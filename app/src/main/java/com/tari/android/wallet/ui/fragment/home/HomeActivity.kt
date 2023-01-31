@@ -79,6 +79,7 @@ import com.tari.android.wallet.ui.fragment.settings.allSettings.AllSettingsRoute
 import com.tari.android.wallet.ui.fragment.settings.allSettings.about.TariAboutFragment
 import com.tari.android.wallet.ui.fragment.settings.backgroundService.BackgroundServiceSettingsFragment
 import com.tari.android.wallet.ui.fragment.settings.backup.BackupSettingsRouter
+import com.tari.android.wallet.ui.fragment.settings.backup.backupOnboarding.BackupOnboardingFlowFragment
 import com.tari.android.wallet.ui.fragment.settings.backup.backupSettings.BackupSettingsFragment
 import com.tari.android.wallet.ui.fragment.settings.backup.changeSecurePassword.ChangeSecurePasswordFragment
 import com.tari.android.wallet.ui.fragment.settings.backup.enterCurrentPassword.EnterCurrentPasswordFragment
@@ -336,6 +337,8 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>(), AllSe
     override fun toBackgroundService() = addFragment(BackgroundServiceSettingsFragment())
 
     override fun toAbout() = addFragment(TariAboutFragment())
+
+    override fun toBackupOnboardingFlow() = addFragment(BackupOnboardingFlowFragment())
 
     override fun toBaseNodeSelection() = addFragment(ChangeBaseNodeFragment())
 

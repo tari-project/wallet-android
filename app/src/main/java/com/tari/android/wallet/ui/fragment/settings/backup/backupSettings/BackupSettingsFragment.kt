@@ -34,9 +34,7 @@ package com.tari.android.wallet.ui.fragment.settings.backup.backupSettings
 
 import android.content.Intent
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import androidx.fragment.app.viewModels
 import com.tari.android.wallet.databinding.FragmentWalletBackupSettingsBinding
 import com.tari.android.wallet.extension.observe
@@ -87,6 +85,7 @@ class BackupSettingsFragment : CommonFragment<FragmentWalletBackupSettingsBindin
         backupWithRecoveryPhraseCtaView.setOnClickListener(ThrottleClick { viewModel.onBackupWithRecoveryPhrase() })
         backupWalletToCloudCtaView.setOnClickListener(ThrottleClick { viewModel.onBackupToCloud() })
         updatePasswordCtaView.setOnClickListener(ThrottleClick { viewModel.onUpdatePassword() })
+        learnMoreCtaView.setOnClickListener(ThrottleClick { viewModel.learnMore() })
     }
 
     private fun subscribeUI() = with(viewModel) {
@@ -107,6 +106,7 @@ class BackupSettingsFragment : CommonFragment<FragmentWalletBackupSettingsBindin
             BackupSettingsNavigation.ToChangePassword -> router.toChangePassword()
             BackupSettingsNavigation.ToConfirmPassword -> router.toConfirmPassword()
             BackupSettingsNavigation.ToWalletBackupWithRecoveryPhrase -> router.toWalletBackupWithRecoveryPhrase()
+            BackupSettingsNavigation.ToLearnMore -> router.toBackupOnboardingFlow()
         }
     }
 

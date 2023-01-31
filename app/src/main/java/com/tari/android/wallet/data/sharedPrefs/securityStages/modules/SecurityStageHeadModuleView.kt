@@ -20,5 +20,7 @@ class SecurityStageHeadModuleView(context: Context, buttonModule: SecurityStageH
     init {
         ui.emojiTitle.text = buttonModule.emojiTitle
         ui.title.text = buttonModule.title
+
+        ui.question.setOnClickListener { buttonModule.onboardingFlowAction() }
     }
 }

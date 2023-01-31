@@ -3,67 +3,15 @@ package com.tari.android.wallet.ui.fragment.settings.allSettings
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.tari.android.wallet.R
-import com.tari.android.wallet.R.drawable.vector_all_settings_about_icon
-import com.tari.android.wallet.R.drawable.vector_all_settings_background_service_icon
-import com.tari.android.wallet.R.drawable.vector_all_settings_backup_options_icon
-import com.tari.android.wallet.R.drawable.vector_all_settings_block_explorer_icon
-import com.tari.android.wallet.R.drawable.vector_all_settings_bridge_configuration_icon
-import com.tari.android.wallet.R.drawable.vector_all_settings_contribute_to_tari_icon
-import com.tari.android.wallet.R.drawable.vector_all_settings_delete_button_icon
-import com.tari.android.wallet.R.drawable.vector_all_settings_disclaimer_icon
-import com.tari.android.wallet.R.drawable.vector_all_settings_privacy_policy_icon
-import com.tari.android.wallet.R.drawable.vector_all_settings_report_bug_icon
-import com.tari.android.wallet.R.drawable.vector_all_settings_select_base_node_icon
-import com.tari.android.wallet.R.drawable.vector_all_settings_select_network_icon
-import com.tari.android.wallet.R.drawable.vector_all_settings_select_theme_icon
-import com.tari.android.wallet.R.drawable.vector_all_settings_user_agreement_icon
-import com.tari.android.wallet.R.drawable.vector_all_settings_visit_tari_icon
-import com.tari.android.wallet.R.drawable.vector_all_settings_yat_icon
-import com.tari.android.wallet.R.drawable.vector_open_in_browser
-import com.tari.android.wallet.R.string.all_settings_advanced_settings_label
-import com.tari.android.wallet.R.string.all_settings_background_service
-import com.tari.android.wallet.R.string.all_settings_bridge_configuration
-import com.tari.android.wallet.R.string.all_settings_connect_yats
-import com.tari.android.wallet.R.string.all_settings_contribute
-import com.tari.android.wallet.R.string.all_settings_delete_wallet
-import com.tari.android.wallet.R.string.all_settings_disclaimer
-import com.tari.android.wallet.R.string.all_settings_explorer
-import com.tari.android.wallet.R.string.all_settings_privacy_policy
-import com.tari.android.wallet.R.string.all_settings_report_a_bug
-import com.tari.android.wallet.R.string.all_settings_secondary_settings_label
-import com.tari.android.wallet.R.string.all_settings_security_label
-import com.tari.android.wallet.R.string.all_settings_select_base_node
-import com.tari.android.wallet.R.string.all_settings_select_network
-import com.tari.android.wallet.R.string.all_settings_select_theme
-import com.tari.android.wallet.R.string.all_settings_user_agreement
-import com.tari.android.wallet.R.string.all_settings_version_text_copy_title
-import com.tari.android.wallet.R.string.all_settings_version_text_copy_toast_message
-import com.tari.android.wallet.R.string.all_settings_visit_site
-import com.tari.android.wallet.R.string.all_settings_yat_settings_label
-import com.tari.android.wallet.R.string.back_up_wallet_backup_status_in_progress
-import com.tari.android.wallet.R.string.back_up_wallet_backup_status_outdated
-import com.tari.android.wallet.R.string.back_up_wallet_backup_status_up_to_date
-import com.tari.android.wallet.R.string.check_backup_storage_status_error_title
-import com.tari.android.wallet.R.string.disclaimer_url
-import com.tari.android.wallet.R.string.explorer_url
-import com.tari.android.wallet.R.string.github_repo_url
-import com.tari.android.wallet.R.string.privacy_policy_url
-import com.tari.android.wallet.R.string.tari_about_title
-import com.tari.android.wallet.R.string.tari_url
-import com.tari.android.wallet.R.string.user_agreement_url
+import com.tari.android.wallet.R.drawable.*
+import com.tari.android.wallet.R.string.*
 import com.tari.android.wallet.event.EventBus
-import com.tari.android.wallet.infrastructure.backup.BackupManager
-import com.tari.android.wallet.infrastructure.backup.BackupState
-import com.tari.android.wallet.infrastructure.backup.BackupsState
-import com.tari.android.wallet.ui.common.ClipboardArgs
-import com.tari.android.wallet.ui.common.CommonViewModel
-import com.tari.android.wallet.ui.common.SingleLiveEvent
+import com.tari.android.wallet.infrastructure.backup.*
+import com.tari.android.wallet.ui.common.*
 import com.tari.android.wallet.ui.common.recyclerView.CommonViewHolderItem
 import com.tari.android.wallet.ui.common.recyclerView.items.DividerViewHolderItem
 import com.tari.android.wallet.ui.dialog.error.ErrorDialogArgs
-import com.tari.android.wallet.ui.fragment.settings.allSettings.PresentationBackupState.BackupStateStatus.InProgress
-import com.tari.android.wallet.ui.fragment.settings.allSettings.PresentationBackupState.BackupStateStatus.Success
-import com.tari.android.wallet.ui.fragment.settings.allSettings.PresentationBackupState.BackupStateStatus.Warning
+import com.tari.android.wallet.ui.fragment.settings.allSettings.PresentationBackupState.BackupStateStatus.*
 import com.tari.android.wallet.ui.fragment.settings.allSettings.backupOptions.SettingsBackupOptionViewHolderItem
 import com.tari.android.wallet.ui.fragment.settings.allSettings.button.ButtonStyle
 import com.tari.android.wallet.ui.fragment.settings.allSettings.button.ButtonViewDto
@@ -116,6 +64,7 @@ class AllSettingsViewModel : CommonViewModel() {
         val allOptions = mutableListOf(
             SettingsTitleDto(resourceManager.getString(all_settings_security_label)),
             backupOption,
+            DividerViewHolderItem(),
             SettingsTitleDto(resourceManager.getString(all_settings_secondary_settings_label)),
             ButtonViewDto(resourceManager.getString(tari_about_title), vector_all_settings_about_icon) {
                 _navigation.postValue(AllSettingsNavigation.ToAbout)

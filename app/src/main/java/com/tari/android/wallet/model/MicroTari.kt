@@ -37,9 +37,7 @@ import android.os.Parcelable
 import com.tari.android.wallet.extension.toMicroTari
 import com.tari.android.wallet.ui.extension.readS
 import java.io.Serializable
-import java.math.BigDecimal
-import java.math.BigInteger
-import java.math.RoundingMode
+import java.math.*
 
 /**
  * This wrapper is needed for amount parameters in AIDL methods.
@@ -50,10 +48,9 @@ class MicroTari() : Parcelable, Comparable<MicroTari>, Serializable {
 
     var value = BigInteger("0")
 
-    private val million = BigDecimal(1e6)
     val tariValue: BigDecimal
         // Note: BigDecimal keeps track of both precision and scale, 1e6 != 1_000_000 in this case (scale 6, scale 0)
-        get() = value.toBigDecimal().divide(million, 6, RoundingMode.HALF_UP)
+        get() = value.toBigDecimal().divide(precisionValue, 6, RoundingMode.HALF_UP)
 
     val formattedTariValue: String
         get() = getFormattedValue(tariValue.toString())
@@ -93,6 +90,8 @@ class MicroTari() : Parcelable, Comparable<MicroTari>, Serializable {
     }
 
     companion object CREATOR : Parcelable.Creator<MicroTari> {
+
+        val precisionValue: BigDecimal = BigDecimal.valueOf(1_000_000)
 
         override fun createFromParcel(parcel: Parcel): MicroTari = MicroTari(parcel)
 

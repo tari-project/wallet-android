@@ -1,5 +1,6 @@
 package com.tari.android.wallet.ui.fragment.tx
 
+
 import androidx.lifecycle.*
 import com.tari.android.wallet.R.string.*
 import com.tari.android.wallet.application.securityStage.StagedWalletSecurityManager
