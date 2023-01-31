@@ -45,11 +45,10 @@ import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.ffi.*
 import com.tari.android.wallet.service.seedPhrase.SeedPhraseRepository
 import com.tari.android.wallet.service.service.WalletService
-import com.tari.android.wallet.tor.TorConfig
-import com.tari.android.wallet.tor.TorProxyManager
-import com.tari.android.wallet.tor.TorProxyState
+import com.tari.android.wallet.tor.*
 import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.WalletUtil
+import kotlinx.coroutines.*
 import java.io.File
 
 /**
@@ -73,6 +72,8 @@ class WalletManager(
     private var logFileObserver: LogFileObserver? = null
     private val logger
         get() = Logger.t(WalletManager::class.simpleName)
+
+    val coroutineScope = CoroutineScope(Dispatchers.IO)
 
     init {
         // post initial wallet state
@@ -107,28 +108,30 @@ class WalletManager(
     @SuppressLint("CheckResult")
     private fun onTorProxyStateChanged(torProxyState: TorProxyState) {
         logger.i("Tor proxy state has changed: $torProxyState")
-        if (torProxyState is TorProxyState.Running) {
-            if (EventBus.walletState.publishSubject.value == WalletState.NotReady ||
-                EventBus.walletState.publishSubject.value is WalletState.Failed
-            ) {
-                logger.i("Initialize wallet started")
-                EventBus.walletState.post(WalletState.Initializing)
-                Thread {
-                    try {
-                        initWallet()
-                        EventBus.walletState.post(WalletState.Started)
-                        logger.i("Wallet was started")
-                    } catch (e: Exception) {
-                        val oldCode = ((EventBus.walletState.publishSubject.value as? WalletState.Failed)?.exception as? FFIException)?.error?.code
-                        val newCode = (e as? FFIException)?.error?.code
+        if (torProxyState is TorProxyState.Initializing || torProxyState is TorProxyState.Running) {
+            startWallet()
+        }
+    }
 
-                        if (oldCode == null || oldCode != newCode) {
-                            logger.e(e, "Wallet was failed")
-                        }
-                        EventBus.walletState.post(WalletState.Failed(e))
+    private fun startWallet() {
+        if (EventBus.walletState.publishSubject.value == WalletState.NotReady || EventBus.walletState.publishSubject.value is WalletState.Failed) {
+            logger.i("Initialize wallet started")
+            EventBus.walletState.post(WalletState.Initializing)
+            coroutineScope.launch {
+                try {
+                    initWallet()
+                    EventBus.walletState.post(WalletState.Started)
+                    logger.i("Wallet was started")
+                } catch (e: Exception) {
+                    val oldCode = ((EventBus.walletState.publishSubject.value as? WalletState.Failed)?.exception as? FFIException)?.error?.code
+                    val newCode = (e as? FFIException)?.error?.code
+
+                    if (oldCode == null || oldCode != newCode) {
+                        logger.e(e, "Wallet was failed")
                     }
-                }.start()
-            }
+                    EventBus.walletState.post(WalletState.Failed(e))
+                }
+            }.start()
         }
     }
 
