@@ -83,7 +83,6 @@ class AllSettingsFragment : CommonFragment<FragmentAllSettingsBinding, AllSettin
 
         when (navigation) {
             AllSettingsNavigation.ToBugReporting -> DebugActivity.launch(requireContext(), DebugNavigation.BugReport)
-            AllSettingsNavigation.ToBackupOnboardingFlow -> router.toBackupOnboardingFlow()
             AllSettingsNavigation.ToAbout -> router.toAbout()
             AllSettingsNavigation.ToBackgroundService -> router.toBackgroundService()
             AllSettingsNavigation.ToBackupSettings -> router.toBackupSettings()

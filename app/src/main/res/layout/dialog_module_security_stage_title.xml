@@ -39,6 +39,7 @@
     </LinearLayout>
 
     <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/question"
         android:layout_width="22dp"
         android:layout_height="22dp"
         android:layout_gravity="end|top"

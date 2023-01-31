@@ -1,9 +1,7 @@
 package com.tari.android.wallet.ui.fragment.settings.backup.backupSettings
 
 import android.content.Intent
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import com.tari.android.wallet.R
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.infrastructure.backup.*
@@ -77,6 +75,10 @@ class BackupSettingsViewModel : CommonViewModel() {
                 _navigation.postValue(BackupSettingsNavigation.ToConfirmPassword)
             }
         }
+    }
+
+    fun learnMore() {
+        _navigation.postValue(BackupSettingsNavigation.ToLearnMore)
     }
 
     fun onBackupToCloud() = backupManager.backupNow()

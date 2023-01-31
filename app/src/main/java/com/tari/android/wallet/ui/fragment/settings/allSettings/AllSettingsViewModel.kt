@@ -65,9 +65,6 @@ class AllSettingsViewModel : CommonViewModel() {
             SettingsTitleDto(resourceManager.getString(all_settings_security_label)),
             backupOption,
             DividerViewHolderItem(),
-            ButtonViewDto(resourceManager.getString(all_settings_back_up_wallet_settings_safety), vector_all_settings_backup_options_icon) {
-                _navigation.postValue(AllSettingsNavigation.ToBackupOnboardingFlow)
-            },
             SettingsTitleDto(resourceManager.getString(all_settings_secondary_settings_label)),
             ButtonViewDto(resourceManager.getString(tari_about_title), vector_all_settings_about_icon) {
                 _navigation.postValue(AllSettingsNavigation.ToAbout)

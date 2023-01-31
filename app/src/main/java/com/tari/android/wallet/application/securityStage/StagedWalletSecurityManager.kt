@@ -16,10 +16,13 @@ import com.tari.android.wallet.ui.dialog.modular.ModularDialogArgs
 import com.tari.android.wallet.ui.dialog.modular.modules.body.BodyModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonStyle
+import com.tari.android.wallet.ui.dialog.modular.modules.space.SpaceModule
 import com.tari.android.wallet.ui.fragment.home.HomeActivity
+import com.tari.android.wallet.ui.fragment.settings.backup.backupOnboarding.item.BackupOnboardingArgs
+import com.tari.android.wallet.ui.fragment.settings.backup.backupOnboarding.module.BackupOnboardingFlowItemModule
 import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupSettingsRepository
 import yat.android.ui.extension.HtmlHelper
-import java.math.BigInteger
+import java.math.BigDecimal
 import java.util.Calendar
 import javax.inject.Inject
 
@@ -106,59 +109,78 @@ class StagedWalletSecurityManager : CommonViewModel() {
 
     private fun showStage1APopUp() {
         showPopup(
+            BackupOnboardingArgs.StageOne(resourceManager, this::openStage1),
             resourceManager.getString(R.string.staged_wallet_security_stages_1a_title),
             resourceManager.getString(R.string.staged_wallet_security_stages_1a_subtitle),
             null,
             resourceManager.getString(R.string.staged_wallet_security_stages_1a_buttons_positive),
             HtmlHelper.getSpannedText(resourceManager.getString(R.string.staged_wallet_security_stages_1a_message))
-        ) {
-            HomeActivity.instance.get()?.let {
-                it.toAllSettings()
-                it.toBackupSettings(false)
-                it.toWalletBackupWithRecoveryPhrase()
-            }
+        ) { openStage1() }
+    }
+
+    private fun openStage1() {
+        _dismissDialog.postValue(Unit)
+        HomeActivity.instance.get()?.let {
+            it.toAllSettings()
+            it.toBackupSettings(false)
+            it.toWalletBackupWithRecoveryPhrase()
         }
     }
 
     private fun showStage1BPopUp() {
         showPopup(
+            BackupOnboardingArgs.StageTwo(resourceManager, this::openStage1B),
             resourceManager.getString(R.string.staged_wallet_security_stages_1b_title),
             resourceManager.getString(R.string.staged_wallet_security_stages_1b_subtitle),
             resourceManager.getString(R.string.staged_wallet_security_stages_1b_message),
             resourceManager.getString(R.string.staged_wallet_security_stages_1b_buttons_positive),
-        ) {
-            HomeActivity.instance.get()?.let {
-                it.toAllSettings()
-                it.toBackupSettings()
-            }
+        ) { openStage1() }
+    }
+
+    private fun openStage1B() {
+        _dismissDialog.postValue(Unit)
+        HomeActivity.instance.get()?.let {
+            it.toAllSettings()
+            it.toBackupSettings()
         }
     }
 
     private fun showStage2PopUp() {
         showPopup(
+            BackupOnboardingArgs.StageThree(resourceManager, this::openStage2),
             resourceManager.getString(R.string.staged_wallet_security_stages_2_title),
             resourceManager.getString(R.string.staged_wallet_security_stages_2_subtitle),
             resourceManager.getString(R.string.staged_wallet_security_stages_2_message),
             resourceManager.getString(R.string.staged_wallet_security_stages_2_buttons_positive),
-        ) {
-            HomeActivity.instance.get()?.let {
-                it.toAllSettings()
-                it.toBackupSettings(false)
-                it.toChangePassword()
-            }
+        ) { openStage2() }
+    }
+
+    private fun openStage2() {
+        _dismissDialog.postValue(Unit)
+        HomeActivity.instance.get()?.let {
+            it.toAllSettings()
+            it.toBackupSettings(false)
+            it.toChangePassword()
         }
     }
 
     private fun showStage3PopUp() {
         showPopup(
+            BackupOnboardingArgs.StageFour(resourceManager, this::openStage3),
             resourceManager.getString(R.string.staged_wallet_security_stages_3_title),
             resourceManager.getString(R.string.staged_wallet_security_stages_3_subtitle),
             resourceManager.getString(R.string.staged_wallet_security_stages_3_message),
             resourceManager.getString(R.string.staged_wallet_security_stages_3_buttons_positive),
-        )
+        ) { openStage3() }
+    }
+
+    private fun openStage3() {
+        _dismissDialog.postValue(Unit)
+        //todo for future
     }
 
     private fun showPopup(
+        stage: BackupOnboardingArgs,
         titleEmoji: String,
         title: String,
         body: String?,
@@ -168,24 +190,27 @@ class StagedWalletSecurityManager : CommonViewModel() {
     ) {
         val args = ModularDialogArgs(
             DialogArgs(), listOf(
-                SecurityStageHeadModule(titleEmoji, title) {
-                    HomeActivity.instance.get()?.let(HomeActivity::toBackupOnboardingFlow)
-                },
+                SecurityStageHeadModule(titleEmoji, title) { showBackupInfo(stage) },
                 BodyModule(body, bodyHtml?.let { SpannableString(it) }),
-                ButtonModule(positiveButtonTitle, ButtonStyle.Normal) {
-                    _dismissDialog.postValue(Unit)
-                    positiveAction.invoke()
-                },
+                ButtonModule(positiveButtonTitle, ButtonStyle.Normal) { positiveAction.invoke() },
                 ButtonModule(resourceManager.getString(R.string.staged_wallet_security_buttons_remind_me_later), ButtonStyle.Close)
             )
         )
         _modularDialog.postValue(args)
     }
 
+    private fun showBackupInfo(stage: BackupOnboardingArgs) {
+        val args = ModularDialogArgs(DialogArgs(), listOf(
+            BackupOnboardingFlowItemModule(stage),
+            SpaceModule(20)
+        ))
+        _modularDialog.postValue(args)
+    }
+
     companion object {
-        val minimumStageOneBalance = MicroTari(BigInteger.valueOf(10_000))
-        val stageTwoThresholdBalance = MicroTari(BigInteger.valueOf(100_000))
-        val safeHotWalletBalance = MicroTari(BigInteger.valueOf(500_000_000))
-        val maxHotWalletBalance = MicroTari(BigInteger.valueOf(1_000_000_000))
+        val minimumStageOneBalance = MicroTari((BigDecimal.valueOf(10_000) * MicroTari.precisionValue).toBigInteger())
+        val stageTwoThresholdBalance = MicroTari((BigDecimal.valueOf(100_000) * MicroTari.precisionValue).toBigInteger())
+        val safeHotWalletBalance = MicroTari((BigDecimal.valueOf(500_000_000) * MicroTari.precisionValue).toBigInteger())
+        val maxHotWalletBalance = MicroTari((BigDecimal.valueOf(1_000_000_000) * MicroTari.precisionValue).toBigInteger())
     }
 }

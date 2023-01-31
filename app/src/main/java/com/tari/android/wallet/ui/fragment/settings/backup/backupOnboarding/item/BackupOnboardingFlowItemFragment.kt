@@ -5,6 +5,7 @@ import android.view.*
 import com.tari.android.wallet.databinding.FragmentBackupOnboardingFlowItemBinding
 import com.tari.android.wallet.ui.common.CommonFragment
 import com.tari.android.wallet.ui.extension.serializable
+import com.tari.android.wallet.ui.extension.setVisible
 
 class BackupOnboardingFlowItemFragment : CommonFragment<FragmentBackupOnboardingFlowItemBinding, BackupOnboardingFlowItemViewModel>() {
 
@@ -14,8 +15,18 @@ class BackupOnboardingFlowItemFragment : CommonFragment<FragmentBackupOnboarding
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val args = requireArguments().serializable<BackupOnboardingArgs>(argsKey)
-        //todo set values
+        val args = requireArguments().serializable<BackupOnboardingArgs>(argsKey)!!
+
+        with(ui) {
+            imageView.setImageResource(args.image)
+            title.text = args.title
+            description.text = args.description
+            moduleButton.initItem(args.button) { }
+            textBelow.text = args.bottomText
+
+            divider.setVisible(args.bottomText.isNotEmpty())
+            textBelow.setVisible(args.bottomText.isNotEmpty())
+        }
     }
 
     companion object {

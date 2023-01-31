@@ -33,6 +33,8 @@ import com.tari.android.wallet.ui.fragment.send.addAmount.feeModule.FeeModule
 import com.tari.android.wallet.ui.fragment.send.addAmount.feeModule.FeeModuleView
 import com.tari.android.wallet.ui.fragment.send.shareQr.ShareQRCodeModuleView
 import com.tari.android.wallet.ui.fragment.send.shareQr.ShareQrCodeModule
+import com.tari.android.wallet.ui.fragment.settings.backup.backupOnboarding.module.BackupOnboardingFlowItemModule
+import com.tari.android.wallet.ui.fragment.settings.backup.backupOnboarding.module.BackupOnboardingFlowItemModuleView
 import com.tari.android.wallet.ui.fragment.settings.logs.logs.module.LogLevelCheckedModule
 import com.tari.android.wallet.ui.fragment.settings.logs.logs.module.LogSourceCheckedModule
 import com.tari.android.wallet.ui.fragment.utxos.list.module.*
@@ -41,6 +43,8 @@ import com.tari.android.wallet.ui.fragment.utxos.list.module.*
 open class ModularDialog(val context: Context) : TariDialog {
 
     lateinit var args: ModularDialogArgs
+
+    private val onDismissListeners = mutableListOf<() -> Unit>()
 
     constructor(context: Context, args: ModularDialogArgs) : this(context) {
         applyArgs(args)
@@ -60,7 +64,10 @@ open class ModularDialog(val context: Context) : TariDialog {
         with(dialog) {
             setCancelable(args.dialogArgs.cancelable)
             setCanceledOnTouchOutside(args.dialogArgs.canceledOnTouchOutside)
-            setOnDismissListener { args.dialogArgs.onDismiss() }
+            setOnDismissListener {
+                onDismissListeners.forEach { runCatching { it() } }
+                args.dialogArgs.onDismiss()
+            }
         }
         updateModules(args.modules)
     }
@@ -91,6 +98,7 @@ open class ModularDialog(val context: Context) : TariDialog {
                 is UtxoSplitModule -> UtxoSplitModuleView(context, module)
                 is ConnectionStatusesModule -> ConnectionStatusesModuleView(context, module)
                 is SecurityStageHeadModule -> SecurityStageHeadModuleView(context, module)
+                is BackupOnboardingFlowItemModule -> BackupOnboardingFlowItemModuleView(context, module)
                 else -> View(context)
             }
             root.addView(view)
@@ -102,4 +110,8 @@ open class ModularDialog(val context: Context) : TariDialog {
     override fun dismiss() = dialog.dismiss()
 
     override fun isShowing(): Boolean = dialog.isShowing
+
+    override fun addDismissListener(onDismiss: () -> Unit) {
+        onDismissListeners.add(onDismiss)
+    }
 }

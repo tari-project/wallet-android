@@ -392,7 +392,7 @@
     <string name="all_settings_advanced_settings_label">Advanced</string>
     <string name="all_settings_yat_settings_label">Yat</string>
     <string name="all_settings_back_up_wallet_settings_entry">Wallet Backups</string>
-    <string name="all_settings_back_up_wallet_settings_safety">Why I need safety?</string>
+    <string name="all_settings_back_up_wallet_settings_safety">Learn More</string>
     <string name="all_settings_secondary_settings_label">More</string>
     <string name="all_settings_report_a_bug">Report a Bug</string>
     <string name="all_settings_delete_wallet">Delete Your Wallet</string>
@@ -675,5 +675,29 @@
     <string name="staged_wallet_security_stages_3_message">Your mobile wallet holds way more funds than would normally be considered safe to walk around with in your pocket.\n\nYou should really consider sweeping most of your balance into a cold- or hardware wallet.</string>
     <string name="staged_wallet_security_stages_3_buttons_positive">Set Up My Cold Wallet Address</string>
     <string name="staged_wallet_security_buttons_remind_me_later">Remind me later</string>
+
+
+    <!-- Staged wallet security - onboarding -->
+    <string name="onboarding_staged_wallet_security_page1_title_part1">Write down your</string>
+    <string name="onboarding_staged_wallet_security_page1_title_part2_bold">seed words</string>
+    <string name="onboarding_staged_wallet_security_page1_message_full"><![CDATA[Your seed phrase lets you recover your wallet directly from the blockchain if you ever lose access to it. If you only ever do one thing to back up your wallet, complete this step.\n Write down the <strong>seed phrase</strong> on a piece of paper and store it somewhere safe. Anyone who knows the seed phrase has full access to your wallet. Don\'t store seed phrases online]]></string>
+    <string name="onboarding_staged_wallet_security_page1_action_button">View My Seed Words</string>
+    <string name="onboarding_staged_wallet_security_page2_title_part1">Backup to the</string>
+    <string name="onboarding_staged_wallet_security_page2_title_part2_bold">cloud"</string>
+    <string name="onboarding_staged_wallet_security_page2_message_full"><![CDATA[You may <strong>backup</strong> your wallet to a <strong>cloud provider</strong> of your choice, with a simple password-less approach. Your funds are safe as long as your cloud account is secure]]></string>
+    <string name="onboarding_staged_wallet_security_page2_action_button">Go To Cloud Backups</string>
+    <string name="onboarding_staged_wallet_security_page3_title_part1">Create a</string>
+    <string name="onboarding_staged_wallet_security_page3_title_part2_bold">password</string>
+    <string name="onboarding_staged_wallet_security_page3_message_full"><![CDATA[We recommend upgrading the security of your increasingly bulging wallet with a <strong>strong password</strong>. Keep this password safe. You can\'t restore your wallet without it. (You can always recover your wallet from your seed phrase)]]></string>
+    <string name="onboarding_staged_wallet_security_page3_action_button">Set My Password</string>
+    <string name="onboarding_staged_wallet_security_page4_title_part1">Backup and recovery options</string>
+    <string name="onboarding_staged_wallet_security_page4_title_part2_bold">help keep your coins safe</string>
+    <string name="onboarding_staged_wallet_security_page4_message_full">Try to keep your seed words and backups in a safe place. We also strongly recommend keeping a few copies of your seed words in different places and changing the backup password regularly</string>
+    <string name="onboarding_staged_wallet_security_page4_action_button">Let’s Do This!</string>
+    <string name="onboarding_staged_wallet_security_footer_part1">Aurora helps you secure your funds</string>
+    <string name="onboarding_staged_wallet_security_footer_part2_highlighted">when you need it</string>
+    <string name="onboarding_staged_wallet_security_footer_part3_any_funds">. This step is triggered when you receive funds for the first time, but you can apply any step at any time from the settings</string>
+    <string name="onboarding_staged_wallet_security_footer_part3_threshold">. This step is triggered when your balance exceeds %s for the first time, but you can apply any step at any time from the settings</string>
+
 
 </resources>

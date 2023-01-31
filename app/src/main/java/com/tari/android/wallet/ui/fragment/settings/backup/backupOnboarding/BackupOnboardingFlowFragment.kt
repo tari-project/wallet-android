@@ -1,7 +1,6 @@
 package com.tari.android.wallet.ui.fragment.settings.backup.backupOnboarding
 
 import android.os.Bundle
-import android.text.SpannableString
 import android.view.*
 import androidx.fragment.app.*
 import androidx.viewpager2.adapter.FragmentStateAdapter
@@ -9,7 +8,9 @@ import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.tabs.TabLayoutMediator
 import com.tari.android.wallet.databinding.FragmentBackupOnboardingFlowBinding
 import com.tari.android.wallet.ui.common.CommonFragment
+import com.tari.android.wallet.ui.common.domain.PaletteManager
 import com.tari.android.wallet.ui.extension.setVisible
+import com.tari.android.wallet.ui.fragment.home.HomeActivity
 import com.tari.android.wallet.ui.fragment.settings.backup.backupOnboarding.item.BackupOnboardingArgs
 import com.tari.android.wallet.ui.fragment.settings.backup.backupOnboarding.item.BackupOnboardingFlowItemFragment
 
@@ -47,11 +48,37 @@ class BackupOnboardingFlowFragment : CommonFragment<FragmentBackupOnboardingFlow
     private inner class BackupOnboardingFlowAdapter(fm: FragmentActivity) : FragmentStateAdapter(fm) {
 
         private val args = arrayListOf(
-            BackupOnboardingArgs(0, SpannableString(""), listOf()),
-            BackupOnboardingArgs(0, SpannableString(""), listOf()),
-            BackupOnboardingArgs(0, SpannableString(""), listOf()),
-            BackupOnboardingArgs(0, SpannableString(""), listOf()),
+            BackupOnboardingArgs.StageOne(viewModel.resourceManager) { openStage1() },
+            BackupOnboardingArgs.StageTwo(viewModel.resourceManager) { openStage1B() },
+            BackupOnboardingArgs.StageThree(viewModel.resourceManager) { openStage2() },
+            BackupOnboardingArgs.StageFour(viewModel.resourceManager) { openStage3() },
         )
+
+        private fun openStage1() {
+            HomeActivity.instance.get()?.let {
+                it.onBackPressed()
+                it.toWalletBackupWithRecoveryPhrase()
+            }
+        }
+
+        private fun openStage1B() {
+            HomeActivity.instance.get()?.let {
+                it.onBackPressed()
+            }
+        }
+
+        private fun openStage2() {
+            HomeActivity.instance.get()?.let {
+                it.onBackPressed()
+                it.toChangePassword()
+            }
+        }
+
+        private fun openStage3() {
+            HomeActivity.instance.get()?.let {
+                it.onBackPressed()
+            }
+        }
 
         override fun getItemCount(): Int = 4
 
