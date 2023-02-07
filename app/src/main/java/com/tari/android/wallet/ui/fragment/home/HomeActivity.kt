@@ -412,16 +412,30 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>(), AllSe
         }
     }
 
-    override fun onSendTxFailure(transactionData: TransactionData, txFailureReason: TxFailureReason) {
+    override fun onSendTxFailure(isYat: Boolean, transactionData: TransactionData, txFailureReason: TxFailureReason) {
         EventBus.post(Event.Transaction.TxSendFailed(txFailureReason))
-        finish()
-        overridePendingTransition(R.anim.fade_in, R.anim.fade_out)
+        if (isYat) {
+            finish()
+            overridePendingTransition(R.anim.fade_in, R.anim.fade_out)
+        } else {
+            supportFragmentManager.popBackStackImmediate()
+            supportFragmentManager.popBackStackImmediate()
+            supportFragmentManager.popBackStackImmediate()
+            supportFragmentManager.popBackStackImmediate()
+        }
     }
 
-    override fun onSendTxSuccessful(txId: TxId, transactionData: TransactionData) {
+    override fun onSendTxSuccessful(isYat: Boolean, txId: TxId, transactionData: TransactionData) {
         EventBus.post(Event.Transaction.TxSendSuccessful(txId))
-        finish()
-        overridePendingTransition(R.anim.fade_in, R.anim.fade_out)
+        if (isYat) {
+            finish()
+            overridePendingTransition(R.anim.fade_in, R.anim.fade_out)
+        } else {
+            supportFragmentManager.popBackStackImmediate()
+            supportFragmentManager.popBackStackImmediate()
+            supportFragmentManager.popBackStackImmediate()
+            supportFragmentManager.popBackStackImmediate()
+        }
     }
 
     override fun onPasswordChanged() {

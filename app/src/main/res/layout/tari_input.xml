@@ -12,6 +12,7 @@
         android:hint="@string/dummy_text"
         android:imeOptions="actionNext"
         android:paddingHorizontal="6dp"
+        android:enabled="true"
         android:paddingVertical="12dp"
         android:textColor="?attr/palette_text_heading"
         android:textColorHint="?attr/palette_text_light"

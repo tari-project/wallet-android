@@ -3,8 +3,7 @@ package com.tari.android.wallet.ui.fragment.restore.chooseRestoreOption
 import android.content.Intent
 import androidx.lifecycle.*
 import com.tari.android.wallet.R
-import com.tari.android.wallet.application.WalletManager
-import com.tari.android.wallet.application.WalletState
+import com.tari.android.wallet.application.*
 import com.tari.android.wallet.data.WalletConfig
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.extension.addTo
@@ -50,6 +49,8 @@ class ChooseRestoreOptionViewModel : CommonViewModel() {
 
     val options = MutableLiveData<List<BackupOptionDto>>()
 
+    val migrationManager = MigrationManager()
+
     init {
         component.inject(this)
 
@@ -57,11 +58,9 @@ class ChooseRestoreOptionViewModel : CommonViewModel() {
 
         EventBus.walletState.publishSubject.filter { it is WalletState.Running }.subscribe {
             if (WalletUtil.walletExists(walletConfig) && state.value != null) {
-                val dto = backupSettingsRepository.getOptionDto(state.value!!.backupOptions)!!.copy(isEnable = true)
-                backupSettingsRepository.updateOption(dto)
-                backupManager.backupNow()
-
                 backupSettingsRepository.restoredTxs?.let {
+                    if (it.utxos.isEmpty()) return@let
+
                     val sourceAddress = FFITariWalletAddress(HexString(it.source))
                     val tariWalletAddress = TariWalletAddress(it.source, sourceAddress.getEmojiId())
                     val message = resourceManager.getString(R.string.backup_restored_tx)
@@ -69,6 +68,11 @@ class ChooseRestoreOptionViewModel : CommonViewModel() {
                     walletService.restoreWithUnbindedOutputs(it.utxos, tariWalletAddress, message, error)
                     throwIf(error)
                 }
+                migrationManager.updateWalletVersion()
+
+                val dto = backupSettingsRepository.getOptionDto(state.value!!.backupOptions)!!.copy(isEnable = true)
+                backupSettingsRepository.updateOption(dto)
+                backupManager.backupNow()
 
                 _navigation.postValue(ChooseRestoreOptionNavigation.OnRestoreCompleted)
             }
