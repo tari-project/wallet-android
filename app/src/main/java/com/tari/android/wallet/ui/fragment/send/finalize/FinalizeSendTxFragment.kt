@@ -141,7 +141,8 @@ class FinalizeSendTxFragment : CommonFragment<FragmentFinalizeSendTxBinding, Fin
         translationY = height.toFloat()
         alpha = 1f
         visible()
-        ObjectAnimator.ofFloat(this, "translationY", height.toFloat(), 0f).apply {
+
+        ObjectAnimator.ofFloat(this, View.TRANSLATION_Y, height.toFloat(), 0f).apply {
             duration = Constants.UI.mediumDurationMs
             interpolator = EasingInterpolator(Ease.QUART_IN_OUT)
             startDelay = Constants.UI.FinalizeSendTx.textAppearAnimStartDelayMs + additionalDelay
