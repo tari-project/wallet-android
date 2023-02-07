@@ -14,7 +14,6 @@
     <string name="explorer_url">https://explore-esme.tari.com/</string>
     <string name="explorer_kernel_url">https://explore-esme.tari.com/kernel/</string>
     <string name="tor_bridges_url">https://bridges.torproject.org/bridges</string>
-    <string name="ffi_admin_email_address" translatable="false">bug_reports@tari.com</string>
     <string name="tari_lab_university_url" translatable="false">https://tlu.tarilabs.com/</string>
 
     <!-- digits -->
