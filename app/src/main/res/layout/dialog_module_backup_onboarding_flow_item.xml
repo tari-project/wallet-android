@@ -24,7 +24,7 @@
             android:layout_width="wrap_content"
             android:layout_height="15dp"
             android:layout_gravity="center"
-            android:src="@drawable/vector_close_onboarding_flow" />
+            android:src="@drawable/vector_close_opposite" />
 
     </FrameLayout>
 

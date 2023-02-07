@@ -54,7 +54,7 @@ open class ModularDialog(val context: Context) : TariDialog {
         setContentView(R.layout.dialog_base)
         window?.let {
             it.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-            it.setLayout(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT)
+            it.setLayout(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT)
             it.setGravity(Gravity.BOTTOM)
         }
     }
@@ -67,6 +67,11 @@ open class ModularDialog(val context: Context) : TariDialog {
             setOnDismissListener {
                 onDismissListeners.forEach { runCatching { it() } }
                 args.dialogArgs.onDismiss()
+            }
+            if (args.dialogArgs.canceledOnTouchOutside) {
+                findViewById<View>(R.id.back).setOnClickListener {
+                    dismiss()
+                }
             }
         }
         updateModules(args.modules)

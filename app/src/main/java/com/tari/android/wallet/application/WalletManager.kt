@@ -108,7 +108,9 @@ class WalletManager(
     @SuppressLint("CheckResult")
     private fun onTorProxyStateChanged(torProxyState: TorProxyState) {
         logger.i("Tor proxy state has changed: $torProxyState")
-        if (torProxyState is TorProxyState.Initializing || torProxyState is TorProxyState.Running) {
+        // if I'm trying to use Initializing status, then wallet would fail with
+        // java.io.FileNotFoundException: /data/user/0/com.tari.android.wallet/app_tor_data/control_auth_cookie
+        if (torProxyState is TorProxyState.Running) {
             startWallet()
         }
     }

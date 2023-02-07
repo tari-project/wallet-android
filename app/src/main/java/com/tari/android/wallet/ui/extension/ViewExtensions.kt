@@ -39,18 +39,11 @@ import android.content.res.TypedArray
 import android.graphics.drawable.Drawable
 import android.util.AttributeSet
 import android.util.TypedValue
-import android.view.View
-import android.view.ViewGroup
-import android.view.ViewTreeObserver
+import android.view.*
 import android.view.animation.AccelerateInterpolator
 import android.view.animation.DecelerateInterpolator
-import android.widget.ProgressBar
-import android.widget.ScrollView
-import android.widget.TextView
-import androidx.annotation.ColorRes
-import androidx.annotation.DimenRes
-import androidx.annotation.DrawableRes
-import androidx.annotation.StringRes
+import android.widget.*
+import androidx.annotation.*
 import androidx.appcompat.widget.AppCompatEditText
 import androidx.core.animation.addListener
 import androidx.core.graphics.BlendModeColorFilterCompat
@@ -60,14 +53,13 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.airbnb.lottie.LottieAnimationView
 import com.tari.android.wallet.R
-import com.tari.android.wallet.ui.dialog.modular.DialogArgs
-import com.tari.android.wallet.ui.dialog.modular.ModularDialog
-import com.tari.android.wallet.ui.dialog.modular.ModularDialogArgs
+import com.tari.android.wallet.ui.dialog.modular.*
 import com.tari.android.wallet.ui.dialog.modular.modules.body.BodyModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonStyle
 import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
 import com.tari.android.wallet.util.Constants
+import timber.log.Timber
 import java.lang.ref.WeakReference
 import android.animation.Animator as LegacyAnimator
 import android.animation.Animator.AnimatorListener as LegacyAnimatorListener
@@ -356,6 +348,8 @@ fun View.obtain(attrs: AttributeSet, styleable: IntArray): TypedArray = context.
 fun TypedArray.runRecycle(action: TypedArray.() -> Unit) {
     try {
         action.invoke(this)
+    } catch (e: Throwable) {
+        Timber.e(e)
     } finally {
         recycle()
     }

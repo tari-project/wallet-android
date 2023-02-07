@@ -33,16 +33,16 @@
 package com.tari.android.wallet.ui.component.tari
 
 import android.content.Context
+import android.text.InputType
 import android.util.AttributeSet
 import android.view.LayoutInflater
+import android.view.inputmethod.EditorInfo
 import android.widget.FrameLayout
 import androidx.core.widget.addTextChangedListener
 import com.tari.android.wallet.R
 import com.tari.android.wallet.databinding.TariInputBinding
 import com.tari.android.wallet.ui.common.domain.PaletteManager
-import com.tari.android.wallet.ui.extension.obtain
-import com.tari.android.wallet.ui.extension.runRecycle
-import com.tari.android.wallet.ui.extension.setVisible
+import com.tari.android.wallet.ui.extension.*
 
 class TariInput(context: Context, attrs: AttributeSet) : FrameLayout(context, attrs) {
 
@@ -62,8 +62,8 @@ class TariInput(context: Context, attrs: AttributeSet) : FrameLayout(context, at
             getString(R.styleable.TariInput_hintText)?.let { ui.editText.hint = it }
             setErrorText(getString(R.styleable.TariInput_errorText))
             if (getBoolean(R.styleable.TariInput_android_singleLine, true)) ui.editText.setSingleLine()
-            ui.editText.imeOptions = getInt(R.styleable.TariInput_android_imeOptions, 0)
-            ui.editText.inputType = getInt(R.styleable.TariInput_android_inputType, 0)
+            ui.editText.imeOptions = getInt(R.styleable.TariInput_android_imeOptions, EditorInfo.IME_ACTION_NEXT)
+            ui.editText.inputType = getInt(R.styleable.TariInput_android_inputType, InputType.TYPE_CLASS_TEXT)
             ui.editText.isEnabled = getBoolean(R.styleable.TariInput_android_enabled, true)
         }
 

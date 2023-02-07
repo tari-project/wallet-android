@@ -52,6 +52,6 @@
     <color name="palette_dark_background_secondary">#181818</color>
 
     <!--Shadows-->
-    <color name="palette_dark_shadow_box">#571E95</color>
+    <color name="palette_dark_shadow_box">#FFFFFF</color>
 
 </resources>
