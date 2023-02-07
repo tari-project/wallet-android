@@ -1,11 +1,11 @@
 import org.gradle.api.tasks.testing.logging.TestLogEvent
 
 buildscript {
-    ext.kotlin_version = "1.7.20"
+    ext.kotlin_version = '1.8.10'
 
     // build & version
     ext.buildNumber = 228
-    ext.versionNumber = "0.18.1"
+    ext.versionNumber = "0.19.0"
 
     // JNI libs
     ext.libwalletVersion = "0.44.0"
