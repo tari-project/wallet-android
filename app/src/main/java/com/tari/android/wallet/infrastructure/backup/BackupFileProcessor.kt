@@ -93,11 +93,9 @@ class BackupFileProcessor(
             passphraseFile.bufferedWriter().use { it.append(passphrase) }
 
             val encryptionAlgorithm = SymmetricEncryptionAlgorithm.aes()
-            val encryptedDatabaseFilePath = File(walletConfig.getWalletTempDirPath(), walletConfig.walletDBFullFileName).absolutePath
-            val encryptedDatabaseFile = databaseFile.encrypt(encryptionAlgorithm, passphrase.toCharArray(), encryptedDatabaseFilePath)
 
             val compressionMethod = CompressionMethod.zip()
-            var filesToBackup = compressionMethod.compress(outputFile.absolutePath, listOf(encryptedDatabaseFile, passphraseFile))
+            var filesToBackup = compressionMethod.compress(outputFile.absolutePath, listOf(databaseFile, passphraseFile))
             // encrypt the file if password is set
             val copiedFile = filesToBackup.copyTo(File(filesToBackup.absolutePath + "_temp"))
             val outputFilePath = File(walletConfig.getWalletTempDirPath(), backupFileName).absolutePath
@@ -120,8 +118,6 @@ class BackupFileProcessor(
             val jsonObject = Gson().fromJson(json, BackupUtxos::class.java)
             backupSettingsRepository.restoredTxs = jsonObject
         } else {
-            val databaseFile = File(walletConfig.getWalletFilesDirPath(), walletConfig.walletDBFullFileName)
-
             val walletFilesDir = File(walletConfig.getWalletFilesDirPath())
             val compressionMethod = CompressionMethod.zip()
 
@@ -137,19 +133,9 @@ class BackupFileProcessor(
             val passphraseFile = File(walletConfig.getWalletFilesDirPath(), namingPolicy.getPassphraseFileName())
             val passphrase = passphraseFile.readText()
 
-            val databaseTempFileName = "temp_database" + System.currentTimeMillis()
-            val databaseTempFile = File(walletConfig.getWalletTempDirPath(), databaseTempFileName)
-            databaseTempFile.createNewFile()
-
-            SymmetricEncryptionAlgorithm.aes().decrypt(passphrase.toCharArray(), { databaseFile.inputStream() }, { databaseTempFile.outputStream() })
-            databaseFile.delete()
-
-            databaseTempFile.copyTo(File(databaseFile.absolutePath))
-
             sharedPrefsRepository.databasePassphrase = passphrase
 
             unencryptedCompressedFile.delete()
-            databaseTempFile.delete()
 
             if (!File(walletConfig.walletDatabaseFilePath).exists()) {
                 // delete uncompressed files
