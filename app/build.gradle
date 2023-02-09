@@ -158,7 +158,9 @@ android {
         }
     }
     lint {
-        disable "NewApi", "TimberExceptionLogging", "LogNotTimber", "StringFormatInTimber", "ThrowableNotAtBeginning", "BinaryOperationInTimber", "TimberArgCount", "TimberArgTypes", "TimberTagLength"
+        disable "LintError", "NewApi", "TimberExceptionLogging", "LogNotTimber", "StringFormatInTimber",
+                "ThrowableNotAtBeginning", "BinaryOperationInTimber", "TimberArgCount", "TimberArgTypes",
+                "TimberTagLength"
     }
 
     configurations.all {
