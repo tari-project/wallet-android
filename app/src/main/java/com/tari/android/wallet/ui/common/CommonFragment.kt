@@ -46,6 +46,10 @@ abstract class CommonFragment<Binding : ViewBinding, VM : CommonViewModel> : Fra
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        //to eliminate click throuhg fragments
+        view.isClickable = true
+        view.isFocusable = true
+
         clipboardManager = DiContainer.appComponent.getClipboardManager()
     }
 
