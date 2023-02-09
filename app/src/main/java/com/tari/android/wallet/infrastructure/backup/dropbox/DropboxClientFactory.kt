@@ -19,6 +19,10 @@ object DropboxClientFactory {
         }
     }
 
+    fun signOut() {
+        sDbxClient = null
+    }
+
     val client: DbxClientV2
         get() {
             checkNotNull(sDbxClient) { "Client not initialized." }
