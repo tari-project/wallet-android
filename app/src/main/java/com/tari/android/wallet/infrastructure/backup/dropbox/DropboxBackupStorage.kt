@@ -189,6 +189,7 @@ class DropboxBackupStorage(
 
     override suspend fun signOut() {
         backupSettingsRepository.dropboxCredential = null
+        DropboxClientFactory.signOut()
     }
 
     private companion object {
