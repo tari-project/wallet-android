@@ -59,7 +59,7 @@ class ChooseRestoreOptionViewModel : CommonViewModel() {
         EventBus.walletState.publishSubject.filter { it is WalletState.Running }.subscribe {
             if (WalletUtil.walletExists(walletConfig) && state.value != null) {
                 backupSettingsRepository.restoredTxs?.let {
-                    if (it.utxos.isEmpty()) return@let
+                    if (it.utxos.orEmpty().isEmpty()) return@let
 
                     val sourceAddress = FFITariWalletAddress(HexString(it.source))
                     val tariWalletAddress = TariWalletAddress(it.source, sourceAddress.getEmojiId())
