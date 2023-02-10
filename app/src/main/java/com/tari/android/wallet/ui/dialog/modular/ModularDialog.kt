@@ -1,5 +1,6 @@
 package com.tari.android.wallet.ui.dialog.modular
 
+import android.animation.ValueAnimator
 import android.app.Dialog
 import android.content.Context
 import android.graphics.Color
@@ -8,6 +9,7 @@ import android.view.Gravity
 import android.view.View
 import android.widget.LinearLayout
 import androidx.appcompat.widget.LinearLayoutCompat
+import androidx.core.animation.doOnEnd
 import com.tari.android.wallet.R
 import com.tari.android.wallet.data.sharedPrefs.securityStages.modules.SecurityStageHeadModule
 import com.tari.android.wallet.data.sharedPrefs.securityStages.modules.SecurityStageHeadModuleView
@@ -22,7 +24,12 @@ import com.tari.android.wallet.ui.dialog.modular.modules.checked.CheckedModule
 import com.tari.android.wallet.ui.dialog.modular.modules.checked.CheckedModuleView
 import com.tari.android.wallet.ui.dialog.modular.modules.customBaseNodeBody.CustomBaseNodeBodyModule
 import com.tari.android.wallet.ui.dialog.modular.modules.customBaseNodeBody.CustomBaseNodeBodyModuleView
-import com.tari.android.wallet.ui.dialog.modular.modules.head.*
+import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadBoldSpannableModule
+import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadBoldSpannableModuleView
+import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
+import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModuleView
+import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadSpannableModule
+import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadSpannableModuleView
 import com.tari.android.wallet.ui.dialog.modular.modules.imageModule.ImageModule
 import com.tari.android.wallet.ui.dialog.modular.modules.imageModule.ImageModuleView
 import com.tari.android.wallet.ui.dialog.modular.modules.option.OptionModule
@@ -37,7 +44,14 @@ import com.tari.android.wallet.ui.fragment.settings.backup.backupOnboarding.modu
 import com.tari.android.wallet.ui.fragment.settings.backup.backupOnboarding.module.BackupOnboardingFlowItemModuleView
 import com.tari.android.wallet.ui.fragment.settings.logs.logs.module.LogLevelCheckedModule
 import com.tari.android.wallet.ui.fragment.settings.logs.logs.module.LogSourceCheckedModule
-import com.tari.android.wallet.ui.fragment.utxos.list.module.*
+import com.tari.android.wallet.ui.fragment.utxos.list.module.DetailItemModule
+import com.tari.android.wallet.ui.fragment.utxos.list.module.DetailItemModuleView
+import com.tari.android.wallet.ui.fragment.utxos.list.module.ListItemModule
+import com.tari.android.wallet.ui.fragment.utxos.list.module.ListItemModuleView
+import com.tari.android.wallet.ui.fragment.utxos.list.module.UtxoAmountModule
+import com.tari.android.wallet.ui.fragment.utxos.list.module.UtxoAmountModuleView
+import com.tari.android.wallet.ui.fragment.utxos.list.module.UtxoSplitModule
+import com.tari.android.wallet.ui.fragment.utxos.list.module.UtxoSplitModuleView
 
 
 open class ModularDialog(val context: Context) : TariDialog {
@@ -70,7 +84,7 @@ open class ModularDialog(val context: Context) : TariDialog {
             }
             if (args.dialogArgs.canceledOnTouchOutside) {
                 findViewById<View>(R.id.back).setOnClickListener {
-                    dismiss()
+                    this@ModularDialog.dismiss()
                 }
             }
         }
@@ -110,13 +124,41 @@ open class ModularDialog(val context: Context) : TariDialog {
         }
     }
 
-    override fun show() = dialog.show()
+    override fun show() {
+        dialog.show()
+        showAnimation(true)
+    }
 
-    override fun dismiss() = dialog.dismiss()
+    override fun dismiss() {
+        showAnimation(false, {
+            dialog.dismiss()
+        })
+    }
 
     override fun isShowing(): Boolean = dialog.isShowing
 
     override fun addDismissListener(onDismiss: () -> Unit) {
         onDismissListeners.add(onDismiss)
+    }
+
+    private fun showAnimation(forward: Boolean, endAction: () -> Unit = {}) {
+        val back = dialog.findViewById<View>(R.id.back)
+        val content = dialog.findViewById<View>(R.id.root)
+
+        val backAlpha = 0.13F
+        val start = if (forward) 0.0F else 1.0F
+        val end = if (forward) 1.0F else 0.0F
+        ValueAnimator.ofFloat(start, end).apply {
+            duration = 400
+            addUpdateListener {
+                val value = it.animatedValue as Float
+                back.alpha = value * backAlpha
+
+                val height = content.height
+                content.translationY = (height * (1 - value))
+            }
+            doOnEnd { endAction() }
+            start()
+        }
     }
 }
