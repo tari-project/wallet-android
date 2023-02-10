@@ -8,9 +8,9 @@
     <View
         android:id="@+id/back"
         android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:alpha="0.13"
-        android:background="?attr/palette_shadow_box"
-        android:layout_height="match_parent" />
+        android:background="?attr/palette_shadow_box" />
 
     <com.tari.android.wallet.ui.component.tari.TariPrimaryBackground
         android:id="@+id/root"
@@ -19,6 +19,7 @@
         android:layout_gravity="bottom"
         android:layout_marginHorizontal="14dp"
         android:layout_marginBottom="23dp"
+        android:clickable="true"
         android:orientation="vertical"
         android:paddingTop="20dp"
         android:paddingBottom="13dp"
@@ -28,6 +29,7 @@
             android:id="@+id/dialog_root_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:clickable="true"
             android:orientation="vertical" />
 
     </com.tari.android.wallet.ui.component.tari.TariPrimaryBackground>
