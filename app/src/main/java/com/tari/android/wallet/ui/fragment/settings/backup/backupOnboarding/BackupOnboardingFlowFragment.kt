@@ -1,14 +1,18 @@
 package com.tari.android.wallet.ui.fragment.settings.backup.backupOnboarding
 
+import BackupOnboardingFlowDataSource
 import android.os.Bundle
-import android.view.*
-import androidx.fragment.app.*
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentActivity
+import androidx.fragment.app.viewModels
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.tabs.TabLayoutMediator
 import com.tari.android.wallet.databinding.FragmentBackupOnboardingFlowBinding
 import com.tari.android.wallet.ui.common.CommonFragment
-import com.tari.android.wallet.ui.common.domain.PaletteManager
 import com.tari.android.wallet.ui.extension.setVisible
 import com.tari.android.wallet.ui.fragment.home.HomeActivity
 import com.tari.android.wallet.ui.fragment.settings.backup.backupOnboarding.item.BackupOnboardingArgs
@@ -54,6 +58,10 @@ class BackupOnboardingFlowFragment : CommonFragment<FragmentBackupOnboardingFlow
             BackupOnboardingArgs.StageFour(viewModel.resourceManager) { openStage3() },
         )
 
+        init {
+            BackupOnboardingFlowDataSource.save(args)
+        }
+
         private fun openStage1() {
             HomeActivity.instance.get()?.let {
                 it.onBackPressed()
@@ -82,7 +90,7 @@ class BackupOnboardingFlowFragment : CommonFragment<FragmentBackupOnboardingFlow
 
         override fun getItemCount(): Int = 4
 
-        override fun createFragment(position: Int): Fragment = BackupOnboardingFlowItemFragment.createInstance(args[position])
+        override fun createFragment(position: Int): Fragment = BackupOnboardingFlowItemFragment.createInstance(position)
     }
 }
 
