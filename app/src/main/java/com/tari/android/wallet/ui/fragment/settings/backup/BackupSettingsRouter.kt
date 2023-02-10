@@ -32,9 +32,9 @@
  */
 package com.tari.android.wallet.ui.fragment.settings.backup
 
-import androidx.fragment.app.Fragment
-
 interface BackupSettingsRouter {
+
+    fun toBackupOnboardingFlow()
 
     fun toWalletBackupWithRecoveryPhrase()
 

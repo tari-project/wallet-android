@@ -15,9 +15,7 @@ import com.tari.android.wallet.R
 import com.tari.android.wallet.extension.observe
 import com.tari.android.wallet.ui.component.networkStateIndicator.ConnectionIndicatorViewModel
 import com.tari.android.wallet.ui.component.tari.toast.TariToast
-import com.tari.android.wallet.ui.dialog.modular.DialogArgs
-import com.tari.android.wallet.ui.dialog.modular.ModularDialog
-import com.tari.android.wallet.ui.dialog.modular.ModularDialogArgs
+import com.tari.android.wallet.ui.dialog.modular.*
 import com.tari.android.wallet.ui.dialog.modular.modules.body.BodyModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonStyle
@@ -74,6 +72,7 @@ abstract class CommonActivity<Binding : ViewBinding, VM : CommonViewModel> : App
                     else -> R.style.AppTheme_Light
                 }
             }
+
             TariTheme.Light -> R.style.AppTheme_Light
             TariTheme.Dark -> R.style.AppTheme_Dark
             TariTheme.Purple -> R.style.AppTheme_Purple
@@ -120,11 +119,13 @@ abstract class CommonActivity<Binding : ViewBinding, VM : CommonViewModel> : App
         overridePendingTransition(R.anim.enter_from_left, R.anim.exit_to_right)
     }
 
-    protected fun addFragment(fragment: Fragment, bundle: Bundle? = null, isRoot: Boolean = false) {
+    protected fun addFragment(fragment: Fragment, bundle: Bundle? = null, isRoot: Boolean = false, withAnimation: Boolean = true) {
         bundle?.let { fragment.arguments = it }
         val transaction = supportFragmentManager.beginTransaction()
-            .addEnterLeftAnimation()
-            .add(containerId!!, fragment, fragment::class.java.simpleName)
+        if (withAnimation) {
+            transaction.addEnterLeftAnimation()
+        }
+        transaction.add(containerId!!, fragment, fragment::class.java.simpleName)
         if (!isRoot) {
             transaction.addToBackStack(null)
         }

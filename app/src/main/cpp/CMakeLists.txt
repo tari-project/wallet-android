@@ -82,6 +82,7 @@ add_library(
         jniTariUtxo.cpp
         jniTariCoinPreview.cpp
         jniTariWalletAddress.cpp
+        jniTariUnblindedOutput.cpp
 )
 
 find_library(

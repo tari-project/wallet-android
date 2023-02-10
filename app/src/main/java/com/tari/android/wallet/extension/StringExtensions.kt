@@ -34,14 +34,9 @@ package com.tari.android.wallet.extension
 
 import android.content.Context
 import android.graphics.Typeface
-import android.text.SpannableString
-import android.text.Spanned
-import android.text.style.ForegroundColorSpan
-import android.text.style.RelativeSizeSpan
-import android.text.style.URLSpan
-import com.tari.android.wallet.ui.component.tari.TariFont
-import com.tari.android.wallet.ui.component.tari.TariTypefaceSpan
-import com.tari.android.wallet.ui.component.tari.TariLetterSpacingSpan
+import android.text.*
+import android.text.style.*
+import com.tari.android.wallet.ui.component.tari.*
 
 /**
  * Process the URLs in the given spannable string.
@@ -99,7 +94,7 @@ fun String.applyColorStyle(defaultColor: Int, search: List<String>, styleColor: 
 /**
  * Helper function to apply color style to a spannable string.
  */
-private fun SpannableString.applyColorStyle(search: String, color: Int, applyToOnlyFirstOccurrence: Boolean = false) {
+fun SpannableString.applyColorStyle(search: String, color: Int, applyToOnlyFirstOccurrence: Boolean = false) {
     var index = this.indexOf(search)
     while (index >= 0) {
         setSpan(ForegroundColorSpan(color), index, index + search.length, Spanned.SPAN_INTERMEDIATE)
@@ -113,7 +108,7 @@ private fun SpannableString.applyColorStyle(search: String, color: Int, applyToO
 /**
  * Helper function to apply typeface style to a spannable string.
  */
-private fun SpannableString.applyTypefaceStyle(search: String, typeface: Typeface, applyToOnlyFirstOccurrence: Boolean = false) {
+fun SpannableString.applyTypefaceStyle(search: String, typeface: Typeface, applyToOnlyFirstOccurrence: Boolean = false) {
     var index = this.indexOf(search)
     while (index >= 0) {
         setSpan(TariTypefaceSpan("", typeface), index, index + search.length, Spanned.SPAN_INTERMEDIATE)
@@ -150,4 +145,8 @@ fun SpannableString.applyLetterSpacingStyle(search: String, letterSpacing: Float
         }
         index = this.indexOf(search, index + 1)
     }
+}
+
+fun SpannableString.applyCenterAlignment() {
+    setSpan(AlignmentSpan.Standard(Layout.Alignment.ALIGN_CENTER), 0, length, Spanned.SPAN_INTERMEDIATE)
 }

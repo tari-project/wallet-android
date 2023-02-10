@@ -4,6 +4,9 @@ import com.tari.android.wallet.model.Tx
 import com.tari.android.wallet.model.User
 
 sealed class TxListNavigation {
+
+    object ToSplashScreen : TxListNavigation()
+
     class ToTxDetails(val tx: Tx) : TxListNavigation()
 
     object ToTTLStore : TxListNavigation()

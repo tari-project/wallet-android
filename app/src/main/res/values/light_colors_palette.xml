@@ -14,7 +14,7 @@
     <!--Buttons-->
     <color name="palette_light_button_primary_start">#6239FF</color>
     <color name="palette_light_button_primary_end">#E320BC</color>
-    <color name="palette_light_button_disable">#40388A</color>
+    <color name="palette_light_button_disable">#ECECEC</color>
     <color name="palette_light_button_primary_text">#FFFFFF</color>
     <color name="palette_light_button_disabled_text">#B6B6B6</color>
 
@@ -51,7 +51,7 @@
     <color name="palette_light_background_secondary">#F6F6F6</color>
 
     <!--Shadows-->
-    <color name="palette_light_shadow_box">#E8DEEB</color>
+    <color name="palette_light_shadow_box">#000000</color>
 
 
 </resources>

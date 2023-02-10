@@ -1,47 +1,17 @@
 package com.tari.android.wallet.ui.fragment.tx
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MediatorLiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Transformations
-import androidx.lifecycle.viewModelScope
-import com.tari.android.wallet.R
-import com.tari.android.wallet.R.string.error_no_connection_description
-import com.tari.android.wallet.R.string.error_no_connection_title
-import com.tari.android.wallet.R.string.error_node_unreachable_description
-import com.tari.android.wallet.R.string.error_node_unreachable_title
-import com.tari.android.wallet.R.string.home_back_up_wallet_delay_encrypt_cta
-import com.tari.android.wallet.R.string.home_back_up_wallet_encrypt_cta
-import com.tari.android.wallet.R.string.home_back_up_wallet_encrypt_description
-import com.tari.android.wallet.R.string.home_back_up_wallet_encrypt_title
-import com.tari.android.wallet.R.string.home_back_up_wallet_initial_description
-import com.tari.android.wallet.R.string.home_back_up_wallet_initial_title_highlighted_part
-import com.tari.android.wallet.R.string.home_back_up_wallet_initial_title_regular_part
-import com.tari.android.wallet.R.string.home_back_up_wallet_repeated_description
-import com.tari.android.wallet.R.string.home_back_up_wallet_repeated_title_highlighted_part
-import com.tari.android.wallet.R.string.home_back_up_wallet_repeated_title_regular_part
-import com.tari.android.wallet.R.string.home_pending_transactions_title
+
+import androidx.lifecycle.*
+import com.tari.android.wallet.R.string.*
+import com.tari.android.wallet.application.MigrationManager
+import com.tari.android.wallet.application.securityStage.StagedWalletSecurityManager
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.event.Event
 import com.tari.android.wallet.event.EventBus
-import com.tari.android.wallet.extension.addTo
-import com.tari.android.wallet.extension.debounce
-import com.tari.android.wallet.extension.getWithError
-import com.tari.android.wallet.extension.repopulate
+import com.tari.android.wallet.extension.*
 import com.tari.android.wallet.ffi.FFITxCancellationReason
-import com.tari.android.wallet.model.BalanceInfo
-import com.tari.android.wallet.model.CancelledTx
-import com.tari.android.wallet.model.CompletedTx
-import com.tari.android.wallet.model.Contact
-import com.tari.android.wallet.model.MicroTari
-import com.tari.android.wallet.model.PendingInboundTx
-import com.tari.android.wallet.model.PendingOutboundTx
-import com.tari.android.wallet.model.TariWalletAddress
-import com.tari.android.wallet.model.Tx
-import com.tari.android.wallet.model.TxId
-import com.tari.android.wallet.model.TxStatus
-import com.tari.android.wallet.model.User
-import com.tari.android.wallet.model.WalletError
+import com.tari.android.wallet.model.*
+import com.tari.android.wallet.service.service.WalletServiceLauncher
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.common.SingleLiveEvent
 import com.tari.android.wallet.ui.common.gyphy.presentation.GIFViewModel
@@ -49,6 +19,12 @@ import com.tari.android.wallet.ui.common.gyphy.repository.GIFRepository
 import com.tari.android.wallet.ui.common.recyclerView.CommonViewHolderItem
 import com.tari.android.wallet.ui.common.recyclerView.items.TitleViewHolderItem
 import com.tari.android.wallet.ui.dialog.error.ErrorDialogArgs
+import com.tari.android.wallet.ui.dialog.modular.DialogArgs
+import com.tari.android.wallet.ui.dialog.modular.ModularDialogArgs
+import com.tari.android.wallet.ui.dialog.modular.modules.body.BodyModule
+import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonModule
+import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonStyle
+import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
 import com.tari.android.wallet.ui.fragment.send.finalize.TxFailureReason
 import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupSettingsRepository
 import com.tari.android.wallet.ui.fragment.tx.adapter.TransactionItem
@@ -56,8 +32,6 @@ import com.tari.android.wallet.ui.fragment.tx.ui.progressController.UpdateProgre
 import com.tari.android.wallet.util.Build
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import org.joda.time.DateTime
-import java.math.BigDecimal
 import java.math.BigInteger
 import java.util.concurrent.CopyOnWriteArrayList
 import javax.inject.Inject
@@ -75,6 +49,12 @@ class TxListViewModel : CommonViewModel() {
 
     @Inject
     lateinit var sharedPrefsWrapper: SharedPrefsRepository
+
+    @Inject
+    lateinit var walletServiceLauncher: WalletServiceLauncher
+
+    val stagedWalletSecurityManager = StagedWalletSecurityManager()
+    val migrationManager: MigrationManager = MigrationManager()
 
     lateinit var progressControllerState: UpdateProgressViewController.UpdateProgressState
 
@@ -115,7 +95,9 @@ class TxListViewModel : CommonViewModel() {
     init {
         component.inject(this)
 
-        doOnConnected { onServiceConnected() }
+        migrationManager.validateVersion({ }, { showIncompatibleVersionDialog() })
+
+        doOnConnectedToWallet { doOnConnected { onServiceConnected() } }
     }
 
     val txListIsEmpty: Boolean
@@ -163,10 +145,6 @@ class TxListViewModel : CommonViewModel() {
             updateTxListData()
             refreshBalance(isRestarted)
             updateList()
-
-            if (progressControllerState.numberOfReceivedTxs > 0) {
-                showWalletBackupPromptIfNecessary()
-            }
         }
     }
 
@@ -276,7 +254,7 @@ class TxListViewModel : CommonViewModel() {
         val nonPendingTxs = (cancelledTxs + nonMinedUnconfirmedCompletedTxs).toMutableList()
         nonPendingTxs.sortWith(compareByDescending(Tx::timestamp).thenByDescending { it.id })
         if (nonPendingTxs.isNotEmpty()) {
-            items.add(TitleViewHolderItem(resourceManager.getString(R.string.home_completed_transactions_title), false))
+            items.add(TitleViewHolderItem(resourceManager.getString(home_completed_transactions_title), false))
             items.addAll(nonPendingTxs.mapIndexed { index, tx ->
                 TransactionItem(tx, index + pendingTxs.size, GIFViewModel(gifRepository), confirmationCount)
             })
@@ -319,7 +297,6 @@ class TxListViewModel : CommonViewModel() {
 
         fetchBalanceInfoData()
         _refreshBalanceInfo.postValue(false)
-        showWalletBackupPromptIfNecessary()
         _listUpdateTrigger.postValue(Unit)
     }
 
@@ -452,7 +429,7 @@ class TxListViewModel : CommonViewModel() {
         TxFailureReason.BASE_NODE_CONNECTION_ERROR, TxFailureReason.SEND_ERROR -> displayBaseNodeConnectionErrorDialog()
     }
 
-    fun displayNetworkConnectionErrorDialog() {
+    private fun displayNetworkConnectionErrorDialog() {
         val errorDialogArgs = ErrorDialogArgs(
             resourceManager.getString(error_no_connection_title),
             resourceManager.getString(error_no_connection_description),
@@ -468,71 +445,31 @@ class TxListViewModel : CommonViewModel() {
         _modularDialog.postValue(errorDialogArgs.getModular(resourceManager))
     }
 
-    private fun showWalletBackupPromptIfNecessary() {
-        if (!backupSettingsRepository.isShowHintDialog()) return
-
-        val isAnyBackupEnabled = backupSettingsRepository.getOptionList.any { it.isEnable }
-        if (!isAnyBackupEnabled || backupSettingsRepository.backupPassword == null) {
-            backupSettingsRepository.lastBackupDialogShown = DateTime.now()
-            val inboundTransactionsCount = pendingInboundTxs.size + completedTxs.asSequence().filter { it.direction == Tx.Direction.INBOUND }.count()
-            val tarisAmount = balanceInfo.value!!.availableBalance.tariValue + balanceInfo.value!!.pendingIncomingBalance.tariValue
-            when {
-                inboundTransactionsCount >= 5
-                        && tarisAmount >= BigDecimal("25000")
-                        && isAnyBackupEnabled
-                        && backupSettingsRepository.backupPassword == null -> showSecureYourBackupsDialog()
-
-                inboundTransactionsCount >= 4
-                        && tarisAmount >= BigDecimal("8000")
-                        && !isAnyBackupEnabled -> showRepeatedBackUpPrompt()
-                // Non-faucet transactions only here. Calculation is performed here to avoid
-                // unnecessary calculations as previous two cases have much greater chance to happen
-                pendingInboundTxs.size + completedTxs
-                    .filter { it.direction == Tx.Direction.INBOUND }
-                    .filterNot { it.status == TxStatus.IMPORTED }
-                    .count() >= 1
-                        && !isAnyBackupEnabled -> showInitialBackupPrompt()
-            }
-        }
+    fun showIncompatibleVersionDialog() {
+        val args = ModularDialogArgs(
+            DialogArgs(), listOf(
+                HeadModule(resourceManager.getString(ffi_validation_error_title)),
+                BodyModule(resourceManager.getString(ffi_validation_error_message)),
+                ButtonModule(resourceManager.getString(ffi_validation_error_delete), ButtonStyle.Warning) {
+                    _dismissDialog.postValue(Unit)
+                    deleteWallet()
+                },
+                ButtonModule(resourceManager.getString(ffi_validation_error_cancel), ButtonStyle.Close) {
+                    _dismissDialog.postValue(Unit)
+                }
+            ))
+        _modularDialog.postValue(args)
     }
 
-    private fun showInitialBackupPrompt() {
-        val args = BackupWalletArgs(
-            resourceManager.getString(home_back_up_wallet_initial_title_regular_part),
-            resourceManager.getString(home_back_up_wallet_initial_title_highlighted_part),
-            resourceManager.getString(home_back_up_wallet_initial_description),
-        ) {
-            _navigation.postValue(TxListNavigation.ToTTLStore)
+    private fun deleteWallet() {
+        // disable CTAs
+        viewModelScope.launch(Dispatchers.IO) {
+            walletServiceLauncher.stopAndDelete()
+            _navigation.postValue(TxListNavigation.ToSplashScreen)
         }
-        _modularDialog.postValue(args.getModular(resourceManager))
-    }
-
-    private fun showRepeatedBackUpPrompt() {
-        val args = BackupWalletArgs(
-            resourceManager.getString(home_back_up_wallet_repeated_title_regular_part),
-            resourceManager.getString(home_back_up_wallet_repeated_title_highlighted_part),
-            resourceManager.getString(home_back_up_wallet_repeated_description),
-        ) {
-            _navigation.postValue(TxListNavigation.ToTTLStore)
-        }
-        _modularDialog.postValue(args.getModular(resourceManager))
-    }
-
-    private fun showSecureYourBackupsDialog() {
-        val args = BackupWalletArgs(
-            resourceManager.getString(home_back_up_wallet_encrypt_title),
-            "",
-            resourceManager.getString(home_back_up_wallet_encrypt_description),
-            home_back_up_wallet_encrypt_cta,
-            home_back_up_wallet_delay_encrypt_cta,
-        ) {
-            _navigation.postValue(TxListNavigation.ToTTLStore)
-        }
-        _modularDialog.postValue(args.getModular(resourceManager))
     }
 
     companion object {
         private const val LIST_UPDATE_DEBOUNCE = 500L
-        private const val SECOND_UTXO_STORE_OPEN_DELAY = 3000L
     }
 }

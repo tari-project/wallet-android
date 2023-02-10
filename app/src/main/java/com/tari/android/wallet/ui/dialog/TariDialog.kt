@@ -6,4 +6,6 @@ interface TariDialog {
     fun dismiss()
 
     fun isShowing(): Boolean
+
+    fun addDismissListener(onDismiss: () -> Unit)
 }

@@ -30,21 +30,30 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.tari.android.wallet.ffi
+package com.tari.android.wallet.data.sharedPrefs.securityStages
 
-/**
- * Tari contact wrapper.
- *
- * @author The Tari Development Team
- */
-class FFIOutputFeatures() : FFIBase() {
+import android.content.SharedPreferences
+import com.tari.android.wallet.data.repository.CommonRepository
+import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefGsonDelegate
+import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
+import com.tari.android.wallet.data.sharedPrefs.network.formatKey
+import javax.inject.Inject
 
-    private external fun jniCreate(version: Char, maturity: Long, metadata: FFIByteVector, libError: FFIError)
-    private external fun jniDestroy()
+class SecurityStagesRepository @Inject constructor(sharedPrefs: SharedPreferences, networkRepository: NetworkRepository) :
+    CommonRepository(networkRepository) {
 
-    constructor(version: Char, maturity: Long, metadata: FFIByteVector) : this() {
-        runWithError { jniCreate(version, maturity, metadata, it) }
+    private object Key {
+        const val disabledTimestamps = "tari_disabled_timestamp"
     }
 
-    override fun destroy() = jniDestroy()
+    var disabledTimestamps: DisabledTimestampsDto? by SharedPrefGsonDelegate<DisabledTimestampsDto>(
+        sharedPrefs,
+        formatKey(Key.disabledTimestamps),
+        DisabledTimestampsDto::class.java,
+        DisabledTimestampsDto(mutableMapOf())
+    )
+
+    fun clear() {
+        disabledTimestamps = null
+    }
 }
