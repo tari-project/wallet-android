@@ -49,4 +49,6 @@ class TariProgressDialog constructor(val context: Context, val progressDialogArg
     override fun dismiss() = dialog.dismiss()
 
     override fun isShowing() : Boolean = dialog.isShowing
+
+    override fun addDismissListener(onDismiss: () -> Unit) = Unit
 }

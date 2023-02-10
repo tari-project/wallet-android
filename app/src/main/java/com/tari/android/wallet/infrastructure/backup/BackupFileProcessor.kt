@@ -32,14 +32,16 @@
  */
 package com.tari.android.wallet.infrastructure.backup
 
+import com.google.gson.Gson
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.data.WalletConfig
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
-import com.tari.android.wallet.extension.compress
 import com.tari.android.wallet.extension.encrypt
+import com.tari.android.wallet.ffi.*
 import com.tari.android.wallet.infrastructure.backup.compress.CompressionMethod
 import com.tari.android.wallet.infrastructure.security.encryption.SymmetricEncryptionAlgorithm
 import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupSettingsRepository
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import org.joda.time.DateTime
@@ -63,69 +65,84 @@ class BackupFileProcessor(
 
     suspend fun generateBackupFile(): Triple<File, DateTime, String> = mutex.withLock {
         // create partial backup in temp folder if password not set
+
+        delay(1000)
+
         val databaseFile = File(walletConfig.walletDatabaseFilePath)
         val backupPassword = backupSettingsRepository.backupPassword
+        val backupFileName = namingPolicy.getBackupFileName(backupPassword.isNullOrEmpty())
+        val outputFile = File(walletConfig.getWalletTempDirPath(), backupFileName)
         val backupDate = DateTime.now()
-        // zip the file
-        val compressionMethod = CompressionMethod.zip()
-        var mimeType = compressionMethod.mimeType
-        val backupFileName = namingPolicy.getBackupFileName(backupPassword.orEmpty().isNotEmpty())
-        val compressedFile = File(walletConfig.getWalletTempDirPath(), backupFileName)
-        var fileToBackup = listOf(databaseFile).compress(CompressionMethod.zip(), compressedFile.absolutePath)
-        // encrypt the file if password is set
-        val encryptionAlgorithm = SymmetricEncryptionAlgorithm.aes()
-        if (!backupPassword.isNullOrEmpty()) {
-            val copiedFile = fileToBackup.copyTo(File(fileToBackup.absolutePath + "_temp"))
-            fileToBackup = copiedFile.encrypt(
-                encryptionAlgorithm,
-                backupPassword.toCharArray(),
-                File(walletConfig.getWalletTempDirPath(), backupFileName).absolutePath
-            )
+
+        if (backupPassword.isNullOrEmpty()) {
+            val mimeType = "application/json"
+
+            val ffiWallet = FFIWallet.instance!!
+            val outputs = ffiWallet.getUnbindedOutputs(FFIError())
+            val hexString = HexString(ffiWallet.getWalletAddress().getBytes())
+            val jsonObject = BackupUtxos(outputs.map { it.json }, hexString.hex)
+            val json = Gson().toJson(jsonObject)
+
+            outputFile.bufferedWriter().use { it.append(json) }
+
+            logger.i("Partial files was generated")
+            return Triple(outputFile, backupDate, mimeType)
+        } else {
+            val passphrase = sharedPrefsRepository.databasePassphrase!!
+            val passphraseFile = File(walletConfig.getWalletTempDirPath(), namingPolicy.getPassphraseFileName())
+            passphraseFile.bufferedWriter().use { it.append(passphrase) }
+
+            val encryptionAlgorithm = SymmetricEncryptionAlgorithm.aes()
+
+            val compressionMethod = CompressionMethod.zip()
+            var filesToBackup = compressionMethod.compress(outputFile.absolutePath, listOf(databaseFile, passphraseFile))
+            // encrypt the file if password is set
+            val copiedFile = filesToBackup.copyTo(File(filesToBackup.absolutePath + "_temp"))
+            val outputFilePath = File(walletConfig.getWalletTempDirPath(), backupFileName).absolutePath
+            filesToBackup = copiedFile.encrypt(encryptionAlgorithm, backupPassword.toCharArray(), outputFilePath)
             copiedFile.delete()
-            mimeType = encryptionAlgorithm.mimeType
+
+            logger.i("Full backup files was generated")
+            return Triple(filesToBackup, backupDate, encryptionAlgorithm.mimeType)
         }
-        logger.i("Backup files was generated")
-        return Triple(fileToBackup, backupDate, mimeType)
     }
 
     fun restoreBackupFile(file: File, password: String? = null) {
-        val walletFilesDir = File(walletConfig.getWalletFilesDirPath())
-        val compressionMethod = CompressionMethod.zip()
-        // encrypt file if password is supplied
-        if (!password.isNullOrEmpty()) {
-            val unencryptedCompressedFile = File(
-                walletConfig.getWalletTempDirPath(),
-                "temp_" + System.currentTimeMillis() + "." + compressionMethod.extension
-            )
+
+        if (password.isNullOrEmpty() && !file.absolutePath.endsWith(".json")) {
+            throw BackupFileIsEncryptedException("Restored file is encrypted, password is needed")
+        }
+
+        if (password.isNullOrEmpty()) {
+            val json = file.readText()
+            val jsonObject = Gson().fromJson(json, BackupUtxos::class.java)
+            backupSettingsRepository.restoredTxs = jsonObject
+        } else {
+            val walletFilesDir = File(walletConfig.getWalletFilesDirPath())
+            val compressionMethod = CompressionMethod.zip()
+
+            val tempFileName = "temp_" + System.currentTimeMillis() + "." + compressionMethod.extension
+            val unencryptedCompressedFile = File(walletConfig.getWalletTempDirPath(), tempFileName)
+
             unencryptedCompressedFile.createNewFile()
-            SymmetricEncryptionAlgorithm.aes().decrypt(
-                password.toCharArray(),
-                { file.inputStream() },
-                { unencryptedCompressedFile.outputStream() }
-            )
+
+            SymmetricEncryptionAlgorithm.aes().decrypt(password.toCharArray(), { file.inputStream() }, { unencryptedCompressedFile.outputStream() })
+
             CompressionMethod.zip().uncompress(unencryptedCompressedFile, walletFilesDir)
+
+            val passphraseFile = File(walletConfig.getWalletFilesDirPath(), namingPolicy.getPassphraseFileName())
+            val passphrase = passphraseFile.readText()
+
+            sharedPrefsRepository.databasePassphrase = passphrase
+
+            unencryptedCompressedFile.delete()
+
             if (!File(walletConfig.walletDatabaseFilePath).exists()) {
                 // delete uncompressed files
                 walletFilesDir.deleteRecursively()
                 throw BackupStorageTamperedException("Invalid encrypted backup.")
             }
             logger.i("Backup file was restored")
-        } else {
-            CompressionMethod.zip().uncompress(file, walletFilesDir)
-            // check if wallet database file exists
-            if (!File(walletConfig.walletDatabaseFilePath).exists()) {
-                walletFilesDir.listFiles()?.let { files ->
-                    // delete uncompressed files
-                    for (extractedFile in files) {
-                        if (extractedFile.isFile) {
-                            extractedFile.delete()
-                        }
-                    }
-                }
-                logger.i("Backup file is encrypted")
-                // throw exception
-                throw BackupFileIsEncryptedException("Cannot uncompress. Restored file is encrypted.")
-            }
         }
     }
 
@@ -137,3 +154,4 @@ class BackupFileProcessor(
         }
     }
 }
+

@@ -41,11 +41,13 @@ class BackupNamingPolicy @Inject constructor(val networkRepository: NetworkRepos
 
     val regex = Regex("$backupFileNamePrefix.*")
 
-    fun getBackupFileName(isEncrypted: Boolean):String = if (isEncrypted) getBackupFileNameEncrypted() else getBackupFileName()
+    fun getBackupFileName(isPartial: Boolean):String = if (isPartial) getPartialBackupFileName() else getFullBackupFileName()
 
     fun isBackupFileName(fileName: String): Boolean = regex.matches(fileName)
 
-    private fun getBackupFileName(): String = "$backupFileNamePrefix.zip"
+    fun getPassphraseFileName() = "passphrase"
 
-    private fun getBackupFileNameEncrypted() : String = backupFileNamePrefix
+    private fun getPartialBackupFileName(): String = "$backupFileNamePrefix.json"
+
+    private fun getFullBackupFileName() : String = backupFileNamePrefix
 }

@@ -36,6 +36,6 @@ import com.tari.android.wallet.BuildConfig
 
 object Build {
 
-    private val _mockedTurned = true
+    private val _mockedTurned = false
     val MOCKED = _mockedTurned && BuildConfig.BUILD_TYPE == "debug"
 }

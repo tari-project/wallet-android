@@ -15,7 +15,6 @@
 
     <!-- UI components -->
     <dimen name="menu_item_height">63dp</dimen>
-    <dimen name="header_height">64dp</dimen>
 
     <!-- onboarding -->
     <dimen name="onboarding_bottom_progress_bar_bottom_margin">10dp</dimen>
@@ -66,8 +65,6 @@
 
     <!-- tx list -->
     <dimen name="tx_list_item_gif_container_top_margin">8dp</dimen>
-    <dimen name="tx_list_item_emoji_text_view_normal_top_margin">32dp</dimen>
-    <dimen name="tx_list_item_emoji_text_view_shadow_normal_top_margin">18dp</dimen>
     <dimen name="tx_list_item_content_container_view_normal_top_margin">36dp</dimen>
     <dimen name="home_header_top_margin">40dp</dimen>
 
@@ -126,9 +123,6 @@
     <dimen name="wallet_info_container_qr_code_size">230dp</dimen>
     <dimen name="wallet_info_img_qr_code_size">400dp</dimen>
     <dimen name="back_button_size">50dp</dimen>
-
-    <!-- In-app store -->
-    <dimen name="store_title_text_size">14sp</dimen>
 
     <!-- Seed phrase -->
     <dimen name="write_down_seed_phrase_list_horizontal_margin">25dp</dimen>

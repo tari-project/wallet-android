@@ -27,8 +27,7 @@
         android:layout_marginLeft="4dp"
         android:layout_marginTop="28dp"
         android:padding="14dp"
-        android:src="@drawable/vector_close"
-        android:tint="@color/white"
+        android:src="@drawable/vector_close_opposite"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 

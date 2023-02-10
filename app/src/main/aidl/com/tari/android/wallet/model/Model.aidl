@@ -53,3 +53,4 @@ parcelable TariVector;
 parcelable TariUtxo;
 parcelable TariCoinPreview;
 parcelable TariWalletAddress;
+parcelable TariUnblindedOutput;

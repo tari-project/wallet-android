@@ -36,10 +36,10 @@ import android.content.Context
 import android.content.SharedPreferences
 import com.tari.android.wallet.data.repository.CommonRepository
 import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodeSharedRepository
-import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefBooleanDelegate
-import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefStringDelegate
+import com.tari.android.wallet.data.sharedPrefs.delegates.*
 import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
 import com.tari.android.wallet.data.sharedPrefs.network.formatKey
+import com.tari.android.wallet.data.sharedPrefs.securityStages.SecurityStagesRepository
 import com.tari.android.wallet.data.sharedPrefs.tariSettings.TariSettingsSharedRepository
 import com.tari.android.wallet.data.sharedPrefs.tor.TorSharedRepository
 import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupSettingsRepository
@@ -61,7 +61,8 @@ class SharedPrefsRepository(
     private val baseNodeSharedRepository: BaseNodeSharedRepository,
     private val yatSharedRepository: YatSharedRepository,
     private val torSharedRepository: TorSharedRepository,
-    private var tariSettingsSharedRepository: TariSettingsSharedRepository
+    private val tariSettingsSharedRepository: TariSettingsSharedRepository,
+    private val securityStagesRepository: SecurityStagesRepository
 ) : CommonRepository(networkRepository) {
 
     private object Key {
@@ -82,6 +83,8 @@ class SharedPrefsRepository(
     var isAuthenticated: Boolean by SharedPrefBooleanDelegate(sharedPrefs, formatKey(Key.isAuthenticated))
 
     var emojiId: String? by SharedPrefStringDelegate(sharedPrefs, formatKey(Key.emojiId))
+
+    var databasePassphrase: String? by SharedPrefStringSecuredDelegate(context, sharedPrefs, formatKey(Key.walletDatabasePassphrase))
 
     var onboardingStarted: Boolean by SharedPrefBooleanDelegate(sharedPrefs, formatKey(Key.onboardingStarted))
 
@@ -107,9 +110,11 @@ class SharedPrefsRepository(
         yatSharedRepository.clear()
         torSharedRepository.clear()
         tariSettingsSharedRepository.clear()
+        securityStagesRepository.clear()
         publicKeyHexString = null
         isAuthenticated = false
         emojiId = null
+        databasePassphrase = null
         onboardingStarted = false
         onboardingCompleted = false
         onboardingAuthSetupStarted = false

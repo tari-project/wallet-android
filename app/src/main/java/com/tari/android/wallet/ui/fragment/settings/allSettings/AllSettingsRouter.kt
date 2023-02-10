@@ -3,7 +3,7 @@ package com.tari.android.wallet.ui.fragment.settings.allSettings
 interface AllSettingsRouter {
     fun toAbout()
 
-    fun toBackupSettings()
+    fun toBackupSettings(withAnimation: Boolean = true)
 
     fun toDeleteWallet()
 

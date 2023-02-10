@@ -37,6 +37,7 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.activity.viewModels
 import com.tari.android.wallet.R
+import com.tari.android.wallet.application.MigrationManager
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.data.sharedPrefs.tariSettings.TariSettingsSharedRepository
 import com.tari.android.wallet.databinding.ActivityWalletBackupBinding
@@ -63,6 +64,8 @@ class WalletRestoreActivity : CommonActivity<ActivityWalletBackupBinding, Wallet
 
     @Inject
     lateinit var walletServiceLauncher: WalletServiceLauncher
+
+    val migrationManager = MigrationManager()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         appComponent.inject(this)
@@ -98,6 +101,7 @@ class WalletRestoreActivity : CommonActivity<ActivityWalletBackupBinding, Wallet
         prefs.onboardingAuthSetupCompleted = true
         prefs.onboardingDisplayedAtHome = true
         tariSettingsSharedRepository.isRestoredWallet = true
+        migrationManager.updateWalletVersion()
 
         finish()
         startActivity(Intent(this, AuthActivity::class.java).apply {

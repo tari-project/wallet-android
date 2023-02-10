@@ -132,4 +132,8 @@ interface TariWalletService {
     void joinUtxos(in List<TariUtxo> utxos, out WalletError error);
 
     void splitUtxos(in List<TariUtxo> utxos, int splitCount, out WalletError error);
+
+    List<TariUnblindedOutput> getUnbindedOutputs(out WalletError error);
+
+    void restoreWithUnbindedOutputs(in List<String> jsons, in TariWalletAddress address, in String message, out WalletError error);
 }

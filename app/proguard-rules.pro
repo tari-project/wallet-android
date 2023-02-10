@@ -29,3 +29,7 @@
 -keep class net.danlew.android.joda.R$raw { *; }
 
 -keep enum yat.android.data.YatRecordType { *; }
+
+-keep enum com.tari.android.wallet.ui.fragment.settings.themeSelector.TariTheme { *; }
+
+-keep enum com.tari.android.wallet.data.sharedPrefs.securityStages.WalletSecurityStage { *; }

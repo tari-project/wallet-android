@@ -8,8 +8,8 @@ import com.tari.android.wallet.ui.fragment.send.common.TransactionData
  */
 interface FinalizeSendTxListener {
 
-    fun onSendTxFailure(transactionData: TransactionData, txFailureReason: TxFailureReason)
+    fun onSendTxFailure(isYat: Boolean, transactionData: TransactionData, txFailureReason: TxFailureReason)
 
-    fun onSendTxSuccessful(txId: TxId, transactionData: TransactionData)
+    fun onSendTxSuccessful(isYat: Boolean, txId: TxId, transactionData: TransactionData)
 
 }

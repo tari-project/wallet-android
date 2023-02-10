@@ -1,6 +1,6 @@
 <resources>
 
-<!--    &lt;!&ndash; splash screen theme &ndash;&gt;-->
+    <!--    &lt;!&ndash; splash screen theme &ndash;&gt;-->
     <style name="AppTheme.Splash" parent="AppTheme.Light">
         <item name="android:background">@drawable/tari_splash_screen</item>
         <item name="android:windowTranslucentStatus">true</item>
@@ -36,12 +36,18 @@
     </style>
 
     <style name="BottomSlideDialog" parent="Theme.AppCompat.Dialog">
-        <item name="android:windowAnimationStyle">@style/BottomSlideDialogAnimation</item>
-    </style>
+        <item name="android:windowBackground">@null</item>
+        <item name="android:background">@null</item>
+        <item name="android:backgroundDimEnabled">false</item>
 
-    <style name="BottomSlideDialogAnimation">
-        <item name="android:windowEnterAnimation">@anim/dialog_slide_from_bottom</item>
-        <item name="android:windowExitAnimation">@anim/dialog_slide_to_bottom</item>
+        <item name="android:windowFrame">@null</item>
+        <item name="android:windowIsFloating">false</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:windowTitleStyle">@null</item>
+        <item name="android:windowNoTitle">true</item>
+
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">match_parent</item>
     </style>
 
     <style name="ChooseGIFDialog" parent="android:Theme.Panel">

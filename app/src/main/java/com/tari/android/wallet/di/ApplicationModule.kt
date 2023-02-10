@@ -33,10 +33,8 @@
 package com.tari.android.wallet.di
 
 import android.app.KeyguardManager
-import android.content.ClipboardManager
-import android.content.Context
+import android.content.*
 import android.content.Context.MODE_PRIVATE
-import android.content.SharedPreferences
 import androidx.biometric.BiometricManager
 import androidx.core.content.ContextCompat
 import com.tari.android.wallet.BuildConfig
@@ -47,6 +45,7 @@ import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodeSharedRepository
 import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
 import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepositoryImpl
+import com.tari.android.wallet.data.sharedPrefs.securityStages.SecurityStagesRepository
 import com.tari.android.wallet.data.sharedPrefs.tariSettings.TariSettingsSharedRepository
 import com.tari.android.wallet.data.sharedPrefs.tor.TorSharedRepository
 import com.tari.android.wallet.infrastructure.logging.LoggerAdapter
@@ -116,7 +115,8 @@ class ApplicationModule(private val app: TariWalletApplication) {
         networkRepository: NetworkRepository,
         yatSharedRepository: YatSharedRepository,
         torSharedRepository: TorSharedRepository,
-        tariSettingsSharedRepository: TariSettingsSharedRepository
+        tariSettingsSharedRepository: TariSettingsSharedRepository,
+        securityStagesRepository: SecurityStagesRepository
     ): SharedPrefsRepository =
         SharedPrefsRepository(
             context,
@@ -126,7 +126,8 @@ class ApplicationModule(private val app: TariWalletApplication) {
             baseNodeSharedRepository,
             yatSharedRepository,
             torSharedRepository,
-            tariSettingsSharedRepository
+            tariSettingsSharedRepository,
+            securityStagesRepository
         )
 
     @Provides

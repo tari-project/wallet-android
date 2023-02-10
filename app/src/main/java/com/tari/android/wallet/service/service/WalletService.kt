@@ -34,14 +34,10 @@ package com.tari.android.wallet.service.service
 
 import android.app.Service
 import android.content.Intent
-import android.os.Handler
-import android.os.IBinder
-import android.os.Looper
+import android.os.*
 import androidx.lifecycle.ProcessLifecycleOwner
 import com.orhanobut.logger.Logger
-import com.tari.android.wallet.application.TariWalletApplication
-import com.tari.android.wallet.application.WalletManager
-import com.tari.android.wallet.application.WalletState
+import com.tari.android.wallet.application.*
 import com.tari.android.wallet.application.baseNodes.BaseNodes
 import com.tari.android.wallet.data.WalletConfig
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
@@ -63,9 +59,7 @@ import com.tari.android.wallet.util.WalletUtil
 import io.reactivex.Observable
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
-import org.joda.time.DateTime
-import org.joda.time.Hours
-import org.joda.time.Minutes
+import org.joda.time.*
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
@@ -108,6 +102,7 @@ class WalletService : Service() {
 
     private var lifecycleObserver: ServiceLifecycleCallbacks? = null
     private val stubProxy = TariWalletServiceStubProxy()
+
     @Suppress("unused")
     private val logFilesManager = LogFilesManager()
     private lateinit var wallet: FFIWallet
@@ -144,6 +139,7 @@ class WalletService : Service() {
                 stopService(startId)
                 deleteWallet()
             }
+
             else -> throw RuntimeException("Unexpected intent action: ${intent.action}")
         }
         return START_NOT_STICKY
@@ -154,7 +150,7 @@ class WalletService : Service() {
         DiContainer.appComponent.inject(this)
         // start wallet manager on a separate thread & listen to events
         EventBus.walletState.subscribe(this, this::onWalletStateChanged)
-        Thread { walletManager.start() }.start()
+        walletManager.start()
         logger.i("Wallet service started")
     }
 
@@ -182,7 +178,8 @@ class WalletService : Service() {
         if (walletState == WalletState.Started) {
             wallet = FFIWallet.instance!!
             lifecycleObserver = ServiceLifecycleCallbacks(wallet)
-            val impl = FFIWalletListenerImpl(wallet, backupManager, notificationHelper, app, baseNodeSharedPrefsRepository, baseNodes)
+            val impl =
+                FFIWalletListenerImpl(wallet, backupManager, notificationHelper, notificationService, app, baseNodeSharedPrefsRepository, baseNodes)
             stubProxy.stub = TariWalletServiceStubImpl(wallet, baseNodeSharedPrefsRepository, impl)
             wallet.listener = impl
             EventBus.walletState.unsubscribe(this)

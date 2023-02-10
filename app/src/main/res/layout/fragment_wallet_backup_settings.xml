@@ -196,6 +196,50 @@
 
                     </LinearLayout>
 
+                    <LinearLayout
+                        android:id="@+id/learn_more_cta_container_view"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                        <com.tari.android.wallet.ui.component.tari.TariDivider
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp" />
+
+                        <com.tari.android.wallet.ui.component.tari.TariPrimaryBackground
+                            android:id="@+id/learn_more_cta_view"
+                            android:layout_width="match_parent"
+                            android:layout_height="@dimen/menu_item_height"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:paddingHorizontal="@dimen/common_horizontal_margin">
+
+                            <FrameLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="@dimen/menu_item_height">
+
+                                <com.tari.android.wallet.ui.component.tari.TariTextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_gravity="center_vertical|start"
+                                    android:text="@string/all_settings_back_up_wallet_settings_safety"
+                                    android:textColor="?attr/palette_text_heading"
+                                    android:textSize="15sp"
+                                    app:customFont="medium" />
+
+                                <com.tari.android.wallet.ui.component.tari.TariIconView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_gravity="center_vertical|end"
+                                    android:rotation="180"
+                                    android:src="@drawable/vector_back_button" />
+
+                            </FrameLayout>
+
+                        </com.tari.android.wallet.ui.component.tari.TariPrimaryBackground>
+
+                    </LinearLayout>
+
                 </LinearLayout>
 
             </androidx.appcompat.widget.LinearLayoutCompat>

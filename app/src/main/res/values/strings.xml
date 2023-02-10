@@ -14,7 +14,6 @@
     <string name="explorer_url">https://explore-esme.tari.com/</string>
     <string name="explorer_kernel_url">https://explore-esme.tari.com/kernel/</string>
     <string name="tor_bridges_url">https://bridges.torproject.org/bridges</string>
-    <string name="ffi_admin_email_address" translatable="false">bug_reports@tari.com</string>
     <string name="tari_lab_university_url" translatable="false">https://tlu.tarilabs.com/</string>
 
     <!-- digits -->
@@ -99,6 +98,7 @@
     <string name="common_delete">Delete</string>
     <string name="common_lets_do_it">Yes! Let\'s do it!</string>
     <string name="common_are_you_sure">Are you sure?</string>
+    <string name="common_next">Next</string>
 
     <!-- emoji id copied view -->
     <string name="emoji_id_copied">COPIED</string>
@@ -206,19 +206,6 @@
     <string name="home_store_and_forward_progress_completing_txs">Completing your transactions</string>
     <string name="home_store_and_forward_progress_updating_txs">Updating your transactions</string>
     <string name="home_store_and_forward_progress_up_to_date">You are up to date!</string>
-    <!--backup wallet prompt-->
-    <string name="home_back_up_wallet_initial_title_regular_part">Want to</string>
-    <string name="home_back_up_wallet_initial_title_highlighted_part">back up your wallet?</string>
-    <string name="home_back_up_wallet_initial_description">You can back up your wallet so that you don’t lose your tXTR if your phone is lost or broken. You can configure this in Settings anytime.</string>
-    <string name="home_back_up_wallet_repeated_title_regular_part">It\'s time to</string>
-    <string name="home_back_up_wallet_repeated_title_highlighted_part">back up your wallet</string>
-    <string name="home_back_up_wallet_repeated_description">You have quite a bit of tXTR. You should back up your wallet now so that you don\’t lose it all if your phone is lost or broken.</string>
-    <string name="home_back_up_wallet_back_up_cta">Back Up Wallet</string>
-    <string name="home_back_up_wallet_delay_back_up_cta">I\'ll do it later</string>
-    <string name="home_back_up_wallet_encrypt_title">Further secure your backups</string>
-    <string name="home_back_up_wallet_encrypt_cta">Secure Backups</string>
-    <string name="home_back_up_wallet_delay_encrypt_cta">Not now</string>
-    <string name="home_question_mark">\?</string>
     <!--Balance label-->
     <string name="home_balance_info_help_title">Why is some of my balance not spendable right now?</string>
     <string name="home_balance_info_help_description">The Tari in your wallet is made up of notes, just as your real wallet contains notes and coins. When you spend Tari, you must use up entire notes and wait for change. While you\'re waiting, the change is not spendable until your transaction is mined. You can find out more about how Tari transactions work in TariLabs University</string>
@@ -404,6 +391,7 @@
     <string name="all_settings_advanced_settings_label">Advanced</string>
     <string name="all_settings_yat_settings_label">Yat</string>
     <string name="all_settings_back_up_wallet_settings_entry">Wallet Backups</string>
+    <string name="all_settings_back_up_wallet_settings_safety">Learn More</string>
     <string name="all_settings_secondary_settings_label">More</string>
     <string name="all_settings_report_a_bug">Report a Bug</string>
     <string name="all_settings_delete_wallet">Delete Your Wallet</string>
@@ -655,15 +643,60 @@
     <string name="check_backup_storage_status_error_title">Wallet Backup Incomplete</string>
     <string name="back_up_wallet_storage_setup_error_title">Wallet Backup Incomplete</string>
     <string name="backup_wallet_storage_full_title">Wallet Backup Incomplete</string>
-    <string name="home_back_up_wallet_encrypt_description">Given the amount of money in your wallet, you should password-protect your backups so they\'re safe even if your storage is compromised.</string>
     <string name="check_backup_storage_status_auth_revoked_error_description">Storage is not accessible</string>
     <string name="back_up_wallet_storage_setup_error_desc">Storage setup was interrupt</string>
     <string name="backup_wallet_storage_full_desc">Your storage is full</string>
+    <string name="backup_restored_tx">Funds recovered from your previous wallet</string>
+    <string name="home_question_mark">\?</string>
 
     <!--    FFI Validation-->
     <string name="ffi_validation_error_title">Incompatible version detected</string>
     <string name="ffi_validation_error_message">The data stored locally is incompatible with the current version of the App or with the network itself. We strongly recommend removing the wallet and creating a new one</string>
     <string name="ffi_validation_error_delete">Delete the wallet</string>
     <string name="ffi_validation_error_cancel">I still want to use the wallet</string>
+
+
+    <!-- Staged wallet security -->
+    <string name="staged_wallet_security_stages_1a_title">🔑🔑🔑</string>
+    <string name="staged_wallet_security_stages_1a_subtitle">Write down your seed words</string>
+    <string name="staged_wallet_security_stages_1a_message"><![CDATA[You now have <strong>real</strong> money in your wallet.<br><br>If you accidentally delete your wallet app or lose your device, your funds are lost, and there is no way to recover them unless you have safely kept a copy of your <strong>seed phrase</strong> safe somewhere.<br><br>Click \'Ok\' to review and save the phrase now, or \'Remind me later\' to do it at a more convenient time]]></string>
+    <string name="staged_wallet_security_stages_1a_buttons_positive">Ok</string>
+    <string name="staged_wallet_security_stages_1b_title">🤑🤑🤑</string>
+    <string name="staged_wallet_security_stages_1b_subtitle">Make a cloud backup</string>
+    <string name="staged_wallet_security_stages_1b_message">Your wallet now holds a fair amount of value, which you probably don\'t want to lose. Unlike a physical wallet\'s notes, it\'s possible to make a copy of your wallet\'s contents that you can use to recover your funds in case you lose them.\n\nYou should think about making a copy of your wallet\'s coins, which we will keep up to date after every transaction.\n\nIf you have a copy of your seed phrase saved somewhere safe, and don\'t want to back up your coins into the cloud, you can skip this step.</string>
+    <string name="staged_wallet_security_stages_1b_buttons_positive">Backup My Coins</string>
+    <string name="staged_wallet_security_stages_2_title">😎💰💰💰😎</string>
+    <string name="staged_wallet_security_stages_2_subtitle">Encrypt your wallet with a password</string>
+    <string name="staged_wallet_security_stages_2_message">It\'s awesome that you\'re using [this Tari wallet] so much! You\'re a high-roller, so it\'s time to add another layer of security to your wallet backups.\n\nYour funds will be safer if we encrypt your cloud backups with an additional password of your own choosing.\n\nYou need to make sure that this password is very strong and that YOU DO NOT FORGET it!\n\n(Whatever happens, you can always restore from your seed phrase, so make sure you\'re still keeping this safe and secreted away).\n\nAs an added benefit, password-encrypted backups allow us to backup your transaction history as well!</string>
+    <string name="staged_wallet_security_stages_2_buttons_positive">Upgrade My Backups</string>
+    <string name="staged_wallet_security_stages_3_title">🐋🐋🐋🐋🐋</string>
+    <string name="staged_wallet_security_stages_3_subtitle">❗❗❗ Whale alert ❗❗❗</string>
+    <string name="staged_wallet_security_stages_3_message">Your mobile wallet holds way more funds than would normally be considered safe to walk around with in your pocket.\n\nYou should really consider sweeping most of your balance into a cold- or hardware wallet.</string>
+    <string name="staged_wallet_security_stages_3_buttons_positive">Set Up My Cold Wallet Address</string>
+    <string name="staged_wallet_security_buttons_remind_me_later">Remind me later</string>
+
+
+    <!-- Staged wallet security - onboarding -->
+    <string name="onboarding_staged_wallet_security_page1_title_part1">Write down your</string>
+    <string name="onboarding_staged_wallet_security_page1_title_part2_bold">seed words</string>
+    <string name="onboarding_staged_wallet_security_page1_message_full"><![CDATA[Your seed phrase lets you recover your wallet directly from the blockchain if you ever lose access to it. If you only ever do one thing to back up your wallet, complete this step.\n Write down the <strong>seed phrase</strong> on a piece of paper and store it somewhere safe. Anyone who knows the seed phrase has full access to your wallet. Don\'t store seed phrases online]]></string>
+    <string name="onboarding_staged_wallet_security_page1_action_button">View My Seed Words</string>
+    <string name="onboarding_staged_wallet_security_page2_title_part1">Backup to the</string>
+    <string name="onboarding_staged_wallet_security_page2_title_part2_bold">cloud"</string>
+    <string name="onboarding_staged_wallet_security_page2_message_full"><![CDATA[You may <strong>backup</strong> your wallet to a <strong>cloud provider</strong> of your choice, with a simple password-less approach. Your funds are safe as long as your cloud account is secure]]></string>
+    <string name="onboarding_staged_wallet_security_page2_action_button">Go To Cloud Backups</string>
+    <string name="onboarding_staged_wallet_security_page3_title_part1">Create a</string>
+    <string name="onboarding_staged_wallet_security_page3_title_part2_bold">password</string>
+    <string name="onboarding_staged_wallet_security_page3_message_full"><![CDATA[We recommend upgrading the security of your increasingly bulging wallet with a <strong>strong password</strong>. Keep this password safe. You can\'t restore your wallet without it. (You can always recover your wallet from your seed phrase)]]></string>
+    <string name="onboarding_staged_wallet_security_page3_action_button">Set My Password</string>
+    <string name="onboarding_staged_wallet_security_page4_title_part1">Backup and recovery options</string>
+    <string name="onboarding_staged_wallet_security_page4_title_part2_bold">help keep your coins safe</string>
+    <string name="onboarding_staged_wallet_security_page4_message_full">Try to keep your seed words and backups in a safe place. We also strongly recommend keeping a few copies of your seed words in different places and changing the backup password regularly</string>
+    <string name="onboarding_staged_wallet_security_page4_action_button">Let’s Do This!</string>
+    <string name="onboarding_staged_wallet_security_footer_part1">Aurora helps you secure your funds</string>
+    <string name="onboarding_staged_wallet_security_footer_part2_highlighted">when you need it</string>
+    <string name="onboarding_staged_wallet_security_footer_part3_any_funds">. This step is triggered when you receive funds for the first time, but you can apply any step at any time from the settings</string>
+    <string name="onboarding_staged_wallet_security_footer_part3_threshold">. This step is triggered when your balance exceeds %s for the first time, but you can apply any step at any time from the settings</string>
+
 
 </resources>

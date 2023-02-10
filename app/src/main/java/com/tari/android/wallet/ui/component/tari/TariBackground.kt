@@ -5,9 +5,7 @@ import android.graphics.Outline
 import android.graphics.drawable.ShapeDrawable
 import android.graphics.drawable.shapes.RoundRectShape
 import android.util.AttributeSet
-import android.view.View
-import android.view.ViewGroup
-import android.view.ViewOutlineProvider
+import android.view.*
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.tari.android.wallet.ui.common.domain.PaletteManager
 
@@ -43,6 +41,7 @@ abstract class TariBackground(context: Context, attrs: AttributeSet) : Constrain
                     }
                 }
                 setWithRadius(radius, backColor)
+                elevation = backElevation
             }
 
             radius != 0.0F -> setWithRadius(radius, backColor)

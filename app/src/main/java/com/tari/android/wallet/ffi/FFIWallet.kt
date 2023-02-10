@@ -38,9 +38,7 @@ import com.tari.android.wallet.model.*
 import com.tari.android.wallet.model.recovery.WalletRestorationResult
 import com.tari.android.wallet.service.seedPhrase.SeedPhraseRepository
 import com.tari.android.wallet.util.Constants
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import java.math.BigInteger
 import java.util.concurrent.atomic.AtomicReference
 
@@ -148,9 +146,9 @@ class FFIWallet(
         libError: FFIError
     ): ByteArray
 
-//    private external fun jniSignMessage(message: String, libError: FFIError): String
-//
-//    private external fun jniVerifyMessageSignature(publicKeyPtr: FFIPublicKey, message: String, signature: String, libError: FFIError): Boolean
+    private external fun jniSignMessage(message: String, libError: FFIError): String
+
+    private external fun jniVerifyMessageSignature(publicKeyPtr: FFIPublicKey, message: String, signature: String, libError: FFIError): Boolean
 
     private external fun jniAddBaseNodePeer(publicKey: FFIPublicKey, address: String, libError: FFIError): Boolean
 
@@ -200,6 +198,15 @@ class FFIWallet(
 
     private external fun jniPreviewSplitUtxos(commitments: Array<String>, splitCount: String, feePerGram: String, libError: FFIError): FFIPointer
 
+    private external fun jniWalletGetUnspentOutputs(libError: FFIError): FFIPointer
+
+    private external fun jniImportExternalUtxoAsNonRewindable(
+        output: FFITariUnblindedOutput,
+        sourceAddress: FFITariWalletAddress,
+        message: String,
+        libError: FFIError
+    ): ByteArray
+
     private external fun jniDestroy()
 
 
@@ -216,13 +223,20 @@ class FFIWallet(
     private fun init() {
         val error = FFIError()
         logger.i("Pre jniCreate")
+
+        var passphrase = sharedPrefsRepository.databasePassphrase
+        if (passphrase.isNullOrEmpty()) {
+            passphrase = sharedPrefsRepository.generateDatabasePassphrase()
+            sharedPrefsRepository.databasePassphrase = passphrase
+        }
+
         try {
             jniCreate(
                 commsConfig,
                 logPath,
                 Constants.Wallet.maxNumberOfRollingLogFiles,
                 Constants.Wallet.rollingLogFileMaxSizeBytes,
-                "",
+                passphrase,
                 networkRepository.currentNetwork?.network?.uriComponent,
                 seedPhraseRepository.getPhrase()?.ffiSeedWords,
                 this::onTxReceived.name, "(J)V",
@@ -330,6 +344,7 @@ class FFIWallet(
                 val pendingInboundTx = PendingInboundTx(tx)
                 localScope.launch { listener?.onInboundTxBroadcast(pendingInboundTx) }
             }
+
             Tx.Direction.OUTBOUND -> {
                 val pendingOutboundTx = PendingOutboundTx(tx)
                 localScope.launch { listener?.onOutboundTxBroadcast(pendingOutboundTx) }
@@ -484,10 +499,10 @@ class FFIWallet(
     fun splitPreviewUtxos(commitments: Array<String>, count: Int, feePerGram: BigInteger, error: FFIError): TariCoinPreview =
         TariCoinPreview(FFITariCoinPreview(jniPreviewSplitUtxos(commitments, count.toString(), feePerGram.toString(), error)))
 
-//    fun signMessage(message: String): String = runWithError { jniSignMessage(message, it) }
+    fun signMessage(message: String): String = runWithError { jniSignMessage(message, it) }
 
-//    fun verifyMessageSignature(contactPublicKey: FFIPublicKey, message: String, signature: String): Boolean =
-//        runWithError { jniVerifyMessageSignature(contactPublicKey, message, signature, it) }
+    fun verifyMessageSignature(contactPublicKey: FFIPublicKey, message: String, signature: String): Boolean =
+        runWithError { jniVerifyMessageSignature(contactPublicKey, message, signature, it) }
 
     fun startTXOValidation(): BigInteger = runWithError { BigInteger(1, jniStartTXOValidation(it)) }
 
@@ -520,6 +535,22 @@ class FFIWallet(
         runWithError { jniStartRecovery(baseNodePublicKey, this::onWalletRecovery.name, "(I[B[B)V", recoveryOutputMessage, it) }
 
     fun getFeePerGramStats(): FFIFeePerGramStats = runWithError { FFIFeePerGramStats(jniWalletGetFeePerGramStats(3, it)) }
+
+    fun getUnbindedOutputs(error: FFIError): MutableList<TariUnblindedOutput> {
+        val outputs = FFITariUnblindedOutputs(jniWalletGetUnspentOutputs(error))
+        val txs = mutableListOf<TariUnblindedOutput>()
+        for (i in 0 until outputs.getLength()) {
+            txs.add(TariUnblindedOutput(outputs.getAt(i)))
+        }
+        return txs
+    }
+
+    fun restoreWithUnbindedOutputs(jsons: MutableList<String>, address: TariWalletAddress, message: String, error: FFIError) {
+        for (json in jsons) {
+            val output = FFITariUnblindedOutput(json)
+            jniImportExternalUtxoAsNonRewindable(output, FFITariWalletAddress(address.emojiId), message, error)
+        }
+    }
 
     /**
      * This callback function cannot be private due to JNI behaviour.
