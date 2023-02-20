@@ -699,4 +699,16 @@
     <string name="onboarding_staged_wallet_security_footer_part3_threshold">. This step is triggered when your balance exceeds %s for the first time, but you can apply any step at any time from the settings</string>
 
 
+    <!-- Contact book -->
+    <string name="contact_book_contacts_book_title">Contact Book</string>
+    <string name="contact_book_contacts_title">Contacts</string>
+    <string name="contact_book_favorites_title">Favorites</string>
+    <string name="contact_book_add_contact_title">Add Contact</string>
+    <string name="contact_book_search_hint">Find Contact</string>
+    <string name="contact_book_details_send_tari">Send Tari</string>
+    <string name="contact_book_details_requst_tari">Request Tari</string>
+    <string name="contact_book_details_add_to_favorites">Add to Favorites</string>
+    <string name="contact_book_details_remove_from_favorites">Remove from Favorites</string>
+    <string name="contact_book_details_delete_contact">Delete Contact</string>
+
 </resources>

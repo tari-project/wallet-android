@@ -13,6 +13,8 @@ class YatUser() : User(), Parcelable {
         this.walletAddress = tariWalletAddress
     }
 
+    override fun filtered(text: String): Boolean = super.filtered(text) || yat.contains(text, true)
+
     // region Parcelable
 
     constructor(parcel: Parcel) : this() {

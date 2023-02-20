@@ -49,6 +49,8 @@ open class User() : Parcelable {
         this.walletAddress = publicKey
     }
 
+    open fun filtered(text: String): Boolean = walletAddress.emojiId.contains(text, true)
+
     override fun toString(): String = "User(publicKey=$walletAddress)"
 
     override fun equals(other: Any?): Boolean = (other is User) && walletAddress == other.walletAddress

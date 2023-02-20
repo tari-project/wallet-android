@@ -41,6 +41,10 @@ import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.component.networkStateIndicator.ConnectionIndicatorViewModel
 import com.tari.android.wallet.ui.fragment.auth.AuthActivity
 import com.tari.android.wallet.ui.fragment.auth.AuthViewModel
+import com.tari.android.wallet.ui.fragment.contact_book.add.AddContactViewModel
+import com.tari.android.wallet.ui.fragment.contact_book.contacts.ContactsViewModel
+import com.tari.android.wallet.ui.fragment.contact_book.details.ContactDetailsViewModel
+import com.tari.android.wallet.ui.fragment.contact_book.root.ContactBookViewModel
 import com.tari.android.wallet.ui.fragment.home.HomeActivity
 import com.tari.android.wallet.ui.fragment.home.HomeViewModel
 import com.tari.android.wallet.ui.fragment.onboarding.activity.OnboardingFlowActivity
@@ -172,6 +176,10 @@ interface ApplicationComponent {
     fun inject(viewModel: StagedWalletSecurityManager)
     fun inject(viewModel: BackupOnboardingFlowViewModel)
     fun inject(viewModel: BackupOnboardingFlowItemViewModel)
+    fun inject(viewModel: ContactBookViewModel)
+    fun inject(viewModel: ContactDetailsViewModel)
+    fun inject(viewModel: ContactsViewModel)
+    fun inject(viewModel: AddContactViewModel)
 
     fun getClipboardManager(): ClipboardManager
 }

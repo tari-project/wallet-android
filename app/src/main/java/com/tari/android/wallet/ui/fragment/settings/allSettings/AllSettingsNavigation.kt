@@ -1,6 +1,7 @@
 package com.tari.android.wallet.ui.fragment.settings.allSettings
 
 sealed class AllSettingsNavigation {
+    object ToMyProfile : AllSettingsNavigation()
     object ToBugReporting : AllSettingsNavigation()
     object ToAbout : AllSettingsNavigation()
     object ToBackupSettings : AllSettingsNavigation()

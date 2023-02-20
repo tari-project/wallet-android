@@ -30,65 +30,18 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.tari.android.wallet.model
+package com.tari.android.wallet.ui.fragment.contact_book.favorites
 
-import android.os.Parcel
-import android.os.Parcelable
-import com.tari.android.wallet.ui.extension.readP
+import android.os.Bundle
+import android.view.View
+import com.tari.android.wallet.ui.fragment.contact_book.contacts.ContactsFragment
 
-/**
- * Contact is a user with an alias.
- *
- * @author The Tari Development Team
- */
-class Contact() : User(), Parcelable {
+class FavoritesFragment : ContactsFragment() {
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
-    var alias: String = ""
-
-    constructor(
-        tariWalletAddress: TariWalletAddress,
-        alias: String
-    ) : this() {
-        this.walletAddress = tariWalletAddress
-        this.alias = alias
+        viewModel.addFilter { contactItem -> contactItem.contact.isFavorite }
     }
-
-    override fun filtered(text: String): Boolean = super.filtered(text) || alias.contains(text, true)
-
-    override fun toString(): String = "Contact(alias='$alias') ${super.toString()}"
-
-    // region Parcelable
-
-    constructor(parcel: Parcel) : this() {
-        readFromParcel(parcel)
-    }
-
-    companion object CREATOR : Parcelable.Creator<Contact> {
-
-        override fun createFromParcel(parcel: Parcel): Contact {
-            return Contact(parcel)
-        }
-
-        override fun newArray(size: Int): Array<Contact> {
-            return Array(size) { Contact() }
-        }
-
-    }
-
-    override fun writeToParcel(parcel: Parcel, flags: Int) {
-        parcel.writeParcelable(walletAddress, flags)
-        parcel.writeString(alias)
-    }
-
-    private fun readFromParcel(inParcel: Parcel) {
-        walletAddress = inParcel.readP(TariWalletAddress::class.java)
-        alias = inParcel.readString().orEmpty()
-    }
-
-    override fun describeContents(): Int {
-        return 0
-    }
-
-    // endregion
-
 }
+
+

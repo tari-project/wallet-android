@@ -1,6 +1,9 @@
 package com.tari.android.wallet.ui.fragment.settings.allSettings
 
 interface AllSettingsRouter {
+
+    fun toMyProfile()
+
     fun toAbout()
 
     fun toBackupSettings(withAnimation: Boolean = true)
