@@ -40,6 +40,7 @@ class FavoritesFragment : ContactsFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        viewModel.isFavorite = true
         viewModel.addFilter { contactItem -> contactItem.contact.isFavorite }
     }
 }

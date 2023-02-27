@@ -55,10 +55,9 @@ class ContactProfileViewHolder(view: ItemContactProfileBinding) :
 
     private fun showEmojiId(emojiId: String) {
         if (emojiId.isEmpty()) {
-            ui.firstEmojiTextView.gone()
+            ui.participantEmojiIdView.emojiIdSummaryContainer.gone()
             return
         }
-        ui.firstEmojiTextView.text = emojiId.extractEmojis()[0]
         emojiIdSummaryController.display(emojiId)
     }
 

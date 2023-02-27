@@ -1,7 +1,12 @@
 package com.tari.android.wallet.ui.fragment.contact_book.details.adapter.profile
 
+import android.app.Activity
 import com.tari.android.wallet.R
 import com.tari.android.wallet.databinding.ItemContactProfileBinding
+import com.tari.android.wallet.ui.extension.hideKeyboard
+import com.tari.android.wallet.ui.extension.setSelectionToEnd
+import com.tari.android.wallet.ui.extension.showKeyboard
+import com.tari.android.wallet.ui.fragment.home.HomeActivity
 
 class NameController(private val binding: ItemContactProfileBinding, private val saveName: (String) -> Unit) {
 
@@ -25,5 +30,12 @@ class NameController(private val binding: ItemContactProfileBinding, private val
         binding.aliasEditIcon.setImageResource(icon)
         binding.aliasBackground.switch(editState)
         binding.alias.isEnabled = editState
+        if (editState) {
+            binding.alias.requestFocus()
+            binding.alias.setSelectionToEnd()
+            HomeActivity.instance.get()?.showKeyboard()
+        } else {
+            HomeActivity.instance.get()?.hideKeyboard()
+        }
     }
 }

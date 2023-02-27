@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.appcompat.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:clickable="true"
+    android:focusable="true"
+    android:orientation="vertical">
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/empty_state_image_view"
+        android:layout_width="150dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="30dp" />
+
+    <com.tari.android.wallet.ui.component.tari.TariTextView
+        android:id="@+id/empty_state_title_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="30dp"
+        android:gravity="center_horizontal"
+        android:textColor="?attr/palette_text_heading"
+        android:textSize="18sp"
+        app:customFont="regular"
+        tools:text="@string/dummy_message" />
+
+    <com.tari.android.wallet.ui.component.tari.TariTextView
+        android:id="@+id/empty_state_body_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginHorizontal="30dp"
+        android:layout_marginTop="20dp"
+        android:gravity="center_horizontal"
+        android:lineSpacingExtra="8dp"
+        android:textColor="?attr/palette_text_body"
+        android:textSize="14sp"
+        app:customFont="medium"
+        tools:text="@string/long_dummy_message" />
+
+    <com.tari.android.wallet.ui.component.tari.TariSecondaryButton
+        android:id="@+id/empty_state_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="20dp" />
+
+</androidx.appcompat.widget.LinearLayoutCompat>

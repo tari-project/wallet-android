@@ -14,7 +14,7 @@ class ContactsRepository @Inject constructor(
 
     init {
         doOnConnectedToWallet {
-            val list = (1..100).map { ContactDto.generateContactDto() }.toMutableList()
+            val list = (1..10).map { ContactDto.generateContactDto() }.toMutableList()
             publishSubject.onNext(list)
         }
     }

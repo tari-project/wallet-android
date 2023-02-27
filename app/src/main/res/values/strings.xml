@@ -712,5 +712,11 @@
     <string name="contact_book_details_delete_contact">Delete Contact</string>
     <string name="contact_book_details_phone_contacts">Phone Contact</string>
     <string name="contact_book_details_connected_wallets">Connected Wallets</string>
+    <string name="contact_book_empty_state_title">Find your friends</string>
+    <string name="contact_book_empty_state_body">Keep track of your contacts by saving them in the contact book. To add a new contact, tap the “add contact” icon at the top of the page</string>
+    <string name="contact_book_empty_state_body_no_permissions">You can add a new contact by tapping on the “add contact” icon at the top of the page.\n Aurora can also automatically detect contacts with Tari addresses on you phone. We’ll need your permission to access your existing contact book to do this.</string>
+    <string name="contact_book_empty_state_favorites_title">Add some favorites</string>
+    <string name="contact_book_empty_state_favorites_body">You can favorite contacts to easily access them later. Tap on the contact’s name and then on the star icon to add them to your favorites list.</string>
+    <string name="contact_book_empty_state_grant_access_button">Grant app access to my contacts</string>
 
 </resources>

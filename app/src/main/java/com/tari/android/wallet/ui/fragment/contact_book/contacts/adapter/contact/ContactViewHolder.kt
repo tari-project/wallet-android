@@ -1,20 +1,17 @@
-package com.tari.android.wallet.ui.fragment.contact_book.contacts.adapter
+package com.tari.android.wallet.ui.fragment.contact_book.contacts.adapter.contact
 
 import com.tari.android.wallet.databinding.ItemContactBinding
-import com.tari.android.wallet.model.Contact
 import com.tari.android.wallet.ui.common.recyclerView.CommonViewHolder
 import com.tari.android.wallet.ui.common.recyclerView.ViewHolderBuilder
 import com.tari.android.wallet.ui.component.fullEmojiId.EmojiIdSummaryViewController
 import com.tari.android.wallet.ui.extension.gone
 import com.tari.android.wallet.ui.extension.setVisible
 import com.tari.android.wallet.ui.extension.visible
-import com.tari.android.wallet.ui.fragment.contact_book.data.ContactDto
 import com.tari.android.wallet.ui.fragment.contact_book.data.FFIContactDto
 import com.tari.android.wallet.ui.fragment.contact_book.data.MergedContactDto
 import com.tari.android.wallet.ui.fragment.contact_book.data.PhoneContactDto
 import com.tari.android.wallet.ui.fragment.contact_book.data.YatContactDto
 import com.tari.android.wallet.util.extractEmojis
-import com.tari.android.wallet.yat.YatUser
 
 class ContactViewHolder(view: ItemContactBinding) : CommonViewHolder<ContactItem, ItemContactBinding>(view) {
 
@@ -74,3 +71,5 @@ class ContactViewHolder(view: ItemContactBinding) : CommonViewHolder<ContactItem
             ViewHolderBuilder(ItemContactBinding::inflate, ContactItem::class.java) { ContactViewHolder(it as ItemContactBinding) }
     }
 }
+
+

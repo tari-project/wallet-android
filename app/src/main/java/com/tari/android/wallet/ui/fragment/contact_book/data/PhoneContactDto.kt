@@ -8,4 +8,6 @@ class PhoneContactDto(var name: String) : IContact {
     override fun extractWalletAddress(): TariWalletAddress = throw UnsupportedOperationException()
 
     override fun getAlias(): String = name
+
+    override fun getContactActions(): List<ContactAction> = super.getContactActions().filter { it != ContactAction.Send }
 }

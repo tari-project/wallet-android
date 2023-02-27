@@ -1,12 +1,14 @@
 package com.tari.android.wallet.ui.fragment.contact_book.contacts
 
 
+import android.text.SpannedString
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import androidx.lifecycle.viewModelScope
 import com.tari.android.wallet.R
+import com.tari.android.wallet.R.string.*
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.event.Event
 import com.tari.android.wallet.event.EventBus
@@ -18,7 +20,8 @@ import com.tari.android.wallet.ui.common.SingleLiveEvent
 import com.tari.android.wallet.ui.common.gyphy.repository.GIFRepository
 import com.tari.android.wallet.ui.common.recyclerView.CommonViewHolderItem
 import com.tari.android.wallet.ui.extension.toLiveData
-import com.tari.android.wallet.ui.fragment.contact_book.contacts.adapter.ContactItem
+import com.tari.android.wallet.ui.fragment.contact_book.contacts.adapter.contact.ContactItem
+import com.tari.android.wallet.ui.fragment.contact_book.contacts.adapter.emptyState.EmptyStateItem
 import com.tari.android.wallet.ui.fragment.contact_book.data.ContactsRepository
 import com.tari.android.wallet.ui.fragment.contact_book.data.PhoneContactDto
 import com.tari.android.wallet.ui.fragment.contact_book.root.ContactBookNavigation
@@ -48,6 +51,8 @@ class ContactsViewModel : CommonViewModel() {
 
     @Inject
     lateinit var contactsRepository: ContactsRepository
+
+    var isFavorite = false
 
     private val _navigation = SingleLiveEvent<ContactBookNavigation>()
     val navigation: LiveData<ContactBookNavigation> = _navigation
@@ -119,21 +124,56 @@ class ContactsViewModel : CommonViewModel() {
         val sourceList = sourceList.value ?: return
         val filters = filters.value ?: return
 
-        val filtered = sourceList.filter { contact -> contact.filtered(searchText) && filters.all { it.invoke(contact) } }
-
-        val (phoneContacts, notPhoneContact)  = filtered.partition { it.contact.contact is PhoneContactDto }
-
         val resultList = mutableListOf<CommonViewHolderItem>()
-        resultList.addAll(notPhoneContact)
-        resultList.add(SettingsTitleDto(resourceManager.getString(R.string.contact_book_details_phone_contacts)))
-        resultList.addAll(phoneContacts)
+
+        val filtered = sourceList.filter { !it.contact.isDeleted }
+            .filter { contact -> contact.filtered(searchText) && filters.all { it.invoke(contact) } }
+
+        if (filtered.isEmpty()) {
+            val emptyState = EmptyStateItem(getEmptyTitle(), getBody(), getEmptyImage(), getButtonTitle()) { grandPermission() }
+            resultList += emptyState
+        } else {
+            val (phoneContacts, notPhoneContact) = filtered.partition { it.contact.contact is PhoneContactDto }
+
+            resultList.addAll(notPhoneContact)
+            if (phoneContacts.isNotEmpty()) {
+                resultList.add(SettingsTitleDto(resourceManager.getString(contact_book_details_phone_contacts)))
+                resultList.addAll(phoneContacts)
+            }
+        }
 
         list.postValue(resultList)
     }
 
+    private fun getEmptyTitle(): SpannedString {
+        val resource = if (isFavorite) contact_book_empty_state_favorites_title else contact_book_empty_state_title
+        return SpannedString(resourceManager.getString(resource))
+    }
+
+    private fun getBody(): SpannedString {
+        val resource = if (isFavorite) contact_book_empty_state_favorites_body else
+            (if (isPermissionGranted()) contact_book_empty_state_body else contact_book_empty_state_body_no_permissions)
+        return SpannedString(resourceManager.getString(resource))
+    }
+
+    private fun getEmptyImage(): Int = if (isFavorite) R.drawable.vector_contact_favorite_empty_state else R.drawable.vector_contact_empty_state
+
+    private fun getButtonTitle() : String =
+        if (isPermissionGranted()) "" else resourceManager.getString(contact_book_empty_state_grant_access_button)
+
     private fun subscribeToEventBus() {
         EventBus.subscribe<Event.Contact.ContactAddedOrUpdated>(this) { onContactAddedOrUpdated(it.contactAddress, it.contactAlias) }
         EventBus.subscribe<Event.Contact.ContactRemoved>(this) { onContactRemoved(it.contactAddress) }
+    }
+
+    private fun isPermissionGranted(): Boolean {
+        //todo
+        return true
+    }
+
+    private fun grandPermission(): Boolean {
+        //todo
+        return true
     }
 
     private fun onContactAddedOrUpdated(tariWalletAddress: TariWalletAddress, alias: String) {
