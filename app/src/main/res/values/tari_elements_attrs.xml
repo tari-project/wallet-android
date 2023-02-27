@@ -26,6 +26,12 @@
         <attr name="elevation" />
     </declare-styleable>
 
+    <declare-styleable name="TariSwitchedBackground">
+        <attr name="cornerRadius" />
+        <attr name="elevation" />
+        <attr name="turnedOn" format="boolean" />
+    </declare-styleable>
+
     <attr name="customFont" format="enum">
         <enum name="black" value="0" />
         <enum name="heavy" value="1" />

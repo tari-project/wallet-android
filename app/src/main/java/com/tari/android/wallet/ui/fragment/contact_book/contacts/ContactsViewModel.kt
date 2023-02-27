@@ -6,6 +6,7 @@ import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import androidx.lifecycle.viewModelScope
+import com.tari.android.wallet.R
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.event.Event
 import com.tari.android.wallet.event.EventBus
@@ -19,7 +20,9 @@ import com.tari.android.wallet.ui.common.recyclerView.CommonViewHolderItem
 import com.tari.android.wallet.ui.extension.toLiveData
 import com.tari.android.wallet.ui.fragment.contact_book.contacts.adapter.ContactItem
 import com.tari.android.wallet.ui.fragment.contact_book.data.ContactsRepository
+import com.tari.android.wallet.ui.fragment.contact_book.data.PhoneContactDto
 import com.tari.android.wallet.ui.fragment.contact_book.root.ContactBookNavigation
+import com.tari.android.wallet.ui.fragment.settings.allSettings.title.SettingsTitleDto
 import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupSettingsRepository
 import io.reactivex.BackpressureStrategy
 import kotlinx.coroutines.Dispatchers
@@ -49,7 +52,7 @@ class ContactsViewModel : CommonViewModel() {
     private val _navigation = SingleLiveEvent<ContactBookNavigation>()
     val navigation: LiveData<ContactBookNavigation> = _navigation
 
-    val sourceList = MutableLiveData<MutableList<CommonViewHolderItem>>(mutableListOf())
+    val sourceList = MutableLiveData<MutableList<ContactItem>>(mutableListOf())
 
     val filters = MutableLiveData<MutableList<(ContactItem) -> Boolean>>(mutableListOf())
 
@@ -91,7 +94,7 @@ class ContactsViewModel : CommonViewModel() {
     }
 
     private fun updateTxListData() {
-        val newItems: MutableList<CommonViewHolderItem> = contactsRepository.publishSubject.value!!.map { ContactItem(it, 0) }.toMutableList()
+        val newItems = contactsRepository.publishSubject.value!!.map { ContactItem(it, 0) }.toMutableList()
         sourceList.postValue(newItems)
     }
 
@@ -116,8 +119,16 @@ class ContactsViewModel : CommonViewModel() {
         val sourceList = sourceList.value ?: return
         val filters = filters.value ?: return
 
-        list.postValue(sourceList.filter { contact -> contact !is ContactItem || contact.filtered(searchText) && filters.all { it.invoke(contact) } }
-            .toMutableList())
+        val filtered = sourceList.filter { contact -> contact.filtered(searchText) && filters.all { it.invoke(contact) } }
+
+        val (phoneContacts, notPhoneContact)  = filtered.partition { it.contact.contact is PhoneContactDto }
+
+        val resultList = mutableListOf<CommonViewHolderItem>()
+        resultList.addAll(notPhoneContact)
+        resultList.add(SettingsTitleDto(resourceManager.getString(R.string.contact_book_details_phone_contacts)))
+        resultList.addAll(phoneContacts)
+
+        list.postValue(resultList)
     }
 
     private fun subscribeToEventBus() {

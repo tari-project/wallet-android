@@ -55,6 +55,7 @@ import com.tari.android.wallet.ui.dialog.error.ErrorDialogArgs
 import com.tari.android.wallet.ui.dialog.modular.ModularDialog
 import com.tari.android.wallet.ui.dialog.tooltipDialog.TooltipDialogArgs
 import com.tari.android.wallet.ui.extension.*
+import com.tari.android.wallet.ui.fragment.contact_book.data.IContact
 import com.tari.android.wallet.ui.fragment.home.HomeActivity
 import com.tari.android.wallet.ui.fragment.send.addAmount.feeModule.NetworkSpeed
 import com.tari.android.wallet.ui.fragment.send.addAmount.keyboard.KeyboardController
@@ -72,7 +73,7 @@ class AddAmountFragment : CommonFragment<FragmentAddAmountBinding, AddAmountView
     /**
      * Recipient is either an emoji id or a user from contacts or recent txs.
      */
-    private var recipientUser: User? = null
+    private var recipientUser: IContact? = null
 
     /**
      *     Control full emoji popups
@@ -139,10 +140,21 @@ class AddAmountFragment : CommonFragment<FragmentAddAmountBinding, AddAmountView
             requireContext(),
             fullEmojiIdListener
         )
-        fullEmojiIdViewController.fullEmojiId = recipientUser?.walletAddress?.emojiId.orEmpty()
-        fullEmojiIdViewController.emojiIdHex = recipientUser?.walletAddress?.hexString.orEmpty()
+        val walletAddress = recipientUser?.extractWalletAddress()
+        fullEmojiIdViewController.fullEmojiId = walletAddress?.emojiId.orEmpty()
+        fullEmojiIdViewController.emojiIdHex = walletAddress?.hexString.orEmpty()
+
         displayAliasOrEmojiId()
         setActionBindings()
+    }
+
+    private fun displayAliasOrEmojiId() {
+        val alias = recipientUser?.getAlias().orEmpty()
+        if (alias.isEmpty()) {
+            displayEmojiId(recipientUser?.extractWalletAddress()?.emojiId.orEmpty())
+        } else {
+            displayAlias(alias)
+        }
     }
 
     private fun setActionBindings() {
@@ -172,16 +184,10 @@ class AddAmountFragment : CommonFragment<FragmentAddAmountBinding, AddAmountView
         addAmountListenerWR = WeakReference(context as AddAmountListener)
     }
 
-    private fun displayAliasOrEmojiId() {
-        if (recipientUser is Contact) {
-            ui.emojiIdSummaryContainerView.gone()
-            ui.titleTextView.visible()
-            ui.titleTextView.text = (recipientUser as Contact).alias
-        } else {
-            recipientUser?.walletAddress?.emojiId?.let {
-                displayEmojiId(it)
-            }
-        }
+    private fun displayAlias(alias: String) {
+        ui.emojiIdSummaryContainerView.gone()
+        ui.titleTextView.visible()
+        ui.titleTextView.text = alias
     }
 
     private fun displayEmojiId(emojiId: String) {

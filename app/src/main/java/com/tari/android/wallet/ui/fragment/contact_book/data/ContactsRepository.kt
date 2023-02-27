@@ -1,13 +1,7 @@
 package com.tari.android.wallet.ui.fragment.contact_book.data
 
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
-import com.tari.android.wallet.ffi.FFIWallet
-import com.tari.android.wallet.model.Contact
-import com.tari.android.wallet.model.TariWalletAddress
-import com.tari.android.wallet.model.User
 import com.tari.android.wallet.ui.common.CommonViewModel
-import com.tari.android.wallet.util.extractEmojis
-import com.tari.android.wallet.yat.YatUser
 import io.reactivex.subjects.BehaviorSubject
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -19,37 +13,38 @@ class ContactsRepository @Inject constructor(
     var publishSubject = BehaviorSubject.create<MutableList<ContactDto>>()
 
     init {
-        val items = mutableListOf<ContactDto>()
-
         doOnConnectedToWallet {
-            val address = it.getWalletAddress()
-
-            items.add(ContactDto(Contact(TariWalletAddress(address.toString(), address.getEmojiId()), "S"), true))
-            items.add(ContactDto(Contact(TariWalletAddress(address.toString(), address.getEmojiId()), "Sa"), false))
-            items.add(ContactDto(Contact(TariWalletAddress(address.toString(), address.getEmojiId()), "Sam"), true))
-            items.add(ContactDto(User(TariWalletAddress(address.toString(), address.getEmojiId())), false))
-            items.add(ContactDto(User(TariWalletAddress(address.toString(), address.getEmojiId())), true))
-            items.add(ContactDto(YatUser(TariWalletAddress(address.toString(), address.getEmojiId())).also {
-                it.yat = address.getEmojiId().extractEmojis().take(3).joinToString()
-            }, false))
-            items.add(ContactDto(YatUser(TariWalletAddress(address.toString(), address.getEmojiId())).also {
-                it.yat = address.getEmojiId().extractEmojis().take(5).joinToString()
-            }, true))
-
-            publishSubject.onNext(items)
+            val list = (1..100).map { ContactDto.generateContactDto() }.toMutableList()
+            publishSubject.onNext(list)
         }
     }
 
     fun toggleFavorite(contactDto: ContactDto) {
-        val value = publishSubject.value!!
-        contactDto.isFavorite = !contactDto.isFavorite
-        publishSubject.onNext(value)
+        updateContact(contactDto.uuid) {
+            it.isFavorite = !it.isFavorite
+        }
     }
 
     fun deleteContact(contactDto: ContactDto) {
+        updateContact(contactDto.uuid) {
+            it.isDeleted = true
+        }
+    }
+
+    fun updateContactName(contact: ContactDto, newName: String) {
+        updateContact(contact.uuid) {
+            when (val user = it.contact) {
+                is FFIContactDto -> user.localAlias = newName
+                is PhoneContactDto -> user.name = newName
+                is MergedContactDto -> user.phoneContactDto.name = newName
+            }
+        }
+    }
+
+    private fun updateContact(contactUuid: String, updateAction: (contact: ContactDto) -> Unit) {
         val value = publishSubject.value!!
-        val foundContact = value.firstOrNull { it.uuid == contactDto.uuid }
-        value.remove(foundContact)
+        val foundContact = value.firstOrNull { it.uuid == contactUuid }
+        foundContact?.let { contact -> updateAction.invoke(contact) }
         publishSubject.onNext(value)
     }
 }

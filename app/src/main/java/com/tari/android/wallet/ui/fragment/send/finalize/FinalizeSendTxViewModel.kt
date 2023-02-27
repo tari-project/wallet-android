@@ -170,7 +170,7 @@ class FinalizeSendTxViewModel : CommonViewModel() {
             viewModelScope.launch(Dispatchers.IO) {
                 val error = WalletError()
                 val txId = walletService.sendTari(
-                    transactionData.recipientUser,
+                    transactionData.recipientContact?.toUser(),
                     transactionData.amount,
                     transactionData.feePerGram ?: Constants.Wallet.defaultFeePerGram,
                     transactionData.note.orEmpty(),

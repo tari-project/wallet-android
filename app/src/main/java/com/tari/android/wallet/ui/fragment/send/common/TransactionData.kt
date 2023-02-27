@@ -3,13 +3,14 @@ package com.tari.android.wallet.ui.fragment.send.common
 import android.os.Parcel
 import android.os.Parcelable
 import com.tari.android.wallet.model.MicroTari
-import com.tari.android.wallet.model.User
 import com.tari.android.wallet.ui.extension.readP
+import com.tari.android.wallet.ui.extension.readS
+import com.tari.android.wallet.ui.fragment.contact_book.data.IContact
 
-data class TransactionData(val recipientUser: User?, val amount: MicroTari?, val note: String?, val feePerGram: MicroTari?, val isOneSidePayment: Boolean) : Parcelable {
+data class TransactionData(val recipientContact: IContact?, val amount: MicroTari?, val note: String?, val feePerGram: MicroTari?, val isOneSidePayment: Boolean) : Parcelable {
 
     constructor(parcel: Parcel) : this(
-        parcel.readP(User::class.java),
+        parcel.readS(IContact::class.java),
         parcel.readP(MicroTari::class.java),
         parcel.readString(),
         parcel.readP(MicroTari::class.java),
@@ -17,7 +18,7 @@ data class TransactionData(val recipientUser: User?, val amount: MicroTari?, val
     )
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
-        parcel.writeParcelable(recipientUser, flags)
+        parcel.writeSerializable(recipientContact)
         parcel.writeParcelable(amount, flags)
         parcel.writeString(note)
         parcel.writeParcelable(feePerGram, flags)

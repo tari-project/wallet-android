@@ -21,6 +21,7 @@ interface ContactBookRouter {
                 is ContactBookNavigation.ToContactDetails -> router.toContactDetails(navigation.contact)
                 is ContactBookNavigation.ToRequestTari -> router.toRequestTariFromContact(navigation.contact)
                 is ContactBookNavigation.ToSendTari -> router.toSendTariToContact(navigation.contact)
+                is ContactBookNavigation.ToExternalWallet -> Unit //todo
             }
         }
     }

@@ -23,6 +23,10 @@ abstract class TariBackground(context: Context, attrs: AttributeSet) : Constrain
         updateBack()
     }
 
+    fun restoreFullBack() {
+        updateBack()
+    }
+
     fun updateBack(r: Float? = null, elevation: Float? = null, backColor: Int? = null) {
         r?.let { radius = it }
         elevation?.let { backElevation = it }
@@ -53,6 +57,11 @@ abstract class TariBackground(context: Context, attrs: AttributeSet) : Constrain
         val shapeDrawable = ShapeDrawable(RoundRectShape(floatArrayOf(r, r, r, r, r, r, r, r), null, null))
         shapeDrawable.paint.color = backColor
         background = shapeDrawable
+    }
+
+    protected fun reset() {
+        background = null
+        elevation = 0.0F
     }
 
     override fun onAttachedToWindow() {

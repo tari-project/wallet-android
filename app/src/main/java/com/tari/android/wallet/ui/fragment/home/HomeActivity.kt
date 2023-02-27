@@ -77,6 +77,8 @@ import com.tari.android.wallet.ui.extension.showInternetConnectionErrorDialog
 import com.tari.android.wallet.ui.extension.string
 import com.tari.android.wallet.ui.fragment.contact_book.add.AddContactFragment
 import com.tari.android.wallet.ui.fragment.contact_book.data.ContactDto
+import com.tari.android.wallet.ui.fragment.contact_book.data.IContact
+import com.tari.android.wallet.ui.fragment.contact_book.data.YatContactDto
 import com.tari.android.wallet.ui.fragment.contact_book.details.ContactDetailsFragment
 import com.tari.android.wallet.ui.fragment.contact_book.root.ContactBookFragment
 import com.tari.android.wallet.ui.fragment.contact_book.root.ContactBookRouter
@@ -120,7 +122,6 @@ import com.tari.android.wallet.ui.fragment.tx.details.TxDetailsFragment.Companio
 import com.tari.android.wallet.ui.fragment.tx.details.TxDetailsFragment.Companion.TX_ID_EXTRA_KEY
 import com.tari.android.wallet.ui.fragment.utxos.list.UtxosListFragment
 import com.tari.android.wallet.util.Constants
-import com.tari.android.wallet.yat.YatUser
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -385,15 +386,15 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>(), AllSe
 
     override fun toChangePassword() = addFragment(ChangeSecurePasswordFragment())
 
-    override fun toSendTari(user: User?) = sendToUser(user)
+    override fun toSendTari(user: IContact?) = sendToUser(user)
 
     override fun toAddContact() = addFragment(AddContactFragment())
 
     override fun toContactDetails(contact: ContactDto) = addFragment(ContactDetailsFragment.createFragment(contact))
 
-    override fun toRequestTariFromContact(contact: ContactDto) = sendToUser(contact.user)
+    override fun toRequestTariFromContact(contact: ContactDto) = sendToUser(contact.contact)
 
-    override fun toSendTariToContact(contact: ContactDto) = sendToUser(contact.user)
+    override fun toSendTariToContact(contact: ContactDto) = sendToUser(contact.contact)
 
     override fun continueToAmount(user: User, amount: MicroTari?) {
         if (EventBus.networkConnectionState.publishSubject.value != NetworkConnectionState.CONNECTED) {
@@ -425,7 +426,7 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>(), AllSe
             return
         }
         val bundle = Bundle().apply {
-            putParcelable("transactionData", transactionData)
+            putParcelable(PARAMETER_TRANSACTION, transactionData)
             intent.getStringExtra(PARAMETER_NOTE)?.let { putString(PARAMETER_NOTE, it) }
         }
         addFragment(AddNoteFragment(), bundle)
@@ -436,7 +437,7 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>(), AllSe
     }
 
     override fun continueToFinalizeSendTx(transactionData: TransactionData) {
-        if (transactionData.recipientUser is YatUser) {
+        if (transactionData.recipientContact is YatContactDto) {
             viewModel.yatAdapter.showOutcomingFinalizeActivity(this, transactionData)
         } else {
             addFragment(FinalizeSendTxFragment.create(transactionData))
@@ -495,13 +496,13 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>(), AllSe
             WalletError.NoError -> contacts.firstOrNull { it.walletAddress == walletAddress } ?: User(walletAddress)
             else -> User(walletAddress)
         }
-        sendToUser(recipientUser)
+        sendToUser(IContact.generateFromUser(recipientUser))
     }
 
-    private fun sendToUser(recipientUser: User?) {
+    private fun sendToUser(recipientUser: IContact?) {
         if (recipientUser != null) {
             val bundle = Bundle().apply {
-                putParcelable("recipientUser", recipientUser)
+                putSerializable(PARAMETER_USER, recipientUser)
                 intent.getDoubleExtra(PARAMETER_AMOUNT, Double.MIN_VALUE).takeIf { it > 0 }?.let { putDouble(PARAMETER_AMOUNT, it) }
             }
             addFragment(AddAmountFragment(), bundle)
@@ -533,6 +534,7 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>(), AllSe
         const val PARAMETER_NOTE = "note"
         const val PARAMETER_AMOUNT = "amount"
         const val PARAMETER_USER = "recipientUser"
+        const val PARAMETER_TRANSACTION = "transaction_data"
 
         private const val KEY_PAGE = "key_page"
         private const val INDEX_HOME = 0

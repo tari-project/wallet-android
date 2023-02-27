@@ -9,6 +9,10 @@ import com.tari.android.wallet.ui.extension.gone
 import com.tari.android.wallet.ui.extension.setVisible
 import com.tari.android.wallet.ui.extension.visible
 import com.tari.android.wallet.ui.fragment.contact_book.data.ContactDto
+import com.tari.android.wallet.ui.fragment.contact_book.data.FFIContactDto
+import com.tari.android.wallet.ui.fragment.contact_book.data.MergedContactDto
+import com.tari.android.wallet.ui.fragment.contact_book.data.PhoneContactDto
+import com.tari.android.wallet.ui.fragment.contact_book.data.YatContactDto
 import com.tari.android.wallet.util.extractEmojis
 import com.tari.android.wallet.yat.YatUser
 
@@ -19,42 +23,50 @@ class ContactViewHolder(view: ItemContactBinding) : CommonViewHolder<ContactItem
     override fun bind(item: ContactItem) {
         super.bind(item)
 
-        with(item.contact) {
-            displayFirstEmoji(this)
-            displayAliasOrEmojiId(this)
-            ui.starred.setVisible(item.contact.isFavorite)
-        }
-    }
-
-    private fun displayFirstEmoji(contactDto: ContactDto) {
-        // display first emoji of emoji id
-        val firstEmoji = contactDto.user.walletAddress.emojiId.extractEmojis()[0]
-        ui.firstEmojiTextView.text = firstEmoji
-    }
-
-    private fun displayAliasOrEmojiId(contactDto: ContactDto) {
-        // display contact name or emoji id
-        when (val txUser = contactDto.user) {
-            is Contact -> {
-                val alias = txUser.alias
-                ui.alias.text = alias
-                ui.alias.visible()
-                ui.participantEmojiIdView.root.gone()
+        when(val dto = item.contact.contact) {
+            is YatContactDto -> {
+                displayFirstEmojiOrText(dto.walletAddress.emojiId.extractEmojis()[0])
+                if (dto.localAlias.isEmpty()) {
+                    displayEmojiId(dto.walletAddress.emojiId)
+                } else {
+                    displayAlias(dto.localAlias)
+                }
             }
-
-            is YatUser -> {
-                val alias = txUser.yat
-                ui.alias.text = alias
-                ui.alias.visible()
-                ui.participantEmojiIdView.root.gone()
+            is FFIContactDto -> {
+                displayFirstEmojiOrText(dto.walletAddress.emojiId.extractEmojis()[0])
+                if (dto.localAlias.isEmpty()) {
+                    displayEmojiId(dto.walletAddress.emojiId)
+                } else {
+                    displayAlias(dto.localAlias)
+                }
             }
-
-            else -> {
-                ui.participantEmojiIdView.root.visible()
-                ui.alias.gone()
-                emojiIdSummaryController.display(txUser.walletAddress.emojiId, showEmojisFromEachEnd = 3)
+            is MergedContactDto -> {
+                displayFirstEmojiOrText(dto.ffiContactDto.walletAddress.emojiId.extractEmojis()[0])
+                displayAlias(dto.phoneContactDto.name)
+            }
+            is PhoneContactDto -> {
+                displayFirstEmojiOrText(dto.name.firstOrNull()?.toString() ?: "C")
+                displayAlias(dto.name)
             }
         }
+
+        ui.starred.setVisible(item.contact.isFavorite)
+    }
+
+    private fun displayFirstEmojiOrText(string: String) {
+        ui.firstEmojiTextView.text = string
+    }
+
+    private fun displayAlias(alias: String) {
+        ui.alias.text = alias
+        ui.alias.visible()
+        ui.participantEmojiIdView.root.gone()
+    }
+
+    private fun displayEmojiId(emojiId: String) {
+        ui.participantEmojiIdView.root.visible()
+        ui.alias.gone()
+        emojiIdSummaryController.display(emojiId, showEmojisFromEachEnd = 3)
     }
 
     companion object {

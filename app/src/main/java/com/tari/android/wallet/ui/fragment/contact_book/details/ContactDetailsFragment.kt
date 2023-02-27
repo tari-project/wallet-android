@@ -54,4 +54,3 @@ class ContactDetailsFragment : CommonFragment<FragmentContactsDetailsBinding, Co
         }
     }
 }
-
