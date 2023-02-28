@@ -50,7 +50,7 @@ class ContactBookFragment : CommonFragment<FragmentContactBookRootBinding, Conta
             )
         }.attach()
 
-        ui.toolbar.rightAction = { viewModel.navigate(ContactBookNavigation.ToAddContact()) }
+        ui.toolbar.rightAction = { viewModel.navigate(ContactBookNavigation.ToAddContact) }
 
         ui.searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextChange(newText: String?): Boolean {

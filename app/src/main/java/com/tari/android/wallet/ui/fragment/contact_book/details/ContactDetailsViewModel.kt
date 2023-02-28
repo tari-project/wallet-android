@@ -61,8 +61,7 @@ class ContactDetailsViewModel : CommonViewModel() {
 
         if (availableActions.contains(ContactAction.FavoriteToggle)) {
             newList.add(ButtonViewDto(resourceManager.getString(favoritesText), iconId = R.drawable.tari_empty_drawable) {
-                contactsRepository.toggleFavorite(contact)
-                _backPressed.postValue(Unit)
+                this.contact.value = contactsRepository.toggleFavorite(contact)
             })
             newList.add(DividerViewHolderItem())
         }

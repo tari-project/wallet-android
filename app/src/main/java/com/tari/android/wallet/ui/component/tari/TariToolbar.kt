@@ -45,6 +45,11 @@ class TariToolbar(context: Context, attrs: AttributeSet) : FrameLayout(context, 
         setOnThrottledClickListener { rightAction() }
     }
 
+    fun clearRightIcon() {
+        ui.toolbarRightIcon.gone()
+        ui.toolbarRightText.gone()
+    }
+
     fun setupRightIcon(icon: Drawable) = with(ui.toolbarRightIcon) {
         visible()
         setImageDrawable(icon)

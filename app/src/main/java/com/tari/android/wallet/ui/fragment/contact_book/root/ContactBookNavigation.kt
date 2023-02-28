@@ -1,12 +1,17 @@
 package com.tari.android.wallet.ui.fragment.contact_book.root
 
 import com.tari.android.wallet.ui.fragment.contact_book.data.ContactDto
+import com.tari.android.wallet.ui.fragment.contact_book.data.IContact
 
 sealed class ContactBookNavigation {
 
     class ToContactDetails(val contact: ContactDto) : ContactBookNavigation()
 
-    class ToAddContact : ContactBookNavigation()
+    object ToAddContact : ContactBookNavigation()
+
+    class ToAddContactName(val contact: IContact) : ContactBookNavigation()
+
+    object ToFinalizeAddingContact : ContactBookNavigation()
 
     class ToSendTari(val contact: ContactDto) : ContactBookNavigation()
 

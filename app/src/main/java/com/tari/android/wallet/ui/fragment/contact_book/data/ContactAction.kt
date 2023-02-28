@@ -4,5 +4,7 @@ enum class ContactAction {
     Send,
     FavoriteToggle,
     EditName,
-    Delete
+    Delete,
+    Lint,
+    Unlink
 }

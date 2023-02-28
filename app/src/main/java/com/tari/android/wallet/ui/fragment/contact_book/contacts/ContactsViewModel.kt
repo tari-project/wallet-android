@@ -133,7 +133,9 @@ class ContactsViewModel : CommonViewModel() {
             val emptyState = EmptyStateItem(getEmptyTitle(), getBody(), getEmptyImage(), getButtonTitle()) { grandPermission() }
             resultList += emptyState
         } else {
-            val (phoneContacts, notPhoneContact) = filtered.partition { it.contact.contact is PhoneContactDto }
+            val sorted = filtered.sortedBy { it.contact.contact.getAlias().lowercase() }
+
+            val (phoneContacts, notPhoneContact) = sorted.partition { it.contact.contact is PhoneContactDto }
 
             resultList.addAll(notPhoneContact)
             if (phoneContacts.isNotEmpty()) {

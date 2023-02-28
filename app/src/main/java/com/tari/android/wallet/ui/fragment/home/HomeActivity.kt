@@ -76,6 +76,7 @@ import com.tari.android.wallet.ui.extension.parcelable
 import com.tari.android.wallet.ui.extension.showInternetConnectionErrorDialog
 import com.tari.android.wallet.ui.extension.string
 import com.tari.android.wallet.ui.fragment.contact_book.add.AddContactFragment
+import com.tari.android.wallet.ui.fragment.contact_book.addContactName.AddContactNameFragment
 import com.tari.android.wallet.ui.fragment.contact_book.data.ContactDto
 import com.tari.android.wallet.ui.fragment.contact_book.data.IContact
 import com.tari.android.wallet.ui.fragment.contact_book.data.YatContactDto
@@ -395,6 +396,13 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>(), AllSe
     override fun toRequestTariFromContact(contact: ContactDto) = sendToUser(contact.contact)
 
     override fun toSendTariToContact(contact: ContactDto) = sendToUser(contact.contact)
+
+    override fun toAddContactName(contact: IContact) = addFragment(AddContactNameFragment.createFragment(contact))
+
+    override fun toFinalizeAddingContact() {
+        onBackPressed()
+        onBackPressed()
+    }
 
     override fun continueToAmount(user: User, amount: MicroTari?) {
         if (EventBus.networkConnectionState.publishSubject.value != NetworkConnectionState.CONNECTED) {

@@ -701,9 +701,12 @@
 
     <!-- Contact book -->
     <string name="contact_book_contacts_book_title">Contact Book</string>
+    <string name="contact_book_contacts_book_details_title">Contact Profile</string>
     <string name="contact_book_contacts_title">Contacts</string>
     <string name="contact_book_favorites_title">Favorites</string>
     <string name="contact_book_add_contact_title">Add Contact</string>
+    <string name="contact_book_add_contact_name_hint">Full Name</string>
+    <string name="contact_book_add_contact_placeholder">Enter Emoji ID</string>
     <string name="contact_book_search_hint">Find Contact</string>
     <string name="contact_book_details_send_tari">Send Tari</string>
     <string name="contact_book_details_requst_tari">Request Tari</string>
@@ -718,5 +721,7 @@
     <string name="contact_book_empty_state_favorites_title">Add some favorites</string>
     <string name="contact_book_empty_state_favorites_body">You can favorite contacts to easily access them later. Tap on the contact’s name and then on the star icon to add them to your favorites list.</string>
     <string name="contact_book_empty_state_grant_access_button">Grant app access to my contacts</string>
+    <string name="contact_book_add_contact_done_button">Done</string>
+    <string name="contact_book_add_contact_next_button">Next</string>
 
 </resources>

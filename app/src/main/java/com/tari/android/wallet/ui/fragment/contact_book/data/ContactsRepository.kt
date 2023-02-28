@@ -19,11 +19,21 @@ class ContactsRepository @Inject constructor(
         }
     }
 
-    fun toggleFavorite(contactDto: ContactDto) {
+    fun addContact(contact: IContact) {
+        withListUpdate {
+            val newContact = ContactDto(contact)
+            it.add(newContact)
+        }
+    }
+
+    fun toggleFavorite(contactDto: ContactDto): ContactDto {
         updateContact(contactDto.uuid) {
             it.isFavorite = !it.isFavorite
         }
+        return getByUuid(contactDto.uuid)
     }
+
+    fun getByUuid(uuid: String): ContactDto = publishSubject.value!!.first { it.uuid == uuid }
 
     fun deleteContact(contactDto: ContactDto) {
         updateContact(contactDto.uuid) {
@@ -42,9 +52,15 @@ class ContactsRepository @Inject constructor(
     }
 
     private fun updateContact(contactUuid: String, updateAction: (contact: ContactDto) -> Unit) {
+        withListUpdate {
+            val foundContact = it.firstOrNull { it.uuid == contactUuid }
+            foundContact?.let { contact -> updateAction.invoke(contact) }
+        }
+    }
+
+    private fun withListUpdate(updateAction: (list: MutableList<ContactDto>) -> Unit) {
         val value = publishSubject.value!!
-        val foundContact = value.firstOrNull { it.uuid == contactUuid }
-        foundContact?.let { contact -> updateAction.invoke(contact) }
+        updateAction.invoke(value)
         publishSubject.onNext(value)
     }
 }
