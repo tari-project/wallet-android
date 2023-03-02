@@ -703,11 +703,13 @@
     <string name="contact_book_contacts_book_title">Contact Book</string>
     <string name="contact_book_contacts_book_details_title">Contact Profile</string>
     <string name="contact_book_contacts_book_link_title">Link Contact</string>
+    <string name="contact_book_contacts_book_link_message2">Click "confirm" below to link\n 🍕🦄🔥 to Chris</string>
+    <string name="contact_book_contacts_book_link_success_message">You have successfully linked \n 🍕🦄🔥 to Chris</string>
     <string name="contact_book_contacts_book_link_message">You can quickly associate an Emoji ID or Yat with a contact already present in your phone. Simply click on a name below and it will be linked to 🍕🦄🔥.</string>
     <string name="contact_book_contacts_book_unlink_title">Unlink Contact</string>
-    <string name="contact_book_contacts_book_unlink_message">Click “confirm” to unlink\n 🍕🦄🔥 from from Chris</string>
+    <string name="contact_book_contacts_book_unlink_message">Click "confirm" to unlink\n 🍕🦄🔥 from Chris</string>
     <string name="contact_book_contacts_book_unlink_success_title">Success!</string>
-    <string name="contact_book_contacts_book_unlink_success_message">You have successfully unlinked \n 🍕🦄🔥 from from Chris</string>
+    <string name="contact_book_contacts_book_unlink_success_message">You have successfully unlinked \n 🍕🦄🔥 from Chris</string>
     <string name="contact_book_contacts_title">Contacts</string>
     <string name="contact_book_favorites_title">Favorites</string>
     <string name="contact_book_add_contact_title">Add Contact</string>

@@ -122,7 +122,7 @@ class ContactDetailsViewModel : CommonViewModel() {
                 newList += DividerViewHolderItem()
             }
         }
-        
+
         newList += SpaceVerticalViewHolderItem(20)
 
         list.postValue(newList)
@@ -170,7 +170,7 @@ class ContactDetailsViewModel : CommonViewModel() {
         val modules = listOf(
             HeadModule(resourceManager.getString(R.string.contact_book_details_delete_contact)),
             BodyModule(resourceManager.getString(R.string.contact_book_details_delete_message)),
-            ButtonModule(resourceManager.getString(R.string.contact_book_details_delete_message), Warning) {
+            ButtonModule(resourceManager.getString(R.string.contact_book_details_delete_button_title), Warning) {
                 contactsRepository.deleteContact(contact.value!!)
                 _backPressed.postValue(Unit)
             },
