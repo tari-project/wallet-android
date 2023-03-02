@@ -143,8 +143,6 @@ class AddContactFragment : CommonFragment<FragmentContactsAddBinding, AddContact
 
         observe(showClipboardData) { showClipboardData(it) }
 
-        observe(foundYatUser) { showYatUser(if (it.isPresent) it.get() else null) }
-
         observeOnLoad(readyToInteract)
         observeOnLoad(serviceIsReady)
         observeOnLoad(clipboardChecker)
@@ -160,30 +158,6 @@ class AddContactFragment : CommonFragment<FragmentContactsAddBinding, AddContact
 
     private fun processNavigation(navigation: ContactBookNavigation) {
         ContactBookRouter.processNavigation(requireActivity(), navigation)
-    }
-
-    private fun showYatUser(yatUser: YatUser?) {
-        val isExist = yatUser != null
-        ui.yatEyeButton.setVisible(isExist)
-        ui.yatIcon.setVisible(isExist)
-
-        if (isExist) {
-            setYatState(true)
-            ui.searchEditText.postDelayed({
-                TransitionManager.beginDelayedTransition(ui.searchEditTextAnimateContainer)
-                ui.searchEditText.textAlignment = View.TEXT_ALIGNMENT_CENTER
-                ui.searchEditText.gravity = Gravity.CENTER
-            }, 100)
-
-            ui.toolbar.setupRightButton(getString(R.string.contact_book_add_contact_next_button))
-            requireActivity().hideKeyboard()
-            ui.searchEditText.clearFocus()
-        } else {
-            ui.searchEditText.postDelayed({
-                ui.searchEditText.textAlignment = View.TEXT_ALIGNMENT_TEXT_START
-                ui.searchEditText.gravity = Gravity.CENTER_VERTICAL or Gravity.START
-            }, 100)
-        }
     }
 
     private fun setupUI() {
@@ -227,12 +201,10 @@ class AddContactFragment : CommonFragment<FragmentContactsAddBinding, AddContact
         if (!isOpen) {
             ui.searchEditText.removeTextChangedListener(this)
             ui.searchEditText.isEnabled = false
-            ui.searchEditText.setText(viewModel.foundYatUser.value!!.get().walletAddress.hexString)
             ui.yatEyeButton.setImageDrawable(ContextCompat.getDrawable(requireContext(), R.drawable.vector_closed_eye))
         } else {
             ui.searchEditText.isEnabled = true
             ui.searchEditText.removeTextChangedListener(this)
-            ui.searchEditText.setText(viewModel.foundYatUser.value!!.get().yat)
             ui.searchEditText.setSelectionToEnd()
             ui.searchEditText.addTextChangedListener(this)
             ui.yatEyeButton.setImageDrawable(ContextCompat.getDrawable(requireContext(), R.drawable.vector_opened_eye))

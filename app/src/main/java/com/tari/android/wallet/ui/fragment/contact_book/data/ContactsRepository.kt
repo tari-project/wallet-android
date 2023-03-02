@@ -13,10 +13,13 @@ class ContactsRepository @Inject constructor(
     var publishSubject = BehaviorSubject.create<MutableList<ContactDto>>()
 
     init {
-        doOnConnectedToWallet {
-            val list = (1..10).map { ContactDto.generateContactDto() }.toMutableList()
-            publishSubject.onNext(list)
-        }
+//        doOnConnectedToWallet {
+//            val list = (1..10).map { ContactDto.generateContactDto() }.toMutableList()
+//            publishSubject.onNext(list)
+//        }
+
+        val list = (1..10).map { ContactDto.generateContactDto() }.toMutableList()
+        publishSubject.onNext(list)
     }
 
     fun addContact(contact: IContact) {
@@ -41,7 +44,11 @@ class ContactsRepository @Inject constructor(
         }
     }
 
-    fun updateContactName(contact: ContactDto, newName: String) {
+    fun unlinkContact(contact: ContactDto) {
+        //todo
+    }
+
+    fun updateContactName(contact: ContactDto, newName: String): ContactDto {
         updateContact(contact.uuid) {
             when (val user = it.contact) {
                 is FFIContactDto -> user.localAlias = newName
@@ -49,6 +56,7 @@ class ContactsRepository @Inject constructor(
                 is MergedContactDto -> user.phoneContactDto.name = newName
             }
         }
+        return getByUuid(contact.uuid)
     }
 
     private fun updateContact(contactUuid: String, updateAction: (contact: ContactDto) -> Unit) {

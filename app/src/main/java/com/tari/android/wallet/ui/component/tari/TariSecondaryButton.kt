@@ -35,7 +35,11 @@ package com.tari.android.wallet.ui.component.tari
 import android.content.Context
 import android.util.AttributeSet
 import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
 import android.widget.FrameLayout
+import androidx.core.view.updateLayoutParams
 import com.tari.android.wallet.R
 import com.tari.android.wallet.databinding.TariSecondaryButtonBinding
 import com.tari.android.wallet.ui.extension.obtain
@@ -52,6 +56,10 @@ class TariSecondaryButton(context: Context, attrs: AttributeSet) : FrameLayout(c
             getString(R.styleable.TariSecondaryButton_title)?.let { ui.button.text = it }
             isEnabled = (getBoolean(R.styleable.TariSecondaryButton_android_enabled, true))
         }
+
+//        updateLayoutParams<MarginLayoutParams> {
+//            height = WRAP_CONTENT
+//        }
     }
 
     override fun isEnabled(): Boolean = ui.button.isEnabled

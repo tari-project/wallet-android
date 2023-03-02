@@ -18,5 +18,7 @@ sealed class ContactBookNavigation {
     class ToRequestTari(val contact: ContactDto) : ContactBookNavigation()
 
     class ToExternalWallet(val contact: ContactDto) : ContactBookNavigation()
+
+    class ToLinkContact(val contact: ContactDto) : ContactBookNavigation()
 }
 

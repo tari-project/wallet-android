@@ -81,6 +81,7 @@ import com.tari.android.wallet.ui.fragment.contact_book.data.ContactDto
 import com.tari.android.wallet.ui.fragment.contact_book.data.IContact
 import com.tari.android.wallet.ui.fragment.contact_book.data.YatContactDto
 import com.tari.android.wallet.ui.fragment.contact_book.details.ContactDetailsFragment
+import com.tari.android.wallet.ui.fragment.contact_book.link.ContactLinkFragment
 import com.tari.android.wallet.ui.fragment.contact_book.root.ContactBookFragment
 import com.tari.android.wallet.ui.fragment.contact_book.root.ContactBookRouter
 import com.tari.android.wallet.ui.fragment.onboarding.activity.OnboardingFlowActivity
@@ -404,6 +405,8 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>(), AllSe
         onBackPressed()
     }
 
+    override fun toLinkContact(contact: ContactDto) = addFragment(ContactLinkFragment.createFragment(contact))
+
     override fun continueToAmount(user: User, amount: MicroTari?) {
         if (EventBus.networkConnectionState.publishSubject.value != NetworkConnectionState.CONNECTED) {
             showInternetConnectionErrorDialog(this)
@@ -543,6 +546,8 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>(), AllSe
         const val PARAMETER_AMOUNT = "amount"
         const val PARAMETER_USER = "recipientUser"
         const val PARAMETER_TRANSACTION = "transaction_data"
+        const val PARAMETER_CONTACT = "tari_contact_dto_args"
+
 
         private const val KEY_PAGE = "key_page"
         private const val INDEX_HOME = 0

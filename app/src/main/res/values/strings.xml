@@ -702,6 +702,12 @@
     <!-- Contact book -->
     <string name="contact_book_contacts_book_title">Contact Book</string>
     <string name="contact_book_contacts_book_details_title">Contact Profile</string>
+    <string name="contact_book_contacts_book_link_title">Link Contact</string>
+    <string name="contact_book_contacts_book_link_message">You can quickly associate an Emoji ID or Yat with a contact already present in your phone. Simply click on a name below and it will be linked to 🍕🦄🔥.</string>
+    <string name="contact_book_contacts_book_unlink_title">Unlink Contact</string>
+    <string name="contact_book_contacts_book_unlink_message">Click “confirm” to unlink\n 🍕🦄🔥 from from Chris</string>
+    <string name="contact_book_contacts_book_unlink_success_title">Success!</string>
+    <string name="contact_book_contacts_book_unlink_success_message">You have successfully unlinked \n 🍕🦄🔥 from from Chris</string>
     <string name="contact_book_contacts_title">Contacts</string>
     <string name="contact_book_favorites_title">Favorites</string>
     <string name="contact_book_add_contact_title">Add Contact</string>
@@ -709,12 +715,16 @@
     <string name="contact_book_add_contact_placeholder">Enter Emoji ID</string>
     <string name="contact_book_search_hint">Find Contact</string>
     <string name="contact_book_details_send_tari">Send Tari</string>
-    <string name="contact_book_details_requst_tari">Request Tari</string>
     <string name="contact_book_details_add_to_favorites">Add to Favorites</string>
     <string name="contact_book_details_remove_from_favorites">Remove from Favorites</string>
     <string name="contact_book_details_delete_contact">Delete Contact</string>
+    <string name="contact_book_details_delete_message">You are about to permanently remove this contact. Are you sure?</string>
+    <string name="contact_book_details_delete_button_title">Delete</string>
     <string name="contact_book_details_phone_contacts">Phone Contact</string>
     <string name="contact_book_details_connected_wallets">Connected Wallets</string>
+    <string name="contact_book_details_edit">Edit</string>
+    <string name="contact_book_details_edit_hint">Full Name</string>
+    <string name="contact_book_details_edit_title">Edit Contact</string>
     <string name="contact_book_empty_state_title">Find your friends</string>
     <string name="contact_book_empty_state_body">Keep track of your contacts by saving them in the contact book. To add a new contact, tap the “add contact” icon at the top of the page</string>
     <string name="contact_book_empty_state_body_no_permissions">You can add a new contact by tapping on the “add contact” icon at the top of the page.\n Aurora can also automatically detect contacts with Tari addresses on you phone. We’ll need your permission to access your existing contact book to do this.</string>

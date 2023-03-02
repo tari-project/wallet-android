@@ -15,7 +15,8 @@
         android:layout_height="match_parent"
         android:orientation="vertical"
         android:paddingHorizontal="@dimen/common_horizontal_margin"
-        android:paddingVertical="41dp">
+        android:paddingTop="21dp"
+        android:paddingBottom="21dp">
 
         <com.tari.android.wallet.ui.component.tari.TariPrimaryBackground
             android:layout_width="65dp"
@@ -46,70 +47,25 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="20dp"
             android:layout_weight="1" />
 
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/alias_container"
+        <com.tari.android.wallet.ui.component.tari.TariTextView
+            android:id="@+id/alias"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingVertical="8dp">
-
-            <androidx.appcompat.widget.AppCompatImageView
-                android:id="@+id/alias_hidden_icon"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="end"
-                android:padding="14dp"
-                android:src="@drawable/vector_profile_edit_pen"
-                android:visibility="invisible"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <com.tari.android.wallet.ui.component.tari.TariSwitchedBackground
-                android:id="@+id/alias_background"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                app:cornerRadius="5dp"
-                app:elevation="8dp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@+id/alias_edit_icon"
-                app:layout_constraintStart_toEndOf="@+id/alias_hidden_icon"
-                app:layout_constraintTop_toTopOf="parent"
-                app:turnedOn="true">
-
-                <com.tari.android.wallet.ui.component.tari.TariEditText
-                    android:id="@+id/alias"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:background="@android:color/transparent"
-                    android:gravity="center_horizontal"
-                    android:paddingVertical="8dp"
-                    android:text="@string/tx_list_you_paid"
-                    android:textColor="?attr/palette_text_heading"
-                    android:textSize="15sp"
-                    app:customFont="heavy"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
-
-            </com.tari.android.wallet.ui.component.tari.TariSwitchedBackground>
-
-            <androidx.appcompat.widget.AppCompatImageView
-                android:id="@+id/alias_edit_icon"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="end"
-                android:padding="14dp"
-                android:src="@drawable/vector_profile_edit_pen"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
-        </androidx.constraintlayout.widget.ConstraintLayout>
+            android:layout_gravity="center"
+            android:layout_marginTop="20dp"
+            android:background="@android:color/transparent"
+            android:gravity="center_horizontal"
+            android:text="@string/tx_list_you_paid"
+            android:textColor="?attr/palette_text_heading"
+            android:textSize="15sp"
+            app:customFont="heavy"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
     </androidx.appcompat.widget.LinearLayoutCompat>
 

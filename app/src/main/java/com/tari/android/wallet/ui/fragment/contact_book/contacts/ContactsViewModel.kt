@@ -8,7 +8,13 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import androidx.lifecycle.viewModelScope
 import com.tari.android.wallet.R
-import com.tari.android.wallet.R.string.*
+import com.tari.android.wallet.R.string.contact_book_details_phone_contacts
+import com.tari.android.wallet.R.string.contact_book_empty_state_body
+import com.tari.android.wallet.R.string.contact_book_empty_state_body_no_permissions
+import com.tari.android.wallet.R.string.contact_book_empty_state_favorites_body
+import com.tari.android.wallet.R.string.contact_book_empty_state_favorites_title
+import com.tari.android.wallet.R.string.contact_book_empty_state_grant_access_button
+import com.tari.android.wallet.R.string.contact_book_empty_state_title
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.event.Event
 import com.tari.android.wallet.event.EventBus
@@ -81,7 +87,10 @@ class ContactsViewModel : CommonViewModel() {
 
         list.addSource(filters) { updateList() }
 
-        list.addSource(contactsRepository.publishSubject.toLiveData(BackpressureStrategy.BUFFER)) { updateTxListData() }
+        list.addSource(contactsRepository.publishSubject.toLiveData(BackpressureStrategy.BUFFER)) { updateContacts() }
+
+        //todo remove
+        onServiceConnected()
 
         doOnConnectedToWallet { doOnConnected { onServiceConnected() } }
     }
@@ -98,14 +107,18 @@ class ContactsViewModel : CommonViewModel() {
         refreshAllData()
     }
 
-    private fun updateTxListData() {
-        val newItems = contactsRepository.publishSubject.value!!.map { ContactItem(it, 0) }.toMutableList()
+    private fun updateContacts() {
+        val newItems = contactsRepository.publishSubject.value!!.map { contactDto -> ContactItem(contactDto) { notify(it) } }.toMutableList()
         sourceList.postValue(newItems)
+    }
+
+    private fun notify(currentContact: ContactItem) {
+        list.value?.filterIsInstance<ContactItem>()?.forEach { contactItem -> contactItem.toggleBadges(currentContact == contactItem) }
     }
 
     fun refreshAllData(isRestarted: Boolean = false) {
         viewModelScope.launch(Dispatchers.IO) {
-            updateTxListData()
+            updateContacts()
             updateList()
         }
     }
@@ -160,7 +173,7 @@ class ContactsViewModel : CommonViewModel() {
 
     private fun getEmptyImage(): Int = if (isFavorite) R.drawable.vector_contact_favorite_empty_state else R.drawable.vector_contact_empty_state
 
-    private fun getButtonTitle() : String =
+    private fun getButtonTitle(): String =
         if (isPermissionGranted()) "" else resourceManager.getString(contact_book_empty_state_grant_access_button)
 
     private fun subscribeToEventBus() {

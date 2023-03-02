@@ -17,8 +17,15 @@ class ContactViewHolder(view: ItemContactBinding) : CommonViewHolder<ContactItem
 
     private val emojiIdSummaryController = EmojiIdSummaryViewController(ui.participantEmojiIdView)
 
+    private val badgesController : BadgesController by lazy { BadgesController(view) }
+
     override fun bind(item: ContactItem) {
         super.bind(item)
+
+        item.toggleBadges = badgesController::process
+        badgesController.notifyAction = item.notifyToggling
+
+        badgesController.bind(item)
 
         when(val dto = item.contact.contact) {
             is YatContactDto -> {
@@ -71,5 +78,3 @@ class ContactViewHolder(view: ItemContactBinding) : CommonViewHolder<ContactItem
             ViewHolderBuilder(ItemContactBinding::inflate, ContactItem::class.java) { ContactViewHolder(it as ItemContactBinding) }
     }
 }
-
-

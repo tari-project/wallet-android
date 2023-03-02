@@ -39,9 +39,7 @@ import javax.inject.Inject
 class AddContactViewModel : CommonViewModel() {
 
     var tariWalletAddress: TariWalletAddress? = null
-    var amountFromDeeplink: MicroTari? = null
 
-    private var searchingJob: Job? = null
     private var recentTxUsersLimit = 3
     private var allTxs = mutableListOf<Tx>()
     private var contacts = mutableListOf<Contact>()
@@ -54,9 +52,6 @@ class AddContactViewModel : CommonViewModel() {
 
     private val _showClipboardData: MutableLiveData<TariWalletAddress> = MutableLiveData()
     val showClipboardData: LiveData<TariWalletAddress> = _showClipboardData
-
-    private val _foundYatUser: SingleLiveEvent<Optional<YatUser>> = SingleLiveEvent()
-    val foundYatUser: LiveData<Optional<YatUser>> = _foundYatUser
 
     val readyToInteract = MutableLiveData(false)
 
@@ -138,8 +133,6 @@ class AddContactViewModel : CommonViewModel() {
     }
 
     fun searchAndDisplayRecipients(query: String) {
-        searchingJob?.cancel()
-        _foundYatUser.value = Optional.ofNullable(null)
         // search transaction users
         val filteredTxUsers = allTxs.filter {
             it.user.walletAddress.emojiId.contains(query) || (it.user as? Contact)?.alias?.contains(query, ignoreCase = true) ?: false
@@ -155,15 +148,6 @@ class AddContactViewModel : CommonViewModel() {
         }
 
         displaySearchList(users)
-
-        searchingJob = viewModelScope.launch(Dispatchers.IO) {
-            yatAdapter.searchYats(query)?.result?.entries?.firstOrNull()?.let { response ->
-                walletService.getWalletAddressFromHexString(response.value.address)?.let { pubKey ->
-                    val yatUser = YatUser(pubKey).apply { yat = query }
-                    _foundYatUser.postValue(Optional.ofNullable(yatUser))
-                }
-            }
-        }
     }
 
     private fun fetchAllData() {
@@ -179,9 +163,7 @@ class AddContactViewModel : CommonViewModel() {
 
     fun onContinue() {
         viewModelScope.launch(Dispatchers.IO) {
-            val yatUserOptional = _foundYatUser.value
-            val yatUser = if (yatUserOptional?.isPresent == true) yatUserOptional.get() else null
-            val user = yatUser ?: contacts.firstOrNull { it.walletAddress == tariWalletAddress } ?: User(tariWalletAddress!!)
+            val user = contacts.firstOrNull { it.walletAddress == tariWalletAddress } ?: User(tariWalletAddress!!)
             _navigation.postValue(ContactBookNavigation.ToAddContactName(IContact.generateFromUser(user)))
         }
     }

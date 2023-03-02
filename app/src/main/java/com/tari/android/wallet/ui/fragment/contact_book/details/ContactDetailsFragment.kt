@@ -6,14 +6,16 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.tari.android.wallet.R
 import com.tari.android.wallet.databinding.FragmentContactsDetailsBinding
 import com.tari.android.wallet.extension.observe
 import com.tari.android.wallet.ui.common.CommonFragment
 import com.tari.android.wallet.ui.extension.serializable
+import com.tari.android.wallet.ui.fragment.contact_book.data.ContactAction
 import com.tari.android.wallet.ui.fragment.contact_book.data.ContactDto
 import com.tari.android.wallet.ui.fragment.contact_book.details.adapter.ContactDetailsAdapter
-import com.tari.android.wallet.ui.fragment.contact_book.root.ContactBookNavigation
 import com.tari.android.wallet.ui.fragment.contact_book.root.ContactBookRouter
+import com.tari.android.wallet.ui.fragment.home.HomeActivity.Companion.PARAMETER_CONTACT
 
 class ContactDetailsFragment : CommonFragment<FragmentContactsDetailsBinding, ContactDetailsViewModel>() {
 
@@ -28,7 +30,7 @@ class ContactDetailsFragment : CommonFragment<FragmentContactsDetailsBinding, Co
         val viewModel: ContactDetailsViewModel by viewModels()
         bindViewModel(viewModel)
 
-        viewModel.initArgs(requireArguments().serializable(CONTACT_DTO_ARGS)!!)
+        viewModel.initArgs(requireArguments().serializable(PARAMETER_CONTACT)!!)
 
         setupUI()
         observeUI()
@@ -38,19 +40,28 @@ class ContactDetailsFragment : CommonFragment<FragmentContactsDetailsBinding, Co
         observe(list) { adapter.update(it) }
 
         observe(navigation) { ContactBookRouter.processNavigation(requireActivity(), it) }
+
+        observe(contact) { applyContact(it) }
+    }
+
+    private fun applyContact(contact: ContactDto) {
+        if (contact.contact.getContactActions().contains(ContactAction.EditName)) {
+            ui.toolbar.setupRightButton(getString(R.string.contact_book_details_edit))
+        } else {
+            ui.toolbar.clearRightIcon()
+        }
     }
 
     private fun setupUI() = with(ui) {
         listUi.layoutManager = LinearLayoutManager(requireContext())
         listUi.adapter = adapter
+        toolbar.rightAction = { viewModel.onEditClick() }
     }
 
     companion object {
 
-        const val CONTACT_DTO_ARGS = "tari_contact_dto_args"
-
         fun createFragment(args: ContactDto): ContactDetailsFragment = ContactDetailsFragment().apply {
-            arguments = Bundle().apply { putSerializable(CONTACT_DTO_ARGS, args) }
+            arguments = Bundle().apply { putSerializable(PARAMETER_CONTACT, args) }
         }
     }
 }

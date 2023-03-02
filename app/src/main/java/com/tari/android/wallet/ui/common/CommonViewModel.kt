@@ -69,6 +69,9 @@ open class CommonViewModel : ViewModel() {
     protected val _modularDialog = SingleLiveEvent<ModularDialogArgs>()
     val modularDialog: LiveData<ModularDialogArgs> = _modularDialog
 
+    protected val _inputDialog = SingleLiveEvent<ModularDialogArgs>()
+    val inputDialog: LiveData<ModularDialogArgs> = _inputDialog
+
     protected val _loadingDialog = SingleLiveEvent<ProgressDialogArgs>()
     val loadingDialog: LiveData<ProgressDialogArgs> = _loadingDialog
 

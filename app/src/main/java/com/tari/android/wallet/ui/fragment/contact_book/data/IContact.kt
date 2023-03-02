@@ -22,17 +22,27 @@ interface IContact : Serializable {
 
     fun getAlias(): String
 
-    fun toUser() : User = when (val user = this) {
+    fun toUser(): User = when (val user = this) {
         is YatContactDto -> YatUser().apply {
             this.walletAddress = user.walletAddress
             this.yat = user.yat
         }
+
         is FFIContactDto -> Contact().apply {
             this.walletAddress = user.walletAddress
             this.alias = user.localAlias
         }
+
         else -> throw IllegalArgumentException("Unknown contact type")
     }
 
-    fun getContactActions(): List<ContactAction> = listOf(ContactAction.Send, ContactAction.EditName, ContactAction.FavoriteToggle, ContactAction.Delete)
+    fun getContactActions(): List<ContactAction> = listOf(
+        ContactAction.Send,
+        ContactAction.Link,
+        ContactAction.Unlink,
+        ContactAction.EditName,
+        ContactAction.ToFavorite,
+        ContactAction.ToUnFavorite,
+        ContactAction.Delete
+    )
 }

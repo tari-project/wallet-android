@@ -20,8 +20,6 @@ class ContactProfileViewHolder(view: ItemContactProfileBinding) :
     override fun bind(item: ContactProfileViewHolderItem) {
         super.bind(item)
 
-        val nameController = NameController(ui, item.updateName)
-
         when (val dto = item.contactDto.contact) {
             is YatContactDto -> {
                 showFirstChar(dto.walletAddress.emojiId.extractEmojis()[0])
