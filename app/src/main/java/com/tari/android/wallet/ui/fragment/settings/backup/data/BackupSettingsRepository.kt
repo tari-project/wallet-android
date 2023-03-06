@@ -6,14 +6,21 @@ import android.net.Uri
 import com.dropbox.core.oauth.DbxCredential
 import com.tari.android.wallet.BuildConfig
 import com.tari.android.wallet.data.repository.CommonRepository
-import com.tari.android.wallet.data.sharedPrefs.delegates.*
+import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefGsonDelegate
+import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefStringSecuredDelegate
 import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
 import com.tari.android.wallet.data.sharedPrefs.network.formatKey
 import com.tari.android.wallet.infrastructure.backup.BackupUtxos
 import com.tari.android.wallet.util.Constants
-import org.joda.time.DateTime
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class BackupSettingsRepository(private val context: Context, private val sharedPrefs: SharedPreferences, networkRepository: NetworkRepository) :
+@Singleton
+class BackupSettingsRepository @Inject constructor(
+    private val context: Context,
+    private val sharedPrefs: SharedPreferences,
+    networkRepository: NetworkRepository
+) :
     CommonRepository(networkRepository) {
 
     var localFileOption: BackupOptionDto? by SharedPrefGsonDelegate(sharedPrefs, formatKey(Keys.localFileOptionsKey), BackupOptionDto::class.java)

@@ -76,4 +76,11 @@
         <attr name="backgroundColor" />
     </declare-styleable>
 
+    <declare-styleable name="TariAlphaBackground">
+        <attr name="cornerRadius" />
+        <attr name="elevation" />
+        <attr name="backgroundColor" />
+        <attr name="alphaBackground" format="float"/>
+    </declare-styleable>
+
 </resources>

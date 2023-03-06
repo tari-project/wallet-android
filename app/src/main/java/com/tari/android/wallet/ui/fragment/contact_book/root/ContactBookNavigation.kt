@@ -1,7 +1,6 @@
 package com.tari.android.wallet.ui.fragment.contact_book.root
 
-import com.tari.android.wallet.ui.fragment.contact_book.data.ContactDto
-import com.tari.android.wallet.ui.fragment.contact_book.data.IContact
+import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.ContactDto
 
 sealed class ContactBookNavigation {
 
@@ -9,9 +8,7 @@ sealed class ContactBookNavigation {
 
     object ToAddContact : ContactBookNavigation()
 
-    class ToAddContactName(val contact: IContact) : ContactBookNavigation()
-
-    object ToFinalizeAddingContact : ContactBookNavigation()
+    class ToAddContactName(val contact: ContactDto) : ContactBookNavigation()
 
     class ToSendTari(val contact: ContactDto) : ContactBookNavigation()
 
@@ -20,5 +17,7 @@ sealed class ContactBookNavigation {
     class ToExternalWallet(val contact: ContactDto) : ContactBookNavigation()
 
     class ToLinkContact(val contact: ContactDto) : ContactBookNavigation()
+
+    class BackToContactBook() : ContactBookNavigation()
 }
 

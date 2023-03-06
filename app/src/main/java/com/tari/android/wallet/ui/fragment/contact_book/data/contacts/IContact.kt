@@ -1,4 +1,4 @@
-package com.tari.android.wallet.ui.fragment.contact_book.data
+package com.tari.android.wallet.ui.fragment.contact_book.data.contacts
 
 import com.tari.android.wallet.model.Contact
 import com.tari.android.wallet.model.TariWalletAddress
@@ -33,16 +33,11 @@ interface IContact : Serializable {
             this.alias = user.localAlias
         }
 
+        is MergedContactDto -> Contact().apply {
+            this.walletAddress = user.ffiContactDto.walletAddress
+            this.alias = user.phoneContactDto.name
+        }
+
         else -> throw IllegalArgumentException("Unknown contact type")
     }
-
-    fun getContactActions(): List<ContactAction> = listOf(
-        ContactAction.Send,
-        ContactAction.Link,
-        ContactAction.Unlink,
-        ContactAction.EditName,
-        ContactAction.ToFavorite,
-        ContactAction.ToUnFavorite,
-        ContactAction.Delete
-    )
 }

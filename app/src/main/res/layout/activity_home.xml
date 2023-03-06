@@ -87,7 +87,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
-                        android:src="@drawable/vector_profile_icon" />
+                        android:src="@drawable/vector_contact_book_icon" />
                 </FrameLayout>
 
                 <FrameLayout

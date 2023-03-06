@@ -59,26 +59,15 @@
 
         </com.tari.android.wallet.ui.component.tari.TariPrimaryBackground>
 
-        <com.tari.android.wallet.ui.component.tari.TariPrimaryBackground
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/list_ui"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="0dp"
             android:layout_marginTop="20dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/search_view_container">
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/list_ui"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="parent" />
-
-        </com.tari.android.wallet.ui.component.tari.TariPrimaryBackground>
+            app:layout_constraintTop_toBottomOf="@+id/search_view_container" />
 
     </com.tari.android.wallet.ui.component.tari.TariSecondaryBackground>
 

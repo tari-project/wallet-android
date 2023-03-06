@@ -4,8 +4,11 @@ import android.content.Context
 import com.tari.android.wallet.R
 import com.tari.android.wallet.ui.extension.color
 import com.tari.android.wallet.ui.extension.colorFromAttribute
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class PaletteManager {
+@Singleton
+class PaletteManager @Inject constructor() {
 
     fun getTextHeading(context: Context): Int = context.colorFromAttribute(R.attr.palette_text_heading)
 

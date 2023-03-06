@@ -38,21 +38,31 @@ import android.content.Intent
 import androidx.documentfile.provider.DocumentFile
 import androidx.fragment.app.Fragment
 import com.orhanobut.logger.Logger
+import com.tari.android.wallet.data.WalletConfig
 import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
 import com.tari.android.wallet.extension.getLastPathComponent
-import com.tari.android.wallet.infrastructure.backup.*
+import com.tari.android.wallet.infrastructure.backup.BackupFileProcessor
+import com.tari.android.wallet.infrastructure.backup.BackupNamingPolicy
+import com.tari.android.wallet.infrastructure.backup.BackupStorage
+import com.tari.android.wallet.infrastructure.backup.BackupStorageAuthRevokedException
+import com.tari.android.wallet.infrastructure.backup.BackupStorageSetupCancelled
+import com.tari.android.wallet.infrastructure.backup.BackupStorageSetupException
+import com.tari.android.wallet.infrastructure.backup.BackupStorageTamperedException
 import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupSettingsRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.apache.commons.io.FileUtils
 import org.joda.time.DateTime
 import java.io.File
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class LocalBackupStorage(
+@Singleton
+class LocalBackupStorage @Inject constructor(
     private val context: Context,
     private val backupSettingsRepository: BackupSettingsRepository,
     private val namingPolicy: BackupNamingPolicy,
-    private val walletTempDirPath: String,
+    private val walletConfig: WalletConfig,
     private val networkRepository: NetworkRepository,
     private val backupFileProcessor: BackupFileProcessor
 ) : BackupStorage {
@@ -82,6 +92,7 @@ class LocalBackupStorage(
                     throw BackupStorageSetupException("No folder was selected.")
                 }
             }
+
             Activity.RESULT_CANCELED -> {
                 throw BackupStorageSetupCancelled()
             }
@@ -143,7 +154,7 @@ class LocalBackupStorage(
         } ?: throw BackupStorageTamperedException("Backup file not found in folder.")
         withContext(Dispatchers.IO) {
             // copy file to temp location
-            val tempFolder = File(walletTempDirPath)
+            val tempFolder = File(walletConfig.getWalletTempDirPath())
             val tempFile = File(tempFolder, backupFiles.name!!)
             if (tempFolder.parentFile?.exists() != true) {
                 tempFolder.parentFile?.mkdir()

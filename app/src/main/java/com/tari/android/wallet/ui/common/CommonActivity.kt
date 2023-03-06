@@ -133,7 +133,7 @@ abstract class CommonActivity<Binding : ViewBinding, VM : CommonViewModel> : App
     }
 
     protected fun popUpTo(tag: String) {
-        while (supportFragmentManager.fragments.last().tag != tag) {
+        while (supportFragmentManager.fragments.last().tag != tag && supportFragmentManager.backStackEntryCount > 0) {
             supportFragmentManager.popBackStackImmediate()
         }
     }

@@ -4,6 +4,7 @@ import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import com.tari.android.wallet.R
 import com.tari.android.wallet.ui.common.CommonViewModel
+import com.tari.android.wallet.ui.common.SingleLiveEvent
 import com.tari.android.wallet.ui.common.recyclerView.CommonViewHolderItem
 import com.tari.android.wallet.ui.common.recyclerView.items.DividerViewHolderItem
 import com.tari.android.wallet.ui.common.recyclerView.items.SpaceVerticalViewHolderItem
@@ -16,14 +17,14 @@ import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonStyle.Warn
 import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
 import com.tari.android.wallet.ui.dialog.modular.modules.input.InputModule
 import com.tari.android.wallet.ui.fragment.contact_book.data.ContactAction
-import com.tari.android.wallet.ui.fragment.contact_book.data.ContactDto
 import com.tari.android.wallet.ui.fragment.contact_book.data.ContactsRepository
-import com.tari.android.wallet.ui.fragment.contact_book.data.YatContactDto
+import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.ContactDto
+import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.YatContactDto
 import com.tari.android.wallet.ui.fragment.contact_book.details.adapter.profile.ContactProfileViewHolderItem
 import com.tari.android.wallet.ui.fragment.contact_book.root.ContactBookNavigation
 import com.tari.android.wallet.ui.fragment.settings.allSettings.button.ButtonStyle
 import com.tari.android.wallet.ui.fragment.settings.allSettings.button.ButtonViewDto
-import com.tari.android.wallet.ui.fragment.settings.allSettings.title.SettingsTitleDto
+import com.tari.android.wallet.ui.fragment.settings.allSettings.title.SettingsTitleViewHolderItem
 import javax.inject.Inject
 
 class ContactDetailsViewModel : CommonViewModel() {
@@ -35,7 +36,7 @@ class ContactDetailsViewModel : CommonViewModel() {
 
     val list = MediatorLiveData<MutableList<CommonViewHolderItem>>()
 
-    val navigation = MutableLiveData<ContactBookNavigation>()
+    val navigation = SingleLiveEvent<ContactBookNavigation>()
 
     init {
         component.inject(this)
@@ -49,7 +50,7 @@ class ContactDetailsViewModel : CommonViewModel() {
 
     private fun updateList() {
         val contact = contact.value ?: return
-        val availableActions = contact.contact.getContactActions()
+        val availableActions = contact.getContactActions()
 
         val newList = mutableListOf<CommonViewHolderItem>()
 
@@ -114,7 +115,7 @@ class ContactDetailsViewModel : CommonViewModel() {
         }
 
         if (contact.contact is YatContactDto && availableActions.contains(ContactAction.Yat)) {
-            newList.add(SettingsTitleDto(resourceManager.getString(R.string.contact_book_details_connected_wallets)))
+            newList.add(SettingsTitleViewHolderItem(resourceManager.getString(R.string.contact_book_details_connected_wallets)))
             for (connectedWallet in contact.contact.connectedWallets) {
                 newList += (ButtonViewDto(connectedWallet.name) {
                     navigation.postValue(ContactBookNavigation.ToExternalWallet(contact))
@@ -130,16 +131,22 @@ class ContactDetailsViewModel : CommonViewModel() {
 
     fun onEditClick() {
         val contact = contact.value!!
-        val inputModule = InputModule(contact.contact.getAlias(), resourceManager.getString(R.string.contact_book_details_edit_hint))
+        val inputModule = InputModule(contact.contact.getAlias(), resourceManager.getString(R.string.contact_book_details_edit_hint), true) {
+            saveContactName(it)
+            true
+        }
         val headModule = HeadModule(
             resourceManager.getString(R.string.contact_book_details_edit_title),
             rightButtonTitle = resourceManager.getString(R.string.contact_book_add_contact_done_button)
-        ) {
-            this.contact.value = contactsRepository.updateContactName(contact, inputModule.value)
-            _dismissDialog.postValue(Unit)
-        }
+        ) { saveContactName(inputModule.value) }
         val args = ModularDialogArgs(DialogArgs(), listOf(headModule, inputModule))
         _inputDialog.postValue(args)
+    }
+
+    private fun saveContactName(name: String) {
+        val contact = contact.value!!
+        this.contact.value = contactsRepository.updateContactName(contact, name)
+        _dismissDialog.postValue(Unit)
     }
 
     private fun showUnlinkDialog() {
@@ -148,7 +155,7 @@ class ContactDetailsViewModel : CommonViewModel() {
             BodyModule(resourceManager.getString(R.string.contact_book_contacts_book_unlink_message)),
             ButtonModule(resourceManager.getString(R.string.common_confirm), Warning) {
                 contactsRepository.unlinkContact(contact.value!!)
-                _dismissDialog.postValue(Unit)
+                _dismissDialog.value = Unit
                 showUnlinkSuccessDialog()
             },
             ButtonModule(resourceManager.getString(R.string.common_cancel), Close)
@@ -163,7 +170,9 @@ class ContactDetailsViewModel : CommonViewModel() {
             ButtonModule(resourceManager.getString(R.string.common_confirm), Warning) { _backPressed.postValue(Unit) },
             ButtonModule(resourceManager.getString(R.string.common_cancel), Close)
         )
-        _modularDialog.postValue(ModularDialogArgs(DialogArgs { _backPressed.postValue(Unit) }, modules))
+        _modularDialog.postValue(ModularDialogArgs(DialogArgs {
+            navigation.value = ContactBookNavigation.BackToContactBook()
+        }, modules))
     }
 
     private fun showDeleteContactDialog() {
@@ -172,7 +181,8 @@ class ContactDetailsViewModel : CommonViewModel() {
             BodyModule(resourceManager.getString(R.string.contact_book_details_delete_message)),
             ButtonModule(resourceManager.getString(R.string.contact_book_details_delete_button_title), Warning) {
                 contactsRepository.deleteContact(contact.value!!)
-                _backPressed.postValue(Unit)
+                _dismissDialog.postValue(Unit)
+                navigation.value = ContactBookNavigation.BackToContactBook()
             },
             ButtonModule(resourceManager.getString(R.string.common_cancel), Close)
         )

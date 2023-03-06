@@ -77,9 +77,9 @@ import com.tari.android.wallet.ui.extension.showInternetConnectionErrorDialog
 import com.tari.android.wallet.ui.extension.string
 import com.tari.android.wallet.ui.fragment.contact_book.add.AddContactFragment
 import com.tari.android.wallet.ui.fragment.contact_book.addContactName.AddContactNameFragment
-import com.tari.android.wallet.ui.fragment.contact_book.data.ContactDto
-import com.tari.android.wallet.ui.fragment.contact_book.data.IContact
-import com.tari.android.wallet.ui.fragment.contact_book.data.YatContactDto
+import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.ContactDto
+import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.IContact
+import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.YatContactDto
 import com.tari.android.wallet.ui.fragment.contact_book.details.ContactDetailsFragment
 import com.tari.android.wallet.ui.fragment.contact_book.link.ContactLinkFragment
 import com.tari.android.wallet.ui.fragment.contact_book.root.ContactBookFragment
@@ -388,33 +388,30 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>(), AllSe
 
     override fun toChangePassword() = addFragment(ChangeSecurePasswordFragment())
 
-    override fun toSendTari(user: IContact?) = sendToUser(user)
+    override fun toSendTari(user: ContactDto?) = sendToUser(user)
 
     override fun toAddContact() = addFragment(AddContactFragment())
 
     override fun toContactDetails(contact: ContactDto) = addFragment(ContactDetailsFragment.createFragment(contact))
 
-    override fun toRequestTariFromContact(contact: ContactDto) = sendToUser(contact.contact)
+    override fun toRequestTariFromContact(contact: ContactDto) = sendToUser(contact)
 
-    override fun toSendTariToContact(contact: ContactDto) = sendToUser(contact.contact)
+    override fun toSendTariToContact(contact: ContactDto) = sendToUser(contact)
 
-    override fun toAddContactName(contact: IContact) = addFragment(AddContactNameFragment.createFragment(contact))
+    override fun toAddContactName(contact: ContactDto) = addFragment(AddContactNameFragment.createFragment(contact))
 
-    override fun toFinalizeAddingContact() {
-        onBackPressed()
-        onBackPressed()
-    }
+    override fun backToContactBook() = popUpTo(ContactBookFragment::class.java.simpleName)
 
     override fun toLinkContact(contact: ContactDto) = addFragment(ContactLinkFragment.createFragment(contact))
 
-    override fun continueToAmount(user: User, amount: MicroTari?) {
+    override fun continueToAmount(user: ContactDto, amount: MicroTari?) {
         if (EventBus.networkConnectionState.publishSubject.value != NetworkConnectionState.CONNECTED) {
             showInternetConnectionErrorDialog(this)
             return
         }
         hideKeyboard()
         val bundle = Bundle().apply {
-            putParcelable(PARAMETER_USER, user)
+            putSerializable(PARAMETER_CONTACT, user)
             putParcelable(PARAMETER_AMOUNT, amount)
         }
         ui.rootView.postDelayed({ addFragment(AddAmountFragment(), bundle) }, Constants.UI.keyboardHideWaitMs)
@@ -507,13 +504,13 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>(), AllSe
             WalletError.NoError -> contacts.firstOrNull { it.walletAddress == walletAddress } ?: User(walletAddress)
             else -> User(walletAddress)
         }
-        sendToUser(IContact.generateFromUser(recipientUser))
+        sendToUser(ContactDto(IContact.generateFromUser(recipientUser)))
     }
 
-    private fun sendToUser(recipientUser: IContact?) {
+    private fun sendToUser(recipientUser: ContactDto?) {
         if (recipientUser != null) {
             val bundle = Bundle().apply {
-                putSerializable(PARAMETER_USER, recipientUser)
+                putSerializable(PARAMETER_CONTACT, recipientUser)
                 intent.getDoubleExtra(PARAMETER_AMOUNT, Double.MIN_VALUE).takeIf { it > 0 }?.let { putDouble(PARAMETER_AMOUNT, it) }
             }
             addFragment(AddAmountFragment(), bundle)
@@ -544,7 +541,6 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>(), AllSe
     companion object {
         const val PARAMETER_NOTE = "note"
         const val PARAMETER_AMOUNT = "amount"
-        const val PARAMETER_USER = "recipientUser"
         const val PARAMETER_TRANSACTION = "transaction_data"
         const val PARAMETER_CONTACT = "tari_contact_dto_args"
 

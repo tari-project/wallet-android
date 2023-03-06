@@ -41,10 +41,8 @@ import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.component.networkStateIndicator.ConnectionIndicatorViewModel
 import com.tari.android.wallet.ui.fragment.auth.AuthActivity
 import com.tari.android.wallet.ui.fragment.auth.AuthViewModel
-import com.tari.android.wallet.ui.fragment.contact_book.add.AddContactFragment
-import com.tari.android.wallet.ui.fragment.contact_book.add.AddContactViewModel
-import com.tari.android.wallet.ui.fragment.contact_book.addContactName.AddContactNameFragment
 import com.tari.android.wallet.ui.fragment.contact_book.addContactName.AddContactNameViewModel
+import com.tari.android.wallet.ui.fragment.contact_book.contactSelection.ContactSelectionViewModel
 import com.tari.android.wallet.ui.fragment.contact_book.contacts.ContactsViewModel
 import com.tari.android.wallet.ui.fragment.contact_book.details.ContactDetailsViewModel
 import com.tari.android.wallet.ui.fragment.contact_book.link.ContactLinkViewModel
@@ -67,8 +65,6 @@ import com.tari.android.wallet.ui.fragment.send.addNote.AddNoteFragment
 import com.tari.android.wallet.ui.fragment.send.addNote.AddNoteViewModel
 import com.tari.android.wallet.ui.fragment.send.addNote.gif.ChooseGIFDialogFragment
 import com.tari.android.wallet.ui.fragment.send.addNote.gif.ThumbnailGIFsViewModel
-import com.tari.android.wallet.ui.fragment.send.addRecepient.AddRecipientFragment
-import com.tari.android.wallet.ui.fragment.send.addRecepient.AddRecipientViewModel
 import com.tari.android.wallet.ui.fragment.send.finalize.FinalizeSendTxViewModel
 import com.tari.android.wallet.ui.fragment.send.requestTari.RequestTariViewModel
 import com.tari.android.wallet.ui.fragment.settings.allSettings.AllSettingsViewModel
@@ -112,7 +108,6 @@ import javax.inject.Singleton
         WalletModule::class,
         ServiceModule::class,
         TorModule::class,
-        BackupAndRestoreModule::class,
         PresentationModule::class,
         YatModule::class
     ]
@@ -131,8 +126,6 @@ interface ApplicationComponent {
     fun inject(activity: QRScannerActivity)
     fun inject(activity: WalletRestoreActivity)
 
-    fun inject(fragment: AddRecipientFragment)
-    fun inject(fragment: AddContactFragment)
     fun inject(fragment: AddNoteFragment)
     fun inject(fragment: ChooseGIFDialogFragment)
 
@@ -153,7 +146,6 @@ interface ApplicationComponent {
     fun inject(viewModel: AddCustomBaseNodeViewModel)
     fun inject(viewModel: NetworkSelectionViewModel)
     fun inject(viewModel: AllSettingsViewModel)
-    fun inject(viewModel: AddRecipientViewModel)
     fun inject(viewModel: FinalizeSendTxViewModel)
     fun inject(viewModel: WalletInfoViewModel)
     fun inject(viewModel: RequestTariViewModel)
@@ -184,9 +176,9 @@ interface ApplicationComponent {
     fun inject(viewModel: ContactBookViewModel)
     fun inject(viewModel: ContactDetailsViewModel)
     fun inject(viewModel: ContactsViewModel)
-    fun inject(viewModel: AddContactViewModel)
     fun inject(viewModel: AddContactNameViewModel)
     fun inject(viewModel: ContactLinkViewModel)
+    fun inject(viewModel: ContactSelectionViewModel)
 
     fun getClipboardManager(): ClipboardManager
 }

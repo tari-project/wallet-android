@@ -36,14 +36,19 @@ import android.content.Context
 import android.content.SharedPreferences
 import com.tari.android.wallet.data.repository.CommonRepository
 import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodeSharedRepository
-import com.tari.android.wallet.data.sharedPrefs.delegates.*
+import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefBooleanDelegate
+import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefStringDelegate
+import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefStringSecuredDelegate
 import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
 import com.tari.android.wallet.data.sharedPrefs.network.formatKey
 import com.tari.android.wallet.data.sharedPrefs.securityStages.SecurityStagesRepository
 import com.tari.android.wallet.data.sharedPrefs.tariSettings.TariSettingsSharedRepository
 import com.tari.android.wallet.data.sharedPrefs.tor.TorSharedRepository
+import com.tari.android.wallet.ui.fragment.contact_book.data.localStorage.ContactSharedPrefRepository
 import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupSettingsRepository
 import com.tari.android.wallet.yat.YatSharedRepository
+import javax.inject.Inject
+import javax.inject.Singleton
 import kotlin.random.Random
 
 /**
@@ -53,7 +58,8 @@ import kotlin.random.Random
  */
 //todo Need to thing about reactive realization
 
-class SharedPrefsRepository(
+@Singleton
+class SharedPrefsRepository @Inject constructor(
     context: Context,
     sharedPrefs: SharedPreferences,
     networkRepository: NetworkRepository,
@@ -62,7 +68,8 @@ class SharedPrefsRepository(
     private val yatSharedRepository: YatSharedRepository,
     private val torSharedRepository: TorSharedRepository,
     private val tariSettingsSharedRepository: TariSettingsSharedRepository,
-    private val securityStagesRepository: SecurityStagesRepository
+    private val securityStagesRepository: SecurityStagesRepository,
+    private val contactSharedPrefRepository: ContactSharedPrefRepository
 ) : CommonRepository(networkRepository) {
 
     private object Key {
@@ -111,6 +118,7 @@ class SharedPrefsRepository(
         torSharedRepository.clear()
         tariSettingsSharedRepository.clear()
         securityStagesRepository.clear()
+        contactSharedPrefRepository.clear()
         publicKeyHexString = null
         isAuthenticated = false
         emojiId = null

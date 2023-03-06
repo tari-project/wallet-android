@@ -30,28 +30,26 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.tari.android.wallet.ui.fragment.contact_book.add.addRecepient
+package com.tari.android.wallet.ui.component.tari
 
-import android.view.View
-import com.tari.android.wallet.databinding.ItemAddRecipientListHeaderBinding
-import com.tari.android.wallet.ui.common.recyclerView.CommonViewHolder
-import com.tari.android.wallet.ui.common.recyclerView.ViewHolderBuilder
+import android.content.Context
+import android.util.AttributeSet
+import androidx.core.graphics.ColorUtils
+import com.tari.android.wallet.R
+import com.tari.android.wallet.ui.extension.obtain
+import com.tari.android.wallet.ui.extension.runRecycle
 
-class RecipientHeaderViewHolder(view: ItemAddRecipientListHeaderBinding) :
-    CommonViewHolder<RecipientHeaderItem, ItemAddRecipientListHeaderBinding>(view) {
+class TariAlphaBackground(context: Context, attrs: AttributeSet) : TariBackground(context, attrs) {
 
-    override fun bind(item: RecipientHeaderItem) {
-        super.bind(item)
+    init {
+        obtain(attrs, R.styleable.TariAlphaBackground).runRecycle {
+            val r = getDimension(R.styleable.TariAlphaBackground_cornerRadius, 0.0F)
+            val elevation = getDimension(R.styleable.TariAlphaBackground_elevation, 0.0F)
+            val backColor = getColor(R.styleable.TariAlphaBackground_backgroundColor, 0)
+            val alphaBackground = getFloat(R.styleable.TariAlphaBackground_alphaBackground, 0.0F)
+            val newColor = ColorUtils.setAlphaComponent(backColor, (alphaBackground * 255).toInt())
 
-        ui.separatorView.visibility = if (item.position == 0) View.GONE else View.VISIBLE
-        ui.titleTextView.text = item.title
-    }
-
-    companion object {
-        fun getBuilder(): ViewHolderBuilder = ViewHolderBuilder(ItemAddRecipientListHeaderBinding::inflate, RecipientHeaderItem::class.java) {
-            RecipientHeaderViewHolder(it as ItemAddRecipientListHeaderBinding)
+            setFullBack(r, elevation, newColor)
         }
     }
 }
-
-

@@ -55,10 +55,6 @@ class WalletModule {
 
     @Provides
     @Singleton
-    fun provideWalletConfig(context: Context, networkRepository: NetworkRepository) = WalletConfig(context, networkRepository)
-
-    @Provides
-    @Singleton
     fun provideWalletManager(
         walletConfig: WalletConfig,
         torConfig: TorConfig,
@@ -80,19 +76,6 @@ class WalletModule {
         baseNodes,
         torConfig
     )
-
-    @Provides
-    @Singleton
-    fun provideNetworkConnectionStatusReceiver(): NetworkConnectionStateReceiver = NetworkConnectionStateReceiver()
-
-    @Provides
-    @Singleton
-    fun provideBugReportingService(sharedPrefsWrapper: SharedPrefsRepository, walletConfig: WalletConfig): BugReportingService =
-        BugReportingService(sharedPrefsWrapper, walletConfig)
-
-    @Provides
-    @Singleton
-    fun provideSeedPhraseRepository() = SeedPhraseRepository()
 
     @Provides
     @Singleton

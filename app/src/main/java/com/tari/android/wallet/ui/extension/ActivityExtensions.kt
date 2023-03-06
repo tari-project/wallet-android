@@ -41,6 +41,6 @@ fun Activity.hideKeyboard() =
     (getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager)
         .hideSoftInputFromWindow((currentFocus ?: View(this)).windowToken, 0)
 
-fun Activity.showKeyboard() =
+fun Activity.showKeyboard(view: View? = null) =
     (getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager)
-        .showSoftInput(currentFocus ?: View(this), InputMethodManager.SHOW_IMPLICIT)
+        .showSoftInput(currentFocus ?: view ?: View(this), InputMethodManager.SHOW_IMPLICIT)

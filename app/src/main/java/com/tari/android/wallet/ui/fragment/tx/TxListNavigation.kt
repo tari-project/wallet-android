@@ -1,8 +1,8 @@
 package com.tari.android.wallet.ui.fragment.tx
 
 import com.tari.android.wallet.model.Tx
-import com.tari.android.wallet.model.User
-import com.tari.android.wallet.ui.fragment.contact_book.data.IContact
+import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.ContactDto
+import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.IContact
 
 sealed class TxListNavigation {
 
@@ -16,5 +16,5 @@ sealed class TxListNavigation {
 
     object ToUtxos : TxListNavigation()
 
-    class ToSendTariToUser(val user: IContact) : TxListNavigation()
+    class ToSendTariToUser(val contact: ContactDto) : TxListNavigation()
 }

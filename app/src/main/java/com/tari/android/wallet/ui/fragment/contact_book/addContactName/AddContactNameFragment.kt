@@ -14,8 +14,8 @@ import com.tari.android.wallet.ui.component.fullEmojiId.EmojiIdSummaryViewContro
 import com.tari.android.wallet.ui.component.fullEmojiId.FullEmojiIdViewController
 import com.tari.android.wallet.ui.extension.serializable
 import com.tari.android.wallet.ui.extension.visible
-import com.tari.android.wallet.ui.fragment.contact_book.data.FFIContactDto
-import com.tari.android.wallet.ui.fragment.contact_book.data.IContact
+import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.ContactDto
+import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.FFIContactDto
 import com.tari.android.wallet.ui.fragment.contact_book.root.ContactBookNavigation
 import com.tari.android.wallet.ui.fragment.contact_book.root.ContactBookRouter
 import com.tari.android.wallet.ui.fragment.home.HomeActivity
@@ -34,7 +34,7 @@ class AddContactNameFragment : CommonFragment<FragmentContactsAddNameBinding, Ad
         val viewModel: AddContactNameViewModel by viewModels()
         bindViewModel(viewModel)
 
-        val contact = requireArguments().serializable<IContact>(HomeActivity.PARAMETER_USER)!!
+        val contact = requireArguments().serializable<ContactDto>(HomeActivity.PARAMETER_CONTACT)!!
         viewModel.initContact(contact)
 
         setupUI()
@@ -45,7 +45,7 @@ class AddContactNameFragment : CommonFragment<FragmentContactsAddNameBinding, Ad
     private fun subscribeViewModal() = with(viewModel) {
         observe(navigation) { processNavigation(it) }
 
-        observe(contact) { contact -> displayEmojiId((contact as FFIContactDto).walletAddress) }
+        observe(contact) { contact -> displayEmojiId((contact.contact as FFIContactDto).walletAddress) }
     }
 
     private fun processNavigation(navigation: ContactBookNavigation) {
@@ -77,8 +77,8 @@ class AddContactNameFragment : CommonFragment<FragmentContactsAddNameBinding, Ad
     }
 
     companion object {
-        fun createFragment(contact: IContact): Fragment = AddContactNameFragment().apply {
-            arguments = Bundle().apply { putSerializable(HomeActivity.PARAMETER_USER, contact) }
+        fun createFragment(contact: ContactDto): Fragment = AddContactNameFragment().apply {
+            arguments = Bundle().apply { putSerializable(HomeActivity.PARAMETER_CONTACT, contact) }
         }
     }
 }

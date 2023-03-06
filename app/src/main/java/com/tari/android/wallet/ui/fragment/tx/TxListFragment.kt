@@ -60,6 +60,7 @@ import com.tari.android.wallet.ui.common.recyclerView.CommonViewHolderItem
 import com.tari.android.wallet.ui.component.networkStateIndicator.ConnectionIndicatorViewModel
 import com.tari.android.wallet.ui.extension.*
 import com.tari.android.wallet.ui.extension.PermissionExtensions.runWithPermission
+import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.ContactDto
 import com.tari.android.wallet.ui.fragment.onboarding.activity.OnboardingFlowActivity
 import com.tari.android.wallet.ui.fragment.tx.adapter.TxListAdapter
 import com.tari.android.wallet.ui.fragment.tx.questionMark.QuestionMarkViewModel
@@ -239,7 +240,7 @@ class TxListFragment : CommonFragment<FragmentTxListBinding, TxListViewModel>(),
         when (navigation) {
             TxListNavigation.ToTTLStore -> router.toTTLStore()
             is TxListNavigation.ToTxDetails -> router.toTxDetails(navigation.tx)
-            is TxListNavigation.ToSendTariToUser -> router.toSendTari(navigation.user)
+            is TxListNavigation.ToSendTariToUser -> router.toSendTari(navigation.contact)
             TxListNavigation.ToUtxos -> router.toUtxos()
             TxListNavigation.ToAllSettings -> router.toAllSettings()
             TxListNavigation.ToSplashScreen -> toSplash()

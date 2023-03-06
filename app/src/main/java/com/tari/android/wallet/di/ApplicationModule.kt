@@ -88,55 +88,11 @@ class ApplicationModule(private val app: TariWalletApplication) {
 
     @Provides
     @Singleton
-    fun provideBaseNodeSharedRepository(prefs: SharedPreferences, networkRepository: NetworkRepository): BaseNodeSharedRepository =
-        BaseNodeSharedRepository(prefs, networkRepository)
-
-    @Provides
-    @Singleton
-    fun provideTariSettingsSharedRepository(prefs: SharedPreferences, networkRepository: NetworkRepository): TariSettingsSharedRepository =
-        TariSettingsSharedRepository(prefs, networkRepository)
-
-    @Provides
-    @Singleton
     fun provideNetworkRepository(prefs: SharedPreferences): NetworkRepository = NetworkRepositoryImpl(prefs)
 
     @Provides
     @Singleton
-    fun provideTorSharedRepository(prefs: SharedPreferences, networkRepository: NetworkRepository): TorSharedRepository =
-        TorSharedRepository(prefs, networkRepository)
-
-    @Provides
-    @Singleton
-    fun provideSharedPrefsRepository(
-        context: Context,
-        prefs: SharedPreferences,
-        backupSettingsRepository: BackupSettingsRepository,
-        baseNodeSharedRepository: BaseNodeSharedRepository,
-        networkRepository: NetworkRepository,
-        yatSharedRepository: YatSharedRepository,
-        torSharedRepository: TorSharedRepository,
-        tariSettingsSharedRepository: TariSettingsSharedRepository,
-        securityStagesRepository: SecurityStagesRepository
-    ): SharedPrefsRepository =
-        SharedPrefsRepository(
-            context,
-            prefs,
-            networkRepository,
-            backupSettingsRepository,
-            baseNodeSharedRepository,
-            yatSharedRepository,
-            torSharedRepository,
-            tariSettingsSharedRepository,
-            securityStagesRepository
-        )
-
-    @Provides
-    @Singleton
     fun provideResourceManager(context: Context): ResourceManager = ResourceManager(context)
-
-    @Provides
-    @Singleton
-    fun providePaletteManager(): PaletteManager = PaletteManager()
 
     @Provides
     @Singleton
@@ -162,14 +118,6 @@ class ApplicationModule(private val app: TariWalletApplication) {
             BiometricManager.from(context),
             context.getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager
         )
-
-    @Provides
-    @Singleton
-    fun provideDeeplinkHandler(networkRepository: NetworkRepository): DeeplinkHandler = DeeplinkHandler(networkRepository)
-
-    @Provides
-    @Singleton
-    fun provideLoggerAdapter(walletConfig: WalletConfig): LoggerAdapter = LoggerAdapter(walletConfig)
 
     @Provides
     @Singleton

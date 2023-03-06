@@ -1,8 +1,7 @@
 package com.tari.android.wallet.ui.fragment.contact_book.root
 
 import androidx.fragment.app.FragmentActivity
-import com.tari.android.wallet.ui.fragment.contact_book.data.ContactDto
-import com.tari.android.wallet.ui.fragment.contact_book.data.IContact
+import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.ContactDto
 
 interface ContactBookRouter {
 
@@ -14,11 +13,11 @@ interface ContactBookRouter {
 
     fun toAddContact()
 
-    fun toAddContactName(contact: IContact)
-
-    fun toFinalizeAddingContact()
+    fun toAddContactName(contact: ContactDto)
 
     fun toLinkContact(contact: ContactDto)
+
+    fun backToContactBook()
 
     companion object {
         fun processNavigation(appCompatActivity: FragmentActivity, navigation: ContactBookNavigation) {
@@ -29,8 +28,8 @@ interface ContactBookRouter {
                 is ContactBookNavigation.ToRequestTari -> router.toRequestTariFromContact(navigation.contact)
                 is ContactBookNavigation.ToSendTari -> router.toSendTariToContact(navigation.contact)
                 is ContactBookNavigation.ToAddContactName -> router.toAddContactName(navigation.contact)
-                is ContactBookNavigation.ToFinalizeAddingContact -> router.toFinalizeAddingContact()
                 is ContactBookNavigation.ToLinkContact -> router.toLinkContact(navigation.contact)
+                is ContactBookNavigation.BackToContactBook -> router.backToContactBook()
                 is ContactBookNavigation.ToExternalWallet -> Unit //todo
             }
         }

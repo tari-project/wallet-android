@@ -66,9 +66,8 @@ import com.tari.android.wallet.ui.fragment.settings.allSettings.PresentationBack
 import com.tari.android.wallet.ui.fragment.settings.allSettings.backupOptions.SettingsBackupOptionViewHolderItem
 import com.tari.android.wallet.ui.fragment.settings.allSettings.button.ButtonStyle
 import com.tari.android.wallet.ui.fragment.settings.allSettings.button.ButtonViewDto
-import com.tari.android.wallet.ui.fragment.contact_book.details.adapter.profile.ContactProfileViewHolderItem
 import com.tari.android.wallet.ui.fragment.settings.allSettings.myProfile.MyProfileViewHolderItem
-import com.tari.android.wallet.ui.fragment.settings.allSettings.title.SettingsTitleDto
+import com.tari.android.wallet.ui.fragment.settings.allSettings.title.SettingsTitleViewHolderItem
 import com.tari.android.wallet.ui.fragment.settings.allSettings.version.SettingsVersionViewHolderItem
 import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupSettingsRepository
 import com.tari.android.wallet.ui.fragment.settings.userAutorization.BiometricAuthenticationViewModel
@@ -125,10 +124,10 @@ class AllSettingsViewModel : CommonViewModel() {
             ButtonViewDto(resourceManager.getString(all_settings_connect_yats), vector_all_settings_yat_icon) {
                 _openYatOnboarding.postValue(Unit)
             },
-            SettingsTitleDto(resourceManager.getString(all_settings_security_label)),
+            SettingsTitleViewHolderItem(resourceManager.getString(all_settings_security_label)),
             backupOption,
             DividerViewHolderItem(),
-            SettingsTitleDto(resourceManager.getString(all_settings_secondary_settings_label)),
+            SettingsTitleViewHolderItem(resourceManager.getString(all_settings_secondary_settings_label)),
             ButtonViewDto(resourceManager.getString(tari_about_title), vector_all_settings_about_icon) {
                 _navigation.postValue(AllSettingsNavigation.ToAbout)
             },
@@ -160,7 +159,7 @@ class AllSettingsViewModel : CommonViewModel() {
             ButtonViewDto(resourceManager.getString(all_settings_explorer), vector_all_settings_block_explorer_icon) {
                 _openLink.postValue(resourceManager.getString(explorer_url))
             },
-            SettingsTitleDto(resourceManager.getString(all_settings_advanced_settings_label)),
+            SettingsTitleViewHolderItem(resourceManager.getString(all_settings_advanced_settings_label)),
             ButtonViewDto(resourceManager.getString(all_settings_select_theme), vector_all_settings_select_theme_icon) {
                 _navigation.postValue(AllSettingsNavigation.ToThemeSelection)
             },

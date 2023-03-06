@@ -5,7 +5,7 @@ import android.os.Parcelable
 import com.tari.android.wallet.model.MicroTari
 import com.tari.android.wallet.ui.extension.readP
 import com.tari.android.wallet.ui.extension.readS
-import com.tari.android.wallet.ui.fragment.contact_book.data.IContact
+import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.IContact
 
 data class TransactionData(val recipientContact: IContact?, val amount: MicroTari?, val note: String?, val feePerGram: MicroTari?, val isOneSidePayment: Boolean) : Parcelable {
 

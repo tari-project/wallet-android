@@ -10,9 +10,11 @@ import com.tari.android.wallet.R
 import com.tari.android.wallet.databinding.FragmentContactsLinkBinding
 import com.tari.android.wallet.extension.observe
 import com.tari.android.wallet.ui.common.CommonFragment
+import com.tari.android.wallet.ui.common.recyclerView.CommonAdapter
 import com.tari.android.wallet.ui.extension.serializable
-import com.tari.android.wallet.ui.fragment.contact_book.data.ContactDto
+import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.ContactDto
 import com.tari.android.wallet.ui.fragment.contact_book.link.adapter.LinkContactAdapter
+import com.tari.android.wallet.ui.fragment.contact_book.root.ContactBookRouter
 import com.tari.android.wallet.ui.fragment.home.HomeActivity
 
 class ContactLinkFragment : CommonFragment<FragmentContactsLinkBinding, ContactLinkViewModel>() {
@@ -37,12 +39,15 @@ class ContactLinkFragment : CommonFragment<FragmentContactsLinkBinding, ContactL
     private fun observeUI() = with(viewModel) {
         observe(list) { adapter.update(it) }
 
-        observe(contact) { showTooltip(it) }
+        observe(navigation) { ContactBookRouter.processNavigation(requireActivity(), it) }
+
+        observe(ffiContact) { showTooltip(it) }
     }
 
     private fun initUI() = with(ui) {
         listUi.adapter = adapter
         listUi.layoutManager = LinearLayoutManager(context)
+        adapter.setClickListener(CommonAdapter.ItemClickListener { item -> viewModel.onContactClick(item) })
     }
 
     private fun showTooltip(contactDto: ContactDto) {

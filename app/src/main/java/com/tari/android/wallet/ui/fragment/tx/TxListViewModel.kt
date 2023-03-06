@@ -25,6 +25,8 @@ import com.tari.android.wallet.ui.dialog.modular.modules.body.BodyModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonStyle
 import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
+import com.tari.android.wallet.ui.fragment.contact_book.data.ContactsRepository
+import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.IContact
 import com.tari.android.wallet.ui.fragment.send.finalize.TxFailureReason
 import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupSettingsRepository
 import com.tari.android.wallet.ui.fragment.tx.adapter.TransactionItem
@@ -52,6 +54,9 @@ class TxListViewModel : CommonViewModel() {
 
     @Inject
     lateinit var walletServiceLauncher: WalletServiceLauncher
+
+    @Inject
+    lateinit var contactsRepository: ContactsRepository
 
     val stagedWalletSecurityManager = StagedWalletSecurityManager()
     val migrationManager: MigrationManager = MigrationManager()

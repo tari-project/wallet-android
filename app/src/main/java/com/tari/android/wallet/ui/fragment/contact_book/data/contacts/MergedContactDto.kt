@@ -1,4 +1,4 @@
-package com.tari.android.wallet.ui.fragment.contact_book.data
+package com.tari.android.wallet.ui.fragment.contact_book.data.contacts
 
 import com.tari.android.wallet.model.TariWalletAddress
 

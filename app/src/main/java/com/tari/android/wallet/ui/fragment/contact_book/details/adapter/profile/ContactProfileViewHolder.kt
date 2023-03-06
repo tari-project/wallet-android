@@ -6,10 +6,10 @@ import com.tari.android.wallet.ui.common.recyclerView.ViewHolderBuilder
 import com.tari.android.wallet.ui.component.fullEmojiId.EmojiIdSummaryViewController
 import com.tari.android.wallet.ui.extension.gone
 import com.tari.android.wallet.ui.extension.setVisible
-import com.tari.android.wallet.ui.fragment.contact_book.data.FFIContactDto
-import com.tari.android.wallet.ui.fragment.contact_book.data.MergedContactDto
-import com.tari.android.wallet.ui.fragment.contact_book.data.PhoneContactDto
-import com.tari.android.wallet.ui.fragment.contact_book.data.YatContactDto
+import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.FFIContactDto
+import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.MergedContactDto
+import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.PhoneContactDto
+import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.YatContactDto
 import com.tari.android.wallet.util.extractEmojis
 
 class ContactProfileViewHolder(view: ItemContactProfileBinding) :

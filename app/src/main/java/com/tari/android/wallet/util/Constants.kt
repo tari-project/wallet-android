@@ -137,6 +137,10 @@ object Constants {
         val defaultFeePerGram = MicroTari(BigInteger.valueOf(10))
     }
 
+    object Contacts {
+        const val recentContactCount = 3
+    }
+
     object Build {
         const val regularFlavor = "regular"
         const val privacyFlavor = "privacy"

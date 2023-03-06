@@ -1,11 +1,14 @@
-package com.tari.android.wallet.ui.fragment.contact_book.data
+package com.tari.android.wallet.ui.fragment.contact_book.data.contacts
 
+import com.google.api.client.util.DateTime
+import com.tari.android.wallet.data.sharedPrefs.delegates.SerializableTime
 import com.tari.android.wallet.model.TariWalletAddress
+import com.tari.android.wallet.ui.fragment.contact_book.data.ContactAction
 import java.io.Serializable
 import java.util.Random
 import java.util.UUID
 
-class ContactDto(val contact: IContact, var isFavorite: Boolean = false, var uuid: String = UUID.randomUUID().toString(), var isDeleted: Boolean = false) : Serializable {
+class ContactDto(val contact: IContact, var isFavorite: Boolean = false, var uuid: String = UUID.randomUUID().toString(), var lastUsedDate: SerializableTime? = null, var isDeleted: Boolean = false) : Serializable {
     fun filtered(text: String): Boolean = contact.filtered(text)
 
     companion object {
@@ -27,5 +30,34 @@ class ContactDto(val contact: IContact, var isFavorite: Boolean = false, var uui
         }
 
         fun generateContactDto() : ContactDto = ContactDto(generate(), Random().nextBoolean())
+    }
+
+    fun getContactActions(): List<ContactAction> {
+        val actions = mutableListOf<ContactAction>()
+
+        if (contact is FFIContactDto || contact is MergedContactDto) {
+            actions.add(ContactAction.Send)
+        }
+
+        if (contact is FFIContactDto) {
+            actions.add(ContactAction.Link)
+        }
+
+        if (contact is MergedContactDto) {
+            actions.add(ContactAction.Unlink)
+        }
+
+        actions.add(ContactAction.OpenProfile)
+        actions.add(ContactAction.EditName)
+
+        if (isFavorite) {
+            actions.add(ContactAction.ToUnFavorite)
+        } else {
+            actions.add(ContactAction.ToFavorite)
+        }
+
+        actions.add(ContactAction.Delete)
+
+        return actions
     }
 }

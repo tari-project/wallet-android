@@ -7,19 +7,22 @@ import com.tari.android.wallet.ui.component.fullEmojiId.EmojiIdSummaryViewContro
 import com.tari.android.wallet.ui.extension.gone
 import com.tari.android.wallet.ui.extension.setVisible
 import com.tari.android.wallet.ui.extension.visible
-import com.tari.android.wallet.ui.fragment.contact_book.data.FFIContactDto
-import com.tari.android.wallet.ui.fragment.contact_book.data.MergedContactDto
-import com.tari.android.wallet.ui.fragment.contact_book.data.PhoneContactDto
-import com.tari.android.wallet.ui.fragment.contact_book.data.YatContactDto
+import com.tari.android.wallet.ui.fragment.contact_book.contacts.adapter.contact.badges.BadgesController
+import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.FFIContactDto
+import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.MergedContactDto
+import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.PhoneContactDto
+import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.YatContactDto
 import com.tari.android.wallet.util.extractEmojis
 
 class ContactViewHolder(view: ItemContactBinding) : CommonViewHolder<ContactItem, ItemContactBinding>(view) {
 
     private val emojiIdSummaryController = EmojiIdSummaryViewController(ui.participantEmojiIdView)
 
-    private val badgesController : BadgesController by lazy { BadgesController(view) }
+    private val badgesController: BadgesController by lazy { BadgesController(view) }
 
     override fun bind(item: ContactItem) {
+        item.toggleBadges = { }
+
         super.bind(item)
 
         item.toggleBadges = badgesController::process
@@ -27,7 +30,7 @@ class ContactViewHolder(view: ItemContactBinding) : CommonViewHolder<ContactItem
 
         badgesController.bind(item)
 
-        when(val dto = item.contact.contact) {
+        when (val dto = item.contact.contact) {
             is YatContactDto -> {
                 displayFirstEmojiOrText(dto.walletAddress.emojiId.extractEmojis()[0])
                 if (dto.localAlias.isEmpty()) {
@@ -36,6 +39,7 @@ class ContactViewHolder(view: ItemContactBinding) : CommonViewHolder<ContactItem
                     displayAlias(dto.localAlias)
                 }
             }
+
             is FFIContactDto -> {
                 displayFirstEmojiOrText(dto.walletAddress.emojiId.extractEmojis()[0])
                 if (dto.localAlias.isEmpty()) {
@@ -44,10 +48,12 @@ class ContactViewHolder(view: ItemContactBinding) : CommonViewHolder<ContactItem
                     displayAlias(dto.localAlias)
                 }
             }
+
             is MergedContactDto -> {
                 displayFirstEmojiOrText(dto.ffiContactDto.walletAddress.emojiId.extractEmojis()[0])
                 displayAlias(dto.phoneContactDto.name)
             }
+
             is PhoneContactDto -> {
                 displayFirstEmojiOrText(dto.name.firstOrNull()?.toString() ?: "C")
                 displayAlias(dto.name)

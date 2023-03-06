@@ -56,8 +56,11 @@ import kotlinx.coroutines.sync.withLock
 import org.joda.time.DateTime
 import java.net.UnknownHostException
 import java.util.concurrent.TimeUnit
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class BackupManager(
+@Singleton
+class BackupManager @Inject constructor(
     private val context: Context,
     private val backupSettingsRepository: BackupSettingsRepository,
     private val localFileBackupStorage: LocalBackupStorage,
@@ -153,7 +156,8 @@ class BackupManager(
         val backupsState = EventBus.backupState.publishSubject.value!!.copy()
         backupSettingsRepository.updateOption(BackupOptionDto(optionType))
         backupSettingsRepository.backupPassword = null
-        val newState = backupsState.copy(backupsStates = backupsState.backupsStates.toMutableMap().also { it[optionType] = BackupState.BackupDisabled })
+        val newState =
+            backupsState.copy(backupsStates = backupsState.backupsStates.toMutableMap().also { it[optionType] = BackupState.BackupDisabled })
         EventBus.backupState.post(newState)
         val backupStorage = getStorageByOption(optionType)
         localScope.launch { backupStorage.signOut() }
@@ -188,9 +192,11 @@ class BackupManager(
             exception is BackupStorageFullException -> context.getString(
                 R.string.backup_wallet_storage_full_desc
             )
+
             exception is BackupStorageAuthRevokedException -> context.getString(
                 R.string.check_backup_storage_status_auth_revoked_error_description
             )
+
             exception is UnknownHostException -> context.getString(R.string.error_no_connection_title)
             exception.message == null -> context.getString(R.string.back_up_wallet_backing_up_unknown_error)
             else -> context.getString(R.string.back_up_wallet_backing_up_error_desc, exception.message!!)

@@ -6,7 +6,17 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <RelativeLayout
+    <com.tari.android.wallet.ui.component.tari.TariToolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:rightText="done"
+        app:text="@string/contact_book_add_contact_title" />
+
+    <com.tari.android.wallet.ui.component.tari.TariSecondaryBackground
         android:id="@+id/add_recipient_vw_search_container"
         android:layout_width="0dp"
         android:layout_height="@dimen/add_recipient_search_bar_container_height"
@@ -14,7 +24,7 @@
         android:orientation="horizontal"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toBottomOf="@+id/toolbar">
 
         <View
             android:id="@+id/middle_dimmer_view"
@@ -32,7 +42,11 @@
             android:layout_centerInParent="true"
             android:layout_marginHorizontal="@dimen/common_horizontal_margin"
             app:cornerRadius="6dp"
-            app:elevation="8dp">
+            app:elevation="8dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
 
             <RelativeLayout
                 android:layout_width="match_parent"
@@ -83,7 +97,7 @@
                             android:layout_height="@dimen/add_recipient_search_text_view_height"
                             android:layout_marginHorizontal="16dp"
                             android:background="@color/transparent"
-                            android:hint="@string/add_recipient_hint"
+                            android:hint="@string/contact_book_add_contact_placeholder"
                             android:imeOptions="actionDone"
                             android:inputType="textNoSuggestions"
                             android:letterSpacing="0.02"
@@ -130,7 +144,7 @@
             </RelativeLayout>
 
         </com.tari.android.wallet.ui.component.tari.TariPrimaryBackground>
-    </RelativeLayout>
+    </com.tari.android.wallet.ui.component.tari.TariSecondaryBackground>
 
     <RelativeLayout
         android:layout_width="0dp"
@@ -155,15 +169,6 @@
             android:layout_height="@dimen/common_scroll_height_gradient_height"
             android:alpha="0.5"
             android:background="@drawable/vector_view_elevation_gradient" />
-
-        <com.tari.android.wallet.ui.component.tari.TariProgressBar
-            android:id="@+id/progress_bar"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_centerHorizontal="true"
-            android:layout_marginTop="40dp"
-            android:indeterminate="true"
-            android:visibility="visible" />
 
         <View
             android:id="@+id/bottom_dimmer_view"
@@ -216,12 +221,12 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@id/paste_emoji_id_button"
                 android:layout_centerHorizontal="true"
-                android:tint="?attr/palette_overlay"
-                android:src="@drawable/tari_speech_notch_down" />
+                android:src="@drawable/tari_speech_notch_down"
+                android:tint="?attr/palette_overlay" />
 
         </RelativeLayout>
 
-        <RelativeLayout
+        <com.tari.android.wallet.ui.component.tari.TariPrimaryBackground
             android:id="@+id/emoji_id_container_view"
             android:layout_width="match_parent"
             android:layout_height="@dimen/add_recipient_clipboard_emoji_id_container_height"
@@ -248,9 +253,10 @@
                     android:singleLine="true"
                     android:textColor="?attr/palette_text_heading"
                     android:textSize="15sp" />
+
             </HorizontalScrollView>
 
-        </RelativeLayout>
+        </com.tari.android.wallet.ui.component.tari.TariPrimaryBackground>
 
     </RelativeLayout>
 
@@ -272,18 +278,5 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/add_recipient_vw_search_container" />
-
-    <com.tari.android.wallet.ui.component.tari.TariGradientButton
-        android:id="@+id/continue_button"
-        android:layout_width="0dp"
-        android:layout_height="@dimen/common_action_button_height"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginHorizontal="@dimen/common_horizontal_margin"
-        android:layout_marginBottom="@dimen/common_horizontal_margin"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:title="@string/common_continue" />
 
 </com.tari.android.wallet.ui.component.tari.TariPrimaryBackground>

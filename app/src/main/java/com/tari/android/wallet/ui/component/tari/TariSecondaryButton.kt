@@ -56,10 +56,6 @@ class TariSecondaryButton(context: Context, attrs: AttributeSet) : FrameLayout(c
             getString(R.styleable.TariSecondaryButton_title)?.let { ui.button.text = it }
             isEnabled = (getBoolean(R.styleable.TariSecondaryButton_android_enabled, true))
         }
-
-//        updateLayoutParams<MarginLayoutParams> {
-//            height = WRAP_CONTENT
-//        }
     }
 
     override fun isEnabled(): Boolean = ui.button.isEnabled
