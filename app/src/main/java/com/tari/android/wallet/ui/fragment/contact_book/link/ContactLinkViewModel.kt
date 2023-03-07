@@ -71,6 +71,8 @@ class ContactLinkViewModel : CommonViewModel() {
             list = list.filter { it.filtered(searchText) }
         }
 
+        list = list.sortedBy { it.contact.contact.getAlias().lowercase() }
+
         this.list.postValue(list.toMutableList())
     }
 

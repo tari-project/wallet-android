@@ -36,7 +36,6 @@ class BadgeItemView : CommonView<CommonViewModel, ViewBadgeItemBinding> {
     fun setItem(item: BadgeItem) {
         ui.badgeItemIconImageView.setImageResource(item.icon)
         ui.root.setOnClickListener { item.action.invoke() }
-        this.gone()
     }
 }
 

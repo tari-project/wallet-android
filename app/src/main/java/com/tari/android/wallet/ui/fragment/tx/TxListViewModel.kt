@@ -131,9 +131,7 @@ class TxListViewModel : CommonViewModel() {
 
         migrationManager.validateVersion({ }, { showIncompatibleVersionDialog() })
 
-        _listUpdateTrigger.addSource(contactsRepository.publishSubject.toLiveData(BackpressureStrategy.LATEST)) { _listUpdateTrigger.postValue(Unit) }
-
-        doOnConnectedToWallet { doOnConnected { onServiceConnected() } }
+        doOnConnectedToWallet { doOnConnected { runCatching { onServiceConnected() } } }
     }
 
     val txListIsEmpty: Boolean
@@ -150,6 +148,8 @@ class TxListViewModel : CommonViewModel() {
 
     private fun onServiceConnected() {
         subscribeToEventBus()
+
+        _listUpdateTrigger.addSource(contactsRepository.publishSubject.toLiveData(BackpressureStrategy.LATEST)) { _listUpdateTrigger.postValue(Unit) }
 
         viewModelScope.launch(Dispatchers.IO) {
             updateTxListData()

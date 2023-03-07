@@ -100,7 +100,7 @@ open class ContactSelectionViewModel : CommonViewModel() {
         }
         result.addAll(resentUsed)
 
-        val restOfContact = list.filter { !resentUsed.contains(it) }
+        val restOfContact = list.filter { !resentUsed.contains(it) }.sortedBy { it.contact.contact.getAlias().lowercase() }
         if (restOfContact.isNotEmpty() && resentUsed.isNotEmpty()) {
             result.add(TitleViewHolderItem(resourceManager.getString(R.string.add_recipient_my_contacts)))
         }
