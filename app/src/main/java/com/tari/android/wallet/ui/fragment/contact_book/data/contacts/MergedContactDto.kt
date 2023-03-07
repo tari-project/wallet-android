@@ -8,5 +8,5 @@ class MergedContactDto(var ffiContactDto: FFIContactDto, var phoneContactDto: Ph
 
     override fun extractWalletAddress(): TariWalletAddress = ffiContactDto.walletAddress
 
-    override fun getAlias(): String = phoneContactDto.name
+    override fun getAlias(): String = phoneContactDto.firstName
 }

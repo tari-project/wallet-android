@@ -36,13 +36,13 @@ class ContactProfileViewHolder(view: ItemContactProfileBinding) :
             is MergedContactDto -> {
                 showFirstChar(dto.ffiContactDto.walletAddress.emojiId.extractEmojis()[0])
                 showEmojiId(dto.ffiContactDto.walletAddress.emojiId)
-                showAlias(dto.phoneContactDto.name)
+                showAlias(dto.phoneContactDto.getAlias())
             }
 
             is PhoneContactDto -> {
-                showFirstChar(dto.name.firstOrNull()?.toString() ?: "C")
+                showFirstChar(dto.getAlias().firstOrNull()?.toString() ?: "C")
                 showEmojiId("")
-                showAlias(dto.name)
+                showAlias(dto.getAlias())
             }
         }
     }
@@ -64,7 +64,7 @@ class ContactProfileViewHolder(view: ItemContactProfileBinding) :
             ui.alias.gone()
             return
         }
-        ui.alias.setText(alias)
+        ui.alias.text = alias
         ui.alias.setVisible(alias.isNotEmpty())
     }
 

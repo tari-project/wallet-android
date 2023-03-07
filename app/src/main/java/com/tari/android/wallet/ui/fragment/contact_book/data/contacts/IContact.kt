@@ -35,7 +35,7 @@ interface IContact : Serializable {
 
         is MergedContactDto -> Contact().apply {
             this.walletAddress = user.ffiContactDto.walletAddress
-            this.alias = user.phoneContactDto.name
+            this.alias = user.phoneContactDto.firstName
         }
 
         else -> throw IllegalArgumentException("Unknown contact type")

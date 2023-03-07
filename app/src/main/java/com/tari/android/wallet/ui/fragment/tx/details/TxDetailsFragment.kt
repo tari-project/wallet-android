@@ -37,8 +37,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.inputmethod.EditorInfo
-import android.widget.TextView
 import androidx.fragment.app.viewModels
 import com.bumptech.glide.Glide
 import com.tari.android.wallet.R.color.*
@@ -65,6 +63,8 @@ import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonStyle
 import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
 import com.tari.android.wallet.ui.dialog.tooltipDialog.TooltipDialogArgs
 import com.tari.android.wallet.ui.extension.*
+import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.ContactDto
+import com.tari.android.wallet.ui.fragment.contact_book.root.ContactBookRouter
 import com.tari.android.wallet.ui.fragment.tx.details.gif.GIFView
 import com.tari.android.wallet.ui.fragment.tx.details.gif.GIFViewModel
 import com.tari.android.wallet.ui.fragment.tx.details.gif.TxState
@@ -114,12 +114,23 @@ class TxDetailsFragment : CommonFragment<FragmentTxDetailsBinding, TxDetailsView
         observe(tx) {
             fetchGIFIfAttached(it)
             bindTxData(it)
-            enableCTAs()
         }
+
+        observe(contact) { updateContactInfo(it) }
 
         observe(cancellationReason) { setCancellationReason(it) }
 
         observe(explorerLink) { showExplorerLink(it) }
+
+        observe(navigation) { ContactBookRouter.processNavigation(requireActivity(), it) }
+    }
+
+    private fun updateContactInfo(contact: ContactDto) {
+        val alias = contact.contact.getAlias()
+        val addEditText = if (alias.isEmpty()) tx_detail_add_contact else tx_detail_edit
+        ui.addContactButton.text = getString(addEditText)
+        ui.alias.text = alias
+        ui.alias.setVisible(alias.isNotEmpty())
     }
 
     private fun setCancellationReason(text: String) {
@@ -137,7 +148,6 @@ class TxDetailsFragment : CommonFragment<FragmentTxDetailsBinding, TxDetailsView
     private fun setupUI() {
         bindViews()
         setUICommands()
-        disableCTAs()
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -150,32 +160,15 @@ class TxDetailsFragment : CommonFragment<FragmentTxDetailsBinding, TxDetailsView
         ui.gifContainer.root.invisible()
     }
 
-    private fun disableCTAs() {
-        arrayOf<TextView>(ui.addContactButton, ui.cancelTxView, ui.editContactLabelTextView).forEach {
-            it.isEnabled = false
-            it.setTextColor(viewModel.paletteManager.getButtonDisabled(requireContext()))
-        }
-    }
-
-    private fun enableCTAs() {
-        arrayOf<TextView>(ui.addContactButton, ui.cancelTxView, ui.editContactLabelTextView).forEach { it.isEnabled = true }
-        ui.addContactButton.setTextColor(viewModel.paletteManager.getTextLinks(requireContext()))
-        ui.editContactLabelTextView.setTextColor(viewModel.paletteManager.getTextLinks(requireContext()))
-        ui.cancelTxView.setTextColor(viewModel.paletteManager.getRed(requireContext()))
-    }
-
     private fun setUICommands() {
         ui.emojiIdSummaryContainerView.setOnClickListener { onEmojiSummaryClicked(it) }
         ui.feeLabelTextView.setOnClickListener { showTxFeeToolTip() }
-        ui.addContactButton.setOnClickListener { onAddContactClick() }
-        ui.editContactLabelTextView.setOnClickListener { onEditContactClick() }
-        ui.createContactEditText.setOnEditorActionListener { _, actionId, _ -> onContactEditTextEditAction(actionId) }
+        ui.addContactButton.setOnClickListener { viewModel.addOrEditContact() }
         ui.cancelTxView.setOnClickListener { onTransactionCancel() }
     }
 
     private fun bindTxData(tx: Tx) {
         ui.userContainer.setVisible(!tx.isOneSided)
-        ui.contactContainerView.setVisible(!tx.isOneSided)
 
         setTxStatusData(tx)
         setTxMetaData(tx)
@@ -192,6 +185,7 @@ class TxDetailsFragment : CommonFragment<FragmentTxDetailsBinding, TxDetailsView
             state.status == MINED_CONFIRMED || state.status == IMPORTED ->
                 if (state.direction == INBOUND) string(tx_detail_payment_received)
                 else string(tx_detail_payment_sent)
+
             else -> string(tx_detail_pending_payment_received)
         }
         when {
@@ -230,17 +224,8 @@ class TxDetailsFragment : CommonFragment<FragmentTxDetailsBinding, TxDetailsView
     }
 
     private fun setTxAddresseeData(tx: Tx) {
-        val user = tx.user
-        if (user is Contact) {
-            ui.contactContainerView.visible()
-            setUIAlias(user.alias)
-        } else {
-            ui.addContactButton.visible()
-            ui.contactContainerView.gone()
-        }
         val state = TxState.from(tx)
-        ui.fromTextView.text =
-            if (state.direction == INBOUND) string(common_from) else string(common_to)
+        ui.fromTextView.text = if (state.direction == INBOUND) string(common_from) else string(common_to)
         emojiIdSummaryController.display(tx.user.walletAddress.emojiId)
     }
 
@@ -257,6 +242,7 @@ class TxDetailsFragment : CommonFragment<FragmentTxDetailsBinding, TxDetailsView
                 if (tx is CompletedTx) tx.confirmationCount.toInt() + 1 else 1,
                 viewModel.requiredConfirmationCount + 1
             )
+
             else -> ""
         }
         ui.statusTextView.text = statusText
@@ -299,21 +285,6 @@ class TxDetailsFragment : CommonFragment<FragmentTxDetailsBinding, TxDetailsView
         fullEmojiIdViewController.showFullEmojiId()
     }
 
-    private fun onContactEditTextEditAction(actionId: Int): Boolean {
-        if (actionId == EditorInfo.IME_ACTION_DONE) {
-            val alias = ui.createContactEditText.text?.toString()
-            if (!alias.isNullOrEmpty()) {
-                viewModel.updateContactAlias(alias)
-                setUIAlias(alias)
-            } else {
-                viewModel.removeContact()
-            }
-            ui.contactLabelTextView.setTextColor(viewModel.paletteManager.getTextBody(requireContext()))
-            return false
-        }
-        return true
-    }
-
     private fun onTransactionCancel() {
         val tx = viewModel.tx.value!!
         if (tx is PendingOutboundTx && tx.direction == OUTBOUND && tx.status == PENDING)
@@ -335,42 +306,6 @@ class TxDetailsFragment : CommonFragment<FragmentTxDetailsBinding, TxDetailsView
         )
         dialog.applyArgs(args)
         dialog.show()
-    }
-
-    private fun setUIAlias(alias: String) {
-        ui.contactNameTextView.visible()
-        ui.createContactEditText.invisible()
-        ui.contactNameTextView.text = alias
-        ui.editContactLabelTextView.visible()
-        ui.addContactButton.invisible()
-    }
-
-    private fun onAddContactClick() {
-        ui.contactContainerView.visible()
-        ui.addContactButton.invisible()
-        ui.createContactEditText.visible()
-        ui.contactLabelTextView.visible()
-        ui.editContactLabelTextView.invisible()
-
-        focusContactEditText()
-    }
-
-    private fun onEditContactClick() {
-        ui.editContactLabelTextView.invisible()
-        ui.createContactEditText.visible()
-        focusContactEditText()
-        val user = viewModel.tx.value!!.user
-        if (user is Contact) {
-            ui.createContactEditText.setText(user.alias)
-        }
-        ui.contactNameTextView.invisible()
-    }
-
-    private fun focusContactEditText() {
-        ui.createContactEditText.requestFocus()
-        ui.createContactEditText.setSelection(ui.createContactEditText.text?.length ?: 0)
-        requireActivity().showKeyboard()
-        ui.contactLabelTextView.setTextColor(viewModel.paletteManager.getTextHeading(requireContext()))
     }
 
     private fun showTxFeeToolTip() {

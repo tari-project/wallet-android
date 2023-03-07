@@ -26,6 +26,6 @@ class InputModularDialog(context: Context) : ModularDialog(context) {
             }
         }
         dialog.window?.clearFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM)
-        dialog.window?.setSoftInputMode(SOFT_INPUT_STATE_VISIBLE)
+        dialog.window?.setSoftInputMode(SOFT_INPUT_STATE_VISIBLE or WindowManager.LayoutParams.SOFT_INPUT_ADJUST_UNSPECIFIED)
     }
 }

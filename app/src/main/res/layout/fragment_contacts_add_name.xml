@@ -62,15 +62,26 @@
         </com.tari.android.wallet.ui.component.tari.TariSecondaryBackground>
 
         <com.tari.android.wallet.ui.component.tari.TariInput
-            android:id="@+id/add_name_input"
+            android:id="@+id/add_first_name_input"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="25dp"
             android:layout_marginTop="16dp"
-            app:hintText="@string/contact_book_add_contact_name_hint"
+            app:hintText="@string/contact_book_add_contact_first_name_hint"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/emoji_id_summary_container" />
+
+        <com.tari.android.wallet.ui.component.tari.TariInput
+            android:id="@+id/add_surname_input"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="25dp"
+            android:layout_marginTop="16dp"
+            app:hintText="@string/contact_book_add_contact_surname_hint"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/add_first_name_input" />
 
     </com.tari.android.wallet.ui.component.tari.TariPrimaryBackground>
 

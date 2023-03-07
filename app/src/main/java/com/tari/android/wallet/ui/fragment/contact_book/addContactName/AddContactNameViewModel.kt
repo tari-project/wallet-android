@@ -6,7 +6,6 @@ import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.common.SingleLiveEvent
 import com.tari.android.wallet.ui.fragment.contact_book.data.ContactsRepository
 import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.ContactDto
-import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.FFIContactDto
 import com.tari.android.wallet.ui.fragment.contact_book.root.ContactBookNavigation
 import javax.inject.Inject
 
@@ -30,11 +29,9 @@ class AddContactNameViewModel : CommonViewModel() {
         this.contact.postValue(contact)
     }
 
-    fun onContinue(name: String) {
+    fun onContinue(firstName: String, surname: String) {
         val contact = this.contact.value ?: return
-        val ffiContact = contact.contact as FFIContactDto
-        ffiContact.localAlias = name
-        contactBookRepository.addContact(ffiContact)
+        contactBookRepository.updateContactName(contact, firstName, surname)
         navigation.postValue(ContactBookNavigation.BackToContactBook())
     }
 }

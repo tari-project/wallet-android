@@ -4,6 +4,7 @@ import com.tari.android.wallet.data.sharedPrefs.delegates.SerializableTime
 import com.tari.android.wallet.event.Event
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.model.TariWalletAddress
+import com.tari.android.wallet.model.Tx
 import com.tari.android.wallet.model.User
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.ContactDto
@@ -37,23 +38,15 @@ class ContactsRepository @Inject constructor(
         }
     }
 
-    fun updateRecentUsedTime(contact: ContactDto) {
-        val existContact = publishSubject.value.orEmpty().firstOrNull { it.uuid == contact.uuid }
-        if (existContact == null) {
+    fun addContact(contact: ContactDto) {
+        if (contactExists(contact)) {
             withListUpdate { list ->
-                list.add(contact)
+                list.firstOrNull { it.uuid == contact.uuid }?.let { list.remove(it) }
             }
         }
 
-        updateContact(contact.uuid) {
-            it.lastUsedDate = SerializableTime(DateTime.now())
-        }
-    }
-
-    fun addContact(contact: IContact) {
         withListUpdate {
-            val newContact = ContactDto(contact)
-            it.add(newContact)
+            it.add(contact)
         }
     }
 
@@ -64,12 +57,23 @@ class ContactsRepository @Inject constructor(
         return getByUuid(contactDto.uuid)
     }
 
-    fun getByUuid(uuid: String): ContactDto = publishSubject.value!!.first { it.uuid == uuid }
+    fun updateContactName(contact: ContactDto, firstName: String, surname: String): ContactDto {
+        if (!contactExists(contact)) addContact(contact)
+        updateContact(contact.uuid) {
+            when (val user = it.contact) {
+                is FFIContactDto -> user.localAlias = "$firstName $surname"
+                is PhoneContactDto -> {
+                    user.firstName = firstName
+                    user.surname = surname
+                }
 
-    fun deleteContact(contactDto: ContactDto) {
-        updateContact(contactDto.uuid) {
-            it.isDeleted = true
+                is MergedContactDto -> {
+                    user.phoneContactDto.firstName = firstName
+                    user.phoneContactDto.surname = surname
+                }
+            }
         }
+        return getByUuid(contact.uuid)
     }
 
     fun linkContacts(ffiContact: ContactDto, phoneContactDto: ContactDto) {
@@ -91,16 +95,25 @@ class ContactsRepository @Inject constructor(
         }
     }
 
-    fun updateContactName(contact: ContactDto, newName: String): ContactDto {
-        updateContact(contact.uuid) {
-            when (val user = it.contact) {
-                is FFIContactDto -> user.localAlias = newName
-                is PhoneContactDto -> user.name = newName
-                is MergedContactDto -> user.phoneContactDto.name = newName
+    fun updateRecentUsedTime(contact: ContactDto) {
+        val existContact = publishSubject.value.orEmpty().firstOrNull { it.uuid == contact.uuid }
+        if (existContact == null) {
+            withListUpdate { list ->
+                list.add(contact)
             }
         }
-        return getByUuid(contact.uuid)
+
+        updateContact(contact.uuid) {
+            it.lastUsedDate = SerializableTime(DateTime.now())
+        }
     }
+
+    fun deleteContact(contactDto: ContactDto) {
+        updateContact(contactDto.uuid) {
+            it.isDeleted = true
+        }
+    }
+
 
     private fun updateContact(contactUuid: String, updateAction: (contact: ContactDto) -> Unit) {
         withListUpdate {
@@ -108,6 +121,10 @@ class ContactsRepository @Inject constructor(
             foundContact?.let { contact -> updateAction.invoke(contact) }
         }
     }
+
+    private fun getByUuid(uuid: String): ContactDto = publishSubject.value!!.first { it.uuid == uuid }
+
+    private fun contactExists(contact: ContactDto): Boolean = publishSubject.value!!.any { it.uuid == contact.uuid }
 
     private fun withListUpdate(updateAction: (list: MutableList<ContactDto>) -> Unit) {
         val value = publishSubject.value!!
@@ -122,6 +139,12 @@ class ContactsRepository @Inject constructor(
             subscribeToActions()
 
             doOnConnectedToWallet { doOnConnected { synchronize() } }
+        }
+
+        fun getContactForTx(tx: Tx): ContactDto {
+            val walletAddress = tx.user.walletAddress
+            val contact = publishSubject.value!!.firstOrNull { it.contact is FFIContactDto && it.contact.walletAddress == walletAddress }
+            return contact ?: ContactDto(FFIContactDto(walletAddress))
         }
 
         private fun synchronize() {

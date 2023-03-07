@@ -1,20 +1,29 @@
 package com.tari.android.wallet.ui.fragment.tx.details
 
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import com.tari.android.wallet.R
 import com.tari.android.wallet.event.Event
 import com.tari.android.wallet.event.EventBus
-import com.tari.android.wallet.extension.executeWithError
 import com.tari.android.wallet.extension.getWithError
 import com.tari.android.wallet.ffi.FFITxCancellationReason
-import com.tari.android.wallet.model.*
+import com.tari.android.wallet.model.CancelledTx
+import com.tari.android.wallet.model.CompletedTx
+import com.tari.android.wallet.model.Tx
+import com.tari.android.wallet.model.TxId
+import com.tari.android.wallet.model.WalletError
 import com.tari.android.wallet.service.TariWalletService
 import com.tari.android.wallet.ui.common.CommonViewModel
+import com.tari.android.wallet.ui.common.SingleLiveEvent
 import com.tari.android.wallet.ui.dialog.error.ErrorDialogArgs
 import com.tari.android.wallet.ui.extension.toLiveData
+import com.tari.android.wallet.ui.fragment.contact_book.data.ContactsRepository
+import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.ContactDto
+import com.tari.android.wallet.ui.fragment.contact_book.root.ContactBookNavigation
 import io.reactivex.BackpressureStrategy
 import io.reactivex.subjects.BehaviorSubject
+import javax.inject.Inject
 
 class TxDetailsViewModel : CommonViewModel() {
 
@@ -33,7 +42,16 @@ class TxDetailsViewModel : CommonViewModel() {
     private val _explorerLink = MutableLiveData("")
     val explorerLink: LiveData<String> = _explorerLink
 
+    val navigation = SingleLiveEvent<ContactBookNavigation>()
+
+    val contact = MediatorLiveData<ContactDto>()
+
+    @Inject
+    lateinit var contactsRepository: ContactsRepository
+
     init {
+        component.inject(this)
+
         doOnConnected {
             fetchRequiredConfirmationCount()
             findTxAndUpdateUI()
@@ -41,6 +59,10 @@ class TxDetailsViewModel : CommonViewModel() {
         }
 
         observeTxUpdates()
+
+        contact.addSource(contactsRepository.publishSubject.toLiveData(BackpressureStrategy.LATEST)) { updateContact() }
+
+        contact.addSource(tx) { updateContact() }
     }
 
     fun setTxArg(tx: Tx) {
@@ -65,30 +87,24 @@ class TxDetailsViewModel : CommonViewModel() {
         }
     }
 
-    fun removeContact() {
-        val currentTx = tx.value!!
-        val contact = currentTx.user as? Contact ?: return
-
-        walletService.executeWithError { error, wallet -> wallet.removeContact(contact, error) }
-        currentTx.user = User(contact.walletAddress)
-        EventBus.post(Event.Contact.ContactRemoved(contact.walletAddress))
-
-        _txObject.onNext(currentTx)
-    }
-
-
-    fun updateContactAlias(newAlias: String) {
-        val tx = tx.value!!
-
-        walletService.executeWithError { error, wallet -> wallet.updateContactAlias(tx.user.walletAddress, newAlias, error) }
-
-        tx.user = Contact(tx.user.walletAddress, newAlias)
-        EventBus.post(Event.Contact.ContactAddedOrUpdated(tx.user.walletAddress, newAlias))
-        _txObject.onNext(tx)
+    fun addOrEditContact() {
+        val tx = this.tx.value ?: return
+        val contact = contactsRepository.ffiBridge.getContactForTx(tx)
+        if (contact.contact.getAlias().isEmpty()) {
+            navigation.postValue(ContactBookNavigation.ToAddContactName(contact))
+        } else {
+            navigation.postValue(ContactBookNavigation.ToContactDetails(contact))
+        }
     }
 
     fun openInBlockExplorer() {
         _openLink.postValue(_explorerLink.value.orEmpty())
+    }
+
+    private fun updateContact() {
+        val tx = this.tx.value ?: return
+        val contact = contactsRepository.ffiBridge.getContactForTx(tx)
+        this.contact.postValue(contact)
     }
 
     private fun getCancellationReason(tx: Tx): String {

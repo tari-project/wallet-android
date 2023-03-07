@@ -53,7 +53,7 @@ class AddContactNameFragment : CommonFragment<FragmentContactsAddNameBinding, Ad
     }
 
     private fun setupUI() = with(ui) {
-        toolbar.rightAction = { viewModel.onContinue(addNameInput.ui.editText.text.toString()) }
+        toolbar.rightAction = { viewModel.onContinue(addFirstNameInput.ui.editText.text.toString(), addSurnameInput.ui.editText.text.toString()) }
 
         emojiIdSummaryController = EmojiIdSummaryViewController(ui.emojiIdSummaryView)
         fullEmojiIdViewController = FullEmojiIdViewController(

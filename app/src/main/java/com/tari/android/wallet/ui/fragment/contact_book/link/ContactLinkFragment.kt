@@ -51,8 +51,8 @@ class ContactLinkFragment : CommonFragment<FragmentContactsLinkBinding, ContactL
     }
 
     private fun showTooltip(contactDto: ContactDto) {
-        //todo
-        ui.linkContactMessage.text = getString(R.string.contact_book_contacts_book_link_message)
+        val shortVersion = contactDto.contact.extractWalletAddress().extractShortVersion()
+        ui.linkContactMessage.text = getString(R.string.contact_book_contacts_book_link_message, shortVersion)
     }
 
     companion object {

@@ -51,12 +51,12 @@ class ContactViewHolder(view: ItemContactBinding) : CommonViewHolder<ContactItem
 
             is MergedContactDto -> {
                 displayFirstEmojiOrText(dto.ffiContactDto.walletAddress.emojiId.extractEmojis()[0])
-                displayAlias(dto.phoneContactDto.name)
+                displayAlias(dto.phoneContactDto.getAlias())
             }
 
             is PhoneContactDto -> {
-                displayFirstEmojiOrText(dto.name.firstOrNull()?.toString() ?: "C")
-                displayAlias(dto.name)
+                displayFirstEmojiOrText(dto.getAlias().firstOrNull()?.toString() ?: "C")
+                displayAlias(dto.getAlias())
             }
         }
 

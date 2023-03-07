@@ -1,5 +1,6 @@
 package com.tari.android.wallet.ui.fragment.contact_book.details
 
+import android.text.SpannableString
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import com.tari.android.wallet.R
@@ -19,12 +20,15 @@ import com.tari.android.wallet.ui.dialog.modular.modules.input.InputModule
 import com.tari.android.wallet.ui.fragment.contact_book.data.ContactAction
 import com.tari.android.wallet.ui.fragment.contact_book.data.ContactsRepository
 import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.ContactDto
+import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.MergedContactDto
+import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.PhoneContactDto
 import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.YatContactDto
 import com.tari.android.wallet.ui.fragment.contact_book.details.adapter.profile.ContactProfileViewHolderItem
 import com.tari.android.wallet.ui.fragment.contact_book.root.ContactBookNavigation
 import com.tari.android.wallet.ui.fragment.settings.allSettings.button.ButtonStyle
 import com.tari.android.wallet.ui.fragment.settings.allSettings.button.ButtonViewDto
 import com.tari.android.wallet.ui.fragment.settings.allSettings.title.SettingsTitleViewHolderItem
+import yat.android.ui.extension.HtmlHelper
 import javax.inject.Inject
 
 class ContactDetailsViewModel : CommonViewModel() {
@@ -131,28 +135,57 @@ class ContactDetailsViewModel : CommonViewModel() {
 
     fun onEditClick() {
         val contact = contact.value!!
-        val inputModule = InputModule(contact.contact.getAlias(), resourceManager.getString(R.string.contact_book_details_edit_hint), true) {
+
+        var name = contact.contact.getAlias()
+        var surname = ""
+
+        if (contact.contact is PhoneContactDto) {
+            name = contact.contact.firstName
+            surname = contact.contact.surname
+        } else if (contact.contact is MergedContactDto) {
+            name = contact.contact.phoneContactDto.firstName
+            surname = contact.contact.phoneContactDto.surname
+        }
+
+        val inputModule =
+            InputModule(name, resourceManager.getString(R.string.contact_book_add_contact_first_name_hint), true) {
+                saveContactName(it)
+                true
+            }
+        val surnameModule = InputModule(surname, resourceManager.getString(R.string.contact_book_add_contact_surname_hint), true) {
             saveContactName(it)
             true
         }
+
         val headModule = HeadModule(
             resourceManager.getString(R.string.contact_book_details_edit_title),
             rightButtonTitle = resourceManager.getString(R.string.contact_book_add_contact_done_button)
-        ) { saveContactName(inputModule.value) }
-        val args = ModularDialogArgs(DialogArgs(), listOf(headModule, inputModule))
+        ) { saveContactName(inputModule.value, surnameModule.value) }
+
+        val moduleList = mutableListOf(headModule, inputModule)
+        if (contact.contact is MergedContactDto || contact.contact is PhoneContactDto) {
+            moduleList.add(surnameModule)
+        }
+
+        val args = ModularDialogArgs(DialogArgs(), moduleList)
         _inputDialog.postValue(args)
     }
 
-    private fun saveContactName(name: String) {
+    private fun saveContactName(name: String, surname: String = "") {
         val contact = contact.value!!
-        this.contact.value = contactsRepository.updateContactName(contact, name)
+        this.contact.value = contactsRepository.updateContactName(contact, name, surname)
         _dismissDialog.postValue(Unit)
     }
 
     private fun showUnlinkDialog() {
+        val mergedDto = contact.value!!.contact as MergedContactDto
+        val shortEmoji = mergedDto.ffiContactDto.walletAddress.extractShortVersion()
+        val name = mergedDto.phoneContactDto.firstName
+        val bodyHtml = HtmlHelper.getSpannedText(resourceManager.getString(R.string.contact_book_contacts_book_unlink_message, shortEmoji, name))
+
         val modules = listOf(
             HeadModule(resourceManager.getString(R.string.contact_book_contacts_book_unlink_title)),
-            BodyModule(resourceManager.getString(R.string.contact_book_contacts_book_unlink_message)),
+            BodyModule(null, SpannableString(bodyHtml)),
             ButtonModule(resourceManager.getString(R.string.common_confirm), Warning) {
                 contactsRepository.unlinkContact(contact.value!!)
                 _dismissDialog.value = Unit
@@ -164,10 +197,15 @@ class ContactDetailsViewModel : CommonViewModel() {
     }
 
     private fun showUnlinkSuccessDialog() {
+        val mergedDto = contact.value!!.contact as MergedContactDto
+        val shortEmoji = mergedDto.ffiContactDto.walletAddress.extractShortVersion()
+        val name = mergedDto.phoneContactDto.firstName
+        val bodyHtml =
+            HtmlHelper.getSpannedText(resourceManager.getString(R.string.contact_book_contacts_book_unlink_success_message, shortEmoji, name))
+
         val modules = listOf(
             HeadModule(resourceManager.getString(R.string.contact_book_contacts_book_unlink_success_title)),
-            BodyModule(resourceManager.getString(R.string.contact_book_contacts_book_unlink_success_message)),
-            ButtonModule(resourceManager.getString(R.string.common_confirm), Warning) { _backPressed.postValue(Unit) },
+            BodyModule(null, SpannableString(bodyHtml)),
             ButtonModule(resourceManager.getString(R.string.common_cancel), Close)
         )
         _modularDialog.postValue(ModularDialogArgs(DialogArgs {

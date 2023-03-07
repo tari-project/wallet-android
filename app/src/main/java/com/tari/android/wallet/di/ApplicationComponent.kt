@@ -91,6 +91,7 @@ import com.tari.android.wallet.ui.fragment.settings.torBridges.customBridges.Cus
 import com.tari.android.wallet.ui.fragment.settings.userAutorization.BiometricAuthenticationViewModel
 import com.tari.android.wallet.ui.fragment.splash.SplashActivity
 import com.tari.android.wallet.ui.fragment.tx.TxListViewModel
+import com.tari.android.wallet.ui.fragment.tx.details.TxDetailsViewModel
 import com.tari.android.wallet.ui.fragment.tx.details.gif.GIFViewModel
 import com.tari.android.wallet.ui.fragment.utxos.list.UtxosListViewModel
 import dagger.Component
@@ -179,6 +180,7 @@ interface ApplicationComponent {
     fun inject(viewModel: AddContactNameViewModel)
     fun inject(viewModel: ContactLinkViewModel)
     fun inject(viewModel: ContactSelectionViewModel)
+    fun inject(viewModel: TxDetailsViewModel)
 
     fun getClipboardManager(): ClipboardManager
 }

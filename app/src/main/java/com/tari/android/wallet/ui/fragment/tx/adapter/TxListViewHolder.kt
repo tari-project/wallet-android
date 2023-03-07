@@ -29,6 +29,7 @@ import com.tari.android.wallet.ui.extension.gone
 import com.tari.android.wallet.ui.extension.setTopMargin
 import com.tari.android.wallet.ui.extension.string
 import com.tari.android.wallet.ui.extension.visible
+import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.ContactDto
 import com.tari.android.wallet.util.WalletUtil
 import com.tari.android.wallet.util.extractEmojis
 import org.joda.time.DateTime
@@ -49,7 +50,7 @@ class TxListViewHolder(view: ItemHomeTxListBinding) : CommonViewHolder<Transacti
         with(item.tx) {
             this@TxListViewHolder.tx = this
             displayFirstEmoji(this)
-            displayAliasOrEmojiId(this)
+            displayAliasOrEmojiId(this, item.contact)
             displayAmount(this)
             displayDate(this)
             displayStatus(this)
@@ -67,7 +68,7 @@ class TxListViewHolder(view: ItemHomeTxListBinding) : CommonViewHolder<Transacti
         ui.firstEmojiTextView.text = firstEmoji
     }
 
-    private fun displayAliasOrEmojiId(tx: Tx) {
+    private fun displayAliasOrEmojiId(tx: Tx, contact: ContactDto?) {
         val txUser = tx.user
         // display contact name or emoji id
         when {
@@ -77,6 +78,23 @@ class TxListViewHolder(view: ItemHomeTxListBinding) : CommonViewHolder<Transacti
                 ui.participantTextView2.gone()
                 ui.participantEmojiIdView.root.gone()
                 ui.participantTextView1.text = title
+            }
+
+            contact != null && contact.contact.getAlias().isNotEmpty() -> {
+                val alias = contact.contact.getAlias()
+                val fullText = when (tx.direction) {
+                    Tx.Direction.INBOUND -> string(R.string.tx_list_sent_a_payment, alias)
+                    Tx.Direction.OUTBOUND -> string(R.string.tx_list_you_paid_with_alias, alias)
+                }
+                ui.participantTextView1.visible()
+                ui.participantTextView1.text = fullText.applyFontStyle(
+                    itemView.context,
+                    TariFont.AVENIR_LT_STD_LIGHT,
+                    listOf(alias),
+                    TariFont.AVENIR_LT_STD_HEAVY
+                )
+                ui.participantEmojiIdView.root.gone()
+                ui.participantTextView2.gone()
             }
 
             txUser is Contact -> {

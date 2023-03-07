@@ -19,12 +19,13 @@ class ContactDto(val contact: IContact, var isFavorite: Boolean = false, var uui
             }
             val alias = ""
             val name = "Name"
+            val surname = "Surname"
             val yat = "Yat"
             val connectedWallets = (0..Random().nextInt(10)).map { YatContactDto.ConnectedWallet("Wallet $it") }.toList()
             return when(pos) {
                 0 -> FFIContactDto(walletAddress, alias)
-                1 -> PhoneContactDto(name)
-                2 -> MergedContactDto(FFIContactDto(walletAddress, alias), PhoneContactDto(name))
+                1 -> PhoneContactDto(name, surname)
+                2 -> MergedContactDto(FFIContactDto(walletAddress, alias), PhoneContactDto(name, surname))
                 else -> YatContactDto(walletAddress, yat, connectedWallets, alias)
             }
         }

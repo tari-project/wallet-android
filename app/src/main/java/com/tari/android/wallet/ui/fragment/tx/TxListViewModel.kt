@@ -1,16 +1,44 @@
 package com.tari.android.wallet.ui.fragment.tx
 
 
-import androidx.lifecycle.*
-import com.tari.android.wallet.R.string.*
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MediatorLiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Transformations
+import androidx.lifecycle.viewModelScope
+import com.tari.android.wallet.R.string.error_no_connection_description
+import com.tari.android.wallet.R.string.error_no_connection_title
+import com.tari.android.wallet.R.string.error_node_unreachable_description
+import com.tari.android.wallet.R.string.error_node_unreachable_title
+import com.tari.android.wallet.R.string.ffi_validation_error_cancel
+import com.tari.android.wallet.R.string.ffi_validation_error_delete
+import com.tari.android.wallet.R.string.ffi_validation_error_message
+import com.tari.android.wallet.R.string.ffi_validation_error_title
+import com.tari.android.wallet.R.string.home_completed_transactions_title
+import com.tari.android.wallet.R.string.home_pending_transactions_title
 import com.tari.android.wallet.application.MigrationManager
 import com.tari.android.wallet.application.securityStage.StagedWalletSecurityManager
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.event.Event
 import com.tari.android.wallet.event.EventBus
-import com.tari.android.wallet.extension.*
+import com.tari.android.wallet.extension.addTo
+import com.tari.android.wallet.extension.debounce
+import com.tari.android.wallet.extension.getWithError
+import com.tari.android.wallet.extension.repopulate
 import com.tari.android.wallet.ffi.FFITxCancellationReason
-import com.tari.android.wallet.model.*
+import com.tari.android.wallet.model.BalanceInfo
+import com.tari.android.wallet.model.CancelledTx
+import com.tari.android.wallet.model.CompletedTx
+import com.tari.android.wallet.model.Contact
+import com.tari.android.wallet.model.MicroTari
+import com.tari.android.wallet.model.PendingInboundTx
+import com.tari.android.wallet.model.PendingOutboundTx
+import com.tari.android.wallet.model.TariWalletAddress
+import com.tari.android.wallet.model.Tx
+import com.tari.android.wallet.model.TxId
+import com.tari.android.wallet.model.TxStatus
+import com.tari.android.wallet.model.User
+import com.tari.android.wallet.model.WalletError
 import com.tari.android.wallet.service.service.WalletServiceLauncher
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.common.SingleLiveEvent
@@ -25,13 +53,14 @@ import com.tari.android.wallet.ui.dialog.modular.modules.body.BodyModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonStyle
 import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
+import com.tari.android.wallet.ui.extension.toLiveData
 import com.tari.android.wallet.ui.fragment.contact_book.data.ContactsRepository
-import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.IContact
 import com.tari.android.wallet.ui.fragment.send.finalize.TxFailureReason
 import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupSettingsRepository
 import com.tari.android.wallet.ui.fragment.tx.adapter.TransactionItem
 import com.tari.android.wallet.ui.fragment.tx.ui.progressController.UpdateProgressViewController
 import com.tari.android.wallet.util.Build
+import io.reactivex.BackpressureStrategy
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.math.BigInteger
@@ -101,6 +130,8 @@ class TxListViewModel : CommonViewModel() {
         component.inject(this)
 
         migrationManager.validateVersion({ }, { showIncompatibleVersionDialog() })
+
+        _listUpdateTrigger.addSource(contactsRepository.publishSubject.toLiveData(BackpressureStrategy.LATEST)) { _listUpdateTrigger.postValue(Unit) }
 
         doOnConnectedToWallet { doOnConnected { onServiceConnected() } }
     }
@@ -252,7 +283,15 @@ class TxListViewModel : CommonViewModel() {
         pendingTxs.sortWith(compareByDescending(Tx::timestamp).thenByDescending { it.id })
         if (pendingTxs.isNotEmpty()) {
             items.add(TitleViewHolderItem(resourceManager.getString(home_pending_transactions_title), true))
-            items.addAll(pendingTxs.mapIndexed { index, tx -> TransactionItem(tx, index, GIFViewModel(gifRepository), confirmationCount) })
+            items.addAll(pendingTxs.mapIndexed { index, tx ->
+                TransactionItem(
+                    tx,
+                    contactsRepository.ffiBridge.getContactForTx(tx),
+                    index,
+                    GIFViewModel(gifRepository),
+                    confirmationCount
+                )
+            })
         }
 
         // sort and add non-pending txs
@@ -261,7 +300,13 @@ class TxListViewModel : CommonViewModel() {
         if (nonPendingTxs.isNotEmpty()) {
             items.add(TitleViewHolderItem(resourceManager.getString(home_completed_transactions_title), false))
             items.addAll(nonPendingTxs.mapIndexed { index, tx ->
-                TransactionItem(tx, index + pendingTxs.size, GIFViewModel(gifRepository), confirmationCount)
+                TransactionItem(
+                    tx,
+                    contactsRepository.ffiBridge.getContactForTx(tx),
+                    index + pendingTxs.size,
+                    GIFViewModel(gifRepository),
+                    confirmationCount
+                )
             })
         }
         _list.postValue(items)
