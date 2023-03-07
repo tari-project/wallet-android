@@ -83,7 +83,7 @@ open class ContactSelectionViewModel : CommonViewModel() {
         val source = contactListSource.value ?: return
         val searchText = searchText.value ?: return
 
-        var list = source.filter { additionalFilter.invoke(it) }.filter { it.contact.isDeleted.not() }
+        var list = source.filter { additionalFilter.invoke(it) }
 
         if (searchText.isNotEmpty()) {
             list = list.filter { it.filtered(searchText) }

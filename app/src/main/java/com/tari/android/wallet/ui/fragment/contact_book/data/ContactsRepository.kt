@@ -1,5 +1,8 @@
 package com.tari.android.wallet.ui.fragment.contact_book.data
 
+import android.content.Context
+import android.database.Cursor
+import android.provider.ContactsContract
 import com.tari.android.wallet.data.sharedPrefs.delegates.SerializableTime
 import com.tari.android.wallet.event.Event
 import com.tari.android.wallet.event.EventBus
@@ -21,6 +24,7 @@ import javax.inject.Singleton
 
 @Singleton
 class ContactsRepository @Inject constructor(
+    val context: Context,
     private val contactSharedPrefRepository: ContactSharedPrefRepository
 ) : CommonViewModel() {
     var publishSubject = BehaviorSubject.create<MutableList<ContactDto>>()
@@ -30,11 +34,10 @@ class ContactsRepository @Inject constructor(
 
     init {
         val saved = contactSharedPrefRepository.savedContacts.orEmpty()
+        publishSubject.onNext(saved.toMutableList())
         if (saved.isEmpty()) {
-            val list = (1..20).map { ContactDto.generateContactDto() }.toMutableList()
-            publishSubject.onNext(list)
-        } else {
-            publishSubject.onNext(saved.toMutableList())
+//            val list = (1..20).map { ContactDto.generateContactDto() }.toMutableList()
+//            publishSubject.onNext(list)
         }
     }
 
@@ -77,9 +80,11 @@ class ContactsRepository @Inject constructor(
     }
 
     fun linkContacts(ffiContact: ContactDto, phoneContactDto: ContactDto) {
-        updateContact(ffiContact.uuid) { it.isDeleted = true }
 
-        updateContact(phoneContactDto.uuid) { it.isDeleted = true }
+        withListUpdate {
+            it.remove(getByUuid(ffiContact.uuid))
+            it.remove(getByUuid(phoneContactDto.uuid))
+        }
 
         val mergedContact = ContactDto(MergedContactDto(ffiContact.contact as FFIContactDto, phoneContactDto.contact as PhoneContactDto))
         withListUpdate { list -> list.add(mergedContact) }
@@ -88,7 +93,7 @@ class ContactsRepository @Inject constructor(
     fun unlinkContact(contact: ContactDto) {
         if (contact.contact is MergedContactDto) {
             withListUpdate { list ->
-                list.firstOrNull { it.uuid == contact.uuid }?.let { contact.isDeleted = true }
+                list.remove(getByUuid(contact.uuid))
                 list.add(ContactDto(contact.contact.phoneContactDto, contact.isFavorite))
                 list.add(ContactDto(contact.contact.ffiContactDto, contact.isFavorite))
             }
@@ -109,8 +114,8 @@ class ContactsRepository @Inject constructor(
     }
 
     fun deleteContact(contactDto: ContactDto) {
-        updateContact(contactDto.uuid) {
-            it.isDeleted = true
+        withListUpdate {
+            it.remove(getByUuid(contactDto.uuid))
         }
     }
 
@@ -143,7 +148,10 @@ class ContactsRepository @Inject constructor(
 
         fun getContactForTx(tx: Tx): ContactDto {
             val walletAddress = tx.user.walletAddress
-            val contact = publishSubject.value!!.firstOrNull { it.contact is FFIContactDto && it.contact.walletAddress == walletAddress }
+            val contact = publishSubject.value!!.firstOrNull {
+                it.contact is FFIContactDto && it.contact.walletAddress == walletAddress
+                        || it.contact is MergedContactDto && it.contact.ffiContactDto.walletAddress == walletAddress
+            }
             return contact ?: ContactDto(FFIContactDto(walletAddress))
         }
 
@@ -187,10 +195,14 @@ class ContactsRepository @Inject constructor(
             }
         }
 
-        private fun onFFIContactRemoved(contact: TariWalletAddress) {
-            withFFIContact(contact) {
-                it.isDeleted = true
+        private fun onFFIContactRemoved(tariWalletAddress: TariWalletAddress) {
+            withListUpdate {
+                it.remove(getFFIContact(tariWalletAddress))
             }
+        }
+
+        private fun getFFIContact(walletAddress: TariWalletAddress) = publishSubject.value!!.firstOrNull {
+            it.contact is FFIContactDto && it.contact.walletAddress == walletAddress
         }
 
         private fun ffiContactExist(walletAddress: TariWalletAddress): Boolean =
@@ -204,5 +216,63 @@ class ContactsRepository @Inject constructor(
         }
     }
 
-    inner class PhoneBookRepositoryBridge
+    inner class PhoneBookRepositoryBridge {
+
+        fun synchronize() {
+            val contacts = getPhoneContacts()
+
+            withListUpdate {
+                contacts.forEach { phoneContact ->
+                    val existContact = it.firstOrNull {
+                        it.contact is PhoneContactDto && it.contact.id == phoneContact.id
+                                || it.contact is MergedContactDto && it.contact.phoneContactDto.id == phoneContact.id
+                    }
+                    if (existContact == null) {
+                        it.add(ContactDto(phoneContact.toPhoneContactDto()))
+                    } else {
+                        if (existContact.contact is MergedContactDto) {
+                            existContact.contact.phoneContactDto = phoneContact.toPhoneContactDto()
+                        }
+                        if (existContact.contact is PhoneContactDto) {
+                            existContact.contact.avatar = phoneContact.avatar
+                            existContact.contact.firstName = phoneContact.firstName
+                            existContact.contact.surname = phoneContact.surname
+                        }
+                    }
+                }
+            }
+
+            val c = contacts.size
+        }
+
+        fun getPhoneContacts(): MutableList<PhoneContact> {
+            val contacts = mutableListOf<PhoneContact>()
+            val cr = context.contentResolver
+            val cur = cr.query(ContactsContract.Contacts.CONTENT_URI, null, null, null, null)!!
+            while (cur.moveToNext()) {
+                val id = getString(cur, ContactsContract.CommonDataKinds.Phone.NAME_RAW_CONTACT_ID)
+                val firstName = getString(cur, ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME)
+                val surname = getString(cur, ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME)
+                val avatar = getString(cur, ContactsContract.CommonDataKinds.Phone.PHOTO_URI)
+                contacts.add(PhoneContact(id, firstName, surname, avatar))
+            }
+            cur.close()
+            return contacts
+        }
+    }
+
+    private fun getString(cursor: Cursor, columnName: String): String {
+        val columnIndex = cursor.getColumnIndex(columnName)
+        if (columnIndex == -1) return ""
+        return cursor.getString(columnIndex).orEmpty()
+    }
+
+    data class PhoneContact(
+        val id: String,
+        val firstName: String,
+        val surname: String,
+        val avatar: String
+    ) {
+        fun toPhoneContactDto(): PhoneContactDto = PhoneContactDto(id, firstName, surname, avatar)
+    }
 }

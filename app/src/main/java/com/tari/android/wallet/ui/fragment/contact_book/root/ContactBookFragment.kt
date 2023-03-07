@@ -16,6 +16,7 @@ import com.tari.android.wallet.extension.observe
 import com.tari.android.wallet.ui.common.CommonFragment
 import com.tari.android.wallet.ui.fragment.contact_book.contacts.ContactsFragment
 import com.tari.android.wallet.ui.fragment.contact_book.favorites.FavoritesFragment
+import com.tari.android.wallet.ui.fragment.home.HomeActivity
 import java.lang.ref.WeakReference
 
 class ContactBookFragment : CommonFragment<FragmentContactBookRootBinding, ContactBookViewModel>() {
@@ -49,6 +50,10 @@ class ContactBookFragment : CommonFragment<FragmentContactBookRootBinding, Conta
                 }
             )
         }.attach()
+
+        ui.searchView.setOnQueryTextFocusChangeListener { _, hasFocus ->
+            (requireActivity() as? HomeActivity)?.setBottomBarVisibility(!hasFocus)
+        }
 
         ui.toolbar.rightAction = { viewModel.navigate(ContactBookNavigation.ToAddContact) }
 

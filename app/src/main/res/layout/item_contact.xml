@@ -42,12 +42,27 @@
                     android:layout_marginHorizontal="5dp"
                     android:layout_marginVertical="5dp"
                     android:clickable="true"
+                    android:clipChildren="true"
+                    android:clipToOutline="true"
+                    android:clipToPadding="true"
                     android:focusable="true"
                     app:cornerRadius="21dp"
                     app:elevation="4dp"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent">
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/avatar"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:clipToPadding="true"
+                        android:gravity="center"
+                        android:src="@color/yat_lib_blue"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
 
                     <com.tari.android.wallet.ui.component.tari.TariTextView
                         android:id="@+id/first_emoji_text_view"

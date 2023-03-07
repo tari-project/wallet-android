@@ -1,5 +1,6 @@
 package com.tari.android.wallet.ui.fragment.contact_book.details.adapter.profile
 
+import android.net.Uri
 import com.tari.android.wallet.databinding.ItemContactProfileBinding
 import com.tari.android.wallet.ui.common.recyclerView.CommonViewHolder
 import com.tari.android.wallet.ui.common.recyclerView.ViewHolderBuilder
@@ -22,33 +23,38 @@ class ContactProfileViewHolder(view: ItemContactProfileBinding) :
 
         when (val dto = item.contactDto.contact) {
             is YatContactDto -> {
-                showFirstChar(dto.walletAddress.emojiId.extractEmojis()[0])
+                showFirstCharOrAvatar(dto.walletAddress.emojiId.extractEmojis()[0])
                 showEmojiId(dto.walletAddress.emojiId)
                 showAlias(dto.localAlias)
             }
 
             is FFIContactDto -> {
-                showFirstChar(dto.walletAddress.emojiId.extractEmojis()[0])
+                showFirstCharOrAvatar(dto.walletAddress.emojiId.extractEmojis()[0])
                 showEmojiId(dto.walletAddress.emojiId)
                 showAlias(dto.localAlias)
             }
 
             is MergedContactDto -> {
-                showFirstChar(dto.ffiContactDto.walletAddress.emojiId.extractEmojis()[0])
+                showFirstCharOrAvatar(dto.ffiContactDto.walletAddress.emojiId.extractEmojis()[0], dto.phoneContactDto.avatar)
                 showEmojiId(dto.ffiContactDto.walletAddress.emojiId)
                 showAlias(dto.phoneContactDto.getAlias())
             }
 
             is PhoneContactDto -> {
-                showFirstChar(dto.getAlias().firstOrNull()?.toString() ?: "C")
+                showFirstCharOrAvatar(dto.getAlias().firstOrNull()?.toString() ?: "C", dto.avatar)
                 showEmojiId("")
                 showAlias(dto.getAlias())
             }
         }
     }
 
-    private fun showFirstChar(firstChar: String) {
+    private fun showFirstCharOrAvatar(firstChar: String, avatar: String? = null) {
         ui.firstEmojiTextView.text = firstChar
+        if (avatar.orEmpty().isNotEmpty()) {
+            ui.avatar.setImageURI(Uri.parse(avatar))
+        }
+        ui.firstEmojiTextView.setVisible(avatar.isNullOrEmpty())
+        ui.avatar.setVisible(avatar.orEmpty().isNotEmpty())
     }
 
     private fun showEmojiId(emojiId: String) {

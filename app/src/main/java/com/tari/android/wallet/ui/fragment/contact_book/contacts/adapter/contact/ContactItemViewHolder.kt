@@ -1,5 +1,6 @@
 package com.tari.android.wallet.ui.fragment.contact_book.contacts.adapter.contact
 
+import android.net.Uri
 import com.tari.android.wallet.databinding.ItemContactBinding
 import com.tari.android.wallet.ui.common.recyclerView.CommonViewHolder
 import com.tari.android.wallet.ui.common.recyclerView.ViewHolderBuilder
@@ -14,7 +15,7 @@ import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.PhoneConta
 import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.YatContactDto
 import com.tari.android.wallet.util.extractEmojis
 
-class ContactViewHolder(view: ItemContactBinding) : CommonViewHolder<ContactItem, ItemContactBinding>(view) {
+class ContactItemViewHolder(view: ItemContactBinding) : CommonViewHolder<ContactItem, ItemContactBinding>(view) {
 
     private val emojiIdSummaryController = EmojiIdSummaryViewController(ui.participantEmojiIdView)
 
@@ -50,12 +51,14 @@ class ContactViewHolder(view: ItemContactBinding) : CommonViewHolder<ContactItem
             }
 
             is MergedContactDto -> {
-                displayFirstEmojiOrText(dto.ffiContactDto.walletAddress.emojiId.extractEmojis()[0])
+                if (dto.phoneContactDto.avatar.isNotEmpty()) displayAvatar(dto.phoneContactDto.avatar) else
+                    displayFirstEmojiOrText(dto.ffiContactDto.walletAddress.emojiId.extractEmojis()[0])
                 displayAlias(dto.phoneContactDto.getAlias())
             }
 
             is PhoneContactDto -> {
-                displayFirstEmojiOrText(dto.getAlias().firstOrNull()?.toString() ?: "C")
+                if (dto.avatar.isNotEmpty()) displayAvatar(dto.avatar) else
+                    displayFirstEmojiOrText(dto.getAlias().firstOrNull()?.toString() ?: "C")
                 displayAlias(dto.getAlias())
             }
         }
@@ -63,7 +66,15 @@ class ContactViewHolder(view: ItemContactBinding) : CommonViewHolder<ContactItem
         ui.starred.setVisible(item.contact.isFavorite)
     }
 
+    private fun displayAvatar(url: String) {
+        ui.avatar.setImageURI(Uri.parse(url))
+        ui.avatar.visible()
+        ui.firstEmojiTextView.gone()
+    }
+
     private fun displayFirstEmojiOrText(string: String) {
+        ui.firstEmojiTextView.visible()
+        ui.avatar.gone()
         ui.firstEmojiTextView.text = string
     }
 
@@ -81,6 +92,6 @@ class ContactViewHolder(view: ItemContactBinding) : CommonViewHolder<ContactItem
 
     companion object {
         fun getBuilder(): ViewHolderBuilder =
-            ViewHolderBuilder(ItemContactBinding::inflate, ContactItem::class.java) { ContactViewHolder(it as ItemContactBinding) }
+            ViewHolderBuilder(ItemContactBinding::inflate, ContactItem::class.java) { ContactItemViewHolder(it as ItemContactBinding) }
     }
 }

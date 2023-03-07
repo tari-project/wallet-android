@@ -73,6 +73,7 @@ import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonStyle
 import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
 import com.tari.android.wallet.ui.extension.hideKeyboard
 import com.tari.android.wallet.ui.extension.parcelable
+import com.tari.android.wallet.ui.extension.setVisible
 import com.tari.android.wallet.ui.extension.showInternetConnectionErrorDialog
 import com.tari.android.wallet.ui.extension.string
 import com.tari.android.wallet.ui.fragment.contact_book.add.AddContactFragment
@@ -224,6 +225,14 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>(), AllSe
         }
     }
 
+    fun setBottomBarVisibility(isVisible: Boolean) {
+        val postDelay = if (!isVisible) 0 else Constants.UI.shortDurationMs
+        ui.bottomNavigationView.postDelayed({
+            ui.bottomNavigationView.setVisible(isVisible)
+            ui.sendTariCtaView.setVisible(isVisible)
+        }, postDelay)
+    }
+
     private fun setupUi() {
         setupBottomNavigation()
         setupCTAs()
@@ -284,7 +293,6 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>(), AllSe
             displayIncompatibleNetworkDialog()
         }
     }
-
 
     private fun displayIncompatibleNetworkDialog() {
         if (this.isFinishing) return

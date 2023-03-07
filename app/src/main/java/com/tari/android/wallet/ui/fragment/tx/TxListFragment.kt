@@ -151,6 +151,10 @@ class TxListFragment : CommonFragment<FragmentTxListBinding, TxListViewModel>(),
                 viewModel.logger.i("notification permission checked successfully")
             }
         }
+
+        runWithPermission(android.Manifest.permission.READ_CONTACTS) {
+            viewModel.contactsRepository.PhoneBookRepositoryBridge().synchronize()
+        }
     }
 
     @SuppressLint("ClickableViewAccessibility")

@@ -131,10 +131,9 @@ class ContactsViewModel : CommonViewModel() {
 
         val resultList = mutableListOf<CommonViewHolderItem>()
 
-        val filtered = sourceList.filter { !it.contact.isDeleted }
-            .filter { contact -> contact.filtered(searchText) && filters.all { it.invoke(contact) } }
+        val filtered = sourceList.filter { contact -> contact.filtered(searchText) && filters.all { it.invoke(contact) } }
 
-        if (filtered.isEmpty()) {
+        if (filtered.isEmpty() && searchText.isBlank()) {
             val emptyState = EmptyStateItem(getEmptyTitle(), getBody(), getEmptyImage(), getButtonTitle()) { grandPermission() }
             resultList += emptyState
         } else {

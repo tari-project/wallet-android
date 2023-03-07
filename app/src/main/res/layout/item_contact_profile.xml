@@ -22,6 +22,9 @@
             android:layout_width="65dp"
             android:layout_height="65dp"
             android:layout_gravity="center_horizontal"
+            android:clipChildren="true"
+            android:clipToOutline="true"
+            android:clipToPadding="true"
             android:elevation="8dp"
             app:cornerRadius="33dp"
             app:elevation="8dp">
@@ -38,6 +41,16 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 tools:text="A" />
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/avatar"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
         </com.tari.android.wallet.ui.component.tari.TariPrimaryBackground>
 

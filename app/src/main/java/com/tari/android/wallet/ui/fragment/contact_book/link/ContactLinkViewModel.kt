@@ -65,7 +65,7 @@ class ContactLinkViewModel : CommonViewModel() {
         val source = contactListSource.value ?: return
         val searchText = searchText.value ?: return
 
-        var list = source.filter { it.contact.isDeleted.not() }.filter { it.contact.contact is PhoneContactDto }
+        var list = source.filter { it.contact.contact is PhoneContactDto }
 
         if (searchText.isNotEmpty()) {
             list = list.filter { it.filtered(searchText) }
