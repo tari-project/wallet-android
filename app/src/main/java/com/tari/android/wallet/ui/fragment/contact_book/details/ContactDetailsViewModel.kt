@@ -44,6 +44,7 @@ import com.tari.android.wallet.ui.fragment.contact_book.data.ContactsRepository
 import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.ContactDto
 import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.MergedContactDto
 import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.YatContactDto
+import com.tari.android.wallet.ui.fragment.contact_book.details.adapter.contactType.ContactTypeViewHolderItem
 import com.tari.android.wallet.ui.fragment.contact_book.details.adapter.profile.ContactProfileViewHolderItem
 import com.tari.android.wallet.ui.fragment.contact_book.root.ContactBookNavigation
 import com.tari.android.wallet.ui.fragment.settings.allSettings.button.ButtonStyle
@@ -166,6 +167,8 @@ class ContactDetailsViewModel : CommonViewModel() {
                 }
             }
         }
+
+        newList += ContactTypeViewHolderItem(resourceManager.getString(contact.getTypeName()), contact.getTypeIcon())
 
         newList += SpaceVerticalViewHolderItem(20)
 

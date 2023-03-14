@@ -1,5 +1,6 @@
 package com.tari.android.wallet.ui.component.tari
 
+import android.R.attr
 import android.content.Context
 import android.graphics.drawable.Drawable
 import android.util.AttributeSet
@@ -8,6 +9,7 @@ import android.widget.FrameLayout
 import com.tari.android.wallet.R
 import com.tari.android.wallet.databinding.TariToolbarBinding
 import com.tari.android.wallet.ui.extension.*
+
 
 class TariToolbar(context: Context, attrs: AttributeSet) : FrameLayout(context, attrs) {
 
@@ -24,6 +26,8 @@ class TariToolbar(context: Context, attrs: AttributeSet) : FrameLayout(context, 
     init {
         ui = TariToolbarBinding.inflate(LayoutInflater.from(context), this, false)
         addView(ui.root)
+
+        layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
 
         ui.backCtaView.setOnThrottledClickListener { backPressedAction.invoke() }
 

@@ -5,6 +5,7 @@ import com.tari.android.wallet.ui.common.recyclerView.CommonViewHolderItem
 import com.tari.android.wallet.ui.common.recyclerView.ViewHolderBuilder
 import com.tari.android.wallet.ui.common.recyclerView.viewHolders.SpaceVerticalViewHolder
 import com.tari.android.wallet.ui.common.recyclerView.viewHolders.TitleViewHolder
+import com.tari.android.wallet.ui.fragment.contact_book.details.adapter.contactType.ContactTypeViewHolder
 import com.tari.android.wallet.ui.fragment.contact_book.details.adapter.profile.ContactProfileViewHolder
 import com.tari.android.wallet.ui.fragment.settings.allSettings.button.ButtonViewHolder
 import com.tari.android.wallet.ui.fragment.settings.allSettings.divider.SettingsDividerViewHolder
@@ -18,5 +19,6 @@ class ContactDetailsAdapter : CommonAdapter<CommonViewHolderItem>() {
         ButtonViewHolder.getBuilder(),
         SettingsTitleViewHolder.getBuilder(),
         SpaceVerticalViewHolder.getBuilder(),
+        ContactTypeViewHolder.getBuilder(),
     )
 }

@@ -94,6 +94,39 @@
                     app:layout_constraintStart_toEndOf="@+id/profile_container"
                     app:layout_constraintTop_toTopOf="parent" />
 
+                <com.tari.android.wallet.ui.component.tari.TariPrimaryBackground
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
+                    android:layout_marginStart="-12dp"
+                    android:layout_marginBottom="-2dp"
+                    android:elevation="2dp"
+                    app:cornerRadius="9dp"
+                    app:layout_constraintBottom_toBottomOf="@+id/profile_container"
+                    app:layout_constraintStart_toEndOf="@+id/profile_container">
+
+                    <com.tari.android.wallet.ui.component.tari.TariAlphaBackground
+                        android:layout_width="16dp"
+                        android:layout_height="16dp"
+                        app:alphaBackground="1"
+                        app:backgroundColor="?attr/palette_brand_purple"
+                        app:cornerRadius="8dp"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent">
+
+                        <androidx.appcompat.widget.AppCompatImageView
+                            android:id="@+id/contact_icon_type"
+                            android:padding="3dp"
+                            android:src="@drawable/vector_contact_type_link"
+                            android:layout_width="match_parent"
+                            android:tint="?attr/palette_background_primary"
+                            android:layout_height="match_parent" />
+
+                    </com.tari.android.wallet.ui.component.tari.TariAlphaBackground>
+
+                </com.tari.android.wallet.ui.component.tari.TariPrimaryBackground>
+
             </androidx.constraintlayout.widget.ConstraintLayout>
 
         </com.tari.android.wallet.ui.component.tari.TariSwitchedBackground>

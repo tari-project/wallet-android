@@ -15,13 +15,24 @@
         app:layout_constraintTop_toTopOf="parent"
         app:text="@string/contact_book_contacts_book_details_title" />
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/list_ui"
+    <com.tari.android.wallet.ui.component.tari.TariSecondaryBackground
         android:layout_width="match_parent"
         android:layout_height="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/toolbar" />
+        app:layout_constraintTop_toBottomOf="@+id/toolbar">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/list_ui"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    </com.tari.android.wallet.ui.component.tari.TariSecondaryBackground>
+
 
 </com.tari.android.wallet.ui.component.tari.TariPrimaryBackground>

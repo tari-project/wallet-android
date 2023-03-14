@@ -62,6 +62,7 @@ class ContactItemViewHolder(view: ItemContactBinding) : CommonViewHolder<Contact
             }
         }
 
+        ui.contactIconType.setImageResource(item.contact.getTypeIcon())
         ui.starred.setVisible(item.contact.contact.isFavorite)
     }
 
