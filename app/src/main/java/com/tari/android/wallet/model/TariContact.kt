@@ -41,19 +41,23 @@ import com.tari.android.wallet.ui.extension.readP
  *
  * @author The Tari Development Team
  */
-class Contact() : User(), Parcelable {
+class TariContact() : Parcelable {
 
+    var walletAddress = TariWalletAddress()
+    var isFavorite: Boolean = false
     var alias: String = ""
 
     constructor(
         tariWalletAddress: TariWalletAddress,
-        alias: String
+        alias: String = "",
+        isFavorite: Boolean = false
     ) : this() {
         this.walletAddress = tariWalletAddress
         this.alias = alias
+        this.isFavorite = isFavorite
     }
 
-    override fun filtered(text: String): Boolean = super.filtered(text) || alias.contains(text, true)
+    fun filtered(text: String): Boolean = walletAddress.emojiId.contains(text, true) || alias.contains(text, true)
 
     override fun toString(): String = "Contact(alias='$alias') ${super.toString()}"
 
@@ -63,14 +67,14 @@ class Contact() : User(), Parcelable {
         readFromParcel(parcel)
     }
 
-    companion object CREATOR : Parcelable.Creator<Contact> {
+    companion object CREATOR : Parcelable.Creator<TariContact> {
 
-        override fun createFromParcel(parcel: Parcel): Contact {
-            return Contact(parcel)
+        override fun createFromParcel(parcel: Parcel): TariContact {
+            return TariContact(parcel)
         }
 
-        override fun newArray(size: Int): Array<Contact> {
-            return Array(size) { Contact() }
+        override fun newArray(size: Int): Array<TariContact> {
+            return Array(size) { TariContact() }
         }
 
     }
@@ -78,11 +82,13 @@ class Contact() : User(), Parcelable {
     override fun writeToParcel(parcel: Parcel, flags: Int) {
         parcel.writeParcelable(walletAddress, flags)
         parcel.writeString(alias)
+        parcel.writeBoolean(isFavorite)
     }
 
     private fun readFromParcel(inParcel: Parcel) {
         walletAddress = inParcel.readP(TariWalletAddress::class.java)
         alias = inParcel.readString().orEmpty()
+        isFavorite = inParcel.readBoolean()
     }
 
     override fun describeContents(): Int {

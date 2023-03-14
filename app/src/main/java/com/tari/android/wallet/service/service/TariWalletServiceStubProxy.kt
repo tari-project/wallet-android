@@ -24,7 +24,7 @@ class TariWalletServiceStubProxy : TariWalletService.Stub() {
     override fun estimateTxFee(amount: MicroTari, error: WalletError, feePerGram: MicroTari?): MicroTari? =
         stub.estimateTxFee(amount, error, feePerGram)
 
-    override fun getContacts(error: WalletError): List<Contact>? = stub.getContacts(error)
+    override fun getContacts(error: WalletError): List<TariContact>? = stub.getContacts(error)
 
     override fun getCompletedTxs(error: WalletError): List<CompletedTx>? = stub.getCompletedTxs(error)
 
@@ -50,7 +50,7 @@ class TariWalletServiceStubProxy : TariWalletService.Stub() {
     override fun startBaseNodeSync(error: WalletError): Boolean = stub.startBaseNodeSync(error)
 
     override fun sendTari(
-        contact: User,
+        contact: TariContact,
         amount: MicroTari,
         feePerGram: MicroTari,
         message: String,
@@ -61,7 +61,7 @@ class TariWalletServiceStubProxy : TariWalletService.Stub() {
     override fun updateContactAlias(contactPublicKey: TariWalletAddress, alias: String, error: WalletError): Boolean =
         stub.updateContactAlias(contactPublicKey, alias, error)
 
-    override fun removeContact(contact: Contact, error: WalletError): Boolean = stub.removeContact(contact, error)
+    override fun removeContact(tariContact: TariContact, error: WalletError): Boolean = stub.removeContact(tariContact, error)
 
     override fun getWalletAddressFromHexString(hex: String): TariWalletAddress? = stub.getWalletAddressFromHexString(hex)
 

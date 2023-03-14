@@ -33,6 +33,7 @@
 package com.tari.android.wallet.ui.fragment.home
 
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.widget.ImageView
 import androidx.activity.viewModels
@@ -55,8 +56,6 @@ import com.tari.android.wallet.extension.applyFontStyle
 import com.tari.android.wallet.model.MicroTari
 import com.tari.android.wallet.model.Tx
 import com.tari.android.wallet.model.TxId
-import com.tari.android.wallet.model.User
-import com.tari.android.wallet.model.WalletError
 import com.tari.android.wallet.network.NetworkConnectionState
 import com.tari.android.wallet.service.TariWalletService
 import com.tari.android.wallet.service.connection.ServiceConnectionStatus
@@ -79,7 +78,6 @@ import com.tari.android.wallet.ui.extension.string
 import com.tari.android.wallet.ui.fragment.contact_book.add.AddContactFragment
 import com.tari.android.wallet.ui.fragment.contact_book.addContactName.AddContactNameFragment
 import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.ContactDto
-import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.IContact
 import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.YatContactDto
 import com.tari.android.wallet.ui.fragment.contact_book.details.ContactDetailsFragment
 import com.tari.android.wallet.ui.fragment.contact_book.link.ContactLinkFragment
@@ -412,6 +410,22 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>(), AllSe
 
     override fun toLinkContact(contact: ContactDto) = addFragment(ContactLinkFragment.createFragment(contact))
 
+    override fun toExternalWallet(connectedWallet: YatContactDto.ConnectedWallet) {
+
+        try {
+            val externalAddress = connectedWallet.getExternalLink()
+            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(externalAddress))
+
+            if (intent.resolveActivity(packageManager) != null) {
+                startActivity(intent)
+            } else {
+                viewModel.openWalletErrorDialog()
+            }
+        } catch (e: Throwable) {
+            viewModel.openWalletErrorDialog()
+        }
+    }
+
     override fun continueToAmount(user: ContactDto, amount: MicroTari?) {
         if (EventBus.networkConnectionState.publishSubject.value != NetworkConnectionState.CONNECTED) {
             showInternetConnectionErrorDialog(this)
@@ -453,7 +467,7 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>(), AllSe
     }
 
     override fun continueToFinalizeSendTx(transactionData: TransactionData) {
-        if (transactionData.recipientContact is YatContactDto) {
+        if (transactionData.recipientContact?.contact is YatContactDto) {
             viewModel.yatAdapter.showOutcomingFinalizeActivity(this, transactionData)
         } else {
             addFragment(FinalizeSendTxFragment.create(transactionData))
@@ -505,14 +519,8 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>(), AllSe
     }
 
     private fun sendTariToUser(service: TariWalletService, sendDeeplink: DeepLink.Send) {
-        val error = WalletError()
-        val contacts = service.getContacts(error)
         val walletAddress = service.getWalletAddressFromHexString(sendDeeplink.walletAddressHex)
-        val recipientUser = when (error) {
-            WalletError.NoError -> contacts.firstOrNull { it.walletAddress == walletAddress } ?: User(walletAddress)
-            else -> User(walletAddress)
-        }
-        sendToUser(ContactDto(IContact.generateFromUser(recipientUser)))
+        sendToUser(viewModel.contactsRepository.ffiBridge.getContactByAdress(walletAddress))
     }
 
     private fun sendToUser(recipientUser: ContactDto?) {

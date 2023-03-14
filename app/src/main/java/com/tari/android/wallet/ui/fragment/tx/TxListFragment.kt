@@ -153,7 +153,7 @@ class TxListFragment : CommonFragment<FragmentTxListBinding, TxListViewModel>(),
         }
 
         runWithPermission(android.Manifest.permission.READ_CONTACTS) {
-            viewModel.contactsRepository.PhoneBookRepositoryBridge().synchronize()
+            viewModel.contactsRepository.phoneBookRepositoryBridge.synchronize()
         }
     }
 

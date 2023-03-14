@@ -72,6 +72,7 @@ import com.tari.android.wallet.ui.common.gyphy.repository.GIFItem
 import com.tari.android.wallet.ui.component.fullEmojiId.EmojiIdSummaryViewController
 import com.tari.android.wallet.ui.component.fullEmojiId.FullEmojiIdViewController
 import com.tari.android.wallet.ui.extension.*
+import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.ContactDto
 import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.IContact
 import com.tari.android.wallet.ui.fragment.home.HomeActivity
 import com.tari.android.wallet.ui.fragment.send.addNote.gif.*
@@ -94,7 +95,7 @@ class AddNoteFragment : CommonFragment<FragmentAddNoteBinding, AddNoteViewModel>
 
     // Tx properties.
     private lateinit var transactionData: TransactionData
-    private lateinit var recipientUser: IContact
+    private lateinit var recipientUser: ContactDto
     private lateinit var amount: MicroTari
     private var isOneSidePayment: Boolean = false
 
@@ -178,7 +179,7 @@ class AddNoteFragment : CommonFragment<FragmentAddNoteBinding, AddNoteViewModel>
             requireContext(),
             fullEmojiIdListener
         )
-        val walletAddress = recipientUser.extractWalletAddress()
+        val walletAddress = recipientUser.contact.extractWalletAddress()
         fullEmojiIdViewController.fullEmojiId = walletAddress.emojiId
         fullEmojiIdViewController.emojiIdHex = walletAddress.hexString
 
@@ -248,8 +249,8 @@ class AddNoteFragment : CommonFragment<FragmentAddNoteBinding, AddNoteViewModel>
     }
 
     private fun displayAliasOrEmojiId() {
-        val alias = recipientUser.getAlias()
-        if (alias.isEmpty()) displayEmojiId(recipientUser.extractWalletAddress().emojiId) else displayAlias(alias)
+        val alias = recipientUser.contact.getAlias()
+        if (alias.isEmpty()) displayEmojiId(recipientUser.contact.extractWalletAddress().emojiId) else displayAlias(alias)
     }
 
     private fun displayAlias(alias: String) {

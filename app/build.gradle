@@ -205,7 +205,7 @@ Properties loadProps(fileName) {
     return properties
 }
 
-preBuild.dependsOn("downloadLibwallet")
+//preBuild.dependsOn("downloadLibwallet")
 
 dependencies {
     // kotlin

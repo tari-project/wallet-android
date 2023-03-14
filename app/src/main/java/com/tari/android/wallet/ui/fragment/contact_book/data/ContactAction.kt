@@ -11,5 +11,4 @@ enum class ContactAction(val icon: Int, val title: Int) {
     Link(R.drawable.vector_contact_action_link, R.string.contact_book_contacts_book_link_title),
     Unlink(R.drawable.vector_contact_action_unlink, R.string.contact_book_contacts_book_unlink_title),
     Delete(R.drawable.tari_empty_drawable, R.string.contact_book_details_delete_contact),
-    Yat(R.drawable.tari_empty_drawable, R.string.contact_book_details_connected_wallets),
 }

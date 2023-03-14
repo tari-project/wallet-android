@@ -15,13 +15,13 @@ class AddContactFragment : ContactSelectionFragment() {
 
         ui.toolbar.ui.toolbarTitle.text = string(R.string.contact_book_add_contact_title)
 
-        viewModel.additionalFilter = { it.contact.contact is FFIContactDto && it.contact.contact.localAlias.isEmpty() }
+        viewModel.additionalFilter = { it.contact.contact is FFIContactDto && it.contact.contact.getAlias().isEmpty() }
     }
 
     override fun goToNext() {
         super.goToNext()
 
-        val user = viewModel.selectedUser.value ?: return
+        val user = viewModel.getUserDto()
         viewModel.navigation.postValue(ContactBookNavigation.ToAddContactName(user))
     }
 }

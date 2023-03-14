@@ -6,19 +6,21 @@ import android.provider.ContactsContract
 import com.tari.android.wallet.data.sharedPrefs.delegates.SerializableTime
 import com.tari.android.wallet.event.Event
 import com.tari.android.wallet.event.EventBus
+import com.tari.android.wallet.ffi.FFIWallet
+import com.tari.android.wallet.model.TariContact
 import com.tari.android.wallet.model.TariWalletAddress
 import com.tari.android.wallet.model.Tx
-import com.tari.android.wallet.model.User
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.ContactDto
 import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.FFIContactDto
-import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.IContact
 import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.MergedContactDto
 import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.PhoneContactDto
+import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.YatContactDto
 import com.tari.android.wallet.ui.fragment.contact_book.data.localStorage.ContactSharedPrefRepository
 import com.tari.android.wallet.ui.fragment.contact_book.data.localStorage.ContactsList
 import io.reactivex.subjects.BehaviorSubject
 import org.joda.time.DateTime
+import yat.android.sdk.models.PaymentAddressResponseResult
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -35,10 +37,6 @@ class ContactsRepository @Inject constructor(
     init {
         val saved = contactSharedPrefRepository.savedContacts.orEmpty()
         publishSubject.onNext(saved.toMutableList())
-        if (saved.isEmpty()) {
-//            val list = (1..20).map { ContactDto.generateContactDto() }.toMutableList()
-//            publishSubject.onNext(list)
-        }
     }
 
     fun addContact(contact: ContactDto) {
@@ -55,16 +53,34 @@ class ContactsRepository @Inject constructor(
 
     fun toggleFavorite(contactDto: ContactDto): ContactDto {
         updateContact(contactDto.uuid) {
-            it.isFavorite = !it.isFavorite
+            it.contact.isFavorite = !it.contact.isFavorite
         }
         return getByUuid(contactDto.uuid)
     }
 
-    fun updateContactName(contact: ContactDto, firstName: String, surname: String): ContactDto {
+    fun updateContactInfo(contact: ContactDto, firstName: String, surname: String, yat: String): ContactDto {
         if (!contactExists(contact)) addContact(contact)
         updateContact(contact.uuid) {
             when (val user = it.contact) {
-                is FFIContactDto -> user.localAlias = "$firstName $surname"
+                is YatContactDto -> {
+                    user.firstName = firstName
+                    user.surname = surname
+                    user.yat = yat
+                    if (yat.isEmpty()) {
+                        contact.contact = FFIContactDto(user.walletAddress, firstName, surname, user.isFavorite)
+                    }
+                }
+
+                is FFIContactDto -> {
+                    user.firstName = firstName
+                    user.surname = surname
+                    if (yat.isNotEmpty()) {
+                        contact.contact = YatContactDto(user.walletAddress, yat, listOf(), user.getAlias()).apply {
+                            isFavorite = contact.contact.isFavorite
+                        }
+                    }
+                }
+
                 is PhoneContactDto -> {
                     user.firstName = firstName
                     user.surname = surname
@@ -73,6 +89,12 @@ class ContactsRepository @Inject constructor(
                 is MergedContactDto -> {
                     user.phoneContactDto.firstName = firstName
                     user.phoneContactDto.surname = surname
+                    val yatContactDto = contact.getYatDto()
+                    if (yatContactDto != null) {
+                        yatContactDto.yat = yat
+                    } else if (yat.isNotEmpty()) {
+                        user.ffiContactDto = YatContactDto(user.ffiContactDto.walletAddress, yat, listOf(), user.ffiContactDto.getAlias())
+                    }
                 }
             }
         }
@@ -91,11 +113,11 @@ class ContactsRepository @Inject constructor(
     }
 
     fun unlinkContact(contact: ContactDto) {
-        if (contact.contact is MergedContactDto) {
+        (contact.contact as? MergedContactDto)?.let { mergedContact ->
             withListUpdate { list ->
                 list.remove(getByUuid(contact.uuid))
-                list.add(ContactDto(contact.contact.phoneContactDto, contact.isFavorite))
-                list.add(ContactDto(contact.contact.ffiContactDto, contact.isFavorite))
+                list.add(ContactDto(mergedContact.phoneContactDto))
+                list.add(ContactDto(mergedContact.ffiContactDto))
             }
         }
     }
@@ -127,7 +149,7 @@ class ContactsRepository @Inject constructor(
         }
     }
 
-    private fun getByUuid(uuid: String): ContactDto = publishSubject.value!!.first { it.uuid == uuid }
+    fun getByUuid(uuid: String): ContactDto = publishSubject.value!!.first { it.uuid == uuid }
 
     private fun contactExists(contact: ContactDto): Boolean = publishSubject.value!!.any { it.uuid == contact.uuid }
 
@@ -141,68 +163,59 @@ class ContactsRepository @Inject constructor(
 
     inner class FFIContactsRepositoryBridge {
         init {
-            subscribeToActions()
-
-            doOnConnectedToWallet { doOnConnected { synchronize() } }
+            doOnConnectedToWallet { doOnConnected { subscribeToActions() } }
         }
 
-        fun getContactForTx(tx: Tx): ContactDto {
-            val walletAddress = tx.user.walletAddress
-            val contact = publishSubject.value!!.firstOrNull {
-                it.contact is FFIContactDto && it.contact.walletAddress == walletAddress
-                        || it.contact is MergedContactDto && it.contact.ffiContactDto.walletAddress == walletAddress
-            }
-            return contact ?: ContactDto(FFIContactDto(walletAddress))
-        }
+        fun getContactForTx(tx: Tx): ContactDto = getContactByAdress(tx.tariContact.walletAddress)
 
-        private fun synchronize() {
-            //todo
-        }
+        fun getContactByAdress(address: TariWalletAddress): ContactDto =
+            publishSubject.value!!.firstOrNull { it.getFFIDto()?.walletAddress == address } ?: ContactDto(FFIContactDto(address))
 
         private fun subscribeToActions() {
-            EventBus.subscribe<Event.Transaction.TxReceived>(this) { updateRecentUsedTime(it.tx.user) }
-            EventBus.subscribe<Event.Transaction.TxReplyReceived>(this) { updateRecentUsedTime(it.tx.user) }
-            EventBus.subscribe<Event.Transaction.TxFinalized>(this) { updateRecentUsedTime(it.tx.user) }
-            EventBus.subscribe<Event.Transaction.InboundTxBroadcast>(this) { updateRecentUsedTime(it.tx.user) }
-            EventBus.subscribe<Event.Transaction.OutboundTxBroadcast>(this) { updateRecentUsedTime(it.tx.user) }
-            EventBus.subscribe<Event.Transaction.TxMinedUnconfirmed>(this) { updateRecentUsedTime(it.tx.user) }
-            EventBus.subscribe<Event.Transaction.TxMined>(this) { updateRecentUsedTime(it.tx.user) }
-            EventBus.subscribe<Event.Transaction.TxFauxMinedUnconfirmed>(this) { updateRecentUsedTime(it.tx.user) }
-            EventBus.subscribe<Event.Transaction.TxFauxConfirmed>(this) { updateRecentUsedTime(it.tx.user) }
-            EventBus.subscribe<Event.Transaction.TxCancelled>(this) { updateRecentUsedTime(it.tx.user) }
-
-            EventBus.subscribe<Event.Contact.ContactAddedOrUpdated>(this) { onFFIContactAddedOrUpdated(it.contactAddress, it.contactAlias) }
-            EventBus.subscribe<Event.Contact.ContactRemoved>(this) { onFFIContactRemoved(it.contactAddress) }
+            EventBus.subscribe<Event.Transaction.TxReceived>(this) { updateRecentUsedTime(it.tx.tariContact) }
+            EventBus.subscribe<Event.Transaction.TxReplyReceived>(this) { updateRecentUsedTime(it.tx.tariContact) }
+            EventBus.subscribe<Event.Transaction.TxFinalized>(this) { updateRecentUsedTime(it.tx.tariContact) }
+            EventBus.subscribe<Event.Transaction.InboundTxBroadcast>(this) { updateRecentUsedTime(it.tx.tariContact) }
+            EventBus.subscribe<Event.Transaction.OutboundTxBroadcast>(this) { updateRecentUsedTime(it.tx.tariContact) }
+            EventBus.subscribe<Event.Transaction.TxMinedUnconfirmed>(this) { updateRecentUsedTime(it.tx.tariContact) }
+            EventBus.subscribe<Event.Transaction.TxMined>(this) { updateRecentUsedTime(it.tx.tariContact) }
+            EventBus.subscribe<Event.Transaction.TxFauxMinedUnconfirmed>(this) { updateRecentUsedTime(it.tx.tariContact) }
+            EventBus.subscribe<Event.Transaction.TxFauxConfirmed>(this) { updateRecentUsedTime(it.tx.tariContact) }
+            EventBus.subscribe<Event.Transaction.TxCancelled>(this) { updateRecentUsedTime(it.tx.tariContact) }
         }
 
-        private fun updateRecentUsedTime(user: User) {
-            val existContact = publishSubject.value.orEmpty().firstOrNull { it.contact.extractWalletAddress() == user.walletAddress }
-            val contact = existContact ?: ContactDto(IContact.generateFromUser(user))
+        private fun updateRecentUsedTime(tariContact: TariContact) {
+            val contacts = FFIWallet.instance!!.getContacts()
+            for (contactIndex in 0 until contacts.getLength()) {
+                val actualContact = contacts.getAt(contactIndex)
+
+                val walletAddress = actualContact.getWalletAddress()
+                val ffiWalletAddress = TariWalletAddress(walletAddress.toString(), walletAddress.getEmojiId())
+                val alias = actualContact.getAlias()
+                val isFavorite = actualContact.getIsFavorite()
+
+                onFFIContactAddedOrUpdated(ffiWalletAddress, alias, isFavorite)
+            }
+
+
+            val existContact = publishSubject.value.orEmpty().firstOrNull { it.contact.extractWalletAddress() == tariContact.walletAddress }
+            val contact = existContact ?: ContactDto(FFIContactDto(tariContact.walletAddress))
             updateRecentUsedTime(contact)
         }
 
-        private fun onFFIContactAddedOrUpdated(contact: TariWalletAddress, alias: String) {
+        private fun onFFIContactAddedOrUpdated(contact: TariWalletAddress, alias: String, isFavorite: Boolean) {
             if (ffiContactExist(contact)) {
                 withFFIContact(contact) {
-                    if (it.contact is FFIContactDto) {
-                        it.contact.localAlias = alias
+                    it.getFFIDto()?.let { ffiContactDto ->
+                        ffiContactDto.setAlias(alias)
+                        ffiContactDto.isFavorite = isFavorite
                     }
                 }
             } else {
                 withListUpdate {
-                    it.add(ContactDto(IContact.generateFromUser(User(contact))))
+                    it.add(ContactDto(FFIContactDto(contact, alias, isFavorite)))
                 }
             }
-        }
-
-        private fun onFFIContactRemoved(tariWalletAddress: TariWalletAddress) {
-            withListUpdate {
-                it.remove(getFFIContact(tariWalletAddress))
-            }
-        }
-
-        private fun getFFIContact(walletAddress: TariWalletAddress) = publishSubject.value!!.firstOrNull {
-            it.contact is FFIContactDto && it.contact.walletAddress == walletAddress
         }
 
         private fun ffiContactExist(walletAddress: TariWalletAddress): Boolean =
@@ -214,6 +227,13 @@ class ContactsRepository @Inject constructor(
                 foundContact?.let { contact -> updateAction.invoke(contact) }
             }
         }
+
+        fun updateYatInfo(contactDto: ContactDto, entries: Map<String, PaymentAddressResponseResult>) {
+            withListUpdate {
+                val existContact = it.firstOrNull { it.uuid == contactDto.uuid }
+                existContact?.getYatDto()?.connectedWallets = entries.map { YatContactDto.ConnectedWallet(it.key, it.value) }
+            }
+        }
     }
 
     inner class PhoneBookRepositoryBridge {
@@ -223,38 +243,47 @@ class ContactsRepository @Inject constructor(
 
             withListUpdate {
                 contacts.forEach { phoneContact ->
-                    val existContact = it.firstOrNull {
-                        it.contact is PhoneContactDto && it.contact.id == phoneContact.id
-                                || it.contact is MergedContactDto && it.contact.phoneContactDto.id == phoneContact.id
-                    }
+                    val existContact = it.firstOrNull { it.getPhoneDto()?.id == phoneContact.id }
                     if (existContact == null) {
                         it.add(ContactDto(phoneContact.toPhoneContactDto()))
                     } else {
-                        if (existContact.contact is MergedContactDto) {
-                            existContact.contact.phoneContactDto = phoneContact.toPhoneContactDto()
-                        }
-                        if (existContact.contact is PhoneContactDto) {
-                            existContact.contact.avatar = phoneContact.avatar
-                            existContact.contact.firstName = phoneContact.firstName
-                            existContact.contact.surname = phoneContact.surname
+                        existContact.getPhoneDto()?.let {
+                            it.avatar = phoneContact.avatar
+                            it.firstName = phoneContact.firstName
+                            it.surname = phoneContact.surname
                         }
                     }
                 }
             }
-
-            val c = contacts.size
         }
 
         fun getPhoneContacts(): MutableList<PhoneContact> {
             val contacts = mutableListOf<PhoneContact>()
             val cr = context.contentResolver
+
             val cur = cr.query(ContactsContract.Contacts.CONTENT_URI, null, null, null, null)!!
             while (cur.moveToNext()) {
                 val id = getString(cur, ContactsContract.CommonDataKinds.Phone.NAME_RAW_CONTACT_ID)
-                val firstName = getString(cur, ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME)
-                val surname = getString(cur, ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME)
                 val avatar = getString(cur, ContactsContract.CommonDataKinds.Phone.PHOTO_URI)
-                contacts.add(PhoneContact(id, firstName, surname, avatar))
+                val isFavorite = getString(cur, ContactsContract.CommonDataKinds.Phone.STARRED) == "1"
+
+                val whereName = ContactsContract.Data.MIMETYPE + " = ? AND " + ContactsContract.CommonDataKinds.StructuredName.CONTACT_ID + " = ?"
+                val whereNameParams = arrayOf(ContactsContract.CommonDataKinds.StructuredName.CONTENT_ITEM_TYPE, id)
+
+                val nameCur = cr.query(
+                    ContactsContract.Data.CONTENT_URI,
+                    null,
+                    whereName,
+                    whereNameParams,
+                    ContactsContract.CommonDataKinds.StructuredName.GIVEN_NAME
+                )!!
+                nameCur.moveToFirst()
+                val firstName = getString(nameCur, ContactsContract.CommonDataKinds.StructuredName.GIVEN_NAME)
+                val surname = getString(nameCur, ContactsContract.CommonDataKinds.StructuredName.FAMILY_NAME)
+
+                contacts.add(PhoneContact(id, firstName, surname, avatar, isFavorite))
+
+                nameCur.close()
             }
             cur.close()
             return contacts
@@ -271,8 +300,9 @@ class ContactsRepository @Inject constructor(
         val id: String,
         val firstName: String,
         val surname: String,
-        val avatar: String
+        val avatar: String,
+        val isFavorite: Boolean,
     ) {
-        fun toPhoneContactDto(): PhoneContactDto = PhoneContactDto(id, firstName, surname, avatar)
+        fun toPhoneContactDto(): PhoneContactDto = PhoneContactDto(id, avatar, firstName, surname, isFavorite)
     }
 }

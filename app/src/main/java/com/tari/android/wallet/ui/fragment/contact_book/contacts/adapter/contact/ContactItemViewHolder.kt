@@ -33,27 +33,26 @@ class ContactItemViewHolder(view: ItemContactBinding) : CommonViewHolder<Contact
 
         when (val dto = item.contact.contact) {
             is YatContactDto -> {
-                displayFirstEmojiOrText(dto.walletAddress.emojiId.extractEmojis()[0])
-                if (dto.localAlias.isEmpty()) {
-                    displayEmojiId(dto.walletAddress.emojiId)
-                } else {
-                    displayAlias(dto.localAlias)
+                if (dto.yat.isNotEmpty()) {
+                    displayFirstEmojiOrText(dto.yat.extractEmojis()[0])
+                    displayAlias(dto.getAlias() + " " + dto.yat)
                 }
             }
 
             is FFIContactDto -> {
                 displayFirstEmojiOrText(dto.walletAddress.emojiId.extractEmojis()[0])
-                if (dto.localAlias.isEmpty()) {
+                if (dto.getAlias().isEmpty()) {
                     displayEmojiId(dto.walletAddress.emojiId)
                 } else {
-                    displayAlias(dto.localAlias)
+                    displayAlias(dto.getAlias())
                 }
             }
 
             is MergedContactDto -> {
+                val yat = item.contact.getYatDto()?.yat.orEmpty()
                 if (dto.phoneContactDto.avatar.isNotEmpty()) displayAvatar(dto.phoneContactDto.avatar) else
-                    displayFirstEmojiOrText(dto.ffiContactDto.walletAddress.emojiId.extractEmojis()[0])
-                displayAlias(dto.phoneContactDto.getAlias())
+                    displayFirstEmojiOrText(yat.ifEmpty { dto.ffiContactDto.walletAddress.emojiId }.extractEmojis()[0])
+                displayAlias(dto.phoneContactDto.getAlias() + " " + yat)
             }
 
             is PhoneContactDto -> {
@@ -63,7 +62,7 @@ class ContactItemViewHolder(view: ItemContactBinding) : CommonViewHolder<Contact
             }
         }
 
-        ui.starred.setVisible(item.contact.isFavorite)
+        ui.starred.setVisible(item.contact.contact.isFavorite)
     }
 
     private fun displayAvatar(url: String) {

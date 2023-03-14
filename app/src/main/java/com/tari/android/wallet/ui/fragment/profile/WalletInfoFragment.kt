@@ -48,13 +48,14 @@ import com.tari.android.wallet.extension.observe
 import com.tari.android.wallet.extension.observeOnLoad
 import com.tari.android.wallet.ui.common.CommonFragment
 import com.tari.android.wallet.ui.component.fullEmojiId.EmojiIdSummaryViewController
+import com.tari.android.wallet.ui.component.fullEmojiId.EmojiIdWithYatSummaryViewController
 import com.tari.android.wallet.ui.component.fullEmojiId.FullEmojiIdViewController
 import com.tari.android.wallet.ui.extension.*
 import java.util.*
 
 class WalletInfoFragment : CommonFragment<FragmentWalletInfoBinding, WalletInfoViewModel>() {
 
-    private lateinit var emojiIdSummaryController: EmojiIdSummaryViewController
+    private lateinit var emojiIdSummaryController: EmojiIdWithYatSummaryViewController
     private lateinit var fullEmojiIdViewController: FullEmojiIdViewController
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
@@ -76,7 +77,7 @@ class WalletInfoFragment : CommonFragment<FragmentWalletInfoBinding, WalletInfoV
 
     private fun subscribeUI() = with(viewModel) {
         observe(emojiId) {
-            emojiIdSummaryController.display(it)
+            emojiIdSummaryController.emojiId = it
             fullEmojiIdViewController.fullEmojiId = it
         }
 
@@ -88,13 +89,7 @@ class WalletInfoFragment : CommonFragment<FragmentWalletInfoBinding, WalletInfoV
             }
         }
 
-        observe(yat) { ui.yatButton.setVisible(it.isNotEmpty()) }
-
-        observe(isYatForegrounded) {
-            val icon = if (it) R.drawable.vector_tari_yat_open else R.drawable.vector_tari_yat_close
-            val drawable = ContextCompat.getDrawable(requireContext(), icon)
-            ui.yatButton.setImageDrawable(drawable)
-        }
+        observe(yat) { emojiIdSummaryController.yat = it }
 
         observe(reconnectVisibility) {
             val text = if (it) R.string.wallet_info_yat_disconnected_description else R.string.wallet_info_qr_code_desc
@@ -106,25 +101,23 @@ class WalletInfoFragment : CommonFragment<FragmentWalletInfoBinding, WalletInfoV
     }
 
     private fun setupUI() {
-        ui.emojiIdSummaryContainerView.setOnClickListener(this::onEmojiSummaryClicked)
+        ui.emojiIdSummaryWithYatView.emojiIdSummaryContainerView.setOnClickListener(this::onEmojiSummaryClicked)
 
-        emojiIdSummaryController = EmojiIdSummaryViewController(ui.emojiIdSummaryView)
+        emojiIdSummaryController = EmojiIdWithYatSummaryViewController(ui.emojiIdSummaryWithYatView)
 
         fullEmojiIdViewController = FullEmojiIdViewController(
             ui.emojiIdOuterContainer,
-            ui.emojiIdSummaryView,
+            ui.emojiIdSummaryWithYatView.emojiIdSummaryView,
             requireContext()
         )
 
         ui.root.doOnGlobalLayout {
             ui.emojiIdOuterContainer.fullEmojiIdContainerView.apply {
-                setTopMargin(ui.emojiIdSummaryContainerView.top)
-                setLayoutHeight(ui.emojiIdSummaryContainerView.height)
-                setLayoutWidth(ui.emojiIdSummaryContainerView.width)
+                setTopMargin(ui.emojiIdSummaryWithYatView.root.top)
+                setLayoutHeight(ui.emojiIdSummaryWithYatView.root.height)
+                setLayoutWidth(ui.emojiIdSummaryWithYatView.root.width)
             }
         }
-
-        ui.yatButton.setOnClickListener { viewModel.changeYatVisibility() }
 
         ui.reconnectButton.setOnThrottledClickListener { viewModel.openYatOnboarding(requireContext()) }
     }

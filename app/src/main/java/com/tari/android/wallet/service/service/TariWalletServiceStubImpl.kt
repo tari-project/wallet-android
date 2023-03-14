@@ -21,23 +21,23 @@ class TariWalletServiceStubImpl(
     private val logger
         get() = Logger.t(WalletService::class.simpleName)
 
-    private var _cachedContacts: List<Contact>? = null
-    private val cachedContacts: List<Contact>
+    private var _cachedTariContacts: List<TariContact>? = null
+    private val cachedTariContacts: List<TariContact>
         @Synchronized get() {
-            _cachedContacts?.let { return it }
+            _cachedTariContacts?.let { return it }
             val contactsFFI = wallet.getContacts()
-            val contacts = mutableListOf<Contact>()
+            val tariContacts = mutableListOf<TariContact>()
             for (i in 0 until contactsFFI.getLength()) {
                 val contactFFI = contactsFFI.getAt(i)
                 val ffiTariWalletAddress = contactFFI.getWalletAddress()
-                contacts.add(Contact(walletAddressFromFFI(ffiTariWalletAddress), contactFFI.getAlias()))
+                tariContacts.add(TariContact(walletAddressFromFFI(ffiTariWalletAddress), contactFFI.getAlias(), contactFFI.getIsFavorite()))
                 // destroy native objects
                 ffiTariWalletAddress.destroy()
                 contactFFI.destroy()
             }
             // destroy native collection
             contactsFFI.destroy()
-            return contacts.sortedWith(compareBy { it.alias }).also { _cachedContacts = it }
+            return tariContacts.sortedWith(compareBy { it.alias }).also { _cachedTariContacts = it }
         }
 
     override fun registerListener(listener: TariWalletServiceListener): Boolean {
@@ -62,7 +62,7 @@ class TariWalletServiceStubImpl(
     /**
      * Get all contacts.
      */
-    override fun getContacts(error: WalletError): List<Contact>? = runMapping(error) { cachedContacts }
+    override fun getContacts(error: WalletError): List<TariContact>? = runMapping(error) { cachedTariContacts }
 
     /**
      * Get all completed transactions.
@@ -151,9 +151,9 @@ class TariWalletServiceStubImpl(
     } ?: false
 
     override fun sendTari(
-        user: User, amount: MicroTari, feePerGram: MicroTari, message: String, isOneSidePayment: Boolean, error: WalletError
+        tariContact: TariContact, amount: MicroTari, feePerGram: MicroTari, message: String, isOneSidePayment: Boolean, error: WalletError
     ): TxId? = runMapping(error) {
-        val recipientAddressHex = user.walletAddress.hexString
+        val recipientAddressHex = tariContact.walletAddress.hexString
         val recipientAddress = FFITariWalletAddress(HexString(recipientAddressHex)).runWithDestroy {
             wallet.sendTx(it, amount.value, feePerGram.value, message, isOneSidePayment)
         }
@@ -161,17 +161,17 @@ class TariWalletServiceStubImpl(
         TxId(recipientAddress)
     }
 
-    override fun removeContact(contact: Contact, error: WalletError): Boolean = runMapping(error) {
+    override fun removeContact(tariContact: TariContact, error: WalletError): Boolean = runMapping(error) {
         val contactsFFI = wallet.getContacts()
         for (i in 0 until contactsFFI.getLength()) {
             val contactFFI = contactsFFI.getAt(i)
             val ffiTariWalletAddress = contactFFI.getWalletAddress()
-            if (ffiTariWalletAddress.toString() == contact.walletAddress.hexString) {
+            if (ffiTariWalletAddress.toString() == tariContact.walletAddress.hexString) {
                 return@runMapping wallet.removeContact(contactFFI).also {
                     ffiTariWalletAddress.destroy()
                     contactFFI.destroy()
                     contactsFFI.destroy()
-                    _cachedContacts = null
+                    _cachedTariContacts = null
                 }
             }
             ffiTariWalletAddress.destroy()
@@ -187,7 +187,7 @@ class TariWalletServiceStubImpl(
         wallet.addUpdateContact(contact).also {
             ffiTariWalletAddress.destroy()
             contact.destroy()
-            _cachedContacts = null
+            _cachedTariContacts = null
         }
     } ?: false
 

@@ -59,7 +59,7 @@ abstract class TariBackground(context: Context, attrs: AttributeSet) : Constrain
         background = shapeDrawable
     }
 
-    protected fun reset() {
+    fun reset() {
         background = null
         elevation = 0.0F
     }

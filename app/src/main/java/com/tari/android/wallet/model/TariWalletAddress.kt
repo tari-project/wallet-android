@@ -58,8 +58,6 @@ class TariWalletAddress() : Parcelable {
         }
     }
 
-    fun extractShortVersion() = emojiId.extractEmojis().take(3).joinToString("")
-
     override fun equals(other: Any?): Boolean = (other is TariWalletAddress) && hexString == other.hexString
 
     override fun hashCode(): Int = hexString.hashCode()

@@ -1,43 +1,23 @@
 package com.tari.android.wallet.ui.fragment.contact_book.data.contacts
 
-import com.tari.android.wallet.model.Contact
 import com.tari.android.wallet.model.TariWalletAddress
-import com.tari.android.wallet.model.User
-import com.tari.android.wallet.yat.YatUser
 import java.io.Serializable
 
-interface IContact : Serializable {
-    fun filtered(text: String): Boolean
+abstract class IContact : Serializable {
 
-    companion object {
+    var firstName: String = ""
+    var surname: String = ""
+    var isFavorite: Boolean = false
 
-        fun generateFromUser(user: User): IContact = when (user) {
-            is YatUser -> YatContactDto(user.walletAddress, user.yat, listOf(), user.walletAddress.emojiId)
-            is Contact -> FFIContactDto(user.walletAddress, user.alias)
-            else -> FFIContactDto(user.walletAddress, user.walletAddress.emojiId)
-        }
+    constructor(firstName: String = "", surname: String = "", isFavorite: Boolean = false) {
+        this.firstName = firstName
+        this.surname = surname
+        this.isFavorite = isFavorite
     }
 
-    fun extractWalletAddress(): TariWalletAddress
+    abstract fun filtered(text: String): Boolean
 
-    fun getAlias(): String
+    abstract fun extractWalletAddress(): TariWalletAddress
 
-    fun toUser(): User = when (val user = this) {
-        is YatContactDto -> YatUser().apply {
-            this.walletAddress = user.walletAddress
-            this.yat = user.yat
-        }
-
-        is FFIContactDto -> Contact().apply {
-            this.walletAddress = user.walletAddress
-            this.alias = user.localAlias
-        }
-
-        is MergedContactDto -> Contact().apply {
-            this.walletAddress = user.ffiContactDto.walletAddress
-            this.alias = user.phoneContactDto.firstName
-        }
-
-        else -> throw IllegalArgumentException("Unknown contact type")
-    }
+    open fun getAlias(): String = "$firstName $surname"
 }

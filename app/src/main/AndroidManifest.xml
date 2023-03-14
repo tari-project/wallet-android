@@ -20,6 +20,11 @@
     <uses-permission
         android:name="com.android.vending.BILLING"
         tools:node="remove" />
+    <queries>
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+        </intent>
+    </queries>
 
     <application
         android:name=".application.TariWalletApplication"

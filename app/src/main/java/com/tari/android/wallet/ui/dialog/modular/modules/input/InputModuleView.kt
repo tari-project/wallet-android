@@ -25,9 +25,9 @@ class InputModuleView(context: Context, inputModule: InputModule) : CommonView<C
         editText.setText(inputModule.value)
         editText.hint = inputModule.hint
         ui.input.textChangedListener = { text, _, _, _ -> inputModule.value = text.toString() }
-        editText.imeOptions = EditorInfo.IME_ACTION_DONE
-        editText.setOnEditorActionListener { _, _, _ -> inputModule.onDoneAction(editText.text.toString()) }
-        if (inputModule.focused) {
+        editText.imeOptions = if (inputModule.isEnd) EditorInfo.IME_ACTION_DONE else EditorInfo.IME_ACTION_NEXT
+        editText.setOnEditorActionListener { _, id, _ -> if (id == EditorInfo.IME_ACTION_DONE) inputModule.onDoneAction() else false }
+        if (inputModule.isFirst) {
             ui.input.ui.editText.postDelayed({
                 editText.requestFocus()
                 editText.postDelayed({

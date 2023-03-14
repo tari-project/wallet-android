@@ -48,18 +48,18 @@ class BadgesController(val view: ItemContactBinding) {
                 view.badgesContainer.addView(BadgeItemView(view.root.context).apply { this.setItem(badgeItem) })
             }
         }
-        view.badgesContainer.setVisible(false)
+        view.badgesContainer.setVisible(false, View.INVISIBLE)
     }
 
     fun toggle() = process(!isOpen)
 
     fun process(newState: Boolean) {
         if (isOpen == newState) return
-        val oldState = isOpen
+
         isOpen = newState
 
         if (isOpen) {
-            view.badgesContainer.setVisible(true)
+            view.badgesContainer.setVisible(true, View.INVISIBLE)
             view.profileBadgesContainer.switch(true)
         }
 
@@ -81,7 +81,7 @@ class BadgesController(val view: ItemContactBinding) {
                 }
                 addListener(doOnEnd {
                     if (!isOpen) {
-                        view.badgesContainer.setVisible(false)
+                        view.badgesContainer.setVisible(false, View.INVISIBLE)
                         view.profileBadgesContainer.switch(false)
                     }
                 })

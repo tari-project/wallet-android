@@ -11,6 +11,8 @@ import android.os.Looper
 import android.text.Editable
 import android.text.InputType
 import android.text.TextWatcher
+import android.transition.TransitionManager
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -39,13 +41,13 @@ import com.tari.android.wallet.ui.extension.postDelayed
 import com.tari.android.wallet.ui.extension.setBottomMargin
 import com.tari.android.wallet.ui.extension.setSelectionToEnd
 import com.tari.android.wallet.ui.extension.setTopMargin
+import com.tari.android.wallet.ui.extension.setVisible
 import com.tari.android.wallet.ui.extension.string
 import com.tari.android.wallet.ui.extension.temporarilyDisableClick
 import com.tari.android.wallet.ui.extension.visible
 import com.tari.android.wallet.ui.fragment.contact_book.contacts.adapter.ContactListAdapter
 import com.tari.android.wallet.ui.fragment.contact_book.contacts.adapter.contact.ContactItem
-import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.ContactDto
-import com.tari.android.wallet.ui.fragment.contact_book.root.ContactBookNavigation
+import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.YatContactDto
 import com.tari.android.wallet.ui.fragment.contact_book.root.ContactBookRouter
 import com.tari.android.wallet.ui.fragment.qr.QRScannerActivity
 import com.tari.android.wallet.util.Constants
@@ -91,36 +93,42 @@ open class ContactSelectionFragment : CommonFragment<FragmentContactsSelectionBi
         bindViewModel(viewModel)
 
         setupUI()
-        ui.searchEditText.setRawInputType(InputType.TYPE_CLASS_TEXT)
-        ui.searchEditText.addTextChangedListener(this@ContactSelectionFragment)
 
         subscribeViewModal()
     }
 
-    open fun goToNext() = Unit
+    open fun goToNext() {
+        requireActivity().hideKeyboard(ui.searchEditText)
+        ui.searchEditText.clearFocus()
+    }
 
     private fun subscribeViewModal() = with(viewModel) {
         observe(list) { recyclerViewAdapter.update(it) }
 
-        observe(navigation) { processNavigation(it) }
-
         observe(clipboardTariWalletAddress) { showClipboardData(it) }
+
+        observe(selectedTariWalletAddress) { putEmojiId(it.emojiId) }
 
         observe(navigation) { ContactBookRouter.processNavigation(requireActivity(), it) }
 
+        observe(foundYatUser) { showYatUser(if (it.isPresent) it.get() else null) }
+
         observeOnLoad(clipboardChecker)
+    }
+
+    private fun putEmojiId(emojiId: String) {
+        val rawEmojiId = emojiId.replace(string(R.string.emoji_id_chunk_separator), "")
+        if (rawEmojiId == emojiId) return
+        ui.searchEditText.setText(emojiId)
+        ui.searchEditText.setSelectionToEnd()
     }
 
     private fun showClipboardData(data: TariWalletAddress) {
         ui.rootView.postDelayed({
             hidePasteEmojiIdViewsOnTextChanged = true
-            showPasteEmojiIdViews(data)
+            showPasteEmojiIdViews(data.emojiId)
             focusEditTextAndShowKeyboard()
         }, 100)
-    }
-
-    private fun processNavigation(navigation: ContactBookNavigation) {
-        ContactBookRouter.processNavigation(requireActivity(), navigation)
     }
 
     private fun setupUI() {
@@ -138,6 +146,8 @@ open class ContactSelectionFragment : CommonFragment<FragmentContactsSelectionBi
         ui.pasteEmojiIdButton.setOnClickListener { onPasteEmojiIdButtonClicked() }
         ui.emojiIdTextView.setOnClickListener { onPasteEmojiIdButtonClicked() }
         ui.yatEyeButton.setOnClickListener { toggleYatEye() }
+        ui.searchEditText.setRawInputType(InputType.TYPE_CLASS_TEXT)
+        ui.searchEditText.addTextChangedListener(this@ContactSelectionFragment)
     }
 
     private fun setupRecyclerView() {
@@ -158,10 +168,8 @@ open class ContactSelectionFragment : CommonFragment<FragmentContactsSelectionBi
     private fun setYatState(isOpen: Boolean) {
         if (!isOpen) {
             ui.searchEditText.removeTextChangedListener(this)
-            ui.searchEditText.isEnabled = false
             ui.yatEyeButton.setImageDrawable(ContextCompat.getDrawable(requireContext(), R.drawable.vector_closed_eye))
         } else {
-            ui.searchEditText.isEnabled = true
             ui.searchEditText.removeTextChangedListener(this)
             ui.searchEditText.setSelectionToEnd()
             ui.searchEditText.addTextChangedListener(this)
@@ -170,11 +178,33 @@ open class ContactSelectionFragment : CommonFragment<FragmentContactsSelectionBi
         yatEyeState = isOpen
     }
 
+    private fun showYatUser(yatUser: YatContactDto?) {
+        val isExist = yatUser != null
+        ui.yatEyeButton.setVisible(isExist)
+        ui.yatIcon.setVisible(isExist)
+
+        if (isExist) {
+            setYatState(true)
+            ui.searchEditText.postDelayed({
+                TransitionManager.beginDelayedTransition(ui.searchEditTextAnimateContainer)
+                ui.searchEditText.textAlignment = View.TEXT_ALIGNMENT_CENTER
+                ui.searchEditText.gravity = Gravity.CENTER
+            }, 100)
+
+            requireActivity().hideKeyboard()
+            ui.searchEditText.clearFocus()
+        } else {
+            ui.searchEditText.postDelayed({
+                ui.searchEditText.textAlignment = View.TEXT_ALIGNMENT_TEXT_START
+                ui.searchEditText.gravity = Gravity.CENTER_VERTICAL or Gravity.START
+            }, 100)
+        }
+    }
+
     fun reset() {
         // state is not initial if there's some character in the search input
         if (ui.searchEditText.text.toString().isNotEmpty()) {
             ui.searchEditText.setText("")
-            ui.searchEditText.isEnabled = true
             ui.toolbar.clearRightIcon()
         }
     }
@@ -189,9 +219,9 @@ open class ContactSelectionFragment : CommonFragment<FragmentContactsSelectionBi
     /**
      * Displays paste-emoji-id-related views.
      */
-    private fun showPasteEmojiIdViews(tariWalletAddress: TariWalletAddress) {
+    private fun showPasteEmojiIdViews(emojiId: String) {
         ui.emojiIdTextView.text = EmojiUtil.getFullEmojiIdSpannable(
-            tariWalletAddress.emojiId,
+            emojiId,
             string(R.string.emoji_id_chunk_separator),
             viewModel.paletteManager.getBlack(requireContext()),
             viewModel.paletteManager.getLightGray(requireContext())
@@ -336,10 +366,7 @@ open class ContactSelectionFragment : CommonFragment<FragmentContactsSelectionBi
         hidePasteEmojiIdViews(animate = true) {
             ui.searchEditText.scaleX = 0f
             ui.searchEditText.scaleY = 0f
-            ui.searchEditText.setText(
-                viewModel.clipboardTariWalletAddress.value?.emojiId,
-                TextView.BufferType.EDITABLE
-            )
+            ui.searchEditText.setText(viewModel.clipboardTariWalletAddress.value?.emojiId, TextView.BufferType.EDITABLE)
             ui.searchEditText.setSelection(ui.searchEditText.text?.length ?: 0)
             ui.rootView.postDelayed({ animateEmojiIdPaste() }, Constants.UI.xShortDurationMs)
         }
@@ -426,24 +453,21 @@ open class ContactSelectionFragment : CommonFragment<FragmentContactsSelectionBi
             // check if valid emoji - don't search if not
             val emojisNumber = textWithoutSeparators.numberOfEmojis()
             if (textWithoutSeparators.containsNonEmoji() || emojisNumber > Constants.Wallet.emojiIdLength) {
-                viewModel.clipboardTariWalletAddress.value = null
+                viewModel.selectedTariWalletAddress.value = null
                 ui.invalidEmojiIdTextView.text = string(R.string.add_recipient_invalid_emoji_id)
                 ui.invalidEmojiIdTextView.visible()
-                ui.qrCodeButton.visible()
             } else {
                 if (emojisNumber == Constants.Wallet.emojiIdLength) {
                     finishEntering(textWithoutSeparators)
                 } else {
-                    viewModel.clipboardTariWalletAddress.value = null
-                    ui.qrCodeButton.visible()
+                    viewModel.selectedTariWalletAddress.value = null
                     viewModel.searchText.value = textWithoutSeparators
                 }
             }
         } else if (viewModel.checkForWalletAddressHex(text)) {
-            finishEntering(viewModel.clipboardTariWalletAddress.value!!.emojiId)
+            finishEntering(viewModel.selectedTariWalletAddress.value!!.emojiId)
         } else {
-            viewModel.clipboardTariWalletAddress.value = null
-            ui.qrCodeButton.visible()
+            viewModel.selectedTariWalletAddress.value = null
             ui.searchEditText.textAlignment = View.TEXT_ALIGNMENT_TEXT_START
             ui.searchEditText.letterSpacing = inputNormalLetterSpacing
             viewModel.searchText.value = editable.toString()
@@ -452,11 +476,9 @@ open class ContactSelectionFragment : CommonFragment<FragmentContactsSelectionBi
     }
 
     private fun finishEntering(text: String) {
-        ui.qrCodeButton.gone()
-
         lifecycleScope.launch(Dispatchers.Main) {
-            viewModel.clipboardTariWalletAddress.value = viewModel.getWalletAddressFromEmojiId(text)
-            if (viewModel.clipboardTariWalletAddress.value == null) {
+            viewModel.selectedTariWalletAddress.value = viewModel.getWalletAddressFromEmojiId(text)
+            if (viewModel.selectedTariWalletAddress.value == null) {
                 ui.invalidEmojiIdTextView.text = string(R.string.add_recipient_invalid_emoji_id)
                 ui.invalidEmojiIdTextView.visible()
             } else {
@@ -465,7 +487,6 @@ open class ContactSelectionFragment : CommonFragment<FragmentContactsSelectionBi
                 activity?.hideKeyboard()
                 ui.searchEditText.clearFocus()
                 viewModel.searchText.value = text
-                ui.searchEditText.isEnabled = false
             }
         }
     }

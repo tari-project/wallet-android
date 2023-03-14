@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import com.orhanobut.logger.Logger
 import com.orhanobut.logger.Printer
+import com.tari.android.wallet.R
 import com.tari.android.wallet.application.WalletState
 import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
 import com.tari.android.wallet.data.sharedPrefs.tariSettings.TariSettingsSharedRepository
@@ -21,7 +22,12 @@ import com.tari.android.wallet.ui.common.domain.ResourceManager
 import com.tari.android.wallet.ui.component.tari.toast.TariToastArgs
 import com.tari.android.wallet.ui.dialog.error.WalletErrorArgs
 import com.tari.android.wallet.ui.dialog.inProgress.ProgressDialogArgs
+import com.tari.android.wallet.ui.dialog.modular.DialogArgs
 import com.tari.android.wallet.ui.dialog.modular.ModularDialogArgs
+import com.tari.android.wallet.ui.dialog.modular.modules.body.BodyModule
+import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonModule
+import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonStyle
+import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
 import com.tari.android.wallet.ui.fragment.settings.themeSelector.TariTheme
 import io.reactivex.disposables.CompositeDisposable
 import javax.inject.Inject
@@ -122,5 +128,16 @@ open class CommonViewModel : ViewModel() {
             logger.e(it, it.toString())
         }.subscribe { action(FFIWallet.instance!!) }
             .addTo(compositeDisposable)
+    }
+
+    fun openWalletErrorDialog() {
+        val modularArgs = ModularDialogArgs(
+            DialogArgs(), listOf(
+                HeadModule(resourceManager.getString(R.string.common_error_title)),
+                BodyModule(resourceManager.getString(R.string.contact_book_details_connected_wallets_no_application)),
+                ButtonModule(resourceManager.getString(R.string.common_close), ButtonStyle.Close)
+            )
+        )
+        _modularDialog.postValue(modularArgs)
     }
 }

@@ -6,6 +6,7 @@ import com.tari.android.wallet.R.string.*
 import com.tari.android.wallet.event.Event
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.extension.addTo
+import com.tari.android.wallet.model.TariContact
 import com.tari.android.wallet.model.TransactionSendStatus
 import com.tari.android.wallet.model.TxId
 import com.tari.android.wallet.model.WalletError
@@ -170,7 +171,7 @@ class FinalizeSendTxViewModel : CommonViewModel() {
             viewModelScope.launch(Dispatchers.IO) {
                 val error = WalletError()
                 val txId = walletService.sendTari(
-                    transactionData.recipientContact?.toUser(),
+                    TariContact(transactionData.recipientContact!!.contact.extractWalletAddress()),
                     transactionData.amount,
                     transactionData.feePerGram ?: Constants.Wallet.defaultFeePerGram,
                     transactionData.note.orEmpty(),

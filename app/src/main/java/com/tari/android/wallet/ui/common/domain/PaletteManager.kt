@@ -52,6 +52,8 @@ class PaletteManager @Inject constructor() {
 
     fun getIconDefault(context: Context) = context.colorFromAttribute(R.attr.palette_icons_default)
 
+    fun getIconInactive(context: Context) = context.colorFromAttribute(R.attr.palette_icons_inactive)
+
     fun getShadowBox(context: Context) = context.colorFromAttribute(R.attr.palette_shadow_box)
 
 

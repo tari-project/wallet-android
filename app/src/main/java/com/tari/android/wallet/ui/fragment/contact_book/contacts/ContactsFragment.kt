@@ -32,8 +32,12 @@
  */
 package com.tari.android.wallet.ui.fragment.contact_book.contacts
 
-import android.os.*
-import android.view.*
+import android.content.Intent
+import android.net.Uri
+import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.tari.android.wallet.databinding.FragmentContactsBinding
@@ -41,9 +45,10 @@ import com.tari.android.wallet.extension.observe
 import com.tari.android.wallet.extension.observeOnLoad
 import com.tari.android.wallet.ui.common.CommonFragment
 import com.tari.android.wallet.ui.common.recyclerView.CommonAdapter
+import com.tari.android.wallet.ui.extension.PermissionExtensions.runWithPermission
 import com.tari.android.wallet.ui.fragment.contact_book.contacts.adapter.ContactListAdapter
-import com.tari.android.wallet.ui.fragment.contact_book.root.ContactBookNavigation
 import com.tari.android.wallet.ui.fragment.contact_book.root.ContactBookRouter
+
 
 open class ContactsFragment : CommonFragment<FragmentContactsBinding, ContactsViewModel>() {
 
@@ -62,6 +67,13 @@ open class ContactsFragment : CommonFragment<FragmentContactsBinding, ContactsVi
 
         setupUI()
         observeUI()
+
+        grantPermission(false)
+    }
+
+    override fun onStart() {
+        super.onStart()
+        grantPermission(false)
     }
 
     fun search(text: String) = viewModel.search(text)
@@ -71,12 +83,21 @@ open class ContactsFragment : CommonFragment<FragmentContactsBinding, ContactsVi
 
         observe(list) { recyclerViewAdapter.update(it) }
 
+        observe(grantPermission) { grantPermission(true) }
+
         observeOnLoad(listUpdateTrigger)
         observeOnLoad(debouncedList)
     }
 
     private fun setupUI() = with(ui) {
         setupRecyclerView()
+    }
+
+    private fun grantPermission(withSettings: Boolean) {
+        runWithPermission(android.Manifest.permission.READ_CONTACTS, withSettings) {
+            viewModel.contactsRepository.phoneBookRepositoryBridge.synchronize()
+            viewModel.contactPermission.postValue(true)
+        }
     }
 
     private fun setupRecyclerView() {

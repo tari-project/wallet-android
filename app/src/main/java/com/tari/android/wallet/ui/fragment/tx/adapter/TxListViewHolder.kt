@@ -12,7 +12,7 @@ import com.tari.android.wallet.databinding.ItemHomeTxListBinding
 import com.tari.android.wallet.extension.applyFontStyle
 import com.tari.android.wallet.model.CancelledTx
 import com.tari.android.wallet.model.CompletedTx
-import com.tari.android.wallet.model.Contact
+import com.tari.android.wallet.model.TariContact
 import com.tari.android.wallet.model.PendingInboundTx
 import com.tari.android.wallet.model.PendingOutboundTx
 import com.tari.android.wallet.model.Tx
@@ -69,7 +69,7 @@ class TxListViewHolder(view: ItemHomeTxListBinding) : CommonViewHolder<Transacti
         val avatar = (contact?.contact as? MergedContactDto)?.phoneContactDto?.avatar.orEmpty()
         if (avatar.isEmpty()) {
             // display first emoji of emoji id
-            val firstEmoji = if (tx.isOneSided) string(R.string.tx_list_emoji_one_side_payment_placeholder) else tx.user.walletAddress.emojiId.extractEmojis()[0]
+            val firstEmoji = if (tx.isOneSided) string(R.string.tx_list_emoji_one_side_payment_placeholder) else tx.tariContact.walletAddress.emojiId.extractEmojis()[0]
             ui.firstEmojiTextView.text = firstEmoji
         } else {
             // display avatar
@@ -80,7 +80,7 @@ class TxListViewHolder(view: ItemHomeTxListBinding) : CommonViewHolder<Transacti
     }
 
     private fun displayAliasOrEmojiId(tx: Tx, contact: ContactDto?) {
-        val txUser = tx.user
+        val txUser = tx.tariContact
         // display contact name or emoji id
         when {
             tx.isOneSided -> {
@@ -102,22 +102,6 @@ class TxListViewHolder(view: ItemHomeTxListBinding) : CommonViewHolder<Transacti
                     itemView.context,
                     TariFont.AVENIR_LT_STD_LIGHT,
                     listOf(alias),
-                    TariFont.AVENIR_LT_STD_HEAVY
-                )
-                ui.participantEmojiIdView.root.gone()
-                ui.participantTextView2.gone()
-            }
-
-            txUser is Contact -> {
-                val fullText = when (tx.direction) {
-                    Tx.Direction.INBOUND -> string(R.string.tx_list_sent_a_payment, txUser.alias)
-                    Tx.Direction.OUTBOUND -> string(R.string.tx_list_you_paid_with_alias, txUser.alias)
-                }
-                ui.participantTextView1.visible()
-                ui.participantTextView1.text = fullText.applyFontStyle(
-                    itemView.context,
-                    TariFont.AVENIR_LT_STD_LIGHT,
-                    listOf(txUser.alias),
                     TariFont.AVENIR_LT_STD_HEAVY
                 )
                 ui.participantEmojiIdView.root.gone()

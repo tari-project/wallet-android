@@ -45,9 +45,10 @@
                     android:clipChildren="true"
                     android:clipToOutline="true"
                     android:clipToPadding="true"
+                    android:elevation="2dp"
                     android:focusable="true"
                     app:cornerRadius="21dp"
-                    app:elevation="4dp"
+                    app:elevation="2dp"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent">
@@ -57,6 +58,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:clipToPadding="true"
+                        android:elevation="2dp"
                         android:gravity="center"
                         android:src="@color/yat_lib_blue"
                         app:layout_constraintBottom_toBottomOf="parent"
@@ -68,6 +70,7 @@
                         android:id="@+id/first_emoji_text_view"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:elevation="2dp"
                         android:gravity="center"
                         android:textColor="?attr/palette_text_light"
                         android:textSize="20sp"
@@ -83,9 +86,12 @@
                     android:id="@+id/badges_container"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
+                    android:layout_marginStart="5dp"
                     android:orientation="horizontal"
+                    android:visibility="invisible"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/profile_container"
                     app:layout_constraintTop_toTopOf="parent" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>

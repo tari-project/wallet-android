@@ -10,6 +10,7 @@ import com.orhanobut.logger.Logger
 import com.tari.android.wallet.BuildConfig
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
+import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.YatContactDto
 import com.tari.android.wallet.ui.fragment.send.common.TransactionData
 import com.tari.android.wallet.ui.fragment.send.finalize.FinalizeSendTxViewModel
 import com.tari.android.wallet.ui.fragment.send.finalize.YatFinalizeSendTxActivity
@@ -36,8 +37,11 @@ class YatAdapter(
         YatIntegration.setup(application, config, YatIntegration.ColorMode.LIGHT, this)
     }
 
-    fun searchYats(query: String): PaymentAddressResponse? =
+    fun searchTariYats(query: String): PaymentAddressResponse? =
         kotlin.runCatching { YatLibApi.emojiIDApi.lookupEmojiIDPayment(query, "0x0101") }.getOrNull()
+
+    fun searchAnyYats(query: String): PaymentAddressResponse? =
+        kotlin.runCatching { YatLibApi.emojiIDApi.lookupEmojiIDPayment(query, null) }.getOrNull()
 
     fun openOnboarding(context: Context) {
         val address = commonRepository.publicKeyHexString.orEmpty()
@@ -45,7 +49,7 @@ class YatAdapter(
     }
 
     fun showOutcomingFinalizeActivity(activity: Activity, transactionData: TransactionData) {
-        val yatUser = transactionData.recipientContact as YatUser
+        val yatUser = transactionData.recipientContact?.contact as YatContactDto
         val currentTicker = networkRepository.currentNetwork?.ticker.orEmpty()
         val data = YatLibOutcomingTransactionData(transactionData.amount!!.tariValue.toDouble(), currentTicker, yatUser.yat)
 

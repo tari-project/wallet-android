@@ -31,7 +31,7 @@ class AddContactNameViewModel : CommonViewModel() {
 
     fun onContinue(firstName: String, surname: String) {
         val contact = this.contact.value ?: return
-        contactBookRepository.updateContactName(contact, firstName, surname)
+        contactBookRepository.updateContactInfo(contact, firstName, surname, "")
         navigation.postValue(ContactBookNavigation.BackToContactBook())
     }
 }

@@ -3,13 +3,14 @@ package com.tari.android.wallet.ui.fragment.contact_book.contactSelection
 import android.content.ClipboardManager
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.viewModelScope
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.deeplinks.DeepLink
 import com.tari.android.wallet.application.deeplinks.DeeplinkHandler
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.extension.getWithError
+import com.tari.android.wallet.model.TariContact
 import com.tari.android.wallet.model.TariWalletAddress
-import com.tari.android.wallet.model.User
 import com.tari.android.wallet.service.TariWalletService
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.common.SingleLiveEvent
@@ -19,21 +20,31 @@ import com.tari.android.wallet.ui.extension.toLiveData
 import com.tari.android.wallet.ui.fragment.contact_book.contacts.adapter.contact.ContactItem
 import com.tari.android.wallet.ui.fragment.contact_book.data.ContactsRepository
 import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.ContactDto
+import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.FFIContactDto
 import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.IContact
+import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.YatContactDto
 import com.tari.android.wallet.ui.fragment.contact_book.root.ContactBookNavigation
 import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.extractEmojis
 import com.tari.android.wallet.yat.YatAdapter
 import io.reactivex.BackpressureStrategy
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
+import java.util.Optional
 import javax.inject.Inject
 
 open class ContactSelectionViewModel : CommonViewModel() {
 
+    private var searchingJob: Job? = null
+
     var additionalFilter: (ContactItem) -> Boolean = { true }
 
-    val clipboardTariWalletAddress = MutableLiveData<TariWalletAddress>()
+    val clipboardTariWalletAddress = SingleLiveEvent<TariWalletAddress>()
 
     val selectedUser = MutableLiveData<ContactDto>()
+
+    val selectedTariWalletAddress = MutableLiveData<TariWalletAddress>()
 
     val contactListSource = MediatorLiveData<List<ContactItem>>()
 
@@ -44,6 +55,8 @@ open class ContactSelectionViewModel : CommonViewModel() {
     val navigation = SingleLiveEvent<ContactBookNavigation>()
 
     val clipboardChecker = MediatorLiveData<Unit>()
+
+    val foundYatUser: SingleLiveEvent<Optional<YatContactDto>> = SingleLiveEvent()
 
     @Inject
     lateinit var yatAdapter: YatAdapter
@@ -76,12 +89,14 @@ open class ContactSelectionViewModel : CommonViewModel() {
     }
 
     fun getUserDto(): ContactDto = selectedUser.value ?: contactListSource.value.orEmpty()
-        .firstOrNull { it.contact.contact.extractWalletAddress() == clipboardTariWalletAddress.value }?.contact
-    ?: ContactDto(IContact.generateFromUser(User(clipboardTariWalletAddress.value!!)))
+        .firstOrNull { it.contact.contact.extractWalletAddress() == selectedTariWalletAddress.value }?.contact
+    ?: ContactDto(FFIContactDto(selectedTariWalletAddress.value!!))
 
     private fun updateList() {
         val source = contactListSource.value ?: return
         val searchText = searchText.value ?: return
+
+        searchAndDisplayRecipients(searchText)
 
         var list = source.filter { additionalFilter.invoke(it) }
 
@@ -108,6 +123,22 @@ open class ContactSelectionViewModel : CommonViewModel() {
         result.addAll(restOfContact)
 
         this.list.postValue(result)
+    }
+
+    private fun searchAndDisplayRecipients(query: String) {
+        searchingJob?.cancel()
+        foundYatUser.value = Optional.ofNullable(null)
+
+        if (query.isEmpty()) return
+
+        searchingJob = viewModelScope.launch(Dispatchers.IO) {
+            yatAdapter.searchTariYats(query)?.result?.entries?.firstOrNull()?.let { response ->
+                walletService.getWalletAddressFromHexString(response.value.address)?.let { pubKey ->
+                    val yatUser = YatContactDto(pubKey, query).apply { yat = query }
+                    foundYatUser.postValue(Optional.ofNullable(yatUser))
+                }
+            }
+        }
     }
 
     /**

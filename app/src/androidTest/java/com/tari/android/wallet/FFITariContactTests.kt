@@ -42,7 +42,7 @@ import org.junit.Test
  *
  * @author The Tari Development Team
  */
-class FFIContactTests {
+class FFITariContactTests {
 
     @Test
     fun constructor_assertThatConstructedContactIsValid() {

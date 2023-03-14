@@ -1,6 +1,7 @@
 package com.tari.android.wallet.ui.fragment.contact_book.root
 
 import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.ContactDto
+import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.YatContactDto
 
 sealed class ContactBookNavigation {
 
@@ -14,7 +15,7 @@ sealed class ContactBookNavigation {
 
     class ToRequestTari(val contact: ContactDto) : ContactBookNavigation()
 
-    class ToExternalWallet(val contact: ContactDto) : ContactBookNavigation()
+    class ToExternalWallet(val connectedWallet: YatContactDto.ConnectedWallet) : ContactBookNavigation()
 
     class ToLinkContact(val contact: ContactDto) : ContactBookNavigation()
 

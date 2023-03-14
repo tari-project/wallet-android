@@ -29,7 +29,6 @@ import com.tari.android.wallet.ffi.FFITxCancellationReason
 import com.tari.android.wallet.model.BalanceInfo
 import com.tari.android.wallet.model.CancelledTx
 import com.tari.android.wallet.model.CompletedTx
-import com.tari.android.wallet.model.Contact
 import com.tari.android.wallet.model.MicroTari
 import com.tari.android.wallet.model.PendingInboundTx
 import com.tari.android.wallet.model.PendingOutboundTx
@@ -37,7 +36,6 @@ import com.tari.android.wallet.model.TariWalletAddress
 import com.tari.android.wallet.model.Tx
 import com.tari.android.wallet.model.TxId
 import com.tari.android.wallet.model.TxStatus
-import com.tari.android.wallet.model.User
 import com.tari.android.wallet.model.WalletError
 import com.tari.android.wallet.service.service.WalletServiceLauncher
 import com.tari.android.wallet.ui.common.CommonViewModel
@@ -196,85 +194,6 @@ class TxListViewModel : CommonViewModel() {
 
         val items = mutableListOf<CommonViewHolderItem>()
 
-        if (Build.MOCKED) {
-            completedTxs.add(CompletedTx().apply {
-                fee = MicroTari(BigInteger("100"))
-                this.confirmationCount = BigInteger("4")
-                this.user = User().apply {
-                    walletAddress = TariWalletAddress().apply {
-                        hexString = "hex string"
-                        emojiId =
-                            "\uD83C\uDF6A\uD83C\uDF5E\uD83D\uDC8E\uD83C\uDFBD\uD83D\uDC28\uD83D\uDC2C\uD83C\uDF4C\uD83D\uDC89\uD83C\uDF79\uD83C\uDF4E\uD83D\uDD2C\uD83D\uDEBD\uD83C\uDF6F\uD83C\uDF54\uD83D\uDC54\uD83D\uDC11\uD83C\uDF1F\uD83C\uDFA5\uD83D\uDC51\uD83C\uDF4D\uD83D\uDC89\uD83D\uDC0A\uD83D\uDC94\uD83C\uDFBD\uD83D\uDCBB\uD83D\uDC5A\uD83D\uDD2D\uD83D\uDC38\uD83C\uDF5A\uD83D\uDCC8\uD83C\uDF40\uD83C\uDFB1\uD83C\uDF1F"
-                    }
-                }
-                this.amount = MicroTari(BigInteger("1000000000"))
-                this.direction = Tx.Direction.INBOUND
-                this.message = "message"
-                this.status = TxStatus.COMPLETED
-            })
-
-            completedTxs.add(CompletedTx().apply {
-                fee = MicroTari(BigInteger("100"))
-                this.confirmationCount = BigInteger("40")
-                this.user = User().apply {
-                    walletAddress = TariWalletAddress().apply {
-                        hexString = "hex string"
-                        emojiId =
-                            "\uD83C\uDF6A\uD83C\uDF5E\uD83D\uDC8E\uD83C\uDFBD\uD83D\uDC28\uD83D\uDC2C\uD83C\uDF4C\uD83D\uDC89\uD83C\uDF79\uD83C\uDF4E\uD83D\uDD2C\uD83D\uDEBD\uD83C\uDF6F\uD83C\uDF54\uD83D\uDC54\uD83D\uDC11\uD83C\uDF1F\uD83C\uDFA5\uD83D\uDC51\uD83C\uDF4D\uD83D\uDC89\uD83D\uDC0A\uD83D\uDC94\uD83C\uDFBD\uD83D\uDCBB\uD83D\uDC5A\uD83D\uDD2D\uD83D\uDC38\uD83C\uDF5A\uD83D\uDCC8\uD83C\uDF40\uD83C\uDFB1\uD83C\uDF1F"
-                    }
-                }
-                this.amount = MicroTari(BigInteger("1000000000"))
-                this.direction = Tx.Direction.OUTBOUND
-                this.message = "message"
-                this.status = TxStatus.COMPLETED
-            })
-
-            pendingInboundTxs.add(PendingInboundTx().apply {
-                this.user = User().apply {
-                    walletAddress = TariWalletAddress().apply {
-                        hexString = "hex string"
-                        emojiId =
-                            "\uD83C\uDF6A\uD83C\uDF5E\uD83D\uDC8E\uD83C\uDFBD\uD83D\uDC28\uD83D\uDC2C\uD83C\uDF4C\uD83D\uDC89\uD83C\uDF79\uD83C\uDF4E\uD83D\uDD2C\uD83D\uDEBD\uD83C\uDF6F\uD83C\uDF54\uD83D\uDC54\uD83D\uDC11\uD83C\uDF1F\uD83C\uDFA5\uD83D\uDC51\uD83C\uDF4D\uD83D\uDC89\uD83D\uDC0A\uD83D\uDC94\uD83C\uDFBD\uD83D\uDCBB\uD83D\uDC5A\uD83D\uDD2D\uD83D\uDC38\uD83C\uDF5A\uD83D\uDCC8\uD83C\uDF40\uD83C\uDFB1\uD83C\uDF1F"
-                    }
-                }
-                this.amount = MicroTari(BigInteger("1000000000"))
-                this.direction = Tx.Direction.INBOUND
-                this.message = "message"
-                this.status = TxStatus.PENDING
-            })
-
-            pendingOutboundTxs.add(PendingOutboundTx().apply {
-                fee = MicroTari(BigInteger("100"))
-                this.user = User().apply {
-                    walletAddress = TariWalletAddress().apply {
-                        hexString = "hex string"
-                        emojiId =
-                            "\uD83C\uDF6A\uD83C\uDF5E\uD83D\uDC8E\uD83C\uDFBD\uD83D\uDC28\uD83D\uDC2C\uD83C\uDF4C\uD83D\uDC89\uD83C\uDF79\uD83C\uDF4E\uD83D\uDD2C\uD83D\uDEBD\uD83C\uDF6F\uD83C\uDF54\uD83D\uDC54\uD83D\uDC11\uD83C\uDF1F\uD83C\uDFA5\uD83D\uDC51\uD83C\uDF4D\uD83D\uDC89\uD83D\uDC0A\uD83D\uDC94\uD83C\uDFBD\uD83D\uDCBB\uD83D\uDC5A\uD83D\uDD2D\uD83D\uDC38\uD83C\uDF5A\uD83D\uDCC8\uD83C\uDF40\uD83C\uDFB1\uD83C\uDF1F"
-                    }
-                }
-                this.amount = MicroTari(BigInteger("1000000000"))
-                this.direction = Tx.Direction.OUTBOUND
-                this.message = "message"
-                this.status = TxStatus.PENDING
-            })
-
-            cancelledTxs.add(CancelledTx().apply {
-                fee = MicroTari(BigInteger("100"))
-                cancellationReason = FFITxCancellationReason.UserCancelled
-                this.user = User().apply {
-                    walletAddress = TariWalletAddress().apply {
-                        hexString = "hex string"
-                        emojiId =
-                            "\uD83C\uDF6A\uD83C\uDF5E\uD83D\uDC8E\uD83C\uDFBD\uD83D\uDC28\uD83D\uDC2C\uD83C\uDF4C\uD83D\uDC89\uD83C\uDF79\uD83C\uDF4E\uD83D\uDD2C\uD83D\uDEBD\uD83C\uDF6F\uD83C\uDF54\uD83D\uDC54\uD83D\uDC11\uD83C\uDF1F\uD83C\uDFA5\uD83D\uDC51\uD83C\uDF4D\uD83D\uDC89\uD83D\uDC0A\uD83D\uDC94\uD83C\uDFBD\uD83D\uDCBB\uD83D\uDC5A\uD83D\uDD2D\uD83D\uDC38\uD83C\uDF5A\uD83D\uDCC8\uD83C\uDF40\uD83C\uDFB1\uD83C\uDF1F"
-                    }
-                }
-                this.amount = MicroTari(BigInteger("1000000000"))
-                this.direction = Tx.Direction.OUTBOUND
-                this.message = "message"
-                this.status = TxStatus.REJECTED
-            })
-        }
-
         val minedUnconfirmedTxs = completedTxs.filter { it.status == TxStatus.MINED_UNCONFIRMED }
         val nonMinedUnconfirmedCompletedTxs = completedTxs.filter { it.status != TxStatus.MINED_UNCONFIRMED }
 
@@ -337,9 +256,6 @@ class TxListViewModel : CommonViewModel() {
         EventBus.subscribe<Event.Transaction.TxSendFailed>(this) { onTxSendFailed(it.failureReason) }
 
         EventBus.balanceState.publishSubject.subscribe { _balanceInfo.postValue(it) }.addTo(compositeDisposable)
-
-        EventBus.subscribe<Event.Contact.ContactAddedOrUpdated>(this) { onContactAddedOrUpdated(it.contactAddress, it.contactAlias) }
-        EventBus.subscribe<Event.Contact.ContactRemoved>(this) { onContactRemoved(it.contactAddress) }
     }
 
     private fun onTxReceived(tx: PendingInboundTx) {
@@ -435,22 +351,6 @@ class TxListViewModel : CommonViewModel() {
         cancelledTxs.add(tx)
         fetchBalanceInfoData()
         _refreshBalanceInfo.postValue(false)
-        _listUpdateTrigger.postValue(Unit)
-    }
-
-    private fun onContactAddedOrUpdated(tariWalletAddress: TariWalletAddress, alias: String) {
-        val contact = Contact(tariWalletAddress, alias)
-        (cancelledTxs.asSequence() + pendingInboundTxs + pendingOutboundTxs + completedTxs)
-            .filter { it.user.walletAddress == tariWalletAddress }
-            .forEach { it.user = contact }
-        _listUpdateTrigger.postValue(Unit)
-    }
-
-    private fun onContactRemoved(tariWalletAddress: TariWalletAddress) {
-        val user = User(tariWalletAddress)
-        (cancelledTxs.asSequence() + pendingInboundTxs + pendingOutboundTxs + completedTxs)
-            .filter { it.user.walletAddress == tariWalletAddress }
-            .forEach { it.user = user }
         _listUpdateTrigger.postValue(Unit)
     }
 
