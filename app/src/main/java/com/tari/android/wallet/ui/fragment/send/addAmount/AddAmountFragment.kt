@@ -57,6 +57,8 @@ import com.tari.android.wallet.ui.dialog.tooltipDialog.TooltipDialogArgs
 import com.tari.android.wallet.ui.extension.*
 import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.ContactDto
 import com.tari.android.wallet.ui.fragment.home.HomeActivity
+import com.tari.android.wallet.ui.fragment.home.TariNavigator.Companion.PARAMETER_AMOUNT
+import com.tari.android.wallet.ui.fragment.home.TariNavigator.Companion.PARAMETER_CONTACT
 import com.tari.android.wallet.ui.fragment.send.addAmount.feeModule.NetworkSpeed
 import com.tari.android.wallet.ui.fragment.send.addAmount.keyboard.KeyboardController
 import com.tari.android.wallet.ui.fragment.send.amountView.AmountStyle
@@ -115,9 +117,9 @@ class AddAmountFragment : CommonFragment<FragmentAddAmountBinding, AddAmountView
     }
 
     private fun setupUI() {
-        val amount = arguments?.parcelable<MicroTari>(HomeActivity.PARAMETER_AMOUNT)
+        val amount = arguments?.parcelable<MicroTari>(PARAMETER_AMOUNT)
         keyboardController.setup(requireContext(), AmountCheckRunnable(), ui.numpad, ui.amount, amount?.tariValue?.toDouble() ?: Double.MIN_VALUE)
-        contactDto = arguments?.serializable(HomeActivity.PARAMETER_CONTACT)
+        contactDto = arguments?.serializable(PARAMETER_CONTACT)
         // hide tx fee
         ui.txFeeContainerView.invisible()
 

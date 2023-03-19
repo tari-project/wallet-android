@@ -6,7 +6,8 @@ import android.text.SpannedString
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Transformations
+import androidx.lifecycle.map
+import androidx.lifecycle.toLiveData
 import com.tari.android.wallet.R
 import com.tari.android.wallet.R.string.contact_book_details_phone_contacts
 import com.tari.android.wallet.R.string.contact_book_empty_state_body
@@ -29,7 +30,6 @@ import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonStyle
 import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
 import com.tari.android.wallet.ui.dialog.modular.modules.shortEmoji.ShortEmojiIdModule
-import com.tari.android.wallet.ui.extension.toLiveData
 import com.tari.android.wallet.ui.fragment.contact_book.contacts.adapter.contact.ContactItem
 import com.tari.android.wallet.ui.fragment.contact_book.contacts.adapter.emptyState.EmptyStateItem
 import com.tari.android.wallet.ui.fragment.contact_book.data.ContactAction
@@ -83,7 +83,7 @@ class ContactsViewModel : CommonViewModel() {
     private val _listUpdateTrigger = MediatorLiveData<Unit>()
     val listUpdateTrigger: LiveData<Unit> = _listUpdateTrigger
 
-    val debouncedList = Transformations.map(listUpdateTrigger.debounce(LIST_UPDATE_DEBOUNCE)) {
+    val debouncedList = listUpdateTrigger.debounce(LIST_UPDATE_DEBOUNCE).map {
         updateList()
     }
 
@@ -98,7 +98,7 @@ class ContactsViewModel : CommonViewModel() {
 
         list.addSource(contactPermission) { updateList() }
 
-        list.addSource(contactsRepository.publishSubject.toLiveData(BackpressureStrategy.LATEST)) { updateContacts() }
+        list.addSource(contactsRepository.publishSubject.toFlowable(BackpressureStrategy.LATEST).toLiveData()) { updateContacts() }
     }
 
     fun processItemClick(item: CommonViewHolderItem) {

@@ -3,6 +3,7 @@ package com.tari.android.wallet.ui.fragment.tx.details
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.toLiveData
 import com.tari.android.wallet.R
 import com.tari.android.wallet.event.Event
 import com.tari.android.wallet.event.EventBus
@@ -17,7 +18,6 @@ import com.tari.android.wallet.service.TariWalletService
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.common.SingleLiveEvent
 import com.tari.android.wallet.ui.dialog.error.ErrorDialogArgs
-import com.tari.android.wallet.ui.extension.toLiveData
 import com.tari.android.wallet.ui.fragment.contact_book.data.ContactsRepository
 import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.ContactDto
 import com.tari.android.wallet.ui.fragment.contact_book.root.ContactBookNavigation
@@ -34,7 +34,7 @@ class TxDetailsViewModel : CommonViewModel() {
 
     private val _txObject = BehaviorSubject.create<Tx>()
 
-    val tx: LiveData<Tx> = _txObject.toLiveData(BackpressureStrategy.LATEST)
+    val tx: LiveData<Tx> = _txObject.toFlowable(BackpressureStrategy.LATEST).toLiveData()
 
     private val _cancellationReason = MutableLiveData<String>()
     val cancellationReason: LiveData<String> = _cancellationReason
@@ -60,7 +60,7 @@ class TxDetailsViewModel : CommonViewModel() {
 
         observeTxUpdates()
 
-        contact.addSource(contactsRepository.publishSubject.toLiveData(BackpressureStrategy.LATEST)) { updateContact() }
+        contact.addSource(contactsRepository.publishSubject.toFlowable(BackpressureStrategy.LATEST).toLiveData()) { updateContact() }
 
         contact.addSource(tx) { updateContact() }
     }

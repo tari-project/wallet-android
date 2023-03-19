@@ -2,7 +2,7 @@ package com.tari.android.wallet.ui.component.networkStateIndicator
 
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Transformations
+import androidx.lifecycle.map
 import com.tari.android.wallet.R
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.network.NetworkConnectionState
@@ -25,7 +25,7 @@ class ConnectionIndicatorViewModel : CommonViewModel() {
     private val _syncState = MutableLiveData<BaseNodeSyncState>()
 
     private val _state = MediatorLiveData<ConnectionIndicatorState>()
-    val state = Transformations.map(_state) { it }
+    val state = _state.map { it }
 
     init {
         component.inject(this)

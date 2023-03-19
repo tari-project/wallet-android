@@ -242,7 +242,7 @@
     <string name="add_recipient_invalid_emoji_id">Not a valid Emoji ID</string>
     <string name="add_recipient_own_emoji_id">Sorry, you cannot send tXTR to yourself.</string>
     <!-- QR-scanner -->
-    <string name="add_recipient_scan_qr_description">Scan a Tari QR code\nto send tXTR to the recipient.</string>
+    <string name="add_recipient_scan_qr_description">Scan a Tari QR code</string>
     <string name="add_recipient_failed_init_camera_message">Failed to initialize Camera</string>
     <string name="add_recipient_camera_permission_denied_message">Camera permission denied</string>
 

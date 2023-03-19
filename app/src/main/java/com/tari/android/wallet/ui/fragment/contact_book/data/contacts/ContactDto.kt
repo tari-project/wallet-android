@@ -13,7 +13,6 @@ class ContactDto(
 ) : Serializable {
     fun filtered(text: String): Boolean = contact.filtered(text)
 
-
     fun getContactActions(): List<ContactAction> {
         val actions = mutableListOf<ContactAction>()
 
@@ -62,4 +61,6 @@ class ContactDto(
     fun getFFIDto(): FFIContactDto? = (contact as? FFIContactDto) ?: (contact as? MergedContactDto)?.ffiContactDto
 
     fun getPhoneDto(): PhoneContactDto? = (contact as? PhoneContactDto) ?: (contact as? MergedContactDto)?.phoneContactDto
+
+    fun getMergedDto(): MergedContactDto? = (contact as? MergedContactDto)
 }

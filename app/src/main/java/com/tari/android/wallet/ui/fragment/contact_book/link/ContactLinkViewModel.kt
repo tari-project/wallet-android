@@ -3,6 +3,7 @@ package com.tari.android.wallet.ui.fragment.contact_book.link
 import android.text.SpannableString
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.toLiveData
 import com.tari.android.wallet.R.string.common_cancel
 import com.tari.android.wallet.R.string.common_close
 import com.tari.android.wallet.R.string.common_confirm
@@ -23,7 +24,6 @@ import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonStyle
 import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
 import com.tari.android.wallet.ui.dialog.modular.modules.shortEmoji.ShortEmojiIdModule
-import com.tari.android.wallet.ui.extension.toLiveData
 import com.tari.android.wallet.ui.fragment.contact_book.contacts.adapter.contact.ContactItem
 import com.tari.android.wallet.ui.fragment.contact_book.data.ContactsRepository
 import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.ContactDto
@@ -54,7 +54,7 @@ class ContactLinkViewModel : CommonViewModel() {
     init {
         component.inject(this)
 
-        contactListSource.addSource(contactsRepository.publishSubject.toLiveData(BackpressureStrategy.LATEST)) {
+        contactListSource.addSource(contactsRepository.publishSubject.toFlowable(BackpressureStrategy.LATEST).toLiveData()) {
             contactListSource.value = it.map { contactDto -> ContactItem(contactDto, true) }
         }
 

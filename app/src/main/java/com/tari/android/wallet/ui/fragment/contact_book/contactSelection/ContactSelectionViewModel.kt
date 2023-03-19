@@ -3,25 +3,23 @@ package com.tari.android.wallet.ui.fragment.contact_book.contactSelection
 import android.content.ClipboardManager
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.toLiveData
 import androidx.lifecycle.viewModelScope
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.deeplinks.DeepLink
 import com.tari.android.wallet.application.deeplinks.DeeplinkHandler
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.extension.getWithError
-import com.tari.android.wallet.model.TariContact
 import com.tari.android.wallet.model.TariWalletAddress
 import com.tari.android.wallet.service.TariWalletService
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.common.SingleLiveEvent
 import com.tari.android.wallet.ui.common.recyclerView.CommonViewHolderItem
 import com.tari.android.wallet.ui.common.recyclerView.items.TitleViewHolderItem
-import com.tari.android.wallet.ui.extension.toLiveData
 import com.tari.android.wallet.ui.fragment.contact_book.contacts.adapter.contact.ContactItem
 import com.tari.android.wallet.ui.fragment.contact_book.data.ContactsRepository
 import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.ContactDto
 import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.FFIContactDto
-import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.IContact
 import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.YatContactDto
 import com.tari.android.wallet.ui.fragment.contact_book.root.ContactBookNavigation
 import com.tari.android.wallet.util.Constants
@@ -80,7 +78,7 @@ open class ContactSelectionViewModel : CommonViewModel() {
             checkClipboardForValidEmojiId(it)
         }
 
-        contactListSource.addSource(contactsRepository.publishSubject.toLiveData(BackpressureStrategy.LATEST)) {
+        contactListSource.addSource(contactsRepository.publishSubject.toFlowable(BackpressureStrategy.LATEST).toLiveData()) {
             contactListSource.value = it.map { contactDto -> ContactItem(contactDto, true) }
         }
 

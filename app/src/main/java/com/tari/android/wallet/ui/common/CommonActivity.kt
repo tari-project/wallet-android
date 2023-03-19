@@ -34,9 +34,9 @@ abstract class CommonActivity<Binding : ViewBinding, VM : CommonViewModel> : App
     private val dialogManager = DialogManager()
     private var containerId: Int? = null
 
-    protected lateinit var ui: Binding
+    lateinit var ui: Binding
 
-    protected lateinit var viewModel: VM
+    lateinit var viewModel: VM
 
     private val shakeDetector by lazy { ShakeDetector(this) }
 
@@ -119,7 +119,7 @@ abstract class CommonActivity<Binding : ViewBinding, VM : CommonViewModel> : App
         overridePendingTransition(R.anim.enter_from_left, R.anim.exit_to_right)
     }
 
-    protected fun addFragment(fragment: Fragment, bundle: Bundle? = null, isRoot: Boolean = false, withAnimation: Boolean = true) {
+    fun addFragment(fragment: Fragment, bundle: Bundle? = null, isRoot: Boolean = false, withAnimation: Boolean = true) {
         bundle?.let { fragment.arguments = it }
         val transaction = supportFragmentManager.beginTransaction()
         if (withAnimation) {
@@ -132,7 +132,7 @@ abstract class CommonActivity<Binding : ViewBinding, VM : CommonViewModel> : App
         transaction.commit()
     }
 
-    protected fun popUpTo(tag: String) {
+    fun popUpTo(tag: String) {
         while (supportFragmentManager.fragments.last().tag != tag && supportFragmentManager.backStackEntryCount > 0) {
             supportFragmentManager.popBackStackImmediate()
         }

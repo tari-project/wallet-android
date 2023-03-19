@@ -83,6 +83,11 @@ import com.tari.android.wallet.ui.fragment.contact_book.details.ContactDetailsFr
 import com.tari.android.wallet.ui.fragment.contact_book.link.ContactLinkFragment
 import com.tari.android.wallet.ui.fragment.contact_book.root.ContactBookFragment
 import com.tari.android.wallet.ui.fragment.contact_book.root.ContactBookRouter
+import com.tari.android.wallet.ui.fragment.home.TariNavigator.Companion.INDEX_CONTACT_BOOK
+import com.tari.android.wallet.ui.fragment.home.TariNavigator.Companion.INDEX_HOME
+import com.tari.android.wallet.ui.fragment.home.TariNavigator.Companion.INDEX_SETTINGS
+import com.tari.android.wallet.ui.fragment.home.TariNavigator.Companion.INDEX_STORE
+import com.tari.android.wallet.ui.fragment.home.TariNavigator.Companion.NO_SMOOTH_SCROLL
 import com.tari.android.wallet.ui.fragment.onboarding.activity.OnboardingFlowActivity
 import com.tari.android.wallet.ui.fragment.profile.WalletInfoFragment
 import com.tari.android.wallet.ui.fragment.send.addAmount.AddAmountFragment
@@ -129,12 +134,7 @@ import kotlinx.coroutines.launch
 import java.lang.ref.WeakReference
 import javax.inject.Inject
 
-class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>(), AllSettingsRouter, TxListRouter, BaseNodeRouter, BackupSettingsRouter,
-    AddRecipientListener,
-    AddAmountListener,
-    AddNodeListener,
-    ContactBookRouter,
-    FinalizeSendTxListener {
+class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>() {
 
     @Inject
     lateinit var sharedPrefsWrapper: SharedPrefsRepository
@@ -152,6 +152,8 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>(), AllSe
     lateinit var resourceManager: ResourceManager
 
     private val deeplinkViewModel: DeeplinkViewModel by viewModels()
+
+    val tariNavigator = TariNavigator(this)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -241,7 +243,7 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>(), AllSe
             if (EventBus.networkConnectionState.publishSubject.value != NetworkConnectionState.CONNECTED) {
                 showInternetConnectionErrorDialog(this)
             } else {
-                sendToUser(null)
+                tariNavigator.sendToUser(null)
             }
         }
     }
@@ -341,7 +343,7 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>(), AllSe
         if (screen.orEmpty().isNotEmpty()) {
             when (HomeDeeplinkScreens.parse(screen)) {
                 HomeDeeplinkScreens.TxDetails -> {
-                    (intent.parcelable<TxId>(HomeDeeplinkScreens.KeyTxDetailsArgs))?.let { toTxDetails(null, it) }
+                    (intent.parcelable<TxId>(HomeDeeplinkScreens.KeyTxDetailsArgs))?.let { tariNavigator.toTxDetails(null, it) }
                 }
 
                 else -> {}
@@ -349,16 +351,65 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>(), AllSe
         }
     }
 
-    override fun toTxDetails(tx: Tx?, txId: TxId?) = addFragment(TxDetailsFragment().apply {
+    fun willNotifyAboutNewTx(): Boolean = ui.viewPager.currentItem == TariNavigator.INDEX_HOME
+
+    private fun processIntentDeepLink(service: TariWalletService, intent: Intent) {
+        deeplinkHandler.handle(intent.data?.toString().orEmpty())?.let { deepLink ->
+            (deepLink as? DeepLink.Send)?.let { tariNavigator.sendTariToUser(service, it) }
+
+            (deepLink as? DeepLink.AddBaseNode)?.let { deeplinkViewModel.executeAction(this, it) }
+        }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        instance = WeakReference(null)
+        viewModelStore.clear()
+    }
+
+    class HomeAdapter(fm: FragmentManager, lifecycle: Lifecycle) : FragmentStateAdapter(fm, lifecycle) {
+
+        override fun createFragment(position: Int): Fragment = when (position) {
+            INDEX_HOME -> TxListFragment()
+            INDEX_STORE -> StoreFragment.newInstance()
+            INDEX_CONTACT_BOOK -> ContactBookFragment()
+            INDEX_SETTINGS -> AllSettingsFragment.newInstance()
+            else -> error("Unexpected position: $position")
+        }
+
+        override fun getItemCount(): Int = 4
+    }
+
+    companion object {
+
+        private const val KEY_PAGE = "key_page"
+
+        @Volatile
+        var instance: WeakReference<HomeActivity> = WeakReference(null)
+            private set
+    }
+}
+
+
+class TariNavigator(val activity: HomeActivity) :AllSettingsRouter, TxListRouter, BaseNodeRouter, BackupSettingsRouter,
+    AddRecipientListener,
+    AddAmountListener,
+    AddNodeListener,
+    ContactBookRouter,
+    FinalizeSendTxListener {
+
+    fun onBackPressed() = activity.onBackPressed()
+
+    override fun toTxDetails(tx: Tx?, txId: TxId?) = activity.addFragment(TxDetailsFragment().apply {
         arguments = Bundle().apply {
             putParcelable(TX_EXTRA_KEY, tx)
             putParcelable(TX_ID_EXTRA_KEY, txId)
         }
     })
 
-    override fun toTTLStore() = ui.viewPager.setCurrentItem(INDEX_STORE, NO_SMOOTH_SCROLL)
+    override fun toTTLStore() = activity.ui.viewPager.setCurrentItem(INDEX_STORE, NO_SMOOTH_SCROLL)
 
-    override fun toAllSettings() = ui.viewPager.setCurrentItem(INDEX_SETTINGS, NO_SMOOTH_SCROLL)
+    override fun toAllSettings() = activity.ui.viewPager.setCurrentItem(INDEX_SETTINGS, NO_SMOOTH_SCROLL)
 
     override fun toBackupSettings(withAnimation: Boolean) = addFragment(BackupSettingsFragment(), withAnimation = withAnimation)
 
@@ -416,48 +467,48 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>(), AllSe
             val externalAddress = connectedWallet.getExternalLink()
             val intent = Intent(Intent.ACTION_VIEW, Uri.parse(externalAddress))
 
-            if (intent.resolveActivity(packageManager) != null) {
-                startActivity(intent)
+            if (intent.resolveActivity(activity.packageManager) != null) {
+                activity.startActivity(intent)
             } else {
-                viewModel.openWalletErrorDialog()
+                activity.viewModel.openWalletErrorDialog()
             }
         } catch (e: Throwable) {
-            viewModel.openWalletErrorDialog()
+            activity.viewModel.openWalletErrorDialog()
         }
     }
 
     override fun continueToAmount(user: ContactDto, amount: MicroTari?) {
         if (EventBus.networkConnectionState.publishSubject.value != NetworkConnectionState.CONNECTED) {
-            showInternetConnectionErrorDialog(this)
+            showInternetConnectionErrorDialog(this.activity)
             return
         }
-        hideKeyboard()
+        activity.hideKeyboard()
         val bundle = Bundle().apply {
             putSerializable(PARAMETER_CONTACT, user)
             putParcelable(PARAMETER_AMOUNT, amount)
         }
-        ui.rootView.postDelayed({ addFragment(AddAmountFragment(), bundle) }, Constants.UI.keyboardHideWaitMs)
+        activity.ui.rootView.postDelayed({ addFragment(AddAmountFragment(), bundle) }, Constants.UI.keyboardHideWaitMs)
     }
 
     override fun onAmountExceedsActualAvailableBalance(fragment: AddAmountFragment) {
         val args = ModularDialogArgs(
             DialogArgs(), listOf(
-                HeadModule(string(R.string.error_balance_exceeded_title)),
-                BodyModule(string(R.string.error_balance_exceeded_description)),
-                ButtonModule(string(R.string.common_close), ButtonStyle.Close),
+                HeadModule(activity.string(R.string.error_balance_exceeded_title)),
+                BodyModule(activity.string(R.string.error_balance_exceeded_description)),
+                ButtonModule(activity.string(R.string.common_close), ButtonStyle.Close),
             )
         )
-        ModularDialog(this, args).show()
+        ModularDialog(activity, args).show()
     }
 
     override fun continueToAddNote(transactionData: TransactionData) {
         if (EventBus.networkConnectionState.publishSubject.value != NetworkConnectionState.CONNECTED) {
-            showInternetConnectionErrorDialog(this)
+            showInternetConnectionErrorDialog(this.activity)
             return
         }
         val bundle = Bundle().apply {
             putParcelable(PARAMETER_TRANSACTION, transactionData)
-            intent.getStringExtra(PARAMETER_NOTE)?.let { putString(PARAMETER_NOTE, it) }
+            activity.intent.getStringExtra(PARAMETER_NOTE)?.let { putString(PARAMETER_NOTE, it) }
         }
         addFragment(AddNoteFragment(), bundle)
     }
@@ -468,7 +519,7 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>(), AllSe
 
     override fun continueToFinalizeSendTx(transactionData: TransactionData) {
         if (transactionData.recipientContact?.contact is YatContactDto) {
-            viewModel.yatAdapter.showOutcomingFinalizeActivity(this, transactionData)
+            activity.viewModel.yatAdapter.showOutcomingFinalizeActivity(this.activity, transactionData)
         } else {
             addFragment(FinalizeSendTxFragment.create(transactionData))
         }
@@ -477,26 +528,30 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>(), AllSe
     override fun onSendTxFailure(isYat: Boolean, transactionData: TransactionData, txFailureReason: TxFailureReason) {
         EventBus.post(Event.Transaction.TxSendFailed(txFailureReason))
         if (isYat) {
-            finish()
-            overridePendingTransition(R.anim.fade_in, R.anim.fade_out)
+            activity.finish()
+            activity.overridePendingTransition(R.anim.fade_in, R.anim.fade_out)
         } else {
-            supportFragmentManager.popBackStackImmediate()
-            supportFragmentManager.popBackStackImmediate()
-            supportFragmentManager.popBackStackImmediate()
-            supportFragmentManager.popBackStackImmediate()
+            activity.supportFragmentManager.let {
+                it.popBackStackImmediate()
+                it.popBackStackImmediate()
+                it.popBackStackImmediate()
+                it.popBackStackImmediate()
+            }
         }
     }
 
     override fun onSendTxSuccessful(isYat: Boolean, txId: TxId, transactionData: TransactionData) {
         EventBus.post(Event.Transaction.TxSendSuccessful(txId))
         if (isYat) {
-            finish()
-            overridePendingTransition(R.anim.fade_in, R.anim.fade_out)
+            activity.finish()
+            activity.overridePendingTransition(R.anim.fade_in, R.anim.fade_out)
         } else {
-            supportFragmentManager.popBackStackImmediate()
-            supportFragmentManager.popBackStackImmediate()
-            supportFragmentManager.popBackStackImmediate()
-            supportFragmentManager.popBackStackImmediate()
+            activity.supportFragmentManager.let {
+                it.popBackStackImmediate()
+                it.popBackStackImmediate()
+                it.popBackStackImmediate()
+                it.popBackStackImmediate()
+            }
         }
     }
 
@@ -508,26 +563,16 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>(), AllSe
         popUpTo(BackupSettingsFragment::class.java.simpleName)
     }
 
-    fun willNotifyAboutNewTx(): Boolean = ui.viewPager.currentItem == INDEX_HOME
-
-    private fun processIntentDeepLink(service: TariWalletService, intent: Intent) {
-        deeplinkHandler.handle(intent.data?.toString().orEmpty())?.let { deepLink ->
-            (deepLink as? DeepLink.Send)?.let { sendTariToUser(service, it) }
-
-            (deepLink as? DeepLink.AddBaseNode)?.let { deeplinkViewModel.executeAction(this, it) }
-        }
-    }
-
-    private fun sendTariToUser(service: TariWalletService, sendDeeplink: DeepLink.Send) {
+    fun sendTariToUser(service: TariWalletService, sendDeeplink: DeepLink.Send) {
         val walletAddress = service.getWalletAddressFromHexString(sendDeeplink.walletAddressHex)
-        sendToUser(viewModel.contactsRepository.ffiBridge.getContactByAdress(walletAddress))
+        sendToUser(activity.viewModel.contactsRepository.ffiBridge.getContactByAdress(walletAddress))
     }
 
-    private fun sendToUser(recipientUser: ContactDto?) {
+    fun sendToUser(recipientUser: ContactDto?) {
         if (recipientUser != null) {
             val bundle = Bundle().apply {
                 putSerializable(PARAMETER_CONTACT, recipientUser)
-                intent.getDoubleExtra(PARAMETER_AMOUNT, Double.MIN_VALUE).takeIf { it > 0 }?.let { putDouble(PARAMETER_AMOUNT, it) }
+                activity.intent.getDoubleExtra(PARAMETER_AMOUNT, Double.MIN_VALUE).takeIf { it > 0 }?.let { putDouble(PARAMETER_AMOUNT, it) }
             }
             addFragment(AddAmountFragment(), bundle)
         } else {
@@ -535,24 +580,13 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>(), AllSe
         }
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        instance = WeakReference(null)
-        viewModelStore.clear()
-    }
 
-    class HomeAdapter(fm: FragmentManager, lifecycle: Lifecycle) : FragmentStateAdapter(fm, lifecycle) {
+    private fun addFragment(fragment: Fragment, bundle: Bundle? = null, isRoot: Boolean = false, withAnimation: Boolean = true) =
+        activity.addFragment(fragment, bundle, isRoot, withAnimation)
 
-        override fun createFragment(position: Int): Fragment = when (position) {
-            INDEX_HOME -> TxListFragment()
-            INDEX_STORE -> StoreFragment.newInstance()
-            INDEX_CONTACT_BOOK -> ContactBookFragment()
-            INDEX_SETTINGS -> AllSettingsFragment.newInstance()
-            else -> error("Unexpected position: $position")
-        }
+    //popup fragment
+    private fun popUpTo(tag: String) = activity.popUpTo(tag)
 
-        override fun getItemCount(): Int = 4
-    }
 
     companion object {
         const val PARAMETER_NOTE = "note"
@@ -560,16 +594,10 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>(), AllSe
         const val PARAMETER_TRANSACTION = "transaction_data"
         const val PARAMETER_CONTACT = "tari_contact_dto_args"
 
-
-        private const val KEY_PAGE = "key_page"
-        private const val INDEX_HOME = 0
-        private const val INDEX_STORE = 1
-        private const val INDEX_CONTACT_BOOK = 2
-        private const val INDEX_SETTINGS = 3
-        private const val NO_SMOOTH_SCROLL = false
-
-        @Volatile
-        var instance: WeakReference<HomeActivity> = WeakReference(null)
-            private set
+        const val INDEX_HOME = 0
+        const val INDEX_STORE = 1
+        const val INDEX_CONTACT_BOOK = 2
+        const val INDEX_SETTINGS = 3
+        const val NO_SMOOTH_SCROLL = false
     }
 }

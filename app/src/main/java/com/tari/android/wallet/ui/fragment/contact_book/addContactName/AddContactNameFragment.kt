@@ -19,6 +19,7 @@ import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.FFIContact
 import com.tari.android.wallet.ui.fragment.contact_book.root.ContactBookNavigation
 import com.tari.android.wallet.ui.fragment.contact_book.root.ContactBookRouter
 import com.tari.android.wallet.ui.fragment.home.HomeActivity
+import com.tari.android.wallet.ui.fragment.home.TariNavigator.Companion.PARAMETER_CONTACT
 
 class AddContactNameFragment : CommonFragment<FragmentContactsAddNameBinding, AddContactNameViewModel>() {
 
@@ -34,7 +35,7 @@ class AddContactNameFragment : CommonFragment<FragmentContactsAddNameBinding, Ad
         val viewModel: AddContactNameViewModel by viewModels()
         bindViewModel(viewModel)
 
-        val contact = requireArguments().serializable<ContactDto>(HomeActivity.PARAMETER_CONTACT)!!
+        val contact = requireArguments().serializable<ContactDto>(PARAMETER_CONTACT)!!
         viewModel.initContact(contact)
 
         setupUI()
@@ -78,7 +79,7 @@ class AddContactNameFragment : CommonFragment<FragmentContactsAddNameBinding, Ad
 
     companion object {
         fun createFragment(contact: ContactDto): Fragment = AddContactNameFragment().apply {
-            arguments = Bundle().apply { putSerializable(HomeActivity.PARAMETER_CONTACT, contact) }
+            arguments = Bundle().apply { putSerializable(PARAMETER_CONTACT, contact) }
         }
     }
 }

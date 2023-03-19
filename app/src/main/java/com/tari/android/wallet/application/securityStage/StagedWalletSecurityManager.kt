@@ -120,7 +120,7 @@ class StagedWalletSecurityManager : CommonViewModel() {
 
     private fun openStage1() {
         _dismissDialog.postValue(Unit)
-        HomeActivity.instance.get()?.let {
+        HomeActivity.instance.get()?.tariNavigator?.let {
             it.toAllSettings()
             it.toBackupSettings(false)
             it.toWalletBackupWithRecoveryPhrase()
@@ -139,7 +139,7 @@ class StagedWalletSecurityManager : CommonViewModel() {
 
     private fun openStage1B() {
         _dismissDialog.postValue(Unit)
-        HomeActivity.instance.get()?.let {
+        HomeActivity.instance.get()?.tariNavigator?.let {
             it.toAllSettings()
             it.toBackupSettings()
         }
@@ -157,7 +157,7 @@ class StagedWalletSecurityManager : CommonViewModel() {
 
     private fun openStage2() {
         _dismissDialog.postValue(Unit)
-        HomeActivity.instance.get()?.let {
+        HomeActivity.instance.get()?.tariNavigator?.let {
             it.toAllSettings()
             it.toBackupSettings(false)
             it.toChangePassword()

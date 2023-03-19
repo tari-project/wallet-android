@@ -35,7 +35,7 @@ class ContactsRepository @Inject constructor(
     val phoneBookRepositoryBridge = PhoneBookRepositoryBridge()
 
     init {
-        val saved = contactSharedPrefRepository.savedContacts.orEmpty()
+        val saved = contactSharedPrefRepository.getSavedContacts()
         publishSubject.onNext(saved.toMutableList())
     }
 
@@ -153,10 +153,11 @@ class ContactsRepository @Inject constructor(
 
     private fun contactExists(contact: ContactDto): Boolean = publishSubject.value!!.any { it.uuid == contact.uuid }
 
+    @Synchronized
     private fun withListUpdate(updateAction: (list: MutableList<ContactDto>) -> Unit) {
         val value = publishSubject.value!!
         updateAction.invoke(value)
-        contactSharedPrefRepository.savedContacts = ContactsList(value)
+        contactSharedPrefRepository.saveContacts(value)
         publishSubject.onNext(value)
     }
 

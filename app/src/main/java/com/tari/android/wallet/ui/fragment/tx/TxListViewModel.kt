@@ -4,7 +4,8 @@ package com.tari.android.wallet.ui.fragment.tx
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Transformations
+import androidx.lifecycle.map
+import androidx.lifecycle.toLiveData
 import androidx.lifecycle.viewModelScope
 import com.tari.android.wallet.R.string.error_no_connection_description
 import com.tari.android.wallet.R.string.error_no_connection_title
@@ -25,14 +26,11 @@ import com.tari.android.wallet.extension.addTo
 import com.tari.android.wallet.extension.debounce
 import com.tari.android.wallet.extension.getWithError
 import com.tari.android.wallet.extension.repopulate
-import com.tari.android.wallet.ffi.FFITxCancellationReason
 import com.tari.android.wallet.model.BalanceInfo
 import com.tari.android.wallet.model.CancelledTx
 import com.tari.android.wallet.model.CompletedTx
-import com.tari.android.wallet.model.MicroTari
 import com.tari.android.wallet.model.PendingInboundTx
 import com.tari.android.wallet.model.PendingOutboundTx
-import com.tari.android.wallet.model.TariWalletAddress
 import com.tari.android.wallet.model.Tx
 import com.tari.android.wallet.model.TxId
 import com.tari.android.wallet.model.TxStatus
@@ -51,17 +49,14 @@ import com.tari.android.wallet.ui.dialog.modular.modules.body.BodyModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonStyle
 import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
-import com.tari.android.wallet.ui.extension.toLiveData
 import com.tari.android.wallet.ui.fragment.contact_book.data.ContactsRepository
 import com.tari.android.wallet.ui.fragment.send.finalize.TxFailureReason
 import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupSettingsRepository
 import com.tari.android.wallet.ui.fragment.tx.adapter.TransactionItem
 import com.tari.android.wallet.ui.fragment.tx.ui.progressController.UpdateProgressViewController
-import com.tari.android.wallet.util.Build
 import io.reactivex.BackpressureStrategy
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import java.math.BigInteger
 import java.util.concurrent.CopyOnWriteArrayList
 import javax.inject.Inject
 
@@ -116,7 +111,7 @@ class TxListViewModel : CommonViewModel() {
     private val _listUpdateTrigger = MediatorLiveData<Unit>()
     val listUpdateTrigger: LiveData<Unit> = _listUpdateTrigger
 
-    val debouncedList = Transformations.map(listUpdateTrigger.debounce(LIST_UPDATE_DEBOUNCE)) {
+    val debouncedList = listUpdateTrigger.debounce(LIST_UPDATE_DEBOUNCE).map {
         updateList()
         refreshBalance()
     }
@@ -147,7 +142,9 @@ class TxListViewModel : CommonViewModel() {
     private fun onServiceConnected() {
         subscribeToEventBus()
 
-        _listUpdateTrigger.addSource(contactsRepository.publishSubject.toLiveData(BackpressureStrategy.LATEST)) { _listUpdateTrigger.postValue(Unit) }
+        _listUpdateTrigger.addSource(
+            contactsRepository.publishSubject.toFlowable(BackpressureStrategy.LATEST).toLiveData()
+        ) { _listUpdateTrigger.postValue(Unit) }
 
         viewModelScope.launch(Dispatchers.IO) {
             updateTxListData()

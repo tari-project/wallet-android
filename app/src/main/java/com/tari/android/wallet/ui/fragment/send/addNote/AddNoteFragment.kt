@@ -75,6 +75,8 @@ import com.tari.android.wallet.ui.extension.*
 import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.ContactDto
 import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.IContact
 import com.tari.android.wallet.ui.fragment.home.HomeActivity
+import com.tari.android.wallet.ui.fragment.home.TariNavigator.Companion.PARAMETER_NOTE
+import com.tari.android.wallet.ui.fragment.home.TariNavigator.Companion.PARAMETER_TRANSACTION
 import com.tari.android.wallet.ui.fragment.send.addNote.gif.*
 import com.tari.android.wallet.ui.fragment.send.addNote.gif.ThumbnailGIFsViewModel.Companion.REQUEST_CODE_GIF
 import com.tari.android.wallet.ui.fragment.send.common.TransactionData
@@ -211,12 +213,12 @@ class AddNoteFragment : CommonFragment<FragmentAddNoteBinding, AddNoteViewModel>
     }
 
     private fun retrievePageArguments(savedInstanceState: Bundle?) {
-        transactionData = requireArguments().parcelable(HomeActivity.PARAMETER_TRANSACTION)!!
+        transactionData = requireArguments().parcelable(PARAMETER_TRANSACTION)!!
         recipientUser = transactionData.recipientContact!!
         amount = transactionData.amount!!
         isOneSidePayment = transactionData.isOneSidePayment
         if (savedInstanceState == null) {
-            requireArguments().getString(HomeActivity.PARAMETER_NOTE)
+            requireArguments().getString(PARAMETER_NOTE)
                 ?.let { ui.noteEditText.setText(it) }
         }
     }

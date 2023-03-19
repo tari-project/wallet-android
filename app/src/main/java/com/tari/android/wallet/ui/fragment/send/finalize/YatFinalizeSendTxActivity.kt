@@ -48,8 +48,8 @@ class YatFinalizeSendTxActivity : YatLibOutcomingTransactionActivity() {
 
     override fun onStop() {
         super.onStop()
-        viewModel.sentTxId.value?.let { HomeActivity.instance.get()?.onSendTxSuccessful(true, it, viewModel.transactionData) }
+        viewModel.sentTxId.value?.let { HomeActivity.instance.get()?.tariNavigator?.onSendTxSuccessful(true, it, viewModel.transactionData) }
 
-        viewModel.txFailureReason.value?.let { HomeActivity.instance.get()?.onSendTxFailure(true, viewModel.transactionData, it) }
+        viewModel.txFailureReason.value?.let { HomeActivity.instance.get()?.tariNavigator?.onSendTxFailure(true, viewModel.transactionData, it) }
     }
 }

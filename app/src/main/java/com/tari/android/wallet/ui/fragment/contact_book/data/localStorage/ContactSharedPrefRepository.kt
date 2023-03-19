@@ -5,6 +5,7 @@ import com.tari.android.wallet.data.repository.CommonRepository
 import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefGsonDelegate
 import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
 import com.tari.android.wallet.data.sharedPrefs.network.formatKey
+import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.ContactDto
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -14,7 +15,14 @@ class ContactSharedPrefRepository @Inject constructor(
     val sharedPrefs: SharedPreferences
 ) : CommonRepository(networkRepository) {
 
-    var savedContacts: ContactsList? by SharedPrefGsonDelegate(sharedPrefs, formatKey(KEY_SAVED_CONTACTS), ContactsList::class.java, ContactsList())
+    private var savedContacts: ContactsList? by SharedPrefGsonDelegate(sharedPrefs, formatKey(KEY_SAVED_CONTACTS), ContactsList::class.java, ContactsList())
+
+    fun getSavedContacts(): List<ContactDto> = savedContacts.orEmpty().map { ContactDtoSerializable.toContactDto(it) }
+
+    @Synchronized
+    fun saveContacts(list: List<ContactDto>) {
+        savedContacts = ContactsList(list.map { ContactDtoSerializable.fromContactDto(it) })
+    }
 
     fun clear() {
         savedContacts = null

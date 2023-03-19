@@ -59,7 +59,7 @@ class InputSeedWordsViewModel : CommonViewModel() {
     private val _inProgress = MutableLiveData(false)
     val isInProgress: LiveData<Boolean> = _inProgress
 
-    val isAllEntered: LiveData<Boolean> = Transformations.map(_words) { words ->
+    val isAllEntered: LiveData<Boolean> = _words.map { words ->
         words.all { it.text.value!!.isNotEmpty() } && words.size == SeedPhrase.SeedPhraseLength
     }
 
