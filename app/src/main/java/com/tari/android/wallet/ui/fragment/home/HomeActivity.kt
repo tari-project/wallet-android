@@ -33,7 +33,6 @@
 package com.tari.android.wallet.ui.fragment.home
 
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.widget.ImageView
 import androidx.activity.viewModels
@@ -43,18 +42,17 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.tari.android.wallet.R
+import com.tari.android.wallet.application.MigrationManager
 import com.tari.android.wallet.application.deeplinks.DeepLink
 import com.tari.android.wallet.application.deeplinks.DeeplinkHandler
 import com.tari.android.wallet.application.deeplinks.DeeplinkViewModel
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
+import com.tari.android.wallet.data.sharedPrefs.tariSettings.TariSettingsSharedRepository
 import com.tari.android.wallet.databinding.ActivityHomeBinding
 import com.tari.android.wallet.di.DiContainer.appComponent
-import com.tari.android.wallet.event.Event
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.extension.applyFontStyle
-import com.tari.android.wallet.model.MicroTari
-import com.tari.android.wallet.model.Tx
 import com.tari.android.wallet.model.TxId
 import com.tari.android.wallet.network.NetworkConnectionState
 import com.tari.android.wallet.service.TariWalletService
@@ -70,63 +68,22 @@ import com.tari.android.wallet.ui.dialog.modular.modules.body.BodyModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonStyle
 import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
-import com.tari.android.wallet.ui.extension.hideKeyboard
 import com.tari.android.wallet.ui.extension.parcelable
 import com.tari.android.wallet.ui.extension.setVisible
 import com.tari.android.wallet.ui.extension.showInternetConnectionErrorDialog
 import com.tari.android.wallet.ui.extension.string
-import com.tari.android.wallet.ui.fragment.contact_book.add.AddContactFragment
-import com.tari.android.wallet.ui.fragment.contact_book.addContactName.AddContactNameFragment
-import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.ContactDto
-import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.YatContactDto
-import com.tari.android.wallet.ui.fragment.contact_book.details.ContactDetailsFragment
-import com.tari.android.wallet.ui.fragment.contact_book.link.ContactLinkFragment
 import com.tari.android.wallet.ui.fragment.contact_book.root.ContactBookFragment
-import com.tari.android.wallet.ui.fragment.contact_book.root.ContactBookRouter
-import com.tari.android.wallet.ui.fragment.home.TariNavigator.Companion.INDEX_CONTACT_BOOK
-import com.tari.android.wallet.ui.fragment.home.TariNavigator.Companion.INDEX_HOME
-import com.tari.android.wallet.ui.fragment.home.TariNavigator.Companion.INDEX_SETTINGS
-import com.tari.android.wallet.ui.fragment.home.TariNavigator.Companion.INDEX_STORE
-import com.tari.android.wallet.ui.fragment.home.TariNavigator.Companion.NO_SMOOTH_SCROLL
+import com.tari.android.wallet.ui.fragment.home.navigation.TariNavigator
+import com.tari.android.wallet.ui.fragment.home.navigation.TariNavigator.Companion.INDEX_CONTACT_BOOK
+import com.tari.android.wallet.ui.fragment.home.navigation.TariNavigator.Companion.INDEX_HOME
+import com.tari.android.wallet.ui.fragment.home.navigation.TariNavigator.Companion.INDEX_SETTINGS
+import com.tari.android.wallet.ui.fragment.home.navigation.TariNavigator.Companion.INDEX_STORE
+import com.tari.android.wallet.ui.fragment.home.navigation.TariNavigator.Companion.NO_SMOOTH_SCROLL
 import com.tari.android.wallet.ui.fragment.onboarding.activity.OnboardingFlowActivity
-import com.tari.android.wallet.ui.fragment.profile.WalletInfoFragment
-import com.tari.android.wallet.ui.fragment.send.addAmount.AddAmountFragment
-import com.tari.android.wallet.ui.fragment.send.addAmount.AddAmountListener
-import com.tari.android.wallet.ui.fragment.send.addNote.AddNodeListener
-import com.tari.android.wallet.ui.fragment.send.addNote.AddNoteFragment
-import com.tari.android.wallet.ui.fragment.send.addRecepient.AddRecipientListener
-import com.tari.android.wallet.ui.fragment.send.common.TransactionData
-import com.tari.android.wallet.ui.fragment.send.finalize.FinalizeSendTxFragment
-import com.tari.android.wallet.ui.fragment.send.finalize.FinalizeSendTxListener
-import com.tari.android.wallet.ui.fragment.send.finalize.TxFailureReason
-import com.tari.android.wallet.ui.fragment.send.makeTransaction.MakeTransactionFragment
 import com.tari.android.wallet.ui.fragment.settings.allSettings.AllSettingsFragment
-import com.tari.android.wallet.ui.fragment.settings.allSettings.AllSettingsRouter
-import com.tari.android.wallet.ui.fragment.settings.allSettings.about.TariAboutFragment
-import com.tari.android.wallet.ui.fragment.settings.backgroundService.BackgroundServiceSettingsFragment
-import com.tari.android.wallet.ui.fragment.settings.backup.BackupSettingsRouter
-import com.tari.android.wallet.ui.fragment.settings.backup.backupOnboarding.BackupOnboardingFlowFragment
-import com.tari.android.wallet.ui.fragment.settings.backup.backupSettings.BackupSettingsFragment
-import com.tari.android.wallet.ui.fragment.settings.backup.changeSecurePassword.ChangeSecurePasswordFragment
-import com.tari.android.wallet.ui.fragment.settings.backup.enterCurrentPassword.EnterCurrentPasswordFragment
-import com.tari.android.wallet.ui.fragment.settings.backup.verifySeedPhrase.VerifySeedPhraseFragment
-import com.tari.android.wallet.ui.fragment.settings.backup.writeDownSeedWords.WriteDownSeedPhraseFragment
-import com.tari.android.wallet.ui.fragment.settings.baseNodeConfig.BaseNodeRouter
-import com.tari.android.wallet.ui.fragment.settings.baseNodeConfig.addBaseNode.AddCustomBaseNodeFragment
-import com.tari.android.wallet.ui.fragment.settings.baseNodeConfig.changeBaseNode.ChangeBaseNodeFragment
-import com.tari.android.wallet.ui.fragment.settings.deleteWallet.DeleteWalletFragment
-import com.tari.android.wallet.ui.fragment.settings.networkSelection.NetworkSelectionFragment
-import com.tari.android.wallet.ui.fragment.settings.themeSelector.ThemeSelectorFragment
-import com.tari.android.wallet.ui.fragment.settings.torBridges.TorBridgesSelectionFragment
-import com.tari.android.wallet.ui.fragment.settings.torBridges.customBridges.CustomTorBridgesFragment
 import com.tari.android.wallet.ui.fragment.splash.SplashActivity
 import com.tari.android.wallet.ui.fragment.store.StoreFragment
 import com.tari.android.wallet.ui.fragment.tx.TxListFragment
-import com.tari.android.wallet.ui.fragment.tx.TxListRouter
-import com.tari.android.wallet.ui.fragment.tx.details.TxDetailsFragment
-import com.tari.android.wallet.ui.fragment.tx.details.TxDetailsFragment.Companion.TX_EXTRA_KEY
-import com.tari.android.wallet.ui.fragment.tx.details.TxDetailsFragment.Companion.TX_ID_EXTRA_KEY
-import com.tari.android.wallet.ui.fragment.utxos.list.UtxosListFragment
 import com.tari.android.wallet.util.Constants
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -151,9 +108,15 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>() {
     @Inject
     lateinit var resourceManager: ResourceManager
 
+    @Inject
+    lateinit var migrationManager: MigrationManager
+
+    @Inject
+    lateinit var tariSettingsRepository: TariSettingsSharedRepository
+
     private val deeplinkViewModel: DeeplinkViewModel by viewModels()
 
-    val tariNavigator = TariNavigator(this)
+    val tariNavigator = TariNavigator(this, sharedPrefsWrapper, migrationManager, tariSettingsRepository)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -351,7 +314,7 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>() {
         }
     }
 
-    fun willNotifyAboutNewTx(): Boolean = ui.viewPager.currentItem == TariNavigator.INDEX_HOME
+    fun willNotifyAboutNewTx(): Boolean = ui.viewPager.currentItem == INDEX_HOME
 
     private fun processIntentDeepLink(service: TariWalletService, intent: Intent) {
         deeplinkHandler.handle(intent.data?.toString().orEmpty())?.let { deepLink ->
@@ -391,213 +354,3 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>() {
 }
 
 
-class TariNavigator(val activity: HomeActivity) :AllSettingsRouter, TxListRouter, BaseNodeRouter, BackupSettingsRouter,
-    AddRecipientListener,
-    AddAmountListener,
-    AddNodeListener,
-    ContactBookRouter,
-    FinalizeSendTxListener {
-
-    fun onBackPressed() = activity.onBackPressed()
-
-    override fun toTxDetails(tx: Tx?, txId: TxId?) = activity.addFragment(TxDetailsFragment().apply {
-        arguments = Bundle().apply {
-            putParcelable(TX_EXTRA_KEY, tx)
-            putParcelable(TX_ID_EXTRA_KEY, txId)
-        }
-    })
-
-    override fun toTTLStore() = activity.ui.viewPager.setCurrentItem(INDEX_STORE, NO_SMOOTH_SCROLL)
-
-    override fun toAllSettings() = activity.ui.viewPager.setCurrentItem(INDEX_SETTINGS, NO_SMOOTH_SCROLL)
-
-    override fun toBackupSettings(withAnimation: Boolean) = addFragment(BackupSettingsFragment(), withAnimation = withAnimation)
-
-    override fun toDeleteWallet() = addFragment(DeleteWalletFragment())
-
-    override fun toBackgroundService() = addFragment(BackgroundServiceSettingsFragment())
-
-    override fun toMyProfile() = addFragment(WalletInfoFragment())
-
-    override fun toAbout() = addFragment(TariAboutFragment())
-
-    override fun toBackupOnboardingFlow() = addFragment(BackupOnboardingFlowFragment())
-
-    override fun toBaseNodeSelection() = addFragment(ChangeBaseNodeFragment())
-
-    override fun toTorBridges() = addFragment(TorBridgesSelectionFragment())
-
-    override fun toThemeSelection() = addFragment(ThemeSelectorFragment())
-
-    override fun toUtxos() = addFragment(UtxosListFragment())
-
-    override fun toCustomTorBridges() = addFragment(CustomTorBridgesFragment())
-
-    override fun toNetworkSelection() = addFragment(NetworkSelectionFragment())
-
-    override fun toAddCustomBaseNode() = addFragment(AddCustomBaseNodeFragment())
-
-    override fun toWalletBackupWithRecoveryPhrase() = addFragment(WriteDownSeedPhraseFragment())
-
-    override fun toSeedPhraseVerification(seedWords: List<String>) = addFragment(VerifySeedPhraseFragment.newInstance(seedWords))
-
-    override fun toConfirmPassword() = addFragment(EnterCurrentPasswordFragment())
-
-    override fun toChangePassword() = addFragment(ChangeSecurePasswordFragment())
-
-    override fun toSendTari(user: ContactDto?) = sendToUser(user)
-
-    override fun toAddContact() = addFragment(AddContactFragment())
-
-    override fun toContactDetails(contact: ContactDto) = addFragment(ContactDetailsFragment.createFragment(contact))
-
-    override fun toRequestTariFromContact(contact: ContactDto) = sendToUser(contact)
-
-    override fun toSendTariToContact(contact: ContactDto) = sendToUser(contact)
-
-    override fun toAddContactName(contact: ContactDto) = addFragment(AddContactNameFragment.createFragment(contact))
-
-    override fun backToContactBook() = popUpTo(ContactBookFragment::class.java.simpleName)
-
-    override fun toLinkContact(contact: ContactDto) = addFragment(ContactLinkFragment.createFragment(contact))
-
-    override fun toExternalWallet(connectedWallet: YatContactDto.ConnectedWallet) {
-
-        try {
-            val externalAddress = connectedWallet.getExternalLink()
-            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(externalAddress))
-
-            if (intent.resolveActivity(activity.packageManager) != null) {
-                activity.startActivity(intent)
-            } else {
-                activity.viewModel.openWalletErrorDialog()
-            }
-        } catch (e: Throwable) {
-            activity.viewModel.openWalletErrorDialog()
-        }
-    }
-
-    override fun continueToAmount(user: ContactDto, amount: MicroTari?) {
-        if (EventBus.networkConnectionState.publishSubject.value != NetworkConnectionState.CONNECTED) {
-            showInternetConnectionErrorDialog(this.activity)
-            return
-        }
-        activity.hideKeyboard()
-        val bundle = Bundle().apply {
-            putSerializable(PARAMETER_CONTACT, user)
-            putParcelable(PARAMETER_AMOUNT, amount)
-        }
-        activity.ui.rootView.postDelayed({ addFragment(AddAmountFragment(), bundle) }, Constants.UI.keyboardHideWaitMs)
-    }
-
-    override fun onAmountExceedsActualAvailableBalance(fragment: AddAmountFragment) {
-        val args = ModularDialogArgs(
-            DialogArgs(), listOf(
-                HeadModule(activity.string(R.string.error_balance_exceeded_title)),
-                BodyModule(activity.string(R.string.error_balance_exceeded_description)),
-                ButtonModule(activity.string(R.string.common_close), ButtonStyle.Close),
-            )
-        )
-        ModularDialog(activity, args).show()
-    }
-
-    override fun continueToAddNote(transactionData: TransactionData) {
-        if (EventBus.networkConnectionState.publishSubject.value != NetworkConnectionState.CONNECTED) {
-            showInternetConnectionErrorDialog(this.activity)
-            return
-        }
-        val bundle = Bundle().apply {
-            putParcelable(PARAMETER_TRANSACTION, transactionData)
-            activity.intent.getStringExtra(PARAMETER_NOTE)?.let { putString(PARAMETER_NOTE, it) }
-        }
-        addFragment(AddNoteFragment(), bundle)
-    }
-
-    override fun continueToFinalizing(transactionData: TransactionData) {
-        continueToFinalizeSendTx(transactionData)
-    }
-
-    override fun continueToFinalizeSendTx(transactionData: TransactionData) {
-        if (transactionData.recipientContact?.contact is YatContactDto) {
-            activity.viewModel.yatAdapter.showOutcomingFinalizeActivity(this.activity, transactionData)
-        } else {
-            addFragment(FinalizeSendTxFragment.create(transactionData))
-        }
-    }
-
-    override fun onSendTxFailure(isYat: Boolean, transactionData: TransactionData, txFailureReason: TxFailureReason) {
-        EventBus.post(Event.Transaction.TxSendFailed(txFailureReason))
-        if (isYat) {
-            activity.finish()
-            activity.overridePendingTransition(R.anim.fade_in, R.anim.fade_out)
-        } else {
-            activity.supportFragmentManager.let {
-                it.popBackStackImmediate()
-                it.popBackStackImmediate()
-                it.popBackStackImmediate()
-                it.popBackStackImmediate()
-            }
-        }
-    }
-
-    override fun onSendTxSuccessful(isYat: Boolean, txId: TxId, transactionData: TransactionData) {
-        EventBus.post(Event.Transaction.TxSendSuccessful(txId))
-        if (isYat) {
-            activity.finish()
-            activity.overridePendingTransition(R.anim.fade_in, R.anim.fade_out)
-        } else {
-            activity.supportFragmentManager.let {
-                it.popBackStackImmediate()
-                it.popBackStackImmediate()
-                it.popBackStackImmediate()
-                it.popBackStackImmediate()
-            }
-        }
-    }
-
-    override fun onPasswordChanged() {
-        popUpTo(BackupSettingsFragment::class.java.simpleName)
-    }
-
-    override fun onSeedPhraseVerificationComplete() {
-        popUpTo(BackupSettingsFragment::class.java.simpleName)
-    }
-
-    fun sendTariToUser(service: TariWalletService, sendDeeplink: DeepLink.Send) {
-        val walletAddress = service.getWalletAddressFromHexString(sendDeeplink.walletAddressHex)
-        sendToUser(activity.viewModel.contactsRepository.ffiBridge.getContactByAdress(walletAddress))
-    }
-
-    fun sendToUser(recipientUser: ContactDto?) {
-        if (recipientUser != null) {
-            val bundle = Bundle().apply {
-                putSerializable(PARAMETER_CONTACT, recipientUser)
-                activity.intent.getDoubleExtra(PARAMETER_AMOUNT, Double.MIN_VALUE).takeIf { it > 0 }?.let { putDouble(PARAMETER_AMOUNT, it) }
-            }
-            addFragment(AddAmountFragment(), bundle)
-        } else {
-            addFragment(MakeTransactionFragment(), null)
-        }
-    }
-
-
-    private fun addFragment(fragment: Fragment, bundle: Bundle? = null, isRoot: Boolean = false, withAnimation: Boolean = true) =
-        activity.addFragment(fragment, bundle, isRoot, withAnimation)
-
-    //popup fragment
-    private fun popUpTo(tag: String) = activity.popUpTo(tag)
-
-
-    companion object {
-        const val PARAMETER_NOTE = "note"
-        const val PARAMETER_AMOUNT = "amount"
-        const val PARAMETER_TRANSACTION = "transaction_data"
-        const val PARAMETER_CONTACT = "tari_contact_dto_args"
-
-        const val INDEX_HOME = 0
-        const val INDEX_STORE = 1
-        const val INDEX_CONTACT_BOOK = 2
-        const val INDEX_SETTINGS = 3
-        const val NO_SMOOTH_SCROLL = false
-    }
-}

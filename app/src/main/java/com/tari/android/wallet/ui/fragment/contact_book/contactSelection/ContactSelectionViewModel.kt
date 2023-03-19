@@ -21,7 +21,6 @@ import com.tari.android.wallet.ui.fragment.contact_book.data.ContactsRepository
 import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.ContactDto
 import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.FFIContactDto
 import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.YatContactDto
-import com.tari.android.wallet.ui.fragment.contact_book.root.ContactBookNavigation
 import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.extractEmojis
 import com.tari.android.wallet.yat.YatAdapter
@@ -49,8 +48,6 @@ open class ContactSelectionViewModel : CommonViewModel() {
     val searchText = MutableLiveData("")
 
     val list = MediatorLiveData<MutableList<CommonViewHolderItem>>()
-
-    val navigation = SingleLiveEvent<ContactBookNavigation>()
 
     val clipboardChecker = MediatorLiveData<Unit>()
 

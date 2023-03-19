@@ -48,7 +48,6 @@ import com.tari.android.wallet.ui.extension.visible
 import com.tari.android.wallet.ui.fragment.contact_book.contacts.adapter.ContactListAdapter
 import com.tari.android.wallet.ui.fragment.contact_book.contacts.adapter.contact.ContactItem
 import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.YatContactDto
-import com.tari.android.wallet.ui.fragment.contact_book.root.ContactBookRouter
 import com.tari.android.wallet.ui.fragment.qr.QRScannerActivity
 import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.EmojiUtil
@@ -108,8 +107,6 @@ open class ContactSelectionFragment : CommonFragment<FragmentContactsSelectionBi
         observe(clipboardTariWalletAddress) { showClipboardData(it) }
 
         observe(selectedTariWalletAddress) { putEmojiId(it.emojiId) }
-
-        observe(navigation) { ContactBookRouter.processNavigation(requireActivity(), it) }
 
         observe(foundYatUser) { showYatUser(if (it.isPresent) it.get() else null) }
 

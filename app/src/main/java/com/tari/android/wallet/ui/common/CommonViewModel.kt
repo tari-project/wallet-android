@@ -28,6 +28,7 @@ import com.tari.android.wallet.ui.dialog.modular.modules.body.BodyModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonStyle
 import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
+import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
 import com.tari.android.wallet.ui.fragment.settings.themeSelector.TariTheme
 import io.reactivex.disposables.CompositeDisposable
 import javax.inject.Inject
@@ -86,6 +87,8 @@ open class CommonViewModel : ViewModel() {
 
     protected val _blockedBackPressed = SingleLiveEvent<Boolean>()
     val blockedBackPressed: LiveData<Boolean> = _blockedBackPressed
+
+    val navigation: SingleLiveEvent<Navigation> = SingleLiveEvent()
 
     init {
         @Suppress("LeakingThis")

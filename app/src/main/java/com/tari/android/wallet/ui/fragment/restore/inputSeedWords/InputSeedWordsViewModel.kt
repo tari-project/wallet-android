@@ -1,6 +1,10 @@
 package com.tari.android.wallet.ui.fragment.restore.inputSeedWords
 
-import androidx.lifecycle.*
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MediatorLiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.map
+import androidx.lifecycle.viewModelScope
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.WalletState
 import com.tari.android.wallet.event.EventBus
@@ -17,6 +21,7 @@ import com.tari.android.wallet.ui.common.domain.ResourceManager
 import com.tari.android.wallet.ui.component.loadingButton.LoadingButtonState
 import com.tari.android.wallet.ui.dialog.error.ErrorDialogArgs
 import com.tari.android.wallet.ui.dialog.error.WalletErrorArgs
+import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
 import com.tari.android.wallet.ui.fragment.restore.inputSeedWords.suggestions.SuggestionState
 import com.tari.android.wallet.ui.fragment.restore.inputSeedWords.suggestions.SuggestionViewHolderItem
 import io.reactivex.disposables.CompositeDisposable
@@ -34,9 +39,6 @@ class InputSeedWordsViewModel : CommonViewModel() {
 
     @Inject
     lateinit var walletServiceLauncher: WalletServiceLauncher
-
-    private val _navigation = SingleLiveEvent<InputSeedWordsNavigation>()
-    val navigation: LiveData<InputSeedWordsNavigation> = _navigation
 
     private val _suggestions = MediatorLiveData<SuggestionState>()
     val suggestions: LiveData<SuggestionState> = _suggestions.debounce(50)
@@ -122,7 +124,7 @@ class InputSeedWordsViewModel : CommonViewModel() {
                     clear()
                 }
                 WalletState.Running -> {
-                    _navigation.postValue(InputSeedWordsNavigation.ToRestoreFormSeedWordsInProgress)
+                    navigation.postValue(Navigation.InputSeedWordsNavigation.ToRestoreFormSeedWordsInProgress)
                     _inProgress.postValue(false)
                 }
                 else -> Unit

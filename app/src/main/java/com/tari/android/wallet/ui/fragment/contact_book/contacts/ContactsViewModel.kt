@@ -37,7 +37,7 @@ import com.tari.android.wallet.ui.fragment.contact_book.data.ContactsRepository
 import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.ContactDto
 import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.MergedContactDto
 import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.PhoneContactDto
-import com.tari.android.wallet.ui.fragment.contact_book.root.ContactBookNavigation
+import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
 import com.tari.android.wallet.ui.fragment.settings.allSettings.title.SettingsTitleViewHolderItem
 import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupSettingsRepository
 import io.reactivex.BackpressureStrategy
@@ -65,8 +65,6 @@ class ContactsViewModel : CommonViewModel() {
     lateinit var contactsRepository: ContactsRepository
 
     var isFavorite = false
-
-    val navigation = SingleLiveEvent<ContactBookNavigation>()
 
     val grantPermission = SingleLiveEvent<Unit>()
 
@@ -103,7 +101,7 @@ class ContactsViewModel : CommonViewModel() {
 
     fun processItemClick(item: CommonViewHolderItem) {
         if (item is ContactItem) {
-            navigation.postValue(ContactBookNavigation.ToContactDetails(item.contact))
+            navigation.postValue(Navigation.ContactBookNavigation.ToContactDetails(item.contact))
         }
     }
 
@@ -173,11 +171,11 @@ class ContactsViewModel : CommonViewModel() {
 
     private fun performAction(contact: ContactDto, contactAction: ContactAction) {
         when (contactAction) {
-            ContactAction.Send -> navigation.postValue(ContactBookNavigation.ToSendTari(contact))
+            ContactAction.Send -> navigation.postValue(Navigation.ContactBookNavigation.ToSendTari(contact))
             ContactAction.ToFavorite -> contactsRepository.toggleFavorite(contact)
             ContactAction.ToUnFavorite -> contactsRepository.toggleFavorite(contact)
-            ContactAction.OpenProfile -> navigation.postValue(ContactBookNavigation.ToContactDetails(contact))
-            ContactAction.Link -> navigation.postValue(ContactBookNavigation.ToLinkContact(contact))
+            ContactAction.OpenProfile -> navigation.postValue(Navigation.ContactBookNavigation.ToContactDetails(contact))
+            ContactAction.Link -> navigation.postValue(Navigation.ContactBookNavigation.ToLinkContact(contact))
             ContactAction.Unlink -> showUnlinkDialog(contact)
             else -> Unit
         }
@@ -221,7 +219,7 @@ class ContactsViewModel : CommonViewModel() {
             ButtonModule(resourceManager.getString(R.string.common_cancel), ButtonStyle.Close)
         )
         _modularDialog.postValue(ModularDialogArgs(DialogArgs {
-            navigation.value = ContactBookNavigation.BackToContactBook()
+            navigation.value = Navigation.ContactBookNavigation.BackToContactBook()
         }, modules))
     }
 

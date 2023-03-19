@@ -16,10 +16,7 @@ import com.tari.android.wallet.ui.extension.serializable
 import com.tari.android.wallet.ui.extension.visible
 import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.ContactDto
 import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.FFIContactDto
-import com.tari.android.wallet.ui.fragment.contact_book.root.ContactBookNavigation
-import com.tari.android.wallet.ui.fragment.contact_book.root.ContactBookRouter
-import com.tari.android.wallet.ui.fragment.home.HomeActivity
-import com.tari.android.wallet.ui.fragment.home.TariNavigator.Companion.PARAMETER_CONTACT
+import com.tari.android.wallet.ui.fragment.home.navigation.TariNavigator.Companion.PARAMETER_CONTACT
 
 class AddContactNameFragment : CommonFragment<FragmentContactsAddNameBinding, AddContactNameViewModel>() {
 
@@ -44,13 +41,7 @@ class AddContactNameFragment : CommonFragment<FragmentContactsAddNameBinding, Ad
     }
 
     private fun subscribeViewModal() = with(viewModel) {
-        observe(navigation) { processNavigation(it) }
-
         observe(contact) { contact -> displayEmojiId((contact.contact as FFIContactDto).walletAddress) }
-    }
-
-    private fun processNavigation(navigation: ContactBookNavigation) {
-        ContactBookRouter.processNavigation(requireActivity(), navigation)
     }
 
     private fun setupUI() = with(ui) {

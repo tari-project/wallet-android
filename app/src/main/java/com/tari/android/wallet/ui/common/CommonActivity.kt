@@ -15,7 +15,9 @@ import com.tari.android.wallet.R
 import com.tari.android.wallet.extension.observe
 import com.tari.android.wallet.ui.component.networkStateIndicator.ConnectionIndicatorViewModel
 import com.tari.android.wallet.ui.component.tari.toast.TariToast
-import com.tari.android.wallet.ui.dialog.modular.*
+import com.tari.android.wallet.ui.dialog.modular.DialogArgs
+import com.tari.android.wallet.ui.dialog.modular.ModularDialog
+import com.tari.android.wallet.ui.dialog.modular.ModularDialogArgs
 import com.tari.android.wallet.ui.dialog.modular.modules.body.BodyModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonStyle
@@ -23,6 +25,7 @@ import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
 import com.tari.android.wallet.ui.dialog.modular.modules.option.OptionModule
 import com.tari.android.wallet.ui.dialog.modular.modules.space.SpaceModule
 import com.tari.android.wallet.ui.extension.addEnterLeftAnimation
+import com.tari.android.wallet.ui.fragment.home.HomeActivity
 import com.tari.android.wallet.ui.fragment.settings.allSettings.TariVersionModel
 import com.tari.android.wallet.ui.fragment.settings.logs.activity.DebugActivity
 import com.tari.android.wallet.ui.fragment.settings.logs.activity.DebugNavigation
@@ -62,6 +65,8 @@ abstract class CommonActivity<Binding : ViewBinding, VM : CommonViewModel> : App
         observe(loadingDialog) { dialogManager.handleProgress(it) }
 
         observe(showToast) { TariToast(this@CommonActivity, it) }
+
+        observe(navigation) { HomeActivity.instance.get()?.tariNavigator?.navigate(it) }
     }
 
     private fun setTariTheme(theme: TariTheme) {

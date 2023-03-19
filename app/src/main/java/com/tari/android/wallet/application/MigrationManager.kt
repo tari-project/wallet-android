@@ -9,8 +9,11 @@ import com.tari.android.wallet.ui.common.CommonViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class MigrationManager : CommonViewModel() {
+@Singleton
+class MigrationManager @Inject constructor() : CommonViewModel() {
 
     private val minValidVersion = DefaultArtifactVersion("0.44.0")
 

@@ -4,7 +4,9 @@ import android.text.SpannableString
 import android.text.Spanned
 import com.tari.android.wallet.R
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
-import com.tari.android.wallet.data.sharedPrefs.securityStages.*
+import com.tari.android.wallet.data.sharedPrefs.securityStages.DisabledTimestampsDto
+import com.tari.android.wallet.data.sharedPrefs.securityStages.SecurityStagesRepository
+import com.tari.android.wallet.data.sharedPrefs.securityStages.WalletSecurityStage
 import com.tari.android.wallet.data.sharedPrefs.securityStages.modules.SecurityStageHeadModule
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.extension.addTo
@@ -141,7 +143,7 @@ class StagedWalletSecurityManager : CommonViewModel() {
         _dismissDialog.postValue(Unit)
         HomeActivity.instance.get()?.tariNavigator?.let {
             it.toAllSettings()
-            it.toBackupSettings()
+            it.toBackupSettings(true)
         }
     }
 

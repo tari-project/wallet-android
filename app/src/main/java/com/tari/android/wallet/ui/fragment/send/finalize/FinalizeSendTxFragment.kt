@@ -37,7 +37,9 @@ import android.animation.ValueAnimator
 import android.media.AudioManager
 import android.os.Build
 import android.os.Bundle
-import android.view.*
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import androidx.core.animation.addListener
 import androidx.fragment.app.viewModels
 import com.daasuu.ei.Ease
@@ -48,7 +50,11 @@ import com.tari.android.wallet.extension.observe
 import com.tari.android.wallet.extension.observeOnLoad
 import com.tari.android.wallet.ui.common.CommonFragment
 import com.tari.android.wallet.ui.component.tari.TariTextView
-import com.tari.android.wallet.ui.extension.*
+import com.tari.android.wallet.ui.extension.getResourceUri
+import com.tari.android.wallet.ui.extension.invisible
+import com.tari.android.wallet.ui.extension.parcelable
+import com.tari.android.wallet.ui.extension.visible
+import com.tari.android.wallet.ui.fragment.home.HomeActivity
 import com.tari.android.wallet.ui.fragment.send.common.TransactionData
 import com.tari.android.wallet.util.Constants
 
@@ -198,7 +204,14 @@ class FinalizeSendTxFragment : CommonFragment<FragmentFinalizeSendTxBinding, Fin
                 runCatching {
                     removeAllListeners()
                     ui.lottieAnimationView.alpha = 0f
-                    (requireActivity() as? FinalizeSendTxListener)?.onSendTxFailure(false, viewModel.transactionData, txFailureReason)
+
+                    viewModel.txFailureReason.value?.let {
+                        HomeActivity.instance.get()?.tariNavigator?.onSendTxFailure(
+                            true,
+                            viewModel.transactionData,
+                            it
+                        )
+                    }
                 }
             })
             start()
@@ -226,7 +239,13 @@ class FinalizeSendTxFragment : CommonFragment<FragmentFinalizeSendTxBinding, Fin
                 runCatching {
                     removeAllListeners()
                     ui.lottieAnimationView.alpha = 0f
-                    (requireActivity() as? FinalizeSendTxListener)?.onSendTxSuccessful(false, viewModel.sentTxId.value!!, viewModel.transactionData)
+                    viewModel.sentTxId.value?.let {
+                        HomeActivity.instance.get()?.tariNavigator?.onSendTxSuccessful(
+                            true,
+                            it,
+                            viewModel.transactionData
+                        )
+                    }
                 }
             })
             start()

@@ -6,7 +6,7 @@ import com.tari.android.wallet.R
 import com.tari.android.wallet.ui.extension.string
 import com.tari.android.wallet.ui.fragment.contact_book.contactSelection.ContactSelectionFragment
 import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.FFIContactDto
-import com.tari.android.wallet.ui.fragment.contact_book.root.ContactBookNavigation
+import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
 
 class AddContactFragment : ContactSelectionFragment() {
 
@@ -22,6 +22,6 @@ class AddContactFragment : ContactSelectionFragment() {
         super.goToNext()
 
         val user = viewModel.getUserDto()
-        viewModel.navigation.postValue(ContactBookNavigation.ToAddContactName(user))
+        viewModel.navigation.postValue(Navigation.ContactBookNavigation.ToAddContactName(user))
     }
 }

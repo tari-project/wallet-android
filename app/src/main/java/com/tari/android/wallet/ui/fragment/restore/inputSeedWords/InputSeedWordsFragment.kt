@@ -16,8 +16,13 @@ import com.tari.android.wallet.extension.observeOnLoad
 import com.tari.android.wallet.model.seedPhrase.SeedPhrase
 import com.tari.android.wallet.ui.common.CommonFragment
 import com.tari.android.wallet.ui.common.recyclerView.CommonAdapter
-import com.tari.android.wallet.ui.extension.*
-import com.tari.android.wallet.ui.fragment.restore.activity.WalletRestoreRouter
+import com.tari.android.wallet.ui.extension.hideKeyboard
+import com.tari.android.wallet.ui.extension.setOnThrottledClickListener
+import com.tari.android.wallet.ui.extension.setSelectionToEnd
+import com.tari.android.wallet.ui.extension.setTextSilently
+import com.tari.android.wallet.ui.extension.setVisible
+import com.tari.android.wallet.ui.extension.showKeyboard
+import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
 import com.tari.android.wallet.ui.fragment.restore.inputSeedWords.suggestions.SuggestionState
 import com.tari.android.wallet.ui.fragment.restore.inputSeedWords.suggestions.SuggestionViewHolderItem
 import com.tari.android.wallet.ui.fragment.restore.inputSeedWords.suggestions.SuggestionsAdapter
@@ -71,7 +76,7 @@ class InputSeedWordsFragment : CommonFragment<FragmentWalletInputSeedWordsBindin
             }
             true
         }
-        chooseBaseNodeButton.setOnClickListener { processNavigation(InputSeedWordsNavigation.ToBaseNodeSelection) }
+        chooseBaseNodeButton.setOnClickListener { viewModel.navigation.postValue(Navigation.InputSeedWordsNavigation.ToBaseNodeSelection) }
         suggestionsAdapter.setClickListener(CommonAdapter.ItemClickListener { viewModel.selectSuggestion(it) })
         suggestions.adapter = suggestionsAdapter
         suggestions.layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
@@ -94,20 +99,10 @@ class InputSeedWordsFragment : CommonFragment<FragmentWalletInputSeedWordsBindin
 
         observe(focusedIndex) { requestFocusAtIndex(it) }
 
-        observe(navigation) { processNavigation(it) }
-
         observe(suggestions) { showSuggestions(it) }
 
         observeOnLoad(isAllEntered)
         observeOnLoad(isInProgress)
-    }
-
-    private fun processNavigation(navigation: InputSeedWordsNavigation) {
-        val router = requireActivity() as WalletRestoreRouter
-        when (navigation) {
-            InputSeedWordsNavigation.ToRestoreFormSeedWordsInProgress -> router.toRestoreFromSeedWordsInProgress()
-            InputSeedWordsNavigation.ToBaseNodeSelection -> router.toBaseNodeSelection()
-        }
     }
 
     private fun showSuggestions(suggestions: SuggestionState) = when (suggestions) {

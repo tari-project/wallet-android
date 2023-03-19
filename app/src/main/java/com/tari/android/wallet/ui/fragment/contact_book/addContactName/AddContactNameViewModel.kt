@@ -3,15 +3,12 @@ package com.tari.android.wallet.ui.fragment.contact_book.addContactName
 import androidx.lifecycle.MutableLiveData
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.ui.common.CommonViewModel
-import com.tari.android.wallet.ui.common.SingleLiveEvent
 import com.tari.android.wallet.ui.fragment.contact_book.data.ContactsRepository
 import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.ContactDto
-import com.tari.android.wallet.ui.fragment.contact_book.root.ContactBookNavigation
+import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
 import javax.inject.Inject
 
 class AddContactNameViewModel : CommonViewModel() {
-
-    val navigation = SingleLiveEvent<ContactBookNavigation>()
 
     val contact = MutableLiveData<ContactDto>()
 
@@ -32,6 +29,6 @@ class AddContactNameViewModel : CommonViewModel() {
     fun onContinue(firstName: String, surname: String) {
         val contact = this.contact.value ?: return
         contactBookRepository.updateContactInfo(contact, firstName, surname, "")
-        navigation.postValue(ContactBookNavigation.BackToContactBook())
+        navigation.postValue(Navigation.ContactBookNavigation.BackToContactBook())
     }
 }

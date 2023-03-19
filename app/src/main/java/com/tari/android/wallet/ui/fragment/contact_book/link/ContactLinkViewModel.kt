@@ -15,7 +15,6 @@ import com.tari.android.wallet.R.string.contact_book_contacts_book_link_title
 import com.tari.android.wallet.R.string.contact_book_contacts_book_unlink_success_title
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.ui.common.CommonViewModel
-import com.tari.android.wallet.ui.common.SingleLiveEvent
 import com.tari.android.wallet.ui.common.recyclerView.CommonViewHolderItem
 import com.tari.android.wallet.ui.dialog.modular.DialogArgs
 import com.tari.android.wallet.ui.dialog.modular.ModularDialogArgs
@@ -28,7 +27,7 @@ import com.tari.android.wallet.ui.fragment.contact_book.contacts.adapter.contact
 import com.tari.android.wallet.ui.fragment.contact_book.data.ContactsRepository
 import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.ContactDto
 import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.PhoneContactDto
-import com.tari.android.wallet.ui.fragment.contact_book.root.ContactBookNavigation
+import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
 import io.reactivex.BackpressureStrategy
 import yat.android.ui.extension.HtmlHelper
 import javax.inject.Inject
@@ -40,8 +39,6 @@ class ContactLinkViewModel : CommonViewModel() {
     val searchText = MutableLiveData("")
 
     val list = MediatorLiveData<MutableList<CommonViewHolderItem>>()
-
-    val navigation = SingleLiveEvent<ContactBookNavigation>()
 
     val ffiContact = MutableLiveData<ContactDto>()
 
@@ -124,7 +121,7 @@ class ContactLinkViewModel : CommonViewModel() {
             ButtonModule(resourceManager.getString(common_close), ButtonStyle.Close)
         )
         _modularDialog.postValue(ModularDialogArgs(DialogArgs {
-            navigation.value = ContactBookNavigation.BackToContactBook()
+            navigation.value = Navigation.ContactBookNavigation.BackToContactBook()
         }, modules))
     }
 }

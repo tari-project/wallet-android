@@ -16,11 +16,10 @@ import com.tari.android.wallet.model.TxId
 import com.tari.android.wallet.model.WalletError
 import com.tari.android.wallet.service.TariWalletService
 import com.tari.android.wallet.ui.common.CommonViewModel
-import com.tari.android.wallet.ui.common.SingleLiveEvent
 import com.tari.android.wallet.ui.dialog.error.ErrorDialogArgs
 import com.tari.android.wallet.ui.fragment.contact_book.data.ContactsRepository
 import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.ContactDto
-import com.tari.android.wallet.ui.fragment.contact_book.root.ContactBookNavigation
+import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
 import io.reactivex.BackpressureStrategy
 import io.reactivex.subjects.BehaviorSubject
 import javax.inject.Inject
@@ -41,8 +40,6 @@ class TxDetailsViewModel : CommonViewModel() {
 
     private val _explorerLink = MutableLiveData("")
     val explorerLink: LiveData<String> = _explorerLink
-
-    val navigation = SingleLiveEvent<ContactBookNavigation>()
 
     val contact = MediatorLiveData<ContactDto>()
 
@@ -91,9 +88,9 @@ class TxDetailsViewModel : CommonViewModel() {
         val tx = this.tx.value ?: return
         val contact = contactsRepository.ffiBridge.getContactForTx(tx)
         if (contact.contact.getAlias().isEmpty()) {
-            navigation.postValue(ContactBookNavigation.ToAddContactName(contact))
+            navigation.postValue(Navigation.ContactBookNavigation.ToAddContactName(contact))
         } else {
-            navigation.postValue(ContactBookNavigation.ToContactDetails(contact))
+            navigation.postValue(Navigation.ContactBookNavigation.ToContactDetails(contact))
         }
     }
 

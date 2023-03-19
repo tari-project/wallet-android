@@ -8,7 +8,6 @@ import com.tari.android.wallet.application.MigrationManager
 import com.tari.android.wallet.application.baseNodes.BaseNodes
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodeDto
-import com.tari.android.wallet.data.sharedPrefs.tariSettings.TariSettingsSharedRepository
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.extension.addTo
 import com.tari.android.wallet.ffi.FFIPublicKey
@@ -18,9 +17,9 @@ import com.tari.android.wallet.model.recovery.WalletRestorationResult
 import com.tari.android.wallet.service.seedPhrase.SeedPhraseRepository
 import com.tari.android.wallet.service.service.WalletServiceLauncher
 import com.tari.android.wallet.ui.common.CommonViewModel
-import com.tari.android.wallet.ui.common.SingleLiveEvent
 import com.tari.android.wallet.ui.common.domain.ResourceManager
 import com.tari.android.wallet.ui.dialog.error.ErrorDialogArgs
+import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
 import io.reactivex.disposables.CompositeDisposable
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -45,9 +44,6 @@ class WalletRestoringFromSeedWordsViewModel : CommonViewModel() {
     val migrationManager = MigrationManager()
 
     private lateinit var baseNodeIterator: Iterator<BaseNodeDto>
-
-    private val _navigation = SingleLiveEvent<WalletRestoringFromSeedWordsNavigation>()
-    val navigation: LiveData<WalletRestoringFromSeedWordsNavigation> = _navigation
 
     private val _recoveryState = MutableLiveData<RecoveryState>(RecoveryState.ConnectingToBaseNode(resourceManager))
     val recoveryState: LiveData<RecoveryState> = _recoveryState
@@ -124,12 +120,12 @@ class WalletRestoringFromSeedWordsViewModel : CommonViewModel() {
     private fun onSuccessRestoration() {
         tariSettingsSharedRepository.hasVerifiedSeedWords = true
         migrationManager.updateWalletVersion()
-        _navigation.postValue(WalletRestoringFromSeedWordsNavigation.OnRestoreCompleted)
+        navigation.postValue(Navigation.WalletRestoringFromSeedWordsNavigation.OnRestoreCompleted)
     }
 
     private fun onProgress(recoveryState: RecoveryState) = _recoveryState.postValue(recoveryState)
 
-    private fun onErrorClosed() = _navigation.postValue(WalletRestoringFromSeedWordsNavigation.OnRestoreFailed)
+    private fun onErrorClosed() = navigation.postValue(Navigation.WalletRestoringFromSeedWordsNavigation.OnRestoreFailed)
 
     sealed class RestorationError(title: String, message: String, dismissAction: () -> Unit) {
 

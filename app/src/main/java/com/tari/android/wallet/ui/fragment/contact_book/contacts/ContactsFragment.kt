@@ -32,8 +32,6 @@
  */
 package com.tari.android.wallet.ui.fragment.contact_book.contacts
 
-import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -47,8 +45,6 @@ import com.tari.android.wallet.ui.common.CommonFragment
 import com.tari.android.wallet.ui.common.recyclerView.CommonAdapter
 import com.tari.android.wallet.ui.extension.PermissionExtensions.runWithPermission
 import com.tari.android.wallet.ui.fragment.contact_book.contacts.adapter.ContactListAdapter
-import com.tari.android.wallet.ui.fragment.contact_book.root.ContactBookRouter
-
 
 open class ContactsFragment : CommonFragment<FragmentContactsBinding, ContactsViewModel>() {
 
@@ -79,8 +75,6 @@ open class ContactsFragment : CommonFragment<FragmentContactsBinding, ContactsVi
     fun search(text: String) = viewModel.search(text)
 
     private fun observeUI() = with(viewModel) {
-        observe(navigation) { ContactBookRouter.processNavigation(requireActivity(), it) }
-
         observe(list) { recyclerViewAdapter.update(it) }
 
         observe(grantPermission) { grantPermission(true) }

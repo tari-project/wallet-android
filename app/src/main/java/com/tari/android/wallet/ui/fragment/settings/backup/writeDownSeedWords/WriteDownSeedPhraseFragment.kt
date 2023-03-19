@@ -50,7 +50,7 @@ import com.tari.android.wallet.ui.extension.ThrottleClick
 import com.tari.android.wallet.ui.extension.animateClick
 import com.tari.android.wallet.ui.extension.dimenPx
 import com.tari.android.wallet.ui.extension.setVisible
-import com.tari.android.wallet.ui.fragment.settings.backup.BackupSettingsRouter
+import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
 import com.tari.android.wallet.ui.fragment.settings.backup.writeDownSeedWords.adapter.PhraseWordsAdapter
 import com.tari.android.wallet.util.Constants
 
@@ -76,7 +76,7 @@ class WriteDownSeedPhraseFragment : CommonFragment<FragmentWriteDownSeedPhraseBi
     private fun setupUI() {
         ui.warningCheckBox.setOnCheckedChangeListener { _, isChecked -> updateContinueButtonState(isChecked) }
         ui.continueCtaView.setOnClickListener(ThrottleClick {
-            it.animateClick { (requireActivity() as BackupSettingsRouter).toSeedPhraseVerification(viewModel.seedWords.value!!) }
+            it.animateClick { viewModel.navigation.postValue(Navigation.VerifySeedPhraseNavigation.ToSeedPhraseVerification(viewModel.seedWords.value!!)) }
         })
         ui.phraseWordsRecyclerView.layoutManager = GridLayoutManager(requireContext(), WORD_COLUMNS_COUNT)
         ui.phraseWordsRecyclerView.adapter = adapter

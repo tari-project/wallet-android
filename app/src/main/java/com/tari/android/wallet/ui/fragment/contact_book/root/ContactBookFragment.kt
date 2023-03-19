@@ -12,11 +12,11 @@ import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.google.android.material.tabs.TabLayoutMediator
 import com.tari.android.wallet.R
 import com.tari.android.wallet.databinding.FragmentContactBookRootBinding
-import com.tari.android.wallet.extension.observe
 import com.tari.android.wallet.ui.common.CommonFragment
 import com.tari.android.wallet.ui.fragment.contact_book.contacts.ContactsFragment
 import com.tari.android.wallet.ui.fragment.contact_book.favorites.FavoritesFragment
 import com.tari.android.wallet.ui.fragment.home.HomeActivity
+import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
 import java.lang.ref.WeakReference
 
 class ContactBookFragment : CommonFragment<FragmentContactBookRootBinding, ContactBookViewModel>() {
@@ -36,7 +36,6 @@ class ContactBookFragment : CommonFragment<FragmentContactBookRootBinding, Conta
     }
 
     private fun subscribeUI() = with(viewModel) {
-        observe(navigation) { ContactBookRouter.processNavigation(requireActivity(), it) }
     }
 
     private fun setupUI() {
@@ -55,7 +54,7 @@ class ContactBookFragment : CommonFragment<FragmentContactBookRootBinding, Conta
             (requireActivity() as? HomeActivity)?.setBottomBarVisibility(!hasFocus)
         }
 
-        ui.toolbar.rightAction = { viewModel.navigate(ContactBookNavigation.ToAddContact) }
+        ui.toolbar.rightAction = { viewModel.navigation.postValue(Navigation.ContactBookNavigation.ToAddContact) }
 
         ui.searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextChange(newText: String?): Boolean {

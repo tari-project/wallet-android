@@ -2,19 +2,14 @@ package com.tari.android.wallet.ui.fragment.settings.backup.verifySeedPhrase
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.tari.android.wallet.data.sharedPrefs.tariSettings.TariSettingsSharedRepository
 import com.tari.android.wallet.ui.common.CommonViewModel
-import com.tari.android.wallet.ui.common.SingleLiveEvent
-import javax.inject.Inject
+import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
 
 class VerifySeedPhraseViewModel : CommonViewModel() {
 
     init {
         component.inject(this)
     }
-
-    private val _navigation = SingleLiveEvent<VerifySeedPhraseNavigation>()
-    val navigation: LiveData<VerifySeedPhraseNavigation> = _navigation
 
     private val _nothingSelected = MutableLiveData(false)
     val nothingSelected: LiveData<Boolean> = _nothingSelected
@@ -55,6 +50,6 @@ class VerifySeedPhraseViewModel : CommonViewModel() {
 
     fun verify() {
         tariSettingsSharedRepository.hasVerifiedSeedWords = true
-        _navigation.postValue(VerifySeedPhraseNavigation.ToSeedPhraseVerificationComplete)
+        navigation.postValue(Navigation.VerifySeedPhraseNavigation.ToSeedPhraseVerificationComplete)
     }
 }

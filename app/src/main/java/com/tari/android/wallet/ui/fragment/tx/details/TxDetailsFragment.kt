@@ -64,7 +64,6 @@ import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
 import com.tari.android.wallet.ui.dialog.tooltipDialog.TooltipDialogArgs
 import com.tari.android.wallet.ui.extension.*
 import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.ContactDto
-import com.tari.android.wallet.ui.fragment.contact_book.root.ContactBookRouter
 import com.tari.android.wallet.ui.fragment.tx.details.gif.GIFView
 import com.tari.android.wallet.ui.fragment.tx.details.gif.GIFViewModel
 import com.tari.android.wallet.ui.fragment.tx.details.gif.TxState
@@ -121,8 +120,6 @@ class TxDetailsFragment : CommonFragment<FragmentTxDetailsBinding, TxDetailsView
         observe(cancellationReason) { setCancellationReason(it) }
 
         observe(explorerLink) { showExplorerLink(it) }
-
-        observe(navigation) { ContactBookRouter.processNavigation(requireActivity(), it) }
     }
 
     private fun updateContactInfo(contact: ContactDto) {

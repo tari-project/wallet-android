@@ -24,7 +24,6 @@ import com.tari.android.wallet.R.string.contact_book_details_delete_contact
 import com.tari.android.wallet.R.string.contact_book_details_delete_message
 import com.tari.android.wallet.R.string.contact_book_details_edit_title
 import com.tari.android.wallet.ui.common.CommonViewModel
-import com.tari.android.wallet.ui.common.SingleLiveEvent
 import com.tari.android.wallet.ui.common.recyclerView.CommonViewHolderItem
 import com.tari.android.wallet.ui.common.recyclerView.items.DividerViewHolderItem
 import com.tari.android.wallet.ui.common.recyclerView.items.SpaceVerticalViewHolderItem
@@ -46,7 +45,7 @@ import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.MergedCont
 import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.YatContactDto
 import com.tari.android.wallet.ui.fragment.contact_book.details.adapter.contactType.ContactTypeViewHolderItem
 import com.tari.android.wallet.ui.fragment.contact_book.details.adapter.profile.ContactProfileViewHolderItem
-import com.tari.android.wallet.ui.fragment.contact_book.root.ContactBookNavigation
+import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
 import com.tari.android.wallet.ui.fragment.settings.allSettings.button.ButtonStyle
 import com.tari.android.wallet.ui.fragment.settings.allSettings.button.ButtonViewDto
 import com.tari.android.wallet.ui.fragment.settings.allSettings.title.SettingsTitleViewHolderItem
@@ -74,8 +73,6 @@ class ContactDetailsViewModel : CommonViewModel() {
 
     val list = MediatorLiveData<MutableList<CommonViewHolderItem>>()
 
-    val navigation = SingleLiveEvent<ContactBookNavigation>()
-
     init {
         component.inject(this)
 
@@ -100,7 +97,7 @@ class ContactDetailsViewModel : CommonViewModel() {
         ContactAction.Send.let {
             if (availableActions.contains(it)) {
                 newList += ButtonViewDto(resourceManager.getString(it.title)) {
-                    navigation.postValue(ContactBookNavigation.ToSendTari(contact))
+                    navigation.postValue(Navigation.ContactBookNavigation.ToSendTari(contact))
                 }
                 newList += DividerViewHolderItem()
             }
@@ -127,7 +124,7 @@ class ContactDetailsViewModel : CommonViewModel() {
         ContactAction.Link.let {
             if (availableActions.contains(it)) {
                 newList += (ButtonViewDto(resourceManager.getString(it.title)) {
-                    navigation.postValue(ContactBookNavigation.ToLinkContact(contact))
+                    navigation.postValue(Navigation.ContactBookNavigation.ToLinkContact(contact))
                 })
                 newList += DividerViewHolderItem()
             }
@@ -161,7 +158,7 @@ class ContactDetailsViewModel : CommonViewModel() {
                 newList.add(SettingsTitleViewHolderItem(resourceManager.getString(contact_book_details_connected_wallets)))
                 for (connectedWallet in connectedWallets) {
                     newList += (ButtonViewDto(resourceManager.getString(connectedWallet.name!!)) {
-                        navigation.postValue(ContactBookNavigation.ToExternalWallet(connectedWallet))
+                        navigation.postValue(Navigation.ContactBookNavigation.ToExternalWallet(connectedWallet))
                     })
                     newList += DividerViewHolderItem()
                 }
@@ -282,7 +279,7 @@ class ContactDetailsViewModel : CommonViewModel() {
             ButtonModule(resourceManager.getString(common_close), Close)
         )
         _modularDialog.postValue(ModularDialogArgs(DialogArgs {
-            navigation.value = ContactBookNavigation.BackToContactBook()
+            navigation.value = Navigation.ContactBookNavigation.BackToContactBook()
         }, modules))
     }
 
@@ -293,7 +290,7 @@ class ContactDetailsViewModel : CommonViewModel() {
             ButtonModule(resourceManager.getString(contact_book_details_delete_button_title), Warning) {
                 contactsRepository.deleteContact(contact.value!!)
                 _dismissDialog.postValue(Unit)
-                navigation.value = ContactBookNavigation.BackToContactBook()
+                navigation.value = Navigation.ContactBookNavigation.BackToContactBook()
             },
             ButtonModule(resourceManager.getString(common_close), Close)
         )

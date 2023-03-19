@@ -179,11 +179,11 @@
     <string name="home_setup_is_complete">Your wallet setup is complete.</string>
     <string name="home_you_are_ready_to_explore">You’re ready to start exploring</string>
     <string name="home_empty_wallet">We don’t see any transactions yet.\nHopefully something happens soon…🤞</string>
-    <string name="home_navigation_content_description_navigate_to_settings">Navigate to settings</string>
-    <string name="home_navigation_content_description_navigate_to_wallet_info">Navigate to wallet info</string>
-    <string name="home_navigation_content_description_navigate_to_ttl_store">Navigate to TTL store</string>
-    <string name="home_navigation_content_description_navigate_to_transactions_list">Navigate to transactions list</string>
-    <string name="home_navigation_content_description_navigate_to_send_tari">Navigate to Tari send flow</string>
+    <string name="homenavigation_content_description_navigate_to_settings">Navigate to settings</string>
+    <string name="homenavigation_content_description_navigate_to_wallet_info">Navigate to wallet info</string>
+    <string name="homenavigation_content_description_navigate_to_ttl_store">Navigate to TTL store</string>
+    <string name="homenavigation_content_description_navigate_to_transactions_list">Navigate to transactions list</string>
+    <string name="homenavigation_content_description_navigate_to_send_tari">Navigate to Tari send flow</string>
     <string name="home_pending_transactions_title">Pending Transactions</string>
     <string name="home_completed_transactions_title">Completed Transactions</string>
     <string name="home_custom_base_node_title">Add custom base node</string>
@@ -345,7 +345,7 @@
     <string name="debug_log_filter_aurora_general">Aurora - General</string>
     <string name="debug_log_filter_aurora_connection">Aurora - Connection</string>
     <string name="debug_log_filter_aurora_ui">Aurora - UI</string>
-    <string name="debug_log_filter_aurora_navigation">Aurora - Navigation</string>
+    <string name="debug_log_filter_auroranavigation">Aurora - Navigation</string>
 
     <string name="bugs_reporting_title">Report a Bug</string>
     <string name="bugs_reporting_description">Has something gone wrong? Please let us know!</string>

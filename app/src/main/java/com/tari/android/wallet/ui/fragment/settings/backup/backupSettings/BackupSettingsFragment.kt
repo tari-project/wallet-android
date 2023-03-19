@@ -34,14 +34,15 @@ package com.tari.android.wallet.ui.fragment.settings.backup.backupSettings
 
 import android.content.Intent
 import android.os.Bundle
-import android.view.*
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import com.tari.android.wallet.databinding.FragmentWalletBackupSettingsBinding
 import com.tari.android.wallet.extension.observe
 import com.tari.android.wallet.ui.common.CommonFragment
 import com.tari.android.wallet.ui.extension.ThrottleClick
 import com.tari.android.wallet.ui.extension.setVisible
-import com.tari.android.wallet.ui.fragment.settings.backup.BackupSettingsRouter
 import com.tari.android.wallet.ui.fragment.settings.backup.backupSettings.option.BackupOptionView
 import com.tari.android.wallet.ui.fragment.settings.backup.backupSettings.option.BackupOptionViewModel
 import com.tari.android.wallet.ui.fragment.settings.userAutorization.BiometricAuthenticationViewModel
@@ -89,8 +90,6 @@ class BackupSettingsFragment : CommonFragment<FragmentWalletBackupSettingsBindin
     }
 
     private fun subscribeUI() = with(viewModel) {
-        observe(navigation) { processNavigation(it) }
-
         observe(backupStateChanged) { resetStatusIcons() }
 
         observe(isBackupNowAvailable) { ui.backupWalletToCloudCtaContainerView.setVisible(it) }
@@ -98,16 +97,6 @@ class BackupSettingsFragment : CommonFragment<FragmentWalletBackupSettingsBindin
         observe(setPasswordVisible) { ui.updatePasswordCtaView.setVisible(it) }
 
         observe(options) { initBackupOptions(it) }
-    }
-
-    private fun processNavigation(navigation: BackupSettingsNavigation) {
-        val router = requireActivity() as BackupSettingsRouter
-        when (navigation) {
-            BackupSettingsNavigation.ToChangePassword -> router.toChangePassword()
-            BackupSettingsNavigation.ToConfirmPassword -> router.toConfirmPassword()
-            BackupSettingsNavigation.ToWalletBackupWithRecoveryPhrase -> router.toWalletBackupWithRecoveryPhrase()
-            BackupSettingsNavigation.ToLearnMore -> router.toBackupOnboardingFlow()
-        }
     }
 
     private fun initBackupOptions(options: List<BackupOptionViewModel>) {

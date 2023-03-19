@@ -20,6 +20,7 @@ import com.tari.android.wallet.ui.component.tari.toast.TariToast
 import com.tari.android.wallet.ui.component.tari.toast.TariToastArgs
 import com.tari.android.wallet.ui.dialog.modular.InputModularDialog
 import com.tari.android.wallet.ui.dialog.modular.ModularDialog
+import com.tari.android.wallet.ui.fragment.home.HomeActivity
 
 abstract class CommonFragment<Binding : ViewBinding, VM : CommonViewModel> : Fragment() {
 
@@ -91,6 +92,8 @@ abstract class CommonFragment<Binding : ViewBinding, VM : CommonViewModel> : Fra
         observe(blockedBackPressed) {
             blockingBackPressDispatcher.isEnabled = it
         }
+
+        observe(navigation) { HomeActivity.instance.get()?.tariNavigator?.navigate(it) }
     }
 
     protected fun changeOnBackPressed(isBlocked: Boolean) {

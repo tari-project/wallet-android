@@ -15,9 +15,7 @@ import com.tari.android.wallet.ui.common.recyclerView.CommonAdapter
 import com.tari.android.wallet.ui.extension.serializable
 import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.ContactDto
 import com.tari.android.wallet.ui.fragment.contact_book.link.adapter.LinkContactAdapter
-import com.tari.android.wallet.ui.fragment.contact_book.root.ContactBookRouter
-import com.tari.android.wallet.ui.fragment.home.HomeActivity
-import com.tari.android.wallet.ui.fragment.home.TariNavigator.Companion.PARAMETER_CONTACT
+import com.tari.android.wallet.ui.fragment.home.navigation.TariNavigator.Companion.PARAMETER_CONTACT
 
 class ContactLinkFragment : CommonFragment<FragmentContactsLinkBinding, ContactLinkViewModel>() {
 
@@ -40,8 +38,6 @@ class ContactLinkFragment : CommonFragment<FragmentContactsLinkBinding, ContactL
 
     private fun observeUI() = with(viewModel) {
         observe(list) { adapter.update(it) }
-
-        observe(navigation) { ContactBookRouter.processNavigation(requireActivity(), it) }
 
         observe(ffiContact) { showTooltip(it) }
     }

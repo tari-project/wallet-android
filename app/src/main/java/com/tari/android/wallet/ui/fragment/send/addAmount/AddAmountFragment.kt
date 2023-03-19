@@ -34,7 +34,6 @@ package com.tari.android.wallet.ui.fragment.send.addAmount
 
 import android.animation.ValueAnimator
 import android.annotation.SuppressLint
-import android.content.Context
 import android.os.Bundle
 import android.view.*
 import androidx.core.content.ContextCompat
@@ -56,9 +55,9 @@ import com.tari.android.wallet.ui.dialog.modular.ModularDialog
 import com.tari.android.wallet.ui.dialog.tooltipDialog.TooltipDialogArgs
 import com.tari.android.wallet.ui.extension.*
 import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.ContactDto
-import com.tari.android.wallet.ui.fragment.home.HomeActivity
-import com.tari.android.wallet.ui.fragment.home.TariNavigator.Companion.PARAMETER_AMOUNT
-import com.tari.android.wallet.ui.fragment.home.TariNavigator.Companion.PARAMETER_CONTACT
+import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
+import com.tari.android.wallet.ui.fragment.home.navigation.TariNavigator.Companion.PARAMETER_AMOUNT
+import com.tari.android.wallet.ui.fragment.home.navigation.TariNavigator.Companion.PARAMETER_CONTACT
 import com.tari.android.wallet.ui.fragment.send.addAmount.feeModule.NetworkSpeed
 import com.tari.android.wallet.ui.fragment.send.addAmount.keyboard.KeyboardController
 import com.tari.android.wallet.ui.fragment.send.amountView.AmountStyle
@@ -66,11 +65,8 @@ import com.tari.android.wallet.ui.fragment.send.common.TransactionData
 import com.tari.android.wallet.util.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import java.lang.ref.WeakReference
 
 class AddAmountFragment : CommonFragment<FragmentAddAmountBinding, AddAmountViewModel>() {
-
-    private lateinit var addAmountListenerWR: WeakReference<AddAmountListener>
 
     /**
      * Recipient is either an emoji id or a user from contacts or recent txs.
@@ -181,11 +177,6 @@ class AddAmountFragment : CommonFragment<FragmentAddAmountBinding, AddAmountView
         ui.networkTrafficIcon.setImageDrawable(ContextCompat.getDrawable(requireContext(), iconId))
     }
 
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        addAmountListenerWR = WeakReference(context as AddAmountListener)
-    }
-
     private fun displayAlias(alias: String) {
         ui.emojiIdSummaryContainerView.gone()
         ui.titleTextView.visible()
@@ -270,7 +261,7 @@ class AddAmountFragment : CommonFragment<FragmentAddAmountBinding, AddAmountView
     }
 
     private fun actualBalanceExceeded() {
-        addAmountListenerWR.get()?.onAmountExceedsActualAvailableBalance(this)
+        viewModel.navigation.postValue(Navigation.AddAmountNavigation.OnAmountExceedsActualAvailableBalance)
         ui.continueButton.isClickable = true
     }
 
@@ -279,9 +270,9 @@ class AddAmountFragment : CommonFragment<FragmentAddAmountBinding, AddAmountView
         val transactionData =
             TransactionData(contactDto, keyboardController.currentAmount, null, viewModel.selectedFeeData!!.feePerGram, isOneSidePayment)
         if (isOneSidePayment) {
-            addAmountListenerWR.get()?.continueToFinalizing(transactionData)
+            viewModel.navigation.postValue(Navigation.AddAmountNavigation.ContinueToFinalizing(transactionData))
         } else {
-            addAmountListenerWR.get()?.continueToAddNote(transactionData)
+            viewModel.navigation.postValue(Navigation.AddAmountNavigation.ContinueToAddNote(transactionData))
         }
     }
 

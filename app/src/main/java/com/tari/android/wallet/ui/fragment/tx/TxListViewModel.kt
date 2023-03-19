@@ -50,6 +50,7 @@ import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonStyle
 import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
 import com.tari.android.wallet.ui.fragment.contact_book.data.ContactsRepository
+import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
 import com.tari.android.wallet.ui.fragment.send.finalize.TxFailureReason
 import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupSettingsRepository
 import com.tari.android.wallet.ui.fragment.tx.adapter.TransactionItem
@@ -89,9 +90,6 @@ class TxListViewModel : CommonViewModel() {
     private val completedTxs = CopyOnWriteArrayList<CompletedTx>()
     private val pendingInboundTxs = CopyOnWriteArrayList<PendingInboundTx>()
     private val pendingOutboundTxs = CopyOnWriteArrayList<PendingOutboundTx>()
-
-    private val _navigation = SingleLiveEvent<TxListNavigation>()
-    val navigation: LiveData<TxListNavigation> = _navigation
 
     private val _connected = SingleLiveEvent<Unit>()
     val connected: LiveData<Unit> = _connected
@@ -135,7 +133,7 @@ class TxListViewModel : CommonViewModel() {
 
     fun processItemClick(item: CommonViewHolderItem) {
         if (item is TransactionItem) {
-            _navigation.postValue(TxListNavigation.ToTxDetails(item.tx))
+            navigation.postValue(Navigation.TxListNavigation.ToTxDetails(item.tx))
         }
     }
 
@@ -412,7 +410,7 @@ class TxListViewModel : CommonViewModel() {
         // disable CTAs
         viewModelScope.launch(Dispatchers.IO) {
             walletServiceLauncher.stopAndDelete()
-            _navigation.postValue(TxListNavigation.ToSplashScreen)
+            navigation.postValue(Navigation.TxListNavigation.ToSplashScreen)
         }
     }
 
