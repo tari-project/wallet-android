@@ -2,6 +2,7 @@ package com.tari.android.wallet.ui.common
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.orhanobut.logger.Logger
 import com.orhanobut.logger.Printer
 import com.tari.android.wallet.R
@@ -29,8 +30,12 @@ import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonStyle
 import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
 import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
+import com.tari.android.wallet.ui.fragment.home.navigation.TariNavigator
 import com.tari.android.wallet.ui.fragment.settings.themeSelector.TariTheme
 import io.reactivex.disposables.CompositeDisposable
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 open class CommonViewModel : ViewModel() {
@@ -55,6 +60,9 @@ open class CommonViewModel : ViewModel() {
 
     @Inject
     lateinit var paletteManager: PaletteManager
+
+    @Inject
+    lateinit var tariNavigator: TariNavigator
 
     val logger: Printer
         get() = Logger.t(this::class.simpleName).t(LoggerTags.UI.name)
@@ -120,16 +128,14 @@ open class CommonViewModel : ViewModel() {
 
     fun doOnConnected(action: (walletService: TariWalletService) -> Unit) {
         serviceConnection.connection.filter { it.status == ServiceConnectionStatus.CONNECTED }.take(1)
-            .doOnError {
-                logger.e(it, it.toString())
-            }.subscribe { action(it.service!!) }
+            .doOnError { logger.e(it, it.toString()) }
+            .subscribe { action(it.service!!) }
             .addTo(compositeDisposable)
     }
 
     fun doOnConnectedToWallet(action: (walletService: FFIWallet) -> Unit) {
-        EventBus.walletState.publishSubject.filter { it == WalletState.Running }.take(1).doOnError {
-            logger.e(it, it.toString())
-        }.subscribe { action(FFIWallet.instance!!) }
+        EventBus.walletState.publishSubject.filter { it == WalletState.Running }.take(1).doOnError { Logger.e(it.toString()) }
+            .subscribe { action(FFIWallet.instance!!) }
             .addTo(compositeDisposable)
     }
 
@@ -143,4 +149,6 @@ open class CommonViewModel : ViewModel() {
         )
         _modularDialog.postValue(modularArgs)
     }
+
+    fun doOnBackground(action: suspend CoroutineScope.() -> Unit): Job = viewModelScope.launch { action() }
 }

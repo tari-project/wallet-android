@@ -37,6 +37,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.viewModelScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.tari.android.wallet.databinding.FragmentContactsBinding
 import com.tari.android.wallet.extension.observe
@@ -45,6 +46,8 @@ import com.tari.android.wallet.ui.common.CommonFragment
 import com.tari.android.wallet.ui.common.recyclerView.CommonAdapter
 import com.tari.android.wallet.ui.extension.PermissionExtensions.runWithPermission
 import com.tari.android.wallet.ui.fragment.contact_book.contacts.adapter.ContactListAdapter
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 open class ContactsFragment : CommonFragment<FragmentContactsBinding, ContactsViewModel>() {
 
@@ -63,13 +66,6 @@ open class ContactsFragment : CommonFragment<FragmentContactsBinding, ContactsVi
 
         setupUI()
         observeUI()
-
-        grantPermission(false)
-    }
-
-    override fun onStart() {
-        super.onStart()
-        grantPermission(false)
     }
 
     fun search(text: String) = viewModel.search(text)
@@ -77,7 +73,7 @@ open class ContactsFragment : CommonFragment<FragmentContactsBinding, ContactsVi
     private fun observeUI() = with(viewModel) {
         observe(list) { recyclerViewAdapter.update(it) }
 
-        observe(grantPermission) { grantPermission(true) }
+        observe(grantPermission) { grantPermission() }
 
         observeOnLoad(listUpdateTrigger)
         observeOnLoad(debouncedList)
@@ -87,17 +83,19 @@ open class ContactsFragment : CommonFragment<FragmentContactsBinding, ContactsVi
         setupRecyclerView()
     }
 
-    private fun grantPermission(withSettings: Boolean) {
-        runWithPermission(android.Manifest.permission.READ_CONTACTS, withSettings) {
-            viewModel.contactsRepository.phoneBookRepositoryBridge.synchronize()
-            viewModel.contactPermission.postValue(true)
-        }
-    }
-
     private fun setupRecyclerView() {
         ui.contactsListRecyclerView.layoutManager = LinearLayoutManager(requireContext())
         recyclerViewAdapter.setClickListener(CommonAdapter.ItemClickListener { viewModel.processItemClick(it) })
         ui.contactsListRecyclerView.adapter = recyclerViewAdapter
+    }
+
+    private fun grantPermission() {
+        runWithPermission(android.Manifest.permission.READ_CONTACTS, true) {
+            viewModel.viewModelScope.launch(Dispatchers.IO) {
+                viewModel.contactsRepository.contactPermission.postValue(true)
+                viewModel.contactsRepository.phoneBookRepositoryBridge.loadFromPhoneBook()
+            }
+        }
     }
 }
 

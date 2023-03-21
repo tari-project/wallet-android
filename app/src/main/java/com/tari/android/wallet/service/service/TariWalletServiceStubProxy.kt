@@ -1,6 +1,19 @@
 package com.tari.android.wallet.service.service
 
-import com.tari.android.wallet.model.*
+import com.tari.android.wallet.model.BalanceInfo
+import com.tari.android.wallet.model.CancelledTx
+import com.tari.android.wallet.model.CompletedTx
+import com.tari.android.wallet.model.MicroTari
+import com.tari.android.wallet.model.PendingInboundTx
+import com.tari.android.wallet.model.PendingOutboundTx
+import com.tari.android.wallet.model.TariCoinPreview
+import com.tari.android.wallet.model.TariContact
+import com.tari.android.wallet.model.TariUnblindedOutput
+import com.tari.android.wallet.model.TariUtxo
+import com.tari.android.wallet.model.TariVector
+import com.tari.android.wallet.model.TariWalletAddress
+import com.tari.android.wallet.model.TxId
+import com.tari.android.wallet.model.WalletError
 import com.tari.android.wallet.service.TariWalletService
 import com.tari.android.wallet.service.TariWalletServiceListener
 
@@ -58,8 +71,8 @@ class TariWalletServiceStubProxy : TariWalletService.Stub() {
         error: WalletError
     ): TxId? = stub.sendTari(contact, amount, feePerGram, message, isOneSidePayment, error)
 
-    override fun updateContactAlias(contactPublicKey: TariWalletAddress, alias: String, error: WalletError): Boolean =
-        stub.updateContactAlias(contactPublicKey, alias, error)
+    override fun updateContact(contactPublicKey: TariWalletAddress, alias: String, isFavorite: Boolean, error: WalletError): Boolean =
+        stub.updateContact(contactPublicKey, alias, isFavorite, error)
 
     override fun removeContact(tariContact: TariContact, error: WalletError): Boolean = stub.removeContact(tariContact, error)
 

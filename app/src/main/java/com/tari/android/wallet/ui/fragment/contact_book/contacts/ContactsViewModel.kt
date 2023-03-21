@@ -68,8 +68,6 @@ class ContactsViewModel : CommonViewModel() {
 
     val grantPermission = SingleLiveEvent<Unit>()
 
-    val contactPermission = MutableLiveData(false)
-
     val sourceList = MutableLiveData<MutableList<ContactItem>>(mutableListOf())
 
     val filters = MutableLiveData<MutableList<(ContactItem) -> Boolean>>(mutableListOf())
@@ -93,8 +91,6 @@ class ContactsViewModel : CommonViewModel() {
         list.addSource(sourceList) { updateList() }
 
         list.addSource(filters) { updateList() }
-
-        list.addSource(contactPermission) { updateList() }
 
         list.addSource(contactsRepository.publishSubject.toFlowable(BackpressureStrategy.LATEST).toLiveData()) { updateContacts() }
     }
@@ -129,13 +125,12 @@ class ContactsViewModel : CommonViewModel() {
         val searchText = searchText.value ?: return
         val sourceList = sourceList.value ?: return
         val filters = filters.value ?: return
-        val contactPermission = contactPermission.value ?: return
 
         val resultList = mutableListOf<CommonViewHolderItem>()
 
         val filtered = sourceList.filter { contact -> contact.filtered(searchText) && filters.all { it.invoke(contact) } }
 
-        if (contactPermission.not()) {
+        if (contactsRepository.contactPermission.value == false || filtered.isEmpty()) {
             val emptyState = EmptyStateItem(getEmptyTitle(), getBody(), getEmptyImage(), getButtonTitle()) { grantPermission.postValue(Unit) }
             resultList += emptyState
         }
@@ -160,14 +155,14 @@ class ContactsViewModel : CommonViewModel() {
 
     private fun getBody(): SpannedString {
         val resource = if (isFavorite) contact_book_empty_state_favorites_body else
-            (if (contactPermission.value == true) contact_book_empty_state_body else contact_book_empty_state_body_no_permissions)
+            (if (contactsRepository.contactPermission.value == true) contact_book_empty_state_body else contact_book_empty_state_body_no_permissions)
         return SpannedString(HtmlHelper.getSpannedText(resourceManager.getString(resource)))
     }
 
     private fun getEmptyImage(): Int = if (isFavorite) R.drawable.vector_contact_favorite_empty_state else R.drawable.vector_contact_empty_state
 
     private fun getButtonTitle(): String =
-        if (contactPermission.value == true) "" else resourceManager.getString(contact_book_empty_state_grant_access_button)
+        if (contactsRepository.contactPermission.value == true) "" else resourceManager.getString(contact_book_empty_state_grant_access_button)
 
     private fun performAction(contact: ContactDto, contactAction: ContactAction) {
         when (contactAction) {

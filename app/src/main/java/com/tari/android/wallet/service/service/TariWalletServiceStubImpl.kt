@@ -3,8 +3,28 @@ package com.tari.android.wallet.service.service
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodeSharedRepository
 import com.tari.android.wallet.event.EventBus
-import com.tari.android.wallet.ffi.*
-import com.tari.android.wallet.model.*
+import com.tari.android.wallet.ffi.FFIContact
+import com.tari.android.wallet.ffi.FFIError
+import com.tari.android.wallet.ffi.FFIException
+import com.tari.android.wallet.ffi.FFIPublicKey
+import com.tari.android.wallet.ffi.FFITariWalletAddress
+import com.tari.android.wallet.ffi.FFIWallet
+import com.tari.android.wallet.ffi.HexString
+import com.tari.android.wallet.ffi.runWithDestroy
+import com.tari.android.wallet.model.BalanceInfo
+import com.tari.android.wallet.model.CancelledTx
+import com.tari.android.wallet.model.CompletedTx
+import com.tari.android.wallet.model.MicroTari
+import com.tari.android.wallet.model.PendingInboundTx
+import com.tari.android.wallet.model.PendingOutboundTx
+import com.tari.android.wallet.model.TariCoinPreview
+import com.tari.android.wallet.model.TariContact
+import com.tari.android.wallet.model.TariUnblindedOutput
+import com.tari.android.wallet.model.TariUtxo
+import com.tari.android.wallet.model.TariVector
+import com.tari.android.wallet.model.TariWalletAddress
+import com.tari.android.wallet.model.TxId
+import com.tari.android.wallet.model.WalletError
 import com.tari.android.wallet.service.TariWalletService
 import com.tari.android.wallet.service.TariWalletServiceListener
 import com.tari.android.wallet.service.baseNode.BaseNodeSyncState
@@ -181,9 +201,9 @@ class TariWalletServiceStubImpl(
         false
     } ?: false
 
-    override fun updateContactAlias(walletAddress: TariWalletAddress, alias: String, error: WalletError): Boolean = runMapping(error) {
+    override fun updateContact(walletAddress: TariWalletAddress, alias: String, isFavorite: Boolean, error: WalletError): Boolean = runMapping(error) {
         val ffiTariWalletAddress = FFITariWalletAddress(HexString(walletAddress.hexString))
-        val contact = FFIContact(alias, ffiTariWalletAddress)
+        val contact = FFIContact(alias, ffiTariWalletAddress, isFavorite)
         wallet.addUpdateContact(contact).also {
             ffiTariWalletAddress.destroy()
             contact.destroy()

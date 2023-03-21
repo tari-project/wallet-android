@@ -70,11 +70,13 @@ import com.tari.android.wallet.ui.fragment.settings.torBridges.customBridges.Cus
 import com.tari.android.wallet.ui.fragment.tx.details.TxDetailsFragment
 import com.tari.android.wallet.ui.fragment.utxos.list.UtxosListFragment
 import com.tari.android.wallet.util.Constants
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class TariNavigator(
-    val activity: CommonActivity<*,*>, val prefs: SharedPrefsRepository, val migrationManager: MigrationManager,
-    val tariSettingsSharedRepository: TariSettingsSharedRepository
-) {
+@Singleton
+class TariNavigator @Inject constructor (val prefs: SharedPrefsRepository, val tariSettingsSharedRepository: TariSettingsSharedRepository) {
+
+    lateinit var activity: CommonActivity<*, *>
 
     fun navigate(navigation: Navigation) {
         when (navigation) {
@@ -154,7 +156,7 @@ class TariNavigator(
         prefs.onboardingAuthSetupCompleted = true
         prefs.onboardingDisplayedAtHome = true
         tariSettingsSharedRepository.isRestoredWallet = true
-        migrationManager.updateWalletVersion()
+        MigrationManager().updateWalletVersion()
 
         activity.finish()
         activity.startActivity(Intent(this.activity, AuthActivity::class.java).apply {

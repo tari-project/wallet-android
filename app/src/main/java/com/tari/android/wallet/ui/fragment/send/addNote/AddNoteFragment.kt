@@ -73,7 +73,6 @@ import com.tari.android.wallet.ui.component.fullEmojiId.EmojiIdSummaryViewContro
 import com.tari.android.wallet.ui.component.fullEmojiId.FullEmojiIdViewController
 import com.tari.android.wallet.ui.extension.*
 import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.ContactDto
-import com.tari.android.wallet.ui.fragment.home.HomeActivity
 import com.tari.android.wallet.ui.fragment.home.navigation.TariNavigator.Companion.PARAMETER_NOTE
 import com.tari.android.wallet.ui.fragment.home.navigation.TariNavigator.Companion.PARAMETER_TRANSACTION
 import com.tari.android.wallet.ui.fragment.send.addNote.gif.*
@@ -443,7 +442,7 @@ class AddNoteFragment : CommonFragment<FragmentAddNoteBinding, AddNoteViewModel>
         // notify listener (i.e. activity)
         val note = TxNote(ui.noteEditText.editableText.toString(), gifContainer.gifItem?.embedUri?.toString()).compose()
         val newData = transactionData.copy(note = note)
-        HomeActivity.instance.get()?.tariNavigator?.continueToFinalizeSendTx(newData)
+        viewModel.tariNavigator.continueToFinalizeSendTx(newData)
     }
 
     private fun restoreSlider() {

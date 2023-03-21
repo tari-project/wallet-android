@@ -9,13 +9,11 @@ import android.view.ViewGroup
 import android.widget.LinearLayout
 import androidx.lifecycle.LifecycleOwner
 import androidx.viewbinding.ViewBinding
-import com.tari.android.wallet.extension.observe
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.common.DialogManager
 import com.tari.android.wallet.ui.common.domain.PaletteManager
 import com.tari.android.wallet.ui.component.tari.toast.TariToast
 import com.tari.android.wallet.ui.dialog.modular.ModularDialog
-import com.tari.android.wallet.ui.fragment.home.HomeActivity
 
 abstract class CommonView<VM : CommonViewModel, VB : ViewBinding> : LinearLayout {
 
@@ -70,6 +68,6 @@ abstract class CommonView<VM : CommonViewModel, VB : ViewBinding> : LinearLayout
 
         viewModel.showToast.observe(viewLifecycle) { TariToast(context, it) }
 
-        viewModel.navigation.observe(viewLifecycle) { HomeActivity.instance.get()?.tariNavigator?.navigate(it) }
+        viewModel.navigation.observe(viewLifecycle) { viewModel.tariNavigator.navigate(it) }
     }
 }

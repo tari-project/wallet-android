@@ -73,7 +73,6 @@ import com.tari.android.wallet.ui.extension.scrollToTop
 import com.tari.android.wallet.ui.extension.showKeyboard
 import com.tari.android.wallet.ui.extension.string
 import com.tari.android.wallet.ui.extension.visible
-import com.tari.android.wallet.ui.fragment.home.HomeActivity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.net.UnknownHostException
@@ -276,7 +275,7 @@ class ChangeSecurePasswordFragment : CommonFragment<FragmentChangeSecurePassword
         when (backupState) {
             is BackupUpToDate -> {
                 allowExitAndPasswordEditing()
-                HomeActivity.instance.get()?.tariNavigator?.onPasswordChanged()
+                viewModel.tariNavigator.onPasswordChanged()
             }
             is BackupFailed -> { // backup failed
                 showBackupErrorDialog(deductBackupErrorMessage(backupState.backupException)) {

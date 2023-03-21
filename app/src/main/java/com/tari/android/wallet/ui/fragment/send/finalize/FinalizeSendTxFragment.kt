@@ -54,7 +54,6 @@ import com.tari.android.wallet.ui.extension.getResourceUri
 import com.tari.android.wallet.ui.extension.invisible
 import com.tari.android.wallet.ui.extension.parcelable
 import com.tari.android.wallet.ui.extension.visible
-import com.tari.android.wallet.ui.fragment.home.HomeActivity
 import com.tari.android.wallet.ui.fragment.send.common.TransactionData
 import com.tari.android.wallet.util.Constants
 
@@ -206,7 +205,7 @@ class FinalizeSendTxFragment : CommonFragment<FragmentFinalizeSendTxBinding, Fin
                     ui.lottieAnimationView.alpha = 0f
 
                     viewModel.txFailureReason.value?.let {
-                        HomeActivity.instance.get()?.tariNavigator?.onSendTxFailure(
+                       viewModel.tariNavigator.onSendTxFailure(
                             true,
                             viewModel.transactionData,
                             it
@@ -240,7 +239,7 @@ class FinalizeSendTxFragment : CommonFragment<FragmentFinalizeSendTxBinding, Fin
                     removeAllListeners()
                     ui.lottieAnimationView.alpha = 0f
                     viewModel.sentTxId.value?.let {
-                        HomeActivity.instance.get()?.tariNavigator?.onSendTxSuccessful(
+                        viewModel.tariNavigator.onSendTxSuccessful(
                             true,
                             it,
                             viewModel.transactionData

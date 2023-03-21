@@ -37,7 +37,6 @@ import android.view.View
 import com.tari.android.wallet.ui.extension.gone
 import com.tari.android.wallet.ui.fragment.contact_book.contactSelection.ContactSelectionFragment
 import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.PhoneContactDto
-import com.tari.android.wallet.ui.fragment.home.HomeActivity
 
 
 class AddRecipientFragment : ContactSelectionFragment() {
@@ -54,6 +53,6 @@ class AddRecipientFragment : ContactSelectionFragment() {
         super.goToNext()
 
         val user = viewModel.selectedUser.value ?: return
-        HomeActivity.instance.get()?.tariNavigator?.continueToAmount(user, null)
+        viewModel.tariNavigator.continueToAmount(user, null)
     }
 }

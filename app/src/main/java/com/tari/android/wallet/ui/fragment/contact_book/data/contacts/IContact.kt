@@ -5,9 +5,9 @@ import java.io.Serializable
 
 abstract class IContact : Serializable {
 
-    var firstName: String = ""
-    var surname: String = ""
-    var isFavorite: Boolean = false
+    open var firstName: String = ""
+    open var surname: String = ""
+    open var isFavorite: Boolean = false
 
     constructor(firstName: String = "", surname: String = "", isFavorite: Boolean = false) {
         this.firstName = firstName

@@ -12,7 +12,10 @@ import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.google.android.material.tabs.TabLayoutMediator
 import com.tari.android.wallet.R
 import com.tari.android.wallet.databinding.FragmentContactBookRootBinding
+import com.tari.android.wallet.extension.observe
 import com.tari.android.wallet.ui.common.CommonFragment
+import com.tari.android.wallet.ui.extension.PermissionExtensions.runWithPermission
+import com.tari.android.wallet.ui.extension.setVisible
 import com.tari.android.wallet.ui.fragment.contact_book.contacts.ContactsFragment
 import com.tari.android.wallet.ui.fragment.contact_book.favorites.FavoritesFragment
 import com.tari.android.wallet.ui.fragment.home.HomeActivity
@@ -33,9 +36,30 @@ class ContactBookFragment : CommonFragment<FragmentContactBookRootBinding, Conta
         setupUI()
 
         subscribeUI()
+
+        initTests()
+
+        grantPermission()
     }
 
     private fun subscribeUI() = with(viewModel) {
+        observe(contactsRepository.loadingState) {
+            ui.isSyncingProgressBar.setVisible(it.isLoading)
+            ui.syncingStatus.text = it.name + " " + it.time + "ms"
+        }
+    }
+
+    private fun grantPermission() {
+        runWithPermission(android.Manifest.permission.READ_CONTACTS, false) {
+            viewModel.contactsRepository.contactPermission.value = true
+            viewModel.contactsRepository.phoneBookRepositoryBridge.loadFromPhoneBook()
+        }
+    }
+
+    private fun initTests() {
+        ui.testButtons.visibility = View.VISIBLE
+        ui.removeAllButton.setOnClickListener { viewModel.contactsRepository.phoneBookRepositoryBridge.clean() }
+        ui.add1000Button.setOnClickListener { viewModel.contactsRepository.phoneBookRepositoryBridge.addTestContacts() }
     }
 
     private fun setupUI() {

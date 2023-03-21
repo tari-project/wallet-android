@@ -91,7 +91,7 @@ interface TariWalletService {
         out WalletError error
     );
 
-    boolean updateContactAlias(in TariWalletAddress address, in String alias, out WalletError error);
+    boolean updateContact(in TariWalletAddress address, in String alias, boolean isFavorite, out WalletError error);
 
     boolean removeContact(in TariContact contact, out WalletError error);
 

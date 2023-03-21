@@ -325,6 +325,8 @@ dependencies {
     // debugImplementation because LeakCanary should only run in debug builds.
     debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.10'
 
+    implementation 'com.github.vestrel00:contacts-android:0.2.4'
+
     // test
     testImplementation "junit:junit:4.13.2"
     testImplementation 'io.mockk:mockk:1.13.4'

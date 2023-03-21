@@ -4,11 +4,23 @@ import com.tari.android.wallet.model.TariWalletAddress
 
 class MergedContactDto(var ffiContactDto: FFIContactDto, var phoneContactDto: PhoneContactDto) : IContact() {
 
-    init {
-        firstName = phoneContactDto.firstName
-        surname = phoneContactDto.surname
-        isFavorite = phoneContactDto.isFavorite || ffiContactDto.isFavorite
-    }
+    override var firstName: String
+        get() = phoneContactDto.firstName
+        set(value) {
+            phoneContactDto.firstName = value
+        }
+
+    override var surname: String
+        get() = phoneContactDto.surname
+        set(value) {
+            phoneContactDto.surname = value
+        }
+
+    override var isFavorite: Boolean
+        get() = phoneContactDto.isFavorite
+        set(value) {
+            phoneContactDto.isFavorite = value
+        }
 
     override fun filtered(text: String): Boolean = ffiContactDto.filtered(text) || phoneContactDto.filtered(text)
 

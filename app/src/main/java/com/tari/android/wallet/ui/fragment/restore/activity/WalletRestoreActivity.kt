@@ -44,7 +44,6 @@ import com.tari.android.wallet.databinding.ActivityWalletBackupBinding
 import com.tari.android.wallet.di.DiContainer.appComponent
 import com.tari.android.wallet.service.service.WalletServiceLauncher
 import com.tari.android.wallet.ui.common.CommonActivity
-import com.tari.android.wallet.ui.fragment.home.navigation.TariNavigator
 import com.tari.android.wallet.ui.fragment.restore.chooseRestoreOption.ChooseRestoreOptionFragment
 import javax.inject.Inject
 
@@ -67,8 +66,6 @@ class WalletRestoreActivity : CommonActivity<ActivityWalletBackupBinding, Wallet
 
     @Inject
     lateinit var tariSettingsRepository: TariSettingsSharedRepository
-
-    val tariNavigator = TariNavigator(this, sharedPrefsWrapper, migrationManager, tariSettingsRepository)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         appComponent.inject(this)

@@ -25,7 +25,6 @@ import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
 import com.tari.android.wallet.ui.dialog.modular.modules.option.OptionModule
 import com.tari.android.wallet.ui.dialog.modular.modules.space.SpaceModule
 import com.tari.android.wallet.ui.extension.addEnterLeftAnimation
-import com.tari.android.wallet.ui.fragment.home.HomeActivity
 import com.tari.android.wallet.ui.fragment.settings.allSettings.TariVersionModel
 import com.tari.android.wallet.ui.fragment.settings.logs.activity.DebugActivity
 import com.tari.android.wallet.ui.fragment.settings.logs.activity.DebugNavigation
@@ -48,6 +47,8 @@ abstract class CommonActivity<Binding : ViewBinding, VM : CommonViewModel> : App
     fun bindViewModel(viewModel: VM) = with(viewModel) {
         this@CommonActivity.viewModel = viewModel
 
+        viewModel.tariNavigator.activity = this@CommonActivity
+
         setTariTheme(viewModel.tariSettingsSharedRepository.currentTheme!!)
 
         subscribeToCommon(viewModel)
@@ -66,7 +67,7 @@ abstract class CommonActivity<Binding : ViewBinding, VM : CommonViewModel> : App
 
         observe(showToast) { TariToast(this@CommonActivity, it) }
 
-        observe(navigation) { HomeActivity.instance.get()?.tariNavigator?.navigate(it) }
+        observe(navigation) { viewModel.tariNavigator.navigate(it) }
     }
 
     private fun setTariTheme(theme: TariTheme) {

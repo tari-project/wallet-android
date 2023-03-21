@@ -73,7 +73,6 @@ import com.tari.android.wallet.ui.extension.setVisible
 import com.tari.android.wallet.ui.extension.showInternetConnectionErrorDialog
 import com.tari.android.wallet.ui.extension.string
 import com.tari.android.wallet.ui.fragment.contact_book.root.ContactBookFragment
-import com.tari.android.wallet.ui.fragment.home.navigation.TariNavigator
 import com.tari.android.wallet.ui.fragment.home.navigation.TariNavigator.Companion.INDEX_CONTACT_BOOK
 import com.tari.android.wallet.ui.fragment.home.navigation.TariNavigator.Companion.INDEX_HOME
 import com.tari.android.wallet.ui.fragment.home.navigation.TariNavigator.Companion.INDEX_SETTINGS
@@ -115,8 +114,6 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>() {
     lateinit var tariSettingsRepository: TariSettingsSharedRepository
 
     private val deeplinkViewModel: DeeplinkViewModel by viewModels()
-
-    val tariNavigator = TariNavigator(this, sharedPrefsWrapper, migrationManager, tariSettingsRepository)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -206,7 +203,7 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>() {
             if (EventBus.networkConnectionState.publishSubject.value != NetworkConnectionState.CONNECTED) {
                 showInternetConnectionErrorDialog(this)
             } else {
-                tariNavigator.sendToUser(null)
+                viewModel.tariNavigator.sendToUser(null)
             }
         }
     }
@@ -306,7 +303,7 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>() {
         if (screen.orEmpty().isNotEmpty()) {
             when (HomeDeeplinkScreens.parse(screen)) {
                 HomeDeeplinkScreens.TxDetails -> {
-                    (intent.parcelable<TxId>(HomeDeeplinkScreens.KeyTxDetailsArgs))?.let { tariNavigator.toTxDetails(null, it) }
+                    (intent.parcelable<TxId>(HomeDeeplinkScreens.KeyTxDetailsArgs))?.let { viewModel.tariNavigator.toTxDetails(null, it) }
                 }
 
                 else -> {}
@@ -318,7 +315,7 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>() {
 
     private fun processIntentDeepLink(service: TariWalletService, intent: Intent) {
         deeplinkHandler.handle(intent.data?.toString().orEmpty())?.let { deepLink ->
-            (deepLink as? DeepLink.Send)?.let { tariNavigator.sendTariToUser(service, it) }
+            (deepLink as? DeepLink.Send)?.let { viewModel.tariNavigator.sendTariToUser(service, it) }
 
             (deepLink as? DeepLink.AddBaseNode)?.let { deeplinkViewModel.executeAction(this, it) }
         }

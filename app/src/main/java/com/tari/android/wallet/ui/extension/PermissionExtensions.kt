@@ -19,6 +19,8 @@ object PermissionExtensions {
     fun CommonFragment<*, *>.runWithPermission(permission: String, openSettings: Boolean = false, callback: () -> Unit) {
         logger.d("runWithPermissions: start")
 
+        if (this.isDetached) return
+
         if (requireContext().isPermissionGranted(permission)) {
             logger.d("permission granted: $permission")
             callback()
