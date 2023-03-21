@@ -38,14 +38,17 @@ class ContactBookFragment : CommonFragment<FragmentContactBookRootBinding, Conta
         subscribeUI()
 
         initTests()
+    }
 
+    override fun onResume() {
+        super.onResume()
         grantPermission()
     }
 
     private fun subscribeUI() = with(viewModel) {
         observe(contactsRepository.loadingState) {
             ui.isSyncingProgressBar.setVisible(it.isLoading)
-            ui.syncingStatus.text = it.name + " " + it.time + "ms"
+            ui.syncingStatus.text = it.name + " " + it.time + "s"
         }
     }
 

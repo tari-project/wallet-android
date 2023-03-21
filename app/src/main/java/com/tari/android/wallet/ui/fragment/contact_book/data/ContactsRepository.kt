@@ -54,7 +54,7 @@ class ContactsRepository @Inject constructor(
 
     val contactPermission = MutableLiveData(false)
 
-    class LoadingState(val isLoading: Boolean, val name: String, val time: Long = 0)
+    class LoadingState(val isLoading: Boolean, val name: String, val time: Double = 0.0)
 
     init {
         doWithLoading("Parsing from shared prefs") {
@@ -64,10 +64,9 @@ class ContactsRepository @Inject constructor(
     }
 
     private fun doWithLoading(name: String, action: () -> Unit) {
-
         loadingState.postValue(LoadingState(true, name))
         viewModelScope.launch(Dispatchers.IO) {
-            val time = measureNanoTime { action() }
+            val time = measureNanoTime { runCatching { action() } } / 1_000_000_000.0
             action()
             loadingState.postValue(LoadingState(false, name, time))
         }
@@ -245,22 +244,48 @@ class ContactsRepository @Inject constructor(
         }
 
         private fun updateRecentUsedTime(tariContact: TariContact) {
-            val contacts = FFIWallet.instance!!.getContacts()
-            for (contactIndex in 0 until contacts.getLength()) {
-                val actualContact = contacts.getAt(contactIndex)
+            doWithLoading("Updating contact changes to phone and FFI") {
+                updateFFIContacts()
 
-                val walletAddress = actualContact.getWalletAddress()
-                val ffiWalletAddress = TariWalletAddress(walletAddress.toString(), walletAddress.getEmojiId())
-                val alias = actualContact.getAlias()
-                val isFavorite = actualContact.getIsFavorite()
-
-                onFFIContactAddedOrUpdated(ffiWalletAddress, alias, isFavorite)
+                val existContact = publishSubject.value.orEmpty().firstOrNull { it.contact.extractWalletAddress() == tariContact.walletAddress }
+                val contact = existContact ?: ContactDto(FFIContactDto(tariContact.walletAddress, tariContact.alias, tariContact.isFavorite))
+                updateRecentUsedTime(contact)
             }
+        }
 
+        private fun updateFFIContacts() {
+            doWithLoading("Updating FFI contacts") {
+                try {
+                    val contacts = FFIWallet.instance!!.getContacts()
+                    for (contactIndex in 0 until contacts.getLength()) {
+                        val actualContact = contacts.getAt(contactIndex)
 
-            val existContact = publishSubject.value.orEmpty().firstOrNull { it.contact.extractWalletAddress() == tariContact.walletAddress }
-            val contact = existContact ?: ContactDto(FFIContactDto(tariContact.walletAddress))
-            updateRecentUsedTime(contact)
+                        val walletAddress = actualContact.getWalletAddress()
+                        val ffiWalletAddress = TariWalletAddress(walletAddress.toString(), walletAddress.getEmojiId())
+                        val alias = actualContact.getAlias()
+                        val isFavorite = actualContact.getIsFavorite()
+
+                        onFFIContactAddedOrUpdated(ffiWalletAddress, alias, isFavorite)
+                    }
+                } catch (e: Throwable) {
+                    e.printStackTrace()
+                }
+
+                try {
+                    serviceConnection.currentState.service?.let {
+                        val allTxes =
+                            it.getCompletedTxs(WalletError()) + it.getCancelledTxs(WalletError()) + it.getPendingInboundTxs(WalletError()) + it.getPendingOutboundTxs(
+                                WalletError()
+                            )
+                        val allUsers = allTxes.map { it.tariContact }.distinctBy { it.walletAddress }
+                        for (user in allUsers) {
+                            onFFIContactAddedOrUpdated(user.walletAddress, user.alias, user.isFavorite)
+                        }
+                    }
+                } catch (e: Throwable) {
+                    e.printStackTrace()
+                }
+            }
         }
 
         private fun onFFIContactAddedOrUpdated(contact: TariWalletAddress, alias: String, isFavorite: Boolean) {
@@ -299,7 +324,7 @@ class ContactsRepository @Inject constructor(
     inner class PhoneBookRepositoryBridge {
 
         fun clean() {
-            doOnBackground {
+            doWithLoading("cleaning") {
                 try {
                     val contactsIds = contacts.query().include(Fields.DataId).find().map { it.id }
 
@@ -310,16 +335,14 @@ class ContactsRepository @Inject constructor(
                     e.printStackTrace()
                 }
 
-                viewModelScope.launch(Dispatchers.Main) {
-                    withListUpdate {
-                        it.removeAll { it.getPhoneDto() != null }
-                    }
+                withListUpdate {
+                    it.removeAll { it.getPhoneDto() != null }
                 }
             }
         }
 
         fun addTestContacts() {
-            doOnBackground {
+            doWithLoading("Adding test contacts") {
                 try {
                     val newContacts = (1..1000).map {
                         PhoneContact(
@@ -355,6 +378,8 @@ class ContactsRepository @Inject constructor(
         }
 
         fun loadFromPhoneBook() {
+            if (contactPermission.value != true) return
+
             doWithLoading("Loading contacts from phone book") {
                 val contacts = getPhoneContacts()
 
@@ -381,7 +406,7 @@ class ContactsRepository @Inject constructor(
             if (contactPermission.value == true) {
                 doWithLoading("Saving updates to contact book") {
                     try {
-                        withListUpdate { list ->
+                        withListUpdate(true) { list ->
                             val contacts = list.mapNotNull { it.getPhoneDto() }.filter { it.shouldUpdate }
 
                             for (item in contacts) {
