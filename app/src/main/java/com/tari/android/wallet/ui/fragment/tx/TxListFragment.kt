@@ -132,6 +132,11 @@ class TxListFragment : CommonFragment<FragmentTxListBinding, TxListViewModel>(),
         super.onStop()
     }
 
+    override fun onResume() {
+        super.onResume()
+        grantPermission()
+    }
+
     override fun onDestroyView() {
         EventBus.unsubscribe(this)
         EventBus.networkConnectionState.unsubscribe(this)
@@ -241,6 +246,13 @@ class TxListFragment : CommonFragment<FragmentTxListBinding, TxListViewModel>(),
             showNoTxsTextView()
         } else {
             ui.noTxsInfoTextView.gone()
+        }
+    }
+
+    private fun grantPermission() {
+        runWithPermission(android.Manifest.permission.READ_CONTACTS, false) {
+            viewModel.contactsRepository.contactPermission.value = true
+            viewModel.contactsRepository.phoneBookRepositoryBridge.loadFromPhoneBook()
         }
     }
 

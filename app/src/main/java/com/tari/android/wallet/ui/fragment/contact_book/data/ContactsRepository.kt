@@ -174,6 +174,8 @@ class ContactsRepository @Inject constructor(
 
     fun deleteContact(contactDto: ContactDto) {
         withListUpdate {
+            contactDto.getPhoneDto()?.let { phoneContactDto -> phoneBookRepositoryBridge.deleteFromContactBook(phoneContactDto) }
+            contactDto.getFFIDto()?.let { ffiContactDto -> ffiBridge.deleteContact(ffiContactDto) }
             it.remove(getByUuid(contactDto.uuid))
         }
     }
@@ -288,6 +290,18 @@ class ContactsRepository @Inject constructor(
             }
         }
 
+        fun deleteContact(contact: FFIContactDto) {
+            doWithLoading("Deleting contact") {
+                doOnConnectedToWallet {
+                    doOnConnected { service ->
+                        viewModelScope.launch(Dispatchers.IO) {
+                            service.updateContact(contact.walletAddress, "", false, WalletError())
+                        }
+                    }
+                }
+            }
+        }
+
         private fun onFFIContactAddedOrUpdated(contact: TariWalletAddress, alias: String, isFavorite: Boolean) {
             if (ffiContactExist(contact)) {
                 withFFIContact(contact) {
@@ -344,7 +358,7 @@ class ContactsRepository @Inject constructor(
         fun addTestContacts() {
             doWithLoading("Adding test contacts") {
                 try {
-                    val newContacts = (1..1000).map {
+                    val newContacts = (1..100).map {
                         PhoneContact(
                             it.toString(),
                             it.toString(),
@@ -400,6 +414,23 @@ class ContactsRepository @Inject constructor(
                     }
                 }
             }
+        }
+
+        private fun getPhoneContacts(): MutableList<PhoneContact> {
+            val phoneContacts = contacts.query().include(Fields.all()).find()
+            val contacts = phoneContacts.map {
+                val name = it.names().firstOrNull()
+                PhoneContact(
+                    it.id.toString(),
+                    name?.givenName.orEmpty(),
+                    name?.familyName.orEmpty(),
+                    name?.displayName.orEmpty(),
+                    it.photoUri?.toString().orEmpty(),
+                    it.options?.starred ?: false
+                )
+            }
+
+            return contacts.toMutableList()
         }
 
         fun updateToPhoneBook() {
@@ -463,21 +494,10 @@ class ContactsRepository @Inject constructor(
             }
         }
 
-        private fun getPhoneContacts(): MutableList<PhoneContact> {
-            val phoneContacts = contacts.query().include(Fields.all()).find()
-            val contacts = phoneContacts.map {
-                val name = it.names().firstOrNull()
-                PhoneContact(
-                    it.id.toString(),
-                    name?.givenName.orEmpty(),
-                    name?.familyName.orEmpty(),
-                    name?.displayName.orEmpty(),
-                    it.photoUri?.toString().orEmpty(),
-                    it.options?.starred ?: false
-                )
+        fun deleteFromContactBook(contact: PhoneContactDto) {
+            doWithLoading("Deleting contact from contact book") {
+                contacts.delete().contactsWithId(contact.id.toLong()).commit()
             }
-
-            return contacts.toMutableList()
         }
     }
 

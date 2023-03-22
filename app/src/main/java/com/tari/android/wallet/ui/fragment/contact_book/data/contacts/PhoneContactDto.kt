@@ -8,8 +8,7 @@ class PhoneContactDto(
     firstName: String = "",
     surname: String = "",
     isFavorite: Boolean = false
-) :
-    IContact(firstName, surname, isFavorite) {
+) : IContact(firstName, surname, isFavorite) {
 
     var displayName: String = ""
         get() = field.ifEmpty { "$firstName $surname" }

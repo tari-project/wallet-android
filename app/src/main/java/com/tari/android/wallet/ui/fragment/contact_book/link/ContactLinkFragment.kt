@@ -4,10 +4,8 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.tari.android.wallet.R
 import com.tari.android.wallet.databinding.FragmentContactsLinkBinding
 import com.tari.android.wallet.extension.observe
 import com.tari.android.wallet.ui.common.CommonFragment
@@ -38,27 +36,13 @@ class ContactLinkFragment : CommonFragment<FragmentContactsLinkBinding, ContactL
 
     private fun observeUI() = with(viewModel) {
         observe(list) { adapter.update(it) }
-
-        observe(ffiContact) { showTooltip(it) }
     }
 
     private fun initUI() = with(ui) {
         listUi.adapter = adapter
         listUi.layoutManager = LinearLayoutManager(context)
-        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
-            override fun onQueryTextSubmit(query: String?): Boolean = true
 
-            override fun onQueryTextChange(newText: String?): Boolean {
-                viewModel.onSearchQueryChanged(newText.orEmpty())
-                return true
-            }
-        })
         adapter.setClickListener(CommonAdapter.ItemClickListener { item -> viewModel.onContactClick(item) })
-    }
-
-    private fun showTooltip(contactDto: ContactDto) {
-        val walletAddress = contactDto.contact.extractWalletAddress()
-        ui.linkContactMessage.text = getString(R.string.contact_book_contacts_book_link_message, walletAddress.emojiId)
     }
 
     companion object {

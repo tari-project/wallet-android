@@ -15,7 +15,7 @@ import javax.inject.Singleton
 @Singleton
 class MigrationManager @Inject constructor() {
 
-    private val minValidVersion = DefaultArtifactVersion("0.44.0")
+    private val minValidVersion = DefaultArtifactVersion("0.49.0")
 
     private val simpleViewModel = SimpleViewModel()
 

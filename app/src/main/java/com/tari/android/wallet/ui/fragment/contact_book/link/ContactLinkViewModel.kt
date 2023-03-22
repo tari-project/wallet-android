@@ -27,6 +27,7 @@ import com.tari.android.wallet.ui.fragment.contact_book.contacts.adapter.contact
 import com.tari.android.wallet.ui.fragment.contact_book.data.ContactsRepository
 import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.ContactDto
 import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.PhoneContactDto
+import com.tari.android.wallet.ui.fragment.contact_book.link.adapter.link_header.ContactLinkHeaderViewHolderItem
 import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
 import io.reactivex.BackpressureStrategy
 import yat.android.ui.extension.HtmlHelper
@@ -41,6 +42,8 @@ class ContactLinkViewModel : CommonViewModel() {
     val list = MediatorLiveData<MutableList<CommonViewHolderItem>>()
 
     val ffiContact = MutableLiveData<ContactDto>()
+
+    private var searchModule: ContactLinkHeaderViewHolderItem? = null
 
     @Inject
     lateinit var sharedPrefsWrapper: SharedPrefsRepository
@@ -75,6 +78,10 @@ class ContactLinkViewModel : CommonViewModel() {
         val source = contactListSource.value ?: return
         val searchText = searchText.value ?: return
 
+        if (searchModule == null) {
+            searchModule = ContactLinkHeaderViewHolderItem(::onSearchQueryChanged, ffiContact.value!!.contact.extractWalletAddress())
+        }
+
         var list = source.filter { it.contact.contact is PhoneContactDto }
 
         if (searchText.isNotEmpty()) {
@@ -83,7 +90,10 @@ class ContactLinkViewModel : CommonViewModel() {
 
         list = list.sortedBy { it.contact.contact.getAlias().lowercase() }
 
-        this.list.postValue(list.toMutableList())
+        val endList: MutableList<CommonViewHolderItem> = list.toMutableList()
+        endList.add(0, searchModule!!)
+
+        this.list.postValue(endList)
     }
 
     private fun showLinkDialog(phoneContactDto: ContactDto) {

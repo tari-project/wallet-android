@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <com.tari.android.wallet.ui.component.tari.TariPrimaryBackground xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/root_view"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -24,52 +23,11 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/toolbar">
 
-        <androidx.core.widget.NestedScrollView
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/list_ui"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
-            <androidx.appcompat.widget.LinearLayoutCompat
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="vertical">
-
-                <com.tari.android.wallet.ui.component.tari.TariTextView
-                    android:id="@+id/link_contact_message"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginHorizontal="20dp"
-                    android:layout_marginTop="20dp"
-                    android:gravity="center"
-                    android:lineSpacingExtra="8dp"
-                    app:customFont="medium"
-                    tools:text="@string/long_dummy_message" />
-
-                <com.tari.android.wallet.ui.component.tari.TariPrimaryBackground
-                    android:id="@+id/search_view_container"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginHorizontal="20dp"
-                    android:layout_marginTop="20dp"
-                    app:cornerRadius="6dp">
-
-                    <androidx.appcompat.widget.SearchView
-                        android:id="@+id/search_view"
-                        android:layout_width="match_parent"
-                        android:layout_height="46dp"
-                        android:hint="@string/contact_book_search_hint"
-                        app:defaultQueryHint="@string/contact_book_search_hint" />
-
-                </com.tari.android.wallet.ui.component.tari.TariPrimaryBackground>
-
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/list_ui"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="20dp" />
-
-            </androidx.appcompat.widget.LinearLayoutCompat>
-
-        </androidx.core.widget.NestedScrollView>
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp" />
 
     </com.tari.android.wallet.ui.component.tari.TariSecondaryBackground>
 
