@@ -87,11 +87,8 @@ class TxDetailsViewModel : CommonViewModel() {
     fun addOrEditContact() {
         val tx = this.tx.value ?: return
         val contact = contactsRepository.ffiBridge.getContactForTx(tx)
-        if (contact.contact.getAlias().isEmpty()) {
-            navigation.postValue(Navigation.ContactBookNavigation.ToAddContactName(contact))
-        } else {
-            navigation.postValue(Navigation.ContactBookNavigation.ToContactDetails(contact))
-        }
+        navigation.postValue(Navigation.ContactBookNavigation.ToContactDetails(contact))
+
     }
 
     fun openInBlockExplorer() {

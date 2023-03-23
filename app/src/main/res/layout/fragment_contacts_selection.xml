@@ -154,13 +154,38 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/add_recipient_vw_search_container">
 
-        <!-- list -->
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/contacts_list_recycler_view"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:overScrollMode="never"
-            android:scrollbars="none" />
+            android:orientation="vertical">
+
+            <com.tari.android.wallet.ui.component.tari.TariInput
+                android:id="@+id/add_first_name_input"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="25dp"
+                android:layout_marginTop="16dp"
+                android:visibility="gone"
+                app:hintText="@string/contact_book_add_contact_first_name_hint" />
+
+            <com.tari.android.wallet.ui.component.tari.TariInput
+                android:id="@+id/add_surname_input"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="25dp"
+                android:layout_marginTop="16dp"
+                android:visibility="gone"
+                app:hintText="@string/contact_book_add_contact_surname_hint" />
+
+            <!-- list -->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/contacts_list_recycler_view"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:overScrollMode="never"
+                android:scrollbars="none" />
+
+        </LinearLayout>
 
         <!-- depth gradient -->
         <View

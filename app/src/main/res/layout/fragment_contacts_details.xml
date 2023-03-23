@@ -34,5 +34,11 @@
 
     </com.tari.android.wallet.ui.component.tari.TariSecondaryBackground>
 
+    <!-- full emoji id outer container -->
+    <include
+        android:id="@+id/emoji_id_outer_container"
+        layout="@layout/view_full_emoji_id"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
 
 </com.tari.android.wallet.ui.component.tari.TariPrimaryBackground>

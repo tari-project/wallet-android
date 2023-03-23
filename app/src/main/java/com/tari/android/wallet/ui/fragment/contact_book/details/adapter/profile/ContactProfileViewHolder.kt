@@ -4,7 +4,6 @@ import android.net.Uri
 import com.tari.android.wallet.databinding.ItemContactProfileBinding
 import com.tari.android.wallet.ui.common.recyclerView.CommonViewHolder
 import com.tari.android.wallet.ui.common.recyclerView.ViewHolderBuilder
-import com.tari.android.wallet.ui.component.fullEmojiId.EmojiIdSummaryViewController
 import com.tari.android.wallet.ui.component.fullEmojiId.EmojiIdWithYatSummaryViewController
 import com.tari.android.wallet.ui.extension.gone
 import com.tari.android.wallet.ui.extension.setVisible
@@ -19,12 +18,14 @@ class ContactProfileViewHolder(view: ItemContactProfileBinding) :
 
     private val emojiIdSummaryController = EmojiIdWithYatSummaryViewController(ui.participantEmojiIdView)
 
-    init {
-        ui.participantEmojiIdView.emojiIdSummaryContainerView.reset()
-    }
-
     override fun bind(item: ContactProfileViewHolderItem) {
         super.bind(item)
+
+        ui.participantEmojiIdView.emojiIdSummaryContainerView.setOnClickListener {
+            item.show()
+        }
+
+        item.init(ui.participantEmojiIdView)
 
         when (val dto = item.contactDto.contact) {
             is YatContactDto -> {

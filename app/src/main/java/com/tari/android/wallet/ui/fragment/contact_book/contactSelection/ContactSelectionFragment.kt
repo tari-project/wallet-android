@@ -155,7 +155,6 @@ open class ContactSelectionFragment : CommonFragment<FragmentContactsSelectionBi
 
     private fun onItemClick(contactItem: ContactItem?) {
         contactItem?.contact?.let { viewModel.selectedUser.value = it }
-        goToNext()
     }
 
     private fun toggleYatEye() {

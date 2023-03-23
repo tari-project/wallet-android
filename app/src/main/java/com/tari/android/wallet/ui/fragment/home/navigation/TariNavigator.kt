@@ -29,7 +29,6 @@ import com.tari.android.wallet.ui.extension.showInternetConnectionErrorDialog
 import com.tari.android.wallet.ui.extension.string
 import com.tari.android.wallet.ui.fragment.auth.AuthActivity
 import com.tari.android.wallet.ui.fragment.contact_book.add.AddContactFragment
-import com.tari.android.wallet.ui.fragment.contact_book.addContactName.AddContactNameFragment
 import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.ContactDto
 import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.YatContactDto
 import com.tari.android.wallet.ui.fragment.contact_book.details.ContactDetailsFragment
@@ -84,7 +83,6 @@ class TariNavigator @Inject constructor (val prefs: SharedPrefsRepository, val t
             is ContactBookNavigation.ToContactDetails -> toContactDetails(navigation.contact)
             is ContactBookNavigation.ToRequestTari -> toRequestTariFromContact(navigation.contact)
             is ContactBookNavigation.ToSendTari -> toSendTariToContact(navigation.contact)
-            is ContactBookNavigation.ToAddContactName -> toAddContactName(navigation.contact)
             is ContactBookNavigation.ToLinkContact -> toLinkContact(navigation.contact)
             is ContactBookNavigation.BackToContactBook -> backToContactBook()
             is ContactBookNavigation.ToExternalWallet -> toExternalWallet(navigation.connectedWallet)
@@ -220,8 +218,6 @@ class TariNavigator @Inject constructor (val prefs: SharedPrefsRepository, val t
     fun toRequestTariFromContact(contact: ContactDto) = sendToUser(contact)
 
     fun toSendTariToContact(contact: ContactDto) = sendToUser(contact)
-
-    fun toAddContactName(contact: ContactDto) = addFragment(AddContactNameFragment.createFragment(contact))
 
     fun backToContactBook() = popUpTo(ContactBookFragment::class.java.simpleName)
 

@@ -35,7 +35,7 @@ class ContactItemViewHolder(view: ItemContactBinding) : CommonViewHolder<Contact
             is YatContactDto -> {
                 if (dto.yat.isNotEmpty()) {
                     displayFirstEmojiOrText(dto.yat.extractEmojis()[0])
-                    displayAlias(dto.getAlias() + " " + dto.yat)
+                    displayAlias(dto.getAlias())
                 }
             }
 
@@ -56,8 +56,12 @@ class ContactItemViewHolder(view: ItemContactBinding) : CommonViewHolder<Contact
             }
 
             is PhoneContactDto -> {
-                if (dto.avatar.isNotEmpty()) displayAvatar(dto.avatar) else
-                    displayFirstEmojiOrText(dto.getAlias().firstOrNull()?.toString() ?: "C")
+                if (dto.avatar.isNotEmpty()) displayAvatar(dto.avatar) else {
+                    var name = ""
+                    dto.firstName.firstOrNull()?.let { name += it }
+                    dto.surname.firstOrNull()?.let { name += it }
+                    displayFirstEmojiOrText(name.ifEmpty { "C" })
+                }
                 displayAlias(dto.getAlias())
             }
         }

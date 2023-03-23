@@ -122,6 +122,9 @@ class ContactsRepository @Inject constructor(
                 }
 
                 is MergedContactDto -> {
+                    user.ffiContactDto.firstName = firstName
+                    user.ffiContactDto.surname = surname
+                    user.ffiContactDto.isFavorite = contact.contact.isFavorite
                     user.phoneContactDto.firstName = firstName
                     user.phoneContactDto.surname = surname
                     user.phoneContactDto.shouldUpdate = true

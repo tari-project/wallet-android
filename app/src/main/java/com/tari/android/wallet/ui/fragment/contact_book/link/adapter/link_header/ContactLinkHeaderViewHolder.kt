@@ -7,6 +7,7 @@ import com.tari.android.wallet.databinding.ItemContactLinkHeaderBinding
 import com.tari.android.wallet.ui.common.recyclerView.CommonViewHolder
 import com.tari.android.wallet.ui.common.recyclerView.ViewHolderBuilder
 import com.tari.android.wallet.ui.extension.showKeyboard
+import com.tari.android.wallet.util.extractEmojis
 
 class ContactLinkHeaderViewHolder(view: ItemContactLinkHeaderBinding) :
     CommonViewHolder<ContactLinkHeaderViewHolderItem, ItemContactLinkHeaderBinding>(view) {
@@ -26,7 +27,10 @@ class ContactLinkHeaderViewHolder(view: ItemContactLinkHeaderBinding) :
         ui.searchView.requestFocus()
         (ui.searchView.context as? Activity)?.showKeyboard(ui.searchView)
 
-        ui.linkContactMessage.text = itemView.context.getString(R.string.contact_book_contacts_book_link_message, item.walletAddress.emojiId)
+        val emojiId = item.walletAddress.emojiId.extractEmojis()
+        val shortEmojiId = emojiId.take(3) + itemView.context.getString(R.string.emoji_id_bullet_separator) + emojiId.takeLast(3)
+        val shortString = shortEmojiId.joinToString("")
+        ui.linkContactMessage.text = itemView.context.getString(R.string.contact_book_contacts_book_link_message, shortString)
     }
 
     companion object {

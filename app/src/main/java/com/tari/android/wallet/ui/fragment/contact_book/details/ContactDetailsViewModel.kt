@@ -23,7 +23,9 @@ import com.tari.android.wallet.R.string.contact_book_details_delete_button_title
 import com.tari.android.wallet.R.string.contact_book_details_delete_contact
 import com.tari.android.wallet.R.string.contact_book_details_delete_message
 import com.tari.android.wallet.R.string.contact_book_details_edit_title
+import com.tari.android.wallet.databinding.ViewEmojiIdWithYatSummaryBinding
 import com.tari.android.wallet.ui.common.CommonViewModel
+import com.tari.android.wallet.ui.common.SingleLiveEvent
 import com.tari.android.wallet.ui.common.recyclerView.CommonViewHolderItem
 import com.tari.android.wallet.ui.common.recyclerView.items.DividerViewHolderItem
 import com.tari.android.wallet.ui.common.recyclerView.items.SpaceVerticalViewHolderItem
@@ -73,6 +75,10 @@ class ContactDetailsViewModel : CommonViewModel() {
 
     val list = MediatorLiveData<MutableList<CommonViewHolderItem>>()
 
+    val initFullEmojiId = SingleLiveEvent<ViewEmojiIdWithYatSummaryBinding>()
+
+    val showFullEmojiId = SingleLiveEvent<Unit>()
+
     init {
         component.inject(this)
 
@@ -92,7 +98,7 @@ class ContactDetailsViewModel : CommonViewModel() {
 
         val newList = mutableListOf<CommonViewHolderItem>()
 
-        newList.add(ContactProfileViewHolderItem(contact))
+        newList.add(ContactProfileViewHolderItem(contact, { showFullEmojiId.postValue(Unit) }) { initFullEmojiId.postValue(it) })
 
         ContactAction.Send.let {
             if (availableActions.contains(it)) {

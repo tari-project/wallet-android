@@ -41,7 +41,6 @@ import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.component.networkStateIndicator.ConnectionIndicatorViewModel
 import com.tari.android.wallet.ui.fragment.auth.AuthActivity
 import com.tari.android.wallet.ui.fragment.auth.AuthViewModel
-import com.tari.android.wallet.ui.fragment.contact_book.addContactName.AddContactNameViewModel
 import com.tari.android.wallet.ui.fragment.contact_book.contactSelection.ContactSelectionViewModel
 import com.tari.android.wallet.ui.fragment.contact_book.contacts.ContactsViewModel
 import com.tari.android.wallet.ui.fragment.contact_book.details.ContactDetailsViewModel
@@ -177,7 +176,6 @@ interface ApplicationComponent {
     fun inject(viewModel: ContactBookViewModel)
     fun inject(viewModel: ContactDetailsViewModel)
     fun inject(viewModel: ContactsViewModel)
-    fun inject(viewModel: AddContactNameViewModel)
     fun inject(viewModel: ContactLinkViewModel)
     fun inject(viewModel: ContactSelectionViewModel)
     fun inject(viewModel: TxDetailsViewModel)
