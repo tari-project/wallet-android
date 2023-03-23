@@ -43,6 +43,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodeSharedRepository
 import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepositoryImpl
+import com.tari.android.wallet.data.sharedPrefs.securityStages.SecurityStagesRepository
 import com.tari.android.wallet.data.sharedPrefs.tariSettings.TariSettingsSharedRepository
 import com.tari.android.wallet.data.sharedPrefs.tor.TorSharedRepository
 import com.tari.android.wallet.di.ApplicationModule
@@ -50,6 +51,7 @@ import com.tari.android.wallet.ffi.*
 import com.tari.android.wallet.model.*
 import com.tari.android.wallet.model.recovery.WalletRestorationResult
 import com.tari.android.wallet.service.seedPhrase.SeedPhraseRepository
+import com.tari.android.wallet.ui.fragment.contact_book.data.localStorage.ContactSharedPrefRepository
 import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupSettingsRepository
 import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.yat.YatSharedRepository
@@ -73,18 +75,22 @@ class FFIWalletTests {
     private val backupSettingsRepository = BackupSettingsRepository(context, prefs, networkRepository)
     private val yatSharedPrefsRepository = YatSharedRepository(prefs, networkRepository)
     private val tariSettingsRepository = TariSettingsSharedRepository(prefs, networkRepository)
+    private val securityStagesRepository = SecurityStagesRepository(prefs, networkRepository)
+    private val contactSharedPrefRepository = ContactSharedPrefRepository(networkRepository, prefs)
     private val torSharedRepository = TorSharedRepository(prefs, networkRepository)
-    private val sharedPrefsRepository =
-        SharedPrefsRepository(
-            context,
-            prefs,
-            networkRepository,
-            backupSettingsRepository,
-            baseNodeSharedPrefsRepository,
-            yatSharedPrefsRepository,
-            torSharedRepository,
-            tariSettingsRepository
-        )
+    private val sharedPrefsRepository = SharedPrefsRepository(
+        context,
+        prefs,
+        networkRepository,
+        backupSettingsRepository,
+        baseNodeSharedPrefsRepository,
+        yatSharedPrefsRepository,
+        torSharedRepository,
+        tariSettingsRepository,
+        securityStagesRepository,
+        contactSharedPrefRepository
+    )
+
     private val walletDirPath = context.filesDir.absolutePath
 
     private fun clean() {
