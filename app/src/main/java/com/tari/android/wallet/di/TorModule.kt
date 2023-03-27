@@ -64,9 +64,4 @@ class TorModule {
             sock5Password = "123456"
         )
     }
-
-    @Provides
-    @Singleton
-    fun provideTorProxyManager(context: Context, torSharedRepository: TorSharedRepository, torConfig: TorConfig): TorProxyManager =
-        TorProxyManager(context, torSharedRepository, torConfig)
 }

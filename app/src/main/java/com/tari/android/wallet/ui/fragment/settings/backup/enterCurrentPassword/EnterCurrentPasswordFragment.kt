@@ -12,7 +12,7 @@ import com.tari.android.wallet.ui.extension.gone
 import com.tari.android.wallet.ui.extension.postDelayed
 import com.tari.android.wallet.ui.extension.showKeyboard
 import com.tari.android.wallet.ui.extension.visible
-import com.tari.android.wallet.ui.fragment.settings.backup.BackupSettingsRouter
+import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
 
 class EnterCurrentPasswordFragment : CommonFragment<FragmentEnterCurrentPasswordBinding, EnterCurrentPasswordViewModel>() {
 
@@ -37,7 +37,7 @@ class EnterCurrentPasswordFragment : CommonFragment<FragmentEnterCurrentPassword
             val input = (passwordInput.text?.toString() ?: "").toCharArray()
             val backupPassword = viewModel.backupSettingsRepository.backupPassword?.toCharArray() ?: charArrayOf()
             if (input.contentEquals(backupPassword)) {
-                (requireActivity() as BackupSettingsRouter).toChangePassword()
+                viewModel.navigation.postValue(Navigation.BackupSettingsNavigation.ToChangePassword)
             } else {
                 ui.changePasswordCtaTextView.isEnabled = false
                 canEnableChangePasswordCTA = false

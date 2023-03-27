@@ -51,13 +51,12 @@ import com.tari.android.wallet.model.TxId
 import com.tari.android.wallet.ui.extension.PermissionExtensions.isPermissionGranted
 import com.tari.android.wallet.ui.fragment.home.HomeDeeplinkScreens
 import com.tari.android.wallet.util.WalletUtil
+import javax.inject.Inject
+import javax.inject.Singleton
 
-/**
- * Contains helper functions for building and posting notifications.
- *
- * @author The Tari Development Team
- */
-class NotificationHelper(private val context: Context) {
+
+@Singleton
+class NotificationHelper @Inject constructor(private val context: Context) {
 
     companion object {
         // notification channel id

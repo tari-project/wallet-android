@@ -4,6 +4,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewbinding.ViewBinding
+import com.tari.android.wallet.ui.fragment.contact_book.link.adapter.link_header.ContactLinkHeaderViewHolderItem
 
 abstract class CommonAdapter<T : CommonViewHolderItem> : RecyclerView.Adapter<CommonViewHolder<T, ViewBinding>>() {
     private var items: MutableList<T> = mutableListOf()
@@ -14,7 +15,11 @@ abstract class CommonAdapter<T : CommonViewHolderItem> : RecyclerView.Adapter<Co
 
     fun update(newItems: MutableList<T>) {
         items = newItems.toMutableList()
-        notifyDataSetChanged()
+        if(items[0] is ContactLinkHeaderViewHolderItem) {
+            notifyItemRangeChanged(1, items.size - 1)
+        } else {
+            notifyDataSetChanged()
+        }
     }
 
     fun setClickListener(onClickListener: ItemClickListener<T>?) {

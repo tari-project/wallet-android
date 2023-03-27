@@ -42,17 +42,19 @@ typealias FFIContactPtr = Long
 class FFIContact() : FFIBase() {
 
     private external fun jniGetAlias(libError: FFIError): String
+
+    private external fun jniGetIsFavorite(libError: FFIError): Boolean
     private external fun jniGetTariWalletAddress(libError: FFIError): FFIPointer
     private external fun jniDestroy()
-    private external fun jniCreate(alias: String, publicKeyPtr: FFITariWalletAddress, libError: FFIError)
+    private external fun jniCreate(alias: String, isFavorite: Boolean, publicKeyPtr: FFITariWalletAddress, libError: FFIError)
 
     constructor(pointer: FFIPointer) : this() {
         this.pointer = pointer
     }
 
-    constructor(alias: String, ffiTariWalletAddress: FFITariWalletAddress) : this() {
+    constructor(alias: String, ffiTariWalletAddress: FFITariWalletAddress, isFavorite: Boolean = false) : this() {
         if (alias.isNotEmpty()) {
-            runWithError { jniCreate(alias, ffiTariWalletAddress, it) }
+            runWithError { jniCreate(alias, isFavorite, ffiTariWalletAddress, it) }
         } else {
             throw FFIException(message = "Alias is an empty String.")
         }
@@ -61,6 +63,8 @@ class FFIContact() : FFIBase() {
     fun getAlias(): String = runWithError { jniGetAlias(it) }
 
     fun getWalletAddress(): FFITariWalletAddress = runWithError { FFITariWalletAddress(jniGetTariWalletAddress(it)) }
+
+    fun getIsFavorite(): Boolean = runWithError { jniGetIsFavorite(it) }
 
     override fun toString(): String = StringBuilder()
         .append(getAlias())

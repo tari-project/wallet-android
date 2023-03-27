@@ -32,8 +32,14 @@ import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadSpannableModul
 import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadSpannableModuleView
 import com.tari.android.wallet.ui.dialog.modular.modules.imageModule.ImageModule
 import com.tari.android.wallet.ui.dialog.modular.modules.imageModule.ImageModuleView
+import com.tari.android.wallet.ui.dialog.modular.modules.input.InputModule
+import com.tari.android.wallet.ui.dialog.modular.modules.input.InputModuleView
+import com.tari.android.wallet.ui.dialog.modular.modules.yatInput.YatInputModule
+import com.tari.android.wallet.ui.dialog.modular.modules.yatInput.YatInputModuleView
 import com.tari.android.wallet.ui.dialog.modular.modules.option.OptionModule
 import com.tari.android.wallet.ui.dialog.modular.modules.option.OptionModuleView
+import com.tari.android.wallet.ui.dialog.modular.modules.shortEmoji.ShortEmojiIdModule
+import com.tari.android.wallet.ui.dialog.modular.modules.shortEmoji.ShortEmojiModuleView
 import com.tari.android.wallet.ui.dialog.modular.modules.space.SpaceModule
 import com.tari.android.wallet.ui.dialog.modular.modules.space.SpaceModuleView
 import com.tari.android.wallet.ui.fragment.send.addAmount.feeModule.FeeModule
@@ -52,7 +58,6 @@ import com.tari.android.wallet.ui.fragment.utxos.list.module.UtxoAmountModule
 import com.tari.android.wallet.ui.fragment.utxos.list.module.UtxoAmountModuleView
 import com.tari.android.wallet.ui.fragment.utxos.list.module.UtxoSplitModule
 import com.tari.android.wallet.ui.fragment.utxos.list.module.UtxoSplitModuleView
-
 
 open class ModularDialog(val context: Context) : TariDialog {
 
@@ -118,6 +123,9 @@ open class ModularDialog(val context: Context) : TariDialog {
                 is ConnectionStatusesModule -> ConnectionStatusesModuleView(context, module)
                 is SecurityStageHeadModule -> SecurityStageHeadModuleView(context, module)
                 is BackupOnboardingFlowItemModule -> BackupOnboardingFlowItemModuleView(context, module)
+                is YatInputModule -> YatInputModuleView(context, module)
+                is InputModule -> InputModuleView(context, module)
+                is ShortEmojiIdModule-> ShortEmojiModuleView(context, module)
                 else -> View(context)
             }
             root.addView(view)
@@ -130,9 +138,9 @@ open class ModularDialog(val context: Context) : TariDialog {
     }
 
     override fun dismiss() {
-        showAnimation(false, {
+        showAnimation(false) {
             dialog.dismiss()
-        })
+        }
     }
 
     override fun isShowing(): Boolean = dialog.isShowing

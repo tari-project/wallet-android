@@ -49,7 +49,13 @@ import android.widget.TextView
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
-import com.tari.android.wallet.R.string.*
+import com.tari.android.wallet.R.string.back_up_wallet_backing_up_error_desc
+import com.tari.android.wallet.R.string.back_up_wallet_backing_up_error_title
+import com.tari.android.wallet.R.string.back_up_wallet_backing_up_unknown_error
+import com.tari.android.wallet.R.string.change_password_change_password_cta
+import com.tari.android.wallet.R.string.change_password_page_description_general_part
+import com.tari.android.wallet.R.string.change_password_page_description_highlight_part
+import com.tari.android.wallet.R.string.error_no_connection_title
 import com.tari.android.wallet.databinding.FragmentChangeSecurePasswordBinding
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.infrastructure.backup.BackupState
@@ -58,8 +64,15 @@ import com.tari.android.wallet.infrastructure.backup.BackupState.BackupUpToDate
 import com.tari.android.wallet.ui.common.CommonFragment
 import com.tari.android.wallet.ui.dialog.error.ErrorDialogArgs
 import com.tari.android.wallet.ui.dialog.modular.ModularDialog
-import com.tari.android.wallet.ui.extension.*
-import com.tari.android.wallet.ui.fragment.settings.backup.BackupSettingsRouter
+import com.tari.android.wallet.ui.extension.animateClick
+import com.tari.android.wallet.ui.extension.gone
+import com.tari.android.wallet.ui.extension.hideKeyboard
+import com.tari.android.wallet.ui.extension.postDelayed
+import com.tari.android.wallet.ui.extension.scrollToBottom
+import com.tari.android.wallet.ui.extension.scrollToTop
+import com.tari.android.wallet.ui.extension.showKeyboard
+import com.tari.android.wallet.ui.extension.string
+import com.tari.android.wallet.ui.extension.visible
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.net.UnknownHostException
@@ -262,7 +275,7 @@ class ChangeSecurePasswordFragment : CommonFragment<FragmentChangeSecurePassword
         when (backupState) {
             is BackupUpToDate -> {
                 allowExitAndPasswordEditing()
-                (requireActivity() as BackupSettingsRouter).onPasswordChanged()
+                viewModel.tariNavigator.onPasswordChanged()
             }
             is BackupFailed -> { // backup failed
                 showBackupErrorDialog(deductBackupErrorMessage(backupState.backupException)) {

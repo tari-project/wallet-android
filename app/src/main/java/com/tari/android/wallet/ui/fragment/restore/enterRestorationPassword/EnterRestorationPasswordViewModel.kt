@@ -13,6 +13,7 @@ import com.tari.android.wallet.service.service.WalletServiceLauncher
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.common.SingleLiveEvent
 import com.tari.android.wallet.ui.dialog.error.ErrorDialogArgs
+import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
 import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupSettingsRepository
 import com.tari.android.wallet.util.WalletUtil
 import kotlinx.coroutines.Dispatchers
@@ -44,7 +45,7 @@ class EnterRestorationPasswordViewModel : CommonViewModel() {
                 backupSettingsRepository.updateOption(dto)
                 backupManager.backupNow()
 
-                _navigation.postValue(EnterRestorationPasswordNavigation.OnRestore)
+                navigation.postValue(Navigation.EnterRestorationPasswordNavigation.OnRestore)
             }
         }.addTo(compositeDisposable)
 
@@ -59,9 +60,6 @@ class EnterRestorationPasswordViewModel : CommonViewModel() {
 
     private val _state = SingleLiveEvent<EnterRestorationPasswordState>()
     val state: LiveData<EnterRestorationPasswordState> = _state
-
-    private val _navigation = SingleLiveEvent<EnterRestorationPasswordNavigation>()
-    val navigation: LiveData<EnterRestorationPasswordNavigation> = _navigation
 
     fun onBack() {
         _backPressed.postValue(Unit)

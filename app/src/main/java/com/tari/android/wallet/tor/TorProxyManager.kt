@@ -40,6 +40,8 @@ import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.infrastructure.logging.LoggerTags
 import java.io.BufferedReader
 import java.io.InputStreamReader
+import javax.inject.Inject
+import javax.inject.Singleton
 
 /**
  * Manages the installation and the running of the Tor proxy.
@@ -47,7 +49,8 @@ import java.io.InputStreamReader
  *
  * @author The Tari Development Team
  */
-class TorProxyManager(
+@Singleton
+class TorProxyManager @Inject constructor(
     private val context: Context,
     private val torSharedRepository: TorSharedRepository,
     private val torConfig: TorConfig

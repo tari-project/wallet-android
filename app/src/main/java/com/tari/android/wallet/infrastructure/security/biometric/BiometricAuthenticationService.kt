@@ -40,9 +40,11 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import com.tari.android.wallet.R
 import java.util.concurrent.Executor
+import javax.inject.Inject
+import javax.inject.Singleton
 import kotlin.coroutines.suspendCoroutine
 
-class BiometricAuthenticationService(
+class BiometricAuthenticationService constructor(
     private val executor: Executor,
     private val manager: BiometricManager,
     private val keyguardManager: KeyguardManager?

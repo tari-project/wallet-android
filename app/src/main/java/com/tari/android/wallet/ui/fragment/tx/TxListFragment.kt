@@ -34,7 +34,6 @@ package com.tari.android.wallet.ui.fragment.tx
 
 import android.animation.*
 import android.annotation.SuppressLint
-import android.content.Intent
 import android.graphics.drawable.GradientDrawable
 import android.os.*
 import android.view.*
@@ -60,7 +59,7 @@ import com.tari.android.wallet.ui.common.recyclerView.CommonViewHolderItem
 import com.tari.android.wallet.ui.component.networkStateIndicator.ConnectionIndicatorViewModel
 import com.tari.android.wallet.ui.extension.*
 import com.tari.android.wallet.ui.extension.PermissionExtensions.runWithPermission
-import com.tari.android.wallet.ui.fragment.onboarding.activity.OnboardingFlowActivity
+import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
 import com.tari.android.wallet.ui.fragment.tx.adapter.TxListAdapter
 import com.tari.android.wallet.ui.fragment.tx.questionMark.QuestionMarkViewModel
 import com.tari.android.wallet.ui.fragment.tx.ui.CustomScrollView
@@ -118,8 +117,6 @@ class TxListFragment : CommonFragment<FragmentTxListBinding, TxListViewModel>(),
 
         observe(refreshBalanceInfo) { updateBalanceInfoUI(it) }
 
-        observe(navigation) { processNavigation(it) }
-
         observe(txSendSuccessful) { playTxSendSuccessfulAnim() }
 
         observe(list) { updateTxListUI(it) }
@@ -133,6 +130,11 @@ class TxListFragment : CommonFragment<FragmentTxListBinding, TxListViewModel>(),
     override fun onStop() {
         handler.removeCallbacksAndMessages(null)
         super.onStop()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        grantPermission()
     }
 
     override fun onDestroyView() {
@@ -150,6 +152,10 @@ class TxListFragment : CommonFragment<FragmentTxListBinding, TxListViewModel>(),
                 viewModel.logger.i("notification permission checked successfully")
             }
         }
+
+        runWithPermission(android.Manifest.permission.READ_CONTACTS) {
+            viewModel.contactsRepository.phoneBookRepositoryBridge.loadFromPhoneBook()
+        }
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -165,7 +171,7 @@ class TxListFragment : CommonFragment<FragmentTxListBinding, TxListViewModel>(),
         scrollView.setOnTouchListener(this@TxListFragment)
         txRecyclerView.setOnTouchListener(this@TxListFragment)
         walletButton.ui.image.setImageResource(R.drawable.vector_wallet)
-        walletButton.touchListener = { processNavigation(TxListNavigation.ToUtxos) }
+        walletButton.touchListener = { viewModel.navigation.postValue(Navigation.TxListNavigation.ToUtxos) }
 
         headerElevationView.alpha = 0F
         balanceTextView.alpha = 0F
@@ -234,31 +240,19 @@ class TxListFragment : CommonFragment<FragmentTxListBinding, TxListViewModel>(),
         ui.balanceQuestionMark.bindViewModel(questionMarkViewModel)
     }
 
-    private fun processNavigation(navigation: TxListNavigation) {
-        val router = requireActivity() as TxListRouter
-        when (navigation) {
-            TxListNavigation.ToTTLStore -> router.toTTLStore()
-            is TxListNavigation.ToTxDetails -> router.toTxDetails(navigation.tx)
-            is TxListNavigation.ToSendTariToUser -> router.toSendTari(navigation.user)
-            TxListNavigation.ToUtxos -> router.toUtxos()
-            TxListNavigation.ToAllSettings -> router.toAllSettings()
-            TxListNavigation.ToSplashScreen -> toSplash()
-        }
-    }
-
-    private fun toSplash() {
-        val intent = Intent(requireActivity(), OnboardingFlowActivity::class.java)
-        intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
-        startActivity(intent)
-        requireActivity().finishAffinity()
-    }
-
     private fun updateTxListUI(list: MutableList<CommonViewHolderItem>) {
         recyclerViewAdapter.update(list)
         if (list.isEmpty()) {
             showNoTxsTextView()
         } else {
             ui.noTxsInfoTextView.gone()
+        }
+    }
+
+    private fun grantPermission() {
+        runWithPermission(android.Manifest.permission.READ_CONTACTS, false) {
+            viewModel.contactsRepository.contactPermission.value = true
+            viewModel.contactsRepository.phoneBookRepositoryBridge.loadFromPhoneBook()
         }
     }
 

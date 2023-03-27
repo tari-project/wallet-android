@@ -15,7 +15,9 @@ import com.tari.android.wallet.R
 import com.tari.android.wallet.extension.observe
 import com.tari.android.wallet.ui.component.networkStateIndicator.ConnectionIndicatorViewModel
 import com.tari.android.wallet.ui.component.tari.toast.TariToast
-import com.tari.android.wallet.ui.dialog.modular.*
+import com.tari.android.wallet.ui.dialog.modular.DialogArgs
+import com.tari.android.wallet.ui.dialog.modular.ModularDialog
+import com.tari.android.wallet.ui.dialog.modular.ModularDialogArgs
 import com.tari.android.wallet.ui.dialog.modular.modules.body.BodyModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonStyle
@@ -34,9 +36,9 @@ abstract class CommonActivity<Binding : ViewBinding, VM : CommonViewModel> : App
     private val dialogManager = DialogManager()
     private var containerId: Int? = null
 
-    protected lateinit var ui: Binding
+    lateinit var ui: Binding
 
-    protected lateinit var viewModel: VM
+    lateinit var viewModel: VM
 
     private val shakeDetector by lazy { ShakeDetector(this) }
 
@@ -44,6 +46,8 @@ abstract class CommonActivity<Binding : ViewBinding, VM : CommonViewModel> : App
 
     fun bindViewModel(viewModel: VM) = with(viewModel) {
         this@CommonActivity.viewModel = viewModel
+
+        viewModel.tariNavigator.activity = this@CommonActivity
 
         setTariTheme(viewModel.tariSettingsSharedRepository.currentTheme!!)
 
@@ -62,6 +66,8 @@ abstract class CommonActivity<Binding : ViewBinding, VM : CommonViewModel> : App
         observe(loadingDialog) { dialogManager.handleProgress(it) }
 
         observe(showToast) { TariToast(this@CommonActivity, it) }
+
+        observe(navigation) { viewModel.tariNavigator.navigate(it) }
     }
 
     private fun setTariTheme(theme: TariTheme) {
@@ -119,7 +125,7 @@ abstract class CommonActivity<Binding : ViewBinding, VM : CommonViewModel> : App
         overridePendingTransition(R.anim.enter_from_left, R.anim.exit_to_right)
     }
 
-    protected fun addFragment(fragment: Fragment, bundle: Bundle? = null, isRoot: Boolean = false, withAnimation: Boolean = true) {
+    fun addFragment(fragment: Fragment, bundle: Bundle? = null, isRoot: Boolean = false, withAnimation: Boolean = true) {
         bundle?.let { fragment.arguments = it }
         val transaction = supportFragmentManager.beginTransaction()
         if (withAnimation) {
@@ -132,8 +138,8 @@ abstract class CommonActivity<Binding : ViewBinding, VM : CommonViewModel> : App
         transaction.commit()
     }
 
-    protected fun popUpTo(tag: String) {
-        while (supportFragmentManager.fragments.last().tag != tag) {
+    fun popUpTo(tag: String) {
+        while (supportFragmentManager.fragments.last().tag != tag && supportFragmentManager.backStackEntryCount > 0) {
             supportFragmentManager.popBackStackImmediate()
         }
     }

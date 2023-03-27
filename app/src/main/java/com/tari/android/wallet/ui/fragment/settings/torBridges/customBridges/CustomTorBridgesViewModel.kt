@@ -1,13 +1,12 @@
 package com.tari.android.wallet.ui.fragment.settings.torBridges.customBridges
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.WalletManager
 import com.tari.android.wallet.data.sharedPrefs.tor.TorBridgeConfiguration
 import com.tari.android.wallet.data.sharedPrefs.tor.TorSharedRepository
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.dialog.error.ErrorDialogArgs
+import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
 import javax.inject.Inject
 
 class CustomTorBridgesViewModel : CommonViewModel() {
@@ -22,14 +21,11 @@ class CustomTorBridgesViewModel : CommonViewModel() {
         component.inject(this)
     }
 
-    private val _navigation = MutableLiveData<CustomBridgeNavigation>()
-    val navigation: LiveData<CustomBridgeNavigation> = _navigation
-
     fun openRequestPage() = _openLink.postValue(resourceManager.getString(R.string.tor_bridges_url))
 
-    fun navigateToScanQr() = _navigation.postValue(CustomBridgeNavigation.ScanQrCode)
+    fun navigateToScanQr() = navigation.postValue(Navigation.CustomBridgeNavigation.ScanQrCode)
 
-    fun navigateToUploadQr() = _navigation.postValue(CustomBridgeNavigation.UploadQrCode)
+    fun navigateToUploadQr() = navigation.postValue(Navigation.CustomBridgeNavigation.UploadQrCode)
 
     fun connect(inputStr: String) {
         val newBridges = mutableListOf<TorBridgeConfiguration>()

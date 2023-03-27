@@ -53,7 +53,7 @@ class CancelledTx() : Tx(), Parcelable {
     constructor(tx: FFICompletedTx) : this() {
         this.id = tx.getId()
         this.direction = tx.getDirection()
-        this.user = tx.getUser()
+        this.tariContact = tx.getContact()
         this.amount = MicroTari(tx.getAmount())
         this.fee = MicroTari(tx.getFee())
         this.timestamp = tx.getTimestamp()
@@ -68,10 +68,7 @@ class CancelledTx() : Tx(), Parcelable {
     constructor(parcel: Parcel) : this() {
         id = parcel.readS(BigInteger::class.java)
         direction = parcel.readS(Direction::class.java)
-        val userIsContact = parcel.readSerializable() == Contact::class.java
-        user =
-            if (userIsContact) parcel.readP(Contact::class.java)
-            else parcel.readP(User::class.java)
+        tariContact = parcel.readP(TariContact::class.java)
         amount = parcel.readP(MicroTari::class.java)
         fee = parcel.readP(MicroTari::class.java)
         timestamp = parcel.readS(BigInteger::class.java)
@@ -91,8 +88,8 @@ class CancelledTx() : Tx(), Parcelable {
     override fun writeToParcel(parcel: Parcel, flags: Int) {
         parcel.writeSerializable(id)
         parcel.writeSerializable(direction)
-        parcel.writeSerializable(user.javaClass)
-        parcel.writeParcelable(user, flags)
+        parcel.writeSerializable(tariContact.javaClass)
+        parcel.writeParcelable(tariContact, flags)
         parcel.writeParcelable(amount, flags)
         parcel.writeParcelable(fee, flags)
         parcel.writeSerializable(timestamp)

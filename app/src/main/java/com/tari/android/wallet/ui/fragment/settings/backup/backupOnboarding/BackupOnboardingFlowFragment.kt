@@ -63,7 +63,7 @@ class BackupOnboardingFlowFragment : CommonFragment<FragmentBackupOnboardingFlow
         }
 
         private fun openStage1() {
-            HomeActivity.instance.get()?.let {
+            viewModel.tariNavigator.let {
                 it.onBackPressed()
                 it.toWalletBackupWithRecoveryPhrase()
             }
@@ -76,7 +76,7 @@ class BackupOnboardingFlowFragment : CommonFragment<FragmentBackupOnboardingFlow
         }
 
         private fun openStage2() {
-            HomeActivity.instance.get()?.let {
+            viewModel.tariNavigator.let {
                 it.onBackPressed()
                 it.toChangePassword()
             }

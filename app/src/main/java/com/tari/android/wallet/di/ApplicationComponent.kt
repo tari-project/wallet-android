@@ -41,6 +41,11 @@ import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.component.networkStateIndicator.ConnectionIndicatorViewModel
 import com.tari.android.wallet.ui.fragment.auth.AuthActivity
 import com.tari.android.wallet.ui.fragment.auth.AuthViewModel
+import com.tari.android.wallet.ui.fragment.contact_book.contactSelection.ContactSelectionViewModel
+import com.tari.android.wallet.ui.fragment.contact_book.contacts.ContactsViewModel
+import com.tari.android.wallet.ui.fragment.contact_book.details.ContactDetailsViewModel
+import com.tari.android.wallet.ui.fragment.contact_book.link.ContactLinkViewModel
+import com.tari.android.wallet.ui.fragment.contact_book.root.ContactBookViewModel
 import com.tari.android.wallet.ui.fragment.home.HomeActivity
 import com.tari.android.wallet.ui.fragment.home.HomeViewModel
 import com.tari.android.wallet.ui.fragment.onboarding.activity.OnboardingFlowActivity
@@ -59,8 +64,6 @@ import com.tari.android.wallet.ui.fragment.send.addNote.AddNoteFragment
 import com.tari.android.wallet.ui.fragment.send.addNote.AddNoteViewModel
 import com.tari.android.wallet.ui.fragment.send.addNote.gif.ChooseGIFDialogFragment
 import com.tari.android.wallet.ui.fragment.send.addNote.gif.ThumbnailGIFsViewModel
-import com.tari.android.wallet.ui.fragment.send.addRecepient.AddRecipientFragment
-import com.tari.android.wallet.ui.fragment.send.addRecepient.AddRecipientViewModel
 import com.tari.android.wallet.ui.fragment.send.finalize.FinalizeSendTxViewModel
 import com.tari.android.wallet.ui.fragment.send.requestTari.RequestTariViewModel
 import com.tari.android.wallet.ui.fragment.settings.allSettings.AllSettingsViewModel
@@ -87,6 +90,7 @@ import com.tari.android.wallet.ui.fragment.settings.torBridges.customBridges.Cus
 import com.tari.android.wallet.ui.fragment.settings.userAutorization.BiometricAuthenticationViewModel
 import com.tari.android.wallet.ui.fragment.splash.SplashActivity
 import com.tari.android.wallet.ui.fragment.tx.TxListViewModel
+import com.tari.android.wallet.ui.fragment.tx.details.TxDetailsViewModel
 import com.tari.android.wallet.ui.fragment.tx.details.gif.GIFViewModel
 import com.tari.android.wallet.ui.fragment.utxos.list.UtxosListViewModel
 import dagger.Component
@@ -104,7 +108,6 @@ import javax.inject.Singleton
         WalletModule::class,
         ServiceModule::class,
         TorModule::class,
-        BackupAndRestoreModule::class,
         PresentationModule::class,
         YatModule::class
     ]
@@ -123,7 +126,6 @@ interface ApplicationComponent {
     fun inject(activity: QRScannerActivity)
     fun inject(activity: WalletRestoreActivity)
 
-    fun inject(fragment: AddRecipientFragment)
     fun inject(fragment: AddNoteFragment)
     fun inject(fragment: ChooseGIFDialogFragment)
 
@@ -144,7 +146,6 @@ interface ApplicationComponent {
     fun inject(viewModel: AddCustomBaseNodeViewModel)
     fun inject(viewModel: NetworkSelectionViewModel)
     fun inject(viewModel: AllSettingsViewModel)
-    fun inject(viewModel: AddRecipientViewModel)
     fun inject(viewModel: FinalizeSendTxViewModel)
     fun inject(viewModel: WalletInfoViewModel)
     fun inject(viewModel: RequestTariViewModel)
@@ -172,6 +173,12 @@ interface ApplicationComponent {
     fun inject(viewModel: StagedWalletSecurityManager)
     fun inject(viewModel: BackupOnboardingFlowViewModel)
     fun inject(viewModel: BackupOnboardingFlowItemViewModel)
+    fun inject(viewModel: ContactBookViewModel)
+    fun inject(viewModel: ContactDetailsViewModel)
+    fun inject(viewModel: ContactsViewModel)
+    fun inject(viewModel: ContactLinkViewModel)
+    fun inject(viewModel: ContactSelectionViewModel)
+    fun inject(viewModel: TxDetailsViewModel)
 
     fun getClipboardManager(): ClipboardManager
 }

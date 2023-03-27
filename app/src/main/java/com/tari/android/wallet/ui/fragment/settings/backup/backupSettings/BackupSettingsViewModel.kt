@@ -1,13 +1,19 @@
 package com.tari.android.wallet.ui.fragment.settings.backup.backupSettings
 
 import android.content.Intent
-import androidx.lifecycle.*
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.viewModelScope
 import com.tari.android.wallet.R
 import com.tari.android.wallet.event.EventBus
-import com.tari.android.wallet.infrastructure.backup.*
+import com.tari.android.wallet.infrastructure.backup.BackupManager
+import com.tari.android.wallet.infrastructure.backup.BackupState
+import com.tari.android.wallet.infrastructure.backup.BackupStorageAuthRevokedException
+import com.tari.android.wallet.infrastructure.backup.BackupStorageFullException
+import com.tari.android.wallet.infrastructure.backup.BackupsState
 import com.tari.android.wallet.ui.common.CommonViewModel
-import com.tari.android.wallet.ui.common.SingleLiveEvent
 import com.tari.android.wallet.ui.dialog.error.ErrorDialogArgs
+import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
 import com.tari.android.wallet.ui.fragment.settings.backup.backupSettings.option.BackupOptionViewModel
 import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupSettingsRepository
 import com.tari.android.wallet.ui.fragment.settings.userAutorization.BiometricAuthenticationViewModel
@@ -27,9 +33,6 @@ class BackupSettingsViewModel : CommonViewModel() {
     lateinit var biometricAuthenticationViewModel: BiometricAuthenticationViewModel
 
     val options = MutableLiveData<List<BackupOptionViewModel>>()
-
-    private val _navigation = SingleLiveEvent<BackupSettingsNavigation>()
-    val navigation: LiveData<BackupSettingsNavigation> = _navigation
 
     private val _isBackupNowAvailable = MutableLiveData<Boolean>()
     val isBackupNowAvailable: LiveData<Boolean> = _isBackupNowAvailable
@@ -63,22 +66,22 @@ class BackupSettingsViewModel : CommonViewModel() {
 
     fun onBackupWithRecoveryPhrase() {
         biometricAuthenticationViewModel.requireAuthorization {
-            _navigation.postValue(BackupSettingsNavigation.ToWalletBackupWithRecoveryPhrase)
+            navigation.postValue(Navigation.BackupSettingsNavigation.ToWalletBackupWithRecoveryPhrase)
         }
     }
 
     fun onUpdatePassword() {
         biometricAuthenticationViewModel.requireAuthorization {
             if (backupSettingsRepository.backupPassword == null) {
-                _navigation.postValue(BackupSettingsNavigation.ToChangePassword)
+                navigation.postValue(Navigation.BackupSettingsNavigation.ToChangePassword)
             } else {
-                _navigation.postValue(BackupSettingsNavigation.ToConfirmPassword)
+                navigation.postValue(Navigation.BackupSettingsNavigation.ToConfirmPassword)
             }
         }
     }
 
     fun learnMore() {
-        _navigation.postValue(BackupSettingsNavigation.ToLearnMore)
+        navigation.postValue(Navigation.BackupSettingsNavigation.ToLearnMore)
     }
 
     fun onBackupToCloud() = backupManager.backupNow()

@@ -1,11 +1,16 @@
-import org.gradle.api.tasks.testing.logging.TestLogEvent
-
 buildscript {
+    ext {
+
+        agp_version2 = '7.4.2'
+        agp_version1 = '8.1.0-alpha09'
+        agp_version = '7.4.2'
+    }
     ext.kotlin_version = '1.8.10'
+    ext.lifecycle_version = '2.6.0'
 
     // build & version
     ext.buildNumber = 232
-    ext.versionNumber = "0.19.0"
+    ext.versionNumber = "0.20.0"
 
     // JNI libs
     ext.libwalletVersion = "0.44.0"
@@ -14,14 +19,13 @@ buildscript {
 
     repositories {
         google()
-        jcenter()
         mavenCentral()
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:7.3.1'
+        classpath "com.android.tools.build:gradle:$agp_version2"
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-        classpath "io.sentry:sentry-android-gradle-plugin:3.2.0"
+        classpath "io.sentry:sentry-android-gradle-plugin:3.4.2"
     }
 }
 
@@ -34,7 +38,6 @@ allprojects {
         // for yat
         google()
         mavenCentral()
-        jcenter()
         maven { url "https://jitpack.io" }
         maven { url "https://giphy.bintray.com/giphy-sdk" }
         maven { url "https://raw.githubusercontent.com/guardianproject/gpmaven/master" }

@@ -45,12 +45,13 @@ Java_com_tari_android_wallet_ffi_FFIContact_jniCreate(
         JNIEnv *jEnv,
         jobject jThis,
         jstring jAlias,
+        jboolean jIsFavorite,
         jobject jPublicKey,
         jobject error) {
     ExecuteWithError(jEnv, error, [&](int *errorPointer) {
         const char *pAlias = jEnv->GetStringUTFChars(jAlias, JNI_FALSE);
         auto pTariWalletAddress = GetPointerField<TariWalletAddress *>(jEnv, jPublicKey);
-        TariContact *pContact = contact_create(pAlias, pTariWalletAddress, errorPointer);
+        TariContact *pContact = contact_create(pAlias, pTariWalletAddress, jIsFavorite, errorPointer);
         jEnv->ReleaseStringUTFChars(jAlias, pAlias);
         SetPointerField(jEnv, jThis, reinterpret_cast<jlong>(pContact));
     });
@@ -68,6 +69,19 @@ Java_com_tari_android_wallet_ffi_FFIContact_jniGetAlias(
         jstring result = jEnv->NewStringUTF(pAlias);
         string_destroy(const_cast<char *>(pAlias));
         return result;
+    });
+}
+
+extern "C"
+JNIEXPORT jboolean JNICALL
+Java_com_tari_android_wallet_ffi_FFIContact_jniGetIsFavorite(
+        JNIEnv *jEnv,
+        jobject jThis,
+        jobject error) {
+    return ExecuteWithError<jboolean>(jEnv, error, [&](int *errorPointer) {
+        auto pContact = GetPointerField<TariContact *>(jEnv, jThis);
+        bool isFavorite = contact_get_favourite(pContact, errorPointer);
+        return isFavorite;
     });
 }
 

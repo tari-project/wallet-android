@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<com.tari.android.wallet.ui.component.tari.TariAlphaBackground xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="42dp"
+    android:layout_height="42dp"
+    android:layout_marginHorizontal="7dp"
+    android:layout_marginVertical="5dp"
+    android:clickable="true"
+    android:focusable="true"
+    app:backgroundColor="?attr/palette_background_primary"
+    app:alphaBackground="0.15"
+    app:cornerRadius="21dp">
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/badge_item_icon_image_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_centerInParent="true"
+        android:layout_gravity="center"
+        android:src="@drawable/vector_contact_action_send"
+        android:tint="?attr/palette_button_primary_text" />
+
+</com.tari.android.wallet.ui.component.tari.TariAlphaBackground>

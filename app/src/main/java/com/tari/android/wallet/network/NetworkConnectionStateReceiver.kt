@@ -43,13 +43,11 @@ import android.os.Build
 import androidx.annotation.RequiresApi
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.event.EventBus
+import javax.inject.Inject
+import javax.inject.Singleton
 
-/**
- * Receives network connection changes and posts changes to the event bus.
- *
- * @author The Tari Development Team
- */
-class NetworkConnectionStateReceiver : BroadcastReceiver() {
+@Singleton
+class NetworkConnectionStateReceiver @Inject constructor() : BroadcastReceiver() {
 
     private val action = "android.net.conn.CONNECTIVITY_CHANGE"
     val intentFilter = IntentFilter(action)

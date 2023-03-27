@@ -10,7 +10,6 @@ import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.tor.TorProxyManager
 import com.tari.android.wallet.tor.TorProxyState
 import com.tari.android.wallet.ui.common.CommonViewModel
-import com.tari.android.wallet.ui.common.SingleLiveEvent
 import com.tari.android.wallet.ui.dialog.error.ErrorDialogArgs
 import com.tari.android.wallet.ui.dialog.inProgress.ProgressDialogArgs
 import com.tari.android.wallet.ui.dialog.modular.DialogArgs
@@ -19,6 +18,7 @@ import com.tari.android.wallet.ui.dialog.modular.modules.body.BodyModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonStyle
 import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
+import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
 import com.tari.android.wallet.ui.fragment.settings.torBridges.torItem.TorBridgeViewHolderItem
 import javax.inject.Inject
 
@@ -39,9 +39,6 @@ class TorBridgesSelectionViewModel : CommonViewModel() {
 
     private val _torBridges = MutableLiveData<MutableList<TorBridgeViewHolderItem>>()
     val torBridges: LiveData<MutableList<TorBridgeViewHolderItem>> = _torBridges
-
-    private val _navigation = SingleLiveEvent<TorBridgeNavigation>()
-    val navigation: LiveData<TorBridgeNavigation> = _navigation
 
     init {
         loadData()
@@ -75,7 +72,7 @@ class TorBridgesSelectionViewModel : CommonViewModel() {
     fun preselect(torBridgeItem: TorBridgeViewHolderItem) {
         val list = _torBridges.value.orEmpty()
         when (torBridgeItem) {
-            is TorBridgeViewHolderItem.CustomBridges -> _navigation.postValue(TorBridgeNavigation.ToCustomBridges)
+            is TorBridgeViewHolderItem.CustomBridges -> navigation.postValue(Navigation.TorBridgeNavigation.ToCustomBridges)
             is TorBridgeViewHolderItem.Empty -> {
                 list.forEach { it.isSelected = false }
                 torBridgeItem.isSelected = true

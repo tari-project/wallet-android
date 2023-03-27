@@ -33,14 +33,14 @@
 package com.tari.android.wallet.ui.fragment.settings.allSettings
 
 import android.os.Bundle
-import android.view.*
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.tari.android.wallet.databinding.FragmentAllSettingsBinding
 import com.tari.android.wallet.extension.observe
 import com.tari.android.wallet.ui.common.CommonFragment
-import com.tari.android.wallet.ui.fragment.settings.logs.activity.DebugActivity
-import com.tari.android.wallet.ui.fragment.settings.logs.activity.DebugNavigation
 import com.tari.android.wallet.ui.fragment.settings.userAutorization.BiometricAuthenticationViewModel
 
 class AllSettingsFragment : CommonFragment<FragmentAllSettingsBinding, AllSettingsViewModel>() {
@@ -71,27 +71,9 @@ class AllSettingsFragment : CommonFragment<FragmentAllSettingsBinding, AllSettin
     }
 
     private fun observeUI() = with(viewModel) {
-        observe(navigation) { processNavigation(it) }
-
         observe(openYatOnboarding) { yatAdapter.openOnboarding(requireActivity()) }
 
         observe(allSettingsOptions) { optionsAdapter.update(it) }
-    }
-
-    private fun processNavigation(navigation: AllSettingsNavigation) {
-        val router = requireActivity() as AllSettingsRouter
-
-        when (navigation) {
-            AllSettingsNavigation.ToBugReporting -> DebugActivity.launch(requireContext(), DebugNavigation.BugReport)
-            AllSettingsNavigation.ToAbout -> router.toAbout()
-            AllSettingsNavigation.ToBackgroundService -> router.toBackgroundService()
-            AllSettingsNavigation.ToBackupSettings -> router.toBackupSettings()
-            AllSettingsNavigation.ToBaseNodeSelection -> router.toBaseNodeSelection()
-            AllSettingsNavigation.ToDeleteWallet -> router.toDeleteWallet()
-            AllSettingsNavigation.ToNetworkSelection -> router.toNetworkSelection()
-            AllSettingsNavigation.ToTorBridges -> router.toTorBridges()
-            AllSettingsNavigation.ToThemeSelection -> router.toThemeSelection()
-        }
     }
 
     companion object {

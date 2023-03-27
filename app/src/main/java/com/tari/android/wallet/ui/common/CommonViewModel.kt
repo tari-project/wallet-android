@@ -2,8 +2,10 @@ package com.tari.android.wallet.ui.common
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.orhanobut.logger.Logger
 import com.orhanobut.logger.Printer
+import com.tari.android.wallet.R
 import com.tari.android.wallet.application.WalletState
 import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
 import com.tari.android.wallet.data.sharedPrefs.tariSettings.TariSettingsSharedRepository
@@ -21,9 +23,19 @@ import com.tari.android.wallet.ui.common.domain.ResourceManager
 import com.tari.android.wallet.ui.component.tari.toast.TariToastArgs
 import com.tari.android.wallet.ui.dialog.error.WalletErrorArgs
 import com.tari.android.wallet.ui.dialog.inProgress.ProgressDialogArgs
+import com.tari.android.wallet.ui.dialog.modular.DialogArgs
 import com.tari.android.wallet.ui.dialog.modular.ModularDialogArgs
+import com.tari.android.wallet.ui.dialog.modular.modules.body.BodyModule
+import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonModule
+import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonStyle
+import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
+import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
+import com.tari.android.wallet.ui.fragment.home.navigation.TariNavigator
 import com.tari.android.wallet.ui.fragment.settings.themeSelector.TariTheme
 import io.reactivex.disposables.CompositeDisposable
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 open class CommonViewModel : ViewModel() {
@@ -49,6 +61,9 @@ open class CommonViewModel : ViewModel() {
     @Inject
     lateinit var paletteManager: PaletteManager
 
+    @Inject
+    lateinit var tariNavigator: TariNavigator
+
     val logger: Printer
         get() = Logger.t(this::class.simpleName).t(LoggerTags.UI.name)
 
@@ -69,6 +84,9 @@ open class CommonViewModel : ViewModel() {
     protected val _modularDialog = SingleLiveEvent<ModularDialogArgs>()
     val modularDialog: LiveData<ModularDialogArgs> = _modularDialog
 
+    protected val _inputDialog = SingleLiveEvent<ModularDialogArgs>()
+    val inputDialog: LiveData<ModularDialogArgs> = _inputDialog
+
     protected val _loadingDialog = SingleLiveEvent<ProgressDialogArgs>()
     val loadingDialog: LiveData<ProgressDialogArgs> = _loadingDialog
 
@@ -77,6 +95,8 @@ open class CommonViewModel : ViewModel() {
 
     protected val _blockedBackPressed = SingleLiveEvent<Boolean>()
     val blockedBackPressed: LiveData<Boolean> = _blockedBackPressed
+
+    val navigation: SingleLiveEvent<Navigation> = SingleLiveEvent()
 
     init {
         @Suppress("LeakingThis")
@@ -108,16 +128,27 @@ open class CommonViewModel : ViewModel() {
 
     fun doOnConnected(action: (walletService: TariWalletService) -> Unit) {
         serviceConnection.connection.filter { it.status == ServiceConnectionStatus.CONNECTED }.take(1)
-            .doOnError {
-                logger.e(it, it.toString())
-            }.subscribe { action(it.service!!) }
+            .doOnError { logger.e(it, it.toString()) }
+            .subscribe { action(it.service!!) }
             .addTo(compositeDisposable)
     }
 
     fun doOnConnectedToWallet(action: (walletService: FFIWallet) -> Unit) {
-        EventBus.walletState.publishSubject.filter { it == WalletState.Running }.take(1).doOnError {
-            logger.e(it, it.toString())
-        }.subscribe { action(FFIWallet.instance!!) }
+        EventBus.walletState.publishSubject.filter { it == WalletState.Running }.take(1).doOnError { Logger.e(it.toString()) }
+            .subscribe { action(FFIWallet.instance!!) }
             .addTo(compositeDisposable)
     }
+
+    fun openWalletErrorDialog() {
+        val modularArgs = ModularDialogArgs(
+            DialogArgs(), listOf(
+                HeadModule(resourceManager.getString(R.string.common_error_title)),
+                BodyModule(resourceManager.getString(R.string.contact_book_details_connected_wallets_no_application)),
+                ButtonModule(resourceManager.getString(R.string.common_close), ButtonStyle.Close)
+            )
+        )
+        _modularDialog.postValue(modularArgs)
+    }
+
+    fun doOnBackground(action: suspend CoroutineScope.() -> Unit): Job = viewModelScope.launch { action() }
 }

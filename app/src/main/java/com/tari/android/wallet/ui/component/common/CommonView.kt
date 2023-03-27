@@ -67,5 +67,7 @@ abstract class CommonView<VM : CommonViewModel, VB : ViewBinding> : LinearLayout
         viewModel.loadingDialog.observe(viewLifecycle) { dialogManager.handleProgress(it) }
 
         viewModel.showToast.observe(viewLifecycle) { TariToast(context, it) }
+
+        viewModel.navigation.observe(viewLifecycle) { viewModel.tariNavigator.navigate(it) }
     }
 }

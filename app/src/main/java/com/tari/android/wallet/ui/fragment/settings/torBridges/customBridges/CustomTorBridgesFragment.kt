@@ -8,9 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import com.google.gson.Gson
-import com.tari.android.wallet.R
 import com.tari.android.wallet.databinding.FragmentCustomTorBridgesBinding
-import com.tari.android.wallet.extension.observe
 import com.tari.android.wallet.ui.common.CommonFragment
 import com.tari.android.wallet.ui.extension.setOnThrottledClickListener
 import com.tari.android.wallet.ui.fragment.qr.QRScannerActivity
@@ -27,8 +25,6 @@ class CustomTorBridgesFragment : CommonFragment<FragmentCustomTorBridgesBinding,
         bindViewModel(viewModel)
 
         setupViews()
-
-        observeUI()
     }
 
     private fun setupViews() = with(ui) {
@@ -36,21 +32,6 @@ class CustomTorBridgesFragment : CommonFragment<FragmentCustomTorBridgesBinding,
         scanQrCta.setOnThrottledClickListener { viewModel.navigateToScanQr() }
         uploadQrCta.setOnThrottledClickListener { viewModel.navigateToUploadQr() }
         toolbar.rightAction = { viewModel.connect(torBridgeConfiguration.ui.editText.text.toString()) }
-    }
-
-    private fun observeUI() = with(viewModel) {
-        observe(navigation) { processNavigation(it) }
-    }
-
-    private fun processNavigation(navigation: CustomBridgeNavigation) {
-        when (navigation) {
-            CustomBridgeNavigation.ScanQrCode -> {
-                val intent = Intent(requireContext(), QRScannerActivity::class.java)
-                startActivityForResult(intent, QRScannerActivity.REQUEST_QR_SCANNER)
-                requireActivity().overridePendingTransition(R.anim.slide_up, 0)
-            }
-            CustomBridgeNavigation.UploadQrCode -> Unit
-        }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

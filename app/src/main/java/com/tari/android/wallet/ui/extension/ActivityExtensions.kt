@@ -37,10 +37,10 @@ import android.content.Context
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 
-fun Activity.hideKeyboard() =
+fun Activity.hideKeyboard(view: View? = null) =
     (getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager)
-        .hideSoftInputFromWindow((currentFocus ?: View(this)).windowToken, 0)
+        .hideSoftInputFromWindow((currentFocus ?: view ?: View(this)).windowToken, 0)
 
-fun Activity.showKeyboard() =
+fun Activity.showKeyboard(view: View? = null) =
     (getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager)
-        .showSoftInput(currentFocus ?: View(this), InputMethodManager.SHOW_IMPLICIT)
+        .showSoftInput(currentFocus ?: view ?: View(this), InputMethodManager.SHOW_IMPLICIT)
