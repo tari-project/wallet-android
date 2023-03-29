@@ -53,7 +53,8 @@ class ContactProfileViewHolder(view: ItemContactProfileBinding) :
     }
 
     private fun showYat(yatDto: YatDto?) = yatDto?.let { dto ->
-        if (dto.yat.isNotEmpty()) {
+        val yatEmojies = dto.yat.extractEmojis()
+        if (dto.yat.isNotEmpty() && yatEmojies.isNotEmpty()) {
             showFirstCharOrAvatar(dto.yat.extractEmojis()[0])
             emojiIdSummaryController.yat = dto.yat
         }

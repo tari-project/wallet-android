@@ -1,6 +1,8 @@
 package com.tari.android.wallet.ui.fragment.contact_book.data
 
+import android.content.ContentProviderOperation
 import android.content.Context
+import android.provider.ContactsContract
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.tari.android.wallet.data.sharedPrefs.delegates.SerializableTime
@@ -395,6 +397,8 @@ class ContactsRepository @Inject constructor(
                                 it.surname = phoneContact.surname
                                 it.displayName = phoneContact.displayName
                                 it.isFavorite = phoneContact.isFavorite
+//                                it.yat = phoneContact.yat
+//                                it.phoneEmojiId = phoneContact.emojiId
                             }
                         }
                     }
@@ -403,6 +407,7 @@ class ContactsRepository @Inject constructor(
         }
 
         private fun getPhoneContacts(): MutableList<PhoneContact> {
+
             val phoneContacts = contacts.query().include(Fields.all()).find()
             val contacts = phoneContacts.map {
                 val name = it.names().firstOrNull()
@@ -429,9 +434,19 @@ class ContactsRepository @Inject constructor(
                             val contacts = list.mapNotNull { it.getPhoneDto() }.filter { it.shouldUpdate }
 
                             for (item in contacts) {
-                                val contact = PhoneContact(item.id, item.firstName, item.surname, item.displayName, item.avatar, item.yat, item.phoneEmojiId, item.isFavorite)
+                                val contact = PhoneContact(
+                                    item.id,
+                                    item.firstName,
+                                    item.surname,
+                                    item.displayName,
+                                    item.avatar,
+                                    item.yat,
+                                    item.phoneEmojiId,
+                                    item.isFavorite
+                                )
                                 saveNamesToPhoneBook(contact)
                                 saveStarredToPhoneBook(contact)
+//                                saveCustomFieldsToPhoneBook(contact)
                                 item.shouldUpdate = false
                             }
                         }
@@ -482,6 +497,26 @@ class ContactsRepository @Inject constructor(
             }
         }
 
+        private fun saveCustomFieldsToPhoneBook(contact: PhoneContact) {
+            runCatching {
+                val operations = arrayListOf<ContentProviderOperation>()
+
+                ContentProviderOperation.newInsert(ContactsContract.Data.CONTENT_URI)
+                    .withValueBackReference(ContactsContract.Data.RAW_CONTACT_ID, contact.id.toInt())
+                    .withValue(ContactsContract.Data.MIMETYPE, "vnd.android.cursor.item/com.tari.android.wallet.yat")
+                    .withValue("data1", contact.yat)
+                    .build().apply { operations.add(this) }
+
+                ContentProviderOperation.newInsert(ContactsContract.Data.CONTENT_URI)
+                    .withValueBackReference(ContactsContract.Data.RAW_CONTACT_ID, contact.id.toInt())
+                    .withValue(ContactsContract.Data.MIMETYPE, "vnd.android.cursor.item/com.tari.android.wallet.emojiId")
+                    .withValue("data1", contact.emojiId)
+                    .build().apply { operations.add(this) }
+
+                context.contentResolver.applyBatch(ContactsContract.AUTHORITY, operations)
+            }
+        }
+
         fun deleteFromContactBook(contact: PhoneContactDto) {
             doWithLoading("Deleting contact from contact book") {
                 contacts.delete().contactsWithId(contact.id.toLong()).commit()
@@ -501,7 +536,6 @@ class ContactsRepository @Inject constructor(
     ) {
         fun toPhoneContactDto(): PhoneContactDto = PhoneContactDto(id, avatar, firstName, surname, yat, isFavorite).apply {
             this.displayName = displayName
-            this.phoneEmojiId = phoneEmojiId
         }
     }
 }
