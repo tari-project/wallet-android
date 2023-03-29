@@ -159,9 +159,13 @@ class NotificationHelper @Inject constructor(private val context: Context) {
         }
 
         // send group notification
-        notificationManager.notify(APP_NOTIFICATION_GROUP_ID, txGroupNotification)
-        // send actual notification
-        notificationManager.notify(tx.id.toInt(), notification)
+        try {
+            notificationManager.notify(APP_NOTIFICATION_GROUP_ID, txGroupNotification)
+            // send actual notification
+            notificationManager.notify(tx.id.toInt(), notification)
+        } catch (e: SecurityException) {
+            e.printStackTrace()
+        }
     }
 
     fun postTxCanceledNotification(tx: CancelledTx) {
@@ -188,10 +192,14 @@ class NotificationHelper @Inject constructor(private val context: Context) {
             priority = NotificationCompat.PRIORITY_MAX
             build()
         }
-        // send group notification
-        notificationManager.notify(APP_NOTIFICATION_GROUP_ID, txGroupNotification)
-        // send actual notification
-        notificationManager.notify(tx.id.toInt(), notification)
+
+        try {
+            notificationManager.notify(APP_NOTIFICATION_GROUP_ID, txGroupNotification)
+            // send actual notification
+            notificationManager.notify(tx.id.toInt(), notification)
+        } catch (e: SecurityException) {
+            e.printStackTrace()
+        }
     }
 
     /**
@@ -212,8 +220,11 @@ class NotificationHelper @Inject constructor(private val context: Context) {
             build()
         }
 
-        // send notification
-        notificationManager.notify(APP_NOTIFICATION_GROUP_ID, txGroupNotification)
-        notificationManager.notify(System.currentTimeMillis().toInt(), notification)
+        try {
+            notificationManager.notify(APP_NOTIFICATION_GROUP_ID, txGroupNotification)
+            notificationManager.notify(System.currentTimeMillis().toInt(), notification)
+        } catch (e: SecurityException) {
+            e.printStackTrace()
+        }
     }
 }
