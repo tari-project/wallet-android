@@ -37,7 +37,7 @@ class ContactBookFragment : CommonFragment<FragmentContactBookRootBinding, Conta
 
         subscribeUI()
 
-        initTests()
+//        initTests()
     }
 
     override fun onResume() {
@@ -80,6 +80,8 @@ class ContactBookFragment : CommonFragment<FragmentContactBookRootBinding, Conta
         ui.searchView.setOnQueryTextFocusChangeListener { _, hasFocus ->
             (requireActivity() as? HomeActivity)?.setBottomBarVisibility(!hasFocus)
         }
+
+        ui.searchView.setIconifiedByDefault(false)
 
         ui.toolbar.rightAction = { viewModel.navigation.postValue(Navigation.ContactBookNavigation.ToAddContact) }
 

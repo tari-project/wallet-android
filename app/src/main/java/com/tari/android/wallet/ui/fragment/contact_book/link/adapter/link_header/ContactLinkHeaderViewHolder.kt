@@ -24,6 +24,8 @@ class ContactLinkHeaderViewHolder(view: ItemContactLinkHeaderBinding) :
             }
         })
 
+        ui.searchView.setIconifiedByDefault(false)
+
         ui.searchView.requestFocus()
         (ui.searchView.context as? Activity)?.showKeyboard(ui.searchView)
 

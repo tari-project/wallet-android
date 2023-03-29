@@ -11,6 +11,7 @@ import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.FFIContact
 import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.MergedContactDto
 import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.PhoneContactDto
 import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.YatDto
+import com.tari.android.wallet.util.containsNonEmoji
 import com.tari.android.wallet.util.extractEmojis
 
 class ContactProfileViewHolder(view: ItemContactProfileBinding) :
@@ -37,7 +38,7 @@ class ContactProfileViewHolder(view: ItemContactProfileBinding) :
             is MergedContactDto -> {
                 val yat = item.contactDto.getYatDto()?.yat.orEmpty()
                 emojiIdSummaryController.yat = yat
-                showFirstCharOrAvatar(yat.ifEmpty { dto.ffiContactDto.walletAddress.emojiId }.extractEmojis()[0], dto.phoneContactDto.avatar)
+                showFirstCharOrAvatar(dto.ffiContactDto.walletAddress.emojiId.extractEmojis()[0], dto.phoneContactDto.avatar)
                 showEmojiId(dto.ffiContactDto.walletAddress.emojiId)
                 showAlias(dto.phoneContactDto.getAlias())
                 showYat(dto.phoneContactDto.yatDto)
@@ -53,9 +54,9 @@ class ContactProfileViewHolder(view: ItemContactProfileBinding) :
     }
 
     private fun showYat(yatDto: YatDto?) = yatDto?.let { dto ->
-        val yatEmojies = dto.yat.extractEmojis()
-        if (dto.yat.isNotEmpty() && yatEmojies.isNotEmpty()) {
-            showFirstCharOrAvatar(dto.yat.extractEmojis()[0])
+        val extracted = dto.yat.extractEmojis()
+        if (dto.yat.isNotEmpty() && !dto.yat.containsNonEmoji() && extracted.isNotEmpty()) {
+            showFirstCharOrAvatar(extracted[0])
             emojiIdSummaryController.yat = dto.yat
         }
     }

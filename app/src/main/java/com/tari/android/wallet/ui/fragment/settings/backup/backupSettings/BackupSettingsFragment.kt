@@ -70,6 +70,7 @@ class BackupSettingsFragment : CommonFragment<FragmentWalletBackupSettingsBindin
     override fun onResume() {
         super.onResume()
         onActivityResult(0, 0, null)
+        viewModel.backupStateChanged.postValue(Unit)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

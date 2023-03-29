@@ -119,6 +119,7 @@ class TariNavigator @Inject constructor (val prefs: SharedPrefsRepository, val t
             Navigation.TorBridgeNavigation.ToCustomBridges -> toCustomTorBridges()
             Navigation.BaseNodeNavigation.ToAddCustomBaseNode -> toAddCustomBaseNode()
             Navigation.VerifySeedPhraseNavigation.ToSeedPhraseVerificationComplete -> onSeedPhraseVerificationComplete()
+            is Navigation.VerifySeedPhraseNavigation.ToSeedPhraseVerification -> toSeedPhraseVerification(navigation.seedWords)
             Navigation.BackupSettingsNavigation.ToChangePassword -> toChangePassword()
             Navigation.BackupSettingsNavigation.ToConfirmPassword -> toConfirmPassword()
             Navigation.BackupSettingsNavigation.ToWalletBackupWithRecoveryPhrase -> toWalletBackupWithRecoveryPhrase()

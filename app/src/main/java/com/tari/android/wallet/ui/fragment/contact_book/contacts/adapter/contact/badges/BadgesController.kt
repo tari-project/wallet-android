@@ -90,7 +90,7 @@ class BadgesController(val view: ItemContactBinding) {
             }
         }
 
-        if (isOpen) badgeViewModel?.openNew { process(false) }
+        if (isOpen) badgeViewModel?.openNew(contactItem) { process(false) }
     }
 
     private fun hideBadges() {
