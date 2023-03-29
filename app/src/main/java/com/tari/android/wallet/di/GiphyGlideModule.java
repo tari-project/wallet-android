@@ -48,5 +48,4 @@ public class GiphyGlideModule extends AppGlideModule {
     public void applyOptions(@NonNull Context context, @NonNull GlideBuilder builder) {
         builder.setMemoryCache(new LruResourceCache(30 * 1024 * 1024));
     }
-
 }

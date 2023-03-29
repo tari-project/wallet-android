@@ -67,7 +67,9 @@ class ContactLinkViewModel : CommonViewModel() {
     }
 
     fun onContactClick(item: CommonViewHolderItem) {
-        showLinkDialog((item as ContactItem).contact)
+        (item as? ContactItem)?.let {
+            showLinkDialog(it.contact)
+        }
     }
 
     fun onSearchQueryChanged(query: String) {

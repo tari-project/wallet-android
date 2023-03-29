@@ -82,6 +82,15 @@ class TorProxyManager @Inject constructor(
      * Executes shell command.
      */
     private fun exec(command: String) {
+        try {
+            val response = Runtime.getRuntime().exec("killall tor")
+            response.waitFor()
+            val responseText = BufferedReader(InputStreamReader(response.inputStream)).use(BufferedReader::readText)
+            println(responseText)
+        } catch (e: Throwable) {
+            e.printStackTrace()
+        }
+
         val process = Runtime.getRuntime().exec(command)
         logger.i("Tor process started")
         EventBus.torProxyState.post(TorProxyState.Initializing(null))

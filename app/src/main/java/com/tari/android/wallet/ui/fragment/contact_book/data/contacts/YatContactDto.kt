@@ -2,16 +2,14 @@ package com.tari.android.wallet.ui.fragment.contact_book.data.contacts
 
 import com.google.gson.annotations.SerializedName
 import com.tari.android.wallet.R
-import com.tari.android.wallet.model.TariWalletAddress
 import yat.android.data.YatRecordType
 import yat.android.sdk.models.PaymentAddressResponseResult
 import java.io.Serializable
 import java.lang.reflect.Field
 
-class YatContactDto(walletAddress: TariWalletAddress, var yat: String, var connectedWallets: List<ConnectedWallet> = listOf(), alias: String = "") :
-    FFIContactDto(walletAddress, alias) {
+class YatDto(var yat: String, var connectedWallets: List<ConnectedWallet> = listOf()) {
 
-    override fun filtered(text: String): Boolean = super.filtered(text) || yat.contains(text, true)
+    fun filtered(text: String): Boolean = yat.contains(text, true)
 
     class ConnectedWallet(val key: String, val value: PaymentAddressResponseResult) : Serializable {
 

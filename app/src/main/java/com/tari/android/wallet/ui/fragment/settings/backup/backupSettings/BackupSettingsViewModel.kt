@@ -37,8 +37,7 @@ class BackupSettingsViewModel : CommonViewModel() {
     private val _isBackupNowAvailable = MutableLiveData<Boolean>()
     val isBackupNowAvailable: LiveData<Boolean> = _isBackupNowAvailable
 
-    private val _backupStateChanged = MutableLiveData<Unit>()
-    val backupStateChanged: LiveData<Unit> = _backupStateChanged
+    val backupStateChanged = MutableLiveData<Unit>()
 
     private val _updatePasswordEnabled = MutableLiveData<Boolean>()
     val setPasswordVisible: LiveData<Boolean> = _updatePasswordEnabled
@@ -48,7 +47,7 @@ class BackupSettingsViewModel : CommonViewModel() {
 
         EventBus.backupState.subscribe(this, this::onBackupStateChanged)
 
-        _backupStateChanged.postValue(Unit)
+        backupStateChanged.postValue(Unit)
 
         options.postValue(backupSettingsRepository.getOptionList.map { option -> BackupOptionViewModel().apply { setup(option.type) } })
 

@@ -12,7 +12,7 @@ import com.tari.android.wallet.ui.fragment.contact_book.contacts.adapter.contact
 import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.FFIContactDto
 import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.MergedContactDto
 import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.PhoneContactDto
-import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.YatContactDto
+import com.tari.android.wallet.util.containsNonEmoji
 import com.tari.android.wallet.util.extractEmojis
 
 class ContactItemViewHolder(view: ItemContactBinding) : CommonViewHolder<ContactItem, ItemContactBinding>(view) {
@@ -22,23 +22,10 @@ class ContactItemViewHolder(view: ItemContactBinding) : CommonViewHolder<Contact
     private val badgesController: BadgesController by lazy { BadgesController(view) }
 
     override fun bind(item: ContactItem) {
-        item.toggleBadges = { }
-
         super.bind(item)
-
-        item.toggleBadges = badgesController::process
-        badgesController.notifyAction = item.notifyToggling
-
         badgesController.bind(item)
 
         when (val dto = item.contact.contact) {
-            is YatContactDto -> {
-                if (dto.yat.isNotEmpty()) {
-                    displayFirstEmojiOrText(dto.yat.extractEmojis()[0])
-                    displayAlias(dto.getAlias())
-                }
-            }
-
             is FFIContactDto -> {
                 displayFirstEmojiOrText(dto.walletAddress.emojiId.extractEmojis()[0])
                 if (dto.getAlias().isEmpty()) {
@@ -49,10 +36,10 @@ class ContactItemViewHolder(view: ItemContactBinding) : CommonViewHolder<Contact
             }
 
             is MergedContactDto -> {
-                val yat = item.contact.getYatDto()?.yat.orEmpty()
                 if (dto.phoneContactDto.avatar.isNotEmpty()) displayAvatar(dto.phoneContactDto.avatar) else
-                    displayFirstEmojiOrText(yat.ifEmpty { dto.ffiContactDto.walletAddress.emojiId }.extractEmojis()[0])
-                displayAlias(dto.phoneContactDto.getAlias() + " " + yat)
+                    displayFirstEmojiOrText(dto.ffiContactDto.walletAddress.emojiId.extractEmojis()[0])
+                displayAlias(dto.phoneContactDto.getAlias())
+                displayYat(dto.phoneContactDto.yat)
             }
 
             is PhoneContactDto -> {
@@ -63,11 +50,19 @@ class ContactItemViewHolder(view: ItemContactBinding) : CommonViewHolder<Contact
                     displayFirstEmojiOrText(name.ifEmpty { "C" })
                 }
                 displayAlias(dto.getAlias())
+                displayYat(dto.yat)
             }
         }
 
         ui.contactIconType.setImageResource(item.contact.getTypeIcon())
         ui.starred.setVisible(item.contact.contact.isFavorite)
+    }
+
+    private fun displayYat(yat: String) {
+        val extracted = yat.extractEmojis()
+        if (yat.isNotEmpty() && !yat.containsNonEmoji() && extracted.isNotEmpty()) {
+            ui.firstEmojiTextView.text = extracted[0]
+        }
     }
 
     private fun displayAvatar(url: String) {

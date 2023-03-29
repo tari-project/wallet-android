@@ -5,7 +5,6 @@ import android.net.Uri
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import com.tari.android.wallet.R
-import com.tari.android.wallet.application.MigrationManager
 import com.tari.android.wallet.application.deeplinks.DeepLink
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.data.sharedPrefs.tariSettings.TariSettingsSharedRepository
@@ -30,7 +29,7 @@ import com.tari.android.wallet.ui.extension.string
 import com.tari.android.wallet.ui.fragment.auth.AuthActivity
 import com.tari.android.wallet.ui.fragment.contact_book.add.AddContactFragment
 import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.ContactDto
-import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.YatContactDto
+import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.YatDto
 import com.tari.android.wallet.ui.fragment.contact_book.details.ContactDetailsFragment
 import com.tari.android.wallet.ui.fragment.contact_book.link.ContactLinkFragment
 import com.tari.android.wallet.ui.fragment.contact_book.root.ContactBookFragment
@@ -120,6 +119,7 @@ class TariNavigator @Inject constructor (val prefs: SharedPrefsRepository, val t
             Navigation.TorBridgeNavigation.ToCustomBridges -> toCustomTorBridges()
             Navigation.BaseNodeNavigation.ToAddCustomBaseNode -> toAddCustomBaseNode()
             Navigation.VerifySeedPhraseNavigation.ToSeedPhraseVerificationComplete -> onSeedPhraseVerificationComplete()
+            is Navigation.VerifySeedPhraseNavigation.ToSeedPhraseVerification -> toSeedPhraseVerification(navigation.seedWords)
             Navigation.BackupSettingsNavigation.ToChangePassword -> toChangePassword()
             Navigation.BackupSettingsNavigation.ToConfirmPassword -> toConfirmPassword()
             Navigation.BackupSettingsNavigation.ToWalletBackupWithRecoveryPhrase -> toWalletBackupWithRecoveryPhrase()
@@ -154,7 +154,6 @@ class TariNavigator @Inject constructor (val prefs: SharedPrefsRepository, val t
         prefs.onboardingAuthSetupCompleted = true
         prefs.onboardingDisplayedAtHome = true
         tariSettingsSharedRepository.isRestoredWallet = true
-        MigrationManager().updateWalletVersion()
 
         activity.finish()
         activity.startActivity(Intent(this.activity, AuthActivity::class.java).apply {
@@ -223,7 +222,7 @@ class TariNavigator @Inject constructor (val prefs: SharedPrefsRepository, val t
 
     fun toLinkContact(contact: ContactDto) = addFragment(ContactLinkFragment.createFragment(contact))
 
-    fun toExternalWallet(connectedWallet: YatContactDto.ConnectedWallet) {
+    fun toExternalWallet(connectedWallet: YatDto.ConnectedWallet) {
 
         try {
             val externalAddress = connectedWallet.getExternalLink()
@@ -275,12 +274,8 @@ class TariNavigator @Inject constructor (val prefs: SharedPrefsRepository, val t
         addFragment(AddNoteFragment(), bundle)
     }
 
-    fun continueToFinalizing(transactionData: TransactionData) {
-        continueToFinalizeSendTx(transactionData)
-    }
-
     fun continueToFinalizeSendTx(transactionData: TransactionData) {
-        if (transactionData.recipientContact?.contact is YatContactDto) {
+        if (transactionData.recipientContact?.getYatDto() != null) {
             (activity as HomeActivity).viewModel.yatAdapter.showOutcomingFinalizeActivity(this.activity, transactionData)
         } else {
             addFragment(FinalizeSendTxFragment.create(transactionData))

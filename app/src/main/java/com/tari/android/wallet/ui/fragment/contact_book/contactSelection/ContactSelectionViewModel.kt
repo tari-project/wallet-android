@@ -20,7 +20,7 @@ import com.tari.android.wallet.ui.fragment.contact_book.contacts.adapter.contact
 import com.tari.android.wallet.ui.fragment.contact_book.data.ContactsRepository
 import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.ContactDto
 import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.FFIContactDto
-import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.YatContactDto
+import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.YatDto
 import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.extractEmojis
 import com.tari.android.wallet.yat.YatAdapter
@@ -51,7 +51,7 @@ open class ContactSelectionViewModel : CommonViewModel() {
 
     val clipboardChecker = MediatorLiveData<Unit>()
 
-    val foundYatUser: SingleLiveEvent<Optional<YatContactDto>> = SingleLiveEvent()
+    val foundYatUser: SingleLiveEvent<Optional<YatDto>> = SingleLiveEvent()
 
     @Inject
     lateinit var yatAdapter: YatAdapter
@@ -129,7 +129,7 @@ open class ContactSelectionViewModel : CommonViewModel() {
         searchingJob = viewModelScope.launch(Dispatchers.IO) {
             yatAdapter.searchTariYats(query)?.result?.entries?.firstOrNull()?.let { response ->
                 walletService.getWalletAddressFromHexString(response.value.address)?.let { pubKey ->
-                    val yatUser = YatContactDto(pubKey, query).apply { yat = query }
+                    val yatUser = YatDto(query)
                     foundYatUser.postValue(Optional.ofNullable(yatUser))
                 }
             }

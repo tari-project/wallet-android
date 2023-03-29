@@ -8,6 +8,7 @@ import com.tari.android.wallet.databinding.ItemContactBinding
 import com.tari.android.wallet.ui.common.domain.PaletteManager
 import com.tari.android.wallet.ui.extension.setLayoutWidth
 import com.tari.android.wallet.ui.extension.setVisible
+import com.tari.android.wallet.ui.fragment.contact_book.contacts.BadgeViewModel
 import com.tari.android.wallet.ui.fragment.contact_book.contacts.adapter.contact.ContactItem
 import com.tari.android.wallet.ui.fragment.contact_book.data.ContactAction
 
@@ -15,20 +16,26 @@ import com.tari.android.wallet.ui.fragment.contact_book.data.ContactAction
 class BadgesController(val view: ItemContactBinding) {
 
     private var isOpen = false
-    var notifyAction: (ContactItem) -> Unit = { }
+    var badgeViewModel: BadgeViewModel? = null
     private lateinit var contactItem: ContactItem
 
     private var lastAnimator: ValueAnimator? = null
-
-    private val actions = mutableListOf<ContactAction>()
 
     init {
         view.profileBadgesContainer.updateBack(backColor = PaletteManager().getPurpleBrand(view.root.context))
         view.profileBadgesContainer.switch(false)
         view.profileBadgesContainerInner.outlineProvider = view.profileBadgesContainer.outlineProvider
+
+        availableContactActions.forEach { contactAction ->
+            BadgeItem(contactAction.icon) { performAction(contactAction) }.let { badgeItem ->
+                view.badgesContainer.addView(BadgeItemView(view.root.context).apply { this.setItem(badgeItem, contactAction) })
+            }
+        }
     }
 
     fun bind(item: ContactItem) {
+        badgeViewModel = item.badgeViewModel
+        hideBadges()
         contactItem = item
         isOpen = false
 
@@ -38,17 +45,12 @@ class BadgesController(val view: ItemContactBinding) {
             view.profileContainer.setOnClickListener { toggle() }
         }
 
-        actions.clear()
         val contactActions = item.contact.getContactActions()
-        actions.addAll(availableContactActions.filter { contactAction -> contactActions.contains(contactAction) })
 
-        view.badgesContainer.removeAllViews()
-        actions.forEach { contactAction ->
-            BadgeItem(contactAction.icon) { performAction(contactAction) }.let { badgeItem ->
-                view.badgesContainer.addView(BadgeItemView(view.root.context).apply { this.setItem(badgeItem) })
-            }
+        for (child in 0 until view.badgesContainer.childCount) {
+            val badgeItemView = view.badgesContainer.getChildAt(child) as BadgeItemView
+            badgeItemView.setVisible(contactActions.contains(badgeItemView.contactAction), View.GONE)
         }
-        view.badgesContainer.setVisible(false, View.INVISIBLE)
     }
 
     fun toggle() = process(!isOpen)
@@ -59,8 +61,7 @@ class BadgesController(val view: ItemContactBinding) {
         isOpen = newState
 
         if (isOpen) {
-            view.badgesContainer.setVisible(true, View.INVISIBLE)
-            view.profileBadgesContainer.switch(true)
+            showBadges()
         }
 
         val startValue = if (isOpen) 0f else 1f
@@ -81,8 +82,7 @@ class BadgesController(val view: ItemContactBinding) {
                 }
                 addListener(doOnEnd {
                     if (!isOpen) {
-                        view.badgesContainer.setVisible(false, View.INVISIBLE)
-                        view.profileBadgesContainer.switch(false)
+                        hideBadges()
                     }
                 })
                 duration = 400
@@ -90,7 +90,17 @@ class BadgesController(val view: ItemContactBinding) {
             }
         }
 
-        if (isOpen) notifyAction.invoke(contactItem)
+        if (isOpen) badgeViewModel?.openNew(contactItem) { process(false) }
+    }
+
+    private fun hideBadges() {
+        view.badgesContainer.setVisible(false, View.INVISIBLE)
+        view.profileBadgesContainer.switch(false)
+    }
+
+    private fun showBadges() {
+        view.badgesContainer.setVisible(true, View.INVISIBLE)
+        view.profileBadgesContainer.switch(true)
     }
 
     private fun performAction(contactAction: ContactAction) {

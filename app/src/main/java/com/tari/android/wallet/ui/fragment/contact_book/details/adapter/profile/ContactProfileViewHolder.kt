@@ -10,7 +10,8 @@ import com.tari.android.wallet.ui.extension.setVisible
 import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.FFIContactDto
 import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.MergedContactDto
 import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.PhoneContactDto
-import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.YatContactDto
+import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.YatDto
+import com.tari.android.wallet.util.containsNonEmoji
 import com.tari.android.wallet.util.extractEmojis
 
 class ContactProfileViewHolder(view: ItemContactProfileBinding) :
@@ -28,15 +29,6 @@ class ContactProfileViewHolder(view: ItemContactProfileBinding) :
         item.init(ui.participantEmojiIdView)
 
         when (val dto = item.contactDto.contact) {
-            is YatContactDto -> {
-                if (dto.yat.isNotEmpty()) {
-                    showFirstCharOrAvatar(dto.yat.extractEmojis()[0])
-                    emojiIdSummaryController.yat = dto.yat
-                }
-                showEmojiId(dto.walletAddress.emojiId)
-                showAlias(dto.getAlias())
-            }
-
             is FFIContactDto -> {
                 showFirstCharOrAvatar(dto.walletAddress.emojiId.extractEmojis()[0])
                 showEmojiId(dto.walletAddress.emojiId)
@@ -46,16 +38,26 @@ class ContactProfileViewHolder(view: ItemContactProfileBinding) :
             is MergedContactDto -> {
                 val yat = item.contactDto.getYatDto()?.yat.orEmpty()
                 emojiIdSummaryController.yat = yat
-                showFirstCharOrAvatar(yat.ifEmpty { dto.ffiContactDto.walletAddress.emojiId }.extractEmojis()[0], dto.phoneContactDto.avatar)
+                showFirstCharOrAvatar(dto.ffiContactDto.walletAddress.emojiId.extractEmojis()[0], dto.phoneContactDto.avatar)
                 showEmojiId(dto.ffiContactDto.walletAddress.emojiId)
                 showAlias(dto.phoneContactDto.getAlias())
+                showYat(dto.phoneContactDto.yatDto)
             }
 
             is PhoneContactDto -> {
                 showFirstCharOrAvatar(dto.getAlias().firstOrNull()?.toString() ?: "C", dto.avatar)
                 showEmojiId("")
                 showAlias(dto.getAlias())
+                showYat(dto.yatDto)
             }
+        }
+    }
+
+    private fun showYat(yatDto: YatDto?) = yatDto?.let { dto ->
+        val extracted = dto.yat.extractEmojis()
+        if (dto.yat.isNotEmpty() && !dto.yat.containsNonEmoji() && extracted.isNotEmpty()) {
+            showFirstCharOrAvatar(extracted[0])
+            emojiIdSummaryController.yat = dto.yat
         }
     }
 

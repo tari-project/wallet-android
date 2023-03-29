@@ -11,13 +11,8 @@ import com.tari.android.wallet.R.string.error_no_connection_description
 import com.tari.android.wallet.R.string.error_no_connection_title
 import com.tari.android.wallet.R.string.error_node_unreachable_description
 import com.tari.android.wallet.R.string.error_node_unreachable_title
-import com.tari.android.wallet.R.string.ffi_validation_error_cancel
-import com.tari.android.wallet.R.string.ffi_validation_error_delete
-import com.tari.android.wallet.R.string.ffi_validation_error_message
-import com.tari.android.wallet.R.string.ffi_validation_error_title
 import com.tari.android.wallet.R.string.home_completed_transactions_title
 import com.tari.android.wallet.R.string.home_pending_transactions_title
-import com.tari.android.wallet.application.MigrationManager
 import com.tari.android.wallet.application.securityStage.StagedWalletSecurityManager
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.event.Event
@@ -43,12 +38,6 @@ import com.tari.android.wallet.ui.common.gyphy.repository.GIFRepository
 import com.tari.android.wallet.ui.common.recyclerView.CommonViewHolderItem
 import com.tari.android.wallet.ui.common.recyclerView.items.TitleViewHolderItem
 import com.tari.android.wallet.ui.dialog.error.ErrorDialogArgs
-import com.tari.android.wallet.ui.dialog.modular.DialogArgs
-import com.tari.android.wallet.ui.dialog.modular.ModularDialogArgs
-import com.tari.android.wallet.ui.dialog.modular.modules.body.BodyModule
-import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonModule
-import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonStyle
-import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
 import com.tari.android.wallet.ui.fragment.contact_book.data.ContactsRepository
 import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
 import com.tari.android.wallet.ui.fragment.send.finalize.TxFailureReason
@@ -82,7 +71,6 @@ class TxListViewModel : CommonViewModel() {
     lateinit var contactsRepository: ContactsRepository
 
     val stagedWalletSecurityManager = StagedWalletSecurityManager()
-    val migrationManager: MigrationManager = MigrationManager()
 
     lateinit var progressControllerState: UpdateProgressViewController.UpdateProgressState
 
@@ -119,8 +107,6 @@ class TxListViewModel : CommonViewModel() {
 
     init {
         component.inject(this)
-
-        migrationManager.validateVersion({ }, { showIncompatibleVersionDialog() })
 
         doOnConnectedToWallet { doOnConnected { runCatching { onServiceConnected() } } }
     }
@@ -388,30 +374,6 @@ class TxListViewModel : CommonViewModel() {
             resourceManager.getString(error_node_unreachable_description),
         )
         _modularDialog.postValue(errorDialogArgs.getModular(resourceManager))
-    }
-
-    fun showIncompatibleVersionDialog() {
-        val args = ModularDialogArgs(
-            DialogArgs(), listOf(
-                HeadModule(resourceManager.getString(ffi_validation_error_title)),
-                BodyModule(resourceManager.getString(ffi_validation_error_message)),
-                ButtonModule(resourceManager.getString(ffi_validation_error_delete), ButtonStyle.Warning) {
-                    _dismissDialog.postValue(Unit)
-                    deleteWallet()
-                },
-                ButtonModule(resourceManager.getString(ffi_validation_error_cancel), ButtonStyle.Close) {
-                    _dismissDialog.postValue(Unit)
-                }
-            ))
-        _modularDialog.postValue(args)
-    }
-
-    private fun deleteWallet() {
-        // disable CTAs
-        viewModelScope.launch(Dispatchers.IO) {
-            walletServiceLauncher.stopAndDelete()
-            navigation.postValue(Navigation.TxListNavigation.ToSplashScreen)
-        }
     }
 
     companion object {

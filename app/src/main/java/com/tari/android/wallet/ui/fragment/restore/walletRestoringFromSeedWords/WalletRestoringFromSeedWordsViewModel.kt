@@ -4,7 +4,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.tari.android.wallet.R
-import com.tari.android.wallet.application.MigrationManager
 import com.tari.android.wallet.application.baseNodes.BaseNodes
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodeDto
@@ -40,8 +39,6 @@ class WalletRestoringFromSeedWordsViewModel : CommonViewModel() {
 
     @Inject
     lateinit var baseNodes: BaseNodes
-
-    val migrationManager = MigrationManager()
 
     private lateinit var baseNodeIterator: Iterator<BaseNodeDto>
 
@@ -119,7 +116,6 @@ class WalletRestoringFromSeedWordsViewModel : CommonViewModel() {
 
     private fun onSuccessRestoration() {
         tariSettingsSharedRepository.hasVerifiedSeedWords = true
-        migrationManager.updateWalletVersion()
         navigation.postValue(Navigation.WalletRestoringFromSeedWordsNavigation.OnRestoreCompleted)
     }
 
