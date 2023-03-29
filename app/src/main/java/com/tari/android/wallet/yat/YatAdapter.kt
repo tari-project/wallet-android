@@ -10,7 +10,6 @@ import com.orhanobut.logger.Logger
 import com.tari.android.wallet.BuildConfig
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
-import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.YatContactDto
 import com.tari.android.wallet.ui.fragment.send.common.TransactionData
 import com.tari.android.wallet.ui.fragment.send.finalize.FinalizeSendTxViewModel
 import com.tari.android.wallet.ui.fragment.send.finalize.YatFinalizeSendTxActivity
@@ -49,7 +48,7 @@ class YatAdapter(
     }
 
     fun showOutcomingFinalizeActivity(activity: Activity, transactionData: TransactionData) {
-        val yatUser = transactionData.recipientContact?.contact as YatContactDto
+        val yatUser = transactionData.recipientContact?.getYatDto() ?: return
         val currentTicker = networkRepository.currentNetwork?.ticker.orEmpty()
         val data = YatLibOutcomingTransactionData(transactionData.amount!!.tariValue.toDouble(), currentTicker, yatUser.yat)
 

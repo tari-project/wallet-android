@@ -6,7 +6,6 @@ import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.FFIContact
 import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.IContact
 import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.MergedContactDto
 import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.PhoneContactDto
-import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.YatContactDto
 import java.io.Serializable
 
 class ContactsList() : ArrayList<ContactDtoSerializable>(), Serializable {
@@ -22,7 +21,6 @@ class ContactDtoSerializable() : Serializable {
     var lastUsedDate: SerializableTime? = null
     var uuid: String = ""
     var ffiContactDto: FFIContactDto? = null
-    var yatContactDto: YatContactDto? = null
     var phoneBookDto: PhoneContactDto? = null
     var mergedDto: MergedContactDto? = null
 
@@ -30,14 +28,13 @@ class ContactDtoSerializable() : Serializable {
         lastUsedDate = contactDto.lastUsedDate
         uuid = contactDto.uuid
         when (contactDto.contact) {
-            is YatContactDto -> yatContactDto = contactDto.getYatDto()
             is FFIContactDto -> ffiContactDto = contactDto.getFFIDto()
             is PhoneContactDto -> phoneBookDto = contactDto.getPhoneDto()
             is MergedContactDto -> mergedDto = contactDto.getMergedDto()
         }
     }
 
-    fun getDto(): IContact = yatContactDto ?: ffiContactDto ?: phoneBookDto ?: mergedDto!!
+    fun getDto(): IContact = ffiContactDto ?: phoneBookDto ?: mergedDto!!
 
     companion object {
         fun toContactDto(contactDtoSerializable: ContactDtoSerializable): ContactDto =

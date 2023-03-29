@@ -43,20 +43,18 @@ class ContactDto(
     }
 
     fun getTypeName(): Int = when (contact) {
-        is YatContactDto -> R.string.contact_book_type_yat
         is FFIContactDto -> R.string.contact_book_type_ffi
         is MergedContactDto -> R.string.contact_book_type_merged
         else -> R.string.contact_book_type_contact_book
     }
 
     fun getTypeIcon(): Int = when (contact) {
-        is YatContactDto -> R.drawable.vector_yat_logo
         is FFIContactDto -> R.drawable.vector_gem
         is MergedContactDto -> R.drawable.vector_contact_type_link
         else -> R.drawable.vector_contact_book_type
     }
 
-    fun getYatDto(): YatContactDto? = (contact as? YatContactDto) ?: (contact as? MergedContactDto)?.ffiContactDto as? YatContactDto
+    fun getYatDto(): YatDto? = (contact as? PhoneContactDto)?.yatDto ?: (contact as? MergedContactDto)?.phoneContactDto?.yatDto
 
     fun getFFIDto(): FFIContactDto? = (contact as? FFIContactDto) ?: (contact as? MergedContactDto)?.ffiContactDto
 

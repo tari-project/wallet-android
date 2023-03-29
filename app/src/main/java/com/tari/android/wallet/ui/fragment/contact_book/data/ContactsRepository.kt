@@ -16,7 +16,7 @@ import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.ContactDto
 import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.FFIContactDto
 import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.MergedContactDto
 import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.PhoneContactDto
-import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.YatContactDto
+import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.YatDto
 import com.tari.android.wallet.ui.fragment.contact_book.data.localStorage.ContactSharedPrefRepository
 import contacts.core.Contacts
 import contacts.core.Fields
@@ -96,29 +96,16 @@ class ContactsRepository @Inject constructor(
         if (!contactExists(contact)) addContact(contact)
         updateContact(contact.uuid) {
             when (val user = it.contact) {
-                is YatContactDto -> {
-                    user.firstName = firstName
-                    user.surname = surname
-                    user.yat = yat
-                    if (yat.isEmpty()) {
-                        contact.contact = FFIContactDto(user.walletAddress, firstName, surname, user.isFavorite)
-                    }
-                }
-
                 is FFIContactDto -> {
                     user.firstName = firstName
                     user.surname = surname
-                    if (yat.isNotEmpty()) {
-                        contact.contact = YatContactDto(user.walletAddress, yat, listOf(), user.getAlias()).apply {
-                            isFavorite = contact.contact.isFavorite
-                        }
-                    }
                 }
 
                 is PhoneContactDto -> {
                     user.firstName = firstName
                     user.surname = surname
                     user.shouldUpdate = true
+                    user.saveYat(yat)
                 }
 
                 is MergedContactDto -> {
@@ -130,12 +117,7 @@ class ContactsRepository @Inject constructor(
                     user.phoneContactDto.shouldUpdate = true
                     user.firstName = firstName
                     user.surname = surname
-                    val yatContactDto = contact.getYatDto()
-                    if (yatContactDto != null) {
-                        yatContactDto.yat = yat
-                    } else if (yat.isNotEmpty()) {
-                        user.ffiContactDto = YatContactDto(user.ffiContactDto.walletAddress, yat, listOf(), user.ffiContactDto.getAlias())
-                    }
+                    user.phoneContactDto.saveYat(yat)
                 }
             }
         }
@@ -183,6 +165,12 @@ class ContactsRepository @Inject constructor(
         }
     }
 
+    fun updateYatInfo(contactDto: ContactDto, entries: Map<String, PaymentAddressResponseResult>) {
+        withListUpdate {
+            val existContact = it.firstOrNull { it.uuid == contactDto.uuid }
+            existContact?.getYatDto()?.connectedWallets = entries.map { YatDto.ConnectedWallet(it.key, it.value) }
+        }
+    }
 
     private fun updateContact(contactUuid: String, silently: Boolean = false, updateAction: (contact: ContactDto) -> Unit) {
         withListUpdate(silently) {
@@ -329,13 +317,6 @@ class ContactsRepository @Inject constructor(
                 foundContact?.let { contact -> updateAction.invoke(contact) }
             }
         }
-
-        fun updateYatInfo(contactDto: ContactDto, entries: Map<String, PaymentAddressResponseResult>) {
-            withListUpdate {
-                val existContact = it.firstOrNull { it.uuid == contactDto.uuid }
-                existContact?.getYatDto()?.connectedWallets = entries.map { YatContactDto.ConnectedWallet(it.key, it.value) }
-            }
-        }
     }
 
     inner class PhoneBookRepositoryBridge {
@@ -367,6 +348,8 @@ class ContactsRepository @Inject constructor(
                             it.toString(),
                             (it * 1000).toString(),
                             (it.toString() + (it * 1000).toString()),
+                            "",
+                            "",
                             "",
                             Random.nextBoolean()
                         )
@@ -428,6 +411,8 @@ class ContactsRepository @Inject constructor(
                     name?.givenName.orEmpty(),
                     name?.familyName.orEmpty(),
                     name?.displayName.orEmpty(),
+                    "",
+                    "",
                     it.photoUri?.toString().orEmpty(),
                     it.options?.starred ?: false
                 )
@@ -444,7 +429,7 @@ class ContactsRepository @Inject constructor(
                             val contacts = list.mapNotNull { it.getPhoneDto() }.filter { it.shouldUpdate }
 
                             for (item in contacts) {
-                                val contact = PhoneContact(item.id, item.firstName, item.surname, item.displayName, item.avatar, item.isFavorite)
+                                val contact = PhoneContact(item.id, item.firstName, item.surname, item.displayName, item.avatar, item.yat, item.phoneEmojiId, item.isFavorite)
                                 saveNamesToPhoneBook(contact)
                                 saveStarredToPhoneBook(contact)
                                 item.shouldUpdate = false
@@ -509,11 +494,14 @@ class ContactsRepository @Inject constructor(
         val firstName: String,
         val surname: String,
         val displayName: String,
+        val yat: String,
+        val emojiId: String,
         val avatar: String,
         val isFavorite: Boolean,
     ) {
-        fun toPhoneContactDto(): PhoneContactDto = PhoneContactDto(id, avatar, firstName, surname, isFavorite).apply {
+        fun toPhoneContactDto(): PhoneContactDto = PhoneContactDto(id, avatar, firstName, surname, yat, isFavorite).apply {
             this.displayName = displayName
+            this.phoneEmojiId = phoneEmojiId
         }
     }
 }

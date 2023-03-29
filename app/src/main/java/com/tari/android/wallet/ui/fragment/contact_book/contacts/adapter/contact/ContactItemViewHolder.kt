@@ -12,7 +12,6 @@ import com.tari.android.wallet.ui.fragment.contact_book.contacts.adapter.contact
 import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.FFIContactDto
 import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.MergedContactDto
 import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.PhoneContactDto
-import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.YatContactDto
 import com.tari.android.wallet.util.extractEmojis
 
 class ContactItemViewHolder(view: ItemContactBinding) : CommonViewHolder<ContactItem, ItemContactBinding>(view) {
@@ -32,13 +31,6 @@ class ContactItemViewHolder(view: ItemContactBinding) : CommonViewHolder<Contact
         badgesController.bind(item)
 
         when (val dto = item.contact.contact) {
-            is YatContactDto -> {
-                if (dto.yat.isNotEmpty()) {
-                    displayFirstEmojiOrText(dto.yat.extractEmojis()[0])
-                    displayAlias(dto.getAlias())
-                }
-            }
-
             is FFIContactDto -> {
                 displayFirstEmojiOrText(dto.walletAddress.emojiId.extractEmojis()[0])
                 if (dto.getAlias().isEmpty()) {

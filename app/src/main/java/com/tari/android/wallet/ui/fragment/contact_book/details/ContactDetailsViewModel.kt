@@ -44,7 +44,7 @@ import com.tari.android.wallet.ui.fragment.contact_book.data.ContactAction
 import com.tari.android.wallet.ui.fragment.contact_book.data.ContactsRepository
 import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.ContactDto
 import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.MergedContactDto
-import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.YatContactDto
+import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.YatDto
 import com.tari.android.wallet.ui.fragment.contact_book.details.adapter.contactType.ContactTypeViewHolderItem
 import com.tari.android.wallet.ui.fragment.contact_book.details.adapter.profile.ContactProfileViewHolderItem
 import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
@@ -68,7 +68,7 @@ class ContactDetailsViewModel : CommonViewModel() {
     @Inject
     lateinit var yatAdapter: YatAdapter
 
-    private var searchingJob: Deferred<YatContactDto?>? = null
+    private var searchingJob: Deferred<YatDto?>? = null
     private var updatingJob: Job? = null
 
     val contact = MutableLiveData<ContactDto>()
@@ -182,10 +182,15 @@ class ContactDetailsViewModel : CommonViewModel() {
         if (updatingJob != null || it.yat.isEmpty()) return@let
 
         updatingJob = viewModelScope.launch(Dispatchers.IO) {
-            val entries = yatAdapter.searchAnyYats(it.yat)?.result?.entries ?: return@launch
-            val map = entries.associate { entry -> entry.key to entry.value }
-            contactsRepository.ffiBridge.updateYatInfo(contact.value!!, map)
-            contact.postValue(contactsRepository.getByUuid(contact.value!!.uuid))
+            try {
+                val entries = yatAdapter.searchAnyYats(it.yat)?.result?.entries
+                entries ?: return@launch
+                val map = entries.associate { entry -> entry.key to entry.value }
+                contactsRepository.updateYatInfo(contact.value!!, map)
+                contact.postValue(contactsRepository.getByUuid(contact.value!!.uuid))
+            } catch (e: Throwable) {
+                e.printStackTrace()
+            }
         }
     }
 
@@ -194,15 +199,15 @@ class ContactDetailsViewModel : CommonViewModel() {
 
         val name = contact.contact.firstName
         val surname = contact.contact.surname
-        val ffiDto = contact.getFFIDto()
+        val phoneDto = contact.getPhoneDto()
         val yatDto = contact.getYatDto()
 
         var saveAction: () -> Boolean = { false }
 
         val nameModule = InputModule(name, resourceManager.getString(contact_book_add_contact_first_name_hint), true, false) { saveAction.invoke() }
         val surnameModule =
-            InputModule(surname, resourceManager.getString(contact_book_add_contact_surname_hint), false, ffiDto == null) { saveAction.invoke() }
-        val yatModule = ffiDto?.let {
+            InputModule(surname, resourceManager.getString(contact_book_add_contact_surname_hint), false, phoneDto == null) { saveAction.invoke() }
+        val yatModule = phoneDto?.let {
             YatInputModule(this::yatSearchAction, yatDto?.yat.orEmpty(), resourceManager.getString(contact_book_add_contact_yat_hint), false, true) {
                 saveAction.invoke()
             }
@@ -231,11 +236,11 @@ class ContactDetailsViewModel : CommonViewModel() {
         if (yat.isEmpty()) return false
 
         searchingJob = viewModelScope.async(Dispatchers.IO) {
-            val entries = yatAdapter.searchTariYats(yat)?.result?.entries?.firstOrNull() ?: return@async null
+            val entries = yatAdapter.searchTariYats(yat)?.result?.entries?.firstOrNull()
+            entries ?: return@async null
             val pubkey = entries.value.address
             val address = walletService.getWalletAddressFromHexString(pubkey) ?: return@async null
-            val user = YatContactDto(address, yat).apply { this.yat = yat }
-            user
+            YatDto(yat)
         }
         return searchingJob?.await() != null
     }

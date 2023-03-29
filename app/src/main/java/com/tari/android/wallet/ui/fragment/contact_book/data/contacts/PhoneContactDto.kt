@@ -7,8 +7,23 @@ class PhoneContactDto(
     var avatar: String,
     firstName: String = "",
     surname: String = "",
+    var yat: String = "",
     isFavorite: Boolean = false
 ) : IContact(firstName, surname, isFavorite) {
+
+    var yatDto: YatDto? = null
+
+    var phoneEmojiId: String = ""
+
+    init {
+        saveYat(yat)
+    }
+
+    fun saveYat(newYat: String) {
+        if (yatDto?.yat == newYat) return
+        yat = newYat
+        yatDto = (if (yat.isNotEmpty()) YatDto(yat) else null)
+    }
 
     var displayName: String = ""
         get() = field.ifEmpty { "$firstName $surname" }

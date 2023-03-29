@@ -29,7 +29,7 @@ import com.tari.android.wallet.ui.extension.string
 import com.tari.android.wallet.ui.fragment.auth.AuthActivity
 import com.tari.android.wallet.ui.fragment.contact_book.add.AddContactFragment
 import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.ContactDto
-import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.YatContactDto
+import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.YatDto
 import com.tari.android.wallet.ui.fragment.contact_book.details.ContactDetailsFragment
 import com.tari.android.wallet.ui.fragment.contact_book.link.ContactLinkFragment
 import com.tari.android.wallet.ui.fragment.contact_book.root.ContactBookFragment
@@ -221,7 +221,7 @@ class TariNavigator @Inject constructor (val prefs: SharedPrefsRepository, val t
 
     fun toLinkContact(contact: ContactDto) = addFragment(ContactLinkFragment.createFragment(contact))
 
-    fun toExternalWallet(connectedWallet: YatContactDto.ConnectedWallet) {
+    fun toExternalWallet(connectedWallet: YatDto.ConnectedWallet) {
 
         try {
             val externalAddress = connectedWallet.getExternalLink()
@@ -273,12 +273,8 @@ class TariNavigator @Inject constructor (val prefs: SharedPrefsRepository, val t
         addFragment(AddNoteFragment(), bundle)
     }
 
-    fun continueToFinalizing(transactionData: TransactionData) {
-        continueToFinalizeSendTx(transactionData)
-    }
-
     fun continueToFinalizeSendTx(transactionData: TransactionData) {
-        if (transactionData.recipientContact?.contact is YatContactDto) {
+        if (transactionData.recipientContact?.getYatDto() != null) {
             (activity as HomeActivity).viewModel.yatAdapter.showOutcomingFinalizeActivity(this.activity, transactionData)
         } else {
             addFragment(FinalizeSendTxFragment.create(transactionData))
