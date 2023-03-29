@@ -66,6 +66,8 @@ class ContactsViewModel : CommonViewModel() {
 
     var isFavorite = false
 
+    val badgeViewModel = BadgeViewModel()
+
     val grantPermission = SingleLiveEvent<Unit>()
 
     val sourceList = MutableLiveData<MutableList<ContactItem>>(mutableListOf())
@@ -103,13 +105,9 @@ class ContactsViewModel : CommonViewModel() {
 
     private fun updateContacts() {
         val newItems =
-            contactsRepository.publishSubject.value!!.map { contactDto -> ContactItem(contactDto, false, this::performAction) { notify(it) } }
+            contactsRepository.publishSubject.value!!.map { contactDto -> ContactItem(contactDto, false, this::performAction, badgeViewModel) }
                 .toMutableList()
         sourceList.postValue(newItems)
-    }
-
-    private fun notify(currentContact: ContactItem) {
-        list.value?.filterIsInstance<ContactItem>()?.forEach { contactItem -> contactItem.toggleBadges(currentContact == contactItem) }
     }
 
     fun search(text: String) {
@@ -222,3 +220,4 @@ class ContactsViewModel : CommonViewModel() {
         private const val LIST_UPDATE_DEBOUNCE = 500L
     }
 }
+

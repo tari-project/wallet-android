@@ -21,13 +21,7 @@ class ContactItemViewHolder(view: ItemContactBinding) : CommonViewHolder<Contact
     private val badgesController: BadgesController by lazy { BadgesController(view) }
 
     override fun bind(item: ContactItem) {
-        item.toggleBadges = { }
-
         super.bind(item)
-
-        item.toggleBadges = badgesController::process
-        badgesController.notifyAction = item.notifyToggling
-
         badgesController.bind(item)
 
         when (val dto = item.contact.contact) {

@@ -7,8 +7,7 @@ import android.view.ViewGroup
 import com.tari.android.wallet.databinding.ViewBadgeItemBinding
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.component.common.CommonView
-import com.tari.android.wallet.ui.extension.gone
-import com.tari.android.wallet.ui.extension.visible
+import com.tari.android.wallet.ui.fragment.contact_book.data.ContactAction
 
 class BadgeItemView : CommonView<CommonViewModel, ViewBadgeItemBinding> {
     constructor(context: Context) : super(context, null) {
@@ -33,7 +32,10 @@ class BadgeItemView : CommonView<CommonViewModel, ViewBadgeItemBinding> {
 
     private fun init() = Unit
 
-    fun setItem(item: BadgeItem) {
+    var contactAction: ContactAction? = null
+
+    fun setItem(item: BadgeItem, contactAction: ContactAction) {
+        this.contactAction = contactAction
         ui.badgeItemIconImageView.setImageResource(item.icon)
         ui.root.setOnClickListener { item.action.invoke() }
     }
