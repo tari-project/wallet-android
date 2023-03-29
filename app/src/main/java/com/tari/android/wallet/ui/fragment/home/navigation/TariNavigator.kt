@@ -5,7 +5,6 @@ import android.net.Uri
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import com.tari.android.wallet.R
-import com.tari.android.wallet.application.MigrationManager
 import com.tari.android.wallet.application.deeplinks.DeepLink
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.data.sharedPrefs.tariSettings.TariSettingsSharedRepository
@@ -154,7 +153,6 @@ class TariNavigator @Inject constructor (val prefs: SharedPrefsRepository, val t
         prefs.onboardingAuthSetupCompleted = true
         prefs.onboardingDisplayedAtHome = true
         tariSettingsSharedRepository.isRestoredWallet = true
-        MigrationManager().updateWalletVersion()
 
         activity.finish()
         activity.startActivity(Intent(this.activity, AuthActivity::class.java).apply {

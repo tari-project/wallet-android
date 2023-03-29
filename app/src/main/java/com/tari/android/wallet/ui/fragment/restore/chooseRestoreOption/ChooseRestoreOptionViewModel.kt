@@ -59,8 +59,6 @@ class ChooseRestoreOptionViewModel : CommonViewModel() {
 
     val options = MutableLiveData<List<BackupOptionDto>>()
 
-    val migrationManager = MigrationManager()
-
     init {
         component.inject(this)
 
@@ -78,7 +76,6 @@ class ChooseRestoreOptionViewModel : CommonViewModel() {
                     walletService.restoreWithUnbindedOutputs(it.utxos, tariWalletAddress, message, error)
                     throwIf(error)
                 }
-                migrationManager.updateWalletVersion()
 
                 val dto = backupSettingsRepository.getOptionDto(state.value!!.backupOptions)!!.copy(isEnable = true)
                 backupSettingsRepository.updateOption(dto)
