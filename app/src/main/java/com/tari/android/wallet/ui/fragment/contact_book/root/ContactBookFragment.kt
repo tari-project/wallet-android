@@ -14,8 +14,10 @@ import com.tari.android.wallet.R
 import com.tari.android.wallet.databinding.FragmentContactBookRootBinding
 import com.tari.android.wallet.extension.observe
 import com.tari.android.wallet.ui.common.CommonFragment
+import com.tari.android.wallet.ui.component.tari.toolbar.TariToolbarActionArg
 import com.tari.android.wallet.ui.extension.PermissionExtensions.runWithPermission
 import com.tari.android.wallet.ui.extension.setVisible
+import com.tari.android.wallet.ui.extension.string
 import com.tari.android.wallet.ui.fragment.contact_book.contacts.ContactsFragment
 import com.tari.android.wallet.ui.fragment.contact_book.favorites.FavoritesFragment
 import com.tari.android.wallet.ui.fragment.home.HomeActivity
@@ -50,6 +52,8 @@ class ContactBookFragment : CommonFragment<FragmentContactBookRootBinding, Conta
             ui.isSyncingProgressBar.setVisible(it.isLoading)
             ui.syncingStatus.text = it.name + " " + it.time + "s"
         }
+
+        observe(sharedState) { updateSharedState(it) }
     }
 
     private fun grantPermission() {
@@ -83,8 +87,6 @@ class ContactBookFragment : CommonFragment<FragmentContactBookRootBinding, Conta
 
         ui.searchView.setIconifiedByDefault(false)
 
-        ui.toolbar.rightAction = { viewModel.navigation.postValue(Navigation.ContactBookNavigation.ToAddContact) }
-
         ui.searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextChange(newText: String?): Boolean {
                 (ui.viewPager.adapter as ContactBookAdapter).fragments.forEach { it.get()?.search(newText.orEmpty()) }
@@ -93,6 +95,27 @@ class ContactBookFragment : CommonFragment<FragmentContactBookRootBinding, Conta
 
             override fun onQueryTextSubmit(query: String?): Boolean = true
         })
+    }
+
+    private fun updateSharedState(sharedState: Boolean) {
+        if (sharedState) {
+            val shareArgs = TariToolbarActionArg(title = string(R.string.common_share)) {
+                viewModel.shareSelectedContacts()
+            }
+            ui.toolbar.setRightArgs(shareArgs)
+            val cancelArgs = TariToolbarActionArg(title = string(R.string.common_cancel)) {
+                viewModel.sharedState.postValue(false)
+            }
+            ui.toolbar.setLeftArgs(cancelArgs)
+        } else {
+            val addContactArg = TariToolbarActionArg(icon = R.drawable.vector_add_contact) {
+                viewModel.navigation.postValue(Navigation.ContactBookNavigation.ToAddContact)
+            }
+            val shareContactArg = TariToolbarActionArg(icon = R.drawable.vector_share) {
+                viewModel.sharedState.postValue(true)
+            }
+            ui.toolbar.setRightArgs(shareContactArg, addContactArg)
+        }
     }
 
     private inner class ContactBookAdapter(fm: FragmentActivity) : FragmentStateAdapter(fm) {

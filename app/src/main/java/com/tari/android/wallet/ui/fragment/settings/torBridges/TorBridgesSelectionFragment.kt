@@ -6,10 +6,12 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.tari.android.wallet.R
 import com.tari.android.wallet.databinding.FragmentTorBridgeSelectionBinding
 import com.tari.android.wallet.extension.observe
 import com.tari.android.wallet.ui.common.CommonFragment
 import com.tari.android.wallet.ui.common.recyclerView.CommonAdapter
+import com.tari.android.wallet.ui.component.tari.toolbar.TariToolbarActionArg
 import com.tari.android.wallet.ui.fragment.settings.torBridges.torItem.TorBridgesAdapter
 
 class TorBridgesSelectionFragment : CommonFragment<FragmentTorBridgeSelectionBinding, TorBridgesSelectionViewModel>() {
@@ -39,7 +41,10 @@ class TorBridgesSelectionFragment : CommonFragment<FragmentTorBridgeSelectionBin
         torBridgesList.layoutManager = LinearLayoutManager(requireContext())
         torBridgesList.adapter = adapter
         adapter.setClickListener(CommonAdapter.ItemClickListener { viewModel.preselect(it) })
-        toolbar.rightAction = { viewModel.connect() }
+        val actionArgs = TariToolbarActionArg(title = requireContext().getString(R.string.tor_bridges_connect)) {
+            viewModel.connect()
+        }
+        toolbar.setRightArgs(actionArgs)
     }
 
     private fun observeUI() = with(viewModel) {

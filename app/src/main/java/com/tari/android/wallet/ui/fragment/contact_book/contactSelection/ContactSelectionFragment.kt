@@ -34,6 +34,7 @@ import com.tari.android.wallet.extension.observeOnLoad
 import com.tari.android.wallet.model.TariWalletAddress
 import com.tari.android.wallet.ui.common.CommonFragment
 import com.tari.android.wallet.ui.common.recyclerView.CommonAdapter
+import com.tari.android.wallet.ui.component.tari.toolbar.TariToolbarActionArg
 import com.tari.android.wallet.ui.extension.dimenPx
 import com.tari.android.wallet.ui.extension.gone
 import com.tari.android.wallet.ui.extension.hideKeyboard
@@ -131,14 +132,15 @@ open class ContactSelectionFragment : CommonFragment<FragmentContactsSelectionBi
     private fun setupUI() {
         setupRecyclerView()
         ui.scrollDepthGradientView.alpha = 0f
-        ui.toolbar.clearRightIcon()
+        ui.toolbar.hideRightActions()
         ui.invalidEmojiIdTextView.gone()
         hidePasteEmojiIdViews(animate = false)
         OverScrollDecoratorHelper.setUpOverScroll(ui.emojiIdScrollView)
         OverScrollDecoratorHelper.setUpOverScroll(ui.searchEditTextScrollView)
         ui.searchEditText.inputType = InputType.TYPE_NULL
         ui.qrCodeButton.setOnClickListener { onQRButtonClick(it) }
-        ui.toolbar.rightAction = { goToNext() }
+        val args = TariToolbarActionArg(title = string(R.string.common_done)) { goToNext() }
+        ui.toolbar.setRightArgs(args)
         dimmerViews.forEach { it.setOnClickListener { onEmojiIdDimmerClicked() } }
         ui.pasteEmojiIdButton.setOnClickListener { onPasteEmojiIdButtonClicked() }
         ui.emojiIdTextView.setOnClickListener { onPasteEmojiIdButtonClicked() }
@@ -201,7 +203,7 @@ open class ContactSelectionFragment : CommonFragment<FragmentContactsSelectionBi
         // state is not initial if there's some character in the search input
         if (ui.searchEditText.text.toString().isNotEmpty()) {
             ui.searchEditText.setText("")
-            ui.toolbar.clearRightIcon()
+            ui.toolbar.hideRightActions()
         }
     }
 
@@ -410,7 +412,7 @@ open class ContactSelectionFragment : CommonFragment<FragmentContactsSelectionBi
         val editable = ui.searchEditText.editableText
         var text = editable.toString()
 
-        ui.toolbar.clearRightIcon()
+        ui.toolbar.hideRightActions()
         ui.invalidEmojiIdTextView.gone()
 
         if (editable.toString().firstNCharactersAreEmojis(Constants.Wallet.emojiFormatterChunkSize)) {
@@ -479,7 +481,7 @@ open class ContactSelectionFragment : CommonFragment<FragmentContactsSelectionBi
                 ui.invalidEmojiIdTextView.visible()
             } else {
                 ui.invalidEmojiIdTextView.gone()
-                ui.toolbar.setupRightButton(getString(R.string.contact_book_add_contact_next_button))
+                ui.toolbar.setRightArgs(TariToolbarActionArg(title = string(R.string.contact_book_add_contact_next_button)) { goToNext() })
                 activity?.hideKeyboard()
                 ui.searchEditText.clearFocus()
                 viewModel.searchText.value = text
