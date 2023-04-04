@@ -43,9 +43,6 @@ class WalletInfoViewModel : CommonViewModel() {
     private val _yatDisconnected: MutableLiveData<Boolean> = MutableLiveData(false)
     val yatDisconnected: LiveData<Boolean> = _yatDisconnected
 
-    private val _isYatForegrounded: MutableLiveData<Boolean> = MutableLiveData(false)
-    val isYatForegrounded: LiveData<Boolean> = _isYatForegrounded
-
     private val _reconnectVisibility: MediatorLiveData<Boolean> = MediatorLiveData()
     val reconnectVisibility: LiveData<Boolean> = _reconnectVisibility
 
@@ -53,7 +50,6 @@ class WalletInfoViewModel : CommonViewModel() {
         component.inject(this)
 
         _reconnectVisibility.addSource(_yatDisconnected) { updateReconnectVisibility() }
-        _reconnectVisibility.addSource(_isYatForegrounded) { updateReconnectVisibility() }
 
         refreshData()
     }
@@ -65,15 +61,8 @@ class WalletInfoViewModel : CommonViewModel() {
         _qrDeepLink.postValue(qrCode)
         _yat.postValue(yatSharedPrefsRepository.connectedYat.orEmpty())
         _yatDisconnected.postValue(yatSharedPrefsRepository.yatWasDisconnected)
-        _isYatForegrounded.postValue(false)
 
         checkEmojiIdConnection()
-    }
-
-    fun changeYatVisibility() {
-        val newValue = !isYatForegrounded.value!!
-        _isYatForegrounded.postValue(!_isYatForegrounded.value!!)
-        _emojiId.postValue(if (newValue) yatSharedPrefsRepository.connectedYat else sharedPrefsWrapper.emojiId)
     }
 
     fun openYatOnboarding(context: Context) {
@@ -84,7 +73,7 @@ class WalletInfoViewModel : CommonViewModel() {
         val connectedYat = yatSharedPrefsRepository.connectedYat.orEmpty()
         if (connectedYat.isNotEmpty()) {
             viewModelScope.launch(Dispatchers.IO) {
-                yatAdapter.searchYats(connectedYat).let {
+                yatAdapter.searchTariYats(connectedYat).let {
                     if (it?.status == true) {
                         it.result?.entries?.firstOrNull()?.let { response ->
                             val wasDisconnected = response.value.address.lowercase() != sharedPrefsWrapper.publicKeyHexString.orEmpty().lowercase()
@@ -101,6 +90,6 @@ class WalletInfoViewModel : CommonViewModel() {
     }
 
     private fun updateReconnectVisibility() {
-        _reconnectVisibility.postValue(_isYatForegrounded.value!! && _yatDisconnected.value!!)
+        _reconnectVisibility.postValue(_yatDisconnected.value!!)
     }
 }

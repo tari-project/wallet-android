@@ -1,8 +1,12 @@
 package com.tari.android.wallet.application.deeplinks
 
 import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class DeeplinkHandler(networkRepository: NetworkRepository) {
+
+@Singleton
+class DeeplinkHandler @Inject constructor(networkRepository: NetworkRepository) {
 
     private val deeplinkFormatter = DeeplinkFormatter(networkRepository)
 

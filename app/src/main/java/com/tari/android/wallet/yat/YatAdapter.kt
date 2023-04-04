@@ -36,8 +36,11 @@ class YatAdapter(
         YatIntegration.setup(application, config, YatIntegration.ColorMode.LIGHT, this)
     }
 
-    fun searchYats(query: String): PaymentAddressResponse? =
+    fun searchTariYats(query: String): PaymentAddressResponse? =
         kotlin.runCatching { YatLibApi.emojiIDApi.lookupEmojiIDPayment(query, "0x0101") }.getOrNull()
+
+    fun searchAnyYats(query: String): PaymentAddressResponse? =
+        kotlin.runCatching { YatLibApi.emojiIDApi.lookupEmojiIDPayment(query, null) }.getOrNull()
 
     fun openOnboarding(context: Context) {
         val address = commonRepository.publicKeyHexString.orEmpty()
@@ -45,7 +48,7 @@ class YatAdapter(
     }
 
     fun showOutcomingFinalizeActivity(activity: Activity, transactionData: TransactionData) {
-        val yatUser = transactionData.recipientUser as YatUser
+        val yatUser = transactionData.recipientContact?.getYatDto() ?: return
         val currentTicker = networkRepository.currentNetwork?.ticker.orEmpty()
         val data = YatLibOutcomingTransactionData(transactionData.amount!!.tariValue.toDouble(), currentTicker, yatUser.yat)
 

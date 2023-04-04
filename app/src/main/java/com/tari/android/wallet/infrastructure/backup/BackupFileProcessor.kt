@@ -37,7 +37,9 @@ import com.orhanobut.logger.Logger
 import com.tari.android.wallet.data.WalletConfig
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.extension.encrypt
-import com.tari.android.wallet.ffi.*
+import com.tari.android.wallet.ffi.FFIError
+import com.tari.android.wallet.ffi.FFIWallet
+import com.tari.android.wallet.ffi.HexString
 import com.tari.android.wallet.infrastructure.backup.compress.CompressionMethod
 import com.tari.android.wallet.infrastructure.security.encryption.SymmetricEncryptionAlgorithm
 import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupSettingsRepository
@@ -46,13 +48,11 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import org.joda.time.DateTime
 import java.io.File
+import javax.inject.Inject
+import javax.inject.Singleton
 
-/**
- * Utility functions to prepares the backup or restoration files.
- *
- * @author The Tari Development Team
- */
-class BackupFileProcessor(
+@Singleton
+class BackupFileProcessor @Inject constructor(
     private val backupSettingsRepository: BackupSettingsRepository,
     private val sharedPrefsRepository: SharedPrefsRepository,
     private val walletConfig: WalletConfig,

@@ -45,5 +45,6 @@ class DialogManager {
 
     fun dismiss() {
         currentDialog?.dismiss()
+        dialogQueue.removeLastOrNull()
     }
 }

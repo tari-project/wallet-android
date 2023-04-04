@@ -4,7 +4,9 @@ import android.text.SpannableString
 import android.text.Spanned
 import com.tari.android.wallet.R
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
-import com.tari.android.wallet.data.sharedPrefs.securityStages.*
+import com.tari.android.wallet.data.sharedPrefs.securityStages.DisabledTimestampsDto
+import com.tari.android.wallet.data.sharedPrefs.securityStages.SecurityStagesRepository
+import com.tari.android.wallet.data.sharedPrefs.securityStages.WalletSecurityStage
 import com.tari.android.wallet.data.sharedPrefs.securityStages.modules.SecurityStageHeadModule
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.extension.addTo
@@ -17,7 +19,6 @@ import com.tari.android.wallet.ui.dialog.modular.modules.body.BodyModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonStyle
 import com.tari.android.wallet.ui.dialog.modular.modules.space.SpaceModule
-import com.tari.android.wallet.ui.fragment.home.HomeActivity
 import com.tari.android.wallet.ui.fragment.settings.backup.backupOnboarding.item.BackupOnboardingArgs
 import com.tari.android.wallet.ui.fragment.settings.backup.backupOnboarding.module.BackupOnboardingFlowItemModule
 import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupSettingsRepository
@@ -120,7 +121,7 @@ class StagedWalletSecurityManager : CommonViewModel() {
 
     private fun openStage1() {
         _dismissDialog.postValue(Unit)
-        HomeActivity.instance.get()?.let {
+        tariNavigator?.let {
             it.toAllSettings()
             it.toBackupSettings(false)
             it.toWalletBackupWithRecoveryPhrase()
@@ -139,9 +140,9 @@ class StagedWalletSecurityManager : CommonViewModel() {
 
     private fun openStage1B() {
         _dismissDialog.postValue(Unit)
-        HomeActivity.instance.get()?.let {
+        tariNavigator?.let {
             it.toAllSettings()
-            it.toBackupSettings()
+            it.toBackupSettings(true)
         }
     }
 
@@ -157,7 +158,7 @@ class StagedWalletSecurityManager : CommonViewModel() {
 
     private fun openStage2() {
         _dismissDialog.postValue(Unit)
-        HomeActivity.instance.get()?.let {
+        tariNavigator?.let {
             it.toAllSettings()
             it.toBackupSettings(false)
             it.toChangePassword()

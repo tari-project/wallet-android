@@ -3,8 +3,28 @@ package com.tari.android.wallet.service.service
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodeSharedRepository
 import com.tari.android.wallet.event.EventBus
-import com.tari.android.wallet.ffi.*
-import com.tari.android.wallet.model.*
+import com.tari.android.wallet.ffi.FFIContact
+import com.tari.android.wallet.ffi.FFIError
+import com.tari.android.wallet.ffi.FFIException
+import com.tari.android.wallet.ffi.FFIPublicKey
+import com.tari.android.wallet.ffi.FFITariWalletAddress
+import com.tari.android.wallet.ffi.FFIWallet
+import com.tari.android.wallet.ffi.HexString
+import com.tari.android.wallet.ffi.runWithDestroy
+import com.tari.android.wallet.model.BalanceInfo
+import com.tari.android.wallet.model.CancelledTx
+import com.tari.android.wallet.model.CompletedTx
+import com.tari.android.wallet.model.MicroTari
+import com.tari.android.wallet.model.PendingInboundTx
+import com.tari.android.wallet.model.PendingOutboundTx
+import com.tari.android.wallet.model.TariCoinPreview
+import com.tari.android.wallet.model.TariContact
+import com.tari.android.wallet.model.TariUnblindedOutput
+import com.tari.android.wallet.model.TariUtxo
+import com.tari.android.wallet.model.TariVector
+import com.tari.android.wallet.model.TariWalletAddress
+import com.tari.android.wallet.model.TxId
+import com.tari.android.wallet.model.WalletError
 import com.tari.android.wallet.service.TariWalletService
 import com.tari.android.wallet.service.TariWalletServiceListener
 import com.tari.android.wallet.service.baseNode.BaseNodeSyncState
@@ -21,23 +41,23 @@ class TariWalletServiceStubImpl(
     private val logger
         get() = Logger.t(WalletService::class.simpleName)
 
-    private var _cachedContacts: List<Contact>? = null
-    private val cachedContacts: List<Contact>
+    private var _cachedTariContacts: List<TariContact>? = null
+    private val cachedTariContacts: List<TariContact>
         @Synchronized get() {
-            _cachedContacts?.let { return it }
+            _cachedTariContacts?.let { return it }
             val contactsFFI = wallet.getContacts()
-            val contacts = mutableListOf<Contact>()
+            val tariContacts = mutableListOf<TariContact>()
             for (i in 0 until contactsFFI.getLength()) {
                 val contactFFI = contactsFFI.getAt(i)
                 val ffiTariWalletAddress = contactFFI.getWalletAddress()
-                contacts.add(Contact(walletAddressFromFFI(ffiTariWalletAddress), contactFFI.getAlias()))
+                tariContacts.add(TariContact(walletAddressFromFFI(ffiTariWalletAddress), contactFFI.getAlias(), contactFFI.getIsFavorite()))
                 // destroy native objects
                 ffiTariWalletAddress.destroy()
                 contactFFI.destroy()
             }
             // destroy native collection
             contactsFFI.destroy()
-            return contacts.sortedWith(compareBy { it.alias }).also { _cachedContacts = it }
+            return tariContacts.sortedWith(compareBy { it.alias }).also { _cachedTariContacts = it }
         }
 
     override fun registerListener(listener: TariWalletServiceListener): Boolean {
@@ -62,7 +82,7 @@ class TariWalletServiceStubImpl(
     /**
      * Get all contacts.
      */
-    override fun getContacts(error: WalletError): List<Contact>? = runMapping(error) { cachedContacts }
+    override fun getContacts(error: WalletError): List<TariContact>? = runMapping(error) { cachedTariContacts }
 
     /**
      * Get all completed transactions.
@@ -151,9 +171,9 @@ class TariWalletServiceStubImpl(
     } ?: false
 
     override fun sendTari(
-        user: User, amount: MicroTari, feePerGram: MicroTari, message: String, isOneSidePayment: Boolean, error: WalletError
+        tariContact: TariContact, amount: MicroTari, feePerGram: MicroTari, message: String, isOneSidePayment: Boolean, error: WalletError
     ): TxId? = runMapping(error) {
-        val recipientAddressHex = user.walletAddress.hexString
+        val recipientAddressHex = tariContact.walletAddress.hexString
         val recipientAddress = FFITariWalletAddress(HexString(recipientAddressHex)).runWithDestroy {
             wallet.sendTx(it, amount.value, feePerGram.value, message, isOneSidePayment)
         }
@@ -161,17 +181,17 @@ class TariWalletServiceStubImpl(
         TxId(recipientAddress)
     }
 
-    override fun removeContact(contact: Contact, error: WalletError): Boolean = runMapping(error) {
+    override fun removeContact(tariContact: TariContact, error: WalletError): Boolean = runMapping(error) {
         val contactsFFI = wallet.getContacts()
         for (i in 0 until contactsFFI.getLength()) {
             val contactFFI = contactsFFI.getAt(i)
             val ffiTariWalletAddress = contactFFI.getWalletAddress()
-            if (ffiTariWalletAddress.toString() == contact.walletAddress.hexString) {
+            if (ffiTariWalletAddress.toString() == tariContact.walletAddress.hexString) {
                 return@runMapping wallet.removeContact(contactFFI).also {
                     ffiTariWalletAddress.destroy()
                     contactFFI.destroy()
                     contactsFFI.destroy()
-                    _cachedContacts = null
+                    _cachedTariContacts = null
                 }
             }
             ffiTariWalletAddress.destroy()
@@ -181,13 +201,13 @@ class TariWalletServiceStubImpl(
         false
     } ?: false
 
-    override fun updateContactAlias(walletAddress: TariWalletAddress, alias: String, error: WalletError): Boolean = runMapping(error) {
+    override fun updateContact(walletAddress: TariWalletAddress, alias: String, isFavorite: Boolean, error: WalletError): Boolean = runMapping(error) {
         val ffiTariWalletAddress = FFITariWalletAddress(HexString(walletAddress.hexString))
-        val contact = FFIContact(alias, ffiTariWalletAddress)
+        val contact = FFIContact(alias, ffiTariWalletAddress, isFavorite)
         wallet.addUpdateContact(contact).also {
             ffiTariWalletAddress.destroy()
             contact.destroy()
-            _cachedContacts = null
+            _cachedTariContacts = null
         }
     } ?: false
 

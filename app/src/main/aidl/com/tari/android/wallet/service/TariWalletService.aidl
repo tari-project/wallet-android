@@ -55,7 +55,7 @@ interface TariWalletService {
 
     MicroTari estimateTxFee(in MicroTari amount, out WalletError error, in MicroTari feePerGram);
 
-    List<Contact> getContacts(out WalletError error);
+    List<TariContact> getContacts(out WalletError error);
 
     List<CompletedTx> getCompletedTxs(out WalletError error);
     CompletedTx getCompletedTxById(in TxId id, out WalletError error);
@@ -83,7 +83,7 @@ interface TariWalletService {
     boolean startBaseNodeSync(out WalletError error);
 
     TxId sendTari(
-        in User contact,
+        in TariContact contact,
         in MicroTari amount,
         in MicroTari feePerGram,
         String message,
@@ -91,9 +91,9 @@ interface TariWalletService {
         out WalletError error
     );
 
-    boolean updateContactAlias(in TariWalletAddress address, in String alias, out WalletError error);
+    boolean updateContact(in TariWalletAddress address, in String alias, boolean isFavorite, out WalletError error);
 
-    boolean removeContact(in Contact contact, out WalletError error);
+    boolean removeContact(in TariContact contact, out WalletError error);
 
     /**
     * Two functions below to get the public key from emoji id and public key hex string

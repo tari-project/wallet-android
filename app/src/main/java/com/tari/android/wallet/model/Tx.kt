@@ -57,11 +57,11 @@ abstract class Tx : Parcelable {
     /**
      * This is the receiver for an outbound tx and sender for an inbound tx.
      */
-    var user = User()
+    var tariContact = TariContact()
 
     val isOneSided
-        get() = user.walletAddress.hexString.all{ it == '0' }
+        get() = tariContact.walletAddress.hexString.all{ it == '0' }
 
-    override fun toString(): String = "Tx(id=$id, direction=$direction, amount=$amount, timestamp=$timestamp, message='$message', user=$user)"
+    override fun toString(): String = "Tx(id=$id, direction=$direction, amount=$amount, timestamp=$timestamp, message='$message', user=$tariContact)"
 
 }

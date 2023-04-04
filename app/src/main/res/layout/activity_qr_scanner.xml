@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
@@ -18,26 +19,36 @@
         app:frameCornersSize="65dp"
         app:frameSize="0.72"
         app:frameThickness="10dp"
-        app:maskColor="#77000000" />
+        app:maskColor="#77000000"
+        tools:layout_editor_absoluteX="-123dp"
+        tools:layout_editor_absoluteY="0dp" />
 
-    <androidx.appcompat.widget.AppCompatImageView
-        android:id="@+id/qr_close_view"
-        android:layout_width="42dp"
-        android:layout_height="42dp"
-        android:layout_marginLeft="4dp"
+    <com.tari.android.wallet.ui.component.tari.TariPrimaryBackground
+        android:id="@+id/qr_close_view_container"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="28dp"
         android:layout_marginTop="28dp"
-        android:padding="14dp"
-        android:src="@drawable/vector_close_opposite"
+        app:cornerRadius="28dp"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent">
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/qr_close_view"
+            android:layout_width="42dp"
+            android:layout_height="42dp"
+            android:padding="14dp"
+            android:src="@drawable/vector_close_opposite" />
+
+    </com.tari.android.wallet.ui.component.tari.TariPrimaryBackground>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:gravity="center"
         android:layout_marginTop="22dp"
+        android:gravity="center"
         app:layout_constraintDimensionRatio="3:1"
-        app:layout_constraintTop_toBottomOf="@id/qr_close_view">
+        app:layout_constraintTop_toBottomOf="@id/qr_close_view_container">
 
         <com.tari.android.wallet.ui.component.tari.TariTextView
             android:layout_width="wrap_content"

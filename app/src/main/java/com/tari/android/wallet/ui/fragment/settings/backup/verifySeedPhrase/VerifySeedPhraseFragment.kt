@@ -45,8 +45,11 @@ import androidx.fragment.app.viewModels
 import com.tari.android.wallet.databinding.FragmentVerifySeedPhraseBinding
 import com.tari.android.wallet.extension.observe
 import com.tari.android.wallet.ui.common.CommonFragment
-import com.tari.android.wallet.ui.extension.*
-import com.tari.android.wallet.ui.fragment.settings.backup.BackupSettingsRouter
+import com.tari.android.wallet.ui.extension.ThrottleClick
+import com.tari.android.wallet.ui.extension.animateClick
+import com.tari.android.wallet.ui.extension.gone
+import com.tari.android.wallet.ui.extension.setVisible
+import com.tari.android.wallet.ui.extension.visible
 
 class VerifySeedPhraseFragment : CommonFragment<FragmentVerifySeedPhraseBinding, VerifySeedPhraseViewModel>() {
 
@@ -73,20 +76,11 @@ class VerifySeedPhraseFragment : CommonFragment<FragmentVerifySeedPhraseBinding,
     }
 
     private fun observeUI() = with(viewModel) {
-        observe(navigation) { processNavigation(it) }
-
         observe(nothingSelected) { ui.selectWordsLabelView.setVisible(it) }
 
         observe(selectionIsCompleted) { onEndSelection(it) }
 
         observe(addWord) { addSelectedWord(it.first, it.second) }
-    }
-
-    private fun processNavigation(navigation: VerifySeedPhraseNavigation) {
-        val router = requireActivity() as BackupSettingsRouter
-        when (navigation) {
-            VerifySeedPhraseNavigation.ToSeedPhraseVerificationComplete -> router.onSeedPhraseVerificationComplete()
-        }
     }
 
     private fun fillSelectableWordsContainer() {

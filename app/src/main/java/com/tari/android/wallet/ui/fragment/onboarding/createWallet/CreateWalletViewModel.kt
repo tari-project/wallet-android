@@ -9,11 +9,7 @@ class CreateWalletViewModel : CommonViewModel() {
     @Inject
     lateinit var sharedPrefsWrapper: SharedPrefsRepository
 
-    private val migrationManager = MigrationManager()
-
     init {
         component.inject(this)
-
-        migrationManager.updateWalletVersion()
     }
 }

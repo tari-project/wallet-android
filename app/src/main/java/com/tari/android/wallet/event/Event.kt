@@ -64,12 +64,4 @@ object Event {
         data class TxSendSuccessful(val txId: TxId)
         data class TxSendFailed(val failureReason: TxFailureReason)
     }
-
-    /**
-     * Contact events.
-     */
-    object Contact {
-        data class ContactAddedOrUpdated(val contactAddress: TariWalletAddress, val contactAlias: String)
-        data class ContactRemoved(val contactAddress: TariWalletAddress)
-    }
 }

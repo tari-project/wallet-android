@@ -38,14 +38,12 @@ import android.os.Bundle
 import androidx.activity.viewModels
 import com.tari.android.wallet.databinding.ActivityDebugBinding
 import com.tari.android.wallet.ui.common.CommonActivity
-import com.tari.android.wallet.ui.fragment.settings.baseNodeConfig.BaseNodeRouter
-import com.tari.android.wallet.ui.fragment.settings.baseNodeConfig.addBaseNode.AddCustomBaseNodeFragment
 import com.tari.android.wallet.ui.fragment.settings.bugReporting.BugsReportingFragment
 import com.tari.android.wallet.ui.fragment.settings.logs.logFiles.LogFilesFragment
 import com.tari.android.wallet.ui.fragment.settings.logs.logs.LogsFragment
 import java.io.File
 
-class DebugActivity : CommonActivity<ActivityDebugBinding, DebugViewModel>(), BaseNodeRouter {
+class DebugActivity : CommonActivity<ActivityDebugBinding, DebugViewModel>() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -71,15 +69,13 @@ class DebugActivity : CommonActivity<ActivityDebugBinding, DebugViewModel>(), Ba
         }
     }
 
-    override fun toAddCustomBaseNode() = addFragment(AddCustomBaseNodeFragment())
-
     companion object {
-        const val navigation_key = "Debug_navigation"
+        const val navigation_key = "Debugnavigation"
         const val log_file = "Logs_detail"
 
         fun launch(context: Context, navigation: DebugNavigation) {
             val intent = Intent(context, DebugActivity::class.java)
-            intent.putExtra("Debug_navigation", navigation.toString())
+            intent.putExtra("Debugnavigation", navigation.toString())
             context.startActivity(intent)
         }
     }

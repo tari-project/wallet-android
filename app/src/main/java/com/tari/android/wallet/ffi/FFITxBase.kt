@@ -1,8 +1,8 @@
 package com.tari.android.wallet.ffi
 
+import com.tari.android.wallet.model.TariContact
 import com.tari.android.wallet.model.TariWalletAddress
 import com.tari.android.wallet.model.Tx
-import com.tari.android.wallet.model.User
 
 abstract class FFITxBase() : FFIBase() {
 
@@ -14,7 +14,7 @@ abstract class FFITxBase() : FFIBase() {
     abstract fun getDestinationPublicKey(): FFITariWalletAddress
     abstract fun isOutbound(): Boolean
 
-    fun getUser(): User {
+    fun getContact(): TariContact {
         val publicKey = if (isOutbound()) {
             getDestinationPublicKey().runWithDestroy {
                 val destinationHex = it.toString()
@@ -28,7 +28,7 @@ abstract class FFITxBase() : FFIBase() {
                 TariWalletAddress(sourceHex, sourceEmoji)
             }
         }
-        return User(publicKey)
+        return TariContact(publicKey)
     }
 
     fun getDirection(): Tx.Direction = if (isOutbound()) Tx.Direction.OUTBOUND else Tx.Direction.INBOUND

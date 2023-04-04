@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/root"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:paddingBottom="22dp"
+    android:orientation="vertical"
     android:paddingHorizontal="20dp"
-    android:orientation="vertical">
+    android:paddingBottom="22dp">
 
     <com.tari.android.wallet.ui.component.tari.TariTextView
         android:id="@+id/head"
@@ -17,6 +17,16 @@
         android:lineSpacingExtra="8dp"
         android:textColor="?attr/palette_text_heading"
         android:textSize="18sp"
-        app:customFont="light" />
+        app:customFont="heavy" />
 
-</LinearLayout>
+    <com.tari.android.wallet.ui.component.tari.TariSecondaryButton
+        android:id="@+id/button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end|center_vertical"
+        android:lineSpacingExtra="8dp"
+        android:textSize="14sp"
+        app:customFont="light"
+        app:title="@string/contact_book_add_contact_done_button" />
+
+</FrameLayout>

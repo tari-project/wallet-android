@@ -52,7 +52,7 @@ class PendingOutboundTx() : Tx(), Parcelable {
     constructor(tx: FFICompletedTx) : this() {
         this.id = tx.getId()
         this.direction = tx.getDirection()
-        this.user = tx.getUser()
+        this.tariContact = tx.getContact()
         this.amount = MicroTari(tx.getAmount())
         this.fee = MicroTari(tx.getFee())
         this.timestamp = tx.getTimestamp()
@@ -64,7 +64,7 @@ class PendingOutboundTx() : Tx(), Parcelable {
     constructor(tx: FFIPendingOutboundTx) : this() {
         this.id = tx.getId()
         this.direction = tx.getDirection()
-        this.user = tx.getUser()
+        this.tariContact = tx.getContact()
         this.amount = MicroTari(tx.getAmount())
         this.fee = MicroTari(tx.getFee())
         this.timestamp = tx.getTimestamp()
@@ -97,8 +97,8 @@ class PendingOutboundTx() : Tx(), Parcelable {
     override fun writeToParcel(parcel: Parcel, flags: Int) {
         parcel.writeSerializable(id)
         parcel.writeSerializable(direction)
-        parcel.writeSerializable(user.javaClass)
-        parcel.writeParcelable(user, flags)
+        parcel.writeSerializable(tariContact.javaClass)
+        parcel.writeParcelable(tariContact, flags)
         parcel.writeParcelable(amount, flags)
         parcel.writeParcelable(fee, flags)
         parcel.writeSerializable(timestamp)
@@ -109,12 +109,7 @@ class PendingOutboundTx() : Tx(), Parcelable {
     private fun readFromParcel(inParcel: Parcel) {
         id = inParcel.readS(BigInteger::class.java)
         direction = inParcel.readS(Direction::class.java)
-        val userIsContact = inParcel.readSerializable() == Contact::class.java
-        user = if (userIsContact) {
-            inParcel.readP(Contact::class.java)
-        } else {
-            inParcel.readP(User::class.java)
-        }
+        tariContact = inParcel.readP(TariContact::class.java)
         amount = inParcel.readP(MicroTari::class.java)
         fee = inParcel.readP(MicroTari::class.java)
         timestamp = inParcel.readS(BigInteger::class.java)

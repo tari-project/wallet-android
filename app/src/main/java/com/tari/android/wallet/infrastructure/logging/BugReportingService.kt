@@ -38,11 +38,18 @@ import com.tari.android.wallet.util.WalletUtil
 import io.sentry.Attachment
 import io.sentry.Sentry
 import io.sentry.UserFeedback
-import java.io.*
+import java.io.BufferedInputStream
+import java.io.BufferedOutputStream
+import java.io.File
+import java.io.FileInputStream
+import java.io.FileOutputStream
 import java.util.zip.ZipEntry
 import java.util.zip.ZipOutputStream
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class BugReportingService(private val sharedPrefsWrapper: SharedPrefsRepository, private val walletConfig: WalletConfig) {
+@Singleton
+class BugReportingService @Inject constructor(private val sharedPrefsWrapper: SharedPrefsRepository, private val walletConfig: WalletConfig) {
 
     fun share(name: String, email: String, bugDescription: String) {
         val zippedFile = getZippedLogs()

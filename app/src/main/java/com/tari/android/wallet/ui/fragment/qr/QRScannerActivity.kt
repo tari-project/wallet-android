@@ -41,7 +41,11 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import com.budiyev.android.codescanner.*
+import com.budiyev.android.codescanner.AutoFocusMode
+import com.budiyev.android.codescanner.CodeScanner
+import com.budiyev.android.codescanner.DecodeCallback
+import com.budiyev.android.codescanner.ErrorCallback
+import com.budiyev.android.codescanner.ScanMode
 import com.google.zxing.BarcodeFormat
 import com.tari.android.wallet.R
 import com.tari.android.wallet.databinding.ActivityQrScannerBinding
@@ -83,7 +87,7 @@ class QRScannerActivity : AppCompatActivity() {
     }
 
     private fun setupUi() {
-        ui.qrCloseView.setOnClickListener {
+        ui.qrCloseViewContainer.setOnClickListener {
             finish()
             overridePendingTransition(0, R.anim.slide_down)
         }

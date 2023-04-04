@@ -42,7 +42,7 @@ import com.tari.android.wallet.databinding.FragmentBaseNodeChangeBinding
 import com.tari.android.wallet.extension.observe
 import com.tari.android.wallet.ui.common.CommonFragment
 import com.tari.android.wallet.ui.common.recyclerView.CommonAdapter
-import com.tari.android.wallet.ui.fragment.settings.baseNodeConfig.BaseNodeRouter
+import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
 import com.tari.android.wallet.ui.fragment.settings.baseNodeConfig.changeBaseNode.adapter.BaseNodeViewHolderItem
 import com.tari.android.wallet.ui.fragment.settings.baseNodeConfig.changeBaseNode.adapter.ChangeBaseNodeAdapter
 
@@ -68,7 +68,7 @@ class ChangeBaseNodeFragment : CommonFragment<FragmentBaseNodeChangeBinding, Cha
     }
 
     private fun setupUI() = with(ui) {
-        toolbar.rightAction = { (requireActivity() as BaseNodeRouter).toAddCustomBaseNode() }
+        toolbar.rightAction = { viewModel.navigation.postValue(Navigation.BaseNodeNavigation.ToAddCustomBaseNode) }
         baseNodeList.adapter = adapter
         baseNodeList.layoutManager = LinearLayoutManager(requireContext())
         adapter.setClickListener(CommonAdapter.ItemClickListener { viewModel.selectBaseNode((it as BaseNodeViewHolderItem).baseNodeDto) })

@@ -1,16 +1,35 @@
 package com.tari.android.wallet.ui.fragment.tx
 
 
-import androidx.lifecycle.*
-import com.tari.android.wallet.R.string.*
-import com.tari.android.wallet.application.MigrationManager
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MediatorLiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.map
+import androidx.lifecycle.toLiveData
+import androidx.lifecycle.viewModelScope
+import com.tari.android.wallet.R.string.error_no_connection_description
+import com.tari.android.wallet.R.string.error_no_connection_title
+import com.tari.android.wallet.R.string.error_node_unreachable_description
+import com.tari.android.wallet.R.string.error_node_unreachable_title
+import com.tari.android.wallet.R.string.home_completed_transactions_title
+import com.tari.android.wallet.R.string.home_pending_transactions_title
 import com.tari.android.wallet.application.securityStage.StagedWalletSecurityManager
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.event.Event
 import com.tari.android.wallet.event.EventBus
-import com.tari.android.wallet.extension.*
-import com.tari.android.wallet.ffi.FFITxCancellationReason
-import com.tari.android.wallet.model.*
+import com.tari.android.wallet.extension.addTo
+import com.tari.android.wallet.extension.debounce
+import com.tari.android.wallet.extension.getWithError
+import com.tari.android.wallet.extension.repopulate
+import com.tari.android.wallet.model.BalanceInfo
+import com.tari.android.wallet.model.CancelledTx
+import com.tari.android.wallet.model.CompletedTx
+import com.tari.android.wallet.model.PendingInboundTx
+import com.tari.android.wallet.model.PendingOutboundTx
+import com.tari.android.wallet.model.Tx
+import com.tari.android.wallet.model.TxId
+import com.tari.android.wallet.model.TxStatus
+import com.tari.android.wallet.model.WalletError
 import com.tari.android.wallet.service.service.WalletServiceLauncher
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.common.SingleLiveEvent
@@ -19,20 +38,15 @@ import com.tari.android.wallet.ui.common.gyphy.repository.GIFRepository
 import com.tari.android.wallet.ui.common.recyclerView.CommonViewHolderItem
 import com.tari.android.wallet.ui.common.recyclerView.items.TitleViewHolderItem
 import com.tari.android.wallet.ui.dialog.error.ErrorDialogArgs
-import com.tari.android.wallet.ui.dialog.modular.DialogArgs
-import com.tari.android.wallet.ui.dialog.modular.ModularDialogArgs
-import com.tari.android.wallet.ui.dialog.modular.modules.body.BodyModule
-import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonModule
-import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonStyle
-import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
+import com.tari.android.wallet.ui.fragment.contact_book.data.ContactsRepository
+import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
 import com.tari.android.wallet.ui.fragment.send.finalize.TxFailureReason
 import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupSettingsRepository
 import com.tari.android.wallet.ui.fragment.tx.adapter.TransactionItem
 import com.tari.android.wallet.ui.fragment.tx.ui.progressController.UpdateProgressViewController
-import com.tari.android.wallet.util.Build
+import io.reactivex.BackpressureStrategy
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import java.math.BigInteger
 import java.util.concurrent.CopyOnWriteArrayList
 import javax.inject.Inject
 
@@ -53,8 +67,10 @@ class TxListViewModel : CommonViewModel() {
     @Inject
     lateinit var walletServiceLauncher: WalletServiceLauncher
 
+    @Inject
+    lateinit var contactsRepository: ContactsRepository
+
     val stagedWalletSecurityManager = StagedWalletSecurityManager()
-    val migrationManager: MigrationManager = MigrationManager()
 
     lateinit var progressControllerState: UpdateProgressViewController.UpdateProgressState
 
@@ -62,9 +78,6 @@ class TxListViewModel : CommonViewModel() {
     private val completedTxs = CopyOnWriteArrayList<CompletedTx>()
     private val pendingInboundTxs = CopyOnWriteArrayList<PendingInboundTx>()
     private val pendingOutboundTxs = CopyOnWriteArrayList<PendingOutboundTx>()
-
-    private val _navigation = SingleLiveEvent<TxListNavigation>()
-    val navigation: LiveData<TxListNavigation> = _navigation
 
     private val _connected = SingleLiveEvent<Unit>()
     val connected: LiveData<Unit> = _connected
@@ -84,7 +97,7 @@ class TxListViewModel : CommonViewModel() {
     private val _listUpdateTrigger = MediatorLiveData<Unit>()
     val listUpdateTrigger: LiveData<Unit> = _listUpdateTrigger
 
-    val debouncedList = Transformations.map(listUpdateTrigger.debounce(LIST_UPDATE_DEBOUNCE)) {
+    val debouncedList = listUpdateTrigger.debounce(LIST_UPDATE_DEBOUNCE).map {
         updateList()
         refreshBalance()
     }
@@ -95,9 +108,7 @@ class TxListViewModel : CommonViewModel() {
     init {
         component.inject(this)
 
-        migrationManager.validateVersion({ }, { showIncompatibleVersionDialog() })
-
-        doOnConnectedToWallet { doOnConnected { onServiceConnected() } }
+        doOnConnectedToWallet { doOnConnected { runCatching { onServiceConnected() } } }
     }
 
     val txListIsEmpty: Boolean
@@ -108,12 +119,16 @@ class TxListViewModel : CommonViewModel() {
 
     fun processItemClick(item: CommonViewHolderItem) {
         if (item is TransactionItem) {
-            _navigation.postValue(TxListNavigation.ToTxDetails(item.tx))
+            navigation.postValue(Navigation.TxListNavigation.ToTxDetails(item.tx))
         }
     }
 
     private fun onServiceConnected() {
         subscribeToEventBus()
+
+        _listUpdateTrigger.addSource(
+            contactsRepository.publishSubject.toFlowable(BackpressureStrategy.LATEST).toLiveData()
+        ) { _listUpdateTrigger.postValue(Unit) }
 
         viewModelScope.launch(Dispatchers.IO) {
             updateTxListData()
@@ -160,85 +175,6 @@ class TxListViewModel : CommonViewModel() {
 
         val items = mutableListOf<CommonViewHolderItem>()
 
-        if (Build.MOCKED) {
-            completedTxs.add(CompletedTx().apply {
-                fee = MicroTari(BigInteger("100"))
-                this.confirmationCount = BigInteger("4")
-                this.user = User().apply {
-                    walletAddress = TariWalletAddress().apply {
-                        hexString = "hex string"
-                        emojiId =
-                            "\uD83C\uDF6A\uD83C\uDF5E\uD83D\uDC8E\uD83C\uDFBD\uD83D\uDC28\uD83D\uDC2C\uD83C\uDF4C\uD83D\uDC89\uD83C\uDF79\uD83C\uDF4E\uD83D\uDD2C\uD83D\uDEBD\uD83C\uDF6F\uD83C\uDF54\uD83D\uDC54\uD83D\uDC11\uD83C\uDF1F\uD83C\uDFA5\uD83D\uDC51\uD83C\uDF4D\uD83D\uDC89\uD83D\uDC0A\uD83D\uDC94\uD83C\uDFBD\uD83D\uDCBB\uD83D\uDC5A\uD83D\uDD2D\uD83D\uDC38\uD83C\uDF5A\uD83D\uDCC8\uD83C\uDF40\uD83C\uDFB1\uD83C\uDF1F"
-                    }
-                }
-                this.amount = MicroTari(BigInteger("1000000000"))
-                this.direction = Tx.Direction.INBOUND
-                this.message = "message"
-                this.status = TxStatus.COMPLETED
-            })
-
-            completedTxs.add(CompletedTx().apply {
-                fee = MicroTari(BigInteger("100"))
-                this.confirmationCount = BigInteger("40")
-                this.user = User().apply {
-                    walletAddress = TariWalletAddress().apply {
-                        hexString = "hex string"
-                        emojiId =
-                            "\uD83C\uDF6A\uD83C\uDF5E\uD83D\uDC8E\uD83C\uDFBD\uD83D\uDC28\uD83D\uDC2C\uD83C\uDF4C\uD83D\uDC89\uD83C\uDF79\uD83C\uDF4E\uD83D\uDD2C\uD83D\uDEBD\uD83C\uDF6F\uD83C\uDF54\uD83D\uDC54\uD83D\uDC11\uD83C\uDF1F\uD83C\uDFA5\uD83D\uDC51\uD83C\uDF4D\uD83D\uDC89\uD83D\uDC0A\uD83D\uDC94\uD83C\uDFBD\uD83D\uDCBB\uD83D\uDC5A\uD83D\uDD2D\uD83D\uDC38\uD83C\uDF5A\uD83D\uDCC8\uD83C\uDF40\uD83C\uDFB1\uD83C\uDF1F"
-                    }
-                }
-                this.amount = MicroTari(BigInteger("1000000000"))
-                this.direction = Tx.Direction.OUTBOUND
-                this.message = "message"
-                this.status = TxStatus.COMPLETED
-            })
-
-            pendingInboundTxs.add(PendingInboundTx().apply {
-                this.user = User().apply {
-                    walletAddress = TariWalletAddress().apply {
-                        hexString = "hex string"
-                        emojiId =
-                            "\uD83C\uDF6A\uD83C\uDF5E\uD83D\uDC8E\uD83C\uDFBD\uD83D\uDC28\uD83D\uDC2C\uD83C\uDF4C\uD83D\uDC89\uD83C\uDF79\uD83C\uDF4E\uD83D\uDD2C\uD83D\uDEBD\uD83C\uDF6F\uD83C\uDF54\uD83D\uDC54\uD83D\uDC11\uD83C\uDF1F\uD83C\uDFA5\uD83D\uDC51\uD83C\uDF4D\uD83D\uDC89\uD83D\uDC0A\uD83D\uDC94\uD83C\uDFBD\uD83D\uDCBB\uD83D\uDC5A\uD83D\uDD2D\uD83D\uDC38\uD83C\uDF5A\uD83D\uDCC8\uD83C\uDF40\uD83C\uDFB1\uD83C\uDF1F"
-                    }
-                }
-                this.amount = MicroTari(BigInteger("1000000000"))
-                this.direction = Tx.Direction.INBOUND
-                this.message = "message"
-                this.status = TxStatus.PENDING
-            })
-
-            pendingOutboundTxs.add(PendingOutboundTx().apply {
-                fee = MicroTari(BigInteger("100"))
-                this.user = User().apply {
-                    walletAddress = TariWalletAddress().apply {
-                        hexString = "hex string"
-                        emojiId =
-                            "\uD83C\uDF6A\uD83C\uDF5E\uD83D\uDC8E\uD83C\uDFBD\uD83D\uDC28\uD83D\uDC2C\uD83C\uDF4C\uD83D\uDC89\uD83C\uDF79\uD83C\uDF4E\uD83D\uDD2C\uD83D\uDEBD\uD83C\uDF6F\uD83C\uDF54\uD83D\uDC54\uD83D\uDC11\uD83C\uDF1F\uD83C\uDFA5\uD83D\uDC51\uD83C\uDF4D\uD83D\uDC89\uD83D\uDC0A\uD83D\uDC94\uD83C\uDFBD\uD83D\uDCBB\uD83D\uDC5A\uD83D\uDD2D\uD83D\uDC38\uD83C\uDF5A\uD83D\uDCC8\uD83C\uDF40\uD83C\uDFB1\uD83C\uDF1F"
-                    }
-                }
-                this.amount = MicroTari(BigInteger("1000000000"))
-                this.direction = Tx.Direction.OUTBOUND
-                this.message = "message"
-                this.status = TxStatus.PENDING
-            })
-
-            cancelledTxs.add(CancelledTx().apply {
-                fee = MicroTari(BigInteger("100"))
-                cancellationReason = FFITxCancellationReason.UserCancelled
-                this.user = User().apply {
-                    walletAddress = TariWalletAddress().apply {
-                        hexString = "hex string"
-                        emojiId =
-                            "\uD83C\uDF6A\uD83C\uDF5E\uD83D\uDC8E\uD83C\uDFBD\uD83D\uDC28\uD83D\uDC2C\uD83C\uDF4C\uD83D\uDC89\uD83C\uDF79\uD83C\uDF4E\uD83D\uDD2C\uD83D\uDEBD\uD83C\uDF6F\uD83C\uDF54\uD83D\uDC54\uD83D\uDC11\uD83C\uDF1F\uD83C\uDFA5\uD83D\uDC51\uD83C\uDF4D\uD83D\uDC89\uD83D\uDC0A\uD83D\uDC94\uD83C\uDFBD\uD83D\uDCBB\uD83D\uDC5A\uD83D\uDD2D\uD83D\uDC38\uD83C\uDF5A\uD83D\uDCC8\uD83C\uDF40\uD83C\uDFB1\uD83C\uDF1F"
-                    }
-                }
-                this.amount = MicroTari(BigInteger("1000000000"))
-                this.direction = Tx.Direction.OUTBOUND
-                this.message = "message"
-                this.status = TxStatus.REJECTED
-            })
-        }
-
         val minedUnconfirmedTxs = completedTxs.filter { it.status == TxStatus.MINED_UNCONFIRMED }
         val nonMinedUnconfirmedCompletedTxs = completedTxs.filter { it.status != TxStatus.MINED_UNCONFIRMED }
 
@@ -247,7 +183,15 @@ class TxListViewModel : CommonViewModel() {
         pendingTxs.sortWith(compareByDescending(Tx::timestamp).thenByDescending { it.id })
         if (pendingTxs.isNotEmpty()) {
             items.add(TitleViewHolderItem(resourceManager.getString(home_pending_transactions_title), true))
-            items.addAll(pendingTxs.mapIndexed { index, tx -> TransactionItem(tx, index, GIFViewModel(gifRepository), confirmationCount) })
+            items.addAll(pendingTxs.mapIndexed { index, tx ->
+                TransactionItem(
+                    tx,
+                    contactsRepository.ffiBridge.getContactForTx(tx),
+                    index,
+                    GIFViewModel(gifRepository),
+                    confirmationCount
+                )
+            })
         }
 
         // sort and add non-pending txs
@@ -256,7 +200,13 @@ class TxListViewModel : CommonViewModel() {
         if (nonPendingTxs.isNotEmpty()) {
             items.add(TitleViewHolderItem(resourceManager.getString(home_completed_transactions_title), false))
             items.addAll(nonPendingTxs.mapIndexed { index, tx ->
-                TransactionItem(tx, index + pendingTxs.size, GIFViewModel(gifRepository), confirmationCount)
+                TransactionItem(
+                    tx,
+                    contactsRepository.ffiBridge.getContactForTx(tx),
+                    index + pendingTxs.size,
+                    GIFViewModel(gifRepository),
+                    confirmationCount
+                )
             })
         }
         _list.postValue(items)
@@ -287,9 +237,6 @@ class TxListViewModel : CommonViewModel() {
         EventBus.subscribe<Event.Transaction.TxSendFailed>(this) { onTxSendFailed(it.failureReason) }
 
         EventBus.balanceState.publishSubject.subscribe { _balanceInfo.postValue(it) }.addTo(compositeDisposable)
-
-        EventBus.subscribe<Event.Contact.ContactAddedOrUpdated>(this) { onContactAddedOrUpdated(it.contactAddress, it.contactAlias) }
-        EventBus.subscribe<Event.Contact.ContactRemoved>(this) { onContactRemoved(it.contactAddress) }
     }
 
     private fun onTxReceived(tx: PendingInboundTx) {
@@ -388,22 +335,6 @@ class TxListViewModel : CommonViewModel() {
         _listUpdateTrigger.postValue(Unit)
     }
 
-    private fun onContactAddedOrUpdated(tariWalletAddress: TariWalletAddress, alias: String) {
-        val contact = Contact(tariWalletAddress, alias)
-        (cancelledTxs.asSequence() + pendingInboundTxs + pendingOutboundTxs + completedTxs)
-            .filter { it.user.walletAddress == tariWalletAddress }
-            .forEach { it.user = contact }
-        _listUpdateTrigger.postValue(Unit)
-    }
-
-    private fun onContactRemoved(tariWalletAddress: TariWalletAddress) {
-        val user = User(tariWalletAddress)
-        (cancelledTxs.asSequence() + pendingInboundTxs + pendingOutboundTxs + completedTxs)
-            .filter { it.user.walletAddress == tariWalletAddress }
-            .forEach { it.user = user }
-        _listUpdateTrigger.postValue(Unit)
-    }
-
     private fun onTxSendSuccessful(txId: TxId) {
         _txSendSuccessful.postValue(Unit)
 
@@ -443,30 +374,6 @@ class TxListViewModel : CommonViewModel() {
             resourceManager.getString(error_node_unreachable_description),
         )
         _modularDialog.postValue(errorDialogArgs.getModular(resourceManager))
-    }
-
-    fun showIncompatibleVersionDialog() {
-        val args = ModularDialogArgs(
-            DialogArgs(), listOf(
-                HeadModule(resourceManager.getString(ffi_validation_error_title)),
-                BodyModule(resourceManager.getString(ffi_validation_error_message)),
-                ButtonModule(resourceManager.getString(ffi_validation_error_delete), ButtonStyle.Warning) {
-                    _dismissDialog.postValue(Unit)
-                    deleteWallet()
-                },
-                ButtonModule(resourceManager.getString(ffi_validation_error_cancel), ButtonStyle.Close) {
-                    _dismissDialog.postValue(Unit)
-                }
-            ))
-        _modularDialog.postValue(args)
-    }
-
-    private fun deleteWallet() {
-        // disable CTAs
-        viewModelScope.launch(Dispatchers.IO) {
-            walletServiceLauncher.stopAndDelete()
-            _navigation.postValue(TxListNavigation.ToSplashScreen)
-        }
     }
 
     companion object {

@@ -179,11 +179,11 @@
     <string name="home_setup_is_complete">Your wallet setup is complete.</string>
     <string name="home_you_are_ready_to_explore">You’re ready to start exploring</string>
     <string name="home_empty_wallet">We don’t see any transactions yet.\nHopefully something happens soon…🤞</string>
-    <string name="home_navigation_content_description_navigate_to_settings">Navigate to settings</string>
-    <string name="home_navigation_content_description_navigate_to_wallet_info">Navigate to wallet info</string>
-    <string name="home_navigation_content_description_navigate_to_ttl_store">Navigate to TTL store</string>
-    <string name="home_navigation_content_description_navigate_to_transactions_list">Navigate to transactions list</string>
-    <string name="home_navigation_content_description_navigate_to_send_tari">Navigate to Tari send flow</string>
+    <string name="homenavigation_content_description_navigate_to_settings">Navigate to settings</string>
+    <string name="homenavigation_content_description_navigate_to_wallet_info">Navigate to wallet info</string>
+    <string name="homenavigation_content_description_navigate_to_ttl_store">Navigate to TTL store</string>
+    <string name="homenavigation_content_description_navigate_to_transactions_list">Navigate to transactions list</string>
+    <string name="homenavigation_content_description_navigate_to_send_tari">Navigate to Tari send flow</string>
     <string name="home_pending_transactions_title">Pending Transactions</string>
     <string name="home_completed_transactions_title">Completed Transactions</string>
     <string name="home_custom_base_node_title">Add custom base node</string>
@@ -237,13 +237,12 @@
     <string name="request_tari_share_text">Hi! Please send me %s Tari(s) using this link: %s</string>
 
     <!-- send tari - add recipient -->
-    <string name="add_recipient_hint">Enter Emoji ID, Contact Name or Yat</string>
     <string name="add_recipient_recent_tx_contacts">Recent</string>
     <string name="add_recipient_my_contacts">My Contacts</string>
     <string name="add_recipient_invalid_emoji_id">Not a valid Emoji ID</string>
     <string name="add_recipient_own_emoji_id">Sorry, you cannot send tXTR to yourself.</string>
     <!-- QR-scanner -->
-    <string name="add_recipient_scan_qr_description">Scan a Tari QR code\nto send tXTR to the recipient.</string>
+    <string name="add_recipient_scan_qr_description">Scan a Tari QR code</string>
     <string name="add_recipient_failed_init_camera_message">Failed to initialize Camera</string>
     <string name="add_recipient_camera_permission_denied_message">Camera permission denied</string>
 
@@ -346,7 +345,7 @@
     <string name="debug_log_filter_aurora_general">Aurora - General</string>
     <string name="debug_log_filter_aurora_connection">Aurora - Connection</string>
     <string name="debug_log_filter_aurora_ui">Aurora - UI</string>
-    <string name="debug_log_filter_aurora_navigation">Aurora - Navigation</string>
+    <string name="debug_log_filter_auroranavigation">Aurora - Navigation</string>
 
     <string name="bugs_reporting_title">Report a Bug</string>
     <string name="bugs_reporting_description">Has something gone wrong? Please let us know!</string>
@@ -698,5 +697,57 @@
     <string name="onboarding_staged_wallet_security_footer_part3_any_funds">. This step is triggered when you receive funds for the first time, but you can apply any step at any time from the settings</string>
     <string name="onboarding_staged_wallet_security_footer_part3_threshold">. This step is triggered when your balance exceeds %s for the first time, but you can apply any step at any time from the settings</string>
 
+
+    <!-- Contact book -->
+    <string name="contact_book_contacts_book_title">Contact Book</string>
+    <string name="contact_book_contacts_book_details_title">Contact Profile</string>
+    <string name="contact_book_contacts_book_link_title">Link Contact</string>
+    <string name="contact_book_contacts_book_link_message_firstLine"><![CDATA[Click "confirm" below to link]]></string>
+    <string name="contact_book_contacts_book_link_message_secondLine"><![CDATA[to <b>%s</b>]]></string>
+    <string name="contact_book_contacts_book_link_success_message_firstLine"><![CDATA[You have successfully linked]]></string>
+    <string name="contact_book_contacts_book_link_success_message_secondLine"><![CDATA[to <b>%s</b>]]></string>
+    <string name="contact_book_contacts_book_link_message">You can quickly associate an Emoji ID or Yat with a contact already present in your phone. Simply click on a name below and it will be linked to %s</string>
+    <string name="contact_book_contacts_book_unlink_title">Unlink Contact</string>
+    <string name="contact_book_contacts_book_unlink_message_firstLine"><![CDATA[Click "confirm" to unlink]]></string>
+    <string name="contact_book_contacts_book_unlink_message_secondLine"><![CDATA[from <b>%s</b>]]></string>
+    <string name="contact_book_contacts_book_unlink_success_title">Success!</string>
+    <string name="contact_book_contacts_book_unlink_success_message_firstLine"><![CDATA[You have successfully unlinked]]></string>
+    <string name="contact_book_contacts_book_unlink_success_message_secondLine"><![CDATA[from <b>%s</b>]]></string>
+    <string name="contact_book_contacts_title">Contacts</string>
+    <string name="contact_book_favorites_title">Favorites</string>
+    <string name="contact_book_add_contact_title">Add Contact</string>
+    <string name="contact_book_add_contact_first_name_hint">First Name</string>
+    <string name="contact_book_add_contact_surname_hint">Surname</string>
+    <string name="contact_book_add_contact_yat_hint">Yat</string>
+    <string name="contact_book_add_contact_placeholder">Enter Emoji ID, Contact Name or Yat</string>
+    <string name="contact_book_search_hint">Find Contact</string>
+    <string name="contact_book_details_send_tari">Send Tari</string>
+    <string name="contact_book_details_add_to_favorites">Add to Favorites</string>
+    <string name="contact_book_details_remove_from_favorites">Remove from Favorites</string>
+    <string name="contact_book_details_delete_contact">Delete Contact</string>
+    <string name="contact_book_details_delete_message">You are about to permanently remove this contact. Are you sure?</string>
+    <string name="contact_book_details_delete_button_title">Delete</string>
+    <string name="contact_book_details_phone_contacts">Phone Contact</string>
+    <string name="contact_book_details_connected_wallets">Connected Wallets</string>
+    <string name="contact_book_details_connected_wallets_bitcoin">Open Bitcoin Wallet</string>
+    <string name="contact_book_details_connected_wallets_etherium">Open Etherium Wallet</string>
+    <string name="contact_book_details_connected_wallets_monero">Open Monero Wallet</string>
+    <string name="contact_book_details_connected_wallets_no_application">Unfortunately, there are no applications that could open this type of address. Try to install corresponding application</string>
+    <string name="contact_book_details_edit">Edit</string>
+    <string name="contact_book_details_edit_title">Edit Contact</string>
+    <string name="contact_book_empty_state_title"><![CDATA[Find your <b>friends</b>]]></string>
+    <string name="contact_book_empty_state_body"><![CDATA[Keep track of your contacts by saving them in the contact book. To <b>add a new contact,</b> tap the "add contact" icon at the top of the page]]></string>
+    <string name="contact_book_empty_state_body_no_permissions"><![CDATA[You can <b>add a new contact</b> by tapping on the "add contact" icon at the top of the page. Aurora can also automatically detect contacts with Tari addresses on you phone. We’ll need your permission to access your existing contact book to do this]]></string>
+    <string name="contact_book_empty_state_favorites_title"><![CDATA[Add some <b>favorites</b>]]></string>
+    <string name="contact_book_empty_state_favorites_body"><![CDATA[You can <b>favorite contacts</b> to easily access them later. Tap on the contact’s name and then on the star icon to add them to your favorites list]]></string>
+    <string name="contact_book_empty_state_grant_access_button">Grant app access to my contacts</string>
+    <string name="contact_book_add_contact_done_button">Done</string>
+    <string name="contact_book_add_contact_next_button">Next</string>
+    <string name="contact_book_type_yat">Yat Contact</string>
+    <string name="contact_book_type_ffi">Tari Contact</string>
+    <string name="contact_book_type_contact_book">Phone Contact</string>
+    <string name="contact_book_type_merged">Linked Contact</string>
+    <string name="remove_all">Remove all contacts</string>
+    <string name="add_1000_contacts">Add 1000 contacts</string>
 
 </resources>
