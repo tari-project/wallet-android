@@ -39,14 +39,13 @@ package com.tari.android.wallet
 
 import android.content.Context
 import androidx.test.core.app.ApplicationProvider.getApplicationContext
+import com.tari.android.wallet.data.WalletConfig
 import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepositoryImpl
 import com.tari.android.wallet.di.ApplicationModule
-import com.tari.android.wallet.di.WalletModule
 import com.tari.android.wallet.ffi.FFICommsConfig
 import com.tari.android.wallet.ffi.FFIException
 import com.tari.android.wallet.ffi.FFITariTransportConfig
 import com.tari.android.wallet.ffi.nullptr
-import com.tari.android.wallet.ui.common.domain.ResourceManager
 import com.tari.android.wallet.util.Constants
 import org.junit.After
 import org.junit.Assert.assertNotEquals
@@ -70,7 +69,7 @@ class FFICommsConfigTests {
         @BeforeClass
         @JvmStatic
         fun fullSetup() {
-            walletDir = WalletModule().provideWalletConfig(context, networkRepository).getWalletFilesDirPath()
+            walletDir = WalletConfig(context, networkRepository).getWalletFilesDirPath()
             FFITestUtil.clearTestFiles(walletDir)
         }
     }

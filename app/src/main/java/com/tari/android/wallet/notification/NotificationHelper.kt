@@ -51,13 +51,12 @@ import com.tari.android.wallet.model.TxId
 import com.tari.android.wallet.ui.extension.PermissionExtensions.isPermissionGranted
 import com.tari.android.wallet.ui.fragment.home.HomeDeeplinkScreens
 import com.tari.android.wallet.util.WalletUtil
+import javax.inject.Inject
+import javax.inject.Singleton
 
-/**
- * Contains helper functions for building and posting notifications.
- *
- * @author The Tari Development Team
- */
-class NotificationHelper(private val context: Context) {
+
+@Singleton
+class NotificationHelper @Inject constructor(private val context: Context) {
 
     companion object {
         // notification channel id
@@ -160,9 +159,13 @@ class NotificationHelper(private val context: Context) {
         }
 
         // send group notification
-        notificationManager.notify(APP_NOTIFICATION_GROUP_ID, txGroupNotification)
-        // send actual notification
-        notificationManager.notify(tx.id.toInt(), notification)
+        try {
+            notificationManager.notify(APP_NOTIFICATION_GROUP_ID, txGroupNotification)
+            // send actual notification
+            notificationManager.notify(tx.id.toInt(), notification)
+        } catch (e: SecurityException) {
+            e.printStackTrace()
+        }
     }
 
     fun postTxCanceledNotification(tx: CancelledTx) {
@@ -189,10 +192,14 @@ class NotificationHelper(private val context: Context) {
             priority = NotificationCompat.PRIORITY_MAX
             build()
         }
-        // send group notification
-        notificationManager.notify(APP_NOTIFICATION_GROUP_ID, txGroupNotification)
-        // send actual notification
-        notificationManager.notify(tx.id.toInt(), notification)
+
+        try {
+            notificationManager.notify(APP_NOTIFICATION_GROUP_ID, txGroupNotification)
+            // send actual notification
+            notificationManager.notify(tx.id.toInt(), notification)
+        } catch (e: SecurityException) {
+            e.printStackTrace()
+        }
     }
 
     /**
@@ -213,8 +220,11 @@ class NotificationHelper(private val context: Context) {
             build()
         }
 
-        // send notification
-        notificationManager.notify(APP_NOTIFICATION_GROUP_ID, txGroupNotification)
-        notificationManager.notify(System.currentTimeMillis().toInt(), notification)
+        try {
+            notificationManager.notify(APP_NOTIFICATION_GROUP_ID, txGroupNotification)
+            notificationManager.notify(System.currentTimeMillis().toInt(), notification)
+        } catch (e: SecurityException) {
+            e.printStackTrace()
+        }
     }
 }

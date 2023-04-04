@@ -10,7 +10,6 @@ import com.tari.android.wallet.databinding.FragmentTorBridgeSelectionBinding
 import com.tari.android.wallet.extension.observe
 import com.tari.android.wallet.ui.common.CommonFragment
 import com.tari.android.wallet.ui.common.recyclerView.CommonAdapter
-import com.tari.android.wallet.ui.fragment.settings.allSettings.AllSettingsRouter
 import com.tari.android.wallet.ui.fragment.settings.torBridges.torItem.TorBridgesAdapter
 
 class TorBridgesSelectionFragment : CommonFragment<FragmentTorBridgeSelectionBinding, TorBridgesSelectionViewModel>() {
@@ -45,14 +44,5 @@ class TorBridgesSelectionFragment : CommonFragment<FragmentTorBridgeSelectionBin
 
     private fun observeUI() = with(viewModel) {
         observe(torBridges) { adapter.update(it) }
-
-        observe(navigation) { processNavigation(it) }
-    }
-
-    private fun processNavigation(navigation: TorBridgeNavigation) {
-        val router = requireActivity() as AllSettingsRouter
-        when (navigation) {
-            TorBridgeNavigation.ToCustomBridges -> router.toCustomTorBridges()
-        }
     }
 }

@@ -6,8 +6,12 @@ import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefBooleanDeleg
 import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefStringDelegate
 import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
 import com.tari.android.wallet.data.sharedPrefs.network.formatKey
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class YatSharedRepository(sharedPreferences: SharedPreferences, networkRepository: NetworkRepository) : CommonRepository(networkRepository) {
+@Singleton
+class YatSharedRepository @Inject constructor(sharedPreferences: SharedPreferences, networkRepository: NetworkRepository) :
+    CommonRepository(networkRepository) {
     private object Key {
         const val yatKey = "tari_wallet_yat_string"
         const val yatKeyDisconnected = "tari_wallet_yat_disconnected_string"

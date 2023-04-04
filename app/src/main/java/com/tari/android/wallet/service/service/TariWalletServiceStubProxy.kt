@@ -1,6 +1,19 @@
 package com.tari.android.wallet.service.service
 
-import com.tari.android.wallet.model.*
+import com.tari.android.wallet.model.BalanceInfo
+import com.tari.android.wallet.model.CancelledTx
+import com.tari.android.wallet.model.CompletedTx
+import com.tari.android.wallet.model.MicroTari
+import com.tari.android.wallet.model.PendingInboundTx
+import com.tari.android.wallet.model.PendingOutboundTx
+import com.tari.android.wallet.model.TariCoinPreview
+import com.tari.android.wallet.model.TariContact
+import com.tari.android.wallet.model.TariUnblindedOutput
+import com.tari.android.wallet.model.TariUtxo
+import com.tari.android.wallet.model.TariVector
+import com.tari.android.wallet.model.TariWalletAddress
+import com.tari.android.wallet.model.TxId
+import com.tari.android.wallet.model.WalletError
 import com.tari.android.wallet.service.TariWalletService
 import com.tari.android.wallet.service.TariWalletServiceListener
 
@@ -24,7 +37,7 @@ class TariWalletServiceStubProxy : TariWalletService.Stub() {
     override fun estimateTxFee(amount: MicroTari, error: WalletError, feePerGram: MicroTari?): MicroTari? =
         stub.estimateTxFee(amount, error, feePerGram)
 
-    override fun getContacts(error: WalletError): List<Contact>? = stub.getContacts(error)
+    override fun getContacts(error: WalletError): List<TariContact>? = stub.getContacts(error)
 
     override fun getCompletedTxs(error: WalletError): List<CompletedTx>? = stub.getCompletedTxs(error)
 
@@ -50,7 +63,7 @@ class TariWalletServiceStubProxy : TariWalletService.Stub() {
     override fun startBaseNodeSync(error: WalletError): Boolean = stub.startBaseNodeSync(error)
 
     override fun sendTari(
-        contact: User,
+        contact: TariContact,
         amount: MicroTari,
         feePerGram: MicroTari,
         message: String,
@@ -58,10 +71,10 @@ class TariWalletServiceStubProxy : TariWalletService.Stub() {
         error: WalletError
     ): TxId? = stub.sendTari(contact, amount, feePerGram, message, isOneSidePayment, error)
 
-    override fun updateContactAlias(contactPublicKey: TariWalletAddress, alias: String, error: WalletError): Boolean =
-        stub.updateContactAlias(contactPublicKey, alias, error)
+    override fun updateContact(contactPublicKey: TariWalletAddress, alias: String, isFavorite: Boolean, error: WalletError): Boolean =
+        stub.updateContact(contactPublicKey, alias, isFavorite, error)
 
-    override fun removeContact(contact: Contact, error: WalletError): Boolean = stub.removeContact(contact, error)
+    override fun removeContact(tariContact: TariContact, error: WalletError): Boolean = stub.removeContact(tariContact, error)
 
     override fun getWalletAddressFromHexString(hex: String): TariWalletAddress? = stub.getWalletAddressFromHexString(hex)
 

@@ -40,7 +40,6 @@ import androidx.fragment.app.viewModels
 import com.tari.android.wallet.databinding.FragmentWalletRestoringFromSeedWordsBinding
 import com.tari.android.wallet.extension.observe
 import com.tari.android.wallet.ui.common.CommonFragment
-import com.tari.android.wallet.ui.fragment.restore.activity.WalletRestoreRouter
 
 class WalletRestoringFromSeedWordsFragment :
     CommonFragment<FragmentWalletRestoringFromSeedWordsBinding, WalletRestoringFromSeedWordsViewModel>() {
@@ -61,20 +60,7 @@ class WalletRestoringFromSeedWordsFragment :
     }
 
     private fun subscribeUI() = with(viewModel) {
-        observe(navigation) { processNavigation(it) }
-
         observe(recoveryState) { processRecoveryState(it) }
-    }
-
-    private fun processNavigation(navigation: WalletRestoringFromSeedWordsNavigation) {
-        val router = requireActivity() as WalletRestoreRouter
-        when (navigation) {
-            WalletRestoringFromSeedWordsNavigation.OnRestoreCompleted -> router.onRestoreCompleted()
-            WalletRestoringFromSeedWordsNavigation.OnRestoreFailed -> {
-                changeOnBackPressed(false)
-                requireActivity().onBackPressed()
-            }
-        }
     }
 
     private fun processRecoveryState(state: WalletRestoringFromSeedWordsViewModel.RecoveryState) {

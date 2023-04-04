@@ -15,8 +15,21 @@
         android:layout_height="42dp"
         android:layout_marginStart="11dp"
         android:layout_marginTop="32dp"
+        android:clipChildren="true"
+        android:clipToOutline="true"
+        android:clipToPadding="true"
         app:cornerRadius="21dp"
         app:elevation="4dp">
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/avatar"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
             android:id="@+id/first_emoji_text_view"

@@ -56,7 +56,6 @@ import com.tari.android.wallet.ui.extension.setOnThrottledClickListener
 import com.tari.android.wallet.ui.extension.showKeyboard
 import com.tari.android.wallet.ui.extension.string
 import com.tari.android.wallet.ui.extension.visible
-import com.tari.android.wallet.ui.fragment.restore.activity.WalletRestoreRouter
 
 class EnterRestorationPasswordFragment : CommonFragment<FragmentEnterRestorePasswordBinding, EnterRestorationPasswordViewModel>() {
 
@@ -86,8 +85,6 @@ class EnterRestorationPasswordFragment : CommonFragment<FragmentEnterRestorePass
 
     private fun observeUI() = with(viewModel) {
         observe(state) { processState(it) }
-
-        observe(navigation) { processNavigation(it) }
     }
 
     private fun processState(state: EnterRestorationPasswordState) {
@@ -98,13 +95,6 @@ class EnterRestorationPasswordFragment : CommonFragment<FragmentEnterRestorePass
                 showWrongPasswordErrorLabels()
                 showInputUI()
             }
-        }
-    }
-
-    private fun processNavigation(navigation: EnterRestorationPasswordNavigation) {
-        val router = requireActivity() as WalletRestoreRouter
-        when (navigation) {
-            EnterRestorationPasswordNavigation.OnRestore -> router.onRestoreCompleted()
         }
     }
 

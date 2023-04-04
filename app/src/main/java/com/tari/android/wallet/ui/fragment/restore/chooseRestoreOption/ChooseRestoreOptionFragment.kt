@@ -42,8 +42,7 @@ import androidx.fragment.app.viewModels
 import com.tari.android.wallet.databinding.FragmentChooseRestoreOptionBinding
 import com.tari.android.wallet.extension.observe
 import com.tari.android.wallet.ui.common.CommonFragment
-import com.tari.android.wallet.ui.extension.setOnThrottledClickListener
-import com.tari.android.wallet.ui.fragment.restore.activity.WalletRestoreRouter
+import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
 import com.tari.android.wallet.ui.fragment.restore.chooseRestoreOption.option.RecoveryOptionView
 import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupOptionDto
 import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupOptions
@@ -75,7 +74,7 @@ class ChooseRestoreOptionFragment : CommonFragment<FragmentChooseRestoreOptionBi
     }
 
     private fun setupUI() = with(ui) {
-        restoreWithRecoveryPhraseCtaView.setOnClickListener { processNavigation(ChooseRestoreOptionNavigation.ToRestoreWithRecoveryPhrase) }
+        restoreWithRecoveryPhraseCtaView.setOnClickListener { viewModel.navigation.postValue(Navigation.ChooseRestoreOptionNavigation.ToRestoreWithRecoveryPhrase) }
     }
 
     private fun startRecovery(options: BackupOptions) {
@@ -85,8 +84,6 @@ class ChooseRestoreOptionFragment : CommonFragment<FragmentChooseRestoreOptionBi
 
     private fun observeUI() = with(viewModel) {
         observe(state) { processState(it) }
-
-        observe(navigation) { processNavigation(it) }
 
         observe(options) { initOptions(it) }
     }
@@ -109,14 +106,6 @@ class ChooseRestoreOptionFragment : CommonFragment<FragmentChooseRestoreOptionBi
         }
     }
 
-    private fun processNavigation(navigation: ChooseRestoreOptionNavigation) {
-        val router = requireActivity() as WalletRestoreRouter
-        when (navigation) {
-            ChooseRestoreOptionNavigation.ToEnterRestorePassword -> router.toEnterRestorePassword()
-            ChooseRestoreOptionNavigation.OnRestoreCompleted -> router.onRestoreCompleted()
-            ChooseRestoreOptionNavigation.ToRestoreWithRecoveryPhrase -> router.toRestoreWithRecoveryPhrase()
-        }
-    }
 
     private fun updateProgress(backupOptions: BackupOptions, isStarted: Boolean) {
         blockingBackPressDispatcher.isEnabled = isStarted

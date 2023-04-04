@@ -93,15 +93,4 @@ class PresentationModule {
     fun provideGIFsRepository(@Named(GIPHY_RETROFIT) retrofit: Retrofit): GIFRepository =
         GiphyRESTRetrofitRepository(retrofit.create())
 
-    @Provides
-    @Singleton
-    fun provideGiphyKeywordsRepository(): GiphyKeywordsRepository = GiphyKeywordsRepository()
-
-    @Provides
-    @Singleton
-    fun provideBackupSettingsRepository(
-        context: Context,
-        networkRepository: NetworkRepository,
-        sharedPreferences: SharedPreferences
-    ): BackupSettingsRepository = BackupSettingsRepository(context, sharedPreferences, networkRepository)
 }

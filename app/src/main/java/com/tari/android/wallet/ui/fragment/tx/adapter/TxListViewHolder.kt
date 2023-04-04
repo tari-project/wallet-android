@@ -1,5 +1,6 @@
 package com.tari.android.wallet.ui.fragment.tx.adapter
 
+import android.net.Uri
 import androidx.annotation.StringRes
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
@@ -11,7 +12,7 @@ import com.tari.android.wallet.databinding.ItemHomeTxListBinding
 import com.tari.android.wallet.extension.applyFontStyle
 import com.tari.android.wallet.model.CancelledTx
 import com.tari.android.wallet.model.CompletedTx
-import com.tari.android.wallet.model.Contact
+import com.tari.android.wallet.model.TariContact
 import com.tari.android.wallet.model.PendingInboundTx
 import com.tari.android.wallet.model.PendingOutboundTx
 import com.tari.android.wallet.model.Tx
@@ -27,8 +28,11 @@ import com.tari.android.wallet.ui.component.tari.TariFont
 import com.tari.android.wallet.ui.extension.dimen
 import com.tari.android.wallet.ui.extension.gone
 import com.tari.android.wallet.ui.extension.setTopMargin
+import com.tari.android.wallet.ui.extension.setVisible
 import com.tari.android.wallet.ui.extension.string
 import com.tari.android.wallet.ui.extension.visible
+import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.ContactDto
+import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.MergedContactDto
 import com.tari.android.wallet.util.WalletUtil
 import com.tari.android.wallet.util.extractEmojis
 import org.joda.time.DateTime
@@ -48,8 +52,8 @@ class TxListViewHolder(view: ItemHomeTxListBinding) : CommonViewHolder<Transacti
 
         with(item.tx) {
             this@TxListViewHolder.tx = this
-            displayFirstEmoji(this)
-            displayAliasOrEmojiId(this)
+            displayFirstEmojiOrAvatar(this, item.contact)
+            displayAliasOrEmojiId(this, item.contact)
             displayAmount(this)
             displayDate(this)
             displayStatus(this)
@@ -61,15 +65,22 @@ class TxListViewHolder(view: ItemHomeTxListBinding) : CommonViewHolder<Transacti
         item.viewModel.gifState.observeForever { it.handle(this) }
     }
 
-    private fun displayFirstEmoji(tx: Tx) {
-        // display first emoji of emoji id
-        val firstEmoji =
-            if (tx.isOneSided) string(R.string.tx_list_emoji_one_side_payment_placeholder) else tx.user.walletAddress.emojiId.extractEmojis()[0]
-        ui.firstEmojiTextView.text = firstEmoji
+    private fun displayFirstEmojiOrAvatar(tx: Tx, contact: ContactDto?) {
+        val avatar = (contact?.contact as? MergedContactDto)?.phoneContactDto?.avatar.orEmpty()
+        if (avatar.isEmpty()) {
+            // display first emoji of emoji id
+            val firstEmoji = if (tx.isOneSided) string(R.string.tx_list_emoji_one_side_payment_placeholder) else tx.tariContact.walletAddress.emojiId.extractEmojis()[0]
+            ui.firstEmojiTextView.text = firstEmoji
+        } else {
+            // display avatar
+            ui.avatar.setImageURI(Uri.parse(avatar))
+        }
+        ui.avatar.setVisible(avatar.isNotEmpty())
+        ui.firstEmojiTextView.setVisible(avatar.isEmpty())
     }
 
-    private fun displayAliasOrEmojiId(tx: Tx) {
-        val txUser = tx.user
+    private fun displayAliasOrEmojiId(tx: Tx, contact: ContactDto?) {
+        val txUser = tx.tariContact
         // display contact name or emoji id
         when {
             tx.isOneSided -> {
@@ -80,16 +91,17 @@ class TxListViewHolder(view: ItemHomeTxListBinding) : CommonViewHolder<Transacti
                 ui.participantTextView1.text = title
             }
 
-            txUser is Contact -> {
+            contact != null && contact.contact.getAlias().isNotEmpty() -> {
+                val alias = contact.contact.getAlias()
                 val fullText = when (tx.direction) {
-                    Tx.Direction.INBOUND -> string(R.string.tx_list_sent_a_payment, txUser.alias)
-                    Tx.Direction.OUTBOUND -> string(R.string.tx_list_you_paid_with_alias, txUser.alias)
+                    Tx.Direction.INBOUND -> string(R.string.tx_list_sent_a_payment, alias)
+                    Tx.Direction.OUTBOUND -> string(R.string.tx_list_you_paid_with_alias, alias)
                 }
                 ui.participantTextView1.visible()
                 ui.participantTextView1.text = fullText.applyFontStyle(
                     itemView.context,
                     TariFont.AVENIR_LT_STD_LIGHT,
-                    listOf(txUser.alias),
+                    listOf(alias),
                     TariFont.AVENIR_LT_STD_HEAVY
                 )
                 ui.participantEmojiIdView.root.gone()

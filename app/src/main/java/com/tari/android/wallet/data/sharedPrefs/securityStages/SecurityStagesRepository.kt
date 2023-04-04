@@ -38,7 +38,9 @@ import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefGsonDelegate
 import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
 import com.tari.android.wallet.data.sharedPrefs.network.formatKey
 import javax.inject.Inject
+import javax.inject.Singleton
 
+@Singleton
 class SecurityStagesRepository @Inject constructor(sharedPrefs: SharedPreferences, networkRepository: NetworkRepository) :
     CommonRepository(networkRepository) {
 
@@ -46,7 +48,7 @@ class SecurityStagesRepository @Inject constructor(sharedPrefs: SharedPreference
         const val disabledTimestamps = "tari_disabled_timestamp"
     }
 
-    var disabledTimestamps: DisabledTimestampsDto? by SharedPrefGsonDelegate<DisabledTimestampsDto>(
+    var disabledTimestamps: DisabledTimestampsDto? by SharedPrefGsonDelegate(
         sharedPrefs,
         formatKey(Key.disabledTimestamps),
         DisabledTimestampsDto::class.java,

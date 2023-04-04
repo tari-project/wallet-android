@@ -1,20 +1,28 @@
 package com.tari.android.wallet.ui.fragment.tx.details
 
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.toLiveData
 import com.tari.android.wallet.R
 import com.tari.android.wallet.event.Event
 import com.tari.android.wallet.event.EventBus
-import com.tari.android.wallet.extension.executeWithError
 import com.tari.android.wallet.extension.getWithError
 import com.tari.android.wallet.ffi.FFITxCancellationReason
-import com.tari.android.wallet.model.*
+import com.tari.android.wallet.model.CancelledTx
+import com.tari.android.wallet.model.CompletedTx
+import com.tari.android.wallet.model.Tx
+import com.tari.android.wallet.model.TxId
+import com.tari.android.wallet.model.WalletError
 import com.tari.android.wallet.service.TariWalletService
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.dialog.error.ErrorDialogArgs
-import com.tari.android.wallet.ui.extension.toLiveData
+import com.tari.android.wallet.ui.fragment.contact_book.data.ContactsRepository
+import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.ContactDto
+import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
 import io.reactivex.BackpressureStrategy
 import io.reactivex.subjects.BehaviorSubject
+import javax.inject.Inject
 
 class TxDetailsViewModel : CommonViewModel() {
 
@@ -25,7 +33,7 @@ class TxDetailsViewModel : CommonViewModel() {
 
     private val _txObject = BehaviorSubject.create<Tx>()
 
-    val tx: LiveData<Tx> = _txObject.toLiveData(BackpressureStrategy.LATEST)
+    val tx: LiveData<Tx> = _txObject.toFlowable(BackpressureStrategy.LATEST).toLiveData()
 
     private val _cancellationReason = MutableLiveData<String>()
     val cancellationReason: LiveData<String> = _cancellationReason
@@ -33,7 +41,14 @@ class TxDetailsViewModel : CommonViewModel() {
     private val _explorerLink = MutableLiveData("")
     val explorerLink: LiveData<String> = _explorerLink
 
+    val contact = MediatorLiveData<ContactDto>()
+
+    @Inject
+    lateinit var contactsRepository: ContactsRepository
+
     init {
+        component.inject(this)
+
         doOnConnected {
             fetchRequiredConfirmationCount()
             findTxAndUpdateUI()
@@ -41,6 +56,10 @@ class TxDetailsViewModel : CommonViewModel() {
         }
 
         observeTxUpdates()
+
+        contact.addSource(contactsRepository.publishSubject.toFlowable(BackpressureStrategy.LATEST).toLiveData()) { updateContact() }
+
+        contact.addSource(tx) { updateContact() }
     }
 
     fun setTxArg(tx: Tx) {
@@ -65,30 +84,21 @@ class TxDetailsViewModel : CommonViewModel() {
         }
     }
 
-    fun removeContact() {
-        val currentTx = tx.value!!
-        val contact = currentTx.user as? Contact ?: return
+    fun addOrEditContact() {
+        val tx = this.tx.value ?: return
+        val contact = contactsRepository.ffiBridge.getContactForTx(tx)
+        navigation.postValue(Navigation.ContactBookNavigation.ToContactDetails(contact))
 
-        walletService.executeWithError { error, wallet -> wallet.removeContact(contact, error) }
-        currentTx.user = User(contact.walletAddress)
-        EventBus.post(Event.Contact.ContactRemoved(contact.walletAddress))
-
-        _txObject.onNext(currentTx)
-    }
-
-
-    fun updateContactAlias(newAlias: String) {
-        val tx = tx.value!!
-
-        walletService.executeWithError { error, wallet -> wallet.updateContactAlias(tx.user.walletAddress, newAlias, error) }
-
-        tx.user = Contact(tx.user.walletAddress, newAlias)
-        EventBus.post(Event.Contact.ContactAddedOrUpdated(tx.user.walletAddress, newAlias))
-        _txObject.onNext(tx)
     }
 
     fun openInBlockExplorer() {
         _openLink.postValue(_explorerLink.value.orEmpty())
+    }
+
+    private fun updateContact() {
+        val tx = this.tx.value ?: return
+        val contact = contactsRepository.ffiBridge.getContactForTx(tx)
+        this.contact.postValue(contact)
     }
 
     private fun getCancellationReason(tx: Tx): String {

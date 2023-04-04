@@ -25,7 +25,7 @@ class SettingsTitleView : CommonView<CommonViewModel, ViewSettingsTitleBinding> 
 
     override fun setup() = Unit
 
-    fun initDto(dto: SettingsTitleDto) {
+    fun initDto(dto: SettingsTitleViewHolderItem) {
         ui.title.text = dto.title
     }
 }

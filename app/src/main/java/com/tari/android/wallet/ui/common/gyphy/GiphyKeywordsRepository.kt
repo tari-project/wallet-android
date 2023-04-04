@@ -1,6 +1,10 @@
 package com.tari.android.wallet.ui.common.gyphy
 
-class GiphyKeywordsRepository {
+import javax.inject.Inject
+import javax.inject.Singleton
+
+@Singleton
+class GiphyKeywordsRepository @Inject constructor() {
     private val _words = listOf("money", "money machine", "rich")
     private var _currentIndex = 0
 

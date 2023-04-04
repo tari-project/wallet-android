@@ -38,10 +38,9 @@ import android.icu.text.BreakIterator
 import android.view.View
 import android.widget.RemoteViews
 import com.tari.android.wallet.R
-import com.tari.android.wallet.model.Contact
+import com.tari.android.wallet.model.TariContact
 import com.tari.android.wallet.model.MicroTari
 import com.tari.android.wallet.model.Tx
-import com.tari.android.wallet.model.User
 import com.tari.android.wallet.util.WalletUtil
 
 /**
@@ -53,8 +52,8 @@ class CustomTxNotificationViewHolder(val context: Context, tx: Tx) :
     RemoteViews(context.packageName, R.layout.notification_remote_tx) {
 
     init {
-        val user = tx.user
-        if (user is Contact) {
+        val user = tx.tariContact
+        if (user.alias.isNotEmpty()) {
             displayTxContactAlias(user)
         } else {
             displayTxUserEmojiId(user)
@@ -71,22 +70,22 @@ class CustomTxNotificationViewHolder(val context: Context, tx: Tx) :
 
     }
 
-    private fun displayTxContactAlias(contact: Contact) {
-        setTextViewText(R.id.notification_tx_received_txt_contact_alias, contact.alias)
+    private fun displayTxContactAlias(tariContact: TariContact) {
+        setTextViewText(R.id.notification_tx_received_txt_contact_alias, tariContact.alias)
         setViewVisibility(R.id.notification_tx_received_vw_emoji_summary, View.INVISIBLE)
     }
 
-    private fun displayTxUserEmojiId(user: User) {
+    private fun displayTxUserEmojiId(tariContact: TariContact) {
         setTextViewText(R.id.notification_tx_received_txt_contact_alias, "")
         setViewVisibility(R.id.notification_tx_received_txt_contact_alias, View.INVISIBLE)
         val emojis = ArrayList<String>()
         val it: BreakIterator = BreakIterator.getCharacterInstance()
-        it.setText(user.walletAddress.emojiId)
+        it.setText(tariContact.walletAddress.emojiId)
         var previous = 0
         while (it.next() != BreakIterator.DONE) {
             val builder = StringBuilder()
             for (i in previous until it.current()) {
-                builder.append(user.walletAddress.emojiId[i])
+                builder.append(tariContact.walletAddress.emojiId[i])
             }
             emojis.add(builder.toString())
             previous = it.current()

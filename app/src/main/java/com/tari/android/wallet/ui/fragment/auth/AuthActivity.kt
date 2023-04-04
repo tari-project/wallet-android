@@ -32,7 +32,9 @@
  */
 package com.tari.android.wallet.ui.fragment.auth
 
-import android.animation.*
+import android.animation.AnimatorSet
+import android.animation.ObjectAnimator
+import android.animation.ValueAnimator
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
@@ -43,11 +45,24 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import com.daasuu.ei.Ease
 import com.daasuu.ei.EasingInterpolator
-import com.tari.android.wallet.R.string.*
+import com.tari.android.wallet.R.string.auth_biometric_prompt
+import com.tari.android.wallet.R.string.auth_device_lock_code_prompt
+import com.tari.android.wallet.R.string.auth_failed_desc
+import com.tari.android.wallet.R.string.auth_failed_title
+import com.tari.android.wallet.R.string.auth_not_available_or_canceled_desc
+import com.tari.android.wallet.R.string.auth_not_available_or_canceled_title
+import com.tari.android.wallet.R.string.auth_title
+import com.tari.android.wallet.R.string.exit
+import com.tari.android.wallet.R.string.proceed
 import com.tari.android.wallet.databinding.ActivityAuthBinding
+import com.tari.android.wallet.extension.observe
 import com.tari.android.wallet.infrastructure.security.biometric.BiometricAuthenticationException
 import com.tari.android.wallet.ui.common.CommonActivity
-import com.tari.android.wallet.ui.extension.*
+import com.tari.android.wallet.ui.extension.addAnimatorListener
+import com.tari.android.wallet.ui.extension.invisible
+import com.tari.android.wallet.ui.extension.setColor
+import com.tari.android.wallet.ui.extension.string
+import com.tari.android.wallet.ui.extension.visible
 import com.tari.android.wallet.ui.fragment.home.HomeActivity
 import com.tari.android.wallet.ui.fragment.settings.allSettings.TariVersionModel
 import com.tari.android.wallet.util.Constants
@@ -69,14 +84,17 @@ class AuthActivity : CommonActivity<ActivityAuthBinding, AuthViewModel>() {
         bindViewModel(viewModel)
 
         setupUi()
-        viewModel.walletServiceLauncher.start()
+
+        observe(viewModel.goAuth) {
+            // call the animations
+            showTariText()
+            viewModel.walletServiceLauncher.start()
+        }
     }
 
     private fun setupUi() {
         ui.progressBar.setColor(viewModel.paletteManager.getWhite(this))
         ui.progressBar.invisible()
-        // call the animations
-        showTariText()
         ui.networkInfoTextView.text = TariVersionModel(viewModel.networkRepository).versionInfo
     }
 

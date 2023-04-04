@@ -45,8 +45,12 @@ import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
 import com.tari.android.wallet.data.sharedPrefs.network.formatKey
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.service.baseNode.BaseNodeState
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class BaseNodeSharedRepository(sharedPrefs: SharedPreferences, networkRepository: NetworkRepository) : CommonRepository(networkRepository) {
+@Singleton
+class BaseNodeSharedRepository @Inject constructor(sharedPrefs: SharedPreferences, networkRepository: NetworkRepository) :
+    CommonRepository(networkRepository) {
 
     private object Key {
         const val currentBaseNodeField = "tari_wallet_current_base_node"

@@ -46,8 +46,15 @@ import com.google.api.client.googleapis.extensions.android.gms.auth.UserRecovera
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.BuildConfig
 import com.tari.android.wallet.R
+import com.tari.android.wallet.data.WalletConfig
 import com.tari.android.wallet.data.sharedPrefs.delegates.SerializableTime
-import com.tari.android.wallet.infrastructure.backup.*
+import com.tari.android.wallet.infrastructure.backup.BackupException
+import com.tari.android.wallet.infrastructure.backup.BackupFileProcessor
+import com.tari.android.wallet.infrastructure.backup.BackupNamingPolicy
+import com.tari.android.wallet.infrastructure.backup.BackupStorage
+import com.tari.android.wallet.infrastructure.backup.BackupStorageAuthRevokedException
+import com.tari.android.wallet.infrastructure.backup.BackupStorageSetupCancelled
+import com.tari.android.wallet.infrastructure.backup.BackupStorageTamperedException
 import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupSettingsRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -55,12 +62,15 @@ import org.joda.time.DateTime
 import java.io.File
 import java.io.FileOutputStream
 import java.io.InputStream
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class DropboxBackupStorage(
+@Singleton
+class DropboxBackupStorage @Inject constructor(
     private val context: Context,
     private val namingPolicy: BackupNamingPolicy,
     private val backupSettingsRepository: BackupSettingsRepository,
-    private val walletTempDirPath: String,
+    private val walletConfig: WalletConfig,
     private val backupFileProcessor: BackupFileProcessor
 ) : BackupStorage {
 
@@ -154,7 +164,7 @@ class DropboxBackupStorage(
         val backup = searchForBackups().firstOrNull() ?: throw BackupStorageTamperedException("Backup file not found in folder.")
 
         withContext(Dispatchers.IO) {
-            val tempFolder = File(walletTempDirPath)
+            val tempFolder = File(walletConfig.getWalletTempDirPath())
             val tempFile = File(tempFolder, backup.metadata.metadataValue.name)
             if (tempFolder.parentFile?.exists() != true) {
                 tempFolder.parentFile?.mkdir()

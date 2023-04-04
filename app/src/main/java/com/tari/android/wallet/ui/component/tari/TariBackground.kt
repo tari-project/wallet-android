@@ -12,14 +12,18 @@ import com.tari.android.wallet.ui.common.domain.PaletteManager
 abstract class TariBackground(context: Context, attrs: AttributeSet) : ConstraintLayout(context, attrs) {
 
     protected var radius = 0.0F
-    protected var backColor = 0
+    protected var backColor: Int? = null
     protected var backElevation = 0.0F
 
-    fun setFullBack(r: Float, elevation: Float, backColor: Int) {
+    fun setFullBack(r: Float, elevation: Float, backColor: Int?) {
         this.radius = r
         this.backElevation = elevation
         this.backColor = backColor
 
+        updateBack()
+    }
+
+    fun restoreFullBack() {
         updateBack()
     }
 
@@ -45,14 +49,19 @@ abstract class TariBackground(context: Context, attrs: AttributeSet) : Constrain
             }
 
             radius != 0.0F -> setWithRadius(radius, backColor)
-            else -> setBackgroundColor(backColor)
+            backColor != null -> setBackgroundColor(backColor!!)
         }
     }
 
-    private fun setWithRadius(r: Float, backColor: Int) {
+    private fun setWithRadius(r: Float, backColor: Int?) {
         val shapeDrawable = ShapeDrawable(RoundRectShape(floatArrayOf(r, r, r, r, r, r, r, r), null, null))
-        shapeDrawable.paint.color = backColor
+        backColor?.let { shapeDrawable.paint.color = it }
         background = shapeDrawable
+    }
+
+    fun reset() {
+        background = null
+        elevation = 0.0F
     }
 
     override fun onAttachedToWindow() {

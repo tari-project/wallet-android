@@ -156,16 +156,14 @@ class WalletManager(
     /**
      * Instantiates the comms configuration for the wallet.
      */
-    private fun getCommsConfig(walletConfig: WalletConfig): FFICommsConfig {
-        return FFICommsConfig(
-            NetAddressString("127.0.0.1", 39069).toString(),
-            getTorTransport(),
-            walletConfig.walletDBName,
-            walletConfig.getWalletFilesDirPath(),
-            Constants.Wallet.discoveryTimeoutSec,
-            Constants.Wallet.storeAndForwardMessageDurationSec,
-        )
-    }
+    fun getCommsConfig(): FFICommsConfig = FFICommsConfig(
+        NetAddressString("127.0.0.1", 39069).toString(),
+        getTorTransport(),
+        walletConfig.walletDBName,
+        walletConfig.getWalletFilesDirPath(),
+        Constants.Wallet.discoveryTimeoutSec,
+        Constants.Wallet.storeAndForwardMessageDurationSec,
+    )
 
     /**
      * Starts the log file observer only in debug mode.
@@ -202,7 +200,7 @@ class WalletManager(
                 sharedPrefsWrapper,
                 seedPhraseRepository,
                 networkRepository,
-                getCommsConfig(walletConfig),
+                getCommsConfig(),
                 walletConfig.getWalletLogFilePath()
             )
             FFIWallet.instance = wallet

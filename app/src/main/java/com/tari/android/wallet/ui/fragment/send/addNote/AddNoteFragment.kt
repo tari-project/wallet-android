@@ -64,17 +64,17 @@ import com.tari.android.wallet.R.dimen.*
 import com.tari.android.wallet.databinding.FragmentAddNoteBinding
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.extension.observe
-import com.tari.android.wallet.model.Contact
 import com.tari.android.wallet.model.MicroTari
 import com.tari.android.wallet.model.TxNote
-import com.tari.android.wallet.model.User
 import com.tari.android.wallet.network.NetworkConnectionState
 import com.tari.android.wallet.ui.common.CommonFragment
 import com.tari.android.wallet.ui.common.gyphy.repository.GIFItem
 import com.tari.android.wallet.ui.component.fullEmojiId.EmojiIdSummaryViewController
 import com.tari.android.wallet.ui.component.fullEmojiId.FullEmojiIdViewController
 import com.tari.android.wallet.ui.extension.*
-import com.tari.android.wallet.ui.fragment.home.HomeActivity
+import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.ContactDto
+import com.tari.android.wallet.ui.fragment.home.navigation.TariNavigator.Companion.PARAMETER_NOTE
+import com.tari.android.wallet.ui.fragment.home.navigation.TariNavigator.Companion.PARAMETER_TRANSACTION
 import com.tari.android.wallet.ui.fragment.send.addNote.gif.*
 import com.tari.android.wallet.ui.fragment.send.addNote.gif.ThumbnailGIFsViewModel.Companion.REQUEST_CODE_GIF
 import com.tari.android.wallet.ui.fragment.send.common.TransactionData
@@ -95,7 +95,7 @@ class AddNoteFragment : CommonFragment<FragmentAddNoteBinding, AddNoteViewModel>
 
     // Tx properties.
     private lateinit var transactionData: TransactionData
-    private lateinit var recipientUser: User
+    private lateinit var recipientUser: ContactDto
     private lateinit var amount: MicroTari
     private var isOneSidePayment: Boolean = false
 
@@ -179,8 +179,9 @@ class AddNoteFragment : CommonFragment<FragmentAddNoteBinding, AddNoteViewModel>
             requireContext(),
             fullEmojiIdListener
         )
-        fullEmojiIdViewController.fullEmojiId = recipientUser.walletAddress.emojiId
-        fullEmojiIdViewController.emojiIdHex = recipientUser.walletAddress.hexString
+        val walletAddress = recipientUser.contact.extractWalletAddress()
+        fullEmojiIdViewController.fullEmojiId = walletAddress.emojiId
+        fullEmojiIdViewController.emojiIdHex = walletAddress.hexString
 
         displayAliasOrEmojiId()
         ui.progressBar.setWhite()
@@ -210,12 +211,12 @@ class AddNoteFragment : CommonFragment<FragmentAddNoteBinding, AddNoteViewModel>
     }
 
     private fun retrievePageArguments(savedInstanceState: Bundle?) {
-        transactionData = requireArguments().parcelable("transactionData")!!
-        recipientUser = transactionData.recipientUser!!
+        transactionData = requireArguments().parcelable(PARAMETER_TRANSACTION)!!
+        recipientUser = transactionData.recipientContact!!
         amount = transactionData.amount!!
         isOneSidePayment = transactionData.isOneSidePayment
         if (savedInstanceState == null) {
-            requireArguments().getString(HomeActivity.PARAMETER_NOTE)
+            requireArguments().getString(PARAMETER_NOTE)
                 ?.let { ui.noteEditText.setText(it) }
         }
     }
@@ -248,13 +249,14 @@ class AddNoteFragment : CommonFragment<FragmentAddNoteBinding, AddNoteViewModel>
     }
 
     private fun displayAliasOrEmojiId() {
-        if (recipientUser is Contact) {
-            ui.emojiIdSummaryContainerView.gone()
-            ui.titleTextView.visible()
-            ui.titleTextView.text = (recipientUser as Contact).alias
-        } else {
-            displayEmojiId(recipientUser.walletAddress.emojiId)
-        }
+        val alias = recipientUser.contact.getAlias()
+        if (alias.isEmpty()) displayEmojiId(recipientUser.contact.extractWalletAddress().emojiId) else displayAlias(alias)
+    }
+
+    private fun displayAlias(alias: String) {
+        ui.emojiIdSummaryContainerView.gone()
+        ui.titleTextView.visible()
+        ui.titleTextView.text = alias
     }
 
     private fun displayEmojiId(emojiId: String) {
@@ -440,7 +442,7 @@ class AddNoteFragment : CommonFragment<FragmentAddNoteBinding, AddNoteViewModel>
         // notify listener (i.e. activity)
         val note = TxNote(ui.noteEditText.editableText.toString(), gifContainer.gifItem?.embedUri?.toString()).compose()
         val newData = transactionData.copy(note = note)
-        (requireContext() as? AddNodeListener)?.continueToFinalizeSendTx(newData)
+        viewModel.tariNavigator.continueToFinalizeSendTx(newData)
     }
 
     private fun restoreSlider() {

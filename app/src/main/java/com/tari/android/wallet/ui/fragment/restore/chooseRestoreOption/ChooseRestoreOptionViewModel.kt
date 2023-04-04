@@ -1,22 +1,35 @@
 package com.tari.android.wallet.ui.fragment.restore.chooseRestoreOption
 
 import android.content.Intent
-import androidx.lifecycle.*
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.viewModelScope
 import com.tari.android.wallet.R
-import com.tari.android.wallet.application.*
+import com.tari.android.wallet.application.MigrationManager
+import com.tari.android.wallet.application.WalletManager
+import com.tari.android.wallet.application.WalletState
 import com.tari.android.wallet.data.WalletConfig
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.extension.addTo
 import com.tari.android.wallet.ffi.FFITariWalletAddress
 import com.tari.android.wallet.ffi.HexString
-import com.tari.android.wallet.infrastructure.backup.*
-import com.tari.android.wallet.model.*
+import com.tari.android.wallet.infrastructure.backup.BackupFileIsEncryptedException
+import com.tari.android.wallet.infrastructure.backup.BackupManager
+import com.tari.android.wallet.infrastructure.backup.BackupStorageAuthRevokedException
+import com.tari.android.wallet.infrastructure.backup.BackupStorageTamperedException
+import com.tari.android.wallet.infrastructure.backup.WalletStartFailedException
+import com.tari.android.wallet.model.TariWalletAddress
+import com.tari.android.wallet.model.WalletError
+import com.tari.android.wallet.model.throwIf
 import com.tari.android.wallet.service.service.WalletServiceLauncher
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.common.SingleLiveEvent
 import com.tari.android.wallet.ui.dialog.error.ErrorDialogArgs
 import com.tari.android.wallet.ui.dialog.error.WalletErrorArgs
-import com.tari.android.wallet.ui.fragment.settings.backup.data.*
+import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
+import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupOptionDto
+import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupOptions
+import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupSettingsRepository
 import com.tari.android.wallet.util.WalletUtil
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -44,12 +57,7 @@ class ChooseRestoreOptionViewModel : CommonViewModel() {
     private val _state = SingleLiveEvent<ChooseRestoreOptionState>()
     val state: LiveData<ChooseRestoreOptionState> = _state
 
-    private val _navigation = SingleLiveEvent<ChooseRestoreOptionNavigation>()
-    val navigation: LiveData<ChooseRestoreOptionNavigation> = _navigation
-
     val options = MutableLiveData<List<BackupOptionDto>>()
-
-    val migrationManager = MigrationManager()
 
     init {
         component.inject(this)
@@ -68,13 +76,12 @@ class ChooseRestoreOptionViewModel : CommonViewModel() {
                     walletService.restoreWithUnbindedOutputs(it.utxos, tariWalletAddress, message, error)
                     throwIf(error)
                 }
-                migrationManager.updateWalletVersion()
 
                 val dto = backupSettingsRepository.getOptionDto(state.value!!.backupOptions)!!.copy(isEnable = true)
                 backupSettingsRepository.updateOption(dto)
                 backupManager.backupNow()
 
-                _navigation.postValue(ChooseRestoreOptionNavigation.OnRestoreCompleted)
+                navigation.postValue(Navigation.ChooseRestoreOptionNavigation.OnRestoreCompleted)
             }
         }.addTo(compositeDisposable)
 
@@ -133,7 +140,7 @@ class ChooseRestoreOptionViewModel : CommonViewModel() {
             }
 
             is BackupFileIsEncryptedException -> {
-                _navigation.postValue(ChooseRestoreOptionNavigation.ToEnterRestorePassword)
+                navigation.postValue(Navigation.ChooseRestoreOptionNavigation.ToEnterRestorePassword)
             }
 
             is WalletStartFailedException -> {
