@@ -4,7 +4,9 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.LinearLayout
 import androidx.appcompat.widget.SearchView
+import androidx.core.view.updateLayoutParams
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.viewModels
@@ -20,6 +22,8 @@ import com.tari.android.wallet.ui.extension.setVisible
 import com.tari.android.wallet.ui.extension.string
 import com.tari.android.wallet.ui.fragment.contact_book.contacts.ContactsFragment
 import com.tari.android.wallet.ui.fragment.contact_book.favorites.FavoritesFragment
+import com.tari.android.wallet.ui.fragment.contact_book.root.share.ShareOptionArgs
+import com.tari.android.wallet.ui.fragment.contact_book.root.share.ShareOptionView
 import com.tari.android.wallet.ui.fragment.home.HomeActivity
 import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
 import java.lang.ref.WeakReference
@@ -54,6 +58,8 @@ class ContactBookFragment : CommonFragment<FragmentContactBookRootBinding, Conta
         }
 
         observe(sharedState) { updateSharedState(it) }
+
+        observe(shareList) { updateShareList(it) }
     }
 
     private fun grantPermission() {
@@ -111,10 +117,24 @@ class ContactBookFragment : CommonFragment<FragmentContactBookRootBinding, Conta
             val addContactArg = TariToolbarActionArg(icon = R.drawable.vector_add_contact) {
                 viewModel.navigation.postValue(Navigation.ContactBookNavigation.ToAddContact)
             }
-            val shareContactArg = TariToolbarActionArg(icon = R.drawable.vector_share) {
+            val shareContactArg = TariToolbarActionArg(icon = R.drawable.vector_share_dots) {
                 viewModel.sharedState.postValue(true)
             }
+            ui.toolbar.setLeftArgs()
             ui.toolbar.setRightArgs(shareContactArg, addContactArg)
+        }
+        ui.shareTypesContainer.setVisible(sharedState)
+    }
+
+    private fun updateShareList(list: List<ShareOptionArgs>) {
+        ui.shareTypesContainer.removeAllViews()
+        for (item in list) {
+            val shareOption = ShareOptionView(requireContext()).apply { setArgs(item) }
+            ui.shareTypesContainer.addView(shareOption)
+            shareOption.updateLayoutParams<LinearLayout.LayoutParams> {
+                width = 0
+                weight = 1f
+            }
         }
     }
 

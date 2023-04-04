@@ -750,5 +750,9 @@
     <string name="contact_book_type_merged">Linked Contact</string>
     <string name="remove_all">Remove all contacts</string>
     <string name="add_1000_contacts">Add 1000 contacts</string>
+    <string name="share_contact_via_qr_code">QR Code</string>
+    <string name="share_contact_via_qr_link">Link</string>
+    <string name="share_contact_via_qr_nfc">NFC</string>
+    <string name="share_contact_via_qr_ble">BLE</string>
 
 </resources>

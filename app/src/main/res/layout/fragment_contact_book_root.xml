@@ -56,16 +56,41 @@
         android:id="@+id/search_bar_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingHorizontal="25dp"
-        android:paddingVertical="24dp"
+        android:animateLayoutChanges="true"
+        android:paddingBottom="20dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/test_buttons">
 
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:id="@+id/share_types_container"
+            android:layout_width="match_parent"
+            android:layout_height="80dp"
+            android:layout_marginTop="12dp"
+            android:gravity="center_horizontal"
+            android:weightSum="4"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <com.tari.android.wallet.ui.fragment.contact_book.root.share.ShareOptionView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@color/palette_dark_system_blue" />
+
+        </androidx.appcompat.widget.LinearLayoutCompat>
+
         <com.tari.android.wallet.ui.component.tari.TariPrimaryBackground
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:cornerRadius="6dp">
+            android:layout_marginHorizontal="25dp"
+            android:layout_marginTop="20dp"
+            app:cornerRadius="6dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/share_types_container">
 
             <androidx.appcompat.widget.SearchView
                 android:id="@+id/search_view"

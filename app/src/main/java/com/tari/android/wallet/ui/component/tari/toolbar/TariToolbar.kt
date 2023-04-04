@@ -56,11 +56,11 @@ class TariToolbar(context: Context, attrs: AttributeSet) : FrameLayout(context, 
     private fun invalidateToolbar() {
         ui.toolbarRightActions.removeAllViews()
         for (action in rightArgs) {
-            ui.toolbarRightActions.addView(TariToolbarView(context).apply { setArgs(action) })
+            ui.toolbarRightActions.addView(TariToolbarActionView(context).apply { setArgs(action, true) })
         }
         ui.toolbarLeftActions.removeAllViews()
         for (action in leftArgs) {
-            ui.toolbarLeftActions.addView(TariToolbarView(context).apply { setArgs(action) })
+            ui.toolbarLeftActions.addView(TariToolbarActionView(context).apply { setArgs(action, false) })
         }
     }
 
