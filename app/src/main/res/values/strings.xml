@@ -281,7 +281,7 @@
 
     <!-- wallet info -->
     <string name="wallet_info_my_profile">My Profile</string>
-    <string name="wallet_info_qr_code_desc">Transacting in person? Others can scan this QR code from the Tari Aurora App to send you tXTR.</string>
+    <string name="wallet_info_qr_code_desc">Easily receive tXTR from others by sharing your profile via one of the methods below:</string>
     <string name="wallet_info_yat_disconnected_description">You\'ve previously connected this Yat.\n Do you want to re-connect it to your wallet?</string>
     <string name="wallet_info_yat_disconnected_reconnect">Reconnect Yat</string>
 
@@ -754,5 +754,6 @@
     <string name="share_contact_via_qr_link">Link</string>
     <string name="share_contact_via_qr_nfc">NFC</string>
     <string name="share_contact_via_qr_ble">BLE</string>
+    <string name="wallet_info_alias_edit_title">Edit Name</string>
 
 </resources>

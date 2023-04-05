@@ -5,10 +5,15 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
+import com.tari.android.wallet.R
 import com.tari.android.wallet.application.deeplinks.DeepLink
 import com.tari.android.wallet.application.deeplinks.DeeplinkHandler
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.ui.common.CommonViewModel
+import com.tari.android.wallet.ui.dialog.modular.DialogArgs
+import com.tari.android.wallet.ui.dialog.modular.ModularDialogArgs
+import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
+import com.tari.android.wallet.ui.dialog.modular.modules.input.InputModule
 import com.tari.android.wallet.yat.YatAdapter
 import com.tari.android.wallet.yat.YatSharedRepository
 import kotlinx.coroutines.Dispatchers
@@ -40,6 +45,8 @@ class WalletInfoViewModel : CommonViewModel() {
     private val _yat: MutableLiveData<String> = MutableLiveData()
     val yat: LiveData<String> = _yat
 
+    val alias: MutableLiveData<String> = MutableLiveData("")
+
     private val _yatDisconnected: MutableLiveData<Boolean> = MutableLiveData(false)
     val yatDisconnected: LiveData<Boolean> = _yatDisconnected
 
@@ -61,6 +68,7 @@ class WalletInfoViewModel : CommonViewModel() {
         _qrDeepLink.postValue(qrCode)
         _yat.postValue(yatSharedPrefsRepository.connectedYat.orEmpty())
         _yatDisconnected.postValue(yatSharedPrefsRepository.yatWasDisconnected)
+        alias.postValue(sharedPrefsWrapper.name.orEmpty() + " " + sharedPrefsWrapper.surname.orEmpty())
 
         checkEmojiIdConnection()
     }
@@ -91,5 +99,54 @@ class WalletInfoViewModel : CommonViewModel() {
 
     private fun updateReconnectVisibility() {
         _reconnectVisibility.postValue(_yatDisconnected.value!!)
+    }
+
+    fun shareViaQrCode() {
+        //todo
+    }
+
+    fun shareViaLink() {
+        //todo
+    }
+
+    fun shareViaNFC() {
+        //todo
+    }
+
+    fun shareViaBLE() {
+        //todo
+    }
+
+    fun showEditAliasDialog() {
+        val name = sharedPrefsWrapper.name.orEmpty()
+        val surname = sharedPrefsWrapper.surname.orEmpty()
+
+        var saveAction: () -> Boolean = { false }
+
+        val nameModule =
+            InputModule(name, resourceManager.getString(R.string.contact_book_add_contact_first_name_hint), true, false) { saveAction.invoke() }
+        val surnameModule =
+            InputModule(surname, resourceManager.getString(R.string.contact_book_add_contact_surname_hint), false, true) { saveAction.invoke() }
+
+        val headModule = HeadModule(
+            resourceManager.getString(R.string.wallet_info_alias_edit_title),
+            rightButtonTitle = resourceManager.getString(R.string.contact_book_add_contact_done_button)
+        ) { saveAction.invoke() }
+
+        val moduleList = mutableListOf(headModule, nameModule, surnameModule)
+        saveAction = {
+            saveDetails(nameModule.value, surnameModule.value)
+            true
+        }
+
+        val args = ModularDialogArgs(DialogArgs(), moduleList)
+        _inputDialog.postValue(args)
+    }
+
+    private fun saveDetails(name: String, surname: String) {
+        sharedPrefsWrapper.name = name
+        sharedPrefsWrapper.surname = name
+        alias.postValue("$name $surname")
+        _dismissDialog.postValue(Unit)
     }
 }

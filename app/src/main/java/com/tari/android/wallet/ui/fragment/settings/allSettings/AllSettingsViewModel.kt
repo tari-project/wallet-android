@@ -114,8 +114,10 @@ class AllSettingsViewModel : CommonViewModel() {
             resourceManager.getString(all_settings_version_text_copy_toast_message)
         )
 
+        val alias = settingsRepository.name + " " + settingsRepository.surname
+
         val allOptions = mutableListOf(
-            MyProfileViewHolderItem(settingsRepository.emojiId.orEmpty()) {
+            MyProfileViewHolderItem(settingsRepository.emojiId.orEmpty(), alias) {
                 navigation.postValue(AllSettingsNavigation.ToMyProfile)
             },
             DividerViewHolderItem(),

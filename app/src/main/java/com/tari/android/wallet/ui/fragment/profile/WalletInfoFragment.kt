@@ -37,7 +37,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.viewModels
 import com.google.zxing.BarcodeFormat
 import com.google.zxing.EncodeHintType
@@ -47,11 +46,20 @@ import com.tari.android.wallet.databinding.FragmentWalletInfoBinding
 import com.tari.android.wallet.extension.observe
 import com.tari.android.wallet.extension.observeOnLoad
 import com.tari.android.wallet.ui.common.CommonFragment
-import com.tari.android.wallet.ui.component.fullEmojiId.EmojiIdSummaryViewController
 import com.tari.android.wallet.ui.component.fullEmojiId.EmojiIdWithYatSummaryViewController
 import com.tari.android.wallet.ui.component.fullEmojiId.FullEmojiIdViewController
-import com.tari.android.wallet.ui.extension.*
-import java.util.*
+import com.tari.android.wallet.ui.component.tari.toolbar.TariToolbarActionArg
+import com.tari.android.wallet.ui.extension.doOnGlobalLayout
+import com.tari.android.wallet.ui.extension.setLayoutHeight
+import com.tari.android.wallet.ui.extension.setLayoutWidth
+import com.tari.android.wallet.ui.extension.setOnThrottledClickListener
+import com.tari.android.wallet.ui.extension.setTopMargin
+import com.tari.android.wallet.ui.extension.setVisible
+import com.tari.android.wallet.ui.extension.string
+import com.tari.android.wallet.ui.extension.temporarilyDisableClick
+import com.tari.android.wallet.ui.fragment.contact_book.root.share.ShareOptionArgs
+import com.tari.android.wallet.ui.fragment.contact_book.root.share.ShareOptionView
+import java.util.EnumMap
 
 class WalletInfoFragment : CommonFragment<FragmentWalletInfoBinding, WalletInfoViewModel>() {
 
@@ -83,11 +91,11 @@ class WalletInfoFragment : CommonFragment<FragmentWalletInfoBinding, WalletInfoV
 
         observe(publicKeyHex) { fullEmojiIdViewController.emojiIdHex = it }
 
-        observe(qrDeepLink) {
-            getQREncodedBitmap(it, dimenPx(R.dimen.wallet_info_img_qr_code_size))?.let { bitmap ->
-                ui.qrImageView.setImageBitmap(bitmap)
-            }
-        }
+//        observe(qrDeepLink) {
+//            getQREncodedBitmap(it, dimenPx(R.dimen.wallet_info_img_qr_code_size))?.let { bitmap ->
+//                ui.qrImageView.setImageBitmap(bitmap)
+//            }
+//        }
 
         observe(yat) { emojiIdSummaryController.yat = it }
 
@@ -98,10 +106,27 @@ class WalletInfoFragment : CommonFragment<FragmentWalletInfoBinding, WalletInfoV
         }
 
         observeOnLoad(yatDisconnected)
+
+        observe(alias) { updateAlias(it) }
     }
 
     private fun setupUI() {
         ui.emojiIdSummaryWithYatView.emojiIdSummaryContainerView.setOnClickListener(this::onEmojiSummaryClicked)
+
+        val qrCodeArgs = ShareOptionArgs(string(R.string.share_contact_via_qr_code), R.drawable.vector_share_qr_code) {
+            viewModel.shareViaQrCode()
+        }
+
+        val linkArgs = ShareOptionArgs(string(R.string.share_contact_via_qr_link), R.drawable.vector_share_link) { viewModel.shareViaLink() }
+        val nfcArgs = ShareOptionArgs(string(R.string.share_contact_via_qr_nfc), R.drawable.vector_share_nfc) { viewModel.shareViaNFC() }
+        val bleArgs = ShareOptionArgs(string(R.string.share_contact_via_qr_ble), R.drawable.vector_share_ble) { viewModel.shareViaBLE() }
+
+        ui.shareTypeFirstRow.addView(ShareOptionView(requireContext()).apply { setArgs(qrCodeArgs, ShareOptionView.Size.Big) })
+        ui.shareTypeFirstRow.addView(ShareOptionView(requireContext()).apply { setArgs(linkArgs, ShareOptionView.Size.Big) })
+        ui.shareTypeSecondRow.addView(ShareOptionView(requireContext()).apply { setArgs(nfcArgs, ShareOptionView.Size.Big) })
+        ui.shareTypeSecondRow.addView(ShareOptionView(requireContext()).apply { setArgs(bleArgs, ShareOptionView.Size.Big) })
+
+        ui.toolbar.setRightArgs(TariToolbarActionArg(title = string(R.string.tx_detail_edit)) { viewModel.showEditAliasDialog() })
 
         emojiIdSummaryController = EmojiIdWithYatSummaryViewController(ui.emojiIdSummaryWithYatView)
 
@@ -137,6 +162,11 @@ class WalletInfoFragment : CommonFragment<FragmentWalletInfoBinding, WalletInfoV
     private fun onEmojiSummaryClicked(view: View) {
         view.temporarilyDisableClick()
         fullEmojiIdViewController.showFullEmojiId()
+    }
+
+    private fun updateAlias(alias: String?) {
+        ui.alias.setVisible(alias.orEmpty().isNotBlank())
+        ui.alias.text = alias.orEmpty()
     }
 }
 
