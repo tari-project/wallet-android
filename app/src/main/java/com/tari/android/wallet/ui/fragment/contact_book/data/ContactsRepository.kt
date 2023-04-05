@@ -202,6 +202,11 @@ class ContactsRepository @Inject constructor(
         }
     }
 
+    fun getSelectedContacts(): List<ContactDto> {
+        //todo
+        return emptyList()
+    }
+
 
     inner class FFIContactsRepositoryBridge {
         init {

@@ -12,8 +12,11 @@ import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.dialog.modular.DialogArgs
 import com.tari.android.wallet.ui.dialog.modular.ModularDialogArgs
+import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonModule
+import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonStyle
 import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
 import com.tari.android.wallet.ui.dialog.modular.modules.input.InputModule
+import com.tari.android.wallet.ui.fragment.send.shareQr.ShareQrCodeModule
 import com.tari.android.wallet.yat.YatAdapter
 import com.tari.android.wallet.yat.YatSharedRepository
 import kotlinx.coroutines.Dispatchers
@@ -102,7 +105,14 @@ class WalletInfoViewModel : CommonViewModel() {
     }
 
     fun shareViaQrCode() {
-        //todo
+        val args = ModularDialogArgs(
+            DialogArgs(true, canceledOnTouchOutside = true), listOf(
+                HeadModule(resourceManager.getString(R.string.share_via_qr_code_title)),
+                ShareQrCodeModule(qrDeepLink.value.orEmpty()),
+                ButtonModule(resourceManager.getString(R.string.common_close), ButtonStyle.Close)
+            )
+        )
+        _modularDialog.postValue(args)
     }
 
     fun shareViaLink() {

@@ -756,5 +756,6 @@
     <string name="share_contact_via_qr_ble">BLE</string>
     <string name="wallet_info_alias_edit_title">Edit Name</string>
     <string name="tx_details_contact_name">Contact name here</string>
+    <string name="share_via_qr_code_title">Share QR Code</string>
 
 </resources>
