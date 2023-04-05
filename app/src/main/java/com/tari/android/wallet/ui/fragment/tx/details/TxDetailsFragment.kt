@@ -125,9 +125,8 @@ class TxDetailsFragment : CommonFragment<FragmentTxDetailsBinding, TxDetailsView
     private fun updateContactInfo(contact: ContactDto) {
         val alias = contact.contact.getAlias()
         val addEditText = if (alias.isEmpty()) tx_detail_add_contact else tx_detail_edit
-        ui.addContactButton.text = getString(addEditText)
-        ui.alias.text = alias
-        ui.alias.setVisible(alias.isNotEmpty())
+        ui.editContactLabelTextView.text = getString(addEditText)
+        ui.contactNameTextView.setText(contact.contact.getAlias())
     }
 
     private fun setCancellationReason(text: String) {
@@ -160,7 +159,7 @@ class TxDetailsFragment : CommonFragment<FragmentTxDetailsBinding, TxDetailsView
     private fun setUICommands() {
         ui.emojiIdSummaryContainerView.setOnClickListener { onEmojiSummaryClicked(it) }
         ui.feeLabelTextView.setOnClickListener { showTxFeeToolTip() }
-        ui.addContactButton.setOnClickListener { viewModel.addOrEditContact() }
+        ui.editContactLabelTextView.setOnClickListener { viewModel.addOrEditContact() }
         ui.cancelTxView.setOnClickListener { onTransactionCancel() }
     }
 

@@ -270,48 +270,75 @@
 
                     </com.tari.android.wallet.ui.component.tari.TariPrimaryBackground>
 
-                    <com.tari.android.wallet.ui.component.tari.TariButton
-                        android:id="@+id/add_contact_button"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_below="@id/from_text_view"
-                        android:layout_alignTop="@id/emoji_id_summary_container_view"
-                        android:layout_alignBottom="@id/emoji_id_summary_container_view"
-                        android:layout_alignParentEnd="true"
-                        android:layout_marginEnd="@dimen/common_horizontal_margin"
-                        android:layout_toEndOf="@id/emoji_id_summary_container_view"
-                        android:background="@color/transparent"
-                        android:ellipsize="middle"
-                        android:gravity="center_vertical|end"
-                        android:singleLine="true"
-                        android:text="@string/tx_detail_add_contact"
-                        android:textAllCaps="false"
-                        android:textColor="?attr/palette_brand_purple"
-                        android:textSize="14sp"
-                        app:customFont="medium" />
-
                 </RelativeLayout>
 
-                <com.tari.android.wallet.ui.component.tari.TariTextView
-                    android:id="@+id/alias"
+                <RelativeLayout
+                    android:id="@+id/contact_container_view"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_below="@id/user_container"
-                    android:layout_gravity="center"
-                    android:layout_marginStart="25dp"
-                    android:layout_marginTop="20dp"
-                    android:background="@android:color/transparent"
-                    android:gravity="start"
-                    android:text="@string/dummy_text"
-                    android:textColor="?attr/palette_text_heading"
-                    android:textSize="15sp"
-                    app:customFont="heavy" />
+                    android:layout_marginHorizontal="25dp"
+                    android:layout_marginStart="@dimen/common_horizontal_margin"
+                    android:layout_marginTop="25dp"
+                    android:layout_marginEnd="12dp"
+                    android:orientation="vertical"
+                    app:layout_constraintEnd_toEndOf="parent">
+
+                    <com.tari.android.wallet.ui.component.tari.TariTextView
+                        android:id="@+id/contact_label_text_view"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/tx_detail_contact_name"
+                        android:textColor="?attr/palette_text_body"
+                        android:textSize="13sp"
+                        app:customFont="medium" />
+
+                    <com.tari.android.wallet.ui.component.tari.TariTextView
+                        android:id="@+id/edit_contact_label_text_view"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@id/contact_label_text_view"
+                        android:layout_alignParentEnd="true"
+                        android:layout_marginTop="2dp"
+                        android:gravity="center"
+                        android:padding="12dp"
+                        android:text="@string/tx_detail_edit"
+                        android:textColor="?attr/palette_text_links"
+                        app:customFont="medium" />
+
+                    <com.tari.android.wallet.ui.component.tari.TariEditText
+                        android:id="@+id/contact_name_text_view"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@id/contact_label_text_view"
+                        android:layout_alignParentStart="true"
+                        android:layout_marginTop="8dp"
+                        android:enabled="false"
+                        android:background="@null"
+                        android:hint="@string/tx_details_contact_name"
+                        android:layout_marginEnd="4dp"
+                        android:layout_toStartOf="@id/edit_contact_label_text_view"
+                        android:ellipsize="end"
+                        android:paddingTop="5dp"
+                        android:paddingBottom="5dp"
+                        android:singleLine="true"
+                        android:textColor="?attr/palette_text_heading"
+                        android:textSize="14sp"
+                        app:customFont="roman" />
+
+                    <com.tari.android.wallet.ui.component.tari.TariDivider
+                        android:layout_width="match_parent"
+                        android:layout_height="2dp"
+                        android:layout_below="@+id/contact_name_text_view"
+                        android:layout_marginTop="20dp" />
+
+                </RelativeLayout>
 
                 <androidx.appcompat.widget.LinearLayoutCompat
                     android:id="@+id/note_container"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_below="@id/alias"
+                    android:layout_below="@id/contact_container_view"
                     android:orientation="vertical">
 
                     <com.tari.android.wallet.ui.component.tari.TariDivider
