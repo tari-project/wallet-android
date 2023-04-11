@@ -25,13 +25,18 @@
         android:visibility="gone"
         tools:visibility="visible" />
 
-    <com.tari.android.wallet.ui.component.tari.TariTextView
+    <com.tari.android.wallet.ui.component.tari.TariButton
         android:id="@+id/toolbar_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
+        android:background="@null"
+        android:insetLeft="0dp"
+        android:insetRight="0dp"
+        android:minWidth="0dp"
         android:text="@string/dummy_text"
-        android:textColor="?attr/palette_icons_active"
+        android:textAllCaps="false"
+        android:textColor="@color/toolbar_text_color_selector"
         android:visibility="gone"
         app:customFont="heavy"
         tools:visibility="visible" />

@@ -9,6 +9,7 @@ class ContactItem(
     val contact: ContactDto,
     val isSimple: Boolean = false,
     var isSelectionState: Boolean = false,
+    var isSelected: Boolean = false,
     val contactAction: (ContactDto, ContactAction) -> Unit = { _, _ -> },
     val badgeViewModel: BadgeViewModel = BadgeViewModel()
 ) : CommonViewHolderItem() {

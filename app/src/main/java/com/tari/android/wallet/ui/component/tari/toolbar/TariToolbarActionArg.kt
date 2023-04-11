@@ -5,5 +5,6 @@ class TariToolbarActionArg(
     val drawable: Int? = null,
     val title: String? = null,
     val isBack: Boolean = false,
+    val isDisabled: Boolean = false,
     val action: (() -> Unit)? = null
 )

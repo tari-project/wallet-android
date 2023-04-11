@@ -63,10 +63,6 @@ class ContactBookViewModel : CommonViewModel() {
         )
     }
 
-    fun setSharedState(state: Boolean) {
-        contactSelectionRepository.isSelectionState.postValue(state)
-    }
-
     fun shareViaQrCode() = setSelectedToPosition(0)
 
     fun shareViaLink() = setSelectedToPosition(1)
@@ -76,10 +72,9 @@ class ContactBookViewModel : CommonViewModel() {
     fun shareViaBLE() = setSelectedToPosition(3)
 
     fun shareSelectedContacts() {
-        setSharedState(false)
         val args = shareList.value!!.first { it.isSelected }
         val selectedContacts = contactSelectionRepository.selectedContacts.map { it.contact }
-        contactSelectionRepository.selectedContacts.clear()
+        contactSelectionRepository.clear()
         val deeplink = getDeeplink(selectedContacts)
         when (args.type) {
             ShareType.QR_CODE -> doShareViaQrCode(deeplink)

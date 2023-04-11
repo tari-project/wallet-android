@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:clickable="true"
@@ -9,19 +10,33 @@
     <com.tari.android.wallet.ui.component.tari.TariPrimaryBackground
         android:id="@+id/root_view"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:animateLayoutChanges="true"
+        android:paddingStart="22dp">
+
+        <com.tari.android.wallet.ui.component.tari.TariCheckbox
+            android:id="@+id/checkbox"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:clickable="false"
+            android:enabled="false"
+            android:focusable="false"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:visibility="visible" />
 
         <com.tari.android.wallet.ui.component.tari.TariSwitchedBackground
             android:id="@+id/profile_badges_container"
             android:layout_width="wrap_content"
             android:layout_height="52dp"
             android:layout_marginVertical="5dp"
-            android:layout_marginStart="22dp"
             android:clipToPadding="false"
             app:cornerRadius="50dp"
             app:elevation="4dp"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/checkbox"
             app:layout_constraintTop_toTopOf="parent">
 
             <androidx.constraintlayout.widget.ConstraintLayout
@@ -117,11 +132,11 @@
 
                         <androidx.appcompat.widget.AppCompatImageView
                             android:id="@+id/contact_icon_type"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
                             android:padding="3dp"
                             android:src="@drawable/vector_contact_type_link"
-                            android:layout_width="match_parent"
-                            android:tint="?attr/palette_background_primary"
-                            android:layout_height="match_parent" />
+                            android:tint="?attr/palette_background_primary" />
 
                     </com.tari.android.wallet.ui.component.tari.TariAlphaBackground>
 
@@ -137,13 +152,13 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
-            android:layout_marginStart="87dp"
+            android:layout_marginStart="65dp"
             android:layout_weight="1"
             android:gravity="center_vertical"
             android:orientation="horizontal"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/checkbox"
             app:layout_constraintTop_toTopOf="parent">
 
             <com.tari.android.wallet.ui.component.tari.TariTextView

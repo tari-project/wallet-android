@@ -23,22 +23,27 @@ class TariToolbarActionView @JvmOverloads constructor(
 
     fun setArgs(args: TariToolbarActionArg, isRight: Boolean) {
         this.setOnThrottledClickListener { args.action?.invoke() }
-        this.isClickable = true
-        this.isFocusable = true
+        this.isClickable = args.isDisabled.not()
+        this.isFocusable = args.isDisabled.not()
         setMargins(ui.root, isRight)
         when {
             args.title != null -> {
                 ui.toolbarText.visible()
+                ui.toolbarText.isEnabled = args.isDisabled.not()
+                ui.toolbarText.isClickable = false
+                ui.toolbarText.isFocusable = false
                 ui.toolbarText.text = args.title
             }
 
             args.drawable != null -> {
                 ui.toolbarIcon.visible()
+                ui.toolbarIcon.isEnabled = args.isDisabled.not()
                 ui.toolbarIcon.setImageResource(args.drawable)
             }
 
             args.icon != null -> {
                 ui.toolbarIcon.visible()
+                ui.toolbarIcon.isEnabled = args.isDisabled.not()
                 ui.toolbarIcon.setImageResource(args.icon)
             }
 
@@ -46,6 +51,7 @@ class TariToolbarActionView @JvmOverloads constructor(
                 ui.root.setStartMargin(0)
                 ui.root.setEndMargin(0)
                 ui.backCtaView.visible()
+                ui.backCtaView.isEnabled = args.isDisabled.not()
                 args.action?.let { ui.backCtaView.ui.backCtaView.setOnClickListener { it() } }
             }
         }

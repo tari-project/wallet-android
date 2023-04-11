@@ -158,7 +158,7 @@ class WalletInfoViewModel : CommonViewModel() {
 
     private fun saveDetails(name: String, surname: String) {
         sharedPrefsWrapper.name = name
-        sharedPrefsWrapper.surname = name
+        sharedPrefsWrapper.surname = surname
         alias.postValue("$name $surname")
         _dismissDialog.postValue(Unit)
     }

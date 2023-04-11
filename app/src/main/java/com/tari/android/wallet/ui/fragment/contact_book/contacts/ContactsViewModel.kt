@@ -120,13 +120,13 @@ class ContactsViewModel : CommonViewModel() {
             if (it is ContactItem) {
                 it.isSelectionState = state
             }
+            it.rebind()
         }
-        list.postValue(list.value)
     }
 
     private fun updateContacts() {
         val newItems =
-            contactsRepository.publishSubject.value!!.map { contactDto -> ContactItem(contactDto, false, false, this::performAction, badgeViewModel) }
+            contactsRepository.publishSubject.value!!.map { contactDto -> ContactItem(contactDto, false, false, false, this::performAction, badgeViewModel) }
                 .toMutableList()
         sourceList.postValue(newItems)
     }
