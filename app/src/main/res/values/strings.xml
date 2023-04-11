@@ -758,4 +758,7 @@
     <string name="tx_details_contact_name">Contact name here</string>
     <string name="share_via_qr_code_title">Share QR Code</string>
 
+    <string name="contact_deeplink_title">Contact Sharing</string>
+    <string name="contact_deeplink_message">%s contacts will be added to you contact book</string>
+
 </resources>

@@ -2,7 +2,10 @@ package com.tari.android.wallet.ui.fragment.contact_book.root
 
 import androidx.lifecycle.MutableLiveData
 import com.tari.android.wallet.R
+import com.tari.android.wallet.application.deeplinks.DeepLink
+import com.tari.android.wallet.application.deeplinks.DeeplinkHandler
 import com.tari.android.wallet.ui.common.CommonViewModel
+import com.tari.android.wallet.ui.common.SingleLiveEvent
 import com.tari.android.wallet.ui.dialog.modular.DialogArgs
 import com.tari.android.wallet.ui.dialog.modular.ModularDialogArgs
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonModule
@@ -20,9 +23,15 @@ class ContactBookViewModel : CommonViewModel() {
     @Inject
     lateinit var contactsRepository: ContactsRepository
 
-    val sharedState = MutableLiveData(false)
+    @Inject
+    lateinit var deeplinkFormatter: DeeplinkHandler
+
+    @Inject
+    lateinit var contactSelectionRepository: ContactSelectionRepository
 
     val shareList = MutableLiveData<List<ShareOptionArgs>>()
+
+    val shareText = SingleLiveEvent<String>()
 
     init {
         component.inject(this)
@@ -55,7 +64,7 @@ class ContactBookViewModel : CommonViewModel() {
     }
 
     fun setSharedState(state: Boolean) {
-        sharedState.value = state
+        contactSelectionRepository.isSelectionState.postValue(state)
     }
 
     fun shareViaQrCode() = setSelectedToPosition(0)
@@ -67,21 +76,20 @@ class ContactBookViewModel : CommonViewModel() {
     fun shareViaBLE() = setSelectedToPosition(3)
 
     fun shareSelectedContacts() {
-        //todo
         setSharedState(false)
         val args = shareList.value!!.first { it.isSelected }
-        val selectedContacts = contactsRepository.getSelectedContacts()
+        val selectedContacts = contactSelectionRepository.selectedContacts.map { it.contact }
+        contactSelectionRepository.selectedContacts.clear()
+        val deeplink = getDeeplink(selectedContacts)
         when (args.type) {
-            ShareType.QR_CODE -> doShareViaQrCode(selectedContacts)
-            ShareType.LINK -> doShareViaLink(selectedContacts)
-            ShareType.NFC -> doShareViaNFC(selectedContacts)
-            ShareType.BLE -> doShareViaBLE(selectedContacts)
+            ShareType.QR_CODE -> doShareViaQrCode(deeplink)
+            ShareType.LINK -> doShareViaLink(deeplink)
+            ShareType.NFC -> doShareViaNFC(deeplink)
+            ShareType.BLE -> doShareViaBLE(deeplink)
         }
     }
 
-    private fun doShareViaQrCode(selectedContacts: List<ContactDto>) {
-        //todo
-        val deeplink = selectedContacts.toString()
+    private fun doShareViaQrCode(deeplink: String) {
         val args = ModularDialogArgs(
             DialogArgs(true, canceledOnTouchOutside = true), listOf(
                 HeadModule(resourceManager.getString(R.string.share_via_qr_code_title)),
@@ -92,16 +100,21 @@ class ContactBookViewModel : CommonViewModel() {
         _modularDialog.postValue(args)
     }
 
-    private fun doShareViaLink(selectedContacts: List<ContactDto>) {
+    private fun doShareViaLink(deeplink: String) {
+        shareText.postValue(deeplink)
+    }
+
+    private fun doShareViaNFC(deeplink: String) {
         //todo
     }
 
-    private fun doShareViaNFC(selectedContacts: List<ContactDto>) {
+    private fun doShareViaBLE(deeplink: String) {
         //todo
     }
 
-    private fun doShareViaBLE(selectedContacts: List<ContactDto>) {
-        //todo
+    private fun getDeeplink(selectedContacts: List<ContactDto>) : String {
+        val contacts = selectedContacts.map { DeepLink.Contacts.DeeplinkContact(it.contact.getAlias(), it.contact.extractWalletAddress().hexString) }
+        return deeplinkFormatter.getDeeplink(DeepLink.Contacts(contacts))
     }
 
     private fun setSelectedToPosition(position: Int) {
@@ -111,3 +124,4 @@ class ContactBookViewModel : CommonViewModel() {
         shareList.postValue(values)
     }
 }
+

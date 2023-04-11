@@ -8,6 +8,7 @@ import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.ContactDto
 class ContactItem(
     val contact: ContactDto,
     val isSimple: Boolean = false,
+    var isSelectionState: Boolean = false,
     val contactAction: (ContactDto, ContactAction) -> Unit = { _, _ -> },
     val badgeViewModel: BadgeViewModel = BadgeViewModel()
 ) : CommonViewHolderItem() {

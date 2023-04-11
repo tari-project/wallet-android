@@ -98,6 +98,8 @@ class WalletInfoFragment : CommonFragment<FragmentWalletInfoBinding, WalletInfoV
         observeOnLoad(yatDisconnected)
 
         observe(alias) { updateAlias(it) }
+
+        observe(sharedText) { shareViaText(it) }
     }
 
     private fun setupUI() {

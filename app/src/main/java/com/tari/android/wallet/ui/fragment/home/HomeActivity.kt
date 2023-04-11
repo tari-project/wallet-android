@@ -121,6 +121,7 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>() {
 
         val viewModel: HomeViewModel by viewModels()
         bindViewModel(viewModel)
+        subscribeToCommon(deeplinkViewModel)
 
         setContainerId(R.id.nav_container)
 
@@ -318,6 +319,8 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>() {
             (deepLink as? DeepLink.Send)?.let { viewModel.tariNavigator.sendTariToUser(service, it) }
 
             (deepLink as? DeepLink.AddBaseNode)?.let { deeplinkViewModel.executeAction(this, it) }
+
+            (deepLink as? DeepLink.Contacts)?.let { deeplinkViewModel.addContacts(it.contacts) }
         }
     }
 

@@ -13,6 +13,7 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.viewbinding.ViewBinding
+import com.tari.android.wallet.R
 import com.tari.android.wallet.di.DiContainer
 import com.tari.android.wallet.extension.observe
 import com.tari.android.wallet.ui.component.mainList.MutedBackPressedCallback
@@ -20,6 +21,7 @@ import com.tari.android.wallet.ui.component.tari.toast.TariToast
 import com.tari.android.wallet.ui.component.tari.toast.TariToastArgs
 import com.tari.android.wallet.ui.dialog.modular.InputModularDialog
 import com.tari.android.wallet.ui.dialog.modular.ModularDialog
+import com.tari.android.wallet.ui.extension.string
 
 abstract class CommonFragment<Binding : ViewBinding, VM : CommonViewModel> : Fragment() {
 
@@ -104,6 +106,18 @@ abstract class CommonFragment<Binding : ViewBinding, VM : CommonViewModel> : Fra
     private fun copy(clipboardArgs: ClipboardArgs) {
         clipboardManager.setPrimaryClip(ClipData.newPlainText(clipboardArgs.clipLabel, clipboardArgs.clipText))
         TariToast(requireContext(), TariToastArgs(clipboardArgs.toastMessage, Toast.LENGTH_LONG))
+    }
+
+    protected fun shareViaText(text: String) {
+        val shareIntent = Intent()
+        shareIntent.action = Intent.ACTION_SEND
+        shareIntent.putExtra(Intent.EXTRA_TEXT, text)
+        shareIntent.type = "text/plain"
+        if (shareIntent.resolveActivity(requireContext().packageManager) != null) {
+            startActivity(Intent.createChooser(shareIntent, null))
+        } else {
+            TariToast(requireContext(), TariToastArgs(string(R.string.store_no_application_to_open_the_link_error), Toast.LENGTH_LONG))
+        }
     }
 
     override fun onDestroy() {

@@ -91,6 +91,7 @@ open class ContactSelectionFragment : CommonFragment<FragmentContactsSelectionBi
 
         val viewModel: ContactSelectionViewModel by viewModels()
         bindViewModel(viewModel)
+        subscribeVM(deeplinkViewModel)
 
         setupUI()
 
@@ -343,6 +344,8 @@ open class ContactSelectionFragment : CommonFragment<FragmentContactsSelectionBi
             }
 
             (viewModel.deeplinkHandler.handle(qrData) as? DeepLink.AddBaseNode)?.let { deeplinkViewModel.executeAction(requireContext(), it) }
+
+            (viewModel.deeplinkHandler.handle(qrData) as? DeepLink.Contacts)?.let { deeplinkViewModel.addContacts(it.contacts) }
         }
     }
 
@@ -482,6 +485,7 @@ open class ContactSelectionFragment : CommonFragment<FragmentContactsSelectionBi
             } else {
                 ui.invalidEmojiIdTextView.gone()
                 ui.toolbar.setRightArgs(TariToolbarActionArg(title = string(R.string.contact_book_add_contact_next_button)) { goToNext() })
+                ui.toolbar.showRightActions()
                 activity?.hideKeyboard()
                 ui.searchEditText.clearFocus()
                 viewModel.searchText.value = text

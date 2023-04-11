@@ -57,9 +57,11 @@ class ContactBookFragment : CommonFragment<FragmentContactBookRootBinding, Conta
             ui.syncingStatus.text = it.name + " " + it.time + "s"
         }
 
-        observe(sharedState) { updateSharedState(it) }
+        observe(contactSelectionRepository.isSelectionState) { updateSharedState(it) }
 
         observe(shareList) { updateShareList(it) }
+
+        observe(shareText) { shareViaText(it) }
     }
 
     private fun grantPermission() {
@@ -110,7 +112,7 @@ class ContactBookFragment : CommonFragment<FragmentContactBookRootBinding, Conta
             }
             ui.toolbar.setRightArgs(shareArgs)
             val cancelArgs = TariToolbarActionArg(title = string(R.string.common_cancel)) {
-                viewModel.sharedState.postValue(false)
+                viewModel.contactSelectionRepository.isSelectionState.postValue(false)
             }
             ui.toolbar.setLeftArgs(cancelArgs)
         } else {
@@ -118,7 +120,7 @@ class ContactBookFragment : CommonFragment<FragmentContactBookRootBinding, Conta
                 viewModel.navigation.postValue(Navigation.ContactBookNavigation.ToAddContact)
             }
             val shareContactArg = TariToolbarActionArg(icon = R.drawable.vector_share_dots) {
-                viewModel.sharedState.postValue(true)
+                viewModel.contactSelectionRepository.isSelectionState.postValue(true)
             }
             ui.toolbar.setLeftArgs()
             ui.toolbar.setRightArgs(shareContactArg, addContactArg)

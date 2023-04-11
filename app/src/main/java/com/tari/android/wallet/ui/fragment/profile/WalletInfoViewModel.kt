@@ -10,6 +10,7 @@ import com.tari.android.wallet.application.deeplinks.DeepLink
 import com.tari.android.wallet.application.deeplinks.DeeplinkHandler
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.ui.common.CommonViewModel
+import com.tari.android.wallet.ui.common.SingleLiveEvent
 import com.tari.android.wallet.ui.dialog.modular.DialogArgs
 import com.tari.android.wallet.ui.dialog.modular.ModularDialogArgs
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonModule
@@ -55,6 +56,8 @@ class WalletInfoViewModel : CommonViewModel() {
 
     private val _reconnectVisibility: MediatorLiveData<Boolean> = MediatorLiveData()
     val reconnectVisibility: LiveData<Boolean> = _reconnectVisibility
+
+    val sharedText = SingleLiveEvent<String>()
 
     init {
         component.inject(this)
@@ -116,7 +119,7 @@ class WalletInfoViewModel : CommonViewModel() {
     }
 
     fun shareViaLink() {
-        //todo
+        sharedText.postValue(qrDeepLink.value.orEmpty())
     }
 
     fun shareViaNFC() {
