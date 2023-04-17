@@ -13,6 +13,8 @@ import androidx.core.animation.doOnEnd
 import com.tari.android.wallet.R
 import com.tari.android.wallet.data.sharedPrefs.securityStages.modules.SecurityStageHeadModule
 import com.tari.android.wallet.data.sharedPrefs.securityStages.modules.SecurityStageHeadModuleView
+import com.tari.android.wallet.infrastructure.bluetooth.devicesModule.DevicesModule
+import com.tari.android.wallet.infrastructure.bluetooth.devicesModule.DevicesModuleView
 import com.tari.android.wallet.ui.component.networkStateIndicator.module.ConnectionStatusesModule
 import com.tari.android.wallet.ui.component.networkStateIndicator.module.ConnectionStatusesModuleView
 import com.tari.android.wallet.ui.dialog.TariDialog
@@ -34,14 +36,14 @@ import com.tari.android.wallet.ui.dialog.modular.modules.imageModule.ImageModule
 import com.tari.android.wallet.ui.dialog.modular.modules.imageModule.ImageModuleView
 import com.tari.android.wallet.ui.dialog.modular.modules.input.InputModule
 import com.tari.android.wallet.ui.dialog.modular.modules.input.InputModuleView
-import com.tari.android.wallet.ui.dialog.modular.modules.yatInput.YatInputModule
-import com.tari.android.wallet.ui.dialog.modular.modules.yatInput.YatInputModuleView
 import com.tari.android.wallet.ui.dialog.modular.modules.option.OptionModule
 import com.tari.android.wallet.ui.dialog.modular.modules.option.OptionModuleView
 import com.tari.android.wallet.ui.dialog.modular.modules.shortEmoji.ShortEmojiIdModule
 import com.tari.android.wallet.ui.dialog.modular.modules.shortEmoji.ShortEmojiModuleView
 import com.tari.android.wallet.ui.dialog.modular.modules.space.SpaceModule
 import com.tari.android.wallet.ui.dialog.modular.modules.space.SpaceModuleView
+import com.tari.android.wallet.ui.dialog.modular.modules.yatInput.YatInputModule
+import com.tari.android.wallet.ui.dialog.modular.modules.yatInput.YatInputModuleView
 import com.tari.android.wallet.ui.fragment.send.addAmount.feeModule.FeeModule
 import com.tari.android.wallet.ui.fragment.send.addAmount.feeModule.FeeModuleView
 import com.tari.android.wallet.ui.fragment.send.shareQr.ShareQRCodeModuleView
@@ -126,6 +128,7 @@ open class ModularDialog(val context: Context) : TariDialog {
                 is YatInputModule -> YatInputModuleView(context, module)
                 is InputModule -> InputModuleView(context, module)
                 is ShortEmojiIdModule-> ShortEmojiModuleView(context, module)
+                is DevicesModule-> DevicesModuleView(context, module)
                 else -> View(context)
             }
             root.addView(view)

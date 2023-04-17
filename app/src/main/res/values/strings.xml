@@ -758,6 +758,17 @@
     <string name="tx_details_contact_name">Contact name here</string>
     <string name="share_via_qr_code_title">Share QR Code</string>
 
+    <string name="share_via_bluetooth_title">Share via BLE</string>
+    <string name="share_via_bluetooth_message">Bring the smartphone close to a BLE enabled device</string>
+    <string name="share_via_bluetooth_scanning_title">Searching device..</string>
+    <string name="share_via_bluetooth_scanning_body">Select devices to share to</string>
+
+    <string name="share_success_title">Profile Shared</string>
+    <string name="share_success_message">Awesome! Your details have been shared successfully.</string>
+
+    <string name="share_received_title">You received a message</string>
+    <string name="share_received_message">Charlie has sent you contact details</string>
+
     <string name="contact_deeplink_title">Contact Sharing</string>
     <string name="contact_deeplink_message">%s contacts will be added to you contact book</string>
 

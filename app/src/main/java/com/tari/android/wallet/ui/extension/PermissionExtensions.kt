@@ -16,6 +16,30 @@ object PermissionExtensions {
     private val logger: Printer
         get() = com.orhanobut.logger.Logger.t("permission")
 
+    fun CommonFragment<*, *>.runWithPermissions(vararg permissions: String, openSettings: Boolean = false, callback: () -> Unit) {
+        logger.d("runWithPermissions: start")
+
+        if (this.isDetached) return
+
+        for (permission in permissions) {
+            if (requireContext().isPermissionGranted(permission)) {
+                logger.d("permission granted: $permission")
+            } else {
+                if (!shouldShowRequestPermissionRationale(permission)) {
+                    grantedAction = { runWithPermissions(*permissions, openSettings = openSettings, callback = callback) }
+                    launcher.launch(permission)
+                    return
+                } else {
+                    if (openSettings) {
+                        requireContext().openSettings()
+                    }
+                }
+                return
+            }
+        }
+        callback()
+    }
+
     fun CommonFragment<*, *>.runWithPermission(permission: String, openSettings: Boolean = false, callback: () -> Unit) {
         logger.d("runWithPermissions: start")
 

@@ -1,5 +1,6 @@
 package com.tari.android.wallet.ui.fragment.contact_book.root
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -18,6 +19,7 @@ import com.tari.android.wallet.extension.observe
 import com.tari.android.wallet.ui.common.CommonFragment
 import com.tari.android.wallet.ui.component.tari.toolbar.TariToolbarActionArg
 import com.tari.android.wallet.ui.extension.PermissionExtensions.runWithPermission
+import com.tari.android.wallet.ui.extension.PermissionExtensions.runWithPermissions
 import com.tari.android.wallet.ui.extension.setVisible
 import com.tari.android.wallet.ui.extension.string
 import com.tari.android.wallet.ui.fragment.contact_book.contacts.ContactsFragment
@@ -38,6 +40,14 @@ class ContactBookFragment : CommonFragment<FragmentContactBookRootBinding, Conta
 
         val viewModel: ContactBookViewModel by viewModels()
         bindViewModel(viewModel)
+
+        subscribeVM(viewModel.shareViewModel)
+        subscribeVM(viewModel.shareViewModel.bluetoothAdapter)
+        subscribeVM(viewModel.shareViewModel.deeplinkViewModel)
+
+        viewModel.shareViewModel.bluetoothAdapter.init(this)
+
+        startReceiving()
 
         setupUI()
 
@@ -63,7 +73,16 @@ class ContactBookFragment : CommonFragment<FragmentContactBookRootBinding, Conta
 
         observe(shareList) { updateShareList(it) }
 
-        observe(shareText) { shareViaText(it) }
+        observe(shareViewModel.shareText) { shareViaText(it) }
+
+        observe(shareViewModel.launchPermissionCheck) { runWithPermissions(*it.toTypedArray(), openSettings = true) {
+            viewModel.shareViewModel.startBLESharing()
+        } }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        viewModel.shareViewModel.bluetoothAdapter.handleActivityResult(requestCode, resultCode, data)
     }
 
     private fun grantPermission() {
@@ -127,10 +146,19 @@ class ContactBookFragment : CommonFragment<FragmentContactBookRootBinding, Conta
             val shareContactArg = TariToolbarActionArg(icon = R.drawable.vector_share_dots) {
                 viewModel.contactSelectionRepository.isSelectionState.postValue(true)
             }
+            val scanArgs = TariToolbarActionArg(icon = R.drawable.vector_all_settings_block_explorer_icon) { startReceiving() }
             ui.toolbar.setLeftArgs()
             ui.toolbar.setRightArgs(shareContactArg, addContactArg)
+            ui.toolbar.setLeftArgs(scanArgs)
         }
         ui.shareTypesContainer.setVisible(sharedState)
+    }
+
+    private fun startReceiving() {
+        val permissions = (viewModel.shareViewModel.bluetoothAdapter.bluetoothPermissions + viewModel.shareViewModel.bluetoothAdapter.locationPermission)
+        runWithPermissions(*permissions.toTypedArray(), openSettings = false) {
+            viewModel.shareViewModel.bluetoothAdapter.startReceiving()
+        }
     }
 
     private fun updateShareList(list: List<ShareOptionArgs>) {

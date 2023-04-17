@@ -142,6 +142,9 @@ class WalletManager(
      */
     private fun getTorTransport(): FFITariTransportConfig {
         val cookieFile = File(torConfig.cookieFilePath)
+        if (!cookieFile.exists()) {
+            cookieFile.createNewFile()
+        }
         val cookieString: ByteArray = cookieFile.readBytes()
         val torCookie = FFIByteVector(cookieString)
         return FFITariTransportConfig(

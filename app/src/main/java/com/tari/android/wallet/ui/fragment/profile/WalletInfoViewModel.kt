@@ -10,14 +10,12 @@ import com.tari.android.wallet.application.deeplinks.DeepLink
 import com.tari.android.wallet.application.deeplinks.DeeplinkHandler
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.ui.common.CommonViewModel
-import com.tari.android.wallet.ui.common.SingleLiveEvent
 import com.tari.android.wallet.ui.dialog.modular.DialogArgs
 import com.tari.android.wallet.ui.dialog.modular.ModularDialogArgs
-import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonModule
-import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonStyle
 import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
 import com.tari.android.wallet.ui.dialog.modular.modules.input.InputModule
-import com.tari.android.wallet.ui.fragment.send.shareQr.ShareQrCodeModule
+import com.tari.android.wallet.ui.fragment.contact_book.root.ShareViewModel
+import com.tari.android.wallet.ui.fragment.contact_book.root.share.ShareType
 import com.tari.android.wallet.yat.YatAdapter
 import com.tari.android.wallet.yat.YatSharedRepository
 import kotlinx.coroutines.Dispatchers
@@ -36,6 +34,8 @@ class WalletInfoViewModel : CommonViewModel() {
 
     @Inject
     lateinit var deeplinkHandler: DeeplinkHandler
+
+    val shareViewModel = ShareViewModel()
 
     private val _emojiId: MutableLiveData<String> = MutableLiveData()
     val emojiId: LiveData<String> = _emojiId
@@ -56,8 +56,6 @@ class WalletInfoViewModel : CommonViewModel() {
 
     private val _reconnectVisibility: MediatorLiveData<Boolean> = MediatorLiveData()
     val reconnectVisibility: LiveData<Boolean> = _reconnectVisibility
-
-    val sharedText = SingleLiveEvent<String>()
 
     init {
         component.inject(this)
@@ -107,27 +105,9 @@ class WalletInfoViewModel : CommonViewModel() {
         _reconnectVisibility.postValue(_yatDisconnected.value!!)
     }
 
-    fun shareViaQrCode() {
-        val args = ModularDialogArgs(
-            DialogArgs(true, canceledOnTouchOutside = true), listOf(
-                HeadModule(resourceManager.getString(R.string.share_via_qr_code_title)),
-                ShareQrCodeModule(qrDeepLink.value.orEmpty()),
-                ButtonModule(resourceManager.getString(R.string.common_close), ButtonStyle.Close)
-            )
-        )
-        _modularDialog.postValue(args)
-    }
-
-    fun shareViaLink() {
-        sharedText.postValue(qrDeepLink.value.orEmpty())
-    }
-
-    fun shareViaNFC() {
-        //todo
-    }
-
-    fun shareViaBLE() {
-        //todo
+    fun shareData(type: ShareType) {
+        val deeplink = qrDeepLink.value.orEmpty()
+        shareViewModel.share(type, deeplink)
     }
 
     fun showEditAliasDialog() {
