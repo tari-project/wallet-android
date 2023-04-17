@@ -6,6 +6,7 @@ import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothGatt
 import android.bluetooth.BluetoothGattCallback
 import android.bluetooth.BluetoothGattCharacteristic
+import android.bluetooth.BluetoothGattServer
 import android.bluetooth.BluetoothGattServerCallback
 import android.bluetooth.BluetoothGattService
 import android.bluetooth.BluetoothManager
@@ -174,6 +175,8 @@ class BluetoothAdapter @Inject constructor() : CommonViewModel() {
 
                 override fun onCharacteristicWrite(gatt: BluetoothGatt?, characteristic: BluetoothGattCharacteristic?, status: Int) {
                     super.onCharacteristicWrite(gatt, characteristic, status)
+                    gatt?.disconnect()
+                    gatt?.close()
                     onSuccessSharing.invoke()
                 }
             }
@@ -188,7 +191,12 @@ class BluetoothAdapter @Inject constructor() : CommonViewModel() {
 
         logger.e("doReceiving")
 
+        var bluetoothGattServer: BluetoothGattServer? = null
+
         val callback = object : BluetoothGattServerCallback() {
+
+            val receivedString = StringBuilder()
+
             override fun onCharacteristicWriteRequest(
                 device: BluetoothDevice?,
                 requestId: Int,
@@ -199,8 +207,21 @@ class BluetoothAdapter @Inject constructor() : CommonViewModel() {
                 value: ByteArray?
             ) {
                 super.onCharacteristicWriteRequest(device, requestId, characteristic, preparedWrite, responseNeeded, offset, value)
+                if (responseNeeded) {
+                    bluetoothGattServer?.sendResponse(device, requestId, BluetoothGatt.GATT_SUCCESS, offset, value)
+                }
+
+                logger.e(preparedWrite.toString() + " " + responseNeeded.toString() + " " + offset.toString() + " " + value.toString())
+
                 if (characteristic?.uuid == UUID.fromString(CHARACTERISTIC_UUID)) {
-                    onReceived.invoke(String(value!!))
+                    receivedString.append(String(value!!))
+                }
+            }
+
+            override fun onConnectionStateChange(device: BluetoothDevice?, status: Int, newState: Int) {
+                super.onConnectionStateChange(device, status, newState)
+                if (newState == BluetoothProfile.STATE_DISCONNECTED) {
+                    onReceived.invoke(receivedString.toString())
                 }
             }
         }
@@ -208,17 +229,17 @@ class BluetoothAdapter @Inject constructor() : CommonViewModel() {
         val advertiseCallback = object : AdvertiseCallback() {
             override fun onStartSuccess(settingsInEffect: AdvertiseSettings?) {
                 super.onStartSuccess(settingsInEffect)
-                logger.e("onStartSuccess: $settingsInEffect")
+                logger.i("onStartSuccess: $settingsInEffect")
             }
 
             override fun onStartFailure(errorCode: Int) {
                 super.onStartFailure(errorCode)
-                logger.e("onStartFailure: $errorCode")
+                logger.i("onStartFailure: $errorCode")
             }
         }
 
         val bluetoothManager = fragment?.requireContext()?.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager? ?: return
-        val bluetoothGattServer = bluetoothManager.openGattServer(fragment!!.requireContext(), callback) ?: return
+        bluetoothGattServer = bluetoothManager.openGattServer(fragment!!.requireContext(), callback) ?: return
 
         val myService = BluetoothGattService(UUID.fromString(SERVICE_UUID), BluetoothGattService.SERVICE_TYPE_PRIMARY)
 
@@ -247,7 +268,7 @@ class BluetoothAdapter @Inject constructor() : CommonViewModel() {
 
         bluetoothLeAdvertiser.startAdvertising(settings, data, advertiseCallback)
 
-        logger.e("startAdvertising")
+        logger.i("startAdvertising")
     }
 
     companion object {
