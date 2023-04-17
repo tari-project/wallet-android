@@ -13,11 +13,10 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <com.tari.android.wallet.ui.component.tari.TariToolbar
+        <com.tari.android.wallet.ui.component.tari.toolbar.TariToolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:rightText="@string/tor_bridges_connect"
             app:text="@string/tor_bridges_custom_bridges" />
 
         <ScrollView

@@ -86,6 +86,7 @@
     <string name="common_from">From</string>
     <string name="common_to">To</string>
     <string name="common_close">Close</string>
+    <string name="common_done">Done</string>
     <string name="common_new_uppercase">NEW</string>
     <string name="common_save">Save</string>
     <string name="common_cancel">Cancel</string>
@@ -280,7 +281,7 @@
 
     <!-- wallet info -->
     <string name="wallet_info_my_profile">My Profile</string>
-    <string name="wallet_info_qr_code_desc">Transacting in person? Others can scan this QR code from the Tari Aurora App to send you tXTR.</string>
+    <string name="wallet_info_qr_code_desc">Easily receive tXTR from others by sharing your profile via one of the methods below:</string>
     <string name="wallet_info_yat_disconnected_description">You\'ve previously connected this Yat.\n Do you want to re-connect it to your wallet?</string>
     <string name="wallet_info_yat_disconnected_reconnect">Reconnect Yat</string>
 
@@ -749,5 +750,15 @@
     <string name="contact_book_type_merged">Linked Contact</string>
     <string name="remove_all">Remove all contacts</string>
     <string name="add_1000_contacts">Add 1000 contacts</string>
+    <string name="share_contact_via_qr_code">QR Code</string>
+    <string name="share_contact_via_qr_link">Link</string>
+    <string name="share_contact_via_qr_nfc">NFC</string>
+    <string name="share_contact_via_qr_ble">BLE</string>
+    <string name="wallet_info_alias_edit_title">Edit Name</string>
+    <string name="tx_details_contact_name">Contact name here</string>
+    <string name="share_via_qr_code_title">Share QR Code</string>
+
+    <string name="contact_deeplink_title">Contact Sharing</string>
+    <string name="contact_deeplink_message">%s contacts will be added to you contact book</string>
 
 </resources>

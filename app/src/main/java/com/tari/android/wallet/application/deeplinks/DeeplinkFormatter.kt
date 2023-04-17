@@ -6,15 +6,21 @@ import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
 class DeeplinkFormatter(private val networkRepository: NetworkRepository) {
     fun parse(deepLink: String): DeepLink? {
         val uri = Uri.parse(deepLink)
-        if (!uri.scheme.equals(scheme, true)) {
-            return null
-        }
 
         if (!uri.authority.equals(networkRepository.currentNetwork!!.network.uriComponent)) {
             return null
         }
 
-        return DeepLink.getByCommand(uri.path.orEmpty().trimStart('/'), uri.queryParameterNames.associateWith { uri.getQueryParameter(it).orEmpty() })
+        var paramentrs = uri.queryParameterNames.associateWith { uri.getQueryParameter(it).orEmpty() }.toMutableMap()
+        val command = uri.path.orEmpty().trimStart('/')
+        if (command == DeepLink.Contacts.contactsCommand) {
+            val values = uri.query.orEmpty().split("&").map {
+                val (key, value) = it.split("=")
+                key to value
+            }.toMap()
+            paramentrs = values.toMutableMap()
+        }
+        return DeepLink.getByCommand(command, paramentrs)
     }
 
     fun toDeeplink(deepLink: DeepLink): String {

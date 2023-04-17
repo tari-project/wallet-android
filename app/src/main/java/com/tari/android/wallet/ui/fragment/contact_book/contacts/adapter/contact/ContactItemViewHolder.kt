@@ -22,8 +22,10 @@ class ContactItemViewHolder(view: ItemContactBinding) : CommonViewHolder<Contact
     private val badgesController: BadgesController by lazy { BadgesController(view) }
 
     override fun bind(item: ContactItem) {
+        item.rebindAction = { }
         super.bind(item)
         badgesController.bind(item)
+        item.rebindAction = { bind(item) }
 
         when (val dto = item.contact.contact) {
             is FFIContactDto -> {
@@ -56,6 +58,8 @@ class ContactItemViewHolder(view: ItemContactBinding) : CommonViewHolder<Contact
 
         ui.contactIconType.setImageResource(item.contact.getTypeIcon())
         ui.starred.setVisible(item.contact.contact.isFavorite)
+        ui.checkbox.setVisible(item.isSelectionState && item.contact.getFFIDto() != null)
+        ui.checkbox.isChecked = item.isSelected
     }
 
     private fun displayYat(yat: String) {

@@ -12,6 +12,7 @@ import com.tari.android.wallet.databinding.ViewEmojiIdWithYatSummaryBinding
 import com.tari.android.wallet.extension.observe
 import com.tari.android.wallet.ui.common.CommonFragment
 import com.tari.android.wallet.ui.component.fullEmojiId.FullEmojiIdViewController
+import com.tari.android.wallet.ui.component.tari.toolbar.TariToolbarActionArg
 import com.tari.android.wallet.ui.extension.doOnGlobalLayout
 import com.tari.android.wallet.ui.extension.gone
 import com.tari.android.wallet.ui.extension.serializable
@@ -87,16 +88,17 @@ class ContactDetailsFragment : CommonFragment<FragmentContactsDetailsBinding, Co
         fullEmojiIdViewController?.emojiIdHex = address.hexString
 
         if (contact.getContactActions().contains(ContactAction.EditName)) {
-            ui.toolbar.setupRightButton(getString(R.string.contact_book_details_edit))
+            ui.toolbar.setRightArgs(TariToolbarActionArg(title = getString(R.string.contact_book_details_edit)) {
+                viewModel.onEditClick()
+            })
         } else {
-            ui.toolbar.clearRightIcon()
+            ui.toolbar.hideRightActions()
         }
     }
 
     private fun setupUI() = with(ui) {
         listUi.layoutManager = LinearLayoutManager(requireContext())
         listUi.adapter = adapter
-        toolbar.rightAction = { viewModel.onEditClick() }
     }
 
     companion object {

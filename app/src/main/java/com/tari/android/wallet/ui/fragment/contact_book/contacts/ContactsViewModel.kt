@@ -37,6 +37,7 @@ import com.tari.android.wallet.ui.fragment.contact_book.data.ContactsRepository
 import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.ContactDto
 import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.MergedContactDto
 import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.PhoneContactDto
+import com.tari.android.wallet.ui.fragment.contact_book.root.ContactSelectionRepository
 import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
 import com.tari.android.wallet.ui.fragment.settings.allSettings.title.SettingsTitleViewHolderItem
 import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupSettingsRepository
@@ -64,6 +65,9 @@ class ContactsViewModel : CommonViewModel() {
     @Inject
     lateinit var contactsRepository: ContactsRepository
 
+    @Inject
+    lateinit var contactSelectionRepository: ContactSelectionRepository
+
     var isFavorite = false
 
     val badgeViewModel = BadgeViewModel()
@@ -75,6 +79,8 @@ class ContactsViewModel : CommonViewModel() {
     val filters = MutableLiveData<MutableList<(ContactItem) -> Boolean>>(mutableListOf())
 
     val searchText = MutableLiveData("")
+
+    val selectionTrigger: LiveData<Unit>
 
     val list = MediatorLiveData<MutableList<CommonViewHolderItem>>()
 
@@ -94,18 +100,33 @@ class ContactsViewModel : CommonViewModel() {
 
         list.addSource(filters) { updateList() }
 
+        selectionTrigger = contactSelectionRepository.isSelectionState.map { isSelectionState -> updateState(isSelectionState == true) }
+
         list.addSource(contactsRepository.publishSubject.toFlowable(BackpressureStrategy.LATEST).toLiveData()) { updateContacts() }
     }
 
     fun processItemClick(item: CommonViewHolderItem) {
         if (item is ContactItem) {
-            navigation.postValue(Navigation.ContactBookNavigation.ToContactDetails(item.contact))
+            if (contactSelectionRepository.isSelectionState.value == true) {
+                contactSelectionRepository.toggle(item)
+            } else {
+                navigation.postValue(Navigation.ContactBookNavigation.ToContactDetails(item.contact))
+            }
+        }
+    }
+
+    private fun updateState(state: Boolean) {
+        list.value.orEmpty().forEach {
+            if (it is ContactItem) {
+                it.isSelectionState = state
+            }
+            it.rebind()
         }
     }
 
     private fun updateContacts() {
         val newItems =
-            contactsRepository.publishSubject.value!!.map { contactDto -> ContactItem(contactDto, false, this::performAction, badgeViewModel) }
+            contactsRepository.publishSubject.value!!.map { contactDto -> ContactItem(contactDto, false, false, false, this::performAction, badgeViewModel) }
                 .toMutableList()
         sourceList.postValue(newItems)
     }

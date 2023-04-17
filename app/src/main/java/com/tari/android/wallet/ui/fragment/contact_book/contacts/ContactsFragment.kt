@@ -77,6 +77,7 @@ open class ContactsFragment : CommonFragment<FragmentContactsBinding, ContactsVi
 
         observeOnLoad(listUpdateTrigger)
         observeOnLoad(debouncedList)
+        observeOnLoad(selectionTrigger)
     }
 
     private fun setupUI() = with(ui) {

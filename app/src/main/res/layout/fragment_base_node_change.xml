@@ -11,11 +11,10 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <com.tari.android.wallet.ui.component.tari.TariToolbar
+        <com.tari.android.wallet.ui.component.tari.toolbar.TariToolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:rightIcon="@drawable/vector_plus"
             app:text="@string/debug_change_base_node" />
 
         <com.tari.android.wallet.ui.component.tari.TariSecondaryBackground
