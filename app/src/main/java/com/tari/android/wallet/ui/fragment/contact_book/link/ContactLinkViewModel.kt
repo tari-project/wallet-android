@@ -116,7 +116,7 @@ class ContactLinkViewModel : CommonViewModel() {
             },
             ButtonModule(resourceManager.getString(common_cancel), ButtonStyle.Close)
         )
-        _modularDialog.postValue(ModularDialogArgs(DialogArgs(), modules))
+        modularDialog.postValue(ModularDialogArgs(DialogArgs(), modules))
     }
 
     private fun showLinkSuccessDialog(phoneContactDto: ContactDto) {
@@ -132,7 +132,7 @@ class ContactLinkViewModel : CommonViewModel() {
             BodyModule(null, SpannableString(secondLineHtml)),
             ButtonModule(resourceManager.getString(common_close), ButtonStyle.Close)
         )
-        _modularDialog.postValue(ModularDialogArgs(DialogArgs {
+        modularDialog.postValue(ModularDialogArgs(DialogArgs {
             navigation.value = Navigation.ContactBookNavigation.BackToContactBook()
         }, modules))
     }

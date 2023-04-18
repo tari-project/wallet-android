@@ -90,12 +90,15 @@
     <string name="common_new_uppercase">NEW</string>
     <string name="common_save">Save</string>
     <string name="common_cancel">Cancel</string>
+    <string name="common_retry">Retry</string>
     <string name="common_ok">OK</string>
     <string name="common_confirm">Confirm</string>
     <string name="common_apply">Apply</string>
     <string name="common_share">Share</string>
     <string name="common_error_title">Error</string>
     <string name="common_unknown_error">Unknown error</string>
+    <string name="common_permission_required_dialog_body">We need access to %s to perform this action. Please, open the Settings app, find this permission in the list, and grant it</string>
+    <string name="common_permission_required_button">To Settings</string>
     <string name="common_delete">Delete</string>
     <string name="common_lets_do_it">Yes! Let\'s do it!</string>
     <string name="common_are_you_sure">Are you sure?</string>
@@ -768,6 +771,6 @@
     <string name="share_received_message">Charlie has sent you contact details</string>
 
     <string name="contact_deeplink_title">Contact Sharing</string>
-    <string name="contact_deeplink_message">%s contacts will be added to you contact book</string>
+    <string name="contact_deeplink_message">%s contacts will be added to your contact book</string>
 
 </resources>

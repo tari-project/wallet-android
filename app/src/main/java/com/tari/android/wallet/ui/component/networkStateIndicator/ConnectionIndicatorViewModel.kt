@@ -51,7 +51,7 @@ class ConnectionIndicatorViewModel : CommonViewModel() {
                 ButtonModule(resourceManager.getString(R.string.common_close), ButtonStyle.Close)
             )
         )
-        _modularDialog.postValue(args)
+        modularDialog.postValue(args)
     }
 
     private fun subscribeOnEventBus() {

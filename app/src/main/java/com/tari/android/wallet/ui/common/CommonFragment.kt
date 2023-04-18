@@ -16,6 +16,7 @@ import androidx.viewbinding.ViewBinding
 import com.tari.android.wallet.R
 import com.tari.android.wallet.di.DiContainer
 import com.tari.android.wallet.extension.observe
+import com.tari.android.wallet.ui.common.permission.PermissionManagerUI
 import com.tari.android.wallet.ui.component.mainList.MutedBackPressedCallback
 import com.tari.android.wallet.ui.component.tari.toast.TariToast
 import com.tari.android.wallet.ui.component.tari.toast.TariToastArgs
@@ -29,20 +30,19 @@ abstract class CommonFragment<Binding : ViewBinding, VM : CommonViewModel> : Fra
 
     private val dialogManager = DialogManager()
 
+    val permissionManagerUI = PermissionManagerUI(this)
+
     protected var blockingBackPressDispatcher = MutedBackPressedCallback(false)
 
     protected lateinit var ui: Binding
 
-    protected lateinit var viewModel: VM
-
-    var grantedAction: () -> Unit = {}
-    var notGrantedAction: () -> Unit = {}
+    lateinit var viewModel: VM
 
     val launcher = registerForActivityResult(ActivityResultContracts.RequestPermission()) {
         if (it) {
-            grantedAction()
+            permissionManagerUI.grantedAction()
         } else {
-            notGrantedAction()
+            permissionManagerUI.notGrantedAction()
         }
     }
 
@@ -95,6 +95,12 @@ abstract class CommonFragment<Binding : ViewBinding, VM : CommonViewModel> : Fra
         }
 
         observe(navigation) { viewModel.tariNavigator.navigate(it) }
+
+        observe(permissionManager.checkForPermission) {
+            permissionManagerUI.grantedAction = { viewModel.permissionManager.permissionAction?.invoke() }
+            permissionManagerUI.notGrantedAction = { viewModel.permissionManager.showPermissionRequiredDialog(it) }
+            launcher.launch(it)
+        }
     }
 
     protected fun changeOnBackPressed(isBlocked: Boolean) {
@@ -125,3 +131,4 @@ abstract class CommonFragment<Binding : ViewBinding, VM : CommonViewModel> : Fra
         super.onDestroy()
     }
 }
+

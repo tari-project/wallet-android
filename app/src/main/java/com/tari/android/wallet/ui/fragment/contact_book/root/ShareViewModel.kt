@@ -5,7 +5,8 @@ import com.tari.android.wallet.R
 import com.tari.android.wallet.application.deeplinks.DeepLink
 import com.tari.android.wallet.application.deeplinks.DeeplinkHandler
 import com.tari.android.wallet.application.deeplinks.DeeplinkViewModel
-import com.tari.android.wallet.infrastructure.bluetooth.BluetoothAdapter
+import com.tari.android.wallet.infrastructure.bluetooth.TariBluetoothClient
+import com.tari.android.wallet.infrastructure.bluetooth.TariBluetoothServer
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.common.SingleLiveEvent
 import com.tari.android.wallet.ui.dialog.modular.DialogArgs
@@ -22,9 +23,11 @@ import javax.inject.Inject
 
 class ShareViewModel : CommonViewModel() {
 
+    @Inject
+    lateinit var tariBluetoothClient: TariBluetoothClient
 
     @Inject
-    lateinit var bluetoothAdapter: BluetoothAdapter
+    lateinit var tariBluetoothServer: TariBluetoothServer
 
     @Inject
     lateinit var deeplinkHandler: DeeplinkHandler
@@ -40,12 +43,11 @@ class ShareViewModel : CommonViewModel() {
 
     val launchPermissionCheck = SingleLiveEvent<List<String>>()
 
-
     init {
         component.inject(this)
-        bluetoothAdapter.onReceived = this::onReceived
-        bluetoothAdapter.onSuccessSharing = this::showShareSuccessDialog
-        bluetoothAdapter.onFailedSharing = this::showShareErrorDialog
+        tariBluetoothServer.onReceived = this::onReceived
+        tariBluetoothClient.onSuccessSharing = this::showShareSuccessDialog
+        tariBluetoothClient.onFailedSharing = this::showShareErrorDialog
     }
 
     fun share(type: ShareType, deeplink: String) {
@@ -60,15 +62,15 @@ class ShareViewModel : CommonViewModel() {
 
     fun startBLESharing() {
         val args = ModularDialogArgs(
-            DialogArgs { bluetoothAdapter.stopSharing() }, listOf(
+            DialogArgs { tariBluetoothClient.stopSharing() }, listOf(
                 IconModule(R.drawable.vector_sharing_via_ble),
                 HeadModule(resourceManager.getString(R.string.share_via_bluetooth_title)),
                 BodyModule(resourceManager.getString(R.string.share_via_bluetooth_message)),
                 ButtonModule(resourceManager.getString(R.string.common_close), ButtonStyle.Close)
             )
         )
-        _modularDialog.postValue(args)
-        bluetoothAdapter.startSharing(shareInfo.value.orEmpty())
+        modularDialog.postValue(args)
+        tariBluetoothClient.startSharing(shareInfo.value.orEmpty())
     }
 
     private fun doShareViaQrCode(deeplink: String) {
@@ -79,7 +81,7 @@ class ShareViewModel : CommonViewModel() {
                 ButtonModule(resourceManager.getString(R.string.common_close), ButtonStyle.Close)
             )
         )
-        _modularDialog.postValue(args)
+        modularDialog.postValue(args)
     }
 
     private fun doShareViaLink(deeplink: String) {
@@ -92,7 +94,7 @@ class ShareViewModel : CommonViewModel() {
     }
 
     private fun doShareViaBLE() {
-        launchPermissionCheck.postValue(bluetoothAdapter.bluetoothPermissions + bluetoothAdapter.locationPermission)
+        launchPermissionCheck.postValue(tariBluetoothServer.bluetoothPermissions + tariBluetoothServer.locationPermission)
     }
 
     private fun showShareSuccessDialog() {
@@ -104,7 +106,7 @@ class ShareViewModel : CommonViewModel() {
                 ButtonModule(resourceManager.getString(R.string.common_close), ButtonStyle.Close)
             )
         )
-        _modularDialog.postValue(args)
+        modularDialog.postValue(args)
     }
 
     private fun showShareErrorDialog(message: String) {
@@ -116,7 +118,7 @@ class ShareViewModel : CommonViewModel() {
                 ButtonModule(resourceManager.getString(R.string.common_close), ButtonStyle.Close)
             )
         )
-        _modularDialog.postValue(args)
+        modularDialog.postValue(args)
     }
 
     private fun onReceived(data: List<DeepLink.Contacts.DeeplinkContact>) {

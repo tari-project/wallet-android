@@ -23,6 +23,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 class WalletInfoViewModel : CommonViewModel() {
+
     @Inject
     lateinit var sharedPrefsWrapper: SharedPrefsRepository
 

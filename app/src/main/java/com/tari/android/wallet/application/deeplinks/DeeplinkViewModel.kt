@@ -70,7 +70,7 @@ class DeeplinkViewModel : CommonViewModel() {
                 ButtonModule(resourceManager.getString(R.string.common_cancel), ButtonStyle.Close)
             )
         )
-        _modularDialog.postValue(args)
+        modularDialog.postValue(args)
     }
 
     private fun addBaseNode(baseNodeDto: BaseNodeDto) {

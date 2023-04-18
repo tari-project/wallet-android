@@ -43,12 +43,12 @@ import android.content.Intent.FLAG_ACTIVITY_CLEAR_TOP
 import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import androidx.core.content.ContextCompat
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.R
 import com.tari.android.wallet.model.CancelledTx
 import com.tari.android.wallet.model.Tx
 import com.tari.android.wallet.model.TxId
-import com.tari.android.wallet.ui.extension.PermissionExtensions.isPermissionGranted
 import com.tari.android.wallet.ui.fragment.home.HomeDeeplinkScreens
 import com.tari.android.wallet.util.WalletUtil
 import javax.inject.Inject
@@ -126,7 +126,7 @@ class NotificationHelper @Inject constructor(private val context: Context) {
      * Posts custom-layout heads-up transaction notification.
      */
     fun postCustomLayoutTxNotification(tx: Tx) {
-        if (!context.isPermissionGranted(android.Manifest.permission.POST_NOTIFICATIONS)) return
+        if (ContextCompat.checkSelfPermission(context, android.Manifest.permission.POST_NOTIFICATIONS) != android.content.pm.PackageManager.PERMISSION_GRANTED) return
 
         logger.i("postCustomLayoutTxNotification: ${tx.id}")
         val notificationTitle = context.getString(R.string.notification_tx_received_title)
@@ -169,7 +169,7 @@ class NotificationHelper @Inject constructor(private val context: Context) {
     }
 
     fun postTxCanceledNotification(tx: CancelledTx) {
-        if (!context.isPermissionGranted(android.Manifest.permission.POST_NOTIFICATIONS)) return
+        if (ContextCompat.checkSelfPermission(context, android.Manifest.permission.POST_NOTIFICATIONS) != android.content.pm.PackageManager.PERMISSION_GRANTED) return
 
         logger.i("postTxCanceledNotification: ${tx.id}")
         val layout = TxCanceledViewHolder(context, tx)
@@ -206,7 +206,7 @@ class NotificationHelper @Inject constructor(private val context: Context) {
      * Posts standard Android heads-up notification.
      */
     fun postNotification(title: String, body: String) {
-        if (!context.isPermissionGranted(android.Manifest.permission.POST_NOTIFICATIONS)) return
+        if (ContextCompat.checkSelfPermission(context, android.Manifest.permission.POST_NOTIFICATIONS) != android.content.pm.PackageManager.PERMISSION_GRANTED) return
 
         // prepare notification
         val notification = NotificationCompat.Builder(context, APP_NOTIFICATION_CHANNEL_ID).run {

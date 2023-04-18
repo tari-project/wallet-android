@@ -122,7 +122,7 @@ class TorBridgesSelectionViewModel : CommonViewModel() {
                         resourceManager.getString(R.string.tor_bridges_connecting_error_description, it.e.message.orEmpty()),
                         cancelable = true
                     ) { stopConnecting() }
-                    _modularDialog.postValue(errorArgs.getModular(resourceManager))
+                    modularDialog.postValue(errorArgs.getModular(resourceManager))
                 }
                 is TorProxyState.Running -> {
                     if (it.bootstrapStatus.progress == 100) {
@@ -146,7 +146,7 @@ class TorBridgesSelectionViewModel : CommonViewModel() {
                                  },
                             )
                         )
-                        _modularDialog.postValue(args)
+                        modularDialog.postValue(args)
                     } else {
                         val description = resourceManager.getString(
                             R.string.tor_bridges_connection_progress_description_full,

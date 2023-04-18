@@ -54,6 +54,14 @@ class ContactBookViewModel : CommonViewModel() {
                 ) { shareViaBLE() },
             )
         )
+
+        shareViewModel.tariBluetoothServer.doOnRequiredPermissions = { permissions, action ->
+            permissionManager.runWithPermission(permissions, action)
+        }
+
+        shareViewModel.tariBluetoothClient.doOnRequiredPermissions = { permissions, action ->
+            permissionManager.runWithPermission(permissions, action)
+        }
     }
 
     fun shareViaQrCode() = setSelectedToPosition(0)
@@ -71,7 +79,6 @@ class ContactBookViewModel : CommonViewModel() {
         val deeplink = getDeeplink(selectedContacts)
         shareViewModel.share(args.type, deeplink)
     }
-
 
     private fun getDeeplink(selectedContacts: List<ContactDto>) : String {
         val contacts = selectedContacts.map { DeepLink.Contacts.DeeplinkContact(it.contact.getAlias(), it.contact.extractWalletAddress().hexString) }

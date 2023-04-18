@@ -69,7 +69,11 @@ class WalletInfoFragment : CommonFragment<FragmentWalletInfoBinding, WalletInfoV
         bindViewModel(viewModel)
 
         subscribeVM(viewModel.shareViewModel)
-        viewModel.shareViewModel.bluetoothAdapter.init(this)
+        subscribeVM(viewModel.shareViewModel.tariBluetoothServer)
+        subscribeVM(viewModel.shareViewModel.tariBluetoothClient)
+
+        viewModel.shareViewModel.tariBluetoothServer.init(this)
+        viewModel.shareViewModel.tariBluetoothClient.init(this)
 
         setupUI()
         subscribeUI()
