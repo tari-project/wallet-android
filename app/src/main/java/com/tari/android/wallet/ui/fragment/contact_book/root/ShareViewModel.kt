@@ -19,7 +19,7 @@ import com.tari.android.wallet.ui.fragment.contact_book.root.share.ShareType
 import com.tari.android.wallet.ui.fragment.send.shareQr.ShareQrCodeModule
 import javax.inject.Inject
 
-class ShareViewModel(): CommonViewModel() {
+class ShareViewModel : CommonViewModel() {
 
 
     @Inject
@@ -44,6 +44,7 @@ class ShareViewModel(): CommonViewModel() {
         component.inject(this)
         bluetoothAdapter.onReceived = this::onReceived
         bluetoothAdapter.onSuccessSharing = this::showShareSuccessDialog
+        bluetoothAdapter.onFailedSharing = this::showShareErrorDialog
     }
 
     fun share(type: ShareType, deeplink: String) {
@@ -58,7 +59,7 @@ class ShareViewModel(): CommonViewModel() {
 
     fun startBLESharing() {
         val args = ModularDialogArgs(
-            DialogArgs() { bluetoothAdapter.stopSharing() }, listOf(
+            DialogArgs { bluetoothAdapter.stopSharing() }, listOf(
                 HeadModule(resourceManager.getString(R.string.share_via_bluetooth_title)),
                 BodyModule(resourceManager.getString(R.string.share_via_bluetooth_message)),
                 ButtonModule(resourceManager.getString(R.string.common_close), ButtonStyle.Close)
@@ -114,21 +115,7 @@ class ShareViewModel(): CommonViewModel() {
         _modularDialog.postValue(args)
     }
 
-    private fun onReceived(data: String) {
-        val args = ModularDialogArgs(
-            DialogArgs(), listOf(
-                HeadModule(resourceManager.getString(R.string.share_received_title)),
-                BodyModule(data),
-                ButtonModule(resourceManager.getString(R.string.common_confirm), ButtonStyle.Normal) {
-                    val contactDeeplink = deeplinkHandler.handle(data)
-                    if (contactDeeplink is DeepLink.Contacts) {
-                        deeplinkViewModel.addContacts(contactDeeplink.contacts)
-                    }
-                    _dismissDialog.postValue(Unit)
-                },
-                ButtonModule(resourceManager.getString(R.string.common_close), ButtonStyle.Close)
-            )
-        )
-        _modularDialog.postValue(args)
+    private fun onReceived(data: List<DeepLink.Contacts.DeeplinkContact>) {
+        deeplinkViewModel.addContacts(data)
     }
 }

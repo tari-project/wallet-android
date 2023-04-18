@@ -146,10 +146,8 @@ class ContactBookFragment : CommonFragment<FragmentContactBookRootBinding, Conta
             val shareContactArg = TariToolbarActionArg(icon = R.drawable.vector_share_dots) {
                 viewModel.contactSelectionRepository.isSelectionState.postValue(true)
             }
-            val scanArgs = TariToolbarActionArg(icon = R.drawable.vector_all_settings_block_explorer_icon) { startReceiving() }
             ui.toolbar.setLeftArgs()
             ui.toolbar.setRightArgs(shareContactArg, addContactArg)
-            ui.toolbar.setLeftArgs(scanArgs)
         }
         ui.shareTypesContainer.setVisible(sharedState)
     }

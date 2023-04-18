@@ -760,8 +760,6 @@
 
     <string name="share_via_bluetooth_title">Share via BLE</string>
     <string name="share_via_bluetooth_message">Bring the smartphone close to a BLE enabled device</string>
-    <string name="share_via_bluetooth_scanning_title">Searching device..</string>
-    <string name="share_via_bluetooth_scanning_body">Select devices to share to</string>
 
     <string name="share_success_title">Profile Shared</string>
     <string name="share_success_message">Awesome! Your details have been shared successfully.</string>
