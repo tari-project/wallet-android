@@ -32,6 +32,8 @@ import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
 import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModuleView
 import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadSpannableModule
 import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadSpannableModuleView
+import com.tari.android.wallet.ui.dialog.modular.modules.icon.IconModule
+import com.tari.android.wallet.ui.dialog.modular.modules.icon.IconModuleView
 import com.tari.android.wallet.ui.dialog.modular.modules.imageModule.ImageModule
 import com.tari.android.wallet.ui.dialog.modular.modules.imageModule.ImageModuleView
 import com.tari.android.wallet.ui.dialog.modular.modules.input.InputModule
@@ -129,6 +131,7 @@ open class ModularDialog(val context: Context) : TariDialog {
                 is InputModule -> InputModuleView(context, module)
                 is ShortEmojiIdModule-> ShortEmojiModuleView(context, module)
                 is ScanModule-> ScanModuleView(context, module)
+                is IconModule-> IconModuleView(context, module)
                 else -> View(context)
             }
             root.addView(view)

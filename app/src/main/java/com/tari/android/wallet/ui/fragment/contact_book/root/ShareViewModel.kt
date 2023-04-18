@@ -14,6 +14,7 @@ import com.tari.android.wallet.ui.dialog.modular.modules.body.BodyModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonStyle
 import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
+import com.tari.android.wallet.ui.dialog.modular.modules.icon.IconModule
 import com.tari.android.wallet.ui.fragment.contact_book.data.ContactsRepository
 import com.tari.android.wallet.ui.fragment.contact_book.root.share.ShareType
 import com.tari.android.wallet.ui.fragment.send.shareQr.ShareQrCodeModule
@@ -60,6 +61,7 @@ class ShareViewModel : CommonViewModel() {
     fun startBLESharing() {
         val args = ModularDialogArgs(
             DialogArgs { bluetoothAdapter.stopSharing() }, listOf(
+                IconModule(R.drawable.vector_sharing_via_ble),
                 HeadModule(resourceManager.getString(R.string.share_via_bluetooth_title)),
                 BodyModule(resourceManager.getString(R.string.share_via_bluetooth_message)),
                 ButtonModule(resourceManager.getString(R.string.common_close), ButtonStyle.Close)
@@ -96,6 +98,7 @@ class ShareViewModel : CommonViewModel() {
     private fun showShareSuccessDialog() {
         val args = ModularDialogArgs(
             DialogArgs(), listOf(
+                IconModule(R.drawable.vector_sharing_success),
                 HeadModule(resourceManager.getString(R.string.share_success_title)),
                 BodyModule(resourceManager.getString(R.string.share_success_message)),
                 ButtonModule(resourceManager.getString(R.string.common_close), ButtonStyle.Close)
@@ -107,6 +110,7 @@ class ShareViewModel : CommonViewModel() {
     private fun showShareErrorDialog(message: String) {
         val args = ModularDialogArgs(
             DialogArgs(), listOf(
+                IconModule(R.drawable.vector_sharing_failed),
                 HeadModule(resourceManager.getString(R.string.common_error_title)),
                 BodyModule(message),
                 ButtonModule(resourceManager.getString(R.string.common_close), ButtonStyle.Close)
