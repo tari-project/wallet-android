@@ -259,6 +259,10 @@ void storeAndForwardMessagesReceivedCallback() {
     // no-op
 }
 
+void baseNodeStatusCallback(TariBaseNodeState *pBaseNodeState) {
+    // no-op
+}
+
 
 void recoveringProcessCompleteCallback(uint8_t first, uint64_t second, uint64_t third) {
     auto *jniEnv = getJNIEnv();
@@ -460,6 +464,7 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniCreate(
             transactionValidationCompleteCallback,
             storeAndForwardMessagesReceivedCallback,
             connectivityStatusCallback,
+            baseNodeStatusCallback,
             pRecovery,
             &errorCode);
 

@@ -52,7 +52,7 @@ class BaseNodes(
             context.resources.openRawResource(getBaseNodeResource(networkRepository.currentNetwork!!.network)),
             "UTF-8"
         )
-        Regex("(.+::[A-Za-z0-9]{64}::/onion3/[A-Za-z0-9]+:[\\d]+)").findAll(fileContent).map { matchResult ->
+        Regex("(.+::[A-Za-z0-9 ]{64}::/onion3/[A-Za-z0-9]+:[\\d]+)").findAll(fileContent).map { matchResult ->
             val tripleString = matchResult.value.split("::")
             BaseNodeDto(tripleString[0], tripleString[1], tripleString[2])
         }
@@ -90,6 +90,6 @@ class BaseNodes(
 
     @Suppress("UNUSED_EXPRESSION")
     private fun getBaseNodeResource(network: Network): Int = when(network) {
-        else -> R.raw.esmeralda_base_nodes
+        else -> R.raw.nextnet_base_nodes
     }
 }

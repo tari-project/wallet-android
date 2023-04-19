@@ -36,14 +36,16 @@ import com.tari.android.wallet.application.deeplinks.DeepLink
 import com.tari.android.wallet.application.deeplinks.DeeplinkHandler
 import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
 import com.tari.android.wallet.data.sharedPrefs.network.TariNetwork
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertNull
 import org.junit.Test
 
 class DeepLinkTest {
 
     private val networkRepository: NetworkRepository = NetworkRepositoryMock()
     private val deeplinkHandler: DeeplinkHandler = DeeplinkHandler(networkRepository)
-    private val currentNetwork = Network.ESMERALDA
+    private val currentNetwork = Network.NEXTNET
 
     @Test
     fun assertNetwork() {
@@ -117,7 +119,7 @@ class DeepLinkTest {
     }
 
     class NetworkRepositoryMock : NetworkRepository {
-        private val network: Network = Network.ESMERALDA
+        private val network: Network = Network.NEXTNET
 
         override var supportedNetworks: List<Network> = listOf(network)
         override var currentNetwork: TariNetwork? = TariNetwork(network, "")

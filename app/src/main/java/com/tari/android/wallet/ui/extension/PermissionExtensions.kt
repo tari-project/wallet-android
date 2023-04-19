@@ -25,7 +25,7 @@ object PermissionExtensions {
             logger.d("permission granted: $permission")
             callback()
         } else {
-            if (shouldShowRequestPermissionRationale(permission)) {
+            if (!shouldShowRequestPermissionRationale(permission)) {
                 grantedAction = callback
                 launcher.launch(permission)
             } else {
