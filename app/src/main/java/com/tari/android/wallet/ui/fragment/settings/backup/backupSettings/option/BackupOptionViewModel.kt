@@ -139,7 +139,7 @@ class BackupOptionViewModel : CommonViewModel() {
                 }
             ))
 
-        _modularDialog.postValue(args)
+        modularDialog.postValue(args)
     }
 
     private fun showBackupStorageSetupFailedDialog(exception: Throwable? = null) {
@@ -152,7 +152,7 @@ class BackupOptionViewModel : CommonViewModel() {
             is BackupException -> exception.message.orEmpty()
             else -> resourceManager.getString(R.string.back_up_wallet_storage_setup_error_desc)
         }
-        _modularDialog.postValue(ErrorDialogArgs(errorTitle, errorDescription) {
+        modularDialog.postValue(ErrorDialogArgs(errorTitle, errorDescription) {
             _switchChecked.postValue(false)
             _inProgress.postValue(false)
         }.getModular(resourceManager))

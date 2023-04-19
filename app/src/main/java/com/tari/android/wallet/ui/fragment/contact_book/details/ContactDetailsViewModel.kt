@@ -271,7 +271,7 @@ class ContactDetailsViewModel : CommonViewModel() {
             },
             ButtonModule(resourceManager.getString(common_cancel), Close)
         )
-        _modularDialog.postValue(ModularDialogArgs(DialogArgs(), modules))
+        modularDialog.postValue(ModularDialogArgs(DialogArgs(), modules))
     }
 
     private fun showUnlinkSuccessDialog() {
@@ -289,7 +289,7 @@ class ContactDetailsViewModel : CommonViewModel() {
             BodyModule(null, SpannableString(secondLineHtml)),
             ButtonModule(resourceManager.getString(common_close), Close)
         )
-        _modularDialog.postValue(ModularDialogArgs(DialogArgs {
+        modularDialog.postValue(ModularDialogArgs(DialogArgs {
             navigation.value = Navigation.ContactBookNavigation.BackToContactBook()
         }, modules))
     }
@@ -305,6 +305,6 @@ class ContactDetailsViewModel : CommonViewModel() {
             },
             ButtonModule(resourceManager.getString(common_close), Close)
         )
-        _modularDialog.postValue(ModularDialogArgs(DialogArgs(), modules))
+        modularDialog.postValue(ModularDialogArgs(DialogArgs(), modules))
     }
 }

@@ -68,6 +68,13 @@ class WalletInfoFragment : CommonFragment<FragmentWalletInfoBinding, WalletInfoV
         val viewModel: WalletInfoViewModel by viewModels()
         bindViewModel(viewModel)
 
+        subscribeVM(viewModel.shareViewModel)
+        subscribeVM(viewModel.shareViewModel.tariBluetoothServer)
+        subscribeVM(viewModel.shareViewModel.tariBluetoothClient)
+
+        viewModel.shareViewModel.tariBluetoothServer.init(this)
+        viewModel.shareViewModel.tariBluetoothClient.init(this)
+
         setupUI()
         subscribeUI()
 
@@ -99,22 +106,25 @@ class WalletInfoFragment : CommonFragment<FragmentWalletInfoBinding, WalletInfoV
 
         observe(alias) { updateAlias(it) }
 
-        observe(sharedText) { shareViaText(it) }
+        observe(shareViewModel.shareText) { shareViaText(it) }
     }
 
     private fun setupUI() {
         ui.emojiIdSummaryWithYatView.emojiIdSummaryContainerView.setOnClickListener(this::onEmojiSummaryClicked)
 
         val qrCodeArgs = ShareOptionArgs(ShareType.QR_CODE, string(R.string.share_contact_via_qr_code), R.drawable.vector_share_qr_code) {
-            viewModel.shareViaQrCode()
+            viewModel.shareData(ShareType.QR_CODE)
         }
 
-        val linkArgs =
-            ShareOptionArgs(ShareType.LINK, string(R.string.share_contact_via_qr_link), R.drawable.vector_share_link) { viewModel.shareViaLink() }
-        val nfcArgs =
-            ShareOptionArgs(ShareType.NFC, string(R.string.share_contact_via_qr_nfc), R.drawable.vector_share_nfc) { viewModel.shareViaNFC() }
-        val bleArgs =
-            ShareOptionArgs(ShareType.BLE, string(R.string.share_contact_via_qr_ble), R.drawable.vector_share_ble) { viewModel.shareViaBLE() }
+        val linkArgs = ShareOptionArgs(ShareType.LINK, string(R.string.share_contact_via_qr_link), R.drawable.vector_share_link) {
+            viewModel.shareData(ShareType.LINK)
+        }
+        val nfcArgs = ShareOptionArgs(ShareType.NFC, string(R.string.share_contact_via_qr_nfc), R.drawable.vector_share_nfc) {
+            viewModel.shareData(ShareType.NFC)
+        }
+        val bleArgs = ShareOptionArgs(ShareType.BLE, string(R.string.share_contact_via_qr_ble), R.drawable.vector_share_ble) {
+            viewModel.shareData(ShareType.BLE)
+        }
 
         ui.shareTypeFirstRow.addView(ShareOptionView(requireContext()).apply { setArgs(qrCodeArgs, ShareOptionView.Size.Big) })
         ui.shareTypeFirstRow.addView(ShareOptionView(requireContext()).apply { setArgs(linkArgs, ShareOptionView.Size.Big) })

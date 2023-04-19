@@ -365,7 +365,7 @@ class TxListViewModel : CommonViewModel() {
             resourceManager.getString(error_no_connection_title),
             resourceManager.getString(error_no_connection_description),
         )
-        _modularDialog.postValue(errorDialogArgs.getModular(resourceManager))
+        modularDialog.postValue(errorDialogArgs.getModular(resourceManager))
     }
 
     private fun displayBaseNodeConnectionErrorDialog() {
@@ -373,7 +373,7 @@ class TxListViewModel : CommonViewModel() {
             resourceManager.getString(error_node_unreachable_title),
             resourceManager.getString(error_node_unreachable_description),
         )
-        _modularDialog.postValue(errorDialogArgs.getModular(resourceManager))
+        modularDialog.postValue(errorDialogArgs.getModular(resourceManager))
     }
 
     companion object {

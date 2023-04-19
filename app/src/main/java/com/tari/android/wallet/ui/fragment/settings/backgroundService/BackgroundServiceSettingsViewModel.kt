@@ -28,7 +28,7 @@ class BackgroundServiceSettingsViewModel : CommonViewModel() {
             turnSwitcher(true)
         } else {
             _switchState.value = TariLoadingSwitchState(isChecked = true, isLoading = true)
-            _modularDialog.value = ConfirmDialogArgs(
+            modularDialog.value = ConfirmDialogArgs(
                 resourceManager.getString(R.string.background_service_button_confirmation_title),
                 resourceManager.getString(R.string.background_service_button_confirmation_description),
                 onConfirm = { turnSwitcher(false) },

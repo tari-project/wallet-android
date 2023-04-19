@@ -58,7 +58,6 @@ import com.tari.android.wallet.ui.common.recyclerView.CommonAdapter
 import com.tari.android.wallet.ui.common.recyclerView.CommonViewHolderItem
 import com.tari.android.wallet.ui.component.networkStateIndicator.ConnectionIndicatorViewModel
 import com.tari.android.wallet.ui.extension.*
-import com.tari.android.wallet.ui.extension.PermissionExtensions.runWithPermission
 import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
 import com.tari.android.wallet.ui.fragment.tx.adapter.TxListAdapter
 import com.tari.android.wallet.ui.fragment.tx.questionMark.QuestionMarkViewModel
@@ -148,12 +147,12 @@ class TxListFragment : CommonFragment<FragmentTxListBinding, TxListViewModel>(),
 
     private fun checkPermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            runWithPermission(android.Manifest.permission.POST_NOTIFICATIONS) {
+            permissionManagerUI.runWithPermission(android.Manifest.permission.POST_NOTIFICATIONS) {
                 viewModel.logger.i("notification permission checked successfully")
             }
         }
 
-        runWithPermission(android.Manifest.permission.READ_CONTACTS) {
+        permissionManagerUI.runWithPermission(android.Manifest.permission.READ_CONTACTS) {
             viewModel.contactsRepository.phoneBookRepositoryBridge.loadFromPhoneBook()
         }
     }
@@ -250,7 +249,7 @@ class TxListFragment : CommonFragment<FragmentTxListBinding, TxListViewModel>(),
     }
 
     private fun grantPermission() {
-        runWithPermission(android.Manifest.permission.READ_CONTACTS, false) {
+        permissionManagerUI.runWithPermission(android.Manifest.permission.READ_CONTACTS, false) {
             viewModel.contactsRepository.contactPermission.value = true
             viewModel.contactsRepository.phoneBookRepositoryBridge.loadFromPhoneBook()
         }

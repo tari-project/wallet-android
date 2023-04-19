@@ -118,7 +118,7 @@ class InputSeedWordsViewModel : CommonViewModel() {
                     if (walletError == WalletError.NoError) {
                         onError(RestorationError.Unknown(resourceManager))
                     } else {
-                        _modularDialog.postValue(WalletErrorArgs(resourceManager, it.exception).getErrorArgs().getModular(resourceManager))
+                        modularDialog.postValue(WalletErrorArgs(resourceManager, it.exception).getErrorArgs().getModular(resourceManager))
                     }
                     _inProgress.postValue(false)
                     clear()
@@ -145,7 +145,7 @@ class InputSeedWordsViewModel : CommonViewModel() {
         onError(errorDialogArgs)
     }
 
-    private fun onError(restorationError: RestorationError) = _modularDialog.postValue(restorationError.args.getModular(resourceManager))
+    private fun onError(restorationError: RestorationError) = modularDialog.postValue(restorationError.args.getModular(resourceManager))
 
     private fun clear() {
         walletServiceLauncher.stopAndDelete()

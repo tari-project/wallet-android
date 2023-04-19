@@ -214,7 +214,7 @@ class AllSettingsViewModel : CommonViewModel() {
 
     private fun showBackupStorageCheckFailedDialog(message: String) {
         val errorArgs = ErrorDialogArgs(resourceManager.getString(check_backup_storage_status_error_title), message)
-        _modularDialog.postValue(errorArgs.getModular(resourceManager))
+        modularDialog.postValue(errorArgs.getModular(resourceManager))
     }
 }
 
