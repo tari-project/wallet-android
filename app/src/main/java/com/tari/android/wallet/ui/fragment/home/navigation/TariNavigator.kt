@@ -33,6 +33,7 @@ import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.YatDto
 import com.tari.android.wallet.ui.fragment.contact_book.details.ContactDetailsFragment
 import com.tari.android.wallet.ui.fragment.contact_book.link.ContactLinkFragment
 import com.tari.android.wallet.ui.fragment.contact_book.root.ContactBookFragment
+import com.tari.android.wallet.ui.fragment.contact_book.transactionHistory.TransactionHistoryFragment
 import com.tari.android.wallet.ui.fragment.home.HomeActivity
 import com.tari.android.wallet.ui.fragment.home.navigation.Navigation.AllSettingsNavigation
 import com.tari.android.wallet.ui.fragment.home.navigation.Navigation.ContactBookNavigation
@@ -72,7 +73,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class TariNavigator @Inject constructor (val prefs: SharedPrefsRepository, val tariSettingsSharedRepository: TariSettingsSharedRepository) {
+class TariNavigator @Inject constructor(val prefs: SharedPrefsRepository, val tariSettingsSharedRepository: TariSettingsSharedRepository) {
 
     lateinit var activity: CommonActivity<*, *>
 
@@ -85,6 +86,7 @@ class TariNavigator @Inject constructor (val prefs: SharedPrefsRepository, val t
             is ContactBookNavigation.ToLinkContact -> toLinkContact(navigation.contact)
             is ContactBookNavigation.BackToContactBook -> backToContactBook()
             is ContactBookNavigation.ToExternalWallet -> toExternalWallet(navigation.connectedWallet)
+            is ContactBookNavigation.ToContactTransactionHistory -> toContactTransactionHistory(navigation.contact)
             Navigation.ChooseRestoreOptionNavigation.ToEnterRestorePassword -> toEnterRestorePassword()
             Navigation.ChooseRestoreOptionNavigation.OnRestoreCompleted -> onRestoreCompleted()
             Navigation.ChooseRestoreOptionNavigation.ToRestoreWithRecoveryPhrase -> toRestoreWithRecoveryPhrase()
@@ -221,6 +223,8 @@ class TariNavigator @Inject constructor (val prefs: SharedPrefsRepository, val t
     fun backToContactBook() = popUpTo(ContactBookFragment::class.java.simpleName)
 
     fun toLinkContact(contact: ContactDto) = addFragment(ContactLinkFragment.createFragment(contact))
+
+    fun toContactTransactionHistory(contact: ContactDto) = addFragment(TransactionHistoryFragment.createFragment(contact))
 
     fun toExternalWallet(connectedWallet: YatDto.ConnectedWallet) {
 

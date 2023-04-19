@@ -773,4 +773,9 @@
     <string name="contact_deeplink_title">Contact Sharing</string>
     <string name="contact_deeplink_message">%s contacts will be added to your contact book</string>
 
+    <string name="contact_details_transaction_history">Transaction History</string>
+    <string name="contact_details_transaction_history_description">Your transaction history with %s</string>
+    <string name="contact_details_transaction_history_empty_state_title">No transactions found</string>
+    <string name="contact_details_transaction_history_empty_state_description"><![CDATA[You don’t have any transactions with <strong>%s</strong> yet. Click the button below to send some Tari]]></string>
+
 </resources>

@@ -118,12 +118,15 @@ class TxListFragment : CommonFragment<FragmentTxListBinding, TxListViewModel>(),
 
         observe(txSendSuccessful) { playTxSendSuccessfulAnim() }
 
-        observe(list) { updateTxListUI(it) }
-
-        observeOnLoad(requiredConfirmationCount)
         observeOnLoad(balanceInfo)
-        observeOnLoad(listUpdateTrigger)
-        observeOnLoad(debouncedList)
+
+        with(transactionRepository) {
+            observe( list) { updateTxListUI(it) }
+
+            observeOnLoad(requiredConfirmationCount)
+            observeOnLoad(listUpdateTrigger)
+            observeOnLoad(debouncedList)
+        }
     }
 
     override fun onStop() {
@@ -283,9 +286,9 @@ class TxListFragment : CommonFragment<FragmentTxListBinding, TxListViewModel>(),
 
     private fun initializeTxListUI() {
         if (viewModel.sharedPrefsWrapper.onboardingDisplayedAtHome) {
-            recyclerViewAdapter.update(viewModel.list.value!!)
+            recyclerViewAdapter.update(viewModel.transactionRepository.list.value!!)
             playNonOnboardingStartupAnim()
-            if (viewModel.txListIsEmpty) {
+            if (viewModel.transactionRepository.txListIsEmpty) {
                 showNoTxsTextView()
             }
             updateProgressViewController.reset()
