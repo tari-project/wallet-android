@@ -38,10 +38,12 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.tari.android.wallet.R
 import com.tari.android.wallet.databinding.FragmentLogsBinding
 import com.tari.android.wallet.extension.observe
 import com.tari.android.wallet.ui.common.CommonFragment
 import com.tari.android.wallet.ui.common.recyclerView.CommonAdapter
+import com.tari.android.wallet.ui.component.tari.toolbar.TariToolbarActionArg
 import com.tari.android.wallet.ui.extension.serializable
 import com.tari.android.wallet.ui.extension.setVisible
 import com.tari.android.wallet.ui.fragment.settings.logs.activity.DebugActivity
@@ -72,8 +74,8 @@ class LogsFragment : CommonFragment<FragmentLogsBinding, LogsViewModel>() {
     }
 
     private fun setupUI() = with(ui) {
-        ui.toolbar.rightAction = { viewModel.showFilters() }
-        ui.toolbar.ui.toolbarRightIcon.setVisible(false)
+        ui.toolbar.setRightArgs(TariToolbarActionArg(icon = R.drawable.vector_logs_filter, action = viewModel::showFilters))
+        ui.toolbar.hideRightActions()
         recyclerViewAdapter = LogListAdapter()
         recyclerViewAdapter.setLongClickListener(CommonAdapter.ItemLongClickListener {
             viewModel.copyToClipboard(it)
@@ -89,7 +91,7 @@ class LogsFragment : CommonFragment<FragmentLogsBinding, LogsViewModel>() {
 
     private fun updateData(list: MutableList<LogViewHolderItem>) {
         ui.loadingState.setVisible(false)
-        ui.toolbar.ui.toolbarRightIcon.setVisible(true)
+        ui.toolbar.showRightActions()
         recyclerViewAdapter.update(list)
     }
 

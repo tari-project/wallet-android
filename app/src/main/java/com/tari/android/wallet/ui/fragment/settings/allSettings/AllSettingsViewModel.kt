@@ -114,8 +114,10 @@ class AllSettingsViewModel : CommonViewModel() {
             resourceManager.getString(all_settings_version_text_copy_toast_message)
         )
 
+        val alias = settingsRepository.name + " " + settingsRepository.surname
+
         val allOptions = mutableListOf(
-            MyProfileViewHolderItem(settingsRepository.emojiId.orEmpty()) {
+            MyProfileViewHolderItem(settingsRepository.emojiId.orEmpty(), alias) {
                 navigation.postValue(AllSettingsNavigation.ToMyProfile)
             },
             DividerViewHolderItem(),
@@ -212,7 +214,7 @@ class AllSettingsViewModel : CommonViewModel() {
 
     private fun showBackupStorageCheckFailedDialog(message: String) {
         val errorArgs = ErrorDialogArgs(resourceManager.getString(check_backup_storage_status_error_title), message)
-        _modularDialog.postValue(errorArgs.getModular(resourceManager))
+        modularDialog.postValue(errorArgs.getModular(resourceManager))
     }
 }
 

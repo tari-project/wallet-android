@@ -111,6 +111,8 @@ sealed class Navigation {
 
         class ToLinkContact(val contact: ContactDto) : ContactBookNavigation()
 
+        class ToContactTransactionHistory(val contact: ContactDto) : ContactBookNavigation()
+
         class BackToContactBook : ContactBookNavigation()
     }
 }

@@ -202,7 +202,6 @@ class ContactsRepository @Inject constructor(
         }
     }
 
-
     inner class FFIContactsRepositoryBridge {
         init {
             doOnConnectedToWallet { doOnConnected { subscribeToActions() } }

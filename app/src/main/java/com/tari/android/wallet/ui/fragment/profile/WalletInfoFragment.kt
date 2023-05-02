@@ -32,26 +32,30 @@
  */
 package com.tari.android.wallet.ui.fragment.profile
 
-import android.graphics.Bitmap
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.viewModels
-import com.google.zxing.BarcodeFormat
-import com.google.zxing.EncodeHintType
-import com.journeyapps.barcodescanner.BarcodeEncoder
 import com.tari.android.wallet.R
 import com.tari.android.wallet.databinding.FragmentWalletInfoBinding
 import com.tari.android.wallet.extension.observe
 import com.tari.android.wallet.extension.observeOnLoad
 import com.tari.android.wallet.ui.common.CommonFragment
-import com.tari.android.wallet.ui.component.fullEmojiId.EmojiIdSummaryViewController
 import com.tari.android.wallet.ui.component.fullEmojiId.EmojiIdWithYatSummaryViewController
 import com.tari.android.wallet.ui.component.fullEmojiId.FullEmojiIdViewController
-import com.tari.android.wallet.ui.extension.*
-import java.util.*
+import com.tari.android.wallet.ui.component.tari.toolbar.TariToolbarActionArg
+import com.tari.android.wallet.ui.extension.doOnGlobalLayout
+import com.tari.android.wallet.ui.extension.setLayoutHeight
+import com.tari.android.wallet.ui.extension.setLayoutWidth
+import com.tari.android.wallet.ui.extension.setOnThrottledClickListener
+import com.tari.android.wallet.ui.extension.setTopMargin
+import com.tari.android.wallet.ui.extension.setVisible
+import com.tari.android.wallet.ui.extension.string
+import com.tari.android.wallet.ui.extension.temporarilyDisableClick
+import com.tari.android.wallet.ui.fragment.contact_book.root.share.ShareOptionArgs
+import com.tari.android.wallet.ui.fragment.contact_book.root.share.ShareOptionView
+import com.tari.android.wallet.ui.fragment.contact_book.root.share.ShareType
 
 class WalletInfoFragment : CommonFragment<FragmentWalletInfoBinding, WalletInfoViewModel>() {
 
@@ -63,6 +67,13 @@ class WalletInfoFragment : CommonFragment<FragmentWalletInfoBinding, WalletInfoV
 
         val viewModel: WalletInfoViewModel by viewModels()
         bindViewModel(viewModel)
+
+        subscribeVM(viewModel.shareViewModel)
+        subscribeVM(viewModel.shareViewModel.tariBluetoothServer)
+        subscribeVM(viewModel.shareViewModel.tariBluetoothClient)
+
+        viewModel.shareViewModel.tariBluetoothServer.init(this)
+        viewModel.shareViewModel.tariBluetoothClient.init(this)
 
         setupUI()
         subscribeUI()
@@ -83,12 +94,6 @@ class WalletInfoFragment : CommonFragment<FragmentWalletInfoBinding, WalletInfoV
 
         observe(publicKeyHex) { fullEmojiIdViewController.emojiIdHex = it }
 
-        observe(qrDeepLink) {
-            getQREncodedBitmap(it, dimenPx(R.dimen.wallet_info_img_qr_code_size))?.let { bitmap ->
-                ui.qrImageView.setImageBitmap(bitmap)
-            }
-        }
-
         observe(yat) { emojiIdSummaryController.yat = it }
 
         observe(reconnectVisibility) {
@@ -98,10 +103,35 @@ class WalletInfoFragment : CommonFragment<FragmentWalletInfoBinding, WalletInfoV
         }
 
         observeOnLoad(yatDisconnected)
+
+        observe(alias) { updateAlias(it) }
+
+        observe(shareViewModel.shareText) { shareViaText(it) }
     }
 
     private fun setupUI() {
         ui.emojiIdSummaryWithYatView.emojiIdSummaryContainerView.setOnClickListener(this::onEmojiSummaryClicked)
+
+        val qrCodeArgs = ShareOptionArgs(ShareType.QR_CODE, string(R.string.share_contact_via_qr_code), R.drawable.vector_share_qr_code) {
+            viewModel.shareData(ShareType.QR_CODE)
+        }
+
+        val linkArgs = ShareOptionArgs(ShareType.LINK, string(R.string.share_contact_via_qr_link), R.drawable.vector_share_link) {
+            viewModel.shareData(ShareType.LINK)
+        }
+        val nfcArgs = ShareOptionArgs(ShareType.NFC, string(R.string.share_contact_via_qr_nfc), R.drawable.vector_share_nfc) {
+            viewModel.shareData(ShareType.NFC)
+        }
+        val bleArgs = ShareOptionArgs(ShareType.BLE, string(R.string.share_contact_via_qr_ble), R.drawable.vector_share_ble) {
+            viewModel.shareData(ShareType.BLE)
+        }
+
+        ui.shareTypeFirstRow.addView(ShareOptionView(requireContext()).apply { setArgs(qrCodeArgs, ShareOptionView.Size.Big) })
+        ui.shareTypeFirstRow.addView(ShareOptionView(requireContext()).apply { setArgs(linkArgs, ShareOptionView.Size.Big) })
+        ui.shareTypeSecondRow.addView(ShareOptionView(requireContext()).apply { setArgs(nfcArgs, ShareOptionView.Size.Big) })
+        ui.shareTypeSecondRow.addView(ShareOptionView(requireContext()).apply { setArgs(bleArgs, ShareOptionView.Size.Big) })
+
+        ui.toolbar.setRightArgs(TariToolbarActionArg(title = string(R.string.tx_detail_edit)) { viewModel.showEditAliasDialog() })
 
         emojiIdSummaryController = EmojiIdWithYatSummaryViewController(ui.emojiIdSummaryWithYatView)
 
@@ -122,21 +152,14 @@ class WalletInfoFragment : CommonFragment<FragmentWalletInfoBinding, WalletInfoV
         ui.reconnectButton.setOnThrottledClickListener { viewModel.openYatOnboarding(requireContext()) }
     }
 
-    private fun getQREncodedBitmap(content: String, size: Int): Bitmap? {
-        return try {
-            val hints: MutableMap<EncodeHintType, String> = EnumMap(EncodeHintType::class.java)
-            hints[EncodeHintType.CHARACTER_SET] = "UTF-8"
-            val barcodeEncoder = BarcodeEncoder()
-            val map = barcodeEncoder.encode(content, BarcodeFormat.QR_CODE, size, size, hints)
-            barcodeEncoder.createBitmap(map)
-        } catch (e: Throwable) {
-            null
-        }
-    }
-
     private fun onEmojiSummaryClicked(view: View) {
         view.temporarilyDisableClick()
         fullEmojiIdViewController.showFullEmojiId()
+    }
+
+    private fun updateAlias(alias: String?) {
+        ui.alias.setVisible(alias.orEmpty().isNotBlank())
+        ui.alias.text = alias.orEmpty()
     }
 }
 

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center_vertical"
+    android:minHeight="50dp"
+    android:paddingTop="8dp">
+
+    <com.tari.android.wallet.ui.component.tari.TariBackButton
+        android:id="@+id/back_cta_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        tools:visibility="visible" />
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/toolbar_icon"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_gravity="center"
+        android:src="@drawable/vector_plus"
+        android:tint="?attr/palette_text_heading"
+        android:visibility="gone"
+        tools:visibility="visible" />
+
+    <com.tari.android.wallet.ui.component.tari.TariButton
+        android:id="@+id/toolbar_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:background="@null"
+        android:insetLeft="0dp"
+        android:insetRight="0dp"
+        android:minWidth="0dp"
+        android:text="@string/dummy_text"
+        android:textAllCaps="false"
+        android:textColor="@color/toolbar_text_color_selector"
+        android:visibility="gone"
+        app:customFont="heavy"
+        tools:visibility="visible" />
+
+</FrameLayout>

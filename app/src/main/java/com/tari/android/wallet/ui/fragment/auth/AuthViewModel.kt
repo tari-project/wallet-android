@@ -55,7 +55,7 @@ class AuthViewModel : CommonViewModel() {
                     _dismissDialog.postValue(Unit)
                 }
             ))
-        _modularDialog.postValue(args)
+        modularDialog.postValue(args)
     }
 
     private fun deleteWallet() {

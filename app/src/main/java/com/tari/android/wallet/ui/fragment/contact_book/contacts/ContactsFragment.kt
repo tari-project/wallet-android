@@ -44,7 +44,6 @@ import com.tari.android.wallet.extension.observe
 import com.tari.android.wallet.extension.observeOnLoad
 import com.tari.android.wallet.ui.common.CommonFragment
 import com.tari.android.wallet.ui.common.recyclerView.CommonAdapter
-import com.tari.android.wallet.ui.extension.PermissionExtensions.runWithPermission
 import com.tari.android.wallet.ui.fragment.contact_book.contacts.adapter.ContactListAdapter
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -77,6 +76,7 @@ open class ContactsFragment : CommonFragment<FragmentContactsBinding, ContactsVi
 
         observeOnLoad(listUpdateTrigger)
         observeOnLoad(debouncedList)
+        observeOnLoad(selectionTrigger)
     }
 
     private fun setupUI() = with(ui) {
@@ -90,7 +90,7 @@ open class ContactsFragment : CommonFragment<FragmentContactsBinding, ContactsVi
     }
 
     private fun grantPermission() {
-        runWithPermission(android.Manifest.permission.READ_CONTACTS, true) {
+        permissionManagerUI.runWithPermission(android.Manifest.permission.READ_CONTACTS, true) {
             viewModel.viewModelScope.launch(Dispatchers.IO) {
                 viewModel.contactsRepository.contactPermission.postValue(true)
                 viewModel.contactsRepository.phoneBookRepositoryBridge.loadFromPhoneBook()

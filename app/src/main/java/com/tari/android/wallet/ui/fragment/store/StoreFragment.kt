@@ -52,6 +52,7 @@ import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.network.NetworkConnectionState
 import com.tari.android.wallet.ui.component.tari.toast.TariToast
 import com.tari.android.wallet.ui.component.tari.toast.TariToastArgs
+import com.tari.android.wallet.ui.component.tari.toolbar.TariToolbarActionArg
 import com.tari.android.wallet.ui.extension.*
 import com.tari.android.wallet.ui.fragment.store.EventsPropagatingWebViewClient.ExternalSiteOverride
 import io.reactivex.Observable
@@ -88,7 +89,8 @@ class StoreFragment : Fragment() {
         configureWebView()
         ui.browserBackCtaView.setOnClickListener { ui.webView.apply { if (canGoBack()) goBack() } }
         ui.browserForwardCtaView.setOnClickListener { ui.webView.apply { if (canGoForward()) goForward() } }
-        ui.toolbar.rightAction = { shareStoreLink() }
+        val args = TariToolbarActionArg(icon = vector_store_share) { shareStoreLink() }
+        ui.toolbar.setRightArgs(args)
     }
 
     private fun reloadWebViewOnErrorAndConnectedState() {

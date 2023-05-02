@@ -86,15 +86,19 @@
     <string name="common_from">From</string>
     <string name="common_to">To</string>
     <string name="common_close">Close</string>
+    <string name="common_done">Done</string>
     <string name="common_new_uppercase">NEW</string>
     <string name="common_save">Save</string>
     <string name="common_cancel">Cancel</string>
+    <string name="common_retry">Retry</string>
     <string name="common_ok">OK</string>
     <string name="common_confirm">Confirm</string>
     <string name="common_apply">Apply</string>
     <string name="common_share">Share</string>
     <string name="common_error_title">Error</string>
     <string name="common_unknown_error">Unknown error</string>
+    <string name="common_permission_required_dialog_body">We need access to %s to perform this action. Please, open the Settings app, find this permission in the list, and grant it</string>
+    <string name="common_permission_required_button">To Settings</string>
     <string name="common_delete">Delete</string>
     <string name="common_lets_do_it">Yes! Let\'s do it!</string>
     <string name="common_are_you_sure">Are you sure?</string>
@@ -280,7 +284,7 @@
 
     <!-- wallet info -->
     <string name="wallet_info_my_profile">My Profile</string>
-    <string name="wallet_info_qr_code_desc">Transacting in person? Others can scan this QR code from the Tari Aurora App to send you tXTR.</string>
+    <string name="wallet_info_qr_code_desc">Easily receive tXTR from others by sharing your profile via one of the methods below:</string>
     <string name="wallet_info_yat_disconnected_description">You\'ve previously connected this Yat.\n Do you want to re-connect it to your wallet?</string>
     <string name="wallet_info_yat_disconnected_reconnect">Reconnect Yat</string>
 
@@ -749,5 +753,29 @@
     <string name="contact_book_type_merged">Linked Contact</string>
     <string name="remove_all">Remove all contacts</string>
     <string name="add_1000_contacts">Add 1000 contacts</string>
+    <string name="share_contact_via_qr_code">QR Code</string>
+    <string name="share_contact_via_qr_link">Link</string>
+    <string name="share_contact_via_qr_nfc">NFC</string>
+    <string name="share_contact_via_qr_ble">BLE</string>
+    <string name="wallet_info_alias_edit_title">Edit Name</string>
+    <string name="tx_details_contact_name">Contact name here</string>
+    <string name="share_via_qr_code_title">Share QR Code</string>
+
+    <string name="share_via_bluetooth_title">Share via BLE</string>
+    <string name="share_via_bluetooth_message">Bring the smartphone close to a BLE enabled device</string>
+
+    <string name="share_success_title">Profile Shared</string>
+    <string name="share_success_message">Awesome! Your details have been shared successfully.</string>
+
+    <string name="share_received_title">You received a message</string>
+    <string name="share_received_message">Charlie has sent you contact details</string>
+
+    <string name="contact_deeplink_title">Contact Sharing</string>
+    <string name="contact_deeplink_message">%s contacts will be added to your contact book</string>
+
+    <string name="contact_details_transaction_history">Transaction History</string>
+    <string name="contact_details_transaction_history_description">Your transaction history with %s</string>
+    <string name="contact_details_transaction_history_empty_state_title">No transactions found</string>
+    <string name="contact_details_transaction_history_empty_state_description"><![CDATA[You don’t have any transactions with <strong>%s</strong> yet. Click the button below to send some Tari]]></string>
 
 </resources>

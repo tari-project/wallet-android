@@ -54,7 +54,7 @@ abstract class CommonActivity<Binding : ViewBinding, VM : CommonViewModel> : App
         subscribeToCommon(viewModel)
     }
 
-    private fun subscribeToCommon(commonViewModel: CommonViewModel) = with(commonViewModel) {
+    fun subscribeToCommon(commonViewModel: CommonViewModel) = with(commonViewModel) {
         observe(backPressed) { onBackPressed() }
 
         observe(openLink) { startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(it))) }

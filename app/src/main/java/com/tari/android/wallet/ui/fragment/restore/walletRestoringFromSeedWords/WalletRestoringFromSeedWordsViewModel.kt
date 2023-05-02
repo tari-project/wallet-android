@@ -111,7 +111,7 @@ class WalletRestoringFromSeedWordsViewModel : CommonViewModel() {
 
     private fun onError(restorationError: RestorationError) {
         walletServiceLauncher.stopAndDelete()
-        _modularDialog.postValue(restorationError.args.getModular(resourceManager))
+        modularDialog.postValue(restorationError.args.getModular(resourceManager))
     }
 
     private fun onSuccessRestoration() {

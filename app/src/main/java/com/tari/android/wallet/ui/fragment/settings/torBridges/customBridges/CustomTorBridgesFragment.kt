@@ -8,8 +8,10 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import com.google.gson.Gson
+import com.tari.android.wallet.R
 import com.tari.android.wallet.databinding.FragmentCustomTorBridgesBinding
 import com.tari.android.wallet.ui.common.CommonFragment
+import com.tari.android.wallet.ui.component.tari.toolbar.TariToolbarActionArg
 import com.tari.android.wallet.ui.extension.setOnThrottledClickListener
 import com.tari.android.wallet.ui.fragment.qr.QRScannerActivity
 
@@ -31,7 +33,10 @@ class CustomTorBridgesFragment : CommonFragment<FragmentCustomTorBridgesBinding,
         requestBridgesCta.setOnThrottledClickListener { viewModel.openRequestPage() }
         scanQrCta.setOnThrottledClickListener { viewModel.navigateToScanQr() }
         uploadQrCta.setOnThrottledClickListener { viewModel.navigateToUploadQr() }
-        toolbar.rightAction = { viewModel.connect(torBridgeConfiguration.ui.editText.text.toString()) }
+        val actionArgs = TariToolbarActionArg(title = requireContext().getString(R.string.tor_bridges_connect)) {
+            viewModel.connect(torBridgeConfiguration.ui.editText.text.toString())
+        }
+        toolbar.setRightArgs(actionArgs)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -44,4 +49,3 @@ class CustomTorBridgesFragment : CommonFragment<FragmentCustomTorBridgesBinding,
 
     class StringList : ArrayList<String>()
 }
-

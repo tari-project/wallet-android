@@ -76,6 +76,8 @@ class SharedPrefsRepository @Inject constructor(
         const val publicKeyHexString = "tari_wallet_public_key_hex_string"
         const val isAuthenticated = "tari_wallet_is_authenticated"
         const val emojiId = "tari_wallet_emoji_id_"
+        const val name = "tari_wallet_name_"
+        const val surname = "tari_wallet_surname_"
         const val onboardingStarted = "tari_wallet_onboarding_started"
         const val onboardingAuthSetupCompleted = "tari_wallet_onboarding_auth_setup_completed"
         const val onboardingAuthSetupStarted = "tari_wallet_onboarding_auth_setup_started"
@@ -90,6 +92,10 @@ class SharedPrefsRepository @Inject constructor(
     var isAuthenticated: Boolean by SharedPrefBooleanDelegate(sharedPrefs, formatKey(Key.isAuthenticated))
 
     var emojiId: String? by SharedPrefStringDelegate(sharedPrefs, formatKey(Key.emojiId))
+
+    var name: String? by SharedPrefStringDelegate(sharedPrefs, formatKey(Key.name))
+
+    var surname: String? by SharedPrefStringDelegate(sharedPrefs, formatKey(Key.surname))
 
     var databasePassphrase: String? by SharedPrefStringSecuredDelegate(context, sharedPrefs, formatKey(Key.walletDatabasePassphrase))
 
