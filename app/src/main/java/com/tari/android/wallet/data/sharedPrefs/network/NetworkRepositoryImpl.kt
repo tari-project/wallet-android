@@ -7,9 +7,9 @@ import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefGsonDelegate
 
 class NetworkRepositoryImpl(sharedPrefs: SharedPreferences) : NetworkRepository {
 
-    override var supportedNetworks: List<Network> = listOf(Network.ESMERALDA)
+    override var supportedNetworks: List<Network> = listOf(Network.NEXTNET)
 
-    override var recommendedNetworks: List<Network> = listOf(Network.ESMERALDA)
+    override var recommendedNetworks: List<Network> = listOf(Network.NEXTNET)
 
     override var currentNetwork by SharedPrefGsonDelegate(sharedPrefs, Keys.currentNetwork, TariNetwork::class.java)
 
@@ -17,7 +17,7 @@ class NetworkRepositoryImpl(sharedPrefs: SharedPreferences) : NetworkRepository 
         try {
             currentNetwork!!.network.displayName
         } catch (e: Throwable) {
-            currentNetwork = getEsmeralda()
+            currentNetwork = getNextnet()
         }
     }
 
@@ -25,7 +25,7 @@ class NetworkRepositoryImpl(sharedPrefs: SharedPreferences) : NetworkRepository 
 
     override var incompatibleNetworkShown by SharedPrefBooleanDelegate(sharedPrefs, formatKey(Keys.networkIncompatible), false)
 
-    override fun getAllNetworks(): List<TariNetwork> = listOf(getEsmeralda())
+    override fun getAllNetworks(): List<TariNetwork> = listOf(getNextnet())
 
     object Keys {
         const val currentNetwork = "tari_current_network"
@@ -37,6 +37,6 @@ class NetworkRepositoryImpl(sharedPrefs: SharedPreferences) : NetworkRepository 
         private const val mainNetThicker = "XTR"
         private const val testNetThicker = "tXTR"
 
-        fun getEsmeralda(): TariNetwork = TariNetwork(Network.ESMERALDA, testNetThicker)
+        fun getNextnet(): TariNetwork = TariNetwork(Network.NEXTNET, testNetThicker)
     }
 }
