@@ -80,6 +80,7 @@ import com.tari.android.wallet.ui.fragment.settings.backup.enterCurrentPassword.
 import com.tari.android.wallet.ui.fragment.settings.backup.verifySeedPhrase.VerifySeedPhraseViewModel
 import com.tari.android.wallet.ui.fragment.settings.baseNodeConfig.addBaseNode.AddCustomBaseNodeViewModel
 import com.tari.android.wallet.ui.fragment.settings.baseNodeConfig.changeBaseNode.ChangeBaseNodeViewModel
+import com.tari.android.wallet.ui.fragment.settings.bluetoothSettings.BluetoothSettingsViewModel
 import com.tari.android.wallet.ui.fragment.settings.bugReporting.BugsReportingViewModel
 import com.tari.android.wallet.ui.fragment.settings.deleteWallet.DeleteWalletViewModel
 import com.tari.android.wallet.ui.fragment.settings.logs.LogFilesManager
@@ -185,6 +186,7 @@ interface ApplicationComponent {
     fun inject(viewModel: ShareViewModel)
     fun inject(viewModel: TransactionRepository)
     fun inject(viewModel: TransactionHistoryViewModel)
+    fun inject(viewModel: BluetoothSettingsViewModel)
 
     fun getClipboardManager(): ClipboardManager
 }

@@ -2,6 +2,7 @@ package com.tari.android.wallet.data.sharedPrefs.network
 
 import android.content.SharedPreferences
 import com.tari.android.wallet.application.Network
+import com.tari.android.wallet.data.repository.SimpleRepository
 import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefBooleanDelegate
 import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefGsonDelegate
 
@@ -11,7 +12,7 @@ class NetworkRepositoryImpl(sharedPrefs: SharedPreferences) : NetworkRepository 
 
     override var recommendedNetworks: List<Network> = listOf(Network.NEXTNET)
 
-    override var currentNetwork by SharedPrefGsonDelegate(sharedPrefs, Keys.currentNetwork, TariNetwork::class.java)
+    override var currentNetwork by SharedPrefGsonDelegate(sharedPrefs, SimpleRepository(this),  Keys.currentNetwork, TariNetwork::class.java)
 
     init {
         try {
@@ -21,9 +22,9 @@ class NetworkRepositoryImpl(sharedPrefs: SharedPreferences) : NetworkRepository 
         }
     }
 
-    override var ffiNetwork: Network? by SharedPrefGsonDelegate(sharedPrefs, formatKey(Keys.ffiNetwork), Network::class.java)
+    override var ffiNetwork: Network? by SharedPrefGsonDelegate(sharedPrefs, SimpleRepository(this),  formatKey(Keys.ffiNetwork), Network::class.java)
 
-    override var incompatibleNetworkShown by SharedPrefBooleanDelegate(sharedPrefs, formatKey(Keys.networkIncompatible), false)
+    override var incompatibleNetworkShown by SharedPrefBooleanDelegate(sharedPrefs, SimpleRepository(this),  formatKey(Keys.networkIncompatible), false)
 
     override fun getAllNetworks(): List<TariNetwork> = listOf(getNextnet())
 

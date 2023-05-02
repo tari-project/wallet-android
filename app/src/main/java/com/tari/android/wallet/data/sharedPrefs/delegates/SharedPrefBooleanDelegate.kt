@@ -1,13 +1,19 @@
 package com.tari.android.wallet.data.sharedPrefs.delegates
 
 import android.content.SharedPreferences
+import com.tari.android.wallet.data.repository.CommonRepository
 import kotlin.reflect.KProperty
 
 class SharedPrefBooleanDelegate(
     val prefs: SharedPreferences,
+    val commonRepository: CommonRepository,
     val name: String,
     val defValue: Boolean = false
 ) {
+    init {
+        commonRepository.updateNotifier.onNext(Unit)
+    }
+
     operator fun getValue(thisRef: Any?, property: KProperty<*>): Boolean =
         prefs.getBoolean(name, defValue)
 
@@ -15,5 +21,6 @@ class SharedPrefBooleanDelegate(
         prefs.edit().run {
             putBoolean(name, value)
             apply()
+            commonRepository.updateNotifier.onNext(Unit)
         }
 }

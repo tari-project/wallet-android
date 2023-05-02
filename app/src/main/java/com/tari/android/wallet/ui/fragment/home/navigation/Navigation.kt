@@ -73,10 +73,12 @@ sealed class Navigation {
         object ToBackupSettings : AllSettingsNavigation()
         object ToDeleteWallet : AllSettingsNavigation()
         object ToBackgroundService : AllSettingsNavigation()
+        object ToBluetoothSettings : AllSettingsNavigation()
         object ToThemeSelection : AllSettingsNavigation()
         object ToTorBridges : AllSettingsNavigation()
         object ToNetworkSelection : AllSettingsNavigation()
         object ToBaseNodeSelection : AllSettingsNavigation()
+        object ToRequestTari : AllSettingsNavigation()
     }
 
     sealed class InputSeedWordsNavigation : Navigation() {

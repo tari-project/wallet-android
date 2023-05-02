@@ -30,7 +30,7 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.tari.android.wallet.data.sharedPrefs.securityStages
+package com.tari.android.wallet.data.sharedPrefs.bluetooth
 
 import android.content.SharedPreferences
 import com.tari.android.wallet.data.repository.CommonRepository
@@ -41,22 +41,23 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class SecurityStagesRepository @Inject constructor(sharedPrefs: SharedPreferences, networkRepository: NetworkRepository) :
+class ShareSettingsRepository @Inject constructor(sharedPrefs: SharedPreferences, networkRepository: NetworkRepository) :
     CommonRepository(networkRepository) {
 
     private object Key {
-        const val disabledTimestamps = "tari_disabled_timestamp"
+        const val bluetoothSettingsKey = "tari_bluetooth_server_settings"
     }
 
-    var disabledTimestamps: DisabledTimestampsDto? by SharedPrefGsonDelegate(
+    var bluetoothSettingsState: BluetoothServerState? by SharedPrefGsonDelegate(
         sharedPrefs,
         this,
-        formatKey(Key.disabledTimestamps),
-        DisabledTimestampsDto::class.java,
-        DisabledTimestampsDto(mutableMapOf())
+        formatKey(Key.bluetoothSettingsKey),
+        BluetoothServerState::class.java,
+        BluetoothServerState.ENABLED
     )
 
     fun clear() {
-        disabledTimestamps = null
+        bluetoothSettingsState = null
     }
 }
+

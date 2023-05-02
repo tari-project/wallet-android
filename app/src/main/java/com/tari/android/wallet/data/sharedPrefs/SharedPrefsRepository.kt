@@ -87,25 +87,25 @@ class SharedPrefsRepository @Inject constructor(
         const val isDataCleared = "tari_is_data_cleared"
     }
 
-    var publicKeyHexString: String? by SharedPrefStringDelegate(sharedPrefs, formatKey(Key.publicKeyHexString))
+    var publicKeyHexString: String? by SharedPrefStringDelegate(sharedPrefs, this,  formatKey(Key.publicKeyHexString))
 
-    var isAuthenticated: Boolean by SharedPrefBooleanDelegate(sharedPrefs, formatKey(Key.isAuthenticated))
+    var isAuthenticated: Boolean by SharedPrefBooleanDelegate(sharedPrefs, this,  formatKey(Key.isAuthenticated))
 
-    var emojiId: String? by SharedPrefStringDelegate(sharedPrefs, formatKey(Key.emojiId))
+    var emojiId: String? by SharedPrefStringDelegate(sharedPrefs, this,  formatKey(Key.emojiId))
 
-    var name: String? by SharedPrefStringDelegate(sharedPrefs, formatKey(Key.name))
+    var name: String? by SharedPrefStringDelegate(sharedPrefs, this,  formatKey(Key.name))
 
-    var surname: String? by SharedPrefStringDelegate(sharedPrefs, formatKey(Key.surname))
+    var surname: String? by SharedPrefStringDelegate(sharedPrefs, this,  formatKey(Key.surname))
 
-    var databasePassphrase: String? by SharedPrefStringSecuredDelegate(context, sharedPrefs, formatKey(Key.walletDatabasePassphrase))
+    var databasePassphrase: String? by SharedPrefStringSecuredDelegate(context, sharedPrefs, this, formatKey(Key.walletDatabasePassphrase))
 
-    var onboardingStarted: Boolean by SharedPrefBooleanDelegate(sharedPrefs, formatKey(Key.onboardingStarted))
+    var onboardingStarted: Boolean by SharedPrefBooleanDelegate(sharedPrefs, this,  formatKey(Key.onboardingStarted))
 
-    var onboardingCompleted: Boolean by SharedPrefBooleanDelegate(sharedPrefs, formatKey(Key.onboardingCompleted))
+    var onboardingCompleted: Boolean by SharedPrefBooleanDelegate(sharedPrefs, this,  formatKey(Key.onboardingCompleted))
 
-    var onboardingAuthSetupStarted: Boolean by SharedPrefBooleanDelegate(sharedPrefs, formatKey(Key.onboardingAuthSetupStarted))
+    var onboardingAuthSetupStarted: Boolean by SharedPrefBooleanDelegate(sharedPrefs, this,  formatKey(Key.onboardingAuthSetupStarted))
 
-    var onboardingAuthSetupCompleted: Boolean by SharedPrefBooleanDelegate(sharedPrefs, formatKey(Key.onboardingAuthSetupCompleted))
+    var onboardingAuthSetupCompleted: Boolean by SharedPrefBooleanDelegate(sharedPrefs, this,  formatKey(Key.onboardingAuthSetupCompleted))
 
     val onboardingAuthWasInterrupted: Boolean
         get() = onboardingAuthSetupStarted && !onboardingAuthSetupCompleted
@@ -113,9 +113,9 @@ class SharedPrefsRepository @Inject constructor(
     val onboardingWasInterrupted: Boolean
         get() = onboardingStarted && !onboardingCompleted
 
-    var onboardingDisplayedAtHome: Boolean by SharedPrefBooleanDelegate(sharedPrefs, formatKey(Key.onboardingDisplayedAtHome))
+    var onboardingDisplayedAtHome: Boolean by SharedPrefBooleanDelegate(sharedPrefs, this,  formatKey(Key.onboardingDisplayedAtHome))
 
-    var isDataCleared: Boolean by SharedPrefBooleanDelegate(sharedPrefs, formatKey(Key.isDataCleared), true)
+    var isDataCleared: Boolean by SharedPrefBooleanDelegate(sharedPrefs, this,  formatKey(Key.isDataCleared), true)
 
     fun clear() {
         baseNodeSharedRepository.clear()

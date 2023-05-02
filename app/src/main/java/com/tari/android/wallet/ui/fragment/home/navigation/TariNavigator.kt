@@ -49,6 +49,7 @@ import com.tari.android.wallet.ui.fragment.send.common.TransactionData
 import com.tari.android.wallet.ui.fragment.send.finalize.FinalizeSendTxFragment
 import com.tari.android.wallet.ui.fragment.send.finalize.TxFailureReason
 import com.tari.android.wallet.ui.fragment.send.makeTransaction.MakeTransactionFragment
+import com.tari.android.wallet.ui.fragment.send.requestTari.RequestTariFragment
 import com.tari.android.wallet.ui.fragment.settings.allSettings.about.TariAboutFragment
 import com.tari.android.wallet.ui.fragment.settings.backgroundService.BackgroundServiceSettingsFragment
 import com.tari.android.wallet.ui.fragment.settings.backup.backupOnboarding.BackupOnboardingFlowFragment
@@ -59,6 +60,7 @@ import com.tari.android.wallet.ui.fragment.settings.backup.verifySeedPhrase.Veri
 import com.tari.android.wallet.ui.fragment.settings.backup.writeDownSeedWords.WriteDownSeedPhraseFragment
 import com.tari.android.wallet.ui.fragment.settings.baseNodeConfig.addBaseNode.AddCustomBaseNodeFragment
 import com.tari.android.wallet.ui.fragment.settings.baseNodeConfig.changeBaseNode.ChangeBaseNodeFragment
+import com.tari.android.wallet.ui.fragment.settings.bluetoothSettings.BluetoothSettingsFragment
 import com.tari.android.wallet.ui.fragment.settings.deleteWallet.DeleteWalletFragment
 import com.tari.android.wallet.ui.fragment.settings.logs.activity.DebugActivity
 import com.tari.android.wallet.ui.fragment.settings.logs.activity.DebugNavigation
@@ -94,12 +96,14 @@ class TariNavigator @Inject constructor(val prefs: SharedPrefsRepository, val ta
             AllSettingsNavigation.ToMyProfile -> toMyProfile()
             AllSettingsNavigation.ToAbout -> toAbout()
             AllSettingsNavigation.ToBackgroundService -> toBackgroundService()
+            AllSettingsNavigation.ToBluetoothSettings -> addFragment(BluetoothSettingsFragment())
             AllSettingsNavigation.ToBackupSettings -> toBackupSettings(true)
             AllSettingsNavigation.ToBaseNodeSelection -> toBaseNodeSelection()
             AllSettingsNavigation.ToDeleteWallet -> toDeleteWallet()
             AllSettingsNavigation.ToNetworkSelection -> toNetworkSelection()
             AllSettingsNavigation.ToTorBridges -> toTorBridges()
             AllSettingsNavigation.ToThemeSelection -> toThemeSelection()
+            AllSettingsNavigation.ToRequestTari -> addFragment(RequestTariFragment())
             Navigation.EnterRestorationPasswordNavigation.OnRestore -> onRestoreCompleted()
             Navigation.InputSeedWordsNavigation.ToRestoreFormSeedWordsInProgress -> toRestoreFromSeedWordsInProgress()
             Navigation.InputSeedWordsNavigation.ToBaseNodeSelection -> toBaseNodeSelection()

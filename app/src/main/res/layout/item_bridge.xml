@@ -41,8 +41,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
+            android:rotation="180"
             android:src="@drawable/vector_back_button"
-android:rotation="180"
             android:visibility="gone" />
 
     </FrameLayout>

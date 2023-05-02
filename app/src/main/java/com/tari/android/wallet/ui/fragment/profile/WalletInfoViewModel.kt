@@ -16,6 +16,7 @@ import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
 import com.tari.android.wallet.ui.dialog.modular.modules.input.InputModule
 import com.tari.android.wallet.ui.fragment.contact_book.root.ShareViewModel
 import com.tari.android.wallet.ui.fragment.contact_book.root.share.ShareType
+import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
 import com.tari.android.wallet.yat.YatAdapter
 import com.tari.android.wallet.yat.YatSharedRepository
 import kotlinx.coroutines.Dispatchers
@@ -140,6 +141,10 @@ class WalletInfoViewModel : CommonViewModel() {
 
         val args = ModularDialogArgs(DialogArgs(), moduleList)
         _inputDialog.postValue(args)
+    }
+
+    fun openRequestTari() {
+        navigation.postValue(Navigation.AllSettingsNavigation.ToRequestTari)
     }
 
     private fun saveDetails(name: String, surname: String) {

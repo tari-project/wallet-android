@@ -14,15 +14,50 @@ import android.content.Context
 import android.os.ParcelUuid
 import com.tari.android.wallet.application.deeplinks.DeepLink
 import com.tari.android.wallet.application.deeplinks.DeeplinkHandler
+import com.tari.android.wallet.data.sharedPrefs.bluetooth.BluetoothServerState
+import com.tari.android.wallet.data.sharedPrefs.bluetooth.ShareSettingsRepository
+import com.tari.android.wallet.extension.addTo
 import java.util.UUID
 import javax.inject.Inject
 import javax.inject.Singleton
 
 
 @Singleton
-class TariBluetoothServer @Inject constructor(val deeplinkHandler: DeeplinkHandler) : TariBluetoothAdapter() {
+class TariBluetoothServer @Inject constructor(private val shareSettingsRepository: ShareSettingsRepository, val deeplinkHandler: DeeplinkHandler) :
+    TariBluetoothAdapter() {
 
-    fun startReceiving() {
+    init {
+        shareSettingsRepository.updateNotifier.subscribe {
+            try {
+                handleReceiving()
+            } catch (e: Throwable) {
+                logger.e("Error handling receiving", e)
+            }
+        }.addTo(compositeDisposable)
+    }
+
+    private val advertiseCallback = object : AdvertiseCallback() {
+        override fun onStartSuccess(settingsInEffect: AdvertiseSettings?) {
+            super.onStartSuccess(settingsInEffect)
+            logger.i("onStartSuccess: $settingsInEffect")
+        }
+
+        override fun onStartFailure(errorCode: Int) {
+            super.onStartFailure(errorCode)
+            logger.i("onStartFailure: $errorCode")
+        }
+    }
+
+    private fun handleReceiving() {
+        when (shareSettingsRepository.bluetoothSettingsState) {
+            BluetoothServerState.DISABLED -> stopReceiving()
+            BluetoothServerState.WHILE_UP -> startReceiving()
+            BluetoothServerState.ENABLED -> startReceiving()
+            null -> Unit
+        }
+    }
+
+    private fun startReceiving() {
         ensureBluetoothIsEnabled {
             runWithPermissions(bluetoothAdvertisePermission) {
                 runWithPermissions(bluetoothConnectPermission) {
@@ -83,18 +118,6 @@ class TariBluetoothServer @Inject constructor(val deeplinkHandler: DeeplinkHandl
             }
         }
 
-        val advertiseCallback = object : AdvertiseCallback() {
-            override fun onStartSuccess(settingsInEffect: AdvertiseSettings?) {
-                super.onStartSuccess(settingsInEffect)
-                logger.i("onStartSuccess: $settingsInEffect")
-            }
-
-            override fun onStartFailure(errorCode: Int) {
-                super.onStartFailure(errorCode)
-                logger.i("onStartFailure: $errorCode")
-            }
-        }
-
         val bluetoothManager = fragment?.requireContext()?.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager? ?: return
         @Suppress("MissingPermission")
         bluetoothGattServer = bluetoothManager.openGattServer(fragment!!.requireContext(), callback) ?: return
@@ -129,5 +152,12 @@ class TariBluetoothServer @Inject constructor(val deeplinkHandler: DeeplinkHandl
         bluetoothLeAdvertiser.startAdvertising(settings, data, advertiseCallback)
 
         logger.i("startAdvertising")
+    }
+
+    private fun stopReceiving() {
+        val bluetoothLeAdvertiser = bluetoothAdapter!!.bluetoothLeAdvertiser
+
+        @Suppress("MissingPermission")
+        bluetoothLeAdvertiser.stopAdvertising(advertiseCallback)
     }
 }

@@ -4,10 +4,12 @@ import android.content.SharedPreferences
 import android.net.Uri
 import com.google.gson.GsonBuilder
 import com.orhanobut.logger.Logger
+import com.tari.android.wallet.data.repository.CommonRepository
 import kotlin.reflect.KProperty
 
 class SharedPrefGsonDelegate<T>(
     private val prefs: SharedPreferences,
+    private val commonRepository: CommonRepository,
     private val name: String,
     private val type: Class<T>,
     private val defValue: T? = null,
@@ -15,6 +17,10 @@ class SharedPrefGsonDelegate<T>(
     private val gson = with(GsonBuilder()) {
         registerTypeAdapter(Uri::class.java, UriDeserializer())
         create()
+    }
+
+    init {
+        commonRepository.updateNotifier.onNext(Unit)
     }
 
     operator fun getValue(thisRef: Any?, property: KProperty<*>): T? {
@@ -35,6 +41,7 @@ class SharedPrefGsonDelegate<T>(
         prefs.edit().run {
             putString(name, gson.toJson(value, type))
             apply()
+            commonRepository.updateNotifier.onNext(Unit)
         }
     }
 

@@ -162,6 +162,8 @@ class WalletInfoFragment : CommonFragment<FragmentWalletInfoBinding, WalletInfoV
         }
 
         ui.reconnectButton.setOnThrottledClickListener { viewModel.openYatOnboarding(requireContext()) }
+
+        ui.requestTari.setOnClickListener { viewModel.openRequestTari() }
     }
 
     private fun onEmojiSummaryClicked(view: View) {

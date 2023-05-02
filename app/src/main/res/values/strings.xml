@@ -405,6 +405,7 @@
     <string name="all_settings_disclaimer">Disclaimer</string>
     <string name="all_settings_explorer">Block Explorer</string>
     <string name="all_settings_background_service">Background Service</string>
+    <string name="all_settings_bluetooth_settings">Bluetooth Settings</string>
     <string name="all_settings_bridge_configuration">Bridge Configuration</string>
     <string name="all_settings_connect_yats">Connect Yats</string>
     <string name="all_settings_select_base_node">Select Base Node</string>
@@ -423,6 +424,14 @@
     <string name="background_service_button_title">Allow Tari to receive transactions and notifications in the background</string>
     <string name="background_service_button_confirmation_title">Background service will be turned off</string>
     <string name="background_service_button_confirmation_description">You will not get any notifications and updates. Are you sure you want to proceed?</string>
+
+    <!-- Bluetooth settings -->
+    <string name="bluetooth_settings_title">Bluetooth Settings</string>
+    <string name="bluetooth_settings_description">Other users can share their contacts using Bluetooth Low Energy (BLE) by moving their devices near your device. Your device will be visible to nearby Bluetooth devices when it\'s turned on.\n \n Choose an option below. BLE should be:</string>
+    <string name="bluetooth_settings_option_on">Always on</string>
+    <string name="bluetooth_settings_option_off">Turned off</string>
+    <string name="bluetooth_settings_option_while_up">Only active while the app is open</string>
+
 
     <!-- delete wallet -->
     <string name="delete_wallet_title">You\'re about to lose everything!</string>

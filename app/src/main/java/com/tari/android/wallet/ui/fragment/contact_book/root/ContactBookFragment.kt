@@ -52,7 +52,6 @@ class ContactBookFragment : CommonFragment<FragmentContactBookRootBinding, Conta
         subscribeUI()
 
         grantPermission()
-        startReceiving()
 
 //        initTests()
     }
@@ -147,13 +146,6 @@ class ContactBookFragment : CommonFragment<FragmentContactBookRootBinding, Conta
             ui.toolbar.setRightArgs(shareContactArg, addContactArg)
         }
         ui.shareTypesContainer.setVisible(sharedState)
-    }
-
-    private fun startReceiving() {
-        val permissions = (viewModel.shareViewModel.tariBluetoothServer.bluetoothPermissions + viewModel.shareViewModel.tariBluetoothServer.locationPermission)
-        permissionManagerUI.runWithPermissions(*permissions.toTypedArray(), openSettings = false) {
-            viewModel.shareViewModel.tariBluetoothServer.startReceiving()
-        }
     }
 
     private fun updateShareList(list: List<ShareOptionArgs>) {
