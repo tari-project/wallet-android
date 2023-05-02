@@ -44,9 +44,6 @@ class WalletInfoViewModel : CommonViewModel() {
     private val _publicKeyHex: MutableLiveData<String> = MutableLiveData()
     val publicKeyHex: LiveData<String> = _publicKeyHex
 
-    private val _qrDeepLink: MutableLiveData<String> = MutableLiveData()
-    val qrDeepLink: LiveData<String> = _qrDeepLink
-
     private val _yat: MutableLiveData<String> = MutableLiveData()
     val yat: LiveData<String> = _yat
 
@@ -63,14 +60,20 @@ class WalletInfoViewModel : CommonViewModel() {
 
         _reconnectVisibility.addSource(_yatDisconnected) { updateReconnectVisibility() }
 
+        shareViewModel.tariBluetoothServer.doOnRequiredPermissions = { permissions, action ->
+            permissionManager.runWithPermission(permissions, action)
+        }
+
+        shareViewModel.tariBluetoothClient.doOnRequiredPermissions = { permissions, action ->
+            permissionManager.runWithPermission(permissions, action)
+        }
+
         refreshData()
     }
 
     fun refreshData() {
         _emojiId.postValue(sharedPrefsWrapper.emojiId)
         _publicKeyHex.postValue(sharedPrefsWrapper.publicKeyHexString)
-        val qrCode = deeplinkHandler.getDeeplink(DeepLink.Send(sharedPrefsWrapper.publicKeyHexString.orEmpty()))
-        _qrDeepLink.postValue(qrCode)
         _yat.postValue(yatSharedPrefsRepository.connectedYat.orEmpty())
         _yatDisconnected.postValue(yatSharedPrefsRepository.yatWasDisconnected)
         alias.postValue(sharedPrefsWrapper.name.orEmpty() + " " + sharedPrefsWrapper.surname.orEmpty())
@@ -107,7 +110,9 @@ class WalletInfoViewModel : CommonViewModel() {
     }
 
     fun shareData(type: ShareType) {
-        val deeplink = qrDeepLink.value.orEmpty()
+        val name = alias.value.orEmpty()
+        val walletEmojiId = sharedPrefsWrapper.emojiId.orEmpty()
+        val deeplink = deeplinkHandler.getDeeplink(DeepLink.Contacts(listOf(DeepLink.Contacts.DeeplinkContact(name, walletEmojiId))))
         shareViewModel.share(type, deeplink)
     }
 

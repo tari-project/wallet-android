@@ -36,10 +36,8 @@ class TariBluetoothClient @Inject constructor() : TariBluetoothAdapter() {
     }
 
     fun stopSharing() {
-        runWithPermissions(bluetoothScanPermission) {
-            @Suppress("MissingPermission")
-            bluetoothAdapter?.bluetoothLeScanner?.stopScan(callback)
-        }
+        @Suppress("MissingPermission")
+        bluetoothAdapter?.bluetoothLeScanner?.stopScan(callback)
     }
 
     private fun doScanning(data: String) {
