@@ -33,9 +33,11 @@
 package com.tari.android.wallet.ui.component.clipboardController
 
 import android.animation.AnimatorSet
+import android.animation.LayoutTransition
 import android.animation.ValueAnimator
 import android.app.Activity
 import android.view.View
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.animation.addListener
 import com.daasuu.ei.Ease
 import com.daasuu.ei.EasingInterpolator
@@ -57,7 +59,11 @@ import com.tari.android.wallet.util.EmojiUtil
  *
  * @author The Tari Development Team
  */
-class ClipboardController(private val localDimmers: List<View>, private val ui: ViewClipboardWalletBinding, private val viewModel: WalletAddressViewModel) {
+class ClipboardController(
+    private val localDimmers: List<View>,
+    private val ui: ViewClipboardWalletBinding,
+    private val viewModel: WalletAddressViewModel
+) {
 
     private val context = ui.root.context
     private val activity = ui.root.context as Activity
@@ -75,6 +81,11 @@ class ClipboardController(private val localDimmers: List<View>, private val ui: 
         dimmerViews.forEach { it.setOnClickListener { onEmojiIdDimmerClicked() } }
         ui.pasteEmojiIdButton.setOnClickListener { onPasteEmojiIdButtonClicked() }
         ui.emojiIdTextView.setOnClickListener { onPasteEmojiIdButtonClicked() }
+
+        dimmerViews.forEach {
+            (it.parent as? ConstraintLayout)?.layoutTransition?.disableTransitionType(LayoutTransition.DISAPPEARING)
+            (it.parent as? ConstraintLayout)?.layoutTransition?.disableTransitionType(LayoutTransition.APPEARING)
+        }
     }
 
 
@@ -143,13 +154,14 @@ class ClipboardController(private val localDimmers: List<View>, private val ui: 
     private fun onPasteEmojiIdButtonClicked() {
         hidePasteEmojiIdViewsOnTextChanged = false
         hidePasteEmojiIdViews(animate = true) {
-            listener?.onPaste(viewModel.discoveredWalletAddress.value!!)
+            listener?.onPaste(viewModel.discoveredWalletAddressFromClipboard.value!!)
         }
     }
 
     private fun onEmojiIdDimmerClicked() {
         hidePasteEmojiIdViews(animate = true) {
             activity.hideKeyboard()
+            listener?.focusOnEditText(false)
         }
     }
 
@@ -182,7 +194,7 @@ class ClipboardController(private val localDimmers: List<View>, private val ui: 
             }
             addListener(onEnd = {
                 ui.emojiIdContainerView.gone()
-                dimmerViews.forEach(View::gone)
+                dimmerViews.forEach { it.gone() }
             })
             duration = Constants.UI.shortDurationMs
         }

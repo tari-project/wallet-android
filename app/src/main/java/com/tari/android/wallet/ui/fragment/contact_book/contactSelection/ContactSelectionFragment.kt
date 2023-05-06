@@ -102,7 +102,7 @@ open class ContactSelectionFragment : CommonFragment<FragmentContactsSelectionBi
     private fun subscribeViewModal() = with(viewModel) {
         observe(list) { recyclerViewAdapter.update(it) }
 
-        observe(walletAddressViewModel.discoveredWalletAddress) { clipboardController.showClipboardData(it) }
+        observe(walletAddressViewModel.discoveredWalletAddressFromClipboard) { clipboardController.showClipboardData(it) }
 
         observe(selectedTariWalletAddress) { putEmojiId(it.emojiId) }
 
@@ -136,7 +136,10 @@ open class ContactSelectionFragment : CommonFragment<FragmentContactsSelectionBi
             override fun onPaste(walletAddress: TariWalletAddress) {
                 ui.searchEditText.scaleX = 0f
                 ui.searchEditText.scaleY = 0f
-                ui.searchEditText.setText(viewModel.walletAddressViewModel.discoveredWalletAddress.value?.emojiId, TextView.BufferType.EDITABLE)
+                ui.searchEditText.setText(
+                    viewModel.walletAddressViewModel.discoveredWalletAddressFromClipboard.value?.emojiId,
+                    TextView.BufferType.EDITABLE
+                )
                 ui.searchEditText.setSelection(ui.searchEditText.text?.length ?: 0)
                 ui.rootView.postDelayed({ animateEmojiIdPaste() }, Constants.UI.xShortDurationMs)
             }

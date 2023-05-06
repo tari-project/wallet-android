@@ -12,7 +12,7 @@ import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.extractEmojis
 import javax.inject.Inject
 
-class WalletAddressViewModel() : CommonViewModel() {
+class WalletAddressViewModel : CommonViewModel() {
 
     @Inject
     lateinit var clipboardManager: ClipboardManager
@@ -20,7 +20,11 @@ class WalletAddressViewModel() : CommonViewModel() {
     @Inject
     lateinit var deeplinkHandler: DeeplinkHandler
 
-    val discoveredWalletAddress = SingleLiveEvent<TariWalletAddress>()
+    val discoveredWalletAddressFromClipboard = SingleLiveEvent<TariWalletAddress>()
+
+    val discoveredWalletAddressFromQuery = SingleLiveEvent<TariWalletAddress>()
+
+    var discoveredWalletAddress: TariWalletAddress? = null
 
     init {
         component.inject(this)
@@ -36,12 +40,20 @@ class WalletAddressViewModel() : CommonViewModel() {
         val clipboardString = clipboardManager.primaryClip?.getItemAt(0)?.text?.toString() ?: return
 
         checkForValidEmojiId(walletService, clipboardString)
+
+        discoveredWalletAddressFromClipboard.value = discoveredWalletAddress
+    }
+
+    fun checkFromQuery(walletService: TariWalletService, query: String) {
+        checkForValidEmojiId(walletService, query)
+        discoveredWalletAddressFromQuery.value = discoveredWalletAddress
     }
 
     fun checkForValidEmojiId(walletService: TariWalletService, query: String) {
+        discoveredWalletAddress = null
         val deepLink = deeplinkHandler.handle(query) as? DeepLink.Send
         if (deepLink != null) { // there is a deep link in the clipboard
-            discoveredWalletAddress.value = walletService.getWalletAddressFromHexString(deepLink.walletAddressHex)
+            discoveredWalletAddress = walletService.getWalletAddressFromHexString(deepLink.walletAddressHex)
         } else { // try to extract a valid emoji id
             val emojis = query.trim().extractEmojis()
             // search in windows of length = emoji id length
@@ -51,14 +63,14 @@ class WalletAddressViewModel() : CommonViewModel() {
                     .subList(currentIndex, currentIndex + Constants.Wallet.emojiIdLength)
                     .joinToString(separator = "")
                 // there is a chunked emoji id in the clipboard
-                discoveredWalletAddress.value = walletService.getWalletAddressFromEmojiId(emojiWindow)
-                if (discoveredWalletAddress.value != null) {
+                discoveredWalletAddress = walletService.getWalletAddressFromEmojiId(emojiWindow)
+                if (discoveredWalletAddress != null) {
                     break
                 }
                 --currentIndex
             }
         }
-        if (discoveredWalletAddress.value == null) {
+        if (discoveredWalletAddress == null) {
             checkForWalletAddressHex(query)
         }
     }
@@ -68,8 +80,8 @@ class WalletAddressViewModel() : CommonViewModel() {
         var result = hexStringRegex.find(query)
         while (result != null) {
             val hexString = result.value
-            discoveredWalletAddress.value = walletService.getWalletAddressFromHexString(hexString)
-            if (discoveredWalletAddress.value != null) {
+            discoveredWalletAddress = walletService.getWalletAddressFromHexString(hexString)
+            if (discoveredWalletAddress != null) {
                 return true
             }
             result = result.next()

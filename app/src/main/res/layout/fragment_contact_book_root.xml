@@ -103,6 +103,18 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/test_buttons">
 
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/send_button"
+            android:layout_width="38dp"
+            android:layout_height="wrap_content"
+            android:paddingStart="10dp"
+            android:src="@drawable/vector_icon_send_tari"
+            android:tint="?attr/palette_icons_default"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="@+id/search_view_container"
+            app:layout_constraintEnd_toStartOf="@+id/space"
+            app:layout_constraintTop_toTopOf="@+id/search_view_container" />
+
         <View
             android:id="@+id/dimmer_view"
             android:layout_width="0dp"
@@ -158,17 +170,6 @@
                 app:queryBackground="@null" />
 
         </com.tari.android.wallet.ui.component.tari.TariPrimaryBackground>
-
-        <androidx.appcompat.widget.AppCompatImageView
-            android:id="@+id/send_button"
-            android:layout_width="38dp"
-            android:layout_height="wrap_content"
-            android:paddingStart="10dp"
-            android:src="@drawable/vector_icon_send_tari"
-            android:visibility="visible"
-            app:layout_constraintBottom_toBottomOf="@+id/search_view_container"
-            app:layout_constraintEnd_toStartOf="@+id/space"
-            app:layout_constraintTop_toTopOf="@+id/search_view_container" />
 
         <androidx.constraintlayout.widget.Barrier
             android:id="@+id/search_bar_barrier"

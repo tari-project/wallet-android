@@ -10,6 +10,7 @@ import com.tari.android.wallet.ui.fragment.contact_book.data.ContactsRepository
 import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.ContactDto
 import com.tari.android.wallet.ui.fragment.contact_book.root.share.ShareOptionArgs
 import com.tari.android.wallet.ui.fragment.contact_book.root.share.ShareType
+import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
 import javax.inject.Inject
 
 class ContactBookViewModel : CommonViewModel() {
@@ -26,8 +27,6 @@ class ContactBookViewModel : CommonViewModel() {
     val shareViewModel = ShareViewModel()
 
     val shareList = MutableLiveData<List<ShareOptionArgs>>()
-
-    val readyToSend = MutableLiveData<String>()
 
     val walletAddressViewModel = WalletAddressViewModel()
 
@@ -70,14 +69,15 @@ class ContactBookViewModel : CommonViewModel() {
     }
 
     fun doSearch(query: String) {
-        readyToSend.postValue(query)
+        doOnConnected {
+            walletAddressViewModel.checkFromQuery(it, query)
+        }
     }
 
     fun send() {
-//        val tariWalletAddress = walletService.contact
-//        val contact = contactsRepository.ffiBridge.getContactByAdress()
-//        navigation.postValue(Navigation.TxListNavigation.ToSendTariToUser())
-        TODO("Not yet implemented")
+        val walletAddress = walletAddressViewModel.discoveredWalletAddressFromQuery.value!!
+        val contact = contactsRepository.ffiBridge.getContactByAdress(walletAddress)
+        navigation.postValue(Navigation.TxListNavigation.ToSendTariToUser(contact))
     }
 
     fun shareViaQrCode() = setSelectedToPosition(0)
@@ -96,7 +96,7 @@ class ContactBookViewModel : CommonViewModel() {
         shareViewModel.share(args.type, deeplink)
     }
 
-    private fun getDeeplink(selectedContacts: List<ContactDto>) : String {
+    private fun getDeeplink(selectedContacts: List<ContactDto>): String {
         val contacts = selectedContacts.map { DeepLink.Contacts.DeeplinkContact(it.contact.getAlias(), it.contact.extractWalletAddress().hexString) }
         return deeplinkFormatter.getDeeplink(DeepLink.Contacts(contacts))
     }

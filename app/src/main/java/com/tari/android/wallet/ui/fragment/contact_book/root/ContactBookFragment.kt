@@ -1,13 +1,10 @@
 package com.tari.android.wallet.ui.fragment.contact_book.root
 
-import android.animation.ValueAnimator
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.inputmethod.InputMethodManager
 import android.widget.LinearLayout
 import androidx.appcompat.widget.SearchView
 import androidx.core.view.updateLayoutParams
@@ -15,8 +12,6 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.viewModels
 import androidx.viewpager2.adapter.FragmentStateAdapter
-import com.daasuu.ei.Ease
-import com.daasuu.ei.EasingInterpolator
 import com.google.android.material.tabs.TabLayoutMediator
 import com.tari.android.wallet.R
 import com.tari.android.wallet.databinding.FragmentContactBookRootBinding
@@ -25,7 +20,10 @@ import com.tari.android.wallet.model.TariWalletAddress
 import com.tari.android.wallet.ui.common.CommonFragment
 import com.tari.android.wallet.ui.component.clipboardController.ClipboardController
 import com.tari.android.wallet.ui.component.tari.toolbar.TariToolbarActionArg
+import com.tari.android.wallet.ui.extension.hideKeyboard
+import com.tari.android.wallet.ui.extension.postDelayed
 import com.tari.android.wallet.ui.extension.setVisible
+import com.tari.android.wallet.ui.extension.showKeyboard
 import com.tari.android.wallet.ui.extension.string
 import com.tari.android.wallet.ui.fragment.contact_book.contacts.ContactsFragment
 import com.tari.android.wallet.ui.fragment.contact_book.favorites.FavoritesFragment
@@ -33,7 +31,6 @@ import com.tari.android.wallet.ui.fragment.contact_book.root.share.ShareOptionAr
 import com.tari.android.wallet.ui.fragment.contact_book.root.share.ShareOptionView
 import com.tari.android.wallet.ui.fragment.home.HomeActivity
 import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
-import com.tari.android.wallet.util.Constants
 import java.lang.ref.WeakReference
 
 class ContactBookFragment : CommonFragment<FragmentContactBookRootBinding, ContactBookViewModel>() {
@@ -81,7 +78,9 @@ class ContactBookFragment : CommonFragment<FragmentContactBookRootBinding, Conta
 
         observe(contactSelectionRepository.isSelectionState) { updateSharedState() }
 
-        observe(walletAddressViewModel.discoveredWalletAddress) { clipboardController.showClipboardData(it) }
+        observe(walletAddressViewModel.discoveredWalletAddressFromClipboard) { clipboardController.showClipboardData(it) }
+
+        observe(walletAddressViewModel.discoveredWalletAddressFromQuery) { ui.sendButton.setVisible(it != null) }
 
         observe(contactSelectionRepository.isPossibleToShare) { updateSharedState() }
 
@@ -94,8 +93,6 @@ class ContactBookFragment : CommonFragment<FragmentContactBookRootBinding, Conta
                 viewModel.shareViewModel.startBLESharing()
             }
         }
-
-        observe(readyToSend) { ui.sendButton.setVisible(it.isNotEmpty()) }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -129,9 +126,9 @@ class ContactBookFragment : CommonFragment<FragmentContactBookRootBinding, Conta
             )
         }.attach()
 
-        ui.searchView.setOnQueryTextFocusChangeListener { _, hasFocus ->
-            (requireActivity() as? HomeActivity)?.setBottomBarVisibility(!hasFocus)
-        }
+        ui.searchView.setOnQueryTextFocusChangeListener { _, hasFocus -> (requireActivity() as? HomeActivity)?.setBottomBarVisibility(!hasFocus) }
+
+        ui.searchView.setOnFocusChangeListener { _, hasFocus -> (requireActivity() as? HomeActivity)?.setBottomBarVisibility(!hasFocus) }
 
         ui.searchView.setIconifiedByDefault(false)
 
@@ -145,51 +142,38 @@ class ContactBookFragment : CommonFragment<FragmentContactBookRootBinding, Conta
             override fun onQueryTextSubmit(query: String?): Boolean = true
         })
 
-        ui.sendButton.setOnClickListener { viewModel.send() }
+        ui.sendButton.setOnClickListener {
+            clearFocusOnSearch()
+            viewModel.send()
+        }
 
         clipboardController.listener = object : ClipboardController.ClipboardControllerListener {
 
             override fun onPaste(walletAddress: TariWalletAddress) {
-                ui.searchView.scaleX = 0f
-                ui.searchView.scaleY = 0f
-                ui.searchView.setQuery(viewModel.walletAddressViewModel.discoveredWalletAddress.value?.emojiId, false)
-//                ui.searchView.setSelection(ui.searchView.query?.length ?: 0)
-                ui.rootView.postDelayed({ animateEmojiIdPaste() }, Constants.UI.xShortDurationMs)
+                ui.searchView.setQuery(viewModel.walletAddressViewModel.discoveredWalletAddressFromClipboard.value?.emojiId, false)
             }
 
             override fun focusOnEditText(isFocused: Boolean) {
+                (requireActivity() as? HomeActivity)?.setBottomBarVisibility(!isFocused)
                 if (isFocused) {
                     focusEditTextAndShowKeyboard()
                 } else {
-                    ui.searchView.clearFocus()
+                    clearFocusOnSearch()
                 }
             }
         }
     }
 
     private fun focusEditTextAndShowKeyboard() {
-        val mActivity = activity ?: return
-        ui.searchView.requestFocus()
-        val imm = mActivity.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-        imm.showSoftInput(ui.searchView, InputMethodManager.HIDE_IMPLICIT_ONLY)
+        getRealSearch().postDelayed(150) {
+            getRealSearch().requestFocus()
+            requireActivity().showKeyboard(getRealSearch())
+        }
     }
 
-    private fun animateEmojiIdPaste() {
-        // animate text size
-        ValueAnimator.ofFloat(0f, 1f).apply {
-            addUpdateListener { valueAnimator: ValueAnimator ->
-                val value = valueAnimator.animatedValue as Float
-                ui.searchView.scaleX = value
-                ui.searchView.scaleY = value
-                // searchEditText.translationX = -width * (1f - value) / 2f
-            }
-            duration = Constants.UI.shortDurationMs
-            interpolator = EasingInterpolator(Ease.BACK_OUT)
-            start()
-        }
-        ui.rootView.postDelayed({
-//            ui.searchEditTextScrollView.smoothScrollTo(0, 0)
-        }, Constants.UI.shortDurationMs)
+    private fun clearFocusOnSearch() {
+        requireActivity().hideKeyboard(getRealSearch())
+        getRealSearch().clearFocus()
     }
 
     private fun updateSharedState() {
@@ -229,6 +213,8 @@ class ContactBookFragment : CommonFragment<FragmentContactBookRootBinding, Conta
             }
         }
     }
+
+    private fun getRealSearch(): View = ui.searchView.findViewById(androidx.appcompat.R.id.search_src_text)
 
     private inner class ContactBookAdapter(fm: FragmentActivity) : FragmentStateAdapter(fm) {
 
