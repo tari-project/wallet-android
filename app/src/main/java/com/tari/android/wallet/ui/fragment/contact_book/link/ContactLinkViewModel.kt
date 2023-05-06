@@ -55,7 +55,7 @@ class ContactLinkViewModel : CommonViewModel() {
         component.inject(this)
 
         contactListSource.addSource(contactsRepository.publishSubject.toFlowable(BackpressureStrategy.LATEST).toLiveData()) {
-            contactListSource.value = it.map { contactDto -> ContactItem(contactDto, true) }
+            contactListSource.value = it.filter(contactsRepository.filter).map { contactDto -> ContactItem(contactDto, true) }
         }
 
         list.addSource(contactListSource) { updateList() }

@@ -45,12 +45,19 @@ class ContactsRepository @Inject constructor(
     val context: Context,
     private val contactSharedPrefRepository: ContactSharedPrefRepository
 ) : CommonViewModel() {
-    var publishSubject = BehaviorSubject.create<MutableList<ContactDto>>()
+
+    val publishSubject = BehaviorSubject.create<MutableList<ContactDto>>()
+
+    val filter: (ContactDto) -> Boolean = {
+        it.getPhoneDto()?.let { phoneContact ->
+            return@let phoneContact.displayName.isNotBlank()
+                    || phoneContact.firstName.isNotBlank()
+                    || phoneContact.surname.isNotBlank()
+        } ?: true
+    }
 
     val ffiBridge = FFIContactsRepositoryBridge()
     val phoneBookRepositoryBridge = PhoneBookRepositoryBridge()
-
-    val contacts = Contacts(context)
 
     val loadingState = MutableLiveData<LoadingState>()
 
@@ -61,7 +68,7 @@ class ContactsRepository @Inject constructor(
     init {
         doWithLoading("Parsing from shared prefs") {
             val saved = contactSharedPrefRepository.getSavedContacts()
-            publishSubject.onNext(saved.toMutableList())
+            this.publishSubject.onNext(saved.toMutableList())
         }
     }
 
@@ -147,7 +154,7 @@ class ContactsRepository @Inject constructor(
     }
 
     fun updateRecentUsedTime(contact: ContactDto) {
-        val existContact = publishSubject.value.orEmpty().firstOrNull { it.uuid == contact.uuid }
+        val existContact = this.publishSubject.value.orEmpty().firstOrNull { it.uuid == contact.uuid }
         if (existContact == null) {
             withListUpdate { list ->
                 list.add(contact)
@@ -181,16 +188,16 @@ class ContactsRepository @Inject constructor(
         }
     }
 
-    fun getByUuid(uuid: String): ContactDto = publishSubject.value!!.first { it.uuid == uuid }
+    fun getByUuid(uuid: String): ContactDto = this.publishSubject.value!!.first { it.uuid == uuid }
 
-    private fun contactExists(contact: ContactDto): Boolean = publishSubject.value!!.any { it.uuid == contact.uuid }
+    private fun contactExists(contact: ContactDto): Boolean = this.publishSubject.value!!.any { it.uuid == contact.uuid }
 
     @Synchronized
     private fun withListUpdate(silently: Boolean = false, updateAction: (list: MutableList<ContactDto>) -> Unit) {
-        val value = publishSubject.value!!
+        val value = this.publishSubject.value!!
         updateAction.invoke(value)
         viewModelScope.launch(Dispatchers.Main) {
-            publishSubject.onNext(value)
+            this@ContactsRepository.publishSubject.onNext(value)
         }
 
         doWithLoading("Updating contact changes to phone and FFI") {
@@ -222,7 +229,11 @@ class ContactsRepository @Inject constructor(
         fun getContactForTx(tx: Tx): ContactDto = getContactByAdress(tx.tariContact.walletAddress)
 
         fun getContactByAdress(address: TariWalletAddress): ContactDto =
-            publishSubject.value!!.firstOrNull { it.getFFIDto()?.walletAddress == address } ?: ContactDto(FFIContactDto(address))
+            this@ContactsRepository.publishSubject.value!!.firstOrNull { it.getFFIDto()?.walletAddress == address } ?: ContactDto(
+                FFIContactDto(
+                    address
+                )
+            )
 
         private fun subscribeToActions() {
             EventBus.subscribe<Event.Transaction.TxReceived>(this) { updateRecentUsedTime(it.tx.tariContact) }
@@ -241,7 +252,9 @@ class ContactsRepository @Inject constructor(
             doWithLoading("Updating contact changes to phone and FFI") {
                 updateFFIContacts()
 
-                val existContact = publishSubject.value.orEmpty().firstOrNull { it.contact.extractWalletAddress() == tariContact.walletAddress }
+                val existContact =
+                    this@ContactsRepository.publishSubject.value.orEmpty()
+                        .firstOrNull { it.contact.extractWalletAddress() == tariContact.walletAddress }
                 val contact = existContact ?: ContactDto(FFIContactDto(tariContact.walletAddress, tariContact.alias, tariContact.isFavorite))
                 updateRecentUsedTime(contact)
             }
@@ -310,7 +323,7 @@ class ContactsRepository @Inject constructor(
         }
 
         private fun ffiContactExist(walletAddress: TariWalletAddress): Boolean =
-            publishSubject.value!!.any { it.contact.extractWalletAddress() == walletAddress }
+            this@ContactsRepository.publishSubject.value!!.any { it.contact.extractWalletAddress() == walletAddress }
 
         private fun withFFIContact(walletAddress: TariWalletAddress, updateAction: (contact: ContactDto) -> Unit) {
             withListUpdate {
@@ -321,6 +334,8 @@ class ContactsRepository @Inject constructor(
     }
 
     inner class PhoneBookRepositoryBridge {
+
+        val contacts = Contacts(context)
 
         fun clean() {
             doWithLoading("cleaning") {

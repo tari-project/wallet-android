@@ -126,7 +126,7 @@ class ContactsViewModel : CommonViewModel() {
 
     private fun updateContacts() {
         val newItems =
-            contactsRepository.publishSubject.value!!.map { contactDto -> ContactItem(contactDto, false, false, false, this::performAction, badgeViewModel) }
+            contactsRepository.publishSubject.value!!.filter(contactsRepository.filter).map { contactDto -> ContactItem(contactDto, false, false, false, this::performAction, badgeViewModel) }
                 .toMutableList()
         sourceList.postValue(newItems)
     }
