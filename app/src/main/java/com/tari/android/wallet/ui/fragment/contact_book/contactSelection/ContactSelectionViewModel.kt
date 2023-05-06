@@ -6,23 +6,20 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.toLiveData
 import androidx.lifecycle.viewModelScope
 import com.tari.android.wallet.R
-import com.tari.android.wallet.application.deeplinks.DeepLink
 import com.tari.android.wallet.application.deeplinks.DeeplinkHandler
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
-import com.tari.android.wallet.extension.getWithError
 import com.tari.android.wallet.model.TariWalletAddress
-import com.tari.android.wallet.service.TariWalletService
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.common.SingleLiveEvent
 import com.tari.android.wallet.ui.common.recyclerView.CommonViewHolderItem
 import com.tari.android.wallet.ui.common.recyclerView.items.TitleViewHolderItem
+import com.tari.android.wallet.ui.component.clipboardController.WalletAddressViewModel
 import com.tari.android.wallet.ui.fragment.contact_book.contacts.adapter.contact.ContactItem
 import com.tari.android.wallet.ui.fragment.contact_book.data.ContactsRepository
 import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.ContactDto
 import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.FFIContactDto
 import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.YatDto
 import com.tari.android.wallet.util.Constants
-import com.tari.android.wallet.util.extractEmojis
 import com.tari.android.wallet.yat.YatAdapter
 import io.reactivex.BackpressureStrategy
 import kotlinx.coroutines.Dispatchers
@@ -37,8 +34,6 @@ open class ContactSelectionViewModel : CommonViewModel() {
 
     var additionalFilter: (ContactItem) -> Boolean = { true }
 
-    val clipboardTariWalletAddress = SingleLiveEvent<TariWalletAddress>()
-
     val selectedUser = MutableLiveData<ContactDto>()
 
     val selectedTariWalletAddress = MutableLiveData<TariWalletAddress>()
@@ -52,6 +47,8 @@ open class ContactSelectionViewModel : CommonViewModel() {
     val clipboardChecker = MediatorLiveData<Unit>()
 
     val foundYatUser: SingleLiveEvent<Optional<YatDto>> = SingleLiveEvent()
+
+    val walletAddressViewModel = WalletAddressViewModel()
 
     @Inject
     lateinit var yatAdapter: YatAdapter
@@ -72,7 +69,7 @@ open class ContactSelectionViewModel : CommonViewModel() {
         component.inject(this)
 
         doOnConnected {
-            checkClipboardForValidEmojiId(it)
+            walletAddressViewModel.checkClipboardForValidEmojiId(it)
         }
 
         contactListSource.addSource(contactsRepository.publishSubject.toFlowable(BackpressureStrategy.LATEST).toLiveData()) {
@@ -135,57 +132,6 @@ open class ContactSelectionViewModel : CommonViewModel() {
             }
         }
     }
-
-    /**
-     * Checks clipboard data for a valid deep link or an emoji id.
-     */
-    private fun checkClipboardForValidEmojiId(walletService: TariWalletService) {
-        val clipboardString = clipboardManager.primaryClip?.getItemAt(0)?.text?.toString() ?: return
-
-        val deepLink = deeplinkHandler.handle(clipboardString) as? DeepLink.Send
-        if (deepLink != null) { // there is a deep link in the clipboard
-            clipboardTariWalletAddress.value = walletService.getWalletAddressFromHexString(deepLink.walletAddressHex)
-        } else { // try to extract a valid emoji id
-            val emojis = clipboardString.trim().extractEmojis()
-            // search in windows of length = emoji id length
-            var currentIndex = emojis.size - Constants.Wallet.emojiIdLength
-            while (currentIndex >= 0) {
-                val emojiWindow = emojis
-                    .subList(currentIndex, currentIndex + Constants.Wallet.emojiIdLength)
-                    .joinToString(separator = "")
-                // there is a chunked emoji id in the clipboard
-                clipboardTariWalletAddress.value = walletService.getWalletAddressFromEmojiId(emojiWindow)
-                if (clipboardTariWalletAddress.value != null) {
-                    break
-                }
-                --currentIndex
-            }
-        }
-        if (clipboardTariWalletAddress.value == null) {
-            checkForWalletAddressHex(clipboardString)
-        }
-    }
-
-    /**
-     * Checks clipboard data for a public key hex string.
-     */
-    fun checkForWalletAddressHex(input: String): Boolean {
-        val hexStringRegex = Regex("([A-Za-z0-9]{66})")
-        var result = hexStringRegex.find(input)
-        while (result != null) {
-            val hexString = result.value
-            clipboardTariWalletAddress.value = walletService.getWalletAddressFromHexString(hexString)
-            if (clipboardTariWalletAddress.value != null) {
-                return true
-            }
-            result = result.next()
-        }
-        return false
-    }
-
-    fun getWalletAddressFromHexString(publicKeyHex: String): TariWalletAddress? =
-        walletService.getWithError { _, wallet -> wallet.getWalletAddressFromHexString(publicKeyHex) }
-
-    fun getWalletAddressFromEmojiId(emojiId: String): TariWalletAddress? =
-        walletService.getWithError { _, wallet -> wallet.getWalletAddressFromEmojiId(emojiId) }
 }
+
+

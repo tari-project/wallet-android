@@ -5,6 +5,7 @@ import com.tari.android.wallet.R
 import com.tari.android.wallet.application.deeplinks.DeepLink
 import com.tari.android.wallet.application.deeplinks.DeeplinkHandler
 import com.tari.android.wallet.ui.common.CommonViewModel
+import com.tari.android.wallet.ui.component.clipboardController.WalletAddressViewModel
 import com.tari.android.wallet.ui.fragment.contact_book.data.ContactsRepository
 import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.ContactDto
 import com.tari.android.wallet.ui.fragment.contact_book.root.share.ShareOptionArgs
@@ -25,6 +26,10 @@ class ContactBookViewModel : CommonViewModel() {
     val shareViewModel = ShareViewModel()
 
     val shareList = MutableLiveData<List<ShareOptionArgs>>()
+
+    val readyToSend = MutableLiveData<String>()
+
+    val walletAddressViewModel = WalletAddressViewModel()
 
     init {
         component.inject(this)
@@ -62,6 +67,17 @@ class ContactBookViewModel : CommonViewModel() {
         shareViewModel.tariBluetoothClient.doOnRequiredPermissions = { permissions, action ->
             permissionManager.runWithPermission(permissions, action)
         }
+    }
+
+    fun doSearch(query: String) {
+        readyToSend.postValue(query)
+    }
+
+    fun send() {
+//        val tariWalletAddress = walletService.contact
+//        val contact = contactsRepository.ffiBridge.getContactByAdress()
+//        navigation.postValue(Navigation.TxListNavigation.ToSendTariToUser())
+        TODO("Not yet implemented")
     }
 
     fun shareViaQrCode() = setSelectedToPosition(0)

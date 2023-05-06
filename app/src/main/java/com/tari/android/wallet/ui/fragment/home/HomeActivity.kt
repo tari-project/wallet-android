@@ -51,10 +51,8 @@ import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
 import com.tari.android.wallet.data.sharedPrefs.tariSettings.TariSettingsSharedRepository
 import com.tari.android.wallet.databinding.ActivityHomeBinding
 import com.tari.android.wallet.di.DiContainer.appComponent
-import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.extension.applyFontStyle
 import com.tari.android.wallet.model.TxId
-import com.tari.android.wallet.network.NetworkConnectionState
 import com.tari.android.wallet.service.TariWalletService
 import com.tari.android.wallet.service.connection.ServiceConnectionStatus
 import com.tari.android.wallet.service.service.WalletServiceLauncher
@@ -70,7 +68,6 @@ import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonStyle
 import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
 import com.tari.android.wallet.ui.extension.parcelable
 import com.tari.android.wallet.ui.extension.setVisible
-import com.tari.android.wallet.ui.extension.showInternetConnectionErrorDialog
 import com.tari.android.wallet.ui.extension.string
 import com.tari.android.wallet.ui.fragment.contact_book.root.ContactBookFragment
 import com.tari.android.wallet.ui.fragment.home.navigation.TariNavigator.Companion.INDEX_CONTACT_BOOK
@@ -190,23 +187,11 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>() {
         val postDelay = if (!isVisible) 0 else Constants.UI.shortDurationMs
         ui.bottomNavigationView.postDelayed({
             ui.bottomNavigationView.setVisible(isVisible)
-            ui.sendTariCtaView.setVisible(isVisible)
         }, postDelay)
     }
 
     private fun setupUi() {
         setupBottomNavigation()
-        setupCTAs()
-    }
-
-    private fun setupCTAs() {
-        ui.sendTariCtaView.setOnClickListener {
-            if (EventBus.networkConnectionState.publishSubject.value != NetworkConnectionState.CONNECTED) {
-                showInternetConnectionErrorDialog(this)
-            } else {
-                viewModel.tariNavigator.sendToUser(null)
-            }
-        }
     }
 
     private fun setupBottomNavigation() {

@@ -48,7 +48,6 @@ import com.tari.android.wallet.ui.fragment.send.addNote.AddNoteFragment
 import com.tari.android.wallet.ui.fragment.send.common.TransactionData
 import com.tari.android.wallet.ui.fragment.send.finalize.FinalizeSendTxFragment
 import com.tari.android.wallet.ui.fragment.send.finalize.TxFailureReason
-import com.tari.android.wallet.ui.fragment.send.makeTransaction.MakeTransactionFragment
 import com.tari.android.wallet.ui.fragment.send.requestTari.RequestTariFragment
 import com.tari.android.wallet.ui.fragment.settings.allSettings.about.TariAboutFragment
 import com.tari.android.wallet.ui.fragment.settings.backgroundService.BackgroundServiceSettingsFragment
@@ -214,7 +213,7 @@ class TariNavigator @Inject constructor(val prefs: SharedPrefsRepository, val ta
 
     fun toChangePassword() = addFragment(ChangeSecurePasswordFragment())
 
-    fun toSendTari(user: ContactDto?) = sendToUser(user)
+    fun toSendTari(user: ContactDto) = sendToUser(user)
 
     fun toAddContact() = addFragment(AddContactFragment())
 
@@ -333,16 +332,12 @@ class TariNavigator @Inject constructor(val prefs: SharedPrefsRepository, val ta
         sendToUser((activity as HomeActivity).viewModel.contactsRepository.ffiBridge.getContactByAdress(walletAddress))
     }
 
-    fun sendToUser(recipientUser: ContactDto?) {
-        if (recipientUser != null) {
-            val bundle = Bundle().apply {
-                putSerializable(PARAMETER_CONTACT, recipientUser)
-                activity.intent.getDoubleExtra(PARAMETER_AMOUNT, Double.MIN_VALUE).takeIf { it > 0 }?.let { putDouble(PARAMETER_AMOUNT, it) }
-            }
-            addFragment(AddAmountFragment(), bundle)
-        } else {
-            addFragment(MakeTransactionFragment(), null)
+    fun sendToUser(recipientUser: ContactDto) {
+        val bundle = Bundle().apply {
+            putSerializable(PARAMETER_CONTACT, recipientUser)
+            activity.intent.getDoubleExtra(PARAMETER_AMOUNT, Double.MIN_VALUE).takeIf { it > 0 }?.let { putDouble(PARAMETER_AMOUNT, it) }
         }
+        addFragment(AddAmountFragment(), bundle)
     }
 
 

@@ -38,6 +38,7 @@ import com.tari.android.wallet.application.deeplinks.DeeplinkViewModel
 import com.tari.android.wallet.application.securityStage.StagedWalletSecurityManager
 import com.tari.android.wallet.service.service.WalletService
 import com.tari.android.wallet.ui.common.CommonViewModel
+import com.tari.android.wallet.ui.component.clipboardController.WalletAddressViewModel
 import com.tari.android.wallet.ui.component.networkStateIndicator.ConnectionIndicatorViewModel
 import com.tari.android.wallet.ui.fragment.auth.AuthActivity
 import com.tari.android.wallet.ui.fragment.auth.AuthViewModel
@@ -187,6 +188,7 @@ interface ApplicationComponent {
     fun inject(viewModel: TransactionRepository)
     fun inject(viewModel: TransactionHistoryViewModel)
     fun inject(viewModel: BluetoothSettingsViewModel)
+    fun inject(viewModel: WalletAddressViewModel)
 
     fun getClipboardManager(): ClipboardManager
 }
