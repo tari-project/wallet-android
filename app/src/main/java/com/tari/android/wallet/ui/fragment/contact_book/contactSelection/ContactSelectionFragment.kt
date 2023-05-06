@@ -106,13 +106,15 @@ open class ContactSelectionFragment : CommonFragment<FragmentContactsSelectionBi
 
         observe(selectedTariWalletAddress) { putEmojiId(it.emojiId) }
 
+        observe(selectedUser) { putEmojiId(it.contact.extractWalletAddress().emojiId) }
+
         observe(foundYatUser) { showYatUser(if (it.isPresent) it.get() else null) }
 
         observeOnLoad(clipboardChecker)
     }
 
     private fun putEmojiId(emojiId: String) {
-        val rawEmojiId = emojiId.replace(string(R.string.emoji_id_chunk_separator), "")
+        val rawEmojiId = ui.searchEditText.text.toString().replace(string(R.string.emoji_id_chunk_separator), "")
         if (rawEmojiId == emojiId) return
         ui.searchEditText.setText(emojiId)
         ui.searchEditText.setSelectionToEnd()
