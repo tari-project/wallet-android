@@ -105,6 +105,8 @@ sealed class Navigation {
 
         object ToAddContact : ContactBookNavigation()
 
+        object ToAddPhoneContact : ContactBookNavigation()
+
         class ToSendTari(val contact: ContactDto) : ContactBookNavigation()
 
         class ToRequestTari(val contact: ContactDto) : ContactBookNavigation()

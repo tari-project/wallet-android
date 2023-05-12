@@ -3,6 +3,7 @@ package com.tari.android.wallet.ui.fragment.home.navigation
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.provider.ContactsContract
 import androidx.fragment.app.Fragment
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.deeplinks.DeepLink
@@ -73,6 +74,7 @@ import com.tari.android.wallet.util.Constants
 import javax.inject.Inject
 import javax.inject.Singleton
 
+
 @Singleton
 class TariNavigator @Inject constructor(val prefs: SharedPrefsRepository, val tariSettingsSharedRepository: TariSettingsSharedRepository) {
 
@@ -88,6 +90,7 @@ class TariNavigator @Inject constructor(val prefs: SharedPrefsRepository, val ta
             is ContactBookNavigation.BackToContactBook -> backToContactBook()
             is ContactBookNavigation.ToExternalWallet -> toExternalWallet(navigation.connectedWallet)
             is ContactBookNavigation.ToContactTransactionHistory -> toContactTransactionHistory(navigation.contact)
+            is ContactBookNavigation.ToAddPhoneContact -> toAddPhoneContact()
             Navigation.ChooseRestoreOptionNavigation.ToEnterRestorePassword -> toEnterRestorePassword()
             Navigation.ChooseRestoreOptionNavigation.OnRestoreCompleted -> onRestoreCompleted()
             Navigation.ChooseRestoreOptionNavigation.ToRestoreWithRecoveryPhrase -> toRestoreWithRecoveryPhrase()
@@ -145,6 +148,11 @@ class TariNavigator @Inject constructor(val prefs: SharedPrefsRepository, val ta
         intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
         activity.startActivity(intent)
         activity.finishAffinity()
+    }
+
+    fun toAddPhoneContact() {
+        val intent = Intent(Intent.ACTION_INSERT, ContactsContract.Contacts.CONTENT_URI)
+        activity.startActivity(intent)
     }
 
     fun toEnterRestorePassword() = addFragment(EnterRestorationPasswordFragment.newInstance())

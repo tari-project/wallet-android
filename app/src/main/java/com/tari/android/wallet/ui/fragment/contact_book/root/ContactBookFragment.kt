@@ -62,7 +62,7 @@ class ContactBookFragment : CommonFragment<FragmentContactBookRootBinding, Conta
 
         grantPermission()
 
-//        initTests()
+        initTests()
     }
 
     override fun onResume() {

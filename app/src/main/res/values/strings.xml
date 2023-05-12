@@ -715,6 +715,12 @@
     <string name="contact_book_contacts_book_title">Contact Book</string>
     <string name="contact_book_contacts_book_details_title">Contact Profile</string>
     <string name="contact_book_contacts_book_link_title">Link Contact</string>
+    <string name="contact_book_contacts_book_link_empty_state_title">Oh no, it’s empty in here!</string>
+    <string name="contact_book_contacts_book_link_empty_state_no_contacts">Looks like you don’t have any contacts that we can link to yet. Once you’ve added a contact, you’ll be able to link to their profile.</string>
+    <string name="contact_book_contacts_book_link_empty_state_empty_book">Looks like your phone’s contact book is empty. Once you’ve added a contact, you’ll be able to link to their profile.</string>
+    <string name="contact_book_contacts_book_link_empty_state_no_access">Aurora doesn’t currently have permission to access your phone’s contacts. If you would like to link to an existing contact, please click below and grant permission to the app to read from your contact book.</string>
+    <string name="contact_book_contacts_book_link_empty_state_add_contact">Add a contact</string>
+    <string name="contact_book_contacts_book_link_empty_state_go_to_permission_settings">Go to permission settings</string>
     <string name="contact_book_contacts_book_link_message_firstLine"><![CDATA[Click "confirm" below to link]]></string>
     <string name="contact_book_contacts_book_link_message_secondLine"><![CDATA[to <b>%s</b>]]></string>
     <string name="contact_book_contacts_book_link_success_message_firstLine"><![CDATA[You have successfully linked]]></string>
