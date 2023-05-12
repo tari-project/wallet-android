@@ -1,5 +1,6 @@
 package com.tari.android.wallet.infrastructure.bluetooth
 
+import android.annotation.SuppressLint
 import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothGatt
 import android.bluetooth.BluetoothGattCallback
@@ -22,9 +23,14 @@ class TariBluetoothClient @Inject constructor() : TariBluetoothAdapter() {
     var shareData: String? = null
 
     val callback = object : ScanCallback() {
+        @SuppressLint("MissingPermission")
         override fun onScanResult(callbackType: Int, result: android.bluetooth.le.ScanResult?) {
-            result?.device?.let {
-                doPairingOrShare(it)
+            if (((result?.rssi ?: Int.MIN_VALUE) > RSSI_Threshold)) {
+                result?.device?.let {
+                    stopSharing()
+                    println("onScanResult: ${it.name} ${it.address} ${result.rssi}")
+                    doPairingOrShare(it)
+                }
             }
         }
     }
@@ -43,8 +49,18 @@ class TariBluetoothClient @Inject constructor() : TariBluetoothAdapter() {
     private fun doScanning(data: String) {
         shareData = data
 
-        val scanFilter = ScanFilter.Builder().setServiceUuid(ParcelUuid(UUID.fromString(SERVICE_UUID))).build()
-        val scanSetting = ScanSettings.Builder().build()
+        val scanFilter = ScanFilter.Builder()
+            .setServiceUuid(ParcelUuid(UUID.fromString(SERVICE_UUID)))
+            .build()
+
+        val scanSetting = ScanSettings.Builder()
+            .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)
+            .setMatchMode(ScanSettings.MATCH_MODE_AGGRESSIVE)
+            .setNumOfMatches(ScanSettings.MATCH_NUM_ONE_ADVERTISEMENT)
+            .setReportDelay(0)
+            .setLegacy(false)
+            .setCallbackType(ScanSettings.CALLBACK_TYPE_ALL_MATCHES)
+            .build()
 
         runWithPermissions(bluetoothScanPermission) {
             @Suppress("MissingPermission")
@@ -97,5 +113,9 @@ class TariBluetoothClient @Inject constructor() : TariBluetoothAdapter() {
             @Suppress("MissingPermission")
             device.connectGatt(fragment!!.requireContext(), false, gattCallback)
         }
+    }
+
+    companion object {
+        const val RSSI_Threshold = -40
     }
 }
