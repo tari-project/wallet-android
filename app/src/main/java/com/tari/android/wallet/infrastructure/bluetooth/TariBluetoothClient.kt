@@ -55,10 +55,10 @@ class TariBluetoothClient @Inject constructor() : TariBluetoothAdapter() {
 
         val scanSetting = ScanSettings.Builder()
             .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)
-            .setMatchMode(ScanSettings.MATCH_MODE_AGGRESSIVE)
-            .setNumOfMatches(ScanSettings.MATCH_NUM_ONE_ADVERTISEMENT)
+            .setMatchMode(ScanSettings.MATCH_MODE_STICKY)
+            .setNumOfMatches(ScanSettings.MATCH_NUM_MAX_ADVERTISEMENT)
             .setReportDelay(0)
-            .setLegacy(false)
+            .setLegacy(true)
             .setCallbackType(ScanSettings.CALLBACK_TYPE_ALL_MATCHES)
             .build()
 
