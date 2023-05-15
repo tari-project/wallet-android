@@ -113,6 +113,15 @@
                                 android:orientation="horizontal"
                                 android:paddingHorizontal="50dp" />
 
+                            <com.tari.android.wallet.ui.component.tari.TariGradientButton
+                                android:id="@+id/request_tari"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginHorizontal="20dp"
+                                android:layout_marginTop="40dp"
+                                app:customFont="@string/font_regular"
+                                app:title="@string/request_tari_title" />
+
                         </androidx.appcompat.widget.LinearLayoutCompat>
 
                     </androidx.appcompat.widget.LinearLayoutCompat>

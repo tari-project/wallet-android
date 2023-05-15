@@ -16,9 +16,14 @@ import com.google.android.material.tabs.TabLayoutMediator
 import com.tari.android.wallet.R
 import com.tari.android.wallet.databinding.FragmentContactBookRootBinding
 import com.tari.android.wallet.extension.observe
+import com.tari.android.wallet.model.TariWalletAddress
 import com.tari.android.wallet.ui.common.CommonFragment
+import com.tari.android.wallet.ui.component.clipboardController.ClipboardController
 import com.tari.android.wallet.ui.component.tari.toolbar.TariToolbarActionArg
+import com.tari.android.wallet.ui.extension.hideKeyboard
+import com.tari.android.wallet.ui.extension.postDelayed
 import com.tari.android.wallet.ui.extension.setVisible
+import com.tari.android.wallet.ui.extension.showKeyboard
 import com.tari.android.wallet.ui.extension.string
 import com.tari.android.wallet.ui.fragment.contact_book.contacts.ContactsFragment
 import com.tari.android.wallet.ui.fragment.contact_book.favorites.FavoritesFragment
@@ -29,6 +34,8 @@ import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
 import java.lang.ref.WeakReference
 
 class ContactBookFragment : CommonFragment<FragmentContactBookRootBinding, ContactBookViewModel>() {
+
+    private lateinit var clipboardController: ClipboardController
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?) =
         FragmentContactBookRootBinding.inflate(inflater, container, false).also { ui = it }.root
@@ -47,14 +54,20 @@ class ContactBookFragment : CommonFragment<FragmentContactBookRootBinding, Conta
         viewModel.shareViewModel.tariBluetoothServer.init(this)
         viewModel.shareViewModel.tariBluetoothClient.init(this)
 
+        clipboardController = ClipboardController(listOf(ui.dimmerView), ui.clipboardWallet, viewModel.walletAddressViewModel)
+
         setupUI()
 
         subscribeUI()
 
         grantPermission()
-        startReceiving()
 
-//        initTests()
+        initTests()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        viewModel.walletAddressViewModel.tryToCheckClipboard()
     }
 
     private fun subscribeUI() = with(viewModel) {
@@ -65,15 +78,21 @@ class ContactBookFragment : CommonFragment<FragmentContactBookRootBinding, Conta
 
         observe(contactSelectionRepository.isSelectionState) { updateSharedState() }
 
+        observe(walletAddressViewModel.discoveredWalletAddressFromClipboard) { clipboardController.showClipboardData(it) }
+
+        observe(walletAddressViewModel.discoveredWalletAddressFromQuery) { ui.sendButton.setVisible(it != null) }
+
         observe(contactSelectionRepository.isPossibleToShare) { updateSharedState() }
 
         observe(shareList) { updateShareList(it) }
 
         observe(shareViewModel.shareText) { shareViaText(it) }
 
-        observe(shareViewModel.launchPermissionCheck) { permissionManagerUI.runWithPermissions(*it.toTypedArray(), openSettings = true) {
-            viewModel.shareViewModel.startBLESharing()
-        } }
+        observe(shareViewModel.launchPermissionCheck) {
+            permissionManagerUI.runWithPermissions(*it.toTypedArray(), openSettings = true) {
+                viewModel.shareViewModel.startBLESharing()
+            }
+        }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -107,20 +126,54 @@ class ContactBookFragment : CommonFragment<FragmentContactBookRootBinding, Conta
             )
         }.attach()
 
-        ui.searchView.setOnQueryTextFocusChangeListener { _, hasFocus ->
-            (requireActivity() as? HomeActivity)?.setBottomBarVisibility(!hasFocus)
-        }
+        ui.searchView.setOnQueryTextFocusChangeListener { _, hasFocus -> (requireActivity() as? HomeActivity)?.setBottomBarVisibility(!hasFocus) }
+
+        ui.searchView.setOnFocusChangeListener { _, hasFocus -> (requireActivity() as? HomeActivity)?.setBottomBarVisibility(!hasFocus) }
 
         ui.searchView.setIconifiedByDefault(false)
 
         ui.searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextChange(newText: String?): Boolean {
                 (ui.viewPager.adapter as ContactBookAdapter).fragments.forEach { it.get()?.search(newText.orEmpty()) }
+                viewModel.doSearch(newText.orEmpty())
                 return true
             }
 
             override fun onQueryTextSubmit(query: String?): Boolean = true
         })
+
+        ui.sendButton.setOnClickListener {
+            clearFocusOnSearch()
+            viewModel.send()
+        }
+
+        clipboardController.listener = object : ClipboardController.ClipboardControllerListener {
+
+            override fun onPaste(walletAddress: TariWalletAddress) {
+                ui.searchView.setQuery(viewModel.walletAddressViewModel.discoveredWalletAddressFromClipboard.value?.emojiId, false)
+            }
+
+            override fun focusOnEditText(isFocused: Boolean) {
+                (requireActivity() as? HomeActivity)?.setBottomBarVisibility(!isFocused)
+                if (isFocused) {
+                    focusEditTextAndShowKeyboard()
+                } else {
+                    clearFocusOnSearch()
+                }
+            }
+        }
+    }
+
+    private fun focusEditTextAndShowKeyboard() {
+        getRealSearch().postDelayed(150) {
+            getRealSearch().requestFocus()
+            requireActivity().showKeyboard(getRealSearch())
+        }
+    }
+
+    private fun clearFocusOnSearch() {
+        requireActivity().hideKeyboard(getRealSearch())
+        getRealSearch().clearFocus()
     }
 
     private fun updateSharedState() {
@@ -149,13 +202,6 @@ class ContactBookFragment : CommonFragment<FragmentContactBookRootBinding, Conta
         ui.shareTypesContainer.setVisible(sharedState)
     }
 
-    private fun startReceiving() {
-        val permissions = (viewModel.shareViewModel.tariBluetoothServer.bluetoothPermissions + viewModel.shareViewModel.tariBluetoothServer.locationPermission)
-        permissionManagerUI.runWithPermissions(*permissions.toTypedArray(), openSettings = false) {
-            viewModel.shareViewModel.tariBluetoothServer.startReceiving()
-        }
-    }
-
     private fun updateShareList(list: List<ShareOptionArgs>) {
         ui.shareTypesContainer.removeAllViews()
         for (item in list) {
@@ -167,6 +213,8 @@ class ContactBookFragment : CommonFragment<FragmentContactBookRootBinding, Conta
             }
         }
     }
+
+    private fun getRealSearch(): View = ui.searchView.findViewById(androidx.appcompat.R.id.search_src_text)
 
     private inner class ContactBookAdapter(fm: FragmentActivity) : FragmentStateAdapter(fm) {
 

@@ -1,6 +1,5 @@
 package com.tari.android.wallet.ui.fragment.contact_book.contactSelection
 
-import android.animation.AnimatorSet
 import android.animation.ValueAnimator
 import android.app.Activity
 import android.content.Context
@@ -18,7 +17,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import android.widget.TextView
-import androidx.core.animation.addListener
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
@@ -34,14 +32,12 @@ import com.tari.android.wallet.extension.observeOnLoad
 import com.tari.android.wallet.model.TariWalletAddress
 import com.tari.android.wallet.ui.common.CommonFragment
 import com.tari.android.wallet.ui.common.recyclerView.CommonAdapter
+import com.tari.android.wallet.ui.component.clipboardController.ClipboardController
 import com.tari.android.wallet.ui.component.tari.toolbar.TariToolbarActionArg
-import com.tari.android.wallet.ui.extension.dimenPx
 import com.tari.android.wallet.ui.extension.gone
 import com.tari.android.wallet.ui.extension.hideKeyboard
 import com.tari.android.wallet.ui.extension.postDelayed
-import com.tari.android.wallet.ui.extension.setBottomMargin
 import com.tari.android.wallet.ui.extension.setSelectionToEnd
-import com.tari.android.wallet.ui.extension.setTopMargin
 import com.tari.android.wallet.ui.extension.setVisible
 import com.tari.android.wallet.ui.extension.string
 import com.tari.android.wallet.ui.extension.temporarilyDisableClick
@@ -61,6 +57,8 @@ import me.everything.android.ui.overscroll.OverScrollDecoratorHelper
 
 open class ContactSelectionFragment : CommonFragment<FragmentContactsSelectionBinding, ContactSelectionViewModel>(), TextWatcher {
 
+    private lateinit var clipboardController: ClipboardController
+
     private val deeplinkViewModel: DeeplinkViewModel by viewModels()
 
     private var recyclerViewAdapter = ContactListAdapter()
@@ -77,11 +75,7 @@ open class ContactSelectionFragment : CommonFragment<FragmentContactsSelectionBi
     private val textChangedProcessHandler = Handler(Looper.getMainLooper())
     private var textChangedProcessRunnable = Runnable { processTextChanged() }
 
-    private var hidePasteEmojiIdViewsOnTextChanged = false
     private var yatEyeState = true
-
-    private val dimmerViews
-        get() = arrayOf(ui.middleDimmerView, ui.bottomDimmerView)
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
         FragmentContactsSelectionBinding.inflate(inflater, container, false).also { ui = it }.root
@@ -92,6 +86,8 @@ open class ContactSelectionFragment : CommonFragment<FragmentContactsSelectionBi
         val viewModel: ContactSelectionViewModel by viewModels()
         bindViewModel(viewModel)
         subscribeVM(deeplinkViewModel)
+
+        clipboardController = ClipboardController(listOf(ui.dimmerView), ui.clipboard, viewModel.walletAddressViewModel)
 
         setupUI()
 
@@ -106,9 +102,11 @@ open class ContactSelectionFragment : CommonFragment<FragmentContactsSelectionBi
     private fun subscribeViewModal() = with(viewModel) {
         observe(list) { recyclerViewAdapter.update(it) }
 
-        observe(clipboardTariWalletAddress) { showClipboardData(it) }
+        observe(walletAddressViewModel.discoveredWalletAddressFromClipboard) { clipboardController.showClipboardData(it) }
 
         observe(selectedTariWalletAddress) { putEmojiId(it.emojiId) }
+
+        observe(selectedUser) { putEmojiId(it.contact.extractWalletAddress().emojiId) }
 
         observe(foundYatUser) { showYatUser(if (it.isPresent) it.get() else null) }
 
@@ -116,38 +114,46 @@ open class ContactSelectionFragment : CommonFragment<FragmentContactsSelectionBi
     }
 
     private fun putEmojiId(emojiId: String) {
-        val rawEmojiId = emojiId.replace(string(R.string.emoji_id_chunk_separator), "")
+        val rawEmojiId = ui.searchEditText.text.toString().replace(string(R.string.emoji_id_chunk_separator), "")
         if (rawEmojiId == emojiId) return
         ui.searchEditText.setText(emojiId)
         ui.searchEditText.setSelectionToEnd()
     }
 
-    private fun showClipboardData(data: TariWalletAddress) {
-        ui.rootView.postDelayed({
-            hidePasteEmojiIdViewsOnTextChanged = true
-            showPasteEmojiIdViews(data.emojiId)
-            focusEditTextAndShowKeyboard()
-        }, 100)
-    }
-
     private fun setupUI() {
         setupRecyclerView()
-        ui.scrollDepthGradientView.alpha = 0f
         ui.toolbar.hideRightActions()
         ui.invalidEmojiIdTextView.gone()
-        hidePasteEmojiIdViews(animate = false)
-        OverScrollDecoratorHelper.setUpOverScroll(ui.emojiIdScrollView)
         OverScrollDecoratorHelper.setUpOverScroll(ui.searchEditTextScrollView)
         ui.searchEditText.inputType = InputType.TYPE_NULL
         ui.qrCodeButton.setOnClickListener { onQRButtonClick(it) }
         val args = TariToolbarActionArg(title = string(R.string.common_done)) { goToNext() }
         ui.toolbar.setRightArgs(args)
-        dimmerViews.forEach { it.setOnClickListener { onEmojiIdDimmerClicked() } }
-        ui.pasteEmojiIdButton.setOnClickListener { onPasteEmojiIdButtonClicked() }
-        ui.emojiIdTextView.setOnClickListener { onPasteEmojiIdButtonClicked() }
         ui.yatEyeButton.setOnClickListener { toggleYatEye() }
         ui.searchEditText.setRawInputType(InputType.TYPE_CLASS_TEXT)
         ui.searchEditText.addTextChangedListener(this@ContactSelectionFragment)
+
+        clipboardController.listener = object : ClipboardController.ClipboardControllerListener {
+
+            override fun onPaste(walletAddress: TariWalletAddress) {
+                ui.searchEditText.scaleX = 0f
+                ui.searchEditText.scaleY = 0f
+                ui.searchEditText.setText(
+                    viewModel.walletAddressViewModel.discoveredWalletAddressFromClipboard.value?.emojiId,
+                    TextView.BufferType.EDITABLE
+                )
+                ui.searchEditText.setSelection(ui.searchEditText.text?.length ?: 0)
+                ui.rootView.postDelayed({ animateEmojiIdPaste() }, Constants.UI.xShortDurationMs)
+            }
+
+            override fun focusOnEditText(isFocused: Boolean) {
+                if (isFocused) {
+                    focusEditTextAndShowKeyboard()
+                } else {
+                    ui.searchEditText.clearFocus()
+                }
+            }
+        }
     }
 
     private fun setupRecyclerView() {
@@ -214,104 +220,6 @@ open class ContactSelectionFragment : CommonFragment<FragmentContactsSelectionBi
         activity?.overridePendingTransition(R.anim.slide_up, 0)
     }
 
-
-    /**
-     * Displays paste-emoji-id-related views.
-     */
-    private fun showPasteEmojiIdViews(emojiId: String) {
-        ui.emojiIdTextView.text = EmojiUtil.getFullEmojiIdSpannable(
-            emojiId,
-            string(R.string.emoji_id_chunk_separator),
-            viewModel.paletteManager.getBlack(requireContext()),
-            viewModel.paletteManager.getLightGray(requireContext())
-        )
-        ui.emojiIdContainerView.setBottomMargin(-dimenPx(R.dimen.add_recipient_clipboard_emoji_id_container_height))
-        ui.emojiIdContainerView.visible()
-        dimmerViews.forEach { dimmerView ->
-            dimmerView.alpha = 0f
-            dimmerView.visible()
-        }
-
-        // animate
-        val emojiIdAppearAnim = ValueAnimator.ofFloat(0f, 1f).apply {
-            addUpdateListener { valueAnimator: ValueAnimator ->
-                val animValue = valueAnimator.animatedValue as Float
-                dimmerViews.forEach { dimmerView -> dimmerView.alpha = animValue * 0.6f }
-                ui.emojiIdContainerView.setBottomMargin((-dimenPx(R.dimen.add_recipient_clipboard_emoji_id_container_height) * (1f - animValue)).toInt())
-            }
-            interpolator = EasingInterpolator(Ease.EASE_IN_OUT_EXPO)
-            duration = Constants.UI.mediumDurationMs
-        }
-
-
-        // animate and show paste emoji id button
-        ui.pasteEmojiIdContainerView.setTopMargin(0)
-        val pasteButtonAppearAnim = ValueAnimator.ofFloat(0f, 1f).apply {
-            addUpdateListener { valueAnimator: ValueAnimator ->
-                val value = valueAnimator.animatedValue as Float
-                ui.pasteEmojiIdContainerView.setTopMargin(
-                    (dimenPx(R.dimen.add_recipient_paste_emoji_id_button_visible_top_margin) * value).toInt()
-                )
-                ui.pasteEmojiIdContainerView.alpha = value
-            }
-            addListener(onStart = { ui.pasteEmojiIdContainerView.visible() })
-            interpolator = EasingInterpolator(Ease.BACK_OUT)
-            duration = Constants.UI.shortDurationMs
-        }
-
-        AnimatorSet().apply {
-            playSequentially(emojiIdAppearAnim, pasteButtonAppearAnim)
-            startDelay = Constants.UI.xShortDurationMs
-            start()
-        }
-    }
-
-    /**
-     * Hides paste-emoji-id-related views.
-     */
-    private fun hidePasteEmojiIdViews(animate: Boolean, onEnd: (() -> (Unit))? = null) {
-        if (!animate) {
-            ui.pasteEmojiIdContainerView.gone()
-            ui.emojiIdContainerView.gone()
-            dimmerViews.forEach(View::gone)
-            onEnd?.let { it() }
-            return
-        }
-        // animate and hide paste emoji id button
-        val pasteButtonDisappearAnim = ValueAnimator.ofFloat(0f, 1f).apply {
-            addUpdateListener { valueAnimator: ValueAnimator ->
-                val value = valueAnimator.animatedValue as Float
-                ui.pasteEmojiIdContainerView.setTopMargin(
-                    (dimenPx(R.dimen.add_recipient_paste_emoji_id_button_visible_top_margin) * (1 - value)).toInt()
-                )
-                ui.pasteEmojiIdContainerView.alpha = (1 - value)
-            }
-            addListener(onEnd = { ui.pasteEmojiIdContainerView.gone() })
-            duration = Constants.UI.shortDurationMs
-        }
-        // animate and hide emoji id & dimmers
-        val emojiIdDisappearAnim = ValueAnimator.ofFloat(0f, 1f).apply {
-            addUpdateListener { valueAnimator: ValueAnimator ->
-                val value = valueAnimator.animatedValue as Float
-                dimmerViews.forEach { dimmerView -> dimmerView.alpha = 0.6f * (1 - value) }
-                ui.emojiIdContainerView.setBottomMargin((-dimenPx(R.dimen.add_recipient_clipboard_emoji_id_container_height) * value).toInt())
-            }
-            addListener(onEnd = {
-                ui.emojiIdContainerView.gone()
-                dimmerViews.forEach(View::gone)
-            })
-            duration = Constants.UI.shortDurationMs
-        }
-
-        // chain anim.s and start
-        val animSet = AnimatorSet()
-        animSet.playSequentially(pasteButtonDisappearAnim, emojiIdDisappearAnim)
-        if (onEnd != null) {
-            animSet.addListener(onEnd = { onEnd() })
-        }
-        animSet.start()
-    }
-
     private fun focusEditTextAndShowKeyboard() {
         val mActivity = activity ?: return
         ui.searchEditText.requestFocus()
@@ -325,7 +233,7 @@ open class ContactSelectionFragment : CommonFragment<FragmentContactsSelectionBi
     private fun onQRButtonClick(view: View) {
         view.temporarilyDisableClick()
         requireActivity().hideKeyboard()
-        hidePasteEmojiIdViews(animate = true) {
+        clipboardController.hidePasteEmojiIdViews(animate = true) {
             ui.rootView.postDelayed(Constants.UI.keyboardHideWaitMs) { startQRCodeActivity() }
         }
     }
@@ -335,7 +243,7 @@ open class ContactSelectionFragment : CommonFragment<FragmentContactsSelectionBi
             val qrData = data.getStringExtra(QRScannerActivity.EXTRA_QR_DATA) ?: return
             (viewModel.deeplinkHandler.handle(qrData) as? DeepLink.Send)?.let {
                 lifecycleScope.launch(Dispatchers.IO) {
-                    val tariWalletAddress = viewModel.getWalletAddressFromHexString(it.walletAddressHex)
+                    val tariWalletAddress = viewModel.walletAddressViewModel.getWalletAddressFromHexString(it.walletAddressHex)
                     if (tariWalletAddress != null) {
                         ui.rootView.post { ui.searchEditText.setText(tariWalletAddress.emojiId, TextView.BufferType.EDITABLE) }
                         ui.searchEditText.postDelayed({ ui.searchEditTextScrollView.smoothScrollTo(0, 0) }, Constants.UI.mediumDurationMs)
@@ -346,30 +254,6 @@ open class ContactSelectionFragment : CommonFragment<FragmentContactsSelectionBi
             (viewModel.deeplinkHandler.handle(qrData) as? DeepLink.AddBaseNode)?.let { deeplinkViewModel.executeAction(requireContext(), it) }
 
             (viewModel.deeplinkHandler.handle(qrData) as? DeepLink.Contacts)?.let { deeplinkViewModel.addContacts(it.contacts) }
-        }
-    }
-
-    /**
-     * Dimmer clicked - hide paste-related views.
-     */
-    private fun onEmojiIdDimmerClicked() {
-        hidePasteEmojiIdViews(animate = true) {
-            requireActivity().hideKeyboard()
-            ui.searchEditText.clearFocus()
-        }
-    }
-
-    /**
-     * Paste banner clicked.
-     */
-    private fun onPasteEmojiIdButtonClicked() {
-        hidePasteEmojiIdViewsOnTextChanged = false
-        hidePasteEmojiIdViews(animate = true) {
-            ui.searchEditText.scaleX = 0f
-            ui.searchEditText.scaleY = 0f
-            ui.searchEditText.setText(viewModel.clipboardTariWalletAddress.value?.emojiId, TextView.BufferType.EDITABLE)
-            ui.searchEditText.setSelection(ui.searchEditText.text?.length ?: 0)
-            ui.rootView.postDelayed({ animateEmojiIdPaste() }, Constants.UI.xShortDurationMs)
         }
     }
 
@@ -399,9 +283,9 @@ open class ContactSelectionFragment : CommonFragment<FragmentContactsSelectionBi
     override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) = Unit
 
     override fun afterTextChanged(editable: Editable) {
-        if (hidePasteEmojiIdViewsOnTextChanged) {
-            hidePasteEmojiIdViews(animate = true)
-            hidePasteEmojiIdViewsOnTextChanged = false
+        if (clipboardController.hidePasteEmojiIdViewsOnTextChanged) {
+            clipboardController.hidePasteEmojiIdViews(animate = true)
+            clipboardController.hidePasteEmojiIdViewsOnTextChanged = false
         }
         if (textWatcherIsRunning) {
             return
@@ -465,7 +349,7 @@ open class ContactSelectionFragment : CommonFragment<FragmentContactsSelectionBi
                     viewModel.searchText.value = textWithoutSeparators
                 }
             }
-        } else if (viewModel.checkForWalletAddressHex(text)) {
+        } else if (viewModel.walletAddressViewModel.checkForWalletAddressHex(text)) {
             finishEntering(viewModel.selectedTariWalletAddress.value!!.emojiId)
         } else {
             viewModel.selectedTariWalletAddress.value = null
@@ -478,7 +362,7 @@ open class ContactSelectionFragment : CommonFragment<FragmentContactsSelectionBi
 
     private fun finishEntering(text: String) {
         lifecycleScope.launch(Dispatchers.Main) {
-            viewModel.selectedTariWalletAddress.value = viewModel.getWalletAddressFromEmojiId(text)
+            viewModel.selectedTariWalletAddress.value = viewModel.walletAddressViewModel.getWalletAddressFromEmojiId(text)
             if (viewModel.selectedTariWalletAddress.value == null) {
                 ui.invalidEmojiIdTextView.text = string(R.string.add_recipient_invalid_emoji_id)
                 ui.invalidEmojiIdTextView.visible()

@@ -405,6 +405,7 @@
     <string name="all_settings_disclaimer">Disclaimer</string>
     <string name="all_settings_explorer">Block Explorer</string>
     <string name="all_settings_background_service">Background Service</string>
+    <string name="all_settings_bluetooth_settings">Bluetooth Settings</string>
     <string name="all_settings_bridge_configuration">Bridge Configuration</string>
     <string name="all_settings_connect_yats">Connect Yats</string>
     <string name="all_settings_select_base_node">Select Base Node</string>
@@ -423,6 +424,14 @@
     <string name="background_service_button_title">Allow Tari to receive transactions and notifications in the background</string>
     <string name="background_service_button_confirmation_title">Background service will be turned off</string>
     <string name="background_service_button_confirmation_description">You will not get any notifications and updates. Are you sure you want to proceed?</string>
+
+    <!-- Bluetooth settings -->
+    <string name="bluetooth_settings_title">Bluetooth Settings</string>
+    <string name="bluetooth_settings_description">Other users can share their contacts using Bluetooth Low Energy (BLE) by moving their devices near your device. Your device will be visible to nearby Bluetooth devices when it\'s turned on.\n \n Choose an option below. BLE should be:</string>
+    <string name="bluetooth_settings_option_on">Always on</string>
+    <string name="bluetooth_settings_option_off">Turned off</string>
+    <string name="bluetooth_settings_option_while_up">Only active while the app is open</string>
+
 
     <!-- delete wallet -->
     <string name="delete_wallet_title">You\'re about to lose everything!</string>
@@ -706,6 +715,12 @@
     <string name="contact_book_contacts_book_title">Contact Book</string>
     <string name="contact_book_contacts_book_details_title">Contact Profile</string>
     <string name="contact_book_contacts_book_link_title">Link Contact</string>
+    <string name="contact_book_contacts_book_link_empty_state_title">Oh no, it’s empty in here!</string>
+    <string name="contact_book_contacts_book_link_empty_state_no_contacts">Looks like you don’t have any contacts that we can link to yet. Once you’ve added a contact, you’ll be able to link to their profile.</string>
+    <string name="contact_book_contacts_book_link_empty_state_empty_book">Looks like your phone’s contact book is empty. Once you’ve added a contact, you’ll be able to link to their profile.</string>
+    <string name="contact_book_contacts_book_link_empty_state_no_access">Aurora doesn’t currently have permission to access your phone’s contacts. If you would like to link to an existing contact, please click below and grant permission to the app to read from your contact book.</string>
+    <string name="contact_book_contacts_book_link_empty_state_add_contact">Add a contact</string>
+    <string name="contact_book_contacts_book_link_empty_state_go_to_permission_settings">Go to permission settings</string>
     <string name="contact_book_contacts_book_link_message_firstLine"><![CDATA[Click "confirm" below to link]]></string>
     <string name="contact_book_contacts_book_link_message_secondLine"><![CDATA[to <b>%s</b>]]></string>
     <string name="contact_book_contacts_book_link_success_message_firstLine"><![CDATA[You have successfully linked]]></string>

@@ -54,15 +54,15 @@ class TariSettingsSharedRepository @Inject constructor(sharedPrefs: SharedPrefer
         const val themeKey = "tari_theme_key"
     }
 
-    var isRestoredWallet: Boolean by SharedPrefBooleanDelegate(sharedPrefs, formatKey(Key.isRestoredWallet))
+    var isRestoredWallet: Boolean by SharedPrefBooleanDelegate(sharedPrefs, this,  formatKey(Key.isRestoredWallet))
 
-    var hasVerifiedSeedWords: Boolean by SharedPrefBooleanDelegate(sharedPrefs, formatKey(Key.hasVerifiedSeedWords))
+    var hasVerifiedSeedWords: Boolean by SharedPrefBooleanDelegate(sharedPrefs, this,  formatKey(Key.hasVerifiedSeedWords))
 
-    var backgroundServiceTurnedOn: Boolean by SharedPrefBooleanDelegate(sharedPrefs, formatKey(Key.backgroundServiceTurnedOnKey), true)
+    var backgroundServiceTurnedOn: Boolean by SharedPrefBooleanDelegate(sharedPrefs, this,  formatKey(Key.backgroundServiceTurnedOnKey), true)
 
-    var isOneSidePaymentEnabled: Boolean by SharedPrefBooleanDelegate(sharedPrefs, formatKey(Key.isOneSidePaymentEnabledKey), false)
+    var isOneSidePaymentEnabled: Boolean by SharedPrefBooleanDelegate(sharedPrefs, this,  formatKey(Key.isOneSidePaymentEnabledKey), false)
 
-    var currentTheme: TariTheme? by SharedPrefGsonDelegate(sharedPrefs, Key.themeKey, TariTheme::class.java, TariTheme.AppBased)
+    var currentTheme: TariTheme? by SharedPrefGsonDelegate(sharedPrefs, this,  Key.themeKey, TariTheme::class.java, TariTheme.AppBased)
 
     fun clear() {
         isRestoredWallet = false

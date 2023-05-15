@@ -38,6 +38,7 @@ import com.tari.android.wallet.application.deeplinks.DeeplinkViewModel
 import com.tari.android.wallet.application.securityStage.StagedWalletSecurityManager
 import com.tari.android.wallet.service.service.WalletService
 import com.tari.android.wallet.ui.common.CommonViewModel
+import com.tari.android.wallet.ui.component.clipboardController.WalletAddressViewModel
 import com.tari.android.wallet.ui.component.networkStateIndicator.ConnectionIndicatorViewModel
 import com.tari.android.wallet.ui.fragment.auth.AuthActivity
 import com.tari.android.wallet.ui.fragment.auth.AuthViewModel
@@ -80,6 +81,7 @@ import com.tari.android.wallet.ui.fragment.settings.backup.enterCurrentPassword.
 import com.tari.android.wallet.ui.fragment.settings.backup.verifySeedPhrase.VerifySeedPhraseViewModel
 import com.tari.android.wallet.ui.fragment.settings.baseNodeConfig.addBaseNode.AddCustomBaseNodeViewModel
 import com.tari.android.wallet.ui.fragment.settings.baseNodeConfig.changeBaseNode.ChangeBaseNodeViewModel
+import com.tari.android.wallet.ui.fragment.settings.bluetoothSettings.BluetoothSettingsViewModel
 import com.tari.android.wallet.ui.fragment.settings.bugReporting.BugsReportingViewModel
 import com.tari.android.wallet.ui.fragment.settings.deleteWallet.DeleteWalletViewModel
 import com.tari.android.wallet.ui.fragment.settings.logs.LogFilesManager
@@ -185,6 +187,8 @@ interface ApplicationComponent {
     fun inject(viewModel: ShareViewModel)
     fun inject(viewModel: TransactionRepository)
     fun inject(viewModel: TransactionHistoryViewModel)
+    fun inject(viewModel: BluetoothSettingsViewModel)
+    fun inject(viewModel: WalletAddressViewModel)
 
     fun getClipboardManager(): ClipboardManager
 }

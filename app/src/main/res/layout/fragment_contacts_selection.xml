@@ -15,6 +15,49 @@
         app:layout_constraintTop_toTopOf="parent"
         app:text="@string/contact_book_add_contact_title" />
 
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/add_recipient_vw_search_container">
+
+        <com.tari.android.wallet.ui.component.tari.TariInput
+            android:id="@+id/add_first_name_input"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="25dp"
+            android:layout_marginTop="16dp"
+            android:visibility="gone"
+            app:hintText="@string/contact_book_add_contact_first_name_hint" />
+
+        <com.tari.android.wallet.ui.component.tari.TariInput
+            android:id="@+id/add_surname_input"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="25dp"
+            android:layout_marginTop="16dp"
+            android:visibility="gone"
+            app:hintText="@string/contact_book_add_contact_surname_hint" />
+
+        <!-- list -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/contacts_list_recycler_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:overScrollMode="never"
+            android:scrollbars="none" />
+
+    </LinearLayout>
+
+    <include
+        android:id="@+id/clipboard"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        layout="@layout/view_clipboard_wallet" />
+
     <com.tari.android.wallet.ui.component.tari.TariSecondaryBackground
         android:id="@+id/add_recipient_vw_search_container"
         android:layout_width="0dp"
@@ -26,7 +69,7 @@
         app:layout_constraintTop_toBottomOf="@+id/toolbar">
 
         <View
-            android:id="@+id/middle_dimmer_view"
+            android:id="@+id/dimmer_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:alpha="0.6"
@@ -144,145 +187,6 @@
 
         </com.tari.android.wallet.ui.component.tari.TariPrimaryBackground>
     </com.tari.android.wallet.ui.component.tari.TariSecondaryBackground>
-
-    <RelativeLayout
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/add_recipient_vw_search_container">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical">
-
-            <com.tari.android.wallet.ui.component.tari.TariInput
-                android:id="@+id/add_first_name_input"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginHorizontal="25dp"
-                android:layout_marginTop="16dp"
-                android:visibility="gone"
-                app:hintText="@string/contact_book_add_contact_first_name_hint" />
-
-            <com.tari.android.wallet.ui.component.tari.TariInput
-                android:id="@+id/add_surname_input"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginHorizontal="25dp"
-                android:layout_marginTop="16dp"
-                android:visibility="gone"
-                app:hintText="@string/contact_book_add_contact_surname_hint" />
-
-            <!-- list -->
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/contacts_list_recycler_view"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:overScrollMode="never"
-                android:scrollbars="none" />
-
-        </LinearLayout>
-
-        <!-- depth gradient -->
-        <View
-            android:id="@+id/scroll_depth_gradient_view"
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/common_scroll_height_gradient_height"
-            android:alpha="0.5"
-            android:background="@drawable/vector_view_elevation_gradient" />
-
-        <View
-            android:id="@+id/bottom_dimmer_view"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:alpha="0.6"
-            android:background="@color/black"
-            android:clickable="true"
-            android:focusable="true" />
-
-        <RelativeLayout
-            android:id="@+id/paste_emoji_id_container_view"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignTop="@id/emoji_id_container_view"
-            android:layout_centerHorizontal="true"
-            android:layout_marginTop="0dp">
-
-            <com.tari.android.wallet.ui.component.tari.TariPrimaryBackground
-                android:id="@+id/add_recipient_txt_paste_emoji_id"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:paddingHorizontal="20dp"
-                android:paddingVertical="10dp"
-                app:cornerRadius="8dp"
-                app:elevation="8dp">
-
-                <com.tari.android.wallet.ui.component.tari.TariTextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/paste_emoji_id"
-                    android:textColor="?attr/palette_text_links"
-                    android:textSize="14sp"
-                    app:customFont="heavy" />
-
-            </com.tari.android.wallet.ui.component.tari.TariPrimaryBackground>
-
-            <Button
-                android:id="@+id/paste_emoji_id_button"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:layout_alignStart="@id/add_recipient_txt_paste_emoji_id"
-                android:layout_alignTop="@id/add_recipient_txt_paste_emoji_id"
-                android:layout_alignEnd="@id/add_recipient_txt_paste_emoji_id"
-                android:layout_alignBottom="@id/add_recipient_txt_paste_emoji_id"
-                android:background="@color/transparent" />
-
-            <androidx.appcompat.widget.AppCompatImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/paste_emoji_id_button"
-                android:layout_centerHorizontal="true"
-                android:src="@drawable/tari_speech_notch_down"
-                android:tint="?attr/palette_overlay" />
-
-        </RelativeLayout>
-
-        <com.tari.android.wallet.ui.component.tari.TariPrimaryBackground
-            android:id="@+id/emoji_id_container_view"
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/add_recipient_clipboard_emoji_id_container_height"
-            android:layout_alignParentBottom="true">
-
-            <!-- emoji id container -->
-            <HorizontalScrollView
-                android:id="@+id/emoji_id_scroll_view"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:paddingHorizontal="0dp"
-                android:scrollbars="none">
-
-                <!-- emoji id -->
-                <TextView
-                    android:id="@+id/emoji_id_text_view"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:clickable="true"
-                    android:focusable="true"
-                    android:gravity="center_vertical"
-                    android:letterSpacing="0.22"
-                    android:paddingHorizontal="16dp"
-                    android:singleLine="true"
-                    android:textColor="?attr/palette_text_heading"
-                    android:textSize="15sp" />
-
-            </HorizontalScrollView>
-
-        </com.tari.android.wallet.ui.component.tari.TariPrimaryBackground>
-
-    </RelativeLayout>
 
     <com.tari.android.wallet.ui.component.tari.TariTextView
         android:id="@+id/invalid_emoji_id_text_view"

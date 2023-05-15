@@ -1,9 +1,11 @@
 package com.tari.android.wallet.ui.fragment.contact_book.link
 
 import android.text.SpannableString
+import android.text.SpannedString
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.toLiveData
+import com.tari.android.wallet.R
 import com.tari.android.wallet.R.string.common_cancel
 import com.tari.android.wallet.R.string.common_close
 import com.tari.android.wallet.R.string.common_confirm
@@ -15,6 +17,7 @@ import com.tari.android.wallet.R.string.contact_book_contacts_book_link_title
 import com.tari.android.wallet.R.string.contact_book_contacts_book_unlink_success_title
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.ui.common.CommonViewModel
+import com.tari.android.wallet.ui.common.SingleLiveEvent
 import com.tari.android.wallet.ui.common.recyclerView.CommonViewHolderItem
 import com.tari.android.wallet.ui.dialog.modular.DialogArgs
 import com.tari.android.wallet.ui.dialog.modular.ModularDialogArgs
@@ -24,8 +27,10 @@ import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonStyle
 import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
 import com.tari.android.wallet.ui.dialog.modular.modules.shortEmoji.ShortEmojiIdModule
 import com.tari.android.wallet.ui.fragment.contact_book.contacts.adapter.contact.ContactItem
+import com.tari.android.wallet.ui.fragment.contact_book.contacts.adapter.emptyState.EmptyStateItem
 import com.tari.android.wallet.ui.fragment.contact_book.data.ContactsRepository
 import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.ContactDto
+import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.MergedContactDto
 import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.PhoneContactDto
 import com.tari.android.wallet.ui.fragment.contact_book.link.adapter.link_header.ContactLinkHeaderViewHolderItem
 import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
@@ -34,6 +39,8 @@ import yat.android.ui.extension.HtmlHelper
 import javax.inject.Inject
 
 class ContactLinkViewModel : CommonViewModel() {
+
+    val grantPermission = SingleLiveEvent<Unit>()
 
     val contactListSource = MediatorLiveData<List<ContactItem>>()
 
@@ -55,7 +62,7 @@ class ContactLinkViewModel : CommonViewModel() {
         component.inject(this)
 
         contactListSource.addSource(contactsRepository.publishSubject.toFlowable(BackpressureStrategy.LATEST).toLiveData()) {
-            contactListSource.value = it.map { contactDto -> ContactItem(contactDto, true) }
+            contactListSource.value = it.filter(contactsRepository.filter).map { contactDto -> ContactItem(contactDto, true) }
         }
 
         list.addSource(contactListSource) { updateList() }
@@ -93,9 +100,53 @@ class ContactLinkViewModel : CommonViewModel() {
         list = list.sortedBy { it.contact.contact.getAlias().lowercase() }
 
         val endList: MutableList<CommonViewHolderItem> = list.toMutableList()
-        endList.add(0, searchModule!!)
+
+        if (list.isEmpty()) {
+            endList.add(0, EmptyStateItem(getEmptyTitle(), getBody(source), getEmptyImage(), getButtonTitle()) { doAction() })
+        } else {
+            endList.add(0, searchModule!!)
+        }
 
         this.list.postValue(endList)
+    }
+
+    private fun getEmptyTitle(): SpannedString =
+        SpannedString(HtmlHelper.getSpannedText(resourceManager.getString(R.string.contact_book_contacts_book_link_empty_state_title)))
+
+    private fun getBody(sourceList: List<ContactItem>): SpannedString {
+        val noContacts = sourceList.none { it.contact.contact is PhoneContactDto }
+        val noMergedContacts = sourceList.none { it.contact.contact is MergedContactDto }
+        val havePermission = contactsRepository.contactPermission.value == true
+
+        val resource = when {
+            !havePermission -> R.string.contact_book_contacts_book_link_empty_state_no_access
+            noContacts && noMergedContacts -> R.string.contact_book_contacts_book_link_empty_state_empty_book
+            noContacts -> R.string.contact_book_contacts_book_link_empty_state_no_contacts
+            else -> throw IllegalStateException("Unknown state")
+        }
+
+        return SpannedString(HtmlHelper.getSpannedText(resourceManager.getString(resource)))
+    }
+
+    private fun getEmptyImage(): Int = R.drawable.vector_contact_favorite_empty_state
+
+    private fun getButtonTitle(): String {
+        val havePermission = contactsRepository.contactPermission.value == true
+
+        return when {
+            !havePermission -> resourceManager.getString(R.string.contact_book_contacts_book_link_empty_state_go_to_permission_settings)
+            else -> resourceManager.getString(R.string.contact_book_contacts_book_link_empty_state_add_contact)
+        }
+    }
+
+    private fun doAction() {
+        val havePermission = contactsRepository.contactPermission.value == true
+
+        if (!havePermission) {
+            grantPermission.postValue(Unit)
+        } else {
+            navigation.postValue(Navigation.ContactBookNavigation.ToAddPhoneContact)
+        }
     }
 
     private fun showLinkDialog(phoneContactDto: ContactDto) {
