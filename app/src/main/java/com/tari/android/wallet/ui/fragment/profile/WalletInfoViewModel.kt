@@ -37,8 +37,6 @@ class WalletInfoViewModel : CommonViewModel() {
     @Inject
     lateinit var deeplinkHandler: DeeplinkHandler
 
-    val shareViewModel = ShareViewModel()
-
     private val _emojiId: MutableLiveData<String> = MutableLiveData()
     val emojiId: LiveData<String> = _emojiId
 
@@ -60,14 +58,6 @@ class WalletInfoViewModel : CommonViewModel() {
         component.inject(this)
 
         _reconnectVisibility.addSource(_yatDisconnected) { updateReconnectVisibility() }
-
-        shareViewModel.tariBluetoothServer.doOnRequiredPermissions = { permissions, action ->
-            permissionManager.runWithPermission(permissions, action)
-        }
-
-        shareViewModel.tariBluetoothClient.doOnRequiredPermissions = { permissions, action ->
-            permissionManager.runWithPermission(permissions, action)
-        }
 
         refreshData()
     }
@@ -114,7 +104,7 @@ class WalletInfoViewModel : CommonViewModel() {
         val name = alias.value.orEmpty()
         val walletEmojiId = sharedPrefsWrapper.emojiId.orEmpty()
         val deeplink = deeplinkHandler.getDeeplink(DeepLink.Contacts(listOf(DeepLink.Contacts.DeeplinkContact(name, walletEmojiId))))
-        shareViewModel.share(type, deeplink)
+        ShareViewModel.currentInstant?.share(type, deeplink)
     }
 
     fun showEditAliasDialog() {

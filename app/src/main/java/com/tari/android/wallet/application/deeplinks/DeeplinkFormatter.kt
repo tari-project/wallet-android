@@ -5,7 +5,7 @@ import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
 
 class DeeplinkFormatter(private val networkRepository: NetworkRepository) {
     fun parse(deepLink: String): DeepLink? {
-        val uri = Uri.parse(deepLink)
+        val uri = Uri.parse(Uri.decode(deepLink))
 
         if (!uri.authority.equals(networkRepository.currentNetwork!!.network.uriComponent)) {
             return null
@@ -33,7 +33,7 @@ class DeeplinkFormatter(private val networkRepository: NetworkRepository) {
             builder.appendQueryParameter(key, value)
         }
 
-        return Uri.decode(builder.build().toString())
+        return Uri.encode(builder.build().toString())
     }
 
     companion object {

@@ -24,8 +24,6 @@ class ContactBookViewModel : CommonViewModel() {
     @Inject
     lateinit var contactSelectionRepository: ContactSelectionRepository
 
-    val shareViewModel = ShareViewModel()
-
     val shareList = MutableLiveData<List<ShareOptionArgs>>()
 
     val walletAddressViewModel = WalletAddressViewModel()
@@ -58,14 +56,6 @@ class ContactBookViewModel : CommonViewModel() {
                 ) { shareViaBLE() },
             )
         )
-
-        shareViewModel.tariBluetoothServer.doOnRequiredPermissions = { permissions, action ->
-            permissionManager.runWithPermission(permissions, action)
-        }
-
-        shareViewModel.tariBluetoothClient.doOnRequiredPermissions = { permissions, action ->
-            permissionManager.runWithPermission(permissions, action)
-        }
     }
 
     fun doSearch(query: String) {
@@ -93,7 +83,7 @@ class ContactBookViewModel : CommonViewModel() {
         val selectedContacts = contactSelectionRepository.selectedContacts.map { it.contact }
         contactSelectionRepository.clear()
         val deeplink = getDeeplink(selectedContacts)
-        shareViewModel.share(args.type, deeplink)
+        ShareViewModel.currentInstant?.share(args.type, deeplink)
     }
 
     private fun getDeeplink(selectedContacts: List<ContactDto>): String {

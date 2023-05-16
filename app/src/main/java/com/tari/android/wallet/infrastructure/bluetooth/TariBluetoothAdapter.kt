@@ -6,14 +6,15 @@ import android.bluetooth.BluetoothManager
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import com.tari.android.wallet.ui.common.CommonViewModel
 
 abstract class TariBluetoothAdapter() : CommonViewModel() {
-    protected var fragment: Fragment? = null
+    protected var fragappCompatActivity: AppCompatActivity? = null
     protected var bluetoothAdapter: BluetoothAdapter? = null
+    protected var bluetoothManager: BluetoothManager? = null
 
     protected val bluetoothConnectPermission = when {
         Build.VERSION.SDK_INT <= Build.VERSION_CODES.R -> Manifest.permission.BLUETOOTH
@@ -50,11 +51,11 @@ abstract class TariBluetoothAdapter() : CommonViewModel() {
     var doOnRequiredPermissions: (permissions: List<String>, continueAction: () -> Unit) -> Unit = { _, _ -> }
 
 
-    fun init(fragment: Fragment) {
-        this.fragment = fragment
+    fun init(fragment: AppCompatActivity) {
+        this.fragappCompatActivity = fragment
 
-        val bluetoothManager: BluetoothManager = fragment.requireContext().getSystemService(BluetoothManager::class.java)
-        bluetoothAdapter = bluetoothManager.adapter
+        bluetoothManager = fragment.getSystemService(BluetoothManager::class.java)
+        bluetoothAdapter = bluetoothManager!!.adapter
     }
 
     fun handleActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -69,7 +70,7 @@ abstract class TariBluetoothAdapter() : CommonViewModel() {
 
     protected fun runWithPermissions(permission: String, action: () -> Unit) {
         try {
-            if (ActivityCompat.checkSelfPermission(fragment!!.requireContext(), permission) != PackageManager.PERMISSION_GRANTED) {
+            if (ActivityCompat.checkSelfPermission(fragappCompatActivity!!, permission) != PackageManager.PERMISSION_GRANTED) {
                 doOnRequiredPermissions.invoke(bluetoothPermissions, action)
             } else {
                 action()
@@ -84,7 +85,8 @@ abstract class TariBluetoothAdapter() : CommonViewModel() {
             onBluetoothEnabled = action
             onBluetoothNotEnabled = this::showDialogBluetoothRequired
             val enableBtIntent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
-            fragment?.startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT)
+            @Suppress("MissingPermission")
+            fragappCompatActivity?.startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT)
         } else {
             action.invoke()
         }

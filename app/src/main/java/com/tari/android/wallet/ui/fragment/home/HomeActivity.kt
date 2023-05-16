@@ -52,6 +52,7 @@ import com.tari.android.wallet.data.sharedPrefs.tariSettings.TariSettingsSharedR
 import com.tari.android.wallet.databinding.ActivityHomeBinding
 import com.tari.android.wallet.di.DiContainer.appComponent
 import com.tari.android.wallet.extension.applyFontStyle
+import com.tari.android.wallet.extension.observe
 import com.tari.android.wallet.model.TxId
 import com.tari.android.wallet.service.TariWalletService
 import com.tari.android.wallet.service.connection.ServiceConnectionStatus
@@ -120,6 +121,14 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>() {
         bindViewModel(viewModel)
         subscribeToCommon(deeplinkViewModel)
 
+        subscribeToCommon(viewModel.shareViewModel)
+        subscribeToCommon(viewModel.shareViewModel.tariBluetoothServer)
+        subscribeToCommon(viewModel.shareViewModel.tariBluetoothClient)
+        subscribeToCommon(viewModel.shareViewModel.deeplinkViewModel)
+
+        viewModel.shareViewModel.tariBluetoothServer.init(this)
+        viewModel.shareViewModel.tariBluetoothClient.init(this)
+
         setContainerId(R.id.nav_container)
 
         overridePendingTransition(0, 0)
@@ -146,12 +155,29 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>() {
             enableNavigationView(index)
         }
         setupUi()
+        subscribeUI()
         lifecycleScope.launch(Dispatchers.IO) {
             delay(3000)
             launch(Dispatchers.Main) {
                 checkNetworkCompatibility()
             }
         }
+    }
+
+    private fun subscribeUI() = with(viewModel) {
+        observe(shareViewModel.shareText) { shareViaText(it) }
+
+        observe(shareViewModel.launchPermissionCheck) {
+            permissionManagerUI.runWithPermissions(*it.toTypedArray(), openSettings = true) {
+                viewModel.shareViewModel.startBLESharing()
+            }
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        viewModel.shareViewModel.tariBluetoothServer.handleActivityResult(requestCode, resultCode, data)
+        viewModel.shareViewModel.tariBluetoothClient.handleActivityResult(requestCode, resultCode, data)
     }
 
     override fun onNewIntent(intent: Intent) {

@@ -50,7 +50,7 @@ class TariBluetoothClient @Inject constructor() : TariBluetoothAdapter() {
         shareData = data
 
         val scanFilter = ScanFilter.Builder()
-            .setServiceUuid(ParcelUuid(UUID.fromString(SERVICE_UUID)))
+            .setServiceUuid(ParcelUuid(UUID.fromString(SERVICE_UUID.lowercase())))
             .build()
 
         val scanSetting = ScanSettings.Builder()
@@ -86,7 +86,7 @@ class TariBluetoothClient @Inject constructor() : TariBluetoothAdapter() {
                 if (status == BluetoothGatt.GATT_SUCCESS) {
                     val service = gatt?.getService(UUID.fromString(SERVICE_UUID))
                     service?.characteristics?.forEach {
-                        if (it.uuid == UUID.fromString(CHARACTERISTIC_UUID)) {
+                        if (it.uuid.toString().lowercase() == CHARACTERISTIC_UUID.lowercase()) {
                             runWithPermissions(bluetoothConnectPermission) {
                                 @Suppress("MissingPermission")
                                 gatt.writeCharacteristic(it, shareData.orEmpty().toByteArray(), BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT)
@@ -111,11 +111,11 @@ class TariBluetoothClient @Inject constructor() : TariBluetoothAdapter() {
 
         runWithPermissions(bluetoothConnectPermission) {
             @Suppress("MissingPermission")
-            device.connectGatt(fragment!!.requireContext(), false, gattCallback)
+            device.connectGatt(fragappCompatActivity!!, false, gattCallback)
         }
     }
 
     companion object {
-        const val RSSI_Threshold = -40
+        const val RSSI_Threshold = -105
     }
 }
