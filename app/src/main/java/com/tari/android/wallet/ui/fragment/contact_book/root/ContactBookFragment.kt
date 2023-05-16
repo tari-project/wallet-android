@@ -1,6 +1,5 @@
 package com.tari.android.wallet.ui.fragment.contact_book.root
 
-import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -46,14 +45,6 @@ class ContactBookFragment : CommonFragment<FragmentContactBookRootBinding, Conta
         val viewModel: ContactBookViewModel by viewModels()
         bindViewModel(viewModel)
 
-        subscribeVM(viewModel.shareViewModel)
-        subscribeVM(viewModel.shareViewModel.tariBluetoothServer)
-        subscribeVM(viewModel.shareViewModel.tariBluetoothClient)
-        subscribeVM(viewModel.shareViewModel.deeplinkViewModel)
-
-        viewModel.shareViewModel.tariBluetoothServer.init(this)
-        viewModel.shareViewModel.tariBluetoothClient.init(this)
-
         clipboardController = ClipboardController(listOf(ui.dimmerView), ui.clipboardWallet, viewModel.walletAddressViewModel)
 
         setupUI()
@@ -85,20 +76,6 @@ class ContactBookFragment : CommonFragment<FragmentContactBookRootBinding, Conta
         observe(contactSelectionRepository.isPossibleToShare) { updateSharedState() }
 
         observe(shareList) { updateShareList(it) }
-
-        observe(shareViewModel.shareText) { shareViaText(it) }
-
-        observe(shareViewModel.launchPermissionCheck) {
-            permissionManagerUI.runWithPermissions(*it.toTypedArray(), openSettings = true) {
-                viewModel.shareViewModel.startBLESharing()
-            }
-        }
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        viewModel.shareViewModel.tariBluetoothServer.handleActivityResult(requestCode, resultCode, data)
-        viewModel.shareViewModel.tariBluetoothClient.handleActivityResult(requestCode, resultCode, data)
     }
 
     private fun grantPermission() {

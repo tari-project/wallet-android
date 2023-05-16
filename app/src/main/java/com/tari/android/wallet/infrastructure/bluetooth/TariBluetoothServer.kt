@@ -6,11 +6,9 @@ import android.bluetooth.BluetoothGattCharacteristic
 import android.bluetooth.BluetoothGattServer
 import android.bluetooth.BluetoothGattServerCallback
 import android.bluetooth.BluetoothGattService
-import android.bluetooth.BluetoothManager
 import android.bluetooth.le.AdvertiseCallback
 import android.bluetooth.le.AdvertiseData
 import android.bluetooth.le.AdvertiseSettings
-import android.content.Context
 import android.os.ParcelUuid
 import com.tari.android.wallet.application.deeplinks.DeepLink
 import com.tari.android.wallet.application.deeplinks.DeeplinkHandler
@@ -25,6 +23,8 @@ import javax.inject.Singleton
 @Singleton
 class TariBluetoothServer @Inject constructor(private val shareSettingsRepository: ShareSettingsRepository, val deeplinkHandler: DeeplinkHandler) :
     TariBluetoothAdapter() {
+
+    private var bluetoothGattServer: BluetoothGattServer? = null
 
     init {
         shareSettingsRepository.updateNotifier.subscribe {
@@ -72,8 +72,6 @@ class TariBluetoothServer @Inject constructor(private val shareSettingsRepositor
     private fun doReceiving() {
         logger.e("doReceiving")
 
-        var bluetoothGattServer: BluetoothGattServer? = null
-
         val callback = object : BluetoothGattServerCallback() {
 
             val receivedString = StringBuilder()
@@ -91,8 +89,14 @@ class TariBluetoothServer @Inject constructor(private val shareSettingsRepositor
 
                 logger.e(preparedWrite.toString() + " " + responseNeeded.toString() + " " + offset.toString() + " " + value.toString())
 
-                if (characteristic?.uuid == UUID.fromString(CHARACTERISTIC_UUID)) {
-                    receivedString.append(String(value!!))
+                //todo some delay here
+                if (characteristic?.uuid.toString().lowercase() == CHARACTERISTIC_UUID.lowercase()) {
+                    if (receivedString.isEmpty()) {
+                        receivedString.append(String(value!!))
+                        doHandling()
+                    } else {
+                        receivedString.append(String(value!!))
+                    }
                 }
 
                 if (responseNeeded) {
@@ -107,20 +111,23 @@ class TariBluetoothServer @Inject constructor(private val shareSettingsRepositor
                 super.onExecuteWrite(device, requestId, execute)
 
                 if (execute) {
-                    val handled = runCatching { deeplinkHandler.handle(receivedString.toString()) }.getOrNull()
-
-                    if (handled != null && handled is DeepLink.Contacts) {
-                        receivedString.clear()
-                        onReceived.invoke(handled.contacts)
-                    }
+                    doHandling()
                 }
-                receivedString.clear()
+            }
+
+            private fun doHandling() {
+                val handled = runCatching { deeplinkHandler.handle(receivedString.toString()) }.getOrNull()
+
+                if (handled != null && handled is DeepLink.Contacts) {
+                    receivedString.clear()
+                    onReceived.invoke(handled.contacts)
+                    receivedString.clear()
+                }
             }
         }
 
-        val bluetoothManager = fragment?.requireContext()?.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager? ?: return
         @Suppress("MissingPermission")
-        bluetoothGattServer = bluetoothManager.openGattServer(fragment!!.requireContext(), callback) ?: return
+        bluetoothGattServer = bluetoothManager?.openGattServer(fragappCompatActivity!!, callback) ?: return
 
         val myService = BluetoothGattService(UUID.fromString(SERVICE_UUID), BluetoothGattService.SERVICE_TYPE_PRIMARY)
 
@@ -133,11 +140,11 @@ class TariBluetoothServer @Inject constructor(private val shareSettingsRepositor
         myService.addCharacteristic(myCharacteristic)
 
         @Suppress("MissingPermission")
-        bluetoothGattServer.addService(myService)
+        bluetoothGattServer?.addService(myService)
 
         val bluetoothLeAdvertiser = bluetoothAdapter!!.bluetoothLeAdvertiser
         val settings = AdvertiseSettings.Builder()
-            .setAdvertiseMode(AdvertiseSettings.ADVERTISE_MODE_BALANCED)
+            .setAdvertiseMode(AdvertiseSettings.ADVERTISE_MODE_LOW_LATENCY)
             .setConnectable(true)
             .setTimeout(0)
             .setTxPowerLevel(AdvertiseSettings.ADVERTISE_TX_POWER_HIGH)
@@ -159,5 +166,13 @@ class TariBluetoothServer @Inject constructor(private val shareSettingsRepositor
 
         @Suppress("MissingPermission")
         bluetoothLeAdvertiser.stopAdvertising(advertiseCallback)
+
+        bluetoothGattServer?.let {
+            @Suppress("MissingPermission")
+            it.clearServices()
+            @Suppress("MissingPermission")
+            it.close()
+        }
+        bluetoothGattServer = null
     }
 }

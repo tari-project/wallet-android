@@ -6,6 +6,8 @@ import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import android.hardware.SensorManager
 import android.net.Uri
 import android.os.Bundle
+import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
@@ -13,8 +15,10 @@ import androidx.viewbinding.ViewBinding
 import com.squareup.seismic.ShakeDetector
 import com.tari.android.wallet.R
 import com.tari.android.wallet.extension.observe
+import com.tari.android.wallet.ui.common.permission.PermissionManagerActivityUI
 import com.tari.android.wallet.ui.component.networkStateIndicator.ConnectionIndicatorViewModel
 import com.tari.android.wallet.ui.component.tari.toast.TariToast
+import com.tari.android.wallet.ui.component.tari.toast.TariToastArgs
 import com.tari.android.wallet.ui.dialog.modular.DialogArgs
 import com.tari.android.wallet.ui.dialog.modular.ModularDialog
 import com.tari.android.wallet.ui.dialog.modular.ModularDialogArgs
@@ -25,6 +29,7 @@ import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
 import com.tari.android.wallet.ui.dialog.modular.modules.option.OptionModule
 import com.tari.android.wallet.ui.dialog.modular.modules.space.SpaceModule
 import com.tari.android.wallet.ui.extension.addEnterLeftAnimation
+import com.tari.android.wallet.ui.extension.string
 import com.tari.android.wallet.ui.fragment.settings.allSettings.TariVersionModel
 import com.tari.android.wallet.ui.fragment.settings.logs.activity.DebugActivity
 import com.tari.android.wallet.ui.fragment.settings.logs.activity.DebugNavigation
@@ -43,6 +48,16 @@ abstract class CommonActivity<Binding : ViewBinding, VM : CommonViewModel> : App
     private val shakeDetector by lazy { ShakeDetector(this) }
 
     private val connectionStateViewModel: ConnectionIndicatorViewModel by viewModels()
+
+    val permissionManagerUI = PermissionManagerActivityUI(this)
+
+    val launcher = registerForActivityResult(ActivityResultContracts.RequestPermission()) {
+        if (it) {
+            permissionManagerUI.grantedAction()
+        } else {
+            permissionManagerUI.notGrantedAction()
+        }
+    }
 
     fun bindViewModel(viewModel: VM) = with(viewModel) {
         this@CommonActivity.viewModel = viewModel
@@ -164,6 +179,18 @@ abstract class CommonActivity<Binding : ViewBinding, VM : CommonViewModel> : App
             )
         )
         dialogManager.replace(ModularDialog(this, modularDialogArgs))
+    }
+
+    protected fun shareViaText(text: String) {
+        val shareIntent = Intent()
+        shareIntent.action = Intent.ACTION_SEND
+        shareIntent.putExtra(Intent.EXTRA_TEXT, text)
+        shareIntent.type = "text/plain"
+        if (shareIntent.resolveActivity(packageManager) != null) {
+            startActivity(Intent.createChooser(shareIntent, null))
+        } else {
+            TariToast(this, TariToastArgs(string(R.string.store_no_application_to_open_the_link_error), Toast.LENGTH_LONG))
+        }
     }
 
     private fun openActivity(navigation: DebugNavigation) {

@@ -32,7 +32,6 @@
  */
 package com.tari.android.wallet.ui.fragment.profile
 
-import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -69,14 +68,6 @@ class WalletInfoFragment : CommonFragment<FragmentWalletInfoBinding, WalletInfoV
         val viewModel: WalletInfoViewModel by viewModels()
         bindViewModel(viewModel)
 
-        subscribeVM(viewModel.shareViewModel)
-        subscribeVM(viewModel.shareViewModel.tariBluetoothServer)
-        subscribeVM(viewModel.shareViewModel.tariBluetoothClient)
-        subscribeVM(viewModel.shareViewModel.deeplinkViewModel)
-
-        viewModel.shareViewModel.tariBluetoothServer.init(this)
-        viewModel.shareViewModel.tariBluetoothClient.init(this)
-
         setupUI()
         subscribeUI()
 
@@ -86,12 +77,6 @@ class WalletInfoFragment : CommonFragment<FragmentWalletInfoBinding, WalletInfoV
     override fun onResume() {
         super.onResume()
         viewModel.refreshData()
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        viewModel.shareViewModel.tariBluetoothServer.handleActivityResult(requestCode, resultCode, data)
-        viewModel.shareViewModel.tariBluetoothClient.handleActivityResult(requestCode, resultCode, data)
     }
 
     private fun subscribeUI() = with(viewModel) {
@@ -113,12 +98,6 @@ class WalletInfoFragment : CommonFragment<FragmentWalletInfoBinding, WalletInfoV
         observeOnLoad(yatDisconnected)
 
         observe(alias) { updateAlias(it) }
-
-        observe(shareViewModel.shareText) { shareViaText(it) }
-
-        observe(shareViewModel.launchPermissionCheck) { permissionManagerUI.runWithPermissions(*it.toTypedArray(), openSettings = true) {
-            viewModel.shareViewModel.startBLESharing()
-        } }
     }
 
     private fun setupUI() {

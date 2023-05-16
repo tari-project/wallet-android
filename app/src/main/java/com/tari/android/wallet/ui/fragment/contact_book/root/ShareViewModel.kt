@@ -44,6 +44,7 @@ class ShareViewModel : CommonViewModel() {
     val launchPermissionCheck = SingleLiveEvent<List<String>>()
 
     init {
+        currentInstant = this
         component.inject(this)
         tariBluetoothServer.onReceived = this::onReceived
         tariBluetoothClient.onSuccessSharing = this::showShareSuccessDialog
@@ -123,5 +124,10 @@ class ShareViewModel : CommonViewModel() {
 
     private fun onReceived(data: List<DeepLink.Contacts.DeeplinkContact>) {
         deeplinkViewModel.addContacts(data)
+    }
+
+    companion object {
+        var currentInstant: ShareViewModel? = null
+            private set
     }
 }

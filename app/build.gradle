@@ -18,6 +18,7 @@ android {
         versionCode buildNumber
         versionName versionNumber + "-libwallet-" + libwalletVersion
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        multiDexEnabled = true
 
         ndk {
             abiFilters = []
