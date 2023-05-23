@@ -99,9 +99,8 @@
         <com.tari.android.wallet.ui.fragment.tx.questionMark.QuestionMarkView
             android:id="@+id/balance_question_mark"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="25dp"
             android:layout_alignTop="@+id/available_balance_text_view"
-            android:layout_alignBottom="@+id/available_balance_text_view"
             android:layout_toEndOf="@+id/available_balance_text_view" />
 
         <com.tari.android.wallet.ui.component.tari.TariTextView
@@ -114,6 +113,7 @@
             android:letterSpacing="-0.018"
             android:textColor="?attr/palette_button_primary_text"
             android:textSize="12sp"
+            tools:text="0.00"
             app:customFont="heavy" />
 
         <com.tari.android.wallet.ui.component.mainList.MainListImageButton

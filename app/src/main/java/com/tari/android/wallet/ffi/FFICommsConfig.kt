@@ -51,7 +51,7 @@ class FFICommsConfig() : FFIBase() {
         error: FFIError
     )
 
-    private external fun jniGetLastVersion(error: FFIError): String
+    private external fun jniGetLastVersion(error: FFIError): String?
 
     private external fun jniDestroy()
 
@@ -84,7 +84,7 @@ class FFICommsConfig() : FFIBase() {
         }
     }
 
-    fun getLastVersion(): String = runWithError { jniGetLastVersion(it) }
+    fun getLastVersion(): String = runWithError { jniGetLastVersion(it).orEmpty() }
 
     override fun destroy() = jniDestroy()
 }

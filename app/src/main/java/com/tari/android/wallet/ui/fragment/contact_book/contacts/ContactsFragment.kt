@@ -70,7 +70,10 @@ open class ContactsFragment : CommonFragment<FragmentContactsBinding, ContactsVi
     fun search(text: String) = viewModel.search(text)
 
     private fun observeUI() = with(viewModel) {
-        observe(list) { recyclerViewAdapter.update(it) }
+        observe(list) {
+            ui.swipeRefreshLayout.isRefreshing = false
+            recyclerViewAdapter.update(it)
+        }
 
         observe(grantPermission) { grantPermission() }
 
@@ -81,9 +84,12 @@ open class ContactsFragment : CommonFragment<FragmentContactsBinding, ContactsVi
 
     private fun setupUI() = with(ui) {
         setupRecyclerView()
+        swipeRefreshLayout.setOnRefreshListener { viewModel.refresh() }
+        swipeRefreshLayout.setColorSchemeColors(viewModel.paletteManager.getPurpleBrand(requireContext()))
     }
 
     private fun setupRecyclerView() {
+        ui.contactsListRecyclerView.setHasFixedSize(true)
         ui.contactsListRecyclerView.layoutManager = LinearLayoutManager(requireContext())
         recyclerViewAdapter.setClickListener(CommonAdapter.ItemClickListener { viewModel.processItemClick(it) })
         ui.contactsListRecyclerView.adapter = recyclerViewAdapter

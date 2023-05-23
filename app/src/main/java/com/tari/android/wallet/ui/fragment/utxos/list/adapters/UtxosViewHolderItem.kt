@@ -6,7 +6,7 @@ import com.tari.android.wallet.ui.dialog.ChangedPropertyDelegate
 import com.tari.android.wallet.util.WalletUtil
 import org.joda.time.DateTime
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Locale
 
 class UtxosViewHolderItem(val source: TariUtxo, var height: Int = 0) : CommonViewHolderItem() {
 
@@ -32,11 +32,14 @@ class UtxosViewHolderItem(val source: TariUtxo, var height: Int = 0) : CommonVie
             TariUtxo.UtxoStatus.Unspent -> UtxosStatus.Mined
             TariUtxo.UtxoStatus.EncumberedToBeReceived,
             TariUtxo.UtxoStatus.UnspentMinedUnconfirmed -> UtxosStatus.Confirmed
+
             else -> null
         }
         isSelectable = status == UtxosStatus.Mined
         isShowingStatus = status != null
     }
+
+    override val viewHolderUUID: String = "UtxosViewHolderItem" + source.value.toString()
 
     companion object {
         const val minTileHeight = 100.0

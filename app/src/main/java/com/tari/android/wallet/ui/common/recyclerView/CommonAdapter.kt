@@ -2,19 +2,17 @@ package com.tari.android.wallet.ui.common.recyclerView
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.ListAdapter
 import androidx.viewbinding.ViewBinding
 
-abstract class CommonAdapter<T : CommonViewHolderItem> : RecyclerView.Adapter<CommonViewHolder<T, ViewBinding>>() {
-    private var items: MutableList<T> = mutableListOf()
+abstract class CommonAdapter<T : CommonViewHolderItem> : ListAdapter<T, CommonViewHolder<T, ViewBinding>>(DefaultDiffCallback()) {
     private var onClickListener: ItemClickListener<T> = ItemClickListener()
     private var onLongClickListener: ItemLongClickListener<T> = ItemLongClickListener()
 
     abstract var viewHolderBuilders: List<ViewHolderBuilder>
 
     fun update(newItems: MutableList<T>) {
-        items = newItems.toMutableList()
-        notifyDataSetChanged()
+        submitList(newItems.toList())
     }
 
     fun setClickListener(onClickListener: ItemClickListener<T>?) {
@@ -25,10 +23,17 @@ abstract class CommonAdapter<T : CommonViewHolderItem> : RecyclerView.Adapter<Co
         this.onLongClickListener = onLongClickListener ?: ItemLongClickListener()
     }
 
-    override fun onBindViewHolder(holder: CommonViewHolder<T, ViewBinding>, position: Int) = holder.bind(items[position])
+    override fun onBindViewHolder(holder: CommonViewHolder<T, ViewBinding>, position: Int, payloads: MutableList<Any>) {
+        super.onBindViewHolder(holder, position, payloads)
+        holder.bind(getItem(position))
+    }
+
+    override fun onBindViewHolder(holder: CommonViewHolder<T, ViewBinding>, position: Int) {
+        holder.bind(getItem(position))
+    }
 
     override fun getItemViewType(position: Int): Int {
-        val item = items[position]
+        val item = getItem(position)
         val builder = viewHolderBuilders.firstOrNull { it.itemJavaClass == item.javaClass || isFitSuperclass(item.javaClass, it.itemJavaClass) }
 
         builder ?: throw Exception("Нет такого билдера \nнужный: ${item.javaClass} \nposition: $position \n$viewHolderBuilders \n${item.javaClass}")
@@ -68,9 +73,8 @@ abstract class CommonAdapter<T : CommonViewHolderItem> : RecyclerView.Adapter<Co
         return viewHolder
     }
 
-    override fun getItemCount(): Int = items.size
-
     open class ItemClickListener<T>(val doOnClick: (T) -> Unit = {})
 
     open class ItemLongClickListener<T>(val doOnLongClick: (T) -> Boolean = { false })
 }
+

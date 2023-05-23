@@ -1,10 +1,7 @@
 package com.tari.android.wallet.infrastructure.bluetooth
 
-import android.bluetooth.BluetoothDevice
-import android.bluetooth.BluetoothGatt
 import android.bluetooth.BluetoothGattCharacteristic
 import android.bluetooth.BluetoothGattServer
-import android.bluetooth.BluetoothGattServerCallback
 import android.bluetooth.BluetoothGattService
 import android.bluetooth.le.AdvertiseCallback
 import android.bluetooth.le.AdvertiseData
@@ -15,7 +12,14 @@ import com.tari.android.wallet.application.deeplinks.DeeplinkHandler
 import com.tari.android.wallet.data.sharedPrefs.bluetooth.BluetoothServerState
 import com.tari.android.wallet.data.sharedPrefs.bluetooth.ShareSettingsRepository
 import com.tari.android.wallet.extension.addTo
+import com.welie.blessed.BluetoothCentral
+import com.welie.blessed.BluetoothPeripheralManager
+import com.welie.blessed.BluetoothPeripheralManagerCallback
+import com.welie.blessed.GattStatus
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.disposables.Disposable
 import java.util.UUID
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -26,7 +30,12 @@ class TariBluetoothServer @Inject constructor(private val shareSettingsRepositor
 
     private var bluetoothGattServer: BluetoothGattServer? = null
 
-    init {
+    override fun onContextSet() {
+        super.onContextSet()
+        compositeDisposable.dispose()
+        compositeDisposable = CompositeDisposable()
+        stopReceiving()
+        handleReceiving()
         shareSettingsRepository.updateNotifier.subscribe {
             try {
                 handleReceiving()
@@ -61,7 +70,7 @@ class TariBluetoothServer @Inject constructor(private val shareSettingsRepositor
         ensureBluetoothIsEnabled {
             runWithPermissions(bluetoothAdvertisePermission) {
                 runWithPermissions(bluetoothConnectPermission) {
-                    doReceiving()
+                    doReceiving2()
                 }
             }
         }
@@ -69,65 +78,51 @@ class TariBluetoothServer @Inject constructor(private val shareSettingsRepositor
 
     var onReceived: (List<DeepLink.Contacts.DeeplinkContact>) -> Unit = {}
 
-    private fun doReceiving() {
-        logger.e("doReceiving")
+    private fun doReceiving2() {
+        val callback = object : BluetoothPeripheralManagerCallback() {
 
-        val callback = object : BluetoothGattServerCallback() {
+            var wholeData = byteArrayOf()
 
-            val receivedString = StringBuilder()
+            var throttle: Disposable? = null
 
-            override fun onCharacteristicWriteRequest(
-                device: BluetoothDevice?,
-                requestId: Int,
-                characteristic: BluetoothGattCharacteristic?,
-                preparedWrite: Boolean,
-                responseNeeded: Boolean,
-                offset: Int,
+            override fun onCharacteristicWrite(
+                bluetoothCentral: BluetoothCentral,
+                characteristic: BluetoothGattCharacteristic,
+                value: ByteArray?
+            ): GattStatus {
+
+                if (characteristic.uuid.toString().lowercase() == CHARACTERISTIC_UUID.lowercase()) {
+                    wholeData += value!!
+                }
+
+                throttle?.dispose()
+                throttle = io.reactivex.Observable.timer(1000, TimeUnit.MILLISECONDS)
+                    .subscribe { doHandling(String(wholeData, Charsets.UTF_16)) }
+
+                return GattStatus.SUCCESS
+            }
+
+            override fun onCharacteristicWriteCompleted(
+                bluetoothCentral: BluetoothCentral,
+                characteristic: BluetoothGattCharacteristic,
                 value: ByteArray?
             ) {
-                super.onCharacteristicWriteRequest(device, requestId, characteristic, preparedWrite, responseNeeded, offset, value)
+                super.onCharacteristicWriteCompleted(bluetoothCentral, characteristic, value)
 
-                logger.e(preparedWrite.toString() + " " + responseNeeded.toString() + " " + offset.toString() + " " + value.toString())
-
-                //todo some delay here
-                if (characteristic?.uuid.toString().lowercase() == CHARACTERISTIC_UUID.lowercase()) {
-                    if (receivedString.isEmpty()) {
-                        receivedString.append(String(value!!))
-                        doHandling()
-                    } else {
-                        receivedString.append(String(value!!))
-                    }
-                }
-
-                if (responseNeeded) {
-                    runWithPermissions(bluetoothConnectPermission) {
-                        @Suppress("MissingPermission")
-                        bluetoothGattServer?.sendResponse(device, requestId, BluetoothGatt.GATT_SUCCESS, offset, value)
-                    }
-                }
+                throttle?.dispose()
+                doHandling(String(wholeData, Charsets.UTF_16))
             }
 
-            override fun onExecuteWrite(device: BluetoothDevice?, requestId: Int, execute: Boolean) {
-                super.onExecuteWrite(device, requestId, execute)
-
-                if (execute) {
-                    doHandling()
-                }
-            }
-
-            private fun doHandling() {
-                val handled = runCatching { deeplinkHandler.handle(receivedString.toString()) }.getOrNull()
+            private fun doHandling(string: String): GattStatus {
+                val handled = runCatching { deeplinkHandler.handle(string) }.getOrNull()
 
                 if (handled != null && handled is DeepLink.Contacts) {
-                    receivedString.clear()
+                    wholeData = byteArrayOf()
                     onReceived.invoke(handled.contacts)
-                    receivedString.clear()
                 }
+                return if (handled != null) GattStatus.SUCCESS else GattStatus.INVALID_HANDLE
             }
         }
-
-        @Suppress("MissingPermission")
-        bluetoothGattServer = bluetoothManager?.openGattServer(fragappCompatActivity!!, callback) ?: return
 
         val myService = BluetoothGattService(UUID.fromString(SERVICE_UUID), BluetoothGattService.SERVICE_TYPE_PRIMARY)
 
@@ -139,10 +134,9 @@ class TariBluetoothServer @Inject constructor(private val shareSettingsRepositor
 
         myService.addCharacteristic(myCharacteristic)
 
-        @Suppress("MissingPermission")
-        bluetoothGattServer?.addService(myService)
+        val manager = BluetoothPeripheralManager(fragappCompatActivity!!, bluetoothManager!!, callback)
+        manager.add(myService)
 
-        val bluetoothLeAdvertiser = bluetoothAdapter!!.bluetoothLeAdvertiser
         val settings = AdvertiseSettings.Builder()
             .setAdvertiseMode(AdvertiseSettings.ADVERTISE_MODE_LOW_LATENCY)
             .setConnectable(true)
@@ -154,14 +148,11 @@ class TariBluetoothServer @Inject constructor(private val shareSettingsRepositor
             .setIncludeDeviceName(false)
             .addServiceUuid(ParcelUuid(UUID.fromString(SERVICE_UUID)))
             .build()
-
-        @Suppress("MissingPermission")
-        bluetoothLeAdvertiser.startAdvertising(settings, data, advertiseCallback)
-
-        logger.i("startAdvertising")
+        manager.startAdvertising(settings, data, data)
     }
 
     private fun stopReceiving() {
+        bluetoothAdapter ?: return
         val bluetoothLeAdvertiser = bluetoothAdapter!!.bluetoothLeAdvertiser
 
         @Suppress("MissingPermission")

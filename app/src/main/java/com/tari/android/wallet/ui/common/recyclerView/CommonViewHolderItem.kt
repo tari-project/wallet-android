@@ -4,11 +4,10 @@ import java.io.Serializable
 
 abstract class CommonViewHolderItem : Serializable {
 
-    var rebindAction: () -> Unit = {}
+    // override if need nice list refreshing
+    abstract val viewHolderUUID: String
 
-    fun rebind() {
-        runCatching {
-            rebindAction()
-        }
-    }
+    override fun equals(other: Any?): Boolean = this === other
+
+    override fun hashCode(): Int = super.hashCode()
 }

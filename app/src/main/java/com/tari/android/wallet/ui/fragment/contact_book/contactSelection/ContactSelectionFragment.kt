@@ -243,7 +243,7 @@ open class ContactSelectionFragment : CommonFragment<FragmentContactsSelectionBi
             val qrData = data.getStringExtra(QRScannerActivity.EXTRA_QR_DATA) ?: return
             (viewModel.deeplinkHandler.handle(qrData) as? DeepLink.Send)?.let {
                 lifecycleScope.launch(Dispatchers.IO) {
-                    val tariWalletAddress = viewModel.walletAddressViewModel.getWalletAddressFromHexString(it.walletAddressHex)
+                    val tariWalletAddress = viewModel.walletAddressViewModel.getWalletAddressFromHexString(it.walletAddress)
                     if (tariWalletAddress != null) {
                         ui.rootView.post { ui.searchEditText.setText(tariWalletAddress.emojiId, TextView.BufferType.EDITABLE) }
                         ui.searchEditText.postDelayed({ ui.searchEditTextScrollView.smoothScrollTo(0, 0) }, Constants.UI.mediumDurationMs)

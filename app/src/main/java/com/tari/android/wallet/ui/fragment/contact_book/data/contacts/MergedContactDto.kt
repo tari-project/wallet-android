@@ -27,4 +27,6 @@ class MergedContactDto(var ffiContactDto: FFIContactDto, var phoneContactDto: Ph
     override fun extractWalletAddress(): TariWalletAddress = ffiContactDto.walletAddress
 
     override fun getAlias(): String = phoneContactDto.firstName
+
+    override fun copy(): IContact = MergedContactDto(ffiContactDto.copy() as FFIContactDto, phoneContactDto.copy() as PhoneContactDto)
 }

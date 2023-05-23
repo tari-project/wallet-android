@@ -13,8 +13,14 @@ import com.tari.android.wallet.ui.common.CommonViewModel
 
 abstract class TariBluetoothAdapter() : CommonViewModel() {
     protected var fragappCompatActivity: AppCompatActivity? = null
+        private set(value) {
+            field = value
+            onContextSet()
+        }
     protected var bluetoothAdapter: BluetoothAdapter? = null
     protected var bluetoothManager: BluetoothManager? = null
+
+    open fun onContextSet() { }
 
     protected val bluetoothConnectPermission = when {
         Build.VERSION.SDK_INT <= Build.VERSION_CODES.R -> Manifest.permission.BLUETOOTH
@@ -33,7 +39,7 @@ abstract class TariBluetoothAdapter() : CommonViewModel() {
 
     protected val bluetoothAdminPermission = when {
         Build.VERSION.SDK_INT <= Build.VERSION_CODES.R -> Manifest.permission.BLUETOOTH
-        else -> Manifest.permission.BLUETOOTH_ADMIN
+        else ->  Manifest.permission.BLUETOOTH
     }
 
     val bluetoothPermissions = mutableListOf(
@@ -52,10 +58,10 @@ abstract class TariBluetoothAdapter() : CommonViewModel() {
 
 
     fun init(fragment: AppCompatActivity) {
-        this.fragappCompatActivity = fragment
-
         bluetoothManager = fragment.getSystemService(BluetoothManager::class.java)
         bluetoothAdapter = bluetoothManager!!.adapter
+
+        this.fragappCompatActivity = fragment
     }
 
     fun handleActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

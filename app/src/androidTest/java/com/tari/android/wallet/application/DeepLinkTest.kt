@@ -73,7 +73,7 @@ class DeepLinkTest {
     fun assertPubkey() {
         val deeplink = "tari://${currentNetwork.uriComponent}/${DeepLink.Send.sendCommand}?${DeepLink.Send.publicKeyKey}=$PUBLIC_KEY"
         val result = deeplinkHandler.handle(deeplink) as? DeepLink.Send
-        assertEquals(result!!.walletAddressHex, PUBLIC_KEY)
+        assertEquals(result!!.walletAddress, PUBLIC_KEY)
     }
 
     @Test
@@ -102,7 +102,7 @@ class DeepLinkTest {
         val sendDeeplink = "tari://${currentNetwork.uriComponent}/${DeepLink.Send.sendCommand}?${DeepLink.Send.amountKey}=12345678&${DeepLink.Send.noteKey}=hey&${DeepLink.Send.publicKeyKey}=$PUBLIC_KEY"
         val result = deeplinkHandler.handle(sendDeeplink) as? DeepLink.Send
         assertEquals(result!!.note, "hey")
-        assertEquals(result.walletAddressHex, PUBLIC_KEY)
+        assertEquals(result.walletAddress, PUBLIC_KEY)
         assertEquals(result.amount!!.tariValue.toDouble(), 12.345678, 0.1)
 
         val baseNodeDeeplink = "tari://${currentNetwork.uriComponent}/${DeepLink.AddBaseNode.addNodeCommand}?${DeepLink.AddBaseNode.peerKey}=${PEER}&${DeepLink.AddBaseNode.nameKey}=actual_name"

@@ -142,6 +142,7 @@ abstract class CommonActivity<Binding : ViewBinding, VM : CommonViewModel> : App
 
     fun addFragment(fragment: Fragment, bundle: Bundle? = null, isRoot: Boolean = false, withAnimation: Boolean = true) {
         bundle?.let { fragment.arguments = it }
+        if (supportFragmentManager.isDestroyed) return
         val transaction = supportFragmentManager.beginTransaction()
         if (withAnimation) {
             transaction.addEnterLeftAnimation()

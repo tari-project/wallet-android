@@ -1,13 +1,26 @@
 package com.tari.android.wallet.service.service
 
+import com.orhanobut.logger.Logger
+import com.orhanobut.logger.Printer
 import com.tari.android.wallet.application.TariWalletApplication
 import com.tari.android.wallet.application.baseNodes.BaseNodes
 import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodeSharedRepository
 import com.tari.android.wallet.event.Event
 import com.tari.android.wallet.event.EventBus
-import com.tari.android.wallet.ffi.*
+import com.tari.android.wallet.ffi.FFIWallet
+import com.tari.android.wallet.ffi.FFIWalletListener
+import com.tari.android.wallet.ffi.TransactionValidationStatus
 import com.tari.android.wallet.infrastructure.backup.BackupManager
-import com.tari.android.wallet.model.*
+import com.tari.android.wallet.model.BalanceInfo
+import com.tari.android.wallet.model.CancelledTx
+import com.tari.android.wallet.model.CompletedTx
+import com.tari.android.wallet.model.PendingInboundTx
+import com.tari.android.wallet.model.PendingOutboundTx
+import com.tari.android.wallet.model.TariContact
+import com.tari.android.wallet.model.TariWalletAddress
+import com.tari.android.wallet.model.TransactionSendStatus
+import com.tari.android.wallet.model.Tx
+import com.tari.android.wallet.model.TxId
 import com.tari.android.wallet.model.recovery.WalletRestorationResult
 import com.tari.android.wallet.notification.NotificationHelper
 import com.tari.android.wallet.service.TariWalletServiceListener
@@ -20,7 +33,11 @@ import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import java.math.BigInteger
 import java.util.Locale
-import java.util.concurrent.*
+import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.ConcurrentMap
+import java.util.concurrent.CopyOnWriteArrayList
+import java.util.concurrent.CopyOnWriteArraySet
+import java.util.concurrent.TimeUnit
 
 class FFIWalletListenerImpl(
     private val wallet: FFIWallet,
@@ -32,6 +49,7 @@ class FFIWalletListenerImpl(
     private val baseNodes: BaseNodes
 ) : FFIWalletListener {
 
+    private val logger: Printer = Logger.t("FFIWalletListenerImpl")
     var listeners = CopyOnWriteArrayList<TariWalletServiceListener>()
 
     /**
@@ -198,6 +216,7 @@ class FFIWalletListenerImpl(
                 EventBus.baseNodeState.post(BaseNodeState.Online)
                 listeners.iterator().forEach { it.onBaseNodeSyncComplete(true) }
             }
+
             2 -> {
                 val currentBaseNode = baseNodeSharedPrefsRepository.currentBaseNode
                 if (currentBaseNode == null || !currentBaseNode.isCustom) {
@@ -289,10 +308,14 @@ class FFIWalletListenerImpl(
     }
 
     private fun checkValidationResult(type: BaseNodeValidationType, responseId: BigInteger, isSuccess: Boolean) {
-        val currentStatus = baseNodeValidationStatusMap[type] ?: return
-        if (currentStatus.first != responseId) return
-        baseNodeValidationStatusMap[type] = Pair(currentStatus.first, isSuccess)
-        checkBaseNodeSyncCompletion()
+        try {
+            val currentStatus = baseNodeValidationStatusMap[type] ?: return
+            if (currentStatus.first != responseId) return
+            baseNodeValidationStatusMap[type] = Pair(currentStatus.first, isSuccess)
+            checkBaseNodeSyncCompletion()
+        } catch (e: Throwable) {
+            logger.e(e.toString())
+        }
     }
 
     override fun onWalletRestoration(result: WalletRestorationResult) {

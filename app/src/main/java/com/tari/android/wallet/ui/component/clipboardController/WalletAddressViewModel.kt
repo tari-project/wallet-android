@@ -39,21 +39,27 @@ class WalletAddressViewModel : CommonViewModel() {
     fun checkClipboardForValidEmojiId(walletService: TariWalletService) {
         val clipboardString = clipboardManager.primaryClip?.getItemAt(0)?.text?.toString() ?: return
 
-        checkForValidEmojiId(walletService, clipboardString)
+        doOnConnectedToWallet {
+            runCatching {
+                checkForValidEmojiId(walletService, clipboardString)
 
-        discoveredWalletAddressFromClipboard.value = discoveredWalletAddress
+                discoveredWalletAddressFromClipboard.value = discoveredWalletAddress
+            }
+        }
     }
 
     fun checkFromQuery(walletService: TariWalletService, query: String) {
-        checkForValidEmojiId(walletService, query)
-        discoveredWalletAddressFromQuery.value = discoveredWalletAddress
+        doOnConnectedToWallet {
+            checkForValidEmojiId(walletService, query)
+            discoveredWalletAddressFromQuery.value = discoveredWalletAddress
+        }
     }
 
     fun checkForValidEmojiId(walletService: TariWalletService, query: String) {
         discoveredWalletAddress = null
         val deepLink = deeplinkHandler.handle(query) as? DeepLink.Send
         if (deepLink != null) { // there is a deep link in the clipboard
-            discoveredWalletAddress = walletService.getWalletAddressFromHexString(deepLink.walletAddressHex)
+            discoveredWalletAddress = walletService.getWalletAddressFromHexString(deepLink.walletAddress)
         } else { // try to extract a valid emoji id
             val emojis = query.trim().extractEmojis()
             // search in windows of length = emoji id length

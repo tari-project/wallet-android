@@ -9,8 +9,8 @@ buildscript {
     ext.lifecycle_version = '2.6.1'
 
     // build & version
-    ext.buildNumber = 234
-    ext.versionNumber = "0.20.1"
+    ext.buildNumber = 237
+    ext.versionNumber = "0.21.1"
 
     // JNI libs
     ext.libwalletVersion = "0.49.0-rc.2"

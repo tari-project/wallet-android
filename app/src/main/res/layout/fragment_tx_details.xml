@@ -341,13 +341,6 @@
                     android:layout_below="@id/contact_container_view"
                     android:orientation="vertical">
 
-                    <com.tari.android.wallet.ui.component.tari.TariDivider
-                        android:id="@+id/note_divider"
-                        android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:layout_marginHorizontal="25dp"
-                        android:layout_marginTop="@dimen/tx_details_note_top_margin" />
-
                     <com.tari.android.wallet.ui.component.tari.TariTextView
                         android:id="@+id/note_label_text_view"
                         android:layout_width="wrap_content"
@@ -435,6 +428,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_gravity="center_vertical|end"
+                            android:background="?attr/palette_icons_default"
                             android:rotation="180"
                             android:src="@drawable/vector_back_button" />
 

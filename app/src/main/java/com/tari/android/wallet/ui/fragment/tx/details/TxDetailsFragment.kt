@@ -215,7 +215,6 @@ class TxDetailsFragment : CommonFragment<FragmentTxDetailsBinding, TxDetailsView
         } else {
             ui.txNoteTextView.text = if (tx.isOneSided) string(tx_list_you_received_one_side_payment) else note.message
         }
-        ui.noteDivider.setVisible(!tx.isOneSided)
         ui.gifContainer.root.visible()
     }
 

@@ -3,7 +3,7 @@ package com.tari.android.wallet.ui.fragment.contact_book.data.contacts
 import com.tari.android.wallet.model.TariContact
 import com.tari.android.wallet.model.TariWalletAddress
 
-open class FFIContactDto() : IContact() {
+class FFIContactDto() : IContact() {
 
     lateinit var walletAddress: TariWalletAddress
 
@@ -26,7 +26,7 @@ open class FFIContactDto() : IContact() {
     }
 
     fun setAlias(alias: String) {
-        val (firstName, secondName) = alias.split(" ").toMutableList().apply { if (size == 1) this.add("") }
+        val (firstName, secondName) = alias.split(" ", limit = 2).toMutableList().apply { if (size == 1) this.add("") }
         this.firstName = firstName
         this.surname = secondName
     }
@@ -36,4 +36,6 @@ open class FFIContactDto() : IContact() {
     override fun extractWalletAddress(): TariWalletAddress = walletAddress
 
     override fun getAlias(): String = "$firstName $surname".ifBlank { "" }
+
+    override fun copy(): IContact = FFIContactDto(walletAddress, firstName, surname, isFavorite)
 }

@@ -117,7 +117,7 @@ class TariNavigator @Inject constructor(val prefs: SharedPrefsRepository, val ta
 
             Navigation.AddAmountNavigation.OnAmountExceedsActualAvailableBalance -> onAmountExceedsActualAvailableBalance()
             is Navigation.AddAmountNavigation.ContinueToAddNote -> continueToAddNote(navigation.transactionData)
-            is Navigation.AddAmountNavigation.ContinueToFinalizing -> continueToAddNote(navigation.transactionData)
+            is Navigation.AddAmountNavigation.ContinueToFinalizing -> continueToFinalizeSendTx(navigation.transactionData)
             Navigation.TxListNavigation.ToTTLStore -> toTTLStore()
             is Navigation.TxListNavigation.ToTxDetails -> toTxDetails(navigation.tx, null)
             is Navigation.TxListNavigation.ToSendTariToUser -> toSendTari(navigation.contact)
@@ -297,23 +297,17 @@ class TariNavigator @Inject constructor(val prefs: SharedPrefsRepository, val ta
         }
     }
 
-    fun onSendTxFailure(isYat: Boolean, transactionData: TransactionData, txFailureReason: TxFailureReason) {
+    fun onSendTxFailure(isYat: Boolean, txFailureReason: TxFailureReason) {
         EventBus.post(Event.Transaction.TxSendFailed(txFailureReason))
-        if (isYat) {
-            activity.finish()
-            activity.overridePendingTransition(R.anim.fade_in, R.anim.fade_out)
-        } else {
-            activity.supportFragmentManager.let {
-                it.popBackStackImmediate()
-                it.popBackStackImmediate()
-                it.popBackStackImmediate()
-                it.popBackStackImmediate()
-            }
-        }
+        navigateBackFromTxSend(isYat)
     }
 
-    fun onSendTxSuccessful(isYat: Boolean, txId: TxId, transactionData: TransactionData) {
+    fun onSendTxSuccessful(isYat: Boolean, txId: TxId) {
         EventBus.post(Event.Transaction.TxSendSuccessful(txId))
+        navigateBackFromTxSend(isYat)
+    }
+
+    private fun navigateBackFromTxSend(isYat: Boolean) {
         if (isYat) {
             activity.finish()
             activity.overridePendingTransition(R.anim.fade_in, R.anim.fade_out)
@@ -336,8 +330,8 @@ class TariNavigator @Inject constructor(val prefs: SharedPrefsRepository, val ta
     }
 
     fun sendTariToUser(service: TariWalletService, sendDeeplink: DeepLink.Send) {
-        val walletAddress = service.getWalletAddressFromHexString(sendDeeplink.walletAddressHex)
-        sendToUser((activity as HomeActivity).viewModel.contactsRepository.ffiBridge.getContactByAdress(walletAddress))
+        val walletAddress = service.getWalletAddressFromHexString(sendDeeplink.walletAddress)
+        sendToUser((activity as HomeActivity).viewModel.contactsRepository.ffiBridge.getContactByAddress(walletAddress))
     }
 
     fun sendToUser(recipientUser: ContactDto) {
