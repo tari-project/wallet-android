@@ -2,10 +2,11 @@ package com.tari.android.wallet.application.deeplinks
 
 import android.net.Uri
 import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
+import java.net.URLDecoder
 
 class DeeplinkFormatter(private val networkRepository: NetworkRepository) {
     fun parse(deepLink: String): DeepLink? {
-        val uri = Uri.parse(Uri.decode(deepLink))
+        val uri = Uri.parse(URLDecoder.decode(deepLink, "UTF-8"))
 
         if (!uri.authority.equals(networkRepository.currentNetwork!!.network.uriComponent)) {
             return null
@@ -24,16 +25,16 @@ class DeeplinkFormatter(private val networkRepository: NetworkRepository) {
     }
 
     fun toDeeplink(deepLink: DeepLink): String {
-        val builder = Uri.Builder()
+        val fullPart = Uri.Builder()
             .scheme("tari")
             .authority(networkRepository.currentNetwork!!.network.uriComponent)
             .appendPath(deepLink.getCommand())
 
         deepLink.getParams().forEach { (key, value) ->
-            builder.appendQueryParameter(key, value)
+            fullPart.appendQueryParameter(key, value)
         }
 
-        return Uri.encode(builder.build().toString())
+        return fullPart.build().toString()
     }
 
     companion object {

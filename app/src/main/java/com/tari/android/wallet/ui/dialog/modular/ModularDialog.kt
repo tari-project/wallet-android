@@ -13,8 +13,6 @@ import androidx.core.animation.doOnEnd
 import com.tari.android.wallet.R
 import com.tari.android.wallet.data.sharedPrefs.securityStages.modules.SecurityStageHeadModule
 import com.tari.android.wallet.data.sharedPrefs.securityStages.modules.SecurityStageHeadModuleView
-import com.tari.android.wallet.infrastructure.bluetooth.devicesModule.ScanModule
-import com.tari.android.wallet.infrastructure.bluetooth.devicesModule.ScanModuleView
 import com.tari.android.wallet.ui.component.networkStateIndicator.module.ConnectionStatusesModule
 import com.tari.android.wallet.ui.component.networkStateIndicator.module.ConnectionStatusesModuleView
 import com.tari.android.wallet.ui.dialog.TariDialog
@@ -130,7 +128,6 @@ open class ModularDialog(val context: Context) : TariDialog {
                 is YatInputModule -> YatInputModuleView(context, module)
                 is InputModule -> InputModuleView(context, module)
                 is ShortEmojiIdModule-> ShortEmojiModuleView(context, module)
-                is ScanModule-> ScanModuleView(context, module)
                 is IconModule-> IconModuleView(context, module)
                 else -> View(context)
             }

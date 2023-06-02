@@ -125,6 +125,7 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>() {
         subscribeToCommon(viewModel.shareViewModel.tariBluetoothServer)
         subscribeToCommon(viewModel.shareViewModel.tariBluetoothClient)
         subscribeToCommon(viewModel.shareViewModel.deeplinkViewModel)
+        viewModel.nfcAdapter.context = this
 
         viewModel.shareViewModel.tariBluetoothServer.init(this)
         viewModel.shareViewModel.tariBluetoothClient.init(this)
@@ -164,6 +165,19 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>() {
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+
+        viewModel.shareViewModel.tariBluetoothServer.init(this)
+
+        viewModel.nfcAdapter.enableForegroundDispatch(this)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        viewModel.nfcAdapter.disableForegroundDispatch(this)
+    }
+
     private fun subscribeUI() = with(viewModel) {
         observe(shareViewModel.shareText) { shareViaText(it) }
 
@@ -182,6 +196,9 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>() {
 
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
+
+        viewModel.nfcAdapter.onNewIntent(intent)
+
         // onNewIntent might get called before onCreate, so we anticipate that here
         checkScreensDeeplink(intent)
         if (viewModel.serviceConnection.currentState.status == ServiceConnectionStatus.CONNECTED) {

@@ -1,35 +1,44 @@
 package com.tari.android.wallet.infrastructure.bluetooth
 
-import android.annotation.SuppressLint
-import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothGatt
-import android.bluetooth.BluetoothGattCallback
 import android.bluetooth.BluetoothGattCharacteristic
-import android.bluetooth.BluetoothProfile
-import android.bluetooth.le.ScanCallback
 import android.bluetooth.le.ScanFilter
-import android.bluetooth.le.ScanSettings
+import android.bluetooth.le.ScanResult
+import android.os.Handler
+import android.os.Looper
 import android.os.ParcelUuid
+import com.welie.blessed.BluetoothCentralManager
+import com.welie.blessed.BluetoothCentralManagerCallback
+import com.welie.blessed.BluetoothPeripheral
+import com.welie.blessed.BluetoothPeripheralCallback
+import com.welie.blessed.GattStatus
+import com.welie.blessed.ScanMode
+import com.welie.blessed.WriteType
 import java.util.UUID
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class TariBluetoothClient @Inject constructor() : TariBluetoothAdapter() {
-    var onSuccessSharing: () -> Unit = {}
 
+    var onSuccessSharing: () -> Unit = {}
     var onFailedSharing: (String) -> Unit = {}
 
     var shareData: String? = null
+    var foundDevice: BluetoothPeripheral? = null
+    var myGatt: BluetoothGatt? = null
 
-    val callback = object : ScanCallback() {
-        @SuppressLint("MissingPermission")
-        override fun onScanResult(callbackType: Int, result: android.bluetooth.le.ScanResult?) {
-            if (((result?.rssi ?: Int.MIN_VALUE) > RSSI_Threshold)) {
-                result?.device?.let {
-                    stopSharing()
-                    println("onScanResult: ${it.name} ${it.address} ${result.rssi}")
-                    doPairingOrShare(it)
+    val manager: BluetoothCentralManager by lazy { BluetoothCentralManager(fragappCompatActivity!!, callback, Handler(Looper.getMainLooper())) }
+
+    val callback = object : BluetoothCentralManagerCallback() {
+        override fun onDiscoveredPeripheral(peripheral: BluetoothPeripheral, scanResult: ScanResult) {
+            super.onDiscoveredPeripheral(peripheral, scanResult)
+
+            if (foundDevice == null && (scanResult.rssi > RSSI_Threshold)) {
+                scanResult.device?.let {
+                    foundDevice = peripheral
+                    stopScanning()
+                    doPairingOrShare(peripheral)
                 }
             }
         }
@@ -37,13 +46,19 @@ class TariBluetoothClient @Inject constructor() : TariBluetoothAdapter() {
 
     fun startSharing(data: String) {
         ensureBluetoothIsEnabled {
+            runCatching { closeAll() }
             doScanning(data)
         }
     }
 
     fun stopSharing() {
+        runCatching { closeAll() }
+        stopScanning()
+    }
+
+    fun stopScanning() {
         @Suppress("MissingPermission")
-        bluetoothAdapter?.bluetoothLeScanner?.stopScan(callback)
+        manager.stopScan()
     }
 
     private fun doScanning(data: String) {
@@ -53,69 +68,71 @@ class TariBluetoothClient @Inject constructor() : TariBluetoothAdapter() {
             .setServiceUuid(ParcelUuid(UUID.fromString(SERVICE_UUID.lowercase())))
             .build()
 
-        val scanSetting = ScanSettings.Builder()
-            .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)
-            .setMatchMode(ScanSettings.MATCH_MODE_STICKY)
-            .setNumOfMatches(ScanSettings.MATCH_NUM_MAX_ADVERTISEMENT)
-            .setReportDelay(0)
-            .setLegacy(true)
-            .setCallbackType(ScanSettings.CALLBACK_TYPE_ALL_MATCHES)
-            .build()
-
-        runWithPermissions(bluetoothScanPermission) {
-            @Suppress("MissingPermission")
-            bluetoothAdapter?.bluetoothLeScanner?.startScan(listOf(scanFilter), scanSetting, callback)
-        }
+        manager.setScanMode(ScanMode.LOW_LATENCY)
+        manager.scanForPeripheralsUsingFilters(listOf(scanFilter))
     }
 
-    private fun doPairingOrShare(device: BluetoothDevice) {
-        val gattCallback = object : BluetoothGattCallback() {
+    private fun doPairingOrShare(device: BluetoothPeripheral) {
+        val shareData = shareData.orEmpty().toByteArray(Charsets.UTF_16)
 
-            override fun onConnectionStateChange(gatt: BluetoothGatt?, status: Int, newState: Int) {
-                super.onConnectionStateChange(gatt, status, newState)
-                if (newState == BluetoothProfile.STATE_CONNECTED) {
-                    runWithPermissions(bluetoothConnectPermission) {
-                        @Suppress("MissingPermission")
-                        gatt?.discoverServices()
-                    }
-                }
-            }
+        val callback = object : BluetoothPeripheralCallback() {
 
-            override fun onServicesDiscovered(gatt: BluetoothGatt?, status: Int) {
-                super.onServicesDiscovered(gatt, status)
-                if (status == BluetoothGatt.GATT_SUCCESS) {
-                    val service = gatt?.getService(UUID.fromString(SERVICE_UUID))
-                    service?.characteristics?.forEach {
-                        if (it.uuid.toString().lowercase() == CHARACTERISTIC_UUID.lowercase()) {
-                            runWithPermissions(bluetoothConnectPermission) {
-                                @Suppress("MissingPermission")
-                                gatt.writeCharacteristic(it, shareData.orEmpty().toByteArray(), BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT)
+            override fun onServicesDiscovered(peripheral: BluetoothPeripheral) {
+                super.onServicesDiscovered(peripheral)
+                val service = peripheral.getService(UUID.fromString(SERVICE_UUID))
+                service?.characteristics?.forEach {
+                    if (it.uuid.toString().lowercase() == CHARACTERISTIC_UUID.lowercase()) {
+                        runWithPermissions(bluetoothConnectPermission) {
+                            @Suppress("MissingPermission")
+                            val dataChunks = shareData.toList().chunked(512)
+                            for (chunk in dataChunks) {
+//                                https://stackoverflow.com/questions/38913743/maximum-packet-length-for-bluetooth-le/38914831#38914831
+                                peripheral.writeCharacteristic(it, chunk.toByteArray(), WriteType.WITH_RESPONSE)
                             }
                         }
                     }
                 }
             }
 
-            override fun onCharacteristicWrite(gatt: BluetoothGatt?, characteristic: BluetoothGattCharacteristic?, status: Int) {
-                super.onCharacteristicWrite(gatt, characteristic, status)
+            override fun onCharacteristicWrite(
+                peripheral: BluetoothPeripheral,
+                value: ByteArray?,
+                characteristic: BluetoothGattCharacteristic,
+                status: GattStatus
+            ) {
+                super.onCharacteristicWrite(peripheral, value, characteristic, status)
                 runWithPermissions(bluetoothConnectPermission) {
-                    @Suppress("MissingPermission")
-                    gatt?.disconnect()
-                    @Suppress("MissingPermission")
-                    gatt?.close()
-                    stopSharing()
-                    onSuccessSharing.invoke()
+                    peripheral.cancelConnection()
+                    stopScanning()
+                    closeAll()
+                }
+
+                when (status) {
+                    GattStatus.SUCCESS -> onSuccessSharing()
+                    //todo str
+                    GattStatus.INVALID_HANDLE -> onFailedSharing.invoke("Failed to share data during BLE transfer. Please try again.")
+                    else -> Unit
                 }
             }
         }
 
-        runWithPermissions(bluetoothConnectPermission) {
-            @Suppress("MissingPermission")
-            device.connectGatt(fragappCompatActivity!!, false, gattCallback)
-        }
+        manager.connectPeripheral(device, callback)
+    }
+
+    private fun closeAll() {
+        foundDevice = null
+        closeGatt()
+    }
+
+    private fun closeGatt() {
+        @Suppress("MissingPermission")
+        myGatt?.disconnect()
+        @Suppress("MissingPermission")
+        myGatt?.close()
+        myGatt = null
     }
 
     companion object {
-        const val RSSI_Threshold = -105
+        const val RSSI_Threshold = -50
     }
 }

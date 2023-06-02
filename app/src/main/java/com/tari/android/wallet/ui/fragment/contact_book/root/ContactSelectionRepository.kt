@@ -17,20 +17,17 @@ class ContactSelectionRepository @Inject constructor() : CommonViewModel() {
     fun toggle(item: ContactItem) {
         if (item.contact.getFFIDto() == null) return
 
-        if (selectedContacts.contains(item)) {
-            selectedContacts.remove(item)
-            item.isSelected = false
+        val contact = selectedContacts.firstOrNull { it.contact.uuid == item.contact.uuid }
+        if (contact != null) {
+            selectedContacts.remove(contact)
         } else {
             selectedContacts.add(item)
-            item.isSelected = true
         }
         isPossibleToShare.postValue(selectedContacts.isNotEmpty())
-        item.rebind()
     }
 
     fun clear() {
-        isSelectionState.postValue(false)
-        selectedContacts.forEach { it.isSelected = false }
         selectedContacts.clear()
+        isSelectionState.postValue(false)
     }
 }

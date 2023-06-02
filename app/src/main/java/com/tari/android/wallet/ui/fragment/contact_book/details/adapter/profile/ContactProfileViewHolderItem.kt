@@ -4,4 +4,6 @@ import com.tari.android.wallet.databinding.ViewEmojiIdWithYatSummaryBinding
 import com.tari.android.wallet.ui.common.recyclerView.CommonViewHolderItem
 import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.ContactDto
 
-class ContactProfileViewHolderItem(val contactDto: ContactDto, val show: () -> Unit, val init: (ViewEmojiIdWithYatSummaryBinding) -> Unit) : CommonViewHolderItem()
+data class ContactProfileViewHolderItem(val contactDto: ContactDto, val show: () -> Unit, val init: (ViewEmojiIdWithYatSummaryBinding) -> Unit) : CommonViewHolderItem() {
+    override val viewHolderUUID: String = contactDto.uuid
+}

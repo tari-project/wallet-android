@@ -598,6 +598,17 @@
     <string name="tari_about_icon_url_server">https://thenounproject.com/icon/internet-server-4213144/</string>
     <string name="tari_about_icon_url_networking">https://thenounproject.com/icon/networking-4213263/</string>
     <string name="tari_about_icon_url_delete">https://thenounproject.com/icon/delete-4727971/</string>
+    <string name="tari_about_icon_url_seed_words">https://thenounproject.com/icon/write-4207866/</string>
+    <string name="tari_about_icon_url_cloud">https://thenounproject.com/icon/cloud-3384041/</string>
+    <string name="tari_about_icon_url_password">https://thenounproject.com/icon/password-3384056/</string>
+    <string name="tari_about_icon_url_final">https://thenounproject.com/icon/key-3384048/</string>
+    <string name="tari_about_icon_url_link">https://thenounproject.com/browse/icons/term/link/</string>
+    <string name="tari_about_icon_url_unlink">https://thenounproject.com/browse/icons/term/unlink/</string>
+    <string name="tari_about_icon_url_contact_book">https://thenounproject.com/browse/icons/term/contact-book/</string>
+    <string name="tari_about_icon_url_bluetooth">https://thenounproject.com/browse/icons/term/bluetooth/</string>
+    <string name="tari_about_icon_url_nfc">https://thenounproject.com/browse/icons/term/nfc/</string>
+    <string name="tari_about_icon_url_empty_wallet">https://thenounproject.com/browse/icons/term/empty-wallet/</string>
+
 
     <string name="tari_about_icon_text_locked">Locked Lock by BlackActurus from\nNounProject.com</string>
     <string name="tari_about_icon_text_about">About by Anggara Putra from\nNounProject.com</string>
@@ -613,6 +624,18 @@
     <string name="tari_about_icon_text_server">Internet Server by Design Circle from\nNounProject.com</string>
     <string name="tari_about_icon_text_networking">Networking by Design Circle from\nNounProject.com</string>
     <string name="tari_about_icon_text_delete">Delete by Maya Nurhayati from\nNounProject.com</string>
+    <string name="tari_about_icon_text_seed_words">Write by Mada Creative from NounProject.com</string>
+    <string name="tari_about_icon_text_cloud">Cloud by Tippawan Sookruay from NounProject.com</string>
+    <string name="tari_about_icon_text_password">Password by Tippawan Sookruay from NounProject.com</string>
+    <string name="tari_about_icon_text_final">Key by Tippawan Sookruay from NounProject.com</string>
+    <string name="tari_about_icon_text_link">Link by Nasik Lababan from Noun Project</string>
+    <string name="tari_about_icon_text_unlink">Unlink by Nasik Lababan from Noun Project</string>
+    <string name="tari_about_icon_text_contact_book">contact book by Vectors Point from Noun Project</string>
+    <string name="tari_about_icon_text_bluetooth">Bluetooth by Winaldi from Noun Project</string>
+    <string name="tari_about_icon_text_nfc">NFC by Fauzan Adiima from Noun Project</string>
+    <string name="tari_about_icon_text_empty_wallet">Empty wallet by Fatkhul Karim from Noun Project</string>
+
+
 
     <string name="utxos_list_title">Wallet</string>
     <string name="utxos_selecting">Select</string>
@@ -778,6 +801,9 @@
 
     <string name="share_via_bluetooth_title">Share via BLE</string>
     <string name="share_via_bluetooth_message">Bring the smartphone close to a BLE enabled device</string>
+
+    <string name="share_via_nfc_title">Share via NFC</string>
+    <string name="share_via_nfc_message">Bring the smartphone close to an NFC device</string>
 
     <string name="share_success_title">Profile Shared</string>
     <string name="share_success_message">Awesome! Your details have been shared successfully.</string>

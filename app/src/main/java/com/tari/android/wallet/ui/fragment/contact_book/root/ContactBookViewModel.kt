@@ -4,6 +4,7 @@ import androidx.lifecycle.MutableLiveData
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.deeplinks.DeepLink
 import com.tari.android.wallet.application.deeplinks.DeeplinkHandler
+import com.tari.android.wallet.infrastructure.nfc.TariNFCAdapter
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.component.clipboardController.WalletAddressViewModel
 import com.tari.android.wallet.ui.fragment.contact_book.data.ContactsRepository
@@ -24,6 +25,9 @@ class ContactBookViewModel : CommonViewModel() {
     @Inject
     lateinit var contactSelectionRepository: ContactSelectionRepository
 
+    @Inject
+    lateinit var nfcAdapter: TariNFCAdapter
+
     val shareList = MutableLiveData<List<ShareOptionArgs>>()
 
     val walletAddressViewModel = WalletAddressViewModel()
@@ -31,31 +35,40 @@ class ContactBookViewModel : CommonViewModel() {
     init {
         component.inject(this)
 
-        shareList.postValue(
-            listOf(
-                ShareOptionArgs(
-                    ShareType.QR_CODE,
-                    resourceManager.getString(R.string.share_contact_via_qr_code),
-                    R.drawable.vector_share_qr_code,
-                    true
-                ) { shareViaQrCode() },
-                ShareOptionArgs(
-                    ShareType.LINK,
-                    resourceManager.getString(R.string.share_contact_via_qr_link),
-                    R.drawable.vector_share_link
-                ) { shareViaLink() },
+        val list = mutableListOf<ShareOptionArgs>()
+        list.add(
+            ShareOptionArgs(
+                ShareType.QR_CODE,
+                resourceManager.getString(R.string.share_contact_via_qr_code),
+                R.drawable.vector_share_qr_code,
+                true
+            ) { shareViaQrCode() }
+        )
+        list.add(
+            ShareOptionArgs(
+                ShareType.LINK,
+                resourceManager.getString(R.string.share_contact_via_qr_link),
+                R.drawable.vector_share_link
+            ) { shareViaLink() }
+        )
+        if (nfcAdapter.isNFCSupported()) {
+            list.add(
                 ShareOptionArgs(
                     ShareType.NFC,
                     resourceManager.getString(R.string.share_contact_via_qr_nfc),
                     R.drawable.vector_share_nfc
-                ) { shareViaNFC() },
-                ShareOptionArgs(
-                    ShareType.BLE,
-                    resourceManager.getString(R.string.share_contact_via_qr_ble),
-                    R.drawable.vector_share_ble
-                ) { shareViaBLE() },
+                ) { shareViaNFC() }
             )
+        }
+        list.add(
+            ShareOptionArgs(
+                ShareType.BLE,
+                resourceManager.getString(R.string.share_contact_via_qr_ble),
+                R.drawable.vector_share_ble
+            ) { shareViaBLE() }
         )
+
+        shareList.postValue(list)
     }
 
     fun doSearch(query: String) {
@@ -66,17 +79,17 @@ class ContactBookViewModel : CommonViewModel() {
 
     fun send() {
         val walletAddress = walletAddressViewModel.discoveredWalletAddressFromQuery.value!!
-        val contact = contactsRepository.ffiBridge.getContactByAdress(walletAddress)
+        val contact = contactsRepository.ffiBridge.getContactByAddress(walletAddress)
         navigation.postValue(Navigation.TxListNavigation.ToSendTariToUser(contact))
     }
 
-    fun shareViaQrCode() = setSelectedToPosition(0)
+    fun shareViaQrCode() = setSelectedToShareType(ShareType.QR_CODE)
 
-    fun shareViaLink() = setSelectedToPosition(1)
+    fun shareViaLink() = setSelectedToShareType(ShareType.LINK)
 
-    fun shareViaNFC() = setSelectedToPosition(2)
+    fun shareViaNFC() = setSelectedToShareType(ShareType.NFC)
 
-    fun shareViaBLE() = setSelectedToPosition(3)
+    fun shareViaBLE() = setSelectedToShareType(ShareType.BLE)
 
     fun shareSelectedContacts() {
         val args = shareList.value!!.first { it.isSelected }
@@ -91,10 +104,10 @@ class ContactBookViewModel : CommonViewModel() {
         return deeplinkFormatter.getDeeplink(DeepLink.Contacts(contacts))
     }
 
-    private fun setSelectedToPosition(position: Int) {
+    private fun setSelectedToShareType(shareType: ShareType) {
         val values = shareList.value!!
         values.forEach { it.isSelected = false }
-        values[position].isSelected = true
+        values.firstOrNull { it.type == shareType }?.isSelected = true
         shareList.postValue(values)
     }
 }

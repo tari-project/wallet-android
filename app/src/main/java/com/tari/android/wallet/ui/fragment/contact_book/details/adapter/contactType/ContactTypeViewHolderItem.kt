@@ -2,4 +2,6 @@ package com.tari.android.wallet.ui.fragment.contact_book.details.adapter.contact
 
 import com.tari.android.wallet.ui.common.recyclerView.CommonViewHolderItem
 
-class ContactTypeViewHolderItem(val type: String, val icon: Int) : CommonViewHolderItem()
+class ContactTypeViewHolderItem(val type: String, val icon: Int) : CommonViewHolderItem() {
+    override val viewHolderUUID: String = "ContactTypeViewHolderItem$type"
+}

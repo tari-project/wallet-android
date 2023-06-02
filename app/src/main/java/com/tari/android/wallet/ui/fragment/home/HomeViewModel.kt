@@ -1,5 +1,6 @@
 package com.tari.android.wallet.ui.fragment.home
 
+import com.tari.android.wallet.infrastructure.nfc.TariNFCAdapter
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.fragment.contact_book.data.ContactsRepository
 import com.tari.android.wallet.ui.fragment.contact_book.root.ShareViewModel
@@ -13,6 +14,9 @@ class HomeViewModel: CommonViewModel() {
 
     @Inject
     lateinit var contactsRepository: ContactsRepository
+
+    @Inject
+    lateinit var nfcAdapter: TariNFCAdapter
 
     val shareViewModel = ShareViewModel()
 

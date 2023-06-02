@@ -6,6 +6,10 @@
         android:name="android.hardware.camera"
         android:required="false" />
 
+    <uses-feature
+        android:name="android.hardware.nfc"
+        android:required="false" />
+
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.USE_BIOMETRIC" />
     <uses-permission android:name="android.permission.INTERNET" />
@@ -21,6 +25,7 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.NFC" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" /> <!-- For GSuite API -->
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
     <uses-permission android:name="android.permission.HIGH_SAMPLING_RATE_SENSORS" />
@@ -113,6 +118,10 @@
                     android:scheme="tari" />
 
                 <data
+                    android:host="nextnet"
+                    android:scheme="tari" />
+
+                <data
                     android:host="esmeralda"
                     android:scheme="tari" />
 
@@ -124,6 +133,13 @@
                     android:host="y.at"
                     android:scheme="tari" />
 
+            </intent-filter>
+
+            <intent-filter>
+                <action android:name="android.nfc.action.NDEF_DISCOVERED" />
+                <action android:name="android.nfc.action.TAG_DISCOVERED" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="text/plain" />
             </intent-filter>
         </activity>
         <!-- sentry -->

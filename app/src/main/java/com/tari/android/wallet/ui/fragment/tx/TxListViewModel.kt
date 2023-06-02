@@ -93,6 +93,7 @@ class TxListViewModel : CommonViewModel() {
     fun refreshAllData(isRestarted: Boolean = false) {
         viewModelScope.launch(Dispatchers.IO) {
             refreshBalance(isRestarted)
+            transactionRepository.refreshAllData()
         }
     }
 

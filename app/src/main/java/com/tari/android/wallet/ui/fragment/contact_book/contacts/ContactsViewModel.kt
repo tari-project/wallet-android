@@ -94,13 +94,15 @@ class ContactsViewModel : CommonViewModel() {
     init {
         component.inject(this)
 
-        list.addSource(searchText) { updateList() }
+        list.addSource(searchText) { _listUpdateTrigger.postValue(Unit) }
 
-        list.addSource(sourceList) { updateList() }
+        list.addSource(sourceList) { _listUpdateTrigger.postValue(Unit) }
 
-        list.addSource(filters) { updateList() }
+        list.addSource(filters) { _listUpdateTrigger.postValue(Unit) }
 
-        selectionTrigger = contactSelectionRepository.isSelectionState.map { isSelectionState -> updateState(isSelectionState == true) }
+        selectionTrigger = contactSelectionRepository.isSelectionState.map { it }
+
+        list.addSource(selectionTrigger) { _listUpdateTrigger.postValue(Unit) }
 
         list.addSource(contactsRepository.publishSubject.toFlowable(BackpressureStrategy.LATEST).toLiveData()) { updateContacts() }
     }
@@ -109,24 +111,21 @@ class ContactsViewModel : CommonViewModel() {
         if (item is ContactItem) {
             if (contactSelectionRepository.isSelectionState.value == true) {
                 contactSelectionRepository.toggle(item)
+                refresh()
             } else {
                 navigation.postValue(Navigation.ContactBookNavigation.ToContactDetails(item.contact))
             }
         }
     }
 
-    private fun updateState(state: Boolean) {
-        list.value.orEmpty().forEach {
-            if (it is ContactItem) {
-                it.isSelectionState = state
-            }
-            it.rebind()
-        }
+    fun refresh() {
+        updateContacts()
+        _listUpdateTrigger.postValue(Unit)
     }
 
     private fun updateContacts() {
         val newItems =
-            contactsRepository.publishSubject.value!!.filter(contactsRepository.filter).map { contactDto -> ContactItem(contactDto, false, false, false, this::performAction, badgeViewModel) }
+            contactsRepository.publishSubject.value!!.filter(contactsRepository.filter).map { contactDto -> ContactItem(contactDto.copy(contact = contactDto.contact.copy()), false, false, false, this::performAction, badgeViewModel) }
                 .toMutableList()
         sourceList.postValue(newItems)
     }
@@ -142,12 +141,19 @@ class ContactsViewModel : CommonViewModel() {
 
     private fun updateList() {
         val searchText = searchText.value ?: return
-        val sourceList = sourceList.value ?: return
+        var sourceList = sourceList.value ?: return
         val filters = filters.value ?: return
+        val selectedItems = contactSelectionRepository.selectedContacts.map { it.contact.uuid }.toList()
+        sourceList = sourceList.map { it.copy() }.toMutableList()
 
         val resultList = mutableListOf<CommonViewHolderItem>()
 
         val filtered = sourceList.filter { contact -> contact.filtered(searchText) && filters.all { it.invoke(contact) } }
+
+        for (item in filtered) {
+            item.isSelected = selectedItems.contains(item.contact.uuid)
+            item.isSelectionState = contactSelectionRepository.isSelectionState.value ?: false
+        }
 
         if (contactsRepository.contactPermission.value == false || filtered.isEmpty()) {
             val emptyState = EmptyStateItem(getEmptyTitle(), getBody(), getEmptyImage(), getButtonTitle()) { grantPermission.postValue(Unit) }
@@ -186,13 +192,18 @@ class ContactsViewModel : CommonViewModel() {
     private fun performAction(contact: ContactDto, contactAction: ContactAction) {
         when (contactAction) {
             ContactAction.Send -> navigation.postValue(Navigation.ContactBookNavigation.ToSendTari(contact))
-            ContactAction.ToFavorite -> contactsRepository.toggleFavorite(contact)
-            ContactAction.ToUnFavorite -> contactsRepository.toggleFavorite(contact)
+            ContactAction.ToFavorite -> runWithUpdate { contactsRepository.toggleFavorite(contact) }
+            ContactAction.ToUnFavorite -> runWithUpdate { contactsRepository.toggleFavorite(contact) }
             ContactAction.OpenProfile -> navigation.postValue(Navigation.ContactBookNavigation.ToContactDetails(contact))
             ContactAction.Link -> navigation.postValue(Navigation.ContactBookNavigation.ToLinkContact(contact))
             ContactAction.Unlink -> showUnlinkDialog(contact)
             else -> Unit
         }
+    }
+
+    private fun runWithUpdate(action: () -> Unit) {
+        action()
+        refresh()
     }
 
     private fun showUnlinkDialog(contact: ContactDto) {
@@ -238,7 +249,7 @@ class ContactsViewModel : CommonViewModel() {
     }
 
     companion object {
-        private const val LIST_UPDATE_DEBOUNCE = 500L
+        private const val LIST_UPDATE_DEBOUNCE = 200L
     }
 }
 

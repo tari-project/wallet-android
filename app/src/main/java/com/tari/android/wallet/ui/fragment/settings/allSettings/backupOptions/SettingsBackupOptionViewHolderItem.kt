@@ -7,4 +7,6 @@ class SettingsBackupOptionViewHolderItem(
     var backupState: PresentationBackupState? = null,
     val leftIconId: Int,
     val action: () -> Unit
-) : CommonViewHolderItem()
+) : CommonViewHolderItem() {
+    override val viewHolderUUID: String = backupState.toString()
+}

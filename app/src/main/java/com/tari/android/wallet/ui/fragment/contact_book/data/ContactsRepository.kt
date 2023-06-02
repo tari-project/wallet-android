@@ -211,7 +211,10 @@ class ContactsRepository @Inject constructor(
 
     inner class FFIContactsRepositoryBridge {
         init {
-            doOnConnectedToWallet { doOnConnected { subscribeToActions() } }
+            viewModelScope.launch(Dispatchers.IO) {
+                publishSubject.blockingFirst()
+                doOnConnectedToWallet { doOnConnected { subscribeToActions() } }
+            }
         }
 
         fun updateToFFI(list: List<ContactDto>) {
@@ -219,16 +222,20 @@ class ContactsRepository @Inject constructor(
                 doOnConnected { service ->
                     viewModelScope.launch(Dispatchers.IO) {
                         for (item in list.mapNotNull { it.getFFIDto() }) {
-                            service.updateContact(item.walletAddress, item.getAlias(), item.isFavorite, WalletError())
+                            val error = WalletError()
+                            service.updateContact(item.walletAddress, item.getAlias(), item.isFavorite, error)
+                            if (error.code != WalletError.NoError.code) {
+                                logger.e("Error updating contact: ${error.code}, ${error.code}")
+                            }
                         }
                     }
                 }
             }
         }
 
-        fun getContactForTx(tx: Tx): ContactDto = getContactByAdress(tx.tariContact.walletAddress)
+        fun getContactForTx(tx: Tx): ContactDto = getContactByAddress(tx.tariContact.walletAddress)
 
-        fun getContactByAdress(address: TariWalletAddress): ContactDto =
+        fun getContactByAddress(address: TariWalletAddress): ContactDto =
             this@ContactsRepository.publishSubject.value!!.firstOrNull { it.getFFIDto()?.walletAddress == address } ?: ContactDto(
                 FFIContactDto(
                     address

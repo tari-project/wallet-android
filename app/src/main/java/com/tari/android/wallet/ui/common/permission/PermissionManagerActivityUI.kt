@@ -36,6 +36,7 @@ class PermissionManagerActivityUI(val activity: CommonActivity<*, *>) {
                 logger.d("permission granted: $permission")
             } else {
                 launcher.launch(permission)
+                logger.d("permission not granted: $permission")
 
                 if (shouldShowRequestPermissionRationale(permission)) {
                     launcher.launch(permission)

@@ -119,7 +119,9 @@ class WalletInfoFragment : CommonFragment<FragmentWalletInfoBinding, WalletInfoV
 
         ui.shareTypeFirstRow.addView(ShareOptionView(requireContext()).apply { setArgs(qrCodeArgs, ShareOptionView.Size.Big) })
         ui.shareTypeFirstRow.addView(ShareOptionView(requireContext()).apply { setArgs(linkArgs, ShareOptionView.Size.Big) })
-        ui.shareTypeSecondRow.addView(ShareOptionView(requireContext()).apply { setArgs(nfcArgs, ShareOptionView.Size.Big) })
+        if (viewModel.nfcAdapter.isNFCSupported()) {
+            ui.shareTypeSecondRow.addView(ShareOptionView(requireContext()).apply { setArgs(nfcArgs, ShareOptionView.Size.Big) })
+        }
         ui.shareTypeSecondRow.addView(ShareOptionView(requireContext()).apply { setArgs(bleArgs, ShareOptionView.Size.Big) })
 
         ui.toolbar.setRightArgs(TariToolbarActionArg(title = string(R.string.tx_detail_edit)) { viewModel.showEditAliasDialog() })

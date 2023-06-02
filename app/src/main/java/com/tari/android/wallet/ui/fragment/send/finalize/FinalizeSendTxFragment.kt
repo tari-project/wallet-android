@@ -206,10 +206,9 @@ class FinalizeSendTxFragment : CommonFragment<FragmentFinalizeSendTxBinding, Fin
 
                     viewModel.txFailureReason.value?.let {
                        viewModel.tariNavigator.onSendTxFailure(
-                            true,
-                            viewModel.transactionData,
-                            it
-                        )
+                           false,
+                           it
+                       )
                     }
                 }
             })
@@ -241,8 +240,7 @@ class FinalizeSendTxFragment : CommonFragment<FragmentFinalizeSendTxBinding, Fin
                     viewModel.sentTxId.value?.let {
                         viewModel.tariNavigator.onSendTxSuccessful(
                             true,
-                            it,
-                            viewModel.transactionData
+                            it
                         )
                     }
                 }
