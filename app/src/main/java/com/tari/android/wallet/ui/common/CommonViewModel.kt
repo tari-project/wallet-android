@@ -20,6 +20,7 @@ import com.tari.android.wallet.service.connection.ServiceConnectionStatus
 import com.tari.android.wallet.service.connection.TariWalletServiceConnection
 import com.tari.android.wallet.ui.common.domain.PaletteManager
 import com.tari.android.wallet.ui.common.domain.ResourceManager
+import com.tari.android.wallet.ui.common.permission.PermissionManager
 import com.tari.android.wallet.ui.component.tari.toast.TariToastArgs
 import com.tari.android.wallet.ui.dialog.error.WalletErrorArgs
 import com.tari.android.wallet.ui.dialog.inProgress.ProgressDialogArgs
@@ -48,6 +49,9 @@ open class CommonViewModel : ViewModel() {
     val serviceConnection: TariWalletServiceConnection = TariWalletServiceConnection()
     val walletService: TariWalletService
         get() = serviceConnection.currentState.service!!
+
+    @Inject
+    lateinit var permissionManager: PermissionManager
 
     @Inject
     lateinit var resourceManager: ResourceManager
@@ -81,8 +85,7 @@ open class CommonViewModel : ViewModel() {
     protected val _copyToClipboard = SingleLiveEvent<ClipboardArgs>()
     val copyToClipboard: LiveData<ClipboardArgs> = _copyToClipboard
 
-    protected val _modularDialog = SingleLiveEvent<ModularDialogArgs>()
-    val modularDialog: LiveData<ModularDialogArgs> = _modularDialog
+    val modularDialog = SingleLiveEvent<ModularDialogArgs>()
 
     protected val _inputDialog = SingleLiveEvent<ModularDialogArgs>()
     val inputDialog: LiveData<ModularDialogArgs> = _inputDialog
@@ -110,7 +113,7 @@ open class CommonViewModel : ViewModel() {
             .subscribe({
                 val exception = (it as WalletState.Failed).exception
                 val errorArgs = WalletErrorArgs(resourceManager, exception).getErrorArgs().getModular(resourceManager, true)
-                _modularDialog.postValue(errorArgs)
+                modularDialog.postValue(errorArgs)
             }, {
                 logger.i(it.toString())
                 logger.i("on showing error dialog from wallet")
@@ -147,7 +150,7 @@ open class CommonViewModel : ViewModel() {
                 ButtonModule(resourceManager.getString(R.string.common_close), ButtonStyle.Close)
             )
         )
-        _modularDialog.postValue(modularArgs)
+        modularDialog.postValue(modularArgs)
     }
 
     fun doOnBackground(action: suspend CoroutineScope.() -> Unit): Job = viewModelScope.launch { action() }

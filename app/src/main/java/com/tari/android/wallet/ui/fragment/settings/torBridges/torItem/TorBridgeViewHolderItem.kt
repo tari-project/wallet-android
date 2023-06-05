@@ -12,4 +12,6 @@ sealed class TorBridgeViewHolderItem(val title: String, var isSelected: Boolean 
     class Bridge(val bridgeConfiguration: TorBridgeConfiguration, isSelected: Boolean) : TorBridgeViewHolderItem(bridgeConfiguration.toString(), isSelected)
 
     class CustomBridges(resourceManager: ResourceManager) : TorBridgeViewHolderItem(resourceManager.getString(R.string.tor_bridges_custom_bridges))
+
+    override val viewHolderUUID: String = title
 }

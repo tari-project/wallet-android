@@ -17,9 +17,9 @@ class YatSharedRepository @Inject constructor(sharedPreferences: SharedPreferenc
         const val yatKeyDisconnected = "tari_wallet_yat_disconnected_string"
     }
 
-    var connectedYat: String? by SharedPrefStringDelegate(sharedPreferences, formatKey(Key.yatKey))
+    var connectedYat: String? by SharedPrefStringDelegate(sharedPreferences, this, formatKey(Key.yatKey))
 
-    var yatWasDisconnected: Boolean by SharedPrefBooleanDelegate(sharedPreferences, formatKey(Key.yatKeyDisconnected), false)
+    var yatWasDisconnected: Boolean by SharedPrefBooleanDelegate(sharedPreferences, this, formatKey(Key.yatKeyDisconnected), false)
 
     fun saveYat(newYat: String?) {
         connectedYat = newYat

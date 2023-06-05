@@ -31,6 +31,6 @@ class WriteDownSeedPhraseViewModel : CommonViewModel() {
             resourceManager.getString(R.string.common_error_title),
             resourceManager.getString(R.string.back_up_seed_phrase_error)
         )
-        _modularDialog.postValue(args.getModular(resourceManager))
+        modularDialog.postValue(args.getModular(resourceManager))
     }
 }

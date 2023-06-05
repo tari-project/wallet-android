@@ -51,10 +51,9 @@ import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
 import com.tari.android.wallet.data.sharedPrefs.tariSettings.TariSettingsSharedRepository
 import com.tari.android.wallet.databinding.ActivityHomeBinding
 import com.tari.android.wallet.di.DiContainer.appComponent
-import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.extension.applyFontStyle
+import com.tari.android.wallet.extension.observe
 import com.tari.android.wallet.model.TxId
-import com.tari.android.wallet.network.NetworkConnectionState
 import com.tari.android.wallet.service.TariWalletService
 import com.tari.android.wallet.service.connection.ServiceConnectionStatus
 import com.tari.android.wallet.service.service.WalletServiceLauncher
@@ -70,7 +69,6 @@ import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonStyle
 import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
 import com.tari.android.wallet.ui.extension.parcelable
 import com.tari.android.wallet.ui.extension.setVisible
-import com.tari.android.wallet.ui.extension.showInternetConnectionErrorDialog
 import com.tari.android.wallet.ui.extension.string
 import com.tari.android.wallet.ui.fragment.contact_book.root.ContactBookFragment
 import com.tari.android.wallet.ui.fragment.home.navigation.TariNavigator.Companion.INDEX_CONTACT_BOOK
@@ -121,6 +119,16 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>() {
 
         val viewModel: HomeViewModel by viewModels()
         bindViewModel(viewModel)
+        subscribeToCommon(deeplinkViewModel)
+
+        subscribeToCommon(viewModel.shareViewModel)
+        subscribeToCommon(viewModel.shareViewModel.tariBluetoothServer)
+        subscribeToCommon(viewModel.shareViewModel.tariBluetoothClient)
+        subscribeToCommon(viewModel.shareViewModel.deeplinkViewModel)
+        viewModel.nfcAdapter.context = this
+
+        viewModel.shareViewModel.tariBluetoothServer.init(this)
+        viewModel.shareViewModel.tariBluetoothClient.init(this)
 
         setContainerId(R.id.nav_container)
 
@@ -148,6 +156,7 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>() {
             enableNavigationView(index)
         }
         setupUi()
+        subscribeUI()
         lifecycleScope.launch(Dispatchers.IO) {
             delay(3000)
             launch(Dispatchers.Main) {
@@ -156,8 +165,40 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>() {
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+
+        viewModel.shareViewModel.tariBluetoothServer.init(this)
+
+        viewModel.nfcAdapter.enableForegroundDispatch(this)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        viewModel.nfcAdapter.disableForegroundDispatch(this)
+    }
+
+    private fun subscribeUI() = with(viewModel) {
+        observe(shareViewModel.shareText) { shareViaText(it) }
+
+        observe(shareViewModel.launchPermissionCheck) {
+            permissionManagerUI.runWithPermissions(*it.toTypedArray(), openSettings = true) {
+                viewModel.shareViewModel.startBLESharing()
+            }
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        viewModel.shareViewModel.tariBluetoothServer.handleActivityResult(requestCode, resultCode, data)
+        viewModel.shareViewModel.tariBluetoothClient.handleActivityResult(requestCode, resultCode, data)
+    }
+
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
+
+        viewModel.nfcAdapter.onNewIntent(intent)
+
         // onNewIntent might get called before onCreate, so we anticipate that here
         checkScreensDeeplink(intent)
         if (viewModel.serviceConnection.currentState.status == ServiceConnectionStatus.CONNECTED) {
@@ -189,23 +230,11 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>() {
         val postDelay = if (!isVisible) 0 else Constants.UI.shortDurationMs
         ui.bottomNavigationView.postDelayed({
             ui.bottomNavigationView.setVisible(isVisible)
-            ui.sendTariCtaView.setVisible(isVisible)
         }, postDelay)
     }
 
     private fun setupUi() {
         setupBottomNavigation()
-        setupCTAs()
-    }
-
-    private fun setupCTAs() {
-        ui.sendTariCtaView.setOnClickListener {
-            if (EventBus.networkConnectionState.publishSubject.value != NetworkConnectionState.CONNECTED) {
-                showInternetConnectionErrorDialog(this)
-            } else {
-                viewModel.tariNavigator.sendToUser(null)
-            }
-        }
     }
 
     private fun setupBottomNavigation() {
@@ -318,6 +347,8 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>() {
             (deepLink as? DeepLink.Send)?.let { viewModel.tariNavigator.sendTariToUser(service, it) }
 
             (deepLink as? DeepLink.AddBaseNode)?.let { deeplinkViewModel.executeAction(this, it) }
+
+            (deepLink as? DeepLink.Contacts)?.let { deeplinkViewModel.addContacts(it.contacts) }
         }
     }
 

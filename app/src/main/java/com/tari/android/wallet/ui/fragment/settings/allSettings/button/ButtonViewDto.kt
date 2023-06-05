@@ -8,4 +8,6 @@ class ButtonViewDto(
     val iconId: Int? = null,
     val style: ButtonStyle = ButtonStyle.Normal,
     val action: () -> Unit
-) : CommonViewHolderItem()
+) : CommonViewHolderItem() {
+    override val viewHolderUUID: String = title
+}

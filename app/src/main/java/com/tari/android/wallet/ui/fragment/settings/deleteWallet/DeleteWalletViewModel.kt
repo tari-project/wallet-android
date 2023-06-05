@@ -35,6 +35,6 @@ class DeleteWalletViewModel : CommonViewModel() {
                 ButtonModule(resourceManager.getString(R.string.common_cancel), ButtonStyle.Close)
             )
         )
-        _modularDialog.postValue(args)
+        modularDialog.postValue(args)
     }
 }

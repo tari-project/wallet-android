@@ -17,9 +17,12 @@ import com.tari.android.wallet.model.WalletError
 import com.tari.android.wallet.service.TariWalletService
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.dialog.error.ErrorDialogArgs
+import com.tari.android.wallet.ui.dialog.modular.DialogArgs
+import com.tari.android.wallet.ui.dialog.modular.ModularDialogArgs
+import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
+import com.tari.android.wallet.ui.dialog.modular.modules.input.InputModule
 import com.tari.android.wallet.ui.fragment.contact_book.data.ContactsRepository
 import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.ContactDto
-import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
 import io.reactivex.BackpressureStrategy
 import io.reactivex.subjects.BehaviorSubject
 import javax.inject.Inject
@@ -80,16 +83,11 @@ class TxDetailsViewModel : CommonViewModel() {
                 resourceManager.getString(R.string.tx_detail_cancellation_error_title),
                 resourceManager.getString(R.string.tx_detail_cancellation_error_description)
             )
-            _modularDialog.postValue(errorDialogArgs.getModular(resourceManager))
+            modularDialog.postValue(errorDialogArgs.getModular(resourceManager))
         }
     }
 
-    fun addOrEditContact() {
-        val tx = this.tx.value ?: return
-        val contact = contactsRepository.ffiBridge.getContactForTx(tx)
-        navigation.postValue(Navigation.ContactBookNavigation.ToContactDetails(contact))
-
-    }
+    fun addOrEditContact() = showEditNameInputs()
 
     fun openInBlockExplorer() {
         _openLink.postValue(_explorerLink.value.orEmpty())
@@ -143,7 +141,7 @@ class TxDetailsViewModel : CommonViewModel() {
                 resourceManager.getString(R.string.tx_details_error_tx_not_found_title),
                 resourceManager.getString(R.string.tx_details_error_tx_not_found_desc)
             ) { _backPressed.call() }
-            _modularDialog.postValue(errorArgs.getModular(resourceManager))
+            modularDialog.postValue(errorArgs.getModular(resourceManager))
         } else {
             foundTx.let { _txObject.onNext(it) }
             generateExplorerLink(foundTx)
@@ -166,5 +164,40 @@ class TxDetailsViewModel : CommonViewModel() {
 
     private fun fetchRequiredConfirmationCount() {
         requiredConfirmationCount = walletService.getWithError { error, wallet -> wallet.getRequiredConfirmationCount(error) }
+    }
+
+    fun showEditNameInputs() {
+        val contact = contact.value!!
+
+        val name = contact.contact.firstName
+        val surname = contact.contact.surname
+        val phoneDto = contact.getPhoneDto()
+
+        var saveAction: () -> Boolean = { false }
+
+        val nameModule = InputModule(name, resourceManager.getString(R.string.contact_book_add_contact_first_name_hint), true, false) { saveAction.invoke() }
+        val surnameModule =
+            InputModule(surname, resourceManager.getString(R.string.contact_book_add_contact_surname_hint), false, phoneDto == null) { saveAction.invoke() }
+
+        val headModule = HeadModule(
+            resourceManager.getString(R.string.contact_book_details_edit_title),
+            rightButtonTitle = resourceManager.getString(R.string.contact_book_add_contact_done_button)
+        ) { saveAction.invoke() }
+
+        val moduleList = mutableListOf(headModule, nameModule, surnameModule)
+
+        saveAction = {
+            saveDetails(nameModule.value, surnameModule.value)
+            true
+        }
+
+        val args = ModularDialogArgs(DialogArgs(), moduleList)
+        _inputDialog.postValue(args)
+    }
+
+    private fun saveDetails(name: String, surname: String = "") {
+        val contact = contact.value!!
+        this.contact.value = contactsRepository.updateContactInfo(contact, name, surname, contact.getYatDto()?.yat.orEmpty())
+        _dismissDialog.postValue(Unit)
     }
 }

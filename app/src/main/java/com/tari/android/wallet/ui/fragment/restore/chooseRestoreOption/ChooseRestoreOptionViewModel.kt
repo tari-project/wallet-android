@@ -152,7 +152,7 @@ class ChooseRestoreOptionViewModel : CommonViewModel() {
                 if (cause == WalletError.DatabaseDataError) {
                     showRestoreFailedDialog(resourceManager.getString(R.string.restore_wallet_error_file_not_supported))
                 } else if (cause != WalletError.NoError) {
-                    _modularDialog.postValue(WalletErrorArgs(resourceManager, cause).getErrorArgs().getModular(resourceManager))
+                    modularDialog.postValue(WalletErrorArgs(resourceManager, cause).getErrorArgs().getModular(resourceManager))
                 } else {
                     showRestoreFailedDialog(exception.cause?.message)
                 }
@@ -179,7 +179,7 @@ class ChooseRestoreOptionViewModel : CommonViewModel() {
             resourceManager.getString(R.string.restore_wallet_error_title),
             resourceManager.getString(R.string.restore_wallet_error_file_not_found),
             onClose = { _backPressed.call() })
-        _modularDialog.postValue(args.getModular(resourceManager))
+        modularDialog.postValue(args.getModular(resourceManager))
     }
 
     private fun showRestoreFailedDialog(message: String? = null) {
@@ -187,7 +187,7 @@ class ChooseRestoreOptionViewModel : CommonViewModel() {
             resourceManager.getString(R.string.restore_wallet_error_title),
             resourceManager.getString(R.string.restore_wallet_error_desc, message.orEmpty())
         )
-        _modularDialog.postValue(args.getModular(resourceManager))
+        modularDialog.postValue(args.getModular(resourceManager))
     }
 
     private fun showAuthFailedDialog() {
@@ -195,6 +195,6 @@ class ChooseRestoreOptionViewModel : CommonViewModel() {
             resourceManager.getString(R.string.restore_wallet_error_title),
             resourceManager.getString(R.string.back_up_wallet_storage_setup_error_desc)
         )
-        _modularDialog.postValue(args.getModular(resourceManager))
+        modularDialog.postValue(args.getModular(resourceManager))
     }
 }

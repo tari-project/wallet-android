@@ -45,7 +45,55 @@ sealed class DeepLink {
     open fun getParams(): Map<String, String> = emptyMap()
     open fun getCommand(): String = ""
 
-    class Send(val walletAddressHex: String = "", val amount: MicroTari? = null, val note: String = "") : DeepLink() {
+
+    // tari://esmeralda/contacts?list[0][alias]=Name&list[0][hex]=hex&list[1][alias]=Name&list[1][hex]=hex
+    class Contacts(val contacts: List<DeeplinkContact>) : DeepLink() {
+
+        constructor(params: Map<String, String>) : this(
+            params.filterKeys { it.startsWith("list[") }
+                .map { FormatExtractor(it.key, it.value) }
+                .groupBy { it.index }
+                .map {
+                    val alias = it.value.firstOrNull { it.name == aliasKey }?.value.orEmpty()
+                    val hex = it.value.firstOrNull { it.name == hexKey }?.value.orEmpty()
+                    DeeplinkContact(alias, hex)
+                }
+        )
+
+        override fun getParams(): Map<String, String> = hashMapOf<String, String>().apply {
+            contacts.forEachIndexed { index, contact ->
+                put("list[$index][$aliasKey]", contact.alias)
+                put("list[$index][$hexKey]", contact.hex)
+            }
+        }
+
+        override fun getCommand(): String = contactsCommand
+
+        companion object {
+            const val contactsCommand = "contacts"
+            const val aliasKey = "alias"
+            const val hexKey = "hex"
+        }
+
+        class DeeplinkContact(val alias: String, val hex: String)
+
+        class FormatExtractor(val key: String, val value: String = "") {
+            val index: Int
+            val name: String
+
+            init {
+                key.replace("list[", "")
+                    .replace("]", "")
+                    .split("[")
+                    .let {
+                        index = it[0].toInt()
+                        name = it[1].split("=")[0]
+                    }
+            }
+        }
+    }
+
+    class Send(val walletAddress: String = "", val amount: MicroTari? = null, val note: String = "") : DeepLink() {
 
         constructor(params: Map<String, String>) : this(
             params[publicKeyKey].orEmpty(),
@@ -54,7 +102,7 @@ sealed class DeepLink {
         )
 
         override fun getParams(): Map<String, String> = hashMapOf<String, String>().apply {
-            put(publicKeyKey, walletAddressHex)
+            put(publicKeyKey, walletAddress)
             put(amountKey, amount?.formattedValue.orEmpty())
             put(noteKey, note)
         }
@@ -64,6 +112,7 @@ sealed class DeepLink {
         companion object {
             const val sendCommand = "transactions/send"
             const val publicKeyKey = "publicKey"
+            const val walletAddressKey = "walletAddressKey"
             const val amountKey = "amount"
             const val noteKey = "note"
         }
@@ -92,12 +141,11 @@ sealed class DeepLink {
 
     companion object {
 
-        fun getByCommand(command: String, params: Map<String, String>): DeepLink? {
-            return when (command) {
-                Send.sendCommand -> Send(params)
-                AddBaseNode.addNodeCommand -> AddBaseNode(params)
-                else -> null
-            }
+        fun getByCommand(command: String, params: Map<String, String>): DeepLink? = when (command) {
+            Contacts.contactsCommand -> Contacts(params)
+            Send.sendCommand -> Send(params)
+            AddBaseNode.addNodeCommand -> AddBaseNode(params)
+            else -> null
         }
     }
 }

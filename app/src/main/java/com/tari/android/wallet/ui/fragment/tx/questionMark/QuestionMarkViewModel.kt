@@ -13,6 +13,6 @@ class QuestionMarkViewModel : CommonViewModel() {
             resourceManager.getString(R.string.home_balance_info_help_button),
             onConfirm = { _openLink.postValue(resourceManager.getString(R.string.tari_lab_university_url)) }
         )
-        _modularDialog.postValue(confirmDialogArgs.getModular(resourceManager))
+        modularDialog.postValue(confirmDialogArgs.getModular(resourceManager))
     }
 }

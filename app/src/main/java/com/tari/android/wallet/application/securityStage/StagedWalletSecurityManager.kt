@@ -197,7 +197,7 @@ class StagedWalletSecurityManager : CommonViewModel() {
                 ButtonModule(resourceManager.getString(R.string.staged_wallet_security_buttons_remind_me_later), ButtonStyle.Close)
             )
         )
-        _modularDialog.postValue(args)
+        modularDialog.postValue(args)
     }
 
     private fun showBackupInfo(stage: BackupOnboardingArgs) {
@@ -205,7 +205,7 @@ class StagedWalletSecurityManager : CommonViewModel() {
             BackupOnboardingFlowItemModule(stage),
             SpaceModule(20)
         ))
-        _modularDialog.postValue(args)
+        modularDialog.postValue(args)
     }
 
     companion object {

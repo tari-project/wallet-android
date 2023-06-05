@@ -240,9 +240,21 @@ fun View.getBottomMargin() = (layoutParams as ViewGroup.MarginLayoutParams).bott
 fun View.getStartMargin() = (layoutParams as ViewGroup.MarginLayoutParams).marginStart
 
 fun View.setStartMargin(margin: Int) {
+    withMargin {
+        it.marginStart = margin
+    }
+}
+
+fun View.setEndMargin(margin: Int) {
+    withMargin {
+        it.marginEnd = margin
+    }
+}
+
+fun View.withMargin(action: (ViewGroup.MarginLayoutParams) -> Unit) {
     if (layoutParams is ViewGroup.MarginLayoutParams) {
         val layoutParams = this.layoutParams as ViewGroup.MarginLayoutParams
-        layoutParams.marginStart = margin
+        action(layoutParams)
         this.layoutParams = layoutParams
     }
 }

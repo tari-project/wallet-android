@@ -106,6 +106,6 @@ class EnterRestorationPasswordViewModel : CommonViewModel() {
             cancelable = false,
             canceledOnTouchOutside = false,
             onClose = { _backPressed.call() })
-        _modularDialog.postValue(args.getModular(resourceManager))
+        modularDialog.postValue(args.getModular(resourceManager))
     }
 }

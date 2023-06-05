@@ -37,14 +37,14 @@ class YatAdapter(
     }
 
     fun searchTariYats(query: String): PaymentAddressResponse? =
-        kotlin.runCatching { YatLibApi.emojiIDApi.lookupEmojiIDPayment(query, "0x0101") }.getOrNull()
+        kotlin.runCatching { YatLibApi.emojiIDApi.lookupEmojiIDPayment(query, "0x0103") }.getOrNull()
 
     fun searchAnyYats(query: String): PaymentAddressResponse? =
         kotlin.runCatching { YatLibApi.emojiIDApi.lookupEmojiIDPayment(query, null) }.getOrNull()
 
     fun openOnboarding(context: Context) {
         val address = commonRepository.publicKeyHexString.orEmpty()
-        YatIntegration.showOnboarding(context, listOf(YatRecord(YatRecordType.TARI_PUBKEY, data = address)))
+        YatIntegration.showOnboarding(context, listOf(YatRecord(YatRecordType.XTR_ADDRESS, data = address)))
     }
 
     fun showOutcomingFinalizeActivity(activity: Activity, transactionData: TransactionData) {

@@ -11,13 +11,12 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <com.tari.android.wallet.ui.component.tari.TariToolbar
+        <com.tari.android.wallet.ui.component.tari.toolbar.TariToolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:text="@string/store_title"
-            app:isRoot="true"
-            app:rightIcon="@drawable/vector_store_share"/>
+            app:isRoot="true"/>
 
         <FrameLayout
             android:layout_width="match_parent"

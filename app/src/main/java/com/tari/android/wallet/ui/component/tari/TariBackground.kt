@@ -4,8 +4,11 @@ import android.content.Context
 import android.graphics.Outline
 import android.graphics.drawable.ShapeDrawable
 import android.graphics.drawable.shapes.RoundRectShape
+import android.os.Build
 import android.util.AttributeSet
-import android.view.*
+import android.view.View
+import android.view.ViewGroup
+import android.view.ViewOutlineProvider
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.tari.android.wallet.ui.common.domain.PaletteManager
 
@@ -37,11 +40,13 @@ abstract class TariBackground(context: Context, attrs: AttributeSet) : Constrain
     private fun updateBack() {
         when {
             backElevation != 0.0F -> {
-                val shadowColor = PaletteManager().getShadowBox(context)
-                outlineSpotShadowColor = shadowColor
-                this.outlineProvider = object : ViewOutlineProvider() {
-                    override fun getOutline(view: View?, outline: Outline?) {
-                        outline?.setRoundRect(0, 0, view!!.width, view.height, radius)
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                    val shadowColor = PaletteManager().getShadowBox(context)
+                    outlineSpotShadowColor = shadowColor
+                    this.outlineProvider = object : ViewOutlineProvider() {
+                        override fun getOutline(view: View?, outline: Outline?) {
+                            outline?.setRoundRect(0, 0, view!!.width, view.height, radius)
+                        }
                     }
                 }
                 setWithRadius(radius, backColor)

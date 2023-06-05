@@ -113,7 +113,7 @@ class UtxosListViewModel : CommonViewModel() {
             DialogArgs(),
             modules
         )
-        _modularDialog.postValue(modularDialogArgs)
+        modularDialog.postValue(modularDialogArgs)
     }
 
     fun join() {
@@ -157,7 +157,7 @@ class UtxosListViewModel : CommonViewModel() {
                 ButtonModule(resourceManager.getString(R.string.common_cancel), ButtonStyle.Close)
             )
         )
-        _modularDialog.postValue(modularDialogArgs)
+        modularDialog.postValue(modularDialogArgs)
     }
 
     private fun loadUtxosFromFFI() {
@@ -258,7 +258,7 @@ class UtxosListViewModel : CommonViewModel() {
                 ButtonModule(resourceManager.getString(R.string.common_cancel), ButtonStyle.Close)
             )
         )
-        _modularDialog.postValue(modularArgs)
+        modularDialog.postValue(modularArgs)
     }
 
     private fun showDetailedDialog(utxoItem: UtxosViewHolderItem) {
@@ -291,7 +291,7 @@ class UtxosListViewModel : CommonViewModel() {
         }
         modules.add(ButtonModule(resourceManager.getString(R.string.common_cancel), ButtonStyle.Close))
         val modularArgs = ModularDialogArgs(DialogArgs(), modules)
-        _modularDialog.postValue(modularArgs)
+        modularDialog.postValue(modularArgs)
     }
 
     private fun showSuccessSplitDialog() = showSuccessDialog(R.string.utxos_success_split_description)
@@ -309,6 +309,6 @@ class UtxosListViewModel : CommonViewModel() {
                 ButtonModule(resourceManager.getString(R.string.common_close), ButtonStyle.Close)
             )
         )
-        _modularDialog.postValue(modularArgs)
+        modularDialog.postValue(modularArgs)
     }
 }

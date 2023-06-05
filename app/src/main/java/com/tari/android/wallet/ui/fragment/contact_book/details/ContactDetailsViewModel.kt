@@ -109,6 +109,22 @@ class ContactDetailsViewModel : CommonViewModel() {
             }
         }
 
+        ContactAction.Link.let {
+            if (availableActions.contains(it)) {
+                newList += (ButtonViewDto(resourceManager.getString(it.title)) {
+                    navigation.postValue(Navigation.ContactBookNavigation.ToLinkContact(contact))
+                })
+                newList += DividerViewHolderItem()
+            }
+        }
+
+        if (contact.getFFIDto() != null) {
+            newList += ButtonViewDto(resourceManager.getString(R.string.contact_details_transaction_history)) {
+                navigation.postValue(Navigation.ContactBookNavigation.ToContactTransactionHistory(contact))
+            }
+            newList += DividerViewHolderItem()
+        }
+
         ContactAction.ToFavorite.let {
             if (availableActions.contains(it)) {
                 newList += ButtonViewDto(resourceManager.getString(it.title), iconId = R.drawable.tari_empty_drawable) {
@@ -123,15 +139,6 @@ class ContactDetailsViewModel : CommonViewModel() {
                 newList += ButtonViewDto(resourceManager.getString(it.title), iconId = R.drawable.tari_empty_drawable) {
                     this.contact.value = contactsRepository.toggleFavorite(contact)
                 }
-                newList += DividerViewHolderItem()
-            }
-        }
-
-        ContactAction.Link.let {
-            if (availableActions.contains(it)) {
-                newList += (ButtonViewDto(resourceManager.getString(it.title)) {
-                    navigation.postValue(Navigation.ContactBookNavigation.ToLinkContact(contact))
-                })
                 newList += DividerViewHolderItem()
             }
         }
@@ -271,7 +278,7 @@ class ContactDetailsViewModel : CommonViewModel() {
             },
             ButtonModule(resourceManager.getString(common_cancel), Close)
         )
-        _modularDialog.postValue(ModularDialogArgs(DialogArgs(), modules))
+        modularDialog.postValue(ModularDialogArgs(DialogArgs(), modules))
     }
 
     private fun showUnlinkSuccessDialog() {
@@ -289,7 +296,7 @@ class ContactDetailsViewModel : CommonViewModel() {
             BodyModule(null, SpannableString(secondLineHtml)),
             ButtonModule(resourceManager.getString(common_close), Close)
         )
-        _modularDialog.postValue(ModularDialogArgs(DialogArgs {
+        modularDialog.postValue(ModularDialogArgs(DialogArgs {
             navigation.value = Navigation.ContactBookNavigation.BackToContactBook()
         }, modules))
     }
@@ -305,6 +312,6 @@ class ContactDetailsViewModel : CommonViewModel() {
             },
             ButtonModule(resourceManager.getString(common_close), Close)
         )
-        _modularDialog.postValue(ModularDialogArgs(DialogArgs(), modules))
+        modularDialog.postValue(ModularDialogArgs(DialogArgs(), modules))
     }
 }

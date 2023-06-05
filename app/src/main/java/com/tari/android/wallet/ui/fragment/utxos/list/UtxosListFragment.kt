@@ -67,7 +67,7 @@ class UtxosListFragment : CommonFragment<FragmentUtxosListBinding, UtxosListView
     }
 
     private fun setupUI() {
-        listTypeSwitchController = ListTypeSwitchController(ui.toolbarContainer.ui.toolbarRightIcon)
+        listTypeSwitchController = ListTypeSwitchController(ui.tariToolbar)
         listTypeSwitchController.toggleCallback = { viewModel.setTypeList(it) }
         listTypeSwitchController.set(ListType.Tile)
 

@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <com.tari.android.wallet.ui.component.tari.TariToolbar
+    <com.tari.android.wallet.ui.component.tari.toolbar.TariToolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -14,7 +14,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:rightIcon="@drawable/vector_add_contact"
         app:text="@string/contact_book_contacts_book_title" />
 
     <androidx.appcompat.widget.LinearLayoutCompat
@@ -53,32 +52,6 @@
 
     </androidx.appcompat.widget.LinearLayoutCompat>
 
-    <com.tari.android.wallet.ui.component.tari.TariSecondaryBackground
-        android:id="@+id/search_bar_container"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingHorizontal="25dp"
-        android:paddingVertical="24dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/test_buttons">
-
-        <com.tari.android.wallet.ui.component.tari.TariPrimaryBackground
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:cornerRadius="6dp">
-
-            <androidx.appcompat.widget.SearchView
-                android:id="@+id/search_view"
-                android:layout_width="match_parent"
-                android:layout_height="46dp"
-                android:hint="@string/contact_book_search_hint"
-                app:defaultQueryHint="@string/contact_book_search_hint" />
-
-        </com.tari.android.wallet.ui.component.tari.TariPrimaryBackground>
-
-    </com.tari.android.wallet.ui.component.tari.TariSecondaryBackground>
-
     <androidx.appcompat.widget.LinearLayoutCompat
         android:id="@+id/main_body"
         android:layout_width="match_parent"
@@ -114,5 +87,104 @@
             android:layout_height="match_parent" />
 
     </androidx.appcompat.widget.LinearLayoutCompat>
+
+    <include
+        android:id="@+id/clipboard_wallet"
+        layout="@layout/view_clipboard_wallet"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <com.tari.android.wallet.ui.component.tari.TariSecondaryBackground
+        android:id="@+id/search_bar_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:animateLayoutChanges="true"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/test_buttons">
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/send_button"
+            android:layout_width="38dp"
+            android:layout_height="wrap_content"
+            android:paddingStart="10dp"
+            android:src="@drawable/vector_icon_send_tari"
+            android:tint="?attr/palette_icons_default"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="@+id/search_view_container"
+            app:layout_constraintEnd_toStartOf="@+id/space"
+            app:layout_constraintTop_toTopOf="@+id/search_view_container" />
+
+        <View
+            android:id="@+id/dimmer_view"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:alpha="0.6"
+            android:background="@color/black"
+            android:clickable="true"
+            android:focusable="true"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:id="@+id/share_types_container"
+            android:layout_width="match_parent"
+            android:layout_height="80dp"
+            android:layout_marginHorizontal="-25dp"
+            android:layout_marginTop="12dp"
+            android:gravity="center_horizontal"
+            android:weightSum="4"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <com.tari.android.wallet.ui.fragment.contact_book.root.share.ShareOptionView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@color/palette_dark_system_blue" />
+
+        </androidx.appcompat.widget.LinearLayoutCompat>
+
+        <com.tari.android.wallet.ui.component.tari.TariPrimaryBackground
+            android:id="@+id/search_view_container"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="20dp"
+            app:cornerRadius="6dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/search_bar_barrier"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/share_types_container">
+
+            <androidx.appcompat.widget.SearchView
+                android:id="@+id/search_view"
+                android:layout_width="match_parent"
+                android:layout_height="46dp"
+                android:hint="@string/contact_book_search_hint"
+                app:defaultQueryHint="@string/contact_book_search_hint"
+                app:queryBackground="@null" />
+
+        </com.tari.android.wallet.ui.component.tari.TariPrimaryBackground>
+
+        <androidx.constraintlayout.widget.Barrier
+            android:id="@+id/search_bar_barrier"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:barrierDirection="start"
+            app:constraint_referenced_ids="space, send_button" />
+
+        <View
+            android:id="@+id/space"
+            android:layout_width="20dp"
+            android:layout_height="1dp"
+            app:layout_constraintBottom_toBottomOf="@+id/search_bar_container"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+    </com.tari.android.wallet.ui.component.tari.TariSecondaryBackground>
 
 </com.tari.android.wallet.ui.component.tari.TariPrimaryBackground>
