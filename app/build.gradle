@@ -321,7 +321,7 @@ dependencies {
 
     implementation 'com.itextpdf:itext7-core:7.2.5'
 
-    implementation("org.apache.maven:maven-artifact:3.0.3")
+    implementation("org.apache.maven:maven-artifact:3.9.2")
 
     // debugImplementation because LeakCanary should only run in debug builds.
     debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.10'
