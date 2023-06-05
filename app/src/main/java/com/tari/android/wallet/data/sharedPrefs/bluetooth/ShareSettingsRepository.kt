@@ -30,28 +30,34 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.tari.android.wallet.ui.fragment.send.addRecepient.recipientList
+package com.tari.android.wallet.data.sharedPrefs.bluetooth
 
-import android.view.View
-import com.tari.android.wallet.databinding.ItemAddRecipientListHeaderBinding
-import com.tari.android.wallet.ui.common.recyclerView.CommonViewHolder
-import com.tari.android.wallet.ui.common.recyclerView.ViewHolderBuilder
+import android.content.SharedPreferences
+import com.tari.android.wallet.data.repository.CommonRepository
+import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefGsonDelegate
+import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
+import com.tari.android.wallet.data.sharedPrefs.network.formatKey
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class RecipientHeaderViewHolder(view: ItemAddRecipientListHeaderBinding) :
-    CommonViewHolder<RecipientHeaderItem, ItemAddRecipientListHeaderBinding>(view) {
+@Singleton
+class ShareSettingsRepository @Inject constructor(sharedPrefs: SharedPreferences, networkRepository: NetworkRepository) :
+    CommonRepository(networkRepository) {
 
-    override fun bind(item: RecipientHeaderItem) {
-        super.bind(item)
-
-        ui.separatorView.visibility = if (item.position == 0) View.GONE else View.VISIBLE
-        ui.titleTextView.text = item.title
+    private object Key {
+        const val bluetoothSettingsKey = "tari_bluetooth_server_settings"
     }
 
-    companion object {
-        fun getBuilder(): ViewHolderBuilder = ViewHolderBuilder(ItemAddRecipientListHeaderBinding::inflate, RecipientHeaderItem::class.java) {
-            RecipientHeaderViewHolder(it as ItemAddRecipientListHeaderBinding)
-        }
+    var bluetoothSettingsState: BluetoothServerState? by SharedPrefGsonDelegate(
+        sharedPrefs,
+        this,
+        formatKey(Key.bluetoothSettingsKey),
+        BluetoothServerState::class.java,
+        BluetoothServerState.ENABLED
+    )
+
+    fun clear() {
+        bluetoothSettingsState = null
     }
 }
-
 

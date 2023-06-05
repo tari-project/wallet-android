@@ -16,7 +16,7 @@
         <com.tari.android.wallet.ui.component.tari.TariSecondaryBackground
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_below="@+id/toolbar_container">
+            android:layout_below="@+id/tari_toolbar">
 
             <RelativeLayout
                 android:id="@+id/data_container"
@@ -286,11 +286,10 @@
 
         </com.tari.android.wallet.ui.component.tari.TariSecondaryBackground>
 
-        <com.tari.android.wallet.ui.component.tari.TariToolbar
-            android:id="@+id/toolbar_container"
+        <com.tari.android.wallet.ui.component.tari.toolbar.TariToolbar
+            android:id="@+id/tari_toolbar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:rightIcon="@drawable/vector_wallet_group_cells"
             app:text="@string/utxos_list_title" />
 
     </RelativeLayout>

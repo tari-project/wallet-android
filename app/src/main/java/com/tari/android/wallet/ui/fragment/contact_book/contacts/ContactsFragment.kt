@@ -44,7 +44,6 @@ import com.tari.android.wallet.extension.observe
 import com.tari.android.wallet.extension.observeOnLoad
 import com.tari.android.wallet.ui.common.CommonFragment
 import com.tari.android.wallet.ui.common.recyclerView.CommonAdapter
-import com.tari.android.wallet.ui.extension.PermissionExtensions.runWithPermission
 import com.tari.android.wallet.ui.fragment.contact_book.contacts.adapter.ContactListAdapter
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -71,26 +70,33 @@ open class ContactsFragment : CommonFragment<FragmentContactsBinding, ContactsVi
     fun search(text: String) = viewModel.search(text)
 
     private fun observeUI() = with(viewModel) {
-        observe(list) { recyclerViewAdapter.update(it) }
+        observe(list) {
+            ui.swipeRefreshLayout.isRefreshing = false
+            recyclerViewAdapter.update(it)
+        }
 
         observe(grantPermission) { grantPermission() }
 
         observeOnLoad(listUpdateTrigger)
         observeOnLoad(debouncedList)
+        observeOnLoad(selectionTrigger)
     }
 
     private fun setupUI() = with(ui) {
         setupRecyclerView()
+        swipeRefreshLayout.setOnRefreshListener { viewModel.refresh() }
+        swipeRefreshLayout.setColorSchemeColors(viewModel.paletteManager.getPurpleBrand(requireContext()))
     }
 
     private fun setupRecyclerView() {
+        ui.contactsListRecyclerView.setHasFixedSize(true)
         ui.contactsListRecyclerView.layoutManager = LinearLayoutManager(requireContext())
         recyclerViewAdapter.setClickListener(CommonAdapter.ItemClickListener { viewModel.processItemClick(it) })
         ui.contactsListRecyclerView.adapter = recyclerViewAdapter
     }
 
     private fun grantPermission() {
-        runWithPermission(android.Manifest.permission.READ_CONTACTS, true) {
+        permissionManagerUI.runWithPermission(android.Manifest.permission.READ_CONTACTS, true) {
             viewModel.viewModelScope.launch(Dispatchers.IO) {
                 viewModel.contactsRepository.contactPermission.postValue(true)
                 viewModel.contactsRepository.phoneBookRepositoryBridge.loadFromPhoneBook()

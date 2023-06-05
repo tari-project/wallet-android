@@ -3,6 +3,7 @@ package com.tari.android.wallet.ui.fragment.home.navigation
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.provider.ContactsContract
 import androidx.fragment.app.Fragment
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.deeplinks.DeepLink
@@ -33,6 +34,7 @@ import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.YatDto
 import com.tari.android.wallet.ui.fragment.contact_book.details.ContactDetailsFragment
 import com.tari.android.wallet.ui.fragment.contact_book.link.ContactLinkFragment
 import com.tari.android.wallet.ui.fragment.contact_book.root.ContactBookFragment
+import com.tari.android.wallet.ui.fragment.contact_book.transactionHistory.TransactionHistoryFragment
 import com.tari.android.wallet.ui.fragment.home.HomeActivity
 import com.tari.android.wallet.ui.fragment.home.navigation.Navigation.AllSettingsNavigation
 import com.tari.android.wallet.ui.fragment.home.navigation.Navigation.ContactBookNavigation
@@ -47,7 +49,7 @@ import com.tari.android.wallet.ui.fragment.send.addNote.AddNoteFragment
 import com.tari.android.wallet.ui.fragment.send.common.TransactionData
 import com.tari.android.wallet.ui.fragment.send.finalize.FinalizeSendTxFragment
 import com.tari.android.wallet.ui.fragment.send.finalize.TxFailureReason
-import com.tari.android.wallet.ui.fragment.send.makeTransaction.MakeTransactionFragment
+import com.tari.android.wallet.ui.fragment.send.requestTari.RequestTariFragment
 import com.tari.android.wallet.ui.fragment.settings.allSettings.about.TariAboutFragment
 import com.tari.android.wallet.ui.fragment.settings.backgroundService.BackgroundServiceSettingsFragment
 import com.tari.android.wallet.ui.fragment.settings.backup.backupOnboarding.BackupOnboardingFlowFragment
@@ -58,6 +60,7 @@ import com.tari.android.wallet.ui.fragment.settings.backup.verifySeedPhrase.Veri
 import com.tari.android.wallet.ui.fragment.settings.backup.writeDownSeedWords.WriteDownSeedPhraseFragment
 import com.tari.android.wallet.ui.fragment.settings.baseNodeConfig.addBaseNode.AddCustomBaseNodeFragment
 import com.tari.android.wallet.ui.fragment.settings.baseNodeConfig.changeBaseNode.ChangeBaseNodeFragment
+import com.tari.android.wallet.ui.fragment.settings.bluetoothSettings.BluetoothSettingsFragment
 import com.tari.android.wallet.ui.fragment.settings.deleteWallet.DeleteWalletFragment
 import com.tari.android.wallet.ui.fragment.settings.logs.activity.DebugActivity
 import com.tari.android.wallet.ui.fragment.settings.logs.activity.DebugNavigation
@@ -71,8 +74,9 @@ import com.tari.android.wallet.util.Constants
 import javax.inject.Inject
 import javax.inject.Singleton
 
+
 @Singleton
-class TariNavigator @Inject constructor (val prefs: SharedPrefsRepository, val tariSettingsSharedRepository: TariSettingsSharedRepository) {
+class TariNavigator @Inject constructor(val prefs: SharedPrefsRepository, val tariSettingsSharedRepository: TariSettingsSharedRepository) {
 
     lateinit var activity: CommonActivity<*, *>
 
@@ -85,6 +89,8 @@ class TariNavigator @Inject constructor (val prefs: SharedPrefsRepository, val t
             is ContactBookNavigation.ToLinkContact -> toLinkContact(navigation.contact)
             is ContactBookNavigation.BackToContactBook -> backToContactBook()
             is ContactBookNavigation.ToExternalWallet -> toExternalWallet(navigation.connectedWallet)
+            is ContactBookNavigation.ToContactTransactionHistory -> toContactTransactionHistory(navigation.contact)
+            is ContactBookNavigation.ToAddPhoneContact -> toAddPhoneContact()
             Navigation.ChooseRestoreOptionNavigation.ToEnterRestorePassword -> toEnterRestorePassword()
             Navigation.ChooseRestoreOptionNavigation.OnRestoreCompleted -> onRestoreCompleted()
             Navigation.ChooseRestoreOptionNavigation.ToRestoreWithRecoveryPhrase -> toRestoreWithRecoveryPhrase()
@@ -92,12 +98,14 @@ class TariNavigator @Inject constructor (val prefs: SharedPrefsRepository, val t
             AllSettingsNavigation.ToMyProfile -> toMyProfile()
             AllSettingsNavigation.ToAbout -> toAbout()
             AllSettingsNavigation.ToBackgroundService -> toBackgroundService()
+            AllSettingsNavigation.ToBluetoothSettings -> addFragment(BluetoothSettingsFragment())
             AllSettingsNavigation.ToBackupSettings -> toBackupSettings(true)
             AllSettingsNavigation.ToBaseNodeSelection -> toBaseNodeSelection()
             AllSettingsNavigation.ToDeleteWallet -> toDeleteWallet()
             AllSettingsNavigation.ToNetworkSelection -> toNetworkSelection()
             AllSettingsNavigation.ToTorBridges -> toTorBridges()
             AllSettingsNavigation.ToThemeSelection -> toThemeSelection()
+            AllSettingsNavigation.ToRequestTari -> addFragment(RequestTariFragment())
             Navigation.EnterRestorationPasswordNavigation.OnRestore -> onRestoreCompleted()
             Navigation.InputSeedWordsNavigation.ToRestoreFormSeedWordsInProgress -> toRestoreFromSeedWordsInProgress()
             Navigation.InputSeedWordsNavigation.ToBaseNodeSelection -> toBaseNodeSelection()
@@ -109,7 +117,7 @@ class TariNavigator @Inject constructor (val prefs: SharedPrefsRepository, val t
 
             Navigation.AddAmountNavigation.OnAmountExceedsActualAvailableBalance -> onAmountExceedsActualAvailableBalance()
             is Navigation.AddAmountNavigation.ContinueToAddNote -> continueToAddNote(navigation.transactionData)
-            is Navigation.AddAmountNavigation.ContinueToFinalizing -> continueToAddNote(navigation.transactionData)
+            is Navigation.AddAmountNavigation.ContinueToFinalizing -> continueToFinalizeSendTx(navigation.transactionData)
             Navigation.TxListNavigation.ToTTLStore -> toTTLStore()
             is Navigation.TxListNavigation.ToTxDetails -> toTxDetails(navigation.tx, null)
             is Navigation.TxListNavigation.ToSendTariToUser -> toSendTari(navigation.contact)
@@ -140,6 +148,11 @@ class TariNavigator @Inject constructor (val prefs: SharedPrefsRepository, val t
         intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
         activity.startActivity(intent)
         activity.finishAffinity()
+    }
+
+    fun toAddPhoneContact() {
+        val intent = Intent(Intent.ACTION_INSERT, ContactsContract.Contacts.CONTENT_URI)
+        activity.startActivity(intent)
     }
 
     fun toEnterRestorePassword() = addFragment(EnterRestorationPasswordFragment.newInstance())
@@ -208,7 +221,7 @@ class TariNavigator @Inject constructor (val prefs: SharedPrefsRepository, val t
 
     fun toChangePassword() = addFragment(ChangeSecurePasswordFragment())
 
-    fun toSendTari(user: ContactDto?) = sendToUser(user)
+    fun toSendTari(user: ContactDto) = sendToUser(user)
 
     fun toAddContact() = addFragment(AddContactFragment())
 
@@ -221,6 +234,8 @@ class TariNavigator @Inject constructor (val prefs: SharedPrefsRepository, val t
     fun backToContactBook() = popUpTo(ContactBookFragment::class.java.simpleName)
 
     fun toLinkContact(contact: ContactDto) = addFragment(ContactLinkFragment.createFragment(contact))
+
+    fun toContactTransactionHistory(contact: ContactDto) = addFragment(TransactionHistoryFragment.createFragment(contact))
 
     fun toExternalWallet(connectedWallet: YatDto.ConnectedWallet) {
 
@@ -282,23 +297,17 @@ class TariNavigator @Inject constructor (val prefs: SharedPrefsRepository, val t
         }
     }
 
-    fun onSendTxFailure(isYat: Boolean, transactionData: TransactionData, txFailureReason: TxFailureReason) {
+    fun onSendTxFailure(isYat: Boolean, txFailureReason: TxFailureReason) {
         EventBus.post(Event.Transaction.TxSendFailed(txFailureReason))
-        if (isYat) {
-            activity.finish()
-            activity.overridePendingTransition(R.anim.fade_in, R.anim.fade_out)
-        } else {
-            activity.supportFragmentManager.let {
-                it.popBackStackImmediate()
-                it.popBackStackImmediate()
-                it.popBackStackImmediate()
-                it.popBackStackImmediate()
-            }
-        }
+        navigateBackFromTxSend(isYat)
     }
 
-    fun onSendTxSuccessful(isYat: Boolean, txId: TxId, transactionData: TransactionData) {
+    fun onSendTxSuccessful(isYat: Boolean, txId: TxId) {
         EventBus.post(Event.Transaction.TxSendSuccessful(txId))
+        navigateBackFromTxSend(isYat)
+    }
+
+    private fun navigateBackFromTxSend(isYat: Boolean) {
         if (isYat) {
             activity.finish()
             activity.overridePendingTransition(R.anim.fade_in, R.anim.fade_out)
@@ -321,20 +330,16 @@ class TariNavigator @Inject constructor (val prefs: SharedPrefsRepository, val t
     }
 
     fun sendTariToUser(service: TariWalletService, sendDeeplink: DeepLink.Send) {
-        val walletAddress = service.getWalletAddressFromHexString(sendDeeplink.walletAddressHex)
-        sendToUser((activity as HomeActivity).viewModel.contactsRepository.ffiBridge.getContactByAdress(walletAddress))
+        val walletAddress = service.getWalletAddressFromHexString(sendDeeplink.walletAddress)
+        sendToUser((activity as HomeActivity).viewModel.contactsRepository.ffiBridge.getContactByAddress(walletAddress))
     }
 
-    fun sendToUser(recipientUser: ContactDto?) {
-        if (recipientUser != null) {
-            val bundle = Bundle().apply {
-                putSerializable(PARAMETER_CONTACT, recipientUser)
-                activity.intent.getDoubleExtra(PARAMETER_AMOUNT, Double.MIN_VALUE).takeIf { it > 0 }?.let { putDouble(PARAMETER_AMOUNT, it) }
-            }
-            addFragment(AddAmountFragment(), bundle)
-        } else {
-            addFragment(MakeTransactionFragment(), null)
+    fun sendToUser(recipientUser: ContactDto) {
+        val bundle = Bundle().apply {
+            putSerializable(PARAMETER_CONTACT, recipientUser)
+            activity.intent.getDoubleExtra(PARAMETER_AMOUNT, Double.MIN_VALUE).takeIf { it > 0 }?.let { putDouble(PARAMETER_AMOUNT, it) }
         }
+        addFragment(AddAmountFragment(), bundle)
     }
 
 

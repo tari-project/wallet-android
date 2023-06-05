@@ -30,29 +30,45 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.tari.android.wallet.ui.fragment.send.addRecepient
+package com.tari.android.wallet.ui.fragment.settings.bluetoothSettings
 
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
-import com.tari.android.wallet.ui.extension.gone
-import com.tari.android.wallet.ui.fragment.contact_book.contactSelection.ContactSelectionFragment
-import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.PhoneContactDto
+import android.view.ViewGroup
+import androidx.fragment.app.viewModels
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.tari.android.wallet.databinding.FragmentBluetoothSettingsBinding
+import com.tari.android.wallet.extension.observe
+import com.tari.android.wallet.ui.common.CommonFragment
+import com.tari.android.wallet.ui.common.recyclerView.CommonAdapter
+import com.tari.android.wallet.ui.fragment.settings.bluetoothSettings.adapter.BluetoothSettingsAdapter
 
+class BluetoothSettingsFragment : CommonFragment<FragmentBluetoothSettingsBinding, BluetoothSettingsViewModel>() {
 
-class AddRecipientFragment : ContactSelectionFragment() {
+    private val adapter = BluetoothSettingsAdapter()
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
+        FragmentBluetoothSettingsBinding.inflate(inflater, container, false).also { ui = it }.root
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        ui.toolbar.gone()
+        val viewModel: BluetoothSettingsViewModel by viewModels()
+        bindViewModel(viewModel)
 
-        viewModel.additionalFilter = { it.contact.contact !is PhoneContactDto }
+        setupViews()
+
+        observeUI()
     }
 
-    override fun goToNext() {
-        super.goToNext()
+    private fun setupViews() = with(ui) {
+        recyclerView.adapter = adapter
+        recyclerView.layoutManager = LinearLayoutManager(requireContext())
+        adapter.setClickListener(CommonAdapter.ItemClickListener { viewModel.setSettings(it.state) })
+    }
 
-        val user = viewModel.selectedUser.value ?: return
-        viewModel.tariNavigator.continueToAmount(user, null)
+    private fun observeUI() = with(viewModel) {
+        observe(list) { adapter.update(it) }
     }
 }

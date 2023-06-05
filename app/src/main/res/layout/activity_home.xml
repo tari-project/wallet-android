@@ -72,11 +72,6 @@
                         android:src="@drawable/vector_ttl_store_icon" />
                 </FrameLayout>
 
-                <View
-                    android:layout_width="0dp"
-                    android:layout_height="0dp"
-                    android:layout_weight="1" />
-
                 <FrameLayout
                     android:id="@+id/wallet_info_view"
                     android:layout_width="0dp"
@@ -108,18 +103,6 @@
             </LinearLayout>
 
         </com.tari.android.wallet.ui.component.tari.TariPrimaryBackground>
-
-        <androidx.appcompat.widget.AppCompatImageButton
-            android:id="@+id/send_tari_cta_view"
-            android:layout_width="52dp"
-            android:layout_height="52dp"
-            android:layout_marginBottom="38dp"
-            android:background="@drawable/vector_send_button_back"
-            android:elevation="10dp"
-            android:src="@drawable/vector_icon_send_tari"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

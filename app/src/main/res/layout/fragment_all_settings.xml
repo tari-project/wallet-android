@@ -10,7 +10,7 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <com.tari.android.wallet.ui.component.tari.TariToolbar
+        <com.tari.android.wallet.ui.component.tari.toolbar.TariToolbar
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:isRoot="true"

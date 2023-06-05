@@ -54,19 +54,21 @@ class TorSharedRepository @Inject constructor(sharedPrefs: SharedPreferences, ne
 
     var currentTorBridges: TorBridgeConfigurationList? by SharedPrefGsonDelegate(
         sharedPrefs,
+        this,
         formatKey(Key.currentTorBridge),
         TorBridgeConfigurationList::class.java
     )
 
     var customTorBridges: TorBridgeConfigurationList? by SharedPrefGsonDelegate(
         sharedPrefs,
+        this,
         formatKey(Key.customTorBridges),
         TorBridgeConfigurationList::class.java
     )
 
-    var torBinPath: String? by SharedPrefStringDelegate(sharedPrefs, formatKey(Key.torBinPath))
+    var torBinPath: String? by SharedPrefStringDelegate(sharedPrefs, this,  formatKey(Key.torBinPath))
 
-    var torrcBinPath: String? by SharedPrefStringDelegate(sharedPrefs, formatKey(Key.torrcBinPath))
+    var torrcBinPath: String? by SharedPrefStringDelegate(sharedPrefs, this,  formatKey(Key.torrcBinPath))
 
     fun clear() {
         currentTorBridges = null

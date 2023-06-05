@@ -23,19 +23,19 @@ class BackupSettingsRepository @Inject constructor(
 ) :
     CommonRepository(networkRepository) {
 
-    var localFileOption: BackupOptionDto? by SharedPrefGsonDelegate(sharedPrefs, formatKey(Keys.localFileOptionsKey), BackupOptionDto::class.java)
+    var localFileOption: BackupOptionDto? by SharedPrefGsonDelegate(sharedPrefs, this,  formatKey(Keys.localFileOptionsKey), BackupOptionDto::class.java)
 
-    var googleDriveOption: BackupOptionDto? by SharedPrefGsonDelegate(sharedPrefs, formatKey(Keys.googleDriveOptionKey), BackupOptionDto::class.java)
+    var googleDriveOption: BackupOptionDto? by SharedPrefGsonDelegate(sharedPrefs, this,  formatKey(Keys.googleDriveOptionKey), BackupOptionDto::class.java)
 
-    var dropboxOption: BackupOptionDto? by SharedPrefGsonDelegate(sharedPrefs, formatKey(Keys.dropboxOptionsKey), BackupOptionDto::class.java)
+    var dropboxOption: BackupOptionDto? by SharedPrefGsonDelegate(sharedPrefs, this,  formatKey(Keys.dropboxOptionsKey), BackupOptionDto::class.java)
 
-    var dropboxCredential: DbxCredential? by SharedPrefGsonDelegate(sharedPrefs, formatKey(Keys.dropboxCredentialKey), DbxCredential::class.java)
+    var dropboxCredential: DbxCredential? by SharedPrefGsonDelegate(sharedPrefs, this,  formatKey(Keys.dropboxCredentialKey), DbxCredential::class.java)
 
-    var backupPassword: String? by SharedPrefStringSecuredDelegate(context, sharedPrefs, formatKey(Keys.backupPassword))
+    var backupPassword: String? by SharedPrefStringSecuredDelegate(context, sharedPrefs, this, formatKey(Keys.backupPassword))
 
-    var localBackupFolderURI: Uri? by SharedPrefGsonDelegate(sharedPrefs, formatKey(Keys.localBackupFolderURI), Uri::class.java)
+    var localBackupFolderURI: Uri? by SharedPrefGsonDelegate(sharedPrefs, this,  formatKey(Keys.localBackupFolderURI), Uri::class.java)
 
-    var restoredTxs: BackupUtxos? by SharedPrefGsonDelegate(sharedPrefs, formatKey(Keys.lastRestoredTxs), BackupUtxos::class.java, null)
+    var restoredTxs: BackupUtxos? by SharedPrefGsonDelegate(sharedPrefs, this,  formatKey(Keys.lastRestoredTxs), BackupUtxos::class.java, null)
 
     init {
         localFileOption = localFileOption ?: BackupOptionDto(BackupOptions.Local)

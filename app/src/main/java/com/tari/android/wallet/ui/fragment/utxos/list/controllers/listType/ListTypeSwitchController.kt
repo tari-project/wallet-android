@@ -1,16 +1,17 @@
 package com.tari.android.wallet.ui.fragment.utxos.list.controllers.listType
 
-import android.widget.ImageView
 import com.tari.android.wallet.R
+import com.tari.android.wallet.ui.component.tari.toolbar.TariToolbar
+import com.tari.android.wallet.ui.component.tari.toolbar.TariToolbarActionArg
 
-class ListTypeSwitchController(val icon: ImageView) {
+class ListTypeSwitchController(val tariToolbar: TariToolbar) {
 
     private var currentState: ListType? = null
 
     var toggleCallback: (ListType) -> Unit = {}
 
     init {
-        icon.setOnClickListener { toggle() }
+        set(ListType.Tile)
     }
 
     fun toggle() {
@@ -19,16 +20,18 @@ class ListTypeSwitchController(val icon: ImageView) {
 
     fun set(type: ListType) {
         currentState = type
-        icon.setImageResource(getListTypeIcon())
+        tariToolbar.setRightArgs(TariToolbarActionArg(icon = getListTypeIcon()) {
+            toggle()
+        })
         toggleCallback.invoke(currentState!!)
     }
 
-    private fun getOppositeListType() : ListType = when(currentState) {
+    private fun getOppositeListType(): ListType = when (currentState) {
         ListType.Tile -> ListType.Text
         else -> ListType.Tile
     }
 
-    private fun getListTypeIcon() : Int = when(currentState) {
+    private fun getListTypeIcon(): Int = when (currentState) {
         ListType.Text -> R.drawable.vector_wallet_group_cells
         else -> R.drawable.vector_wallet_group_list
     }

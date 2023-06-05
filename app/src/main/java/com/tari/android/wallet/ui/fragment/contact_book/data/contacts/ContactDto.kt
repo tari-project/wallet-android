@@ -6,7 +6,7 @@ import com.tari.android.wallet.ui.fragment.contact_book.data.ContactAction
 import java.io.Serializable
 import java.util.UUID
 
-class ContactDto(
+data class ContactDto(
     var contact: IContact,
     var uuid: String = UUID.randomUUID().toString(),
     var lastUsedDate: SerializableTime? = null,
@@ -61,4 +61,6 @@ class ContactDto(
     fun getPhoneDto(): PhoneContactDto? = (contact as? PhoneContactDto) ?: (contact as? MergedContactDto)?.phoneContactDto
 
     fun getMergedDto(): MergedContactDto? = (contact as? MergedContactDto)
+
+    override fun hashCode(): Int = HashcodeUtils.generate(contact, uuid, lastUsedDate)
 }

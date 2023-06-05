@@ -26,9 +26,6 @@ class AddContactFragment : ContactSelectionFragment() {
         val user = viewModel.getUserDto()
         val firstName = ui.addFirstNameInput.ui.editText.text.toString()
         val surname = ui.addSurnameInput.ui.editText.text.toString()
-        if (firstName.isEmpty() && surname.isEmpty()) {
-            return
-        }
 
         viewModel.contactsRepository.updateContactInfo(user, firstName, surname, "")
         viewModel.navigation.postValue(Navigation.ContactBookNavigation.BackToContactBook())

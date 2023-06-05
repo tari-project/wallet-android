@@ -50,6 +50,7 @@ class SecurityStagesRepository @Inject constructor(sharedPrefs: SharedPreference
 
     var disabledTimestamps: DisabledTimestampsDto? by SharedPrefGsonDelegate(
         sharedPrefs,
+        this,
         formatKey(Key.disabledTimestamps),
         DisabledTimestampsDto::class.java,
         DisabledTimestampsDto(mutableMapOf())

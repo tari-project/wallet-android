@@ -52,7 +52,7 @@ class LogsViewModel : CommonViewModel() {
             ) {
                 _backPressed.postValue(Unit)
             }
-            _modularDialog.postValue(errorArgs.getModular(resourceManager))
+            modularDialog.postValue(errorArgs.getModular(resourceManager))
             logger.e(e, "Out of memory on reading big log file")
         }
     }
@@ -78,7 +78,7 @@ class LogsViewModel : CommonViewModel() {
         modules.add(ButtonModule(resourceManager.getString(R.string.common_close), ButtonStyle.Close))
 
         val modularDialogArgs = ModularDialogArgs(DialogArgs(), modules)
-        _modularDialog.postValue(modularDialogArgs)
+        modularDialog.postValue(modularDialogArgs)
     }
 
     fun copyToClipboard(item: LogViewHolderItem) {

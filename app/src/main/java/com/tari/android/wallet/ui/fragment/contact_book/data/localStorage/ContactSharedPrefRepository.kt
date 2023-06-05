@@ -15,7 +15,7 @@ class ContactSharedPrefRepository @Inject constructor(
     val sharedPrefs: SharedPreferences
 ) : CommonRepository(networkRepository) {
 
-    private var savedContacts: ContactsList? by SharedPrefGsonDelegate(sharedPrefs, formatKey(KEY_SAVED_CONTACTS), ContactsList::class.java, ContactsList())
+    private var savedContacts: ContactsList? by SharedPrefGsonDelegate(sharedPrefs, this,  formatKey(KEY_SAVED_CONTACTS), ContactsList::class.java, ContactsList())
 
     fun getSavedContacts(): List<ContactDto> = savedContacts.orEmpty().map { ContactDtoSerializable.toContactDto(it) }
 

@@ -73,10 +73,12 @@ sealed class Navigation {
         object ToBackupSettings : AllSettingsNavigation()
         object ToDeleteWallet : AllSettingsNavigation()
         object ToBackgroundService : AllSettingsNavigation()
+        object ToBluetoothSettings : AllSettingsNavigation()
         object ToThemeSelection : AllSettingsNavigation()
         object ToTorBridges : AllSettingsNavigation()
         object ToNetworkSelection : AllSettingsNavigation()
         object ToBaseNodeSelection : AllSettingsNavigation()
+        object ToRequestTari : AllSettingsNavigation()
     }
 
     sealed class InputSeedWordsNavigation : Navigation() {
@@ -103,6 +105,8 @@ sealed class Navigation {
 
         object ToAddContact : ContactBookNavigation()
 
+        object ToAddPhoneContact : ContactBookNavigation()
+
         class ToSendTari(val contact: ContactDto) : ContactBookNavigation()
 
         class ToRequestTari(val contact: ContactDto) : ContactBookNavigation()
@@ -110,6 +114,8 @@ sealed class Navigation {
         class ToExternalWallet(val connectedWallet: YatDto.ConnectedWallet) : ContactBookNavigation()
 
         class ToLinkContact(val contact: ContactDto) : ContactBookNavigation()
+
+        class ToContactTransactionHistory(val contact: ContactDto) : ContactBookNavigation()
 
         class BackToContactBook : ContactBookNavigation()
     }
