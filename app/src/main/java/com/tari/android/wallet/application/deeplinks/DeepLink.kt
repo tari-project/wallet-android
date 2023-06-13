@@ -118,6 +118,27 @@ sealed class DeepLink {
         }
     }
 
+    class UserProfile(val tariAddressHex: String = "", val alias: String = "") : DeepLink() {
+
+        constructor(params: Map<String, String>) : this(
+            params[walletAddressKey].orEmpty(),
+            params[aliasKey].orEmpty()
+        )
+
+        override fun getParams(): Map<String, String> = hashMapOf<String, String>().apply {
+            put(walletAddressKey, tariAddressHex)
+            put(aliasKey, alias)
+        }
+
+        override fun getCommand(): String = profileCommand
+
+        companion object {
+            const val profileCommand = "profile/"
+            const val walletAddressKey = "walletAddressKey"
+            const val aliasKey = "alias"
+        }
+    }
+
     class AddBaseNode(val name: String = "", val peer: String = "") : DeepLink() {
 
         constructor(params: Map<String, String>) : this(
@@ -145,6 +166,7 @@ sealed class DeepLink {
             Contacts.contactsCommand -> Contacts(params)
             Send.sendCommand -> Send(params)
             AddBaseNode.addNodeCommand -> AddBaseNode(params)
+            UserProfile.profileCommand -> UserProfile(params)
             else -> null
         }
     }

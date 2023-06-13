@@ -101,6 +101,8 @@
     <string name="common_permission_required_button">To Settings</string>
     <string name="common_delete">Delete</string>
     <string name="common_lets_do_it">Yes! Let\'s do it!</string>
+    <string name="common_lets_do_it_2">Yeah! Let\'s do it!</string>
+    <string name="common_no_2">Nah, not now</string>
     <string name="common_are_you_sure">Are you sure?</string>
     <string name="common_next">Next</string>
 
@@ -218,6 +220,8 @@
     <!-- tx list -->
     <string name="tx_list_sent_a_payment">%s sent a payment</string>
     <string name="tx_list_you_paid">You paid</string>
+    <string name="bluetooth_connect">Bluetooth Connect 🤘</string>
+    <string name="bluetooth_connect_description">Connect and send Tari to someone nearby</string>
     <string name="tx_list_you_paid_with_alias">You paid %s</string>
     <string name="tx_list_paid_you">paid you.</string>
     <string name="tx_list_minutes_ago">%dm ago</string>
@@ -818,5 +822,11 @@
     <string name="contact_details_transaction_history_description">Your transaction history with %s</string>
     <string name="contact_details_transaction_history_empty_state_title">No transactions found</string>
     <string name="contact_details_transaction_history_empty_state_description"><![CDATA[You don’t have any transactions with <strong>%s</strong> yet. Click the button below to send some Tari]]></string>
+
+    <string name="contactless_payment_title">Connect to a Device</string>
+    <string name="contactless_payment_success_title">Device Detected</string>
+    <string name="contactless_payment_success_description">We just found a fellow Aurora user nearby!\nWould you like to send Tari to %s?</string>
+    <string name="contactless_payment_description">Aurora can grab contact info from users nearby using BLE (Bluetooth Low Energy)!\n\nSimply place your phones close to each other and make sure Bluetooth is turned on for both devices. Once connected, you’ll be able to send some Tari quick and easy! 😎</string>
+
 
 </resources>
