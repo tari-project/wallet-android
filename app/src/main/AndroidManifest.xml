@@ -122,6 +122,10 @@
                     android:scheme="tari" />
 
                 <data
+                    android:host="stagenet"
+                    android:scheme="tari" />
+
+                <data
                     android:host="esmeralda"
                     android:scheme="tari" />
 
