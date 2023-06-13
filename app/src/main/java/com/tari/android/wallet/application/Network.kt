@@ -50,7 +50,9 @@ enum class Network(val uriComponent: String, val displayName: String) {
 
     ESMERALDA("esmeralda", "ESMERALDA"),
 
-    NEXTNET("nextnet", "NextNet");
+    NEXTNET("nextnet", "NextNet"),
+
+    STAGENET("stagenet", "StageNet");
 
     companion object {
         fun from(uriComponent: String): Network {

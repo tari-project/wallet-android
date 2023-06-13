@@ -45,7 +45,7 @@ class DeepLinkTest {
 
     private val networkRepository: NetworkRepository = NetworkRepositoryMock()
     private val deeplinkHandler: DeeplinkHandler = DeeplinkHandler(networkRepository)
-    private val currentNetwork = Network.NEXTNET
+    private val currentNetwork = Network.STAGENET
 
     @Test
     fun assertNetwork() {
@@ -119,7 +119,7 @@ class DeepLinkTest {
     }
 
     class NetworkRepositoryMock : NetworkRepository {
-        private val network: Network = Network.NEXTNET
+        private val network: Network = Network.STAGENET
 
         override var supportedNetworks: List<Network> = listOf(network)
         override var currentNetwork: TariNetwork? = TariNetwork(network, "")
