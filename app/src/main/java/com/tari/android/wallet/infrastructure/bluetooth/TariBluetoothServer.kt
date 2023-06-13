@@ -9,6 +9,7 @@ import android.bluetooth.le.AdvertiseSettings
 import android.os.ParcelUuid
 import com.tari.android.wallet.application.deeplinks.DeepLink
 import com.tari.android.wallet.application.deeplinks.DeeplinkHandler
+import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.data.sharedPrefs.bluetooth.BluetoothServerState
 import com.tari.android.wallet.data.sharedPrefs.bluetooth.ShareSettingsRepository
 import com.tari.android.wallet.extension.addTo
@@ -16,6 +17,7 @@ import com.welie.blessed.BluetoothCentral
 import com.welie.blessed.BluetoothPeripheralManager
 import com.welie.blessed.BluetoothPeripheralManagerCallback
 import com.welie.blessed.GattStatus
+import com.welie.blessed.ReadResponse
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 import java.util.UUID
@@ -25,7 +27,11 @@ import javax.inject.Singleton
 
 
 @Singleton
-class TariBluetoothServer @Inject constructor(private val shareSettingsRepository: ShareSettingsRepository, val deeplinkHandler: DeeplinkHandler) :
+class TariBluetoothServer @Inject constructor(
+    private val shareSettingsRepository: ShareSettingsRepository,
+    val deeplinkHandler: DeeplinkHandler,
+    val sharedPrefsRepository: SharedPrefsRepository
+) :
     TariBluetoothAdapter() {
 
     private var bluetoothGattServer: BluetoothGattServer? = null
@@ -122,6 +128,18 @@ class TariBluetoothServer @Inject constructor(private val shareSettingsRepositor
                 }
                 return if (handled != null) GattStatus.SUCCESS else GattStatus.INVALID_HANDLE
             }
+
+            override fun onCharacteristicRead(bluetoothCentral: BluetoothCentral, characteristic: BluetoothGattCharacteristic): ReadResponse {
+                return if (characteristic.uuid.toString().lowercase() == TRANSACTION_DATA_UUID.lowercase()) {
+                    val data = deeplinkHandler.getDeeplink(
+                        DeepLink.UserProfile(
+                            sharedPrefsRepository.publicKeyHexString.orEmpty(),
+                            sharedPrefsRepository.name.orEmpty()
+                        )
+                    )
+                    ReadResponse(GattStatus.SUCCESS, data.toByteArray(Charsets.UTF_16))
+                } else super.onCharacteristicRead(bluetoothCentral, characteristic)
+            }
         }
 
         val myService = BluetoothGattService(UUID.fromString(SERVICE_UUID), BluetoothGattService.SERVICE_TYPE_PRIMARY)
@@ -132,7 +150,14 @@ class TariBluetoothServer @Inject constructor(private val shareSettingsRepositor
             BluetoothGattCharacteristic.PERMISSION_READ or BluetoothGattCharacteristic.PERMISSION_WRITE
         )
 
+        val myProfileCharacteristic = BluetoothGattCharacteristic(
+            UUID.fromString(TRANSACTION_DATA_UUID),
+            BluetoothGattCharacteristic.PROPERTY_READ or BluetoothGattCharacteristic.PROPERTY_WRITE,
+            BluetoothGattCharacteristic.PERMISSION_READ or BluetoothGattCharacteristic.PERMISSION_WRITE
+        )
+
         myService.addCharacteristic(myCharacteristic)
+        myService.addCharacteristic(myProfileCharacteristic)
 
         val manager = BluetoothPeripheralManager(fragappCompatActivity!!, bluetoothManager!!, callback)
         manager.add(myService)
