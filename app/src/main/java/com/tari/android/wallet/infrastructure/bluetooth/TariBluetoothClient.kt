@@ -7,6 +7,8 @@ import android.bluetooth.le.ScanResult
 import android.os.Handler
 import android.os.Looper
 import android.os.ParcelUuid
+import com.tari.android.wallet.application.deeplinks.DeepLink
+import com.tari.android.wallet.application.deeplinks.DeeplinkHandler
 import com.welie.blessed.BluetoothCentralManager
 import com.welie.blessed.BluetoothCentralManagerCallback
 import com.welie.blessed.BluetoothPeripheral
@@ -19,12 +21,13 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class TariBluetoothClient @Inject constructor() : TariBluetoothAdapter() {
+class TariBluetoothClient @Inject constructor(val deeplinkHandler: DeeplinkHandler) : TariBluetoothAdapter() {
 
     var onSuccessSharing: () -> Unit = {}
     var onFailedSharing: (String) -> Unit = {}
 
     var shareData: String? = null
+    var scanningCallback: ((DeepLink.UserProfile) -> Unit)? = null
     var foundDevice: BluetoothPeripheral? = null
     var myGatt: BluetoothGatt? = null
 
@@ -47,11 +50,21 @@ class TariBluetoothClient @Inject constructor() : TariBluetoothAdapter() {
     fun startSharing(data: String) {
         ensureBluetoothIsEnabled {
             runCatching { closeAll() }
-            doScanning(data)
+            shareData = data
+            doScanning()
+        }
+    }
+
+    fun startDeviceScanning(callback: (DeepLink.UserProfile) -> Unit) {
+        ensureBluetoothIsEnabled {
+            runCatching { closeAll() }
+            this.scanningCallback = callback
+            doScanning()
         }
     }
 
     fun stopSharing() {
+        shareData = null
         runCatching { closeAll() }
         stopScanning()
     }
@@ -61,9 +74,7 @@ class TariBluetoothClient @Inject constructor() : TariBluetoothAdapter() {
         manager.stopScan()
     }
 
-    private fun doScanning(data: String) {
-        shareData = data
-
+    private fun doScanning() {
         val scanFilter = ScanFilter.Builder()
             .setServiceUuid(ParcelUuid(UUID.fromString(SERVICE_UUID.lowercase())))
             .build()
@@ -73,7 +84,6 @@ class TariBluetoothClient @Inject constructor() : TariBluetoothAdapter() {
     }
 
     private fun doPairingOrShare(device: BluetoothPeripheral) {
-        val shareData = shareData.orEmpty().toByteArray(Charsets.UTF_16)
 
         val callback = object : BluetoothPeripheralCallback() {
 
@@ -81,7 +91,8 @@ class TariBluetoothClient @Inject constructor() : TariBluetoothAdapter() {
                 super.onServicesDiscovered(peripheral)
                 val service = peripheral.getService(UUID.fromString(SERVICE_UUID))
                 service?.characteristics?.forEach {
-                    if (it.uuid.toString().lowercase() == CHARACTERISTIC_UUID.lowercase()) {
+                    if (it.uuid.toString().lowercase() == CHARACTERISTIC_UUID.lowercase() && shareData != null) {
+                        val shareData = shareData.orEmpty().toByteArray(Charsets.UTF_16)
                         runWithPermissions(bluetoothConnectPermission) {
                             @Suppress("MissingPermission")
                             val dataChunks = shareData.toList().chunked(512)
@@ -91,7 +102,34 @@ class TariBluetoothClient @Inject constructor() : TariBluetoothAdapter() {
                             }
                         }
                     }
+
+                    if (it.uuid.toString().lowercase() == TRANSACTION_DATA_UUID.lowercase()) {
+                        peripheral.readCharacteristic(it)
+                    }
                 }
+            }
+
+            override fun onCharacteristicUpdate(
+                peripheral: BluetoothPeripheral,
+                value: ByteArray?,
+                characteristic: BluetoothGattCharacteristic,
+                status: GattStatus
+            ) {
+                super.onCharacteristicUpdate(peripheral, value, characteristic, status)
+
+                if (characteristic.uuid.toString().lowercase() == TRANSACTION_DATA_UUID.lowercase()) {
+                    logger.e("onCharacteristicUpdate: ${String(value ?: byteArrayOf(), Charsets.UTF_16)}")
+                    doHandling(String(value ?: byteArrayOf(), Charsets.UTF_16))
+                }
+            }
+
+            private fun doHandling(string: String): GattStatus {
+                val handled = runCatching { deeplinkHandler.handle(string) }.getOrNull()
+
+                if (handled != null && handled is DeepLink.UserProfile) {
+                    scanningCallback?.invoke(handled)
+                }
+                return if (handled != null) GattStatus.SUCCESS else GattStatus.INVALID_HANDLE
             }
 
             override fun onCharacteristicWrite(

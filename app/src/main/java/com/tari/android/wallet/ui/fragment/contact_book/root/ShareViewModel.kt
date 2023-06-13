@@ -110,9 +110,10 @@ class ShareViewModel : CommonViewModel() {
         modularDialog.postValue(args)
         viewModelScope.launch(Dispatchers.IO) {
             delay(5000)
-            successfullDeviceFoundSharing(DeepLink.UserProfile(sharePrefRepository.publicKeyHexString.orEmpty(), ""))
+            tariBluetoothClient.startDeviceScanning() {
+                successfullDeviceFoundSharing(it)
+            }
         }
-//        tariBluetoothClient.startSharing(shareInfo.value.orEmpty())
     }
 
     fun successfullDeviceFoundSharing(userProfile: DeepLink.UserProfile) {
