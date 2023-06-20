@@ -111,7 +111,7 @@ sealed class DeepLink {
 
         companion object {
             const val sendCommand = "transactions/send"
-            const val publicKeyKey = "publicKey"
+            const val publicKeyKey = "tariAddress"
             const val amountKey = "amount"
             const val noteKey = "note"
         }
