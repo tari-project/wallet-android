@@ -298,11 +298,9 @@ class TariNavigator @Inject constructor(val prefs: SharedPrefsRepository, val ta
             activity.finish()
             activity.overridePendingTransition(R.anim.fade_in, R.anim.fade_out)
         } else {
-            activity.supportFragmentManager.let {
-                it.popBackStackImmediate()
-                it.popBackStackImmediate()
-                it.popBackStackImmediate()
-                it.popBackStackImmediate()
+            val fragmentsCount = activity.supportFragmentManager.fragments.size - 5
+            for (i in 0 until fragmentsCount) {
+                activity.supportFragmentManager.popBackStackImmediate()
             }
         }
     }
