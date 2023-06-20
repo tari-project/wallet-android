@@ -100,7 +100,7 @@ class ContactBookViewModel : CommonViewModel() {
     }
 
     private fun getDeeplink(selectedContacts: List<ContactDto>): String {
-        val contacts = selectedContacts.map { DeepLink.Contacts.DeeplinkContact(it.contact.getAlias(), it.contact.extractWalletAddress().hexString) }
+        val contacts = selectedContacts.map { DeepLink.Contacts.DeeplinkContact(ContactDto.normalizeAlias(it.contact.getAlias(), it.contact.extractWalletAddress()), it.contact.extractWalletAddress().hexString) }
         return deeplinkFormatter.getDeeplink(DeepLink.Contacts(contacts))
     }
 

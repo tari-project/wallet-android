@@ -112,11 +112,11 @@ sealed class DeepLink {
         companion object {
             const val sendCommand = "transactions/send"
             const val publicKeyKey = "publicKey"
-            const val walletAddressKey = "walletAddressKey"
             const val amountKey = "amount"
             const val noteKey = "note"
         }
     }
+
 
     class UserProfile(val tariAddressHex: String = "", val alias: String = "") : DeepLink() {
 
@@ -133,8 +133,8 @@ sealed class DeepLink {
         override fun getCommand(): String = profileCommand
 
         companion object {
-            const val profileCommand = "profile/"
-            const val walletAddressKey = "walletAddress"
+            const val profileCommand = "profile"
+            const val walletAddressKey = "tariAddress"
             const val aliasKey = "alias"
         }
     }

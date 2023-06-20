@@ -92,13 +92,14 @@ class TariBluetoothClient @Inject constructor(val deeplinkHandler: DeeplinkHandl
                 val service = peripheral.getService(UUID.fromString(SERVICE_UUID))
                 service?.characteristics?.forEach {
                     if (it.uuid.toString().lowercase() == CHARACTERISTIC_UUID.lowercase() && shareData != null) {
-                        val shareData = shareData.orEmpty().toByteArray(Charsets.UTF_16)
+                        val shareData = shareData.orEmpty().toByteArray(Charsets.UTF_8)
                         runWithPermissions(bluetoothConnectPermission) {
                             @Suppress("MissingPermission")
                             val dataChunks = shareData.toList().chunked(512)
                             for (chunk in dataChunks) {
 //                                https://stackoverflow.com/questions/38913743/maximum-packet-length-for-bluetooth-le/38914831#38914831
                                 peripheral.writeCharacteristic(it, chunk.toByteArray(), WriteType.WITH_RESPONSE)
+                                logger.e("writeCharacteristic: $shareData")
                             }
                         }
                     }
@@ -171,6 +172,6 @@ class TariBluetoothClient @Inject constructor(val deeplinkHandler: DeeplinkHandl
     }
 
     companion object {
-        const val RSSI_Threshold = -50
+        const val RSSI_Threshold = -55
     }
 }

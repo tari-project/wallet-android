@@ -10,11 +10,13 @@ import com.tari.android.wallet.application.deeplinks.DeepLink
 import com.tari.android.wallet.application.deeplinks.DeeplinkHandler
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.infrastructure.nfc.TariNFCAdapter
+import com.tari.android.wallet.model.TariWalletAddress
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.dialog.modular.DialogArgs
 import com.tari.android.wallet.ui.dialog.modular.ModularDialogArgs
 import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
 import com.tari.android.wallet.ui.dialog.modular.modules.input.InputModule
+import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.ContactDto
 import com.tari.android.wallet.ui.fragment.contact_book.root.ShareViewModel
 import com.tari.android.wallet.ui.fragment.contact_book.root.share.ShareType
 import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
@@ -106,7 +108,10 @@ class WalletInfoViewModel : CommonViewModel() {
 
     fun shareData(type: ShareType) {
         val name = alias.value.orEmpty()
-        val hex = sharedPrefsWrapper.publicKeyHexString.orEmpty()
+        val hex = ContactDto.normalizeAlias(sharedPrefsWrapper.publicKeyHexString.orEmpty(), TariWalletAddress().apply {
+            hexString = sharedPrefsWrapper.publicKeyHexString.orEmpty()
+            emojiId = sharedPrefsWrapper.emojiId.orEmpty()
+        })
         val deeplink = deeplinkHandler.getDeeplink(DeepLink.Contacts(listOf(DeepLink.Contacts.DeeplinkContact(name, hex))))
         ShareViewModel.currentInstant?.share(type, deeplink)
     }

@@ -2,7 +2,9 @@ package com.tari.android.wallet.ui.fragment.contact_book.data.contacts
 
 import com.tari.android.wallet.R
 import com.tari.android.wallet.data.sharedPrefs.delegates.SerializableTime
+import com.tari.android.wallet.model.TariWalletAddress
 import com.tari.android.wallet.ui.fragment.contact_book.data.ContactAction
+import com.tari.android.wallet.util.extractEmojis
 import java.io.Serializable
 import java.util.UUID
 
@@ -61,6 +63,15 @@ data class ContactDto(
     fun getPhoneDto(): PhoneContactDto? = (contact as? PhoneContactDto) ?: (contact as? MergedContactDto)?.phoneContactDto
 
     fun getMergedDto(): MergedContactDto? = (contact as? MergedContactDto)
+
+    companion object {
+        fun getDefaultAlias(walletAddress: TariWalletAddress): String =
+            "Aurora User " + walletAddress.emojiId.extractEmojis().take(3).joinToString("")
+
+        fun normalizeAlias(alias: String?, walletAddress: TariWalletAddress): String {
+            return alias.orEmpty().ifBlank { getDefaultAlias(walletAddress) }
+        }
+    }
 
     override fun hashCode(): Int = HashcodeUtils.generate(contact, uuid, lastUsedDate)
 }
