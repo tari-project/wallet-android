@@ -109,6 +109,8 @@ sealed class Navigation {
 
         class ToSendTari(val contact: ContactDto) : ContactBookNavigation()
 
+        class ToSelectTariUser() : ContactBookNavigation()
+
         class ToRequestTari(val contact: ContactDto) : ContactBookNavigation()
 
         class ToExternalWallet(val connectedWallet: YatDto.ConnectedWallet) : ContactBookNavigation()

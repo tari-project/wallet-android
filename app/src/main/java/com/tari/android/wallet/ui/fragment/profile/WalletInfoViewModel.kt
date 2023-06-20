@@ -106,8 +106,8 @@ class WalletInfoViewModel : CommonViewModel() {
 
     fun shareData(type: ShareType) {
         val name = alias.value.orEmpty()
-        val walletEmojiId = sharedPrefsWrapper.emojiId.orEmpty()
-        val deeplink = deeplinkHandler.getDeeplink(DeepLink.Contacts(listOf(DeepLink.Contacts.DeeplinkContact(name, walletEmojiId))))
+        val hex = sharedPrefsWrapper.publicKeyHexString.orEmpty()
+        val deeplink = deeplinkHandler.getDeeplink(DeepLink.Contacts(listOf(DeepLink.Contacts.DeeplinkContact(name, hex))))
         ShareViewModel.currentInstant?.share(type, deeplink)
     }
 

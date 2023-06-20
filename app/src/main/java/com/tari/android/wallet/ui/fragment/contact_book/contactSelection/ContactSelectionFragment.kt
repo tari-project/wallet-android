@@ -44,7 +44,9 @@ import com.tari.android.wallet.ui.extension.temporarilyDisableClick
 import com.tari.android.wallet.ui.extension.visible
 import com.tari.android.wallet.ui.fragment.contact_book.contacts.adapter.ContactListAdapter
 import com.tari.android.wallet.ui.fragment.contact_book.contacts.adapter.contact.ContactItem
+import com.tari.android.wallet.ui.fragment.contact_book.contacts.adapter.contact.ContactlessPaymentItem
 import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.YatDto
+import com.tari.android.wallet.ui.fragment.contact_book.root.ShareViewModel
 import com.tari.android.wallet.ui.fragment.qr.QRScannerActivity
 import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.EmojiUtil
@@ -158,8 +160,15 @@ open class ContactSelectionFragment : CommonFragment<FragmentContactsSelectionBi
 
     private fun setupRecyclerView() {
         ui.contactsListRecyclerView.layoutManager = LinearLayoutManager(requireContext())
-        recyclerViewAdapter.setClickListener(CommonAdapter.ItemClickListener { onItemClick(it as? ContactItem) })
+        recyclerViewAdapter.setClickListener(CommonAdapter.ItemClickListener {
+            onItemClick(it as? ContactItem)
+            (it as? ContactlessPaymentItem)?.let { onContactlessPaymentClick() }
+        })
         ui.contactsListRecyclerView.adapter = recyclerViewAdapter
+    }
+
+    private fun onContactlessPaymentClick() {
+        ShareViewModel.currentInstant?.doContactlessPayment()
     }
 
     private fun onItemClick(contactItem: ContactItem?) {
@@ -251,7 +260,7 @@ open class ContactSelectionFragment : CommonFragment<FragmentContactsSelectionBi
                 }
             }
 
-            (viewModel.deeplinkHandler.handle(qrData) as? DeepLink.AddBaseNode)?.let { deeplinkViewModel.executeAction(requireContext(), it) }
+            (viewModel.deeplinkHandler.handle(qrData) as? DeepLink.AddBaseNode)?.let { deeplinkViewModel.addBaseNode(requireContext(), it) }
 
             (viewModel.deeplinkHandler.handle(qrData) as? DeepLink.Contacts)?.let { deeplinkViewModel.addContacts(it.contacts) }
         }
@@ -349,6 +358,10 @@ open class ContactSelectionFragment : CommonFragment<FragmentContactsSelectionBi
                     viewModel.searchText.value = textWithoutSeparators
                 }
             }
+        } else if (viewModel.deeplinkHandler.handle(text) != null) {
+            val deeplink = viewModel.deeplinkHandler.handle(text)!!
+            deeplinkViewModel.execute(requireContext(), deeplink)
+            viewModel.selectedTariWalletAddress.value = null
         } else if (viewModel.walletAddressViewModel.checkForWalletAddressHex(text)) {
             finishEntering(viewModel.selectedTariWalletAddress.value!!.emojiId)
         } else {
