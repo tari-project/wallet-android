@@ -134,7 +134,7 @@ sealed class DeepLink {
 
         companion object {
             const val profileCommand = "profile/"
-            const val walletAddressKey = "walletAddressKey"
+            const val walletAddressKey = "walletAddress"
             const val aliasKey = "alias"
         }
     }

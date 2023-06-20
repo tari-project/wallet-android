@@ -137,7 +137,7 @@ class TariBluetoothServer @Inject constructor(
                             sharedPrefsRepository.name.orEmpty()
                         )
                     )
-                    ReadResponse(GattStatus.SUCCESS, data.toByteArray(Charsets.UTF_16))
+                    ReadResponse(GattStatus.SUCCESS, data.toByteArray(Charsets.UTF_8))
                 } else super.onCharacteristicRead(bluetoothCentral, characteristic)
             }
         }

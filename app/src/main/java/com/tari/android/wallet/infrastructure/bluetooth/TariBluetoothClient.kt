@@ -118,8 +118,8 @@ class TariBluetoothClient @Inject constructor(val deeplinkHandler: DeeplinkHandl
                 super.onCharacteristicUpdate(peripheral, value, characteristic, status)
 
                 if (characteristic.uuid.toString().lowercase() == TRANSACTION_DATA_UUID.lowercase()) {
-                    logger.e("onCharacteristicUpdate: ${String(value ?: byteArrayOf(), Charsets.UTF_16)}")
-                    doHandling(String(value ?: byteArrayOf(), Charsets.UTF_16))
+                    logger.e("onCharacteristicUpdate: ${String(value ?: byteArrayOf(), Charsets.UTF_8)}")
+                    doHandling(String(value ?: byteArrayOf(), Charsets.UTF_8))
                 }
             }
 
