@@ -141,7 +141,7 @@ class TorBridgesSelectionViewModel : CommonViewModel() {
                                 HeadModule(resourceManager.getString(R.string.tor_bridges_connection_progress_successful_title)),
                                 BodyModule(description),
                                 ButtonModule(resourceManager.getString(R.string.common_confirm), ButtonStyle.Normal) {
-                                    _dismissDialog.postValue(Unit)
+                                    dismissDialog.postValue(Unit)
                                     _backPressed.postValue(Unit)
                                  },
                             )
@@ -170,6 +170,6 @@ class TorBridgesSelectionViewModel : CommonViewModel() {
     private fun stopConnecting() {
         EventBus.torProxyState.unsubscribe(this)
         torSharedRepository.currentTorBridges = TorBridgeConfigurationList()
-        _dismissDialog.postValue(Unit)
+        dismissDialog.postValue(Unit)
     }
 }

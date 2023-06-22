@@ -150,6 +150,6 @@ class WalletInfoViewModel : CommonViewModel() {
         sharedPrefsWrapper.name = name
         sharedPrefsWrapper.surname = surname
         alias.postValue("$name $surname")
-        _dismissDialog.postValue(Unit)
+        dismissDialog.postValue(Unit)
     }
 }

@@ -24,7 +24,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.daasuu.ei.Ease
 import com.daasuu.ei.EasingInterpolator
 import com.tari.android.wallet.R
-import com.tari.android.wallet.application.deeplinks.DeepLink
 import com.tari.android.wallet.application.deeplinks.DeeplinkViewModel
 import com.tari.android.wallet.databinding.FragmentContactsSelectionBinding
 import com.tari.android.wallet.extension.observe
@@ -250,19 +249,7 @@ open class ContactSelectionFragment : CommonFragment<FragmentContactsSelectionBi
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == QRScannerActivity.REQUEST_QR_SCANNER && resultCode == Activity.RESULT_OK && data != null) {
             val qrData = data.getStringExtra(QRScannerActivity.EXTRA_QR_DATA) ?: return
-            (viewModel.deeplinkHandler.handle(qrData) as? DeepLink.Send)?.let {
-                lifecycleScope.launch(Dispatchers.IO) {
-                    val tariWalletAddress = viewModel.walletAddressViewModel.getWalletAddressFromHexString(it.walletAddress)
-                    if (tariWalletAddress != null) {
-                        ui.rootView.post { ui.searchEditText.setText(tariWalletAddress.emojiId, TextView.BufferType.EDITABLE) }
-                        ui.searchEditText.postDelayed({ ui.searchEditTextScrollView.smoothScrollTo(0, 0) }, Constants.UI.mediumDurationMs)
-                    }
-                }
-            }
-
-            (viewModel.deeplinkHandler.handle(qrData) as? DeepLink.AddBaseNode)?.let { deeplinkViewModel.addBaseNode(requireContext(), it) }
-
-            (viewModel.deeplinkHandler.handle(qrData) as? DeepLink.Contacts)?.let { deeplinkViewModel.addContacts(it.contacts) }
+            deeplinkViewModel.tryToHandle(requireContext(), qrData)
         }
     }
 

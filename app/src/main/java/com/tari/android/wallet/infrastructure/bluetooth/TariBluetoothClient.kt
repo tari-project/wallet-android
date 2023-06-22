@@ -16,7 +16,9 @@ import com.welie.blessed.BluetoothPeripheralCallback
 import com.welie.blessed.GattStatus
 import com.welie.blessed.ScanMode
 import com.welie.blessed.WriteType
+import io.reactivex.disposables.Disposable
 import java.util.UUID
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -110,6 +112,10 @@ class TariBluetoothClient @Inject constructor(val deeplinkHandler: DeeplinkHandl
                 }
             }
 
+            var wholeData = byteArrayOf()
+
+            var throttle: Disposable? = null
+
             override fun onCharacteristicUpdate(
                 peripheral: BluetoothPeripheral,
                 value: ByteArray?,
@@ -120,7 +126,11 @@ class TariBluetoothClient @Inject constructor(val deeplinkHandler: DeeplinkHandl
 
                 if (characteristic.uuid.toString().lowercase() == TRANSACTION_DATA_UUID.lowercase()) {
                     logger.e("onCharacteristicUpdate: ${String(value ?: byteArrayOf(), Charsets.UTF_8)}")
-                    doHandling(String(value ?: byteArrayOf(), Charsets.UTF_8))
+                    wholeData += value ?: byteArrayOf()
+
+                    throttle?.dispose()
+                    throttle = io.reactivex.Observable.timer(1000, TimeUnit.MILLISECONDS)
+                        .subscribe { doHandling(String(wholeData, Charsets.UTF_8)) }
                 }
             }
 
@@ -130,6 +140,7 @@ class TariBluetoothClient @Inject constructor(val deeplinkHandler: DeeplinkHandl
                 if (handled != null && handled is DeepLink.UserProfile) {
                     scanningCallback?.invoke(handled)
                 }
+                wholeData = byteArrayOf()
                 return if (handled != null) GattStatus.SUCCESS else GattStatus.INVALID_HANDLE
             }
 

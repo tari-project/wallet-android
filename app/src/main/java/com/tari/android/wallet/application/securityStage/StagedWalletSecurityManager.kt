@@ -120,7 +120,7 @@ class StagedWalletSecurityManager : CommonViewModel() {
     }
 
     private fun openStage1() {
-        _dismissDialog.postValue(Unit)
+        dismissDialog.postValue(Unit)
         tariNavigator?.let {
             it.toAllSettings()
             it.toBackupSettings(false)
@@ -139,7 +139,7 @@ class StagedWalletSecurityManager : CommonViewModel() {
     }
 
     private fun openStage1B() {
-        _dismissDialog.postValue(Unit)
+        dismissDialog.postValue(Unit)
         tariNavigator?.let {
             it.toAllSettings()
             it.toBackupSettings(true)
@@ -157,7 +157,7 @@ class StagedWalletSecurityManager : CommonViewModel() {
     }
 
     private fun openStage2() {
-        _dismissDialog.postValue(Unit)
+        dismissDialog.postValue(Unit)
         tariNavigator?.let {
             it.toAllSettings()
             it.toBackupSettings(false)
@@ -176,7 +176,7 @@ class StagedWalletSecurityManager : CommonViewModel() {
     }
 
     private fun openStage3() {
-        _dismissDialog.postValue(Unit)
+        dismissDialog.postValue(Unit)
         //todo for future
     }
 

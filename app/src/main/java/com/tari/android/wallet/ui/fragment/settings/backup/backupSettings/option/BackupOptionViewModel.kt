@@ -114,7 +114,7 @@ class BackupOptionViewModel : CommonViewModel() {
             viewModelScope.launch(Dispatchers.IO) {
                 try {
                     backupManager.turnOff(_option.value!!.type)
-                    _dismissDialog.postValue(Unit)
+                    dismissDialog.postValue(Unit)
                 } catch (exception: Exception) {
                     logger.i(exception.toString())
                 }
@@ -135,7 +135,7 @@ class BackupOptionViewModel : CommonViewModel() {
                 },
                 ButtonModule(resourceManager.getString(R.string.common_cancel), ButtonStyle.Close) {
                     onDismissAction()
-                    _dismissDialog.value = Unit
+                    dismissDialog.value = Unit
                 }
             ))
 

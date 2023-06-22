@@ -134,7 +134,7 @@ class ShareViewModel : CommonViewModel() {
                 BodyModule(resourceManager.getString(R.string.contactless_payment_success_description, name)),
                 ButtonModule(resourceManager.getString(R.string.common_lets_do_it_2), ButtonStyle.Normal) {
                     navigation.postValue(Navigation.TxListNavigation.ToSendTariToUser(contactDto))
-                    _dismissDialog.postValue(Unit)
+                    dismissDialog.postValue(Unit)
                 },
                 ButtonModule(resourceManager.getString(R.string.common_no_2), ButtonStyle.Close)
             )

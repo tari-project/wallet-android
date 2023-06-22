@@ -106,7 +106,7 @@ class UtxosListViewModel : CommonViewModel() {
         modules.addAll(listOptions)
         modules.add(ButtonModule(resourceManager.getString(R.string.common_apply), ButtonStyle.Normal) {
             ordering.postValue(listOptions.firstOrNull { it.isSelected }?.ordering)
-            _dismissDialog.postValue(Unit)
+            dismissDialog.postValue(Unit)
         })
         modules.add(ButtonModule(resourceManager.getString(R.string.common_cancel), ButtonStyle.Close))
         val modularDialogArgs = ModularDialogArgs(
@@ -121,7 +121,7 @@ class UtxosListViewModel : CommonViewModel() {
             walletService.getWithError { error, wallet ->
                 val selectedUtxos = textList.value.orEmpty().filter { it.checked.value }.map { it.source }.toList()
                 wallet.joinUtxos(selectedUtxos, error)
-                _dismissDialog.postValue(Unit)
+                dismissDialog.postValue(Unit)
                 loadUtxosFromFFI()
                 EventBus.post(Event.Transaction.Updated)
                 showSuccessJoinDialog()
@@ -143,11 +143,11 @@ class UtxosListViewModel : CommonViewModel() {
                 BodyModule(resourceManager.getString(R.string.utxos_combine_and_break_description)),
                 splitModule,
                 ButtonModule(resourceManager.getString(buttonText), ButtonStyle.Normal) {
-                    _dismissDialog.postValue(Unit)
+                    dismissDialog.postValue(Unit)
                     showConfirmDialog(R.string.utxos_break_description) {
                         walletService.getWithError { error, wallet ->
                             wallet.splitUtxos(selectedUtxos, splitModule.count, error)
-                            _dismissDialog.postValue(Unit)
+                            dismissDialog.postValue(Unit)
                             loadUtxosFromFFI()
                             EventBus.post(Event.Transaction.Updated)
                             showSuccessSplitDialog()
@@ -284,7 +284,7 @@ class UtxosListViewModel : CommonViewModel() {
         if (utxoItem.isSelectable) {
             modules.add(
                 ButtonModule(resourceManager.getString(R.string.utxos_break_button), ButtonStyle.Normal) {
-                    _dismissDialog.postValue(Unit)
+                    dismissDialog.postValue(Unit)
                     split(utxoItem)
                 },
             )

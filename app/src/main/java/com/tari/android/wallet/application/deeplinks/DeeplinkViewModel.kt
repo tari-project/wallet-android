@@ -34,8 +34,15 @@ class DeeplinkViewModel : CommonViewModel() {
     @Inject
     lateinit var contactRepository: ContactsRepository
 
+    @Inject
+    lateinit var deeplinkHandler: DeeplinkHandler
+
     init {
         component.inject(this)
+    }
+
+    fun tryToHandle(context:Context, qrData: String) {
+        deeplinkHandler.handle(qrData)?.let { execute(context, it) }
     }
 
     fun execute(context: Context, deeplink: DeepLink) {
@@ -75,7 +82,7 @@ class DeeplinkViewModel : CommonViewModel() {
                 BodyModule(resourceManager.getString(R.string.contact_deeplink_message, contactDtos.size.toString()) + ". " + names),
                 ButtonModule(resourceManager.getString(R.string.common_confirm), ButtonStyle.Normal) {
                     contactDtos.forEach { contactRepository.addContact(it) }
-                    _dismissDialog.postValue(Unit)
+                    dismissDialog.postValue(Unit)
                 },
                 ButtonModule(resourceManager.getString(R.string.common_cancel), ButtonStyle.Close)
             )
@@ -85,7 +92,7 @@ class DeeplinkViewModel : CommonViewModel() {
 
     fun send(deeplink: DeepLink.Send) {
         val contactDto = runCatching {
-            val ffiWalletAddress = FFITariWalletAddress(HexString(deeplink.walletAddress))
+            val ffiWalletAddress = FFITariWalletAddress(HexString(deeplink.walletAddressHex))
             val tariWalletAddress = TariWalletAddress(ffiWalletAddress.toString(), ffiWalletAddress.getEmojiId())
             ContactDto(FFIContactDto(tariWalletAddress, ""))
         }.getOrNull() ?: return

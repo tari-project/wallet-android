@@ -126,9 +126,9 @@ class TariBluetoothServer @Inject constructor(
                 val handled = runCatching { deeplinkHandler.handle(string) }.getOrNull()
 
                 if (handled != null && handled is DeepLink.Contacts) {
-                    wholeData = byteArrayOf()
                     onReceived.invoke(handled.contacts)
                 }
+                wholeData = byteArrayOf()
                 return if (handled != null) GattStatus.SUCCESS else GattStatus.INVALID_HANDLE
             }
 
