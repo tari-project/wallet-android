@@ -83,7 +83,7 @@ class TorBridgesSelectionViewModel : CommonViewModel() {
         }
         val isEmptyChoice = list.filter { (it is TorBridgeViewHolderItem.Bridge) }.all { !(it as TorBridgeViewHolderItem.Bridge).isSelected }
         list.first { it is TorBridgeViewHolderItem.Empty }.isSelected = isEmptyChoice
-        _torBridges.postValue(_torBridges.value)
+        _torBridges.postValue(_torBridges.value!!.map { it.deepCopy() as TorBridgeViewHolderItem }.toMutableList())
     }
 
     fun connect() {

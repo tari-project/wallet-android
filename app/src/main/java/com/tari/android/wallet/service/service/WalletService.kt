@@ -34,10 +34,14 @@ package com.tari.android.wallet.service.service
 
 import android.app.Service
 import android.content.Intent
-import android.os.*
+import android.os.Handler
+import android.os.IBinder
+import android.os.Looper
 import androidx.lifecycle.ProcessLifecycleOwner
 import com.orhanobut.logger.Logger
-import com.tari.android.wallet.application.*
+import com.tari.android.wallet.application.TariWalletApplication
+import com.tari.android.wallet.application.WalletManager
+import com.tari.android.wallet.application.WalletState
 import com.tari.android.wallet.application.baseNodes.BaseNodes
 import com.tari.android.wallet.data.WalletConfig
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
@@ -59,7 +63,9 @@ import com.tari.android.wallet.util.WalletUtil
 import io.reactivex.Observable
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
-import org.joda.time.*
+import org.joda.time.DateTime
+import org.joda.time.Hours
+import org.joda.time.Minutes
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
@@ -162,6 +168,7 @@ class WalletService : Service() {
     private fun stopService(startId: Int) {
         // stop service
         stopForeground(STOP_FOREGROUND_REMOVE)
+        walletManager.stop()
         stopSelfResult(startId)
         // stop wallet manager on a separate thread & unsubscribe from events
         EventBus.walletState.unsubscribe(this)
