@@ -17,11 +17,9 @@ import com.welie.blessed.BluetoothPeripheralCallback
 import com.welie.blessed.GattStatus
 import com.welie.blessed.ScanMode
 import com.welie.blessed.WriteType
-import io.reactivex.disposables.Disposable
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.util.UUID
-import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -105,8 +103,6 @@ class TariBluetoothClient @Inject constructor(val deeplinkHandler: DeeplinkHandl
 
             var wholeData = byteArrayOf()
 
-            var throttle: Disposable? = null
-
             override fun onCharacteristicUpdate(
                 peripheral: BluetoothPeripheral,
                 value: ByteArray?,
@@ -118,15 +114,19 @@ class TariBluetoothClient @Inject constructor(val deeplinkHandler: DeeplinkHandl
                 if (characteristic.uuid.toString().lowercase() == TRANSACTION_DATA_UUID.lowercase()) {
                     val lastByte = value?.last() ?: 0
                     wholeData += value?.dropLast(1)?.toByteArray() ?: byteArrayOf()
+
+                    if ((value?.size ?: 0) < chunkSize && value?.lastOrNull() == 0.toByte()) {
+                        logger.e("share: read: wrong chunk size: ${value.size}")
+                    }
+
+                    logger.e("contactlessPayment: read: chunk size: ${value?.size ?: 0}")
                     logger.e("contactlessPayment: read: chunk: ${String(value ?: byteArrayOf(), Charsets.UTF_8)}")
                     logger.e("contactlessPayment: read: whole data: ${String(wholeData, Charsets.UTF_8)}")
 
-                    throttle?.dispose()
-                    throttle = io.reactivex.Observable.timer(1000, TimeUnit.MILLISECONDS)
-                        .subscribe { doHandling(String(wholeData, Charsets.UTF_8)) }
-
                     if (lastByte == 1.toByte()) {
                         peripheral.readCharacteristic(characteristic)
+                    } else {
+                        doHandling(String(wholeData, Charsets.UTF_8))
                     }
                 }
             }
