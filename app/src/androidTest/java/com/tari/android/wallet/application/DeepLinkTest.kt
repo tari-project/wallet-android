@@ -49,11 +49,11 @@ class DeepLinkTest {
 
     @Test
     fun assertNetwork() {
-        val nullLink = "tari://mainnet/${DeepLink.Send.sendCommand}?${DeepLink.Send.publicKeyKey}=$PUBLIC_KEY"
+        val nullLink = "tari://mainnet/${DeepLink.Send.sendCommand}?${DeepLink.Send.tariAddressKey}=$PUBLIC_KEY"
         val nullResult = deeplinkHandler.handle(nullLink) as? DeepLink.ContactlessPayment
         assertNull(nullResult)
 
-        val notNullLink = "tari://${currentNetwork.uriComponent}/${DeepLink.Send.sendCommand}?${DeepLink.Send.publicKeyKey}=$PUBLIC_KEY"
+        val notNullLink = "tari://${currentNetwork.uriComponent}/${DeepLink.Send.sendCommand}?${DeepLink.Send.tariAddressKey}=$PUBLIC_KEY"
         val notNullResult = deeplinkHandler.handle(notNullLink) as? DeepLink.ContactlessPayment
         assertNotNull(notNullResult)
     }
@@ -71,7 +71,7 @@ class DeepLinkTest {
 
     @Test
     fun assertPubkey() {
-        val deeplink = "tari://${currentNetwork.uriComponent}/${DeepLink.Send.sendCommand}?${DeepLink.Send.publicKeyKey}=$PUBLIC_KEY"
+        val deeplink = "tari://${currentNetwork.uriComponent}/${DeepLink.Send.sendCommand}?${DeepLink.Send.tariAddressKey}=$PUBLIC_KEY"
         val result = deeplinkHandler.handle(deeplink) as? DeepLink.ContactlessPayment
         assertEquals(result!!.walletAddress, PUBLIC_KEY)
     }
@@ -99,7 +99,7 @@ class DeepLinkTest {
 
     @Test
     fun assertFullDataDeeplinks() {
-        val sendDeeplink = "tari://${currentNetwork.uriComponent}/${DeepLink.Send.sendCommand}?${DeepLink.Send.amountKey}=12345678&${DeepLink.Send.noteKey}=hey&${DeepLink.Send.publicKeyKey}=$PUBLIC_KEY"
+        val sendDeeplink = "tari://${currentNetwork.uriComponent}/${DeepLink.Send.sendCommand}?${DeepLink.Send.amountKey}=12345678&${DeepLink.Send.noteKey}=hey&${DeepLink.Send.tariAddressKey}=$PUBLIC_KEY"
         val result = deeplinkHandler.handle(sendDeeplink) as? DeepLink.ContactlessPayment
         assertEquals(result!!.note, "hey")
         assertEquals(result.walletAddress, PUBLIC_KEY)

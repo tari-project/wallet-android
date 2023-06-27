@@ -234,7 +234,7 @@ class ContactsViewModel : CommonViewModel() {
             BodyModule(null, SpannableString(secondLineHtml)),
             ButtonModule(resourceManager.getString(R.string.common_confirm), ButtonStyle.Normal) {
                 contactsRepository.unlinkContact(contact)
-                _dismissDialog.value = Unit
+                dismissDialog.value = Unit
                 showUnlinkSuccessDialog(contact)
             },
             ButtonModule(resourceManager.getString(R.string.common_cancel), ButtonStyle.Close)

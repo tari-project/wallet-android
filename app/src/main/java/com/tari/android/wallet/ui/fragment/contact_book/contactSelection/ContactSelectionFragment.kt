@@ -24,7 +24,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.daasuu.ei.Ease
 import com.daasuu.ei.EasingInterpolator
 import com.tari.android.wallet.R
-import com.tari.android.wallet.application.deeplinks.DeepLink
 import com.tari.android.wallet.application.deeplinks.DeeplinkViewModel
 import com.tari.android.wallet.databinding.FragmentContactsSelectionBinding
 import com.tari.android.wallet.extension.observe
@@ -44,7 +43,9 @@ import com.tari.android.wallet.ui.extension.temporarilyDisableClick
 import com.tari.android.wallet.ui.extension.visible
 import com.tari.android.wallet.ui.fragment.contact_book.contacts.adapter.ContactListAdapter
 import com.tari.android.wallet.ui.fragment.contact_book.contacts.adapter.contact.ContactItem
+import com.tari.android.wallet.ui.fragment.contact_book.contacts.adapter.contact.ContactlessPaymentItem
 import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.YatDto
+import com.tari.android.wallet.ui.fragment.contact_book.root.ShareViewModel
 import com.tari.android.wallet.ui.fragment.qr.QRScannerActivity
 import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.EmojiUtil
@@ -158,8 +159,15 @@ open class ContactSelectionFragment : CommonFragment<FragmentContactsSelectionBi
 
     private fun setupRecyclerView() {
         ui.contactsListRecyclerView.layoutManager = LinearLayoutManager(requireContext())
-        recyclerViewAdapter.setClickListener(CommonAdapter.ItemClickListener { onItemClick(it as? ContactItem) })
+        recyclerViewAdapter.setClickListener(CommonAdapter.ItemClickListener {
+            onItemClick(it as? ContactItem)
+            (it as? ContactlessPaymentItem)?.let { onContactlessPaymentClick() }
+        })
         ui.contactsListRecyclerView.adapter = recyclerViewAdapter
+    }
+
+    private fun onContactlessPaymentClick() {
+        ShareViewModel.currentInstant?.doContactlessPayment()
     }
 
     private fun onItemClick(contactItem: ContactItem?) {
@@ -241,19 +249,7 @@ open class ContactSelectionFragment : CommonFragment<FragmentContactsSelectionBi
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == QRScannerActivity.REQUEST_QR_SCANNER && resultCode == Activity.RESULT_OK && data != null) {
             val qrData = data.getStringExtra(QRScannerActivity.EXTRA_QR_DATA) ?: return
-            (viewModel.deeplinkHandler.handle(qrData) as? DeepLink.Send)?.let {
-                lifecycleScope.launch(Dispatchers.IO) {
-                    val tariWalletAddress = viewModel.walletAddressViewModel.getWalletAddressFromHexString(it.walletAddress)
-                    if (tariWalletAddress != null) {
-                        ui.rootView.post { ui.searchEditText.setText(tariWalletAddress.emojiId, TextView.BufferType.EDITABLE) }
-                        ui.searchEditText.postDelayed({ ui.searchEditTextScrollView.smoothScrollTo(0, 0) }, Constants.UI.mediumDurationMs)
-                    }
-                }
-            }
-
-            (viewModel.deeplinkHandler.handle(qrData) as? DeepLink.AddBaseNode)?.let { deeplinkViewModel.executeAction(requireContext(), it) }
-
-            (viewModel.deeplinkHandler.handle(qrData) as? DeepLink.Contacts)?.let { deeplinkViewModel.addContacts(it.contacts) }
+            deeplinkViewModel.tryToHandle(requireContext(), qrData)
         }
     }
 
@@ -349,6 +345,10 @@ open class ContactSelectionFragment : CommonFragment<FragmentContactsSelectionBi
                     viewModel.searchText.value = textWithoutSeparators
                 }
             }
+        } else if (viewModel.deeplinkHandler.handle(text) != null) {
+            val deeplink = viewModel.deeplinkHandler.handle(text)!!
+            deeplinkViewModel.execute(requireContext(), deeplink)
+            viewModel.selectedTariWalletAddress.value = null
         } else if (viewModel.walletAddressViewModel.checkForWalletAddressHex(text)) {
             finishEntering(viewModel.selectedTariWalletAddress.value!!.emojiId)
         } else {

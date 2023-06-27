@@ -71,7 +71,7 @@ class LogsViewModel : CommonViewModel() {
         modules.addAll(sourceFiltersModules)
         modules.add(SpaceModule(12))
         modules.add(ButtonModule(resourceManager.getString(R.string.debug_log_filter_apply), ButtonStyle.Normal) {
-            _dismissDialog.postValue(Unit)
+            dismissDialog.postValue(Unit)
             logLevelFilters.postValue(levelFilterModules.filter { it.checkedModule.isChecked }.map { it.logFilter }.toMutableList())
             logSourceFilters.postValue(sourceFiltersModules.filter { it.checkedModule.isChecked }.map { it.logFilter }.toMutableList())
         })

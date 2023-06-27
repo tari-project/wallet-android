@@ -16,7 +16,9 @@ import com.welie.blessed.BluetoothPeripheralCallback
 import com.welie.blessed.GattStatus
 import com.welie.blessed.ScanMode
 import com.welie.blessed.WriteType
+import io.reactivex.disposables.Disposable
 import java.util.UUID
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -92,13 +94,14 @@ class TariBluetoothClient @Inject constructor(val deeplinkHandler: DeeplinkHandl
                 val service = peripheral.getService(UUID.fromString(SERVICE_UUID))
                 service?.characteristics?.forEach {
                     if (it.uuid.toString().lowercase() == CHARACTERISTIC_UUID.lowercase() && shareData != null) {
-                        val shareData = shareData.orEmpty().toByteArray(Charsets.UTF_16)
+                        val shareData = shareData.orEmpty().toByteArray(Charsets.UTF_8)
                         runWithPermissions(bluetoothConnectPermission) {
                             @Suppress("MissingPermission")
                             val dataChunks = shareData.toList().chunked(512)
                             for (chunk in dataChunks) {
 //                                https://stackoverflow.com/questions/38913743/maximum-packet-length-for-bluetooth-le/38914831#38914831
                                 peripheral.writeCharacteristic(it, chunk.toByteArray(), WriteType.WITH_RESPONSE)
+                                logger.e("writeCharacteristic: $shareData")
                             }
                         }
                     }
@@ -109,6 +112,10 @@ class TariBluetoothClient @Inject constructor(val deeplinkHandler: DeeplinkHandl
                 }
             }
 
+            var wholeData = byteArrayOf()
+
+            var throttle: Disposable? = null
+
             override fun onCharacteristicUpdate(
                 peripheral: BluetoothPeripheral,
                 value: ByteArray?,
@@ -118,8 +125,12 @@ class TariBluetoothClient @Inject constructor(val deeplinkHandler: DeeplinkHandl
                 super.onCharacteristicUpdate(peripheral, value, characteristic, status)
 
                 if (characteristic.uuid.toString().lowercase() == TRANSACTION_DATA_UUID.lowercase()) {
-                    logger.e("onCharacteristicUpdate: ${String(value ?: byteArrayOf(), Charsets.UTF_16)}")
-                    doHandling(String(value ?: byteArrayOf(), Charsets.UTF_16))
+                    logger.e("onCharacteristicUpdate: ${String(value ?: byteArrayOf(), Charsets.UTF_8)}")
+                    wholeData += value ?: byteArrayOf()
+
+                    throttle?.dispose()
+                    throttle = io.reactivex.Observable.timer(1000, TimeUnit.MILLISECONDS)
+                        .subscribe { doHandling(String(wholeData, Charsets.UTF_8)) }
                 }
             }
 
@@ -129,6 +140,7 @@ class TariBluetoothClient @Inject constructor(val deeplinkHandler: DeeplinkHandl
                 if (handled != null && handled is DeepLink.UserProfile) {
                     scanningCallback?.invoke(handled)
                 }
+                wholeData = byteArrayOf()
                 return if (handled != null) GattStatus.SUCCESS else GattStatus.INVALID_HANDLE
             }
 
@@ -171,6 +183,6 @@ class TariBluetoothClient @Inject constructor(val deeplinkHandler: DeeplinkHandl
     }
 
     companion object {
-        const val RSSI_Threshold = -50
+        const val RSSI_Threshold = -55
     }
 }

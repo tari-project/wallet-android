@@ -1,5 +1,7 @@
 package com.tari.android.wallet.ui.fragment.contact_book.root
 
+import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -13,6 +15,7 @@ import androidx.fragment.app.viewModels
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.google.android.material.tabs.TabLayoutMediator
 import com.tari.android.wallet.R
+import com.tari.android.wallet.application.deeplinks.DeeplinkViewModel
 import com.tari.android.wallet.databinding.FragmentContactBookRootBinding
 import com.tari.android.wallet.extension.observe
 import com.tari.android.wallet.model.TariWalletAddress
@@ -24,12 +27,15 @@ import com.tari.android.wallet.ui.extension.postDelayed
 import com.tari.android.wallet.ui.extension.setVisible
 import com.tari.android.wallet.ui.extension.showKeyboard
 import com.tari.android.wallet.ui.extension.string
+import com.tari.android.wallet.ui.extension.temporarilyDisableClick
 import com.tari.android.wallet.ui.fragment.contact_book.contacts.ContactsFragment
 import com.tari.android.wallet.ui.fragment.contact_book.favorites.FavoritesFragment
 import com.tari.android.wallet.ui.fragment.contact_book.root.share.ShareOptionArgs
 import com.tari.android.wallet.ui.fragment.contact_book.root.share.ShareOptionView
 import com.tari.android.wallet.ui.fragment.home.HomeActivity
 import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
+import com.tari.android.wallet.ui.fragment.qr.QRScannerActivity
+import com.tari.android.wallet.util.Constants
 import java.lang.ref.WeakReference
 
 class ContactBookFragment : CommonFragment<FragmentContactBookRootBinding, ContactBookViewModel>() {
@@ -39,11 +45,14 @@ class ContactBookFragment : CommonFragment<FragmentContactBookRootBinding, Conta
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?) =
         FragmentContactBookRootBinding.inflate(inflater, container, false).also { ui = it }.root
 
+    private val deeplinkViewModel: DeeplinkViewModel by viewModels()
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         val viewModel: ContactBookViewModel by viewModels()
         bindViewModel(viewModel)
+        subscribeVM(deeplinkViewModel)
 
         clipboardController = ClipboardController(listOf(ui.dimmerView), ui.clipboardWallet, viewModel.walletAddressViewModel)
 
@@ -59,6 +68,14 @@ class ContactBookFragment : CommonFragment<FragmentContactBookRootBinding, Conta
     override fun onResume() {
         super.onResume()
         viewModel.walletAddressViewModel.tryToCheckClipboard()
+        grantPermission()
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        if (requestCode == QRScannerActivity.REQUEST_QR_SCANNER && resultCode == Activity.RESULT_OK && data != null) {
+            val qrData = data.getStringExtra(QRScannerActivity.EXTRA_QR_DATA) ?: return
+            deeplinkViewModel.tryToHandle(requireContext(), qrData)
+        }
     }
 
     private fun subscribeUI() = with(viewModel) {
@@ -93,6 +110,8 @@ class ContactBookFragment : CommonFragment<FragmentContactBookRootBinding, Conta
 
     private fun setupUI() {
         ui.viewPager.adapter = ContactBookAdapter(requireActivity())
+
+        ui.qrCodeButton.setOnClickListener { onQRButtonClick(it) }
 
         TabLayoutMediator(ui.viewPagerIndicators, ui.viewPager) { tab, position ->
             tab.setText(
@@ -139,6 +158,20 @@ class ContactBookFragment : CommonFragment<FragmentContactBookRootBinding, Conta
                 }
             }
         }
+    }
+
+    private fun onQRButtonClick(view: View) {
+        view.temporarilyDisableClick()
+        requireActivity().hideKeyboard()
+        clipboardController.hidePasteEmojiIdViews(animate = true) {
+            ui.rootView.postDelayed(Constants.UI.keyboardHideWaitMs) { startQRCodeActivity() }
+        }
+    }
+
+    private fun startQRCodeActivity() {
+        val intent = Intent(activity, QRScannerActivity::class.java)
+        startActivityForResult(intent, QRScannerActivity.REQUEST_QR_SCANNER)
+        activity?.overridePendingTransition(R.anim.slide_up, 0)
     }
 
     private fun focusEditTextAndShowKeyboard() {

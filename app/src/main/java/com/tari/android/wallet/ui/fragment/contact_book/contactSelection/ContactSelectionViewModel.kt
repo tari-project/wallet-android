@@ -15,6 +15,7 @@ import com.tari.android.wallet.ui.common.recyclerView.CommonViewHolderItem
 import com.tari.android.wallet.ui.common.recyclerView.items.TitleViewHolderItem
 import com.tari.android.wallet.ui.component.clipboardController.WalletAddressViewModel
 import com.tari.android.wallet.ui.fragment.contact_book.contacts.adapter.contact.ContactItem
+import com.tari.android.wallet.ui.fragment.contact_book.contacts.adapter.contact.ContactlessPaymentItem
 import com.tari.android.wallet.ui.fragment.contact_book.data.ContactsRepository
 import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.ContactDto
 import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.FFIContactDto
@@ -50,6 +51,8 @@ open class ContactSelectionViewModel : CommonViewModel() {
 
     val walletAddressViewModel = WalletAddressViewModel()
 
+    val isContactlessPayment = MutableLiveData<Boolean>(false)
+
     @Inject
     lateinit var yatAdapter: YatAdapter
 
@@ -78,6 +81,7 @@ open class ContactSelectionViewModel : CommonViewModel() {
 
         list.addSource(contactListSource) { updateList() }
         list.addSource(searchText) { updateList() }
+        list.addSource(isContactlessPayment) { updateList() }
     }
 
     fun getUserDto(): ContactDto = selectedUser.value ?: contactListSource.value.orEmpty()
@@ -97,6 +101,10 @@ open class ContactSelectionViewModel : CommonViewModel() {
         }
 
         val result = mutableListOf<CommonViewHolderItem>()
+
+        if (isContactlessPayment.value == true) {
+            result.add(ContactlessPaymentItem())
+        }
 
         val resentUsed = list.filter { it.contact.lastUsedDate != null }
             .sortedBy { item -> item.contact.lastUsedDate?.date }

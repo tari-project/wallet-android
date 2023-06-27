@@ -768,6 +768,7 @@
     <string name="contact_book_add_contact_placeholder">Enter Emoji ID, Contact Name or Yat</string>
     <string name="contact_book_search_hint">Find Contact</string>
     <string name="contact_book_details_send_tari">Send Tari</string>
+    <string name="transaction_send_to">Send To</string>
     <string name="contact_book_details_add_to_favorites">Add to Favorites</string>
     <string name="contact_book_details_remove_from_favorites">Remove from Favorites</string>
     <string name="contact_book_details_delete_contact">Delete Contact</string>

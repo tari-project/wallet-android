@@ -162,7 +162,7 @@ class ContactLinkViewModel : CommonViewModel() {
             BodyModule(null, SpannableString(secondLineHtml)),
             ButtonModule(resourceManager.getString(common_confirm), ButtonStyle.Normal) {
                 contactsRepository.linkContacts(ffiContact.value!!, phoneContactDto)
-                _dismissDialog.postValue(Unit)
+                dismissDialog.postValue(Unit)
                 showLinkSuccessDialog(phoneContactDto)
             },
             ButtonModule(resourceManager.getString(common_cancel), ButtonStyle.Close)

@@ -13,6 +13,8 @@ import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.data.sharedPrefs.bluetooth.BluetoothServerState
 import com.tari.android.wallet.data.sharedPrefs.bluetooth.ShareSettingsRepository
 import com.tari.android.wallet.extension.addTo
+import com.tari.android.wallet.model.TariWalletAddress
+import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.ContactDto
 import com.welie.blessed.BluetoothCentral
 import com.welie.blessed.BluetoothPeripheralManager
 import com.welie.blessed.BluetoothPeripheralManagerCallback
@@ -103,7 +105,7 @@ class TariBluetoothServer @Inject constructor(
 
                 throttle?.dispose()
                 throttle = io.reactivex.Observable.timer(1000, TimeUnit.MILLISECONDS)
-                    .subscribe { doHandling(String(wholeData, Charsets.UTF_16)) }
+                    .subscribe { doHandling(String(wholeData, Charsets.UTF_8)) }
 
                 return GattStatus.SUCCESS
             }
@@ -116,28 +118,33 @@ class TariBluetoothServer @Inject constructor(
                 super.onCharacteristicWriteCompleted(bluetoothCentral, characteristic, value)
 
                 throttle?.dispose()
-                doHandling(String(wholeData, Charsets.UTF_16))
+                doHandling(String(wholeData, Charsets.UTF_8))
             }
 
             private fun doHandling(string: String): GattStatus {
+                logger.e("on share receive: $string")
                 val handled = runCatching { deeplinkHandler.handle(string) }.getOrNull()
 
                 if (handled != null && handled is DeepLink.Contacts) {
-                    wholeData = byteArrayOf()
                     onReceived.invoke(handled.contacts)
                 }
+                wholeData = byteArrayOf()
                 return if (handled != null) GattStatus.SUCCESS else GattStatus.INVALID_HANDLE
             }
 
             override fun onCharacteristicRead(bluetoothCentral: BluetoothCentral, characteristic: BluetoothGattCharacteristic): ReadResponse {
                 return if (characteristic.uuid.toString().lowercase() == TRANSACTION_DATA_UUID.lowercase()) {
+                    val myWalletAddress = TariWalletAddress().apply {
+                        hexString = sharedPrefsRepository.publicKeyHexString.orEmpty()
+                        emojiId = sharedPrefsRepository.emojiId.orEmpty()
+                    }
                     val data = deeplinkHandler.getDeeplink(
                         DeepLink.UserProfile(
                             sharedPrefsRepository.publicKeyHexString.orEmpty(),
-                            sharedPrefsRepository.name.orEmpty()
+                            ContactDto.normalizeAlias(sharedPrefsRepository.name.orEmpty(), myWalletAddress),
                         )
                     )
-                    ReadResponse(GattStatus.SUCCESS, data.toByteArray(Charsets.UTF_16))
+                    ReadResponse(GattStatus.SUCCESS, data.toByteArray(Charsets.UTF_8))
                 } else super.onCharacteristicRead(bluetoothCentral, characteristic)
             }
         }

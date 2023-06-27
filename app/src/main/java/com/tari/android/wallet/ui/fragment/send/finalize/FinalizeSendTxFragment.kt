@@ -239,7 +239,7 @@ class FinalizeSendTxFragment : CommonFragment<FragmentFinalizeSendTxBinding, Fin
                     ui.lottieAnimationView.alpha = 0f
                     viewModel.sentTxId.value?.let {
                         viewModel.tariNavigator.onSendTxSuccessful(
-                            true,
+                            false,
                             it
                         )
                     }

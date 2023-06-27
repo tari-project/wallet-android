@@ -88,6 +88,7 @@ class PermissionManagerUI(val fragment: CommonFragment<*, *>) {
                 HeadModule(fragment.getString(R.string.common_error_title)),
                 BodyModule(fragment.getString(R.string.common_permission_required_dialog_body, permissionName)),
                 ButtonModule(fragment.getString(R.string.common_permission_required_button), ButtonStyle.Normal) {
+                    fragment.viewModel.dismissDialog.postValue(Unit)
                     openSettings()
                 },
                 ButtonModule(fragment.getString(R.string.common_cancel), ButtonStyle.Close)
