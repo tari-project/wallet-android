@@ -91,47 +91,16 @@ class TariBluetoothClient @Inject constructor(val deeplinkHandler: DeeplinkHandl
 
     private fun doPairingOrShare(device: BluetoothPeripheral) {
 
-        val callback = object : BluetoothPeripheralCallback() {
-
-            var chunks = listOf<ByteArray>()
-            var chunkDevice: BluetoothPeripheral? = null
-            var characteristic: BluetoothGattCharacteristic? = null
-
+        val contactlessPaymentCallback = object : BluetoothPeripheralCallback() {
             override fun onServicesDiscovered(peripheral: BluetoothPeripheral) {
                 super.onServicesDiscovered(peripheral)
                 val service = peripheral.getService(UUID.fromString(SERVICE_UUID))
                 service?.characteristics?.forEach {
-                    if (it.uuid.toString().lowercase() == CHARACTERISTIC_UUID.lowercase() && shareData != null) {
-                        val shareData = shareData.orEmpty().toByteArray(Charsets.UTF_8)
-                        logger.e("shareCharacteristic: write: whole data: ${String(shareData, Charsets.UTF_8)}")
-                        runWithPermissions(bluetoothConnectPermission) {
-                            viewModelScope.launch(Dispatchers.IO) {
-                                val chunked =  shareData.toList().chunked(chunkSize)
-                                chunks = chunked.mapIndexed { index, items -> (items + if (index == chunked.size - 1) 0 else 1).toByteArray() }.toList()
-                                chunkDevice = peripheral
-                                characteristic = it
-                                doChunkWrite()
-                            }
-                        }
-                    }
-
                     if (it.uuid.toString().lowercase() == TRANSACTION_DATA_UUID.lowercase()) {
                         peripheral.readCharacteristic(it)
                         logger.e("contactlessPayment: read:")
                     }
                 }
-            }
-
-            private fun doChunkWrite() {
-                if (chunks.isEmpty()) {
-                    logger.e("shareCharacteristic: write: done")
-                    return
-                }
-                val newChunk = chunks.first()
-                chunks = chunks.drop(1)
-                chunkDevice?.writeCharacteristic(characteristic!!, newChunk, WriteType.WITH_RESPONSE)
-                logger.e("shareCharacteristic: write: chunk: ${newChunk.joinToString("")}")
-                logger.e("shareCharacteristic: write: chunk: ${String(newChunk, Charsets.UTF_8)}")
             }
 
             var wholeData = byteArrayOf()
@@ -169,11 +138,61 @@ class TariBluetoothClient @Inject constructor(val deeplinkHandler: DeeplinkHandl
 
                 logger.e("contactlessPayment: handle: handled: $handled")
 
-                if (handled != null && handled is DeepLink.UserProfile) {
-                    scanningCallback?.invoke(handled)
+                scanningCallback?.let {
+                    if (handled != null && handled is DeepLink.UserProfile) {
+                        scanningCallback?.invoke(handled)
+                    } else {
+                        onFailedSharing("Something went wrong during contactless payment. Please try again.\n\nError: $string")
+                    }
                 }
                 wholeData = byteArrayOf()
                 return if (handled != null) GattStatus.SUCCESS else GattStatus.INVALID_HANDLE
+            }
+        }
+
+
+        val callback = object : BluetoothPeripheralCallback() {
+
+            var chunks = listOf<ByteArray>()
+            var chunkDevice: BluetoothPeripheral? = null
+            var characteristic: BluetoothGattCharacteristic? = null
+
+            override fun onServicesDiscovered(peripheral: BluetoothPeripheral) {
+                super.onServicesDiscovered(peripheral)
+                val service = peripheral.getService(UUID.fromString(SERVICE_UUID))
+                service?.characteristics?.forEach {
+                    if (it.uuid.toString().lowercase() == CHARACTERISTIC_UUID.lowercase() && shareData != null) {
+                        val shareData = shareData.orEmpty().toByteArray(Charsets.UTF_8)
+                        logger.e("shareCharacteristic: write: whole data: ${String(shareData, Charsets.UTF_8)}")
+                        runWithPermissions(bluetoothConnectPermission) {
+                            viewModelScope.launch(Dispatchers.IO) {
+                                val chunked = shareData.toList().chunked(chunkSize)
+                                chunks =
+                                    chunked.mapIndexed { index, items -> (items + if (index == chunked.size - 1) 0 else 1).toByteArray() }.toList()
+                                chunkDevice = peripheral
+                                characteristic = it
+                                doChunkWrite()
+                            }
+                        }
+                    }
+
+                    if (it.uuid.toString().lowercase() == TRANSACTION_DATA_UUID.lowercase()) {
+                        peripheral.readCharacteristic(it)
+                        logger.e("contactlessPayment: read:")
+                    }
+                }
+            }
+
+            private fun doChunkWrite() {
+                if (chunks.isEmpty()) {
+                    logger.e("shareCharacteristic: write: done")
+                    return
+                }
+                val newChunk = chunks.first()
+                chunks = chunks.drop(1)
+                chunkDevice?.writeCharacteristic(characteristic!!, newChunk, WriteType.WITH_RESPONSE)
+                logger.e("shareCharacteristic: write: chunk: ${newChunk.joinToString("")}")
+                logger.e("shareCharacteristic: write: chunk: ${String(newChunk, Charsets.UTF_8)}")
             }
 
             override fun onCharacteristicWrite(
@@ -202,14 +221,20 @@ class TariBluetoothClient @Inject constructor(val deeplinkHandler: DeeplinkHandl
             }
         }
 
-        manager.connectPeripheral(device, callback)
+        if (shareData != null) {
+            manager.connectPeripheral(device, callback)
+        } else {
+            manager.connectPeripheral(device, contactlessPaymentCallback)
+        }
     }
 
     private fun closeAll() {
+        foundDevice?.let { manager.cancelConnection(it) }
         foundDevice = null
         shareData = null
         scanningCallback = null
         closeGatt()
+        runCatching { manager.close() }
     }
 
     private fun closeGatt() {

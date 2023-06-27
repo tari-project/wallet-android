@@ -100,7 +100,6 @@ class TariBluetoothServer @Inject constructor(
                 characteristic: BluetoothGattCharacteristic,
                 value: ByteArray?
             ): GattStatus {
-
                 if (characteristic.uuid.toString().lowercase() == CHARACTERISTIC_UUID.lowercase()) {
                     wholeData += value?.dropLast(1)?.toByteArray() ?: byteArrayOf()
 
