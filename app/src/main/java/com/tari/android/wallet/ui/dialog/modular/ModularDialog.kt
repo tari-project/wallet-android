@@ -142,7 +142,9 @@ open class ModularDialog(val context: Context) : TariDialog {
 
     override fun dismiss() {
         showAnimation(false) {
-            dialog.dismiss()
+            runCatching {
+                dialog.dismiss()
+            }
         }
     }
 

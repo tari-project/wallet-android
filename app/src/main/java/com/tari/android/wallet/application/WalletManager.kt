@@ -103,6 +103,7 @@ class WalletManager(
         // stop tor proxy
         EventBus.torProxyState.unsubscribe(this)
         torManager.shutdown()
+        EventBus.walletState.post(WalletState.NotReady)
     }
 
     @SuppressLint("CheckResult")

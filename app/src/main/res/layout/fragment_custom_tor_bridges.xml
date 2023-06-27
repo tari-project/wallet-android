@@ -51,6 +51,8 @@
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:layout_marginHorizontal="@dimen/common_horizontal_margin"
+                        android:imeOptions="normal"
+                        android:inputType="textMultiLine"
                         app:hintText="@string/tor_bridges_hint"
                         app:singleLine="false" />
 

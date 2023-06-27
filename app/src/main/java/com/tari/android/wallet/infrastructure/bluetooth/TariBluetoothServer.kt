@@ -91,6 +91,8 @@ class TariBluetoothServer @Inject constructor(
 
             var wholeData = byteArrayOf()
 
+            var shareChunkedData = mutableListOf<ByteArray>()
+
             var throttle: Disposable? = null
 
             override fun onCharacteristicWrite(
@@ -100,30 +102,25 @@ class TariBluetoothServer @Inject constructor(
             ): GattStatus {
 
                 if (characteristic.uuid.toString().lowercase() == CHARACTERISTIC_UUID.lowercase()) {
-                    wholeData += value!!
-                }
+                    wholeData += value?.dropLast(1)?.toByteArray() ?: byteArrayOf()
 
-                throttle?.dispose()
-                throttle = io.reactivex.Observable.timer(1000, TimeUnit.MILLISECONDS)
-                    .subscribe { doHandling(String(wholeData, Charsets.UTF_8)) }
+                    logger.e("share: read: chunk: ${String(value ?: byteArrayOf(), Charsets.UTF_8)}")
+                    logger.e("share: read: whole data: ${String(wholeData, Charsets.UTF_8)}")
+
+                    throttle?.dispose()
+                    throttle = io.reactivex.Observable.timer(1000, TimeUnit.MILLISECONDS)
+                        .subscribe { doHandling(String(wholeData, Charsets.UTF_8)) }
+                }
 
                 return GattStatus.SUCCESS
             }
 
-            override fun onCharacteristicWriteCompleted(
-                bluetoothCentral: BluetoothCentral,
-                characteristic: BluetoothGattCharacteristic,
-                value: ByteArray?
-            ) {
-                super.onCharacteristicWriteCompleted(bluetoothCentral, characteristic, value)
-
-                throttle?.dispose()
-                doHandling(String(wholeData, Charsets.UTF_8))
-            }
-
             private fun doHandling(string: String): GattStatus {
-                logger.e("on share receive: $string")
+                logger.e("share: handle: url: $string")
+
                 val handled = runCatching { deeplinkHandler.handle(string) }.getOrNull()
+
+                logger.e("share: handle: handled: $handled")
 
                 if (handled != null && handled is DeepLink.Contacts) {
                     onReceived.invoke(handled.contacts)
@@ -134,18 +131,34 @@ class TariBluetoothServer @Inject constructor(
 
             override fun onCharacteristicRead(bluetoothCentral: BluetoothCentral, characteristic: BluetoothGattCharacteristic): ReadResponse {
                 return if (characteristic.uuid.toString().lowercase() == TRANSACTION_DATA_UUID.lowercase()) {
-                    val myWalletAddress = TariWalletAddress().apply {
-                        hexString = sharedPrefsRepository.publicKeyHexString.orEmpty()
-                        emojiId = sharedPrefsRepository.emojiId.orEmpty()
-                    }
-                    val data = deeplinkHandler.getDeeplink(
-                        DeepLink.UserProfile(
-                            sharedPrefsRepository.publicKeyHexString.orEmpty(),
-                            ContactDto.normalizeAlias(sharedPrefsRepository.name.orEmpty(), myWalletAddress),
-                        )
-                    )
-                    ReadResponse(GattStatus.SUCCESS, data.toByteArray(Charsets.UTF_8))
+                    initiateReading()
+                    return doRead()
                 } else super.onCharacteristicRead(bluetoothCentral, characteristic)
+            }
+
+            fun initiateReading() {
+                if (shareChunkedData.isNotEmpty()) return
+                val myWalletAddress = TariWalletAddress().apply {
+                    hexString = sharedPrefsRepository.publicKeyHexString.orEmpty()
+                    emojiId = sharedPrefsRepository.emojiId.orEmpty()
+                }
+                val data = deeplinkHandler.getDeeplink(
+                    DeepLink.UserProfile(
+                        sharedPrefsRepository.publicKeyHexString.orEmpty(),
+                        ContactDto.normalizeAlias(sharedPrefsRepository.name.orEmpty(), myWalletAddress),
+                    )
+                )
+                logger.e("contactlessPayment: read: whole data: $data")
+                val chunked = data.toByteArray(Charsets.UTF_8).toList().chunked(chunkSize)
+                shareChunkedData =
+                    chunked.mapIndexed { index, items -> (items + if (index == chunked.size - 1) 0 else 1).toByteArray() }.toMutableList()
+            }
+
+            fun doRead(): ReadResponse {
+                val data = shareChunkedData.first()
+                shareChunkedData = shareChunkedData.drop(1).toMutableList()
+                logger.e("contactlessPayment: read: whole data: ${String(data, Charsets.UTF_8)}")
+                return ReadResponse(GattStatus.SUCCESS, data)
             }
         }
 
