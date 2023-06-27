@@ -17,11 +17,9 @@ import com.welie.blessed.BluetoothPeripheralCallback
 import com.welie.blessed.GattStatus
 import com.welie.blessed.ScanMode
 import com.welie.blessed.WriteType
-import io.reactivex.disposables.Disposable
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.util.UUID
-import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -91,6 +89,68 @@ class TariBluetoothClient @Inject constructor(val deeplinkHandler: DeeplinkHandl
 
     private fun doPairingOrShare(device: BluetoothPeripheral) {
 
+        val contactlessPaymentCallback = object : BluetoothPeripheralCallback() {
+            override fun onServicesDiscovered(peripheral: BluetoothPeripheral) {
+                super.onServicesDiscovered(peripheral)
+                val service = peripheral.getService(UUID.fromString(SERVICE_UUID))
+                service?.characteristics?.forEach {
+                    if (it.uuid.toString().lowercase() == TRANSACTION_DATA_UUID.lowercase()) {
+                        peripheral.readCharacteristic(it)
+                        logger.e("contactlessPayment: read:")
+                    }
+                }
+            }
+
+            var wholeData = byteArrayOf()
+
+            override fun onCharacteristicUpdate(
+                peripheral: BluetoothPeripheral,
+                value: ByteArray?,
+                characteristic: BluetoothGattCharacteristic,
+                status: GattStatus
+            ) {
+                super.onCharacteristicUpdate(peripheral, value, characteristic, status)
+
+                if (characteristic.uuid.toString().lowercase() == TRANSACTION_DATA_UUID.lowercase()) {
+                    val lastByte = value?.last() ?: 0
+                    wholeData += value?.dropLast(1)?.toByteArray() ?: byteArrayOf()
+
+                    if ((value?.size ?: 0) < chunkSize && value?.lastOrNull() == 0.toByte()) {
+                        logger.e("share: read: wrong chunk size: ${value.size}")
+                    }
+
+                    logger.e("contactlessPayment: read: chunk size: ${value?.size ?: 0}")
+                    logger.e("contactlessPayment: read: chunk: ${String(value ?: byteArrayOf(), Charsets.UTF_8)}")
+                    logger.e("contactlessPayment: read: whole data: ${String(wholeData, Charsets.UTF_8)}")
+
+                    if (lastByte == 1.toByte()) {
+                        peripheral.readCharacteristic(characteristic)
+                    } else {
+                        doHandling(String(wholeData, Charsets.UTF_8))
+                    }
+                }
+            }
+
+            private fun doHandling(string: String): GattStatus {
+                logger.e("contactlessPayment: handle: url: $string")
+
+                val handled = runCatching { deeplinkHandler.handle(string) }.getOrNull()
+
+                logger.e("contactlessPayment: handle: handled: $handled")
+
+                scanningCallback?.let {
+                    if (handled != null && handled is DeepLink.UserProfile) {
+                        scanningCallback?.invoke(handled)
+                    } else {
+                        onFailedSharing("Something went wrong during contactless payment. Please try again.\n\nError: $string")
+                    }
+                }
+                wholeData = byteArrayOf()
+                return if (handled != null) GattStatus.SUCCESS else GattStatus.INVALID_HANDLE
+            }
+        }
+
+
         val callback = object : BluetoothPeripheralCallback() {
 
             var chunks = listOf<ByteArray>()
@@ -106,8 +166,9 @@ class TariBluetoothClient @Inject constructor(val deeplinkHandler: DeeplinkHandl
                         logger.e("shareCharacteristic: write: whole data: ${String(shareData, Charsets.UTF_8)}")
                         runWithPermissions(bluetoothConnectPermission) {
                             viewModelScope.launch(Dispatchers.IO) {
-                                val chunked =  shareData.toList().chunked(chunkSize)
-                                chunks = chunked.mapIndexed { index, items -> (items + if (index == chunked.size - 1) 0 else 1).toByteArray() }.toList()
+                                val chunked = shareData.toList().chunked(chunkSize)
+                                chunks =
+                                    chunked.mapIndexed { index, items -> (items + if (index == chunked.size - 1) 0 else 1).toByteArray() }.toList()
                                 chunkDevice = peripheral
                                 characteristic = it
                                 doChunkWrite()
@@ -132,48 +193,6 @@ class TariBluetoothClient @Inject constructor(val deeplinkHandler: DeeplinkHandl
                 chunkDevice?.writeCharacteristic(characteristic!!, newChunk, WriteType.WITH_RESPONSE)
                 logger.e("shareCharacteristic: write: chunk: ${newChunk.joinToString("")}")
                 logger.e("shareCharacteristic: write: chunk: ${String(newChunk, Charsets.UTF_8)}")
-            }
-
-            var wholeData = byteArrayOf()
-
-            var throttle: Disposable? = null
-
-            override fun onCharacteristicUpdate(
-                peripheral: BluetoothPeripheral,
-                value: ByteArray?,
-                characteristic: BluetoothGattCharacteristic,
-                status: GattStatus
-            ) {
-                super.onCharacteristicUpdate(peripheral, value, characteristic, status)
-
-                if (characteristic.uuid.toString().lowercase() == TRANSACTION_DATA_UUID.lowercase()) {
-                    val lastByte = value?.last() ?: 0
-                    wholeData += value?.dropLast(1)?.toByteArray() ?: byteArrayOf()
-                    logger.e("contactlessPayment: read: chunk: ${String(value ?: byteArrayOf(), Charsets.UTF_8)}")
-                    logger.e("contactlessPayment: read: whole data: ${String(wholeData, Charsets.UTF_8)}")
-
-                    throttle?.dispose()
-                    throttle = io.reactivex.Observable.timer(1000, TimeUnit.MILLISECONDS)
-                        .subscribe { doHandling(String(wholeData, Charsets.UTF_8)) }
-
-                    if (lastByte == 1.toByte()) {
-                        peripheral.readCharacteristic(characteristic)
-                    }
-                }
-            }
-
-            private fun doHandling(string: String): GattStatus {
-                logger.e("contactlessPayment: handle: url: $string")
-
-                val handled = runCatching { deeplinkHandler.handle(string) }.getOrNull()
-
-                logger.e("contactlessPayment: handle: handled: $handled")
-
-                if (handled != null && handled is DeepLink.UserProfile) {
-                    scanningCallback?.invoke(handled)
-                }
-                wholeData = byteArrayOf()
-                return if (handled != null) GattStatus.SUCCESS else GattStatus.INVALID_HANDLE
             }
 
             override fun onCharacteristicWrite(
@@ -202,14 +221,20 @@ class TariBluetoothClient @Inject constructor(val deeplinkHandler: DeeplinkHandl
             }
         }
 
-        manager.connectPeripheral(device, callback)
+        if (shareData != null) {
+            manager.connectPeripheral(device, callback)
+        } else {
+            manager.connectPeripheral(device, contactlessPaymentCallback)
+        }
     }
 
     private fun closeAll() {
+        foundDevice?.let { manager.cancelConnection(it) }
         foundDevice = null
         shareData = null
         scanningCallback = null
         closeGatt()
+        runCatching { manager.close() }
     }
 
     private fun closeGatt() {

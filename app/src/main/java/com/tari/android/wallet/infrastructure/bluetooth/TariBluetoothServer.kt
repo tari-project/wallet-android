@@ -100,10 +100,13 @@ class TariBluetoothServer @Inject constructor(
                 characteristic: BluetoothGattCharacteristic,
                 value: ByteArray?
             ): GattStatus {
-
                 if (characteristic.uuid.toString().lowercase() == CHARACTERISTIC_UUID.lowercase()) {
                     wholeData += value?.dropLast(1)?.toByteArray() ?: byteArrayOf()
 
+                    if ((value?.size ?: 0) < chunkSize && value?.lastOrNull() == 0.toByte()) {
+                        logger.e("share: read: wrong chunk size: ${value.size}")
+                    }
+                    logger.e("share: read: chunk size: ${value?.size ?: 0}")
                     logger.e("share: read: chunk: ${String(value ?: byteArrayOf(), Charsets.UTF_8)}")
                     logger.e("share: read: whole data: ${String(wholeData, Charsets.UTF_8)}")
 

@@ -109,6 +109,6 @@ abstract class TariBluetoothAdapter() : CommonViewModel() {
         const val CHARACTERISTIC_UUID = "999CB541-8D4C-4075-BFF3-43AB74DE8C9B"
         const val TRANSACTION_DATA_UUID = "4567F76F-2577-4EA4-9220-AFCCCAA89B59"
 
-        const val chunkSize = 50
+        const val chunkSize = 150
     }
 }
