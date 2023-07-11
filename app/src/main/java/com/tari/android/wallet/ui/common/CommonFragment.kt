@@ -126,6 +126,12 @@ abstract class CommonFragment<Binding : ViewBinding, VM : CommonViewModel> : Fra
         }
     }
 
+    fun ensureIsAdded(action: () -> Unit) {
+        if (isAdded && context != null) {
+            action()
+        }
+    }
+
     override fun onDestroy() {
         dialogManager.dismiss()
         super.onDestroy()

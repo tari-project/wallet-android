@@ -225,7 +225,7 @@ class ContactsRepository @Inject constructor(
                             val error = WalletError()
                             service.updateContact(item.walletAddress, item.getAlias(), item.isFavorite, error)
                             if (error.code != WalletError.NoError.code) {
-                                logger.e("Error updating contact: ${error.code}, ${error.code}")
+                                logger.i("Error updating contact: ${error.code}, ${error.code}")
                             }
                         }
                     }

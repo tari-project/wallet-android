@@ -234,6 +234,7 @@ class TariBluetoothClient @Inject constructor(val deeplinkHandler: DeeplinkHandl
         shareData = null
         scanningCallback = null
         closeGatt()
+        stopScanning()
         runCatching { manager.close() }
     }
 

@@ -17,8 +17,10 @@ abstract class TariBluetoothAdapter() : CommonViewModel() {
             field = value
             onContextSet()
         }
-    protected var bluetoothAdapter: BluetoothAdapter? = null
-    protected var bluetoothManager: BluetoothManager? = null
+    protected val bluetoothAdapter: BluetoothAdapter?
+        get() = bluetoothManager?.adapter
+    protected val bluetoothManager: BluetoothManager?
+        get() = fragappCompatActivity!!.getSystemService(BluetoothManager::class.java)
 
     open fun onContextSet() { }
 
@@ -58,9 +60,6 @@ abstract class TariBluetoothAdapter() : CommonViewModel() {
 
 
     fun init(fragment: AppCompatActivity) {
-        bluetoothManager = fragment.getSystemService(BluetoothManager::class.java)
-        bluetoothAdapter = bluetoothManager!!.adapter
-
         this.fragappCompatActivity = fragment
     }
 

@@ -536,13 +536,15 @@ class CreateWalletFragment : CommonFragment<FragmentCreateWalletBinding, CreateW
         // animate full emoji id view
         ValueAnimator.ofFloat(0f, 1f).apply {
             addUpdateListener { valueAnimator: ValueAnimator ->
-                val value = valueAnimator.animatedValue as Float
-                val width = (fullEmojiIdInitialWidth + fullEmojiIdDeltaWidth * value).toInt()
-                ui.emojiIdContainerView.setLayoutWidth(width)
-                ui.emojiIdContainerView.alpha = (1f - value)
-                ui.emojiIdSummaryContainerView.alpha = value
-                ui.seeFullEmojiIdContainerView.setTopMargin((dimenPx(onboarding_see_full_emoji_id_button_visible_top_margin) * value).toInt())
-                ui.seeFullEmojiIdContainerView.alpha = value
+                ensureIsAdded {
+                    val value = valueAnimator.animatedValue as Float
+                    val width = (fullEmojiIdInitialWidth + fullEmojiIdDeltaWidth * value).toInt()
+                    ui.emojiIdContainerView.setLayoutWidth(width)
+                    ui.emojiIdContainerView.alpha = (1f - value)
+                    ui.emojiIdSummaryContainerView.alpha = value
+                    ui.seeFullEmojiIdContainerView.setTopMargin((dimenPx(onboarding_see_full_emoji_id_button_visible_top_margin) * value).toInt())
+                    ui.seeFullEmojiIdContainerView.alpha = value
+                }
             }
             duration = Constants.UI.shortDurationMs
             addListener(object : AnimatorListenerAdapter() {

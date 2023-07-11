@@ -1,6 +1,7 @@
 package com.tari.android.wallet.ui.dialog.modular
 
 import android.animation.ValueAnimator
+import android.app.Activity
 import android.app.Dialog
 import android.content.Context
 import android.graphics.Color
@@ -127,8 +128,8 @@ open class ModularDialog(val context: Context) : TariDialog {
                 is BackupOnboardingFlowItemModule -> BackupOnboardingFlowItemModuleView(context, module)
                 is YatInputModule -> YatInputModuleView(context, module)
                 is InputModule -> InputModuleView(context, module)
-                is ShortEmojiIdModule-> ShortEmojiModuleView(context, module)
-                is IconModule-> IconModuleView(context, module)
+                is ShortEmojiIdModule -> ShortEmojiModuleView(context, module)
+                is IconModule -> IconModuleView(context, module)
                 else -> View(context)
             }
             root.addView(view)
@@ -143,7 +144,9 @@ open class ModularDialog(val context: Context) : TariDialog {
     override fun dismiss() {
         showAnimation(false) {
             runCatching {
-                dialog.dismiss()
+                if (context !is Activity || !context.isFinishing) {
+                    dialog.dismiss()
+                }
             }
         }
     }

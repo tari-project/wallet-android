@@ -201,10 +201,10 @@ class TariBluetoothServer @Inject constructor(
 
     private fun stopReceiving() {
         bluetoothAdapter ?: return
-        val bluetoothLeAdvertiser = bluetoothAdapter!!.bluetoothLeAdvertiser
+        val bluetoothLeAdvertiser = bluetoothAdapter?.bluetoothLeAdvertiser
 
         @Suppress("MissingPermission")
-        bluetoothLeAdvertiser.stopAdvertising(advertiseCallback)
+        bluetoothLeAdvertiser?.stopAdvertising(advertiseCallback)
 
         bluetoothGattServer?.let {
             @Suppress("MissingPermission")
