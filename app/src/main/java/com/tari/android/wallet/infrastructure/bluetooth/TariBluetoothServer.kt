@@ -48,7 +48,7 @@ class TariBluetoothServer @Inject constructor(
             try {
                 handleReceiving()
             } catch (e: Throwable) {
-                logger.e("Error handling receiving", e)
+                logger.i("Error handling receiving", e)
             }
         }.addTo(compositeDisposable)
     }
@@ -87,6 +87,8 @@ class TariBluetoothServer @Inject constructor(
     var onReceived: (List<DeepLink.Contacts.DeeplinkContact>) -> Unit = {}
 
     private fun doReceiving2() {
+        stopReceiving()
+
         val callback = object : BluetoothPeripheralManagerCallback() {
 
             var wholeData = byteArrayOf()
@@ -183,7 +185,11 @@ class TariBluetoothServer @Inject constructor(
         myService.addCharacteristic(myProfileCharacteristic)
 
         val manager = BluetoothPeripheralManager(fragappCompatActivity!!, bluetoothManager!!, callback)
-        manager.add(myService)
+        try {
+            manager.add(myService)
+        } catch (e: Throwable) {
+            logger.e("share: add service: failed to add service: $e")
+        }
 
         val settings = AdvertiseSettings.Builder()
             .setAdvertiseMode(AdvertiseSettings.ADVERTISE_MODE_LOW_LATENCY)

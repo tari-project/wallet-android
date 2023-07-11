@@ -82,7 +82,13 @@ abstract class CommonActivity<Binding : ViewBinding, VM : CommonViewModel> : App
 
         observe(showToast) { TariToast(this@CommonActivity, it) }
 
-        observe(navigation) { viewModel.tariNavigator.navigate(it) }
+        observe(navigation) { commonViewModel.tariNavigator.navigate(it) }
+
+        observe(permissionManager.checkForPermission) {
+            permissionManagerUI.grantedAction = { commonViewModel.permissionManager.permissionAction?.invoke() }
+            permissionManagerUI.notGrantedAction = { commonViewModel.permissionManager.showPermissionRequiredDialog(it) }
+            launcher.launch(it)
+        }
     }
 
     private fun setTariTheme(theme: TariTheme) {
