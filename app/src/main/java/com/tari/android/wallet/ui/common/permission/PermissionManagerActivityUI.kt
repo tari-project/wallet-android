@@ -21,54 +21,54 @@ import com.tari.android.wallet.ui.dialog.modular.modules.icon.IconModule
 class PermissionManagerActivityUI(val activity: CommonActivity<*, *>) {
 
     var grantedAction: () -> Unit = {}
-    var notGrantedAction: () -> Unit = {}
+    var notGrantedAction: (List<String>) -> Unit = {}
 
     private val logger: Printer
         get() = com.orhanobut.logger.Logger.t("permission")
 
-    fun runWithPermissions(vararg permissions: String, openSettings: Boolean = false, callback: () -> Unit): Unit = with(activity) {
-        logger.d("runWithPermissions: start")
+//    fun runWithPermissions(vararg permissions: String, openSettings: Boolean = false, callback: () -> Unit): Unit = with(activity) {
+//        logger.d("runWithPermissions: start")
+//
+//        grantedAction = { runWithPermissions(*permissions, openSettings = openSettings, callback = callback) }
+//
+//        for (permission in permissions) {
+//            if (isPermissionGranted(permission)) {
+//                logger.d("permission granted: $permission")
+//            } else {
+//                launcher.launch(permission)
+//                logger.d("permission not granted: $permission")
+//
+//                if (shouldShowRequestPermissionRationale(permission)) {
+//                    launcher.launch(permission)
+//                    return
+//                } else {
+//                    if (openSettings) {
+//                        showRationalPermissionDialog(permission)
+//                    }
+//                }
+//                return
+//            }
+//        }
+//        callback()
+//    }
 
-        grantedAction = { runWithPermissions(*permissions, openSettings = openSettings, callback = callback) }
-
-        for (permission in permissions) {
-            if (isPermissionGranted(permission)) {
-                logger.d("permission granted: $permission")
-            } else {
-                launcher.launch(permission)
-                logger.d("permission not granted: $permission")
-
-                if (shouldShowRequestPermissionRationale(permission)) {
-                    launcher.launch(permission)
-                    return
-                } else {
-                    if (openSettings) {
-                        showRationalPermissionDialog(permission)
-                    }
-                }
-                return
-            }
-        }
-        callback()
-    }
-
-    fun runWithPermission(permission: String, openSettings: Boolean = false, callback: () -> Unit) = with(activity) {
-        logger.d("runWithPermissions: start")
-
-        if (isPermissionGranted(permission)) {
-            logger.d("permission granted: $permission")
-            callback()
-        } else {
-            if (shouldShowRequestPermissionRationale(permission)) {
-                grantedAction = callback
-                launcher.launch(permission)
-            } else {
-                if (openSettings) {
-                    showRationalPermissionDialog(permission)
-                }
-            }
-        }
-    }
+//    fun runWithPermission(permission: String, openSettings: Boolean = false, callback: () -> Unit) = with(activity) {
+//        logger.d("runWithPermissions: start")
+//
+//        if (isPermissionGranted(permission)) {
+//            logger.d("permission granted: $permission")
+//            callback()
+//        } else {
+//            if (shouldShowRequestPermissionRationale(permission)) {
+//                grantedAction = callback
+//                launcher.launch(permission)
+//            } else {
+//                if (openSettings) {
+//                    showRationalPermissionDialog(permission)
+//                }
+//            }
+//        }
+//    }
 
     private fun showRationalPermissionDialog(permission: String) {
         val permissionName = kotlin.runCatching {

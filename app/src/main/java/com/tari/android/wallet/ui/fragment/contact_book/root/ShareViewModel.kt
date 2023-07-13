@@ -1,6 +1,5 @@
 package com.tari.android.wallet.ui.fragment.contact_book.root
 
-import android.Manifest
 import androidx.lifecycle.MutableLiveData
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.deeplinks.DeepLink
@@ -56,8 +55,6 @@ class ShareViewModel : CommonViewModel() {
     val shareText = SingleLiveEvent<String>()
 
     val shareInfo = MutableLiveData<String>()
-
-    val launchPermissionCheck = SingleLiveEvent<List<String>>()
 
     init {
         currentInstant = this
@@ -176,9 +173,9 @@ class ShareViewModel : CommonViewModel() {
     }
 
     private fun doShareViaBLE() {
-        val permissions = (tariBluetoothServer.bluetoothPermissions + tariBluetoothServer.locationPermission).distinct().toMutableList()
-        permissions.remove(Manifest.permission.BLUETOOTH)
-        launchPermissionCheck.postValue(permissions)
+        permissionManager.runWithPermission(tariBluetoothServer.bluetoothPermissions) {
+            startBLESharing()
+        }
     }
 
     private fun showShareSuccessDialog() {

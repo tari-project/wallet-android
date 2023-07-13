@@ -15,7 +15,7 @@ import javax.inject.Inject
 
 class PermissionManager @Inject constructor(val resourceManager: ResourceManager) {
 
-    val checkForPermission: SingleLiveEvent<String> = SingleLiveEvent()
+    val checkForPermission: SingleLiveEvent<List<String>> = SingleLiveEvent()
 
     val dialog = SingleLiveEvent<ModularDialogArgs>()
 
@@ -23,24 +23,26 @@ class PermissionManager @Inject constructor(val resourceManager: ResourceManager
 
     fun runWithPermission(permissions: List<String>, action: () -> Unit) {
         permissionAction = action
-        checkForPermission.postValue(permissions.first())
+        checkForPermission.postValue(permissions)
     }
 
-    fun showPermissionRequiredDialog(permission: String) {
-        val permissionName = kotlin.runCatching {
-            val packageManager: PackageManager = resourceManager.context.packageManager
-            val permissionInfo = packageManager.getPermissionInfo(permission, 0)
-            permissionInfo.labelRes
-            resourceManager.getString(permissionInfo.labelRes)
-        }.getOrNull() ?: permission
+    fun showPermissionRequiredDialog(permissions: List<String>) {
+        val permissionNames = permissions.map {
+            kotlin.runCatching {
+                val packageManager: PackageManager = resourceManager.context.packageManager
+                val permissionInfo = packageManager.getPermissionInfo(it, 0)
+                permissionInfo.labelRes
+                resourceManager.getString(permissionInfo.labelRes)
+            }.getOrNull() ?: it
+        }.toList().joinToString(", ")
 
         val args = ModularDialogArgs(
             DialogArgs(), listOf(
                 IconModule(R.drawable.vector_sharing_failed),
                 HeadModule(resourceManager.getString(R.string.common_error_title)),
-                BodyModule(resourceManager.getString(R.string.common_permission_required_dialog_body, permissionName)),
+                BodyModule(resourceManager.getString(R.string.common_permission_required_dialog_body, permissionNames)),
                 ButtonModule(resourceManager.getString(R.string.common_retry), ButtonStyle.Normal) {
-                    checkForPermission.postValue(permission)
+                    checkForPermission.postValue(permissions)
                 },
                 ButtonModule(resourceManager.getString(R.string.common_cancel), ButtonStyle.Close)
             )

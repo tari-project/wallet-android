@@ -51,11 +51,11 @@ abstract class CommonActivity<Binding : ViewBinding, VM : CommonViewModel> : App
 
     val permissionManagerUI = PermissionManagerActivityUI(this)
 
-    val launcher = registerForActivityResult(ActivityResultContracts.RequestPermission()) {
-        if (it) {
+    val launcher = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
+        if (it.all { it.value }) {
             permissionManagerUI.grantedAction()
         } else {
-            permissionManagerUI.notGrantedAction()
+            permissionManagerUI.notGrantedAction(it.filter { !it.value }.map { it.key })
         }
     }
 
@@ -87,7 +87,7 @@ abstract class CommonActivity<Binding : ViewBinding, VM : CommonViewModel> : App
         observe(permissionManager.checkForPermission) {
             permissionManagerUI.grantedAction = { commonViewModel.permissionManager.permissionAction?.invoke() }
             permissionManagerUI.notGrantedAction = { commonViewModel.permissionManager.showPermissionRequiredDialog(it) }
-            launcher.launch(it)
+            launcher.launch(it.toTypedArray())
         }
     }
 

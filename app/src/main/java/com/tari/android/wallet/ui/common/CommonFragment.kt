@@ -38,11 +38,11 @@ abstract class CommonFragment<Binding : ViewBinding, VM : CommonViewModel> : Fra
 
     lateinit var viewModel: VM
 
-    val launcher = registerForActivityResult(ActivityResultContracts.RequestPermission()) {
-        if (it) {
+    val launcher = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
+        if (it.all { it.value }) {
             permissionManagerUI.grantedAction()
         } else {
-            permissionManagerUI.notGrantedAction()
+            permissionManagerUI.notGrantedAction(it.filter { !it.value }.map { it.key })
         }
     }
 
@@ -99,7 +99,7 @@ abstract class CommonFragment<Binding : ViewBinding, VM : CommonViewModel> : Fra
         observe(permissionManager.checkForPermission) {
             permissionManagerUI.grantedAction = { viewModel.permissionManager.permissionAction?.invoke() }
             permissionManagerUI.notGrantedAction = { viewModel.permissionManager.showPermissionRequiredDialog(it) }
-            launcher.launch(it)
+            launcher.launch(it.toTypedArray())
         }
     }
 
