@@ -52,10 +52,11 @@ abstract class CommonActivity<Binding : ViewBinding, VM : CommonViewModel> : App
     val permissionManagerUI = PermissionManagerActivityUI(this)
 
     val launcher = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
-        if (it.all { it.value }) {
+        val (granted, nonGranted) = it.toList().partition { it.second }
+        if (nonGranted.isEmpty()) {
             permissionManagerUI.grantedAction()
         } else {
-            permissionManagerUI.notGrantedAction(it.filter { !it.value }.map { it.key })
+            permissionManagerUI.notGrantedAction(nonGranted.map { it.first }.toList())
         }
     }
 
@@ -89,6 +90,8 @@ abstract class CommonActivity<Binding : ViewBinding, VM : CommonViewModel> : App
             permissionManagerUI.notGrantedAction = { commonViewModel.permissionManager.showPermissionRequiredDialog(it) }
             launcher.launch(it.toTypedArray())
         }
+
+        observe(permissionManager.dialog) { dialogManager.replace(ModularDialog(this@CommonActivity, it)) }
     }
 
     private fun setTariTheme(theme: TariTheme) {

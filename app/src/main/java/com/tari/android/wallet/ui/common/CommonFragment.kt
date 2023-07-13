@@ -101,6 +101,8 @@ abstract class CommonFragment<Binding : ViewBinding, VM : CommonViewModel> : Fra
             permissionManagerUI.notGrantedAction = { viewModel.permissionManager.showPermissionRequiredDialog(it) }
             launcher.launch(it.toTypedArray())
         }
+
+        observe(permissionManager.dialog) { dialogManager.replace(ModularDialog(requireContext(), it)) }
     }
 
     protected fun changeOnBackPressed(isBlocked: Boolean) {

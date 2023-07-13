@@ -92,7 +92,7 @@ class ShareViewModel : CommonViewModel() {
     }
 
     fun doContactlessPayment() {
-        ensurePermissionIsGranted {
+        permissionManager.runWithPermission(tariBluetoothClient.bluetoothPermissions) {
             val args = ModularDialogArgs(
                 DialogArgs(canceledOnTouchOutside = false, cancelable = false) { tariBluetoothClient.stopSharing() }, listOf(
                     IconModule(R.drawable.vector_sharing_via_ble),
@@ -106,11 +106,6 @@ class ShareViewModel : CommonViewModel() {
                 successfullDeviceFoundSharing(it)
             }
         }
-    }
-
-    private fun ensurePermissionIsGranted(action: () -> Unit) {
-        val permissions = tariBluetoothClient.bluetoothPermissions
-        permissionManager.runWithPermission(permissions, action)
     }
 
     fun successfullDeviceFoundSharing(userProfile: DeepLink.UserProfile) {
