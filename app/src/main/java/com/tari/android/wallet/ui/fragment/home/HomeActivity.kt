@@ -181,12 +181,6 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>() {
 
     private fun subscribeUI() = with(viewModel) {
         observe(shareViewModel.shareText) { shareViaText(it) }
-
-        observe(shareViewModel.launchPermissionCheck) {
-            permissionManagerUI.runWithPermissions(*it.toTypedArray(), openSettings = true) {
-                viewModel.shareViewModel.startBLESharing()
-            }
-        }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

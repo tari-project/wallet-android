@@ -164,7 +164,7 @@ class TariBluetoothClient @Inject constructor(val deeplinkHandler: DeeplinkHandl
                     if (it.uuid.toString().lowercase() == CHARACTERISTIC_UUID.lowercase() && shareData != null) {
                         val shareData = shareData.orEmpty().toByteArray(Charsets.UTF_8)
                         logger.e("shareCharacteristic: write: whole data: ${String(shareData, Charsets.UTF_8)}")
-                        runWithPermissions(bluetoothConnectPermission) {
+                        runWithPermissions(bluetoothConnectPermission, true) {
                             viewModelScope.launch(Dispatchers.IO) {
                                 val chunked = shareData.toList().chunked(chunkSize)
                                 chunks =
@@ -234,6 +234,7 @@ class TariBluetoothClient @Inject constructor(val deeplinkHandler: DeeplinkHandl
         shareData = null
         scanningCallback = null
         closeGatt()
+        stopScanning()
         runCatching { manager.close() }
     }
 

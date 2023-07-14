@@ -17,8 +17,10 @@ abstract class TariBluetoothAdapter() : CommonViewModel() {
             field = value
             onContextSet()
         }
-    protected var bluetoothAdapter: BluetoothAdapter? = null
-    protected var bluetoothManager: BluetoothManager? = null
+    protected val bluetoothAdapter: BluetoothAdapter?
+        get() = bluetoothManager?.adapter
+    protected val bluetoothManager: BluetoothManager?
+        get() = fragappCompatActivity!!.getSystemService(BluetoothManager::class.java)
 
     open fun onContextSet() { }
 
@@ -58,9 +60,6 @@ abstract class TariBluetoothAdapter() : CommonViewModel() {
 
 
     fun init(fragment: AppCompatActivity) {
-        bluetoothManager = fragment.getSystemService(BluetoothManager::class.java)
-        bluetoothAdapter = bluetoothManager!!.adapter
-
         this.fragappCompatActivity = fragment
     }
 
@@ -74,15 +73,15 @@ abstract class TariBluetoothAdapter() : CommonViewModel() {
         }
     }
 
-    protected fun runWithPermissions(permission: String, action: () -> Unit) {
+    protected fun runWithPermissions(permission: String, silently: Boolean = false, action: () -> Unit) {
         try {
             if (ActivityCompat.checkSelfPermission(fragappCompatActivity!!, permission) != PackageManager.PERMISSION_GRANTED) {
-                doOnRequiredPermissions.invoke(bluetoothPermissions, action)
+                if (!silently) doOnRequiredPermissions.invoke(listOf(permission), action)
             } else {
                 action()
             }
         } catch (e: SecurityException) {
-            doOnRequiredPermissions.invoke(bluetoothPermissions, action)
+            if (!silently) doOnRequiredPermissions.invoke(listOf(permission), action)
         }
     }
 

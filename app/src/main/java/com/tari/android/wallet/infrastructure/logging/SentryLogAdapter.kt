@@ -31,7 +31,7 @@ class SentryLogAdapter(val walletConfig: WalletConfig) : LogAdapter {
                     Sentry.addBreadcrumb(breadcrumb)
 
                     val attachment = Hint.withAttachment(Attachment(files.firstOrNull()?.absolutePath.orEmpty()))
-                    Sentry.captureException(SentryException(message), attachment)
+                    Sentry.captureEvent(SentryEvent(SentryException(message)), attachment)
                 } catch (e: Throwable) {
                     Sentry.captureException(SentryException(message), Hint.withAttachment(Attachment("tag", tag.orEmpty())))
                 }

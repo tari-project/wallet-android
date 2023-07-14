@@ -87,6 +87,7 @@ class TxListViewModel : CommonViewModel() {
 
     private fun fetchBalanceInfoData() {
         val balance = walletService.getWithError { error, service -> service.getBalanceInfo(error) }
+        EventBus.balanceUpdates.post(balance)
         _balanceInfo.postValue(balance)
     }
 

@@ -1,8 +1,6 @@
 package com.tari.android.wallet.ui.fragment.contact_book.root
 
-import android.Manifest
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.viewModelScope
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.deeplinks.DeepLink
 import com.tari.android.wallet.application.deeplinks.DeeplinkHandler
@@ -30,9 +28,6 @@ import com.tari.android.wallet.ui.fragment.contact_book.root.share.ShareType
 import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
 import com.tari.android.wallet.ui.fragment.send.shareQr.ShareQrCodeModule
 import com.tari.android.wallet.util.extractEmojis
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 class ShareViewModel : CommonViewModel() {
@@ -60,8 +55,6 @@ class ShareViewModel : CommonViewModel() {
     val shareText = SingleLiveEvent<String>()
 
     val shareInfo = MutableLiveData<String>()
-
-    val launchPermissionCheck = SingleLiveEvent<List<String>>()
 
     init {
         currentInstant = this
@@ -99,18 +92,17 @@ class ShareViewModel : CommonViewModel() {
     }
 
     fun doContactlessPayment() {
-        val args = ModularDialogArgs(
-            DialogArgs(canceledOnTouchOutside = false, cancelable = false) { tariBluetoothClient.stopSharing() }, listOf(
-                IconModule(R.drawable.vector_sharing_via_ble),
-                HeadModule(resourceManager.getString(R.string.contactless_payment_title)),
-                BodyModule(resourceManager.getString(R.string.contactless_payment_description)),
-                ButtonModule(resourceManager.getString(R.string.common_close), ButtonStyle.Close)
+        permissionManager.runWithPermission(tariBluetoothClient.bluetoothPermissions) {
+            val args = ModularDialogArgs(
+                DialogArgs(canceledOnTouchOutside = false, cancelable = false) { tariBluetoothClient.stopSharing() }, listOf(
+                    IconModule(R.drawable.vector_sharing_via_ble),
+                    HeadModule(resourceManager.getString(R.string.contactless_payment_title)),
+                    BodyModule(resourceManager.getString(R.string.contactless_payment_description)),
+                    ButtonModule(resourceManager.getString(R.string.common_close), ButtonStyle.Close)
+                )
             )
-        )
-        modularDialog.postValue(args)
-        viewModelScope.launch(Dispatchers.IO) {
-            delay(5000)
-            tariBluetoothClient.startDeviceScanning() {
+            modularDialog.postValue(args)
+            tariBluetoothClient.startDeviceScanning {
                 successfullDeviceFoundSharing(it)
             }
         }
@@ -118,10 +110,10 @@ class ShareViewModel : CommonViewModel() {
 
     fun successfullDeviceFoundSharing(userProfile: DeepLink.UserProfile) {
         val contactDto = runCatching {
-                val ffiWalletAddress = FFITariWalletAddress(HexString(userProfile.tariAddressHex))
-                val tariWalletAddress = TariWalletAddress(ffiWalletAddress.toString(), ffiWalletAddress.getEmojiId())
-                ContactDto(FFIContactDto(tariWalletAddress, userProfile.alias))
-            }.getOrNull() ?: return
+            val ffiWalletAddress = FFITariWalletAddress(HexString(userProfile.tariAddressHex))
+            val tariWalletAddress = TariWalletAddress(ffiWalletAddress.toString(), ffiWalletAddress.getEmojiId())
+            ContactDto(FFIContactDto(tariWalletAddress, userProfile.alias))
+        }.getOrNull() ?: return
 
         val name = userProfile.alias.ifEmpty {
             contactDto.contact.extractWalletAddress().emojiId.extractEmojis().take(3).joinToString("")
@@ -176,9 +168,9 @@ class ShareViewModel : CommonViewModel() {
     }
 
     private fun doShareViaBLE() {
-        val permissions = (tariBluetoothServer.bluetoothPermissions + tariBluetoothServer.locationPermission).distinct().toMutableList()
-        permissions.remove(Manifest.permission.BLUETOOTH)
-        launchPermissionCheck.postValue(permissions)
+        permissionManager.runWithPermission(tariBluetoothServer.bluetoothPermissions) {
+            startBLESharing()
+        }
     }
 
     private fun showShareSuccessDialog() {
