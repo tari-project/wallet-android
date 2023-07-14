@@ -73,15 +73,15 @@ abstract class TariBluetoothAdapter() : CommonViewModel() {
         }
     }
 
-    protected fun runWithPermissions(permission: String, action: () -> Unit) {
+    protected fun runWithPermissions(permission: String, silently: Boolean = false, action: () -> Unit) {
         try {
             if (ActivityCompat.checkSelfPermission(fragappCompatActivity!!, permission) != PackageManager.PERMISSION_GRANTED) {
-                doOnRequiredPermissions.invoke(bluetoothPermissions, action)
+                if (!silently) doOnRequiredPermissions.invoke(listOf(permission), action)
             } else {
                 action()
             }
         } catch (e: SecurityException) {
-            doOnRequiredPermissions.invoke(bluetoothPermissions, action)
+            if (!silently) doOnRequiredPermissions.invoke(listOf(permission), action)
         }
     }
 
