@@ -317,7 +317,7 @@ dependencies {
     // seismic - device shake detector
     implementation "com.squareup:seismic:1.0.3"
 
-    implementation "net.yslibrary.keyboardvisibilityevent:keyboardvisibilityevent:2.2.0"
+    implementation "net.yslibrary.keyboardvisibilityevent:keyboardvisibilityevent:2.3.0"
 
     implementation 'com.itextpdf:itext7-core:7.2.5'
 
