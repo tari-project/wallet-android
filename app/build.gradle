@@ -309,7 +309,7 @@ dependencies {
     implementation "io.github.everythingme:overscroll-decor-android:1.1.1"
 
     // giphy, don"t update to 2.2.0 because of not compatible yet
-    implementation 'com.giphy.sdk:ui:2.3.1'
+    implementation 'com.giphy.sdk:ui:2.3.7'
     // spring animation
     implementation "androidx.dynamicanimation:dynamicanimation:1.0.0"
     implementation "com.github.MasayukiSuda:EasingInterpolator:v1.3.2"
