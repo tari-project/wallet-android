@@ -11,7 +11,6 @@ import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.data.sharedPrefs.tariSettings.TariSettingsSharedRepository
 import com.tari.android.wallet.event.Event
 import com.tari.android.wallet.event.EventBus
-import com.tari.android.wallet.model.MicroTari
 import com.tari.android.wallet.model.Tx
 import com.tari.android.wallet.model.TxId
 import com.tari.android.wallet.network.NetworkConnectionState
@@ -24,11 +23,11 @@ import com.tari.android.wallet.ui.dialog.modular.modules.body.BodyModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonStyle
 import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
-import com.tari.android.wallet.ui.extension.hideKeyboard
 import com.tari.android.wallet.ui.extension.showInternetConnectionErrorDialog
 import com.tari.android.wallet.ui.extension.string
 import com.tari.android.wallet.ui.fragment.auth.AuthActivity
 import com.tari.android.wallet.ui.fragment.contact_book.add.AddContactFragment
+import com.tari.android.wallet.ui.fragment.contact_book.add.SelectUserContactFragment
 import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.ContactDto
 import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.YatDto
 import com.tari.android.wallet.ui.fragment.contact_book.details.ContactDetailsFragment
@@ -70,7 +69,6 @@ import com.tari.android.wallet.ui.fragment.settings.torBridges.TorBridgesSelecti
 import com.tari.android.wallet.ui.fragment.settings.torBridges.customBridges.CustomTorBridgesFragment
 import com.tari.android.wallet.ui.fragment.tx.details.TxDetailsFragment
 import com.tari.android.wallet.ui.fragment.utxos.list.UtxosListFragment
-import com.tari.android.wallet.util.Constants
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -91,6 +89,7 @@ class TariNavigator @Inject constructor(val prefs: SharedPrefsRepository, val ta
             is ContactBookNavigation.ToExternalWallet -> toExternalWallet(navigation.connectedWallet)
             is ContactBookNavigation.ToContactTransactionHistory -> toContactTransactionHistory(navigation.contact)
             is ContactBookNavigation.ToAddPhoneContact -> toAddPhoneContact()
+            is ContactBookNavigation.ToSelectTariUser -> addFragment(SelectUserContactFragment())
             Navigation.ChooseRestoreOptionNavigation.ToEnterRestorePassword -> toEnterRestorePassword()
             Navigation.ChooseRestoreOptionNavigation.OnRestoreCompleted -> onRestoreCompleted()
             Navigation.ChooseRestoreOptionNavigation.ToRestoreWithRecoveryPhrase -> toRestoreWithRecoveryPhrase()
@@ -253,19 +252,6 @@ class TariNavigator @Inject constructor(val prefs: SharedPrefsRepository, val ta
         }
     }
 
-    fun continueToAmount(user: ContactDto, amount: MicroTari?) {
-        if (EventBus.networkConnectionState.publishSubject.value != NetworkConnectionState.CONNECTED) {
-            showInternetConnectionErrorDialog(this.activity)
-            return
-        }
-        activity.hideKeyboard()
-        val bundle = Bundle().apply {
-            putSerializable(PARAMETER_CONTACT, user)
-            putParcelable(PARAMETER_AMOUNT, amount)
-        }
-        (activity as HomeActivity).ui.rootView.postDelayed({ addFragment(AddAmountFragment(), bundle) }, Constants.UI.keyboardHideWaitMs)
-    }
-
     fun onAmountExceedsActualAvailableBalance() {
         val args = ModularDialogArgs(
             DialogArgs(), listOf(
@@ -312,11 +298,9 @@ class TariNavigator @Inject constructor(val prefs: SharedPrefsRepository, val ta
             activity.finish()
             activity.overridePendingTransition(R.anim.fade_in, R.anim.fade_out)
         } else {
-            activity.supportFragmentManager.let {
-                it.popBackStackImmediate()
-                it.popBackStackImmediate()
-                it.popBackStackImmediate()
-                it.popBackStackImmediate()
+            val fragmentsCount = activity.supportFragmentManager.fragments.size - 5
+            for (i in 0 until fragmentsCount) {
+                activity.supportFragmentManager.popBackStackImmediate()
             }
         }
     }
@@ -330,7 +314,7 @@ class TariNavigator @Inject constructor(val prefs: SharedPrefsRepository, val ta
     }
 
     fun sendTariToUser(service: TariWalletService, sendDeeplink: DeepLink.Send) {
-        val walletAddress = service.getWalletAddressFromHexString(sendDeeplink.walletAddress)
+        val walletAddress = service.getWalletAddressFromHexString(sendDeeplink.walletAddressHex)
         sendToUser((activity as HomeActivity).viewModel.contactsRepository.ffiBridge.getContactByAddress(walletAddress))
     }
 
@@ -338,7 +322,9 @@ class TariNavigator @Inject constructor(val prefs: SharedPrefsRepository, val ta
         val bundle = Bundle().apply {
             putSerializable(PARAMETER_CONTACT, recipientUser)
             activity.intent.getDoubleExtra(PARAMETER_AMOUNT, Double.MIN_VALUE).takeIf { it > 0 }?.let { putDouble(PARAMETER_AMOUNT, it) }
+            activity.intent.getSerializableExtra(PARAMETER_CONTACT)?.let { putSerializable(PARAMETER_CONTACT, it) }
         }
+
         addFragment(AddAmountFragment(), bundle)
     }
 

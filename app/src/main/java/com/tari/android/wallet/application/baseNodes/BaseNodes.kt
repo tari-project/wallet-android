@@ -90,6 +90,6 @@ class BaseNodes(
 
     @Suppress("UNUSED_EXPRESSION")
     private fun getBaseNodeResource(network: Network): Int = when(network) {
-        else -> R.raw.nextnet_base_nodes
+        else -> R.raw.stagenet_base_nodes
     }
 }

@@ -57,9 +57,15 @@ class WalletAddressViewModel : CommonViewModel() {
 
     fun checkForValidEmojiId(walletService: TariWalletService, query: String) {
         discoveredWalletAddress = null
-        val deepLink = deeplinkHandler.handle(query) as? DeepLink.Send
-        if (deepLink != null) { // there is a deep link in the clipboard
-            discoveredWalletAddress = walletService.getWalletAddressFromHexString(deepLink.walletAddress)
+        val deepLink = deeplinkHandler.handle(query)
+        val deeplinkHex = when(deepLink) {
+            is DeepLink.Send -> deepLink.walletAddressHex
+            is DeepLink.UserProfile -> deepLink.tariAddressHex
+            is DeepLink.Contacts -> deepLink.contacts.firstOrNull()?.hex
+            else -> null
+        }
+        if (deeplinkHex != null) { // there is a deep link in the clipboard
+            discoveredWalletAddress = walletService.getWalletAddressFromHexString(deeplinkHex)
         } else { // try to extract a valid emoji id
             val emojis = query.trim().extractEmojis()
             // search in windows of length = emoji id length

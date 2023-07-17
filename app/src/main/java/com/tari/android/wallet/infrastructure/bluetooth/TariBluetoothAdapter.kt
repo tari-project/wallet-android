@@ -17,8 +17,10 @@ abstract class TariBluetoothAdapter() : CommonViewModel() {
             field = value
             onContextSet()
         }
-    protected var bluetoothAdapter: BluetoothAdapter? = null
-    protected var bluetoothManager: BluetoothManager? = null
+    protected val bluetoothAdapter: BluetoothAdapter?
+        get() = bluetoothManager?.adapter
+    protected val bluetoothManager: BluetoothManager?
+        get() = fragappCompatActivity!!.getSystemService(BluetoothManager::class.java)
 
     open fun onContextSet() { }
 
@@ -58,9 +60,6 @@ abstract class TariBluetoothAdapter() : CommonViewModel() {
 
 
     fun init(fragment: AppCompatActivity) {
-        bluetoothManager = fragment.getSystemService(BluetoothManager::class.java)
-        bluetoothAdapter = bluetoothManager!!.adapter
-
         this.fragappCompatActivity = fragment
     }
 
@@ -74,15 +73,15 @@ abstract class TariBluetoothAdapter() : CommonViewModel() {
         }
     }
 
-    protected fun runWithPermissions(permission: String, action: () -> Unit) {
+    protected fun runWithPermissions(permission: String, silently: Boolean = false, action: () -> Unit) {
         try {
             if (ActivityCompat.checkSelfPermission(fragappCompatActivity!!, permission) != PackageManager.PERMISSION_GRANTED) {
-                doOnRequiredPermissions.invoke(bluetoothPermissions, action)
+                if (!silently) doOnRequiredPermissions.invoke(listOf(permission), action)
             } else {
                 action()
             }
         } catch (e: SecurityException) {
-            doOnRequiredPermissions.invoke(bluetoothPermissions, action)
+            if (!silently) doOnRequiredPermissions.invoke(listOf(permission), action)
         }
     }
 
@@ -107,5 +106,8 @@ abstract class TariBluetoothAdapter() : CommonViewModel() {
 
         const val SERVICE_UUID = "0DABCA14-0688-458D-89D3-367A3D969537"
         const val CHARACTERISTIC_UUID = "999CB541-8D4C-4075-BFF3-43AB74DE8C9B"
+        const val TRANSACTION_DATA_UUID = "4567F76F-2577-4EA4-9220-AFCCCAA89B59"
+
+        const val chunkSize = 150
     }
 }

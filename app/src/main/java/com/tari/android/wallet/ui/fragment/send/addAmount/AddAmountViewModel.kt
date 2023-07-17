@@ -104,7 +104,7 @@ class AddAmountViewModel : CommonViewModel() {
                 ButtonModule(resourceManager.getString(R.string.add_amount_modify_fee_use), ButtonStyle.Normal) {
                     selectedSpeed = feeModule.selectedSpeed
                     selectedFeeData = feeModule.feePerGram
-                    _dismissDialog.postValue(Unit)
+                    dismissDialog.postValue(Unit)
                 },
                 ButtonModule(resourceManager.getString(R.string.common_cancel), ButtonStyle.Close)
             )

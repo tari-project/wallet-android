@@ -256,7 +256,7 @@ class ContactDetailsViewModel : CommonViewModel() {
         val contact = contact.value!!
         updatingJob = null
         this.contact.value = contactsRepository.updateContactInfo(contact, name, surname, yat)
-        _dismissDialog.postValue(Unit)
+        dismissDialog.postValue(Unit)
     }
 
     private fun showUnlinkDialog() {
@@ -273,7 +273,7 @@ class ContactDetailsViewModel : CommonViewModel() {
             BodyModule(null, SpannableString(secondLineHtml)),
             ButtonModule(resourceManager.getString(common_confirm), Normal) {
                 contactsRepository.unlinkContact(contact.value!!)
-                _dismissDialog.value = Unit
+                dismissDialog.value = Unit
                 showUnlinkSuccessDialog()
             },
             ButtonModule(resourceManager.getString(common_cancel), Close)
@@ -307,7 +307,7 @@ class ContactDetailsViewModel : CommonViewModel() {
             BodyModule(resourceManager.getString(contact_book_details_delete_message)),
             ButtonModule(resourceManager.getString(contact_book_details_delete_button_title), Warning) {
                 contactsRepository.deleteContact(contact.value!!)
-                _dismissDialog.postValue(Unit)
+                dismissDialog.postValue(Unit)
                 navigation.value = Navigation.ContactBookNavigation.BackToContactBook()
             },
             ButtonModule(resourceManager.getString(common_close), Close)

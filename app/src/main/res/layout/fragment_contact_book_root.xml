@@ -157,7 +157,7 @@
             android:layout_marginBottom="20dp"
             app:cornerRadius="6dp"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/search_bar_barrier"
+            app:layout_constraintEnd_toStartOf="@+id/qr_code_button"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/share_types_container">
 
@@ -170,6 +170,18 @@
                 app:queryBackground="@null" />
 
         </com.tari.android.wallet.ui.component.tari.TariPrimaryBackground>
+
+        <!-- QR code button -->
+        <androidx.appcompat.widget.AppCompatImageButton
+            android:id="@+id/qr_code_button"
+            android:layout_width="@dimen/add_recipient_search_text_view_height"
+            android:layout_height="@dimen/add_recipient_search_text_view_height"
+            android:background="@color/transparent"
+            android:tint="?attr/palette_icons_default"
+            android:src="@drawable/vector_share_qr_code"
+            app:layout_constraintBottom_toBottomOf="@+id/search_view_container"
+            app:layout_constraintEnd_toStartOf="@+id/search_bar_barrier"
+            app:layout_constraintTop_toTopOf="@+id/search_view_container" />
 
         <androidx.constraintlayout.widget.Barrier
             android:id="@+id/search_bar_barrier"

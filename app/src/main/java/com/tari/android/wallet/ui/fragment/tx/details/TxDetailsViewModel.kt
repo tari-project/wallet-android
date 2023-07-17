@@ -198,6 +198,6 @@ class TxDetailsViewModel : CommonViewModel() {
     private fun saveDetails(name: String, surname: String = "") {
         val contact = contact.value!!
         this.contact.value = contactsRepository.updateContactInfo(contact, name, surname, contact.getYatDto()?.yat.orEmpty())
-        _dismissDialog.postValue(Unit)
+        dismissDialog.postValue(Unit)
     }
 }

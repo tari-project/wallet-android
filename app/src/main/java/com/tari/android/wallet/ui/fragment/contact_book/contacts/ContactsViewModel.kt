@@ -31,6 +31,7 @@ import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonStyle
 import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
 import com.tari.android.wallet.ui.dialog.modular.modules.shortEmoji.ShortEmojiIdModule
 import com.tari.android.wallet.ui.fragment.contact_book.contacts.adapter.contact.ContactItem
+import com.tari.android.wallet.ui.fragment.contact_book.contacts.adapter.contact.ContactlessPaymentItem
 import com.tari.android.wallet.ui.fragment.contact_book.contacts.adapter.emptyState.EmptyStateItem
 import com.tari.android.wallet.ui.fragment.contact_book.data.ContactAction
 import com.tari.android.wallet.ui.fragment.contact_book.data.ContactsRepository
@@ -38,6 +39,7 @@ import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.ContactDto
 import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.MergedContactDto
 import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.PhoneContactDto
 import com.tari.android.wallet.ui.fragment.contact_book.root.ContactSelectionRepository
+import com.tari.android.wallet.ui.fragment.contact_book.root.ShareViewModel
 import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
 import com.tari.android.wallet.ui.fragment.settings.allSettings.title.SettingsTitleViewHolderItem
 import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupSettingsRepository
@@ -108,7 +110,9 @@ class ContactsViewModel : CommonViewModel() {
     }
 
     fun processItemClick(item: CommonViewHolderItem) {
-        if (item is ContactItem) {
+        if (item is ContactlessPaymentItem) {
+            ShareViewModel.currentInstant?.doContactlessPayment()
+        } else if (item is ContactItem) {
             if (contactSelectionRepository.isSelectionState.value == true) {
                 contactSelectionRepository.toggle(item)
                 refresh()
@@ -125,7 +129,16 @@ class ContactsViewModel : CommonViewModel() {
 
     private fun updateContacts() {
         val newItems =
-            contactsRepository.publishSubject.value!!.filter(contactsRepository.filter).map { contactDto -> ContactItem(contactDto.copy(contact = contactDto.contact.copy()), false, false, false, this::performAction, badgeViewModel) }
+            contactsRepository.publishSubject.value!!.filter(contactsRepository.filter).map { contactDto ->
+                ContactItem(
+                    contactDto.copy(contact = contactDto.contact.copy()),
+                    false,
+                    false,
+                    false,
+                    this::performAction,
+                    badgeViewModel
+                )
+            }
                 .toMutableList()
         sourceList.postValue(newItems)
     }
@@ -147,6 +160,7 @@ class ContactsViewModel : CommonViewModel() {
         sourceList = sourceList.map { it.copy() }.toMutableList()
 
         val resultList = mutableListOf<CommonViewHolderItem>()
+        resultList.add(ContactlessPaymentItem())
 
         val filtered = sourceList.filter { contact -> contact.filtered(searchText) && filters.all { it.invoke(contact) } }
 
@@ -220,7 +234,7 @@ class ContactsViewModel : CommonViewModel() {
             BodyModule(null, SpannableString(secondLineHtml)),
             ButtonModule(resourceManager.getString(R.string.common_confirm), ButtonStyle.Normal) {
                 contactsRepository.unlinkContact(contact)
-                _dismissDialog.value = Unit
+                dismissDialog.value = Unit
                 showUnlinkSuccessDialog(contact)
             },
             ButtonModule(resourceManager.getString(R.string.common_cancel), ButtonStyle.Close)

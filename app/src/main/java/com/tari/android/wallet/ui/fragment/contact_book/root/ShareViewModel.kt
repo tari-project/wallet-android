@@ -1,14 +1,17 @@
 package com.tari.android.wallet.ui.fragment.contact_book.root
 
-import android.Manifest
 import androidx.lifecycle.MutableLiveData
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.deeplinks.DeepLink
 import com.tari.android.wallet.application.deeplinks.DeeplinkHandler
 import com.tari.android.wallet.application.deeplinks.DeeplinkViewModel
+import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
+import com.tari.android.wallet.ffi.FFITariWalletAddress
+import com.tari.android.wallet.ffi.HexString
 import com.tari.android.wallet.infrastructure.bluetooth.TariBluetoothClient
 import com.tari.android.wallet.infrastructure.bluetooth.TariBluetoothServer
 import com.tari.android.wallet.infrastructure.nfc.TariNFCAdapter
+import com.tari.android.wallet.model.TariWalletAddress
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.common.SingleLiveEvent
 import com.tari.android.wallet.ui.dialog.modular.DialogArgs
@@ -19,8 +22,12 @@ import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonStyle
 import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
 import com.tari.android.wallet.ui.dialog.modular.modules.icon.IconModule
 import com.tari.android.wallet.ui.fragment.contact_book.data.ContactsRepository
+import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.ContactDto
+import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.FFIContactDto
 import com.tari.android.wallet.ui.fragment.contact_book.root.share.ShareType
+import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
 import com.tari.android.wallet.ui.fragment.send.shareQr.ShareQrCodeModule
+import com.tari.android.wallet.util.extractEmojis
 import javax.inject.Inject
 
 class ShareViewModel : CommonViewModel() {
@@ -40,13 +47,14 @@ class ShareViewModel : CommonViewModel() {
     @Inject
     lateinit var contactsRepository: ContactsRepository
 
+    @Inject
+    lateinit var sharePrefRepository: SharedPrefsRepository
+
     val deeplinkViewModel = DeeplinkViewModel()
 
     val shareText = SingleLiveEvent<String>()
 
     val shareInfo = MutableLiveData<String>()
-
-    val launchPermissionCheck = SingleLiveEvent<List<String>>()
 
     init {
         currentInstant = this
@@ -83,6 +91,49 @@ class ShareViewModel : CommonViewModel() {
         tariBluetoothClient.startSharing(shareInfo.value.orEmpty())
     }
 
+    fun doContactlessPayment() {
+        permissionManager.runWithPermission(tariBluetoothClient.bluetoothPermissions) {
+            val args = ModularDialogArgs(
+                DialogArgs(canceledOnTouchOutside = false, cancelable = false) { tariBluetoothClient.stopSharing() }, listOf(
+                    IconModule(R.drawable.vector_sharing_via_ble),
+                    HeadModule(resourceManager.getString(R.string.contactless_payment_title)),
+                    BodyModule(resourceManager.getString(R.string.contactless_payment_description)),
+                    ButtonModule(resourceManager.getString(R.string.common_close), ButtonStyle.Close)
+                )
+            )
+            modularDialog.postValue(args)
+            tariBluetoothClient.startDeviceScanning {
+                successfullDeviceFoundSharing(it)
+            }
+        }
+    }
+
+    fun successfullDeviceFoundSharing(userProfile: DeepLink.UserProfile) {
+        val contactDto = runCatching {
+            val ffiWalletAddress = FFITariWalletAddress(HexString(userProfile.tariAddressHex))
+            val tariWalletAddress = TariWalletAddress(ffiWalletAddress.toString(), ffiWalletAddress.getEmojiId())
+            ContactDto(FFIContactDto(tariWalletAddress, userProfile.alias))
+        }.getOrNull() ?: return
+
+        val name = userProfile.alias.ifEmpty {
+            contactDto.contact.extractWalletAddress().emojiId.extractEmojis().take(3).joinToString("")
+        }
+
+        val args = ModularDialogArgs(
+            DialogArgs(), listOf(
+                IconModule(R.drawable.vector_sharing_via_ble),
+                HeadModule(resourceManager.getString(R.string.contactless_payment_success_title)),
+                BodyModule(resourceManager.getString(R.string.contactless_payment_success_description, name)),
+                ButtonModule(resourceManager.getString(R.string.common_lets_do_it_2), ButtonStyle.Normal) {
+                    navigation.postValue(Navigation.TxListNavigation.ToSendTariToUser(contactDto))
+                    dismissDialog.postValue(Unit)
+                },
+                ButtonModule(resourceManager.getString(R.string.common_no_2), ButtonStyle.Close)
+            )
+        )
+        modularDialog.postValue(args)
+    }
+
     private fun doShareViaQrCode(deeplink: String) {
         val args = ModularDialogArgs(
             DialogArgs(true, canceledOnTouchOutside = true), listOf(
@@ -117,9 +168,9 @@ class ShareViewModel : CommonViewModel() {
     }
 
     private fun doShareViaBLE() {
-        val permissions = (tariBluetoothServer.bluetoothPermissions + tariBluetoothServer.locationPermission).distinct().toMutableList()
-        permissions.remove(Manifest.permission.BLUETOOTH)
-        launchPermissionCheck.postValue(permissions)
+        permissionManager.runWithPermission(tariBluetoothServer.bluetoothPermissions) {
+            startBLESharing()
+        }
     }
 
     private fun showShareSuccessDialog() {
