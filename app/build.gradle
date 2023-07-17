@@ -242,7 +242,7 @@ dependencies {
     implementation "androidx.biometric:biometric:1.1.0"
 
     // joda
-    implementation 'net.danlew:android.joda:2.12.1'
+    implementation 'net.danlew:android.joda:2.12.5'
 
     // parceler
     implementation "org.parceler:parceler-api:1.1.13"
