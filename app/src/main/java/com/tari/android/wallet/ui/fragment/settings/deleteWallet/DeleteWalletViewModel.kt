@@ -30,7 +30,7 @@ class DeleteWalletViewModel : CommonViewModel() {
                 BodyModule(resourceManager.getString(R.string.delete_wallet_confirmation_description)),
                 ButtonModule(resourceManager.getString(R.string.common_confirm), ButtonStyle.Warning) {
                     deleteWallet.postValue(Unit)
-                    _dismissDialog.postValue(Unit)
+                    dismissDialog.postValue(Unit)
                 },
                 ButtonModule(resourceManager.getString(R.string.common_cancel), ButtonStyle.Close)
             )

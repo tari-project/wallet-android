@@ -72,7 +72,7 @@ class BackupManager @Inject constructor(
     private val logger
         get() = Logger.t(BackupManager::class.simpleName)
 
-    var currentOption: BackupOptions? = null
+    var currentOption: BackupOptions? = BackupOptions.Dropbox
 
     private val coroutineContext = Job()
     private var localScope = CoroutineScope(coroutineContext)

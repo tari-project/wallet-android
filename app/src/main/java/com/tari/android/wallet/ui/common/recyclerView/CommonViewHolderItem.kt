@@ -9,5 +9,7 @@ abstract class CommonViewHolderItem : Serializable {
 
     override fun equals(other: Any?): Boolean = this === other
 
+    open fun deepCopy(): CommonViewHolderItem = this
+
     override fun hashCode(): Int = super.hashCode()
 }

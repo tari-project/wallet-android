@@ -26,7 +26,7 @@ class DeeplinkFormatter(private val networkRepository: NetworkRepository) {
 
     fun toDeeplink(deepLink: DeepLink): String {
         val fullPart = Uri.Builder()
-            .scheme("tari")
+            .scheme(scheme)
             .authority(networkRepository.currentNetwork!!.network.uriComponent)
             .appendPath(deepLink.getCommand())
 

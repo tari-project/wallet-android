@@ -38,11 +38,11 @@ abstract class CommonFragment<Binding : ViewBinding, VM : CommonViewModel> : Fra
 
     lateinit var viewModel: VM
 
-    val launcher = registerForActivityResult(ActivityResultContracts.RequestPermission()) {
-        if (it) {
+    val launcher = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
+        if (it.all { it.value }) {
             permissionManagerUI.grantedAction()
         } else {
-            permissionManagerUI.notGrantedAction()
+            permissionManagerUI.notGrantedAction(it.filter { !it.value }.map { it.key })
         }
     }
 
@@ -99,8 +99,10 @@ abstract class CommonFragment<Binding : ViewBinding, VM : CommonViewModel> : Fra
         observe(permissionManager.checkForPermission) {
             permissionManagerUI.grantedAction = { viewModel.permissionManager.permissionAction?.invoke() }
             permissionManagerUI.notGrantedAction = { viewModel.permissionManager.showPermissionRequiredDialog(it) }
-            launcher.launch(it)
+            launcher.launch(it.toTypedArray())
         }
+
+        observe(permissionManager.dialog) { dialogManager.replace(ModularDialog(requireContext(), it)) }
     }
 
     protected fun changeOnBackPressed(isBlocked: Boolean) {
@@ -123,6 +125,12 @@ abstract class CommonFragment<Binding : ViewBinding, VM : CommonViewModel> : Fra
             startActivity(Intent.createChooser(shareIntent, null))
         } else {
             TariToast(requireContext(), TariToastArgs(string(R.string.store_no_application_to_open_the_link_error), Toast.LENGTH_LONG))
+        }
+    }
+
+    fun ensureIsAdded(action: () -> Unit) {
+        if (isAdded && context != null) {
+            action()
         }
     }
 

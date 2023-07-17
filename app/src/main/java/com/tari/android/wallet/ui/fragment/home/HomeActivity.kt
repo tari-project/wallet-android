@@ -71,6 +71,7 @@ import com.tari.android.wallet.ui.extension.parcelable
 import com.tari.android.wallet.ui.extension.setVisible
 import com.tari.android.wallet.ui.extension.string
 import com.tari.android.wallet.ui.fragment.contact_book.root.ContactBookFragment
+import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
 import com.tari.android.wallet.ui.fragment.home.navigation.TariNavigator.Companion.INDEX_CONTACT_BOOK
 import com.tari.android.wallet.ui.fragment.home.navigation.TariNavigator.Companion.INDEX_HOME
 import com.tari.android.wallet.ui.fragment.home.navigation.TariNavigator.Companion.INDEX_SETTINGS
@@ -180,12 +181,6 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>() {
 
     private fun subscribeUI() = with(viewModel) {
         observe(shareViewModel.shareText) { shareViaText(it) }
-
-        observe(shareViewModel.launchPermissionCheck) {
-            permissionManagerUI.runWithPermissions(*it.toTypedArray(), openSettings = true) {
-                viewModel.shareViewModel.startBLESharing()
-            }
-        }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -230,10 +225,12 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>() {
         val postDelay = if (!isVisible) 0 else Constants.UI.shortDurationMs
         ui.bottomNavigationView.postDelayed({
             ui.bottomNavigationView.setVisible(isVisible)
+            ui.sendTariButton.setVisible(isVisible)
         }, postDelay)
     }
 
     private fun setupUi() {
+        ui.sendTariButton.setOnClickListener { viewModel.navigation.postValue(Navigation.ContactBookNavigation.ToSelectTariUser()) }
         setupBottomNavigation()
     }
 
@@ -346,7 +343,7 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>() {
         deeplinkHandler.handle(intent.data?.toString().orEmpty())?.let { deepLink ->
             (deepLink as? DeepLink.Send)?.let { viewModel.tariNavigator.sendTariToUser(service, it) }
 
-            (deepLink as? DeepLink.AddBaseNode)?.let { deeplinkViewModel.executeAction(this, it) }
+            (deepLink as? DeepLink.AddBaseNode)?.let { deeplinkViewModel.addBaseNode(this, it) }
 
             (deepLink as? DeepLink.Contacts)?.let { deeplinkViewModel.addContacts(it.contacts) }
         }

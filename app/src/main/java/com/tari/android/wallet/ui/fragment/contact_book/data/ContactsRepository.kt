@@ -195,6 +195,7 @@ class ContactsRepository @Inject constructor(
     @Synchronized
     private fun withListUpdate(silently: Boolean = false, updateAction: (list: MutableList<ContactDto>) -> Unit) {
         val value = this.publishSubject.value!!
+        val silentlyLocal = silently
         updateAction.invoke(value)
         viewModelScope.launch(Dispatchers.Main) {
             this@ContactsRepository.publishSubject.onNext(value)
@@ -202,7 +203,7 @@ class ContactsRepository @Inject constructor(
 
         doWithLoading("Updating contact changes to phone and FFI") {
             contactSharedPrefRepository.saveContacts(value)
-            if (silently.not()) {
+            if (silentlyLocal.not()) {
                 ffiBridge.updateToFFI(value)
                 phoneBookRepositoryBridge.updateToPhoneBook()
             }
@@ -225,7 +226,7 @@ class ContactsRepository @Inject constructor(
                             val error = WalletError()
                             service.updateContact(item.walletAddress, item.getAlias(), item.isFavorite, error)
                             if (error.code != WalletError.NoError.code) {
-                                logger.e("Error updating contact: ${error.code}, ${error.code}")
+                                logger.i("Error updating contact: ${error.code}, ${error.code}")
                             }
                         }
                     }

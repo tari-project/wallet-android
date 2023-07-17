@@ -47,12 +47,12 @@ class AuthViewModel : CommonViewModel() {
                 HeadModule(resourceManager.getString(R.string.ffi_validation_error_title)),
                 BodyModule(resourceManager.getString(R.string.ffi_validation_error_message)),
                 ButtonModule(resourceManager.getString(R.string.ffi_validation_error_delete), ButtonStyle.Warning) {
-                    _dismissDialog.postValue(Unit)
+                    dismissDialog.postValue(Unit)
                     deleteWallet()
                 },
                 ButtonModule(resourceManager.getString(R.string.ffi_validation_error_cancel), ButtonStyle.Close) {
                     goAuth.postValue(Unit)
-                    _dismissDialog.postValue(Unit)
+                    dismissDialog.postValue(Unit)
                 }
             ))
         modularDialog.postValue(args)

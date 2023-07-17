@@ -120,10 +120,10 @@ class TransactionRepository @Inject constructor() : CommonViewModel() {
     }
 
     private fun updateTxListData() {
-        cancelledTxs.repopulate(walletService.getWithError { error, service -> service.getCancelledTxs(error) })
-        completedTxs.repopulate(walletService.getWithError { error, service -> service.getCompletedTxs(error) })
-        pendingInboundTxs.repopulate(walletService.getWithError { error, service -> service.getPendingInboundTxs(error) })
-        pendingOutboundTxs.repopulate(walletService.getWithError { error, service -> service.getPendingOutboundTxs(error) })
+        cancelledTxs.repopulate(walletService.getWithError { error, service -> service.getCancelledTxs(error) }.orEmpty())
+        completedTxs.repopulate(walletService.getWithError { error, service -> service.getCompletedTxs(error) }.orEmpty())
+        pendingInboundTxs.repopulate(walletService.getWithError { error, service -> service.getPendingInboundTxs(error) }.orEmpty())
+        pendingOutboundTxs.repopulate(walletService.getWithError { error, service -> service.getPendingOutboundTxs(error) }.orEmpty())
     }
 
     private fun updateList() = viewModelScope.launch(Dispatchers.Main) {

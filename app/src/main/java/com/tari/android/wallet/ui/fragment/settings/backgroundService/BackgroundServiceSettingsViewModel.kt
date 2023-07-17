@@ -42,7 +42,7 @@ class BackgroundServiceSettingsViewModel : CommonViewModel() {
     private fun turnSwitcher(isTurnedOn: Boolean) {
         tariSettingsSharedRepository.backgroundServiceTurnedOn = isTurnedOn
         _switchState.value = TariLoadingSwitchState(isTurnedOn, false)
-        _dismissDialog.postValue(Unit)
+        dismissDialog.postValue(Unit)
         serviceLauncher.startIfExist()
     }
 }
