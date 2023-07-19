@@ -5,9 +5,9 @@ import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import com.tari.android.wallet.databinding.ViewQuestionMarkBinding
-import com.tari.android.wallet.ui.component.mainList.MainListTouchingView
+import com.tari.android.wallet.ui.component.common.CommonView
 
-class QuestionMarkView : MainListTouchingView<QuestionMarkViewModel, ViewQuestionMarkBinding> {
+class QuestionMarkView : CommonView<QuestionMarkViewModel, ViewQuestionMarkBinding> {
 
     override fun bindingInflate(layoutInflater: LayoutInflater, parent: ViewGroup?, attachToRoot: Boolean):
             ViewQuestionMarkBinding = ViewQuestionMarkBinding.inflate(layoutInflater, parent, attachToRoot)
@@ -20,7 +20,7 @@ class QuestionMarkView : MainListTouchingView<QuestionMarkViewModel, ViewQuestio
 
     override fun setup() = Unit
 
-    override fun doTouch() {
-        viewModel.showUniversityDialog()
+    init {
+        setOnClickListener { viewModel.showUniversityDialog() }
     }
 }

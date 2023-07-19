@@ -51,6 +51,8 @@ sealed class Navigation {
         object ToUtxos : TxListNavigation()
 
         class ToSendTariToUser(val contact: ContactDto) : TxListNavigation()
+
+        object HomeTransactionHistory : TxListNavigation()
     }
 
     sealed class AddAmountNavigation() : Navigation() {

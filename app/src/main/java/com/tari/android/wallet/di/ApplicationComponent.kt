@@ -51,6 +51,7 @@ import com.tari.android.wallet.ui.fragment.contact_book.root.ShareViewModel
 import com.tari.android.wallet.ui.fragment.contact_book.transactionHistory.TransactionHistoryViewModel
 import com.tari.android.wallet.ui.fragment.home.HomeActivity
 import com.tari.android.wallet.ui.fragment.home.HomeViewModel
+import com.tari.android.wallet.ui.fragment.home.homeTransactionHistory.HomeTransactionHistoryViewModel
 import com.tari.android.wallet.ui.fragment.onboarding.activity.OnboardingFlowActivity
 import com.tari.android.wallet.ui.fragment.onboarding.createWallet.CreateWalletViewModel
 import com.tari.android.wallet.ui.fragment.onboarding.inroduction.IntroductionViewModel
@@ -93,8 +94,8 @@ import com.tari.android.wallet.ui.fragment.settings.torBridges.TorBridgesSelecti
 import com.tari.android.wallet.ui.fragment.settings.torBridges.customBridges.CustomTorBridgesViewModel
 import com.tari.android.wallet.ui.fragment.settings.userAutorization.BiometricAuthenticationViewModel
 import com.tari.android.wallet.ui.fragment.splash.SplashActivity
+import com.tari.android.wallet.ui.fragment.tx.HomeFragmentViewModel
 import com.tari.android.wallet.ui.fragment.tx.TransactionRepository
-import com.tari.android.wallet.ui.fragment.tx.TxListViewModel
 import com.tari.android.wallet.ui.fragment.tx.details.TxDetailsViewModel
 import com.tari.android.wallet.ui.fragment.tx.details.gif.GIFViewModel
 import com.tari.android.wallet.ui.fragment.utxos.list.UtxosListViewModel
@@ -146,7 +147,6 @@ interface ApplicationComponent {
     fun inject(viewModel: VerifySeedPhraseViewModel)
     fun inject(viewModel: BackupSettingsViewModel)
     fun inject(viewModel: BiometricAuthenticationViewModel)
-    fun inject(viewModel: TxListViewModel)
     fun inject(viewModel: ChangeBaseNodeViewModel)
     fun inject(viewModel: AddCustomBaseNodeViewModel)
     fun inject(viewModel: NetworkSelectionViewModel)
@@ -172,6 +172,8 @@ interface ApplicationComponent {
     fun inject(viewModel: ThemeSelectorViewModel)
     fun inject(viewModel: DeleteWalletViewModel)
     fun inject(viewModel: HomeViewModel)
+    fun inject(viewModel: HomeFragmentViewModel)
+    fun inject(viewModel: HomeTransactionHistoryViewModel)
     fun inject(viewModel: EnterCurrentPasswordViewModel)
     fun inject(viewModel: ChangeSecurePasswordViewModel)
     fun inject(viewModel: AddNoteViewModel)
