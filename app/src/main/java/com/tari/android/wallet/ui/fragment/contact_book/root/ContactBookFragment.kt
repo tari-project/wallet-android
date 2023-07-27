@@ -35,6 +35,7 @@ import com.tari.android.wallet.ui.fragment.contact_book.root.share.ShareOptionVi
 import com.tari.android.wallet.ui.fragment.home.HomeActivity
 import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
 import com.tari.android.wallet.ui.fragment.qr.QRScannerActivity
+import com.tari.android.wallet.ui.fragment.qr.QrScannerSource
 import com.tari.android.wallet.util.Constants
 import java.lang.ref.WeakReference
 
@@ -74,7 +75,7 @@ class ContactBookFragment : CommonFragment<FragmentContactBookRootBinding, Conta
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == QRScannerActivity.REQUEST_QR_SCANNER && resultCode == Activity.RESULT_OK && data != null) {
             val qrData = data.getStringExtra(QRScannerActivity.EXTRA_QR_DATA) ?: return
-            deeplinkViewModel.tryToHandle(requireContext(), qrData)
+            deeplinkViewModel.tryToHandle(qrData)
         }
     }
 
@@ -169,9 +170,7 @@ class ContactBookFragment : CommonFragment<FragmentContactBookRootBinding, Conta
     }
 
     private fun startQRCodeActivity() {
-        val intent = Intent(activity, QRScannerActivity::class.java)
-        startActivityForResult(intent, QRScannerActivity.REQUEST_QR_SCANNER)
-        activity?.overridePendingTransition(R.anim.slide_up, 0)
+        QRScannerActivity.startScanner(requireActivity(), QrScannerSource.ContactBook)
     }
 
     private fun focusEditTextAndShowKeyboard() {

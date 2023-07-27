@@ -250,9 +250,16 @@
     <string name="add_recipient_invalid_emoji_id">Not a valid Emoji ID</string>
     <string name="add_recipient_own_emoji_id">Sorry, you cannot send tXTR to yourself.</string>
     <!-- QR-scanner -->
-    <string name="add_recipient_scan_qr_description">Scan a Tari QR code</string>
+    <string name="add_recipient_scan_qr_description">Scan Tari QR code in the box below</string>
+    <string name="add_recipient_scan_qr_error">Invalid QR Code.\nYour request cannot be processed at this time.</string>
     <string name="add_recipient_failed_init_camera_message">Failed to initialize Camera</string>
     <string name="add_recipient_camera_permission_denied_message">Camera permission denied</string>
+    <string name="qr_code_scanner_labels_actions_transaction_send">This code contains a funds request.\nWould you like to send funds to %s?</string>
+    <string name="qr_code_scanner_labels_actions_base_node_add">This code contains base node information.\nWould you like to save it to the app?</string>
+    <string name="qr_code_scanner_labels_actions_contacts">This code contains contacts information. \nWould you like to add its to your contact book?</string>
+    <string name="qr_code_scanner_labels_actions_profile">This code contains contact information. \nWould you like to add it to your contact book?</string>
+    <string name="qr_code_scanner_labels_actions_tor_bridges">This code contains a custom bridge.\nWould you like to save it to the app?</string>
+
 
     <!-- send tari - amount -->
     <string name="add_amount_under_construction">Under Construction</string>

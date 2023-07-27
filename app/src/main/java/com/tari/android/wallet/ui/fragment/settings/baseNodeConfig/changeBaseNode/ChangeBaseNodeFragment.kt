@@ -42,7 +42,8 @@ import com.tari.android.wallet.R
 import com.tari.android.wallet.databinding.FragmentBaseNodeChangeBinding
 import com.tari.android.wallet.extension.observe
 import com.tari.android.wallet.ui.common.CommonFragment
-import com.tari.android.wallet.ui.common.recyclerView.CommonAdapter
+import com.tari.android.wallet.ui.common.recyclerView.CommonAdapter.ItemClickListener
+import com.tari.android.wallet.ui.common.recyclerView.CommonAdapter.ItemLongClickListener
 import com.tari.android.wallet.ui.component.tari.toolbar.TariToolbarActionArg
 import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
 import com.tari.android.wallet.ui.fragment.settings.baseNodeConfig.changeBaseNode.adapter.BaseNodeViewHolderItem
@@ -75,7 +76,11 @@ class ChangeBaseNodeFragment : CommonFragment<FragmentBaseNodeChangeBinding, Cha
         })
         baseNodeList.adapter = adapter
         baseNodeList.layoutManager = LinearLayoutManager(requireContext())
-        adapter.setClickListener(CommonAdapter.ItemClickListener { viewModel.selectBaseNode((it as BaseNodeViewHolderItem).baseNodeDto) })
+        adapter.setClickListener(ItemClickListener { viewModel.selectBaseNode((it as BaseNodeViewHolderItem).baseNodeDto) })
+        adapter.setLongClickListener(ItemLongClickListener {
+            viewModel.showQrCode((it as BaseNodeViewHolderItem).baseNodeDto)
+            true
+        })
     }
 
     private fun observeUI() = with(viewModel) {

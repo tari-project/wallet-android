@@ -57,6 +57,7 @@ import com.tari.android.wallet.ui.fragment.onboarding.inroduction.IntroductionVi
 import com.tari.android.wallet.ui.fragment.onboarding.localAuth.LocalAuthViewModel
 import com.tari.android.wallet.ui.fragment.profile.WalletInfoViewModel
 import com.tari.android.wallet.ui.fragment.qr.QRScannerActivity
+import com.tari.android.wallet.ui.fragment.qr.QRScannerViewModel
 import com.tari.android.wallet.ui.fragment.restore.activity.WalletRestoreActivity
 import com.tari.android.wallet.ui.fragment.restore.chooseRestoreOption.ChooseRestoreOptionViewModel
 import com.tari.android.wallet.ui.fragment.restore.enterRestorationPassword.EnterRestorationPasswordViewModel
@@ -189,6 +190,7 @@ interface ApplicationComponent {
     fun inject(viewModel: TransactionHistoryViewModel)
     fun inject(viewModel: BluetoothSettingsViewModel)
     fun inject(viewModel: WalletAddressViewModel)
+    fun inject(viewModel: QRScannerViewModel)
 
     fun getClipboardManager(): ClipboardManager
 }

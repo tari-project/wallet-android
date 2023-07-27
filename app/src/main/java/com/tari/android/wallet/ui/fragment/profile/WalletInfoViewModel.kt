@@ -112,7 +112,7 @@ class WalletInfoViewModel : CommonViewModel() {
             hexString = sharedPrefsWrapper.publicKeyHexString.orEmpty()
             emojiId = sharedPrefsWrapper.emojiId.orEmpty()
         })
-        val deeplink = deeplinkHandler.getDeeplink(DeepLink.Contacts(listOf(DeepLink.Contacts.DeeplinkContact(name, hex))))
+        val deeplink = deeplinkHandler.getDeeplink(DeepLink.UserProfile(hex, name))
         ShareViewModel.currentInstant?.share(type, deeplink)
     }
 
