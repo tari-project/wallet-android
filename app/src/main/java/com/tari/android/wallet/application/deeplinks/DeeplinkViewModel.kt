@@ -1,6 +1,5 @@
 package com.tari.android.wallet.application.deeplinks
 
-import android.content.Context
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.baseNodes.BaseNodes
 import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodeDto
@@ -11,7 +10,6 @@ import com.tari.android.wallet.model.TariWalletAddress
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.dialog.confirm.ConfirmDialogArgs
 import com.tari.android.wallet.ui.dialog.modular.DialogArgs
-import com.tari.android.wallet.ui.dialog.modular.ModularDialog
 import com.tari.android.wallet.ui.dialog.modular.ModularDialogArgs
 import com.tari.android.wallet.ui.dialog.modular.modules.body.BodyModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonModule
@@ -41,39 +39,45 @@ class DeeplinkViewModel : CommonViewModel() {
         component.inject(this)
     }
 
-    fun tryToHandle(context:Context, qrData: String) {
-        deeplinkHandler.handle(qrData)?.let { execute(context, it) }
+    fun tryToHandle(qrData: String) {
+        deeplinkHandler.handle(qrData)?.let { execute(it) }
     }
 
-    fun execute(context: Context, deeplink: DeepLink) {
+    fun execute(deeplink: DeepLink) {
         when (deeplink) {
-            is DeepLink.AddBaseNode -> addBaseNode(context, deeplink)
-            is DeepLink.Contacts -> addContacts(deeplink.contacts)
-            is DeepLink.Send -> send(deeplink)
-            is DeepLink.UserProfile -> addContacts(listOf(DeepLink.Contacts.DeeplinkContact(deeplink.alias, deeplink.tariAddressHex)))
+            is DeepLink.AddBaseNode -> addBaseNode(deeplink)
+            is DeepLink.Contacts -> addContacts(deeplink)
+            is DeepLink.Send -> sendAction(deeplink)
+            is DeepLink.UserProfile -> addUserProfile(deeplink)
         }
     }
 
-    fun addBaseNode(context: Context, deeplink: DeepLink.AddBaseNode) {
-        val baseNode = BaseNodeDto.fromDeeplink(deeplink)
+    fun addBaseNode(deeplink: DeepLink.AddBaseNode) {
+        val baseNode = getData(deeplink)
         val args = ConfirmDialogArgs(
             resourceManager.getString(R.string.home_custom_base_node_title),
             resourceManager.getString(R.string.home_custom_base_node_description),
             resourceManager.getString(R.string.home_custom_base_node_no_button),
             resourceManager.getString(R.string.common_lets_do_it),
-            onConfirm = { addBaseNode(baseNode) }
+            onConfirm = { addBaseNodeAction(baseNode) }
         ).getModular(baseNode, resourceManager)
-        ModularDialog(context, args).show()
+        modularDialog.postValue(args)
     }
 
-    fun addContacts(contacts: List<DeepLink.Contacts.DeeplinkContact>) {
-        val contactDtos = contacts.mapNotNull {
-            runCatching {
-                val ffiWalletAddress = FFITariWalletAddress(HexString(it.hex))
-                val tariWalletAddress = TariWalletAddress(ffiWalletAddress.toString(), ffiWalletAddress.getEmojiId())
-                ContactDto(FFIContactDto(tariWalletAddress, it.alias))
-            }.getOrNull()
-        }
+    fun addUserProfile(deeplink: DeepLink.UserProfile) {
+        val contact = DeepLink.Contacts(
+            listOf(
+                DeepLink.Contacts.DeeplinkContact(
+                    deeplink.alias,
+                    deeplink.tariAddressHex
+                )
+            )
+        )
+        addContacts(contact)
+    }
+
+    fun addContacts(contacts: DeepLink.Contacts) {
+        val contactDtos = getData(contacts)
         if (contactDtos.isEmpty()) return
         val names = contactDtos.joinToString(", ") { it.contact.getAlias().trim() }
         val args = ModularDialogArgs(
@@ -81,7 +85,7 @@ class DeeplinkViewModel : CommonViewModel() {
                 HeadModule(resourceManager.getString(R.string.contact_deeplink_title)),
                 BodyModule(resourceManager.getString(R.string.contact_deeplink_message, contactDtos.size.toString()) + ". " + names),
                 ButtonModule(resourceManager.getString(R.string.common_confirm), ButtonStyle.Normal) {
-                    contactDtos.forEach { contactRepository.addContact(it) }
+                    addContactsAction(contactDtos)
                     dismissDialog.postValue(Unit)
                 },
                 ButtonModule(resourceManager.getString(R.string.common_cancel), ButtonStyle.Close)
@@ -90,17 +94,47 @@ class DeeplinkViewModel : CommonViewModel() {
         modularDialog.postValue(args)
     }
 
-    fun send(deeplink: DeepLink.Send) {
-        val contactDto = runCatching {
-            val ffiWalletAddress = FFITariWalletAddress(HexString(deeplink.walletAddressHex))
-            val tariWalletAddress = TariWalletAddress(ffiWalletAddress.toString(), ffiWalletAddress.getEmojiId())
-            ContactDto(FFIContactDto(tariWalletAddress, ""))
-        }.getOrNull() ?: return
+    fun executeRawDeeplink(deeplink: DeepLink) {
+        when (deeplink) {
+            is DeepLink.AddBaseNode -> addBaseNodeAction(getData(deeplink))
+            is DeepLink.Contacts -> addContactsAction(getData(deeplink))
+            is DeepLink.Send -> sendAction(deeplink)
+            is DeepLink.UserProfile -> addContactsAction(getData(deeplink)?.let { listOf(it) } ?: listOf())
+        }
+    }
 
+    private fun getData(deeplink: DeepLink.AddBaseNode): BaseNodeDto = BaseNodeDto.fromDeeplink(deeplink)
+
+    private fun getData(deeplink: DeepLink.Contacts): List<ContactDto> = deeplink.contacts.mapNotNull {
+        runCatching {
+            val ffiWalletAddress = FFITariWalletAddress(HexString(it.hex))
+            val tariWalletAddress = TariWalletAddress(ffiWalletAddress.toString(), ffiWalletAddress.getEmojiId())
+            ContactDto(FFIContactDto(tariWalletAddress, it.alias))
+        }.getOrNull()
+    }
+
+    private fun getData(deeplink: DeepLink.Send): ContactDto? = runCatching {
+        val ffiWalletAddress = FFITariWalletAddress(HexString(deeplink.walletAddressHex))
+        val tariWalletAddress = TariWalletAddress(ffiWalletAddress.toString(), ffiWalletAddress.getEmojiId())
+        ContactDto(FFIContactDto(tariWalletAddress, ""))
+    }.getOrNull()
+
+    private fun getData(userProfile: DeepLink.UserProfile): ContactDto? = runCatching {
+        val ffiWalletAddress = FFITariWalletAddress(HexString(userProfile.tariAddressHex))
+        val tariWalletAddress = TariWalletAddress(ffiWalletAddress.toString(), ffiWalletAddress.getEmojiId())
+        ContactDto(FFIContactDto(tariWalletAddress, userProfile.alias))
+    }.getOrNull()
+
+    private fun addContactsAction(contacts: List<ContactDto>) {
+        contacts.forEach { contactRepository.addContact(it) }
+    }
+
+    private fun sendAction(deeplink: DeepLink.Send) {
+        val contactDto = getData(deeplink) ?: return
         navigation.postValue(Navigation.TxListNavigation.ToSendTariToUser(contactDto))
     }
 
-    private fun addBaseNode(baseNodeDto: BaseNodeDto) {
+    private fun addBaseNodeAction(baseNodeDto: BaseNodeDto) {
         baseNodeRepository.addUserBaseNode(baseNodeDto)
         baseNodes.setBaseNode(baseNodeDto)
     }

@@ -198,7 +198,7 @@ class ShareViewModel : CommonViewModel() {
     }
 
     private fun onReceived(data: List<DeepLink.Contacts.DeeplinkContact>) {
-        deeplinkViewModel.addContacts(data)
+        deeplinkViewModel.addContacts(DeepLink.Contacts(data))
     }
 
     companion object {

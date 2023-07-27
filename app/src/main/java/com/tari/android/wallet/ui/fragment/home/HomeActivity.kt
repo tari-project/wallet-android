@@ -43,7 +43,6 @@ import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.MigrationManager
-import com.tari.android.wallet.application.deeplinks.DeepLink
 import com.tari.android.wallet.application.deeplinks.DeeplinkHandler
 import com.tari.android.wallet.application.deeplinks.DeeplinkViewModel
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
@@ -54,7 +53,6 @@ import com.tari.android.wallet.di.DiContainer.appComponent
 import com.tari.android.wallet.extension.applyFontStyle
 import com.tari.android.wallet.extension.observe
 import com.tari.android.wallet.model.TxId
-import com.tari.android.wallet.service.TariWalletService
 import com.tari.android.wallet.service.connection.ServiceConnectionStatus
 import com.tari.android.wallet.service.service.WalletServiceLauncher
 import com.tari.android.wallet.ui.common.CommonActivity
@@ -148,7 +146,7 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>() {
             enableNavigationView(ui.homeImageView)
             viewModel.doOnConnected {
                 ui.root.postDelayed({
-                    processIntentDeepLink(it, intent)
+                    processIntentDeepLink(intent)
                 }, Constants.UI.mediumDurationMs)
             }
         } else {
@@ -197,7 +195,7 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>() {
         // onNewIntent might get called before onCreate, so we anticipate that here
         checkScreensDeeplink(intent)
         if (viewModel.serviceConnection.currentState.status == ServiceConnectionStatus.CONNECTED) {
-            processIntentDeepLink(viewModel.serviceConnection.currentState.service!!, intent)
+            processIntentDeepLink(intent)
         } else {
             setIntent(intent)
         }
@@ -339,14 +337,8 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>() {
 
     fun willNotifyAboutNewTx(): Boolean = ui.viewPager.currentItem == INDEX_HOME
 
-    private fun processIntentDeepLink(service: TariWalletService, intent: Intent) {
-        deeplinkHandler.handle(intent.data?.toString().orEmpty())?.let { deepLink ->
-            (deepLink as? DeepLink.Send)?.let { viewModel.tariNavigator.sendTariToUser(service, it) }
-
-            (deepLink as? DeepLink.AddBaseNode)?.let { deeplinkViewModel.addBaseNode(this, it) }
-
-            (deepLink as? DeepLink.Contacts)?.let { deeplinkViewModel.addContacts(it.contacts) }
-        }
+    private fun processIntentDeepLink(intent: Intent) {
+        deeplinkViewModel.tryToHandle(intent.data?.toString().orEmpty())
     }
 
     override fun onDestroy() {

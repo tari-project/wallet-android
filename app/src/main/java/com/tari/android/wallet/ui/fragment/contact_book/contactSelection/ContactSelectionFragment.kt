@@ -47,6 +47,7 @@ import com.tari.android.wallet.ui.fragment.contact_book.contacts.adapter.contact
 import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.YatDto
 import com.tari.android.wallet.ui.fragment.contact_book.root.ShareViewModel
 import com.tari.android.wallet.ui.fragment.qr.QRScannerActivity
+import com.tari.android.wallet.ui.fragment.qr.QrScannerSource
 import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.EmojiUtil
 import com.tari.android.wallet.util.containsNonEmoji
@@ -223,9 +224,7 @@ open class ContactSelectionFragment : CommonFragment<FragmentContactsSelectionBi
     }
 
     private fun startQRCodeActivity() {
-        val intent = Intent(activity, QRScannerActivity::class.java)
-        startActivityForResult(intent, QRScannerActivity.REQUEST_QR_SCANNER)
-        activity?.overridePendingTransition(R.anim.slide_up, 0)
+        QRScannerActivity.startScanner(requireActivity(), QrScannerSource.AddContact)
     }
 
     private fun focusEditTextAndShowKeyboard() {
@@ -249,7 +248,7 @@ open class ContactSelectionFragment : CommonFragment<FragmentContactsSelectionBi
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == QRScannerActivity.REQUEST_QR_SCANNER && resultCode == Activity.RESULT_OK && data != null) {
             val qrData = data.getStringExtra(QRScannerActivity.EXTRA_QR_DATA) ?: return
-            deeplinkViewModel.tryToHandle(requireContext(), qrData)
+            deeplinkViewModel.tryToHandle(qrData)
         }
     }
 
@@ -347,7 +346,7 @@ open class ContactSelectionFragment : CommonFragment<FragmentContactsSelectionBi
             }
         } else if (viewModel.deeplinkHandler.handle(text) != null) {
             val deeplink = viewModel.deeplinkHandler.handle(text)!!
-            deeplinkViewModel.execute(requireContext(), deeplink)
+            deeplinkViewModel.execute(deeplink)
             viewModel.selectedTariWalletAddress.value = null
         } else if (viewModel.walletAddressViewModel.checkForWalletAddressHex(text)) {
             finishEntering(viewModel.selectedTariWalletAddress.value!!.emojiId)

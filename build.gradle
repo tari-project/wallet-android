@@ -1,8 +1,5 @@
 buildscript {
     ext {
-
-        agp_version2 = '7.4.2'
-        agp_version1 = '8.1.0-alpha09'
         agp_version = '7.4.2'
     }
     ext.kotlin_version = '1.8.10'
@@ -23,7 +20,7 @@ buildscript {
     }
 
     dependencies {
-        classpath "com.android.tools.build:gradle:$agp_version2"
+        classpath "com.android.tools.build:gradle:$agp_version"
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
         classpath "io.sentry:sentry-android-gradle-plugin:3.4.3"
     }
