@@ -35,6 +35,7 @@ import com.tari.android.wallet.ui.fragment.contact_book.link.ContactLinkFragment
 import com.tari.android.wallet.ui.fragment.contact_book.root.ContactBookFragment
 import com.tari.android.wallet.ui.fragment.contact_book.transactionHistory.TransactionHistoryFragment
 import com.tari.android.wallet.ui.fragment.home.HomeActivity
+import com.tari.android.wallet.ui.fragment.home.homeTransactionHistory.HomeTransactionHistoryFragment
 import com.tari.android.wallet.ui.fragment.home.navigation.Navigation.AllSettingsNavigation
 import com.tari.android.wallet.ui.fragment.home.navigation.Navigation.ContactBookNavigation
 import com.tari.android.wallet.ui.fragment.onboarding.activity.OnboardingFlowActivity
@@ -124,6 +125,7 @@ class TariNavigator @Inject constructor(val prefs: SharedPrefsRepository, val ta
             Navigation.TxListNavigation.ToUtxos -> toUtxos()
             Navigation.TxListNavigation.ToAllSettings -> toAllSettings()
             Navigation.TxListNavigation.ToSplashScreen -> toSplash()
+            is Navigation.TxListNavigation.HomeTransactionHistory -> addFragment(HomeTransactionHistoryFragment())
             Navigation.TorBridgeNavigation.ToCustomBridges -> toCustomTorBridges()
             Navigation.BaseNodeNavigation.ToAddCustomBaseNode -> toAddCustomBaseNode()
             Navigation.VerifySeedPhraseNavigation.ToSeedPhraseVerificationComplete -> onSeedPhraseVerificationComplete()

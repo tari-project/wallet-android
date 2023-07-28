@@ -79,7 +79,7 @@ import com.tari.android.wallet.ui.fragment.onboarding.activity.OnboardingFlowAct
 import com.tari.android.wallet.ui.fragment.settings.allSettings.AllSettingsFragment
 import com.tari.android.wallet.ui.fragment.splash.SplashActivity
 import com.tari.android.wallet.ui.fragment.store.StoreFragment
-import com.tari.android.wallet.ui.fragment.tx.TxListFragment
+import com.tari.android.wallet.ui.fragment.tx.HomeFragment
 import com.tari.android.wallet.util.Constants
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -350,7 +350,7 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>() {
     class HomeAdapter(fm: FragmentManager, lifecycle: Lifecycle) : FragmentStateAdapter(fm, lifecycle) {
 
         override fun createFragment(position: Int): Fragment = when (position) {
-            INDEX_HOME -> TxListFragment()
+            INDEX_HOME -> HomeFragment()
             INDEX_STORE -> StoreFragment.newInstance()
             INDEX_CONTACT_BOOK -> ContactBookFragment()
             INDEX_SETTINGS -> AllSettingsFragment.newInstance()

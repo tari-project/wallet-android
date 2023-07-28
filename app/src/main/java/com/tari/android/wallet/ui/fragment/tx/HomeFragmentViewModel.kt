@@ -25,13 +25,13 @@ import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
 import com.tari.android.wallet.ui.fragment.send.finalize.TxFailureReason
 import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupSettingsRepository
 import com.tari.android.wallet.ui.fragment.tx.adapter.TransactionItem
-import com.tari.android.wallet.ui.fragment.tx.ui.progressController.UpdateProgressViewController
+import com.tari.android.wallet.util.extractEmojis
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 
-class TxListViewModel : CommonViewModel() {
+class HomeFragmentViewModel : CommonViewModel() {
 
     @Inject
     lateinit var backupSettingsRepository: BackupSettingsRepository
@@ -50,24 +50,21 @@ class TxListViewModel : CommonViewModel() {
 
     val stagedWalletSecurityManager = StagedWalletSecurityManager()
 
-    lateinit var progressControllerState: UpdateProgressViewController.UpdateProgressState
-
-    private val _connected = SingleLiveEvent<Unit>()
-    val connected: LiveData<Unit> = _connected
-
     private val _balanceInfo = MutableLiveData<BalanceInfo>()
     val balanceInfo: LiveData<BalanceInfo> = _balanceInfo
 
     private val _refreshBalanceInfo = SingleLiveEvent<Boolean>()
     val refreshBalanceInfo: SingleLiveEvent<Boolean> = _refreshBalanceInfo
 
-    private val _txSendSuccessful = SingleLiveEvent<Unit>()
-    val txSendSuccessful: MutableLiveData<Unit> = _txSendSuccessful
+    val emoji = MutableLiveData<String>()
 
     init {
         component.inject(this)
 
         doOnConnectedToWallet { doOnConnected { runCatching { onServiceConnected() } } }
+
+        val firstEmoji = sharedPrefsWrapper.emojiId.orEmpty().extractEmojis().take(1).joinToString("")
+        emoji.postValue(firstEmoji)
     }
 
     fun processItemClick(item: CommonViewHolderItem) {
@@ -81,7 +78,6 @@ class TxListViewModel : CommonViewModel() {
 
         viewModelScope.launch(Dispatchers.IO) {
             fetchBalanceInfoData()
-            _connected.postValue(Unit)
         }
     }
 
@@ -118,14 +114,10 @@ class TxListViewModel : CommonViewModel() {
         EventBus.subscribe<Event.Transaction.TxFauxConfirmed>(this) { refreshBalance(false) }
         EventBus.subscribe<Event.Transaction.TxCancelled>(this) { refreshBalance(false) }
 
-        EventBus.subscribe<Event.Transaction.TxSendSuccessful>(this) { onTxSendSuccessful() }
+        EventBus.subscribe<Event.Transaction.TxSendSuccessful>(this) { refreshBalance(false) }
         EventBus.subscribe<Event.Transaction.TxSendFailed>(this) { onTxSendFailed(it.failureReason) }
 
         EventBus.balanceState.publishSubject.subscribe { _balanceInfo.postValue(it) }.addTo(compositeDisposable)
-    }
-
-    private fun onTxSendSuccessful() {
-        _txSendSuccessful.postValue(Unit)
     }
 
     /**

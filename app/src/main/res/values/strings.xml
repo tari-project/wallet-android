@@ -179,7 +179,7 @@
 
     <!-- home -->
     <string name="home_available_balance">Balance</string>
-    <string name="home_available_to_spend_balance">Available to spend</string>
+    <string name="home_available_to_spend_balance">Available to spend:</string>
     <string name="home_tx_list_header_yesterday">Yesterday</string>
     <string name="home_txs">Transactions</string>
     <string name="home_setup_is_complete">Your wallet setup is complete.</string>
@@ -216,6 +216,10 @@
     <string name="home_balance_info_help_title">Why is some of my balance not spendable right now?</string>
     <string name="home_balance_info_help_description">The Tari in your wallet is made up of notes, just as your real wallet contains notes and coins. When you spend Tari, you must use up entire notes and wait for change. While you\'re waiting, the change is not spendable until your transaction is mined. You can find out more about how Tari transactions work in TariLabs University</string>
     <string name="home_balance_info_help_button">Go to TariLabs University</string>
+    <string name="home_transaction_list_empty_description">Nothing to show here yet. Keep an eye on this screen to stay updated on the status of your transactions. Oh, and remember, you can also use the request function to ask someone to send you some Tari if you want!</string>
+    <string name="home_transaction_list_title">No transactions found</string>
+    <string name="home_transaction_view_all_txs">View all transactions</string>
+    <string name="home_search_hint">Enter Emoji ID or Contact Name</string>
 
     <!-- tx list -->
     <string name="tx_list_sent_a_payment">%s sent a payment</string>
