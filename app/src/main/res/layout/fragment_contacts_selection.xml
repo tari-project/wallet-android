@@ -52,11 +52,23 @@
 
     </LinearLayout>
 
+    <com.tari.android.wallet.ui.component.tari.TariGradientButton
+        android:id="@id/continue_button"
+        android:visibility="gone"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/common_action_button_height"
+        android:layout_marginHorizontal="25dp"
+        android:layout_marginBottom="10dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:title="@string/common_continue" />
+
     <include
         android:id="@+id/clipboard"
+        layout="@layout/view_clipboard_wallet"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        layout="@layout/view_clipboard_wallet" />
+        android:layout_height="wrap_content" />
 
     <com.tari.android.wallet.ui.component.tari.TariSecondaryBackground
         android:id="@+id/add_recipient_vw_search_container"

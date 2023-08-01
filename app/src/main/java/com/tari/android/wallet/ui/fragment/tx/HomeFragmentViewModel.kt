@@ -2,7 +2,9 @@ package com.tari.android.wallet.ui.fragment.tx
 
 
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.toLiveData
 import androidx.lifecycle.viewModelScope
 import com.tari.android.wallet.R.string.error_no_connection_description
 import com.tari.android.wallet.R.string.error_no_connection_title
@@ -26,6 +28,7 @@ import com.tari.android.wallet.ui.fragment.send.finalize.TxFailureReason
 import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupSettingsRepository
 import com.tari.android.wallet.ui.fragment.tx.adapter.TransactionItem
 import com.tari.android.wallet.util.extractEmojis
+import io.reactivex.BackpressureStrategy
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -56,15 +59,29 @@ class HomeFragmentViewModel : CommonViewModel() {
     private val _refreshBalanceInfo = SingleLiveEvent<Boolean>()
     val refreshBalanceInfo: SingleLiveEvent<Boolean> = _refreshBalanceInfo
 
+    val txList = MediatorLiveData<MutableList<CommonViewHolderItem>>()
+
     val emoji = MutableLiveData<String>()
+
+    val emojiMedium = MutableLiveData<String>()
 
     init {
         component.inject(this)
 
+        txList.addSource(transactionRepository.list) { updateList() }
+
+        txList.addSource(contactsRepository.publishSubject.toFlowable(BackpressureStrategy.LATEST).toLiveData()) { updateList() }
+
         doOnConnectedToWallet { doOnConnected { runCatching { onServiceConnected() } } }
 
-        val firstEmoji = sharedPrefsWrapper.emojiId.orEmpty().extractEmojis().take(1).joinToString("")
-        emoji.postValue(firstEmoji)
+        val emojies = sharedPrefsWrapper.emojiId.orEmpty().extractEmojis()
+        emojiMedium.postValue(emojies.take(3).joinToString(""))
+        emoji.postValue(emojies.take(1).joinToString(""))
+    }
+
+    private fun updateList() {
+        val list = transactionRepository.list.value ?: return
+        txList.postValue(list.filterIsInstance<TransactionItem>().sortedBy { it.tx.timestamp }.takeLast(amountOfTransactions).toMutableList())
     }
 
     fun processItemClick(item: CommonViewHolderItem) {
@@ -77,7 +94,7 @@ class HomeFragmentViewModel : CommonViewModel() {
         subscribeToEventBus()
 
         viewModelScope.launch(Dispatchers.IO) {
-            fetchBalanceInfoData()
+            refreshAllData(true)
         }
     }
 
@@ -142,5 +159,9 @@ class HomeFragmentViewModel : CommonViewModel() {
             resourceManager.getString(error_node_unreachable_description),
         )
         modularDialog.postValue(errorDialogArgs.getModular(resourceManager))
+    }
+
+    companion object {
+        val amountOfTransactions = 2
     }
 }

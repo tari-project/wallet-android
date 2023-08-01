@@ -51,6 +51,7 @@ import com.tari.android.wallet.ui.fragment.send.common.TransactionData
 import com.tari.android.wallet.ui.fragment.send.finalize.FinalizeSendTxFragment
 import com.tari.android.wallet.ui.fragment.send.finalize.TxFailureReason
 import com.tari.android.wallet.ui.fragment.send.requestTari.RequestTariFragment
+import com.tari.android.wallet.ui.fragment.send.transfer.TransferFragment
 import com.tari.android.wallet.ui.fragment.settings.allSettings.about.TariAboutFragment
 import com.tari.android.wallet.ui.fragment.settings.backgroundService.BackgroundServiceSettingsFragment
 import com.tari.android.wallet.ui.fragment.settings.backup.backupOnboarding.BackupOnboardingFlowFragment
@@ -91,7 +92,7 @@ class TariNavigator @Inject constructor(val prefs: SharedPrefsRepository, val ta
             is ContactBookNavigation.ToExternalWallet -> toExternalWallet(navigation.connectedWallet)
             is ContactBookNavigation.ToContactTransactionHistory -> toContactTransactionHistory(navigation.contact)
             is ContactBookNavigation.ToAddPhoneContact -> toAddPhoneContact()
-            is ContactBookNavigation.ToSelectTariUser -> addFragment(SelectUserContactFragment())
+            is ContactBookNavigation.ToSelectTariUser -> addFragment(SelectUserContactFragment.newInstance())
             Navigation.ChooseRestoreOptionNavigation.ToEnterRestorePassword -> toEnterRestorePassword()
             Navigation.ChooseRestoreOptionNavigation.OnRestoreCompleted -> onRestoreCompleted()
             Navigation.ChooseRestoreOptionNavigation.ToRestoreWithRecoveryPhrase -> toRestoreWithRecoveryPhrase()
@@ -106,7 +107,7 @@ class TariNavigator @Inject constructor(val prefs: SharedPrefsRepository, val ta
             AllSettingsNavigation.ToNetworkSelection -> toNetworkSelection()
             AllSettingsNavigation.ToTorBridges -> toTorBridges()
             AllSettingsNavigation.ToThemeSelection -> toThemeSelection()
-            AllSettingsNavigation.ToRequestTari -> addFragment(RequestTariFragment())
+            AllSettingsNavigation.ToRequestTari -> addFragment(RequestTariFragment.newInstance())
             Navigation.EnterRestorationPasswordNavigation.OnRestore -> onRestoreCompleted()
             Navigation.InputSeedWordsNavigation.ToRestoreFormSeedWordsInProgress -> toRestoreFromSeedWordsInProgress()
             Navigation.InputSeedWordsNavigation.ToBaseNodeSelection -> toBaseNodeSelection()
@@ -125,6 +126,7 @@ class TariNavigator @Inject constructor(val prefs: SharedPrefsRepository, val ta
             Navigation.TxListNavigation.ToUtxos -> toUtxos()
             Navigation.TxListNavigation.ToAllSettings -> toAllSettings()
             Navigation.TxListNavigation.ToSplashScreen -> toSplash()
+            is Navigation.TxListNavigation.ToTransfer -> addFragment(TransferFragment())
             is Navigation.TxListNavigation.HomeTransactionHistory -> addFragment(HomeTransactionHistoryFragment())
             Navigation.TorBridgeNavigation.ToCustomBridges -> toCustomTorBridges()
             Navigation.BaseNodeNavigation.ToAddCustomBaseNode -> toAddCustomBaseNode()

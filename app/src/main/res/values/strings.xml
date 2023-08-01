@@ -48,6 +48,7 @@
     <string name="dummy_message">Thanks again for helping with my move</string>
     <string name="long_dummy_message">Thanks again for helping with my move. Thanks again for helping with my move. Thanks again for helping with my move. Thanks again for helping with my move</string>
     <string name="dummy_emoji">🍀</string>
+    <string name="dummy_emoji2">🍀🍀🍀</string>
     <string name="dummy_text">Test text</string>
 
     <!-- notifications -->
@@ -220,6 +221,7 @@
     <string name="home_transaction_list_title">No transactions found</string>
     <string name="home_transaction_view_all_txs">View all transactions</string>
     <string name="home_search_hint">Enter Emoji ID or Contact Name</string>
+    <string name="home_empty_state">Hey there, %s\n\nWelcome to Aurora! Once you start making some transactions, they\'ll appear right here. In the meantime, you can click the "transact" button below to get things rolling</string>
 
     <!-- tx list -->
     <string name="tx_list_sent_a_payment">%s sent a payment</string>
@@ -227,7 +229,7 @@
     <string name="bluetooth_connect">Bluetooth Connect 🤘</string>
     <string name="bluetooth_connect_description">Connect and send Tari to someone nearby</string>
     <string name="tx_list_you_paid_with_alias">You paid %s</string>
-    <string name="tx_list_paid_you">paid you.</string>
+    <string name="tx_list_paid_you">paid you</string>
     <string name="tx_list_minutes_ago">%dm ago</string>
     <string name="tx_list_hours_ago">%dh ago</string>
     <string name="tx_list_now">Now</string>
@@ -238,10 +240,10 @@
     <string name="tx_list_you_received_one_side_payment">You received a one side payment</string>
 
     <!-- send tari -->
-    <string name="send_tari_title">Send Tari</string>
-    <string name="request_tari_title">Request Tari</string>
+    <string name="send_tari_title">Send To</string>
+    <string name="request_tari_title">Receive Tari</string>
     <string name="send_tari_subtitle">Send</string>
-    <string name="request_tari_subtitle">Request</string>
+    <string name="request_tari_subtitle">Receive</string>
 
     <!-- request tari -->
     <string name="request_tari_generate_qr_code">Generate QR Code</string>

@@ -78,12 +78,15 @@ open class ContactSelectionFragment : CommonFragment<FragmentContactsSelectionBi
     private var textChangedProcessRunnable = Runnable { processTextChanged() }
 
     private var yatEyeState = true
+    private var withToolbar = true
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
         FragmentContactsSelectionBinding.inflate(inflater, container, false).also { ui = it }.root
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        withToolbar = arguments?.getBoolean("withToolbar") ?: true
 
         val viewModel: ContactSelectionViewModel by viewModels()
         bindViewModel(viewModel)
@@ -131,6 +134,7 @@ open class ContactSelectionFragment : CommonFragment<FragmentContactsSelectionBi
         ui.qrCodeButton.setOnClickListener { onQRButtonClick(it) }
         val args = TariToolbarActionArg(title = string(R.string.common_done)) { goToNext() }
         ui.toolbar.setRightArgs(args)
+        ui.continueButton.setOnClickListener { goToNext() }
         ui.yatEyeButton.setOnClickListener { toggleYatEye() }
         ui.searchEditText.setRawInputType(InputType.TYPE_CLASS_TEXT)
         ui.searchEditText.addTextChangedListener(this@ContactSelectionFragment)
@@ -295,6 +299,7 @@ open class ContactSelectionFragment : CommonFragment<FragmentContactsSelectionBi
         var text = editable.toString()
 
         ui.toolbar.hideRightActions()
+        ui.continueButton.gone()
         ui.invalidEmojiIdTextView.gone()
 
         if (editable.toString().firstNCharactersAreEmojis(Constants.Wallet.emojiFormatterChunkSize)) {
@@ -369,6 +374,9 @@ open class ContactSelectionFragment : CommonFragment<FragmentContactsSelectionBi
                 ui.invalidEmojiIdTextView.gone()
                 ui.toolbar.setRightArgs(TariToolbarActionArg(title = string(R.string.contact_book_add_contact_next_button)) { goToNext() })
                 ui.toolbar.showRightActions()
+                if (!withToolbar) {
+                    ui.continueButton.visible()
+                }
                 activity?.hideKeyboard()
                 ui.searchEditText.clearFocus()
                 viewModel.searchText.value = text

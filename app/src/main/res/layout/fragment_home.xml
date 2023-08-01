@@ -50,6 +50,7 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/full_avatar_container"
             android:layout_width="137dp"
             android:layout_height="137dp"
             android:background="@drawable/vector_disable_able_gradient_button_bg_external"
@@ -58,21 +59,30 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
 
-            <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/avatar"
+            <FrameLayout
+                android:id="@+id/avatar_container"
                 android:layout_width="104dp"
                 android:layout_height="104dp"
                 android:layout_marginHorizontal="9dp"
                 android:layout_marginVertical="9dp"
                 android:background="@drawable/vector_avatar_bg_round"
-                android:gravity="center"
-                android:textColor="@color/black"
-                android:textSize="64dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                tools:text="🦊" />
+                app:layout_constraintTop_toTopOf="parent">
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/avatar"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center"
+                    android:gravity="center"
+                    android:textColor="@color/black"
+                    android:textSize="64dp"
+                    android:translationY="-6dp"
+                    tools:text="🦊" />
+
+            </FrameLayout>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -97,14 +107,40 @@
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/transactions_recycler_view"
         android:layout_width="0dp"
-        android:layout_height="0dp"
+        android:layout_height="wrap_content"
         android:layout_marginHorizontal="28dp"
         android:layout_marginBottom="20dp"
         app:layout_constraintBottom_toTopOf="@+id/view_all_txs_button"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintWidth_default="wrap"
+        app:reverseLayout="true"
         tools:itemCount="1" />
+
+    <FrameLayout
+        android:id="@+id/empty_state"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="28dp"
+        android:layout_marginBottom="20dp"
+        android:background="@drawable/tari_home_tx_bg"
+        android:paddingHorizontal="10dp"
+        android:paddingVertical="15dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toTopOf="@+id/view_all_txs_button"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <com.tari.android.wallet.ui.component.tari.TariTextView
+            android:id="@+id/empty_state_text_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:lineSpacingExtra="4dp"
+            android:text="@string/home_empty_state"
+            android:textColor="?attr/palette_button_primary_text"
+            android:textSize="12sp"
+            app:customFont="medium" />
+
+    </FrameLayout>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/top_content_container_view"
@@ -147,7 +183,17 @@
                     android:layout_width="wrap_content"
                     android:layout_height="@dimen/home_balance_digit_height"
                     android:layout_marginTop="-4dp"
-                    android:orientation="horizontal" />
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:gravity="center"
+                        android:text="⏳⌛️"
+                        android:textSize="24dp" />
+
+                </LinearLayout>
 
                 <!-- decimals -->
                 <LinearLayout
@@ -199,17 +245,18 @@
                 android:layout_gravity="center_vertical"
                 android:layout_marginEnd="6dp"
                 android:letterSpacing="-0.018"
+                android:text="⏳⌛️"
                 android:textColor="?attr/palette_button_primary_text"
                 android:textSize="12sp"
-                app:customFont="heavy"
-                tools:text="0.00" />
+                app:customFont="heavy" />
 
             <com.tari.android.wallet.ui.fragment.tx.questionMark.QuestionMarkView
                 android:id="@+id/balance_question_mark"
                 android:layout_width="wrap_content"
-                android:layout_height="25dp"
+                android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
-                android:gravity="center_vertical" />
+                android:gravity="center_vertical"
+                android:padding="5dp" />
 
         </LinearLayout>
 

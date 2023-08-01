@@ -37,15 +37,23 @@ import android.annotation.SuppressLint
 import android.os.*
 import android.view.*
 import androidx.fragment.app.viewModels
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.tari.android.wallet.R
 import com.tari.android.wallet.databinding.FragmentHomeBinding
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.extension.observe
 import com.tari.android.wallet.extension.observeOnLoad
 import com.tari.android.wallet.model.BalanceInfo
 import com.tari.android.wallet.ui.common.CommonFragment
+import com.tari.android.wallet.ui.common.recyclerView.AdapterFactory
+import com.tari.android.wallet.ui.common.recyclerView.CommonAdapter
+import com.tari.android.wallet.ui.common.recyclerView.CommonViewHolderItem
 import com.tari.android.wallet.ui.component.networkStateIndicator.ConnectionIndicatorViewModel
 import com.tari.android.wallet.ui.extension.*
 import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
+import com.tari.android.wallet.ui.fragment.qr.QRScannerActivity
+import com.tari.android.wallet.ui.fragment.qr.QrScannerSource
+import com.tari.android.wallet.ui.fragment.tx.adapter.TxListHomeViewHolder
 import com.tari.android.wallet.ui.fragment.tx.questionMark.QuestionMarkViewModel
 import com.tari.android.wallet.ui.fragment.tx.ui.balanceController.BalanceViewController
 import com.tari.android.wallet.util.WalletUtil
@@ -56,6 +64,8 @@ class HomeFragment : CommonFragment<FragmentHomeBinding, HomeFragmentViewModel>(
     private val questionMarkViewModel: QuestionMarkViewModel by viewModels()
 
     private val handler: Handler = Handler(Looper.getMainLooper())
+
+    private val adapter = AdapterFactory.generate<CommonViewHolderItem>(TxListHomeViewHolder.getBuilder())
 
     // This listener is used only to animate the visibility of the scroll depth gradient view.
     private lateinit var balanceViewController: BalanceViewController
@@ -84,6 +94,14 @@ class HomeFragment : CommonFragment<FragmentHomeBinding, HomeFragmentViewModel>(
         observe(refreshBalanceInfo) { updateBalanceInfoUI(it) }
 
         observe(emoji) { ui.avatar.text = it }
+
+        observe(emojiMedium) { ui.emptyStateTextView.text = getString(R.string.home_empty_state, it) }
+
+        observe(txList) {
+            ui.transactionsRecyclerView.setVisible(it.isNotEmpty())
+            ui.emptyState.setVisible(it.isEmpty())
+            adapter.update(it)
+        }
 
         observeOnLoad(balanceInfo)
 
@@ -125,8 +143,11 @@ class HomeFragment : CommonFragment<FragmentHomeBinding, HomeFragmentViewModel>(
     @SuppressLint("ClickableViewAccessibility")
     private fun setupUI() = with(ui) {
         viewAllTxsButton.setOnClickListener { viewModel.navigation.postValue(Navigation.TxListNavigation.HomeTransactionHistory) }
-        //todo
-//        qrCodeButton.setOnClickListener { QRScannerActivity.start(requireActivity()) }
+        qrCodeButton.setOnClickListener { QRScannerActivity.startScanner(requireActivity(), QrScannerSource.Home) }
+        transactionsRecyclerView.adapter = adapter
+        adapter.setClickListener(CommonAdapter.ItemClickListener { viewModel.processItemClick(it) })
+        transactionsRecyclerView.layoutManager = LinearLayoutManager(requireContext())
+        fullAvatarContainer.setOnClickListener { viewModel.navigation.postValue(Navigation.AllSettingsNavigation.ToMyProfile) }
     }
 
     private fun subscribeToViewModel() {

@@ -7,13 +7,13 @@ import com.tari.android.wallet.ui.fragment.send.common.TransactionData
 
 sealed class Navigation {
 
-    sealed class CustomBridgeNavigation: Navigation() {
-        object ScanQrCode: CustomBridgeNavigation()
+    sealed class CustomBridgeNavigation : Navigation() {
+        object ScanQrCode : CustomBridgeNavigation()
 
-        object UploadQrCode: CustomBridgeNavigation()
+        object UploadQrCode : CustomBridgeNavigation()
     }
 
-    sealed class BackupSettingsNavigation: Navigation() {
+    sealed class BackupSettingsNavigation : Navigation() {
 
         object ToLearnMore : BackupSettingsNavigation()
 
@@ -24,21 +24,21 @@ sealed class Navigation {
         object ToConfirmPassword : BackupSettingsNavigation()
     }
 
-    sealed class VerifySeedPhraseNavigation: Navigation() {
+    sealed class VerifySeedPhraseNavigation : Navigation() {
         object ToSeedPhraseVerificationComplete : VerifySeedPhraseNavigation()
 
-        class ToSeedPhraseVerification(val seedWords: List<String>): VerifySeedPhraseNavigation()
+        class ToSeedPhraseVerification(val seedWords: List<String>) : VerifySeedPhraseNavigation()
     }
 
     sealed class BaseNodeNavigation : Navigation() {
         object ToAddCustomBaseNode : BaseNodeNavigation()
     }
 
-    sealed class TorBridgeNavigation: Navigation() {
+    sealed class TorBridgeNavigation : Navigation() {
         object ToCustomBridges : TorBridgeNavigation()
     }
 
-    sealed class TxListNavigation: Navigation() {
+    sealed class TxListNavigation : Navigation() {
 
         object ToSplashScreen : TxListNavigation()
 
@@ -53,9 +53,11 @@ sealed class Navigation {
         class ToSendTariToUser(val contact: ContactDto) : TxListNavigation()
 
         object HomeTransactionHistory : TxListNavigation()
+
+        class ToTransfer : TxListNavigation()
     }
 
-    sealed class AddAmountNavigation() : Navigation() {
+    sealed class AddAmountNavigation : Navigation() {
         object OnAmountExceedsActualAvailableBalance : AddAmountNavigation()
 
         class ContinueToAddNote(val transactionData: TransactionData) : AddAmountNavigation()
@@ -63,7 +65,7 @@ sealed class Navigation {
         class ContinueToFinalizing(val transactionData: TransactionData) : AddAmountNavigation()
     }
 
-    sealed class WalletRestoringFromSeedWordsNavigation: Navigation() {
+    sealed class WalletRestoringFromSeedWordsNavigation : Navigation() {
         object OnRestoreCompleted : WalletRestoringFromSeedWordsNavigation()
         object OnRestoreFailed : WalletRestoringFromSeedWordsNavigation()
     }
@@ -111,7 +113,7 @@ sealed class Navigation {
 
         class ToSendTari(val contact: ContactDto) : ContactBookNavigation()
 
-        class ToSelectTariUser() : ContactBookNavigation()
+        class ToSelectTariUser : ContactBookNavigation()
 
         class ToRequestTari(val contact: ContactDto) : ContactBookNavigation()
 
