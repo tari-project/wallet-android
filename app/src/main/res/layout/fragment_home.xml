@@ -50,6 +50,7 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/full_avatar_container"
             android:layout_width="137dp"
             android:layout_height="137dp"
             android:background="@drawable/vector_disable_able_gradient_button_bg_external"

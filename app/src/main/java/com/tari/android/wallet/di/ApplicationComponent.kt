@@ -71,6 +71,7 @@ import com.tari.android.wallet.ui.fragment.send.addNote.gif.ChooseGIFDialogFragm
 import com.tari.android.wallet.ui.fragment.send.addNote.gif.ThumbnailGIFsViewModel
 import com.tari.android.wallet.ui.fragment.send.finalize.FinalizeSendTxViewModel
 import com.tari.android.wallet.ui.fragment.send.requestTari.RequestTariViewModel
+import com.tari.android.wallet.ui.fragment.send.transfer.TransferFragment
 import com.tari.android.wallet.ui.fragment.settings.allSettings.AllSettingsViewModel
 import com.tari.android.wallet.ui.fragment.settings.allSettings.about.TariAboutViewModel
 import com.tari.android.wallet.ui.fragment.settings.backgroundService.BackgroundServiceSettingsViewModel
@@ -193,6 +194,7 @@ interface ApplicationComponent {
     fun inject(viewModel: BluetoothSettingsViewModel)
     fun inject(viewModel: WalletAddressViewModel)
     fun inject(viewModel: QRScannerViewModel)
+    fun inject(viewModel: TransferFragment)
 
     fun getClipboardManager(): ClipboardManager
 }

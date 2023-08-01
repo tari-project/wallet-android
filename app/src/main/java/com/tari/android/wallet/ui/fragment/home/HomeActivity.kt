@@ -228,7 +228,7 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>() {
     }
 
     private fun setupUi() {
-        ui.sendTariButton.setOnClickListener { viewModel.navigation.postValue(Navigation.ContactBookNavigation.ToSelectTariUser()) }
+        ui.sendTariButton.setOnClickListener { viewModel.navigation.postValue(Navigation.TxListNavigation.ToTransfer()) }
         setupBottomNavigation()
     }
 

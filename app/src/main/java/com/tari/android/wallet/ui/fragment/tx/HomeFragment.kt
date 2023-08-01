@@ -147,6 +147,7 @@ class HomeFragment : CommonFragment<FragmentHomeBinding, HomeFragmentViewModel>(
         transactionsRecyclerView.adapter = adapter
         adapter.setClickListener(CommonAdapter.ItemClickListener { viewModel.processItemClick(it) })
         transactionsRecyclerView.layoutManager = LinearLayoutManager(requireContext())
+        fullAvatarContainer.setOnClickListener { viewModel.navigation.postValue(Navigation.AllSettingsNavigation.ToMyProfile) }
     }
 
     private fun subscribeToViewModel() {
