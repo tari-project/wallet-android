@@ -115,6 +115,32 @@
         app:reverseLayout="true"
         tools:itemCount="1" />
 
+    <FrameLayout
+        android:id="@+id/empty_state"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="28dp"
+        android:layout_marginBottom="20dp"
+        android:background="@drawable/tari_home_tx_bg"
+        android:paddingHorizontal="10dp"
+        android:paddingVertical="15dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toTopOf="@+id/view_all_txs_button"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <com.tari.android.wallet.ui.component.tari.TariTextView
+            android:id="@+id/empty_state_text_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:lineSpacingExtra="4dp"
+            android:text="@string/home_empty_state"
+            android:textColor="?attr/palette_button_primary_text"
+            android:textSize="12sp"
+            app:customFont="medium" />
+
+    </FrameLayout>
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/top_content_container_view"
         android:layout_width="match_parent"

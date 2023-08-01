@@ -63,6 +63,8 @@ class HomeFragmentViewModel : CommonViewModel() {
 
     val emoji = MutableLiveData<String>()
 
+    val emojiMedium = MutableLiveData<String>()
+
     init {
         component.inject(this)
 
@@ -72,8 +74,9 @@ class HomeFragmentViewModel : CommonViewModel() {
 
         doOnConnectedToWallet { doOnConnected { runCatching { onServiceConnected() } } }
 
-        val firstEmoji = sharedPrefsWrapper.emojiId.orEmpty().extractEmojis().take(1).joinToString("")
-        emoji.postValue(firstEmoji)
+        val emojies = sharedPrefsWrapper.emojiId.orEmpty().extractEmojis()
+        emojiMedium.postValue(emojies.take(3).joinToString(""))
+        emoji.postValue(emojies.take(1).joinToString(""))
     }
 
     private fun updateList() {

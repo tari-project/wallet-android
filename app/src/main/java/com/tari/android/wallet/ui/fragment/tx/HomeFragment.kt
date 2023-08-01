@@ -38,6 +38,7 @@ import android.os.*
 import android.view.*
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.tari.android.wallet.R
 import com.tari.android.wallet.databinding.FragmentHomeBinding
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.extension.observe
@@ -94,7 +95,13 @@ class HomeFragment : CommonFragment<FragmentHomeBinding, HomeFragmentViewModel>(
 
         observe(emoji) { ui.avatar.text = it }
 
-        observe(txList) { adapter.update(it) }
+        observe(emojiMedium) { ui.emptyStateTextView.text = getString(R.string.home_empty_state, it) }
+
+        observe(txList) {
+            ui.transactionsRecyclerView.setVisible(it.isNotEmpty())
+            ui.emptyState.setVisible(it.isEmpty())
+            adapter.update(it)
+        }
 
         observeOnLoad(balanceInfo)
 

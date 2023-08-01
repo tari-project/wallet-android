@@ -221,6 +221,7 @@
     <string name="home_transaction_list_title">No transactions found</string>
     <string name="home_transaction_view_all_txs">View all transactions</string>
     <string name="home_search_hint">Enter Emoji ID or Contact Name</string>
+    <string name="home_empty_state">Hey there, %s\n\nWelcome to Aurora! Once you start making some transactions, they\'ll appear right here. In the meantime, you can click the "transact" button below to get things rolling</string>
 
     <!-- tx list -->
     <string name="tx_list_sent_a_payment">%s sent a payment</string>
