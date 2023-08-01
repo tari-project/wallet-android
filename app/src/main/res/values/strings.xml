@@ -240,10 +240,10 @@
     <string name="tx_list_you_received_one_side_payment">You received a one side payment</string>
 
     <!-- send tari -->
-    <string name="send_tari_title">Send Tari</string>
-    <string name="request_tari_title">Request Tari</string>
+    <string name="send_tari_title">Send To</string>
+    <string name="request_tari_title">Receive Tari</string>
     <string name="send_tari_subtitle">Send</string>
-    <string name="request_tari_subtitle">Request</string>
+    <string name="request_tari_subtitle">Receive</string>
 
     <!-- request tari -->
     <string name="request_tari_generate_qr_code">Generate QR Code</string>
