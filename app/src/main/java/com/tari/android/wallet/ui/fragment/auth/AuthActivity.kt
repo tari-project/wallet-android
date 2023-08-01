@@ -65,6 +65,7 @@ import com.tari.android.wallet.ui.extension.string
 import com.tari.android.wallet.ui.extension.visible
 import com.tari.android.wallet.ui.fragment.home.HomeActivity
 import com.tari.android.wallet.ui.fragment.settings.allSettings.TariVersionModel
+import com.tari.android.wallet.util.Build.MOCKED
 import com.tari.android.wallet.util.Constants
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -139,14 +140,16 @@ class AuthActivity : CommonActivity<ActivityAuthBinding, AuthViewModel>() {
         if (viewModel.authService.isDeviceSecured) {
             lifecycleScope.launch {
                 try {
-                    // prompt system authentication dialog
-                    viewModel.authService.authenticate(
-                        this@AuthActivity,
-                        title = string(auth_title),
-                        subtitle =
-                        if (viewModel.authService.isBiometricAuthAvailable) string(auth_biometric_prompt)
-                        else string(auth_device_lock_code_prompt)
-                    )
+                    if (!MOCKED) {
+                        // prompt system authentication dialog
+                        viewModel.authService.authenticate(
+                            this@AuthActivity,
+                            title = string(auth_title),
+                            subtitle =
+                            if (viewModel.authService.isBiometricAuthAvailable) string(auth_biometric_prompt)
+                            else string(auth_device_lock_code_prompt)
+                        )
+                    }
                     authSuccessful()
                 } catch (e: BiometricAuthenticationException) {
                     authHasFailed()

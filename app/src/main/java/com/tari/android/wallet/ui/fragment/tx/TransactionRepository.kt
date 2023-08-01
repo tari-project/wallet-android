@@ -14,8 +14,11 @@ import com.tari.android.wallet.extension.getWithError
 import com.tari.android.wallet.extension.repopulate
 import com.tari.android.wallet.model.CancelledTx
 import com.tari.android.wallet.model.CompletedTx
+import com.tari.android.wallet.model.MicroTari
 import com.tari.android.wallet.model.PendingInboundTx
 import com.tari.android.wallet.model.PendingOutboundTx
+import com.tari.android.wallet.model.TariContact
+import com.tari.android.wallet.model.TariWalletAddress
 import com.tari.android.wallet.model.Tx
 import com.tari.android.wallet.model.TxId
 import com.tari.android.wallet.model.TxStatus
@@ -27,9 +30,11 @@ import com.tari.android.wallet.ui.common.recyclerView.CommonViewHolderItem
 import com.tari.android.wallet.ui.common.recyclerView.items.TitleViewHolderItem
 import com.tari.android.wallet.ui.fragment.contact_book.data.ContactsRepository
 import com.tari.android.wallet.ui.fragment.tx.adapter.TransactionItem
+import com.tari.android.wallet.util.Build.MOCKED
 import io.reactivex.BackpressureStrategy
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import java.math.BigInteger
 import java.util.concurrent.CopyOnWriteArrayList
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -165,6 +170,78 @@ class TransactionRepository @Inject constructor() : CommonViewModel() {
                 )
             })
         }
+
+        if (MOCKED) {
+            val item = TransactionItem(
+                CompletedTx().apply {
+                    direction = Tx.Direction.INBOUND
+                    status = TxStatus.MINED_CONFIRMED
+                    amount = MicroTari(BigInteger.valueOf(100000))
+                    fee = MicroTari(BigInteger.valueOf(1000))
+                    timestamp = BigInteger.valueOf(System.currentTimeMillis())
+                    id = BigInteger.valueOf(1)
+                    tariContact = TariContact(
+                        TariWalletAddress(
+                            "66961BF37F58D6277B7D2563750D338AFADEF19B058299D5CD51F15AC7799F0CFC",
+                            "\uD83C\uDFE0\uD83D\uDC52\uD83C\uDF4A\uD83D\uDE95\uD83D\uDC28\uD83C\uDFB7\uD83D\uDD26\uD83C\uDF5A\uD83D\uDC1D\uD83D\uDC22\uD83C\uDF55\uD83C\uDFC6\uD83D\uDC17\uD83C\uDF35\uD83C\uDF70\uD83D\uDC35\uD83D\uDEAA\uD83D\uDD2E\uD83D\uDE92\uD83D\uDC57\uD83C\uDF0D\uD83D\uDC2C\uD83D\uDC55\uD83D\uDD25\uD83D\uDCE3\uD83C\uDFAD\uD83D\uDE92\uD83C\uDFB9\uD83D\uDCC9\uD83D\uDC1B\uD83D\uDC5B\uD83C\uDF34\uD83D\uDEB2"
+                        ), "test1"
+                    )
+                },
+                contactsRepository.ffiBridge.getContactForTx(CompletedTx()),
+                0,
+                GIFViewModel(gifRepository),
+                confirmationCount
+            )
+
+            val tx2 = CompletedTx().apply {
+                direction = Tx.Direction.INBOUND
+                status = TxStatus.MINED_CONFIRMED
+                amount = MicroTari(BigInteger.valueOf(110000))
+                fee = MicroTari(BigInteger.valueOf(1000))
+                timestamp = BigInteger.valueOf(System.currentTimeMillis())
+                id = BigInteger.valueOf(1)
+                tariContact = TariContact(
+                    TariWalletAddress(
+                        "66961BF37F58D6277B7D2563750D338AFADEF19B058299D5CD51F15AC7799F0CFC",
+                        "\uD83C\uDFE0\uD83D\uDC52\uD83C\uDF4A\uD83D\uDE95\uD83D\uDC28\uD83C\uDFB7\uD83D\uDD26\uD83C\uDF5A\uD83D\uDC1D\uD83D\uDC22\uD83C\uDF55\uD83C\uDFC6\uD83D\uDC17\uD83C\uDF35\uD83C\uDF70\uD83D\uDC35\uD83D\uDEAA\uD83D\uDD2E\uD83D\uDE92\uD83D\uDC57\uD83C\uDF0D\uD83D\uDC2C\uD83D\uDC55\uD83D\uDD25\uD83D\uDCE3\uD83C\uDFAD\uD83D\uDE92\uD83C\uDFB9\uD83D\uDCC9\uD83D\uDC1B\uD83D\uDC5B\uD83C\uDF34\uD83D\uDEB2"
+                    ), "test2"
+                )
+            }
+            val item2 = TransactionItem(
+                tx2,
+                contactsRepository.ffiBridge.getContactForTx(tx2),
+                0,
+                GIFViewModel(gifRepository),
+                confirmationCount
+            )
+
+            val tx3 = CompletedTx().apply {
+                direction = Tx.Direction.INBOUND
+                status = TxStatus.MINED_CONFIRMED
+                amount = MicroTari(BigInteger.valueOf(111000))
+                fee = MicroTari(BigInteger.valueOf(1000))
+                timestamp = BigInteger.valueOf(System.currentTimeMillis())
+                id = BigInteger.valueOf(1)
+                tariContact = TariContact(
+                    TariWalletAddress(
+                        "66961BF37F58D6277B7D2563750D338AFADEF19B058299D5CD51F15AC7799F0CFC",
+                        "\uD83C\uDFE0\uD83D\uDC52\uD83C\uDF4A\uD83D\uDE95\uD83D\uDC28\uD83C\uDFB7\uD83D\uDD26\uD83C\uDF5A\uD83D\uDC1D\uD83D\uDC22\uD83C\uDF55\uD83C\uDFC6\uD83D\uDC17\uD83C\uDF35\uD83C\uDF70\uD83D\uDC35\uD83D\uDEAA\uD83D\uDD2E\uD83D\uDE92\uD83D\uDC57\uD83C\uDF0D\uD83D\uDC2C\uD83D\uDC55\uD83D\uDD25\uD83D\uDCE3\uD83C\uDFAD\uD83D\uDE92\uD83C\uDFB9\uD83D\uDCC9\uD83D\uDC1B\uD83D\uDC5B\uD83C\uDF34\uD83D\uDEB2"
+                    ), "test3"
+                )
+            }
+            val item3 = TransactionItem(
+                tx3,
+                contactsRepository.ffiBridge.getContactForTx(tx3),
+                0,
+                GIFViewModel(gifRepository),
+                confirmationCount
+            )
+
+            items.add(item)
+            items.add(item2)
+            items.add(item3)
+        }
+
         _list.postValue(items)
     }
 
