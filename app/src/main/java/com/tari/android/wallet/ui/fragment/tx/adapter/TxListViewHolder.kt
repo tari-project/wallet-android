@@ -68,7 +68,8 @@ class TxListViewHolder(view: ItemTxListBinding) : CommonViewHolder<TransactionIt
         val avatar = (contact?.contact as? MergedContactDto)?.phoneContactDto?.avatar.orEmpty()
         if (avatar.isEmpty()) {
             // display first emoji of emoji id
-            val firstEmoji = if (tx.isOneSided) string(R.string.tx_list_emoji_one_side_payment_placeholder) else tx.tariContact.walletAddress.emojiId.extractEmojis()[0]
+            val firstEmoji =
+                if (tx.isOneSided) string(R.string.tx_list_emoji_one_side_payment_placeholder) else tx.tariContact.walletAddress.emojiId.extractEmojis()[0]
             ui.firstEmojiTextView.text = firstEmoji
         } else {
             // display avatar
@@ -109,7 +110,7 @@ class TxListViewHolder(view: ItemTxListBinding) : CommonViewHolder<TransactionIt
 
             else -> { // display emoji id
                 ui.participantEmojiIdView.root.visible()
-                emojiIdSummaryController.display(txUser.walletAddress.emojiId, showEmojisFromEachEnd = 2)
+                emojiIdSummaryController.display(txUser.walletAddress.emojiId, showEmojisFromEachEnd = 3)
                 when (tx.direction) {
                     Tx.Direction.INBOUND -> {
                         ui.participantTextView1.gone()
@@ -225,11 +226,10 @@ class TxListViewHolder(view: ItemTxListBinding) : CommonViewHolder<TransactionIt
         string(R.string.tx_detail_completing_final_processing, step + 1, item!!.requiredConfirmationCount + 1)
     )
 
-    private fun showStatusTextView(@StringRes messageId: Int) =
-        showStatusTextView(string(messageId))
+    private fun showStatusTextView(@StringRes messageId: Int) = showStatusTextView(string(messageId))
 
     private fun showStatusTextView(status: String) {
-        ui.statusTextView.visible()
+        ui.statusTextView.setVisible(status.isNotEmpty())
         ui.statusTextView.text = status
     }
 

@@ -10,21 +10,23 @@ import com.tari.android.wallet.R
 import com.tari.android.wallet.databinding.FragmentContactTransactionHistoryBinding
 import com.tari.android.wallet.extension.observe
 import com.tari.android.wallet.ui.common.CommonFragment
+import com.tari.android.wallet.ui.common.recyclerView.AdapterFactory
 import com.tari.android.wallet.ui.common.recyclerView.CommonAdapter
 import com.tari.android.wallet.ui.common.recyclerView.CommonViewHolderItem
+import com.tari.android.wallet.ui.common.recyclerView.viewHolders.TitleViewHolder
 import com.tari.android.wallet.ui.extension.serializable
 import com.tari.android.wallet.ui.extension.setVisible
 import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.ContactDto
 import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
 import com.tari.android.wallet.ui.fragment.home.navigation.TariNavigator
 import com.tari.android.wallet.ui.fragment.tx.adapter.TransactionItem
-import com.tari.android.wallet.ui.fragment.tx.adapter.TxListAdapter
+import com.tari.android.wallet.ui.fragment.tx.adapter.TxListViewHolder
 import com.tari.android.wallet.util.extractEmojis
 import yat.android.ui.extension.HtmlHelper
 
 class TransactionHistoryFragment : CommonFragment<FragmentContactTransactionHistoryBinding, TransactionHistoryViewModel>() {
 
-    private var adapter = TxListAdapter()
+    private var adapter = AdapterFactory.generate<CommonViewHolderItem>(TitleViewHolder.getBuilder(), TxListViewHolder.getBuilder())
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
         FragmentContactTransactionHistoryBinding.inflate(inflater, container, false).apply { ui = this }.root

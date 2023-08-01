@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/root_view"
@@ -13,13 +13,15 @@
         android:id="@+id/profile_container"
         android:layout_width="42dp"
         android:layout_height="42dp"
-        android:layout_marginStart="11dp"
-        android:layout_marginTop="32dp"
+        android:layout_marginStart="22dp"
+        android:layout_marginTop="20dp"
         android:clipChildren="true"
         android:clipToOutline="true"
         android:clipToPadding="true"
         app:cornerRadius="21dp"
-        app:elevation="4dp">
+        app:elevation="4dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
         <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/avatar"
@@ -47,12 +49,15 @@
 
     <LinearLayout
         android:id="@+id/content_container_view"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/common_horizontal_margin"
-        android:layout_marginTop="@dimen/tx_list_item_content_container_view_normal_top_margin"
+        android:layout_marginTop="20dp"
         android:layout_toEndOf="@id/profile_container"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/profile_container"
+        app:layout_constraintTop_toTopOf="parent">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -175,12 +180,19 @@
             android:layout_height="wrap_content"
             android:layout_marginEnd="@dimen/common_horizontal_margin" />
 
-        <com.tari.android.wallet.ui.component.tari.TariDivider
-            android:id="@+id/separator"
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_marginTop="32dp"
-            android:layout_marginEnd="@dimen/common_horizontal_margin" />
     </LinearLayout>
 
-</RelativeLayout>
+    <com.tari.android.wallet.ui.component.tari.TariDivider
+        android:id="@+id/separator"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_alignParentBottom="true"
+        android:layout_marginStart="22dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginEnd="@dimen/common_horizontal_margin"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/content_container_view" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

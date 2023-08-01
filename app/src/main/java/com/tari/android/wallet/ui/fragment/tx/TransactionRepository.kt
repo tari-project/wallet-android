@@ -172,6 +172,9 @@ class TransactionRepository @Inject constructor() : CommonViewModel() {
         }
 
         if (MOCKED) {
+
+            val title = TitleViewHolderItem("Mocked Transactions", true)
+
             val item = TransactionItem(
                 CompletedTx().apply {
                     direction = Tx.Direction.INBOUND
@@ -200,6 +203,7 @@ class TransactionRepository @Inject constructor() : CommonViewModel() {
                 fee = MicroTari(BigInteger.valueOf(1000))
                 timestamp = BigInteger.valueOf(System.currentTimeMillis())
                 id = BigInteger.valueOf(1)
+                message = "message"
                 tariContact = TariContact(
                     TariWalletAddress(
                         "66961BF37F58D6277B7D2563750D338AFADEF19B058299D5CD51F15AC7799F0CFC",
@@ -237,6 +241,7 @@ class TransactionRepository @Inject constructor() : CommonViewModel() {
                 confirmationCount
             )
 
+            items.add(title)
             items.add(item)
             items.add(item2)
             items.add(item3)
