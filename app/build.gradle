@@ -291,7 +291,7 @@ dependencies {
     implementation('com.google.api-client:google-api-client-android:2.2.0') {
         exclude group: "org.apache.httpcomponents"
     }
-    implementation('com.google.apis:google-api-services-drive:v3-rev20221023-2.0.0') {
+    implementation('com.google.apis:google-api-services-drive:v3-rev20230714-2.0.0') {
         exclude group: "org.apache.httpcomponents"
     }
     // sentry - crash analytics
