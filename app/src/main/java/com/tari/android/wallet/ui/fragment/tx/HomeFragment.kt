@@ -191,5 +191,3 @@ class HomeFragment : CommonFragment<FragmentHomeBinding, HomeFragmentViewModel>(
         balanceViewController = BalanceViewController(requireContext(), ui.balanceDigitContainerView, ui.balanceDecimalsDigitContainerView, info)
     }
 }
-
-
