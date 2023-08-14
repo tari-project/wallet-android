@@ -78,7 +78,7 @@
                     android:layout_gravity="center"
                     android:gravity="center"
                     android:textColor="@color/black"
-                    android:textSize="64dp"
+                    android:textSize="58dp"
                     android:translationY="-6dp"
                     tools:text="🦊" />
 

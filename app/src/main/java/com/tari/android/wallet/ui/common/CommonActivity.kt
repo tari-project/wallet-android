@@ -63,8 +63,6 @@ abstract class CommonActivity<Binding : ViewBinding, VM : CommonViewModel> : App
     fun bindViewModel(viewModel: VM) = with(viewModel) {
         this@CommonActivity.viewModel = viewModel
 
-        viewModel.tariNavigator.activity = this@CommonActivity
-
         setTariTheme(viewModel.tariSettingsSharedRepository.currentTheme!!)
 
         subscribeToCommon(viewModel)
@@ -117,6 +115,8 @@ abstract class CommonActivity<Binding : ViewBinding, VM : CommonViewModel> : App
 
     override fun onResume() {
         super.onResume()
+
+        viewModel.tariNavigator.activity = this@CommonActivity
 
         if (viewModel.tariSettingsSharedRepository.currentTheme != viewModel.currentTheme.value)
             recreate()

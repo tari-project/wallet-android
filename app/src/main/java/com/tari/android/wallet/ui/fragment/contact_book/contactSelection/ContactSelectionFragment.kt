@@ -111,7 +111,11 @@ open class ContactSelectionFragment : CommonFragment<FragmentContactsSelectionBi
 
         observe(selectedTariWalletAddress) { putEmojiId(it.emojiId) }
 
-        observe(selectedUser) { putEmojiId(it.contact.extractWalletAddress().emojiId) }
+        observe(selectedUser) {
+            putEmojiId(it.contact.extractWalletAddress().emojiId)
+            ui.addFirstNameInput.setText(it.contact.firstName)
+            ui.addSurnameInput.setText(it.contact.surname)
+        }
 
         observe(foundYatUser) { showYatUser(if (it.isPresent) it.get() else null) }
 
@@ -228,7 +232,7 @@ open class ContactSelectionFragment : CommonFragment<FragmentContactsSelectionBi
     }
 
     private fun startQRCodeActivity() {
-        QRScannerActivity.startScanner(requireActivity(), QrScannerSource.AddContact)
+        QRScannerActivity.startScanner(this, QrScannerSource.AddContact)
     }
 
     private fun focusEditTextAndShowKeyboard() {
@@ -252,7 +256,7 @@ open class ContactSelectionFragment : CommonFragment<FragmentContactsSelectionBi
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == QRScannerActivity.REQUEST_QR_SCANNER && resultCode == Activity.RESULT_OK && data != null) {
             val qrData = data.getStringExtra(QRScannerActivity.EXTRA_QR_DATA) ?: return
-            deeplinkViewModel.tryToHandle(qrData)
+            viewModel.handleDeeplink(qrData)
         }
     }
 

@@ -41,6 +41,7 @@ import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.fragment.app.Fragment
 import com.budiyev.android.codescanner.AutoFocusMode
 import com.budiyev.android.codescanner.CodeScanner
 import com.budiyev.android.codescanner.DecodeCallback
@@ -54,7 +55,6 @@ import com.tari.android.wallet.extension.observe
 import com.tari.android.wallet.ui.common.CommonActivity
 import com.tari.android.wallet.ui.component.tari.toast.TariToast
 import com.tari.android.wallet.ui.component.tari.toast.TariToastArgs
-import com.tari.android.wallet.ui.extension.serializable
 import com.tari.android.wallet.ui.extension.setVisible
 
 /**
@@ -72,11 +72,15 @@ class QRScannerActivity : CommonActivity<ActivityQrScannerBinding, QRScannerView
 
         fun startScanner(activity: Activity, source: QrScannerSource) {
             val intent = Intent(activity, QRScannerActivity::class.java)
-            val bundle = Bundle().apply {
-                putSerializable(QR_DATA_SOURCE, source)
-            }
-            activity.startActivityForResult(intent, REQUEST_QR_SCANNER, bundle)
+            intent.putExtra(QR_DATA_SOURCE, source)
+            activity.startActivityForResult(intent, REQUEST_QR_SCANNER)
             activity.overridePendingTransition(R.anim.slide_up, 0)
+        }
+
+        fun startScanner(activity: Fragment, source: QrScannerSource) {
+            val intent = Intent(activity.requireActivity(), QRScannerActivity::class.java)
+            intent.putExtra(QR_DATA_SOURCE, source)
+            activity.startActivityForResult(intent, REQUEST_QR_SCANNER)
         }
 
         private const val REQUEST_CAMERA_PERMISSION = 102
@@ -95,7 +99,8 @@ class QRScannerActivity : CommonActivity<ActivityQrScannerBinding, QRScannerView
         bindViewModel(viewModel)
         subscribeToCommon(viewModel.deeplinkViewModel)
 
-        viewModel.init(savedInstanceState?.serializable<QrScannerSource>(QR_DATA_SOURCE) ?: QrScannerSource.None)
+        val data = intent.getSerializableExtra(QR_DATA_SOURCE, QrScannerSource::class.java)
+        viewModel.init(data ?: QrScannerSource.None)
 
         subscribeUI()
         setupUi()

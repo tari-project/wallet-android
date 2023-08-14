@@ -110,10 +110,11 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>() {
     @Inject
     lateinit var tariSettingsRepository: TariSettingsSharedRepository
 
-    private val deeplinkViewModel: DeeplinkViewModel by viewModels()
+    val deeplinkViewModel: DeeplinkViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         instance = WeakReference(this)
 
         val viewModel: HomeViewModel by viewModels()

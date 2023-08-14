@@ -75,7 +75,7 @@ class ContactBookFragment : CommonFragment<FragmentContactBookRootBinding, Conta
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == QRScannerActivity.REQUEST_QR_SCANNER && resultCode == Activity.RESULT_OK && data != null) {
             val qrData = data.getStringExtra(QRScannerActivity.EXTRA_QR_DATA) ?: return
-            deeplinkViewModel.tryToHandle(qrData)
+            viewModel.handleDeeplink(qrData)
         }
     }
 
@@ -94,6 +94,8 @@ class ContactBookFragment : CommonFragment<FragmentContactBookRootBinding, Conta
         observe(contactSelectionRepository.isPossibleToShare) { updateSharedState() }
 
         observe(shareList) { updateShareList(it) }
+
+        observe(query) { ui.searchView.setQuery(it, true) }
     }
 
     private fun grantPermission() {
@@ -170,7 +172,7 @@ class ContactBookFragment : CommonFragment<FragmentContactBookRootBinding, Conta
     }
 
     private fun startQRCodeActivity() {
-        QRScannerActivity.startScanner(requireActivity(), QrScannerSource.ContactBook)
+        QRScannerActivity.startScanner(this, QrScannerSource.ContactBook)
     }
 
     private fun focusEditTextAndShowKeyboard() {
@@ -223,7 +225,7 @@ class ContactBookFragment : CommonFragment<FragmentContactBookRootBinding, Conta
         }
     }
 
-    private fun getRealSearch(): View = ui.searchView.findViewById(androidx.appcompat.R.id.search_src_text)
+    private fun getRealSearch(): View = ui.searchView.findViewById(R.id.search_src_text)
 
     private inner class ContactBookAdapter(fm: FragmentActivity) : FragmentStateAdapter(fm) {
 

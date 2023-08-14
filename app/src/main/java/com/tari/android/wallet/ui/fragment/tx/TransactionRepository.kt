@@ -173,6 +173,9 @@ class TransactionRepository @Inject constructor() : CommonViewModel() {
 
         if (MOCKED) {
 
+            val emojiId =
+                "\uD83C\uDFB9\uD83C\uDFA4\uD83C\uDF20\uD83C\uDFAA\uD83D\uDC16\uD83C\uDF5A\uD83D\uDE08\uD83C\uDF73\uD83C\uDFED\uD83D\uDC2F\uD83D\uDC29\uD83D\uDC33\uD83D\uDC2D\uD83D\uDC35\uD83D\uDC11\uD83C\uDF4E\uD83D\uDE02\uD83C\uDFB3\uD83C\uDF34\uD83C\uDF6D\uD83D\uDC0D\uD83C\uDF1F\uD83D\uDCBC\uD83C\uDFB9\uD83D\uDC3A\uD83D\uDC79\uD83C\uDF77\uD83D\uDC3B\uD83D\uDEAB\uD83D\uDE92\uD83D\uDCB3\uD83C\uDFAE\uD83D\uDD2A"
+            val hex = "5A4A0A4F7427E33469858088838A721FE1560C316F09C55A8EA6388FFBF1C152DA"
             val title = TitleViewHolderItem("Mocked Transactions", true)
 
             val item = TransactionItem(
@@ -183,12 +186,7 @@ class TransactionRepository @Inject constructor() : CommonViewModel() {
                     fee = MicroTari(BigInteger.valueOf(1000))
                     timestamp = BigInteger.valueOf(System.currentTimeMillis())
                     id = BigInteger.valueOf(1)
-                    tariContact = TariContact(
-                        TariWalletAddress(
-                            "66961BF37F58D6277B7D2563750D338AFADEF19B058299D5CD51F15AC7799F0CFC",
-                            "\uD83C\uDFE0\uD83D\uDC52\uD83C\uDF4A\uD83D\uDE95\uD83D\uDC28\uD83C\uDFB7\uD83D\uDD26\uD83C\uDF5A\uD83D\uDC1D\uD83D\uDC22\uD83C\uDF55\uD83C\uDFC6\uD83D\uDC17\uD83C\uDF35\uD83C\uDF70\uD83D\uDC35\uD83D\uDEAA\uD83D\uDD2E\uD83D\uDE92\uD83D\uDC57\uD83C\uDF0D\uD83D\uDC2C\uD83D\uDC55\uD83D\uDD25\uD83D\uDCE3\uD83C\uDFAD\uD83D\uDE92\uD83C\uDFB9\uD83D\uDCC9\uD83D\uDC1B\uD83D\uDC5B\uD83C\uDF34\uD83D\uDEB2"
-                        ), "test1"
-                    )
+                    tariContact = TariContact(TariWalletAddress(hex, emojiId), "test1")
                 },
                 contactsRepository.ffiBridge.getContactForTx(CompletedTx()),
                 0,
@@ -204,12 +202,7 @@ class TransactionRepository @Inject constructor() : CommonViewModel() {
                 timestamp = BigInteger.valueOf(System.currentTimeMillis())
                 id = BigInteger.valueOf(1)
                 message = "message"
-                tariContact = TariContact(
-                    TariWalletAddress(
-                        "66961BF37F58D6277B7D2563750D338AFADEF19B058299D5CD51F15AC7799F0CFC",
-                        "\uD83C\uDFE0\uD83D\uDC52\uD83C\uDF4A\uD83D\uDE95\uD83D\uDC28\uD83C\uDFB7\uD83D\uDD26\uD83C\uDF5A\uD83D\uDC1D\uD83D\uDC22\uD83C\uDF55\uD83C\uDFC6\uD83D\uDC17\uD83C\uDF35\uD83C\uDF70\uD83D\uDC35\uD83D\uDEAA\uD83D\uDD2E\uD83D\uDE92\uD83D\uDC57\uD83C\uDF0D\uD83D\uDC2C\uD83D\uDC55\uD83D\uDD25\uD83D\uDCE3\uD83C\uDFAD\uD83D\uDE92\uD83C\uDFB9\uD83D\uDCC9\uD83D\uDC1B\uD83D\uDC5B\uD83C\uDF34\uD83D\uDEB2"
-                    ), "test2"
-                )
+                tariContact = TariContact(TariWalletAddress(hex, emojiId), "test2")
             }
             val item2 = TransactionItem(
                 tx2,
@@ -226,12 +219,8 @@ class TransactionRepository @Inject constructor() : CommonViewModel() {
                 fee = MicroTari(BigInteger.valueOf(1000))
                 timestamp = BigInteger.valueOf(System.currentTimeMillis())
                 id = BigInteger.valueOf(1)
-                tariContact = TariContact(
-                    TariWalletAddress(
-                        "66961BF37F58D6277B7D2563750D338AFADEF19B058299D5CD51F15AC7799F0CFC",
-                        "\uD83C\uDFE0\uD83D\uDC52\uD83C\uDF4A\uD83D\uDE95\uD83D\uDC28\uD83C\uDFB7\uD83D\uDD26\uD83C\uDF5A\uD83D\uDC1D\uD83D\uDC22\uD83C\uDF55\uD83C\uDFC6\uD83D\uDC17\uD83C\uDF35\uD83C\uDF70\uD83D\uDC35\uD83D\uDEAA\uD83D\uDD2E\uD83D\uDE92\uD83D\uDC57\uD83C\uDF0D\uD83D\uDC2C\uD83D\uDC55\uD83D\uDD25\uD83D\uDCE3\uD83C\uDFAD\uD83D\uDE92\uD83C\uDFB9\uD83D\uDCC9\uD83D\uDC1B\uD83D\uDC5B\uD83C\uDF34\uD83D\uDEB2"
-                    ), "test3"
-                )
+                tariContact = TariContact(TariWalletAddress(hex, emojiId), "test3")
+
             }
             val item3 = TransactionItem(
                 tx3,

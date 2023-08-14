@@ -11,6 +11,11 @@ import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.data.sharedPrefs.tariSettings.TariSettingsSharedRepository
 import com.tari.android.wallet.event.Event
 import com.tari.android.wallet.event.EventBus
+import com.tari.android.wallet.ffi.FFITariWalletAddress
+import com.tari.android.wallet.ffi.FFIWallet
+import com.tari.android.wallet.ffi.HexString
+import com.tari.android.wallet.ffi.runWithDestroy
+import com.tari.android.wallet.model.TariWalletAddress
 import com.tari.android.wallet.model.Tx
 import com.tari.android.wallet.model.TxId
 import com.tari.android.wallet.network.NetworkConnectionState
@@ -123,6 +128,7 @@ class TariNavigator @Inject constructor(val prefs: SharedPrefsRepository, val ta
             Navigation.TxListNavigation.ToTTLStore -> toTTLStore()
             is Navigation.TxListNavigation.ToTxDetails -> toTxDetails(navigation.tx, null)
             is Navigation.TxListNavigation.ToSendTariToUser -> toSendTari(navigation.contact)
+            is Navigation.TxListNavigation.ToSendWithDeeplink -> toSendWithDeeplink(navigation.sendDeeplink)
             Navigation.TxListNavigation.ToUtxos -> toUtxos()
             Navigation.TxListNavigation.ToAllSettings -> toAllSettings()
             Navigation.TxListNavigation.ToSplashScreen -> toSplash()
@@ -225,6 +231,8 @@ class TariNavigator @Inject constructor(val prefs: SharedPrefsRepository, val ta
 
     fun toSendTari(user: ContactDto) = sendToUser(user)
 
+    fun toSendWithDeeplink(deeplink: DeepLink.Send) = sendToUserByDeeplink(deeplink)
+
     fun toAddContact() = addFragment(AddContactFragment())
 
     fun toContactDetails(contact: ContactDto) = addFragment(ContactDetailsFragment.createFragment(contact))
@@ -320,6 +328,23 @@ class TariNavigator @Inject constructor(val prefs: SharedPrefsRepository, val ta
         val walletAddress = service.getWalletAddressFromHexString(sendDeeplink.walletAddressHex)
         sendToUser((activity as HomeActivity).viewModel.contactsRepository.ffiBridge.getContactByAddress(walletAddress))
     }
+
+    fun sendToUserByDeeplink(deeplink: DeepLink.Send) {
+        FFIWallet.instance?.getWalletAddress()
+        val address = FFITariWalletAddress(HexString(deeplink.walletAddressHex)).runWithDestroy {
+            walletAddressFromFFI(it)
+        }
+        val contact = (activity as HomeActivity).viewModel.contactsRepository.ffiBridge.getContactByAddress(address)
+        val bundle = Bundle().apply {
+            putSerializable(PARAMETER_CONTACT, contact)
+            putParcelable(PARAMETER_AMOUNT, deeplink.amount)
+        }
+
+        addFragment(AddAmountFragment(), bundle)
+    }
+
+    private fun walletAddressFromFFI(ffiTariWalletAddress: FFITariWalletAddress): TariWalletAddress =
+        TariWalletAddress(ffiTariWalletAddress.toString(), ffiTariWalletAddress.getEmojiId())
 
     fun sendToUser(recipientUser: ContactDto) {
         val bundle = Bundle().apply {

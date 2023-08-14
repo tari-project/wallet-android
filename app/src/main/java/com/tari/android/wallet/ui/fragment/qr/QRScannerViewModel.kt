@@ -1,23 +1,24 @@
 package com.tari.android.wallet.ui.fragment.qr
 
-import android.content.Context
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.viewModelScope
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.deeplinks.DeepLink
 import com.tari.android.wallet.application.deeplinks.DeeplinkHandler
 import com.tari.android.wallet.application.deeplinks.DeeplinkViewModel
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.common.SingleLiveEvent
+import com.tari.android.wallet.ui.fragment.home.HomeActivity
 import com.tari.android.wallet.util.extractEmojis
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 class QRScannerViewModel : CommonViewModel() {
 
     @Inject
     lateinit var deeplinkHandler: DeeplinkHandler
-
-    @Inject
-    lateinit var context: Context
 
     init {
         component.inject(this)
@@ -33,7 +34,8 @@ class QRScannerViewModel : CommonViewModel() {
 
     val navigationBackWithData: SingleLiveEvent<String> = SingleLiveEvent()
 
-    val deeplinkViewModel: DeeplinkViewModel = DeeplinkViewModel()
+    val deeplinkViewModel: DeeplinkViewModel
+        get() = HomeActivity.instance.get()?.deeplinkViewModel!!
 
     val proceedScan = SingleLiveEvent<Unit>()
 
@@ -43,7 +45,18 @@ class QRScannerViewModel : CommonViewModel() {
 
     fun onAlternativeApply() {
         _backPressed.postValue(Unit)
-        deeplinkViewModel.executeRawDeeplink(scannedDeeplink.value!!)
+        executeWithDelay(deeplinkViewModel) {
+            deeplinkViewModel.executeRawDeeplink(scannedDeeplink.value!!)
+        }
+    }
+
+    private fun executeWithDelay(commonViewModel: CommonViewModel, action: () -> Unit) {
+        commonViewModel.viewModelScope.launch(Dispatchers.IO) {
+            delay(500)
+            commonViewModel.viewModelScope.launch(Dispatchers.Main) {
+                action()
+            }
+        }
     }
 
     fun onAlternativeDeny() {
