@@ -59,7 +59,10 @@ class DeeplinkViewModel : CommonViewModel() {
             resourceManager.getString(R.string.home_custom_base_node_description),
             resourceManager.getString(R.string.home_custom_base_node_no_button),
             resourceManager.getString(R.string.common_lets_do_it),
-            onConfirm = { addBaseNodeAction(baseNode) }
+            onConfirm = {
+                dismissDialog.postValue(Unit)
+                addBaseNodeAction(baseNode)
+            }
         ).getModular(baseNode, resourceManager)
         modularDialog.postValue(args)
     }
@@ -96,7 +99,7 @@ class DeeplinkViewModel : CommonViewModel() {
 
     fun executeRawDeeplink(deeplink: DeepLink) {
         when (deeplink) {
-            is DeepLink.AddBaseNode -> addBaseNodeAction(getData(deeplink))
+            is DeepLink.AddBaseNode -> addBaseNode(deeplink)
             is DeepLink.Contacts -> addContactsAction(getData(deeplink))
             is DeepLink.Send -> sendAction(deeplink)
             is DeepLink.UserProfile -> addContactsAction(getData(deeplink)?.let { listOf(it) } ?: listOf())
@@ -130,8 +133,7 @@ class DeeplinkViewModel : CommonViewModel() {
     }
 
     private fun sendAction(deeplink: DeepLink.Send) {
-        val contactDto = getData(deeplink) ?: return
-        navigation.postValue(Navigation.TxListNavigation.ToSendTariToUser(contactDto))
+        navigation.postValue(Navigation.TxListNavigation.ToSendWithDeeplink(deeplink))
     }
 
     private fun addBaseNodeAction(baseNodeDto: BaseNodeDto) {

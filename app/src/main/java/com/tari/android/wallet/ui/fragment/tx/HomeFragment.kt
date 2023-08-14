@@ -101,6 +101,7 @@ class HomeFragment : CommonFragment<FragmentHomeBinding, HomeFragmentViewModel>(
             ui.transactionsRecyclerView.setVisible(it.isNotEmpty())
             ui.emptyState.setVisible(it.isEmpty())
             adapter.update(it)
+            adapter.notifyDataSetChanged()
         }
 
         observeOnLoad(balanceInfo)
