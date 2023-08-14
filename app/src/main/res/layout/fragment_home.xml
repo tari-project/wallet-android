@@ -14,6 +14,15 @@
         android:alpha="1"
         android:background="@drawable/vector_home_gradient_bg" />
 
+    <com.tari.android.wallet.ui.fragment.tx.WaveView
+        android:id="@+id/second_gradient_view"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/root_avatar_container" />
+
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/qr_code_button"
         android:layout_width="44dp"
@@ -37,6 +46,7 @@
 
     <!--    avatar-->
     <com.tari.android.wallet.ui.component.tari.TariAlphaBackground
+        android:id="@+id/root_avatar_container"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:elevation="50dp"
