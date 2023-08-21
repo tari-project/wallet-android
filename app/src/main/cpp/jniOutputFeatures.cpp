@@ -53,10 +53,10 @@ Java_com_tari_android_wallet_ffi_FFIOutputFeatures_jniCreate(
 
         TariOutputFeatures *pOutputFeatures = output_features_create_from_bytes(
                 version,
-                //todo
                 0,
                 maturity,
                 pMetadata,
+                0,
                 errorPointer);
 
         SetPointerField(jEnv, jThis, reinterpret_cast<jlong>(pOutputFeatures));
