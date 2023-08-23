@@ -21,7 +21,7 @@ import com.tari.android.wallet.ui.fragment.send.addAmount.keyboard.KeyboardContr
 import com.tari.android.wallet.ui.fragment.send.shareQr.ShareQrCodeModule
 
 
-class RequestTariFragment private constructor() : CommonFragment<FragmentRequestTariBinding, RequestTariViewModel>() {
+class RequestTariFragment : CommonFragment<FragmentRequestTariBinding, RequestTariViewModel>() {
 
     companion object {
         fun newInstance(withToolbar: Boolean = true) = RequestTariFragment().apply {

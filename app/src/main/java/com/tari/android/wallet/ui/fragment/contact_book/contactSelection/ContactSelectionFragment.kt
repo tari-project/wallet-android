@@ -346,24 +346,19 @@ open class ContactSelectionFragment : CommonFragment<FragmentContactsSelectionBi
                 ui.invalidEmojiIdTextView.text = string(R.string.add_recipient_invalid_emoji_id)
                 ui.invalidEmojiIdTextView.visible()
             } else {
-                if (emojisNumber == Constants.Wallet.emojiIdLength) {
-                    finishEntering(textWithoutSeparators)
-                } else {
-                    viewModel.selectedTariWalletAddress.value = null
-                    viewModel.searchText.value = textWithoutSeparators
-                }
+                finishEntering(textWithoutSeparators)
             }
         } else if (viewModel.deeplinkHandler.handle(text) != null) {
             val deeplink = viewModel.deeplinkHandler.handle(text)!!
             deeplinkViewModel.execute(deeplink)
             viewModel.selectedTariWalletAddress.value = null
         } else if (viewModel.walletAddressViewModel.checkForWalletAddressHex(text)) {
-            finishEntering(viewModel.selectedTariWalletAddress.value!!.emojiId)
+            finishEntering(viewModel.walletAddressViewModel.discoveredWalletAddress!!.emojiId)
         } else {
             viewModel.selectedTariWalletAddress.value = null
             ui.searchEditText.textAlignment = View.TEXT_ALIGNMENT_TEXT_START
             ui.searchEditText.letterSpacing = inputNormalLetterSpacing
-            viewModel.searchText.value = editable.toString()
+            finishEntering(editable.toString())
         }
         textWatcherIsRunning = false
     }
@@ -372,8 +367,10 @@ open class ContactSelectionFragment : CommonFragment<FragmentContactsSelectionBi
         lifecycleScope.launch(Dispatchers.Main) {
             viewModel.selectedTariWalletAddress.value = viewModel.walletAddressViewModel.getWalletAddressFromEmojiId(text)
             if (viewModel.selectedTariWalletAddress.value == null) {
-                ui.invalidEmojiIdTextView.text = string(R.string.add_recipient_invalid_emoji_id)
-                ui.invalidEmojiIdTextView.visible()
+                if (text.isNotEmpty()) {
+                    ui.invalidEmojiIdTextView.text = string(R.string.add_recipient_invalid_emoji_id)
+                    ui.invalidEmojiIdTextView.visible()
+                }
             } else {
                 ui.invalidEmojiIdTextView.gone()
                 ui.toolbar.setRightArgs(TariToolbarActionArg(title = string(R.string.contact_book_add_contact_next_button)) { goToNext() })

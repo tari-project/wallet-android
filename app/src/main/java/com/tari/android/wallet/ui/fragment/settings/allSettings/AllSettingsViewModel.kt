@@ -6,7 +6,6 @@ import com.tari.android.wallet.R
 import com.tari.android.wallet.R.drawable.vector_all_settings_about_icon
 import com.tari.android.wallet.R.drawable.vector_all_settings_background_service_icon
 import com.tari.android.wallet.R.drawable.vector_all_settings_backup_options_icon
-import com.tari.android.wallet.R.drawable.vector_all_settings_block_explorer_icon
 import com.tari.android.wallet.R.drawable.vector_all_settings_bluetooth
 import com.tari.android.wallet.R.drawable.vector_all_settings_bridge_configuration_icon
 import com.tari.android.wallet.R.drawable.vector_all_settings_contribute_to_tari_icon
@@ -28,7 +27,6 @@ import com.tari.android.wallet.R.string.all_settings_connect_yats
 import com.tari.android.wallet.R.string.all_settings_contribute
 import com.tari.android.wallet.R.string.all_settings_delete_wallet
 import com.tari.android.wallet.R.string.all_settings_disclaimer
-import com.tari.android.wallet.R.string.all_settings_explorer
 import com.tari.android.wallet.R.string.all_settings_privacy_policy
 import com.tari.android.wallet.R.string.all_settings_report_a_bug
 import com.tari.android.wallet.R.string.all_settings_secondary_settings_label
@@ -45,7 +43,6 @@ import com.tari.android.wallet.R.string.back_up_wallet_backup_status_outdated
 import com.tari.android.wallet.R.string.back_up_wallet_backup_status_up_to_date
 import com.tari.android.wallet.R.string.check_backup_storage_status_error_title
 import com.tari.android.wallet.R.string.disclaimer_url
-import com.tari.android.wallet.R.string.explorer_url
 import com.tari.android.wallet.R.string.github_repo_url
 import com.tari.android.wallet.R.string.privacy_policy_url
 import com.tari.android.wallet.R.string.tari_about_title
@@ -158,9 +155,9 @@ class AllSettingsViewModel : CommonViewModel() {
                 _openLink.postValue(resourceManager.getString(disclaimer_url))
             },
             DividerViewHolderItem(),
-            ButtonViewDto(resourceManager.getString(all_settings_explorer), vector_all_settings_block_explorer_icon) {
-                _openLink.postValue(resourceManager.getString(explorer_url))
-            },
+//            ButtonViewDto(resourceManager.getString(all_settings_explorer), vector_all_settings_block_explorer_icon) {
+//                _openLink.postValue(resourceManager.getString(explorer_url))
+//            },
             SettingsTitleViewHolderItem(resourceManager.getString(all_settings_advanced_settings_label)),
             ButtonViewDto(resourceManager.getString(all_settings_select_theme), vector_all_settings_select_theme_icon) {
                 navigation.postValue(AllSettingsNavigation.ToThemeSelection)

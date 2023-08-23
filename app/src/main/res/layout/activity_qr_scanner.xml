@@ -6,6 +6,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
+    <!--    app:maskColor="#809E9E9E"-->
     <com.budiyev.android.codescanner.CodeScannerView
         android:id="@+id/scanner_view"
         android:layout_width="match_parent"
@@ -20,7 +21,7 @@
         app:frameCornersSize="55dp"
         app:frameSize="0.72"
         app:frameThickness="10dp"
-        app:maskColor="#809E9E9E"
+        app:maskColor="#00000000"
         tools:layout_editor_absoluteX="-123dp"
         tools:layout_editor_absoluteY="0dp" />
 

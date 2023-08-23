@@ -51,7 +51,6 @@ abstract class TariBluetoothAdapter() : CommonViewModel() {
 
     val locationPermission = listOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION).distinct()
 
-
     private var onBluetoothEnabled: () -> Unit = {}
 
     private var onBluetoothNotEnabled: () -> Unit = {}
@@ -90,8 +89,9 @@ abstract class TariBluetoothAdapter() : CommonViewModel() {
             onBluetoothEnabled = action
             onBluetoothNotEnabled = this::showDialogBluetoothRequired
             val enableBtIntent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
-            @Suppress("MissingPermission")
-            fragappCompatActivity?.startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT)
+//            @Suppress("MissingPermission")
+            //todo
+//            fragappCompatActivity?.startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT)
         } else {
             action.invoke()
         }

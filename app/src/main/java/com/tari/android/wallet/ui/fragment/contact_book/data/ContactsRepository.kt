@@ -82,11 +82,7 @@ class ContactsRepository @Inject constructor(
     }
 
     fun addContact(contact: ContactDto) {
-        if (contactExists(contact)) {
-            withListUpdate { list ->
-                list.firstOrNull { it.uuid == contact.uuid }?.let { list.remove(it) }
-            }
-        }
+        if (contactExistsByWalletAddress(contact)) return
 
         withListUpdate {
             it.add(contact)
@@ -191,6 +187,8 @@ class ContactsRepository @Inject constructor(
     fun getByUuid(uuid: String): ContactDto = this.publishSubject.value!!.first { it.uuid == uuid }
 
     private fun contactExists(contact: ContactDto): Boolean = this.publishSubject.value!!.any { it.uuid == contact.uuid }
+
+    private fun contactExistsByWalletAddress(contact: ContactDto): Boolean = this.publishSubject.value!!.any { it.contact.extractWalletAddress() == contact.contact.extractWalletAddress() }
 
     @Synchronized
     private fun withListUpdate(silently: Boolean = false, updateAction: (list: MutableList<ContactDto>) -> Unit) {

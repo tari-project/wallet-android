@@ -9,7 +9,7 @@ import com.tari.android.wallet.ui.extension.string
 import com.tari.android.wallet.ui.fragment.contact_book.contactSelection.ContactSelectionFragment
 import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
 
-class SelectUserContactFragment private constructor() : ContactSelectionFragment() {
+class SelectUserContactFragment : ContactSelectionFragment() {
 
     companion object {
         fun newInstance(withToolbar: Boolean = true) = SelectUserContactFragment().apply {

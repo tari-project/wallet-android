@@ -34,14 +34,14 @@ package com.tari.android.wallet.model
 
 import android.os.Parcel
 import android.os.Parcelable
-import com.tari.android.wallet.util.extractEmojis
+import java.io.Serializable
 
 /**
  * This wrapper is needed for id parameters in AIDL methods.
  *
  * @author The Tari Development Team
  */
-class TariWalletAddress() : Parcelable {
+class TariWalletAddress() : Parcelable, Serializable {
 
     var hexString = ""
     var emojiId = ""

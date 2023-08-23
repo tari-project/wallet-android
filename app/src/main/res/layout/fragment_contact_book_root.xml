@@ -177,8 +177,9 @@
             android:layout_width="@dimen/add_recipient_search_text_view_height"
             android:layout_height="@dimen/add_recipient_search_text_view_height"
             android:background="@color/transparent"
-            android:tint="?attr/palette_icons_default"
             android:src="@drawable/vector_share_qr_code"
+            android:tint="?attr/palette_icons_default"
+            android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="@+id/search_view_container"
             app:layout_constraintEnd_toStartOf="@+id/search_bar_barrier"
             app:layout_constraintTop_toTopOf="@+id/search_view_container" />
