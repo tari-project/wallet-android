@@ -11,7 +11,7 @@ import javax.inject.Singleton
 @Singleton
 class MigrationManager @Inject constructor(private val manager: WalletManager) {
 
-    private val minValidVersion = DefaultArtifactVersion("v0.50.0-hotfix.1")
+    private val minValidVersion = DefaultArtifactVersion("0.50.0-hotfix.1")
     private val simpleViewModel = SimpleViewModel()
 
     fun validateVersion(onValid: () -> Unit, onError: () -> Unit) {

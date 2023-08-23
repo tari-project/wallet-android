@@ -106,11 +106,11 @@ class TariBluetoothServer @Inject constructor(
                     wholeData += value?.dropLast(1)?.toByteArray() ?: byteArrayOf()
 
                     if ((value?.size ?: 0) < chunkSize && value?.lastOrNull() == 0.toByte()) {
-                        logger.e("share: read: wrong chunk size: ${value.size}")
+                        logger.i("share: read: wrong chunk size: ${value.size}")
                     }
-                    logger.e("share: read: chunk size: ${value?.size ?: 0}")
-                    logger.e("share: read: chunk: ${String(value ?: byteArrayOf(), Charsets.UTF_8)}")
-                    logger.e("share: read: whole data: ${String(wholeData, Charsets.UTF_8)}")
+                    logger.i("share: read: chunk size: ${value?.size ?: 0}")
+                    logger.i("share: read: chunk: ${String(value ?: byteArrayOf(), Charsets.UTF_8)}")
+                    logger.i("share: read: whole data: ${String(wholeData, Charsets.UTF_8)}")
 
                     throttle?.dispose()
                     throttle = io.reactivex.Observable.timer(1000, TimeUnit.MILLISECONDS)
@@ -121,11 +121,11 @@ class TariBluetoothServer @Inject constructor(
             }
 
             private fun doHandling(string: String): GattStatus {
-                logger.e("share: handle: url: $string")
+                logger.i("share: handle: url: $string")
 
                 val handled = runCatching { deeplinkHandler.handle(string) }.getOrNull()
 
-                logger.e("share: handle: handled: $handled")
+                logger.i("share: handle: handled: $handled")
 
                 if (handled != null && handled is DeepLink.Contacts) {
                     onReceived.invoke(handled.contacts)
@@ -153,7 +153,7 @@ class TariBluetoothServer @Inject constructor(
                         ContactDto.normalizeAlias(sharedPrefsRepository.name.orEmpty(), myWalletAddress),
                     )
                 )
-                logger.e("contactlessPayment: read: whole data: $data")
+                logger.i("contactlessPayment: read: whole data: $data")
                 val chunked = data.toByteArray(Charsets.UTF_8).toList().chunked(chunkSize)
                 shareChunkedData =
                     chunked.mapIndexed { index, items -> (items + if (index == chunked.size - 1) 0 else 1).toByteArray() }.toMutableList()
@@ -162,7 +162,7 @@ class TariBluetoothServer @Inject constructor(
             fun doRead(): ReadResponse {
                 val data = shareChunkedData.first()
                 shareChunkedData = shareChunkedData.drop(1).toMutableList()
-                logger.e("contactlessPayment: read: whole data: ${String(data, Charsets.UTF_8)}")
+                logger.i("contactlessPayment: read: whole data: ${String(data, Charsets.UTF_8)}")
                 return ReadResponse(GattStatus.SUCCESS, data)
             }
         }
@@ -188,7 +188,7 @@ class TariBluetoothServer @Inject constructor(
         try {
             manager.add(myService)
         } catch (e: Throwable) {
-            logger.e("share: add service: failed to add service: $e")
+            logger.i("share: add service: failed to add service: $e")
         }
 
         val settings = AdvertiseSettings.Builder()

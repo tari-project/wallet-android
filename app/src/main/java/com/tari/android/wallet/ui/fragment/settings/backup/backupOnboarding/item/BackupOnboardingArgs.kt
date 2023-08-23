@@ -4,7 +4,9 @@ import android.graphics.Typeface
 import android.text.SpannableString
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.securityStage.StagedWalletSecurityManager
-import com.tari.android.wallet.extension.*
+import com.tari.android.wallet.extension.applyCenterAlignment
+import com.tari.android.wallet.extension.applyColorStyle
+import com.tari.android.wallet.extension.applyTypefaceStyle
 import com.tari.android.wallet.ui.common.domain.PaletteManager
 import com.tari.android.wallet.ui.common.domain.ResourceManager
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonModule
@@ -86,8 +88,7 @@ sealed class BackupOnboardingArgs(
             val firstPart = resourceManager.getString(firstPartInt)
             val secondPart = resourceManager.getString(secondPartInt)
             val spannable = SpannableString("$firstPart $secondPart")
-            spannable.applyTypefaceStyle(secondPart, Typeface.DEFAULT_BOLD)
-            spannable.applyColorStyle(secondPart, paletteManager.getBlack(resourceManager.context))
+            spannable.applyTypefaceStyle(secondPart, Typeface.DEFAULT_BOLD, true)
             spannable.applyCenterAlignment()
             return spannable
         }

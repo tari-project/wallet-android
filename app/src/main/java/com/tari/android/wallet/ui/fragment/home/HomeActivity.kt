@@ -32,7 +32,9 @@
  */
 package com.tari.android.wallet.ui.fragment.home
 
+import android.Manifest.permission.POST_NOTIFICATIONS
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.widget.ImageView
 import androidx.activity.viewModels
@@ -162,6 +164,10 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>() {
             launch(Dispatchers.Main) {
                 checkNetworkCompatibility()
             }
+        }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            requestPermissions(arrayOf(POST_NOTIFICATIONS), 0)
         }
     }
 

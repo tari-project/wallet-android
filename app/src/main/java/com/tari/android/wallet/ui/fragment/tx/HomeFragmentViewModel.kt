@@ -99,9 +99,10 @@ class HomeFragmentViewModel : CommonViewModel() {
     }
 
     private fun fetchBalanceInfoData() {
-        val balance = walletService.getWithError { error, service -> service.getBalanceInfo(error) }
-        EventBus.balanceUpdates.post(balance)
-        _balanceInfo.postValue(balance)
+        walletService.getWithError { error, service -> service.getBalanceInfo(error) }?.let {
+            EventBus.balanceUpdates.post(it)
+            _balanceInfo.postValue(it)
+        }
     }
 
     fun refreshAllData(isRestarted: Boolean = false) {

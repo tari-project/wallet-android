@@ -21,11 +21,27 @@
             android:layout_marginHorizontal="25dp"
             android:orientation="vertical">
 
-            <androidx.appcompat.widget.AppCompatImageView
-                android:id="@+id/image_view"
+            <FrameLayout
                 android:layout_width="match_parent"
                 android:layout_height="166dp"
-                android:layout_marginTop="45dp" />
+                android:layout_marginTop="45dp">
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/image_back"
+                    android:layout_width="wrap_content"
+                    android:layout_height="166dp"
+                    android:layout_gravity="center"
+                    android:src="@drawable/vector_backup_onboarding_icons_back" />
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/image_view"
+                    android:layout_width="wrap_content"
+                    android:layout_height="166dp"
+                    android:layout_gravity="center"
+                    android:tint="?attr/palette_icons_default" />
+
+            </FrameLayout>
+
 
             <com.tari.android.wallet.ui.component.tari.TariTextView
                 android:id="@+id/title"
