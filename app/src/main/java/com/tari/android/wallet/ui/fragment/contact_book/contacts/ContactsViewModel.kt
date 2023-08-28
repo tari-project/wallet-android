@@ -1,7 +1,6 @@
 package com.tari.android.wallet.ui.fragment.contact_book.contacts
 
 
-import android.text.SpannableString
 import android.text.SpannedString
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
@@ -23,20 +22,10 @@ import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.common.SingleLiveEvent
 import com.tari.android.wallet.ui.common.gyphy.repository.GIFRepository
 import com.tari.android.wallet.ui.common.recyclerView.CommonViewHolderItem
-import com.tari.android.wallet.ui.dialog.modular.DialogArgs
-import com.tari.android.wallet.ui.dialog.modular.ModularDialogArgs
-import com.tari.android.wallet.ui.dialog.modular.modules.body.BodyModule
-import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonModule
-import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonStyle
-import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
-import com.tari.android.wallet.ui.dialog.modular.modules.shortEmoji.ShortEmojiIdModule
 import com.tari.android.wallet.ui.fragment.contact_book.contacts.adapter.contact.ContactItem
 import com.tari.android.wallet.ui.fragment.contact_book.contacts.adapter.contact.ContactlessPaymentItem
 import com.tari.android.wallet.ui.fragment.contact_book.contacts.adapter.emptyState.EmptyStateItem
-import com.tari.android.wallet.ui.fragment.contact_book.data.ContactAction
 import com.tari.android.wallet.ui.fragment.contact_book.data.ContactsRepository
-import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.ContactDto
-import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.MergedContactDto
 import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.PhoneContactDto
 import com.tari.android.wallet.ui.fragment.contact_book.root.ContactSelectionRepository
 import com.tari.android.wallet.ui.fragment.contact_book.root.ShareViewModel
@@ -135,7 +124,9 @@ class ContactsViewModel : CommonViewModel() {
                     false,
                     false,
                     false,
-                    this::performAction,
+                    { _, _ ->
+                        //todo suppresed intentionally
+                    },
                     badgeViewModel
                 )
             }
@@ -202,65 +193,6 @@ class ContactsViewModel : CommonViewModel() {
 
     private fun getButtonTitle(): String =
         if (contactsRepository.contactPermission.value == true) "" else resourceManager.getString(contact_book_empty_state_grant_access_button)
-
-    private fun performAction(contact: ContactDto, contactAction: ContactAction) {
-        when (contactAction) {
-            ContactAction.Send -> navigation.postValue(Navigation.ContactBookNavigation.ToSendTari(contact))
-            ContactAction.ToFavorite -> runWithUpdate { contactsRepository.toggleFavorite(contact) }
-            ContactAction.ToUnFavorite -> runWithUpdate { contactsRepository.toggleFavorite(contact) }
-            ContactAction.OpenProfile -> navigation.postValue(Navigation.ContactBookNavigation.ToContactDetails(contact))
-            ContactAction.Link -> navigation.postValue(Navigation.ContactBookNavigation.ToLinkContact(contact))
-            ContactAction.Unlink -> showUnlinkDialog(contact)
-            else -> Unit
-        }
-    }
-
-    private fun runWithUpdate(action: () -> Unit) {
-        action()
-        refresh()
-    }
-
-    private fun showUnlinkDialog(contact: ContactDto) {
-        val mergedDto = contact.contact as MergedContactDto
-        val walletAddress = mergedDto.ffiContactDto.walletAddress
-        val name = mergedDto.phoneContactDto.firstName
-        val firstLineHtml = HtmlHelper.getSpannedText(resourceManager.getString(R.string.contact_book_contacts_book_unlink_message_firstLine))
-        val secondLineHtml = HtmlHelper.getSpannedText(resourceManager.getString(R.string.contact_book_contacts_book_unlink_message_secondLine, name))
-
-        val modules = listOf(
-            HeadModule(resourceManager.getString(R.string.contact_book_contacts_book_unlink_title)),
-            BodyModule(null, SpannableString(firstLineHtml)),
-            ShortEmojiIdModule(walletAddress),
-            BodyModule(null, SpannableString(secondLineHtml)),
-            ButtonModule(resourceManager.getString(R.string.common_confirm), ButtonStyle.Normal) {
-                contactsRepository.unlinkContact(contact)
-                dismissDialog.value = Unit
-                showUnlinkSuccessDialog(contact)
-            },
-            ButtonModule(resourceManager.getString(R.string.common_cancel), ButtonStyle.Close)
-        )
-        modularDialog.postValue(ModularDialogArgs(DialogArgs(), modules))
-    }
-
-    private fun showUnlinkSuccessDialog(contact: ContactDto) {
-        val mergedDto = contact.contact as MergedContactDto
-        val walletAddress = mergedDto.ffiContactDto.walletAddress
-        val name = mergedDto.phoneContactDto.firstName
-        val firstLineHtml = HtmlHelper.getSpannedText(resourceManager.getString(R.string.contact_book_contacts_book_unlink_success_message_firstLine))
-        val secondLineHtml =
-            HtmlHelper.getSpannedText(resourceManager.getString(R.string.contact_book_contacts_book_unlink_success_message_secondLine, name))
-
-        val modules = listOf(
-            HeadModule(resourceManager.getString(R.string.contact_book_contacts_book_unlink_success_title)),
-            BodyModule(null, SpannableString(firstLineHtml)),
-            ShortEmojiIdModule(walletAddress),
-            BodyModule(null, SpannableString(secondLineHtml)),
-            ButtonModule(resourceManager.getString(R.string.common_cancel), ButtonStyle.Close)
-        )
-        modularDialog.postValue(ModularDialogArgs(DialogArgs {
-            navigation.value = Navigation.ContactBookNavigation.BackToContactBook()
-        }, modules))
-    }
 
     companion object {
         private const val LIST_UPDATE_DEBOUNCE = 200L

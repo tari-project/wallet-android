@@ -71,6 +71,7 @@ import com.tari.android.wallet.ui.extension.parcelable
 import com.tari.android.wallet.ui.extension.setVisible
 import com.tari.android.wallet.ui.extension.string
 import com.tari.android.wallet.ui.fragment.contact_book.root.ContactBookFragment
+import com.tari.android.wallet.ui.fragment.contact_book.root.action_menu.ContactBookActionMenuViewModel
 import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
 import com.tari.android.wallet.ui.fragment.home.navigation.TariNavigator.Companion.INDEX_CONTACT_BOOK
 import com.tari.android.wallet.ui.fragment.home.navigation.TariNavigator.Companion.INDEX_HOME
@@ -92,7 +93,7 @@ import javax.inject.Inject
 class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>() {
 
     @Inject
-    lateinit var sharedPrefsWrapper: SharedPrefsRepository
+    lateinit var sharedPrefsRepository: SharedPrefsRepository
 
     @Inject
     lateinit var walletServiceLauncher: WalletServiceLauncher
@@ -114,6 +115,8 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>() {
 
     val deeplinkViewModel: DeeplinkViewModel by viewModels()
 
+    val actionMenuViewModel = ContactBookActionMenuViewModel()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -127,6 +130,7 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>() {
         subscribeToCommon(viewModel.shareViewModel.tariBluetoothServer)
         subscribeToCommon(viewModel.shareViewModel.tariBluetoothClient)
         subscribeToCommon(viewModel.shareViewModel.deeplinkViewModel)
+        subscribeToCommon(actionMenuViewModel)
         viewModel.nfcAdapter.context = this
 
         viewModel.shareViewModel.tariBluetoothServer.init(this)
@@ -136,7 +140,7 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>() {
 
         overridePendingTransition(0, 0)
         appComponent.inject(this)
-        if (!sharedPrefsWrapper.isAuthenticated) {
+        if (!sharedPrefsRepository.isAuthenticated) {
             val intent = Intent(this, SplashActivity::class.java)
                 .apply { flags = Intent.FLAG_ACTIVITY_NEW_TASK }
             this.intent?.data?.let(intent::setData)
@@ -186,6 +190,11 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>() {
 
     private fun subscribeUI() = with(viewModel) {
         observe(shareViewModel.shareText) { shareViaText(it) }
+
+        ui.actionMenuView.init(sharedPrefsRepository)
+        observe(actionMenuViewModel.showWithContact) {
+            ui.actionMenuView.showContact(it)
+        }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -214,6 +223,9 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>() {
     }
 
     override fun onBackPressed() {
+        if (ui.actionMenuView.onBackPressed()) {
+            return
+        }
         if (supportFragmentManager.backStackEntryCount > 0) {
             super.onBackPressed()
         } else {

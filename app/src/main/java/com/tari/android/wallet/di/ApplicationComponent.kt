@@ -48,6 +48,7 @@ import com.tari.android.wallet.ui.fragment.contact_book.details.ContactDetailsVi
 import com.tari.android.wallet.ui.fragment.contact_book.link.ContactLinkViewModel
 import com.tari.android.wallet.ui.fragment.contact_book.root.ContactBookViewModel
 import com.tari.android.wallet.ui.fragment.contact_book.root.ShareViewModel
+import com.tari.android.wallet.ui.fragment.contact_book.root.action_menu.ContactBookActionMenuViewModel
 import com.tari.android.wallet.ui.fragment.contact_book.transactionHistory.TransactionHistoryViewModel
 import com.tari.android.wallet.ui.fragment.home.HomeActivity
 import com.tari.android.wallet.ui.fragment.home.HomeViewModel
@@ -195,6 +196,7 @@ interface ApplicationComponent {
     fun inject(viewModel: WalletAddressViewModel)
     fun inject(viewModel: QRScannerViewModel)
     fun inject(viewModel: TransferFragment)
+    fun inject(viewModel: ContactBookActionMenuViewModel)
 
     fun getClipboardManager(): ClipboardManager
 }

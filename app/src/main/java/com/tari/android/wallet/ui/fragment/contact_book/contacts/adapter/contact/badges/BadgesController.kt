@@ -11,6 +11,7 @@ import com.tari.android.wallet.ui.extension.setVisible
 import com.tari.android.wallet.ui.fragment.contact_book.contacts.BadgeViewModel
 import com.tari.android.wallet.ui.fragment.contact_book.contacts.adapter.contact.ContactItem
 import com.tari.android.wallet.ui.fragment.contact_book.data.ContactAction
+import com.tari.android.wallet.ui.fragment.home.HomeActivity
 
 
 class BadgesController(val view: ItemContactBinding) {
@@ -53,7 +54,8 @@ class BadgesController(val view: ItemContactBinding) {
         }
     }
 
-    fun toggle() = process(!isOpen)
+//    fun toggle() = process(!isOpen)
+    fun toggle() = HomeActivity.instance.get()?.actionMenuViewModel?.showWithContact?.postValue(contactItem.contact)
 
     fun process(newState: Boolean) {
         if (isOpen == newState) return
