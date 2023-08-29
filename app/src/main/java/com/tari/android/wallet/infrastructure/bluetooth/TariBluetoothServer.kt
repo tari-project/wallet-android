@@ -75,11 +75,12 @@ class TariBluetoothServer @Inject constructor(
     }
 
     private fun startReceiving() {
-        ensureBluetoothIsEnabled {
-            runWithPermissions(bluetoothAdvertisePermission) {
-                runWithPermissions(bluetoothConnectPermission) {
-                    doReceiving2()
-                }
+        val permissions = mutableListOf<String>()
+        permissions.addAll(locationPermission)
+        permissions.addAll(bluetoothPermissions)
+        permissionManager.runWithPermission(permissions, true) {
+            ensureBluetoothIsEnabled {
+                doReceiving2()
             }
         }
     }

@@ -119,6 +119,8 @@ open class ContactSelectionFragment : CommonFragment<FragmentContactsSelectionBi
 
         observe(foundYatUser) { showYatUser(if (it.isPresent) it.get() else null) }
 
+        observe(goNext) { goToNext() }
+
         observeOnLoad(clipboardChecker)
     }
 
@@ -231,7 +233,7 @@ open class ContactSelectionFragment : CommonFragment<FragmentContactsSelectionBi
         }
     }
 
-    private fun startQRCodeActivity() {
+    open fun startQRCodeActivity() {
         QRScannerActivity.startScanner(this, QrScannerSource.AddContact)
     }
 

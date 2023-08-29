@@ -178,8 +178,6 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>() {
     override fun onResume() {
         super.onResume()
 
-        viewModel.shareViewModel.tariBluetoothServer.init(this)
-
         viewModel.nfcAdapter.enableForegroundDispatch(this)
     }
 

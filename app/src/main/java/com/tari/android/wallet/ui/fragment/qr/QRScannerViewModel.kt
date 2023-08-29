@@ -80,12 +80,21 @@ class QRScannerViewModel : CommonViewModel() {
             QrScannerSource.None,
             QrScannerSource.Home -> setAlternativeText(deepLink)
 
-            QrScannerSource.TransactionSend,
-            QrScannerSource.AddContact -> {
+            QrScannerSource.TransactionSend -> {
                 when (deepLink) {
                     is DeepLink.Send,
                     is DeepLink.UserProfile -> navigateBack(deepLink)
 
+                    is DeepLink.Contacts,
+                    is DeepLink.AddBaseNode -> setAlternativeText(deepLink)
+                }
+            }
+
+            QrScannerSource.AddContact -> {
+                when (deepLink) {
+                    is DeepLink.UserProfile -> navigateBack(deepLink)
+
+                    is DeepLink.Send,
                     is DeepLink.Contacts,
                     is DeepLink.AddBaseNode -> setAlternativeText(deepLink)
                 }

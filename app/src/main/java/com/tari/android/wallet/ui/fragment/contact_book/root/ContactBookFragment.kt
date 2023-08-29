@@ -69,7 +69,6 @@ class ContactBookFragment : CommonFragment<FragmentContactBookRootBinding, Conta
     override fun onResume() {
         super.onResume()
         viewModel.walletAddressViewModel.tryToCheckClipboard()
-        grantPermission()
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -99,7 +98,7 @@ class ContactBookFragment : CommonFragment<FragmentContactBookRootBinding, Conta
     }
 
     private fun grantPermission() {
-        permissionManagerUI.runWithPermission(android.Manifest.permission.READ_CONTACTS, false) {
+        viewModel.permissionManager.runWithPermission(listOf(android.Manifest.permission.READ_CONTACTS), true) {
             viewModel.contactsRepository.contactPermission.value = true
             viewModel.contactsRepository.phoneBookRepositoryBridge.loadFromPhoneBook()
         }

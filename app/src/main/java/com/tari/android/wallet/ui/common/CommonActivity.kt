@@ -6,16 +6,17 @@ import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import android.hardware.SensorManager
 import android.net.Uri
 import android.os.Bundle
+import android.provider.Settings
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.viewbinding.ViewBinding
 import com.squareup.seismic.ShakeDetector
 import com.tari.android.wallet.R
 import com.tari.android.wallet.extension.observe
-import com.tari.android.wallet.ui.common.permission.PermissionManagerActivityUI
 import com.tari.android.wallet.ui.component.networkStateIndicator.ConnectionIndicatorViewModel
 import com.tari.android.wallet.ui.component.tari.toast.TariToast
 import com.tari.android.wallet.ui.component.tari.toast.TariToastArgs
@@ -49,14 +50,12 @@ abstract class CommonActivity<Binding : ViewBinding, VM : CommonViewModel> : App
 
     private val connectionStateViewModel: ConnectionIndicatorViewModel by viewModels()
 
-    val permissionManagerUI = PermissionManagerActivityUI(this)
-
     val launcher = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
         val (granted, nonGranted) = it.toList().partition { it.second }
         if (nonGranted.isEmpty()) {
-            permissionManagerUI.grantedAction()
+            viewModel.permissionManager.grantedAction()
         } else {
-            permissionManagerUI.notGrantedAction(nonGranted.map { it.first }.toList())
+            viewModel.permissionManager.showPermissionRequiredDialog(nonGranted.map { it.first }.toList())
         }
     }
 
@@ -84,13 +83,22 @@ abstract class CommonActivity<Binding : ViewBinding, VM : CommonViewModel> : App
         observe(navigation) { commonViewModel.tariNavigator.navigate(it) }
 
         observe(permissionManager.checkForPermission) {
-            permissionManagerUI.grantedAction = { commonViewModel.permissionManager.permissionAction?.invoke() }
-            permissionManagerUI.notGrantedAction = { commonViewModel.permissionManager.showPermissionRequiredDialog(it) }
             launcher.launch(it.toTypedArray())
         }
 
+        observe(permissionManager.openSettings) { openSettings() }
+
         observe(permissionManager.dialog) { dialogManager.replace(ModularDialog(this@CommonActivity, it)) }
     }
+
+    private fun openSettings() {
+        Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+            val packageName = this@CommonActivity.packageName
+            data = Uri.fromParts("package", packageName, null)
+            ContextCompat.startActivity(this@CommonActivity, this, Bundle())
+        }
+    }
+
 
     private fun setTariTheme(theme: TariTheme) {
         val themeStyle = when (theme) {
