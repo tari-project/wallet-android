@@ -8,6 +8,8 @@ import com.tari.android.wallet.ui.extension.setVisible
 import com.tari.android.wallet.ui.extension.string
 import com.tari.android.wallet.ui.fragment.contact_book.contactSelection.ContactSelectionFragment
 import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
+import com.tari.android.wallet.ui.fragment.qr.QRScannerActivity
+import com.tari.android.wallet.ui.fragment.qr.QrScannerSource
 
 class SelectUserContactFragment : ContactSelectionFragment() {
 
@@ -31,10 +33,14 @@ class SelectUserContactFragment : ContactSelectionFragment() {
         viewModel.additionalFilter = { it.contact.getFFIDto() != null }
     }
 
+    override fun startQRCodeActivity() {
+        QRScannerActivity.startScanner(this, QrScannerSource.TransactionSend)
+    }
+
     override fun goToNext() {
         super.goToNext()
 
         val user = viewModel.getUserDto()
-        viewModel.navigation.postValue(Navigation.TxListNavigation.ToSendTariToUser(user))
+        viewModel.navigation.postValue(Navigation.TxListNavigation.ToSendTariToUser(user, viewModel.amount.value))
     }
 }

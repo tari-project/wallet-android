@@ -24,11 +24,11 @@ class HomeViewModel: CommonViewModel() {
         component.inject(this)
 
         shareViewModel.tariBluetoothServer.doOnRequiredPermissions = { permissions, action ->
-            permissionManager.runWithPermission(permissions, action)
+            permissionManager.runWithPermission(permissions, false, action)
         }
 
         shareViewModel.tariBluetoothClient.doOnRequiredPermissions = { permissions, action ->
-            permissionManager.runWithPermission(permissions, action)
+            permissionManager.runWithPermission(permissions, false, action)
         }
     }
 }

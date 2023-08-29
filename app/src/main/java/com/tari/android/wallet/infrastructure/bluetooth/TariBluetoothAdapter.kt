@@ -11,7 +11,7 @@ import androidx.core.app.ActivityCompat
 import androidx.fragment.app.FragmentActivity
 import com.tari.android.wallet.ui.common.CommonViewModel
 
-abstract class TariBluetoothAdapter() : CommonViewModel() {
+abstract class TariBluetoothAdapter : CommonViewModel() {
     protected var fragappCompatActivity: AppCompatActivity? = null
         private set(value) {
             field = value
@@ -22,7 +22,7 @@ abstract class TariBluetoothAdapter() : CommonViewModel() {
     protected val bluetoothManager: BluetoothManager?
         get() = fragappCompatActivity!!.getSystemService(BluetoothManager::class.java)
 
-    open fun onContextSet() { }
+    open fun onContextSet() {}
 
     protected val bluetoothConnectPermission = when {
         Build.VERSION.SDK_INT <= Build.VERSION_CODES.R -> Manifest.permission.BLUETOOTH
@@ -41,11 +41,11 @@ abstract class TariBluetoothAdapter() : CommonViewModel() {
 
     protected val bluetoothAdminPermission = when {
         Build.VERSION.SDK_INT <= Build.VERSION_CODES.R -> Manifest.permission.BLUETOOTH
-        else ->  Manifest.permission.BLUETOOTH
+        else -> Manifest.permission.BLUETOOTH_ADMIN
     }
 
     val bluetoothPermissions = mutableListOf(
-        bluetoothConnectPermission, bluetoothScanPermission, bluetoothAdminPermission, bluetoothAdvertisePermission
+        bluetoothConnectPermission, bluetoothScanPermission, bluetoothAdvertisePermission
     ).apply {
     }.distinct()
 
@@ -72,16 +72,24 @@ abstract class TariBluetoothAdapter() : CommonViewModel() {
         }
     }
 
-    protected fun runWithPermissions(permission: String, silently: Boolean = false, action: () -> Unit) {
+    protected fun runWithPermissions(permission: List<String>, silently: Boolean = false, action: () -> Unit) {
         try {
-            if (ActivityCompat.checkSelfPermission(fragappCompatActivity!!, permission) != PackageManager.PERMISSION_GRANTED) {
-                if (!silently) doOnRequiredPermissions.invoke(listOf(permission), action)
+            val notGranted = permission.filter {
+                ActivityCompat.checkSelfPermission(fragappCompatActivity!!, it) != PackageManager.PERMISSION_GRANTED
+            }
+
+            if (notGranted.isNotEmpty()) {
+                if (!silently) doOnRequiredPermissions.invoke(notGranted, action)
             } else {
                 action()
             }
         } catch (e: SecurityException) {
-            if (!silently) doOnRequiredPermissions.invoke(listOf(permission), action)
+            if (!silently) doOnRequiredPermissions.invoke(permission, action)
         }
+    }
+
+    protected fun runWithPermissions(permission: String, silently: Boolean = false, action: () -> Unit) {
+        runWithPermissions(listOf(permission), silently, action)
     }
 
     protected fun ensureBluetoothIsEnabled(action: () -> Unit = {}) {
@@ -89,9 +97,8 @@ abstract class TariBluetoothAdapter() : CommonViewModel() {
             onBluetoothEnabled = action
             onBluetoothNotEnabled = this::showDialogBluetoothRequired
             val enableBtIntent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
-//            @Suppress("MissingPermission")
-            //todo
-//            fragappCompatActivity?.startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT)
+            @Suppress("MissingPermission")
+            fragappCompatActivity?.startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT)
         } else {
             action.invoke()
         }

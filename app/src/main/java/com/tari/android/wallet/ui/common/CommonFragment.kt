@@ -6,17 +6,18 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.provider.Settings
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.viewbinding.ViewBinding
 import com.tari.android.wallet.R
 import com.tari.android.wallet.di.DiContainer
 import com.tari.android.wallet.extension.observe
-import com.tari.android.wallet.ui.common.permission.PermissionManagerUI
 import com.tari.android.wallet.ui.component.mainList.MutedBackPressedCallback
 import com.tari.android.wallet.ui.component.tari.toast.TariToast
 import com.tari.android.wallet.ui.component.tari.toast.TariToastArgs
@@ -30,8 +31,6 @@ abstract class CommonFragment<Binding : ViewBinding, VM : CommonViewModel> : Fra
 
     private val dialogManager = DialogManager()
 
-    val permissionManagerUI = PermissionManagerUI(this)
-
     protected var blockingBackPressDispatcher = MutedBackPressedCallback(false)
 
     protected lateinit var ui: Binding
@@ -40,9 +39,9 @@ abstract class CommonFragment<Binding : ViewBinding, VM : CommonViewModel> : Fra
 
     val launcher = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
         if (it.all { it.value }) {
-            permissionManagerUI.grantedAction()
+            viewModel.permissionManager.grantedAction()
         } else {
-            permissionManagerUI.notGrantedAction(it.filter { !it.value }.map { it.key })
+            viewModel.permissionManager.showPermissionRequiredDialog(it.filter { !it.value }.map { it.key })
         }
     }
 
@@ -97,12 +96,20 @@ abstract class CommonFragment<Binding : ViewBinding, VM : CommonViewModel> : Fra
         observe(navigation) { viewModel.tariNavigator.navigate(it) }
 
         observe(permissionManager.checkForPermission) {
-            permissionManagerUI.grantedAction = { viewModel.permissionManager.permissionAction?.invoke() }
-            permissionManagerUI.notGrantedAction = { viewModel.permissionManager.showPermissionRequiredDialog(it) }
             launcher.launch(it.toTypedArray())
         }
 
+        observe(permissionManager.openSettings) { openSettings() }
+
         observe(permissionManager.dialog) { dialogManager.replace(ModularDialog(requireContext(), it)) }
+    }
+
+    private fun openSettings() {
+        Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+            val packageName = requireContext().packageName
+            data = Uri.fromParts("package", packageName, null)
+            ContextCompat.startActivity(requireActivity(), this, Bundle())
+        }
     }
 
     protected fun changeOnBackPressed(isBlocked: Boolean) {

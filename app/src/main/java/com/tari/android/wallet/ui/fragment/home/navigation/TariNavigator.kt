@@ -15,6 +15,7 @@ import com.tari.android.wallet.ffi.FFITariWalletAddress
 import com.tari.android.wallet.ffi.FFIWallet
 import com.tari.android.wallet.ffi.HexString
 import com.tari.android.wallet.ffi.runWithDestroy
+import com.tari.android.wallet.model.MicroTari
 import com.tari.android.wallet.model.TariWalletAddress
 import com.tari.android.wallet.model.Tx
 import com.tari.android.wallet.model.TxId
@@ -75,8 +76,10 @@ import com.tari.android.wallet.ui.fragment.settings.networkSelection.NetworkSele
 import com.tari.android.wallet.ui.fragment.settings.themeSelector.ThemeSelectorFragment
 import com.tari.android.wallet.ui.fragment.settings.torBridges.TorBridgesSelectionFragment
 import com.tari.android.wallet.ui.fragment.settings.torBridges.customBridges.CustomTorBridgesFragment
+import com.tari.android.wallet.ui.fragment.tx.HomeFragment
 import com.tari.android.wallet.ui.fragment.tx.details.TxDetailsFragment
 import com.tari.android.wallet.ui.fragment.utxos.list.UtxosListFragment
+import java.math.BigInteger
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -127,7 +130,7 @@ class TariNavigator @Inject constructor(val prefs: SharedPrefsRepository, val ta
             is Navigation.AddAmountNavigation.ContinueToFinalizing -> continueToFinalizeSendTx(navigation.transactionData)
             Navigation.TxListNavigation.ToTTLStore -> toTTLStore()
             is Navigation.TxListNavigation.ToTxDetails -> toTxDetails(navigation.tx, null)
-            is Navigation.TxListNavigation.ToSendTariToUser -> toSendTari(navigation.contact)
+            is Navigation.TxListNavigation.ToSendTariToUser -> toSendTari(navigation.contact, navigation.amount)
             is Navigation.TxListNavigation.ToSendWithDeeplink -> toSendWithDeeplink(navigation.sendDeeplink)
             Navigation.TxListNavigation.ToUtxos -> toUtxos()
             Navigation.TxListNavigation.ToAllSettings -> toAllSettings()
@@ -229,9 +232,12 @@ class TariNavigator @Inject constructor(val prefs: SharedPrefsRepository, val ta
 
     fun toChangePassword() = addFragment(ChangeSecurePasswordFragment())
 
-    fun toSendTari(user: ContactDto) = sendToUser(user)
+    fun toSendTari(user: ContactDto, amount: MicroTari?) = sendToUser(user, amount)
 
-    fun toSendWithDeeplink(deeplink: DeepLink.Send) = sendToUserByDeeplink(deeplink)
+    fun toSendWithDeeplink(deeplink: DeepLink.Send)  {
+        popUpTo(HomeFragment::class.java.simpleName)
+        sendToUserByDeeplink(deeplink)
+    }
 
     fun toAddContact() = addFragment(AddContactFragment())
 
@@ -346,10 +352,12 @@ class TariNavigator @Inject constructor(val prefs: SharedPrefsRepository, val ta
     private fun walletAddressFromFFI(ffiTariWalletAddress: FFITariWalletAddress): TariWalletAddress =
         TariWalletAddress(ffiTariWalletAddress.toString(), ffiTariWalletAddress.getEmojiId())
 
-    fun sendToUser(recipientUser: ContactDto) {
+    fun sendToUser(recipientUser: ContactDto, amount: MicroTari? = null) {
         val bundle = Bundle().apply {
             putSerializable(PARAMETER_CONTACT, recipientUser)
-            activity.intent.getDoubleExtra(PARAMETER_AMOUNT, Double.MIN_VALUE).takeIf { it > 0 }?.let { putDouble(PARAMETER_AMOUNT, it) }
+            val innerAmount = (activity.intent.getDoubleExtra(PARAMETER_AMOUNT, Double.MIN_VALUE))
+            val tariAmount = amount ?: if (innerAmount != Double.MIN_VALUE) MicroTari(BigInteger.valueOf(innerAmount.toLong())) else null
+            tariAmount?.let { putParcelable(PARAMETER_AMOUNT, it) }
             activity.intent.getSerializableExtra(PARAMETER_CONTACT)?.let { putSerializable(PARAMETER_CONTACT, it) }
         }
 

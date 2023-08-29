@@ -131,12 +131,12 @@ class HomeFragment : CommonFragment<FragmentHomeBinding, HomeFragmentViewModel>(
 
     private fun checkPermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            permissionManagerUI.runWithPermission(android.Manifest.permission.POST_NOTIFICATIONS) {
+            viewModel.permissionManager.runWithPermission(listOf(android.Manifest.permission.POST_NOTIFICATIONS)) {
                 viewModel.logger.i("notification permission checked successfully")
             }
         }
 
-        permissionManagerUI.runWithPermission(android.Manifest.permission.READ_CONTACTS) {
+        viewModel.permissionManager.runWithPermission(listOf(android.Manifest.permission.READ_CONTACTS)) {
             viewModel.contactsRepository.phoneBookRepositoryBridge.loadFromPhoneBook()
         }
     }
@@ -160,7 +160,7 @@ class HomeFragment : CommonFragment<FragmentHomeBinding, HomeFragmentViewModel>(
     }
 
     private fun grantPermission() {
-        permissionManagerUI.runWithPermission(android.Manifest.permission.READ_CONTACTS, false) {
+        viewModel.permissionManager.runWithPermission(listOf(android.Manifest.permission.READ_CONTACTS), true) {
             viewModel.contactsRepository.contactPermission.value = true
             viewModel.contactsRepository.phoneBookRepositoryBridge.loadFromPhoneBook()
         }
