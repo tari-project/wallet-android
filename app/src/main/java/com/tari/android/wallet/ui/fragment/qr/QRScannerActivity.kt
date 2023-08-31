@@ -38,9 +38,10 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
+import androidx.activity.viewModels
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.fragment.app.Fragment
 import com.budiyev.android.codescanner.AutoFocusMode
 import com.budiyev.android.codescanner.CodeScanner
 import com.budiyev.android.codescanner.DecodeCallback
@@ -50,15 +51,18 @@ import com.google.zxing.BarcodeFormat
 import com.tari.android.wallet.R
 import com.tari.android.wallet.databinding.ActivityQrScannerBinding
 import com.tari.android.wallet.di.DiContainer.appComponent
+import com.tari.android.wallet.extension.observe
+import com.tari.android.wallet.ui.common.CommonActivity
 import com.tari.android.wallet.ui.component.tari.toast.TariToast
 import com.tari.android.wallet.ui.component.tari.toast.TariToastArgs
+import com.tari.android.wallet.ui.extension.setVisible
 
 /**
  * QR code scanner activity - used to add a recipient by QR code.
  *
  * @author The Tari Development Team
  */
-class QRScannerActivity : AppCompatActivity() {
+class QRScannerActivity : CommonActivity<ActivityQrScannerBinding, QRScannerViewModel>() {
 
     companion object {
         /**
@@ -66,19 +70,41 @@ class QRScannerActivity : AppCompatActivity() {
          */
         const val REQUEST_QR_SCANNER = 101
 
+        fun startScanner(activity: Activity, source: QrScannerSource) {
+            val intent = Intent(activity, QRScannerActivity::class.java)
+            intent.putExtra(QR_DATA_SOURCE, source)
+            activity.startActivityForResult(intent, REQUEST_QR_SCANNER)
+            activity.overridePendingTransition(R.anim.slide_up, 0)
+        }
+
+        fun startScanner(activity: Fragment, source: QrScannerSource) {
+            val intent = Intent(activity.requireActivity(), QRScannerActivity::class.java)
+            intent.putExtra(QR_DATA_SOURCE, source)
+            activity.startActivityForResult(intent, REQUEST_QR_SCANNER)
+        }
+
         private const val REQUEST_CAMERA_PERMISSION = 102
         const val EXTRA_QR_DATA = "extra_qr_text"
+        const val QR_DATA_SOURCE = "qr_data_source"
     }
 
     private lateinit var codeScanner: CodeScanner
-
-    private lateinit var ui: ActivityQrScannerBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         appComponent.inject(this)
         super.onCreate(savedInstanceState)
         ui = ActivityQrScannerBinding.inflate(layoutInflater).apply { setContentView(root) }
+
+        val viewModel: QRScannerViewModel by viewModels()
+        bindViewModel(viewModel)
+        subscribeToCommon(viewModel.deeplinkViewModel)
+
+        val data = intent.getSerializableExtra(QR_DATA_SOURCE, QrScannerSource::class.java)
+        viewModel.init(data ?: QrScannerSource.None)
+
+        subscribeUI()
         setupUi()
+
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_DENIED) {
             ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.CAMERA), REQUEST_CAMERA_PERMISSION)
         } else {
@@ -86,11 +112,28 @@ class QRScannerActivity : AppCompatActivity() {
         }
     }
 
-    private fun setupUi() {
-        ui.qrCloseViewContainer.setOnClickListener {
+    private fun subscribeUI() = with(viewModel) {
+        observe(scanError) { ui.errorContainer.setVisible(it) }
+
+        observe(alternativeText) {
+            ui.alternativeText.text = it
+            ui.alternativeContainer.setVisible(it.isNotEmpty())
+        }
+
+        observe(navigationBackWithData) { doNavigationBack(it) }
+
+        observe(proceedScan) { codeScanner.startPreview() }
+    }
+
+    private fun setupUi() = with(ui) {
+        qrCloseView.setOnClickListener {
             finish()
             overridePendingTransition(0, R.anim.slide_down)
         }
+
+        alternativeApply.setOnClickListener { viewModel.onAlternativeApply() }
+        alternativeDeny.setOnClickListener { viewModel.onAlternativeDeny() }
+        retryButton.setOnClickListener { viewModel.onRetry() }
     }
 
     private fun startScanning() {
@@ -103,19 +146,21 @@ class QRScannerActivity : AppCompatActivity() {
             isFlashEnabled = false
         }
 
-        codeScanner.decodeCallback = DecodeCallback {
-            val intent = Intent()
-            intent.putExtra(EXTRA_QR_DATA, it.text)
-            setResult(Activity.RESULT_OK, intent)
-            finish()
-            overridePendingTransition(0, R.anim.slide_down)
-        }
+        codeScanner.decodeCallback = DecodeCallback { viewModel.onScanResult(it.text) }
 
         codeScanner.errorCallback = ErrorCallback {
             runOnUiThread { TariToast(this, TariToastArgs(getString(R.string.add_recipient_failed_init_camera_message), Toast.LENGTH_LONG)) }
         }
 
         ui.scannerView.setOnClickListener { codeScanner.startPreview() }
+    }
+
+    private fun doNavigationBack(text: String) {
+        val intent = Intent()
+        intent.putExtra(EXTRA_QR_DATA, text)
+        setResult(Activity.RESULT_OK, intent)
+        finish()
+        overridePendingTransition(0, R.anim.slide_down)
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {

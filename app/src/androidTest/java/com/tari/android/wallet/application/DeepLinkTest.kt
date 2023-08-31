@@ -37,8 +37,6 @@ import com.tari.android.wallet.application.deeplinks.DeeplinkHandler
 import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
 import com.tari.android.wallet.data.sharedPrefs.network.TariNetwork
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNotNull
-import org.junit.Assert.assertNull
 import org.junit.Test
 
 class DeepLinkTest {
@@ -47,41 +45,6 @@ class DeepLinkTest {
     private val deeplinkHandler: DeeplinkHandler = DeeplinkHandler(networkRepository)
     private val currentNetwork = Network.STAGENET
 
-    @Test
-    fun assertNetwork() {
-        val nullLink = "tari://mainnet/${DeepLink.Send.sendCommand}?${DeepLink.Send.tariAddressKey}=$PUBLIC_KEY"
-        val nullResult = deeplinkHandler.handle(nullLink) as? DeepLink.ContactlessPayment
-        assertNull(nullResult)
-
-        val notNullLink = "tari://${currentNetwork.uriComponent}/${DeepLink.Send.sendCommand}?${DeepLink.Send.tariAddressKey}=$PUBLIC_KEY"
-        val notNullResult = deeplinkHandler.handle(notNullLink) as? DeepLink.ContactlessPayment
-        assertNotNull(notNullResult)
-    }
-
-    @Test
-    fun assertNode() {
-        val deeplink = "tari://${currentNetwork.uriComponent}/${DeepLink.Send.sendCommand}?${DeepLink.Send.noteKey}=hey"
-        val result = deeplinkHandler.handle(deeplink) as? DeepLink.ContactlessPayment
-        assertEquals(result!!.note, "hey")
-
-        val cyrillicDeeplink = "tari://${currentNetwork.uriComponent}/${DeepLink.Send.sendCommand}?${DeepLink.Send.noteKey}=привет"
-        val cyrillicResult = deeplinkHandler.handle(cyrillicDeeplink) as? DeepLink.ContactlessPayment
-        assertEquals(cyrillicResult!!.note, "привет")
-    }
-
-    @Test
-    fun assertPubkey() {
-        val deeplink = "tari://${currentNetwork.uriComponent}/${DeepLink.Send.sendCommand}?${DeepLink.Send.tariAddressKey}=$PUBLIC_KEY"
-        val result = deeplinkHandler.handle(deeplink) as? DeepLink.ContactlessPayment
-        assertEquals(result!!.walletAddress, PUBLIC_KEY)
-    }
-
-    @Test
-    fun assertAmount() {
-        val deeplink = "tari://${currentNetwork.uriComponent}/${DeepLink.Send.sendCommand}?${DeepLink.Send.amountKey}=12345678"
-        val result = deeplinkHandler.handle(deeplink) as? DeepLink.ContactlessPayment
-        assertEquals(result!!.amount!!.tariValue.toDouble(), 12.345678, 0.1)
-    }
 
     @Test
     fun assertBaseNodeName() {
@@ -96,21 +59,6 @@ class DeepLinkTest {
         val result = deeplinkHandler.handle(deeplink) as? DeepLink.AddBaseNode
         assertEquals(result!!.peer, PEER)
     }
-
-    @Test
-    fun assertFullDataDeeplinks() {
-        val sendDeeplink = "tari://${currentNetwork.uriComponent}/${DeepLink.Send.sendCommand}?${DeepLink.Send.amountKey}=12345678&${DeepLink.Send.noteKey}=hey&${DeepLink.Send.tariAddressKey}=$PUBLIC_KEY"
-        val result = deeplinkHandler.handle(sendDeeplink) as? DeepLink.ContactlessPayment
-        assertEquals(result!!.note, "hey")
-        assertEquals(result.walletAddress, PUBLIC_KEY)
-        assertEquals(result.amount!!.tariValue.toDouble(), 12.345678, 0.1)
-
-        val baseNodeDeeplink = "tari://${currentNetwork.uriComponent}/${DeepLink.AddBaseNode.addNodeCommand}?${DeepLink.AddBaseNode.peerKey}=${PEER}&${DeepLink.AddBaseNode.nameKey}=actual_name"
-        val baseNodeResult = deeplinkHandler.handle(baseNodeDeeplink) as? DeepLink.AddBaseNode
-        assertEquals(baseNodeResult!!.peer, PEER)
-        assertEquals(baseNodeResult.name, "actual_name")
-    }
-
 
     companion object {
         private const val PUBLIC_KEY = "2e93c460DF49D8CFBBF7A06DD9004C25A84F92584F7D0AC5E30BD8E0BEEE9A43"

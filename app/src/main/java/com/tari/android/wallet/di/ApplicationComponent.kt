@@ -48,15 +48,18 @@ import com.tari.android.wallet.ui.fragment.contact_book.details.ContactDetailsVi
 import com.tari.android.wallet.ui.fragment.contact_book.link.ContactLinkViewModel
 import com.tari.android.wallet.ui.fragment.contact_book.root.ContactBookViewModel
 import com.tari.android.wallet.ui.fragment.contact_book.root.ShareViewModel
+import com.tari.android.wallet.ui.fragment.contact_book.root.action_menu.ContactBookActionMenuViewModel
 import com.tari.android.wallet.ui.fragment.contact_book.transactionHistory.TransactionHistoryViewModel
 import com.tari.android.wallet.ui.fragment.home.HomeActivity
 import com.tari.android.wallet.ui.fragment.home.HomeViewModel
+import com.tari.android.wallet.ui.fragment.home.homeTransactionHistory.HomeTransactionHistoryViewModel
 import com.tari.android.wallet.ui.fragment.onboarding.activity.OnboardingFlowActivity
 import com.tari.android.wallet.ui.fragment.onboarding.createWallet.CreateWalletViewModel
 import com.tari.android.wallet.ui.fragment.onboarding.inroduction.IntroductionViewModel
 import com.tari.android.wallet.ui.fragment.onboarding.localAuth.LocalAuthViewModel
 import com.tari.android.wallet.ui.fragment.profile.WalletInfoViewModel
 import com.tari.android.wallet.ui.fragment.qr.QRScannerActivity
+import com.tari.android.wallet.ui.fragment.qr.QRScannerViewModel
 import com.tari.android.wallet.ui.fragment.restore.activity.WalletRestoreActivity
 import com.tari.android.wallet.ui.fragment.restore.chooseRestoreOption.ChooseRestoreOptionViewModel
 import com.tari.android.wallet.ui.fragment.restore.enterRestorationPassword.EnterRestorationPasswordViewModel
@@ -69,6 +72,7 @@ import com.tari.android.wallet.ui.fragment.send.addNote.gif.ChooseGIFDialogFragm
 import com.tari.android.wallet.ui.fragment.send.addNote.gif.ThumbnailGIFsViewModel
 import com.tari.android.wallet.ui.fragment.send.finalize.FinalizeSendTxViewModel
 import com.tari.android.wallet.ui.fragment.send.requestTari.RequestTariViewModel
+import com.tari.android.wallet.ui.fragment.send.transfer.TransferFragment
 import com.tari.android.wallet.ui.fragment.settings.allSettings.AllSettingsViewModel
 import com.tari.android.wallet.ui.fragment.settings.allSettings.about.TariAboutViewModel
 import com.tari.android.wallet.ui.fragment.settings.backgroundService.BackgroundServiceSettingsViewModel
@@ -93,8 +97,8 @@ import com.tari.android.wallet.ui.fragment.settings.torBridges.TorBridgesSelecti
 import com.tari.android.wallet.ui.fragment.settings.torBridges.customBridges.CustomTorBridgesViewModel
 import com.tari.android.wallet.ui.fragment.settings.userAutorization.BiometricAuthenticationViewModel
 import com.tari.android.wallet.ui.fragment.splash.SplashActivity
+import com.tari.android.wallet.ui.fragment.tx.HomeFragmentViewModel
 import com.tari.android.wallet.ui.fragment.tx.TransactionRepository
-import com.tari.android.wallet.ui.fragment.tx.TxListViewModel
 import com.tari.android.wallet.ui.fragment.tx.details.TxDetailsViewModel
 import com.tari.android.wallet.ui.fragment.tx.details.gif.GIFViewModel
 import com.tari.android.wallet.ui.fragment.utxos.list.UtxosListViewModel
@@ -146,7 +150,6 @@ interface ApplicationComponent {
     fun inject(viewModel: VerifySeedPhraseViewModel)
     fun inject(viewModel: BackupSettingsViewModel)
     fun inject(viewModel: BiometricAuthenticationViewModel)
-    fun inject(viewModel: TxListViewModel)
     fun inject(viewModel: ChangeBaseNodeViewModel)
     fun inject(viewModel: AddCustomBaseNodeViewModel)
     fun inject(viewModel: NetworkSelectionViewModel)
@@ -172,6 +175,8 @@ interface ApplicationComponent {
     fun inject(viewModel: ThemeSelectorViewModel)
     fun inject(viewModel: DeleteWalletViewModel)
     fun inject(viewModel: HomeViewModel)
+    fun inject(viewModel: HomeFragmentViewModel)
+    fun inject(viewModel: HomeTransactionHistoryViewModel)
     fun inject(viewModel: EnterCurrentPasswordViewModel)
     fun inject(viewModel: ChangeSecurePasswordViewModel)
     fun inject(viewModel: AddNoteViewModel)
@@ -189,6 +194,9 @@ interface ApplicationComponent {
     fun inject(viewModel: TransactionHistoryViewModel)
     fun inject(viewModel: BluetoothSettingsViewModel)
     fun inject(viewModel: WalletAddressViewModel)
+    fun inject(viewModel: QRScannerViewModel)
+    fun inject(viewModel: TransferFragment)
+    fun inject(viewModel: ContactBookActionMenuViewModel)
 
     fun getClipboardManager(): ClipboardManager
 }

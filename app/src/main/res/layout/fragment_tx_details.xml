@@ -390,7 +390,7 @@
                     android:layout_marginHorizontal="@dimen/common_horizontal_margin"
                     android:orientation="vertical"
                     android:paddingBottom="20dp"
-                    android:visibility="visible"
+                    android:visibility="gone"
                     app:layout_constraintEnd_toEndOf="parent">
 
                     <com.tari.android.wallet.ui.component.tari.TariDivider

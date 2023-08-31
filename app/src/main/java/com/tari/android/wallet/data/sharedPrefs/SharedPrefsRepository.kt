@@ -80,6 +80,7 @@ class SharedPrefsRepository @Inject constructor(
         const val surname = "tari_wallet_surname_"
         const val onboardingStarted = "tari_wallet_onboarding_started"
         const val onboardingAuthSetupCompleted = "tari_wallet_onboarding_auth_setup_completed"
+        const val actionMenuSide = "tari_wallet_action_menu_side"
         const val onboardingAuthSetupStarted = "tari_wallet_onboarding_auth_setup_started"
         const val onboardingCompleted = "tari_wallet_onboarding_completed"
         const val onboardingDisplayedAtHome = "tari_wallet_onboarding_displayed_at_home"
@@ -106,6 +107,8 @@ class SharedPrefsRepository @Inject constructor(
     var onboardingAuthSetupStarted: Boolean by SharedPrefBooleanDelegate(sharedPrefs, this,  formatKey(Key.onboardingAuthSetupStarted))
 
     var onboardingAuthSetupCompleted: Boolean by SharedPrefBooleanDelegate(sharedPrefs, this,  formatKey(Key.onboardingAuthSetupCompleted))
+
+    var actionMenuSide: Boolean by SharedPrefBooleanDelegate(sharedPrefs, this, formatKey(Key.actionMenuSide))
 
     val onboardingAuthWasInterrupted: Boolean
         get() = onboardingAuthSetupStarted && !onboardingAuthSetupCompleted

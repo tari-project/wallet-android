@@ -62,6 +62,7 @@ class BaseNodes(
      * Select a base node randomly from the list of base nodes in base_nodes.tx, and sets
      * the wallet and stored the values in shared prefs.
      */
+    @Synchronized
     fun setNextBaseNode() {
         if (!this::baseNodeIterator.isInitialized || !baseNodeIterator.hasNext()) {
             baseNodeIterator = baseNodeList.iterator()

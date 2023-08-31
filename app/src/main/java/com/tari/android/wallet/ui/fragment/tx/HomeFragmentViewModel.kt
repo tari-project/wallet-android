@@ -2,7 +2,9 @@ package com.tari.android.wallet.ui.fragment.tx
 
 
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.toLiveData
 import androidx.lifecycle.viewModelScope
 import com.tari.android.wallet.R.string.error_no_connection_description
 import com.tari.android.wallet.R.string.error_no_connection_title
@@ -25,13 +27,14 @@ import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
 import com.tari.android.wallet.ui.fragment.send.finalize.TxFailureReason
 import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupSettingsRepository
 import com.tari.android.wallet.ui.fragment.tx.adapter.TransactionItem
-import com.tari.android.wallet.ui.fragment.tx.ui.progressController.UpdateProgressViewController
+import com.tari.android.wallet.util.extractEmojis
+import io.reactivex.BackpressureStrategy
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 
-class TxListViewModel : CommonViewModel() {
+class HomeFragmentViewModel : CommonViewModel() {
 
     @Inject
     lateinit var backupSettingsRepository: BackupSettingsRepository
@@ -50,24 +53,35 @@ class TxListViewModel : CommonViewModel() {
 
     val stagedWalletSecurityManager = StagedWalletSecurityManager()
 
-    lateinit var progressControllerState: UpdateProgressViewController.UpdateProgressState
-
-    private val _connected = SingleLiveEvent<Unit>()
-    val connected: LiveData<Unit> = _connected
-
     private val _balanceInfo = MutableLiveData<BalanceInfo>()
     val balanceInfo: LiveData<BalanceInfo> = _balanceInfo
 
     private val _refreshBalanceInfo = SingleLiveEvent<Boolean>()
     val refreshBalanceInfo: SingleLiveEvent<Boolean> = _refreshBalanceInfo
 
-    private val _txSendSuccessful = SingleLiveEvent<Unit>()
-    val txSendSuccessful: MutableLiveData<Unit> = _txSendSuccessful
+    val txList = MediatorLiveData<MutableList<CommonViewHolderItem>>()
+
+    val emoji = MutableLiveData<String>()
+
+    val emojiMedium = MutableLiveData<String>()
 
     init {
         component.inject(this)
 
+        txList.addSource(transactionRepository.list) { updateList() }
+
+        txList.addSource(contactsRepository.publishSubject.toFlowable(BackpressureStrategy.LATEST).toLiveData()) { updateList() }
+
         doOnConnectedToWallet { doOnConnected { runCatching { onServiceConnected() } } }
+
+        val emojies = sharedPrefsWrapper.emojiId.orEmpty().extractEmojis()
+        emojiMedium.postValue(emojies.take(3).joinToString(""))
+        emoji.postValue(emojies.take(1).joinToString(""))
+    }
+
+    private fun updateList() {
+        val list = transactionRepository.list.value ?: return
+        txList.postValue(list.filterIsInstance<TransactionItem>().sortedBy { it.tx.timestamp }.takeLast(amountOfTransactions).toMutableList())
     }
 
     fun processItemClick(item: CommonViewHolderItem) {
@@ -80,15 +94,15 @@ class TxListViewModel : CommonViewModel() {
         subscribeToEventBus()
 
         viewModelScope.launch(Dispatchers.IO) {
-            fetchBalanceInfoData()
-            _connected.postValue(Unit)
+            refreshAllData(true)
         }
     }
 
     private fun fetchBalanceInfoData() {
-        val balance = walletService.getWithError { error, service -> service.getBalanceInfo(error) }
-        EventBus.balanceUpdates.post(balance)
-        _balanceInfo.postValue(balance)
+        walletService.getWithError { error, service -> service.getBalanceInfo(error) }?.let {
+            EventBus.balanceUpdates.post(it)
+            _balanceInfo.postValue(it)
+        }
     }
 
     fun refreshAllData(isRestarted: Boolean = false) {
@@ -118,14 +132,10 @@ class TxListViewModel : CommonViewModel() {
         EventBus.subscribe<Event.Transaction.TxFauxConfirmed>(this) { refreshBalance(false) }
         EventBus.subscribe<Event.Transaction.TxCancelled>(this) { refreshBalance(false) }
 
-        EventBus.subscribe<Event.Transaction.TxSendSuccessful>(this) { onTxSendSuccessful() }
+        EventBus.subscribe<Event.Transaction.TxSendSuccessful>(this) { refreshBalance(false) }
         EventBus.subscribe<Event.Transaction.TxSendFailed>(this) { onTxSendFailed(it.failureReason) }
 
         EventBus.balanceState.publishSubject.subscribe { _balanceInfo.postValue(it) }.addTo(compositeDisposable)
-    }
-
-    private fun onTxSendSuccessful() {
-        _txSendSuccessful.postValue(Unit)
     }
 
     /**
@@ -150,5 +160,9 @@ class TxListViewModel : CommonViewModel() {
             resourceManager.getString(error_node_unreachable_description),
         )
         modularDialog.postValue(errorDialogArgs.getModular(resourceManager))
+    }
+
+    companion object {
+        val amountOfTransactions = 2
     }
 }

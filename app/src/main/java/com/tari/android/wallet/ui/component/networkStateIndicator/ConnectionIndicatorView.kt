@@ -38,10 +38,10 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import com.tari.android.wallet.databinding.ViewConnectionIndicatorBinding
 import com.tari.android.wallet.extension.observe
-import com.tari.android.wallet.ui.component.mainList.MainListTouchingView
+import com.tari.android.wallet.ui.component.common.CommonView
 
 
-class ConnectionIndicatorView : MainListTouchingView<ConnectionIndicatorViewModel, ViewConnectionIndicatorBinding> {
+class ConnectionIndicatorView : CommonView<ConnectionIndicatorViewModel, ViewConnectionIndicatorBinding> {
 
     override fun bindingInflate(layoutInflater: LayoutInflater, parent: ViewGroup?, attachToRoot: Boolean):
             ViewConnectionIndicatorBinding = ViewConnectionIndicatorBinding.inflate(layoutInflater, parent, attachToRoot)
@@ -54,7 +54,9 @@ class ConnectionIndicatorView : MainListTouchingView<ConnectionIndicatorViewMode
 
     override fun setup() = Unit
 
-    override fun doTouch() = viewModel.showStatesDialog()
+    init {
+        setOnClickListener { viewModel.showStatesDialog() }
+    }
 
     override fun bindViewModel(viewModel: ConnectionIndicatorViewModel) {
         super.bindViewModel(viewModel)
