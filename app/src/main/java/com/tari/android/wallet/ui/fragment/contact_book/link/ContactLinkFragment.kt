@@ -51,7 +51,7 @@ class ContactLinkFragment : CommonFragment<FragmentContactsLinkBinding, ContactL
     }
 
     private fun grantPermission() {
-        permissionManagerUI.runWithPermission(android.Manifest.permission.READ_CONTACTS, true) {
+        viewModel.permissionManager.runWithPermission(listOf(android.Manifest.permission.READ_CONTACTS), true) {
             viewModel.viewModelScope.launch(Dispatchers.IO) {
                 viewModel.contactsRepository.contactPermission.postValue(true)
                 viewModel.contactsRepository.phoneBookRepositoryBridge.loadFromPhoneBook()

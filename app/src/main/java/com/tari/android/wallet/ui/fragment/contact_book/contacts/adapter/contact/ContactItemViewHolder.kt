@@ -1,5 +1,7 @@
 package com.tari.android.wallet.ui.fragment.contact_book.contacts.adapter.contact
 
+import android.Manifest.permission.READ_CONTACTS
+import android.content.pm.PackageManager
 import android.net.Uri
 import com.tari.android.wallet.databinding.ItemContactBinding
 import com.tari.android.wallet.ui.common.recyclerView.CommonViewHolder
@@ -36,14 +38,14 @@ class ContactItemViewHolder(view: ItemContactBinding) : CommonViewHolder<Contact
             }
 
             is MergedContactDto -> {
-                if (dto.phoneContactDto.avatar.isNotEmpty()) displayAvatar(dto.phoneContactDto.avatar) else
+                if (dto.phoneContactDto.avatar.isNotEmpty() && hasContactPermission()) displayAvatar(dto.phoneContactDto.avatar) else
                     displayFirstEmojiOrText(dto.ffiContactDto.walletAddress.emojiId.extractEmojis()[0])
                 displayAlias(dto.phoneContactDto.getAlias())
                 displayYat(dto.phoneContactDto.yat)
             }
 
             is PhoneContactDto -> {
-                if (dto.avatar.isNotEmpty()) displayAvatar(dto.avatar) else {
+                if (dto.avatar.isNotEmpty() && hasContactPermission()) displayAvatar(dto.avatar) else {
                     var name = ""
                     dto.firstName.firstOrNull()?.let { name += it }
                     dto.surname.firstOrNull()?.let { name += it }
@@ -59,6 +61,8 @@ class ContactItemViewHolder(view: ItemContactBinding) : CommonViewHolder<Contact
         ui.checkbox.setVisible(item.isSelectionState && item.contact.getFFIDto() != null)
         ui.checkbox.isChecked = item.isSelected
     }
+
+    private fun hasContactPermission(): Boolean = ui.root.context.checkSelfPermission(READ_CONTACTS) == PackageManager.PERMISSION_GRANTED
 
     private fun displayYat(yat: String) {
         val extracted = yat.extractEmojis()

@@ -32,7 +32,9 @@
  */
 package com.tari.android.wallet.ui.fragment.home
 
+import android.Manifest.permission.POST_NOTIFICATIONS
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.widget.ImageView
 import androidx.activity.viewModels
@@ -43,7 +45,6 @@ import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.MigrationManager
-import com.tari.android.wallet.application.deeplinks.DeepLink
 import com.tari.android.wallet.application.deeplinks.DeeplinkHandler
 import com.tari.android.wallet.application.deeplinks.DeeplinkViewModel
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
@@ -54,7 +55,6 @@ import com.tari.android.wallet.di.DiContainer.appComponent
 import com.tari.android.wallet.extension.applyFontStyle
 import com.tari.android.wallet.extension.observe
 import com.tari.android.wallet.model.TxId
-import com.tari.android.wallet.service.TariWalletService
 import com.tari.android.wallet.service.connection.ServiceConnectionStatus
 import com.tari.android.wallet.service.service.WalletServiceLauncher
 import com.tari.android.wallet.ui.common.CommonActivity
@@ -71,6 +71,7 @@ import com.tari.android.wallet.ui.extension.parcelable
 import com.tari.android.wallet.ui.extension.setVisible
 import com.tari.android.wallet.ui.extension.string
 import com.tari.android.wallet.ui.fragment.contact_book.root.ContactBookFragment
+import com.tari.android.wallet.ui.fragment.contact_book.root.action_menu.ContactBookActionMenuViewModel
 import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
 import com.tari.android.wallet.ui.fragment.home.navigation.TariNavigator.Companion.INDEX_CONTACT_BOOK
 import com.tari.android.wallet.ui.fragment.home.navigation.TariNavigator.Companion.INDEX_HOME
@@ -81,7 +82,7 @@ import com.tari.android.wallet.ui.fragment.onboarding.activity.OnboardingFlowAct
 import com.tari.android.wallet.ui.fragment.settings.allSettings.AllSettingsFragment
 import com.tari.android.wallet.ui.fragment.splash.SplashActivity
 import com.tari.android.wallet.ui.fragment.store.StoreFragment
-import com.tari.android.wallet.ui.fragment.tx.TxListFragment
+import com.tari.android.wallet.ui.fragment.tx.HomeFragment
 import com.tari.android.wallet.util.Constants
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -92,7 +93,7 @@ import javax.inject.Inject
 class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>() {
 
     @Inject
-    lateinit var sharedPrefsWrapper: SharedPrefsRepository
+    lateinit var sharedPrefsRepository: SharedPrefsRepository
 
     @Inject
     lateinit var walletServiceLauncher: WalletServiceLauncher
@@ -112,10 +113,13 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>() {
     @Inject
     lateinit var tariSettingsRepository: TariSettingsSharedRepository
 
-    private val deeplinkViewModel: DeeplinkViewModel by viewModels()
+    val deeplinkViewModel: DeeplinkViewModel by viewModels()
+
+    val actionMenuViewModel = ContactBookActionMenuViewModel()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         instance = WeakReference(this)
 
         val viewModel: HomeViewModel by viewModels()
@@ -126,6 +130,7 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>() {
         subscribeToCommon(viewModel.shareViewModel.tariBluetoothServer)
         subscribeToCommon(viewModel.shareViewModel.tariBluetoothClient)
         subscribeToCommon(viewModel.shareViewModel.deeplinkViewModel)
+        subscribeToCommon(actionMenuViewModel)
         viewModel.nfcAdapter.context = this
 
         viewModel.shareViewModel.tariBluetoothServer.init(this)
@@ -135,7 +140,7 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>() {
 
         overridePendingTransition(0, 0)
         appComponent.inject(this)
-        if (!sharedPrefsWrapper.isAuthenticated) {
+        if (!sharedPrefsRepository.isAuthenticated) {
             val intent = Intent(this, SplashActivity::class.java)
                 .apply { flags = Intent.FLAG_ACTIVITY_NEW_TASK }
             this.intent?.data?.let(intent::setData)
@@ -148,7 +153,7 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>() {
             enableNavigationView(ui.homeImageView)
             viewModel.doOnConnected {
                 ui.root.postDelayed({
-                    processIntentDeepLink(it, intent)
+                    processIntentDeepLink(intent)
                 }, Constants.UI.mediumDurationMs)
             }
         } else {
@@ -164,12 +169,14 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>() {
                 checkNetworkCompatibility()
             }
         }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            requestPermissions(arrayOf(POST_NOTIFICATIONS), 0)
+        }
     }
 
     override fun onResume() {
         super.onResume()
-
-        viewModel.shareViewModel.tariBluetoothServer.init(this)
 
         viewModel.nfcAdapter.enableForegroundDispatch(this)
     }
@@ -181,6 +188,11 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>() {
 
     private fun subscribeUI() = with(viewModel) {
         observe(shareViewModel.shareText) { shareViaText(it) }
+
+        ui.actionMenuView.init(sharedPrefsRepository)
+        observe(actionMenuViewModel.showWithContact) {
+            ui.actionMenuView.showContact(it)
+        }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -197,7 +209,7 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>() {
         // onNewIntent might get called before onCreate, so we anticipate that here
         checkScreensDeeplink(intent)
         if (viewModel.serviceConnection.currentState.status == ServiceConnectionStatus.CONNECTED) {
-            processIntentDeepLink(viewModel.serviceConnection.currentState.service!!, intent)
+            processIntentDeepLink(intent)
         } else {
             setIntent(intent)
         }
@@ -209,6 +221,9 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>() {
     }
 
     override fun onBackPressed() {
+        if (ui.actionMenuView.onBackPressed()) {
+            return
+        }
         if (supportFragmentManager.backStackEntryCount > 0) {
             super.onBackPressed()
         } else {
@@ -230,7 +245,7 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>() {
     }
 
     private fun setupUi() {
-        ui.sendTariButton.setOnClickListener { viewModel.navigation.postValue(Navigation.ContactBookNavigation.ToSelectTariUser()) }
+        ui.sendTariButton.setOnClickListener { viewModel.navigation.postValue(Navigation.TxListNavigation.ToTransfer()) }
         setupBottomNavigation()
     }
 
@@ -339,14 +354,8 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>() {
 
     fun willNotifyAboutNewTx(): Boolean = ui.viewPager.currentItem == INDEX_HOME
 
-    private fun processIntentDeepLink(service: TariWalletService, intent: Intent) {
-        deeplinkHandler.handle(intent.data?.toString().orEmpty())?.let { deepLink ->
-            (deepLink as? DeepLink.Send)?.let { viewModel.tariNavigator.sendTariToUser(service, it) }
-
-            (deepLink as? DeepLink.AddBaseNode)?.let { deeplinkViewModel.addBaseNode(this, it) }
-
-            (deepLink as? DeepLink.Contacts)?.let { deeplinkViewModel.addContacts(it.contacts) }
-        }
+    private fun processIntentDeepLink(intent: Intent) {
+        deeplinkViewModel.tryToHandle(intent.data?.toString().orEmpty())
     }
 
     override fun onDestroy() {
@@ -358,7 +367,7 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>() {
     class HomeAdapter(fm: FragmentManager, lifecycle: Lifecycle) : FragmentStateAdapter(fm, lifecycle) {
 
         override fun createFragment(position: Int): Fragment = when (position) {
-            INDEX_HOME -> TxListFragment()
+            INDEX_HOME -> HomeFragment()
             INDEX_STORE -> StoreFragment.newInstance()
             INDEX_CONTACT_BOOK -> ContactBookFragment()
             INDEX_SETTINGS -> AllSettingsFragment.newInstance()

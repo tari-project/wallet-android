@@ -1,19 +1,16 @@
 buildscript {
     ext {
-
-        agp_version2 = '7.4.2'
-        agp_version1 = '8.1.0-alpha09'
         agp_version = '7.4.2'
     }
     ext.kotlin_version = '1.8.10'
     ext.lifecycle_version = '2.6.1'
 
     // build & version
-    ext.buildNumber = 251
-    ext.versionNumber = "0.22.1"
+    ext.buildNumber = 256
+    ext.versionNumber = "0.23.0"
 
     // JNI libs
-    ext.libwalletVersion = "0.49.1"
+    ext.libwalletVersion = "v0.50.0-hotfix.1"
     ext.libwalletHostURL = "https://tari-binaries.s3.amazonaws.com/libwallet/"
     ext.supportedABIs = ["arm64-v8a", "x86_64"]
 
@@ -23,7 +20,7 @@ buildscript {
     }
 
     dependencies {
-        classpath "com.android.tools.build:gradle:$agp_version2"
+        classpath "com.android.tools.build:gradle:$agp_version"
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
         classpath "io.sentry:sentry-android-gradle-plugin:3.4.3"
     }

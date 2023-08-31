@@ -6,8 +6,11 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.toLiveData
 import androidx.lifecycle.viewModelScope
 import com.tari.android.wallet.R
+import com.tari.android.wallet.application.deeplinks.DeepLink
+import com.tari.android.wallet.application.deeplinks.DeeplinkFormatter
 import com.tari.android.wallet.application.deeplinks.DeeplinkHandler
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
+import com.tari.android.wallet.model.MicroTari
 import com.tari.android.wallet.model.TariWalletAddress
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.common.SingleLiveEvent
@@ -51,7 +54,11 @@ open class ContactSelectionViewModel : CommonViewModel() {
 
     val walletAddressViewModel = WalletAddressViewModel()
 
-    val isContactlessPayment = MutableLiveData<Boolean>(false)
+    val isContactlessPayment = MutableLiveData(false)
+
+    val goNext: SingleLiveEvent<Unit> = SingleLiveEvent()
+
+    val amount: MutableLiveData<MicroTari> = MutableLiveData()
 
     @Inject
     lateinit var yatAdapter: YatAdapter
@@ -68,6 +75,9 @@ open class ContactSelectionViewModel : CommonViewModel() {
     @Inject
     lateinit var deeplinkHandler: DeeplinkHandler
 
+    @Inject
+    lateinit var deeplinkFormatter: DeeplinkFormatter
+
     init {
         component.inject(this)
 
@@ -82,6 +92,32 @@ open class ContactSelectionViewModel : CommonViewModel() {
         list.addSource(contactListSource) { updateList() }
         list.addSource(searchText) { updateList() }
         list.addSource(isContactlessPayment) { updateList() }
+    }
+
+    fun handleDeeplink(deeplinkString: String) {
+        val deeplink = deeplinkFormatter.parse(deeplinkString)
+        val hex = when (deeplink) {
+            is DeepLink.Contacts -> deeplink.contacts.firstOrNull()?.hex
+            is DeepLink.Send -> deeplink.walletAddressHex
+            is DeepLink.UserProfile -> deeplink.tariAddressHex
+            else -> null
+        }.orEmpty()
+
+        val name = when (deeplink) {
+            is DeepLink.Contacts -> deeplink.contacts.firstOrNull()?.alias
+            is DeepLink.UserProfile -> deeplink.alias
+            else -> null
+        }.orEmpty()
+
+        when(deeplink) {
+            is DeepLink.Send -> deeplink.amount?.let { amount.value = it }
+            else -> Unit
+        }
+
+        if (hex.isEmpty()) return
+        val walletAddress = walletService.getWalletAddressFromHexString(hex)
+        selectedUser.value = ContactDto(FFIContactDto(walletAddress), name)
+        goNext.postValue(Unit)
     }
 
     fun getUserDto(): ContactDto = selectedUser.value ?: contactListSource.value.orEmpty()

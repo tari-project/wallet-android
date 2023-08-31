@@ -35,6 +35,7 @@ import com.tari.android.wallet.ui.fragment.contact_book.root.share.ShareOptionVi
 import com.tari.android.wallet.ui.fragment.home.HomeActivity
 import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
 import com.tari.android.wallet.ui.fragment.qr.QRScannerActivity
+import com.tari.android.wallet.ui.fragment.qr.QrScannerSource
 import com.tari.android.wallet.util.Constants
 import java.lang.ref.WeakReference
 
@@ -68,13 +69,12 @@ class ContactBookFragment : CommonFragment<FragmentContactBookRootBinding, Conta
     override fun onResume() {
         super.onResume()
         viewModel.walletAddressViewModel.tryToCheckClipboard()
-        grantPermission()
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == QRScannerActivity.REQUEST_QR_SCANNER && resultCode == Activity.RESULT_OK && data != null) {
             val qrData = data.getStringExtra(QRScannerActivity.EXTRA_QR_DATA) ?: return
-            deeplinkViewModel.tryToHandle(requireContext(), qrData)
+            viewModel.handleDeeplink(qrData)
         }
     }
 
@@ -93,10 +93,12 @@ class ContactBookFragment : CommonFragment<FragmentContactBookRootBinding, Conta
         observe(contactSelectionRepository.isPossibleToShare) { updateSharedState() }
 
         observe(shareList) { updateShareList(it) }
+
+        observe(query) { ui.searchView.setQuery(it, true) }
     }
 
     private fun grantPermission() {
-        permissionManagerUI.runWithPermission(android.Manifest.permission.READ_CONTACTS, false) {
+        viewModel.permissionManager.runWithPermission(listOf(android.Manifest.permission.READ_CONTACTS), true) {
             viewModel.contactsRepository.contactPermission.value = true
             viewModel.contactsRepository.phoneBookRepositoryBridge.loadFromPhoneBook()
         }
@@ -169,9 +171,7 @@ class ContactBookFragment : CommonFragment<FragmentContactBookRootBinding, Conta
     }
 
     private fun startQRCodeActivity() {
-        val intent = Intent(activity, QRScannerActivity::class.java)
-        startActivityForResult(intent, QRScannerActivity.REQUEST_QR_SCANNER)
-        activity?.overridePendingTransition(R.anim.slide_up, 0)
+        QRScannerActivity.startScanner(this, QrScannerSource.ContactBook)
     }
 
     private fun focusEditTextAndShowKeyboard() {
@@ -224,7 +224,7 @@ class ContactBookFragment : CommonFragment<FragmentContactBookRootBinding, Conta
         }
     }
 
-    private fun getRealSearch(): View = ui.searchView.findViewById(androidx.appcompat.R.id.search_src_text)
+    private fun getRealSearch(): View = ui.searchView.findViewById(R.id.search_src_text)
 
     private inner class ContactBookAdapter(fm: FragmentActivity) : FragmentStateAdapter(fm) {
 

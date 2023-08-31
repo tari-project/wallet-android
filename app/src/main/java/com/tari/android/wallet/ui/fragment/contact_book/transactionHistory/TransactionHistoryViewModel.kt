@@ -37,3 +37,4 @@ class TransactionHistoryViewModel : CommonViewModel() {
         list.postValue(filtered.orEmpty().toMutableList())
     }
 }
+

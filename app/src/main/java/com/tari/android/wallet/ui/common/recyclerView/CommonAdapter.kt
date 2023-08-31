@@ -77,4 +77,3 @@ abstract class CommonAdapter<T : CommonViewHolderItem> : ListAdapter<T, CommonVi
 
     open class ItemLongClickListener<T>(val doOnLongClick: (T) -> Boolean = { false })
 }
-
