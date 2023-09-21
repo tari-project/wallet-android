@@ -4,7 +4,13 @@ import com.orhanobut.logger.LogAdapter
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.data.WalletConfig
 import com.tari.android.wallet.util.WalletUtil
-import io.sentry.*
+import com.welie.blessed.BluetoothPeripheralManager
+import io.sentry.Attachment
+import io.sentry.Breadcrumb
+import io.sentry.Hint
+import io.sentry.Sentry
+import io.sentry.SentryEvent
+import io.sentry.SentryLevel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -17,6 +23,8 @@ class SentryLogAdapter(val walletConfig: WalletConfig) : LogAdapter {
     override fun isLoggable(priority: Int, tag: String?): Boolean = true
 
     override fun log(priority: Int, tag: String?, message: String) {
+        if (tag == BluetoothPeripheralManager::class.java.simpleName) return
+
         if (priority == Logger.ERROR) {
             localScope.launch(Dispatchers.IO) {
                 try {

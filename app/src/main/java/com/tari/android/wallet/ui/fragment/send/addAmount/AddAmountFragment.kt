@@ -228,13 +228,13 @@ class AddAmountFragment : CommonFragment<FragmentAddAmountBinding, AddAmountView
 
         val amount = keyboardController.currentAmount
         if (error == WalletError.NoError && fee != null) {
-            if (amount > balanceInfo.availableBalance) {
+            if (amount > balanceInfo.availableBalance && !Build.MOCKED) {
                 lifecycleScope.launch(Dispatchers.Main) {
                     actualBalanceExceeded()
                 }
             } else {
                 lifecycleScope.launch(Dispatchers.Main) {
-                    if (fee > amount) {
+                    if (fee > amount && !Build.MOCKED) {
                         val args = ErrorDialogArgs(
                             string(error_fee_more_than_amount_title),
                             string(error_fee_more_than_amount_description)

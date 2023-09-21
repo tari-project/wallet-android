@@ -46,8 +46,6 @@ import com.tari.android.wallet.ui.fragment.home.navigation.Navigation.AllSetting
 import com.tari.android.wallet.ui.fragment.home.navigation.Navigation.ContactBookNavigation
 import com.tari.android.wallet.ui.fragment.onboarding.activity.OnboardingFlowActivity
 import com.tari.android.wallet.ui.fragment.profile.WalletInfoFragment
-import com.tari.android.wallet.ui.fragment.qr.QRScannerActivity
-import com.tari.android.wallet.ui.fragment.qr.QrScannerSource
 import com.tari.android.wallet.ui.fragment.restore.enterRestorationPassword.EnterRestorationPasswordFragment
 import com.tari.android.wallet.ui.fragment.restore.inputSeedWords.InputSeedWordsFragment
 import com.tari.android.wallet.ui.fragment.restore.walletRestoringFromSeedWords.WalletRestoringFromSeedWordsFragment
@@ -145,10 +143,6 @@ class TariNavigator @Inject constructor(val prefs: SharedPrefsRepository, val ta
             Navigation.BackupSettingsNavigation.ToConfirmPassword -> toConfirmPassword()
             Navigation.BackupSettingsNavigation.ToWalletBackupWithRecoveryPhrase -> toWalletBackupWithRecoveryPhrase()
             Navigation.BackupSettingsNavigation.ToLearnMore -> toBackupOnboardingFlow()
-            Navigation.CustomBridgeNavigation.ScanQrCode -> {
-                QRScannerActivity.startScanner(activity, QrScannerSource.TorBridges)
-            }
-
             Navigation.CustomBridgeNavigation.UploadQrCode -> Unit
             else -> Unit
         }

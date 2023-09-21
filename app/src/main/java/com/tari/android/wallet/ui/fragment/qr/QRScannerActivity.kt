@@ -99,7 +99,7 @@ class QRScannerActivity : CommonActivity<ActivityQrScannerBinding, QRScannerView
         bindViewModel(viewModel)
         subscribeToCommon(viewModel.deeplinkViewModel)
 
-        val data = intent.getSerializableExtra(QR_DATA_SOURCE, QrScannerSource::class.java)
+        val data = intent?.getSerializableExtra(QR_DATA_SOURCE, QrScannerSource::class.java)
         viewModel.init(data ?: QrScannerSource.None)
 
         subscribeUI()

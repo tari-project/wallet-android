@@ -38,6 +38,7 @@ import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ProcessLifecycleOwner
 import com.orhanobut.logger.Logger
+import com.tari.android.wallet.BuildConfig
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.di.DiContainer
 import com.tari.android.wallet.event.Event
@@ -48,6 +49,7 @@ import com.tari.android.wallet.notification.NotificationHelper
 import com.tari.android.wallet.service.service.WalletServiceLauncher
 import com.tari.android.wallet.ui.common.gyphy.GiphyAdapter
 import com.tari.android.wallet.yat.YatAdapter
+import io.sentry.android.core.SentryAndroid
 import java.lang.ref.WeakReference
 import javax.inject.Inject
 
@@ -93,14 +95,21 @@ class TariWalletApplication : Application() {
     val currentActivity: Activity?
         get() = activityLifecycleCallbacks.currentActivity
 
+    @Suppress("KotlinConstantConditions")
     override fun onCreate() {
         super.onCreate()
         INSTANCE = WeakReference(this)
+
+        SentryAndroid.init(this) {
+            it.isDebug = BuildConfig.BUILD_TYPE == "debug"
+            it.environment = BuildConfig.BUILD_TYPE + "_" + BuildConfig.FLAVOR
+        }
 
         registerActivityLifecycleCallbacks(activityLifecycleCallbacks)
 
         DiContainer.initContainer(this)
         initApplication()
+
 
         ProcessLifecycleOwner.get().lifecycle.addObserver(AppObserver())
         logger.i("Application inited")
