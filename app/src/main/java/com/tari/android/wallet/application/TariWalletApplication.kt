@@ -102,7 +102,12 @@ class TariWalletApplication : Application() {
 
         SentryAndroid.init(this) {
             it.isDebug = BuildConfig.BUILD_TYPE == "debug"
-            it.environment = BuildConfig.BUILD_TYPE + "_" + BuildConfig.FLAVOR
+            val buildType = when (BuildConfig.BUILD_TYPE) {
+                "debug" -> "DEVELOPMENT"
+                "release" -> "PRODUCTION"
+                else -> "PRODUCTION"
+            }
+            it.environment = buildType + "_" + BuildConfig.FLAVOR
         }
 
         registerActivityLifecycleCallbacks(activityLifecycleCallbacks)
