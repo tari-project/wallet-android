@@ -414,6 +414,7 @@
     <string name="all_settings_back_up_wallet_settings_safety">Learn More</string>
     <string name="all_settings_secondary_settings_label">More</string>
     <string name="all_settings_report_a_bug">Report a Bug</string>
+    <string name="all_settings_store">The TTL Store</string>
     <string name="all_settings_data_collection">Data Collection</string>
     <string name="all_settings_delete_wallet">Delete Your Wallet</string>
     <string name="all_settings_visit_site">Visit Tari.com</string>
@@ -854,5 +855,7 @@
     <string name="chat_title">Messages</string>
     <string name="chat_add_chat">New Chat</string>
     <string name="chat_input_hint">Type message</string>
+    <string name="chat_empty_state_title">No messages yet</string>
+    <string name="chat_empty_state_description">Just tap the \'New Message\' icon up top to kick things off!</string>
 
 </resources>

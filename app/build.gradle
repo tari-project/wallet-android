@@ -84,11 +84,11 @@ android {
 
     applicationVariants.configureEach { variant ->
         variant.mergedFlavor.manifestPlaceholders.dropboxApiKey = loadDropboxProps().getProperty("dropbox_key")
-        if (variant.buildType.name == "debug") {
-            variant.mergedFlavor.manifestPlaceholders.sentryPublicDSN = ""
-        } else {
+//        if (variant.buildType.name == "debug") {
+//            variant.mergedFlavor.manifestPlaceholders.sentryPublicDSN = ""
+//        } else {
             variant.mergedFlavor.manifestPlaceholders.sentryPublicDSN = loadSecretProps().getProperty("sentry.public_dsn")
-        }
+//        }
     }
 
     externalNativeBuild {

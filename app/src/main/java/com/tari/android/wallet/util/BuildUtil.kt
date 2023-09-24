@@ -35,7 +35,7 @@ package com.tari.android.wallet.util
 import com.tari.android.wallet.BuildConfig
 import com.tari.android.wallet.model.TariWalletAddress
 
-object Build {
+object TariBuild {
 
     private val _mockedTurned = true
     val MOCKED = _mockedTurned && BuildConfig.BUILD_TYPE == "debug"

@@ -2,7 +2,7 @@ package com.tari.android.wallet.ui.fragment.chat_list.data
 
 import androidx.lifecycle.MutableLiveData
 import com.tari.android.wallet.ui.common.CommonViewModel
-import com.tari.android.wallet.util.Build
+import com.tari.android.wallet.util.TariBuild
 import java.util.UUID
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -15,7 +15,7 @@ class ChatsRepository @Inject constructor() : CommonViewModel() {
     init {
         component.inject(this)
 
-        if (Build.MOCKED) {
+        if (TariBuild.MOCKED) {
             val list = mutableListOf(
                 ChatItemDto(
                     UUID.randomUUID().toString(),
@@ -28,7 +28,7 @@ class ChatsRepository @Inject constructor() : CommonViewModel() {
                             false
                         )
                     ),
-                    Build.mocked_wallet_address
+                    TariBuild.mocked_wallet_address
                 ),
                 ChatItemDto(
                     UUID.randomUUID().toString(),
@@ -41,7 +41,7 @@ class ChatsRepository @Inject constructor() : CommonViewModel() {
                             false
                         )
                     ),
-                    Build.mocked_wallet_address
+                    TariBuild.mocked_wallet_address
                 ),
                 ChatItemDto(
                     UUID.randomUUID().toString(),
@@ -54,7 +54,7 @@ class ChatsRepository @Inject constructor() : CommonViewModel() {
                             true
                         )
                     ),
-                    Build.mocked_wallet_address
+                    TariBuild.mocked_wallet_address
                 ),
                 ChatItemDto(
                     UUID.randomUUID().toString(),
@@ -67,7 +67,7 @@ class ChatsRepository @Inject constructor() : CommonViewModel() {
                             true
                         )
                     ),
-                    Build.mocked_wallet_address
+                    TariBuild.mocked_wallet_address
                 ),
                 ChatItemDto(
                     UUID.randomUUID().toString(),
@@ -80,7 +80,7 @@ class ChatsRepository @Inject constructor() : CommonViewModel() {
                             false
                         )
                     ),
-                    Build.mocked_wallet_address
+                    TariBuild.mocked_wallet_address
                 ),
                 ChatItemDto(
                     UUID.randomUUID().toString(),
@@ -93,7 +93,7 @@ class ChatsRepository @Inject constructor() : CommonViewModel() {
                             false
                         )
                     ),
-                    Build.mocked_wallet_address
+                    TariBuild.mocked_wallet_address
                 )
             )
 

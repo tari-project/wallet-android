@@ -14,6 +14,7 @@ import com.tari.android.wallet.ui.common.recyclerView.AdapterFactory
 import com.tari.android.wallet.ui.common.recyclerView.CommonAdapter
 import com.tari.android.wallet.ui.common.recyclerView.CommonViewHolderItem
 import com.tari.android.wallet.ui.component.tari.toolbar.TariToolbarActionArg
+import com.tari.android.wallet.ui.extension.setVisible
 import com.tari.android.wallet.ui.fragment.chat_list.adapter.ChatItemViewHolder
 import com.tari.android.wallet.ui.fragment.chat_list.adapter.ChatItemViewHolderItem
 import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
@@ -53,6 +54,10 @@ class ChatListFragment : CommonFragment<FragmentChatListBinding, ChatListViewMod
     }
 
     private fun subscribeUI() = with(viewModel) {
-        observe(list) { adapter.submitList(it) }
+        observe(list) {
+            adapter.submitList(it)
+            ui.list.setVisible(it.isNotEmpty())
+            ui.emptyState.setVisible(it.isEmpty())
+        }
     }
 }

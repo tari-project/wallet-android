@@ -8,6 +8,7 @@ import com.tari.android.wallet.R.drawable.vector_all_settings_background_service
 import com.tari.android.wallet.R.drawable.vector_all_settings_backup_options_icon
 import com.tari.android.wallet.R.drawable.vector_all_settings_bluetooth
 import com.tari.android.wallet.R.drawable.vector_all_settings_bridge_configuration_icon
+import com.tari.android.wallet.R.drawable.vector_all_settings_cart
 import com.tari.android.wallet.R.drawable.vector_all_settings_contribute_to_tari_icon
 import com.tari.android.wallet.R.drawable.vector_all_settings_data_collection
 import com.tari.android.wallet.R.drawable.vector_all_settings_delete_button_icon
@@ -36,6 +37,7 @@ import com.tari.android.wallet.R.string.all_settings_security_label
 import com.tari.android.wallet.R.string.all_settings_select_base_node
 import com.tari.android.wallet.R.string.all_settings_select_network
 import com.tari.android.wallet.R.string.all_settings_select_theme
+import com.tari.android.wallet.R.string.all_settings_store
 import com.tari.android.wallet.R.string.all_settings_user_agreement
 import com.tari.android.wallet.R.string.all_settings_version_text_copy_title
 import com.tari.android.wallet.R.string.all_settings_version_text_copy_toast_message
@@ -49,6 +51,7 @@ import com.tari.android.wallet.R.string.github_repo_url
 import com.tari.android.wallet.R.string.privacy_policy_url
 import com.tari.android.wallet.R.string.tari_about_title
 import com.tari.android.wallet.R.string.tari_url
+import com.tari.android.wallet.R.string.ttl_store_url
 import com.tari.android.wallet.R.string.user_agreement_url
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.event.EventBus
@@ -136,6 +139,10 @@ class AllSettingsViewModel : CommonViewModel() {
                 navigation.postValue(AllSettingsNavigation.ToDataCollection)
             },
             SettingsTitleViewHolderItem(resourceManager.getString(all_settings_secondary_settings_label)),
+            ButtonViewDto(resourceManager.getString(all_settings_store), vector_all_settings_cart) {
+                _openLink.postValue(resourceManager.getString(ttl_store_url))
+            },
+            DividerViewHolderItem(),
             ButtonViewDto(resourceManager.getString(tari_about_title), vector_all_settings_about_icon) {
                 navigation.postValue(AllSettingsNavigation.ToAbout)
             },
