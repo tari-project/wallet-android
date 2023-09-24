@@ -33,7 +33,7 @@ class YatAdapter(
 
     fun initYat(application: Application) {
         val config = YatConfiguration(BuildConfig.YAT_ORGANIZATION_RETURN_URL, BuildConfig.YAT_ORGANIZATION_NAME, BuildConfig.YAT_ORGANIZATION_KEY)
-        YatIntegration.setup(application, config, YatIntegration.ColorMode.LIGHT, this, environment = YatIntegration.Environment.SandBox)
+        YatIntegration.setup(application, config, YatIntegration.ColorMode.LIGHT, this, environment = YatIntegration.Environment.Production)
     }
 
     fun searchTariYats(query: String): PaymentAddressResponse? =

@@ -55,4 +55,6 @@ data class GIFItem(val id: String, val embedUri: Uri, val uri: Uri) : Parcelable
 
         override fun newArray(size: Int): Array<GIFItem?> = arrayOfNulls(size)
     }
+
+    override fun toString(): String = "GIFItem(id='$id', embedUri=$embedUri, uri=$uri)"
 }

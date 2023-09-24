@@ -11,12 +11,15 @@ class MyProfileViewHolder(view: ItemMyProfileBinding) :
     CommonViewHolder<MyProfileViewHolderItem, ItemMyProfileBinding>(view) {
 
     private val emojiIdSummaryController = EmojiIdSummaryViewController(ui.participantEmojiIdView)
+    private val yatController = EmojiIdSummaryViewController(ui.participantYatIdView)
 
     override fun bind(item: MyProfileViewHolderItem) {
         super.bind(item)
         ui.firstEmojiTextView.text = item.emojiId.extractEmojis()[0]
         ui.alias.text = item.alias
         ui.alias.setVisible(item.alias.isNotBlank())
+        ui.participantYatIdView.root.setVisible(item.yat.isNotBlank())
+        yatController.display(item.yat)
         emojiIdSummaryController.display(item.emojiId)
         ui.root.setOnClickListener { item.action.invoke() }
     }

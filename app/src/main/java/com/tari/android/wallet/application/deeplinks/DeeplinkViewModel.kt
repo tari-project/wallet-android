@@ -4,6 +4,7 @@ import com.tari.android.wallet.R
 import com.tari.android.wallet.application.baseNodes.BaseNodes
 import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodeDto
 import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodeSharedRepository
+import com.tari.android.wallet.data.sharedPrefs.tor.TorSharedRepository
 import com.tari.android.wallet.ffi.FFITariWalletAddress
 import com.tari.android.wallet.ffi.HexString
 import com.tari.android.wallet.model.TariWalletAddress
@@ -35,6 +36,9 @@ class DeeplinkViewModel : CommonViewModel() {
     @Inject
     lateinit var deeplinkHandler: DeeplinkHandler
 
+    @Inject
+    lateinit var torSharedRepository: TorSharedRepository
+
     init {
         component.inject(this)
     }
@@ -49,6 +53,7 @@ class DeeplinkViewModel : CommonViewModel() {
             is DeepLink.Contacts -> addContacts(deeplink)
             is DeepLink.Send -> sendAction(deeplink)
             is DeepLink.UserProfile -> addUserProfile(deeplink)
+            is DeepLink.TorBridges -> addTorBridges(deeplink)
         }
     }
 
@@ -97,12 +102,19 @@ class DeeplinkViewModel : CommonViewModel() {
         modularDialog.postValue(args)
     }
 
+    fun addTorBridges(deeplink: DeepLink.TorBridges) {
+        deeplink.torConfigurations.forEach {
+            torSharedRepository.addTorBridgeConfiguration(it)
+        }
+    }
+
     fun executeRawDeeplink(deeplink: DeepLink) {
         when (deeplink) {
             is DeepLink.AddBaseNode -> addBaseNode(deeplink)
             is DeepLink.Contacts -> addContactsAction(getData(deeplink))
             is DeepLink.Send -> sendAction(deeplink)
             is DeepLink.UserProfile -> addContactsAction(getData(deeplink)?.let { listOf(it) } ?: listOf())
+            is DeepLink.TorBridges -> addTorBridges(deeplink)
         }
     }
 

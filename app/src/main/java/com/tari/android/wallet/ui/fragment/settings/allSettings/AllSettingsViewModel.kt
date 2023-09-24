@@ -72,6 +72,7 @@ import com.tari.android.wallet.ui.fragment.settings.allSettings.version.Settings
 import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupSettingsRepository
 import com.tari.android.wallet.ui.fragment.settings.userAutorization.BiometricAuthenticationViewModel
 import com.tari.android.wallet.yat.YatAdapter
+import com.tari.android.wallet.yat.YatSharedRepository
 import javax.inject.Inject
 
 class AllSettingsViewModel : CommonViewModel() {
@@ -93,6 +94,9 @@ class AllSettingsViewModel : CommonViewModel() {
 
     @Inject
     lateinit var settingsRepository: SharedPrefsRepository
+
+    @Inject
+    lateinit var yatSharedPrefsRepository: YatSharedRepository
 
     private val _openYatOnboarding = SingleLiveEvent<Unit>()
     val openYatOnboarding: LiveData<Unit> = _openYatOnboarding
@@ -116,7 +120,7 @@ class AllSettingsViewModel : CommonViewModel() {
         val alias = settingsRepository.name.orEmpty() + " " + settingsRepository.surname.orEmpty()
 
         val allOptions = mutableListOf(
-            MyProfileViewHolderItem(settingsRepository.emojiId.orEmpty(), alias) {
+            MyProfileViewHolderItem(settingsRepository.emojiId.orEmpty(), yatSharedPrefsRepository.connectedYat.orEmpty(), alias) {
                 navigation.postValue(AllSettingsNavigation.ToMyProfile)
             },
             DividerViewHolderItem(),

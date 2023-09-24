@@ -137,6 +137,10 @@
                     android:host="y.at"
                     android:scheme="tari" />
 
+                <data
+                    android:host="yat.fyi"
+                    android:scheme="tari" />
+
             </intent-filter>
 
             <intent-filter>

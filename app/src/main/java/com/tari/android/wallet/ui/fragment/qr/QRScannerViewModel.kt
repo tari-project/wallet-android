@@ -86,6 +86,7 @@ class QRScannerViewModel : CommonViewModel() {
                     is DeepLink.UserProfile -> navigateBack(deepLink)
 
                     is DeepLink.Contacts,
+                    is DeepLink.TorBridges,
                     is DeepLink.AddBaseNode -> setAlternativeText(deepLink)
                 }
             }
@@ -96,6 +97,7 @@ class QRScannerViewModel : CommonViewModel() {
 
                     is DeepLink.Send,
                     is DeepLink.Contacts,
+                    is DeepLink.TorBridges,
                     is DeepLink.AddBaseNode -> setAlternativeText(deepLink)
                 }
             }
@@ -106,6 +108,7 @@ class QRScannerViewModel : CommonViewModel() {
                     is DeepLink.UserProfile,
                     is DeepLink.Contacts -> navigateBack(deepLink)
 
+                    is DeepLink.TorBridges,
                     is DeepLink.AddBaseNode -> setAlternativeText(deepLink)
                 }
             }
@@ -114,9 +117,10 @@ class QRScannerViewModel : CommonViewModel() {
                 when (deepLink) {
                     is DeepLink.Send,
                     is DeepLink.UserProfile,
+                    is DeepLink.AddBaseNode,
                     is DeepLink.Contacts -> setAlternativeText(deepLink)
 
-                    is DeepLink.AddBaseNode -> navigateBack(deepLink)
+                    is DeepLink.TorBridges -> navigateBack(deepLink)
                 }
             }
 
@@ -134,7 +138,7 @@ class QRScannerViewModel : CommonViewModel() {
             is DeepLink.UserProfile -> resourceManager.getString(R.string.qr_code_scanner_labels_actions_profile)
             is DeepLink.Contacts -> resourceManager.getString(R.string.qr_code_scanner_labels_actions_contacts)
             is DeepLink.AddBaseNode -> resourceManager.getString(R.string.qr_code_scanner_labels_actions_base_node_add)
-//            is DeepLink.TorBridge -> resourceManager.getString(R.string.qr_code_scanner_labels_actions_transaction_send)
+            is DeepLink.TorBridges -> resourceManager.getString(R.string.qr_code_scanner_labels_actions_tor_bridges)
         }
         alternativeText.postValue(text)
     }

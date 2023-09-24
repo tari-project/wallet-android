@@ -13,8 +13,8 @@ android {
     defaultConfig {
         applicationId "com.tari.android.wallet"
         minSdkVersion 26
-        targetSdkVersion 33
-        compileSdk 33
+        targetSdkVersion 34
+        compileSdk 34
         versionCode buildNumber
         versionName versionNumber + "-libwallet-" + libwalletVersion
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -214,11 +214,11 @@ dependencies {
     implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle_version"
     implementation "androidx.lifecycle:lifecycle-reactivestreams-ktx:$lifecycle_version"
     implementation "androidx.lifecycle:lifecycle-livedata-ktx:$lifecycle_version"
-    implementation "androidx.fragment:fragment-ktx:1.5.7"
+    implementation "androidx.fragment:fragment-ktx:1.6.1"
     kapt "androidx.lifecycle:lifecycle-compiler:$lifecycle_version"
 
     // kotlin extensions
-    implementation "androidx.core:core-ktx:1.10.1"
+    implementation "androidx.core:core-ktx:1.12.0"
     // android
     implementation "androidx.appcompat:appcompat:1.6.1"
     // support lib
@@ -227,7 +227,7 @@ dependencies {
     // android jetpack
     implementation "androidx.lifecycle:lifecycle-extensions:2.2.0"
     // recycler view
-    implementation "androidx.recyclerview:recyclerview:1.3.1-rc01"
+    implementation "androidx.recyclerview:recyclerview:1.3.1"
     // the new view pager
     implementation "androidx.viewpager2:viewpager2:1.0.0"
     // for tab layout

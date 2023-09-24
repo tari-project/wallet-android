@@ -33,3 +33,13 @@
 -keep enum com.tari.android.wallet.ui.fragment.settings.themeSelector.TariTheme { *; }
 
 -keep enum com.tari.android.wallet.data.sharedPrefs.securityStages.WalletSecurityStage { *; }
+
+-keep enum com.tari.android.wallet.application.Network { *; }
+
+-keep class com.tari.android.wallet.ui.common.gyphy.api.dto.SearchGIFResponse { *; }
+-keep class com.tari.android.wallet.ui.common.gyphy.api.dto.SearchGIFsResponse { *; }
+-keep class com.tari.android.wallet.ui.common.gyphy.api.dto.Data { *; }
+-keep class com.tari.android.wallet.ui.common.gyphy.api.dto.Meta { *; }
+-keep class com.tari.android.wallet.ui.common.gyphy.api.dto.Images { *; }
+-keep class com.tari.android.wallet.ui.common.gyphy.api.dto.ImageVariant { *; }
+-keep class com.tari.android.wallet.ui.common.gyphy.api.dto.Original { *; }

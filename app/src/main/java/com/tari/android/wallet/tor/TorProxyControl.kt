@@ -72,6 +72,7 @@ class TorProxyControl(private val torConfig: TorConfig) {
     private fun checkTorStatus() {
         try {
             val bootstrapStatus = isTorRunning(controlConnection)
+            logger.i(bootstrapStatus.toString())
             if (bootstrapStatus != null) {
                 if (bootstrapStatus.progress == 100 && bootstrapStatus.summary == "Done") {
                     updateState(TorProxyState.Running(bootstrapStatus))
@@ -87,6 +88,7 @@ class TorProxyControl(private val torConfig: TorConfig) {
                 updateState(TorProxyState.Failed(Throwable("Tor not running")))
             }
         } catch (throwable: Throwable) {
+            logger.i("tor state during fall: ${EventBus.torProxyState.publishSubject.value}")
             logger.e(throwable, "Tor proxy has failed")
             updateState(TorProxyState.Failed(throwable))
         }
@@ -99,6 +101,8 @@ class TorProxyControl(private val torConfig: TorConfig) {
     }
 
     private fun updateState(newState: TorProxyState) {
+        logger.i("tor update old state: ${EventBus.torProxyState.publishSubject.value}")
+        logger.i("tor update new state: $newState")
         if (newState != EventBus.torProxyState.publishSubject.value) {
             EventBus.torProxyState.post(newState)
         }

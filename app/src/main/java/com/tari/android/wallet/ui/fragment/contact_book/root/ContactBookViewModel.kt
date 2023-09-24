@@ -5,7 +5,6 @@ import com.tari.android.wallet.R
 import com.tari.android.wallet.application.deeplinks.DeepLink
 import com.tari.android.wallet.application.deeplinks.DeeplinkFormatter
 import com.tari.android.wallet.application.deeplinks.DeeplinkHandler
-import com.tari.android.wallet.infrastructure.nfc.TariNFCAdapter
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.component.clipboardController.WalletAddressViewModel
 import com.tari.android.wallet.ui.fragment.contact_book.data.ContactsRepository
@@ -25,9 +24,6 @@ class ContactBookViewModel : CommonViewModel() {
 
     @Inject
     lateinit var contactSelectionRepository: ContactSelectionRepository
-
-    @Inject
-    lateinit var nfcAdapter: TariNFCAdapter
 
     @Inject
     lateinit var deeplinkFormatter: DeeplinkFormatter
@@ -57,15 +53,6 @@ class ContactBookViewModel : CommonViewModel() {
                 R.drawable.vector_share_link
             ) { shareViaLink() }
         )
-        if (nfcAdapter.isNFCSupported()) {
-            list.add(
-                ShareOptionArgs(
-                    ShareType.NFC,
-                    resourceManager.getString(R.string.share_contact_via_qr_nfc),
-                    R.drawable.vector_share_nfc
-                ) { shareViaNFC() }
-            )
-        }
         list.add(
             ShareOptionArgs(
                 ShareType.BLE,
@@ -106,8 +93,6 @@ class ContactBookViewModel : CommonViewModel() {
     fun shareViaQrCode() = setSelectedToShareType(ShareType.QR_CODE)
 
     fun shareViaLink() = setSelectedToShareType(ShareType.LINK)
-
-    fun shareViaNFC() = setSelectedToShareType(ShareType.NFC)
 
     fun shareViaBLE() = setSelectedToShareType(ShareType.BLE)
 
