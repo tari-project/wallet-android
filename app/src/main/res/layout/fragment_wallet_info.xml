@@ -66,6 +66,70 @@
                             android:layout_gravity="center" />
 
                         <com.tari.android.wallet.ui.component.tari.TariTextView
+                            android:id="@+id/reconnect_button"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginHorizontal="@dimen/common_horizontal_margin"
+                            android:layout_marginTop="2dp"
+                            android:gravity="center"
+                            android:text="@string/wallet_info_yat_disconnected_reconnect"
+                            android:textColor="?attr/palette_brand_purple"
+                            android:textSize="14sp"
+                            app:customFont="black" />
+
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
+                            android:layout_marginHorizontal="28dp"
+                            android:layout_marginTop="20dp"
+                            android:background="?attr/palette_neutral_tertiary" />
+
+                        <com.tari.android.wallet.ui.component.tari.TariTextView
+                            android:id="@+id/my_aurora_title"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:layout_marginTop="20dp"
+                            android:background="@android:color/transparent"
+                            android:gravity="center_horizontal"
+                            android:text="@string/wallet_info_my_aurora_title"
+                            android:textColor="?attr/palette_text_heading"
+                            android:textSize="17sp"
+                            app:customFont="heavy" />
+
+                        <LinearLayout
+                            android:id="@+id/aurora_container"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:layout_marginTop="20dp"
+                            android:gravity="center"
+                            android:orientation="horizontal"
+                            android:paddingHorizontal="90dp">
+
+                        </LinearLayout>
+
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
+                            android:layout_marginHorizontal="28dp"
+                            android:layout_marginTop="20dp"
+                            android:background="?attr/palette_neutral_tertiary" />
+
+                        <com.tari.android.wallet.ui.component.tari.TariTextView
+                            android:id="@+id/share_profile_title"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:layout_marginTop="20dp"
+                            android:background="@android:color/transparent"
+                            android:gravity="center_horizontal"
+                            android:text="@string/wallet_info_share_profile_title"
+                            android:textColor="?attr/palette_text_heading"
+                            android:textSize="17sp"
+                            app:customFont="heavy" />
+
+                        <com.tari.android.wallet.ui.component.tari.TariTextView
                             android:id="@+id/desc_text_view"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
@@ -79,23 +143,11 @@
                             android:textSize="14sp"
                             app:customFont="medium" />
 
-                        <com.tari.android.wallet.ui.component.tari.TariTextView
-                            android:id="@+id/reconnect_button"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginHorizontal="@dimen/common_horizontal_margin"
-                            android:layout_marginTop="2dp"
-                            android:gravity="center"
-                            android:text="@string/wallet_info_yat_disconnected_reconnect"
-                            android:textColor="?attr/palette_brand_purple"
-                            android:textSize="14sp"
-                            app:customFont="black" />
-
                         <androidx.appcompat.widget.LinearLayoutCompat
                             android:id="@+id/share_types_container"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="40dp"
+                            android:layout_marginTop="20dp"
                             android:orientation="vertical">
 
                             <LinearLayout
@@ -105,20 +157,12 @@
                                 android:orientation="horizontal"
                                 android:paddingHorizontal="50dp" />
 
-                            <LinearLayout
-                                android:id="@+id/share_type_second_row"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="20dp"
-                                android:orientation="horizontal"
-                                android:paddingHorizontal="50dp" />
-
                             <com.tari.android.wallet.ui.component.tari.TariGradientButton
                                 android:id="@+id/request_tari"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:layout_marginHorizontal="20dp"
-                                android:layout_marginTop="40dp"
+                                android:layout_marginTop="20dp"
                                 app:customFont="@string/font_regular"
                                 app:title="@string/request_tari_title" />
 

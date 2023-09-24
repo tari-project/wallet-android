@@ -304,6 +304,10 @@
     <string name="wallet_info_qr_code_desc">Easily receive tXTR from others by sharing your profile via one of the methods below:</string>
     <string name="wallet_info_yat_disconnected_description">You\'ve previously connected this Yat.\n Do you want to re-connect it to your wallet?</string>
     <string name="wallet_info_yat_disconnected_reconnect">Reconnect Yat</string>
+    <string name="wallet_info_share_profile_title">Share Profile</string>
+    <string name="wallet_info_my_aurora_title">My Aurora</string>
+    <string name="wallet_info_wallet_button">Wallet</string>
+    <string name="wallet_info_connect_yat_button">Connect Yats</string>
 
     <!-- tx failed dialog -->
     <string name="tx_failed_title">Sorry, you can\'t send tXTR to offline users</string>

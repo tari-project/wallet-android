@@ -9,10 +9,15 @@ import com.tari.android.wallet.databinding.FragmentChatBinding
 import com.tari.android.wallet.extension.observe
 import com.tari.android.wallet.model.TariWalletAddress
 import com.tari.android.wallet.ui.common.CommonFragment
+import com.tari.android.wallet.ui.common.recyclerView.AdapterFactory
+import com.tari.android.wallet.ui.common.recyclerView.CommonViewHolderItem
 import com.tari.android.wallet.ui.extension.parcelable
+import com.tari.android.wallet.ui.extension.setVisible
 import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.ContactDto
 
 class ChatFragment : CommonFragment<FragmentChatBinding, ChatViewModel>() {
+
+    private val adapter = AdapterFactory.generate<CommonViewHolderItem>()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
         FragmentChatBinding.inflate(inflater, container, false).also { ui = it }.root
@@ -26,11 +31,22 @@ class ChatFragment : CommonFragment<FragmentChatBinding, ChatViewModel>() {
         val walletAddress = arguments?.parcelable<TariWalletAddress>(WALLET_ADDRESS)!!
         viewModel.startWith(walletAddress)
 
+        initUI()
         observeUI()
+    }
+
+    private fun initUI() {
+        ui.list.adapter = adapter
     }
 
     private fun observeUI() = with(viewModel) {
         observe(contact) { showContact(it) }
+
+        observe(messages) {
+//            ui.messagesList.adapter = MessagesAdapter(it)
+            ui.emptyState.setVisible(it.isEmpty())
+            ui.list.setVisible(it.isNotEmpty())
+        }
     }
 
     private fun showContact(contact: ContactDto) {

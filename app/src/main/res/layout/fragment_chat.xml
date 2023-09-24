@@ -36,17 +36,17 @@
         <LinearLayout
             android:id="@+id/empty_state"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="0dp"
             android:orientation="vertical"
-            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/input_container"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHeight_default="wrap"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
 
             <FrameLayout
                 android:layout_width="match_parent"
-                android:layout_height="166dp"
-                android:layout_marginTop="45dp">
+                android:layout_height="166dp">
 
                 <androidx.appcompat.widget.AppCompatImageView
                     android:id="@+id/image_back"
@@ -72,8 +72,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:minHeight="66dp"
-            app:alphaBackground="1"
             android:paddingHorizontal="24dp"
+            app:alphaBackground="1"
             app:backgroundColor="?attr/palette_neutral_tertiary"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"

@@ -1,6 +1,7 @@
 package com.tari.android.wallet.ui.fragment.chat_list.data
 
 import androidx.lifecycle.MutableLiveData
+import com.tari.android.wallet.model.TariWalletAddress
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.util.TariBuild
 import java.util.UUID
@@ -19,15 +20,7 @@ class ChatsRepository @Inject constructor() : CommonViewModel() {
             val list = mutableListOf(
                 ChatItemDto(
                     UUID.randomUUID().toString(),
-                    listOf(
-                        ChatMessageItemDto(
-                            UUID.randomUUID().toString(),
-                            "first",
-                            "2 days ago",
-                            false,
-                            false
-                        )
-                    ),
+                    listOf(),
                     TariBuild.mocked_wallet_address
                 ),
                 ChatItemDto(
@@ -84,15 +77,7 @@ class ChatsRepository @Inject constructor() : CommonViewModel() {
                 ),
                 ChatItemDto(
                     UUID.randomUUID().toString(),
-                    listOf(
-                        ChatMessageItemDto(
-                            UUID.randomUUID().toString(),
-                            "sixth",
-                            "2 days ago",
-                            false,
-                            false
-                        )
-                    ),
+                    listOf(),
                     TariBuild.mocked_wallet_address
                 )
             )
@@ -100,4 +85,8 @@ class ChatsRepository @Inject constructor() : CommonViewModel() {
             this.list.postValue(list)
         }
     }
+
+    fun getByUuid(uuid: String): ChatItemDto? = list.value?.find { it.uuid == uuid }
+
+    fun getByWalletAddress(walletAddress: TariWalletAddress): ChatItemDto? = list.value?.find { it.walletAddress == walletAddress }
 }
