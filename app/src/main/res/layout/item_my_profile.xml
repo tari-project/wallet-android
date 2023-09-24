@@ -59,6 +59,15 @@
                 app:customFont="heavy" />
 
             <include
+                android:id="@+id/participant_yat_id_view"
+                layout="@layout/view_emoji_id_summary"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical|start"
+                android:layout_marginTop="5dp"
+                android:visibility="gone" />
+
+            <include
                 android:id="@+id/participant_emoji_id_view"
                 layout="@layout/view_emoji_id_summary"
                 android:layout_width="wrap_content"

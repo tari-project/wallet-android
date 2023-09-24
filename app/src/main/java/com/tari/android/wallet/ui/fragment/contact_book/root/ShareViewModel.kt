@@ -10,7 +10,6 @@ import com.tari.android.wallet.ffi.FFITariWalletAddress
 import com.tari.android.wallet.ffi.HexString
 import com.tari.android.wallet.infrastructure.bluetooth.TariBluetoothClient
 import com.tari.android.wallet.infrastructure.bluetooth.TariBluetoothServer
-import com.tari.android.wallet.infrastructure.nfc.TariNFCAdapter
 import com.tari.android.wallet.model.TariWalletAddress
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.common.SingleLiveEvent
@@ -39,9 +38,6 @@ class ShareViewModel : CommonViewModel() {
     lateinit var tariBluetoothServer: TariBluetoothServer
 
     @Inject
-    lateinit var tariNFCAdapter: TariNFCAdapter
-
-    @Inject
     lateinit var deeplinkHandler: DeeplinkHandler
 
     @Inject
@@ -62,10 +58,6 @@ class ShareViewModel : CommonViewModel() {
         tariBluetoothServer.onReceived = this::onReceived
         tariBluetoothClient.onSuccessSharing = this::showShareSuccessDialog
         tariBluetoothClient.onFailedSharing = this::showShareErrorDialog
-
-        tariNFCAdapter.onReceived = this::onReceived
-        tariNFCAdapter.onSuccessSharing = this::showShareSuccessDialog
-        tariNFCAdapter.onFailedSharing = this::showShareErrorDialog
     }
 
     fun share(type: ShareType, deeplink: String) {
@@ -73,7 +65,6 @@ class ShareViewModel : CommonViewModel() {
         when (type) {
             ShareType.QR_CODE -> doShareViaQrCode(deeplink)
             ShareType.LINK -> doShareViaLink(deeplink)
-            ShareType.NFC -> doShareViaNFC()
             ShareType.BLE -> doShareViaBLE()
         }
     }
@@ -148,23 +139,6 @@ class ShareViewModel : CommonViewModel() {
     private fun doShareViaLink(deeplink: String) {
         shareText.postValue(deeplink)
         showShareSuccessDialog()
-    }
-
-    private fun doShareViaNFC() {
-        if (!tariNFCAdapter.isNFCAvailable()) {
-            tariNFCAdapter.showNFCSettings()
-            return
-        }
-        val args = ModularDialogArgs(
-            DialogArgs(canceledOnTouchOutside = false, cancelable = false) { tariNFCAdapter.stopSharing() }, listOf(
-                IconModule(R.drawable.vector_sharing_via_nfc),
-                HeadModule(resourceManager.getString(R.string.share_via_nfc_title)),
-                BodyModule(resourceManager.getString(R.string.share_via_nfc_message)),
-                ButtonModule(resourceManager.getString(R.string.common_close), ButtonStyle.Close)
-            )
-        )
-        modularDialog.postValue(args)
-        tariNFCAdapter.startSharing(shareInfo.value.orEmpty())
     }
 
     private fun doShareViaBLE() {

@@ -128,7 +128,7 @@ open class ContactSelectionViewModel : CommonViewModel() {
         val source = contactListSource.value ?: return
         val searchText = searchText.value ?: return
 
-        searchAndDisplayRecipients(searchText)
+        searchAndDisplayYatRecipients(searchText)
 
         var list = source.filter { additionalFilter.invoke(it) }
 
@@ -161,14 +161,15 @@ open class ContactSelectionViewModel : CommonViewModel() {
         this.list.postValue(result)
     }
 
-    private fun searchAndDisplayRecipients(query: String) {
+    fun searchAndDisplayYatRecipients(query: String) {
         searchingJob?.cancel()
         foundYatUser.value = Optional.ofNullable(null)
 
         if (query.isEmpty()) return
 
         searchingJob = viewModelScope.launch(Dispatchers.IO) {
-            yatAdapter.searchTariYats(query)?.result?.entries?.firstOrNull()?.let { response ->
+            val response = yatAdapter.searchTariYats(query)
+            response?.result?.entries?.firstOrNull()?.let { response ->
                 walletService.getWalletAddressFromHexString(response.value.address)?.let { pubKey ->
                     val yatUser = YatDto(query)
                     foundYatUser.postValue(Optional.ofNullable(yatUser))

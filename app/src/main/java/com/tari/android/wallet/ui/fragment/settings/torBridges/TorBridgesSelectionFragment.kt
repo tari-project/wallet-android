@@ -44,6 +44,10 @@ class TorBridgesSelectionFragment : CommonFragment<FragmentTorBridgeSelectionBin
         val actionArgs = TariToolbarActionArg(title = requireContext().getString(R.string.tor_bridges_connect)) {
             viewModel.connect()
         }
+        adapter.setLongClickListener(CommonAdapter.ItemLongClickListener {
+            viewModel.showBridgeQrCode(it)
+            true
+        })
         toolbar.setRightArgs(actionArgs)
     }
 

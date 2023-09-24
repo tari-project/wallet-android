@@ -9,7 +9,6 @@ import com.tari.android.wallet.R
 import com.tari.android.wallet.application.deeplinks.DeepLink
 import com.tari.android.wallet.application.deeplinks.DeeplinkHandler
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
-import com.tari.android.wallet.infrastructure.nfc.TariNFCAdapter
 import com.tari.android.wallet.model.TariWalletAddress
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.dialog.modular.DialogArgs
@@ -39,9 +38,6 @@ class WalletInfoViewModel : CommonViewModel() {
 
     @Inject
     lateinit var deeplinkHandler: DeeplinkHandler
-
-    @Inject
-    lateinit var nfcAdapter: TariNFCAdapter
 
     private val _emojiId: MutableLiveData<String> = MutableLiveData()
     val emojiId: LiveData<String> = _emojiId

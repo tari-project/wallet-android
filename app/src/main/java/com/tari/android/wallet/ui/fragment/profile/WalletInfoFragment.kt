@@ -110,18 +110,12 @@ class WalletInfoFragment : CommonFragment<FragmentWalletInfoBinding, WalletInfoV
         val linkArgs = ShareOptionArgs(ShareType.LINK, string(R.string.share_contact_via_qr_link), R.drawable.vector_share_link) {
             viewModel.shareData(ShareType.LINK)
         }
-        val nfcArgs = ShareOptionArgs(ShareType.NFC, string(R.string.share_contact_via_qr_nfc), R.drawable.vector_share_nfc) {
-            viewModel.shareData(ShareType.NFC)
-        }
         val bleArgs = ShareOptionArgs(ShareType.BLE, string(R.string.share_contact_via_qr_ble), R.drawable.vector_share_ble) {
             viewModel.shareData(ShareType.BLE)
         }
 
         ui.shareTypeFirstRow.addView(ShareOptionView(requireContext()).apply { setArgs(qrCodeArgs, ShareOptionView.Size.Big) })
         ui.shareTypeFirstRow.addView(ShareOptionView(requireContext()).apply { setArgs(linkArgs, ShareOptionView.Size.Big) })
-        if (viewModel.nfcAdapter.isNFCSupported()) {
-            ui.shareTypeSecondRow.addView(ShareOptionView(requireContext()).apply { setArgs(nfcArgs, ShareOptionView.Size.Big) })
-        }
         ui.shareTypeSecondRow.addView(ShareOptionView(requireContext()).apply { setArgs(bleArgs, ShareOptionView.Size.Big) })
 
         ui.toolbar.setRightArgs(TariToolbarActionArg(title = string(R.string.tx_detail_edit)) { viewModel.showEditAliasDialog() })

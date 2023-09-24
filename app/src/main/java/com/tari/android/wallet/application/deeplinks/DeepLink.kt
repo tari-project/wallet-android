@@ -32,6 +32,7 @@
  */
 package com.tari.android.wallet.application.deeplinks
 
+import com.tari.android.wallet.data.sharedPrefs.tor.TorBridgeConfiguration
 import com.tari.android.wallet.model.MicroTari
 import java.math.BigInteger
 
@@ -158,6 +159,10 @@ sealed class DeepLink {
             const val nameKey = "name"
             const val peerKey = "peer"
         }
+    }
+
+    class TorBridges(val torConfigurations: List<TorBridgeConfiguration>): DeepLink() {
+
     }
 
     companion object {

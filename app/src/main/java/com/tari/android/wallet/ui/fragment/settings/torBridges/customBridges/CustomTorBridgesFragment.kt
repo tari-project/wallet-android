@@ -7,13 +7,14 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
-import com.google.gson.Gson
 import com.tari.android.wallet.R
 import com.tari.android.wallet.databinding.FragmentCustomTorBridgesBinding
+import com.tari.android.wallet.extension.observe
 import com.tari.android.wallet.ui.common.CommonFragment
 import com.tari.android.wallet.ui.component.tari.toolbar.TariToolbarActionArg
 import com.tari.android.wallet.ui.extension.setOnThrottledClickListener
 import com.tari.android.wallet.ui.fragment.qr.QRScannerActivity
+import com.tari.android.wallet.ui.fragment.qr.QrScannerSource
 
 class CustomTorBridgesFragment : CommonFragment<FragmentCustomTorBridgesBinding, CustomTorBridgesViewModel>() {
 
@@ -31,21 +32,22 @@ class CustomTorBridgesFragment : CommonFragment<FragmentCustomTorBridgesBinding,
 
     private fun setupViews() = with(ui) {
         requestBridgesCta.setOnThrottledClickListener { viewModel.openRequestPage() }
-        scanQrCta.setOnThrottledClickListener { viewModel.navigateToScanQr() }
+        scanQrCta.setOnThrottledClickListener {
+            QRScannerActivity.startScanner(this@CustomTorBridgesFragment, QrScannerSource.TorBridges)
+        }
         uploadQrCta.setOnThrottledClickListener { viewModel.navigateToUploadQr() }
         val actionArgs = TariToolbarActionArg(title = requireContext().getString(R.string.tor_bridges_connect)) {
             viewModel.connect(torBridgeConfiguration.ui.editText.text.toString())
         }
         toolbar.setRightArgs(actionArgs)
+
+        observe(viewModel.text) { torBridgeConfiguration.ui.editText.setText(it) }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == QRScannerActivity.REQUEST_QR_SCANNER && resultCode == Activity.RESULT_OK && data != null) {
             val qrData = data.getStringExtra(QRScannerActivity.EXTRA_QR_DATA) ?: return
-            val bridgeList = Gson().fromJson(qrData, StringList::class.java)
-            ui.torBridgeConfiguration.setText(bridgeList.joinToString("\n"))
+            viewModel.handleQrCode(qrData)
         }
     }
-
-    class StringList : ArrayList<String>()
 }

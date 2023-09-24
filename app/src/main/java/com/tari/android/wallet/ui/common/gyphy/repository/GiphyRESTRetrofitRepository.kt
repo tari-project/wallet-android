@@ -26,13 +26,16 @@ class GiphyRESTRetrofitRepository(private val gateway: GiphyRESTGateway) : GIFRe
     }
 
     override fun getById(id: String): GIFItem {
-        val response: Response<SearchGIFResponse> = gateway.getGIFByID(id).execute()
+        val request = gateway.getGIFByID(id)
+        val response: Response<SearchGIFResponse> = request.execute()
         val body = response.body()
         return if (response.isSuccessful && body != null && body.meta.status in 200..299)
             body.data.let { GIFItem(it.id, Uri.parse(it.embedUrl), Uri.parse(it.images.fixedWidth.url)) }
         else {
             val exception = GIFSearchException(body?.meta?.message ?: response.message() ?: response.errorBody()?.string())
-            logger.e(exception, "Get all was failed")
+            logger.e(exception.message.orEmpty())
+            logger.e(exception.stackTraceToString())
+            logger.e(exception, "Get by id was failed")
             throw exception
         }
     }

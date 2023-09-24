@@ -56,11 +56,11 @@ class WaveView : View {
         waveLength = width * 1.5F
     }
 
-    override fun onDraw(canvas: Canvas?) {
+    override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
 
         doWave()
-        canvas?.drawPath(path, paint)
+        canvas.drawPath(path, paint)
     }
 
     private fun doWave() {

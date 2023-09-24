@@ -303,6 +303,7 @@ open class ContactSelectionFragment : CommonFragment<FragmentContactsSelectionBi
         textWatcherIsRunning = true
         val editable = ui.searchEditText.editableText
         var text = editable.toString()
+        viewModel.searchAndDisplayYatRecipients(text)
 
         ui.toolbar.hideRightActions()
         ui.continueButton.gone()

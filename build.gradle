@@ -2,11 +2,11 @@ buildscript {
     ext {
         agp_version = '7.4.2'
     }
-    ext.kotlin_version = '1.8.10'
-    ext.lifecycle_version = '2.6.1'
+    ext.kotlin_version = '1.8.21'
+    ext.lifecycle_version = '2.6.2'
 
     // build & version
-    ext.buildNumber = 257
+    ext.buildNumber = 259
     ext.versionNumber = "0.24.0"
 
     // JNI libs

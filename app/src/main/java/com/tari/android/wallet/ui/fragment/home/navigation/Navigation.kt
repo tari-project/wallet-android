@@ -10,8 +10,6 @@ import com.tari.android.wallet.ui.fragment.send.common.TransactionData
 sealed class Navigation {
 
     sealed class CustomBridgeNavigation : Navigation() {
-        object ScanQrCode : CustomBridgeNavigation()
-
         object UploadQrCode : CustomBridgeNavigation()
     }
 
