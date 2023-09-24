@@ -163,7 +163,7 @@ class TorBridgesSelectionViewModel : CommonViewModel() {
                                 BodyModule(description),
                                 ButtonModule(resourceManager.getString(R.string.common_confirm), ButtonStyle.Normal) {
                                     dismissDialog.postValue(Unit)
-                                    _backPressed.postValue(Unit)
+                                    backPressed.postValue(Unit)
                                 },
                             )
                         )

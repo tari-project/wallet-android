@@ -140,7 +140,7 @@ class TxDetailsViewModel : CommonViewModel() {
             val errorArgs = ErrorDialogArgs(
                 resourceManager.getString(R.string.tx_details_error_tx_not_found_title),
                 resourceManager.getString(R.string.tx_details_error_tx_not_found_desc)
-            ) { _backPressed.call() }
+            ) { backPressed.call() }
             modularDialog.postValue(errorArgs.getModular(resourceManager))
         } else {
             foundTx.let { _txObject.onNext(it) }

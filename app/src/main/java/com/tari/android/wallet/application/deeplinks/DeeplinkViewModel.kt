@@ -141,7 +141,7 @@ class DeeplinkViewModel : CommonViewModel() {
     }.getOrNull()
 
     private fun addContactsAction(contacts: List<ContactDto>) {
-        _backPressed.postValue(Unit)
+        backPressed.postValue(Unit)
         contacts.forEach { contactRepository.addContact(it) }
     }
 

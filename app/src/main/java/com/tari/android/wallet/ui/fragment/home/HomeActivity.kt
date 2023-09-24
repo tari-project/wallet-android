@@ -70,18 +70,18 @@ import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
 import com.tari.android.wallet.ui.extension.parcelable
 import com.tari.android.wallet.ui.extension.setVisible
 import com.tari.android.wallet.ui.extension.string
+import com.tari.android.wallet.ui.fragment.chat_list.ChatListFragment
 import com.tari.android.wallet.ui.fragment.contact_book.root.ContactBookFragment
 import com.tari.android.wallet.ui.fragment.contact_book.root.action_menu.ContactBookActionMenuViewModel
 import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
+import com.tari.android.wallet.ui.fragment.home.navigation.TariNavigator.Companion.INDEX_CHAT
 import com.tari.android.wallet.ui.fragment.home.navigation.TariNavigator.Companion.INDEX_CONTACT_BOOK
 import com.tari.android.wallet.ui.fragment.home.navigation.TariNavigator.Companion.INDEX_HOME
 import com.tari.android.wallet.ui.fragment.home.navigation.TariNavigator.Companion.INDEX_SETTINGS
-import com.tari.android.wallet.ui.fragment.home.navigation.TariNavigator.Companion.INDEX_STORE
 import com.tari.android.wallet.ui.fragment.home.navigation.TariNavigator.Companion.NO_SMOOTH_SCROLL
 import com.tari.android.wallet.ui.fragment.onboarding.activity.OnboardingFlowActivity
 import com.tari.android.wallet.ui.fragment.settings.allSettings.AllSettingsFragment
 import com.tari.android.wallet.ui.fragment.splash.SplashActivity
-import com.tari.android.wallet.ui.fragment.store.StoreFragment
 import com.tari.android.wallet.ui.fragment.tx.HomeFragment
 import com.tari.android.wallet.util.Constants
 import kotlinx.coroutines.Dispatchers
@@ -245,11 +245,11 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>() {
             enableNavigationView(ui.homeImageView)
         }
         ui.storeView.setOnClickListener {
-            ui.viewPager.setCurrentItem(INDEX_STORE, NO_SMOOTH_SCROLL)
+            ui.viewPager.setCurrentItem(INDEX_CONTACT_BOOK, NO_SMOOTH_SCROLL)
             enableNavigationView(ui.storeImageView)
         }
         ui.walletInfoView.setOnClickListener {
-            ui.viewPager.setCurrentItem(INDEX_CONTACT_BOOK, NO_SMOOTH_SCROLL)
+            ui.viewPager.setCurrentItem(INDEX_CHAT, NO_SMOOTH_SCROLL)
             enableNavigationView(ui.walletInfoImageView)
         }
         ui.settingsView.setOnClickListener {
@@ -261,7 +261,7 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>() {
     private fun enableNavigationView(index: Int) {
         val view: ImageView = when (index) {
             INDEX_HOME -> ui.homeImageView
-            INDEX_STORE -> ui.storeImageView
+            INDEX_CHAT -> ui.storeImageView
             INDEX_CONTACT_BOOK -> ui.walletInfoImageView
             INDEX_SETTINGS -> ui.settingsImageView
             else -> error("Unexpected index: $index")
@@ -354,7 +354,7 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>() {
 
         override fun createFragment(position: Int): Fragment = when (position) {
             INDEX_HOME -> HomeFragment()
-            INDEX_STORE -> StoreFragment.newInstance()
+            INDEX_CHAT -> ChatListFragment()
             INDEX_CONTACT_BOOK -> ContactBookFragment()
             INDEX_SETTINGS -> AllSettingsFragment.newInstance()
             else -> error("Unexpected position: $position")

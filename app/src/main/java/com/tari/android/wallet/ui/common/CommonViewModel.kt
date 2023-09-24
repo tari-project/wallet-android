@@ -73,8 +73,7 @@ open class CommonViewModel : ViewModel() {
 
     val currentTheme = SingleLiveEvent<TariTheme>()
 
-    protected val _backPressed = SingleLiveEvent<Unit>()
-    val backPressed: LiveData<Unit> = _backPressed
+    val backPressed = SingleLiveEvent<Unit>()
 
     protected val _openLink = SingleLiveEvent<String>()
     val openLink: LiveData<String> = _openLink

@@ -62,7 +62,7 @@ class EnterRestorationPasswordViewModel : CommonViewModel() {
     val state: LiveData<EnterRestorationPasswordState> = _state
 
     fun onBack() {
-        _backPressed.postValue(Unit)
+        backPressed.postValue(Unit)
         viewModelScope.launch(Dispatchers.IO) {
             backupManager.signOut()
         }
@@ -105,7 +105,7 @@ class EnterRestorationPasswordViewModel : CommonViewModel() {
             description = message,
             cancelable = false,
             canceledOnTouchOutside = false,
-            onClose = { _backPressed.call() })
+            onClose = { backPressed.call() })
         modularDialog.postValue(args.getModular(resourceManager))
     }
 }

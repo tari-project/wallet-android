@@ -653,7 +653,6 @@
     <string name="tari_about_icon_text_empty_wallet">Empty wallet by Fatkhul Karim from Noun Project</string>
 
 
-
     <string name="utxos_list_title">Wallet</string>
     <string name="utxos_selecting">Select</string>
     <string name="utxos_status_mined">Mined</string>
@@ -842,5 +841,9 @@
     <string name="contactless_payment_success_description">We just found a fellow Aurora user nearby!\nWould you like to send Tari to %s?</string>
     <string name="contactless_payment_description">Aurora can grab contact info from users nearby using BLE (Bluetooth Low Energy)!\n\nSimply place your phones close to each other and make sure Bluetooth is turned on for both devices. Once connected, you’ll be able to send some Tari quick and easy! 😎</string>
 
+    <!--    Chat-->
+    <string name="chat_title">Messages</string>
+    <string name="chat_add_chat">New Chat</string>
+    <string name="chat_input_hint">Type message</string>
 
 </resources>
