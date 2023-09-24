@@ -9,6 +9,7 @@ import com.tari.android.wallet.R.drawable.vector_all_settings_backup_options_ico
 import com.tari.android.wallet.R.drawable.vector_all_settings_bluetooth
 import com.tari.android.wallet.R.drawable.vector_all_settings_bridge_configuration_icon
 import com.tari.android.wallet.R.drawable.vector_all_settings_contribute_to_tari_icon
+import com.tari.android.wallet.R.drawable.vector_all_settings_data_collection
 import com.tari.android.wallet.R.drawable.vector_all_settings_delete_button_icon
 import com.tari.android.wallet.R.drawable.vector_all_settings_disclaimer_icon
 import com.tari.android.wallet.R.drawable.vector_all_settings_privacy_policy_icon
@@ -25,6 +26,7 @@ import com.tari.android.wallet.R.string.all_settings_bluetooth_settings
 import com.tari.android.wallet.R.string.all_settings_bridge_configuration
 import com.tari.android.wallet.R.string.all_settings_connect_yats
 import com.tari.android.wallet.R.string.all_settings_contribute
+import com.tari.android.wallet.R.string.all_settings_data_collection
 import com.tari.android.wallet.R.string.all_settings_delete_wallet
 import com.tari.android.wallet.R.string.all_settings_disclaimer
 import com.tari.android.wallet.R.string.all_settings_privacy_policy
@@ -126,6 +128,9 @@ class AllSettingsViewModel : CommonViewModel() {
             SettingsTitleViewHolderItem(resourceManager.getString(all_settings_security_label)),
             backupOption,
             DividerViewHolderItem(),
+            ButtonViewDto(resourceManager.getString(all_settings_data_collection), vector_all_settings_data_collection) {
+                navigation.postValue(AllSettingsNavigation.ToDataCollection)
+            },
             SettingsTitleViewHolderItem(resourceManager.getString(all_settings_secondary_settings_label)),
             ButtonViewDto(resourceManager.getString(tari_about_title), vector_all_settings_about_icon) {
                 navigation.postValue(AllSettingsNavigation.ToAbout)

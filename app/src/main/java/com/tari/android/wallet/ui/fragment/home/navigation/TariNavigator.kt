@@ -69,6 +69,7 @@ import com.tari.android.wallet.ui.fragment.settings.backup.writeDownSeedWords.Wr
 import com.tari.android.wallet.ui.fragment.settings.baseNodeConfig.addBaseNode.AddCustomBaseNodeFragment
 import com.tari.android.wallet.ui.fragment.settings.baseNodeConfig.changeBaseNode.ChangeBaseNodeFragment
 import com.tari.android.wallet.ui.fragment.settings.bluetoothSettings.BluetoothSettingsFragment
+import com.tari.android.wallet.ui.fragment.settings.dataCollection.DataCollectionFragment
 import com.tari.android.wallet.ui.fragment.settings.deleteWallet.DeleteWalletFragment
 import com.tari.android.wallet.ui.fragment.settings.logs.activity.DebugActivity
 import com.tari.android.wallet.ui.fragment.settings.logs.activity.DebugNavigation
@@ -114,6 +115,7 @@ class TariNavigator @Inject constructor(val prefs: SharedPrefsRepository, val ta
             AllSettingsNavigation.ToDeleteWallet -> toDeleteWallet()
             AllSettingsNavigation.ToNetworkSelection -> toNetworkSelection()
             AllSettingsNavigation.ToTorBridges -> toTorBridges()
+            AllSettingsNavigation.ToDataCollection -> addFragment(DataCollectionFragment())
             AllSettingsNavigation.ToThemeSelection -> toThemeSelection()
             AllSettingsNavigation.ToRequestTari -> addFragment(RequestTariFragment.newInstance())
             Navigation.EnterRestorationPasswordNavigation.OnRestore -> onRestoreCompleted()

@@ -414,6 +414,7 @@
     <string name="all_settings_back_up_wallet_settings_safety">Learn More</string>
     <string name="all_settings_secondary_settings_label">More</string>
     <string name="all_settings_report_a_bug">Report a Bug</string>
+    <string name="all_settings_data_collection">Data Collection</string>
     <string name="all_settings_delete_wallet">Delete Your Wallet</string>
     <string name="all_settings_visit_site">Visit Tari.com</string>
     <string name="all_settings_contribute">Contribute to Tari Aurora</string>
@@ -560,6 +561,14 @@
     <string name="enter_backup_password_password_match_error">That’s not it!</string>
     <string name="enter_backup_password_change_password_cta">Change Password</string>
     <string name="search_gifs_dialog_hint">Search GIPHY</string>
+
+    <!--Data collection-->
+    <string name="data_collection_description">We\'re always striving to make Aurora better.\nTo achieve this, we use a third-party service to gather non-identifiable data like crash logs and usage statistics. This data helps us pinpoint and fix any issues, ultimately improving your experience</string>
+    <string name="data_collection_option">I consent to data collection</string>
+    <string name="data_collection_dialog_title">Help us improve</string>
+    <string name="data_collection_dialog_description">We\'re always striving to make Aurora better.\nTo achieve this, we use a third-party service to gather non-identifiable data like crash logs and usage statistics. This data helps us pinpoint and fix any issues, ultimately improving your experience.\n\nDo you consent to your data being collected?</string>
+    <string name="data_collection_dialog_positive">Yes, I consent</string>
+    <string name="data_collection_dialog_negative">No, I decline</string>
 
     <!-- Network status indicator-->
     <string name="connection_status_dialog_title">Connection Status</string>

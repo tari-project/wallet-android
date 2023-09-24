@@ -42,6 +42,7 @@ import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefStringSecure
 import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
 import com.tari.android.wallet.data.sharedPrefs.network.formatKey
 import com.tari.android.wallet.data.sharedPrefs.securityStages.SecurityStagesRepository
+import com.tari.android.wallet.data.sharedPrefs.sentry.SentryPrefRepository
 import com.tari.android.wallet.data.sharedPrefs.tariSettings.TariSettingsSharedRepository
 import com.tari.android.wallet.data.sharedPrefs.tor.TorSharedRepository
 import com.tari.android.wallet.ui.fragment.contact_book.data.localStorage.ContactSharedPrefRepository
@@ -69,7 +70,8 @@ class SharedPrefsRepository @Inject constructor(
     private val torSharedRepository: TorSharedRepository,
     private val tariSettingsSharedRepository: TariSettingsSharedRepository,
     private val securityStagesRepository: SecurityStagesRepository,
-    private val contactSharedPrefRepository: ContactSharedPrefRepository
+    private val contactSharedPrefRepository: ContactSharedPrefRepository,
+    private val sentryPrefRepository: SentryPrefRepository
 ) : CommonRepository(networkRepository) {
 
     private object Key {
@@ -128,6 +130,7 @@ class SharedPrefsRepository @Inject constructor(
         tariSettingsSharedRepository.clear()
         securityStagesRepository.clear()
         contactSharedPrefRepository.clear()
+        sentryPrefRepository.clear()
         publicKeyHexString = null
         isAuthenticated = false
         emojiId = null
