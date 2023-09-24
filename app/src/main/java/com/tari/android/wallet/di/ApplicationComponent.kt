@@ -89,6 +89,7 @@ import com.tari.android.wallet.ui.fragment.settings.baseNodeConfig.addBaseNode.A
 import com.tari.android.wallet.ui.fragment.settings.baseNodeConfig.changeBaseNode.ChangeBaseNodeViewModel
 import com.tari.android.wallet.ui.fragment.settings.bluetoothSettings.BluetoothSettingsViewModel
 import com.tari.android.wallet.ui.fragment.settings.bugReporting.BugsReportingViewModel
+import com.tari.android.wallet.ui.fragment.settings.dataCollection.DataCollectionViewModel
 import com.tari.android.wallet.ui.fragment.settings.deleteWallet.DeleteWalletViewModel
 import com.tari.android.wallet.ui.fragment.settings.logs.LogFilesManager
 import com.tari.android.wallet.ui.fragment.settings.logs.logFiles.LogFilesViewModel
@@ -201,6 +202,7 @@ interface ApplicationComponent {
     fun inject(viewModel: ContactBookActionMenuViewModel)
     fun inject(viewModel: ChatListViewModel)
     fun inject(viewModel: ChatViewModel)
+    fun inject(viewModel: DataCollectionViewModel)
 
     fun getClipboardManager(): ClipboardManager
 }

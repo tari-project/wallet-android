@@ -81,6 +81,7 @@ sealed class Navigation {
     sealed class AllSettingsNavigation : Navigation() {
         object ToMyProfile : AllSettingsNavigation()
         object ToBugReporting : AllSettingsNavigation()
+        object ToDataCollection : AllSettingsNavigation()
         object ToAbout : AllSettingsNavigation()
         object ToBackupSettings : AllSettingsNavigation()
         object ToDeleteWallet : AllSettingsNavigation()

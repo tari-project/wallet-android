@@ -6,12 +6,14 @@ import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.toLiveData
 import androidx.lifecycle.viewModelScope
+import com.tari.android.wallet.R
 import com.tari.android.wallet.R.string.error_no_connection_description
 import com.tari.android.wallet.R.string.error_no_connection_title
 import com.tari.android.wallet.R.string.error_node_unreachable_description
 import com.tari.android.wallet.R.string.error_node_unreachable_title
 import com.tari.android.wallet.application.securityStage.StagedWalletSecurityManager
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
+import com.tari.android.wallet.data.sharedPrefs.sentry.SentryPrefRepository
 import com.tari.android.wallet.event.Event
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.extension.addTo
@@ -22,6 +24,12 @@ import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.common.SingleLiveEvent
 import com.tari.android.wallet.ui.common.recyclerView.CommonViewHolderItem
 import com.tari.android.wallet.ui.dialog.error.ErrorDialogArgs
+import com.tari.android.wallet.ui.dialog.modular.DialogArgs
+import com.tari.android.wallet.ui.dialog.modular.ModularDialogArgs
+import com.tari.android.wallet.ui.dialog.modular.modules.body.BodyModule
+import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonModule
+import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonStyle
+import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
 import com.tari.android.wallet.ui.fragment.contact_book.data.ContactsRepository
 import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
 import com.tari.android.wallet.ui.fragment.send.finalize.TxFailureReason
@@ -51,6 +59,9 @@ class HomeFragmentViewModel : CommonViewModel() {
     @Inject
     lateinit var transactionRepository: TransactionRepository
 
+    @Inject
+    lateinit var sentryPrefRepository: SentryPrefRepository
+
     val stagedWalletSecurityManager = StagedWalletSecurityManager()
 
     private val _balanceInfo = MutableLiveData<BalanceInfo>()
@@ -77,7 +88,10 @@ class HomeFragmentViewModel : CommonViewModel() {
         val emojies = sharedPrefsWrapper.emojiId.orEmpty().extractEmojis()
         emojiMedium.postValue(emojies.take(3).joinToString(""))
         emoji.postValue(emojies.take(1).joinToString(""))
+
+        checkForDataConsent()
     }
+
 
     private fun updateList() {
         val list = transactionRepository.list.value ?: return
@@ -87,6 +101,25 @@ class HomeFragmentViewModel : CommonViewModel() {
     fun processItemClick(item: CommonViewHolderItem) {
         if (item is TransactionItem) {
             navigation.postValue(Navigation.TxListNavigation.ToTxDetails(item.tx))
+        }
+    }
+
+    private fun checkForDataConsent() {
+        if (sentryPrefRepository.isEnabled == null) {
+            sentryPrefRepository.isEnabled = false
+            val args = ModularDialogArgs(DialogArgs(cancelable = false, canceledOnTouchOutside = false), listOf(
+                HeadModule(resourceManager.getString(R.string.data_collection_dialog_title)),
+                BodyModule(resourceManager.getString(R.string.data_collection_dialog_description)),
+                ButtonModule(resourceManager.getString(R.string.data_collection_dialog_positive), ButtonStyle.Normal) {
+                    sentryPrefRepository.isEnabled = true
+                    dismissDialog.postValue(Unit)
+                },
+                ButtonModule(resourceManager.getString(R.string.data_collection_dialog_negative), ButtonStyle.Close) {
+                    sentryPrefRepository.isEnabled = false
+                    dismissDialog.postValue(Unit)
+                }
+            ))
+            modularDialog.postValue(args)
         }
     }
 
