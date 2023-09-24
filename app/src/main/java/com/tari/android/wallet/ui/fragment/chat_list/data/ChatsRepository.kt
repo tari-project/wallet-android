@@ -1,6 +1,7 @@
 package com.tari.android.wallet.ui.fragment.chat_list.data
 
 import androidx.lifecycle.MutableLiveData
+import com.tari.android.wallet.extension.addTo
 import com.tari.android.wallet.model.TariWalletAddress
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.util.TariBuild
@@ -9,18 +10,34 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class ChatsRepository @Inject constructor() : CommonViewModel() {
+class ChatsRepository @Inject constructor(private val chatsPrefRepository: ChatsPrefRepository) : CommonViewModel() {
 
     val list = MutableLiveData<MutableList<ChatItemDto>>()
 
     init {
         component.inject(this)
 
-        if (TariBuild.MOCKED) {
-            val list = mutableListOf(
+        chatsPrefRepository.updateNotifier.subscribe {
+            updateList()
+        }.addTo(compositeDisposable)
+    }
+
+    private fun updateList() {
+        val list = chatsPrefRepository.getSavedChats().toMutableList()
+
+        if (TariBuild.MOCKED && list.isEmpty()) {
+            val mockedList = mutableListOf(
                 ChatItemDto(
                     UUID.randomUUID().toString(),
-                    listOf(),
+                    listOf(
+                        ChatMessageItemDto(
+                            UUID.randomUUID().toString(),
+                            "first",
+                            "2 days ago",
+                            false,
+                            false
+                        )
+                    ),
                     TariBuild.mocked_wallet_address
                 ),
                 ChatItemDto(
@@ -77,16 +94,31 @@ class ChatsRepository @Inject constructor() : CommonViewModel() {
                 ),
                 ChatItemDto(
                     UUID.randomUUID().toString(),
-                    listOf(),
+                    listOf(
+                        ChatMessageItemDto(
+                            UUID.randomUUID().toString(),
+                            "sixth",
+                            "2 days ago",
+                            false,
+                            false
+                        )
+                    ),
                     TariBuild.mocked_wallet_address
                 )
             )
 
-            this.list.postValue(list)
+            list.addAll(mockedList)
         }
+
+        this.list.postValue(list)
     }
 
     fun getByUuid(uuid: String): ChatItemDto? = list.value?.find { it.uuid == uuid }
 
     fun getByWalletAddress(walletAddress: TariWalletAddress): ChatItemDto? = list.value?.find { it.walletAddress == walletAddress }
+
+    fun addChat(chat: ChatItemDto) = chatsPrefRepository.addChat(chat)
+
+    fun addMessage(walletAddress: TariWalletAddress, message: ChatMessageItemDto) =
+        chatsPrefRepository.saveMessage(getByWalletAddress(walletAddress), message)
 }

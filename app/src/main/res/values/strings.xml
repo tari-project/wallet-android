@@ -241,7 +241,9 @@
 
     <!-- send tari -->
     <string name="send_tari_title">Send To</string>
+    <string name="send_tari">Send Tari</string>
     <string name="request_tari_title">Receive Tari</string>
+    <string name="request_tari">Request Tari</string>
     <string name="send_tari_subtitle">Send</string>
     <string name="request_tari_subtitle">Receive</string>
 
@@ -861,5 +863,6 @@
     <string name="chat_input_hint">Type message</string>
     <string name="chat_empty_state_title">No messages yet</string>
     <string name="chat_empty_state_description">Just tap the \'New Message\' icon up top to kick things off!</string>
+    <string name="chat_options_title">Options</string>
 
 </resources>

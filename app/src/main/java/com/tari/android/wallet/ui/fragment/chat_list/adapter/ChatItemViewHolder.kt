@@ -40,7 +40,7 @@ class ChatItemViewHolder(view: ItemChatItemBinding) : CommonViewHolder<ChatItemV
                 emojiIdSummaryController.display(item.emojiId)
             } else {
                 participantEmojiIdView.root.gone()
-                alias.text = item.emojiId
+                alias.text = item.alias
                 alias.visible()
             }
         }

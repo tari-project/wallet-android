@@ -23,6 +23,25 @@ class ChatsPrefRepository @Inject constructor(
         savedChats = ChatList(list.toList())
     }
 
+    @Synchronized
+    fun addChat(chatItemDto: ChatItemDto) {
+        val list = savedChats?.toMutableList() ?: mutableListOf()
+        list.add(chatItemDto)
+        saveChats(list.toList())
+    }
+
+    fun saveMessage(chatItemDto: ChatItemDto?, messageItemDto: ChatMessageItemDto) {
+        val list = savedChats?.toMutableList() ?: mutableListOf()
+        val index = list.indexOfFirst { it.uuid == chatItemDto?.uuid }
+        if (index != -1) {
+            val chatItem = list[index]
+            val messages = chatItem.messages.toMutableList()
+            messages.add(messageItemDto)
+            list[index] = ChatItemDto(chatItem.uuid, messages.toList(), chatItem.walletAddress)
+            saveChats(list.toList())
+        }
+    }
+
     fun clear() {
         savedChats = null
     }
