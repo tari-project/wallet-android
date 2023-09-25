@@ -42,6 +42,8 @@ import com.tari.android.wallet.ui.component.clipboardController.WalletAddressVie
 import com.tari.android.wallet.ui.component.networkStateIndicator.ConnectionIndicatorViewModel
 import com.tari.android.wallet.ui.fragment.auth.AuthActivity
 import com.tari.android.wallet.ui.fragment.auth.AuthViewModel
+import com.tari.android.wallet.ui.fragment.chat_list.ChatListViewModel
+import com.tari.android.wallet.ui.fragment.chat_list.chat.ChatViewModel
 import com.tari.android.wallet.ui.fragment.contact_book.contactSelection.ContactSelectionViewModel
 import com.tari.android.wallet.ui.fragment.contact_book.contacts.ContactsViewModel
 import com.tari.android.wallet.ui.fragment.contact_book.details.ContactDetailsViewModel
@@ -87,6 +89,7 @@ import com.tari.android.wallet.ui.fragment.settings.baseNodeConfig.addBaseNode.A
 import com.tari.android.wallet.ui.fragment.settings.baseNodeConfig.changeBaseNode.ChangeBaseNodeViewModel
 import com.tari.android.wallet.ui.fragment.settings.bluetoothSettings.BluetoothSettingsViewModel
 import com.tari.android.wallet.ui.fragment.settings.bugReporting.BugsReportingViewModel
+import com.tari.android.wallet.ui.fragment.settings.dataCollection.DataCollectionViewModel
 import com.tari.android.wallet.ui.fragment.settings.deleteWallet.DeleteWalletViewModel
 import com.tari.android.wallet.ui.fragment.settings.logs.LogFilesManager
 import com.tari.android.wallet.ui.fragment.settings.logs.logFiles.LogFilesViewModel
@@ -197,6 +200,9 @@ interface ApplicationComponent {
     fun inject(viewModel: QRScannerViewModel)
     fun inject(viewModel: TransferFragment)
     fun inject(viewModel: ContactBookActionMenuViewModel)
+    fun inject(viewModel: ChatListViewModel)
+    fun inject(viewModel: ChatViewModel)
+    fun inject(viewModel: DataCollectionViewModel)
 
     fun getClipboardManager(): ClipboardManager
 }

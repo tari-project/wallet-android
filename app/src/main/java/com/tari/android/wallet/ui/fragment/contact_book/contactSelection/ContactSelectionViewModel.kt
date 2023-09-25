@@ -17,6 +17,7 @@ import com.tari.android.wallet.ui.common.SingleLiveEvent
 import com.tari.android.wallet.ui.common.recyclerView.CommonViewHolderItem
 import com.tari.android.wallet.ui.common.recyclerView.items.TitleViewHolderItem
 import com.tari.android.wallet.ui.component.clipboardController.WalletAddressViewModel
+import com.tari.android.wallet.ui.fragment.chat_list.data.ChatsRepository
 import com.tari.android.wallet.ui.fragment.contact_book.contacts.adapter.contact.ContactItem
 import com.tari.android.wallet.ui.fragment.contact_book.contacts.adapter.contact.ContactlessPaymentItem
 import com.tari.android.wallet.ui.fragment.contact_book.data.ContactsRepository
@@ -77,6 +78,9 @@ open class ContactSelectionViewModel : CommonViewModel() {
 
     @Inject
     lateinit var deeplinkFormatter: DeeplinkFormatter
+
+    @Inject
+    lateinit var chatsRepository: ChatsRepository
 
     init {
         component.inject(this)

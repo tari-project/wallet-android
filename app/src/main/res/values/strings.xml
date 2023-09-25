@@ -241,7 +241,9 @@
 
     <!-- send tari -->
     <string name="send_tari_title">Send To</string>
+    <string name="send_tari">Send Tari</string>
     <string name="request_tari_title">Receive Tari</string>
+    <string name="request_tari">Request Tari</string>
     <string name="send_tari_subtitle">Send</string>
     <string name="request_tari_subtitle">Receive</string>
 
@@ -304,6 +306,10 @@
     <string name="wallet_info_qr_code_desc">Easily receive tXTR from others by sharing your profile via one of the methods below:</string>
     <string name="wallet_info_yat_disconnected_description">You\'ve previously connected this Yat.\n Do you want to re-connect it to your wallet?</string>
     <string name="wallet_info_yat_disconnected_reconnect">Reconnect Yat</string>
+    <string name="wallet_info_share_profile_title">Share Profile</string>
+    <string name="wallet_info_my_aurora_title">My Aurora</string>
+    <string name="wallet_info_wallet_button">Wallet</string>
+    <string name="wallet_info_connect_yat_button">Connect Yats</string>
 
     <!-- tx failed dialog -->
     <string name="tx_failed_title">Sorry, you can\'t send tXTR to offline users</string>
@@ -414,6 +420,8 @@
     <string name="all_settings_back_up_wallet_settings_safety">Learn More</string>
     <string name="all_settings_secondary_settings_label">More</string>
     <string name="all_settings_report_a_bug">Report a Bug</string>
+    <string name="all_settings_store">The TTL Store</string>
+    <string name="all_settings_data_collection">Data Collection</string>
     <string name="all_settings_delete_wallet">Delete Your Wallet</string>
     <string name="all_settings_visit_site">Visit Tari.com</string>
     <string name="all_settings_contribute">Contribute to Tari Aurora</string>
@@ -561,6 +569,14 @@
     <string name="enter_backup_password_change_password_cta">Change Password</string>
     <string name="search_gifs_dialog_hint">Search GIPHY</string>
 
+    <!--Data collection-->
+    <string name="data_collection_description">We\'re always striving to make Aurora better.\nTo achieve this, we use a third-party service to gather non-identifiable data like crash logs and usage statistics. This data helps us pinpoint and fix any issues, ultimately improving your experience</string>
+    <string name="data_collection_option">I consent to data collection</string>
+    <string name="data_collection_dialog_title">Help us improve</string>
+    <string name="data_collection_dialog_description">We\'re always striving to make Aurora better.\nTo achieve this, we use a third-party service to gather non-identifiable data like crash logs and usage statistics. This data helps us pinpoint and fix any issues, ultimately improving your experience.\n\nDo you consent to your data being collected?</string>
+    <string name="data_collection_dialog_positive">Yes, I consent</string>
+    <string name="data_collection_dialog_negative">No, I decline</string>
+
     <!-- Network status indicator-->
     <string name="connection_status_dialog_title">Connection Status</string>
     <string name="connection_status_dialog_network_status_disconnected">Disconnected from the Internet</string>
@@ -651,7 +667,6 @@
     <string name="tari_about_icon_text_bluetooth">Bluetooth by Winaldi from Noun Project</string>
     <string name="tari_about_icon_text_nfc">NFC by Fauzan Adiima from Noun Project</string>
     <string name="tari_about_icon_text_empty_wallet">Empty wallet by Fatkhul Karim from Noun Project</string>
-
 
 
     <string name="utxos_list_title">Wallet</string>
@@ -842,5 +857,12 @@
     <string name="contactless_payment_success_description">We just found a fellow Aurora user nearby!\nWould you like to send Tari to %s?</string>
     <string name="contactless_payment_description">Aurora can grab contact info from users nearby using BLE (Bluetooth Low Energy)!\n\nSimply place your phones close to each other and make sure Bluetooth is turned on for both devices. Once connected, you’ll be able to send some Tari quick and easy! 😎</string>
 
+    <!--    Chat-->
+    <string name="chat_title">Messages</string>
+    <string name="chat_add_chat">New Chat</string>
+    <string name="chat_input_hint">Type message</string>
+    <string name="chat_empty_state_title">No messages yet</string>
+    <string name="chat_empty_state_description">Just tap the \'New Message\' icon up top to kick things off!</string>
+    <string name="chat_options_title">Options</string>
 
 </resources>

@@ -44,7 +44,7 @@ class QRScannerViewModel : CommonViewModel() {
     }
 
     fun onAlternativeApply() {
-        _backPressed.postValue(Unit)
+        backPressed.postValue(Unit)
         executeWithDelay(deeplinkViewModel) {
             deeplinkViewModel.executeRawDeeplink(scannedDeeplink.value!!)
         }

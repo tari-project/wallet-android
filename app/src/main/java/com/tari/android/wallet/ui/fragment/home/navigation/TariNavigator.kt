@@ -32,6 +32,8 @@ import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
 import com.tari.android.wallet.ui.extension.showInternetConnectionErrorDialog
 import com.tari.android.wallet.ui.extension.string
 import com.tari.android.wallet.ui.fragment.auth.AuthActivity
+import com.tari.android.wallet.ui.fragment.chat_list.addChat.AddChatFragment
+import com.tari.android.wallet.ui.fragment.chat_list.chat.ChatFragment
 import com.tari.android.wallet.ui.fragment.contact_book.add.AddContactFragment
 import com.tari.android.wallet.ui.fragment.contact_book.add.SelectUserContactFragment
 import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.ContactDto
@@ -67,6 +69,7 @@ import com.tari.android.wallet.ui.fragment.settings.backup.writeDownSeedWords.Wr
 import com.tari.android.wallet.ui.fragment.settings.baseNodeConfig.addBaseNode.AddCustomBaseNodeFragment
 import com.tari.android.wallet.ui.fragment.settings.baseNodeConfig.changeBaseNode.ChangeBaseNodeFragment
 import com.tari.android.wallet.ui.fragment.settings.bluetoothSettings.BluetoothSettingsFragment
+import com.tari.android.wallet.ui.fragment.settings.dataCollection.DataCollectionFragment
 import com.tari.android.wallet.ui.fragment.settings.deleteWallet.DeleteWalletFragment
 import com.tari.android.wallet.ui.fragment.settings.logs.activity.DebugActivity
 import com.tari.android.wallet.ui.fragment.settings.logs.activity.DebugNavigation
@@ -112,6 +115,7 @@ class TariNavigator @Inject constructor(val prefs: SharedPrefsRepository, val ta
             AllSettingsNavigation.ToDeleteWallet -> toDeleteWallet()
             AllSettingsNavigation.ToNetworkSelection -> toNetworkSelection()
             AllSettingsNavigation.ToTorBridges -> toTorBridges()
+            AllSettingsNavigation.ToDataCollection -> addFragment(DataCollectionFragment())
             AllSettingsNavigation.ToThemeSelection -> toThemeSelection()
             AllSettingsNavigation.ToRequestTari -> addFragment(RequestTariFragment.newInstance())
             Navigation.EnterRestorationPasswordNavigation.OnRestore -> onRestoreCompleted()
@@ -126,7 +130,7 @@ class TariNavigator @Inject constructor(val prefs: SharedPrefsRepository, val ta
             Navigation.AddAmountNavigation.OnAmountExceedsActualAvailableBalance -> onAmountExceedsActualAvailableBalance()
             is Navigation.AddAmountNavigation.ContinueToAddNote -> continueToAddNote(navigation.transactionData)
             is Navigation.AddAmountNavigation.ContinueToFinalizing -> continueToFinalizeSendTx(navigation.transactionData)
-            Navigation.TxListNavigation.ToTTLStore -> toTTLStore()
+            Navigation.TxListNavigation.ToChat -> toChat()
             is Navigation.TxListNavigation.ToTxDetails -> toTxDetails(navigation.tx, null)
             is Navigation.TxListNavigation.ToSendTariToUser -> toSendTari(navigation.contact, navigation.amount)
             is Navigation.TxListNavigation.ToSendWithDeeplink -> toSendWithDeeplink(navigation.sendDeeplink)
@@ -144,6 +148,15 @@ class TariNavigator @Inject constructor(val prefs: SharedPrefsRepository, val ta
             Navigation.BackupSettingsNavigation.ToWalletBackupWithRecoveryPhrase -> toWalletBackupWithRecoveryPhrase()
             Navigation.BackupSettingsNavigation.ToLearnMore -> toBackupOnboardingFlow()
             Navigation.CustomBridgeNavigation.UploadQrCode -> Unit
+            is Navigation.ChatNavigation.ToChat -> {
+                if (navigation.isNew) {
+                    onBackPressed()
+                }
+
+                addFragment(ChatFragment.newInstance(navigation.walletAddress))
+            }
+
+            Navigation.ChatNavigation.ToAddChat -> addFragment(AddChatFragment())
             else -> Unit
         }
     }
@@ -188,7 +201,7 @@ class TariNavigator @Inject constructor(val prefs: SharedPrefsRepository, val ta
         }
     })
 
-    fun toTTLStore() = (activity as HomeActivity).ui.viewPager.setCurrentItem(INDEX_STORE, NO_SMOOTH_SCROLL)
+    fun toChat() = (activity as HomeActivity).ui.viewPager.setCurrentItem(INDEX_CHAT, NO_SMOOTH_SCROLL)
 
     fun toAllSettings() = (activity as HomeActivity).ui.viewPager.setCurrentItem(INDEX_SETTINGS, NO_SMOOTH_SCROLL)
 
@@ -228,7 +241,7 @@ class TariNavigator @Inject constructor(val prefs: SharedPrefsRepository, val ta
 
     fun toSendTari(user: ContactDto, amount: MicroTari?) = sendToUser(user, amount)
 
-    fun toSendWithDeeplink(deeplink: DeepLink.Send)  {
+    fun toSendWithDeeplink(deeplink: DeepLink.Send) {
         popUpTo(HomeFragment::class.java.simpleName)
         sendToUserByDeeplink(deeplink)
     }
@@ -373,8 +386,8 @@ class TariNavigator @Inject constructor(val prefs: SharedPrefsRepository, val ta
         const val PARAMETER_CONTACT = "tari_contact_dto_args"
 
         const val INDEX_HOME = 0
-        const val INDEX_STORE = 1
-        const val INDEX_CONTACT_BOOK = 2
+        const val INDEX_CONTACT_BOOK = 1
+        const val INDEX_CHAT = 2
         const val INDEX_SETTINGS = 3
         const val NO_SMOOTH_SCROLL = false
     }

@@ -188,7 +188,8 @@ class ContactsRepository @Inject constructor(
 
     private fun contactExists(contact: ContactDto): Boolean = this.publishSubject.value!!.any { it.uuid == contact.uuid }
 
-    private fun contactExistsByWalletAddress(contact: ContactDto): Boolean = this.publishSubject.value!!.any { it.contact.extractWalletAddress() == contact.contact.extractWalletAddress() }
+    private fun contactExistsByWalletAddress(contact: ContactDto): Boolean =
+        this.publishSubject.value!!.any { it.contact.extractWalletAddress() == contact.contact.extractWalletAddress() }
 
     @Synchronized
     private fun withListUpdate(silently: Boolean = false, updateAction: (list: MutableList<ContactDto>) -> Unit) {
@@ -235,11 +236,8 @@ class ContactsRepository @Inject constructor(
         fun getContactForTx(tx: Tx): ContactDto = getContactByAddress(tx.tariContact.walletAddress)
 
         fun getContactByAddress(address: TariWalletAddress): ContactDto =
-            this@ContactsRepository.publishSubject.value!!.firstOrNull { it.getFFIDto()?.walletAddress == address } ?: ContactDto(
-                FFIContactDto(
-                    address
-                )
-            )
+            this@ContactsRepository.publishSubject.value!!.firstOrNull { it.getFFIDto()?.walletAddress == address }
+                ?: ContactDto(FFIContactDto(address))
 
         private fun subscribeToActions() {
             EventBus.subscribe<Event.Transaction.TxReceived>(this) { updateRecentUsedTime(it.tx.tariContact) }

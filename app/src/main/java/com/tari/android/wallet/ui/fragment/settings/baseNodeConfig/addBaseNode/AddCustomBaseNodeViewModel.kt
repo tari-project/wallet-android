@@ -58,7 +58,7 @@ class AddCustomBaseNodeViewModel : CommonViewModel() {
             val baseNodeDto = BaseNodeDto(name, publicKeyHex, address, true)
             baseNodeSharedRepository.addUserBaseNode(baseNodeDto)
             baseNodes.setBaseNode(baseNodeDto)
-            _backPressed.postValue(Unit)
+            backPressed.postValue(Unit)
         } catch (e: Throwable) {
             baseNodes.setNextBaseNode()
             addBaseNodePeerFailed()

@@ -43,7 +43,7 @@ class ChangeBaseNodeViewModel : CommonViewModel() {
 
     fun selectBaseNode(baseNodeDto: BaseNodeDto) {
         baseNodes.setBaseNode(baseNodeDto)
-        _backPressed.postValue(Unit)
+        backPressed.postValue(Unit)
     }
 
     fun showQrCode(baseNodeDto: BaseNodeDto) {

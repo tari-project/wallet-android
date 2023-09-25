@@ -3,6 +3,7 @@ package com.tari.android.wallet.infrastructure.logging
 import com.orhanobut.logger.LogAdapter
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.data.WalletConfig
+import com.tari.android.wallet.data.sharedPrefs.sentry.SentryPrefRepository
 import com.tari.android.wallet.util.WalletUtil
 import com.welie.blessed.BluetoothPeripheralManager
 import io.sentry.Attachment
@@ -16,11 +17,12 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 
-class SentryLogAdapter(val walletConfig: WalletConfig) : LogAdapter {
+class SentryLogAdapter(val walletConfig: WalletConfig,
+                       private val sentryPrefRepository: SentryPrefRepository) : LogAdapter {
 
     private var localScope = CoroutineScope(Job())
 
-    override fun isLoggable(priority: Int, tag: String?): Boolean = true
+    override fun isLoggable(priority: Int, tag: String?): Boolean = sentryPrefRepository.isEnabled == true
 
     override fun log(priority: Int, tag: String?, message: String) {
         if (tag == BluetoothPeripheralManager::class.java.simpleName) return

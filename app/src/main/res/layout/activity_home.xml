@@ -58,7 +58,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
-                        android:src="@drawable/vector_home_icon" />
+                        android:src="@drawable/vector_home_home" />
                 </FrameLayout>
 
                 <FrameLayout
@@ -72,7 +72,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
-                        android:src="@drawable/vector_ttl_store_icon" />
+                        android:src="@drawable/vector_home_book" />
                 </FrameLayout>
 
                 <View
@@ -91,7 +91,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
-                        android:src="@drawable/vector_contact_book_icon" />
+                        android:src="@drawable/vector_home_chat" />
                 </FrameLayout>
 
                 <FrameLayout
@@ -105,7 +105,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
-                        android:src="@drawable/vector_settings_icon" />
+                        android:src="@drawable/vector_home_menu" />
                 </FrameLayout>
 
             </LinearLayout>

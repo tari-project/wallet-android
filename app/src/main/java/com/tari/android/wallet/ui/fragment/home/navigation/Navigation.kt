@@ -2,6 +2,7 @@ package com.tari.android.wallet.ui.fragment.home.navigation
 
 import com.tari.android.wallet.application.deeplinks.DeepLink
 import com.tari.android.wallet.model.MicroTari
+import com.tari.android.wallet.model.TariWalletAddress
 import com.tari.android.wallet.model.Tx
 import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.ContactDto
 import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.YatDto
@@ -44,7 +45,7 @@ sealed class Navigation {
 
         class ToTxDetails(val tx: Tx) : TxListNavigation()
 
-        object ToTTLStore : TxListNavigation()
+        object ToChat : TxListNavigation()
 
         object ToAllSettings : TxListNavigation()
 
@@ -56,6 +57,12 @@ sealed class Navigation {
         object HomeTransactionHistory : TxListNavigation()
 
         class ToTransfer : TxListNavigation()
+    }
+
+    sealed class ChatNavigation : Navigation() {
+        object ToAddChat : ChatNavigation()
+
+        class ToChat(val walletAddress: TariWalletAddress, val isNew: Boolean) : ChatNavigation()
     }
 
     sealed class AddAmountNavigation : Navigation() {
@@ -74,6 +81,7 @@ sealed class Navigation {
     sealed class AllSettingsNavigation : Navigation() {
         object ToMyProfile : AllSettingsNavigation()
         object ToBugReporting : AllSettingsNavigation()
+        object ToDataCollection : AllSettingsNavigation()
         object ToAbout : AllSettingsNavigation()
         object ToBackupSettings : AllSettingsNavigation()
         object ToDeleteWallet : AllSettingsNavigation()

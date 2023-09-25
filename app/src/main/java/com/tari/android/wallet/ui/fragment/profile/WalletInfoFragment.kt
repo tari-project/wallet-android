@@ -56,6 +56,7 @@ import com.tari.android.wallet.ui.extension.temporarilyDisableClick
 import com.tari.android.wallet.ui.fragment.contact_book.root.share.ShareOptionArgs
 import com.tari.android.wallet.ui.fragment.contact_book.root.share.ShareOptionView
 import com.tari.android.wallet.ui.fragment.contact_book.root.share.ShareType
+import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
 
 class WalletInfoFragment : CommonFragment<FragmentWalletInfoBinding, WalletInfoViewModel>() {
 
@@ -114,9 +115,20 @@ class WalletInfoFragment : CommonFragment<FragmentWalletInfoBinding, WalletInfoV
             viewModel.shareData(ShareType.BLE)
         }
 
-        ui.shareTypeFirstRow.addView(ShareOptionView(requireContext()).apply { setArgs(qrCodeArgs, ShareOptionView.Size.Big) })
-        ui.shareTypeFirstRow.addView(ShareOptionView(requireContext()).apply { setArgs(linkArgs, ShareOptionView.Size.Big) })
-        ui.shareTypeSecondRow.addView(ShareOptionView(requireContext()).apply { setArgs(bleArgs, ShareOptionView.Size.Big) })
+        ui.shareTypeFirstRow.addView(ShareOptionView(requireContext()).apply { setArgs(qrCodeArgs, ShareOptionView.Size.Medium) })
+        ui.shareTypeFirstRow.addView(ShareOptionView(requireContext()).apply { setArgs(linkArgs, ShareOptionView.Size.Medium) })
+        ui.shareTypeFirstRow.addView(ShareOptionView(requireContext()).apply { setArgs(bleArgs, ShareOptionView.Size.Medium) })
+
+        ui.auroraContainer.addView(RoundButtonWithIconView(requireContext()).apply {
+            setArgs(getString(R.string.wallet_info_wallet_button), R.drawable.vector_wallet_wallet, {
+                viewModel.navigation.postValue(Navigation.TxListNavigation.ToUtxos)
+            })
+        })
+        ui.auroraContainer.addView(RoundButtonWithIconView(requireContext()).apply {
+            setArgs(getString(R.string.wallet_info_connect_yat_button), R.drawable.vector_wallet_yat, {
+                viewModel.yatAdapter.openOnboarding(requireContext())
+            })
+        })
 
         ui.toolbar.setRightArgs(TariToolbarActionArg(title = string(R.string.tx_detail_edit)) { viewModel.showEditAliasDialog() })
 
