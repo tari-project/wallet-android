@@ -82,7 +82,6 @@ import com.tari.android.wallet.ui.fragment.home.navigation.TariNavigator.Compani
 import com.tari.android.wallet.ui.fragment.onboarding.activity.OnboardingFlowActivity
 import com.tari.android.wallet.ui.fragment.settings.allSettings.AllSettingsFragment
 import com.tari.android.wallet.ui.fragment.splash.SplashActivity
-import com.tari.android.wallet.ui.fragment.store.StoreFragment
 import com.tari.android.wallet.ui.fragment.tx.HomeFragment
 import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.TariBuild
