@@ -20,10 +20,6 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         multiDexEnabled = true
 
-        ndk {
-            abiFilters = []
-            abiFilters.addAll(supportedABIs)
-        }
         externalNativeBuild {
             cmake {
                 arguments "-DANDROID_STL=c++_static"
@@ -201,7 +197,7 @@ Properties loadProps(fileName) {
     return properties
 }
 
-//preBuild.dependsOn("downloadLibwallet")
+preBuild.dependsOn("downloadLibwallet")
 
 dependencies {
     // kotlin

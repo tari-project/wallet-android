@@ -187,7 +187,7 @@ class TransactionRepository @Inject constructor() : CommonViewModel() {
                     message = messageGiphy
                     timestamp = BigInteger.valueOf(System.currentTimeMillis())
                     id = BigInteger.valueOf(1)
-                    tariContact = TariContact(TariBuild.mocked_wallet_address, "test1")
+                    tariContact = TariContact(TariBuild.moched_zero_contact, "test1")
                 },
                 contactsRepository.ffiBridge.getContactForTx(CompletedTx()),
                 0,
@@ -203,7 +203,7 @@ class TransactionRepository @Inject constructor() : CommonViewModel() {
                 timestamp = BigInteger.valueOf(System.currentTimeMillis())
                 id = BigInteger.valueOf(1)
                 message = messageGiphy
-                tariContact = TariContact(TariBuild.mocked_wallet_address, "test2")
+                tariContact = TariContact(TariBuild.moched_zero_contact, "test2")
             }
             val item2 = TransactionItem(
                 tx2,

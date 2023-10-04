@@ -82,8 +82,10 @@ import com.tari.android.wallet.ui.fragment.home.navigation.TariNavigator.Compani
 import com.tari.android.wallet.ui.fragment.onboarding.activity.OnboardingFlowActivity
 import com.tari.android.wallet.ui.fragment.settings.allSettings.AllSettingsFragment
 import com.tari.android.wallet.ui.fragment.splash.SplashActivity
+import com.tari.android.wallet.ui.fragment.store.StoreFragment
 import com.tari.android.wallet.ui.fragment.tx.HomeFragment
 import com.tari.android.wallet.util.Constants
+import com.tari.android.wallet.util.TariBuild
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -237,20 +239,23 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>() {
 
     private fun setupBottomNavigation() {
         enableNavigationView(ui.homeImageView)
-        ui.viewPager.adapter = HomeAdapter(supportFragmentManager, this.lifecycle)
+        ui.viewPager.adapter = if (TariBuild.isChat) HomeChatAdapter(supportFragmentManager, this.lifecycle)
+        else HomeStoreAdapter(supportFragmentManager, this.lifecycle)
         ui.viewPager.isUserInputEnabled = false
         ui.viewPager.offscreenPageLimit = 3
         ui.homeView.setOnClickListener {
             ui.viewPager.setCurrentItem(INDEX_HOME, NO_SMOOTH_SCROLL)
             enableNavigationView(ui.homeImageView)
         }
+        ui.storeImageView.setImageResource(if (TariBuild.isChat) R.drawable.vector_home_book else R.drawable.vector_ttl_store_icon)
         ui.storeView.setOnClickListener {
             ui.viewPager.setCurrentItem(INDEX_CONTACT_BOOK, NO_SMOOTH_SCROLL)
             enableNavigationView(ui.storeImageView)
         }
-        ui.walletInfoView.setOnClickListener {
+        ui.chatImageView.setImageResource(if (TariBuild.isChat) R.drawable.vector_home_chat else R.drawable.vector_home_book)
+        ui.chatView.setOnClickListener {
             ui.viewPager.setCurrentItem(INDEX_CHAT, NO_SMOOTH_SCROLL)
-            enableNavigationView(ui.walletInfoImageView)
+            enableNavigationView(ui.chatImageView)
         }
         ui.settingsView.setOnClickListener {
             ui.viewPager.setCurrentItem(INDEX_SETTINGS, NO_SMOOTH_SCROLL)
@@ -262,7 +267,7 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>() {
         val view: ImageView = when (index) {
             INDEX_HOME -> ui.homeImageView
             INDEX_CHAT -> ui.storeImageView
-            INDEX_CONTACT_BOOK -> ui.walletInfoImageView
+            INDEX_CONTACT_BOOK -> ui.chatImageView
             INDEX_SETTINGS -> ui.settingsImageView
             else -> error("Unexpected index: $index")
         }
@@ -270,7 +275,7 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>() {
     }
 
     private fun enableNavigationView(view: ImageView) {
-        arrayOf(ui.homeImageView, ui.storeImageView, ui.walletInfoImageView, ui.settingsImageView).forEach { it.clearColorFilter() }
+        arrayOf(ui.homeImageView, ui.storeImageView, ui.chatImageView, ui.settingsImageView).forEach { it.clearColorFilter() }
         view.setColorFilter(viewModel.paletteManager.getPurpleBrand(this))
     }
 
@@ -350,7 +355,20 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>() {
         viewModelStore.clear()
     }
 
-    class HomeAdapter(fm: FragmentManager, lifecycle: Lifecycle) : FragmentStateAdapter(fm, lifecycle) {
+    class HomeStoreAdapter(fm: FragmentManager, lifecycle: Lifecycle) : FragmentStateAdapter(fm, lifecycle) {
+
+        override fun createFragment(position: Int): Fragment = when (position) {
+            INDEX_HOME -> HomeFragment()
+            INDEX_CHAT -> ContactBookFragment()
+            INDEX_CONTACT_BOOK -> StoreFragment.newInstance()
+            INDEX_SETTINGS -> AllSettingsFragment.newInstance()
+            else -> error("Unexpected position: $position")
+        }
+
+        override fun getItemCount(): Int = 4
+    }
+
+    class HomeChatAdapter(fm: FragmentManager, lifecycle: Lifecycle) : FragmentStateAdapter(fm, lifecycle) {
 
         override fun createFragment(position: Int): Fragment = when (position) {
             INDEX_HOME -> HomeFragment()

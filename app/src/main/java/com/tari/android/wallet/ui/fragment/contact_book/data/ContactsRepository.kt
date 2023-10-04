@@ -313,12 +313,13 @@ class ContactsRepository @Inject constructor(
 
         private fun onFFIContactAddedOrUpdated(contact: TariWalletAddress, alias: String, isFavorite: Boolean) {
             if (ffiContactExist(contact)) {
-                withFFIContact(contact) {
-                    it.getFFIDto()?.let { ffiContactDto ->
-                        ffiContactDto.setAlias(alias)
-                        ffiContactDto.isFavorite = isFavorite
-                    }
-                }
+                //turn off updated because of name erasing
+//                withFFIContact(contact) {
+//                    it.getFFIDto()?.let { ffiContactDto ->
+//                        ffiContactDto.setAlias(alias)
+//                        ffiContactDto.isFavorite = isFavorite
+//                    }
+//                }
             } else {
                 withListUpdate {
                     it.add(ContactDto(FFIContactDto(contact, alias, isFavorite)))

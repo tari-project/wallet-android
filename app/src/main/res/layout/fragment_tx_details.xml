@@ -172,10 +172,11 @@
                     android:gravity="center_horizontal"
                     android:orientation="vertical">
 
-                    <RelativeLayout
+                    <LinearLayout
                         android:id="@+id/amount_container_view"
-                        android:layout_width="match_parent"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_marginHorizontal="24dp"
                         android:layout_marginTop="@dimen/tx_details_amount_section_vertical_padding"
                         android:orientation="horizontal"
                         android:paddingHorizontal="12dp">
@@ -184,21 +185,27 @@
                             android:id="@+id/amount_gem_image_view"
                             android:layout_width="@dimen/add_amount_gem_size"
                             android:layout_height="@dimen/add_amount_gem_size"
-                            android:layout_centerVertical="true"
+                            android:layout_gravity="center_vertical"
                             android:layout_marginEnd="6dp"
-                            android:layout_toStartOf="@id/amount_text_view"
                             android:src="@drawable/vector_gem" />
 
                         <com.tari.android.wallet.ui.component.tari.TariTextView
                             android:id="@+id/amount_text_view"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_centerHorizontal="true"
+                            android:layout_gravity="center"
+                            android:autoSizeMaxTextSize="90dp"
+                            android:autoSizeMinTextSize="12dp"
+                            android:autoSizeStepGranularity="2dp"
+                            android:autoSizeTextType="uniform"
+                            android:ellipsize="end"
+                            android:gravity="center"
+                            android:lines="1"
                             android:textColor="?attr/palette_text_heading"
                             android:textSize="@dimen/add_amount_element_text_size"
                             app:customFont="black"
-                            tools:text="150" />
-                    </RelativeLayout>
+                            tools:text="150.000000000000000" />
+                    </LinearLayout>
 
                     <com.tari.android.wallet.ui.component.tari.TariTextView
                         android:id="@+id/tx_fee_text_view"
@@ -261,6 +268,16 @@
                         app:cornerRadius="10dp"
                         app:elevation="12dp">
 
+                        <com.tari.android.wallet.ui.component.tari.TariTextView
+                            android:id="@+id/unknown_source"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/unknown_source"
+                            android:singleLine="true"
+                            android:textColor="?attr/palette_text_heading"
+                            android:textSize="14sp"
+                            app:customFont="roman" />
+
                         <include
                             android:id="@+id/emoji_id_summary_view"
                             layout="@layout/view_emoji_id_summary"
@@ -313,12 +330,12 @@
                         android:layout_below="@id/contact_label_text_view"
                         android:layout_alignParentStart="true"
                         android:layout_marginTop="8dp"
-                        android:enabled="false"
-                        android:background="@null"
-                        android:hint="@string/tx_details_contact_name"
                         android:layout_marginEnd="4dp"
                         android:layout_toStartOf="@id/edit_contact_label_text_view"
+                        android:background="@null"
                         android:ellipsize="end"
+                        android:enabled="false"
+                        android:hint="@string/tx_details_contact_name"
                         android:paddingTop="5dp"
                         android:paddingBottom="5dp"
                         android:singleLine="true"
@@ -445,7 +462,8 @@
             android:id="@+id/emoji_id_outer_container"
             layout="@layout/view_full_emoji_id"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent"
+            tools:visibility="gone" />
 
     </RelativeLayout>
 

@@ -10,9 +10,11 @@ buildscript {
     ext.versionNumber = "0.24.0"
 
     // JNI libs
+    ext.libwalletHostURL = "https://github.com/tari-project/tari/releases/download/"
     ext.libwalletVersion = "v0.50.0-hotfix.1"
-    ext.libwalletHostURL = "https://tari-binaries.s3.amazonaws.com/libwallet/"
-    ext.supportedABIs = ["arm64-v8a", "x86_64"]
+    ext.libwalletx64A = "libtari_wallet_ffi.android_x86_64.a"
+    ext.libwalletArmA = "libtari_wallet_ffi.android_aarch64.a"
+    ext.libwalletHeader = "libtari_wallet_ffi.h"
 
     repositories {
         google()

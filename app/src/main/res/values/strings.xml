@@ -864,5 +864,6 @@
     <string name="chat_empty_state_title">No messages yet</string>
     <string name="chat_empty_state_description">Just tap the \'New Message\' icon up top to kick things off!</string>
     <string name="chat_options_title">Options</string>
+    <string name="unknown_source">Unknown source</string>
 
 </resources>

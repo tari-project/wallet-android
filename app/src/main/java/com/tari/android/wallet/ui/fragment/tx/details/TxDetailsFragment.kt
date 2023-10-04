@@ -221,7 +221,14 @@ class TxDetailsFragment : CommonFragment<FragmentTxDetailsBinding, TxDetailsView
     private fun setTxAddresseeData(tx: Tx) {
         val state = TxState.from(tx)
         ui.fromTextView.text = if (state.direction == INBOUND) string(common_from) else string(common_to)
-        emojiIdSummaryController.display(tx.tariContact.walletAddress.emojiId)
+        if (tx.tariContact.walletAddress.isZeros()) {
+            ui.emojiIdSummaryView.root.gone()
+            ui.unknownSource.visible()
+        } else {
+            ui.emojiIdSummaryView.root.visible()
+            ui.unknownSource.gone()
+            emojiIdSummaryController.display(tx.tariContact.walletAddress.emojiId)
+        }
     }
 
     private fun setTxStatusData(tx: Tx) {
