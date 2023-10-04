@@ -44,6 +44,7 @@ import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodeSharedRepository
 import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepositoryImpl
 import com.tari.android.wallet.data.sharedPrefs.securityStages.SecurityStagesRepository
+import com.tari.android.wallet.data.sharedPrefs.sentry.SentryPrefRepository
 import com.tari.android.wallet.data.sharedPrefs.tariSettings.TariSettingsSharedRepository
 import com.tari.android.wallet.data.sharedPrefs.tor.TorSharedRepository
 import com.tari.android.wallet.di.ApplicationModule
@@ -77,6 +78,7 @@ class FFIWalletTests {
     private val tariSettingsRepository = TariSettingsSharedRepository(prefs, networkRepository)
     private val securityStagesRepository = SecurityStagesRepository(prefs, networkRepository)
     private val contactSharedPrefRepository = ContactSharedPrefRepository(networkRepository, prefs)
+    private val sentryPrefRepository: SentryPrefRepository = SentryPrefRepository(prefs, networkRepository)
     private val torSharedRepository = TorSharedRepository(prefs, networkRepository)
     private val sharedPrefsRepository = SharedPrefsRepository(
         context,
@@ -88,7 +90,8 @@ class FFIWalletTests {
         torSharedRepository,
         tariSettingsRepository,
         securityStagesRepository,
-        contactSharedPrefRepository
+        contactSharedPrefRepository,
+        sentryPrefRepository
     )
 
     private val walletDirPath = context.filesDir.absolutePath
