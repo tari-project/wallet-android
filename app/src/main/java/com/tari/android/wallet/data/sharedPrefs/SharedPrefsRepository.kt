@@ -37,6 +37,7 @@ import android.content.SharedPreferences
 import com.tari.android.wallet.data.repository.CommonRepository
 import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodeSharedRepository
 import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefBooleanDelegate
+import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefBooleanNullableDelegate
 import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefStringDelegate
 import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefStringSecuredDelegate
 import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
@@ -77,6 +78,7 @@ class SharedPrefsRepository @Inject constructor(
     private object Key {
         const val publicKeyHexString = "tari_wallet_public_key_hex_string"
         const val isAuthenticated = "tari_wallet_is_authenticated"
+        const val isFeatureAuthenticated = "tari_wallet_is_feature_authenticated"
         const val emojiId = "tari_wallet_emoji_id_"
         const val name = "tari_wallet_name_"
         const val surname = "tari_wallet_surname_"
@@ -88,11 +90,15 @@ class SharedPrefsRepository @Inject constructor(
         const val onboardingDisplayedAtHome = "tari_wallet_onboarding_displayed_at_home"
         const val walletDatabasePassphrase = "tari_wallet_database_passphrase"
         const val isDataCleared = "tari_is_data_cleared"
+        const val pinCode = "tari_is_pincode"
+        const val biometricsKey = "tari_is_biometrics"
     }
 
     var publicKeyHexString: String? by SharedPrefStringDelegate(sharedPrefs, this,  formatKey(Key.publicKeyHexString))
 
     var isAuthenticated: Boolean by SharedPrefBooleanDelegate(sharedPrefs, this,  formatKey(Key.isAuthenticated))
+
+    var isFeatureAuthenticated: Boolean by SharedPrefBooleanDelegate(sharedPrefs, this,  formatKey(Key.isFeatureAuthenticated))
 
     var emojiId: String? by SharedPrefStringDelegate(sharedPrefs, this,  formatKey(Key.emojiId))
 
@@ -111,6 +117,10 @@ class SharedPrefsRepository @Inject constructor(
     var onboardingAuthSetupCompleted: Boolean by SharedPrefBooleanDelegate(sharedPrefs, this,  formatKey(Key.onboardingAuthSetupCompleted))
 
     var actionMenuSide: Boolean by SharedPrefBooleanDelegate(sharedPrefs, this, formatKey(Key.actionMenuSide))
+
+    var pinCode: String? by SharedPrefStringSecuredDelegate(context, sharedPrefs, this, formatKey(Key.pinCode), null)
+
+    var biometricsAuth: Boolean? by SharedPrefBooleanNullableDelegate(sharedPrefs, this, formatKey(Key.biometricsKey))
 
     val onboardingAuthWasInterrupted: Boolean
         get() = onboardingAuthSetupStarted && !onboardingAuthSetupCompleted
@@ -140,6 +150,9 @@ class SharedPrefsRepository @Inject constructor(
         onboardingAuthSetupStarted = false
         onboardingAuthSetupCompleted = false
         onboardingDisplayedAtHome = false
+        pinCode = null
+        biometricsAuth = null
+        isFeatureAuthenticated = false
     }
 
     fun generateDatabasePassphrase(): String {

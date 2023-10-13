@@ -32,6 +32,8 @@ import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
 import com.tari.android.wallet.ui.extension.showInternetConnectionErrorDialog
 import com.tari.android.wallet.ui.extension.string
 import com.tari.android.wallet.ui.fragment.auth.AuthActivity
+import com.tari.android.wallet.ui.fragment.auth.FeatureAuthFragment
+import com.tari.android.wallet.ui.fragment.biometrics.ChangeBiometricsFragment
 import com.tari.android.wallet.ui.fragment.chat_list.addChat.AddChatFragment
 import com.tari.android.wallet.ui.fragment.chat_list.chat.ChatFragment
 import com.tari.android.wallet.ui.fragment.contact_book.add.AddContactFragment
@@ -47,6 +49,7 @@ import com.tari.android.wallet.ui.fragment.home.homeTransactionHistory.HomeTrans
 import com.tari.android.wallet.ui.fragment.home.navigation.Navigation.AllSettingsNavigation
 import com.tari.android.wallet.ui.fragment.home.navigation.Navigation.ContactBookNavigation
 import com.tari.android.wallet.ui.fragment.onboarding.activity.OnboardingFlowActivity
+import com.tari.android.wallet.ui.fragment.pinCode.EnterPinCodeFragment
 import com.tari.android.wallet.ui.fragment.profile.WalletInfoFragment
 import com.tari.android.wallet.ui.fragment.restore.enterRestorationPassword.EnterRestorationPasswordFragment
 import com.tari.android.wallet.ui.fragment.restore.inputSeedWords.InputSeedWordsFragment
@@ -58,6 +61,7 @@ import com.tari.android.wallet.ui.fragment.send.finalize.FinalizeSendTxFragment
 import com.tari.android.wallet.ui.fragment.send.finalize.TxFailureReason
 import com.tari.android.wallet.ui.fragment.send.requestTari.RequestTariFragment
 import com.tari.android.wallet.ui.fragment.send.transfer.TransferFragment
+import com.tari.android.wallet.ui.fragment.settings.allSettings.AllSettingsFragment
 import com.tari.android.wallet.ui.fragment.settings.allSettings.about.TariAboutFragment
 import com.tari.android.wallet.ui.fragment.settings.backgroundService.BackgroundServiceSettingsFragment
 import com.tari.android.wallet.ui.fragment.settings.backup.backupOnboarding.BackupOnboardingFlowFragment
@@ -92,6 +96,9 @@ class TariNavigator @Inject constructor(val prefs: SharedPrefsRepository, val ta
 
     fun navigate(navigation: Navigation) {
         when (navigation) {
+            is Navigation.EnterPinCodeNavigation -> addFragment(EnterPinCodeFragment.newInstance(navigation.behavior, navigation.stashedPin))
+            is Navigation.ChangeBiometrics -> addFragment(ChangeBiometricsFragment())
+            is Navigation.FeatureAuth -> addFragment(FeatureAuthFragment())
             is ContactBookNavigation.ToAddContact -> toAddContact()
             is ContactBookNavigation.ToContactDetails -> toContactDetails(navigation.contact)
             is ContactBookNavigation.ToRequestTari -> toRequestTariFromContact(navigation.contact)
@@ -256,6 +263,8 @@ class TariNavigator @Inject constructor(val prefs: SharedPrefsRepository, val ta
 
     fun backToContactBook() = popUpTo(ContactBookFragment::class.java.simpleName)
 
+    fun backToAllSettings() = popUpTo(AllSettingsFragment::class.java.simpleName)
+
     fun toLinkContact(contact: ContactDto) = addFragment(ContactLinkFragment.createFragment(contact))
 
     fun toContactTransactionHistory(contact: ContactDto) = addFragment(TransactionHistoryFragment.createFragment(contact))
@@ -377,7 +386,6 @@ class TariNavigator @Inject constructor(val prefs: SharedPrefsRepository, val ta
 
     //popup fragment
     private fun popUpTo(tag: String) = activity.popUpTo(tag)
-
 
     companion object {
         const val PARAMETER_NOTE = "note"

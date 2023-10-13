@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.tari.android.wallet.ui.component.tari.TariPrimaryBackground xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/root_view"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <com.tari.android.wallet.ui.component.tari.toolbar.TariToolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        app:text="@string/dummy_text" />
+
+    <com.tari.android.wallet.ui.component.tari.TariSecondaryBackground
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/toolbar">
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:src="@drawable/tari_splash_gem_small"
+            android:tint="?attr/palette_text_heading"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <com.tari.android.wallet.ui.component.tari.TariTextView
+            android:id="@+id/error_message"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="24dp"
+            android:layout_marginBottom="24dp"
+            android:gravity="center"
+            android:text="@string/dummy_text"
+            android:textColor="?attr/palette_system_red"
+            android:textSize="24sp"
+            app:customFont="medium"
+            app:layout_constraintBottom_toTopOf="@id/pin_code_container"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            tools:text="@string/dummy_text" />
+
+        <!-- pin code -->
+        <LinearLayout
+            android:id="@+id/pin_code_container"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="36dp"
+            android:orientation="horizontal"
+            app:layout_constraintBottom_toTopOf="@+id/subtitle"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/pin_code_1"
+                android:layout_width="@dimen/pin_code_input_size"
+                android:layout_height="@dimen/pin_code_input_size"
+                android:layout_marginEnd="@dimen/pin_code_input_margin"
+                android:background="@drawable/vector_pin_input_background"
+                android:gravity="center"
+                android:paddingBottom="2dp"
+                android:text="●"
+                android:textColor="?attr/palette_text_heading"
+                android:textSize="@dimen/pin_code_input_text_size" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/pin_code_2"
+                android:layout_width="@dimen/pin_code_input_size"
+                android:layout_height="@dimen/pin_code_input_size"
+                android:layout_marginEnd="@dimen/pin_code_input_margin"
+                android:background="@drawable/vector_pin_input_background"
+                android:gravity="center"
+                android:text="●"
+                android:textColor="?attr/palette_text_heading"
+                android:textSize="@dimen/pin_code_input_text_size" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/pin_code_3"
+                android:layout_width="@dimen/pin_code_input_size"
+                android:layout_height="@dimen/pin_code_input_size"
+                android:layout_marginEnd="@dimen/pin_code_input_margin"
+                android:background="@drawable/vector_pin_input_background"
+                android:gravity="center"
+                android:text="●"
+                android:textColor="?attr/palette_text_heading"
+                android:textSize="@dimen/pin_code_input_text_size" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/pin_code_4"
+                android:layout_width="@dimen/pin_code_input_size"
+                android:layout_height="@dimen/pin_code_input_size"
+                android:layout_marginEnd="@dimen/pin_code_input_margin"
+                android:background="@drawable/vector_pin_input_background"
+                android:gravity="center"
+                android:text="●"
+                android:textColor="?attr/palette_text_heading"
+                android:textSize="@dimen/pin_code_input_text_size" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/pin_code_5"
+                android:layout_width="@dimen/pin_code_input_size"
+                android:layout_height="@dimen/pin_code_input_size"
+                android:layout_marginEnd="@dimen/pin_code_input_margin"
+                android:background="@drawable/vector_pin_input_background"
+                android:gravity="center"
+                android:textColor="?attr/palette_text_heading"
+                android:textSize="@dimen/pin_code_input_text_size" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/pin_code_6"
+                android:layout_width="@dimen/pin_code_input_size"
+                android:layout_height="@dimen/pin_code_input_size"
+                android:layout_marginEnd="@dimen/pin_code_input_margin"
+                android:background="@drawable/vector_pin_input_background"
+                android:gravity="center"
+                android:textColor="?attr/palette_text_heading"
+                android:textSize="@dimen/pin_code_input_text_size" />
+
+        </LinearLayout>
+
+        <com.tari.android.wallet.ui.component.tari.TariTextView
+            android:id="@+id/subtitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="24dp"
+            android:layout_marginBottom="72dp"
+            android:gravity="center"
+            android:text="@string/dummy_text"
+            android:textColor="?attr/palette_text_body"
+            android:textSize="18sp"
+            app:customFont="medium"
+            app:layout_constraintBottom_toTopOf="@id/numpad"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_goneMarginBottom="72dp"
+            tools:text="@string/dummy_text" />
+
+        <!-- num pad -->
+        <include
+            android:id="@+id/numpad"
+            layout="@layout/view_numpad"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="32dp"
+            app:layout_constraintBottom_toTopOf="@+id/continue_btn"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.75" />
+
+        <com.tari.android.wallet.ui.component.tari.TariGradientButton
+            android:id="@+id/continue_btn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="24dp"
+            android:layout_marginBottom="24dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:title="@string/dummy_text" />
+
+    </com.tari.android.wallet.ui.component.tari.TariSecondaryBackground>
+
+</com.tari.android.wallet.ui.component.tari.TariPrimaryBackground>

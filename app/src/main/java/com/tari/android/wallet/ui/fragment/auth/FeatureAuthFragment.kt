@@ -32,10 +32,12 @@
  */
 package com.tari.android.wallet.ui.fragment.auth
 
-import android.content.Intent
 import android.os.Bundle
-import androidx.activity.viewModels
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import androidx.appcompat.app.AlertDialog
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.tari.android.wallet.R
 import com.tari.android.wallet.R.string.auth_biometric_prompt
@@ -45,25 +47,26 @@ import com.tari.android.wallet.R.string.auth_not_available_or_canceled_title
 import com.tari.android.wallet.R.string.auth_title
 import com.tari.android.wallet.R.string.exit
 import com.tari.android.wallet.R.string.proceed
-import com.tari.android.wallet.databinding.ActivityAuthBinding
+import com.tari.android.wallet.databinding.FragmentFeatureAuthBinding
 import com.tari.android.wallet.extension.observe
 import com.tari.android.wallet.infrastructure.security.biometric.BiometricAuthenticationException
-import com.tari.android.wallet.ui.common.CommonActivity
+import com.tari.android.wallet.ui.common.CommonFragment
 import com.tari.android.wallet.ui.extension.setColor
 import com.tari.android.wallet.ui.extension.string
 import com.tari.android.wallet.ui.extension.visible
-import com.tari.android.wallet.ui.fragment.home.HomeActivity
 import com.tari.android.wallet.ui.fragment.pinCode.EnterPinCodeFragment
 import com.tari.android.wallet.ui.fragment.pinCode.PinCodeScreenBehavior
 import com.tari.android.wallet.ui.fragment.settings.allSettings.TariVersionModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-class AuthActivity : CommonActivity<ActivityAuthBinding, AuthViewModel>() {
+class FeatureAuthFragment : CommonFragment<FragmentFeatureAuthBinding, AuthViewModel>() {
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        ui = ActivityAuthBinding.inflate(layoutInflater).apply { setContentView(root) }
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
+        FragmentFeatureAuthBinding.inflate(inflater, container, false).also { ui = it }.root
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
         val viewModel: AuthViewModel by viewModels()
         bindViewModel(viewModel)
@@ -80,8 +83,8 @@ class AuthActivity : CommonActivity<ActivityAuthBinding, AuthViewModel>() {
     private fun setupPinCodeFragment() {
         val pinCode = viewModel.sharedPrefsWrapper.pinCode
         if (pinCode != null) {
-            val pinCodeFragment = EnterPinCodeFragment.newInstance(PinCodeScreenBehavior.Auth, pinCode)
-            supportFragmentManager.beginTransaction()
+            val pinCodeFragment = EnterPinCodeFragment.newInstance(PinCodeScreenBehavior.FeatureAuth, pinCode)
+            childFragmentManager.beginTransaction()
                 .replace(R.id.fragment_container, pinCodeFragment)
                 .commit()
         }
@@ -91,23 +94,19 @@ class AuthActivity : CommonActivity<ActivityAuthBinding, AuthViewModel>() {
         ui.networkInfoTextView.text = TariVersionModel(viewModel.networkRepository).versionInfo
     }
 
-    override fun onBackPressed() = Unit
-
     private fun doAuth() {
-        showBiometricAuth()
-
         // check whether there's at least screen lock
         if (viewModel.authService.isDeviceSecured) {
-            lifecycleScope.launch {
-                try {
-                    setupPinCodeFragment()
-                } catch (e: BiometricAuthenticationException) {
-                    viewModel.logger.e(e, "Authentication has failed")
-                }
+            try {
+                setupPinCodeFragment()
+            } catch (e: BiometricAuthenticationException) {
+                viewModel.logger.e(e, "Authentication has failed")
             }
         } else {
             displayAuthNotAvailableDialog()
         }
+
+        showBiometricAuth()
     }
 
     fun showBiometricAuth() {
@@ -117,13 +116,13 @@ class AuthActivity : CommonActivity<ActivityAuthBinding, AuthViewModel>() {
                     if (viewModel.sharedPrefsWrapper.biometricsAuth == true) {
                         // prompt system authentication dialog
                         viewModel.authService.authenticate(
-                            this@AuthActivity,
+                            this@FeatureAuthFragment,
                             title = string(auth_title),
                             subtitle =
                             if (viewModel.authService.isBiometricAuthAvailable) string(auth_biometric_prompt)
                             else string(auth_device_lock_code_prompt)
                         )
-                        proceedLogin()
+                        authSuccessfully()
                     }
                 } catch (e: BiometricAuthenticationException) {
                     viewModel.logger.e(e, "Authentication has failed")
@@ -138,39 +137,28 @@ class AuthActivity : CommonActivity<ActivityAuthBinding, AuthViewModel>() {
      * Auth not available on device, i.e. lock screen is disabled
      */
     private fun displayAuthNotAvailableDialog() {
-        val dialog = AlertDialog.Builder(this)
+        val dialog = AlertDialog.Builder(requireContext())
             .setMessage(getString(auth_not_available_or_canceled_desc))
             .setCancelable(false)
             .setPositiveButton(getString(proceed)) { dialog, _ ->
                 dialog.cancel()
                 // user has chosen to proceed without authentication
                 viewModel.sharedPrefsWrapper.isAuthenticated = true
-                proceedLogin()
+                authSuccessfully()
             }
             // negative button text and action
-            .setNegativeButton(getString(exit)) { _, _ -> finish() }
+            .setNegativeButton(getString(exit)) { _, _ -> viewModel.backPressed.postValue(Unit) }
             .create()
         dialog.setTitle(getString(auth_not_available_or_canceled_title))
         dialog.show()
     }
 
-    private fun proceedLogin() {
+    fun authSuccessfully() {
         lifecycleScope.launch(Dispatchers.Main) {
             ui.loader.visible()
-            ui.progressBar.setColor(viewModel.paletteManager.getPurpleBrand(this@AuthActivity))
-            continueToHomeActivity()
-        }
-    }
+            ui.progressBar.setColor(viewModel.paletteManager.getPurpleBrand(requireContext()))
 
-    fun continueToHomeActivity() {
-        viewModel.sharedPrefsWrapper.isAuthenticated = true
-
-        // go to home activity
-        Intent(this, HomeActivity::class.java).apply {
-            flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
-            this@AuthActivity.intent.data?.let(::setData)
-            startActivity(this)
+            viewModel.sharedPrefsWrapper.isFeatureAuthenticated = true
         }
-        finish()
     }
 }

@@ -7,6 +7,7 @@ import com.orhanobut.logger.Logger
 import com.orhanobut.logger.Printer
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.WalletState
+import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
 import com.tari.android.wallet.data.sharedPrefs.tariSettings.TariSettingsSharedRepository
 import com.tari.android.wallet.di.ApplicationComponent
@@ -68,6 +69,11 @@ open class CommonViewModel : ViewModel() {
     @Inject
     lateinit var tariNavigator: TariNavigator
 
+    @Inject
+    lateinit var sharedPrefsRepository: SharedPrefsRepository
+
+    private var authorizedAction: (() -> Unit)? = null
+
     val logger: Printer
         get() = Logger.t(this::class.simpleName).t(LoggerTags.UI.name)
 
@@ -106,6 +112,10 @@ open class CommonViewModel : ViewModel() {
         currentTheme.value = tariSettingsSharedRepository.currentTheme!!
 
         logger.t(LoggerTags.Navigation.name).i(this::class.simpleName + " was started")
+
+        sharedPrefsRepository.updateNotifier.subscribe {
+            checkAuthorization()
+        }.addTo(compositeDisposable)
 
         EventBus.walletState.publishSubject.filter { it is WalletState.Failed }
             .subscribe({
@@ -149,6 +159,20 @@ open class CommonViewModel : ViewModel() {
             )
         )
         modularDialog.postValue(modularArgs)
+    }
+
+    fun runWithAuthorization(action: () -> Unit) {
+        authorizedAction = action
+        navigation.postValue(Navigation.FeatureAuth())
+    }
+
+    fun checkAuthorization() {
+        if (authorizedAction != null && sharedPrefsRepository.isFeatureAuthenticated) {
+            sharedPrefsRepository.isFeatureAuthenticated = false
+            backPressed.value = Unit
+            authorizedAction?.invoke()
+            authorizedAction = null
+        }
     }
 
     fun doOnBackground(action: suspend CoroutineScope.() -> Unit): Job = viewModelScope.launch { action() }

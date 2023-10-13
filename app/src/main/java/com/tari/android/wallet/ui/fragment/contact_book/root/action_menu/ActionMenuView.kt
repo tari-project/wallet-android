@@ -81,6 +81,7 @@ class ActionMenuView : CommonView<CommonViewModel, ViewActionMenuBinding> {
         gone()
     }
 
+    //todo bug
     fun onBackPressed(): Boolean {
         if (currentAnimation != null) {
             close()
