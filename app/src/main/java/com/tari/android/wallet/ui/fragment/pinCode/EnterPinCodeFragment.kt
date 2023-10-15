@@ -5,18 +5,24 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import com.tari.android.wallet.databinding.FragmentEnterPincodeBinding
+import com.tari.android.wallet.extension.addTo
 import com.tari.android.wallet.extension.observe
 import com.tari.android.wallet.ui.common.CommonFragment
 import com.tari.android.wallet.ui.extension.gone
 import com.tari.android.wallet.ui.extension.invisible
 import com.tari.android.wallet.ui.extension.setOnThrottledClickListener
 import com.tari.android.wallet.ui.extension.setVisible
+import com.tari.android.wallet.ui.extension.visible
 import com.tari.android.wallet.ui.fragment.auth.AuthActivity
 import com.tari.android.wallet.ui.fragment.auth.FeatureAuthFragment
+import io.reactivex.Observable
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import java.time.Duration
 import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
-import java.util.Locale
+import java.util.concurrent.TimeUnit
 
 class EnterPinCodeFragment : CommonFragment<FragmentEnterPincodeBinding, EnterPinCodeViewModel>() {
 
@@ -44,17 +50,7 @@ class EnterPinCodeFragment : CommonFragment<FragmentEnterPincodeBinding, EnterPi
     }
 
     private fun initUI() = with(ui.numpad) {
-        pad0Button.setOnClickListener { viewModel.addNum("0") }
-        pad1Button.setOnClickListener { viewModel.addNum("1") }
-        pad2Button.setOnClickListener { viewModel.addNum("2") }
-        pad3Button.setOnClickListener { viewModel.addNum("3") }
-        pad4Button.setOnClickListener { viewModel.addNum("4") }
-        pad5Button.setOnClickListener { viewModel.addNum("5") }
-        pad6Button.setOnClickListener { viewModel.addNum("6") }
-        pad7Button.setOnClickListener { viewModel.addNum("7") }
-        pad8Button.setOnClickListener { viewModel.addNum("8") }
-        pad9Button.setOnClickListener { viewModel.addNum("9") }
-        deleteButton.setOnClickListener { viewModel.removeLast() }
+        initNumpad()
         biometricAuth.setOnClickListener {
             (requireActivity() as? AuthActivity)?.showBiometricAuth()
             requireActivity().supportFragmentManager.fragments.firstOrNull { it is FeatureAuthFragment }?.let {
@@ -117,25 +113,92 @@ class EnterPinCodeFragment : CommonFragment<FragmentEnterPincodeBinding, EnterPi
         observe(nextEnterTime) {
             val nextEnterTime = viewModel.nextEnterTime.value
             val now = LocalDateTime.now()
-            setSecurityState(now.isBefore(nextEnterTime))
-            val formatter = DateTimeFormatter.ofPattern("hh:mm", Locale.ENGLISH)
-            val errorText = if (now.isBefore(nextEnterTime)) "Too many attempts. You should wait ${formatter.format(nextEnterTime)}" else ""
-            ui.errorMessage.text = errorText
+            val isLater = now.isBefore(nextEnterTime)
+            setSecurityState(isLater)
+            ui.errorMessageCountdown.setVisible(isLater)
+            ui.errorMessage.setVisible(!isLater)
+            startCountdown(nextEnterTime)
         }
+    }
+
+    private fun startCountdown(dateTime: LocalDateTime?) {
+        if (dateTime != null && dateTime.isAfter(LocalDateTime.now())) {
+            updateText(Duration.between(LocalDateTime.now(), dateTime))
+            Observable.timer(1, TimeUnit.SECONDS)
+                .repeat()
+                .map { Duration.between(LocalDateTime.now(), dateTime) }
+                .takeWhile {
+                    val shouldTake = LocalDateTime.now().isBefore(dateTime)
+                    if (!shouldTake) {
+                        viewModel.nextEnterTime.postValue(LocalDateTime.now())
+                    }
+                    shouldTake
+                }
+                .subscribe { lifecycleScope.launch(Dispatchers.Main) { updateText(it) } }
+                .addTo(viewModel.compositeDisposable)
+        }
+    }
+
+    private fun updateText(duration: Duration) {
+        val seconds = duration.seconds
+        val minutes = seconds / 60
+        val hours = minutes / 60
+        var timeText = ""
+        if (hours > 0) {
+            timeText += "${hours}h "
+        }
+        if (minutes > 0) {
+            timeText += "${minutes % 60}m "
+        }
+        timeText += "${seconds % 60}s"
+        val errorText = if (!duration.isNegative) "Too many attempts. You should wait $timeText" else ""
+        ui.errorMessageCountdown.text = errorText
+        ui.errorMessageCountdown.visible()
+        ui.errorMessage.invisible()
     }
 
     private fun setSecurityState(isDisabled: Boolean) = with(ui) {
         pinCodeContainer.setVisible(!isDisabled)
-        numpad.root.alpha = if (isDisabled) 0.5f else 1f
+        subtitle.setVisible(!isDisabled)
         for (index in 0 until numpad.root.childCount) {
-            numpad.root.getChildAt(index).isEnabled = !isDisabled
+            numpad.root.getChildAt(index).alpha = if (isDisabled) 0.5f else 1f
         }
+        if (isDisabled) clearNumpad() else initNumpad()
+        numpad.biometricAuth.alpha = 1f
     }
 
     private fun setState(isError: Boolean) {
         val textColor = if (isError) viewModel.paletteManager.getRed(requireContext()) else viewModel.paletteManager.getTextHeading(requireContext())
         val allPinCodeViews = listOf(ui.pinCode1, ui.pinCode2, ui.pinCode3, ui.pinCode4, ui.pinCode5, ui.pinCode6)
         allPinCodeViews.forEach { it.setTextColor(textColor) }
+    }
+
+    private fun initNumpad() = with(ui.numpad) {
+        pad0Button.setOnClickListener { viewModel.addNum("0") }
+        pad1Button.setOnClickListener { viewModel.addNum("1") }
+        pad2Button.setOnClickListener { viewModel.addNum("2") }
+        pad3Button.setOnClickListener { viewModel.addNum("3") }
+        pad4Button.setOnClickListener { viewModel.addNum("4") }
+        pad5Button.setOnClickListener { viewModel.addNum("5") }
+        pad6Button.setOnClickListener { viewModel.addNum("6") }
+        pad7Button.setOnClickListener { viewModel.addNum("7") }
+        pad8Button.setOnClickListener { viewModel.addNum("8") }
+        pad9Button.setOnClickListener { viewModel.addNum("9") }
+        deleteButton.setOnClickListener { viewModel.removeLast() }
+    }
+
+    private fun clearNumpad() = with(ui.numpad) {
+        pad0Button.setOnClickListener { }
+        pad1Button.setOnClickListener { }
+        pad2Button.setOnClickListener { }
+        pad3Button.setOnClickListener { }
+        pad4Button.setOnClickListener { }
+        pad5Button.setOnClickListener { }
+        pad6Button.setOnClickListener { }
+        pad7Button.setOnClickListener { }
+        pad8Button.setOnClickListener { }
+        pad9Button.setOnClickListener { }
+        deleteButton.setOnClickListener { }
     }
 
     companion object {

@@ -9,6 +9,7 @@ import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.common.SingleLiveEvent
 import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
 import java.time.LocalDateTime
+import java.time.OffsetDateTime
 
 class EnterPinCodeViewModel : CommonViewModel() {
 
@@ -66,13 +67,16 @@ class EnterPinCodeViewModel : CommonViewModel() {
 
     private fun doFraudLogic() {
         val attempts = securityPrefRepository.attempts.orEmpty()
-        when(attempts.size) {
-             in 0..3-> nextEnterTime.value = LocalDateTime.now().minusMinutes(1)
-            4 -> nextEnterTime.value = LocalDateTime.now().plusMinutes(1)
-            5 -> nextEnterTime.value = LocalDateTime.now().plusMinutes(5)
-            6 -> nextEnterTime.value = LocalDateTime.now().plusMinutes(60)
-            else -> nextEnterTime.value = LocalDateTime.now().plusMinutes(60 * 5)
+        val lastTimeInMills = attempts.lastOrNull()?.timeInMills
+        val localDateTime = LocalDateTime.ofEpochSecond((lastTimeInMills ?: 0) / 1000, 0, OffsetDateTime.now().offset)
+        val nextDateTime = when (attempts.size) {
+            in 0..3 -> LocalDateTime.now().minusMinutes(1)
+            4 -> localDateTime.plusMinutes(1)
+            5 -> localDateTime.plusMinutes(5)
+            6 -> localDateTime.plusMinutes(60)
+            else -> localDateTime.plusMinutes(60 * 5)
         }
+        nextEnterTime.postValue(nextDateTime)
     }
 
     fun init(behavior: PinCodeScreenBehavior, stashedPin: String? = null) {

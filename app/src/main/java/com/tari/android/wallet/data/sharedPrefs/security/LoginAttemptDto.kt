@@ -1,6 +1,6 @@
 package com.tari.android.wallet.data.sharedPrefs.security
 
-class LoginAttemptDto(val time: Long, val isSuccessful: Boolean)
+class LoginAttemptDto(val timeInMills: Long, val isSuccessful: Boolean)
 
 class LoginAttemptList : ArrayList<LoginAttemptDto>()
 
