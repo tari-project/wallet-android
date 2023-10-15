@@ -134,8 +134,8 @@ class LocalAuthFragment : CommonFragment<FragmentLocalAuthBinding, LocalAuthView
         EventBus.walletState.publishSubject
             .filter { it == WalletState.Running }
             .subscribe {
-                viewModel.sharedPrefsWrapper.isAuthenticated = true
-                viewModel.sharedPrefsWrapper.onboardingAuthSetupCompleted = true
+                viewModel.securityPrefRepository.isAuthenticated = true
+                viewModel.sharedPrefsRepository.onboardingAuthSetupCompleted = true
                 viewModel.backupManager.backupNow()
                 viewModel.navigation.postValue(Navigation.EnterPinCodeNavigation(PinCodeScreenBehavior.CreateConfirm))
                 (requireActivity() as? LocalAuthListener)?.onAuthSuccess()

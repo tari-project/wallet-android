@@ -9,6 +9,7 @@ import com.tari.android.wallet.R
 import com.tari.android.wallet.application.WalletState
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
+import com.tari.android.wallet.data.sharedPrefs.security.SecurityPrefRepository
 import com.tari.android.wallet.data.sharedPrefs.tariSettings.TariSettingsSharedRepository
 import com.tari.android.wallet.di.ApplicationComponent
 import com.tari.android.wallet.di.DiContainer
@@ -71,6 +72,9 @@ open class CommonViewModel : ViewModel() {
 
     @Inject
     lateinit var sharedPrefsRepository: SharedPrefsRepository
+
+    @Inject
+    lateinit var securityPrefRepository: SecurityPrefRepository
 
     private var authorizedAction: (() -> Unit)? = null
 
@@ -167,8 +171,8 @@ open class CommonViewModel : ViewModel() {
     }
 
     fun checkAuthorization() {
-        if (authorizedAction != null && sharedPrefsRepository.isFeatureAuthenticated) {
-            sharedPrefsRepository.isFeatureAuthenticated = false
+        if (authorizedAction != null && securityPrefRepository.isFeatureAuthenticated) {
+            securityPrefRepository.isFeatureAuthenticated = false
             backPressed.value = Unit
             authorizedAction?.invoke()
             authorizedAction = null

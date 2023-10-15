@@ -14,6 +14,9 @@ import com.tari.android.wallet.ui.extension.setOnThrottledClickListener
 import com.tari.android.wallet.ui.extension.setVisible
 import com.tari.android.wallet.ui.fragment.auth.AuthActivity
 import com.tari.android.wallet.ui.fragment.auth.FeatureAuthFragment
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+import java.util.Locale
 
 class EnterPinCodeFragment : CommonFragment<FragmentEnterPincodeBinding, EnterPinCodeViewModel>() {
 
@@ -63,7 +66,8 @@ class EnterPinCodeFragment : CommonFragment<FragmentEnterPincodeBinding, EnterPi
 
     private fun observeUI() = with(viewModel) {
         observe(behavior) {
-            val isVisible = (it == PinCodeScreenBehavior.Auth || it == PinCodeScreenBehavior.FeatureAuth) && viewModel.sharedPrefRepository.biometricsAuth == true
+            val isVisible =
+                (it == PinCodeScreenBehavior.Auth || it == PinCodeScreenBehavior.FeatureAuth) && viewModel.securityPrefRepository.biometricsAuth == true
             ui.numpad.biometricAuth.setVisible(isVisible)
             if (isVisible) {
                 ui.numpad.decimalPointButton.gone()
@@ -108,6 +112,23 @@ class EnterPinCodeFragment : CommonFragment<FragmentEnterPincodeBinding, EnterPi
             requireActivity().supportFragmentManager.fragments.firstOrNull { it is FeatureAuthFragment }?.let {
                 (it as? FeatureAuthFragment)?.authSuccessfully()
             }
+        }
+
+        observe(nextEnterTime) {
+            val nextEnterTime = viewModel.nextEnterTime.value
+            val now = LocalDateTime.now()
+            setSecurityState(now.isBefore(nextEnterTime))
+            val formatter = DateTimeFormatter.ofPattern("hh:mm", Locale.ENGLISH)
+            val errorText = if (now.isBefore(nextEnterTime)) "Too many attempts. You should wait ${formatter.format(nextEnterTime)}" else ""
+            ui.errorMessage.text = errorText
+        }
+    }
+
+    private fun setSecurityState(isDisabled: Boolean) = with(ui) {
+        pinCodeContainer.setVisible(!isDisabled)
+        numpad.root.alpha = if (isDisabled) 0.5f else 1f
+        for (index in 0 until numpad.root.childCount) {
+            numpad.root.getChildAt(index).isEnabled = !isDisabled
         }
     }
 

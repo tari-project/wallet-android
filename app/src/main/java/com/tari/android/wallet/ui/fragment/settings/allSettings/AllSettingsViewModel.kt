@@ -130,7 +130,7 @@ class AllSettingsViewModel : CommonViewModel() {
         )
 
         val alias = settingsRepository.name.orEmpty() + " " + settingsRepository.surname.orEmpty()
-        val pinCode = settingsRepository.pinCode
+        val pinCode = securityPrefRepository.pinCode
 
         val allOptions = mutableListOf(
             MyProfileViewHolderItem(settingsRepository.emojiId.orEmpty(), yatSharedPrefsRepository.connectedYat.orEmpty(), alias) {

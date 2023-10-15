@@ -49,6 +49,7 @@ import com.tari.android.wallet.application.deeplinks.DeeplinkHandler
 import com.tari.android.wallet.application.deeplinks.DeeplinkViewModel
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
+import com.tari.android.wallet.data.sharedPrefs.security.SecurityPrefRepository
 import com.tari.android.wallet.data.sharedPrefs.tariSettings.TariSettingsSharedRepository
 import com.tari.android.wallet.databinding.ActivityHomeBinding
 import com.tari.android.wallet.di.DiContainer.appComponent
@@ -98,6 +99,9 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>() {
     lateinit var sharedPrefsRepository: SharedPrefsRepository
 
     @Inject
+    lateinit var securityPrefRepository: SecurityPrefRepository
+
+    @Inject
     lateinit var walletServiceLauncher: WalletServiceLauncher
 
     @Inject
@@ -141,7 +145,7 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>() {
 
         overridePendingTransition(0, 0)
         appComponent.inject(this)
-        if (!sharedPrefsRepository.isAuthenticated) {
+        if (!securityPrefRepository.isAuthenticated) {
             val intent = Intent(this, SplashActivity::class.java)
                 .apply { flags = Intent.FLAG_ACTIVITY_NEW_TASK }
             this.intent?.data?.let(intent::setData)

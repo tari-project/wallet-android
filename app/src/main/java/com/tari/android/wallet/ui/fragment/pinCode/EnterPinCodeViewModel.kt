@@ -3,16 +3,14 @@ package com.tari.android.wallet.ui.fragment.pinCode
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.map
 import com.tari.android.wallet.R
-import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
+import com.tari.android.wallet.data.sharedPrefs.security.LoginAttemptDto
+import com.tari.android.wallet.extension.addTo
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.common.SingleLiveEvent
 import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
-import javax.inject.Inject
+import java.time.LocalDateTime
 
 class EnterPinCodeViewModel : CommonViewModel() {
-
-    @Inject
-    lateinit var sharedPrefRepository: SharedPrefsRepository
 
     val behavior = MutableLiveData<PinCodeScreenBehavior>()
 
@@ -57,8 +55,24 @@ class EnterPinCodeViewModel : CommonViewModel() {
 
     val successfullyAuth = SingleLiveEvent<Unit>()
 
+    val nextEnterTime = MutableLiveData<LocalDateTime>()
+
     init {
         component.inject(this)
+
+        doFraudLogic()
+        securityPrefRepository.updateNotifier.subscribe { doFraudLogic() }.addTo(compositeDisposable)
+    }
+
+    private fun doFraudLogic() {
+        val attempts = securityPrefRepository.attempts.orEmpty()
+        when(attempts.size) {
+             in 0..3-> nextEnterTime.value = LocalDateTime.now().minusMinutes(1)
+            4 -> nextEnterTime.value = LocalDateTime.now().plusMinutes(1)
+            5 -> nextEnterTime.value = LocalDateTime.now().plusMinutes(5)
+            6 -> nextEnterTime.value = LocalDateTime.now().plusMinutes(60)
+            else -> nextEnterTime.value = LocalDateTime.now().plusMinutes(60 * 5)
+        }
     }
 
     fun init(behavior: PinCodeScreenBehavior, stashedPin: String? = null) {
@@ -105,7 +119,7 @@ class EnterPinCodeViewModel : CommonViewModel() {
             backPressed.postValue(Unit)
             return
         }
-        sharedPrefRepository.pinCode = currentNums.value.orEmpty()
+        securityPrefRepository.pinCode = currentNums.value.orEmpty()
         tariNavigator.backToAllSettings()
     }
 
@@ -118,12 +132,16 @@ class EnterPinCodeViewModel : CommonViewModel() {
             backPressed.postValue(Unit)
             return
         }
-        sharedPrefRepository.pinCode = currentNums.value.orEmpty()
+        securityPrefRepository.pinCode = currentNums.value.orEmpty()
         tariNavigator.backToAllSettings()
     }
 
     private fun authPinCode() {
-        if (currentNums.value != sharedPrefRepository.pinCode) {
+        val isSuccessfully = currentNums.value == securityPrefRepository.pinCode
+
+        securityPrefRepository.saveAttempt(LoginAttemptDto(System.currentTimeMillis(), isSuccessfully))
+
+        if (!isSuccessfully) {
             errorMessage.value = resourceManager.getString(R.string.pin_code_error_message)
             return
         }

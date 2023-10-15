@@ -47,6 +47,7 @@ import com.tari.android.wallet.R.string.auth_not_available_or_canceled_title
 import com.tari.android.wallet.R.string.auth_title
 import com.tari.android.wallet.R.string.exit
 import com.tari.android.wallet.R.string.proceed
+import com.tari.android.wallet.data.sharedPrefs.security.LoginAttemptDto
 import com.tari.android.wallet.databinding.FragmentFeatureAuthBinding
 import com.tari.android.wallet.extension.observe
 import com.tari.android.wallet.infrastructure.security.biometric.BiometricAuthenticationException
@@ -81,7 +82,7 @@ class FeatureAuthFragment : CommonFragment<FragmentFeatureAuthBinding, AuthViewM
     }
 
     private fun setupPinCodeFragment() {
-        val pinCode = viewModel.sharedPrefsWrapper.pinCode
+        val pinCode = viewModel.securityPrefRepository.pinCode
         if (pinCode != null) {
             val pinCodeFragment = EnterPinCodeFragment.newInstance(PinCodeScreenBehavior.FeatureAuth, pinCode)
             childFragmentManager.beginTransaction()
@@ -113,7 +114,7 @@ class FeatureAuthFragment : CommonFragment<FragmentFeatureAuthBinding, AuthViewM
         if (viewModel.authService.isDeviceSecured) {
             lifecycleScope.launch {
                 try {
-                    if (viewModel.sharedPrefsWrapper.biometricsAuth == true) {
+                    if (viewModel.securityPrefRepository.biometricsAuth == true) {
                         // prompt system authentication dialog
                         viewModel.authService.authenticate(
                             this@FeatureAuthFragment,
@@ -143,7 +144,7 @@ class FeatureAuthFragment : CommonFragment<FragmentFeatureAuthBinding, AuthViewM
             .setPositiveButton(getString(proceed)) { dialog, _ ->
                 dialog.cancel()
                 // user has chosen to proceed without authentication
-                viewModel.sharedPrefsWrapper.isAuthenticated = true
+                viewModel.securityPrefRepository.isAuthenticated = true
                 authSuccessfully()
             }
             // negative button text and action
@@ -154,11 +155,12 @@ class FeatureAuthFragment : CommonFragment<FragmentFeatureAuthBinding, AuthViewM
     }
 
     fun authSuccessfully() {
+        viewModel.securityPrefRepository.saveAttempt(LoginAttemptDto(System.currentTimeMillis(), true))
         lifecycleScope.launch(Dispatchers.Main) {
             ui.loader.visible()
             ui.progressBar.setColor(viewModel.paletteManager.getPurpleBrand(requireContext()))
 
-            viewModel.sharedPrefsWrapper.isFeatureAuthenticated = true
+            viewModel.securityPrefRepository.isFeatureAuthenticated = true
         }
     }
 }

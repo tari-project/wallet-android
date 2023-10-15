@@ -45,6 +45,7 @@ import com.tari.android.wallet.R.string.auth_not_available_or_canceled_title
 import com.tari.android.wallet.R.string.auth_title
 import com.tari.android.wallet.R.string.exit
 import com.tari.android.wallet.R.string.proceed
+import com.tari.android.wallet.data.sharedPrefs.security.LoginAttemptDto
 import com.tari.android.wallet.databinding.ActivityAuthBinding
 import com.tari.android.wallet.extension.observe
 import com.tari.android.wallet.infrastructure.security.biometric.BiometricAuthenticationException
@@ -78,7 +79,7 @@ class AuthActivity : CommonActivity<ActivityAuthBinding, AuthViewModel>() {
     }
 
     private fun setupPinCodeFragment() {
-        val pinCode = viewModel.sharedPrefsWrapper.pinCode
+        val pinCode = viewModel.securityPrefRepository.pinCode
         if (pinCode != null) {
             val pinCodeFragment = EnterPinCodeFragment.newInstance(PinCodeScreenBehavior.Auth, pinCode)
             supportFragmentManager.beginTransaction()
@@ -114,7 +115,7 @@ class AuthActivity : CommonActivity<ActivityAuthBinding, AuthViewModel>() {
         if (viewModel.authService.isDeviceSecured) {
             lifecycleScope.launch {
                 try {
-                    if (viewModel.sharedPrefsWrapper.biometricsAuth == true) {
+                    if (viewModel.securityPrefRepository.biometricsAuth == true) {
                         // prompt system authentication dialog
                         viewModel.authService.authenticate(
                             this@AuthActivity,
@@ -144,7 +145,7 @@ class AuthActivity : CommonActivity<ActivityAuthBinding, AuthViewModel>() {
             .setPositiveButton(getString(proceed)) { dialog, _ ->
                 dialog.cancel()
                 // user has chosen to proceed without authentication
-                viewModel.sharedPrefsWrapper.isAuthenticated = true
+                viewModel.securityPrefRepository.isAuthenticated = true
                 proceedLogin()
             }
             // negative button text and action
@@ -155,6 +156,7 @@ class AuthActivity : CommonActivity<ActivityAuthBinding, AuthViewModel>() {
     }
 
     private fun proceedLogin() {
+        viewModel.securityPrefRepository.saveAttempt(LoginAttemptDto(System.currentTimeMillis(), true))
         lifecycleScope.launch(Dispatchers.Main) {
             ui.loader.visible()
             ui.progressBar.setColor(viewModel.paletteManager.getPurpleBrand(this@AuthActivity))
@@ -163,7 +165,7 @@ class AuthActivity : CommonActivity<ActivityAuthBinding, AuthViewModel>() {
     }
 
     fun continueToHomeActivity() {
-        viewModel.sharedPrefsWrapper.isAuthenticated = true
+        viewModel.securityPrefRepository.isAuthenticated = true
 
         // go to home activity
         Intent(this, HomeActivity::class.java).apply {

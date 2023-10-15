@@ -3,7 +3,6 @@ package com.tari.android.wallet.ui.fragment.auth
 import androidx.lifecycle.viewModelScope
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.MigrationManager
-import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.infrastructure.security.biometric.BiometricAuthenticationService
 import com.tari.android.wallet.service.service.WalletServiceLauncher
 import com.tari.android.wallet.ui.common.CommonViewModel
@@ -20,9 +19,6 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 class AuthViewModel : CommonViewModel() {
-
-    @Inject
-    lateinit var sharedPrefsWrapper: SharedPrefsRepository
 
     @Inject
     lateinit var authService: BiometricAuthenticationService
