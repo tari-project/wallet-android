@@ -5,10 +5,19 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <com.tari.android.wallet.ui.component.tari.toolbar.TariToolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        app:text="@string/need_authorization" />
+
     <FrameLayout
         android:id="@+id/fragment_container"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/toolbar" />
 
     <com.tari.android.wallet.ui.component.tari.TariTextView
         android:id="@+id/network_info_text_view"
@@ -28,9 +37,11 @@
     <FrameLayout
         android:id="@+id/loader"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="0dp"
         android:background="?attr/palette_background_primary"
-        android:visibility="gone">
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/toolbar">
 
         <com.tari.android.wallet.ui.component.tari.TariProgressBar
             android:id="@+id/progress_bar"

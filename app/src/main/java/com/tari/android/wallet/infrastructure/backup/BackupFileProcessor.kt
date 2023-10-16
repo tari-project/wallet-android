@@ -35,7 +35,7 @@ package com.tari.android.wallet.infrastructure.backup
 import com.google.gson.Gson
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.data.WalletConfig
-import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
+import com.tari.android.wallet.data.sharedPrefs.security.SecurityPrefRepository
 import com.tari.android.wallet.extension.encrypt
 import com.tari.android.wallet.ffi.FFIError
 import com.tari.android.wallet.ffi.FFIWallet
@@ -54,7 +54,7 @@ import javax.inject.Singleton
 @Singleton
 class BackupFileProcessor @Inject constructor(
     private val backupSettingsRepository: BackupSettingsRepository,
-    private val sharedPrefsRepository: SharedPrefsRepository,
+    private val securityPrefRepository: SecurityPrefRepository,
     private val walletConfig: WalletConfig,
     private val namingPolicy: BackupNamingPolicy,
 ) {
@@ -88,7 +88,7 @@ class BackupFileProcessor @Inject constructor(
             logger.i("Partial files was generated")
             return Triple(outputFile, backupDate, mimeType)
         } else {
-            val passphrase = sharedPrefsRepository.databasePassphrase!!
+            val passphrase = securityPrefRepository.databasePassphrase!!
             val passphraseFile = File(walletConfig.getWalletTempDirPath(), namingPolicy.getPassphraseFileName())
             passphraseFile.bufferedWriter().use { it.append(passphrase) }
 
@@ -133,7 +133,7 @@ class BackupFileProcessor @Inject constructor(
             val passphraseFile = File(walletConfig.getWalletFilesDirPath(), namingPolicy.getPassphraseFileName())
             val passphrase = passphraseFile.readText()
 
-            sharedPrefsRepository.databasePassphrase = passphrase
+            securityPrefRepository.databasePassphrase = passphrase
 
             unencryptedCompressedFile.delete()
 

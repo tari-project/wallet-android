@@ -160,7 +160,7 @@
     <!-- onboarding - local auth -->
     <string name="auth_prompt_title">🔑 Let’s secure your wallet. 🔑</string>
     <string name="auth_prompt_desc">Sleep well at night knowing you’ve taken precautions to keep your tXTR wallet safe and sound.</string>
-    <string name="auth_prompt_button_text">Secure with Device Lock Code</string>
+    <string name="auth_prompt_button_text">Secure with Passcode</string>
     <string name="auth_prompt_button_touch_id_text">Secure with Biometrics</string>
 
     <!-- auth -->
@@ -422,6 +422,9 @@
     <string name="all_settings_report_a_bug">Report a Bug</string>
     <string name="all_settings_store">The TTL Store</string>
     <string name="all_settings_data_collection">Data Collection</string>
+    <string name="all_settings_pin_code">Change Passcode</string>
+    <string name="all_settings_create_pin_code">Create Passcode</string>
+    <string name="all_settings_biometrics">Biometrics</string>
     <string name="all_settings_delete_wallet">Delete Your Wallet</string>
     <string name="all_settings_visit_site">Visit Tari.com</string>
     <string name="all_settings_contribute">Contribute to Tari Aurora</string>
@@ -576,6 +579,11 @@
     <string name="data_collection_dialog_description">We\'re always striving to make Aurora better.\nTo achieve this, we use a third-party service to gather non-identifiable data like crash logs and usage statistics. This data helps us pinpoint and fix any issues, ultimately improving your experience.\n\nDo you consent to your data being collected?</string>
     <string name="data_collection_dialog_positive">Yes, I consent</string>
     <string name="data_collection_dialog_negative">No, I decline</string>
+
+    <!-- Biometrics -->
+    <string name="biometrics_description">We\'re dedicated to enhancing the security and convenience of Aurora\'s authorization process. To achieve this, we integrate a reliable Android native service for biometric authentication. Your unique biometric data ensures secure and effortless access to the application, simplifying your user experience.</string>
+    <string name="biometrics_settings_use">Use biometrics</string>
+    <string name="need_authorization">Authorization needed</string>
 
     <!-- Network status indicator-->
     <string name="connection_status_dialog_title">Connection Status</string>
@@ -865,5 +873,14 @@
     <string name="chat_empty_state_description">Just tap the \'New Message\' icon up top to kick things off!</string>
     <string name="chat_options_title">Options</string>
     <string name="unknown_source">Unknown source</string>
+
+    <string name="pin_code_subtitle_create">Create a passcode</string>
+    <string name="pin_code_subtitle_create_confirm">Confirm a passcode </string>
+    <string name="pin_code_subtitle_change_old">Enter the old passcode</string>
+    <string name="pin_code_subtitle_change_new">Enter the new passcode</string>
+    <string name="pin_code_subtitle_change_new_confirm">Confirm the new passcode</string>
+    <string name="pin_code_subtitle_auth">Enter your passcode to log in</string>
+    <string name="pin_code_subtitle_feature_auth">Enter your passcode to proceed</string>
+    <string name="pin_code_error_message">Wrong passcode</string>
 
 </resources>

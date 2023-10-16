@@ -13,6 +13,7 @@ import com.tari.android.wallet.R.drawable.vector_all_settings_contribute_to_tari
 import com.tari.android.wallet.R.drawable.vector_all_settings_data_collection
 import com.tari.android.wallet.R.drawable.vector_all_settings_delete_button_icon
 import com.tari.android.wallet.R.drawable.vector_all_settings_disclaimer_icon
+import com.tari.android.wallet.R.drawable.vector_all_settings_passcode
 import com.tari.android.wallet.R.drawable.vector_all_settings_privacy_policy_icon
 import com.tari.android.wallet.R.drawable.vector_all_settings_report_bug_icon
 import com.tari.android.wallet.R.drawable.vector_all_settings_select_base_node_icon
@@ -21,15 +22,19 @@ import com.tari.android.wallet.R.drawable.vector_all_settings_select_theme_icon
 import com.tari.android.wallet.R.drawable.vector_all_settings_user_agreement_icon
 import com.tari.android.wallet.R.drawable.vector_all_settings_visit_tari_icon
 import com.tari.android.wallet.R.drawable.vector_all_settings_yat_icon
+import com.tari.android.wallet.R.drawable.vector_fingerprint
 import com.tari.android.wallet.R.string.all_settings_advanced_settings_label
 import com.tari.android.wallet.R.string.all_settings_background_service
+import com.tari.android.wallet.R.string.all_settings_biometrics
 import com.tari.android.wallet.R.string.all_settings_bluetooth_settings
 import com.tari.android.wallet.R.string.all_settings_bridge_configuration
 import com.tari.android.wallet.R.string.all_settings_connect_yats
 import com.tari.android.wallet.R.string.all_settings_contribute
+import com.tari.android.wallet.R.string.all_settings_create_pin_code
 import com.tari.android.wallet.R.string.all_settings_data_collection
 import com.tari.android.wallet.R.string.all_settings_delete_wallet
 import com.tari.android.wallet.R.string.all_settings_disclaimer
+import com.tari.android.wallet.R.string.all_settings_pin_code
 import com.tari.android.wallet.R.string.all_settings_privacy_policy
 import com.tari.android.wallet.R.string.all_settings_report_a_bug
 import com.tari.android.wallet.R.string.all_settings_secondary_settings_label
@@ -64,7 +69,9 @@ import com.tari.android.wallet.ui.common.SingleLiveEvent
 import com.tari.android.wallet.ui.common.recyclerView.CommonViewHolderItem
 import com.tari.android.wallet.ui.common.recyclerView.items.DividerViewHolderItem
 import com.tari.android.wallet.ui.dialog.error.ErrorDialogArgs
+import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
 import com.tari.android.wallet.ui.fragment.home.navigation.Navigation.AllSettingsNavigation
+import com.tari.android.wallet.ui.fragment.pinCode.PinCodeScreenBehavior
 import com.tari.android.wallet.ui.fragment.settings.allSettings.PresentationBackupState.BackupStateStatus.InProgress
 import com.tari.android.wallet.ui.fragment.settings.allSettings.PresentationBackupState.BackupStateStatus.Success
 import com.tari.android.wallet.ui.fragment.settings.allSettings.PresentationBackupState.BackupStateStatus.Warning
@@ -85,7 +92,7 @@ class AllSettingsViewModel : CommonViewModel() {
     lateinit var authenticationViewModel: BiometricAuthenticationViewModel
 
     private val backupOption = SettingsBackupOptionViewHolderItem(leftIconId = vector_all_settings_backup_options_icon) {
-        authenticationViewModel.requireAuthorization { navigation.postValue(AllSettingsNavigation.ToBackupSettings) }
+        runWithAuthorization { navigation.postValue(AllSettingsNavigation.ToBackupSettings) }
     }
 
     @Inject
@@ -123,6 +130,7 @@ class AllSettingsViewModel : CommonViewModel() {
         )
 
         val alias = settingsRepository.name.orEmpty() + " " + settingsRepository.surname.orEmpty()
+        val pinCode = securityPrefRepository.pinCode
 
         val allOptions = mutableListOf(
             MyProfileViewHolderItem(settingsRepository.emojiId.orEmpty(), yatSharedPrefsRepository.connectedYat.orEmpty(), alias) {
@@ -137,6 +145,26 @@ class AllSettingsViewModel : CommonViewModel() {
             DividerViewHolderItem(),
             ButtonViewDto(resourceManager.getString(all_settings_data_collection), vector_all_settings_data_collection) {
                 navigation.postValue(AllSettingsNavigation.ToDataCollection)
+            },
+            DividerViewHolderItem(),
+            if (pinCode != null) {
+                ButtonViewDto(resourceManager.getString(all_settings_pin_code), vector_all_settings_passcode) {
+                    runWithAuthorization {
+                        navigation.postValue(Navigation.EnterPinCodeNavigation(PinCodeScreenBehavior.ChangeNew))
+                    }
+                }
+            } else {
+                ButtonViewDto(resourceManager.getString(all_settings_create_pin_code), vector_all_settings_passcode) {
+                    runWithAuthorization {
+                        navigation.postValue(Navigation.EnterPinCodeNavigation(PinCodeScreenBehavior.Create))
+                    }
+                }
+            },
+            DividerViewHolderItem(),
+            ButtonViewDto(resourceManager.getString(all_settings_biometrics), vector_fingerprint) {
+                runWithAuthorization {
+                    navigation.postValue(Navigation.ChangeBiometrics())
+                }
             },
             SettingsTitleViewHolderItem(resourceManager.getString(all_settings_secondary_settings_label)),
             ButtonViewDto(resourceManager.getString(all_settings_store), vector_all_settings_cart) {

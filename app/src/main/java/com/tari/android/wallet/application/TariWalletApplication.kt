@@ -40,6 +40,7 @@ import androidx.lifecycle.ProcessLifecycleOwner
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.BuildConfig
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
+import com.tari.android.wallet.data.sharedPrefs.security.SecurityPrefRepository
 import com.tari.android.wallet.di.DiContainer
 import com.tari.android.wallet.event.Event
 import com.tari.android.wallet.event.EventBus
@@ -71,6 +72,9 @@ class TariWalletApplication : Application() {
 
     @Inject
     lateinit var sharedPrefsRepository: SharedPrefsRepository
+
+    @Inject
+    lateinit var securityPrefRepository: SecurityPrefRepository
 
     @Inject
     lateinit var walletServiceLauncher: WalletServiceLauncher
@@ -126,7 +130,7 @@ class TariWalletApplication : Application() {
         notificationHelper.createNotificationChannels()
 
         // user should authenticate every time the app starts up
-        sharedPrefsRepository.isAuthenticated = false
+        securityPrefRepository.isAuthenticated = false
 
         registerReceiver(connectionStateReceiver, connectionStateReceiver.intentFilter)
 

@@ -6,9 +6,16 @@ import com.tari.android.wallet.model.TariWalletAddress
 import com.tari.android.wallet.model.Tx
 import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.ContactDto
 import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.YatDto
+import com.tari.android.wallet.ui.fragment.pinCode.PinCodeScreenBehavior
 import com.tari.android.wallet.ui.fragment.send.common.TransactionData
 
 sealed class Navigation {
+
+    class EnterPinCodeNavigation(val behavior: PinCodeScreenBehavior, val stashedPin: String? = null): Navigation()
+
+    class ChangeBiometrics(): Navigation()
+
+    class FeatureAuth(): Navigation()
 
     sealed class CustomBridgeNavigation : Navigation() {
         object UploadQrCode : CustomBridgeNavigation()

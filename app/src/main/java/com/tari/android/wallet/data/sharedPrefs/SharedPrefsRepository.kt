@@ -32,15 +32,14 @@
  */
 package com.tari.android.wallet.data.sharedPrefs
 
-import android.content.Context
 import android.content.SharedPreferences
 import com.tari.android.wallet.data.repository.CommonRepository
 import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodeSharedRepository
 import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefBooleanDelegate
 import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefStringDelegate
-import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefStringSecuredDelegate
 import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
 import com.tari.android.wallet.data.sharedPrefs.network.formatKey
+import com.tari.android.wallet.data.sharedPrefs.security.SecurityPrefRepository
 import com.tari.android.wallet.data.sharedPrefs.securityStages.SecurityStagesRepository
 import com.tari.android.wallet.data.sharedPrefs.sentry.SentryPrefRepository
 import com.tari.android.wallet.data.sharedPrefs.tariSettings.TariSettingsSharedRepository
@@ -61,7 +60,6 @@ import kotlin.random.Random
 
 @Singleton
 class SharedPrefsRepository @Inject constructor(
-    context: Context,
     sharedPrefs: SharedPreferences,
     networkRepository: NetworkRepository,
     private val backupSettingsRepository: BackupSettingsRepository,
@@ -71,12 +69,12 @@ class SharedPrefsRepository @Inject constructor(
     private val tariSettingsSharedRepository: TariSettingsSharedRepository,
     private val securityStagesRepository: SecurityStagesRepository,
     private val contactSharedPrefRepository: ContactSharedPrefRepository,
-    private val sentryPrefRepository: SentryPrefRepository
+    private val sentryPrefRepository: SentryPrefRepository,
+    private val securityPrefRepository: SecurityPrefRepository
 ) : CommonRepository(networkRepository) {
 
     private object Key {
         const val publicKeyHexString = "tari_wallet_public_key_hex_string"
-        const val isAuthenticated = "tari_wallet_is_authenticated"
         const val emojiId = "tari_wallet_emoji_id_"
         const val name = "tari_wallet_name_"
         const val surname = "tari_wallet_surname_"
@@ -86,21 +84,16 @@ class SharedPrefsRepository @Inject constructor(
         const val onboardingAuthSetupStarted = "tari_wallet_onboarding_auth_setup_started"
         const val onboardingCompleted = "tari_wallet_onboarding_completed"
         const val onboardingDisplayedAtHome = "tari_wallet_onboarding_displayed_at_home"
-        const val walletDatabasePassphrase = "tari_wallet_database_passphrase"
         const val isDataCleared = "tari_is_data_cleared"
     }
 
     var publicKeyHexString: String? by SharedPrefStringDelegate(sharedPrefs, this,  formatKey(Key.publicKeyHexString))
-
-    var isAuthenticated: Boolean by SharedPrefBooleanDelegate(sharedPrefs, this,  formatKey(Key.isAuthenticated))
 
     var emojiId: String? by SharedPrefStringDelegate(sharedPrefs, this,  formatKey(Key.emojiId))
 
     var name: String? by SharedPrefStringDelegate(sharedPrefs, this,  formatKey(Key.name))
 
     var surname: String? by SharedPrefStringDelegate(sharedPrefs, this,  formatKey(Key.surname))
-
-    var databasePassphrase: String? by SharedPrefStringSecuredDelegate(context, sharedPrefs, this, formatKey(Key.walletDatabasePassphrase))
 
     var onboardingStarted: Boolean by SharedPrefBooleanDelegate(sharedPrefs, this,  formatKey(Key.onboardingStarted))
 
@@ -131,15 +124,15 @@ class SharedPrefsRepository @Inject constructor(
         securityStagesRepository.clear()
         contactSharedPrefRepository.clear()
         sentryPrefRepository.clear()
+        securityPrefRepository.clear()
         publicKeyHexString = null
-        isAuthenticated = false
         emojiId = null
-        databasePassphrase = null
         onboardingStarted = false
         onboardingCompleted = false
         onboardingAuthSetupStarted = false
         onboardingAuthSetupCompleted = false
         onboardingDisplayedAtHome = false
+
     }
 
     fun generateDatabasePassphrase(): String {
