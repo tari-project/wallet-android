@@ -38,6 +38,7 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.tari.android.wallet.data.WalletConfig
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
+import com.tari.android.wallet.data.sharedPrefs.security.SecurityPrefRepository
 import com.tari.android.wallet.di.DiContainer.appComponent
 import com.tari.android.wallet.service.service.WalletServiceLauncher
 import com.tari.android.wallet.ui.fragment.auth.AuthActivity
@@ -59,6 +60,9 @@ class SplashActivity : AppCompatActivity() {
     lateinit var sharedPrefsRepository: SharedPrefsRepository
 
     @Inject
+    lateinit var securityPrefRepository: SecurityPrefRepository
+
+    @Inject
     lateinit var walletServiceLauncher: WalletServiceLauncher
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -74,6 +78,10 @@ class SplashActivity : AppCompatActivity() {
             // in cases interrupted restoration
             WalletUtil.clearWalletFiles(walletConfig.getWalletFilesDirPath())
             sharedPrefsRepository.clear()
+        }
+        if (securityPrefRepository.pinCode == null) {
+            launch(OnboardingFlowActivity::class.java)
+            return
         }
         launch(if (exists) AuthActivity::class.java else OnboardingFlowActivity::class.java)
     }

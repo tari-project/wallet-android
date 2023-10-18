@@ -106,7 +106,7 @@ class SharedPrefsRepository @Inject constructor(
     var actionMenuSide: Boolean by SharedPrefBooleanDelegate(sharedPrefs, this, formatKey(Key.actionMenuSide))
 
     val onboardingAuthWasInterrupted: Boolean
-        get() = onboardingAuthSetupStarted && !onboardingAuthSetupCompleted
+        get() = onboardingAuthSetupStarted && (!onboardingAuthSetupCompleted || securityPrefRepository.pinCode != null)
 
     val onboardingWasInterrupted: Boolean
         get() = onboardingStarted && !onboardingCompleted
