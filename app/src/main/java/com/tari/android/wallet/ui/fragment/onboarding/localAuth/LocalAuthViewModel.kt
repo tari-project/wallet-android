@@ -40,9 +40,4 @@ class LocalAuthViewModel : CommonViewModel() {
         securityPrefRepository.biometricsAuth = true
         secureState.value = secureState.value!!.copy(biometricsSecured = true)
     }
-
-//    fun securedWithPinCode() {
-//        sharedPrefsWrapper.onboardingAuthSetupCompleted = true
-//        secureState.value = secureState.value!!.copy(pinCodeSecured = true)
-//    }
 }

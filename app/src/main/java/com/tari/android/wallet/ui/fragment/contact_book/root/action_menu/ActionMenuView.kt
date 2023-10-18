@@ -78,10 +78,10 @@ class ActionMenuView : CommonView<CommonViewModel, ViewActionMenuBinding> {
         this.layoutParams = FrameLayout.LayoutParams(ConstraintLayout.LayoutParams.MATCH_PARENT, ConstraintLayout.LayoutParams.MATCH_PARENT)
         changeSideButton.setOnClickListener { changeSide() }
         this.closeButton.setOnClickListener { close() }
+        close()
         gone()
     }
 
-    //todo bug
     fun onBackPressed(): Boolean {
         if (currentAnimation != null) {
             close()

@@ -117,7 +117,7 @@ open class CommonViewModel : ViewModel() {
 
         logger.t(LoggerTags.Navigation.name).i(this::class.simpleName + " was started")
 
-        sharedPrefsRepository.updateNotifier.subscribe {
+        securityPrefRepository.updateNotifier.subscribe {
             checkAuthorization()
         }.addTo(compositeDisposable)
 

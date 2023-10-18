@@ -124,7 +124,7 @@ class EnterPinCodeViewModel : CommonViewModel() {
             return
         }
         securityPrefRepository.pinCode = currentNums.value.orEmpty()
-        tariNavigator.backToAllSettings()
+        tariNavigator.backAfterAuth()
     }
 
     private fun changeNewPinCode() {
@@ -137,7 +137,7 @@ class EnterPinCodeViewModel : CommonViewModel() {
             return
         }
         securityPrefRepository.pinCode = currentNums.value.orEmpty()
-        tariNavigator.backToAllSettings()
+        tariNavigator.backAfterAuth()
     }
 
     private fun authPinCode() {

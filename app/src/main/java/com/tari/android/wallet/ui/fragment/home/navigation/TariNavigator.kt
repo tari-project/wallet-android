@@ -49,6 +49,7 @@ import com.tari.android.wallet.ui.fragment.home.homeTransactionHistory.HomeTrans
 import com.tari.android.wallet.ui.fragment.home.navigation.Navigation.AllSettingsNavigation
 import com.tari.android.wallet.ui.fragment.home.navigation.Navigation.ContactBookNavigation
 import com.tari.android.wallet.ui.fragment.onboarding.activity.OnboardingFlowActivity
+import com.tari.android.wallet.ui.fragment.onboarding.localAuth.LocalAuthFragment
 import com.tari.android.wallet.ui.fragment.pinCode.EnterPinCodeFragment
 import com.tari.android.wallet.ui.fragment.profile.WalletInfoFragment
 import com.tari.android.wallet.ui.fragment.restore.enterRestorationPassword.EnterRestorationPasswordFragment
@@ -264,6 +265,14 @@ class TariNavigator @Inject constructor(val prefs: SharedPrefsRepository, val ta
     fun backToContactBook() = popUpTo(ContactBookFragment::class.java.simpleName)
 
     fun backToAllSettings() = popUpTo(AllSettingsFragment::class.java.simpleName)
+
+    fun backAfterAuth() {
+        if (activity is HomeActivity) {
+            popUpTo(AllSettingsFragment::class.java.simpleName)
+        } else {
+            popUpTo(LocalAuthFragment::class.java.simpleName)
+        }
+    }
 
     fun toLinkContact(contact: ContactDto) = addFragment(ContactLinkFragment.createFragment(contact))
 
