@@ -54,7 +54,7 @@ class FFIPublicKey() : FFIBase() {
     }
 
     constructor(hex: HexString) : this() {
-        if (hex.toString().length == 64) {
+        if (hex.toString().length == 64 || hex.toString().length == 66) {
             runWithError { jniFromHex(hex.hex, it) }
         } else {
             throw FFIException(message = "HexString is not a valid PublicKey")

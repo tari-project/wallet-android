@@ -113,7 +113,7 @@ class OnboardingFlowActivity : CommonActivity<ActivityOnboardingFlowBinding, Com
                     setCustomAnimations(R.anim.enter_from_right, R.anim.exit_to_left, R.anim.enter_from_left, R.anim.exit_to_right)
                 }
             }
-            .add(R.id.onboarding_fragment_container_1, fragment)
+            .add(R.id.onboarding_fragment_container_1, fragment, fragment.javaClass.simpleName)
             .addToBackStack(null)
             .commit()
     }

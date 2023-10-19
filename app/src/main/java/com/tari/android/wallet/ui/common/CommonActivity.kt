@@ -172,7 +172,11 @@ abstract class CommonActivity<Binding : ViewBinding, VM : CommonViewModel> : App
     }
 
     fun popUpTo(tag: String) {
-        while (supportFragmentManager.fragments.last().tag != tag && supportFragmentManager.backStackEntryCount > 0) {
+        viewModel.logger.e("popUpTo $tag")
+        viewModel.logger.e("popUpTo:last ${supportFragmentManager.fragments.last().tag}")
+        viewModel.logger.e("popUpTo:all ${supportFragmentManager.fragments.map { it.tag }.joinToString(", ")}")
+        viewModel.logger.e("popUpTo:all ${supportFragmentManager.fragments.map { it::class.java }.joinToString(", ")}")
+        while (supportFragmentManager.fragments.last()::class.java.simpleName != tag && supportFragmentManager.backStackEntryCount > 0) {
             supportFragmentManager.popBackStackImmediate()
         }
     }

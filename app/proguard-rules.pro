@@ -43,3 +43,6 @@
 -keep class com.tari.android.wallet.ui.common.gyphy.api.dto.Images { *; }
 -keep class com.tari.android.wallet.ui.common.gyphy.api.dto.ImageVariant { *; }
 -keep class com.tari.android.wallet.ui.common.gyphy.api.dto.Original { *; }
+
+-keep class **Fragment** { *; }
+-keep class **ViewModel** { *; }
