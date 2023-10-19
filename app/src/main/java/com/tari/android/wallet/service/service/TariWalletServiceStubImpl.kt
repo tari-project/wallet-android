@@ -149,6 +149,8 @@ class TariWalletServiceStubImpl(
     override fun cancelPendingTx(id: TxId, error: WalletError): Boolean = runMapping(error) { wallet.cancelPendingTx(id.value) } ?: false
 
     override fun addBaseNodePeer(baseNodePublicKey: String, baseNodeAddress: String, error: WalletError): Boolean = runMapping(error) {
+        Logger.t(this::class.simpleName).e("walletServiceStub:addBaseNodePeer:publicKeyHex: ${baseNodePublicKey}")
+        Logger.t(this::class.simpleName).e("walletServiceStub:addBaseNodePeer:address: ${baseNodeAddress}")
         val result = FFIPublicKey(HexString(baseNodePublicKey)).runWithDestroy { wallet.addBaseNodePeer(it, baseNodeAddress) }
         if (result) {
             walletServiceListener.baseNodeValidationStatusMap.clear()
