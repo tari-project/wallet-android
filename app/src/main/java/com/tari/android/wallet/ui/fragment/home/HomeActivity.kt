@@ -71,6 +71,7 @@ import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
 import com.tari.android.wallet.ui.extension.parcelable
 import com.tari.android.wallet.ui.extension.setVisible
 import com.tari.android.wallet.ui.extension.string
+import com.tari.android.wallet.ui.fragment.auth.AuthActivity
 import com.tari.android.wallet.ui.fragment.chat_list.ChatListFragment
 import com.tari.android.wallet.ui.fragment.contact_book.root.ContactBookFragment
 import com.tari.android.wallet.ui.fragment.contact_book.root.action_menu.ContactBookActionMenuViewModel
@@ -177,6 +178,14 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>() {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             requestPermissions(arrayOf(POST_NOTIFICATIONS), 0)
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        if (!viewModel.securityPrefRepository.isAuthenticated) {
+            launch(AuthActivity::class.java)
         }
     }
 

@@ -151,6 +151,7 @@ class TariWalletApplication : Application() {
 
         override fun onStart(owner: LifecycleOwner) {
             super.onStart(owner)
+            securityPrefRepository.isAuthenticated = false
             logger.i("App in foreground")
             isInForeground = true
             walletServiceLauncher.startOnAppForegrounded()
@@ -158,6 +159,7 @@ class TariWalletApplication : Application() {
         }
 
         override fun onStop(owner: LifecycleOwner) {
+            securityPrefRepository.isAuthenticated = false
             super.onStop(owner)
             logger.i("App in background")
             isInForeground = false
@@ -167,6 +169,7 @@ class TariWalletApplication : Application() {
 
         override fun onDestroy(owner: LifecycleOwner) {
             super.onDestroy(owner)
+            securityPrefRepository.isAuthenticated = false
             logger.i("App was destroyed")
             walletServiceLauncher.stopOnAppBackgrounded()
         }

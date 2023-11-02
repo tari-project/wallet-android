@@ -1,5 +1,6 @@
 package com.tari.android.wallet.ui.common
 
+import android.app.Activity
 import android.content.Intent
 import android.content.res.Configuration.UI_MODE_NIGHT_MASK
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
@@ -119,6 +120,14 @@ abstract class CommonActivity<Binding : ViewBinding, VM : CommonViewModel> : App
     override fun onStart() {
         (getSystemService(SENSOR_SERVICE) as? SensorManager)?.let(shakeDetector::start)
         super.onStart()
+    }
+
+    fun <T : Activity> launch(destination: Class<T>) {
+        val intent = Intent(this, destination)
+        intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
+        this.intent.data?.let(intent::setData)
+        startActivity(intent)
+        finish()
     }
 
     override fun onResume() {

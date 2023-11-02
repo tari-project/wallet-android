@@ -179,6 +179,7 @@
         <activity
             android:name="com.tari.android.wallet.ui.fragment.qr.QRScannerActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
+            android:exported="false"
             android:theme="@style/AppTheme.Light"
             android:windowSoftInputMode="stateAlwaysHidden" /> <!-- send tari -->
         <activity
@@ -190,6 +191,7 @@
         <activity
             android:name="com.tari.android.wallet.ui.fragment.settings.logs.activity.DebugActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
+            android:exported="false"
             android:launchMode="singleTask"
             android:parentActivityName=".ui.fragment.home.HomeActivity"
             android:theme="@style/AppTheme.Light"
@@ -197,6 +199,7 @@
         <activity
             android:name="com.tari.android.wallet.ui.fragment.restore.activity.WalletRestoreActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
+            android:exported="false"
             android:launchMode="singleTask"
             android:parentActivityName=".ui.fragment.onboarding.activity.OnboardingFlowActivity"
             android:theme="@style/AppTheme.Light"
