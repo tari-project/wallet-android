@@ -142,6 +142,6 @@
 
     <dimen name="pin_code_input_size">46dp</dimen>
     <dimen name="pin_code_input_margin">12dp</dimen>
-    <dimen name="pin_code_input_text_size">40sp</dimen>
+    <dimen name="pin_code_input_dot_size">14dp</dimen>
 
 </resources>

@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
+import com.tari.android.wallet.R
 import com.tari.android.wallet.databinding.FragmentEnterPincodeBinding
 import com.tari.android.wallet.extension.addTo
 import com.tari.android.wallet.extension.observe
@@ -85,12 +86,12 @@ class EnterPinCodeFragment : CommonFragment<FragmentEnterPincodeBinding, EnterPi
 
         observe(currentNums) {
             val length = it.length
-            ui.pinCode1.text = if (length > 0) "●" else ""
-            ui.pinCode2.text = if (length > 1) "●" else ""
-            ui.pinCode3.text = if (length > 2) "●" else ""
-            ui.pinCode4.text = if (length > 3) "●" else ""
-            ui.pinCode5.text = if (length > 4) "●" else ""
-            ui.pinCode6.text = if (length > 5) "●" else ""
+            ui.pinCode1Dot.setVisible(length > 0)
+            ui.pinCode2Dot.setVisible(length > 1)
+            ui.pinCode3Dot.setVisible(length > 2)
+            ui.pinCode4Dot.setVisible(length > 3)
+            ui.pinCode5Dot.setVisible(length > 4)
+            ui.pinCode6Dot.setVisible(length > 5)
             ui.continueBtn.isEnabled = length >= 6
             if (length < 6) {
                 viewModel.errorMessage.postValue("")
@@ -168,9 +169,9 @@ class EnterPinCodeFragment : CommonFragment<FragmentEnterPincodeBinding, EnterPi
     }
 
     private fun setState(isError: Boolean) {
-        val textColor = if (isError) viewModel.paletteManager.getRed(requireContext()) else viewModel.paletteManager.getTextHeading(requireContext())
-        val allPinCodeViews = listOf(ui.pinCode1, ui.pinCode2, ui.pinCode3, ui.pinCode4, ui.pinCode5, ui.pinCode6)
-        allPinCodeViews.forEach { it.setTextColor(textColor) }
+        val backResource = if (isError) R.drawable.vector_pin_input_dot_error else R.drawable.vector_pin_input_dot_normal
+        val allPinCodeViews = listOf(ui.pinCode1Dot, ui.pinCode2Dot, ui.pinCode3Dot, ui.pinCode4Dot, ui.pinCode5Dot, ui.pinCode6Dot)
+        allPinCodeViews.forEach { it.setBackgroundResource(backResource) }
     }
 
     private fun initNumpad() = with(ui.numpad) {

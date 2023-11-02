@@ -11,7 +11,7 @@ class GlideGIFListener(private val consumer: GIFStateConsumer) : RequestListener
     override fun onLoadFailed(
         e: GlideException?,
         model: Any?,
-        target: Target<GifDrawable>?,
+        target: Target<GifDrawable>,
         isFirstResource: Boolean
     ): Boolean {
         consumer.onErrorState()
@@ -19,10 +19,10 @@ class GlideGIFListener(private val consumer: GIFStateConsumer) : RequestListener
     }
 
     override fun onResourceReady(
-        resource: GifDrawable?,
-        model: Any?,
+        resource: GifDrawable,
+        model: Any,
         target: Target<GifDrawable>?,
-        dataSource: DataSource?,
+        dataSource: DataSource,
         isFirstResource: Boolean
     ): Boolean {
         consumer.onResourceReady()

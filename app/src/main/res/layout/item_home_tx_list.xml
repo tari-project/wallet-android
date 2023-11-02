@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/root_view"
     android:layout_width="match_parent"
-    android:layout_height="60dp"
+    android:layout_height="wrap_content"
     android:layout_marginTop="10dp"
     android:background="@drawable/tari_home_tx_bg"
     android:clickable="true"
@@ -16,6 +16,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
         android:orientation="vertical"
+        android:paddingVertical="16dp"
         android:paddingHorizontal="10dp">
 
         <LinearLayout

@@ -153,17 +153,17 @@ abstract class CommonActivity<Binding : ViewBinding, VM : CommonViewModel> : App
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         dialogManager.context = this
+
+        onBackInvokedDispatcher.registerOnBackInvokedCallback(0) {
+            overridePendingTransition(R.anim.enter_from_left, R.anim.exit_to_right)
+        }
+
         overridePendingTransition(R.anim.enter_from_right, R.anim.exit_to_left)
         subscribeToCommon(connectionStateViewModel)
     }
 
     protected fun setContainerId(id: Int) {
         containerId = id
-    }
-
-    override fun onBackPressed() {
-        super.onBackPressed()
-        overridePendingTransition(R.anim.enter_from_left, R.anim.exit_to_right)
     }
 
     fun addFragment(fragment: Fragment, bundle: Bundle? = null, isRoot: Boolean = false, withAnimation: Boolean = true) {

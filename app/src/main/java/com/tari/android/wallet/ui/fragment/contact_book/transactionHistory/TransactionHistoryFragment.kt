@@ -85,7 +85,6 @@ class TransactionHistoryFragment : CommonFragment<FragmentContactTransactionHist
 
         val emptyStateText = getString(R.string.contact_details_transaction_history_empty_state_description, name)
         ui.emptyStateDescription.text = HtmlHelper.getSpannedText(emptyStateText)
-
     }
 
     companion object {

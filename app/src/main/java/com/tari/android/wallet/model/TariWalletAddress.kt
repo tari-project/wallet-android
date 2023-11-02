@@ -85,6 +85,7 @@ class TariWalletAddress() : Parcelable, Serializable {
             return Array(size) { TariWalletAddress() }
         }
 
+        fun validate(addressHex: String): Boolean = addressHex.length == 66
     }
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
@@ -102,5 +103,4 @@ class TariWalletAddress() : Parcelable, Serializable {
     }
 
     // endregion
-
 }

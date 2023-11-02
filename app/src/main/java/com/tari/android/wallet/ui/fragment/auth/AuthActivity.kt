@@ -34,6 +34,7 @@ package com.tari.android.wallet.ui.fragment.auth
 
 import android.content.Intent
 import android.os.Bundle
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.lifecycleScope
@@ -64,10 +65,15 @@ class AuthActivity : CommonActivity<ActivityAuthBinding, AuthViewModel>() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        ui = ActivityAuthBinding.inflate(layoutInflater).apply { setContentView(root) }
 
         val viewModel: AuthViewModel by viewModels()
         bindViewModel(viewModel)
+
+        onBackPressedDispatcher.addCallback(object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() = Unit
+        })
+
+        ui = ActivityAuthBinding.inflate(layoutInflater).apply { setContentView(root) }
 
         setupUi()
 
@@ -91,8 +97,6 @@ class AuthActivity : CommonActivity<ActivityAuthBinding, AuthViewModel>() {
     private fun setupUi() {
         ui.networkInfoTextView.text = TariVersionModel(viewModel.networkRepository).versionInfo
     }
-
-    override fun onBackPressed() = Unit
 
     private fun doAuth() {
         showBiometricAuth()

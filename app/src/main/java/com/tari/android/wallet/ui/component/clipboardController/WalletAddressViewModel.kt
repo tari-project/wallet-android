@@ -43,7 +43,7 @@ class WalletAddressViewModel : CommonViewModel() {
             runCatching {
                 checkForValidEmojiId(walletService, clipboardString)
 
-                discoveredWalletAddressFromClipboard.value = discoveredWalletAddress
+                discoveredWalletAddressFromClipboard.postValue(discoveredWalletAddress)
             }
         }
     }
@@ -51,7 +51,7 @@ class WalletAddressViewModel : CommonViewModel() {
     fun checkFromQuery(walletService: TariWalletService, query: String) {
         doOnConnectedToWallet {
             checkForValidEmojiId(walletService, query)
-            discoveredWalletAddressFromQuery.value = discoveredWalletAddress
+            discoveredWalletAddressFromQuery.postValue(discoveredWalletAddress)
         }
     }
 

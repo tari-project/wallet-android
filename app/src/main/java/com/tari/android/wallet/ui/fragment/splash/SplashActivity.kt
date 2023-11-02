@@ -35,6 +35,7 @@ package com.tari.android.wallet.ui.fragment.splash
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import androidx.activity.addCallback
 import androidx.appcompat.app.AppCompatActivity
 import com.tari.android.wallet.data.WalletConfig
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
@@ -69,6 +70,8 @@ class SplashActivity : AppCompatActivity() {
         appComponent.inject(this)
         super.onCreate(savedInstanceState)
 
+        onBackPressedDispatcher.addCallback {  }
+
         if (sharedPrefsRepository.checkIfIsDataCleared()) {
             walletServiceLauncher.stopAndDelete()
         }
@@ -93,6 +96,4 @@ class SplashActivity : AppCompatActivity() {
         startActivity(intent)
         finish()
     }
-
-    override fun onBackPressed() = Unit
 }

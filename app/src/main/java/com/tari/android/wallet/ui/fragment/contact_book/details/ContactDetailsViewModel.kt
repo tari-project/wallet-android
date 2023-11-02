@@ -10,7 +10,6 @@ import com.tari.android.wallet.R.string.common_close
 import com.tari.android.wallet.R.string.common_confirm
 import com.tari.android.wallet.R.string.contact_book_add_contact_done_button
 import com.tari.android.wallet.R.string.contact_book_add_contact_first_name_hint
-import com.tari.android.wallet.R.string.contact_book_add_contact_surname_hint
 import com.tari.android.wallet.R.string.contact_book_add_contact_yat_hint
 import com.tari.android.wallet.R.string.contact_book_contacts_book_unlink_message_firstLine
 import com.tari.android.wallet.R.string.contact_book_contacts_book_unlink_message_secondLine
@@ -204,16 +203,13 @@ class ContactDetailsViewModel : CommonViewModel() {
     fun onEditClick() {
         val contact = contact.value!!
 
-        val name = contact.contact.firstName
-        val surname = contact.contact.surname
+        val name = (contact.contact.firstName + " " + contact.contact.surname).trim()
         val phoneDto = contact.getPhoneDto()
         val yatDto = contact.getYatDto()
 
         var saveAction: () -> Boolean = { false }
 
-        val nameModule = InputModule(name, resourceManager.getString(contact_book_add_contact_first_name_hint), true, false) { saveAction.invoke() }
-        val surnameModule =
-            InputModule(surname, resourceManager.getString(contact_book_add_contact_surname_hint), false, phoneDto == null) { saveAction.invoke() }
+        val nameModule = InputModule(name, resourceManager.getString(contact_book_add_contact_first_name_hint), true, true) { saveAction.invoke() }
         val yatModule = phoneDto?.let {
             YatInputModule(this::yatSearchAction, yatDto?.yat.orEmpty(), resourceManager.getString(contact_book_add_contact_yat_hint), false, true) {
                 saveAction.invoke()
@@ -225,11 +221,11 @@ class ContactDetailsViewModel : CommonViewModel() {
             rightButtonTitle = resourceManager.getString(contact_book_add_contact_done_button)
         ) { saveAction.invoke() }
 
-        val moduleList = mutableListOf(headModule, nameModule, surnameModule)
+        val moduleList = mutableListOf(headModule, nameModule)
         yatModule?.let { moduleList.add(it) }
 
         saveAction = {
-            saveDetails(nameModule.value, surnameModule.value, yatModule?.value ?: "")
+            saveDetails(nameModule.value,yatModule?.value ?: "")
             true
         }
 
@@ -252,7 +248,10 @@ class ContactDetailsViewModel : CommonViewModel() {
         return searchingJob?.await() != null
     }
 
-    private fun saveDetails(name: String, surname: String = "", yat: String = "") {
+    private fun saveDetails(newName: String, yat: String = "") {
+        val split = newName.split(" ")
+        val name = split.getOrNull(0).orEmpty().trim()
+        val surname = split.getOrNull(1).orEmpty().trim()
         val contact = contact.value!!
         updatingJob = null
         this.contact.value = contactsRepository.updateContactInfo(contact, name, surname, yat)

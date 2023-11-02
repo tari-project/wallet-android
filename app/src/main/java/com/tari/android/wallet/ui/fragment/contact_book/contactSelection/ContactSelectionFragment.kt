@@ -113,8 +113,7 @@ open class ContactSelectionFragment : CommonFragment<FragmentContactsSelectionBi
 
         observe(selectedUser) {
             putEmojiId(it.contact.extractWalletAddress().emojiId)
-            ui.addFirstNameInput.setText(it.contact.firstName)
-            ui.addSurnameInput.setText(it.contact.surname)
+            ui.addFirstNameInput.setText((it.contact.firstName + " " + it.contact.surname).trim())
         }
 
         observe(foundYatUser) { showYatUser(if (it.isPresent) it.get() else null) }
@@ -255,6 +254,7 @@ open class ContactSelectionFragment : CommonFragment<FragmentContactsSelectionBi
         }
     }
 
+    @Deprecated("Deprecated in Java")
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == QRScannerActivity.REQUEST_QR_SCANNER && resultCode == Activity.RESULT_OK && data != null) {
             val qrData = data.getStringExtra(QRScannerActivity.EXTRA_QR_DATA) ?: return

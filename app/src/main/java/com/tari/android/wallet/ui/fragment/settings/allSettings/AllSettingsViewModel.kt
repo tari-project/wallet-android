@@ -60,6 +60,7 @@ import com.tari.android.wallet.R.string.ttl_store_url
 import com.tari.android.wallet.R.string.user_agreement_url
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.event.EventBus
+import com.tari.android.wallet.extension.addTo
 import com.tari.android.wallet.infrastructure.backup.BackupManager
 import com.tari.android.wallet.infrastructure.backup.BackupState
 import com.tari.android.wallet.infrastructure.backup.BackupsState
@@ -120,6 +121,8 @@ class AllSettingsViewModel : CommonViewModel() {
         component.inject(this)
         initOptions()
         EventBus.backupState.subscribe(this) { backupState -> onBackupStateChanged(backupState) }
+
+        settingsRepository.updateNotifier.subscribe { initOptions() }.addTo(compositeDisposable)
     }
 
     private fun initOptions() {
@@ -233,7 +236,7 @@ class AllSettingsViewModel : CommonViewModel() {
             DividerViewHolderItem(),
             SettingsVersionViewHolderItem(versionText) { _copyToClipboard.postValue(versionArgs) }
         )
-        _allSettingsOptions.value = allOptions
+        _allSettingsOptions.postValue(allOptions)
     }
 
     private fun onBackupStateChanged(backupState: BackupsState?) {

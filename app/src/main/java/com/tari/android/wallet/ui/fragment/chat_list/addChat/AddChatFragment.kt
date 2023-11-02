@@ -17,7 +17,6 @@ class AddChatFragment : ContactSelectionFragment() {
 
         ui.toolbar.ui.toolbarTitle.text = string(R.string.chat_add_chat)
         ui.addFirstNameInput.gone()
-        ui.addSurnameInput.gone()
 
         viewModel.additionalFilter = { it.contact.getFFIDto() != null }
     }

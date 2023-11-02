@@ -74,70 +74,126 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent">
 
-            <androidx.appcompat.widget.AppCompatTextView
+            <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/pin_code_1"
                 android:layout_width="@dimen/pin_code_input_size"
                 android:layout_height="@dimen/pin_code_input_size"
                 android:layout_marginEnd="@dimen/pin_code_input_margin"
-                android:background="@drawable/vector_pin_input_background"
-                android:gravity="center"
-                android:paddingBottom="2dp"
-                android:text="●"
-                android:textColor="?attr/palette_text_heading"
-                android:textSize="@dimen/pin_code_input_text_size" />
+                android:background="@drawable/vector_pin_input_background">
 
-            <androidx.appcompat.widget.AppCompatTextView
+                <View
+                    android:id="@+id/pin_code_1_dot"
+                    android:layout_width="@dimen/pin_code_input_dot_size"
+                    android:layout_height="@dimen/pin_code_input_dot_size"
+                    android:background="@drawable/vector_pin_input_dot_normal"
+                    android:textColor="?attr/palette_text_heading"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/pin_code_2"
                 android:layout_width="@dimen/pin_code_input_size"
                 android:layout_height="@dimen/pin_code_input_size"
                 android:layout_marginEnd="@dimen/pin_code_input_margin"
-                android:background="@drawable/vector_pin_input_background"
-                android:gravity="center"
-                android:text="●"
-                android:textColor="?attr/palette_text_heading"
-                android:textSize="@dimen/pin_code_input_text_size" />
+                android:background="@drawable/vector_pin_input_background">
 
-            <androidx.appcompat.widget.AppCompatTextView
+                <View
+                    android:id="@+id/pin_code_2_dot"
+                    android:layout_width="@dimen/pin_code_input_dot_size"
+                    android:layout_height="@dimen/pin_code_input_dot_size"
+                    android:background="@drawable/vector_pin_input_dot_normal"
+                    android:textColor="?attr/palette_text_heading"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/pin_code_3"
                 android:layout_width="@dimen/pin_code_input_size"
                 android:layout_height="@dimen/pin_code_input_size"
                 android:layout_marginEnd="@dimen/pin_code_input_margin"
-                android:background="@drawable/vector_pin_input_background"
-                android:gravity="center"
-                android:text="●"
-                android:textColor="?attr/palette_text_heading"
-                android:textSize="@dimen/pin_code_input_text_size" />
+                android:background="@drawable/vector_pin_input_background">
 
-            <androidx.appcompat.widget.AppCompatTextView
+                <View
+                    android:id="@+id/pin_code_3_dot"
+                    android:layout_width="@dimen/pin_code_input_dot_size"
+                    android:layout_height="@dimen/pin_code_input_dot_size"
+                    android:background="@drawable/vector_pin_input_dot_normal"
+                    android:textColor="?attr/palette_text_heading"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/pin_code_4"
                 android:layout_width="@dimen/pin_code_input_size"
                 android:layout_height="@dimen/pin_code_input_size"
                 android:layout_marginEnd="@dimen/pin_code_input_margin"
-                android:background="@drawable/vector_pin_input_background"
-                android:gravity="center"
-                android:text="●"
-                android:textColor="?attr/palette_text_heading"
-                android:textSize="@dimen/pin_code_input_text_size" />
+                android:background="@drawable/vector_pin_input_background">
 
-            <androidx.appcompat.widget.AppCompatTextView
+                <View
+                    android:id="@+id/pin_code_4_dot"
+                    android:layout_width="@dimen/pin_code_input_dot_size"
+                    android:layout_height="@dimen/pin_code_input_dot_size"
+                    android:background="@drawable/vector_pin_input_dot_normal"
+                    android:textColor="?attr/palette_text_heading"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+            <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/pin_code_5"
                 android:layout_width="@dimen/pin_code_input_size"
                 android:layout_height="@dimen/pin_code_input_size"
                 android:layout_marginEnd="@dimen/pin_code_input_margin"
-                android:background="@drawable/vector_pin_input_background"
-                android:gravity="center"
-                android:textColor="?attr/palette_text_heading"
-                android:textSize="@dimen/pin_code_input_text_size" />
+                android:background="@drawable/vector_pin_input_background">
 
-            <androidx.appcompat.widget.AppCompatTextView
+                <View
+                    android:id="@+id/pin_code_5_dot"
+                    android:layout_width="@dimen/pin_code_input_dot_size"
+                    android:layout_height="@dimen/pin_code_input_dot_size"
+                    android:background="@drawable/vector_pin_input_dot_normal"
+                    android:textColor="?attr/palette_text_heading"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/pin_code_6"
                 android:layout_width="@dimen/pin_code_input_size"
                 android:layout_height="@dimen/pin_code_input_size"
                 android:layout_marginEnd="@dimen/pin_code_input_margin"
-                android:background="@drawable/vector_pin_input_background"
-                android:gravity="center"
-                android:textColor="?attr/palette_text_heading"
-                android:textSize="@dimen/pin_code_input_text_size" />
+                android:background="@drawable/vector_pin_input_background">
+
+                <View
+                    android:id="@+id/pin_code_6_dot"
+                    android:layout_width="@dimen/pin_code_input_dot_size"
+                    android:layout_height="@dimen/pin_code_input_dot_size"
+                    android:background="@drawable/vector_pin_input_dot_normal"
+                    android:textColor="?attr/palette_text_heading"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
 
         </LinearLayout>
 

@@ -30,9 +30,12 @@
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
     <uses-permission android:name="android.permission.HIGH_SAMPLING_RATE_SENSORS" />
     <uses-permission android:name="android.permission.MANAGE_ACCOUNTS" /> <!-- remove billing support in case it gets included by a 3rd party lib -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
+
     <uses-permission
         android:name="com.android.vending.BILLING"
         tools:node="remove" />
+
     <queries>
         <intent>
             <action android:name="android.intent.action.VIEW" />
@@ -55,7 +58,8 @@
             android:name=".service.service.WalletService"
             android:description="@string/wallet_service_desc"
             android:enabled="true"
-            android:exported="false">
+            android:exported="false"
+            android:foregroundServiceType="dataSync">
             <intent-filter>
                 <action android:name="com.tari.android.wallet.service.TariWalletService" />
             </intent-filter>
@@ -81,6 +85,7 @@
             android:name=".ui.fragment.splash.SplashActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:exported="true"
+            android:screenOrientation="portrait"
             android:theme="@style/AppTheme.Splash"
             android:windowSoftInputMode="stateAlwaysHidden">
             <intent-filter>
@@ -93,11 +98,13 @@
         <activity
             android:name=".ui.fragment.onboarding.activity.OnboardingFlowActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
+            android:screenOrientation="portrait"
             android:theme="@style/AppTheme.Light"
             android:windowSoftInputMode="stateAlwaysHidden" /> <!-- local authentication -->
         <activity
             android:name=".ui.fragment.auth.AuthActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
+            android:screenOrientation="portrait"
             android:theme="@style/AppTheme.Light"
             android:windowSoftInputMode="stateAlwaysHidden" /> <!-- home (transaction list) -->
         <activity
@@ -105,6 +112,7 @@
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:exported="true"
             android:launchMode="singleTask"
+            android:screenOrientation="portrait"
             android:theme="@style/AppTheme.Light"
             android:windowSoftInputMode="stateAlwaysHidden|adjustResize">
             <intent-filter>
@@ -146,6 +154,7 @@
             <intent-filter>
                 <action android:name="android.nfc.action.NDEF_DISCOVERED" />
                 <action android:name="android.nfc.action.TAG_DISCOVERED" />
+
                 <category android:name="android.intent.category.DEFAULT" />
                 <data android:mimeType="text/plain" />
             </intent-filter>
@@ -160,13 +169,15 @@
             android:name="com.google.android.gms.auth.api.signin.internal.SignInHubActivity"
             android:excludeFromRecents="true"
             android:exported="false"
+            android:screenOrientation="portrait"
             android:theme="@style/GoogleSignInActivity"
             tools:replace="android:theme" />
         <activity
             android:name="com.dropbox.core.android.AuthActivity"
             android:configChanges="orientation|keyboard"
             android:exported="true"
-            android:launchMode="singleTask">
+            android:launchMode="singleTask"
+            android:screenOrientation="portrait">
             <intent-filter>
 
                 <data android:scheme="db-${dropboxApiKey}" />
@@ -186,6 +197,7 @@
             android:name=".ui.fragment.send.finalize.YatFinalizeSendTxActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:exported="true"
+            android:screenOrientation="portrait"
             android:theme="@style/YatLibTheme.TransparentCompat"
             android:windowSoftInputMode="stateAlwaysHidden" />
         <activity
@@ -194,6 +206,7 @@
             android:exported="false"
             android:launchMode="singleTask"
             android:parentActivityName=".ui.fragment.home.HomeActivity"
+            android:screenOrientation="portrait"
             android:theme="@style/AppTheme.Light"
             android:windowSoftInputMode="adjustResize|stateAlwaysHidden" />
         <activity
@@ -202,6 +215,7 @@
             android:exported="false"
             android:launchMode="singleTask"
             android:parentActivityName=".ui.fragment.onboarding.activity.OnboardingFlowActivity"
+            android:screenOrientation="portrait"
             android:theme="@style/AppTheme.Light"
             android:windowSoftInputMode="adjustResize" />
 

@@ -31,7 +31,6 @@ import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonStyle
 import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
 import com.tari.android.wallet.ui.extension.showInternetConnectionErrorDialog
 import com.tari.android.wallet.ui.extension.string
-import com.tari.android.wallet.ui.fragment.auth.AuthActivity
 import com.tari.android.wallet.ui.fragment.auth.FeatureAuthFragment
 import com.tari.android.wallet.ui.fragment.biometrics.ChangeBiometricsFragment
 import com.tari.android.wallet.ui.fragment.chat_list.addChat.AddChatFragment
@@ -190,12 +189,14 @@ class TariNavigator @Inject constructor(val prefs: SharedPrefsRepository, val ta
     fun onRestoreCompleted() {
         // wallet restored, setup shared prefs accordingly
         prefs.onboardingCompleted = true
-        prefs.onboardingAuthSetupCompleted = true
+        prefs.onboardingStarted = true
+        prefs.onboardingAuthSetupStarted = true
+        prefs.onboardingAuthSetupCompleted = false
         prefs.onboardingDisplayedAtHome = true
         tariSettingsSharedRepository.isRestoredWallet = true
 
         activity.finish()
-        activity.startActivity(Intent(this.activity, AuthActivity::class.java).apply {
+        activity.startActivity(Intent(this.activity, OnboardingFlowActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         })
     }

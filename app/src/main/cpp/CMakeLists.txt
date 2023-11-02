@@ -49,7 +49,7 @@ add_library(
 set_target_properties(
         wallet
         PROPERTIES
-        IMPORTED_LOCATION ${libs_DIR}/${ANDROID_ABI}/libtari_wallet_ffi.a
+        IMPORTED_LOCATION ${libs_DIR}/${ANDROID_ABI}/libminotari_wallet_ffi.a
         IMPORTED_LINK_INTERFACE_LIBRARIES "ssl;sqlite3"
 )
 

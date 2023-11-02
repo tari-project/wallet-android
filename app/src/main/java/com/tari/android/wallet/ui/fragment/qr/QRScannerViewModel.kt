@@ -149,5 +149,6 @@ class QRScannerViewModel : CommonViewModel() {
 
     fun onRetry() {
         proceedScan.postValue(Unit)
+        scanError.postValue(false)
     }
 }

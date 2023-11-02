@@ -44,6 +44,7 @@ class CustomTorBridgesFragment : CommonFragment<FragmentCustomTorBridgesBinding,
         observe(viewModel.text) { torBridgeConfiguration.ui.editText.setText(it) }
     }
 
+    @Deprecated("Deprecated in Java")
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == QRScannerActivity.REQUEST_QR_SCANNER && resultCode == Activity.RESULT_OK && data != null) {
             val qrData = data.getStringExtra(QRScannerActivity.EXTRA_QR_DATA) ?: return

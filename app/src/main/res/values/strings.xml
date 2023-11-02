@@ -798,8 +798,7 @@
     <string name="contact_book_contacts_title">Contacts</string>
     <string name="contact_book_favorites_title">Favorites</string>
     <string name="contact_book_add_contact_title">Add Contact</string>
-    <string name="contact_book_add_contact_first_name_hint">First Name</string>
-    <string name="contact_book_add_contact_surname_hint">Surname</string>
+    <string name="contact_book_add_contact_first_name_hint">Add Name</string>
     <string name="contact_book_add_contact_yat_hint">Yat</string>
     <string name="contact_book_add_contact_placeholder">Enter Emoji ID, Contact Name or Yat</string>
     <string name="contact_book_search_hint">Find Contact</string>

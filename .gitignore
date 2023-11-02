@@ -80,6 +80,6 @@ CMakeCache.txt
 
 jniLibs/
 libwallet/wallet.h
-libwallet/arm64-v8a/libtari_wallet_ffi.a
-libwallet/x86_64/libtari_wallet_ffi.a
+libwallet/arm64-v8a/libminotari_wallet_ffi.a
+libwallet/x86_64/libminotari_wallet_ffi.a
 !app/src/main/jniLibs/

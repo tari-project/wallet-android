@@ -45,6 +45,9 @@ class BaseNodes(
         }.addTo(compositeDisposable)
     }
 
+    val onionRegex = "(.+::[A-Za-z0-9 ]{64}::/onion3/[A-Za-z0-9]+:[\\d]+)"
+    val ipV4Regex = "(.+::[A-Za-z0-9 ]{64}::/ip4/[0-9]{1,3}[.][0-9]{1,3}[.][0-9]{1,3}[.][0-9]{1,3}/tcp/[0-9]{2,6})"
+
     /**
      * Returns the list of base nodes in the resource file base_nodes.txt as pairs of
      * ({name}, {public_key_hex}, {public_address}).
@@ -55,8 +58,20 @@ class BaseNodes(
             "UTF-8"
         )
         Logger.t(this::class.simpleName).e("baseNodeList: $fileContent")
-        Regex("(.+::[A-Za-z0-9 ]{64}::/onion3/[A-Za-z0-9]+:[\\d]+)").findAll(fileContent).map { matchResult ->
+        val list = mutableListOf<BaseNodeDto>()
+        val onionBaseNodes = findAndAddBaseNode(fileContent, onionRegex).toList()
+        val ipV4BaseNodes = findAndAddBaseNode(fileContent, ipV4Regex).toList()
+        list.addAll(onionBaseNodes)
+        list.addAll(ipV4BaseNodes)
+        list.sortedBy { it.name }
+    }
+
+    private fun findAndAddBaseNode(fileContent: String, regex: String): Sequence<BaseNodeDto> {
+        return Regex(regex).findAll(fileContent).map { matchResult ->
             val tripleString = matchResult.value.split("::")
+            if (tripleString.size ==2) {
+                1
+            }
             Logger.t(this::class.simpleName).e("baseNodeList0: $tripleString, baseNodeList1: ${tripleString[1]}, baseNodeList2: ${tripleString[2]}")
             BaseNodeDto(tripleString[0], tripleString[1], tripleString[2])
         }
@@ -102,7 +117,6 @@ class BaseNodes(
             startSync()
         }
     }
-
     @Suppress("UNUSED_EXPRESSION")
     private fun getBaseNodeResource(network: Network): Int = when (network) {
         else -> R.raw.stagenet_base_nodes

@@ -34,9 +34,11 @@ package com.tari.android.wallet.ui.fragment.home
 
 import android.Manifest.permission.POST_NOTIFICATIONS
 import android.content.Intent
+import android.content.res.Configuration
 import android.os.Build
 import android.os.Bundle
 import android.widget.ImageView
+import androidx.activity.addCallback
 import androidx.activity.viewModels
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
@@ -83,6 +85,7 @@ import com.tari.android.wallet.ui.fragment.home.navigation.TariNavigator.Compani
 import com.tari.android.wallet.ui.fragment.home.navigation.TariNavigator.Companion.NO_SMOOTH_SCROLL
 import com.tari.android.wallet.ui.fragment.onboarding.activity.OnboardingFlowActivity
 import com.tari.android.wallet.ui.fragment.settings.allSettings.AllSettingsFragment
+import com.tari.android.wallet.ui.fragment.settings.themeSelector.TariTheme
 import com.tari.android.wallet.ui.fragment.splash.SplashActivity
 import com.tari.android.wallet.ui.fragment.store.StoreFragment
 import com.tari.android.wallet.ui.fragment.tx.HomeFragment
@@ -126,6 +129,23 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        appComponent.inject(this)
+
+        onBackPressedDispatcher.addCallback {
+            if (ui.actionMenuView.onBackPressed()) {
+                return@addCallback
+            }
+            if (supportFragmentManager.backStackEntryCount > 0) {
+                supportFragmentManager.popBackStack()
+            } else {
+                if (ui.viewPager.currentItem == INDEX_HOME) {
+                    finish()
+                } else {
+                    ui.viewPager.setCurrentItem(INDEX_HOME, NO_SMOOTH_SCROLL)
+                    enableNavigationView(ui.homeImageView)
+                }
+            }
+        }
 
         instance = WeakReference(this)
 
@@ -143,9 +163,8 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>() {
         viewModel.shareViewModel.tariBluetoothClient.init(this)
 
         setContainerId(R.id.nav_container)
-
         overridePendingTransition(0, 0)
-        appComponent.inject(this)
+
         if (!securityPrefRepository.isAuthenticated) {
             val intent = Intent(this, SplashActivity::class.java)
                 .apply { flags = Intent.FLAG_ACTIVITY_NEW_TASK }
@@ -155,6 +174,20 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>() {
             return
         }
         ui = ActivityHomeBinding.inflate(layoutInflater).also { setContentView(it.root) }
+
+        val buttonBg = when(tariSettingsRepository.currentTheme) {
+            TariTheme.AppBased -> {
+                when (resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) {
+                    Configuration.UI_MODE_NIGHT_YES ->  R.drawable.vector_disable_able_gradient_button_bg_external_dark
+                    else -> R.drawable.vector_disable_able_gradient_button_bg_external
+                }
+            }
+            null,
+            TariTheme.Light -> R.drawable.vector_disable_able_gradient_button_bg_external
+            else -> R.drawable.vector_disable_able_gradient_button_bg_external_dark
+        }
+        ui.sendButtonExternalContainer.setBackgroundResource(buttonBg)
+
         if (savedInstanceState == null) {
             enableNavigationView(ui.homeImageView)
             viewModel.doOnConnected {
@@ -198,6 +231,7 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>() {
         }
     }
 
+    @Deprecated("Deprecated in Java")
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         viewModel.shareViewModel.tariBluetoothServer.handleActivityResult(requestCode, resultCode, data)
@@ -219,22 +253,6 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>() {
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         outState.putInt(KEY_PAGE, ui.viewPager.currentItem)
-    }
-
-    override fun onBackPressed() {
-        if (ui.actionMenuView.onBackPressed()) {
-            return
-        }
-        if (supportFragmentManager.backStackEntryCount > 0) {
-            super.onBackPressed()
-        } else {
-            if (ui.viewPager.currentItem == INDEX_HOME) {
-                super.onBackPressed()
-            } else {
-                ui.viewPager.setCurrentItem(INDEX_HOME, NO_SMOOTH_SCROLL)
-                enableNavigationView(ui.homeImageView)
-            }
-        }
     }
 
     fun setBottomBarVisibility(isVisible: Boolean) {
@@ -359,7 +377,7 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>() {
     fun willNotifyAboutNewTx(): Boolean = ui.viewPager.currentItem == INDEX_HOME
 
     private fun processIntentDeepLink(intent: Intent) {
-        deeplinkViewModel.tryToHandle(intent.data?.toString().orEmpty())
+        deeplinkViewModel.tryToHandle(intent.data?.toString().orEmpty(), false)
     }
 
     override fun onDestroy() {

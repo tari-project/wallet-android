@@ -37,7 +37,7 @@ import com.tari.android.wallet.model.TariWalletAddress
 
 object TariBuild {
 
-    private val _mockedTurned = false
+    private val _mockedTurned = true
     val MOCKED = _mockedTurned && BuildConfig.BUILD_TYPE == "debug"
 
     val mocked_emojiId =

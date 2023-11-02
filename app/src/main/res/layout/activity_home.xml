@@ -113,12 +113,12 @@
         </com.tari.android.wallet.ui.component.tari.TariPrimaryBackground>
 
         <com.tari.android.wallet.ui.component.tari.TariAlphaBackground
+            android:id="@+id/send_button_container"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="-40dp"
             android:elevation="30dp"
-            app:alphaBackground="0.2"
-            app:backgroundColor="#FFFFFF"
+            app:backgroundColor="?attr/palette_background_primary"
             app:cornerRadius="40dp"
             app:elevation="30dp"
             app:layout_constraintBottom_toTopOf="@id/bottom_navigation_view"
@@ -126,6 +126,7 @@
             app:layout_constraintStart_toStartOf="parent">
 
             <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/send_button_external_container"
                 android:layout_width="78dp"
                 android:layout_height="78dp"
                 android:background="@drawable/vector_disable_able_gradient_button_bg_external"

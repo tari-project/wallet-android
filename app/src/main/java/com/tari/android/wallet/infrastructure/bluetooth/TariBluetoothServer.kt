@@ -148,7 +148,7 @@ class TariBluetoothServer @Inject constructor(
                 val data = deeplinkHandler.getDeeplink(
                     DeepLink.UserProfile(
                         sharedPrefsRepository.publicKeyHexString.orEmpty(),
-                        ContactDto.normalizeAlias(sharedPrefsRepository.name.orEmpty(), myWalletAddress),
+                        ContactDto.normalizeAlias((sharedPrefsRepository.name.orEmpty() + " " + sharedPrefsRepository.surname).trim(), myWalletAddress),
                     )
                 )
                 logger.i("contactlessPayment: read: whole data: $data")

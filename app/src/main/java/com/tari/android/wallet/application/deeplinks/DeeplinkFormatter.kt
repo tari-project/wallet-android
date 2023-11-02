@@ -3,6 +3,7 @@ package com.tari.android.wallet.application.deeplinks
 import android.net.Uri
 import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
 import com.tari.android.wallet.data.sharedPrefs.tor.TorBridgeConfiguration
+import com.tari.android.wallet.model.TariWalletAddress
 import java.net.URLDecoder
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -30,7 +31,13 @@ class DeeplinkFormatter @Inject constructor(private val networkRepository: Netwo
             }.toMap()
             paramentrs = values.toMutableMap()
         }
-        return DeepLink.getByCommand(command, paramentrs)
+
+        val parsedDeeplink = DeepLink.getByCommand(command, paramentrs)
+
+        if (parsedDeeplink is DeepLink.Send && !TariWalletAddress.validate(parsedDeeplink.walletAddressHex)) return null
+        if (parsedDeeplink is DeepLink.UserProfile && !TariWalletAddress.validate(parsedDeeplink.tariAddressHex)) return null
+
+        return parsedDeeplink
     }
 
     fun toDeeplink(deepLink: DeepLink): String {
