@@ -32,13 +32,20 @@
  */
 package com.tari.android.wallet.ui.fragment.tx
 
-import android.animation.*
 import android.annotation.SuppressLint
-import android.os.*
-import android.view.*
+import android.app.Activity
+import android.content.Intent
+import android.os.Build
+import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.tari.android.wallet.R
+import com.tari.android.wallet.application.deeplinks.DeeplinkViewModel
 import com.tari.android.wallet.databinding.FragmentHomeBinding
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.extension.observe
@@ -49,7 +56,7 @@ import com.tari.android.wallet.ui.common.recyclerView.AdapterFactory
 import com.tari.android.wallet.ui.common.recyclerView.CommonAdapter
 import com.tari.android.wallet.ui.common.recyclerView.CommonViewHolderItem
 import com.tari.android.wallet.ui.component.networkStateIndicator.ConnectionIndicatorViewModel
-import com.tari.android.wallet.ui.extension.*
+import com.tari.android.wallet.ui.extension.setVisible
 import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
 import com.tari.android.wallet.ui.fragment.qr.QRScannerActivity
 import com.tari.android.wallet.ui.fragment.qr.QrScannerSource
@@ -70,6 +77,8 @@ class HomeFragment : CommonFragment<FragmentHomeBinding, HomeFragmentViewModel>(
     // This listener is used only to animate the visibility of the scroll depth gradient view.
     private lateinit var balanceViewController: BalanceViewController
 
+    private val deeplinkViewModel: DeeplinkViewModel by viewModels()
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
         FragmentHomeBinding.inflate(inflater, container, false).also { ui = it }.root
 
@@ -82,6 +91,7 @@ class HomeFragment : CommonFragment<FragmentHomeBinding, HomeFragmentViewModel>(
         viewModel.serviceConnection.reconnectToService()
 
         subscribeVM(viewModel.stagedWalletSecurityManager)
+        subscribeVM(deeplinkViewModel)
 
         checkPermission()
         setupUI()
@@ -99,6 +109,7 @@ class HomeFragment : CommonFragment<FragmentHomeBinding, HomeFragmentViewModel>(
 
         observe(txList) {
             ui.transactionsRecyclerView.setVisible(it.isNotEmpty())
+            ui.viewAllTxsButton.setVisible(it.isNotEmpty())
             ui.emptyState.setVisible(it.isEmpty())
             adapter.update(it)
             adapter.notifyDataSetChanged()
@@ -163,6 +174,14 @@ class HomeFragment : CommonFragment<FragmentHomeBinding, HomeFragmentViewModel>(
         viewModel.permissionManager.runWithPermission(listOf(android.Manifest.permission.READ_CONTACTS), true) {
             viewModel.contactsRepository.contactPermission.value = true
             viewModel.contactsRepository.phoneBookRepositoryBridge.loadFromPhoneBook()
+        }
+    }
+
+    @Deprecated("Deprecated in Java")
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        if (requestCode == QRScannerActivity.REQUEST_QR_SCANNER && resultCode == Activity.RESULT_OK && data != null) {
+            val qrData = data.getStringExtra(QRScannerActivity.EXTRA_QR_DATA) ?: return
+            deeplinkViewModel.tryToHandle(qrData)
         }
     }
 

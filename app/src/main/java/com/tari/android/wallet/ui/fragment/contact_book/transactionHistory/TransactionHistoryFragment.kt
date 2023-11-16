@@ -55,6 +55,7 @@ class TransactionHistoryFragment : CommonFragment<FragmentContactTransactionHist
         ui.emptyState.setVisible(items.isEmpty())
 
         adapter.update(items)
+        adapter.notifyDataSetChanged()
     }
 
     private fun initUI() = with(ui) {

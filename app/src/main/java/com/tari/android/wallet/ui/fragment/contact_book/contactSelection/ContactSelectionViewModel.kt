@@ -121,7 +121,6 @@ open class ContactSelectionViewModel : CommonViewModel() {
         if (hex.isEmpty()) return
         val walletAddress = walletService.getWalletAddressFromHexString(hex)
         selectedUser.value = ContactDto(FFIContactDto(walletAddress), name)
-        goNext.postValue(Unit)
     }
 
     fun getUserDto(): ContactDto = selectedUser.value ?: contactListSource.value.orEmpty()

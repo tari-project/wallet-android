@@ -34,8 +34,12 @@ class DeeplinkFormatter @Inject constructor(private val networkRepository: Netwo
 
         val parsedDeeplink = DeepLink.getByCommand(command, paramentrs)
 
-        if (parsedDeeplink is DeepLink.Send && !TariWalletAddress.validate(parsedDeeplink.walletAddressHex)) return null
-        if (parsedDeeplink is DeepLink.UserProfile && !TariWalletAddress.validate(parsedDeeplink.tariAddressHex)) return null
+        if (parsedDeeplink is DeepLink.Send) {
+            if (!TariWalletAddress.validate(parsedDeeplink.walletAddressHex)) return null
+        }
+        if (parsedDeeplink is DeepLink.UserProfile) {
+            if (!TariWalletAddress.validate(parsedDeeplink.tariAddressHex)) return null
+        }
 
         return parsedDeeplink
     }

@@ -160,7 +160,6 @@ class QRScannerActivity : CommonActivity<ActivityQrScannerBinding, QRScannerView
         intent.putExtra(EXTRA_QR_DATA, text)
         setResult(Activity.RESULT_OK, intent)
         finish()
-        overridePendingTransition(0, R.anim.slide_down)
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {

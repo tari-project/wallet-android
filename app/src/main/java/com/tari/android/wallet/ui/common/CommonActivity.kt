@@ -154,11 +154,6 @@ abstract class CommonActivity<Binding : ViewBinding, VM : CommonViewModel> : App
         super.onCreate(savedInstanceState)
         dialogManager.context = this
 
-        onBackInvokedDispatcher.registerOnBackInvokedCallback(0) {
-            overridePendingTransition(R.anim.enter_from_left, R.anim.exit_to_right)
-        }
-
-        overridePendingTransition(R.anim.enter_from_right, R.anim.exit_to_left)
         subscribeToCommon(connectionStateViewModel)
     }
 

@@ -16,7 +16,7 @@ data class TransactionItem(
 
     override val viewHolderUUID: String = "TransactionItem" + tx.id
 
-    override fun hashCode(): Int = HashcodeUtils.generate(tx.id, contact?.contact, position, requiredConfirmationCount, contact?.contact?.getAlias())
+    override fun hashCode(): Int = HashcodeUtils.generate(tx.id, contact?.contact?.getAlias(), contact?.contact, position, requiredConfirmationCount, contact?.contact?.getAlias())
 
     override fun equals(other: Any?): Boolean {
         return if (other is TransactionItem) {

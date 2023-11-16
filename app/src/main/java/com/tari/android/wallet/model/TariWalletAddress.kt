@@ -85,7 +85,7 @@ class TariWalletAddress() : Parcelable, Serializable {
             return Array(size) { TariWalletAddress() }
         }
 
-        fun validate(addressHex: String): Boolean = addressHex.length == 66
+        fun validate(addressHex: String): Boolean = addressHex.length > 64
     }
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {

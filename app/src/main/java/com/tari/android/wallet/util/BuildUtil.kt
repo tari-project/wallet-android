@@ -48,7 +48,10 @@ object TariBuild {
     val mocked_zero_hex = TariWalletAddress.zero66Hex
 
     val mocked_wallet_address
-        get() = TariWalletAddress(mocked_hex, mocked_emojiId)
+//        get() = TariWalletAddress(mocked_hex, mocked_emojiId)
+        get() = TariWalletAddress(
+    "C05575BE00EF016A209B1F493D9027B0E330F3E25FE89BBE6FA66D966EE5B6356",
+            "\uD83C\uDF34\uD83C\uDF0D\uD83C\uDFB5\uD83C\uDFBA\uD83D\uDDFD\uD83C\uDF37\uD83D\uDE91\uD83C\uDF45\uD83D\uDC60\uD83C\uDF1F\uD83D\uDC8C\uD83D\uDE97\uD83D\uDC40\uD83D\uDD29\uD83C\uDF08\uD83D\uDC1D\uD83C\uDF37\uD83C\uDF70\uD83C\uDF38\uD83C\uDF81\uD83C\uDF55\uD83D\uDEBF\uD83D\uDC34\uD83D\uDCA6\uD83D\uDE0E\uD83D\uDEAA\uD83C\uDFE0\uD83D\uDD29\uD83C\uDFE0\uD83D\uDE82\uD83C\uDFBA\uD83C\uDFC6\uD83C\uDFB3")
 
     val moched_zero_contact
         get() = TariWalletAddress(mocked_zero_hex, mocked_zero_emojiId)
