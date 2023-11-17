@@ -1,5 +1,6 @@
 package com.tari.android.wallet.ui.common
 
+import android.app.Activity
 import android.content.Intent
 import android.content.res.Configuration.UI_MODE_NIGHT_MASK
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
@@ -121,6 +122,14 @@ abstract class CommonActivity<Binding : ViewBinding, VM : CommonViewModel> : App
         super.onStart()
     }
 
+    fun <T : Activity> launch(destination: Class<T>) {
+        val intent = Intent(this, destination)
+        intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
+        this.intent.data?.let(intent::setData)
+        startActivity(intent)
+        finish()
+    }
+
     override fun onResume() {
         super.onResume()
 
@@ -144,17 +153,12 @@ abstract class CommonActivity<Binding : ViewBinding, VM : CommonViewModel> : App
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         dialogManager.context = this
-        overridePendingTransition(R.anim.enter_from_right, R.anim.exit_to_left)
+
         subscribeToCommon(connectionStateViewModel)
     }
 
     protected fun setContainerId(id: Int) {
         containerId = id
-    }
-
-    override fun onBackPressed() {
-        super.onBackPressed()
-        overridePendingTransition(R.anim.enter_from_left, R.anim.exit_to_right)
     }
 
     fun addFragment(fragment: Fragment, bundle: Bundle? = null, isRoot: Boolean = false, withAnimation: Boolean = true) {
@@ -172,7 +176,11 @@ abstract class CommonActivity<Binding : ViewBinding, VM : CommonViewModel> : App
     }
 
     fun popUpTo(tag: String) {
-        while (supportFragmentManager.fragments.last().tag != tag && supportFragmentManager.backStackEntryCount > 0) {
+        viewModel.logger.e("popUpTo $tag")
+        viewModel.logger.e("popUpTo:last ${supportFragmentManager.fragments.last().tag}")
+        viewModel.logger.e("popUpTo:all ${supportFragmentManager.fragments.map { it.tag }.joinToString(", ")}")
+        viewModel.logger.e("popUpTo:all ${supportFragmentManager.fragments.map { it::class.java }.joinToString(", ")}")
+        while (supportFragmentManager.fragments.last()::class.java.simpleName != tag && supportFragmentManager.backStackEntryCount > 0) {
             supportFragmentManager.popBackStackImmediate()
         }
     }

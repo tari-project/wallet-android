@@ -38,7 +38,9 @@ import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ProcessLifecycleOwner
 import com.orhanobut.logger.Logger
+import com.tari.android.wallet.BuildConfig
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
+import com.tari.android.wallet.data.sharedPrefs.security.SecurityPrefRepository
 import com.tari.android.wallet.di.DiContainer
 import com.tari.android.wallet.event.Event
 import com.tari.android.wallet.event.EventBus
@@ -48,6 +50,7 @@ import com.tari.android.wallet.notification.NotificationHelper
 import com.tari.android.wallet.service.service.WalletServiceLauncher
 import com.tari.android.wallet.ui.common.gyphy.GiphyAdapter
 import com.tari.android.wallet.yat.YatAdapter
+import io.sentry.android.core.SentryAndroid
 import java.lang.ref.WeakReference
 import javax.inject.Inject
 
@@ -69,6 +72,9 @@ class TariWalletApplication : Application() {
 
     @Inject
     lateinit var sharedPrefsRepository: SharedPrefsRepository
+
+    @Inject
+    lateinit var securityPrefRepository: SecurityPrefRepository
 
     @Inject
     lateinit var walletServiceLauncher: WalletServiceLauncher
@@ -93,14 +99,26 @@ class TariWalletApplication : Application() {
     val currentActivity: Activity?
         get() = activityLifecycleCallbacks.currentActivity
 
+    @Suppress("KotlinConstantConditions")
     override fun onCreate() {
         super.onCreate()
         INSTANCE = WeakReference(this)
+
+        SentryAndroid.init(this) {
+            it.isDebug = BuildConfig.BUILD_TYPE == "debug"
+            val buildType = when (BuildConfig.BUILD_TYPE) {
+                "debug" -> "DEVELOPMENT"
+                "release" -> "PRODUCTION"
+                else -> "PRODUCTION"
+            }
+            it.environment = buildType + "_" + BuildConfig.FLAVOR
+        }
 
         registerActivityLifecycleCallbacks(activityLifecycleCallbacks)
 
         DiContainer.initContainer(this)
         initApplication()
+
 
         ProcessLifecycleOwner.get().lifecycle.addObserver(AppObserver())
         logger.i("Application inited")
@@ -112,7 +130,7 @@ class TariWalletApplication : Application() {
         notificationHelper.createNotificationChannels()
 
         // user should authenticate every time the app starts up
-        sharedPrefsRepository.isAuthenticated = false
+        securityPrefRepository.isAuthenticated = false
 
         registerReceiver(connectionStateReceiver, connectionStateReceiver.intentFilter)
 
@@ -149,6 +167,7 @@ class TariWalletApplication : Application() {
 
         override fun onDestroy(owner: LifecycleOwner) {
             super.onDestroy(owner)
+            securityPrefRepository.isAuthenticated = false
             logger.i("App was destroyed")
             walletServiceLauncher.stopOnAppBackgrounded()
         }

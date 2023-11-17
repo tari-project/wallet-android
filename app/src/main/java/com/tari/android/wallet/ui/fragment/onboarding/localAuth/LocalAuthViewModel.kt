@@ -1,18 +1,13 @@
 package com.tari.android.wallet.ui.fragment.onboarding.localAuth
 
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
+import com.tari.android.wallet.extension.addTo
 import com.tari.android.wallet.infrastructure.backup.BackupManager
 import com.tari.android.wallet.infrastructure.security.biometric.BiometricAuthenticationService
-import com.tari.android.wallet.infrastructure.security.biometric.BiometricAuthenticationType
 import com.tari.android.wallet.ui.common.CommonViewModel
 import javax.inject.Inject
 
 class LocalAuthViewModel : CommonViewModel() {
-
-    @Inject
-    lateinit var sharedPrefsWrapper: SharedPrefsRepository
 
     @Inject
     lateinit var authService: BiometricAuthenticationService
@@ -20,11 +15,29 @@ class LocalAuthViewModel : CommonViewModel() {
     @Inject
     lateinit var backupManager: BackupManager
 
-    private val _authType = MutableLiveData<BiometricAuthenticationType>()
-    val authType: LiveData<BiometricAuthenticationType> = _authType
+    val secureState = MutableLiveData(SecureState(true, false, false))
+
 
     init {
         component.inject(this)
-        _authType.value = authService.authType
+        sharedPrefsRepository.onboardingAuthSetupStarted = true
+        updateState()
+
+        securityPrefRepository.updateNotifier.subscribe {
+            updateState()
+        }.addTo(compositeDisposable)
+    }
+
+    fun updateState() {
+        secureState.value = SecureState(
+            authService.isBiometricAuthAvailable,
+            securityPrefRepository.pinCode != null,
+            securityPrefRepository.biometricsAuth == true
+        )
+    }
+
+    fun securedWithBiometrics() {
+        securityPrefRepository.biometricsAuth = true
+        secureState.value = secureState.value!!.copy(biometricsSecured = true)
     }
 }

@@ -58,7 +58,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
-                        android:src="@drawable/vector_home_icon" />
+                        android:src="@drawable/vector_home_home" />
                 </FrameLayout>
 
                 <FrameLayout
@@ -72,7 +72,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
-                        android:src="@drawable/vector_ttl_store_icon" />
+                        android:src="@drawable/vector_home_book" />
                 </FrameLayout>
 
                 <View
@@ -81,17 +81,17 @@
                     android:layout_weight="0.35" />
 
                 <FrameLayout
-                    android:id="@+id/wallet_info_view"
+                    android:id="@+id/chat_view"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_weight="1">
 
                     <com.tari.android.wallet.ui.component.tari.TariIconView
-                        android:id="@+id/wallet_info_image_view"
+                        android:id="@+id/chat_image_view"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
-                        android:src="@drawable/vector_contact_book_icon" />
+                        android:src="@drawable/vector_home_chat" />
                 </FrameLayout>
 
                 <FrameLayout
@@ -105,7 +105,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
-                        android:src="@drawable/vector_settings_icon" />
+                        android:src="@drawable/vector_home_menu" />
                 </FrameLayout>
 
             </LinearLayout>
@@ -113,12 +113,12 @@
         </com.tari.android.wallet.ui.component.tari.TariPrimaryBackground>
 
         <com.tari.android.wallet.ui.component.tari.TariAlphaBackground
+            android:id="@+id/send_button_container"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="-40dp"
             android:elevation="30dp"
-            app:alphaBackground="0.2"
-            app:backgroundColor="#FFFFFF"
+            app:backgroundColor="?attr/palette_background_primary"
             app:cornerRadius="40dp"
             app:elevation="30dp"
             app:layout_constraintBottom_toTopOf="@id/bottom_navigation_view"
@@ -126,6 +126,7 @@
             app:layout_constraintStart_toStartOf="parent">
 
             <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/send_button_external_container"
                 android:layout_width="78dp"
                 android:layout_height="78dp"
                 android:background="@drawable/vector_disable_able_gradient_button_bg_external"

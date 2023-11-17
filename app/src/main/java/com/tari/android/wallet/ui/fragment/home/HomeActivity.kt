@@ -34,9 +34,11 @@ package com.tari.android.wallet.ui.fragment.home
 
 import android.Manifest.permission.POST_NOTIFICATIONS
 import android.content.Intent
+import android.content.res.Configuration
 import android.os.Build
 import android.os.Bundle
 import android.widget.ImageView
+import androidx.activity.addCallback
 import androidx.activity.viewModels
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
@@ -49,6 +51,7 @@ import com.tari.android.wallet.application.deeplinks.DeeplinkHandler
 import com.tari.android.wallet.application.deeplinks.DeeplinkViewModel
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
+import com.tari.android.wallet.data.sharedPrefs.security.SecurityPrefRepository
 import com.tari.android.wallet.data.sharedPrefs.tariSettings.TariSettingsSharedRepository
 import com.tari.android.wallet.databinding.ActivityHomeBinding
 import com.tari.android.wallet.di.DiContainer.appComponent
@@ -70,20 +73,24 @@ import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
 import com.tari.android.wallet.ui.extension.parcelable
 import com.tari.android.wallet.ui.extension.setVisible
 import com.tari.android.wallet.ui.extension.string
+import com.tari.android.wallet.ui.fragment.auth.AuthActivity
+import com.tari.android.wallet.ui.fragment.chat_list.ChatListFragment
 import com.tari.android.wallet.ui.fragment.contact_book.root.ContactBookFragment
 import com.tari.android.wallet.ui.fragment.contact_book.root.action_menu.ContactBookActionMenuViewModel
 import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
+import com.tari.android.wallet.ui.fragment.home.navigation.TariNavigator.Companion.INDEX_CHAT
 import com.tari.android.wallet.ui.fragment.home.navigation.TariNavigator.Companion.INDEX_CONTACT_BOOK
 import com.tari.android.wallet.ui.fragment.home.navigation.TariNavigator.Companion.INDEX_HOME
 import com.tari.android.wallet.ui.fragment.home.navigation.TariNavigator.Companion.INDEX_SETTINGS
-import com.tari.android.wallet.ui.fragment.home.navigation.TariNavigator.Companion.INDEX_STORE
 import com.tari.android.wallet.ui.fragment.home.navigation.TariNavigator.Companion.NO_SMOOTH_SCROLL
 import com.tari.android.wallet.ui.fragment.onboarding.activity.OnboardingFlowActivity
 import com.tari.android.wallet.ui.fragment.settings.allSettings.AllSettingsFragment
+import com.tari.android.wallet.ui.fragment.settings.themeSelector.TariTheme
 import com.tari.android.wallet.ui.fragment.splash.SplashActivity
 import com.tari.android.wallet.ui.fragment.store.StoreFragment
 import com.tari.android.wallet.ui.fragment.tx.HomeFragment
 import com.tari.android.wallet.util.Constants
+import com.tari.android.wallet.util.TariBuild
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -94,6 +101,9 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>() {
 
     @Inject
     lateinit var sharedPrefsRepository: SharedPrefsRepository
+
+    @Inject
+    lateinit var securityPrefRepository: SecurityPrefRepository
 
     @Inject
     lateinit var walletServiceLauncher: WalletServiceLauncher
@@ -119,6 +129,23 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        appComponent.inject(this)
+
+        onBackPressedDispatcher.addCallback {
+            if (ui.actionMenuView.onBackPressed()) {
+                return@addCallback
+            }
+            if (supportFragmentManager.backStackEntryCount > 0) {
+                supportFragmentManager.popBackStack()
+            } else {
+                if (ui.viewPager.currentItem == INDEX_HOME) {
+                    finish()
+                } else {
+                    ui.viewPager.setCurrentItem(INDEX_HOME, NO_SMOOTH_SCROLL)
+                    enableNavigationView(ui.homeImageView)
+                }
+            }
+        }
 
         instance = WeakReference(this)
 
@@ -131,16 +158,14 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>() {
         subscribeToCommon(viewModel.shareViewModel.tariBluetoothClient)
         subscribeToCommon(viewModel.shareViewModel.deeplinkViewModel)
         subscribeToCommon(actionMenuViewModel)
-        viewModel.nfcAdapter.context = this
 
         viewModel.shareViewModel.tariBluetoothServer.init(this)
         viewModel.shareViewModel.tariBluetoothClient.init(this)
 
         setContainerId(R.id.nav_container)
-
         overridePendingTransition(0, 0)
-        appComponent.inject(this)
-        if (!sharedPrefsRepository.isAuthenticated) {
+
+        if (!securityPrefRepository.isAuthenticated) {
             val intent = Intent(this, SplashActivity::class.java)
                 .apply { flags = Intent.FLAG_ACTIVITY_NEW_TASK }
             this.intent?.data?.let(intent::setData)
@@ -149,6 +174,20 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>() {
             return
         }
         ui = ActivityHomeBinding.inflate(layoutInflater).also { setContentView(it.root) }
+
+        val buttonBg = when(tariSettingsRepository.currentTheme) {
+            TariTheme.AppBased -> {
+                when (resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) {
+                    Configuration.UI_MODE_NIGHT_YES ->  R.drawable.vector_disable_able_gradient_button_bg_external_dark
+                    else -> R.drawable.vector_disable_able_gradient_button_bg_external
+                }
+            }
+            null,
+            TariTheme.Light -> R.drawable.vector_disable_able_gradient_button_bg_external
+            else -> R.drawable.vector_disable_able_gradient_button_bg_external_dark
+        }
+        ui.sendButtonExternalContainer.setBackgroundResource(buttonBg)
+
         if (savedInstanceState == null) {
             enableNavigationView(ui.homeImageView)
             viewModel.doOnConnected {
@@ -178,12 +217,9 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>() {
     override fun onResume() {
         super.onResume()
 
-        viewModel.nfcAdapter.enableForegroundDispatch(this)
-    }
-
-    override fun onPause() {
-        super.onPause()
-        viewModel.nfcAdapter.disableForegroundDispatch(this)
+        if (!viewModel.securityPrefRepository.isAuthenticated) {
+            launch(AuthActivity::class.java)
+        }
     }
 
     private fun subscribeUI() = with(viewModel) {
@@ -195,6 +231,7 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>() {
         }
     }
 
+    @Deprecated("Deprecated in Java")
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         viewModel.shareViewModel.tariBluetoothServer.handleActivityResult(requestCode, resultCode, data)
@@ -203,8 +240,6 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>() {
 
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
-
-        viewModel.nfcAdapter.onNewIntent(intent)
 
         // onNewIntent might get called before onCreate, so we anticipate that here
         checkScreensDeeplink(intent)
@@ -218,22 +253,6 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>() {
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         outState.putInt(KEY_PAGE, ui.viewPager.currentItem)
-    }
-
-    override fun onBackPressed() {
-        if (ui.actionMenuView.onBackPressed()) {
-            return
-        }
-        if (supportFragmentManager.backStackEntryCount > 0) {
-            super.onBackPressed()
-        } else {
-            if (ui.viewPager.currentItem == INDEX_HOME) {
-                super.onBackPressed()
-            } else {
-                ui.viewPager.setCurrentItem(INDEX_HOME, NO_SMOOTH_SCROLL)
-                enableNavigationView(ui.homeImageView)
-            }
-        }
     }
 
     fun setBottomBarVisibility(isVisible: Boolean) {
@@ -251,20 +270,23 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>() {
 
     private fun setupBottomNavigation() {
         enableNavigationView(ui.homeImageView)
-        ui.viewPager.adapter = HomeAdapter(supportFragmentManager, this.lifecycle)
+        ui.viewPager.adapter = if (TariBuild.isChat) HomeChatAdapter(supportFragmentManager, this.lifecycle)
+        else HomeStoreAdapter(supportFragmentManager, this.lifecycle)
         ui.viewPager.isUserInputEnabled = false
         ui.viewPager.offscreenPageLimit = 3
         ui.homeView.setOnClickListener {
             ui.viewPager.setCurrentItem(INDEX_HOME, NO_SMOOTH_SCROLL)
             enableNavigationView(ui.homeImageView)
         }
+        ui.storeImageView.setImageResource(if (TariBuild.isChat) R.drawable.vector_home_book else R.drawable.vector_ttl_store_icon)
         ui.storeView.setOnClickListener {
-            ui.viewPager.setCurrentItem(INDEX_STORE, NO_SMOOTH_SCROLL)
+            ui.viewPager.setCurrentItem(INDEX_CONTACT_BOOK, NO_SMOOTH_SCROLL)
             enableNavigationView(ui.storeImageView)
         }
-        ui.walletInfoView.setOnClickListener {
-            ui.viewPager.setCurrentItem(INDEX_CONTACT_BOOK, NO_SMOOTH_SCROLL)
-            enableNavigationView(ui.walletInfoImageView)
+        ui.chatImageView.setImageResource(if (TariBuild.isChat) R.drawable.vector_home_chat else R.drawable.vector_home_book)
+        ui.chatView.setOnClickListener {
+            ui.viewPager.setCurrentItem(INDEX_CHAT, NO_SMOOTH_SCROLL)
+            enableNavigationView(ui.chatImageView)
         }
         ui.settingsView.setOnClickListener {
             ui.viewPager.setCurrentItem(INDEX_SETTINGS, NO_SMOOTH_SCROLL)
@@ -275,8 +297,8 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>() {
     private fun enableNavigationView(index: Int) {
         val view: ImageView = when (index) {
             INDEX_HOME -> ui.homeImageView
-            INDEX_STORE -> ui.storeImageView
-            INDEX_CONTACT_BOOK -> ui.walletInfoImageView
+            INDEX_CHAT -> ui.storeImageView
+            INDEX_CONTACT_BOOK -> ui.chatImageView
             INDEX_SETTINGS -> ui.settingsImageView
             else -> error("Unexpected index: $index")
         }
@@ -284,7 +306,7 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>() {
     }
 
     private fun enableNavigationView(view: ImageView) {
-        arrayOf(ui.homeImageView, ui.storeImageView, ui.walletInfoImageView, ui.settingsImageView).forEach { it.clearColorFilter() }
+        arrayOf(ui.homeImageView, ui.storeImageView, ui.chatImageView, ui.settingsImageView).forEach { it.clearColorFilter() }
         view.setColorFilter(viewModel.paletteManager.getPurpleBrand(this))
     }
 
@@ -355,7 +377,7 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>() {
     fun willNotifyAboutNewTx(): Boolean = ui.viewPager.currentItem == INDEX_HOME
 
     private fun processIntentDeepLink(intent: Intent) {
-        deeplinkViewModel.tryToHandle(intent.data?.toString().orEmpty())
+        deeplinkViewModel.tryToHandle(intent.data?.toString().orEmpty(), false)
     }
 
     override fun onDestroy() {
@@ -364,11 +386,24 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>() {
         viewModelStore.clear()
     }
 
-    class HomeAdapter(fm: FragmentManager, lifecycle: Lifecycle) : FragmentStateAdapter(fm, lifecycle) {
+    class HomeStoreAdapter(fm: FragmentManager, lifecycle: Lifecycle) : FragmentStateAdapter(fm, lifecycle) {
 
         override fun createFragment(position: Int): Fragment = when (position) {
             INDEX_HOME -> HomeFragment()
-            INDEX_STORE -> StoreFragment.newInstance()
+            INDEX_CHAT -> ContactBookFragment()
+            INDEX_CONTACT_BOOK -> StoreFragment.newInstance()
+            INDEX_SETTINGS -> AllSettingsFragment.newInstance()
+            else -> error("Unexpected position: $position")
+        }
+
+        override fun getItemCount(): Int = 4
+    }
+
+    class HomeChatAdapter(fm: FragmentManager, lifecycle: Lifecycle) : FragmentStateAdapter(fm, lifecycle) {
+
+        override fun createFragment(position: Int): Fragment = when (position) {
+            INDEX_HOME -> HomeFragment()
+            INDEX_CHAT -> ChatListFragment()
             INDEX_CONTACT_BOOK -> ContactBookFragment()
             INDEX_SETTINGS -> AllSettingsFragment.newInstance()
             else -> error("Unexpected position: $position")

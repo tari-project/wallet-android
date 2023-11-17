@@ -2,17 +2,19 @@ buildscript {
     ext {
         agp_version = '7.4.2'
     }
-    ext.kotlin_version = '1.8.10'
-    ext.lifecycle_version = '2.6.1'
+    ext.kotlin_version = '1.8.21'
+    ext.lifecycle_version = '2.6.2'
 
     // build & version
-    ext.buildNumber = 256
-    ext.versionNumber = "0.23.0"
+    ext.buildNumber = 274
+    ext.versionNumber = "0.24.0"
 
     // JNI libs
-    ext.libwalletVersion = "v0.50.0-hotfix.1"
-    ext.libwalletHostURL = "https://tari-binaries.s3.amazonaws.com/libwallet/"
-    ext.supportedABIs = ["arm64-v8a", "x86_64"]
+    ext.libwalletHostURL = "https://github.com/tari-project/tari/releases/download/"
+    ext.libwalletVersion = "v0.52.0"
+    ext.libwalletx64A = "libminotari_wallet_ffi.android_x86_64.a"
+    ext.libwalletArmA = "libminotari_wallet_ffi.android_aarch64.a"
+    ext.libwalletHeader = "libminotari_wallet_ffi.h"
 
     repositories {
         google()
@@ -22,7 +24,7 @@ buildscript {
     dependencies {
         classpath "com.android.tools.build:gradle:$agp_version"
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-        classpath "io.sentry:sentry-android-gradle-plugin:3.4.3"
+        classpath "io.sentry:sentry-android-gradle-plugin:3.14.0"
     }
 }
 
@@ -41,6 +43,6 @@ allprojects {
     }
 }
 
-task clean(type: Delete) {
+tasks.register('clean', Delete) {
     delete rootProject.buildDir
 }

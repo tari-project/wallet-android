@@ -9,7 +9,6 @@ import com.tari.android.wallet.R
 import com.tari.android.wallet.application.deeplinks.DeepLink
 import com.tari.android.wallet.application.deeplinks.DeeplinkHandler
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
-import com.tari.android.wallet.infrastructure.nfc.TariNFCAdapter
 import com.tari.android.wallet.model.TariWalletAddress
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.dialog.modular.DialogArgs
@@ -39,9 +38,6 @@ class WalletInfoViewModel : CommonViewModel() {
 
     @Inject
     lateinit var deeplinkHandler: DeeplinkHandler
-
-    @Inject
-    lateinit var nfcAdapter: TariNFCAdapter
 
     private val _emojiId: MutableLiveData<String> = MutableLiveData()
     val emojiId: LiveData<String> = _emojiId
@@ -117,24 +113,21 @@ class WalletInfoViewModel : CommonViewModel() {
     }
 
     fun showEditAliasDialog() {
-        val name = sharedPrefsWrapper.name.orEmpty()
-        val surname = sharedPrefsWrapper.surname.orEmpty()
+        val name = (sharedPrefsWrapper.name.orEmpty() + " " + sharedPrefsWrapper.surname.orEmpty()).trim()
 
         var saveAction: () -> Boolean = { false }
 
         val nameModule =
             InputModule(name, resourceManager.getString(R.string.contact_book_add_contact_first_name_hint), true, false) { saveAction.invoke() }
-        val surnameModule =
-            InputModule(surname, resourceManager.getString(R.string.contact_book_add_contact_surname_hint), false, true) { saveAction.invoke() }
 
         val headModule = HeadModule(
             resourceManager.getString(R.string.wallet_info_alias_edit_title),
             rightButtonTitle = resourceManager.getString(R.string.contact_book_add_contact_done_button)
         ) { saveAction.invoke() }
 
-        val moduleList = mutableListOf(headModule, nameModule, surnameModule)
+        val moduleList = mutableListOf(headModule, nameModule)
         saveAction = {
-            saveDetails(nameModule.value, surnameModule.value)
+            saveDetails(nameModule.value)
             true
         }
 
@@ -146,10 +139,11 @@ class WalletInfoViewModel : CommonViewModel() {
         navigation.postValue(Navigation.AllSettingsNavigation.ToRequestTari)
     }
 
-    private fun saveDetails(name: String, surname: String) {
-        sharedPrefsWrapper.name = name
-        sharedPrefsWrapper.surname = surname
-        alias.postValue("$name $surname")
+    private fun saveDetails(name: String) {
+        val split = name.split(" ")
+        sharedPrefsWrapper.name = split.getOrNull(0).orEmpty().trim()
+        sharedPrefsWrapper.surname = split.getOrNull(1).orEmpty().trim()
+        alias.postValue(name)
         dismissDialog.postValue(Unit)
     }
 }

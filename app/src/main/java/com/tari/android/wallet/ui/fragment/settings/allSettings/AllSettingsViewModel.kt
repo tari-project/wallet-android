@@ -8,9 +8,12 @@ import com.tari.android.wallet.R.drawable.vector_all_settings_background_service
 import com.tari.android.wallet.R.drawable.vector_all_settings_backup_options_icon
 import com.tari.android.wallet.R.drawable.vector_all_settings_bluetooth
 import com.tari.android.wallet.R.drawable.vector_all_settings_bridge_configuration_icon
+import com.tari.android.wallet.R.drawable.vector_all_settings_cart
 import com.tari.android.wallet.R.drawable.vector_all_settings_contribute_to_tari_icon
+import com.tari.android.wallet.R.drawable.vector_all_settings_data_collection
 import com.tari.android.wallet.R.drawable.vector_all_settings_delete_button_icon
 import com.tari.android.wallet.R.drawable.vector_all_settings_disclaimer_icon
+import com.tari.android.wallet.R.drawable.vector_all_settings_passcode
 import com.tari.android.wallet.R.drawable.vector_all_settings_privacy_policy_icon
 import com.tari.android.wallet.R.drawable.vector_all_settings_report_bug_icon
 import com.tari.android.wallet.R.drawable.vector_all_settings_select_base_node_icon
@@ -19,14 +22,19 @@ import com.tari.android.wallet.R.drawable.vector_all_settings_select_theme_icon
 import com.tari.android.wallet.R.drawable.vector_all_settings_user_agreement_icon
 import com.tari.android.wallet.R.drawable.vector_all_settings_visit_tari_icon
 import com.tari.android.wallet.R.drawable.vector_all_settings_yat_icon
+import com.tari.android.wallet.R.drawable.vector_fingerprint
 import com.tari.android.wallet.R.string.all_settings_advanced_settings_label
 import com.tari.android.wallet.R.string.all_settings_background_service
+import com.tari.android.wallet.R.string.all_settings_biometrics
 import com.tari.android.wallet.R.string.all_settings_bluetooth_settings
 import com.tari.android.wallet.R.string.all_settings_bridge_configuration
 import com.tari.android.wallet.R.string.all_settings_connect_yats
 import com.tari.android.wallet.R.string.all_settings_contribute
+import com.tari.android.wallet.R.string.all_settings_create_pin_code
+import com.tari.android.wallet.R.string.all_settings_data_collection
 import com.tari.android.wallet.R.string.all_settings_delete_wallet
 import com.tari.android.wallet.R.string.all_settings_disclaimer
+import com.tari.android.wallet.R.string.all_settings_pin_code
 import com.tari.android.wallet.R.string.all_settings_privacy_policy
 import com.tari.android.wallet.R.string.all_settings_report_a_bug
 import com.tari.android.wallet.R.string.all_settings_secondary_settings_label
@@ -34,6 +42,7 @@ import com.tari.android.wallet.R.string.all_settings_security_label
 import com.tari.android.wallet.R.string.all_settings_select_base_node
 import com.tari.android.wallet.R.string.all_settings_select_network
 import com.tari.android.wallet.R.string.all_settings_select_theme
+import com.tari.android.wallet.R.string.all_settings_store
 import com.tari.android.wallet.R.string.all_settings_user_agreement
 import com.tari.android.wallet.R.string.all_settings_version_text_copy_title
 import com.tari.android.wallet.R.string.all_settings_version_text_copy_toast_message
@@ -47,9 +56,11 @@ import com.tari.android.wallet.R.string.github_repo_url
 import com.tari.android.wallet.R.string.privacy_policy_url
 import com.tari.android.wallet.R.string.tari_about_title
 import com.tari.android.wallet.R.string.tari_url
+import com.tari.android.wallet.R.string.ttl_store_url
 import com.tari.android.wallet.R.string.user_agreement_url
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.event.EventBus
+import com.tari.android.wallet.extension.addTo
 import com.tari.android.wallet.infrastructure.backup.BackupManager
 import com.tari.android.wallet.infrastructure.backup.BackupState
 import com.tari.android.wallet.infrastructure.backup.BackupsState
@@ -59,7 +70,9 @@ import com.tari.android.wallet.ui.common.SingleLiveEvent
 import com.tari.android.wallet.ui.common.recyclerView.CommonViewHolderItem
 import com.tari.android.wallet.ui.common.recyclerView.items.DividerViewHolderItem
 import com.tari.android.wallet.ui.dialog.error.ErrorDialogArgs
+import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
 import com.tari.android.wallet.ui.fragment.home.navigation.Navigation.AllSettingsNavigation
+import com.tari.android.wallet.ui.fragment.pinCode.PinCodeScreenBehavior
 import com.tari.android.wallet.ui.fragment.settings.allSettings.PresentationBackupState.BackupStateStatus.InProgress
 import com.tari.android.wallet.ui.fragment.settings.allSettings.PresentationBackupState.BackupStateStatus.Success
 import com.tari.android.wallet.ui.fragment.settings.allSettings.PresentationBackupState.BackupStateStatus.Warning
@@ -72,6 +85,7 @@ import com.tari.android.wallet.ui.fragment.settings.allSettings.version.Settings
 import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupSettingsRepository
 import com.tari.android.wallet.ui.fragment.settings.userAutorization.BiometricAuthenticationViewModel
 import com.tari.android.wallet.yat.YatAdapter
+import com.tari.android.wallet.yat.YatSharedRepository
 import javax.inject.Inject
 
 class AllSettingsViewModel : CommonViewModel() {
@@ -79,7 +93,7 @@ class AllSettingsViewModel : CommonViewModel() {
     lateinit var authenticationViewModel: BiometricAuthenticationViewModel
 
     private val backupOption = SettingsBackupOptionViewHolderItem(leftIconId = vector_all_settings_backup_options_icon) {
-        authenticationViewModel.requireAuthorization { navigation.postValue(AllSettingsNavigation.ToBackupSettings) }
+        runWithAuthorization { navigation.postValue(AllSettingsNavigation.ToBackupSettings) }
     }
 
     @Inject
@@ -94,6 +108,9 @@ class AllSettingsViewModel : CommonViewModel() {
     @Inject
     lateinit var settingsRepository: SharedPrefsRepository
 
+    @Inject
+    lateinit var yatSharedPrefsRepository: YatSharedRepository
+
     private val _openYatOnboarding = SingleLiveEvent<Unit>()
     val openYatOnboarding: LiveData<Unit> = _openYatOnboarding
 
@@ -104,6 +121,8 @@ class AllSettingsViewModel : CommonViewModel() {
         component.inject(this)
         initOptions()
         EventBus.backupState.subscribe(this) { backupState -> onBackupStateChanged(backupState) }
+
+        settingsRepository.updateNotifier.subscribe { initOptions() }.addTo(compositeDisposable)
     }
 
     private fun initOptions() {
@@ -114,9 +133,10 @@ class AllSettingsViewModel : CommonViewModel() {
         )
 
         val alias = settingsRepository.name.orEmpty() + " " + settingsRepository.surname.orEmpty()
+        val pinCode = securityPrefRepository.pinCode
 
         val allOptions = mutableListOf(
-            MyProfileViewHolderItem(settingsRepository.emojiId.orEmpty(), alias) {
+            MyProfileViewHolderItem(settingsRepository.emojiId.orEmpty(), yatSharedPrefsRepository.connectedYat.orEmpty(), alias) {
                 navigation.postValue(AllSettingsNavigation.ToMyProfile)
             },
             DividerViewHolderItem(),
@@ -126,7 +146,34 @@ class AllSettingsViewModel : CommonViewModel() {
             SettingsTitleViewHolderItem(resourceManager.getString(all_settings_security_label)),
             backupOption,
             DividerViewHolderItem(),
+            ButtonViewDto(resourceManager.getString(all_settings_data_collection), vector_all_settings_data_collection) {
+                navigation.postValue(AllSettingsNavigation.ToDataCollection)
+            },
+            DividerViewHolderItem(),
+            if (pinCode != null) {
+                ButtonViewDto(resourceManager.getString(all_settings_pin_code), vector_all_settings_passcode) {
+                    runWithAuthorization {
+                        navigation.postValue(Navigation.EnterPinCodeNavigation(PinCodeScreenBehavior.ChangeNew))
+                    }
+                }
+            } else {
+                ButtonViewDto(resourceManager.getString(all_settings_create_pin_code), vector_all_settings_passcode) {
+                    runWithAuthorization {
+                        navigation.postValue(Navigation.EnterPinCodeNavigation(PinCodeScreenBehavior.Create))
+                    }
+                }
+            },
+            DividerViewHolderItem(),
+            ButtonViewDto(resourceManager.getString(all_settings_biometrics), vector_fingerprint) {
+                runWithAuthorization {
+                    navigation.postValue(Navigation.ChangeBiometrics())
+                }
+            },
             SettingsTitleViewHolderItem(resourceManager.getString(all_settings_secondary_settings_label)),
+            ButtonViewDto(resourceManager.getString(all_settings_store), vector_all_settings_cart) {
+                _openLink.postValue(resourceManager.getString(ttl_store_url))
+            },
+            DividerViewHolderItem(),
             ButtonViewDto(resourceManager.getString(tari_about_title), vector_all_settings_about_icon) {
                 navigation.postValue(AllSettingsNavigation.ToAbout)
             },
@@ -189,7 +236,7 @@ class AllSettingsViewModel : CommonViewModel() {
             DividerViewHolderItem(),
             SettingsVersionViewHolderItem(versionText) { _copyToClipboard.postValue(versionArgs) }
         )
-        _allSettingsOptions.value = allOptions
+        _allSettingsOptions.postValue(allOptions)
     }
 
     private fun onBackupStateChanged(backupState: BackupsState?) {

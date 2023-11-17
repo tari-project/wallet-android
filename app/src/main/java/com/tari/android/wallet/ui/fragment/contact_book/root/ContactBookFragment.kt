@@ -71,6 +71,7 @@ class ContactBookFragment : CommonFragment<FragmentContactBookRootBinding, Conta
         viewModel.walletAddressViewModel.tryToCheckClipboard()
     }
 
+    @Deprecated("Deprecated in Java")
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == QRScannerActivity.REQUEST_QR_SCANNER && resultCode == Activity.RESULT_OK && data != null) {
             val qrData = data.getStringExtra(QRScannerActivity.EXTRA_QR_DATA) ?: return

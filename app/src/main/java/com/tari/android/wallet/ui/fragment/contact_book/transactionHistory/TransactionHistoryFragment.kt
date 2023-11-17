@@ -55,6 +55,7 @@ class TransactionHistoryFragment : CommonFragment<FragmentContactTransactionHist
         ui.emptyState.setVisible(items.isEmpty())
 
         adapter.update(items)
+        adapter.notifyDataSetChanged()
     }
 
     private fun initUI() = with(ui) {
@@ -85,7 +86,6 @@ class TransactionHistoryFragment : CommonFragment<FragmentContactTransactionHist
 
         val emptyStateText = getString(R.string.contact_details_transaction_history_empty_state_description, name)
         ui.emptyStateDescription.text = HtmlHelper.getSpannedText(emptyStateText)
-
     }
 
     companion object {

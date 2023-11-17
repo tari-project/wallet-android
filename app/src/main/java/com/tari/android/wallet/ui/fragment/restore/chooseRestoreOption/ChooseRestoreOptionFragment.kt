@@ -68,6 +68,7 @@ class ChooseRestoreOptionFragment : CommonFragment<FragmentChooseRestoreOptionBi
         onActivityResult(0, 0, null)
     }
 
+    @Deprecated("Deprecated in Java")
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         viewModel.onActivityResult(requestCode, resultCode, data)

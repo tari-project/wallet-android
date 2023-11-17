@@ -50,7 +50,7 @@ class LogsViewModel : CommonViewModel() {
                 resourceManager.getString(R.string.common_error_title),
                 resourceManager.getString(R.string.debug_logs_cant_open_file),
             ) {
-                _backPressed.postValue(Unit)
+                backPressed.postValue(Unit)
             }
             modularDialog.postValue(errorArgs.getModular(resourceManager))
             logger.e(e, "Out of memory on reading big log file")

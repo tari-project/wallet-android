@@ -39,9 +39,8 @@ import com.tari.android.wallet.data.WalletConfig
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodeSharedRepository
 import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
+import com.tari.android.wallet.data.sharedPrefs.security.SecurityPrefRepository
 import com.tari.android.wallet.data.sharedPrefs.tariSettings.TariSettingsSharedRepository
-import com.tari.android.wallet.infrastructure.logging.BugReportingService
-import com.tari.android.wallet.network.NetworkConnectionStateReceiver
 import com.tari.android.wallet.service.seedPhrase.SeedPhraseRepository
 import com.tari.android.wallet.tor.TorConfig
 import com.tari.android.wallet.tor.TorProxyManager
@@ -63,6 +62,7 @@ class WalletModule {
         baseNodeSharedRepository: BaseNodeSharedRepository,
         seedPhraseRepository: SeedPhraseRepository,
         networkRepository: NetworkRepository,
+        securityPrefRepository: SecurityPrefRepository,
         tariSettingsSharedRepository: TariSettingsSharedRepository,
         baseNodes: BaseNodes
     ): WalletManager = WalletManager(
@@ -73,6 +73,7 @@ class WalletModule {
         seedPhraseRepository,
         networkRepository,
         tariSettingsSharedRepository,
+        securityPrefRepository,
         baseNodes,
         torConfig
     )

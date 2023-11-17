@@ -15,7 +15,6 @@ class AddContactFragment : ContactSelectionFragment() {
 
         ui.toolbar.ui.toolbarTitle.text = string(R.string.contact_book_add_contact_title)
         ui.addFirstNameInput.visible()
-        ui.addSurnameInput.visible()
 
         viewModel.additionalFilter = { it.contact.getFFIDto() != null && it.contact.contact.getAlias().isEmpty() }
     }
@@ -24,8 +23,10 @@ class AddContactFragment : ContactSelectionFragment() {
         super.goToNext()
 
         val user = viewModel.getUserDto()
-        val firstName = ui.addFirstNameInput.ui.editText.text.toString()
-        val surname = ui.addSurnameInput.ui.editText.text.toString()
+        val fullName = ui.addFirstNameInput.ui.editText.text.toString()
+        val split = fullName.split(" ")
+        val firstName = split.getOrNull(1).orEmpty().trim()
+        val surname = split.getOrNull(0).orEmpty().trim()
 
         viewModel.contactsRepository.updateContactInfo(user, firstName, surname, "")
         viewModel.navigation.postValue(Navigation.ContactBookNavigation.BackToContactBook())

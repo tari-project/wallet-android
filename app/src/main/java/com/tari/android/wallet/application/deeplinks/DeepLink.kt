@@ -32,7 +32,9 @@
  */
 package com.tari.android.wallet.application.deeplinks
 
+import com.tari.android.wallet.data.sharedPrefs.tor.TorBridgeConfiguration
 import com.tari.android.wallet.model.MicroTari
+import com.tari.android.wallet.model.TariWalletAddress
 import java.math.BigInteger
 
 /**
@@ -49,8 +51,7 @@ sealed class DeepLink {
     // tari://esmeralda/contacts?list[0][alias]=Name&list[0][hex]=hex&list[1][alias]=Name&list[1][hex]=hex
     class Contacts(val contacts: List<DeeplinkContact>) : DeepLink() {
 
-        constructor(params: Map<String, String>) : this(
-            params.filterKeys { it.startsWith("list[") }
+        constructor(params: Map<String, String>) : this(params.filterKeys { it.startsWith("list[") }
                 .map { FormatExtractor(it.key, it.value) }
                 .groupBy { it.index }
                 .map {
@@ -58,7 +59,7 @@ sealed class DeepLink {
                     val hex = it.value.firstOrNull { it.name == hexKey }?.value.orEmpty()
                     DeeplinkContact(alias, hex)
                 }
-        )
+                .filter { TariWalletAddress.validate(it.hex) })
 
         override fun getParams(): Map<String, String> = hashMapOf<String, String>().apply {
             contacts.forEachIndexed { index, contact ->
@@ -158,6 +159,10 @@ sealed class DeepLink {
             const val nameKey = "name"
             const val peerKey = "peer"
         }
+    }
+
+    class TorBridges(val torConfigurations: List<TorBridgeConfiguration>): DeepLink() {
+
     }
 
     companion object {

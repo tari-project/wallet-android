@@ -39,17 +39,45 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import com.bumptech.glide.Glide
-import com.tari.android.wallet.R.color.*
 import com.tari.android.wallet.R.dimen.add_amount_element_text_size
 import com.tari.android.wallet.R.dimen.add_amount_gem_size
-import com.tari.android.wallet.R.string.*
+import com.tari.android.wallet.R.string.common_are_you_sure
+import com.tari.android.wallet.R.string.common_from
+import com.tari.android.wallet.R.string.common_to
+import com.tari.android.wallet.R.string.tx_detail_add_contact
+import com.tari.android.wallet.R.string.tx_detail_completing_final_processing
+import com.tari.android.wallet.R.string.tx_detail_edit
+import com.tari.android.wallet.R.string.tx_detail_fee_tooltip_desc
+import com.tari.android.wallet.R.string.tx_detail_fee_tooltip_transaction_fee
+import com.tari.android.wallet.R.string.tx_detail_payment_cancelled
+import com.tari.android.wallet.R.string.tx_detail_payment_received
+import com.tari.android.wallet.R.string.tx_detail_payment_sent
+import com.tari.android.wallet.R.string.tx_detail_pending_payment_received
+import com.tari.android.wallet.R.string.tx_detail_waiting_for_recipient
+import com.tari.android.wallet.R.string.tx_detail_waiting_for_sender_to_complete
+import com.tari.android.wallet.R.string.tx_details_cancel_dialog_cancel
+import com.tari.android.wallet.R.string.tx_details_cancel_dialog_description
+import com.tari.android.wallet.R.string.tx_details_cancel_dialog_not_cancel
+import com.tari.android.wallet.R.string.tx_details_fee_value
+import com.tari.android.wallet.R.string.tx_list_you_received_one_side_payment
 import com.tari.android.wallet.databinding.FragmentTxDetailsBinding
 import com.tari.android.wallet.extension.observe
 import com.tari.android.wallet.extension.txFormattedDate
-import com.tari.android.wallet.model.*
+import com.tari.android.wallet.model.CancelledTx
+import com.tari.android.wallet.model.CompletedTx
+import com.tari.android.wallet.model.MicroTari
+import com.tari.android.wallet.model.PendingOutboundTx
+import com.tari.android.wallet.model.Tx
 import com.tari.android.wallet.model.Tx.Direction.INBOUND
 import com.tari.android.wallet.model.Tx.Direction.OUTBOUND
-import com.tari.android.wallet.model.TxStatus.*
+import com.tari.android.wallet.model.TxId
+import com.tari.android.wallet.model.TxNote
+import com.tari.android.wallet.model.TxStatus.COINBASE
+import com.tari.android.wallet.model.TxStatus.FAUX_CONFIRMED
+import com.tari.android.wallet.model.TxStatus.FAUX_UNCONFIRMED
+import com.tari.android.wallet.model.TxStatus.IMPORTED
+import com.tari.android.wallet.model.TxStatus.MINED_CONFIRMED
+import com.tari.android.wallet.model.TxStatus.PENDING
 import com.tari.android.wallet.ui.animation.collapseAndHideAnimation
 import com.tari.android.wallet.ui.common.CommonFragment
 import com.tari.android.wallet.ui.component.fullEmojiId.EmojiIdSummaryViewController
@@ -62,13 +90,25 @@ import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonStyle
 import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
 import com.tari.android.wallet.ui.dialog.tooltipDialog.TooltipDialogArgs
-import com.tari.android.wallet.ui.extension.*
+import com.tari.android.wallet.ui.extension.dimen
+import com.tari.android.wallet.ui.extension.getFirstChild
+import com.tari.android.wallet.ui.extension.getLastChild
+import com.tari.android.wallet.ui.extension.gone
+import com.tari.android.wallet.ui.extension.hideKeyboard
+import com.tari.android.wallet.ui.extension.invisible
+import com.tari.android.wallet.ui.extension.parcelable
+import com.tari.android.wallet.ui.extension.setLayoutSize
+import com.tari.android.wallet.ui.extension.setTextSizePx
+import com.tari.android.wallet.ui.extension.setVisible
+import com.tari.android.wallet.ui.extension.string
+import com.tari.android.wallet.ui.extension.temporarilyDisableClick
+import com.tari.android.wallet.ui.extension.visible
 import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.ContactDto
 import com.tari.android.wallet.ui.fragment.tx.details.gif.GIFView
 import com.tari.android.wallet.ui.fragment.tx.details.gif.GIFViewModel
 import com.tari.android.wallet.ui.fragment.tx.details.gif.TxState
 import com.tari.android.wallet.util.WalletUtil
-import java.util.*
+import java.util.Date
 
 /**
  *  Activity class - Transaction detail.
@@ -91,6 +131,8 @@ class TxDetailsFragment : CommonFragment<FragmentTxDetailsBinding, TxDetailsView
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        requireActivity().hideKeyboard()
 
         val viewModel: TxDetailsViewModel by viewModels()
         bindViewModel(viewModel)
@@ -221,7 +263,14 @@ class TxDetailsFragment : CommonFragment<FragmentTxDetailsBinding, TxDetailsView
     private fun setTxAddresseeData(tx: Tx) {
         val state = TxState.from(tx)
         ui.fromTextView.text = if (state.direction == INBOUND) string(common_from) else string(common_to)
-        emojiIdSummaryController.display(tx.tariContact.walletAddress.emojiId)
+        if (tx.tariContact.walletAddress.isZeros()) {
+            ui.emojiIdSummaryView.root.gone()
+            ui.unknownSource.visible()
+        } else {
+            ui.emojiIdSummaryView.root.visible()
+            ui.unknownSource.gone()
+            emojiIdSummaryController.display(tx.tariContact.walletAddress.emojiId)
+        }
     }
 
     private fun setTxStatusData(tx: Tx) {

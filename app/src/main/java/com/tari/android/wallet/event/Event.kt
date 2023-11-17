@@ -32,7 +32,12 @@
  */
 package com.tari.android.wallet.event
 
-import com.tari.android.wallet.model.*
+import com.tari.android.wallet.model.CancelledTx
+import com.tari.android.wallet.model.CompletedTx
+import com.tari.android.wallet.model.PendingInboundTx
+import com.tari.android.wallet.model.PendingOutboundTx
+import com.tari.android.wallet.model.TransactionSendStatus
+import com.tari.android.wallet.model.TxId
 import com.tari.android.wallet.ui.fragment.send.finalize.TxFailureReason
 
 /**

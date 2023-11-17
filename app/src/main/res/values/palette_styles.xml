@@ -3,6 +3,7 @@
     <style name="AppTheme.Base" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="alertDialogTheme">@style/AlertDialogTheme</item>
         <item name="switchStyle">@style/SwitchTheme</item>
+        <item name="searchViewStyle">@style/TariSearchViewTheme</item>
 
         <item name="colorPrimary">?attr/palette_background_primary</item>
         <item name="colorPrimaryDark">?attr/palette_background_secondary</item>

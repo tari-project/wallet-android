@@ -99,7 +99,7 @@ class QRScannerActivity : CommonActivity<ActivityQrScannerBinding, QRScannerView
         bindViewModel(viewModel)
         subscribeToCommon(viewModel.deeplinkViewModel)
 
-        val data = intent.getSerializableExtra(QR_DATA_SOURCE, QrScannerSource::class.java)
+        val data = intent?.getSerializableExtra(QR_DATA_SOURCE, QrScannerSource::class.java)
         viewModel.init(data ?: QrScannerSource.None)
 
         subscribeUI()
@@ -160,7 +160,6 @@ class QRScannerActivity : CommonActivity<ActivityQrScannerBinding, QRScannerView
         intent.putExtra(EXTRA_QR_DATA, text)
         setResult(Activity.RESULT_OK, intent)
         finish()
-        overridePendingTransition(0, R.anim.slide_down)
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {

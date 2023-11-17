@@ -178,7 +178,7 @@ class ChooseRestoreOptionViewModel : CommonViewModel() {
         val args = ErrorDialogArgs(
             resourceManager.getString(R.string.restore_wallet_error_title),
             resourceManager.getString(R.string.restore_wallet_error_file_not_found),
-            onClose = { _backPressed.call() })
+            onClose = { backPressed.call() })
         modularDialog.postValue(args.getModular(resourceManager))
     }
 

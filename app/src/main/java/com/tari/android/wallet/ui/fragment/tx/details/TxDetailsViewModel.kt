@@ -140,7 +140,7 @@ class TxDetailsViewModel : CommonViewModel() {
             val errorArgs = ErrorDialogArgs(
                 resourceManager.getString(R.string.tx_details_error_tx_not_found_title),
                 resourceManager.getString(R.string.tx_details_error_tx_not_found_desc)
-            ) { _backPressed.call() }
+            ) { backPressed.call() }
             modularDialog.postValue(errorArgs.getModular(resourceManager))
         } else {
             foundTx.let { _txObject.onNext(it) }
@@ -169,25 +169,21 @@ class TxDetailsViewModel : CommonViewModel() {
     fun showEditNameInputs() {
         val contact = contact.value!!
 
-        val name = contact.contact.firstName
-        val surname = contact.contact.surname
-        val phoneDto = contact.getPhoneDto()
+        val name = (contact.contact.firstName + " " + contact.contact.surname).trim()
 
         var saveAction: () -> Boolean = { false }
 
         val nameModule = InputModule(name, resourceManager.getString(R.string.contact_book_add_contact_first_name_hint), true, false) { saveAction.invoke() }
-        val surnameModule =
-            InputModule(surname, resourceManager.getString(R.string.contact_book_add_contact_surname_hint), false, phoneDto == null) { saveAction.invoke() }
 
         val headModule = HeadModule(
             resourceManager.getString(R.string.contact_book_details_edit_title),
             rightButtonTitle = resourceManager.getString(R.string.contact_book_add_contact_done_button)
         ) { saveAction.invoke() }
 
-        val moduleList = mutableListOf(headModule, nameModule, surnameModule)
+        val moduleList = mutableListOf(headModule, nameModule)
 
         saveAction = {
-            saveDetails(nameModule.value, surnameModule.value)
+            saveDetails(nameModule.value)
             true
         }
 
@@ -195,7 +191,10 @@ class TxDetailsViewModel : CommonViewModel() {
         _inputDialog.postValue(args)
     }
 
-    private fun saveDetails(name: String, surname: String = "") {
+    private fun saveDetails(newName: String) {
+        val split = newName.split(" ")
+        val name = split.getOrNull(0).orEmpty().trim()
+        val surname = split.getOrNull(1).orEmpty().trim()
         val contact = contact.value!!
         this.contact.value = contactsRepository.updateContactInfo(contact, name, surname, contact.getYatDto()?.yat.orEmpty())
         dismissDialog.postValue(Unit)

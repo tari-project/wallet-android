@@ -17,6 +17,7 @@ import com.tari.android.wallet.ui.common.SingleLiveEvent
 import com.tari.android.wallet.ui.common.recyclerView.CommonViewHolderItem
 import com.tari.android.wallet.ui.common.recyclerView.items.TitleViewHolderItem
 import com.tari.android.wallet.ui.component.clipboardController.WalletAddressViewModel
+import com.tari.android.wallet.ui.fragment.chat_list.data.ChatsRepository
 import com.tari.android.wallet.ui.fragment.contact_book.contacts.adapter.contact.ContactItem
 import com.tari.android.wallet.ui.fragment.contact_book.contacts.adapter.contact.ContactlessPaymentItem
 import com.tari.android.wallet.ui.fragment.contact_book.data.ContactsRepository
@@ -78,6 +79,9 @@ open class ContactSelectionViewModel : CommonViewModel() {
     @Inject
     lateinit var deeplinkFormatter: DeeplinkFormatter
 
+    @Inject
+    lateinit var chatsRepository: ChatsRepository
+
     init {
         component.inject(this)
 
@@ -117,7 +121,6 @@ open class ContactSelectionViewModel : CommonViewModel() {
         if (hex.isEmpty()) return
         val walletAddress = walletService.getWalletAddressFromHexString(hex)
         selectedUser.value = ContactDto(FFIContactDto(walletAddress), name)
-        goNext.postValue(Unit)
     }
 
     fun getUserDto(): ContactDto = selectedUser.value ?: contactListSource.value.orEmpty()
@@ -128,7 +131,7 @@ open class ContactSelectionViewModel : CommonViewModel() {
         val source = contactListSource.value ?: return
         val searchText = searchText.value ?: return
 
-        searchAndDisplayRecipients(searchText)
+        searchAndDisplayYatRecipients(searchText)
 
         var list = source.filter { additionalFilter.invoke(it) }
 
@@ -161,14 +164,15 @@ open class ContactSelectionViewModel : CommonViewModel() {
         this.list.postValue(result)
     }
 
-    private fun searchAndDisplayRecipients(query: String) {
+    fun searchAndDisplayYatRecipients(query: String) {
         searchingJob?.cancel()
         foundYatUser.value = Optional.ofNullable(null)
 
         if (query.isEmpty()) return
 
         searchingJob = viewModelScope.launch(Dispatchers.IO) {
-            yatAdapter.searchTariYats(query)?.result?.entries?.firstOrNull()?.let { response ->
+            val response = yatAdapter.searchTariYats(query)
+            response?.result?.entries?.firstOrNull()?.let { response ->
                 walletService.getWalletAddressFromHexString(response.value.address)?.let { pubKey ->
                     val yatUser = YatDto(query)
                     foundYatUser.postValue(Optional.ofNullable(yatUser))

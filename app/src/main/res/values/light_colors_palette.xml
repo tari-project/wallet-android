@@ -3,7 +3,7 @@
     <!--Neutral-->
     <color name="palette_light_neutral_primary">#FFFFFF</color>
     <color name="palette_light_neutral_secondary">#F6F6F6</color>
-    <color name="palette_light_neutral_tertiary">#ECECEC</color>
+    <color name="palette_light_neutral_tertiary">#EEEEF0</color>
     <color name="palette_light_neutral_inactive">#E1E1E1</color>
 
     <!--Brand-->
@@ -48,7 +48,7 @@
 
     <!--Backgrounds-->
     <color name="palette_light_background_primary">#FFFFFF</color>
-    <color name="palette_light_background_secondary">#F6F6F6</color>
+    <color name="palette_light_background_secondary">#F5F5F7</color>
 
     <!--Shadows-->
     <color name="palette_light_shadow_box">#000000</color>

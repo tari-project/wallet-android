@@ -7,7 +7,9 @@ import com.orhanobut.logger.Logger
 import com.orhanobut.logger.Printer
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.WalletState
+import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
+import com.tari.android.wallet.data.sharedPrefs.security.SecurityPrefRepository
 import com.tari.android.wallet.data.sharedPrefs.tariSettings.TariSettingsSharedRepository
 import com.tari.android.wallet.di.ApplicationComponent
 import com.tari.android.wallet.di.DiContainer
@@ -68,13 +70,20 @@ open class CommonViewModel : ViewModel() {
     @Inject
     lateinit var tariNavigator: TariNavigator
 
+    @Inject
+    lateinit var sharedPrefsRepository: SharedPrefsRepository
+
+    @Inject
+    lateinit var securityPrefRepository: SecurityPrefRepository
+
+    private var authorizedAction: (() -> Unit)? = null
+
     val logger: Printer
         get() = Logger.t(this::class.simpleName).t(LoggerTags.UI.name)
 
     val currentTheme = SingleLiveEvent<TariTheme>()
 
-    protected val _backPressed = SingleLiveEvent<Unit>()
-    val backPressed: LiveData<Unit> = _backPressed
+    val backPressed = SingleLiveEvent<Unit>()
 
     protected val _openLink = SingleLiveEvent<String>()
     val openLink: LiveData<String> = _openLink
@@ -107,6 +116,10 @@ open class CommonViewModel : ViewModel() {
         currentTheme.value = tariSettingsSharedRepository.currentTheme!!
 
         logger.t(LoggerTags.Navigation.name).i(this::class.simpleName + " was started")
+
+        securityPrefRepository.updateNotifier.subscribe {
+            checkAuthorization()
+        }.addTo(compositeDisposable)
 
         EventBus.walletState.publishSubject.filter { it is WalletState.Failed }
             .subscribe({
@@ -150,6 +163,20 @@ open class CommonViewModel : ViewModel() {
             )
         )
         modularDialog.postValue(modularArgs)
+    }
+
+    fun runWithAuthorization(action: () -> Unit) {
+        authorizedAction = action
+        navigation.postValue(Navigation.FeatureAuth())
+    }
+
+    fun checkAuthorization() {
+        if (authorizedAction != null && securityPrefRepository.isFeatureAuthenticated) {
+            securityPrefRepository.isFeatureAuthenticated = false
+            backPressed.value = Unit
+            authorizedAction?.invoke()
+            authorizedAction = null
+        }
     }
 
     fun doOnBackground(action: suspend CoroutineScope.() -> Unit): Job = viewModelScope.launch { action() }

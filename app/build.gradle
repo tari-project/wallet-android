@@ -13,8 +13,8 @@ android {
     defaultConfig {
         applicationId "com.tari.android.wallet"
         minSdkVersion 26
-        targetSdkVersion 33
-        compileSdk 33
+        targetSdkVersion 34
+        compileSdk 34
         versionCode buildNumber
         versionName versionNumber + "-libwallet-" + libwalletVersion
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -22,8 +22,9 @@ android {
 
         ndk {
             abiFilters = []
-            abiFilters.addAll(supportedABIs)
+            abiFilters.addAll(["arm64-v8a", "x86_64"])
         }
+
         externalNativeBuild {
             cmake {
                 arguments "-DANDROID_STL=c++_static"
@@ -63,9 +64,9 @@ android {
 //            PRIVATE BUILD: comment (add two slashes at the start of each line) all the `sentry`
 //            block for private release builds support
             sentry { // https://docs.sentry.io/platforms/android/#gradle-configuration
-                autoUpload.set(true)
-                uploadNativeSymbols.set(true)
-                includeNativeSources.set(true)
+                autoUpload.set(false)
+                uploadNativeSymbols.set(false)
+                includeNativeSources.set(false)
             }
         }
     }
@@ -84,11 +85,7 @@ android {
 
     applicationVariants.configureEach { variant ->
         variant.mergedFlavor.manifestPlaceholders.dropboxApiKey = loadDropboxProps().getProperty("dropbox_key")
-        if (variant.buildType.name == "debug") {
-            variant.mergedFlavor.manifestPlaceholders.sentryPublicDSN = ""
-        } else {
-            variant.mergedFlavor.manifestPlaceholders.sentryPublicDSN = loadSecretProps().getProperty("sentry.public_dsn")
-        }
+        variant.mergedFlavor.manifestPlaceholders.sentryPublicDSN = loadSecretProps().getProperty("sentry.public_dsn")
     }
 
     externalNativeBuild {
@@ -201,24 +198,24 @@ Properties loadProps(fileName) {
     return properties
 }
 
-//preBuild.dependsOn("downloadLibwallet")
+preBuild.dependsOn("downloadLibwallet")
 
 dependencies {
     // kotlin
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
     implementation "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
     // coroutines
-    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4"
-    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3"
     implementation "androidx.lifecycle:lifecycle-runtime-ktx:$lifecycle_version"
     implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle_version"
     implementation "androidx.lifecycle:lifecycle-reactivestreams-ktx:$lifecycle_version"
     implementation "androidx.lifecycle:lifecycle-livedata-ktx:$lifecycle_version"
-    implementation "androidx.fragment:fragment-ktx:1.5.7"
+    implementation "androidx.fragment:fragment-ktx:1.6.2"
     kapt "androidx.lifecycle:lifecycle-compiler:$lifecycle_version"
 
     // kotlin extensions
-    implementation "androidx.core:core-ktx:1.10.1"
+    implementation "androidx.core:core-ktx:1.12.0"
     // android
     implementation "androidx.appcompat:appcompat:1.6.1"
     // support lib
@@ -227,30 +224,30 @@ dependencies {
     // android jetpack
     implementation "androidx.lifecycle:lifecycle-extensions:2.2.0"
     // recycler view
-    implementation "androidx.recyclerview:recyclerview:1.3.1-rc01"
+    implementation "androidx.recyclerview:recyclerview:1.3.2"
     // the new view pager
     implementation "androidx.viewpager2:viewpager2:1.0.0"
     // for tab layout
-    implementation "com.google.android.material:material:1.9.0"
+    implementation "com.google.android.material:material:1.10.0"
     // lottie
-    implementation 'com.airbnb.android:lottie:6.0.0'
+    implementation 'com.airbnb.android:lottie:6.1.0'
     // Glide - image processing & caching library
-    implementation 'com.github.bumptech.glide:glide:4.15.1'
-    kapt 'com.github.bumptech.glide:compiler:4.15.1'
+    implementation 'com.github.bumptech.glide:glide:4.16.0'
+    kapt 'com.github.bumptech.glide:compiler:4.16.0'
 
     // biometric
     implementation "androidx.biometric:biometric:1.1.0"
 
     // joda
-    implementation 'net.danlew:android.joda:2.12.1'
+    implementation 'net.danlew:android.joda:2.12.5'
 
     // parceler
     implementation "org.parceler:parceler-api:1.1.13"
     kapt "org.parceler:parceler:1.1.13"
 
     // dagger - DI
-    implementation 'com.google.dagger:dagger:2.45'
-    kapt 'com.google.dagger:dagger-compiler:2.45'
+    implementation 'com.google.dagger:dagger:2.48.1'
+    kapt 'com.google.dagger:dagger-compiler:2.48.1'
 
     // rx
     implementation "io.reactivex.rxjava2:rxandroid:2.1.1"
@@ -267,7 +264,7 @@ dependencies {
     implementation "com.github.adorsys:secure-storage-android:0.0.2"
 
     // Tor control
-    implementation "info.guardianproject:tor-android:0.4.7.8"
+    implementation "info.guardianproject:tor-android:0.4.7.14"
     implementation "info.guardianproject:jtorctl:0.4.5.7"
 
     // used to read log files
@@ -280,14 +277,14 @@ dependencies {
     // Retrofit2 - Popular (2020) REST API wrapper with Java interface
     implementation "com.squareup.retrofit2:retrofit:2.9.0"
     implementation "com.squareup.retrofit2:converter-gson:2.9.0"
-    implementation "com.squareup.okhttp3:logging-interceptor:5.0.0-alpha.10"
+    implementation "com.squareup.okhttp3:logging-interceptor:5.0.0-alpha.11"
 
     // Google services & Google drive
     implementation platform('com.google.firebase:firebase-bom:31.2.3')
     implementation 'com.google.firebase:firebase-crashlytics'
 
-    implementation 'com.google.android.gms:play-services-auth:20.4.1'
-    implementation 'com.google.http-client:google-http-client-gson:1.43.1'
+    implementation 'com.google.android.gms:play-services-auth:20.7.0'
+    implementation 'com.google.http-client:google-http-client-gson:1.43.3'
     implementation('com.google.api-client:google-api-client-android:2.2.0') {
         exclude group: "org.apache.httpcomponents"
     }
@@ -295,12 +292,12 @@ dependencies {
         exclude group: "org.apache.httpcomponents"
     }
     // sentry - crash analytics
-    implementation 'io.sentry:sentry-android:6.16.0'
+    implementation 'io.sentry:sentry-android:6.33.1'
 
-    implementation "com.dropbox.core:dropbox-core-sdk:5.4.4"
+    implementation "com.dropbox.core:dropbox-core-sdk:5.4.6"
 
-    implementation "com.github.yat-labs:yat-lib-android:0.1.42"
-
+//    implementation "com.github.yat-labs:yat-lib-android:0.1.42"
+    implementation project(":yatlib")
 
     // custom libraries region
     // flex layout
@@ -309,7 +306,7 @@ dependencies {
     implementation "io.github.everythingme:overscroll-decor-android:1.1.1"
 
     // giphy, don"t update to 2.2.0 because of not compatible yet
-    implementation 'com.giphy.sdk:ui:2.3.1'
+    implementation 'com.giphy.sdk:ui:2.3.13'
     // spring animation
     implementation "androidx.dynamicanimation:dynamicanimation:1.0.0"
     implementation "com.github.MasayukiSuda:EasingInterpolator:v1.3.2"
@@ -317,14 +314,14 @@ dependencies {
     // seismic - device shake detector
     implementation "com.squareup:seismic:1.0.3"
 
-    implementation "net.yslibrary.keyboardvisibilityevent:keyboardvisibilityevent:2.2.0"
+    implementation "net.yslibrary.keyboardvisibilityevent:keyboardvisibilityevent:2.3.0"
 
-    implementation 'com.itextpdf:itext7-core:7.2.5'
+    implementation 'com.itextpdf:itext7-core:8.0.2'
 
-    implementation("org.apache.maven:maven-artifact:3.0.3")
+    implementation("org.apache.maven:maven-artifact:3.9.5")
 
     // debugImplementation because LeakCanary should only run in debug builds.
-    debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.10'
+    debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.12'
 
     implementation 'com.github.vestrel00:contacts-android:0.2.4'
 
@@ -332,8 +329,8 @@ dependencies {
 
     // test
     testImplementation "junit:junit:4.13.2"
-    testImplementation 'io.mockk:mockk:1.13.4'
-    androidTestImplementation 'io.mockk:mockk-android:1.13.4'
+    testImplementation 'io.mockk:mockk:1.13.8'
+    androidTestImplementation 'io.mockk:mockk-android:1.13.8'
     androidTestImplementation "androidx.test:core:1.5.0"
     androidTestImplementation "androidx.test.ext:junit:1.1.5"
     androidTestImplementation "androidx.test.espresso:espresso-core:3.5.1"
