@@ -44,7 +44,7 @@ class ServiceLifecycleCallbacks(private val wallet: FFIWallet): DefaultLifecycle
         try {
             wallet.setPowerModeNormal()
         } catch (e: FFIException) {
-            logger.e(e, "Switching to normal power mode failed")
+            logger.i(e.toString() + "Switching to normal power mode failed")
         }
     }
 
@@ -53,7 +53,7 @@ class ServiceLifecycleCallbacks(private val wallet: FFIWallet): DefaultLifecycle
         try {
             wallet.setPowerModeLow()
         } catch (e: FFIException) {
-            logger.e(e, "Switching to low power mode failed")
+            logger.i(e.toString() + "Switching to low power mode failed")
         }
     }
 }

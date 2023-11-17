@@ -339,7 +339,6 @@ class TariNavigator @Inject constructor(val prefs: SharedPrefsRepository, val ta
     private fun navigateBackFromTxSend(isYat: Boolean) {
         if (isYat) {
             activity.finish()
-            activity.overridePendingTransition(R.anim.fade_in, R.anim.fade_out)
         } else {
             val fragmentsCount = activity.supportFragmentManager.fragments.size - 5
             for (i in 0 until fragmentsCount) {

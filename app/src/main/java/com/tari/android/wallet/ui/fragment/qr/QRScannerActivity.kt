@@ -74,7 +74,6 @@ class QRScannerActivity : CommonActivity<ActivityQrScannerBinding, QRScannerView
             val intent = Intent(activity, QRScannerActivity::class.java)
             intent.putExtra(QR_DATA_SOURCE, source)
             activity.startActivityForResult(intent, REQUEST_QR_SCANNER)
-            activity.overridePendingTransition(R.anim.slide_up, 0)
         }
 
         fun startScanner(activity: Fragment, source: QrScannerSource) {
@@ -128,7 +127,6 @@ class QRScannerActivity : CommonActivity<ActivityQrScannerBinding, QRScannerView
     private fun setupUi() = with(ui) {
         qrCloseView.setOnClickListener {
             finish()
-            overridePendingTransition(0, R.anim.slide_down)
         }
 
         alternativeApply.setOnClickListener { viewModel.onAlternativeApply() }

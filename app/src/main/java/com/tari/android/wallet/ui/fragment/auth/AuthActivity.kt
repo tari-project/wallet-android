@@ -107,7 +107,7 @@ class AuthActivity : CommonActivity<ActivityAuthBinding, AuthViewModel>() {
                 try {
                     setupPinCodeFragment()
                 } catch (e: BiometricAuthenticationException) {
-                    viewModel.logger.e(e, "Authentication has failed")
+                    viewModel.logger.i(e.message + "Authentication has failed")
                 }
             }
         } else {
@@ -131,7 +131,7 @@ class AuthActivity : CommonActivity<ActivityAuthBinding, AuthViewModel>() {
                         proceedLogin()
                     }
                 } catch (e: BiometricAuthenticationException) {
-                    viewModel.logger.e(e, "Authentication has failed")
+                    viewModel.logger.i(e.toString() + "Authentication has failed")
                 }
             }
         } else {

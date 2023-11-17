@@ -101,7 +101,7 @@ class FeatureAuthFragment : CommonFragment<FragmentFeatureAuthBinding, AuthViewM
             try {
                 setupPinCodeFragment()
             } catch (e: BiometricAuthenticationException) {
-                viewModel.logger.e(e, "Authentication has failed")
+                viewModel.logger.i(e.toString() + "Authentication has failed")
             }
         } else {
             displayAuthNotAvailableDialog()
@@ -126,7 +126,7 @@ class FeatureAuthFragment : CommonFragment<FragmentFeatureAuthBinding, AuthViewM
                         authSuccessfully()
                     }
                 } catch (e: BiometricAuthenticationException) {
-                    viewModel.logger.e(e, "Authentication has failed")
+                    viewModel.logger.i(e.toString() + "Authentication has failed")
                 }
             }
         } else {

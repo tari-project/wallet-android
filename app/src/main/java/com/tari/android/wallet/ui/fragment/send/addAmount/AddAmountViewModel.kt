@@ -83,7 +83,7 @@ class AddAmountViewModel : CommonViewModel() {
                 }
                 _feePerGrams.postValue(FeePerGramOptions(networkSpeed, MicroTari(slowOption), MicroTari(mediumOption), MicroTari(fastOption)))
             } catch (e: Throwable) {
-                logger.e(e, "load fees")
+                logger.i(e.message + "load fees")
             }
         }
     }
@@ -133,7 +133,7 @@ class AddAmountViewModel : CommonViewModel() {
             feeData = listOf(FeeData(grams.slow, slowFee), FeeData(grams.medium, mediumFee), FeeData(grams.fast, fastFee))
             selectedFeeData = feeData[1]
         } catch (e: Throwable) {
-            logger.e(e, "calculate fees")
+            logger.i(e.message +"calculate fees")
         }
     }
 

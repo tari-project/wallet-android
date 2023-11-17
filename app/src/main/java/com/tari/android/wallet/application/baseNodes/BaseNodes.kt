@@ -98,15 +98,15 @@ class BaseNodes(
 
     fun startSync() {
         try {
-            Logger.t(this::class.simpleName).e("startSync")
+            Logger.t(this::class.simpleName).i("startSync")
             //essential for wallet creation flow
             val baseNode = baseNodeSharedRepository.currentBaseNode ?: return
             serviceConnection.currentState.service ?: return
             if (EventBus.walletState.publishSubject.value != WalletState.Running) return
 
-            Logger.t(this::class.simpleName).e("startSync:publicKeyHex: ${baseNode.publicKeyHex}")
-            Logger.t(this::class.simpleName).e("startSync:address: ${baseNode.address}")
-            Logger.t(this::class.simpleName).e("startSync:address: ${Gson().toJson(baseNodeSharedRepository.userBaseNodes)}")
+            Logger.t(this::class.simpleName).i("startSync:publicKeyHex: ${baseNode.publicKeyHex}")
+            Logger.t(this::class.simpleName).i("startSync:address: ${baseNode.address}")
+            Logger.t(this::class.simpleName).i("startSync:address: ${Gson().toJson(baseNodeSharedRepository.userBaseNodes)}")
             val baseNodeKeyFFI = FFIPublicKey(HexString(baseNode.publicKeyHex))
             FFIWallet.instance?.addBaseNodePeer(baseNodeKeyFFI, baseNode.address)
             baseNodeKeyFFI.destroy()

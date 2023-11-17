@@ -143,13 +143,13 @@ open class CommonViewModel : ViewModel() {
 
     fun doOnConnected(action: (walletService: TariWalletService) -> Unit) {
         serviceConnection.connection.filter { it.status == ServiceConnectionStatus.CONNECTED }.take(1)
-            .doOnError { logger.e(it, it.toString()) }
+            .doOnError { logger.i(it.toString()) }
             .subscribe { action(it.service!!) }
             .addTo(compositeDisposable)
     }
 
     fun doOnConnectedToWallet(action: (walletService: FFIWallet) -> Unit) {
-        EventBus.walletState.publishSubject.filter { it == WalletState.Running }.take(1).doOnError { Logger.e(it.toString()) }
+        EventBus.walletState.publishSubject.filter { it == WalletState.Running }.take(1).doOnError { Logger.i(it.toString()) }
             .subscribe { action(FFIWallet.instance!!) }
             .addTo(compositeDisposable)
     }
