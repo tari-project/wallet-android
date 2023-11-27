@@ -38,3 +38,6 @@ Aurora Android native libraries only support `armeabi-v7a`, `arm64-v8a` and `x86
 Tari native wallet library version to be used by Aurora is specified by the `ext.libwalletVersion` in the `build.gradle` file in the project root directory. Aurora build script automatically fetches the native libraries of this version into the `libwallet` folder in the root directory during the build process. Any library files you place in this folder will be deleted and replaced by this automatic download process.
 
 If you want to disable the automatic download and use the native libraries of your choice, please comment out the line `preBuild.dependsOn("downloadLibwallet")` in the file `app/build.gradle`. 
+
+### For updating openssl
+https://github.com/217heidai/openssl_for_android/releases
