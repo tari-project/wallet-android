@@ -44,8 +44,6 @@ import com.tari.android.wallet.R.string.auth_device_lock_code_prompt
 import com.tari.android.wallet.R.string.auth_not_available_or_canceled_desc
 import com.tari.android.wallet.R.string.auth_not_available_or_canceled_title
 import com.tari.android.wallet.R.string.auth_title
-import com.tari.android.wallet.R.string.exit
-import com.tari.android.wallet.R.string.proceed
 import com.tari.android.wallet.data.sharedPrefs.security.LoginAttemptDto
 import com.tari.android.wallet.databinding.ActivityAuthBinding
 import com.tari.android.wallet.extension.observe
@@ -101,21 +99,18 @@ class AuthActivity : CommonActivity<ActivityAuthBinding, AuthViewModel>() {
     private fun doAuth() {
         showBiometricAuth()
 
-        // check whether there's at least screen lock
-        if (viewModel.authService.isDeviceSecured) {
-            lifecycleScope.launch {
-                try {
-                    setupPinCodeFragment()
-                } catch (e: BiometricAuthenticationException) {
-                    viewModel.logger.i(e.message + "Authentication has failed")
-                }
+        lifecycleScope.launch {
+            try {
+                setupPinCodeFragment()
+            } catch (e: BiometricAuthenticationException) {
+                viewModel.logger.i(e.message + "Authentication has failed")
             }
-        } else {
-            displayAuthNotAvailableDialog()
         }
     }
 
     fun showBiometricAuth() {
+        if (!viewModel.authService.isBiometricAuthAvailable) return
+
         if (viewModel.authService.isDeviceSecured) {
             lifecycleScope.launch {
                 try {
@@ -146,14 +141,7 @@ class AuthActivity : CommonActivity<ActivityAuthBinding, AuthViewModel>() {
         val dialog = AlertDialog.Builder(this)
             .setMessage(getString(auth_not_available_or_canceled_desc))
             .setCancelable(false)
-            .setPositiveButton(getString(proceed)) { dialog, _ ->
-                dialog.cancel()
-                // user has chosen to proceed without authentication
-                viewModel.securityPrefRepository.isAuthenticated = true
-                proceedLogin()
-            }
-            // negative button text and action
-            .setNegativeButton(getString(exit)) { _, _ -> finish() }
+            .setPositiveButton(getString(R.string.common_ok)) { dialog, _ -> dialog.cancel() }
             .create()
         dialog.setTitle(getString(auth_not_available_or_canceled_title))
         dialog.show()
