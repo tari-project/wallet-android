@@ -1,5 +1,7 @@
+---
 name: PR
-on:
+
+'on':
   pull_request:
     types:
       - opened
@@ -16,5 +18,7 @@ jobs:
           npm install -g @commitlint/cli @commitlint/config-conventional
           echo "module.exports = {extends: ['@commitlint/config-conventional']}" > commitlint.config.js
       - name: lint
+        env:
+          PR_TITLE: ${{github.event.pull_request.title}}
         run: |
-          echo "${{github.event.pull_request.title}}" | commitlint
+          echo "$PR_TITLE" | commitlint
