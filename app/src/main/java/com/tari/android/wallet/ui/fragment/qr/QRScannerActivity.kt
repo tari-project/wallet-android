@@ -55,6 +55,7 @@ import com.tari.android.wallet.extension.observe
 import com.tari.android.wallet.ui.common.CommonActivity
 import com.tari.android.wallet.ui.component.tari.toast.TariToast
 import com.tari.android.wallet.ui.component.tari.toast.TariToastArgs
+import com.tari.android.wallet.ui.extension.serializable
 import com.tari.android.wallet.ui.extension.setVisible
 
 /**
@@ -99,7 +100,7 @@ class QRScannerActivity : CommonActivity<ActivityQrScannerBinding, QRScannerView
         bindViewModel(viewModel)
         subscribeToCommon(viewModel.deeplinkViewModel)
 
-        val data = intent?.getSerializableExtra(QR_DATA_SOURCE, QrScannerSource::class.java)
+        val data = intent?.serializable<QrScannerSource>(QR_DATA_SOURCE)
         viewModel.init(data ?: QrScannerSource.None)
 
         subscribeUI()
