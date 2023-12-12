@@ -14,6 +14,7 @@ class WriteDownSeedPhraseViewModel : CommonViewModel() {
     val seedWords: LiveData<List<String>> = _seedWords
 
     init {
+        _seedWords.value = listOf()
         doOnConnected { getSeedWords() }
     }
 

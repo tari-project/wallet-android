@@ -109,7 +109,7 @@ class BaseNodes(
             baseNodeKeyFFI.destroy()
             walletService.getWithError { error, wallet -> wallet.startBaseNodeSync(error) }
         } catch (e: Throwable) {
-            Logger.t(this::class.simpleName).e("startSync")
+            Logger.t(this::class.simpleName).i("startSync")
             setNextBaseNode()
             startSync()
         }
