@@ -71,6 +71,10 @@ class WalletRestoreActivity : CommonActivity<ActivityWalletBackupBinding, Wallet
         appComponent.inject(this)
         super.onCreate(savedInstanceState)
 
+        onBackInvokedDispatcher.registerOnBackInvokedCallback(0) {
+            overridePendingTransition(R.anim.enter_from_top, R.anim.exit_to_bottom)
+        }
+
         ui = ActivityWalletBackupBinding.inflate(layoutInflater).apply { setContentView(root) }
 
         val viewModel: WalletRestoreViewModel by viewModels()
