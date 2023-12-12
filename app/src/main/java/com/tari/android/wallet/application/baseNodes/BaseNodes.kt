@@ -69,10 +69,7 @@ class BaseNodes(
     private fun findAndAddBaseNode(fileContent: String, regex: String): Sequence<BaseNodeDto> {
         return Regex(regex).findAll(fileContent).map { matchResult ->
             val tripleString = matchResult.value.split("::")
-            if (tripleString.size ==2) {
-                1
-            }
-            Logger.t(this::class.simpleName).e("baseNodeList0: $tripleString, baseNodeList1: ${tripleString[1]}, baseNodeList2: ${tripleString[2]}")
+            Logger.t(this::class.simpleName).i("baseNodeList0: $tripleString, baseNodeList1: ${tripleString[1]}, baseNodeList2: ${tripleString[2]}")
             BaseNodeDto(tripleString[0], tripleString[1], tripleString[2])
         }
     }
