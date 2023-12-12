@@ -49,6 +49,11 @@ inline fun <reified T : Parcelable> Intent.parcelable(key: String): T? = when {
     else -> @Suppress("DEPRECATION") getParcelableExtra(key) as? T
 }
 
+inline fun <reified T : java.io.Serializable> Intent.serializable(key: String): T? = when {
+    SDK_INT >= 33 -> getSerializableExtra(key, T::class.java)
+    else -> @Suppress("DEPRECATION") getSerializableExtra(key) as? T
+}
+
 inline fun <reified T : Parcelable> Bundle.parcelable(key: String): T? = when {
     SDK_INT >= 33 -> getParcelable(key, T::class.java)
     else -> @Suppress("DEPRECATION") getParcelable(key) as? T
