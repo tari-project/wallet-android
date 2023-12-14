@@ -4,6 +4,7 @@ import com.tari.android.wallet.R
 import com.tari.android.wallet.application.baseNodes.BaseNodes
 import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodeDto
 import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodeSharedRepository
+import com.tari.android.wallet.data.sharedPrefs.tor.TorSharedRepository
 import com.tari.android.wallet.ffi.FFITariWalletAddress
 import com.tari.android.wallet.ffi.HexString
 import com.tari.android.wallet.model.TariWalletAddress
@@ -35,24 +36,28 @@ class DeeplinkViewModel : CommonViewModel() {
     @Inject
     lateinit var deeplinkHandler: DeeplinkHandler
 
+    @Inject
+    lateinit var torSharedRepository: TorSharedRepository
+
     init {
         component.inject(this)
     }
 
-    fun tryToHandle(qrData: String) {
-        deeplinkHandler.handle(qrData)?.let { execute(it) }
+    fun tryToHandle(qrData: String, isQrData: Boolean = true) {
+        deeplinkHandler.handle(qrData)?.let { execute(it, isQrData) }
     }
 
-    fun execute(deeplink: DeepLink) {
+    fun execute(deeplink: DeepLink, isQrData: Boolean = true) {
         when (deeplink) {
-            is DeepLink.AddBaseNode -> addBaseNode(deeplink)
-            is DeepLink.Contacts -> addContacts(deeplink)
-            is DeepLink.Send -> sendAction(deeplink)
-            is DeepLink.UserProfile -> addUserProfile(deeplink)
+            is DeepLink.AddBaseNode -> addBaseNode(deeplink, isQrData)
+            is DeepLink.Contacts -> addContacts(deeplink, isQrData)
+            is DeepLink.Send -> sendAction(deeplink, isQrData)
+            is DeepLink.UserProfile -> addUserProfile(deeplink, isQrData)
+            is DeepLink.TorBridges -> addTorBridges(deeplink, isQrData)
         }
     }
 
-    fun addBaseNode(deeplink: DeepLink.AddBaseNode) {
+    fun addBaseNode(deeplink: DeepLink.AddBaseNode, isQrData: Boolean = true) {
         val baseNode = getData(deeplink)
         val args = ConfirmDialogArgs(
             resourceManager.getString(R.string.home_custom_base_node_title),
@@ -61,13 +66,13 @@ class DeeplinkViewModel : CommonViewModel() {
             resourceManager.getString(R.string.common_lets_do_it),
             onConfirm = {
                 dismissDialog.postValue(Unit)
-                addBaseNodeAction(baseNode)
+                addBaseNodeAction(baseNode, isQrData)
             }
         ).getModular(baseNode, resourceManager)
         modularDialog.postValue(args)
     }
 
-    fun addUserProfile(deeplink: DeepLink.UserProfile) {
+    fun addUserProfile(deeplink: DeepLink.UserProfile, isQrData: Boolean) {
         val contact = DeepLink.Contacts(
             listOf(
                 DeepLink.Contacts.DeeplinkContact(
@@ -76,10 +81,10 @@ class DeeplinkViewModel : CommonViewModel() {
                 )
             )
         )
-        addContacts(contact)
+        addContacts(contact, isQrData)
     }
 
-    fun addContacts(contacts: DeepLink.Contacts) {
+    fun addContacts(contacts: DeepLink.Contacts, isQrData: Boolean = true) {
         val contactDtos = getData(contacts)
         if (contactDtos.isEmpty()) return
         val names = contactDtos.joinToString(", ") { it.contact.getAlias().trim() }
@@ -88,7 +93,7 @@ class DeeplinkViewModel : CommonViewModel() {
                 HeadModule(resourceManager.getString(R.string.contact_deeplink_title)),
                 BodyModule(resourceManager.getString(R.string.contact_deeplink_message, contactDtos.size.toString()) + ". " + names),
                 ButtonModule(resourceManager.getString(R.string.common_confirm), ButtonStyle.Normal) {
-                    addContactsAction(contactDtos)
+                    addContactsAction(contactDtos, isQrData)
                     dismissDialog.postValue(Unit)
                 },
                 ButtonModule(resourceManager.getString(R.string.common_cancel), ButtonStyle.Close)
@@ -97,12 +102,19 @@ class DeeplinkViewModel : CommonViewModel() {
         modularDialog.postValue(args)
     }
 
-    fun executeRawDeeplink(deeplink: DeepLink) {
+    fun addTorBridges(deeplink: DeepLink.TorBridges, isQrData: Boolean) {
+        deeplink.torConfigurations.forEach {
+            torSharedRepository.addTorBridgeConfiguration(it)
+        }
+    }
+
+    fun executeRawDeeplink(deeplink: DeepLink, isQrData: Boolean = true) {
         when (deeplink) {
             is DeepLink.AddBaseNode -> addBaseNode(deeplink)
-            is DeepLink.Contacts -> addContactsAction(getData(deeplink))
-            is DeepLink.Send -> sendAction(deeplink)
-            is DeepLink.UserProfile -> addContactsAction(getData(deeplink)?.let { listOf(it) } ?: listOf())
+            is DeepLink.Contacts -> addContactsAction(getData(deeplink), isQrData)
+            is DeepLink.Send -> sendAction(deeplink, isQrData)
+            is DeepLink.UserProfile -> addContactsAction(getData(deeplink)?.let { listOf(it) } ?: listOf(), isQrData)
+            is DeepLink.TorBridges -> addTorBridges(deeplink, isQrData)
         }
     }
 
@@ -128,16 +140,18 @@ class DeeplinkViewModel : CommonViewModel() {
         ContactDto(FFIContactDto(tariWalletAddress, userProfile.alias))
     }.getOrNull()
 
-    private fun addContactsAction(contacts: List<ContactDto>) {
-        _backPressed.postValue(Unit)
+    private fun addContactsAction(contacts: List<ContactDto>, isQrData: Boolean) {
+        if (isQrData) {
+            backPressed.postValue(Unit)
+        }
         contacts.forEach { contactRepository.addContact(it) }
     }
 
-    private fun sendAction(deeplink: DeepLink.Send) {
+    private fun sendAction(deeplink: DeepLink.Send, isQrData: Boolean) {
         navigation.postValue(Navigation.TxListNavigation.ToSendWithDeeplink(deeplink))
     }
 
-    private fun addBaseNodeAction(baseNodeDto: BaseNodeDto) {
+    private fun addBaseNodeAction(baseNodeDto: BaseNodeDto, isQrData: Boolean) {
         baseNodeRepository.addUserBaseNode(baseNodeDto)
         baseNodes.setBaseNode(baseNodeDto)
     }

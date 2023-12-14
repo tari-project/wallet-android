@@ -43,7 +43,9 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodeSharedRepository
 import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepositoryImpl
+import com.tari.android.wallet.data.sharedPrefs.security.SecurityPrefRepository
 import com.tari.android.wallet.data.sharedPrefs.securityStages.SecurityStagesRepository
+import com.tari.android.wallet.data.sharedPrefs.sentry.SentryPrefRepository
 import com.tari.android.wallet.data.sharedPrefs.tariSettings.TariSettingsSharedRepository
 import com.tari.android.wallet.data.sharedPrefs.tor.TorSharedRepository
 import com.tari.android.wallet.di.ApplicationModule
@@ -77,9 +79,10 @@ class FFIWalletTests {
     private val tariSettingsRepository = TariSettingsSharedRepository(prefs, networkRepository)
     private val securityStagesRepository = SecurityStagesRepository(prefs, networkRepository)
     private val contactSharedPrefRepository = ContactSharedPrefRepository(networkRepository, prefs)
+    private val sentryPrefRepository: SentryPrefRepository = SentryPrefRepository(prefs, networkRepository)
     private val torSharedRepository = TorSharedRepository(prefs, networkRepository)
+    private val securityPrefRepository = SecurityPrefRepository(context, prefs, networkRepository)
     private val sharedPrefsRepository = SharedPrefsRepository(
-        context,
         prefs,
         networkRepository,
         backupSettingsRepository,
@@ -88,7 +91,9 @@ class FFIWalletTests {
         torSharedRepository,
         tariSettingsRepository,
         securityStagesRepository,
-        contactSharedPrefRepository
+        contactSharedPrefRepository,
+        sentryPrefRepository,
+        securityPrefRepository,
     )
 
     private val walletDirPath = context.filesDir.absolutePath
@@ -118,7 +123,7 @@ class FFIWalletTests {
         )
         val logFile = File(walletDirPath, "test_log.log")
         // create wallet instance
-        wallet = FFIWallet(sharedPrefsRepository, SeedPhraseRepository(), networkRepository, commsConfig, logFile.absolutePath)
+        wallet = FFIWallet(sharedPrefsRepository, securityPrefRepository, SeedPhraseRepository(), networkRepository, commsConfig, logFile.absolutePath)
         // create listener
         listener = TestAddRecipientAddNodeListener()
         wallet.listener = listener

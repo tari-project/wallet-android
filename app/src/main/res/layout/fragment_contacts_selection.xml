@@ -33,15 +33,6 @@
             android:visibility="gone"
             app:hintText="@string/contact_book_add_contact_first_name_hint" />
 
-        <com.tari.android.wallet.ui.component.tari.TariInput
-            android:id="@+id/add_surname_input"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="25dp"
-            android:layout_marginTop="16dp"
-            android:visibility="gone"
-            app:hintText="@string/contact_book_add_contact_surname_hint" />
-
         <!-- list -->
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/contacts_list_recycler_view"

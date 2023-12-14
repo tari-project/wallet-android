@@ -3,7 +3,6 @@ package com.tari.android.wallet.application.securityStage
 import android.text.SpannableString
 import android.text.Spanned
 import com.tari.android.wallet.R
-import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.data.sharedPrefs.securityStages.DisabledTimestampsDto
 import com.tari.android.wallet.data.sharedPrefs.securityStages.SecurityStagesRepository
 import com.tari.android.wallet.data.sharedPrefs.securityStages.WalletSecurityStage
@@ -34,9 +33,6 @@ class StagedWalletSecurityManager : CommonViewModel() {
 
     @Inject
     lateinit var backupPrefsRepository: BackupSettingsRepository
-
-    @Inject
-    lateinit var sharedPrefsRepository: SharedPrefsRepository
 
     init {
         component.inject(this)

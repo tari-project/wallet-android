@@ -14,7 +14,16 @@ import com.tari.android.wallet.R
 import com.tari.android.wallet.databinding.ViewInputAmountBinding
 import com.tari.android.wallet.databinding.ViewNumpadBinding
 import com.tari.android.wallet.model.MicroTari
-import com.tari.android.wallet.ui.extension.*
+import com.tari.android.wallet.ui.extension.dimen
+import com.tari.android.wallet.ui.extension.dimenPx
+import com.tari.android.wallet.ui.extension.getFirstChild
+import com.tari.android.wallet.ui.extension.getLastChild
+import com.tari.android.wallet.ui.extension.setLayoutSize
+import com.tari.android.wallet.ui.extension.setLayoutWidth
+import com.tari.android.wallet.ui.extension.setStartMargin
+import com.tari.android.wallet.ui.extension.setTextSizePx
+import com.tari.android.wallet.ui.extension.setTopMargin
+import com.tari.android.wallet.ui.extension.setWidthAndHeightToMeasured
 import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.WalletUtil
 import java.math.BigInteger
@@ -95,14 +104,14 @@ class KeyboardController {
         if (isFirstLaunch && startAmount != Double.MIN_VALUE) {
             val handler = Handler(Looper.getMainLooper())
             isFirstLaunch = false
-            startAmount.toString().withIndex().forEach { (index, char) ->
-                handler.postDelayed({
+            handler.post {
+                startAmount.toString().withIndex().forEach { (index, char) ->
                     if (Character.isDigit(char)) {
                         onDigitOrSeparatorClicked(char.toString())
                     } else {
                         onDigitOrSeparatorClicked(decimalSeparator)
                     }
-                }, (index + 1) * Constants.UI.AddAmount.numPadDigitEnterAnimDurationMs * 2)
+                }
             }
             handler.postDelayed(
                 this::setActionBindings,
@@ -200,7 +209,6 @@ class KeyboardController {
      * Digit or separator clicked.
      */
     private fun onDigitOrSeparatorClicked(digit: String) {
-        if (digitAnimIsRunning) return
         // check if entering first digit
         var enteringFirstDigit = false
         if (elements.size == 1 && elements[0].first == "0") {

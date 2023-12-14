@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginStart="25dp"
@@ -142,7 +143,21 @@
             android:text="@string/digit_decimal_separator_bullet_char"
             android:textColor="?attr/palette_text_heading"
             android:textSize="@dimen/add_amount_keypad_text_size"
-            app:customFont="heavy" />
+            app:customFont="heavy"
+            tools:visibility="gone" />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/biometric_auth"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@color/transparent"
+            android:padding="8dp"
+            android:src="@drawable/vector_fingerprint"
+            android:tint="?attr/palette_brand_purple"
+            android:visibility="gone"
+            tools:visibility="visible" />
+
         <!-- digit 0 -->
         <com.tari.android.wallet.ui.component.tari.TariButton
             android:id="@+id/pad_0_button"

@@ -91,8 +91,8 @@ class TxListViewHolder(view: ItemTxListBinding) : CommonViewHolder<TransactionIt
                 ui.participantTextView1.text = title
             }
 
-            contact != null && contact.contact.getAlias().isNotEmpty() -> {
-                val alias = contact.contact.getAlias()
+            contact != null && contact.contact.getAlias().isNotEmpty() || txUser.walletAddress.isZeros() -> {
+                val alias = contact?.contact?.getAlias().orEmpty().ifBlank { itemView.context.getString(R.string.unknown_source) }
                 val fullText = when (tx.direction) {
                     Tx.Direction.INBOUND -> string(R.string.tx_list_sent_a_payment, alias)
                     Tx.Direction.OUTBOUND -> string(R.string.tx_list_you_paid_with_alias, alias)

@@ -34,6 +34,7 @@ package com.tari.android.wallet.ui.fragment.onboarding.activity
 
 import android.content.Intent
 import android.os.Bundle
+import androidx.activity.addCallback
 import androidx.activity.viewModels
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
@@ -82,6 +83,12 @@ class OnboardingFlowActivity : CommonActivity<ActivityOnboardingFlowBinding, Com
         super.onCreate(savedInstanceState)
         ui = ActivityOnboardingFlowBinding.inflate(layoutInflater).apply { setContentView(root) }
 
+        onBackPressedDispatcher.addCallback {
+            if (supportFragmentManager.backStackEntryCount > 1) {
+                supportFragmentManager.popBackStack()
+            }
+        }
+
         val viewModel: OnboardingFlowViewModel by viewModels()
         bindViewModel(viewModel)
 
@@ -113,18 +120,9 @@ class OnboardingFlowActivity : CommonActivity<ActivityOnboardingFlowBinding, Com
                     setCustomAnimations(R.anim.enter_from_right, R.anim.exit_to_left, R.anim.enter_from_left, R.anim.exit_to_right)
                 }
             }
-            .add(R.id.onboarding_fragment_container_1, fragment)
+            .add(R.id.onboarding_fragment_container_1, fragment, fragment.javaClass.simpleName)
             .addToBackStack(null)
             .commit()
-    }
-
-    /**
-     * Back button should not be functional during onboarding
-     */
-    override fun onBackPressed() {
-        if (supportFragmentManager.backStackEntryCount > 1) {
-            supportFragmentManager.popBackStack()
-        }
     }
 
     override fun continueToCreateWallet() {

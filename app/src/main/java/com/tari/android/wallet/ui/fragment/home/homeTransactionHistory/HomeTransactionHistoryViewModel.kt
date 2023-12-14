@@ -2,16 +2,22 @@ package com.tari.android.wallet.ui.fragment.home.homeTransactionHistory
 
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.toLiveData
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.common.recyclerView.CommonViewHolderItem
+import com.tari.android.wallet.ui.fragment.contact_book.data.ContactsRepository
 import com.tari.android.wallet.ui.fragment.tx.TransactionRepository
 import com.tari.android.wallet.ui.fragment.tx.adapter.TransactionItem
+import io.reactivex.BackpressureStrategy
 import javax.inject.Inject
 
 class HomeTransactionHistoryViewModel : CommonViewModel() {
 
     @Inject
     lateinit var transactionRepository: TransactionRepository
+
+    @Inject
+    lateinit var contactsRepository: ContactsRepository
 
     var list = MediatorLiveData<MutableList<CommonViewHolderItem>>()
 
@@ -24,6 +30,10 @@ class HomeTransactionHistoryViewModel : CommonViewModel() {
 
     init {
         component.inject(this)
+
+        list.addSource(contactsRepository.publishSubject.toFlowable(BackpressureStrategy.LATEST).toLiveData()) {
+            updateList()
+        }
 
         list.addSource(transactionRepository.list) { updateList() }
 

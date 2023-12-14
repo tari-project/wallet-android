@@ -59,8 +59,9 @@ import com.daasuu.ei.Ease
 import com.daasuu.ei.EasingInterpolator
 import com.giphy.sdk.core.models.Media
 import com.tari.android.wallet.R
-import com.tari.android.wallet.R.color.*
-import com.tari.android.wallet.R.dimen.*
+import com.tari.android.wallet.R.dimen.add_note_gif_inner_margin
+import com.tari.android.wallet.R.dimen.add_note_slide_button_left_margin
+import com.tari.android.wallet.R.dimen.add_note_slide_button_width
 import com.tari.android.wallet.databinding.FragmentAddNoteBinding
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.extension.observe
@@ -71,11 +72,26 @@ import com.tari.android.wallet.ui.common.CommonFragment
 import com.tari.android.wallet.ui.common.gyphy.repository.GIFItem
 import com.tari.android.wallet.ui.component.fullEmojiId.EmojiIdSummaryViewController
 import com.tari.android.wallet.ui.component.fullEmojiId.FullEmojiIdViewController
-import com.tari.android.wallet.ui.extension.*
+import com.tari.android.wallet.ui.extension.dimen
+import com.tari.android.wallet.ui.extension.dimenPx
+import com.tari.android.wallet.ui.extension.getStartMargin
+import com.tari.android.wallet.ui.extension.gone
+import com.tari.android.wallet.ui.extension.hideKeyboard
+import com.tari.android.wallet.ui.extension.invisible
+import com.tari.android.wallet.ui.extension.parcelable
+import com.tari.android.wallet.ui.extension.postDelayed
+import com.tari.android.wallet.ui.extension.setStartMargin
+import com.tari.android.wallet.ui.extension.showInternetConnectionErrorDialog
+import com.tari.android.wallet.ui.extension.temporarilyDisableClick
+import com.tari.android.wallet.ui.extension.visible
 import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.ContactDto
 import com.tari.android.wallet.ui.fragment.home.navigation.TariNavigator.Companion.PARAMETER_NOTE
 import com.tari.android.wallet.ui.fragment.home.navigation.TariNavigator.Companion.PARAMETER_TRANSACTION
-import com.tari.android.wallet.ui.fragment.send.addNote.gif.*
+import com.tari.android.wallet.ui.fragment.send.addNote.gif.ChooseGIFDialogFragment
+import com.tari.android.wallet.ui.fragment.send.addNote.gif.GIFContainer
+import com.tari.android.wallet.ui.fragment.send.addNote.gif.GIFThumbnailAdapter
+import com.tari.android.wallet.ui.fragment.send.addNote.gif.HorizontalInnerMarginDecoration
+import com.tari.android.wallet.ui.fragment.send.addNote.gif.ThumbnailGIFsViewModel
 import com.tari.android.wallet.ui.fragment.send.addNote.gif.ThumbnailGIFsViewModel.Companion.REQUEST_CODE_GIF
 import com.tari.android.wallet.ui.fragment.send.common.TransactionData
 import com.tari.android.wallet.util.Constants
@@ -128,6 +144,7 @@ class AddNoteFragment : CommonFragment<FragmentAddNoteBinding, AddNoteViewModel>
         }
     }
 
+    @Deprecated("Deprecated in Java")
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == REQUEST_CODE_GIF) {

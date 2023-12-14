@@ -18,7 +18,6 @@ import com.tari.android.wallet.model.MicroTari
 import com.tari.android.wallet.model.PendingInboundTx
 import com.tari.android.wallet.model.PendingOutboundTx
 import com.tari.android.wallet.model.TariContact
-import com.tari.android.wallet.model.TariWalletAddress
 import com.tari.android.wallet.model.Tx
 import com.tari.android.wallet.model.TxId
 import com.tari.android.wallet.model.TxStatus
@@ -30,7 +29,8 @@ import com.tari.android.wallet.ui.common.recyclerView.CommonViewHolderItem
 import com.tari.android.wallet.ui.common.recyclerView.items.TitleViewHolderItem
 import com.tari.android.wallet.ui.fragment.contact_book.data.ContactsRepository
 import com.tari.android.wallet.ui.fragment.tx.adapter.TransactionItem
-import com.tari.android.wallet.util.Build.MOCKED
+import com.tari.android.wallet.util.TariBuild
+import com.tari.android.wallet.util.TariBuild.MOCKED
 import io.reactivex.BackpressureStrategy
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -175,10 +175,8 @@ class TransactionRepository @Inject constructor() : CommonViewModel() {
 
         if (MOCKED) {
 
-            val emojiId =
-                "\uD83C\uDFB9\uD83C\uDFA4\uD83C\uDF20\uD83C\uDFAA\uD83D\uDC16\uD83C\uDF5A\uD83D\uDE08\uD83C\uDF73\uD83C\uDFED\uD83D\uDC2F\uD83D\uDC29\uD83D\uDC33\uD83D\uDC2D\uD83D\uDC35\uD83D\uDC11\uD83C\uDF4E\uD83D\uDE02\uD83C\uDFB3\uD83C\uDF34\uD83C\uDF6D\uD83D\uDC0D\uD83C\uDF1F\uD83D\uDCBC\uD83C\uDFB9\uD83D\uDC3A\uD83D\uDC79\uD83C\uDF77\uD83D\uDC3B\uD83D\uDEAB\uD83D\uDE92\uD83D\uDCB3\uD83C\uDFAE\uD83D\uDD2A"
-            val hex = "5A4A0A4F7427E33469858088838A721FE1560C316F09C55A8EA6388FFBF1C152DA"
             val title = TitleViewHolderItem("Mocked Transactions", true)
+            val messageGiphy = " https://giphy.com/embed/5885nYOgBHdCw"
 
             val item = TransactionItem(
                 CompletedTx().apply {
@@ -186,9 +184,10 @@ class TransactionRepository @Inject constructor() : CommonViewModel() {
                     status = TxStatus.MINED_CONFIRMED
                     amount = MicroTari(BigInteger.valueOf(100000))
                     fee = MicroTari(BigInteger.valueOf(1000))
+                    message = messageGiphy
                     timestamp = BigInteger.valueOf(System.currentTimeMillis())
                     id = BigInteger.valueOf(1)
-                    tariContact = TariContact(TariWalletAddress(hex, emojiId), "test1")
+                    tariContact = TariContact(TariBuild.moched_zero_contact, "test1")
                 },
                 contactsRepository.ffiBridge.getContactForTx(CompletedTx()),
                 0,
@@ -203,8 +202,8 @@ class TransactionRepository @Inject constructor() : CommonViewModel() {
                 fee = MicroTari(BigInteger.valueOf(1000))
                 timestamp = BigInteger.valueOf(System.currentTimeMillis())
                 id = BigInteger.valueOf(1)
-                message = "message"
-                tariContact = TariContact(TariWalletAddress(hex, emojiId), "test2")
+                message = messageGiphy
+                tariContact = TariContact(TariBuild.moched_zero_contact, "test2")
             }
             val item2 = TransactionItem(
                 tx2,
@@ -217,11 +216,12 @@ class TransactionRepository @Inject constructor() : CommonViewModel() {
             val tx3 = CompletedTx().apply {
                 direction = Tx.Direction.INBOUND
                 status = TxStatus.MINED_CONFIRMED
+                message = messageGiphy
                 amount = MicroTari(BigInteger.valueOf(111000))
                 fee = MicroTari(BigInteger.valueOf(1000))
                 timestamp = BigInteger.valueOf(System.currentTimeMillis())
                 id = BigInteger.valueOf(1)
-                tariContact = TariContact(TariWalletAddress(hex, emojiId), "test3")
+                tariContact = TariContact(TariBuild.mocked_wallet_address, "test3")
 
             }
             val item3 = TransactionItem(

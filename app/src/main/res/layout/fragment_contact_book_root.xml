@@ -163,11 +163,13 @@
 
             <androidx.appcompat.widget.SearchView
                 android:id="@+id/search_view"
+                android:theme="@style/TariSearchViewTheme"
                 android:layout_width="match_parent"
                 android:layout_height="46dp"
                 android:hint="@string/contact_book_search_hint"
                 app:defaultQueryHint="@string/contact_book_search_hint"
-                app:queryBackground="@null" />
+                app:queryBackground="@null"
+                tools:text="Search"/>
 
         </com.tari.android.wallet.ui.component.tari.TariPrimaryBackground>
 

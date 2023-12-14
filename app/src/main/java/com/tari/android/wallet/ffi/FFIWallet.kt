@@ -34,6 +34,7 @@ package com.tari.android.wallet.ffi
 
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
+import com.tari.android.wallet.data.sharedPrefs.security.SecurityPrefRepository
 import com.tari.android.wallet.model.*
 import com.tari.android.wallet.model.recovery.WalletRestorationResult
 import com.tari.android.wallet.service.seedPhrase.SeedPhraseRepository
@@ -50,6 +51,7 @@ import java.util.concurrent.atomic.AtomicReference
 
 class FFIWallet(
     val sharedPrefsRepository: SharedPrefsRepository,
+    val securityPrefRepository: SecurityPrefRepository,
     val seedPhraseRepository: SeedPhraseRepository,
     val networkRepository: NetworkRepository,
     val commsConfig: FFICommsConfig,
@@ -224,10 +226,10 @@ class FFIWallet(
         val error = FFIError()
         logger.i("Pre jniCreate")
 
-        var passphrase = sharedPrefsRepository.databasePassphrase
+        var passphrase = securityPrefRepository.databasePassphrase
         if (passphrase.isNullOrEmpty()) {
             passphrase = sharedPrefsRepository.generateDatabasePassphrase()
-            sharedPrefsRepository.databasePassphrase = passphrase
+            securityPrefRepository.databasePassphrase = passphrase
         }
 
         try {

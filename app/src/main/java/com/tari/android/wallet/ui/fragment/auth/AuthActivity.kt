@@ -32,115 +32,94 @@
  */
 package com.tari.android.wallet.ui.fragment.auth
 
-import android.animation.AnimatorSet
-import android.animation.ObjectAnimator
-import android.animation.ValueAnimator
 import android.content.Intent
 import android.os.Bundle
-import android.view.View
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
-import androidx.core.animation.addListener
-import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
-import com.daasuu.ei.Ease
-import com.daasuu.ei.EasingInterpolator
+import com.tari.android.wallet.R
 import com.tari.android.wallet.R.string.auth_biometric_prompt
 import com.tari.android.wallet.R.string.auth_device_lock_code_prompt
-import com.tari.android.wallet.R.string.auth_failed_desc
-import com.tari.android.wallet.R.string.auth_failed_title
 import com.tari.android.wallet.R.string.auth_not_available_or_canceled_desc
 import com.tari.android.wallet.R.string.auth_not_available_or_canceled_title
 import com.tari.android.wallet.R.string.auth_title
 import com.tari.android.wallet.R.string.exit
 import com.tari.android.wallet.R.string.proceed
+import com.tari.android.wallet.data.sharedPrefs.security.LoginAttemptDto
 import com.tari.android.wallet.databinding.ActivityAuthBinding
 import com.tari.android.wallet.extension.observe
 import com.tari.android.wallet.infrastructure.security.biometric.BiometricAuthenticationException
 import com.tari.android.wallet.ui.common.CommonActivity
-import com.tari.android.wallet.ui.extension.addAnimatorListener
-import com.tari.android.wallet.ui.extension.invisible
 import com.tari.android.wallet.ui.extension.setColor
 import com.tari.android.wallet.ui.extension.string
 import com.tari.android.wallet.ui.extension.visible
 import com.tari.android.wallet.ui.fragment.home.HomeActivity
+import com.tari.android.wallet.ui.fragment.pinCode.EnterPinCodeFragment
+import com.tari.android.wallet.ui.fragment.pinCode.PinCodeScreenBehavior
 import com.tari.android.wallet.ui.fragment.settings.allSettings.TariVersionModel
-import com.tari.android.wallet.util.Build.MOCKED
-import com.tari.android.wallet.util.Constants
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-/**
- * Initial activity class - authenticates the user.
- *
- * @author The Tari Development Team
- */
 class AuthActivity : CommonActivity<ActivityAuthBinding, AuthViewModel>() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        ui = ActivityAuthBinding.inflate(layoutInflater).apply { setContentView(root) }
 
         val viewModel: AuthViewModel by viewModels()
         bindViewModel(viewModel)
 
+        onBackPressedDispatcher.addCallback(object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() = Unit
+        })
+
+        ui = ActivityAuthBinding.inflate(layoutInflater).apply { setContentView(root) }
+
         setupUi()
 
         observe(viewModel.goAuth) {
-            // call the animations
-            showTariText()
             viewModel.walletServiceLauncher.start()
+        }
+
+        doAuth()
+    }
+
+    private fun setupPinCodeFragment() {
+        val pinCode = viewModel.securityPrefRepository.pinCode
+        if (pinCode != null) {
+            val pinCodeFragment = EnterPinCodeFragment.newInstance(PinCodeScreenBehavior.Auth, pinCode)
+            supportFragmentManager.beginTransaction()
+                .replace(R.id.fragment_container, pinCodeFragment)
+                .commit()
         }
     }
 
     private fun setupUi() {
-        ui.progressBar.setColor(viewModel.paletteManager.getWhite(this))
-        ui.progressBar.invisible()
         ui.networkInfoTextView.text = TariVersionModel(viewModel.networkRepository).versionInfo
     }
 
-    override fun onBackPressed() = Unit
-
-    /**
-     * Hides the gem and displays Tari logo.
-     */
-    private fun showTariText() {
-        // hide features to be shown after animation
-        ui.authAnimLottieAnimationView.alpha = 0f
-        ui.networkInfoTextView.alpha = 0f
-        ui.smallGemImageView.alpha = 0f
-
-        // define animations
-        val hideGemAnim = ValueAnimator.ofFloat(1f, 0f).apply {
-            addUpdateListener { valueAnimator: ValueAnimator ->
-                val alpha = valueAnimator.animatedValue as Float
-                ui.bigGemImageView.alpha = alpha
-            }
-        }
-        val showTariTextAnim = ValueAnimator.ofFloat(0f, 1f).apply {
-            addUpdateListener { valueAnimator: ValueAnimator ->
-                val alpha = valueAnimator.animatedValue as Float
-                ui.authAnimLottieAnimationView.alpha = alpha
-                ui.networkInfoTextView.alpha = alpha
-                ui.smallGemImageView.alpha = alpha
-            }
-        }
-        AnimatorSet().apply {
-            startDelay = Constants.UI.shortDurationMs
-            play(showTariTextAnim).after(hideGemAnim)
-            duration = Constants.UI.shortDurationMs
-            interpolator = EasingInterpolator(Ease.QUART_IN)
-            addListener(onEnd = { doAuth() })
-            start()
-        }
-    }
-
     private fun doAuth() {
+        showBiometricAuth()
+
         // check whether there's at least screen lock
         if (viewModel.authService.isDeviceSecured) {
             lifecycleScope.launch {
                 try {
-                    if (!MOCKED) {
+                    setupPinCodeFragment()
+                } catch (e: BiometricAuthenticationException) {
+                    viewModel.logger.e(e, "Authentication has failed")
+                }
+            }
+        } else {
+            displayAuthNotAvailableDialog()
+        }
+    }
+
+    fun showBiometricAuth() {
+        if (viewModel.authService.isDeviceSecured) {
+            lifecycleScope.launch {
+                try {
+                    if (viewModel.securityPrefRepository.biometricsAuth == true) {
                         // prompt system authentication dialog
                         viewModel.authService.authenticate(
                             this@AuthActivity,
@@ -149,31 +128,15 @@ class AuthActivity : CommonActivity<ActivityAuthBinding, AuthViewModel>() {
                             if (viewModel.authService.isBiometricAuthAvailable) string(auth_biometric_prompt)
                             else string(auth_device_lock_code_prompt)
                         )
+                        proceedLogin()
                     }
-                    authSuccessful()
                 } catch (e: BiometricAuthenticationException) {
-                    authHasFailed()
+                    viewModel.logger.e(e, "Authentication has failed")
                 }
             }
         } else {
-            // local authentication not available
             displayAuthNotAvailableDialog()
         }
-    }
-
-    /**
-     * Auth was successful.
-     */
-    private fun authSuccessful() {
-        viewModel.sharedPrefsWrapper.isAuthenticated = true
-        playTariWalletAnim()
-    }
-
-    /**
-     * Auth has failed.
-     */
-    private fun authHasFailed() {
-        displayAuthFailedDialog()
     }
 
     /**
@@ -186,8 +149,8 @@ class AuthActivity : CommonActivity<ActivityAuthBinding, AuthViewModel>() {
             .setPositiveButton(getString(proceed)) { dialog, _ ->
                 dialog.cancel()
                 // user has chosen to proceed without authentication
-                viewModel.sharedPrefsWrapper.isAuthenticated = true
-                playTariWalletAnim()
+                viewModel.securityPrefRepository.isAuthenticated = true
+                proceedLogin()
             }
             // negative button text and action
             .setNegativeButton(getString(exit)) { _, _ -> finish() }
@@ -196,58 +159,17 @@ class AuthActivity : CommonActivity<ActivityAuthBinding, AuthViewModel>() {
         dialog.show()
     }
 
-    private fun displayAuthFailedDialog() {
-        val state = lifecycle.currentState
-        if (state == Lifecycle.State.RESUMED || state == Lifecycle.State.STARTED) {
-            AlertDialog.Builder(this)
-                .setMessage(getString(auth_failed_desc))
-                .setCancelable(false)
-                .setNegativeButton(getString(exit)) { _, _ -> finish() }
-                .run(AlertDialog.Builder::create)
-                .apply { setTitle(string(auth_failed_title)) }
-                .show()
-        }
-    }
-
-    /**
-     * Plays Tari Wallet text anim.
-     */
-    private fun playTariWalletAnim() {
-        ui.authAnimLottieAnimationView.addAnimatorListener(onEnd = {
-            ui.progressBar.alpha = 0f
-            ui.progressBar.visible()
-            ObjectAnimator.ofFloat(ui.progressBar, View.ALPHA, 0f, 1f).apply {
-                duration = Constants.UI.mediumDurationMs
-                start()
-            }
-
-            proceedLogin()
-        })
-        ui.authAnimLottieAnimationView.playAnimation()
-
-        ValueAnimator.ofFloat(1f, 0f).apply {
-            duration = Constants.UI.mediumDurationMs
-            addUpdateListener { valueAnimator: ValueAnimator ->
-                val alpha = valueAnimator.animatedValue as Float
-                ui.smallGemImageView.alpha = alpha
-                ui.networkInfoTextView.alpha = alpha
-            }
-            startDelay = Constants.UI.CreateWallet.introductionBottomViewsFadeOutDelay
-            start()
-        }
-    }
-
     private fun proceedLogin() {
+        viewModel.securityPrefRepository.saveAttempt(LoginAttemptDto(System.currentTimeMillis(), true))
         lifecycleScope.launch(Dispatchers.Main) {
+            ui.loader.visible()
+            ui.progressBar.setColor(viewModel.paletteManager.getPurpleBrand(this@AuthActivity))
             continueToHomeActivity()
         }
     }
 
-    private fun continueToHomeActivity() {
-        ObjectAnimator.ofFloat(ui.progressBar, View.ALPHA, 1f, 0f).apply {
-            duration = Constants.UI.shortDurationMs
-            start()
-        }
+    fun continueToHomeActivity() {
+        viewModel.securityPrefRepository.isAuthenticated = true
 
         // go to home activity
         Intent(this, HomeActivity::class.java).apply {
@@ -257,5 +179,4 @@ class AuthActivity : CommonActivity<ActivityAuthBinding, AuthViewModel>() {
         }
         finish()
     }
-
 }

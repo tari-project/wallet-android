@@ -17,7 +17,7 @@ class BugsReportingViewModel : CommonViewModel() {
 
     fun send(name: String, email: String, bugDescription: String) = viewModelScope.launch {
         bugReportingService.share(name, email, bugDescription)
-        _backPressed.postValue(Unit)
+        backPressed.postValue(Unit)
     }
 }
 

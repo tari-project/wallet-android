@@ -140,4 +140,8 @@
     <dimen name="contact_book_share_button_size_big">80dp</dimen>
     <dimen name="contact_book_share_button_padding_big">22dp</dimen>
 
+    <dimen name="pin_code_input_size">46dp</dimen>
+    <dimen name="pin_code_input_margin">12dp</dimen>
+    <dimen name="pin_code_input_dot_size">14dp</dimen>
+
 </resources>

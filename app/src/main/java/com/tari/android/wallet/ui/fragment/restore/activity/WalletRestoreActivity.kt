@@ -70,21 +70,21 @@ class WalletRestoreActivity : CommonActivity<ActivityWalletBackupBinding, Wallet
     override fun onCreate(savedInstanceState: Bundle?) {
         appComponent.inject(this)
         super.onCreate(savedInstanceState)
+
+        onBackInvokedDispatcher.registerOnBackInvokedCallback(0) {
+            overridePendingTransition(R.anim.enter_from_top, R.anim.exit_to_bottom)
+        }
+
         ui = ActivityWalletBackupBinding.inflate(layoutInflater).apply { setContentView(root) }
 
-        val viewModel : WalletRestoreViewModel by viewModels()
+        val viewModel: WalletRestoreViewModel by viewModels()
         bindViewModel(viewModel)
-        
+
         setContainerId(R.id.backup_fragment_container)
 
         if (savedInstanceState == null) {
             addFragment(ChooseRestoreOptionFragment(), isRoot = true)
         }
-    }
-
-    override fun onBackPressed() {
-        super.onBackPressed()
-        overridePendingTransition(R.anim.enter_from_top, R.anim.exit_to_bottom)
     }
 
     override fun onDestroy() {

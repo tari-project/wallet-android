@@ -27,7 +27,6 @@ class SelectUserContactFragment : ContactSelectionFragment() {
 
         ui.toolbar.ui.toolbarTitle.text = string(R.string.transaction_send_to)
         ui.addFirstNameInput.gone()
-        ui.addSurnameInput.gone()
 
         viewModel.isContactlessPayment.postValue(true)
         viewModel.additionalFilter = { it.contact.getFFIDto() != null }

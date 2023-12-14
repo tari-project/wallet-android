@@ -4,6 +4,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.baseNodes.BaseNodes
+import com.tari.android.wallet.application.deeplinks.DeepLink
+import com.tari.android.wallet.application.deeplinks.DeeplinkHandler
 import com.tari.android.wallet.data.sharedPrefs.tor.TorBridgeConfigurationList
 import com.tari.android.wallet.data.sharedPrefs.tor.TorSharedRepository
 import com.tari.android.wallet.event.EventBus
@@ -19,6 +21,7 @@ import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonStyle
 import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
 import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
+import com.tari.android.wallet.ui.fragment.send.shareQr.ShareQrCodeModule
 import com.tari.android.wallet.ui.fragment.settings.torBridges.torItem.TorBridgeViewHolderItem
 import javax.inject.Inject
 
@@ -32,6 +35,9 @@ class TorBridgesSelectionViewModel : CommonViewModel() {
 
     @Inject
     lateinit var baseNodes: BaseNodes
+
+    @Inject
+    lateinit var deeplinkHandler: DeeplinkHandler
 
     init {
         component.inject(this)
@@ -77,6 +83,7 @@ class TorBridgesSelectionViewModel : CommonViewModel() {
                 list.forEach { it.isSelected = false }
                 torBridgeItem.isSelected = true
             }
+
             else -> {
                 torBridgeItem.isSelected = !torBridgeItem.isSelected
             }
@@ -84,6 +91,19 @@ class TorBridgesSelectionViewModel : CommonViewModel() {
         val isEmptyChoice = list.filter { (it is TorBridgeViewHolderItem.Bridge) }.all { !(it as TorBridgeViewHolderItem.Bridge).isSelected }
         list.first { it is TorBridgeViewHolderItem.Empty }.isSelected = isEmptyChoice
         _torBridges.postValue(_torBridges.value!!.map { it.deepCopy() as TorBridgeViewHolderItem }.toMutableList())
+    }
+
+    fun showBridgeQrCode(torBridgeItem: TorBridgeViewHolderItem) {
+        if (torBridgeItem !is TorBridgeViewHolderItem.Bridge) return
+        val data = deeplinkHandler.getDeeplink(DeepLink.TorBridges(listOf(torBridgeItem.bridgeConfiguration)))
+        val args = ModularDialogArgs(
+            DialogArgs(true, canceledOnTouchOutside = true), listOf(
+                HeadModule(resourceManager.getString(R.string.share_via_qr_code_title)),
+                ShareQrCodeModule(data),
+                ButtonModule(resourceManager.getString(R.string.common_close), ButtonStyle.Close)
+            )
+        )
+        modularDialog.postValue(args)
     }
 
     fun connect() {
@@ -124,6 +144,7 @@ class TorBridgesSelectionViewModel : CommonViewModel() {
                     ) { stopConnecting() }
                     modularDialog.postValue(errorArgs.getModular(resourceManager))
                 }
+
                 is TorProxyState.Running -> {
                     if (it.bootstrapStatus.progress == 100) {
                         EventBus.torProxyState.unsubscribe(this)
@@ -142,8 +163,8 @@ class TorBridgesSelectionViewModel : CommonViewModel() {
                                 BodyModule(description),
                                 ButtonModule(resourceManager.getString(R.string.common_confirm), ButtonStyle.Normal) {
                                     dismissDialog.postValue(Unit)
-                                    _backPressed.postValue(Unit)
-                                 },
+                                    backPressed.postValue(Unit)
+                                },
                             )
                         )
                         modularDialog.postValue(args)
@@ -162,6 +183,7 @@ class TorBridgesSelectionViewModel : CommonViewModel() {
                         _loadingDialog.postValue(nextArgs)
                     }
                 }
+
                 else -> Unit
             }
         }

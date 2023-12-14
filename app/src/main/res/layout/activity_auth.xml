@@ -1,66 +1,46 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/root_view"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/black">
+    android:layout_height="match_parent">
 
-    <!-- Lottie animation for Tari Wallet text -->
-    <com.airbnb.lottie.LottieAnimationView
-        android:id="@+id/auth_anim_lottie_animation_view"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:background="@color/black"
-        app:lottie_autoPlay="false"
-        app:lottie_enableMergePathsForKitKatAndAbove="true"
-        app:lottie_loop="false"
-        app:lottie_rawRes="@raw/aurora_splash_anim"
-        app:lottie_renderMode="automatic" />
+    <FrameLayout
+        android:id="@+id/fragment_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
 
-    <!-- the big gem to disappear -->
-    <androidx.appcompat.widget.AppCompatImageView
-        android:id="@+id/big_gem_image_view"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:background="@color/black"
-        android:src="@drawable/tari_splash_gem_big" />
-
-    <!-- subtitle -->
     <com.tari.android.wallet.ui.component.tari.TariTextView
         android:id="@+id/network_info_text_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginBottom="22dp"
-        android:background="@color/black"
-        android:letterSpacing="0.1"
-        android:textColor="#50FFFFFF"
-        android:textSize="@dimen/common_network_and_version_info_text_size"
+        android:layout_marginBottom="48dp"
+        android:textColor="?attr/palette_text_heading"
+        android:textSize="14sp"
         app:customFont="heavy"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         tools:ignore="SmallSp" />
 
-    <!-- small gem -->
-    <androidx.appcompat.widget.AppCompatImageView
-        android:id="@+id/small_gem_image_view"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_above="@id/network_info_text_view"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="18dp"
-        android:background="@color/black"
-        android:src="@drawable/tari_splash_gem_small" />
+    <FrameLayout
+        android:id="@+id/loader"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="?attr/palette_background_primary"
+        android:visibility="gone">
 
-    <com.tari.android.wallet.ui.component.tari.TariProgressBar
-        android:id="@+id/progress_bar"
-        android:layout_width="60dp"
-        android:layout_height="60dp"
-        android:layout_centerInParent="true"
-        android:indeterminate="true"
-        android:visibility="visible" />
+        <com.tari.android.wallet.ui.component.tari.TariProgressBar
+            android:id="@+id/progress_bar"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_gravity="center"
+            android:indeterminate="true"
+            android:visibility="visible" />
 
-</RelativeLayout>
+    </FrameLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
+

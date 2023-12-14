@@ -1,10 +1,12 @@
 package com.tari.android.wallet.ui.fragment.settings.torBridges.customBridges
 
 import com.tari.android.wallet.R
-import com.tari.android.wallet.application.WalletManager
+import com.tari.android.wallet.application.deeplinks.DeepLink
+import com.tari.android.wallet.application.deeplinks.DeeplinkHandler
 import com.tari.android.wallet.data.sharedPrefs.tor.TorBridgeConfiguration
 import com.tari.android.wallet.data.sharedPrefs.tor.TorSharedRepository
 import com.tari.android.wallet.ui.common.CommonViewModel
+import com.tari.android.wallet.ui.common.SingleLiveEvent
 import com.tari.android.wallet.ui.dialog.error.ErrorDialogArgs
 import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
 import javax.inject.Inject
@@ -15,15 +17,15 @@ class CustomTorBridgesViewModel : CommonViewModel() {
     lateinit var torSharedRepository: TorSharedRepository
 
     @Inject
-    lateinit var walletManager: WalletManager
+    lateinit var deeplinkHandler: DeeplinkHandler
+
+    var text = SingleLiveEvent<String>()
 
     init {
         component.inject(this)
     }
 
     fun openRequestPage() = _openLink.postValue(resourceManager.getString(R.string.tor_bridges_url))
-
-    fun navigateToScanQr() = navigation.postValue(Navigation.CustomBridgeNavigation.ScanQrCode)
 
     fun navigateToUploadQr() = navigation.postValue(Navigation.CustomBridgeNavigation.UploadQrCode)
 
@@ -61,7 +63,15 @@ class CustomTorBridgesViewModel : CommonViewModel() {
         }
 
         newBridges.forEach { torSharedRepository.addTorBridgeConfiguration(it) }
-        _backPressed.postValue(Unit)
+        backPressed.postValue(Unit)
+    }
+
+    fun handleQrCode(input: String) {
+        val deeplink = deeplinkHandler.handle(input)
+        if (deeplink is DeepLink.TorBridges) {
+            val text = deeplinkHandler.getDeeplink(deeplink)
+            this.text.postValue(text)
+        }
     }
 
     private fun incorrectFormat() {

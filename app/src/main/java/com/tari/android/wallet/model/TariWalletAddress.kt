@@ -48,8 +48,8 @@ class TariWalletAddress() : Parcelable, Serializable {
 
     constructor(hexString: String, emojiId: String) : this() {
         // crunch fix for not crashing on action related to wallet address
-        if (hexString == "0000000000000000000000000000000000000000000000000000000000000026") {
-            this.hexString = "000000000000000000000000000000000000000000000000000000000000000026"
+        if (hexString == zeroHex) {
+            this.hexString = zero66Hex
             this.emojiId =
                 "\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF57"
         } else {
@@ -57,6 +57,8 @@ class TariWalletAddress() : Parcelable, Serializable {
             this.emojiId = emojiId
         }
     }
+
+    fun isZeros(): Boolean = hexString == zeroHex || hexString == zero66Hex || hexString.all { it == '0' }
 
     override fun equals(other: Any?): Boolean = (other is TariWalletAddress) && hexString == other.hexString
 
@@ -72,6 +74,9 @@ class TariWalletAddress() : Parcelable, Serializable {
 
     companion object CREATOR : Parcelable.Creator<TariWalletAddress> {
 
+        const val zeroHex = "0000000000000000000000000000000000000000000000000000000000000026"
+        const val zero66Hex = "000000000000000000000000000000000000000000000000000000000000000026"
+
         override fun createFromParcel(parcel: Parcel): TariWalletAddress {
             return TariWalletAddress(parcel)
         }
@@ -80,6 +85,7 @@ class TariWalletAddress() : Parcelable, Serializable {
             return Array(size) { TariWalletAddress() }
         }
 
+        fun validate(addressHex: String): Boolean = addressHex.length > 64
     }
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
@@ -97,5 +103,4 @@ class TariWalletAddress() : Parcelable, Serializable {
     }
 
     // endregion
-
 }

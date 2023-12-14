@@ -14,6 +14,7 @@ import com.tari.android.wallet.extension.observeOnLoad
 import com.tari.android.wallet.ui.common.CommonFragment
 import com.tari.android.wallet.ui.common.recyclerView.CommonAdapter
 import com.tari.android.wallet.ui.extension.gone
+import com.tari.android.wallet.ui.extension.hideKeyboard
 import com.tari.android.wallet.ui.extension.setVisible
 import com.tari.android.wallet.ui.extension.visible
 import com.tari.android.wallet.ui.fragment.utxos.list.adapters.UtxosListAdapter
@@ -42,6 +43,8 @@ class UtxosListFragment : CommonFragment<FragmentUtxosListBinding, UtxosListView
 
         val viewModel: UtxosListViewModel by viewModels()
         bindViewModel(viewModel)
+
+        requireActivity().hideKeyboard()
 
         setupUI()
         observeUI()

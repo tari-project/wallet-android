@@ -39,7 +39,10 @@ class HomeTransactionHistoryFragment : CommonFragment<FragmentHomeContactTransac
     }
 
     private fun observeUI() = with(viewModel) {
-        observe(list) { adapter.update(it) }
+        observe(list) {
+            adapter.update(it)
+            adapter.notifyDataSetChanged()
+        }
 
         observe(searchBarVisible) { ui.searchFullContainer.setVisible(it) }
 

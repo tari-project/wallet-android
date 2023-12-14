@@ -40,6 +40,7 @@ import com.tari.android.wallet.data.WalletConfig
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodeSharedRepository
 import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
+import com.tari.android.wallet.data.sharedPrefs.security.SecurityPrefRepository
 import com.tari.android.wallet.data.sharedPrefs.tariSettings.TariSettingsSharedRepository
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.ffi.*
@@ -64,7 +65,8 @@ class WalletManager(
     private val baseNodeSharedRepository: BaseNodeSharedRepository,
     private val seedPhraseRepository: SeedPhraseRepository,
     private val networkRepository: NetworkRepository,
-    private var tariSettingsSharedRepository: TariSettingsSharedRepository,
+    private val tariSettingsSharedRepository: TariSettingsSharedRepository,
+    private val securityPrefRepository: SecurityPrefRepository,
     private val baseNodes: BaseNodes,
     private val torConfig: TorConfig
 ) {
@@ -202,6 +204,7 @@ class WalletManager(
             val isNewInstallation = !WalletUtil.walletExists(walletConfig)
             val wallet = FFIWallet(
                 sharedPrefsWrapper,
+                securityPrefRepository,
                 seedPhraseRepository,
                 networkRepository,
                 getCommsConfig(),
