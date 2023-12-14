@@ -6,7 +6,7 @@ buildscript {
     ext.lifecycle_version = '2.6.2'
 
     // build & version
-    ext.buildNumber = 277
+    ext.buildNumber = 278
     ext.versionNumber = "0.24.1"
 
     // JNI libs

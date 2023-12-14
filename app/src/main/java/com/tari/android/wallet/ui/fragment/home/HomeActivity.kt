@@ -163,7 +163,6 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>() {
         viewModel.shareViewModel.tariBluetoothClient.init(this)
 
         setContainerId(R.id.nav_container)
-        overridePendingTransition(0, 0)
 
         if (!securityPrefRepository.isAuthenticated) {
             val intent = Intent(this, SplashActivity::class.java)
