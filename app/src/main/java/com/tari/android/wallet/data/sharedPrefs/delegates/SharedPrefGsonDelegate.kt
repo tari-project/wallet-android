@@ -29,7 +29,7 @@ class SharedPrefGsonDelegate<T>(
             try {
                 gson.fromJson(savedValue, type) as T
             } catch (e: Throwable) {
-                logger.e(e.toString())
+                logger.i(e.toString())
                 defValue
             }
         } else {

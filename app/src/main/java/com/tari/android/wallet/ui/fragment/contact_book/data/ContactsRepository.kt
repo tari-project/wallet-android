@@ -501,11 +501,11 @@ class ContactsRepository @Inject constructor(
 
             val updatedContact = phoneContact?.mutableCopy {
                 if (options == null) {
-                    setOptions(contacts, NewOptions(starred = contact.isFavorite))
+                    setOptions(NewOptions(starred = contact.isFavorite))
                 } else {
-                    setOptions(contacts, options!!.mutableCopy {
-                        starred = contact.isFavorite
-                    })
+                    val copy = options!!.redactedCopy()
+                    copy.starred = contact.isFavorite
+                    setOptions(copy)
                 }
             }
 

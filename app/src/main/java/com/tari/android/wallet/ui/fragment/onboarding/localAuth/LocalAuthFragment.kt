@@ -125,7 +125,7 @@ class LocalAuthFragment : CommonFragment<FragmentLocalAuthBinding, LocalAuthView
                 if (viewModel.authService.authenticate(this@LocalAuthFragment, string(onboarding_auth_title), subtitle))
                     viewModel.securedWithBiometrics()
             } catch (exception: BiometricAuthenticationException) {
-                viewModel.logger.e(exception, exception.message ?: "Biometric authentication failed")
+                viewModel.logger.i( exception.message + "Biometric authentication failed")
             }
         }
     }

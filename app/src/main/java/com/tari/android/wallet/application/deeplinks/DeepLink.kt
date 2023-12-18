@@ -35,7 +35,7 @@ package com.tari.android.wallet.application.deeplinks
 import com.tari.android.wallet.data.sharedPrefs.tor.TorBridgeConfiguration
 import com.tari.android.wallet.model.MicroTari
 import com.tari.android.wallet.model.TariWalletAddress
-import java.math.BigInteger
+import com.tari.android.wallet.util.parseToBigInteger
 
 /**
  * Parses a deep link and contains the structured deep link details.
@@ -98,7 +98,7 @@ sealed class DeepLink {
 
         constructor(params: Map<String, String>) : this(
             params[tariAddressKey].orEmpty(),
-            params[amountKey]?.let { if (it.isEmpty()) null else MicroTari(BigInteger(it)) },
+            params[amountKey]?.let { if (it.isEmpty()) null else MicroTari(it.parseToBigInteger()) },
             params[noteKey].orEmpty()
         )
 

@@ -79,7 +79,7 @@ class FFICommsConfig() : FFIBase() {
             } else {
                 messageBuilder.append("Permission problem.")
             }
-            logger.e(Throwable(), messageBuilder.toString())
+            logger.i(messageBuilder.toString())
             throw FFIException(message = messageBuilder.toString())
         }
     }

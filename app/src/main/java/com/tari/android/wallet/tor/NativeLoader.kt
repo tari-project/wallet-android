@@ -48,13 +48,13 @@ object NativeLoader {
 
             return true
         } catch (e: Exception) {
-            logger.e(e, "Load from zip")
+            logger.i(e.toString() + "Load from zip")
         } finally {
             if (stream != null) {
                 try {
                     stream.close()
                 } catch (e: Exception) {
-                    logger.e(e, "Closing stream")
+                    logger.i(e.toString() + "Closing stream")
                 }
             }
 
@@ -62,7 +62,7 @@ object NativeLoader {
                 try {
                     zipFile.close()
                 } catch (e: Exception) {
-                    logger.e(e, "closing zip file")
+                    logger.i(e.toString() + "closing zip file")
                 }
             }
         }

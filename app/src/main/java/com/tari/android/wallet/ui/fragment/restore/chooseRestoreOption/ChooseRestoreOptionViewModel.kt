@@ -5,7 +5,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.tari.android.wallet.R
-import com.tari.android.wallet.application.MigrationManager
 import com.tari.android.wallet.application.WalletManager
 import com.tari.android.wallet.application.WalletState
 import com.tari.android.wallet.data.WalletConfig
@@ -105,7 +104,7 @@ class ChooseRestoreOptionViewModel : CommonViewModel() {
                     restoreFromBackup()
                 }
             } catch (exception: Exception) {
-                logger.e(exception, "Backup storage setup failed")
+                logger.i(exception.message + "Backup storage setup failed")
                 backupManager.signOut()
                 _state.postValue(ChooseRestoreOptionState.EndProgress(backupManager.currentOption!!))
                 showAuthFailedDialog()

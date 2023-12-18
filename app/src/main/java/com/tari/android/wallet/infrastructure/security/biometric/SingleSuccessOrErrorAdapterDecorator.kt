@@ -10,8 +10,13 @@ class SingleSuccessOrErrorAdapterDecorator(private val decorated: BiometricPromp
 
     override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
         if (!isResumed.get()) {
-            decorated.onAuthenticationSucceeded(result)
-            isResumed.set(true)
+            if (result.cryptoObject?.cipher == null) {
+                decorated.onAuthenticationSucceeded(result)
+                isResumed.set(true)
+            } else {
+                decorated.onAuthenticationError(BiometricPrompt.ERROR_CANCELED, "Crypto object is not null")
+                isResumed.set(true)
+            }
         }
     }
 
