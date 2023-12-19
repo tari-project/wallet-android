@@ -292,6 +292,7 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniCreate(
         jobject jThis,
         jobject jpWalletConfig,
         jstring jLogPath,
+        jint logVerbosity,
         jint maxNumberOfRollingLogFiles,
         jint rollingLogFileMaxSizeBytes,
         jstring jPassphrase,
@@ -443,6 +444,7 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniCreate(
     TariWallet *pWallet = wallet_create(
             pWalletConfig,
             pLogPath,
+            logVerbosity,
             static_cast<unsigned int>(maxNumberOfRollingLogFiles),
             static_cast<unsigned int>(rollingLogFileMaxSizeBytes),
             pPassphrase,

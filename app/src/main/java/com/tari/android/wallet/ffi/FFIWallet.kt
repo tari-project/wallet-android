@@ -32,6 +32,7 @@
  */
 package com.tari.android.wallet.ffi
 
+import com.tari.android.wallet.BuildConfig
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
 import com.tari.android.wallet.data.sharedPrefs.security.SecurityPrefRepository
@@ -61,6 +62,8 @@ class FFIWallet(
     private val coroutineContext = Job()
     private var localScope = CoroutineScope(coroutineContext)
 
+    private val logVerbosity: Int = if (BuildConfig.BUILD_TYPE == "debug") 11 else 2
+
     companion object {
         private var atomicInstance = AtomicReference<FFIWallet>()
         var instance: FFIWallet?
@@ -71,6 +74,7 @@ class FFIWallet(
     private external fun jniCreate(
         commsConfig: FFICommsConfig,
         logPath: String,
+        logVerbosity: Int,
         maxNumberOfRollingLogFiles: Int,
         rollingLogFileMaxSizeBytes: Int,
         passphrase: String?,
@@ -236,6 +240,7 @@ class FFIWallet(
             jniCreate(
                 commsConfig,
                 logPath,
+                logVerbosity,
                 Constants.Wallet.maxNumberOfRollingLogFiles,
                 Constants.Wallet.rollingLogFileMaxSizeBytes,
                 passphrase,
