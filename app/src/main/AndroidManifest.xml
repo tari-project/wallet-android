@@ -52,7 +52,6 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="false"
         android:theme="@style/AppTheme.Light"
-        android:taskAffinity=""
         tools:replace="android:supportsRtl,android:allowBackup">
         <!-- Tari foreground service -->
         <service
