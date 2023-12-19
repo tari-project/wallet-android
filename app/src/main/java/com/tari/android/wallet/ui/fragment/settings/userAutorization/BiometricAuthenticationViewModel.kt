@@ -47,7 +47,7 @@ class BiometricAuthenticationViewModel : CommonViewModel() {
     private fun handleError(e: Exception) {
         if (e is BiometricAuthenticationException) {
             if (e.code != BiometricPrompt.ERROR_USER_CANCELED && e.code != BiometricPrompt.ERROR_CANCELED)
-                logger.e(e, "Other biometric error. Code: ${e.code}")
+                logger.i(e.message + "Other biometric error. Code: ${e.code}")
             val args = AlertDialogArgs(
                 resourceManager.getString(R.string.auth_failed_desc),
                 resourceManager.getString(R.string.auth_failed_title),

@@ -35,13 +35,13 @@ package com.tari.android.wallet.service
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.data.WalletConfig
 import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepositoryImpl
 import com.tari.android.wallet.data.sharedPrefs.tariSettings.TariSettingsSharedRepository
 import com.tari.android.wallet.di.ApplicationModule
 import com.tari.android.wallet.service.service.WalletServiceLauncher
-import com.tari.android.wallet.ui.common.domain.ResourceManager
 
 /**
  * This receiver is responsible for starting the service after boot finish.
@@ -55,6 +55,9 @@ class BootDeviceReceiver : BroadcastReceiver() {
 
     override fun onReceive(context: Context?, intent: Intent?) {
         if (context == null || intent == null) return
+        // not allowed action starts from android 12 dio to new restriction
+        // https://developer.android.com/guide/components/foreground-services#background-start-restriction-exemptions
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) return
         logger.i("Boot device broadcast received")
         if (Intent.ACTION_BOOT_COMPLETED == intent.action) {
             val sharedPreferences = context.getSharedPreferences(ApplicationModule.sharedPrefsFileName, Context.MODE_PRIVATE)

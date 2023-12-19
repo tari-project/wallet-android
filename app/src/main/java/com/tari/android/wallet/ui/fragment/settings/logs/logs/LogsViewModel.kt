@@ -53,7 +53,7 @@ class LogsViewModel : CommonViewModel() {
                 backPressed.postValue(Unit)
             }
             modularDialog.postValue(errorArgs.getModular(resourceManager))
-            logger.e(e, "Out of memory on reading big log file")
+            logger.i(e.message + "Out of memory on reading big log file")
         }
     }
 

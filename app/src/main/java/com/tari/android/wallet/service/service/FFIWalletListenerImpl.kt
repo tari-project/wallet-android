@@ -314,7 +314,7 @@ class FFIWalletListenerImpl(
             baseNodeValidationStatusMap[type] = Pair(currentStatus.first, isSuccess)
             checkBaseNodeSyncCompletion()
         } catch (e: Throwable) {
-            logger.e(e.toString())
+            logger.i(e.toString())
         }
     }
 

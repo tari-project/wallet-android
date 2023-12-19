@@ -27,7 +27,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.joda.time.DateTime
 import org.joda.time.format.DateTimeFormat
-import java.util.*
+import java.util.Locale
 import javax.inject.Inject
 
 class BackupOptionViewModel : CommonViewModel() {
@@ -91,7 +91,7 @@ class BackupOptionViewModel : CommonViewModel() {
     }
 
     private fun turnOff(backupOption: BackupOptions, throwable: Throwable?) {
-        logger.e("Backup storage setup failed: $throwable")
+        logger.i("Backup storage setup failed: $throwable")
         backupManager.turnOff(backupOption)
         _inProgress.postValue(false)
         _switchChecked.postValue(false)

@@ -150,7 +150,7 @@ class BackupFileProcessor @Inject constructor(
         try {
             File(walletConfig.getWalletTempDirPath()).listFiles()?.forEach { it.delete() }
         } catch (e: Exception) {
-            Logger.e(e, "Ignorable backup error while clearing temporary and old files.")
+            Logger.i(e.toString() + "Ignorable backup error while clearing temporary and old files.")
         }
     }
 }

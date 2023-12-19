@@ -20,7 +20,7 @@ class GiphyRESTRetrofitRepository(private val gateway: GiphyRESTGateway) : GIFRe
             body.data.map { GIFItem(it.id, Uri.parse(it.embedUrl), Uri.parse(it.images.fixedWidth.url)) }
         else {
             val exception = GIFSearchException(body?.meta?.message ?: response.message() ?: response.errorBody()?.string())
-            logger.e(exception, "Get all was failed")
+            logger.i(exception.toString() + "Get all was failed")
             throw exception
         }
     }
@@ -33,9 +33,9 @@ class GiphyRESTRetrofitRepository(private val gateway: GiphyRESTGateway) : GIFRe
             body.data.let { GIFItem(it.id, Uri.parse(it.embedUrl), Uri.parse(it.images.fixedWidth.url)) }
         else {
             val exception = GIFSearchException(body?.meta?.message ?: response.message() ?: response.errorBody()?.string())
-            logger.e(exception.message.orEmpty())
-            logger.e(exception.stackTraceToString())
-            logger.e(exception, "Get by id was failed")
+            logger.i(exception.message.orEmpty())
+            logger.i(exception.stackTraceToString())
+            logger.i(exception. toString() + "Get by id was failed")
             throw exception
         }
     }

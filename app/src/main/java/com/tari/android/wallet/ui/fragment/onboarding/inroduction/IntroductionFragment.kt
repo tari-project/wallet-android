@@ -131,7 +131,6 @@ class IntroductionFragment : CommonFragment<FragmentIntroductionBinding, Introdu
             ui.restoreWalletCtaView.setOnClickListener {
                 activity?.let {
                     it.startActivity(WalletRestoreActivity.navigationIntent(it))
-                    it.overridePendingTransition(R.anim.enter_from_bottom, R.anim.exit_to_top)
                 }
             }
             networkInfoTextView.text = TariVersionModel(viewModel.networkRepository).versionInfo

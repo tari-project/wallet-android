@@ -160,7 +160,7 @@ class TariWalletServiceStubImpl(
     } ?: false
 
     override fun startBaseNodeSync(error: WalletError): Boolean = runMapping(error, {
-        logger.e(it, "Base node sync failed")
+        logger.i(it.toString() + "Base node sync failed")
         baseNodeSharedPrefsRepository.baseNodeLastSyncResult = false
         walletServiceListener.baseNodeValidationStatusMap.clear()
         EventBus.baseNodeSyncState.post(BaseNodeSyncState.Failed)
