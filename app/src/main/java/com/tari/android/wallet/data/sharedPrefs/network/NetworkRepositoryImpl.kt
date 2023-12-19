@@ -18,7 +18,7 @@ class NetworkRepositoryImpl(sharedPrefs: SharedPreferences) : NetworkRepository 
         try {
             currentNetwork!!.network.displayName
         } catch (e: Throwable) {
-            currentNetwork = getStagenet()
+            currentNetwork = getNextnet()
         }
     }
 
@@ -26,7 +26,7 @@ class NetworkRepositoryImpl(sharedPrefs: SharedPreferences) : NetworkRepository 
 
     override var incompatibleNetworkShown by SharedPrefBooleanDelegate(sharedPrefs, SimpleRepository(this),  formatKey(Keys.networkIncompatible), false)
 
-    override fun getAllNetworks(): List<TariNetwork> = listOf(getStagenet())
+    override fun getAllNetworks(): List<TariNetwork> = listOf(getNextnet())
 
     object Keys {
         const val currentNetwork = "tari_current_network"
@@ -39,5 +39,6 @@ class NetworkRepositoryImpl(sharedPrefs: SharedPreferences) : NetworkRepository 
         private const val testNetThicker = "tXTR"
 
         fun getStagenet(): TariNetwork = TariNetwork(Network.STAGENET, testNetThicker)
+        fun getNextnet(): TariNetwork = TariNetwork(Network.NEXTNET, testNetThicker)
     }
 }
