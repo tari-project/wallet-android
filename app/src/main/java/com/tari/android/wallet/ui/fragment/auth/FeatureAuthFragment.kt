@@ -45,8 +45,6 @@ import com.tari.android.wallet.R.string.auth_device_lock_code_prompt
 import com.tari.android.wallet.R.string.auth_not_available_or_canceled_desc
 import com.tari.android.wallet.R.string.auth_not_available_or_canceled_title
 import com.tari.android.wallet.R.string.auth_title
-import com.tari.android.wallet.R.string.exit
-import com.tari.android.wallet.R.string.proceed
 import com.tari.android.wallet.data.sharedPrefs.security.LoginAttemptDto
 import com.tari.android.wallet.databinding.FragmentFeatureAuthBinding
 import com.tari.android.wallet.extension.observe
@@ -96,21 +94,18 @@ class FeatureAuthFragment : CommonFragment<FragmentFeatureAuthBinding, AuthViewM
     }
 
     private fun doAuth() {
-        // check whether there's at least screen lock
-        if (viewModel.authService.isDeviceSecured) {
-            try {
-                setupPinCodeFragment()
-            } catch (e: BiometricAuthenticationException) {
-                viewModel.logger.e(e, "Authentication has failed")
-            }
-        } else {
-            displayAuthNotAvailableDialog()
+        try {
+            setupPinCodeFragment()
+        } catch (e: BiometricAuthenticationException) {
+            viewModel.logger.i(e.toString() + "Authentication has failed")
         }
 
         showBiometricAuth()
     }
 
     fun showBiometricAuth() {
+        if (!viewModel.authService.isBiometricAuthAvailable) return
+
         if (viewModel.authService.isDeviceSecured) {
             lifecycleScope.launch {
                 try {
@@ -126,7 +121,7 @@ class FeatureAuthFragment : CommonFragment<FragmentFeatureAuthBinding, AuthViewM
                         authSuccessfully()
                     }
                 } catch (e: BiometricAuthenticationException) {
-                    viewModel.logger.e(e, "Authentication has failed")
+                    viewModel.logger.i(e.toString() + "Authentication has failed")
                 }
             }
         } else {
@@ -141,14 +136,7 @@ class FeatureAuthFragment : CommonFragment<FragmentFeatureAuthBinding, AuthViewM
         val dialog = AlertDialog.Builder(requireContext())
             .setMessage(getString(auth_not_available_or_canceled_desc))
             .setCancelable(false)
-            .setPositiveButton(getString(proceed)) { dialog, _ ->
-                dialog.cancel()
-                // user has chosen to proceed without authentication
-                viewModel.securityPrefRepository.isAuthenticated = true
-                authSuccessfully()
-            }
-            // negative button text and action
-            .setNegativeButton(getString(exit)) { _, _ -> viewModel.backPressed.postValue(Unit) }
+            .setPositiveButton(getString(R.string.common_ok)) { dialog, _ -> dialog.cancel() }
             .create()
         dialog.setTitle(getString(auth_not_available_or_canceled_title))
         dialog.show()

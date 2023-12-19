@@ -124,7 +124,7 @@ class LocalBackupStorage @Inject constructor(
                     }
                 }
             } catch (e: Exception) {
-                logger.e(e, "Ignorable backup error while clearing temporary and old files.")
+                logger.i(e.toString() + "Ignorable backup error while clearing temporary and old files.")
             }
             return@withContext backupDate
         }

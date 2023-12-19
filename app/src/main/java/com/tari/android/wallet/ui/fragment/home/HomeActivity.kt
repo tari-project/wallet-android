@@ -163,14 +163,13 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>() {
         viewModel.shareViewModel.tariBluetoothClient.init(this)
 
         setContainerId(R.id.nav_container)
-        overridePendingTransition(0, 0)
 
         if (!securityPrefRepository.isAuthenticated) {
             val intent = Intent(this, SplashActivity::class.java)
                 .apply { flags = Intent.FLAG_ACTIVITY_NEW_TASK }
             this.intent?.data?.let(intent::setData)
-            startActivity(intent)
             finish()
+            startActivity(intent)
             return
         }
         ui = ActivityHomeBinding.inflate(layoutInflater).also { setContentView(it.root) }
@@ -381,6 +380,7 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>() {
     }
 
     override fun onDestroy() {
+        viewModel.securityPrefRepository.isAuthenticated = false
         super.onDestroy()
         instance = WeakReference(null)
         viewModelStore.clear()

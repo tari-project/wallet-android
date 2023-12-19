@@ -16,7 +16,7 @@ class DeeplinkFormatter @Inject constructor(private val networkRepository: Netwo
             return DeepLink.TorBridges(torBridges)
         }
 
-        val uri = Uri.parse(URLDecoder.decode(deepLink, "UTF-8"))
+        val uri = runCatching { Uri.parse(URLDecoder.decode(deepLink, "UTF-8")) }.getOrNull() ?: return null
 
         if (!uri.authority.equals(networkRepository.currentNetwork!!.network.uriComponent)) {
             return null

@@ -69,10 +69,7 @@ class BaseNodes(
     private fun findAndAddBaseNode(fileContent: String, regex: String): Sequence<BaseNodeDto> {
         return Regex(regex).findAll(fileContent).map { matchResult ->
             val tripleString = matchResult.value.split("::")
-            if (tripleString.size ==2) {
-                1
-            }
-            Logger.t(this::class.simpleName).e("baseNodeList0: $tripleString, baseNodeList1: ${tripleString[1]}, baseNodeList2: ${tripleString[2]}")
+            Logger.t(this::class.simpleName).i("baseNodeList0: $tripleString, baseNodeList1: ${tripleString[1]}, baseNodeList2: ${tripleString[2]}")
             BaseNodeDto(tripleString[0], tripleString[1], tripleString[2])
         }
     }
@@ -98,21 +95,21 @@ class BaseNodes(
 
     fun startSync() {
         try {
-            Logger.t(this::class.simpleName).e("startSync")
+            Logger.t(this::class.simpleName).i("startSync")
             //essential for wallet creation flow
             val baseNode = baseNodeSharedRepository.currentBaseNode ?: return
             serviceConnection.currentState.service ?: return
             if (EventBus.walletState.publishSubject.value != WalletState.Running) return
 
-            Logger.t(this::class.simpleName).e("startSync:publicKeyHex: ${baseNode.publicKeyHex}")
-            Logger.t(this::class.simpleName).e("startSync:address: ${baseNode.address}")
-            Logger.t(this::class.simpleName).e("startSync:address: ${Gson().toJson(baseNodeSharedRepository.userBaseNodes)}")
+            Logger.t(this::class.simpleName).i("startSync:publicKeyHex: ${baseNode.publicKeyHex}")
+            Logger.t(this::class.simpleName).i("startSync:address: ${baseNode.address}")
+            Logger.t(this::class.simpleName).i("startSync:address: ${Gson().toJson(baseNodeSharedRepository.userBaseNodes)}")
             val baseNodeKeyFFI = FFIPublicKey(HexString(baseNode.publicKeyHex))
             FFIWallet.instance?.addBaseNodePeer(baseNodeKeyFFI, baseNode.address)
             baseNodeKeyFFI.destroy()
             walletService.getWithError { error, wallet -> wallet.startBaseNodeSync(error) }
         } catch (e: Throwable) {
-            Logger.t(this::class.simpleName).e("startSync")
+            Logger.t(this::class.simpleName).i("startSync")
             setNextBaseNode()
             startSync()
         }
