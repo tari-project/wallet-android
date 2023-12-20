@@ -8,9 +8,9 @@ import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefGsonDelegate
 
 class NetworkRepositoryImpl(sharedPrefs: SharedPreferences) : NetworkRepository {
 
-    override var supportedNetworks: List<Network> = listOf(Network.STAGENET)
+    override var supportedNetworks: List<Network> = listOf(Network.NEXTNET)
 
-    override var recommendedNetworks: List<Network> = listOf(Network.STAGENET)
+    override var recommendedNetworks: List<Network> = listOf(Network.NEXTNET)
 
     override var currentNetwork by SharedPrefGsonDelegate(sharedPrefs, SimpleRepository(this),  Keys.currentNetwork, TariNetwork::class.java)
 
