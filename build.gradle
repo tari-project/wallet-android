@@ -6,8 +6,8 @@ buildscript {
     ext.lifecycle_version = '2.6.2'
 
     // build & version
-    ext.buildNumber = 280
-    ext.versionNumber = "0.25.0"
+    ext.buildNumber = 281
+    ext.versionNumber = "0.25.1"
 
     // JNI libs
     ext.libwalletHostURL = "https://github.com/tari-project/tari/releases/download/"
