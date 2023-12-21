@@ -49,6 +49,9 @@ enum class FFITxStatus {
     REJECTED,
     FAUX_UNCONFIRMED,
     FAUX_CONFIRMED,
+    QUEUED,
+    COINBASE_UNCONFIRMED,
+    COINBASE_CONFIRMED,
     UNKNOWN;
 
     companion object {
@@ -65,7 +68,10 @@ enum class FFITxStatus {
                 7 -> REJECTED
                 8 -> FAUX_UNCONFIRMED
                 9 -> FAUX_CONFIRMED
-                10 -> UNKNOWN
+                10 -> QUEUED
+                11 -> COINBASE_UNCONFIRMED
+                12 -> COINBASE_CONFIRMED
+                13 -> UNKNOWN
                 else -> throw FFIException(message = "Unexpected status: $status")
             }
         }
