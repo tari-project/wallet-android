@@ -1,0 +1,14 @@
+default_platform(:android)
+
+platform :android do
+  desc "Uploads Proguard mapping file to Sentry"
+  lane :proguard do |options|
+    sentry_upload_proguard(
+      auth_token: options[:auth_token],
+      org_slug: options[:org_slug],
+      project_slug: options[:project_slug],
+      android_manifest_path: 'app/build/intermediates/merged_manifests/regularRelease/AndroidManifest.xml'
+      mapping_path: 'build/outputs/mapping/regularRelease/mapping.txt'
+    )
+  end
+end
