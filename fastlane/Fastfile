@@ -7,8 +7,8 @@ platform :android do
       auth_token: options[:auth_token],
       org_slug: options[:org_slug],
       project_slug: options[:project_slug],
-      android_manifest_path: 'app/build/intermediates/merged_manifests/regularRelease/AndroidManifest.xml'
-      mapping_path: 'build/outputs/mapping/regularRelease/mapping.txt'
+      android_manifest_path: 'app/build/intermediates/merged_manifests/regularRelease/AndroidManifest.xml',
+      mapping_path: options[:mapping_path]
     )
   end
 end

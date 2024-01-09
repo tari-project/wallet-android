@@ -42,7 +42,6 @@ android {
     flavorDimensions.add("privacy-mode")
 
     buildTypes {
-        loadSentryProps()
         def secretProperties = loadSecretProps()
 
         debug {
@@ -57,16 +56,9 @@ android {
             ndk {
                 debugSymbolLevel "FULL"
             }
-//            PRIVATE BUILD: uncomment (remove two slashes at the start) the following line for
-//            private release builds support
-//            signingConfig signingConfigs.debug
-
-//            PRIVATE BUILD: comment (add two slashes at the start of each line) all the `sentry`
-//            block for private release builds support
-            sentry { // https://docs.sentry.io/platforms/android/#gradle-configuration
-                autoUpload.set(true)
-                uploadNativeSymbols.set(true)
-                includeNativeSources.set(true)
+            sentry {
+                autoUpload.set(false)
+                autoUploadProguardMapping.set(false)
             }
         }
     }
