@@ -98,7 +98,7 @@ class BackupSettingsFragment : CommonFragment<FragmentWalletBackupSettingsBindin
 
         observe(setPasswordVisible) { ui.updatePasswordCtaView.setVisible(it) }
 
-        observe(options) { initBackupOptions(it) }
+        observe(optionViewModels) { initBackupOptions(it) }
     }
 
     private fun initBackupOptions(options: List<BackupOptionViewModel>) {

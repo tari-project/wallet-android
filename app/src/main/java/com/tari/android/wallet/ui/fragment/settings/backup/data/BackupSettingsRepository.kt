@@ -17,59 +17,95 @@ import javax.inject.Singleton
 
 @Singleton
 class BackupSettingsRepository @Inject constructor(
-    private val context: Context,
-    private val sharedPrefs: SharedPreferences,
+    context: Context,
+    sharedPrefs: SharedPreferences,
     networkRepository: NetworkRepository
-) :
-    CommonRepository(networkRepository) {
+) : CommonRepository(networkRepository) {
 
-    var localFileOption: BackupOptionDto? by SharedPrefGsonDelegate(sharedPrefs, this,  formatKey(Keys.localFileOptionsKey), BackupOptionDto::class.java)
+    var localFileOption: BackupOptionDto? by SharedPrefGsonDelegate(
+        prefs = sharedPrefs,
+        commonRepository = this,
+        name = formatKey(Keys.localFileOptionsKey),
+        type = BackupOptionDto::class.java,
+        defValue = BackupOptionDto(BackupOptionType.Local),
+    )
 
-    var googleDriveOption: BackupOptionDto? by SharedPrefGsonDelegate(sharedPrefs, this,  formatKey(Keys.googleDriveOptionKey), BackupOptionDto::class.java)
+    var googleDriveOption: BackupOptionDto? by SharedPrefGsonDelegate(
+        prefs = sharedPrefs,
+        commonRepository = this,
+        name = formatKey(Keys.googleDriveOptionKey),
+        type = BackupOptionDto::class.java,
+        defValue = BackupOptionDto(BackupOptionType.Google),
+    )
 
-    var dropboxOption: BackupOptionDto? by SharedPrefGsonDelegate(sharedPrefs, this,  formatKey(Keys.dropboxOptionsKey), BackupOptionDto::class.java)
+    var dropboxOption: BackupOptionDto? by SharedPrefGsonDelegate(
+        prefs = sharedPrefs,
+        commonRepository = this,
+        name = formatKey(Keys.dropboxOptionsKey),
+        type = BackupOptionDto::class.java,
+        defValue = BackupOptionDto(BackupOptionType.Dropbox),
+    )
 
-    var dropboxCredential: DbxCredential? by SharedPrefGsonDelegate(sharedPrefs, this,  formatKey(Keys.dropboxCredentialKey), DbxCredential::class.java)
+    var dropboxCredential: DbxCredential? by SharedPrefGsonDelegate(
+        prefs = sharedPrefs,
+        commonRepository = this,
+        name = formatKey(Keys.dropboxCredentialKey),
+        type = DbxCredential::class.java,
+    )
 
-    var backupPassword: String? by SharedPrefStringSecuredDelegate(context, sharedPrefs, this, formatKey(Keys.backupPassword))
+    var backupPassword: String? by SharedPrefStringSecuredDelegate(
+        context = context,
+        prefs = sharedPrefs,
+        commonRepository = this,
+        name = formatKey(Keys.backupPassword),
+    )
 
-    var localBackupFolderURI: Uri? by SharedPrefGsonDelegate(sharedPrefs, this,  formatKey(Keys.localBackupFolderURI), Uri::class.java)
+    var localBackupFolderURI: Uri? by SharedPrefGsonDelegate(
+        prefs = sharedPrefs,
+        commonRepository = this,
+        name = formatKey(Keys.localBackupFolderURI),
+        type = Uri::class.java,
+    )
 
-    var restoredTxs: BackupUtxos? by SharedPrefGsonDelegate(sharedPrefs, this,  formatKey(Keys.lastRestoredTxs), BackupUtxos::class.java, null)
+    var restoredTxs: BackupUtxos? by SharedPrefGsonDelegate(
+        prefs = sharedPrefs,
+        commonRepository = this,
+        name = formatKey(Keys.lastRestoredTxs),
+        type = BackupUtxos::class.java,
+        defValue = null,
+    )
 
-    init {
-        localFileOption = localFileOption ?: BackupOptionDto(BackupOptions.Local)
-        googleDriveOption = googleDriveOption ?: BackupOptionDto(BackupOptions.Google)
-    }
-
-    val getOptionList: List<BackupOptionDto>
+    val optionList: List<BackupOptionDto>
         get() = if (BuildConfig.FLAVOR == Constants.Build.privacyFlavor) {
             listOfNotNull(localFileOption).toList()
         } else {
             listOfNotNull(googleDriveOption, dropboxOption).toList()
         }
 
+    fun findOption(optionType: BackupOptionType): BackupOptionDto = optionList.find { it.type == optionType }
+        ?: error("Impossible backup option $optionType")
+
     fun clear() {
         backupPassword = null
         localBackupFolderURI = null
-        localFileOption = BackupOptionDto(BackupOptions.Local)
-        googleDriveOption = BackupOptionDto(BackupOptions.Google)
-        dropboxOption = BackupOptionDto(BackupOptions.Dropbox)
+        localFileOption = BackupOptionDto(BackupOptionType.Local)
+        googleDriveOption = BackupOptionDto(BackupOptionType.Google)
+        dropboxOption = BackupOptionDto(BackupOptionType.Dropbox)
     }
 
     fun updateOption(option: BackupOptionDto) {
         when (option.type) {
-            BackupOptions.Google -> googleDriveOption = option
-            BackupOptions.Local -> localFileOption = option
-            BackupOptions.Dropbox -> dropboxOption = option
+            BackupOptionType.Google -> googleDriveOption = option
+            BackupOptionType.Local -> localFileOption = option
+            BackupOptionType.Dropbox -> dropboxOption = option
         }
     }
 
-    fun getOptionDto(type: BackupOptions): BackupOptionDto? = when (type) {
-        BackupOptions.Google -> googleDriveOption
-        BackupOptions.Local -> localFileOption
-        BackupOptions.Dropbox -> dropboxOption
-    }
+    fun getOptionDto(type: BackupOptionType): BackupOptionDto = when (type) {
+        BackupOptionType.Google -> googleDriveOption
+        BackupOptionType.Local -> localFileOption
+        BackupOptionType.Dropbox -> dropboxOption
+    } ?: error("The $type option")
 
     object Keys {
         const val googleDriveOptionKey = "tari_wallet_google_drive_backup_options"
@@ -78,11 +114,6 @@ class BackupSettingsRepository @Inject constructor(
         const val dropboxCredentialKey = "tari_wallet_dropbox_credential_key"
         const val backupPassword = "tari_wallet_last_next_alarm_time"
         const val localBackupFolderURI = "tari_wallet_local_backup_folder_uri"
-        const val lastBackupDialogShownTime = "last_shown_time_key"
         const val lastRestoredTxs = "tari_wallet_restored_txs"
-    }
-
-    companion object {
-        const val delayTimeInMinutes = 5
     }
 }

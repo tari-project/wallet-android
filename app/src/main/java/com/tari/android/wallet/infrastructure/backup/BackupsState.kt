@@ -1,8 +1,8 @@
 package com.tari.android.wallet.infrastructure.backup
 
-import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupOptions
+import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupOptionType
 
-data class BackupsState(val backupsStates: Map<BackupOptions, BackupState>) {
+data class BackupsState(val backupsStates: Map<BackupOptionType, BackupState>) {
 
     val backupsState: BackupState
         get() {

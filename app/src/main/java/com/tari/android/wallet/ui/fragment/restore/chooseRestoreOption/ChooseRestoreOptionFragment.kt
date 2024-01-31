@@ -39,13 +39,16 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.children
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
 import com.tari.android.wallet.databinding.FragmentChooseRestoreOptionBinding
-import com.tari.android.wallet.extension.observe
+import com.tari.android.wallet.extension.launchAndRepeatOnLifecycle
 import com.tari.android.wallet.ui.common.CommonFragment
-import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
+import com.tari.android.wallet.ui.fragment.restore.chooseRestoreOption.ChooseRestoreOptionModel.Effect
 import com.tari.android.wallet.ui.fragment.restore.chooseRestoreOption.option.RecoveryOptionView
 import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupOptionDto
-import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupOptions
+import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupOptionType
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.launch
 
 class ChooseRestoreOptionFragment : CommonFragment<FragmentChooseRestoreOptionBinding, ChooseRestoreOptionViewModel>() {
 
@@ -75,45 +78,50 @@ class ChooseRestoreOptionFragment : CommonFragment<FragmentChooseRestoreOptionBi
     }
 
     private fun setupUI() = with(ui) {
-        restoreWithRecoveryPhraseCtaView.setOnClickListener { viewModel.navigation.postValue(Navigation.ChooseRestoreOptionNavigation.ToRestoreWithRecoveryPhrase) }
+        restoreWithRecoveryPhraseCtaView.setOnClickListener { viewModel.navigateToRecoveryPhrase() }
     }
 
-    private fun startRecovery(options: BackupOptions) {
-        viewModel.startRestore(options)
-        viewModel.backupManager.setupStorage(options, this)
-    }
+    private fun observeUI() {
+        viewLifecycleOwner.launchAndRepeatOnLifecycle(Lifecycle.State.STARTED) {
+            launch {
+                viewModel.effect.collect { effect ->
+                    when (effect) {
+                        is Effect.BeginProgress -> updateProgress(effect.optionType, isStarted = true)
+                        is Effect.EndProgress -> updateProgress(effect.optionType, isStarted = false)
+                        is Effect.SetupStorage -> effect.backupManager.setupStorage(
+                            optionType = effect.optionType,
+                            hostFragment = this@ChooseRestoreOptionFragment,
+                        )
+                    }
+                }
+            }
 
-    private fun observeUI() = with(viewModel) {
-        observe(state) { processState(it) }
-
-        observe(options) { initOptions(it) }
+            launch {
+                viewModel.uiState.filterNotNull().collect { state ->
+                    initOptions(state.options)
+                }
+            }
+        }
     }
 
     private fun initOptions(options: List<BackupOptionDto>) {
+        ui.optionsContainer.removeAllViews()
         for (option in options) {
             val view = RecoveryOptionView(requireContext()).apply {
                 viewLifecycle = viewLifecycleOwner
-                ui.restoreWalletCtaView.setOnClickListener { startRecovery(option.type) }
+                ui.restoreWalletCtaView.setOnClickListener { this@ChooseRestoreOptionFragment.viewModel.selectBackupOption(option.type) }
                 init(option.type)
             }
             ui.optionsContainer.addView(view)
         }
     }
 
-    private fun processState(state: ChooseRestoreOptionState) {
-        when (state) {
-            is ChooseRestoreOptionState.BeginProgress -> updateProgress(state.backupOptions, true)
-            is ChooseRestoreOptionState.EndProgress -> updateProgress(state.backupOptions, false)
-        }
-    }
-
-
-    private fun updateProgress(backupOptions: BackupOptions, isStarted: Boolean) {
+    private fun updateProgress(optionType: BackupOptionType, isStarted: Boolean) {
         blockingBackPressDispatcher.isEnabled = isStarted
-        getBackupOptionView(backupOptions)?.updateLoading(isStarted)
+        getBackupOptionView(optionType)?.updateLoading(isStarted)
     }
 
-    private fun getBackupOptionView(backupOptions: BackupOptions): RecoveryOptionView? =
-        ui.optionsContainer.children.mapNotNull { it as? RecoveryOptionView }.firstOrNull { it.viewModel.option == backupOptions }
+    private fun getBackupOptionView(optionType: BackupOptionType): RecoveryOptionView? =
+        ui.optionsContainer.children.mapNotNull { it as? RecoveryOptionView }.firstOrNull { it.viewModel.option == optionType }
 }
 

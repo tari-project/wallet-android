@@ -38,6 +38,7 @@ import androidx.annotation.ColorRes
 import androidx.annotation.DimenRes
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
+import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 
 fun Fragment.string(@StringRes id: Int): String = requireContext().string(id)
@@ -54,3 +55,8 @@ fun Fragment.dimenPx(@DimenRes id: Int): Int = requireContext().dimenPx(id)
 fun Fragment.dimen(@DimenRes id: Int): Float = requireContext().dimen(id)
 
 fun Fragment.drawable(@DrawableRes id: Int): Drawable? = requireContext().drawable(id)
+
+inline fun <reified T : Fragment> T.withArgs(vararg pairs: Pair<String, Any?>): T {
+    arguments = bundleOf(*pairs)
+    return this
+}

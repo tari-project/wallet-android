@@ -8,6 +8,7 @@ import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.ContactDto
 import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.YatDto
 import com.tari.android.wallet.ui.fragment.pinCode.PinCodeScreenBehavior
 import com.tari.android.wallet.ui.fragment.send.common.TransactionData
+import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupOptionType
 
 sealed class Navigation {
 
@@ -111,7 +112,7 @@ sealed class Navigation {
     }
 
     sealed class ChooseRestoreOptionNavigation : Navigation() {
-        object ToEnterRestorePassword : ChooseRestoreOptionNavigation()
+        data class ToEnterRestorePassword(val optionType: BackupOptionType) : ChooseRestoreOptionNavigation()
 
         object ToRestoreWithRecoveryPhrase : ChooseRestoreOptionNavigation()
 

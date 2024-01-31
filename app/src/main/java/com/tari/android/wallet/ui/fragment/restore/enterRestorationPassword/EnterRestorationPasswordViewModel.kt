@@ -14,6 +14,7 @@ import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.common.SingleLiveEvent
 import com.tari.android.wallet.ui.dialog.error.ErrorDialogArgs
 import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
+import com.tari.android.wallet.ui.fragment.restore.enterRestorationPassword.EnterRestorationPasswordModel.Parameters
 import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupSettingsRepository
 import com.tari.android.wallet.util.WalletUtil
 import kotlinx.coroutines.Dispatchers
@@ -36,12 +37,17 @@ class EnterRestorationPasswordViewModel : CommonViewModel() {
     @Inject
     lateinit var walletServiceLauncher: WalletServiceLauncher
 
+    private lateinit var parameters: Parameters
+
+    private val _state = SingleLiveEvent<EnterRestorationPasswordState>()
+    val state: LiveData<EnterRestorationPasswordState> = _state
+
     init {
         component.inject(this)
 
         EventBus.walletState.publishSubject.filter { it is WalletState.Running }.subscribe {
             if (WalletUtil.walletExists(walletConfig)) {
-                val dto = backupSettingsRepository.getOptionDto(backupManager.currentOption!!)!!.copy(isEnable = true)
+                val dto = backupSettingsRepository.getOptionDto(parameters.selectedOptionType)!!.copy(isEnabled = true)
                 backupSettingsRepository.updateOption(dto)
                 backupManager.backupNow()
 
@@ -58,13 +64,14 @@ class EnterRestorationPasswordViewModel : CommonViewModel() {
             }.addTo(compositeDisposable)
     }
 
-    private val _state = SingleLiveEvent<EnterRestorationPasswordState>()
-    val state: LiveData<EnterRestorationPasswordState> = _state
+    fun assignParameters(parameters: Parameters) {
+        this.parameters = parameters
+    }
 
     fun onBack() {
         backPressed.postValue(Unit)
         viewModelScope.launch(Dispatchers.IO) {
-            backupManager.signOut()
+            backupManager.signOut(parameters.selectedOptionType)
         }
     }
 
@@ -76,7 +83,7 @@ class EnterRestorationPasswordViewModel : CommonViewModel() {
     private fun performRestoration(password: String) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                backupManager.restoreLatestBackup(password)
+                backupManager.restoreLatestBackup(parameters.selectedOptionType, password)
                 backupSettingsRepository.backupPassword = password
                 viewModelScope.launch(Dispatchers.Main) {
                     walletServiceLauncher.start()

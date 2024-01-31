@@ -68,6 +68,7 @@ import com.tari.android.wallet.ui.fragment.settings.backgroundService.Background
 import com.tari.android.wallet.ui.fragment.settings.backup.backupOnboarding.BackupOnboardingFlowFragment
 import com.tari.android.wallet.ui.fragment.settings.backup.backupSettings.BackupSettingsFragment
 import com.tari.android.wallet.ui.fragment.settings.backup.changeSecurePassword.ChangeSecurePasswordFragment
+import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupOptionType
 import com.tari.android.wallet.ui.fragment.settings.backup.enterCurrentPassword.EnterCurrentPasswordFragment
 import com.tari.android.wallet.ui.fragment.settings.backup.verifySeedPhrase.VerifySeedPhraseFragment
 import com.tari.android.wallet.ui.fragment.settings.backup.writeDownSeedWords.WriteDownSeedPhraseFragment
@@ -110,7 +111,7 @@ class TariNavigator @Inject constructor(val prefs: SharedPrefsRepository, val ta
             is ContactBookNavigation.ToContactTransactionHistory -> toContactTransactionHistory(navigation.contact)
             is ContactBookNavigation.ToAddPhoneContact -> toAddPhoneContact()
             is ContactBookNavigation.ToSelectTariUser -> addFragment(SelectUserContactFragment.newInstance())
-            Navigation.ChooseRestoreOptionNavigation.ToEnterRestorePassword -> toEnterRestorePassword()
+            is Navigation.ChooseRestoreOptionNavigation.ToEnterRestorePassword -> toEnterRestorePassword(navigation.optionType)
             Navigation.ChooseRestoreOptionNavigation.OnRestoreCompleted -> onRestoreCompleted()
             Navigation.ChooseRestoreOptionNavigation.ToRestoreWithRecoveryPhrase -> toRestoreWithRecoveryPhrase()
             AllSettingsNavigation.ToBugReporting -> DebugActivity.launch(activity, DebugNavigation.BugReport)
@@ -165,7 +166,6 @@ class TariNavigator @Inject constructor(val prefs: SharedPrefsRepository, val ta
             }
 
             Navigation.ChatNavigation.ToAddChat -> addFragment(AddChatFragment())
-            else -> Unit
         }
     }
 
@@ -181,7 +181,7 @@ class TariNavigator @Inject constructor(val prefs: SharedPrefsRepository, val ta
         activity.startActivity(intent)
     }
 
-    fun toEnterRestorePassword() = addFragment(EnterRestorationPasswordFragment.newInstance())
+    fun toEnterRestorePassword(optionType: BackupOptionType) = addFragment(EnterRestorationPasswordFragment.newInstance(optionType))
 
     fun toRestoreWithRecoveryPhrase() = addFragment(InputSeedWordsFragment.newInstance())
 

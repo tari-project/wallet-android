@@ -1,13 +1,11 @@
 package com.tari.android.wallet.ui.fragment.restore.chooseRestoreOption
 
 import android.content.Intent
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.tari.android.wallet.R
-import com.tari.android.wallet.application.WalletManager
 import com.tari.android.wallet.application.WalletState
 import com.tari.android.wallet.data.WalletConfig
+import com.tari.android.wallet.event.EffectChannelFlow
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.extension.addTo
 import com.tari.android.wallet.ffi.FFITariWalletAddress
@@ -22,15 +20,19 @@ import com.tari.android.wallet.model.WalletError
 import com.tari.android.wallet.model.throwIf
 import com.tari.android.wallet.service.service.WalletServiceLauncher
 import com.tari.android.wallet.ui.common.CommonViewModel
-import com.tari.android.wallet.ui.common.SingleLiveEvent
 import com.tari.android.wallet.ui.dialog.error.ErrorDialogArgs
 import com.tari.android.wallet.ui.dialog.error.WalletErrorArgs
 import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
-import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupOptionDto
-import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupOptions
+import com.tari.android.wallet.ui.fragment.restore.chooseRestoreOption.ChooseRestoreOptionModel.Effect
+import com.tari.android.wallet.ui.fragment.restore.chooseRestoreOption.ChooseRestoreOptionModel.UiState
+import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupOptionType
 import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupSettingsRepository
 import com.tari.android.wallet.util.WalletUtil
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.io.IOException
 import java.util.concurrent.TimeUnit
@@ -45,105 +47,119 @@ class ChooseRestoreOptionViewModel : CommonViewModel() {
     lateinit var backupSettingsRepository: BackupSettingsRepository
 
     @Inject
-    lateinit var walletManager: WalletManager
-
-    @Inject
     lateinit var walletServiceLauncher: WalletServiceLauncher
 
     @Inject
     lateinit var walletConfig: WalletConfig
 
-    private val _state = SingleLiveEvent<ChooseRestoreOptionState>()
-    val state: LiveData<ChooseRestoreOptionState> = _state
+    private val _effect = EffectChannelFlow<Effect>()
+    val effect: Flow<Effect> = _effect.flow
 
-    val options = MutableLiveData<List<BackupOptionDto>>()
+    private val _uiState = MutableStateFlow(UiState())
+    val uiState = _uiState.asStateFlow()
 
     init {
         component.inject(this)
 
-        options.postValue(backupSettingsRepository.getOptionList)
+        _uiState.update { it.copy(options = backupSettingsRepository.optionList) }
 
         EventBus.walletState.publishSubject.filter { it is WalletState.Running }.subscribe {
-            if (WalletUtil.walletExists(walletConfig) && state.value != null) {
-                backupSettingsRepository.restoredTxs?.let {
-                    if (it.utxos.orEmpty().isEmpty()) return@let
+            _uiState.value.selectedOption
+                ?.takeIf { WalletUtil.walletExists(walletConfig) }
+                ?.let { selectedOption ->
+                    backupSettingsRepository.restoredTxs
+                        ?.takeIf { it.utxos.orEmpty().isEmpty() }
+                        ?.let { restoredTxs ->
+                            val sourceAddress = FFITariWalletAddress(HexString(restoredTxs.source))
+                            val tariWalletAddress = TariWalletAddress(restoredTxs.source, sourceAddress.getEmojiId())
+                            val message = resourceManager.getString(R.string.backup_restored_tx)
+                            val error = WalletError()
+                            walletService.restoreWithUnbindedOutputs(restoredTxs.utxos, tariWalletAddress, message, error)
+                            throwIf(error)
+                        }
 
-                    val sourceAddress = FFITariWalletAddress(HexString(it.source))
-                    val tariWalletAddress = TariWalletAddress(it.source, sourceAddress.getEmojiId())
-                    val message = resourceManager.getString(R.string.backup_restored_tx)
-                    val error = WalletError()
-                    walletService.restoreWithUnbindedOutputs(it.utxos, tariWalletAddress, message, error)
-                    throwIf(error)
+                    val dto = backupSettingsRepository.getOptionDto(selectedOption).copy(isEnabled = true)
+                    backupSettingsRepository.updateOption(dto)
+                    backupManager.backupNow()
+
+                    navigation.postValue(Navigation.ChooseRestoreOptionNavigation.OnRestoreCompleted)
                 }
-
-                val dto = backupSettingsRepository.getOptionDto(state.value!!.backupOptions)!!.copy(isEnable = true)
-                backupSettingsRepository.updateOption(dto)
-                backupManager.backupNow()
-
-                navigation.postValue(Navigation.ChooseRestoreOptionNavigation.OnRestoreCompleted)
-            }
         }.addTo(compositeDisposable)
 
         EventBus.walletState.publishSubject.filter { it is WalletState.Failed }
             .map { it as WalletState.Failed }
-            .debounce(300L, TimeUnit.MILLISECONDS).subscribe {
-                viewModelScope.launch(Dispatchers.IO) {
-                    handleException(WalletStartFailedException(it.exception))
+            .debounce(300L, TimeUnit.MILLISECONDS)
+            .map { it.exception }
+            .subscribe { exception ->
+                _uiState.value.selectedOption?.let { selectedOption ->
+                    viewModelScope.launch(Dispatchers.IO) {
+                        handleException(selectedOption, WalletStartFailedException(exception))
+                    }
                 }
             }.addTo(compositeDisposable)
     }
 
-    fun startRestore(options: BackupOptions) {
-        _state.postValue(ChooseRestoreOptionState.BeginProgress(options))
-    }
-
-    fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        viewModelScope.launch(Dispatchers.IO) {
-            try {
-                if (backupManager.onSetupActivityResult(requestCode, resultCode, data)) {
-                    restoreFromBackup()
-                }
-            } catch (exception: Exception) {
-                logger.i(exception.message + "Backup storage setup failed")
-                backupManager.signOut()
-                _state.postValue(ChooseRestoreOptionState.EndProgress(backupManager.currentOption!!))
-                showAuthFailedDialog()
-            }
+    fun selectBackupOption(optionType: BackupOptionType) {
+        viewModelScope.launch {
+            _uiState.update { it.copy(selectedOption = optionType) }
+            _effect.send(Effect.SetupStorage(backupManager, optionType))
+            _effect.send(Effect.BeginProgress(optionType))
         }
     }
 
-    private suspend fun restoreFromBackup() {
+    fun navigateToRecoveryPhrase() {
+        navigation.postValue(Navigation.ChooseRestoreOptionNavigation.ToRestoreWithRecoveryPhrase)
+    }
+
+    fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        _uiState.value.selectedOption?.let { selectedOption ->
+            viewModelScope.launch(Dispatchers.IO) {
+                try {
+                    if (backupManager.onSetupActivityResult(selectedOption, requestCode, resultCode, data)) {
+                        restoreFromBackup(selectedOption)
+                    }
+                } catch (exception: Exception) {
+                    logger.e("Backup storage setup for $selectedOption failed: ${exception.message}")
+                    backupManager.signOut(selectedOption)
+                    _effect.send(Effect.EndProgress(selectedOption))
+                    showAuthFailedDialog()
+                }
+            }
+        } ?: logger.e("SelectedOption is null")
+    }
+
+    private suspend fun restoreFromBackup(currentOption: BackupOptionType) {
         try {
             // try to restore with no password
-            backupManager.restoreLatestBackup()
+            backupManager.restoreLatestBackup(currentOption)
             viewModelScope.launch(Dispatchers.Main) {
                 walletServiceLauncher.start()
             }
         } catch (exception: Throwable) {
-            handleException(exception)
+            handleException(currentOption, exception)
         }
     }
 
-    private suspend fun handleException(exception: Throwable) {
+    private suspend fun handleException(currentOption: BackupOptionType, exception: Throwable) {
         when (exception) {
             is BackupStorageAuthRevokedException -> {
-                logger.i("Auth revoked")
-                backupManager.signOut()
+                logger.e("Auth revoked for $currentOption")
+                backupManager.signOut(currentOption)
                 showAuthFailedDialog()
             }
 
             is BackupStorageTamperedException -> { // backup file not found
-                logger.i("Backup file not found")
-                backupManager.signOut()
+                logger.e("Backup file not found for $currentOption")
+                backupManager.signOut(currentOption)
                 showBackupFileNotFoundDialog()
             }
 
             is BackupFileIsEncryptedException -> {
-                navigation.postValue(Navigation.ChooseRestoreOptionNavigation.ToEnterRestorePassword)
+                navigation.postValue(Navigation.ChooseRestoreOptionNavigation.ToEnterRestorePassword(currentOption))
             }
 
             is WalletStartFailedException -> {
-                logger.i("Restore failed: wallet start failed")
+                logger.e("Restore failed for $currentOption: wallet start failed")
                 viewModelScope.launch(Dispatchers.Main) {
                     walletServiceLauncher.stopAndDelete()
                 }
@@ -158,19 +174,19 @@ class ChooseRestoreOptionViewModel : CommonViewModel() {
             }
 
             is IOException -> {
-                logger.i("Restore failed: network connection")
-                backupManager.signOut()
+                logger.e("Restore failed for $currentOption: network connection")
+                backupManager.signOut(currentOption)
                 showRestoreFailedDialog(resourceManager.getString(R.string.error_no_connection_title))
             }
 
             else -> {
-                logger.i("Restore failed")
-                backupManager.signOut()
+                logger.e("Restore failed for $currentOption")
+                backupManager.signOut(currentOption)
                 showRestoreFailedDialog(exception.message ?: exception.toString())
             }
         }
 
-        _state.postValue(ChooseRestoreOptionState.EndProgress(backupManager.currentOption!!))
+        _effect.send(Effect.EndProgress(currentOption))
     }
 
     private fun showBackupFileNotFoundDialog() {

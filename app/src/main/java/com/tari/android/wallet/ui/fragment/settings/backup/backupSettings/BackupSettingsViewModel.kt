@@ -15,6 +15,7 @@ import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.dialog.error.ErrorDialogArgs
 import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
 import com.tari.android.wallet.ui.fragment.settings.backup.backupSettings.option.BackupOptionViewModel
+import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupOptionType
 import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupSettingsRepository
 import com.tari.android.wallet.ui.fragment.settings.userAutorization.BiometricAuthenticationViewModel
 import kotlinx.coroutines.Dispatchers
@@ -32,7 +33,7 @@ class BackupSettingsViewModel : CommonViewModel() {
 
     lateinit var biometricAuthenticationViewModel: BiometricAuthenticationViewModel
 
-    val options = MutableLiveData<List<BackupOptionViewModel>>()
+    val optionViewModels = MutableLiveData<List<BackupOptionViewModel>>()
 
     private val _isBackupNowAvailable = MutableLiveData<Boolean>()
     val isBackupNowAvailable: LiveData<Boolean> = _isBackupNowAvailable
@@ -42,6 +43,8 @@ class BackupSettingsViewModel : CommonViewModel() {
     private val _updatePasswordEnabled = MutableLiveData<Boolean>()
     val setPasswordVisible: LiveData<Boolean> = _updatePasswordEnabled
 
+    private var currentOption: BackupOptionType? = null // todo could be irrelevant if multiple backups started simultaneously
+
     init {
         component.inject(this)
 
@@ -49,7 +52,16 @@ class BackupSettingsViewModel : CommonViewModel() {
 
         backupStateChanged.postValue(Unit)
 
-        options.postValue(backupSettingsRepository.getOptionList.map { option -> BackupOptionViewModel().apply { setup(option.type) } })
+        optionViewModels.postValue(
+            backupSettingsRepository.optionList.map { option ->
+                BackupOptionViewModel(
+                    optionType = option.type,
+                    backupSettingsViewModel = this@BackupSettingsViewModel,
+                    backupManager = backupManager,
+                    backupSettingsRepository = backupSettingsRepository,
+                ).apply { setup() }
+            }
+        )
 
         loadOptionData()
     }
@@ -57,7 +69,7 @@ class BackupSettingsViewModel : CommonViewModel() {
     fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         viewModelScope.launch(Dispatchers.IO) {
             kotlin.runCatching {
-                options.value.orEmpty().firstOrNull { it.option.value!!.type == backupManager.currentOption }
+                optionViewModels.value.orEmpty().firstOrNull { it.optionType == currentOption }
                     ?.onActivityResult(requestCode, resultCode, data)
             }
         }
@@ -85,9 +97,13 @@ class BackupSettingsViewModel : CommonViewModel() {
 
     fun onBackupToCloud() = backupManager.backupNow()
 
+    fun onOptionSelected(currentOption: BackupOptionType) {
+        this.currentOption = currentOption
+    }
+
     private fun onBackupStateChanged(backupState: BackupsState) {
         backupState.backupsStates.forEach { state ->
-            options.value.orEmpty().firstOrNull { it.option.value!!.type == state.key }?.onBackupStateChanged(state.value)
+            optionViewModels.value.orEmpty().firstOrNull { it.optionType == state.key }?.onBackupStateChanged(state.value)
         }
 
         loadOptionData()
@@ -97,9 +113,9 @@ class BackupSettingsViewModel : CommonViewModel() {
 
     private fun loadOptionData() {
         val backupState = EventBus.backupState.publishSubject.value
-        val optionsDto = backupSettingsRepository.getOptionList
-        _updatePasswordEnabled.postValue(optionsDto.any { it.isEnable })
-        _isBackupNowAvailable.postValue(optionsDto.any { it.isEnable } &&
+        val optionsDto = backupSettingsRepository.optionList
+        _updatePasswordEnabled.postValue(optionsDto.any { it.isEnabled })
+        _isBackupNowAvailable.postValue(optionsDto.any { it.isEnabled } &&
                 backupState != null &&
                 backupState.backupsStates.all { it.value !is BackupState.BackupInProgress })
     }
@@ -113,9 +129,11 @@ class BackupSettingsViewModel : CommonViewModel() {
             exception is BackupStorageFullException -> resourceManager.getString(
                 R.string.backup_wallet_storage_full_desc
             )
+
             exception is BackupStorageAuthRevokedException -> resourceManager.getString(
                 R.string.check_backup_storage_status_auth_revoked_error_description
             )
+
             exception is UnknownHostException -> resourceManager.getString(R.string.error_no_connection_title)
             exception?.message == null -> resourceManager.getString(R.string.back_up_wallet_backing_up_unknown_error)
             else -> resourceManager.getString(R.string.back_up_wallet_backing_up_error_desc, exception.message!!)

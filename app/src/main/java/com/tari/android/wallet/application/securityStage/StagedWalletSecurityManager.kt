@@ -44,7 +44,7 @@ class StagedWalletSecurityManager : CommonViewModel() {
         get() = tariSettingsSharedRepository.hasVerifiedSeedWords
 
     val isBackupOn
-        get() = backupPrefsRepository.getOptionList.any { it.isEnable }
+        get() = backupPrefsRepository.optionList.any { it.isEnabled }
 
     val isBackupPasswordSet
         get() = !backupPrefsRepository.backupPassword.isNullOrEmpty()
@@ -117,7 +117,7 @@ class StagedWalletSecurityManager : CommonViewModel() {
 
     private fun openStage1() {
         dismissDialog.postValue(Unit)
-        tariNavigator?.let {
+        tariNavigator.let {
             it.toAllSettings()
             it.toBackupSettings(false)
             it.toWalletBackupWithRecoveryPhrase()
@@ -136,7 +136,7 @@ class StagedWalletSecurityManager : CommonViewModel() {
 
     private fun openStage1B() {
         dismissDialog.postValue(Unit)
-        tariNavigator?.let {
+        tariNavigator.let {
             it.toAllSettings()
             it.toBackupSettings(true)
         }
@@ -154,7 +154,7 @@ class StagedWalletSecurityManager : CommonViewModel() {
 
     private fun openStage2() {
         dismissDialog.postValue(Unit)
-        tariNavigator?.let {
+        tariNavigator.let {
             it.toAllSettings()
             it.toBackupSettings(false)
             it.toChangePassword()

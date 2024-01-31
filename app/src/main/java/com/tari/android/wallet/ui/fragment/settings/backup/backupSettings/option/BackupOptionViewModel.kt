@@ -1,10 +1,9 @@
 package com.tari.android.wallet.ui.fragment.settings.backup.backupSettings.option
 
 import android.content.Intent
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.tari.android.wallet.R
+import com.tari.android.wallet.event.EffectChannelFlow
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.extension.addTo
 import com.tari.android.wallet.infrastructure.backup.BackupException
@@ -12,7 +11,6 @@ import com.tari.android.wallet.infrastructure.backup.BackupManager
 import com.tari.android.wallet.infrastructure.backup.BackupState
 import com.tari.android.wallet.infrastructure.backup.BackupStorageFullException
 import com.tari.android.wallet.ui.common.CommonViewModel
-import com.tari.android.wallet.ui.common.SingleLiveEvent
 import com.tari.android.wallet.ui.dialog.error.ErrorDialogArgs
 import com.tari.android.wallet.ui.dialog.modular.DialogArgs
 import com.tari.android.wallet.ui.dialog.modular.ModularDialogArgs
@@ -20,90 +18,82 @@ import com.tari.android.wallet.ui.dialog.modular.modules.body.BodyModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonStyle
 import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
-import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupOptionDto
-import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupOptions
+import com.tari.android.wallet.ui.fragment.settings.backup.backupSettings.BackupSettingsViewModel
+import com.tari.android.wallet.ui.fragment.settings.backup.backupSettings.option.BackupOptionModel.Effect
+import com.tari.android.wallet.ui.fragment.settings.backup.backupSettings.option.BackupOptionModel.UiState
+import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupOptionType
 import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupSettingsRepository
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.joda.time.DateTime
 import org.joda.time.format.DateTimeFormat
 import java.util.Locale
-import javax.inject.Inject
 
-class BackupOptionViewModel : CommonViewModel() {
+class BackupOptionViewModel(
+    val optionType: BackupOptionType,
+    private val backupSettingsViewModel: BackupSettingsViewModel,
+    private val backupSettingsRepository: BackupSettingsRepository,
+    private val backupManager: BackupManager,
+) : CommonViewModel() {
 
-    @Inject
-    lateinit var backupSettingsRepository: BackupSettingsRepository
+    private val _uiState = MutableStateFlow(UiState(option = backupSettingsRepository.findOption(optionType)))
+    val uiState = _uiState.asStateFlow()
 
-    @Inject
-    lateinit var backupManager: BackupManager
+    private val _effect = EffectChannelFlow<Effect>()
+    val effect: Flow<Effect> = _effect.flow
 
-    private val _option = MutableLiveData<BackupOptionDto>()
-    val option: LiveData<BackupOptionDto> = _option
-
-    private val _switchChecked = MutableLiveData<Boolean>()
-    val switchChecked: LiveData<Boolean> = _switchChecked
-
-    private val _inProgress = MutableLiveData<Boolean>(false)
-    val inProgress: LiveData<Boolean> = _inProgress
-
-    private val _openFolderSelection = SingleLiveEvent<Unit>()
-    val openFolderSelection: LiveData<Unit> = _openFolderSelection
-
-    val lastSuccessDate = MutableLiveData<String>()
-
-    init {
-        component.inject(this)
-    }
 
     val title: Int
-        get() = when (option.value!!.type) {
-            BackupOptions.Google -> R.string.back_up_wallet_google_title
-            BackupOptions.Local -> R.string.back_up_wallet_local_file_title
-            BackupOptions.Dropbox -> R.string.back_up_wallet_dropbox_backup_title
+        get() = when (optionType) {
+            BackupOptionType.Google -> R.string.back_up_wallet_google_title
+            BackupOptionType.Local -> R.string.back_up_wallet_local_file_title
+            BackupOptionType.Dropbox -> R.string.back_up_wallet_dropbox_backup_title
         }
 
-    fun setup(option: BackupOptions) {
-        _option.value = backupSettingsRepository.getOptionList.first { it.type == option }
-        _switchChecked.value = _option.value!!.isEnable
-        onBackupStateChanged(EventBus.backupState.publishSubject.value?.backupsStates?.get(option))
+    fun setup() {
+        onBackupStateChanged(EventBus.backupState.publishSubject.value?.backupsStates?.get(optionType)) // todo why update?
     }
 
     fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         viewModelScope.launch(Dispatchers.IO) {
-            val currentOption = _option.value!!.type
             try {
-                if (backupManager.onSetupActivityResult(requestCode, resultCode, data)) {
-                    backupSettingsRepository.getOptionDto(currentOption)?.copy(isEnable = true)?.let { backupSettingsRepository.updateOption(it) }
+                if (backupManager.onSetupActivityResult(optionType, requestCode, resultCode, data)) { // todo move to backupManager
+                    backupSettingsRepository.getOptionDto(optionType).copy(isEnabled = true)?.let { backupSettingsRepository.updateOption(it) }
                     EventBus.backupState.publishSubject
                         .filter {
-                            it.backupsStates[currentOption] is BackupState.BackupUpToDate || it.backupsStates[currentOption] is BackupState.BackupFailed
-                        }.take(1)
+                            it.backupsStates[optionType] is BackupState.BackupUpToDate || it.backupsStates[optionType] is BackupState.BackupFailed
+                        }
+                        .take(1)
                         .subscribe {
-                            (it.backupsStates[currentOption] as? BackupState.BackupFailed)?.let { turnOff(currentOption, it.backupException) }
+                            (it.backupsStates[optionType] as? BackupState.BackupFailed)?.let { turnOff(optionType, it.backupException) }
                         }.addTo(compositeDisposable)
                     backupManager.backupNow()
                 }
             } catch (e: Throwable) {
-                turnOff(currentOption, e)
+                turnOff(optionType, e)
             }
         }
     }
 
-    private fun turnOff(backupOption: BackupOptions, throwable: Throwable?) {
-        logger.i("Backup storage setup failed: $throwable")
+    private fun turnOff(backupOption: BackupOptionType, throwable: Throwable?) {
+        logger.e("Backup storage setup failed: $throwable")
         backupManager.turnOff(backupOption)
-        _inProgress.postValue(false)
-        _switchChecked.postValue(false)
+        _uiState.update { it.stopLoading().switchOff() }
         showBackupStorageSetupFailedDialog(throwable)
     }
 
     fun onBackupSwitchChecked(isChecked: Boolean) {
-        _inProgress.postValue(true)
-        _switchChecked.postValue(isChecked)
+        _uiState.update { it.startLoading().switch(isChecked) }
+        backupSettingsViewModel.onOptionSelected(optionType)
 
         if (isChecked) {
-            _openFolderSelection.postValue(Unit)
+            viewModelScope.launch {
+                _effect.send(Effect.SetupStorage(backupManager, optionType))
+            }
         } else {
             tryToTurnOffBackup()
         }
@@ -113,7 +103,7 @@ class BackupOptionViewModel : CommonViewModel() {
         val onAcceptAction = {
             viewModelScope.launch(Dispatchers.IO) {
                 try {
-                    backupManager.turnOff(_option.value!!.type)
+                    backupManager.turnOff(optionType)
                     dismissDialog.postValue(Unit)
                 } catch (exception: Exception) {
                     logger.i(exception.toString())
@@ -122,8 +112,7 @@ class BackupOptionViewModel : CommonViewModel() {
         }
 
         val onDismissAction = {
-            _inProgress.postValue(false)
-            _switchChecked.postValue(true)
+            _uiState.update { it.stopLoading().switchOn() }
         }
 
         val args = ModularDialogArgs(
@@ -153,47 +142,39 @@ class BackupOptionViewModel : CommonViewModel() {
             else -> resourceManager.getString(R.string.back_up_wallet_storage_setup_error_desc)
         }
         modularDialog.postValue(ErrorDialogArgs(errorTitle, errorDescription) {
-            _switchChecked.postValue(false)
-            _inProgress.postValue(false)
+            _uiState.update { it.stopLoading().switchOff() }
         }.getModular(resourceManager))
     }
 
     fun onBackupStateChanged(backupState: BackupState?) {
         updateLastSuccessfulBackupDate(null)
         when (backupState) {
-            BackupState.BackupDisabled -> handleDisabledState()
-            BackupState.BackupInProgress -> handleInProgressState()
-            BackupState.BackupUpToDate -> handleUpToDateState()
+            is BackupState.BackupDisabled -> handleDisabledState()
+            is BackupState.BackupInProgress -> handleInProgressState()
+            is BackupState.BackupUpToDate -> handleUpToDateState()
             is BackupState.BackupFailed -> handleFailedState()
             else -> Unit
         }
     }
 
     private fun handleFailedState() {
-        if (_inProgress.value!!) {
-            _switchChecked.postValue(false)
-        } else {
-            _switchChecked.postValue(true)
-        }
-        _inProgress.postValue(false)
+        val shouldCheck = uiState.value.loading // todo why it depends on the loading state?
+        _uiState.update { it.stopLoading().switch(shouldCheck) }
         showBackupStorageSetupFailedDialog()
     }
 
     private fun handleUpToDateState() {
-        val currentState = backupSettingsRepository.getOptionDto(_option.value!!.type)
-        _inProgress.postValue(false)
-        _switchChecked.postValue(true)
-        updateLastSuccessfulBackupDate(currentState?.lastSuccessDate?.date)
+        val currentState = backupSettingsRepository.getOptionDto(optionType)
+        _uiState.update { it.stopLoading().switchOn() }
+        updateLastSuccessfulBackupDate(currentState.lastSuccessDate?.date)
     }
 
     private fun handleInProgressState() {
-        _inProgress.postValue(true)
-        _switchChecked.postValue(true)
+        _uiState.update { it.startLoading().switchOn() }
     }
 
     private fun handleDisabledState() {
-        _inProgress.postValue(false)
-        _switchChecked.postValue(false)
+        _uiState.update { it.stopLoading().switchOff() }
     }
 
     private fun updateLastSuccessfulBackupDate(lastSuccessfulBackupDate: DateTime?) {
@@ -205,7 +186,8 @@ class BackupOptionViewModel : CommonViewModel() {
                 BACKUP_TIME_FORMATTER.print(date)
             )
         } ?: ""
-        lastSuccessDate.postValue(date)
+
+        _uiState.update { it.copy(lastSuccessDate = date) }
     }
 
     companion object {

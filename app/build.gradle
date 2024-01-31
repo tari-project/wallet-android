@@ -6,6 +6,7 @@ apply plugin: "kotlin-android"
 apply plugin: "kotlin-kapt"
 apply from: "../download-libwallet.gradle"
 apply plugin: "io.sentry.android.gradle"
+apply plugin: 'kotlin-parcelize'
 
 android {
     namespace "com.tari.android.wallet"

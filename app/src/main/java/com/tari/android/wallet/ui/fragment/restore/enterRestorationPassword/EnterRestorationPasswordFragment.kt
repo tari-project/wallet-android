@@ -52,10 +52,14 @@ import com.tari.android.wallet.ui.common.CommonFragment
 import com.tari.android.wallet.ui.extension.colorFromAttribute
 import com.tari.android.wallet.ui.extension.gone
 import com.tari.android.wallet.ui.extension.hideKeyboard
+import com.tari.android.wallet.ui.extension.parcelable
 import com.tari.android.wallet.ui.extension.setOnThrottledClickListener
 import com.tari.android.wallet.ui.extension.showKeyboard
 import com.tari.android.wallet.ui.extension.string
 import com.tari.android.wallet.ui.extension.visible
+import com.tari.android.wallet.ui.extension.withArgs
+import com.tari.android.wallet.ui.fragment.restore.enterRestorationPassword.EnterRestorationPasswordModel.Parameters
+import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupOptionType
 
 class EnterRestorationPasswordFragment : CommonFragment<FragmentEnterRestorePasswordBinding, EnterRestorationPasswordViewModel>() {
 
@@ -67,6 +71,7 @@ class EnterRestorationPasswordFragment : CommonFragment<FragmentEnterRestorePass
 
         val viewModel: EnterRestorationPasswordViewModel by viewModels()
         bindViewModel(viewModel)
+        viewModel.assignParameters(savedInstanceState?.parcelable(EXTRA_PARAMETERS_KEY)!!)
 
         setupUI()
 
@@ -144,6 +149,10 @@ class EnterRestorationPasswordFragment : CommonFragment<FragmentEnterRestorePass
     }
 
     companion object {
-        fun newInstance() = EnterRestorationPasswordFragment()
+        fun newInstance(optionType: BackupOptionType) = EnterRestorationPasswordFragment().withArgs(
+            EXTRA_PARAMETERS_KEY to Parameters(
+                selectedOptionType = optionType,
+            )
+        )
     }
 }
