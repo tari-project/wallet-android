@@ -114,8 +114,10 @@ class BaseNodes(
             startSync()
         }
     }
-    @Suppress("UNUSED_EXPRESSION")
+
     private fun getBaseNodeResource(network: Network): Int = when (network) {
-        else -> R.raw.stagenet_base_nodes
+        Network.STAGENET -> R.raw.stagenet_base_nodes
+        Network.NEXTNET -> R.raw.nextnet_base_nodes
+        else -> error("No base nodes for network: $network")
     }
 }
