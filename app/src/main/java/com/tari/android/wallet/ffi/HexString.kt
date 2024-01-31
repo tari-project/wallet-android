@@ -32,31 +32,28 @@
  */
 package com.tari.android.wallet.ffi
 
-import java.math.BigInteger
-
 /**
  * @author The Tari Development Team
  */
-class HexString constructor(bytes: FFIByteVector) {
+class HexString {
 
-    var hex = String()
+    val hex: String
 
-    init {
-        if (bytes.pointer != nullptr) {
-            if (bytes.getLength() > 0) {
-                val byteArray = ByteArray(bytes.getLength())
-                for (i in byteArray.indices) {
-                    byteArray[i] = bytes.getAt(i).toByte()
-                }
-                hex = String.format("%064X", BigInteger(1, byteArray))
+    constructor(bytes: FFIByteVector) {
+        this.hex = if (bytes.getLength() > 0) {
+            val byteArray = ByteArray(bytes.getLength())
+            for (i in byteArray.indices) {
+                byteArray[i] = bytes.getAt(i).toByte()
             }
+            byteArray.joinToString("") { "%02X".format(it) }
+        } else {
+            String()
         }
     }
 
-    constructor(hex: String) : this(FFIByteVector(nullptr)) {
+    constructor(hex: String) {
         this.hex = hex
     }
 
     override fun toString(): String = hex
-
 }
