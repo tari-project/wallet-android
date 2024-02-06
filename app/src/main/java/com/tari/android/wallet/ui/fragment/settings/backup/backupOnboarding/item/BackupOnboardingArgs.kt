@@ -3,7 +3,7 @@ package com.tari.android.wallet.ui.fragment.settings.backup.backupOnboarding.ite
 import android.graphics.Typeface
 import android.text.SpannableString
 import com.tari.android.wallet.R
-import com.tari.android.wallet.application.securityStage.StagedWalletSecurityManager
+import com.tari.android.wallet.application.securityStage.STAGE_TWO_THRESHOLD_BALANCE
 import com.tari.android.wallet.extension.applyCenterAlignment
 import com.tari.android.wallet.extension.applyColorStyle
 import com.tari.android.wallet.extension.applyTypefaceStyle
@@ -108,7 +108,7 @@ sealed class BackupOnboardingArgs(
                 0 -> resourceManager.getString(R.string.onboarding_staged_wallet_security_footer_part3_any_funds)
                 else -> resourceManager.getString(
                     R.string.onboarding_staged_wallet_security_footer_part3_threshold,
-                    StagedWalletSecurityManager.stageTwoThresholdBalance.formattedTariValue
+                    STAGE_TWO_THRESHOLD_BALANCE.formattedTariValue,
                 )
             }
             val spannable = SpannableString("$firstPart $highlighted$part3")

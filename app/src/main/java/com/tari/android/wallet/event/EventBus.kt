@@ -69,8 +69,6 @@ object EventBus : GeneralEventBus() {
 
     val walletRestorationState = BehaviorEventBus<WalletRestorationResult>()
 
-    val balanceUpdates = BehaviorEventBus<BalanceInfo>()
-
     init {
         baseNodeSyncState.post(BaseNodeSyncState.Syncing)
     }
