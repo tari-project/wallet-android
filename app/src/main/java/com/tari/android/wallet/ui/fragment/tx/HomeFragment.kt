@@ -90,7 +90,6 @@ class HomeFragment : CommonFragment<FragmentHomeBinding, HomeFragmentViewModel>(
 
         viewModel.serviceConnection.reconnectToService()
 
-        subscribeVM(viewModel.stagedWalletSecurityManager)
         subscribeVM(deeplinkViewModel)
 
         checkPermission()

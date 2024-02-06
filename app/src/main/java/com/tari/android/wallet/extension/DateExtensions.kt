@@ -55,3 +55,7 @@ fun Date.txFormattedDate(): String {
     return SimpleDateFormat("MMMM d'$indicator' yyyy 'at' h:mm a", Locale.ENGLISH)
         .format(this)
 }
+
+fun Calendar.isAfterNow(): Boolean {
+    return this.after(Calendar.getInstance())
+}
