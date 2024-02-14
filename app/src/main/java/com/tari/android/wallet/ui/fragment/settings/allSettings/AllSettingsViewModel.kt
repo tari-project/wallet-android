@@ -77,9 +77,9 @@ import com.tari.android.wallet.ui.fragment.settings.allSettings.PresentationBack
 import com.tari.android.wallet.ui.fragment.settings.allSettings.PresentationBackupState.BackupStateStatus.Success
 import com.tari.android.wallet.ui.fragment.settings.allSettings.PresentationBackupState.BackupStateStatus.Warning
 import com.tari.android.wallet.ui.fragment.settings.allSettings.backupOptions.SettingsBackupOptionViewHolderItem
-import com.tari.android.wallet.ui.fragment.settings.allSettings.button.ButtonStyle
-import com.tari.android.wallet.ui.fragment.settings.allSettings.button.ButtonViewDto
 import com.tari.android.wallet.ui.fragment.settings.allSettings.myProfile.MyProfileViewHolderItem
+import com.tari.android.wallet.ui.fragment.settings.allSettings.row.SettingsRowStyle
+import com.tari.android.wallet.ui.fragment.settings.allSettings.row.SettingsRowViewDto
 import com.tari.android.wallet.ui.fragment.settings.allSettings.title.SettingsTitleViewHolderItem
 import com.tari.android.wallet.ui.fragment.settings.allSettings.version.SettingsVersionViewHolderItem
 import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupSettingsRepository
@@ -140,65 +140,65 @@ class AllSettingsViewModel : CommonViewModel() {
                 navigation.postValue(AllSettingsNavigation.ToMyProfile)
             },
             DividerViewHolderItem(),
-            ButtonViewDto(resourceManager.getString(all_settings_connect_yats), vector_all_settings_yat_icon) {
+            SettingsRowViewDto(resourceManager.getString(all_settings_connect_yats), vector_all_settings_yat_icon) {
                 _openYatOnboarding.postValue(Unit)
             },
             SettingsTitleViewHolderItem(resourceManager.getString(all_settings_security_label)),
             backupOption,
             DividerViewHolderItem(),
-            ButtonViewDto(resourceManager.getString(all_settings_data_collection), vector_all_settings_data_collection) {
+            SettingsRowViewDto(resourceManager.getString(all_settings_data_collection), vector_all_settings_data_collection) {
                 navigation.postValue(AllSettingsNavigation.ToDataCollection)
             },
             DividerViewHolderItem(),
             if (pinCode != null) {
-                ButtonViewDto(resourceManager.getString(all_settings_pin_code), vector_all_settings_passcode) {
+                SettingsRowViewDto(resourceManager.getString(all_settings_pin_code), vector_all_settings_passcode) {
                     runWithAuthorization {
                         navigation.postValue(Navigation.EnterPinCodeNavigation(PinCodeScreenBehavior.ChangeNew))
                     }
                 }
             } else {
-                ButtonViewDto(resourceManager.getString(all_settings_create_pin_code), vector_all_settings_passcode) {
+                SettingsRowViewDto(resourceManager.getString(all_settings_create_pin_code), vector_all_settings_passcode) {
                     runWithAuthorization {
                         navigation.postValue(Navigation.EnterPinCodeNavigation(PinCodeScreenBehavior.Create))
                     }
                 }
             },
             DividerViewHolderItem(),
-            ButtonViewDto(resourceManager.getString(all_settings_biometrics), vector_fingerprint) {
+            SettingsRowViewDto(resourceManager.getString(all_settings_biometrics), vector_fingerprint) {
                 runWithAuthorization {
-                    navigation.postValue(Navigation.ChangeBiometrics())
+                    navigation.postValue(Navigation.ChangeBiometrics)
                 }
             },
             SettingsTitleViewHolderItem(resourceManager.getString(all_settings_secondary_settings_label)),
-            ButtonViewDto(resourceManager.getString(all_settings_store), vector_all_settings_cart) {
+            SettingsRowViewDto(resourceManager.getString(all_settings_store), vector_all_settings_cart) {
                 _openLink.postValue(resourceManager.getString(ttl_store_url))
             },
             DividerViewHolderItem(),
-            ButtonViewDto(resourceManager.getString(tari_about_title), vector_all_settings_about_icon) {
+            SettingsRowViewDto(resourceManager.getString(tari_about_title), vector_all_settings_about_icon) {
                 navigation.postValue(AllSettingsNavigation.ToAbout)
             },
             DividerViewHolderItem(),
-            ButtonViewDto(resourceManager.getString(all_settings_report_a_bug), vector_all_settings_report_bug_icon) {
+            SettingsRowViewDto(resourceManager.getString(all_settings_report_a_bug), vector_all_settings_report_bug_icon) {
                 navigation.postValue(AllSettingsNavigation.ToBugReporting)
             },
             DividerViewHolderItem(),
-            ButtonViewDto(resourceManager.getString(all_settings_visit_site), vector_all_settings_visit_tari_icon) {
+            SettingsRowViewDto(resourceManager.getString(all_settings_visit_site), vector_all_settings_visit_tari_icon) {
                 _openLink.postValue(resourceManager.getString(tari_url))
             },
             DividerViewHolderItem(),
-            ButtonViewDto(resourceManager.getString(all_settings_contribute), vector_all_settings_contribute_to_tari_icon) {
+            SettingsRowViewDto(resourceManager.getString(all_settings_contribute), vector_all_settings_contribute_to_tari_icon) {
                 _openLink.postValue(resourceManager.getString(github_repo_url))
             },
             DividerViewHolderItem(),
-            ButtonViewDto(resourceManager.getString(all_settings_user_agreement), vector_all_settings_user_agreement_icon) {
+            SettingsRowViewDto(resourceManager.getString(all_settings_user_agreement), vector_all_settings_user_agreement_icon) {
                 _openLink.postValue(resourceManager.getString(user_agreement_url))
             },
             DividerViewHolderItem(),
-            ButtonViewDto(resourceManager.getString(all_settings_privacy_policy), vector_all_settings_privacy_policy_icon) {
+            SettingsRowViewDto(resourceManager.getString(all_settings_privacy_policy), vector_all_settings_privacy_policy_icon) {
                 _openLink.postValue(resourceManager.getString(privacy_policy_url))
             },
             DividerViewHolderItem(),
-            ButtonViewDto(resourceManager.getString(all_settings_disclaimer), vector_all_settings_disclaimer_icon) {
+            SettingsRowViewDto(resourceManager.getString(all_settings_disclaimer), vector_all_settings_disclaimer_icon) {
                 _openLink.postValue(resourceManager.getString(disclaimer_url))
             },
             DividerViewHolderItem(),
@@ -206,33 +206,36 @@ class AllSettingsViewModel : CommonViewModel() {
 //                _openLink.postValue(resourceManager.getString(explorer_url))
 //            },
             SettingsTitleViewHolderItem(resourceManager.getString(all_settings_advanced_settings_label)),
-            ButtonViewDto(resourceManager.getString(all_settings_select_theme), vector_all_settings_select_theme_icon) {
+            SettingsRowViewDto(resourceManager.getString(all_settings_select_theme), vector_all_settings_select_theme_icon) {
                 navigation.postValue(AllSettingsNavigation.ToThemeSelection)
             },
             DividerViewHolderItem(),
-            ButtonViewDto(resourceManager.getString(all_settings_background_service), vector_all_settings_background_service_icon) {
+            SettingsRowViewDto(resourceManager.getString(all_settings_background_service), vector_all_settings_background_service_icon) {
                 navigation.postValue(AllSettingsNavigation.ToBackgroundService)
             },
             DividerViewHolderItem(),
-            ButtonViewDto(resourceManager.getString(all_settings_bluetooth_settings), vector_all_settings_bluetooth) {
+            SettingsRowViewDto(resourceManager.getString(all_settings_bluetooth_settings), vector_all_settings_bluetooth) {
                 navigation.postValue(AllSettingsNavigation.ToBluetoothSettings)
             },
             DividerViewHolderItem(),
-            ButtonViewDto(resourceManager.getString(all_settings_bridge_configuration), vector_all_settings_bridge_configuration_icon) {
+            SettingsRowViewDto(resourceManager.getString(all_settings_bridge_configuration), vector_all_settings_bridge_configuration_icon) {
                 navigation.postValue(AllSettingsNavigation.ToTorBridges)
             },
             DividerViewHolderItem(),
-            ButtonViewDto(resourceManager.getString(all_settings_select_network), vector_all_settings_select_network_icon) {
+            SettingsRowViewDto(resourceManager.getString(all_settings_select_network), vector_all_settings_select_network_icon) {
                 navigation.postValue(AllSettingsNavigation.ToNetworkSelection)
             },
             DividerViewHolderItem(),
-            ButtonViewDto(resourceManager.getString(all_settings_select_base_node), vector_all_settings_select_base_node_icon) {
+            SettingsRowViewDto(resourceManager.getString(all_settings_select_base_node), vector_all_settings_select_base_node_icon) {
                 navigation.postValue(AllSettingsNavigation.ToBaseNodeSelection)
             },
             DividerViewHolderItem(),
-            ButtonViewDto(resourceManager.getString(all_settings_delete_wallet), vector_all_settings_delete_button_icon, null, ButtonStyle.Warning) {
-                navigation.postValue(AllSettingsNavigation.ToDeleteWallet)
-            },
+            SettingsRowViewDto(
+                title = resourceManager.getString(all_settings_delete_wallet),
+                leftIconId = vector_all_settings_delete_button_icon,
+                iconId = null,
+                style = SettingsRowStyle.Warning,
+            ) { navigation.postValue(AllSettingsNavigation.ToDeleteWallet) },
             DividerViewHolderItem(),
             SettingsVersionViewHolderItem(versionText) { _copyToClipboard.postValue(versionArgs) }
         )

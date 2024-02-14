@@ -7,6 +7,7 @@
     android:layout_height="@dimen/menu_item_height"
     android:clickable="true"
     android:focusable="true"
+    android:foreground="?attr/selectableItemBackground"
     android:orientation="horizontal"
     android:paddingHorizontal="@dimen/common_horizontal_margin">
 
@@ -33,12 +34,22 @@
             android:textSize="15sp"
             app:customFont="medium" />
 
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/warning"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:src="@drawable/vector_wallet_not_backed" />
+
         <com.tari.android.wallet.ui.component.tari.TariIconView
             android:id="@+id/icon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:rotation="180"
             android:layout_gravity="center_vertical|end"
+            android:rotation="180"
             android:src="@drawable/vector_back_button" />
 
     </androidx.appcompat.widget.LinearLayoutCompat>

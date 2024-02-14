@@ -47,8 +47,8 @@ import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.YatDto
 import com.tari.android.wallet.ui.fragment.contact_book.details.adapter.contactType.ContactTypeViewHolderItem
 import com.tari.android.wallet.ui.fragment.contact_book.details.adapter.profile.ContactProfileViewHolderItem
 import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
-import com.tari.android.wallet.ui.fragment.settings.allSettings.button.ButtonStyle
-import com.tari.android.wallet.ui.fragment.settings.allSettings.button.ButtonViewDto
+import com.tari.android.wallet.ui.fragment.settings.allSettings.row.SettingsRowStyle
+import com.tari.android.wallet.ui.fragment.settings.allSettings.row.SettingsRowViewDto
 import com.tari.android.wallet.ui.fragment.settings.allSettings.title.SettingsTitleViewHolderItem
 import com.tari.android.wallet.yat.YatAdapter
 import kotlinx.coroutines.Deferred
@@ -101,7 +101,7 @@ class ContactDetailsViewModel : CommonViewModel() {
 
         ContactAction.Send.let {
             if (availableActions.contains(it)) {
-                newList += ButtonViewDto(resourceManager.getString(it.title)) {
+                newList += SettingsRowViewDto(resourceManager.getString(it.title)) {
                     navigation.postValue(Navigation.ContactBookNavigation.ToSendTari(contact))
                 }
                 newList += DividerViewHolderItem()
@@ -110,7 +110,7 @@ class ContactDetailsViewModel : CommonViewModel() {
 
         ContactAction.Link.let {
             if (availableActions.contains(it)) {
-                newList += (ButtonViewDto(resourceManager.getString(it.title)) {
+                newList += (SettingsRowViewDto(resourceManager.getString(it.title)) {
                     navigation.postValue(Navigation.ContactBookNavigation.ToLinkContact(contact))
                 })
                 newList += DividerViewHolderItem()
@@ -118,7 +118,7 @@ class ContactDetailsViewModel : CommonViewModel() {
         }
 
         if (contact.getFFIDto() != null) {
-            newList += ButtonViewDto(resourceManager.getString(R.string.contact_details_transaction_history)) {
+            newList += SettingsRowViewDto(resourceManager.getString(R.string.contact_details_transaction_history)) {
                 navigation.postValue(Navigation.ContactBookNavigation.ToContactTransactionHistory(contact))
             }
             newList += DividerViewHolderItem()
@@ -126,7 +126,7 @@ class ContactDetailsViewModel : CommonViewModel() {
 
         ContactAction.ToFavorite.let {
             if (availableActions.contains(it)) {
-                newList += ButtonViewDto(resourceManager.getString(it.title), iconId = R.drawable.tari_empty_drawable) {
+                newList += SettingsRowViewDto(resourceManager.getString(it.title), iconId = R.drawable.tari_empty_drawable) {
                     this.contact.value = contactsRepository.toggleFavorite(contact)
                 }
                 newList += DividerViewHolderItem()
@@ -135,7 +135,7 @@ class ContactDetailsViewModel : CommonViewModel() {
 
         ContactAction.ToUnFavorite.let {
             if (availableActions.contains(it)) {
-                newList += ButtonViewDto(resourceManager.getString(it.title), iconId = R.drawable.tari_empty_drawable) {
+                newList += SettingsRowViewDto(resourceManager.getString(it.title), iconId = R.drawable.tari_empty_drawable) {
                     this.contact.value = contactsRepository.toggleFavorite(contact)
                 }
                 newList += DividerViewHolderItem()
@@ -144,7 +144,7 @@ class ContactDetailsViewModel : CommonViewModel() {
 
         ContactAction.Unlink.let {
             if (availableActions.contains(it)) {
-                newList += ButtonViewDto(resourceManager.getString(it.title)) {
+                newList += SettingsRowViewDto(resourceManager.getString(it.title)) {
                     showUnlinkDialog()
                 }
                 newList += DividerViewHolderItem()
@@ -153,9 +153,9 @@ class ContactDetailsViewModel : CommonViewModel() {
 
         ContactAction.Delete.let {
             if (availableActions.contains(it)) {
-                newList += ButtonViewDto(
+                newList += SettingsRowViewDto(
                     resourceManager.getString(it.title),
-                    style = ButtonStyle.Warning,
+                    style = SettingsRowStyle.Warning,
                     iconId = R.drawable.tari_empty_drawable
                 ) {
                     showDeleteContactDialog()
@@ -169,7 +169,7 @@ class ContactDetailsViewModel : CommonViewModel() {
             if (connectedWallets.isNotEmpty()) {
                 newList.add(SettingsTitleViewHolderItem(resourceManager.getString(contact_book_details_connected_wallets)))
                 for (connectedWallet in connectedWallets) {
-                    newList += (ButtonViewDto(resourceManager.getString(connectedWallet.name!!)) {
+                    newList += (SettingsRowViewDto(resourceManager.getString(connectedWallet.name!!)) {
                         navigation.postValue(Navigation.ContactBookNavigation.ToExternalWallet(connectedWallet))
                     })
                     newList += DividerViewHolderItem()

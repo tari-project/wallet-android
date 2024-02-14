@@ -32,24 +32,24 @@
  */
 package com.tari.android.wallet.ui.fragment.settings.logs.logFiles.adapter
 
-import com.tari.android.wallet.databinding.ItemButtonBinding
+import com.tari.android.wallet.databinding.ItemSettingsRowBinding
 import com.tari.android.wallet.ui.common.recyclerView.CommonViewHolder
 import com.tari.android.wallet.ui.common.recyclerView.ViewHolderBuilder
-import com.tari.android.wallet.ui.fragment.settings.allSettings.button.ButtonViewDto
+import com.tari.android.wallet.ui.fragment.settings.allSettings.row.SettingsRowViewDto
 
-class LogFileViewHolder(view: ItemButtonBinding) : CommonViewHolder<LogFileViewHolderItem, ItemButtonBinding>(view) {
+class LogFileViewHolder(view: ItemSettingsRowBinding) : CommonViewHolder<LogFileViewHolderItem, ItemSettingsRowBinding>(view) {
 
     override fun bind(item: LogFileViewHolderItem) {
         super.bind(item)
-        ui.button.initDto(ButtonViewDto(item.filename) { item.action(item) })
+        ui.button.initDto(SettingsRowViewDto(item.filename) { item.action(item) })
         ui.button.ui.title.text = item.filename
     }
 
     companion object {
         fun getBuilder() =
             ViewHolderBuilder(
-                ItemButtonBinding::inflate,
+                ItemSettingsRowBinding::inflate,
                 LogFileViewHolderItem::class.java
-            ) { view -> LogFileViewHolder(view as ItemButtonBinding) }
+            ) { view -> LogFileViewHolder(view as ItemSettingsRowBinding) }
     }
 }
