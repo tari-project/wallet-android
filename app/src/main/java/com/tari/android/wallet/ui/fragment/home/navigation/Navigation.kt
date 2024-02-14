@@ -12,29 +12,22 @@ import com.tari.android.wallet.ui.fragment.send.common.TransactionData
 sealed class Navigation {
 
     class EnterPinCodeNavigation(val behavior: PinCodeScreenBehavior, val stashedPin: String? = null): Navigation()
-
-    class ChangeBiometrics(): Navigation()
-
-    class FeatureAuth(): Navigation()
+    object ChangeBiometrics : Navigation()
+    object FeatureAuth : Navigation()
 
     sealed class CustomBridgeNavigation : Navigation() {
         object UploadQrCode : CustomBridgeNavigation()
     }
 
     sealed class BackupSettingsNavigation : Navigation() {
-
         object ToLearnMore : BackupSettingsNavigation()
-
         object ToWalletBackupWithRecoveryPhrase : BackupSettingsNavigation()
-
         object ToChangePassword : BackupSettingsNavigation()
-
         object ToConfirmPassword : BackupSettingsNavigation()
     }
 
     sealed class VerifySeedPhraseNavigation : Navigation() {
         object ToSeedPhraseVerificationComplete : VerifySeedPhraseNavigation()
-
         class ToSeedPhraseVerification(val seedWords: List<String>) : VerifySeedPhraseNavigation()
     }
 
@@ -47,36 +40,25 @@ sealed class Navigation {
     }
 
     sealed class TxListNavigation : Navigation() {
-
         object ToSplashScreen : TxListNavigation()
-
         class ToTxDetails(val tx: Tx) : TxListNavigation()
-
         object ToChat : TxListNavigation()
-
         object ToAllSettings : TxListNavigation()
-
         object ToUtxos : TxListNavigation()
-
         class ToSendTariToUser(val contact: ContactDto, val amount: MicroTari? = null) : TxListNavigation()
         class ToSendWithDeeplink(val sendDeeplink: DeepLink.Send) : TxListNavigation()
-
         object HomeTransactionHistory : TxListNavigation()
-
-        class ToTransfer : TxListNavigation()
+        object ToTransfer : TxListNavigation()
     }
 
     sealed class ChatNavigation : Navigation() {
         object ToAddChat : ChatNavigation()
-
         class ToChat(val walletAddress: TariWalletAddress, val isNew: Boolean) : ChatNavigation()
     }
 
     sealed class AddAmountNavigation : Navigation() {
         object OnAmountExceedsActualAvailableBalance : AddAmountNavigation()
-
         class ContinueToAddNote(val transactionData: TransactionData) : AddAmountNavigation()
-
         class ContinueToFinalizing(val transactionData: TransactionData) : AddAmountNavigation()
     }
 
@@ -112,34 +94,21 @@ sealed class Navigation {
 
     sealed class ChooseRestoreOptionNavigation : Navigation() {
         object ToEnterRestorePassword : ChooseRestoreOptionNavigation()
-
         object ToRestoreWithRecoveryPhrase : ChooseRestoreOptionNavigation()
-
         object OnRestoreCompleted : ChooseRestoreOptionNavigation()
     }
 
-
     sealed class ContactBookNavigation : Navigation() {
-
         class ToContactDetails(val contact: ContactDto) : ContactBookNavigation()
-
         object ToAddContact : ContactBookNavigation()
-
         object ToAddPhoneContact : ContactBookNavigation()
-
         class ToSendTari(val contact: ContactDto) : ContactBookNavigation()
-
-        class ToSelectTariUser : ContactBookNavigation()
-
+        object ToSelectTariUser : ContactBookNavigation()
         class ToRequestTari(val contact: ContactDto) : ContactBookNavigation()
-
         class ToExternalWallet(val connectedWallet: YatDto.ConnectedWallet) : ContactBookNavigation()
-
         class ToLinkContact(val contact: ContactDto) : ContactBookNavigation()
-
         class ToContactTransactionHistory(val contact: ContactDto) : ContactBookNavigation()
-
-        class BackToContactBook : ContactBookNavigation()
+        object BackToContactBook : ContactBookNavigation()
     }
 }
 

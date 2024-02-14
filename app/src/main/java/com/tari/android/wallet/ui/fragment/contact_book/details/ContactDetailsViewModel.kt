@@ -296,7 +296,7 @@ class ContactDetailsViewModel : CommonViewModel() {
             ButtonModule(resourceManager.getString(common_close), Close)
         )
         modularDialog.postValue(ModularDialogArgs(DialogArgs {
-            navigation.value = Navigation.ContactBookNavigation.BackToContactBook()
+            navigation.value = Navigation.ContactBookNavigation.BackToContactBook
         }, modules))
     }
 
@@ -307,7 +307,7 @@ class ContactDetailsViewModel : CommonViewModel() {
             ButtonModule(resourceManager.getString(contact_book_details_delete_button_title), Warning) {
                 contactsRepository.deleteContact(contact.value!!)
                 dismissDialog.postValue(Unit)
-                navigation.value = Navigation.ContactBookNavigation.BackToContactBook()
+                navigation.value = Navigation.ContactBookNavigation.BackToContactBook
             },
             ButtonModule(resourceManager.getString(common_close), Close)
         )

@@ -89,7 +89,7 @@ class ContactBookActionMenuViewModel : CommonViewModel() {
             ButtonModule(resourceManager.getString(R.string.common_cancel), ButtonStyle.Close)
         )
         modularDialog.postValue(ModularDialogArgs(DialogArgs {
-            navigation.value = Navigation.ContactBookNavigation.BackToContactBook()
+            navigation.value = Navigation.ContactBookNavigation.BackToContactBook
         }, modules))
     }
 }

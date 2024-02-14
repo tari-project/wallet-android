@@ -167,7 +167,7 @@ open class CommonViewModel : ViewModel() {
 
     fun runWithAuthorization(action: () -> Unit) {
         authorizedAction = action
-        navigation.postValue(Navigation.FeatureAuth())
+        navigation.postValue(Navigation.FeatureAuth)
     }
 
     fun checkAuthorization() {
