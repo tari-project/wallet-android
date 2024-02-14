@@ -18,6 +18,7 @@ import androidx.viewbinding.ViewBinding
 import com.squareup.seismic.ShakeDetector
 import com.tari.android.wallet.R
 import com.tari.android.wallet.extension.observe
+import com.tari.android.wallet.extension.safeCastTo
 import com.tari.android.wallet.ui.component.networkStateIndicator.ConnectionIndicatorViewModel
 import com.tari.android.wallet.ui.component.tari.toast.TariToast
 import com.tari.android.wallet.ui.component.tari.toast.TariToastArgs
@@ -38,7 +39,7 @@ import com.tari.android.wallet.ui.fragment.settings.logs.activity.DebugNavigatio
 import com.tari.android.wallet.ui.fragment.settings.themeSelector.TariTheme
 import yat.android.lib.YatIntegration
 
-abstract class CommonActivity<Binding : ViewBinding, VM : CommonViewModel> : AppCompatActivity(), ShakeDetector.Listener {
+abstract class CommonActivity<Binding : ViewBinding, VM : CommonViewModel> : AppCompatActivity(), ShakeDetector.Listener, FragmentPoppedListener {
 
     private val dialogManager = DialogManager()
     private var containerId: Int? = null
@@ -161,7 +162,7 @@ abstract class CommonActivity<Binding : ViewBinding, VM : CommonViewModel> : App
         containerId = id
     }
 
-    fun addFragment(fragment: Fragment, bundle: Bundle? = null, isRoot: Boolean = false, withAnimation: Boolean = true) {
+    fun addFragment(fragment: CommonFragment<*, *>, bundle: Bundle? = null, isRoot: Boolean = false, withAnimation: Boolean = true) {
         bundle?.let { fragment.arguments = it }
         if (supportFragmentManager.isDestroyed) return
         val transaction = supportFragmentManager.beginTransaction()
@@ -172,6 +173,7 @@ abstract class CommonActivity<Binding : ViewBinding, VM : CommonViewModel> : App
         if (!isRoot) {
             transaction.addToBackStack(null)
         }
+        fragment.setFragmentPoppedListener(this)
         transaction.commit()
     }
 
@@ -183,6 +185,12 @@ abstract class CommonActivity<Binding : ViewBinding, VM : CommonViewModel> : App
         while (supportFragmentManager.fragments.last()::class.java.simpleName != tag && supportFragmentManager.backStackEntryCount > 0) {
             supportFragmentManager.popBackStackImmediate()
         }
+    }
+
+    override fun onFragmentPopped(fragmentClass: Class<out Fragment>) {
+        supportFragmentManager.fragments
+            .mapNotNull { it.safeCastTo<CommonFragment<*, *>>() }
+            .forEach { fragment -> fragment.onFragmentPopped(fragmentClass) }
     }
 
     override fun hearShake() = showDebugDialog()

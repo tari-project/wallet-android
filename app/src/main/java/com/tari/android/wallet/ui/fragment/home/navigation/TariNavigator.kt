@@ -391,7 +391,7 @@ class TariNavigator @Inject constructor(val prefs: SharedPrefsRepository, val ta
     }
 
 
-    private fun addFragment(fragment: Fragment, bundle: Bundle? = null, isRoot: Boolean = false, withAnimation: Boolean = true) =
+    private fun addFragment(fragment: CommonFragment<*, *>, bundle: Bundle? = null, isRoot: Boolean = false, withAnimation: Boolean = true) =
         activity.addFragment(fragment, bundle, isRoot, withAnimation)
 
     //popup fragment

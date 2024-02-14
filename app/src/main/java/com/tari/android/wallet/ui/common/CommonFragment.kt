@@ -25,7 +25,7 @@ import com.tari.android.wallet.ui.dialog.modular.InputModularDialog
 import com.tari.android.wallet.ui.dialog.modular.ModularDialog
 import com.tari.android.wallet.ui.extension.string
 
-abstract class CommonFragment<Binding : ViewBinding, VM : CommonViewModel> : Fragment() {
+abstract class CommonFragment<Binding : ViewBinding, VM : CommonViewModel> : Fragment(), FragmentPoppedListener {
 
     lateinit var clipboardManager: ClipboardManager
 
@@ -71,6 +71,21 @@ abstract class CommonFragment<Binding : ViewBinding, VM : CommonViewModel> : Fra
 
         subscribeVM(viewModel)
     }
+
+    override fun onDetach() {
+        super.onDetach()
+
+        fragmentPoppedListener?.onFragmentPopped(javaClass)
+    }
+
+    override fun onFragmentPopped(fragmentClass: Class<out Fragment>) {
+        // implement in subclass
+    }
+
+    fun setFragmentPoppedListener(listener: FragmentPoppedListener) {
+        fragmentPoppedListener = listener
+    }
+
 
     fun <VM : CommonViewModel> subscribeVM(viewModel: VM) = with(viewModel) {
         observe(backPressed) { requireActivity().onBackPressed() }
@@ -147,3 +162,9 @@ abstract class CommonFragment<Binding : ViewBinding, VM : CommonViewModel> : Fra
     }
 }
 
+/**
+ * Interface for listening to fragment pop events and performing actions once a fragment is popped.
+ */
+interface FragmentPoppedListener {
+    fun onFragmentPopped(fragmentClass: Class<out Fragment>)
+}
