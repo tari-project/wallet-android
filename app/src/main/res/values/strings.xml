@@ -433,6 +433,7 @@
     <string name="all_settings_disclaimer">Disclaimer</string>
     <string name="all_settings_explorer">Block Explorer</string>
     <string name="all_settings_background_service">Background Service</string>
+    <string name="all_settings_screen_recording">Screen recording</string>
     <string name="all_settings_bluetooth_settings">Bluetooth Settings</string>
     <string name="all_settings_bridge_configuration">Bridge Configuration</string>
     <string name="all_settings_connect_yats">Connect Yats</string>
@@ -452,6 +453,13 @@
     <string name="background_service_button_title">Allow Tari to receive transactions and notifications in the background</string>
     <string name="background_service_button_confirmation_title">Background service will be turned off</string>
     <string name="background_service_button_confirmation_description">You will not get any notifications and updates. Are you sure you want to proceed?</string>
+
+    <!-- Screen recording -->
+    <string name="screen_recording_title">Screen recording</string>
+    <string name="screen_recording_warning_text">Screen recording and taking screenshots can capture your wallet data and transactions. To keep your wallet data private, you can disable this setting.\n\nNote: Screen recording and screenshots will always be disabled for the Seed Phrase screen.</string>
+    <string name="screen_recording_button_title">Allow screen recording</string>
+    <string name="screen_recording_button_confirmation_title">Screen recording will be enabled</string>
+    <string name="screen_recording_button_confirmation_description">You will be able to record your screen. Are you sure you want to proceed?</string>
 
     <!-- Bluetooth settings -->
     <string name="bluetooth_settings_title">Bluetooth Settings</string>

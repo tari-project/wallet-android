@@ -60,6 +60,8 @@ class WriteDownSeedPhraseFragment : CommonFragment<FragmentWriteDownSeedPhraseBi
     private val adapter = PhraseWordsAdapter()
     private var isExpanded = false
 
+    override fun screenRecordingAlwaysDisable() = true
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
         FragmentWriteDownSeedPhraseBinding.inflate(inflater, container, false).also { ui = it }.root
 

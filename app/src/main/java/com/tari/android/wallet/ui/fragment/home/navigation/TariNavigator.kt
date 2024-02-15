@@ -4,7 +4,6 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.provider.ContactsContract
-import androidx.fragment.app.Fragment
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.deeplinks.DeepLink
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
@@ -22,6 +21,7 @@ import com.tari.android.wallet.model.TxId
 import com.tari.android.wallet.network.NetworkConnectionState
 import com.tari.android.wallet.service.TariWalletService
 import com.tari.android.wallet.ui.common.CommonActivity
+import com.tari.android.wallet.ui.common.CommonFragment
 import com.tari.android.wallet.ui.dialog.modular.DialogArgs
 import com.tari.android.wallet.ui.dialog.modular.ModularDialog
 import com.tari.android.wallet.ui.dialog.modular.ModularDialogArgs
@@ -46,8 +46,20 @@ import com.tari.android.wallet.ui.fragment.contact_book.root.ContactBookFragment
 import com.tari.android.wallet.ui.fragment.contact_book.transactionHistory.TransactionHistoryFragment
 import com.tari.android.wallet.ui.fragment.home.HomeActivity
 import com.tari.android.wallet.ui.fragment.home.homeTransactionHistory.HomeTransactionHistoryFragment
+import com.tari.android.wallet.ui.fragment.home.navigation.Navigation.AddAmountNavigation
 import com.tari.android.wallet.ui.fragment.home.navigation.Navigation.AllSettingsNavigation
+import com.tari.android.wallet.ui.fragment.home.navigation.Navigation.BackupSettingsNavigation
+import com.tari.android.wallet.ui.fragment.home.navigation.Navigation.BaseNodeNavigation
+import com.tari.android.wallet.ui.fragment.home.navigation.Navigation.ChatNavigation
+import com.tari.android.wallet.ui.fragment.home.navigation.Navigation.ChooseRestoreOptionNavigation
 import com.tari.android.wallet.ui.fragment.home.navigation.Navigation.ContactBookNavigation
+import com.tari.android.wallet.ui.fragment.home.navigation.Navigation.CustomBridgeNavigation
+import com.tari.android.wallet.ui.fragment.home.navigation.Navigation.EnterRestorationPasswordNavigation
+import com.tari.android.wallet.ui.fragment.home.navigation.Navigation.InputSeedWordsNavigation
+import com.tari.android.wallet.ui.fragment.home.navigation.Navigation.TorBridgeNavigation
+import com.tari.android.wallet.ui.fragment.home.navigation.Navigation.TxListNavigation
+import com.tari.android.wallet.ui.fragment.home.navigation.Navigation.VerifySeedPhraseNavigation
+import com.tari.android.wallet.ui.fragment.home.navigation.Navigation.WalletRestoringFromSeedWordsNavigation
 import com.tari.android.wallet.ui.fragment.onboarding.activity.OnboardingFlowActivity
 import com.tari.android.wallet.ui.fragment.onboarding.localAuth.LocalAuthFragment
 import com.tari.android.wallet.ui.fragment.pinCode.EnterPinCodeFragment
@@ -79,6 +91,7 @@ import com.tari.android.wallet.ui.fragment.settings.deleteWallet.DeleteWalletFra
 import com.tari.android.wallet.ui.fragment.settings.logs.activity.DebugActivity
 import com.tari.android.wallet.ui.fragment.settings.logs.activity.DebugNavigation
 import com.tari.android.wallet.ui.fragment.settings.networkSelection.NetworkSelectionFragment
+import com.tari.android.wallet.ui.fragment.settings.screenRecording.ScreenRecordingSettingsFragment
 import com.tari.android.wallet.ui.fragment.settings.themeSelector.ThemeSelectorFragment
 import com.tari.android.wallet.ui.fragment.settings.torBridges.TorBridgesSelectionFragment
 import com.tari.android.wallet.ui.fragment.settings.torBridges.customBridges.CustomTorBridgesFragment
@@ -89,7 +102,7 @@ import java.math.BigInteger
 import javax.inject.Inject
 import javax.inject.Singleton
 
-
+// TODO: move navigation logic to only the navigate() method and make all navigation methods private
 @Singleton
 class TariNavigator @Inject constructor(val prefs: SharedPrefsRepository, val tariSettingsSharedRepository: TariSettingsSharedRepository) {
 
@@ -110,53 +123,54 @@ class TariNavigator @Inject constructor(val prefs: SharedPrefsRepository, val ta
             is ContactBookNavigation.ToContactTransactionHistory -> toContactTransactionHistory(navigation.contact)
             is ContactBookNavigation.ToAddPhoneContact -> toAddPhoneContact()
             is ContactBookNavigation.ToSelectTariUser -> addFragment(SelectUserContactFragment.newInstance())
-            Navigation.ChooseRestoreOptionNavigation.ToEnterRestorePassword -> toEnterRestorePassword()
-            Navigation.ChooseRestoreOptionNavigation.OnRestoreCompleted -> onRestoreCompleted()
-            Navigation.ChooseRestoreOptionNavigation.ToRestoreWithRecoveryPhrase -> toRestoreWithRecoveryPhrase()
-            AllSettingsNavigation.ToBugReporting -> DebugActivity.launch(activity, DebugNavigation.BugReport)
-            AllSettingsNavigation.ToMyProfile -> toMyProfile()
-            AllSettingsNavigation.ToAbout -> toAbout()
-            AllSettingsNavigation.ToBackgroundService -> toBackgroundService()
-            AllSettingsNavigation.ToBluetoothSettings -> addFragment(BluetoothSettingsFragment())
-            AllSettingsNavigation.ToBackupSettings -> toBackupSettings(true)
-            AllSettingsNavigation.ToBaseNodeSelection -> toBaseNodeSelection()
-            AllSettingsNavigation.ToDeleteWallet -> toDeleteWallet()
-            AllSettingsNavigation.ToNetworkSelection -> toNetworkSelection()
-            AllSettingsNavigation.ToTorBridges -> toTorBridges()
-            AllSettingsNavigation.ToDataCollection -> addFragment(DataCollectionFragment())
-            AllSettingsNavigation.ToThemeSelection -> toThemeSelection()
-            AllSettingsNavigation.ToRequestTari -> addFragment(RequestTariFragment.newInstance())
-            Navigation.EnterRestorationPasswordNavigation.OnRestore -> onRestoreCompleted()
-            Navigation.InputSeedWordsNavigation.ToRestoreFormSeedWordsInProgress -> toRestoreFromSeedWordsInProgress()
-            Navigation.InputSeedWordsNavigation.ToBaseNodeSelection -> toBaseNodeSelection()
-            Navigation.WalletRestoringFromSeedWordsNavigation.OnRestoreCompleted -> onRestoreCompleted()
-            Navigation.WalletRestoringFromSeedWordsNavigation.OnRestoreFailed -> {
+            is ChooseRestoreOptionNavigation.ToEnterRestorePassword -> toEnterRestorePassword()
+            is ChooseRestoreOptionNavigation.OnRestoreCompleted -> onRestoreCompleted()
+            is ChooseRestoreOptionNavigation.ToRestoreWithRecoveryPhrase -> toRestoreWithRecoveryPhrase()
+            is AllSettingsNavigation.ToBugReporting -> DebugActivity.launch(activity, DebugNavigation.BugReport)
+            is AllSettingsNavigation.ToMyProfile -> toMyProfile()
+            is AllSettingsNavigation.ToAbout -> toAbout()
+            is AllSettingsNavigation.ToBackgroundService -> toBackgroundService()
+            is AllSettingsNavigation.ToScreenRecording -> toScreenRecording()
+            is AllSettingsNavigation.ToBluetoothSettings -> addFragment(BluetoothSettingsFragment())
+            is AllSettingsNavigation.ToBackupSettings -> toBackupSettings(true)
+            is AllSettingsNavigation.ToBaseNodeSelection -> toBaseNodeSelection()
+            is AllSettingsNavigation.ToDeleteWallet -> toDeleteWallet()
+            is AllSettingsNavigation.ToNetworkSelection -> toNetworkSelection()
+            is AllSettingsNavigation.ToTorBridges -> toTorBridges()
+            is AllSettingsNavigation.ToDataCollection -> addFragment(DataCollectionFragment())
+            is AllSettingsNavigation.ToThemeSelection -> toThemeSelection()
+            is AllSettingsNavigation.ToRequestTari -> addFragment(RequestTariFragment.newInstance())
+            is EnterRestorationPasswordNavigation.OnRestore -> onRestoreCompleted()
+            is InputSeedWordsNavigation.ToRestoreFormSeedWordsInProgress -> toRestoreFromSeedWordsInProgress()
+            is InputSeedWordsNavigation.ToBaseNodeSelection -> toBaseNodeSelection()
+            is WalletRestoringFromSeedWordsNavigation.OnRestoreCompleted -> onRestoreCompleted()
+            is WalletRestoringFromSeedWordsNavigation.OnRestoreFailed -> {
 //                changeOnBackPressed(false)
                 onBackPressed()
             }
 
-            Navigation.AddAmountNavigation.OnAmountExceedsActualAvailableBalance -> onAmountExceedsActualAvailableBalance()
-            is Navigation.AddAmountNavigation.ContinueToAddNote -> continueToAddNote(navigation.transactionData)
-            is Navigation.AddAmountNavigation.ContinueToFinalizing -> continueToFinalizeSendTx(navigation.transactionData)
-            Navigation.TxListNavigation.ToChat -> toChat()
-            is Navigation.TxListNavigation.ToTxDetails -> toTxDetails(navigation.tx, null)
-            is Navigation.TxListNavigation.ToSendTariToUser -> toSendTari(navigation.contact, navigation.amount)
-            is Navigation.TxListNavigation.ToSendWithDeeplink -> toSendWithDeeplink(navigation.sendDeeplink)
-            Navigation.TxListNavigation.ToUtxos -> toUtxos()
-            Navigation.TxListNavigation.ToAllSettings -> toAllSettings()
-            Navigation.TxListNavigation.ToSplashScreen -> toSplash()
-            is Navigation.TxListNavigation.ToTransfer -> addFragment(TransferFragment())
-            is Navigation.TxListNavigation.HomeTransactionHistory -> addFragment(HomeTransactionHistoryFragment())
-            Navigation.TorBridgeNavigation.ToCustomBridges -> toCustomTorBridges()
-            Navigation.BaseNodeNavigation.ToAddCustomBaseNode -> toAddCustomBaseNode()
-            Navigation.VerifySeedPhraseNavigation.ToSeedPhraseVerificationComplete -> onSeedPhraseVerificationComplete()
-            is Navigation.VerifySeedPhraseNavigation.ToSeedPhraseVerification -> toSeedPhraseVerification(navigation.seedWords)
-            Navigation.BackupSettingsNavigation.ToChangePassword -> toChangePassword()
-            Navigation.BackupSettingsNavigation.ToConfirmPassword -> toConfirmPassword()
-            Navigation.BackupSettingsNavigation.ToWalletBackupWithRecoveryPhrase -> toWalletBackupWithRecoveryPhrase()
-            Navigation.BackupSettingsNavigation.ToLearnMore -> toBackupOnboardingFlow()
-            Navigation.CustomBridgeNavigation.UploadQrCode -> Unit
-            is Navigation.ChatNavigation.ToChat -> {
+            is AddAmountNavigation.OnAmountExceedsActualAvailableBalance -> onAmountExceedsActualAvailableBalance()
+            is AddAmountNavigation.ContinueToAddNote -> continueToAddNote(navigation.transactionData)
+            is AddAmountNavigation.ContinueToFinalizing -> continueToFinalizeSendTx(navigation.transactionData)
+            is TxListNavigation.ToChat -> toChat()
+            is TxListNavigation.ToTxDetails -> toTxDetails(navigation.tx, null)
+            is TxListNavigation.ToSendTariToUser -> toSendTari(navigation.contact, navigation.amount)
+            is TxListNavigation.ToSendWithDeeplink -> toSendWithDeeplink(navigation.sendDeeplink)
+            is TxListNavigation.ToUtxos -> toUtxos()
+            is TxListNavigation.ToAllSettings -> toAllSettings()
+            is TxListNavigation.ToSplashScreen -> toSplash()
+            is TxListNavigation.ToTransfer -> addFragment(TransferFragment())
+            is TxListNavigation.HomeTransactionHistory -> addFragment(HomeTransactionHistoryFragment())
+            is TorBridgeNavigation.ToCustomBridges -> toCustomTorBridges()
+            is BaseNodeNavigation.ToAddCustomBaseNode -> toAddCustomBaseNode()
+            is VerifySeedPhraseNavigation.ToSeedPhraseVerificationComplete -> onSeedPhraseVerificationComplete()
+            is VerifySeedPhraseNavigation.ToSeedPhraseVerification -> toSeedPhraseVerification(navigation.seedWords)
+            is BackupSettingsNavigation.ToChangePassword -> toChangePassword()
+            is BackupSettingsNavigation.ToConfirmPassword -> toConfirmPassword()
+            is BackupSettingsNavigation.ToWalletBackupWithRecoveryPhrase -> toWalletBackupWithRecoveryPhrase()
+            is BackupSettingsNavigation.ToLearnMore -> toBackupOnboardingFlow()
+            is CustomBridgeNavigation.UploadQrCode -> Unit
+            is ChatNavigation.ToChat -> {
                 if (navigation.isNew) {
                     onBackPressed()
                 }
@@ -164,8 +178,7 @@ class TariNavigator @Inject constructor(val prefs: SharedPrefsRepository, val ta
                 addFragment(ChatFragment.newInstance(navigation.walletAddress))
             }
 
-            Navigation.ChatNavigation.ToAddChat -> addFragment(AddChatFragment())
-            else -> Unit
+            is ChatNavigation.ToAddChat -> addFragment(AddChatFragment())
         }
     }
 
@@ -176,18 +189,18 @@ class TariNavigator @Inject constructor(val prefs: SharedPrefsRepository, val ta
         activity.finishAffinity()
     }
 
-    fun toAddPhoneContact() {
+    private fun toAddPhoneContact() {
         val intent = Intent(Intent.ACTION_INSERT, ContactsContract.Contacts.CONTENT_URI)
         activity.startActivity(intent)
     }
 
-    fun toEnterRestorePassword() = addFragment(EnterRestorationPasswordFragment.newInstance())
+    private fun toEnterRestorePassword() = addFragment(EnterRestorationPasswordFragment.newInstance())
 
-    fun toRestoreWithRecoveryPhrase() = addFragment(InputSeedWordsFragment.newInstance())
+    private fun toRestoreWithRecoveryPhrase() = addFragment(InputSeedWordsFragment.newInstance())
 
-    fun toRestoreFromSeedWordsInProgress() = addFragment(WalletRestoringFromSeedWordsFragment.newInstance())
+    private fun toRestoreFromSeedWordsInProgress() = addFragment(WalletRestoringFromSeedWordsFragment.newInstance())
 
-    fun onRestoreCompleted() {
+    private fun onRestoreCompleted() {
         // wallet restored, setup shared prefs accordingly
         prefs.onboardingCompleted = true
         prefs.onboardingStarted = true
@@ -211,60 +224,62 @@ class TariNavigator @Inject constructor(val prefs: SharedPrefsRepository, val ta
         }
     })
 
-    fun toChat() = (activity as HomeActivity).ui.viewPager.setCurrentItem(INDEX_CHAT, NO_SMOOTH_SCROLL)
+    private fun toChat() = (activity as HomeActivity).ui.viewPager.setCurrentItem(INDEX_CHAT, NO_SMOOTH_SCROLL)
 
     fun toAllSettings() = (activity as HomeActivity).ui.viewPager.setCurrentItem(INDEX_SETTINGS, NO_SMOOTH_SCROLL)
 
     fun toBackupSettings(withAnimation: Boolean) = addFragment(BackupSettingsFragment(), withAnimation = withAnimation)
 
-    fun toDeleteWallet() = addFragment(DeleteWalletFragment())
+    private fun toDeleteWallet() = addFragment(DeleteWalletFragment())
 
-    fun toBackgroundService() = addFragment(BackgroundServiceSettingsFragment())
+    private fun toBackgroundService() = addFragment(BackgroundServiceSettingsFragment())
 
-    fun toMyProfile() = addFragment(WalletInfoFragment())
+    private fun toScreenRecording() = addFragment(ScreenRecordingSettingsFragment())
 
-    fun toAbout() = addFragment(TariAboutFragment())
+    private fun toMyProfile() = addFragment(WalletInfoFragment())
 
-    fun toBackupOnboardingFlow() = addFragment(BackupOnboardingFlowFragment())
+    private fun toAbout() = addFragment(TariAboutFragment())
 
-    fun toBaseNodeSelection() = addFragment(ChangeBaseNodeFragment())
+    private fun toBackupOnboardingFlow() = addFragment(BackupOnboardingFlowFragment())
 
-    fun toTorBridges() = addFragment(TorBridgesSelectionFragment())
+    private fun toBaseNodeSelection() = addFragment(ChangeBaseNodeFragment())
 
-    fun toThemeSelection() = addFragment(ThemeSelectorFragment())
+    private fun toTorBridges() = addFragment(TorBridgesSelectionFragment())
 
-    fun toUtxos() = addFragment(UtxosListFragment())
+    private fun toThemeSelection() = addFragment(ThemeSelectorFragment())
 
-    fun toCustomTorBridges() = addFragment(CustomTorBridgesFragment())
+    private fun toUtxos() = addFragment(UtxosListFragment())
 
-    fun toNetworkSelection() = addFragment(NetworkSelectionFragment())
+    private fun toCustomTorBridges() = addFragment(CustomTorBridgesFragment())
 
-    fun toAddCustomBaseNode() = addFragment(AddCustomBaseNodeFragment())
+    private fun toNetworkSelection() = addFragment(NetworkSelectionFragment())
+
+    private fun toAddCustomBaseNode() = addFragment(AddCustomBaseNodeFragment())
 
     fun toWalletBackupWithRecoveryPhrase() = addFragment(WriteDownSeedPhraseFragment())
 
-    fun toSeedPhraseVerification(seedWords: List<String>) = addFragment(VerifySeedPhraseFragment.newInstance(seedWords))
+    private fun toSeedPhraseVerification(seedWords: List<String>) = addFragment(VerifySeedPhraseFragment.newInstance(seedWords))
 
-    fun toConfirmPassword() = addFragment(EnterCurrentPasswordFragment())
+    private fun toConfirmPassword() = addFragment(EnterCurrentPasswordFragment())
 
     fun toChangePassword() = addFragment(ChangeSecurePasswordFragment())
 
-    fun toSendTari(user: ContactDto, amount: MicroTari?) = sendToUser(user, amount)
+    private fun toSendTari(user: ContactDto, amount: MicroTari?) = sendToUser(user, amount)
 
-    fun toSendWithDeeplink(deeplink: DeepLink.Send) {
+    private fun toSendWithDeeplink(deeplink: DeepLink.Send) {
         popUpTo(HomeFragment::class.java.simpleName)
         sendToUserByDeeplink(deeplink)
     }
 
-    fun toAddContact() = addFragment(AddContactFragment())
+    private fun toAddContact() = addFragment(AddContactFragment())
 
-    fun toContactDetails(contact: ContactDto) = addFragment(ContactDetailsFragment.createFragment(contact))
+    private fun toContactDetails(contact: ContactDto) = addFragment(ContactDetailsFragment.createFragment(contact))
 
-    fun toRequestTariFromContact(contact: ContactDto) = sendToUser(contact)
+    private fun toRequestTariFromContact(contact: ContactDto) = sendToUser(contact)
 
-    fun toSendTariToContact(contact: ContactDto) = sendToUser(contact)
+    private fun toSendTariToContact(contact: ContactDto) = sendToUser(contact)
 
-    fun backToContactBook() = popUpTo(ContactBookFragment::class.java.simpleName)
+    private fun backToContactBook() = popUpTo(ContactBookFragment::class.java.simpleName)
 
     fun backToAllSettings() = popUpTo(AllSettingsFragment::class.java.simpleName)
 
@@ -276,12 +291,11 @@ class TariNavigator @Inject constructor(val prefs: SharedPrefsRepository, val ta
         }
     }
 
-    fun toLinkContact(contact: ContactDto) = addFragment(ContactLinkFragment.createFragment(contact))
+    private fun toLinkContact(contact: ContactDto) = addFragment(ContactLinkFragment.createFragment(contact))
 
-    fun toContactTransactionHistory(contact: ContactDto) = addFragment(TransactionHistoryFragment.createFragment(contact))
+    private fun toContactTransactionHistory(contact: ContactDto) = addFragment(TransactionHistoryFragment.createFragment(contact))
 
-    fun toExternalWallet(connectedWallet: YatDto.ConnectedWallet) {
-
+    private fun toExternalWallet(connectedWallet: YatDto.ConnectedWallet) {
         try {
             val externalAddress = connectedWallet.getExternalLink()
             val intent = Intent(Intent.ACTION_VIEW, Uri.parse(externalAddress))
@@ -296,7 +310,7 @@ class TariNavigator @Inject constructor(val prefs: SharedPrefsRepository, val ta
         }
     }
 
-    fun onAmountExceedsActualAvailableBalance() {
+    private fun onAmountExceedsActualAvailableBalance() {
         val args = ModularDialogArgs(
             DialogArgs(), listOf(
                 HeadModule(activity.string(R.string.error_balance_exceeded_title)),
@@ -307,7 +321,7 @@ class TariNavigator @Inject constructor(val prefs: SharedPrefsRepository, val ta
         ModularDialog(activity, args).show()
     }
 
-    fun continueToAddNote(transactionData: TransactionData) {
+    private fun continueToAddNote(transactionData: TransactionData) {
         if (EventBus.networkConnectionState.publishSubject.value != NetworkConnectionState.CONNECTED) {
             showInternetConnectionErrorDialog(this.activity)
             return
@@ -352,7 +366,7 @@ class TariNavigator @Inject constructor(val prefs: SharedPrefsRepository, val ta
         popUpTo(BackupSettingsFragment::class.java.simpleName)
     }
 
-    fun onSeedPhraseVerificationComplete() {
+    private fun onSeedPhraseVerificationComplete() {
         popUpTo(BackupSettingsFragment::class.java.simpleName)
     }
 
@@ -361,7 +375,7 @@ class TariNavigator @Inject constructor(val prefs: SharedPrefsRepository, val ta
         sendToUser((activity as HomeActivity).viewModel.contactsRepository.ffiBridge.getContactByAddress(walletAddress))
     }
 
-    fun sendToUserByDeeplink(deeplink: DeepLink.Send) {
+    private fun sendToUserByDeeplink(deeplink: DeepLink.Send) {
         FFIWallet.instance?.getWalletAddress()
         val address = FFITariWalletAddress(HexString(deeplink.walletAddressHex)).runWithDestroy {
             walletAddressFromFFI(it)
@@ -378,7 +392,7 @@ class TariNavigator @Inject constructor(val prefs: SharedPrefsRepository, val ta
     private fun walletAddressFromFFI(ffiTariWalletAddress: FFITariWalletAddress): TariWalletAddress =
         TariWalletAddress(ffiTariWalletAddress.toString(), ffiTariWalletAddress.getEmojiId())
 
-    fun sendToUser(recipientUser: ContactDto, amount: MicroTari? = null) {
+    private fun sendToUser(recipientUser: ContactDto, amount: MicroTari? = null) {
         val bundle = Bundle().apply {
             putSerializable(PARAMETER_CONTACT, recipientUser)
             val innerAmount = (activity.intent.getDoubleExtra(PARAMETER_AMOUNT, Double.MIN_VALUE))
@@ -391,7 +405,7 @@ class TariNavigator @Inject constructor(val prefs: SharedPrefsRepository, val ta
     }
 
 
-    private fun addFragment(fragment: Fragment, bundle: Bundle? = null, isRoot: Boolean = false, withAnimation: Boolean = true) =
+    private fun addFragment(fragment: CommonFragment<*, *>, bundle: Bundle? = null, isRoot: Boolean = false, withAnimation: Boolean = true) =
         activity.addFragment(fragment, bundle, isRoot, withAnimation)
 
     //popup fragment

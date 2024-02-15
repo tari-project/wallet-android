@@ -29,6 +29,6 @@ class AddContactFragment : ContactSelectionFragment() {
         val surname = split.getOrNull(0).orEmpty().trim()
 
         viewModel.contactsRepository.updateContactInfo(user, firstName, surname, "")
-        viewModel.navigation.postValue(Navigation.ContactBookNavigation.BackToContactBook())
+        viewModel.navigation.postValue(Navigation.ContactBookNavigation.BackToContactBook)
     }
 }
