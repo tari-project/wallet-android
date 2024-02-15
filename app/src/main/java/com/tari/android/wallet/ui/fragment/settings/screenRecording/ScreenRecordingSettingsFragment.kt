@@ -30,64 +30,47 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.tari.android.wallet.ui.fragment.settings.allSettings
+package com.tari.android.wallet.ui.fragment.settings.screenRecording
 
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.recyclerview.widget.LinearLayoutManager
-import com.tari.android.wallet.databinding.FragmentAllSettingsBinding
-import com.tari.android.wallet.extension.observe
+import androidx.lifecycle.Lifecycle
+import com.tari.android.wallet.databinding.FragmentScreenRecordingSettingsBinding
+import com.tari.android.wallet.extension.launchAndRepeatOnLifecycle
 import com.tari.android.wallet.ui.common.CommonFragment
-import com.tari.android.wallet.ui.fragment.settings.userAutorization.BiometricAuthenticationViewModel
+import kotlinx.coroutines.launch
 
-class AllSettingsFragment : CommonFragment<FragmentAllSettingsBinding, AllSettingsViewModel>() {
-
-    private val optionsAdapter = AllSettingsOptionAdapter()
-
-    private val biometricAuthenticationViewModel: BiometricAuthenticationViewModel by viewModels()
+class ScreenRecordingSettingsFragment : CommonFragment<FragmentScreenRecordingSettingsBinding, ScreenRecordingSettingsViewModel>() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
-        FragmentAllSettingsBinding.inflate(inflater, container, false).also { ui = it }.root
+        FragmentScreenRecordingSettingsBinding.inflate(inflater, container, false).also { ui = it }.root
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val viewModel: AllSettingsViewModel by viewModels()
+        val viewModel: ScreenRecordingSettingsViewModel by viewModels()
         bindViewModel(viewModel)
 
-        BiometricAuthenticationViewModel.bindToFragment(biometricAuthenticationViewModel, this)
-        viewModel.authenticationViewModel = biometricAuthenticationViewModel
+        setupViews()
 
-        setupUI()
         observeUI()
     }
 
-    override fun onFragmentPopped(fragmentClass: Class<out Fragment>) {
-        super.onFragmentPopped(fragmentClass)
-
-        // We need to refresh options when we come back to this fragment from some settings screens
-        // and also disable or enable screen recording calling the onResume method
-        viewModel.updateOptions()
-        onResume()
-    }
-
-    private fun setupUI() {
-        ui.optionsList.layoutManager = LinearLayoutManager(requireContext())
-        ui.optionsList.adapter = optionsAdapter
+    private fun setupViews() = with(ui) {
+        loadingSwitchView.setOnCheckedChangeListener { viewModel.toggleScreenRecordingEnable(it) }
     }
 
     private fun observeUI() = with(viewModel) {
-        observe(openYatOnboarding) { yatAdapter.openOnboarding(requireActivity()) }
-
-        observe(allSettingsOptions) { optionsAdapter.update(it) }
-    }
-
-    companion object {
-        fun newInstance() = AllSettingsFragment()
+        viewLifecycleOwner.launchAndRepeatOnLifecycle(Lifecycle.State.STARTED) {
+            launch {
+                switchState.collect { state ->
+                    ui.loadingSwitchView.setState(state)
+                }
+            }
+        }
     }
 }
 

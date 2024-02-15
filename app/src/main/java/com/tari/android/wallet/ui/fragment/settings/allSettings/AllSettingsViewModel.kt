@@ -16,6 +16,7 @@ import com.tari.android.wallet.R.drawable.vector_all_settings_disclaimer_icon
 import com.tari.android.wallet.R.drawable.vector_all_settings_passcode
 import com.tari.android.wallet.R.drawable.vector_all_settings_privacy_policy_icon
 import com.tari.android.wallet.R.drawable.vector_all_settings_report_bug_icon
+import com.tari.android.wallet.R.drawable.vector_all_settings_screen_recording_icon
 import com.tari.android.wallet.R.drawable.vector_all_settings_select_base_node_icon
 import com.tari.android.wallet.R.drawable.vector_all_settings_select_network_icon
 import com.tari.android.wallet.R.drawable.vector_all_settings_select_theme_icon
@@ -58,6 +59,7 @@ import com.tari.android.wallet.R.string.tari_about_title
 import com.tari.android.wallet.R.string.tari_url
 import com.tari.android.wallet.R.string.ttl_store_url
 import com.tari.android.wallet.R.string.user_agreement_url
+import com.tari.android.wallet.R.string.all_settings_screen_recording
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.extension.addTo
@@ -77,9 +79,9 @@ import com.tari.android.wallet.ui.fragment.settings.allSettings.PresentationBack
 import com.tari.android.wallet.ui.fragment.settings.allSettings.PresentationBackupState.BackupStateStatus.Success
 import com.tari.android.wallet.ui.fragment.settings.allSettings.PresentationBackupState.BackupStateStatus.Warning
 import com.tari.android.wallet.ui.fragment.settings.allSettings.backupOptions.SettingsBackupOptionViewHolderItem
-import com.tari.android.wallet.ui.fragment.settings.allSettings.myProfile.MyProfileViewHolderItem
 import com.tari.android.wallet.ui.fragment.settings.allSettings.row.SettingsRowStyle
 import com.tari.android.wallet.ui.fragment.settings.allSettings.row.SettingsRowViewDto
+import com.tari.android.wallet.ui.fragment.settings.allSettings.myProfile.MyProfileViewHolderItem
 import com.tari.android.wallet.ui.fragment.settings.allSettings.title.SettingsTitleViewHolderItem
 import com.tari.android.wallet.ui.fragment.settings.allSettings.version.SettingsVersionViewHolderItem
 import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupSettingsRepository
@@ -123,6 +125,10 @@ class AllSettingsViewModel : CommonViewModel() {
         EventBus.backupState.subscribe(this) { backupState -> onBackupStateChanged(backupState) }
 
         settingsRepository.updateNotifier.subscribe { initOptions() }.addTo(compositeDisposable)
+    }
+
+    fun updateOptions() {
+        initOptions()
     }
 
     private fun initOptions() {
@@ -212,6 +218,14 @@ class AllSettingsViewModel : CommonViewModel() {
             DividerViewHolderItem(),
             SettingsRowViewDto(resourceManager.getString(all_settings_background_service), vector_all_settings_background_service_icon) {
                 navigation.postValue(AllSettingsNavigation.ToBackgroundService)
+            },
+            DividerViewHolderItem(),
+            SettingsRowViewDto(
+                title = resourceManager.getString(all_settings_screen_recording),
+                leftIconId = vector_all_settings_screen_recording_icon,
+                warning = tariSettingsSharedRepository.screenRecordingTurnedOn,
+            ) {
+                navigation.postValue(AllSettingsNavigation.ToScreenRecording)
             },
             DividerViewHolderItem(),
             SettingsRowViewDto(resourceManager.getString(all_settings_bluetooth_settings), vector_all_settings_bluetooth) {

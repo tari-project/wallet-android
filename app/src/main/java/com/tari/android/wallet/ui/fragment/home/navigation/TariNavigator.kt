@@ -91,6 +91,7 @@ import com.tari.android.wallet.ui.fragment.settings.deleteWallet.DeleteWalletFra
 import com.tari.android.wallet.ui.fragment.settings.logs.activity.DebugActivity
 import com.tari.android.wallet.ui.fragment.settings.logs.activity.DebugNavigation
 import com.tari.android.wallet.ui.fragment.settings.networkSelection.NetworkSelectionFragment
+import com.tari.android.wallet.ui.fragment.settings.screenRecording.ScreenRecordingSettingsFragment
 import com.tari.android.wallet.ui.fragment.settings.themeSelector.ThemeSelectorFragment
 import com.tari.android.wallet.ui.fragment.settings.torBridges.TorBridgesSelectionFragment
 import com.tari.android.wallet.ui.fragment.settings.torBridges.customBridges.CustomTorBridgesFragment
@@ -129,6 +130,7 @@ class TariNavigator @Inject constructor(val prefs: SharedPrefsRepository, val ta
             is AllSettingsNavigation.ToMyProfile -> toMyProfile()
             is AllSettingsNavigation.ToAbout -> toAbout()
             is AllSettingsNavigation.ToBackgroundService -> toBackgroundService()
+            is AllSettingsNavigation.ToScreenRecording -> toScreenRecording()
             is AllSettingsNavigation.ToBluetoothSettings -> addFragment(BluetoothSettingsFragment())
             is AllSettingsNavigation.ToBackupSettings -> toBackupSettings(true)
             is AllSettingsNavigation.ToBaseNodeSelection -> toBaseNodeSelection()
@@ -177,7 +179,6 @@ class TariNavigator @Inject constructor(val prefs: SharedPrefsRepository, val ta
             }
 
             is ChatNavigation.ToAddChat -> addFragment(AddChatFragment())
-            else -> Unit
         }
     }
 
@@ -232,6 +233,8 @@ class TariNavigator @Inject constructor(val prefs: SharedPrefsRepository, val ta
     private fun toDeleteWallet() = addFragment(DeleteWalletFragment())
 
     private fun toBackgroundService() = addFragment(BackgroundServiceSettingsFragment())
+
+    private fun toScreenRecording() = addFragment(ScreenRecordingSettingsFragment())
 
     private fun toMyProfile() = addFragment(WalletInfoFragment())
 

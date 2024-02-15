@@ -97,6 +97,7 @@ import com.tari.android.wallet.ui.fragment.settings.logs.LogFilesManager
 import com.tari.android.wallet.ui.fragment.settings.logs.logFiles.LogFilesViewModel
 import com.tari.android.wallet.ui.fragment.settings.logs.logs.LogsViewModel
 import com.tari.android.wallet.ui.fragment.settings.networkSelection.NetworkSelectionViewModel
+import com.tari.android.wallet.ui.fragment.settings.screenRecording.ScreenRecordingSettingsViewModel
 import com.tari.android.wallet.ui.fragment.settings.themeSelector.ThemeSelectorViewModel
 import com.tari.android.wallet.ui.fragment.settings.torBridges.TorBridgesSelectionViewModel
 import com.tari.android.wallet.ui.fragment.settings.torBridges.customBridges.CustomTorBridgesViewModel
@@ -147,6 +148,7 @@ interface ApplicationComponent {
     fun inject(viewModel: ThumbnailGIFsViewModel)
     fun inject(viewModel: GIFViewModel)
     fun inject(viewModel: BackgroundServiceSettingsViewModel)
+    fun inject(viewModel: ScreenRecordingSettingsViewModel)
     fun inject(viewModel: ConnectionIndicatorViewModel)
     fun inject(viewModel: ChooseRestoreOptionViewModel)
     fun inject(viewModel: EnterRestorationPasswordViewModel)

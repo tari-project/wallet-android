@@ -10,6 +10,7 @@ import android.provider.Settings
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.WindowManager
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
@@ -27,7 +28,7 @@ import com.tari.android.wallet.ui.extension.string
 
 abstract class CommonFragment<Binding : ViewBinding, VM : CommonViewModel> : Fragment(), FragmentPoppedListener {
 
-    lateinit var clipboardManager: ClipboardManager
+    private lateinit var clipboardManager: ClipboardManager
 
     private val dialogManager = DialogManager()
 
@@ -37,18 +38,27 @@ abstract class CommonFragment<Binding : ViewBinding, VM : CommonViewModel> : Fra
 
     lateinit var viewModel: VM
 
-    val launcher = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
-        if (it.all { it.value }) {
+    //TODO make viewModel not lateinit. Sometimes it's not initialized in time and causes crashes, so we need to check if it's initialized
+    private val blockScreenRecording
+        get() = !BuildConfig.DEBUG &&
+                (screenRecordingAlwaysDisable() || !(this::viewModel.isInitialized) || !viewModel.tariSettingsSharedRepository.screenRecordingTurnedOn)
+
+    private var fragmentPoppedListener: FragmentPoppedListener? = null
+
+    private val launcher = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { results ->
+        if (results.all { it.value }) {
             viewModel.permissionManager.grantedAction()
         } else {
-            viewModel.permissionManager.showPermissionRequiredDialog(it.filter { !it.value }.map { it.key })
+            viewModel.permissionManager.showPermissionRequiredDialog(results.filter { !it.value }.map { it.key })
         }
     }
+
+    protected open fun screenRecordingAlwaysDisable() = false
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        //to eliminate click throuhg fragments
+        //to eliminate click through fragments
         view.isClickable = true
         view.isFocusable = true
 
@@ -64,6 +74,16 @@ abstract class CommonFragment<Binding : ViewBinding, VM : CommonViewModel> : Fra
         requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, blockingBackPressDispatcher)
 
         return super.onCreateView(inflater, container, savedInstanceState)
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        if (blockScreenRecording) {
+            requireActivity().window.setFlags(WindowManager.LayoutParams.FLAG_SECURE, WindowManager.LayoutParams.FLAG_SECURE)
+        } else {
+            requireActivity().window.clearFlags(WindowManager.LayoutParams.FLAG_SECURE)
+        }
     }
 
     fun bindViewModel(viewModel: VM) = with(viewModel) {

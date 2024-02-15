@@ -75,6 +75,7 @@ sealed class Navigation {
         object ToBackupSettings : AllSettingsNavigation()
         object ToDeleteWallet : AllSettingsNavigation()
         object ToBackgroundService : AllSettingsNavigation()
+        object ToScreenRecording : AllSettingsNavigation()
         object ToBluetoothSettings : AllSettingsNavigation()
         object ToThemeSelection : AllSettingsNavigation()
         object ToTorBridges : AllSettingsNavigation()
