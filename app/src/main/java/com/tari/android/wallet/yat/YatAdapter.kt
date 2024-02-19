@@ -32,8 +32,18 @@ class YatAdapter(
         get() = Logger.t(YatAdapter::class.simpleName)
 
     fun initYat(application: Application) {
-        val config = YatConfiguration(BuildConfig.YAT_ORGANIZATION_RETURN_URL, BuildConfig.YAT_ORGANIZATION_NAME, BuildConfig.YAT_ORGANIZATION_KEY)
-        YatIntegration.setup(application, config, YatIntegration.ColorMode.LIGHT, this, environment = YatIntegration.Environment.Production)
+        val config = YatConfiguration(
+            appReturnLink = BuildConfig.YAT_ORGANIZATION_RETURN_URL,
+            organizationName = BuildConfig.YAT_ORGANIZATION_NAME,
+            organizationKey = BuildConfig.YAT_ORGANIZATION_KEY,
+        )
+        YatIntegration.setup(
+            context = application,
+            config = config,
+            colorMode = YatIntegration.ColorMode.LIGHT,
+            delegate = this,
+            environment = YatIntegration.Environment.Production,
+        )
     }
 
     fun searchTariYats(query: String): PaymentAddressResponse? =
