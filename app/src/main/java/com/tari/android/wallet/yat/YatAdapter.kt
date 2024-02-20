@@ -13,6 +13,7 @@ import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
 import com.tari.android.wallet.ui.fragment.send.common.TransactionData
 import com.tari.android.wallet.ui.fragment.send.finalize.FinalizeSendTxViewModel
 import com.tari.android.wallet.ui.fragment.send.finalize.YatFinalizeSendTxActivity
+import com.tari.android.wallet.util.DebugConfig
 import yat.android.data.YatRecord
 import yat.android.data.YatRecordType
 import yat.android.lib.YatConfiguration
@@ -42,7 +43,7 @@ class YatAdapter(
             config = config,
             colorMode = YatIntegration.ColorMode.LIGHT,
             delegate = this,
-            environment = YatIntegration.Environment.Production,
+            environment = DebugConfig.yatEnvironment,
         )
     }
 

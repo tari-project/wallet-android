@@ -4,7 +4,8 @@ import androidx.lifecycle.MutableLiveData
 import com.tari.android.wallet.extension.addTo
 import com.tari.android.wallet.model.TariWalletAddress
 import com.tari.android.wallet.ui.common.CommonViewModel
-import com.tari.android.wallet.util.TariBuild
+import com.tari.android.wallet.util.DebugConfig
+import com.tari.android.wallet.util.MockDataStub
 import java.util.UUID
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -25,7 +26,7 @@ class ChatsRepository @Inject constructor(private val chatsPrefRepository: Chats
     private fun updateList() {
         val list = chatsPrefRepository.getSavedChats().toMutableList()
 
-        if (TariBuild.MOCKED && list.isEmpty()) {
+        if (DebugConfig.mockedDataEnabled && list.isEmpty()) {
             val mockedList = mutableListOf(
                 ChatItemDto(
                     UUID.randomUUID().toString(),
@@ -38,7 +39,7 @@ class ChatsRepository @Inject constructor(private val chatsPrefRepository: Chats
                             false
                         )
                     ),
-                    TariBuild.mocked_wallet_address
+                    MockDataStub.WALLET_ADDRESS
                 ),
                 ChatItemDto(
                     UUID.randomUUID().toString(),
@@ -51,7 +52,7 @@ class ChatsRepository @Inject constructor(private val chatsPrefRepository: Chats
                             false
                         )
                     ),
-                    TariBuild.mocked_wallet_address
+                    MockDataStub.WALLET_ADDRESS
                 ),
                 ChatItemDto(
                     UUID.randomUUID().toString(),
@@ -64,7 +65,7 @@ class ChatsRepository @Inject constructor(private val chatsPrefRepository: Chats
                             true
                         )
                     ),
-                    TariBuild.mocked_wallet_address
+                    MockDataStub.WALLET_ADDRESS
                 ),
                 ChatItemDto(
                     UUID.randomUUID().toString(),
@@ -77,7 +78,7 @@ class ChatsRepository @Inject constructor(private val chatsPrefRepository: Chats
                             true
                         )
                     ),
-                    TariBuild.mocked_wallet_address
+                    MockDataStub.WALLET_ADDRESS
                 ),
                 ChatItemDto(
                     UUID.randomUUID().toString(),
@@ -90,7 +91,7 @@ class ChatsRepository @Inject constructor(private val chatsPrefRepository: Chats
                             false
                         )
                     ),
-                    TariBuild.mocked_wallet_address
+                    MockDataStub.WALLET_ADDRESS
                 ),
                 ChatItemDto(
                     UUID.randomUUID().toString(),
@@ -103,7 +104,7 @@ class ChatsRepository @Inject constructor(private val chatsPrefRepository: Chats
                             false
                         )
                     ),
-                    TariBuild.mocked_wallet_address
+                    MockDataStub.WALLET_ADDRESS
                 )
             )
 

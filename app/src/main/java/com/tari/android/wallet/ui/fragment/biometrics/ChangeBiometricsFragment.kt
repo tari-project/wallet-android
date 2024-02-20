@@ -14,7 +14,7 @@ import com.tari.android.wallet.extension.observe
 import com.tari.android.wallet.infrastructure.security.biometric.BiometricAuthenticationException
 import com.tari.android.wallet.ui.common.CommonFragment
 import com.tari.android.wallet.ui.extension.string
-import com.tari.android.wallet.util.TariBuild.MOCKED
+import com.tari.android.wallet.util.DebugConfig
 import kotlinx.coroutines.launch
 
 class ChangeBiometricsFragment : CommonFragment<FragmentChangeBiometricsBinding, ChangeBiometricsViewModel>() {
@@ -45,7 +45,7 @@ class ChangeBiometricsFragment : CommonFragment<FragmentChangeBiometricsBinding,
             viewModel.startAuth(isTurningOn)
             lifecycleScope.launch {
                 try {
-                    if (!MOCKED) {
+                    if (!DebugConfig.mockedDataEnabled) {
                         // prompt system authentication dialog
                         viewModel.authService.authenticate(
                             this@ChangeBiometricsFragment,
