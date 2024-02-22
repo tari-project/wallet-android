@@ -58,8 +58,9 @@ android {
                 debugSymbolLevel "FULL"
             }
             sentry {
-                autoUpload.set(false)
-                autoUploadProguardMapping.set(false)
+                autoUpload.set(true)
+                uploadNativeSymbols.set(true)
+                includeNativeSources.set(true)
             }
         }
     }
