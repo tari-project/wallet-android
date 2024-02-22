@@ -42,6 +42,7 @@ android {
     flavorDimensions.add("privacy-mode")
 
     buildTypes {
+        loadSentryProps()
         def secretProperties = loadSecretProps()
 
         debug {
