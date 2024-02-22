@@ -29,8 +29,8 @@ import com.tari.android.wallet.ui.common.recyclerView.CommonViewHolderItem
 import com.tari.android.wallet.ui.common.recyclerView.items.TitleViewHolderItem
 import com.tari.android.wallet.ui.fragment.contact_book.data.ContactsRepository
 import com.tari.android.wallet.ui.fragment.tx.adapter.TransactionItem
-import com.tari.android.wallet.util.TariBuild
-import com.tari.android.wallet.util.TariBuild.MOCKED
+import com.tari.android.wallet.util.DebugConfig
+import com.tari.android.wallet.util.MockDataStub
 import io.reactivex.BackpressureStrategy
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -173,7 +173,7 @@ class TransactionRepository @Inject constructor() : CommonViewModel() {
             })
         }
 
-        if (MOCKED) {
+        if (DebugConfig.mockedDataEnabled) {
 
             val title = TitleViewHolderItem("Mocked Transactions", true)
             val messageGiphy = " https://giphy.com/embed/5885nYOgBHdCw"
@@ -187,7 +187,7 @@ class TransactionRepository @Inject constructor() : CommonViewModel() {
                     message = messageGiphy
                     timestamp = BigInteger.valueOf(System.currentTimeMillis())
                     id = BigInteger.valueOf(1)
-                    tariContact = TariContact(TariBuild.moched_zero_contact, "test1")
+                    tariContact = TariContact(MockDataStub.WALLET_ADDRESS_ZERO, "test1")
                 },
                 contactsRepository.ffiBridge.getContactForTx(CompletedTx()),
                 0,
@@ -203,7 +203,7 @@ class TransactionRepository @Inject constructor() : CommonViewModel() {
                 timestamp = BigInteger.valueOf(System.currentTimeMillis())
                 id = BigInteger.valueOf(1)
                 message = messageGiphy
-                tariContact = TariContact(TariBuild.moched_zero_contact, "test2")
+                tariContact = TariContact(MockDataStub.WALLET_ADDRESS_ZERO, "test2")
             }
             val item2 = TransactionItem(
                 tx2,
@@ -221,7 +221,7 @@ class TransactionRepository @Inject constructor() : CommonViewModel() {
                 fee = MicroTari(BigInteger.valueOf(1000))
                 timestamp = BigInteger.valueOf(System.currentTimeMillis())
                 id = BigInteger.valueOf(1)
-                tariContact = TariContact(TariBuild.mocked_wallet_address, "test3")
+                tariContact = TariContact(MockDataStub.WALLET_ADDRESS, "test3")
 
             }
             val item3 = TransactionItem(

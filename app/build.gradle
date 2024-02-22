@@ -288,8 +288,10 @@ dependencies {
 
     implementation "com.dropbox.core:dropbox-core-sdk:5.4.6"
 
-//    implementation "com.github.yat-labs:yat-lib-android:0.1.42"
-    implementation project(":yatlib")
+    // It's recommended to use the latest version of the library from the JitPack repository,
+    // but you can also use a locally build version of the library by using the ":yatlib" module and `yat-lib-debug-snapshot.aar` file with your build
+    implementation "com.github.tari-project:yat-lib-android:0.4.1"
+//     implementation project(":yatlib")
 
     // custom libraries region
     // flex layout

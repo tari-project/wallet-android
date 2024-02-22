@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.google.gson.Gson
+import com.orhanobut.logger.Logger
 import com.tari.android.wallet.extension.observe
 import com.tari.android.wallet.extension.observeOnLoad
 import com.tari.android.wallet.ui.fragment.send.common.TransactionData
@@ -17,17 +18,26 @@ class YatFinalizeSendTxActivity : YatLibOutcomingTransactionActivity() {
 
     val viewModel: FinalizeSendTxViewModel by viewModels()
 
+    private val logger
+        get() = Logger.t(YatFinalizeSendTxActivity::class.simpleName)
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val gson = intent.getStringExtra(FinalizeSendTxViewModel.transactionDataKey)!!
-        val entity =  Gson().fromJson(gson, TransactionData::class.java)
+        intent.getStringExtra(FinalizeSendTxViewModel.transactionDataKey)
+            ?.let { Gson().fromJson(it, TransactionData::class.java) }
+            ?.let { entity ->
+                viewModel.transactionData = entity
 
-        viewModel.transactionData = entity
-
-        subscribeOnUI()
-        launchObserver()
+                subscribeOnUI()
+                launchObserver()
+            } ?: run {
+            logger.e("Transaction data is null. Finishing activity.")
+            finish()
+            return
+        }
     }
+
 
     private fun subscribeOnUI() = with(viewModel) {
         observe(txFailureReason) { setTransactionState(TransactionState.Failed) }
@@ -52,6 +62,6 @@ class YatFinalizeSendTxActivity : YatLibOutcomingTransactionActivity() {
         super.onStop()
         viewModel.sentTxId.value?.let { viewModel.tariNavigator.onSendTxSuccessful(true, it) }
 
-        viewModel.txFailureReason.value?.let {viewModel.tariNavigator.onSendTxFailure(true, it) }
+        viewModel.txFailureReason.value?.let { viewModel.tariNavigator.onSendTxFailure(true, it) }
     }
 }
