@@ -59,7 +59,7 @@ class BalanceViewController(
     private val delayByIndex: Long = 80L
 
     init {
-        val balance = _balanceInfo.availableBalance + _balanceInfo.pendingIncomingBalance
+        val balance = _balanceInfo.totalBalance
         formattedBalance = WalletUtil.balanceFormatter.format(balance.tariValue)
         // decimal tens
         viewHolders.add(DecimalDigitViewHolder(context, formattedBalance[formattedBalance.length - 1].toString().toInt()))
@@ -94,7 +94,7 @@ class BalanceViewController(
         set(value) {
             /* execute setter logic */
             _balanceInfo = value
-            val balance = _balanceInfo.availableBalance + _balanceInfo.pendingIncomingBalance
+            val balance = _balanceInfo.totalBalance
             formattedBalance = WalletUtil.balanceFormatter.format(balance.tariValue)
             val sizeDiff = formattedBalance.length - viewHolders.size
             if (sizeDiff <= 0) {

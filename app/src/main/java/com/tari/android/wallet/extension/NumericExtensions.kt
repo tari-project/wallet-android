@@ -47,13 +47,14 @@ fun Float.remap(from1: Float, to1: Float, from2: Float, to2: Float): Float {
 /**
  * Int to MicroTari.
  */
-fun Int.toMicroTari(): MicroTari {
-    return MicroTari(BigInteger.valueOf(this.toLong()))
-}
+fun Int.toMicroTari() = BigInteger.valueOf(this.toLong()).toMicroTari()
 
 /**
  * Long to MicroTari.
  */
-fun Long.toMicroTari(): MicroTari {
-    return MicroTari(BigInteger.valueOf(this))
-}
+fun Long.toMicroTari() = BigInteger.valueOf(this).toMicroTari()
+
+/**
+ * BigInteger to MicroTari.
+ */
+fun BigInteger.toMicroTari() = MicroTari(this)
