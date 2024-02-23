@@ -42,6 +42,7 @@ android {
     flavorDimensions.add("privacy-mode")
 
     buildTypes {
+        loadSentryProps()
         def secretProperties = loadSecretProps()
 
         debug {
@@ -57,8 +58,9 @@ android {
                 debugSymbolLevel "FULL"
             }
             sentry {
-                autoUpload.set(false)
-                autoUploadProguardMapping.set(false)
+                autoUpload.set(true)
+                uploadNativeSymbols.set(true)
+                includeNativeSources.set(true)
             }
         }
     }
