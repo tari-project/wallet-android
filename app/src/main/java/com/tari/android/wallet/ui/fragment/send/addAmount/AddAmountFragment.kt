@@ -228,7 +228,7 @@ class AddAmountFragment : CommonFragment<FragmentAddAmountBinding, AddAmountView
 
         val amount = keyboardController.currentAmount
         if (error == WalletError.NoError && fee != null) {
-            if (amount > balanceInfo.availableBalance && !DebugConfig.mockedDataEnabled) {
+            if (amount > balanceInfo.availableToSpendBalance && !DebugConfig.mockedDataEnabled) {
                 lifecycleScope.launch(Dispatchers.Main) {
                     actualBalanceExceeded()
                 }
@@ -256,7 +256,7 @@ class AddAmountFragment : CommonFragment<FragmentAddAmountBinding, AddAmountView
 
     private fun updateBalanceInfo() {
         balanceInfo = viewModel.walletService.getWithError { error, wallet -> wallet.getBalanceInfo(error) }
-        availableBalance = balanceInfo.availableBalance
+        availableBalance = balanceInfo.availableToSpendBalance
         ui.availableBalanceContainerView.setupArgs(availableBalance)
     }
 
