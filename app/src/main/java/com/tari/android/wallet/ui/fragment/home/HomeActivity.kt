@@ -90,7 +90,7 @@ import com.tari.android.wallet.ui.fragment.splash.SplashActivity
 import com.tari.android.wallet.ui.fragment.store.StoreFragment
 import com.tari.android.wallet.ui.fragment.tx.HomeFragment
 import com.tari.android.wallet.util.Constants
-import com.tari.android.wallet.util.TariBuild
+import com.tari.android.wallet.util.DebugConfig
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -263,13 +263,13 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>() {
     }
 
     private fun setupUi() {
-        ui.sendTariButton.setOnClickListener { viewModel.navigation.postValue(Navigation.TxListNavigation.ToTransfer()) }
+        ui.sendTariButton.setOnClickListener { viewModel.navigation.postValue(Navigation.TxListNavigation.ToTransfer) }
         setupBottomNavigation()
     }
 
     private fun setupBottomNavigation() {
         enableNavigationView(ui.homeImageView)
-        ui.viewPager.adapter = if (TariBuild.isChat) HomeChatAdapter(supportFragmentManager, this.lifecycle)
+        ui.viewPager.adapter = if (DebugConfig.isChatEnabled) HomeChatAdapter(supportFragmentManager, this.lifecycle)
         else HomeStoreAdapter(supportFragmentManager, this.lifecycle)
         ui.viewPager.isUserInputEnabled = false
         ui.viewPager.offscreenPageLimit = 3
@@ -277,12 +277,12 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>() {
             ui.viewPager.setCurrentItem(INDEX_HOME, NO_SMOOTH_SCROLL)
             enableNavigationView(ui.homeImageView)
         }
-        ui.storeImageView.setImageResource(if (TariBuild.isChat) R.drawable.vector_home_book else R.drawable.vector_ttl_store_icon)
+        ui.storeImageView.setImageResource(if (DebugConfig.isChatEnabled) R.drawable.vector_home_book else R.drawable.vector_ttl_store_icon)
         ui.storeView.setOnClickListener {
             ui.viewPager.setCurrentItem(INDEX_CONTACT_BOOK, NO_SMOOTH_SCROLL)
             enableNavigationView(ui.storeImageView)
         }
-        ui.chatImageView.setImageResource(if (TariBuild.isChat) R.drawable.vector_home_chat else R.drawable.vector_home_book)
+        ui.chatImageView.setImageResource(if (DebugConfig.isChatEnabled) R.drawable.vector_home_chat else R.drawable.vector_home_book)
         ui.chatView.setOnClickListener {
             ui.viewPager.setCurrentItem(INDEX_CHAT, NO_SMOOTH_SCROLL)
             enableNavigationView(ui.chatImageView)

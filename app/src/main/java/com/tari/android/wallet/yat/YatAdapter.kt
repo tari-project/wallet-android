@@ -13,6 +13,7 @@ import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
 import com.tari.android.wallet.ui.fragment.send.common.TransactionData
 import com.tari.android.wallet.ui.fragment.send.finalize.FinalizeSendTxViewModel
 import com.tari.android.wallet.ui.fragment.send.finalize.YatFinalizeSendTxActivity
+import com.tari.android.wallet.util.DebugConfig
 import yat.android.data.YatRecord
 import yat.android.data.YatRecordType
 import yat.android.lib.YatConfiguration
@@ -32,8 +33,18 @@ class YatAdapter(
         get() = Logger.t(YatAdapter::class.simpleName)
 
     fun initYat(application: Application) {
-        val config = YatConfiguration(BuildConfig.YAT_ORGANIZATION_RETURN_URL, BuildConfig.YAT_ORGANIZATION_NAME, BuildConfig.YAT_ORGANIZATION_KEY)
-        YatIntegration.setup(application, config, YatIntegration.ColorMode.LIGHT, this, environment = YatIntegration.Environment.Production)
+        val config = YatConfiguration(
+            appReturnLink = BuildConfig.YAT_ORGANIZATION_RETURN_URL,
+            organizationName = BuildConfig.YAT_ORGANIZATION_NAME,
+            organizationKey = BuildConfig.YAT_ORGANIZATION_KEY,
+        )
+        YatIntegration.setup(
+            context = application,
+            config = config,
+            colorMode = YatIntegration.ColorMode.LIGHT,
+            delegate = this,
+            environment = DebugConfig.yatEnvironment,
+        )
     }
 
     fun searchTariYats(query: String): PaymentAddressResponse? =

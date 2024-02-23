@@ -53,6 +53,8 @@ import com.tari.android.wallet.ui.extension.visible
 
 class VerifySeedPhraseFragment : CommonFragment<FragmentVerifySeedPhraseBinding, VerifySeedPhraseViewModel>() {
 
+    override fun screenRecordingAlwaysDisable() = true
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
         FragmentVerifySeedPhraseBinding.inflate(inflater, container, false).also { ui = it }.root
 

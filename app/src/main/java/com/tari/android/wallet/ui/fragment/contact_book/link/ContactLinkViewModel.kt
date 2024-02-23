@@ -184,7 +184,7 @@ class ContactLinkViewModel : CommonViewModel() {
             ButtonModule(resourceManager.getString(common_close), ButtonStyle.Close)
         )
         modularDialog.postValue(ModularDialogArgs(DialogArgs {
-            navigation.value = Navigation.ContactBookNavigation.BackToContactBook()
+            navigation.value = Navigation.ContactBookNavigation.BackToContactBook
         }, modules))
     }
 }

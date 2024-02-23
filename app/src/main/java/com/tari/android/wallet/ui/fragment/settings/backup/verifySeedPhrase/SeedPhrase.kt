@@ -1,12 +1,12 @@
 package com.tari.android.wallet.ui.fragment.settings.backup.verifySeedPhrase
 
-import com.tari.android.wallet.util.TariBuild
+import com.tari.android.wallet.util.DebugConfig
 
 class SeedPhrase(private val seedWords: List<String>) : Iterable<String> {
     val length
         get() = seedWords.size
 
-    private fun sorted(): SeedPhrase = SeedPhrase(if (TariBuild.MOCKED) seedWords else seedWords.sorted())
+    private fun sorted(): SeedPhrase = SeedPhrase(if (DebugConfig.mockedDataEnabled) seedWords else seedWords.sorted())
 
     fun consistsOf(result: List<String>): Boolean = seedWords == result
 

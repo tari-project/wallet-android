@@ -1,93 +1,86 @@
 package com.tari.android.wallet.application.securityStage
 
-import android.text.SpannableString
-import android.text.Spanned
-import com.tari.android.wallet.R
+import com.tari.android.wallet.application.securityStage.StagedWalletSecurityManager.StagedSecurityEffect.NoStagedSecurityPopUp
+import com.tari.android.wallet.application.securityStage.StagedWalletSecurityManager.StagedSecurityEffect.ShowStagedSecurityPopUp
 import com.tari.android.wallet.data.sharedPrefs.securityStages.DisabledTimestampsDto
 import com.tari.android.wallet.data.sharedPrefs.securityStages.SecurityStagesRepository
 import com.tari.android.wallet.data.sharedPrefs.securityStages.WalletSecurityStage
-import com.tari.android.wallet.data.sharedPrefs.securityStages.modules.SecurityStageHeadModule
-import com.tari.android.wallet.event.EventBus
-import com.tari.android.wallet.extension.addTo
+import com.tari.android.wallet.data.sharedPrefs.tariSettings.TariSettingsSharedRepository
+import com.tari.android.wallet.extension.isAfterNow
 import com.tari.android.wallet.model.BalanceInfo
 import com.tari.android.wallet.model.MicroTari
-import com.tari.android.wallet.ui.common.CommonViewModel
-import com.tari.android.wallet.ui.dialog.modular.DialogArgs
-import com.tari.android.wallet.ui.dialog.modular.ModularDialogArgs
-import com.tari.android.wallet.ui.dialog.modular.modules.body.BodyModule
-import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonModule
-import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonStyle
-import com.tari.android.wallet.ui.dialog.modular.modules.space.SpaceModule
-import com.tari.android.wallet.ui.fragment.settings.backup.backupOnboarding.item.BackupOnboardingArgs
-import com.tari.android.wallet.ui.fragment.settings.backup.backupOnboarding.module.BackupOnboardingFlowItemModule
 import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupSettingsRepository
-import yat.android.ui.extension.HtmlHelper
 import java.math.BigDecimal
 import java.util.Calendar
 import javax.inject.Inject
+import javax.inject.Singleton
 
-class StagedWalletSecurityManager : CommonViewModel() {
+val MINIMUM_STAGE_ONE_BALANCE = MicroTari((BigDecimal.valueOf(10_000) * MicroTari.precisionValue).toBigInteger())
+val STAGE_TWO_THRESHOLD_BALANCE = MicroTari((BigDecimal.valueOf(100_000) * MicroTari.precisionValue).toBigInteger())
+val SAFE_HOT_WALLET_BALANCE = MicroTari((BigDecimal.valueOf(500_000_000) * MicroTari.precisionValue).toBigInteger())
+val MAX_HOT_WALLET_BALANCE = MicroTari((BigDecimal.valueOf(1_000_000_000) * MicroTari.precisionValue).toBigInteger())
 
-    @Inject
-    lateinit var securityStagesRepository: SecurityStagesRepository
-
-    @Inject
-    lateinit var backupPrefsRepository: BackupSettingsRepository
-
-    init {
-        component.inject(this)
-
-        EventBus.balanceUpdates.publishSubject.subscribe { handleChange(it) }.addTo(compositeDisposable)
-    }
-
-    val hasVerifiedSeedPhrase
+@Singleton
+class StagedWalletSecurityManager @Inject constructor(
+    private val securityStagesRepository: SecurityStagesRepository,
+    private val backupPrefsRepository: BackupSettingsRepository,
+    private val tariSettingsSharedRepository: TariSettingsSharedRepository,
+) {
+    private val hasVerifiedSeedPhrase
         get() = tariSettingsSharedRepository.hasVerifiedSeedWords
 
-    val isBackupOn
+    private val isBackupOn
         get() = backupPrefsRepository.getOptionList.any { it.isEnable }
 
-    val isBackupPasswordSet
+    private val isBackupPasswordSet
         get() = !backupPrefsRepository.backupPassword.isNullOrEmpty()
 
-    val disabledTimestampSinceNow
+    private val disabledTimestampSinceNow: Calendar
         get() = Calendar.getInstance().also { it.add(Calendar.DAY_OF_YEAR, 7) }
 
-    var disabledTimestamps: MutableMap<WalletSecurityStage, Calendar>
+    private var disabledTimestamps: MutableMap<WalletSecurityStage, Calendar>
         get() = securityStagesRepository.disabledTimestamps?.timestamps ?: DisabledTimestampsDto(mutableMapOf()).timestamps
         set(value) {
             securityStagesRepository.disabledTimestamps = DisabledTimestampsDto(value)
         }
+
+    /**
+     * Check the current security stage based on the balance and the user's security settings.
+     */
+    fun handleBalanceChange(balance: BalanceInfo): StagedSecurityEffect {
+        val securityStage = checkSecurityStage(balance) ?: return NoStagedSecurityPopUp
+        //todo Stage 3 is currently disabled
+        if (securityStage == WalletSecurityStage.Stage3) return NoStagedSecurityPopUp
+        if (isActionDisabled(securityStage)) return NoStagedSecurityPopUp
+
+        updateTimestamp(securityStage)
+
+        return ShowStagedSecurityPopUp(securityStage)
+    }
 
     private fun updateTimestamp(securityStage: WalletSecurityStage) {
         val newTimestamp = disabledTimestampSinceNow
         disabledTimestamps = disabledTimestamps.also { it[securityStage] = newTimestamp }
     }
 
-    private fun handleChange(balance: BalanceInfo) {
-        val securityStage = getSecurityStages(balance) ?: return
-        //todo Stage 3 is currently disabled
-        if (securityStage == WalletSecurityStage.Stage3) return
-        if (isActionDisabled(securityStage)) return
-
-        updateTimestamp(securityStage)
-        showPopUp(securityStage)
-    }
-
-    private fun getSecurityStages(balanceInfo: BalanceInfo): WalletSecurityStage? {
+    /**
+     * Returns null if no security stage is required.
+     */
+    private fun checkSecurityStage(balanceInfo: BalanceInfo): WalletSecurityStage? {
         val balance = balanceInfo.availableBalance
 
         return when {
-            balance >= minimumStageOneBalance && !hasVerifiedSeedPhrase -> WalletSecurityStage.Stage1A
-            balance >= minimumStageOneBalance && !isBackupOn -> WalletSecurityStage.Stage1B
-            balance >= stageTwoThresholdBalance && !isBackupPasswordSet -> WalletSecurityStage.Stage2
-            balance >= safeHotWalletBalance -> WalletSecurityStage.Stage3
+            balance >= MINIMUM_STAGE_ONE_BALANCE && !hasVerifiedSeedPhrase -> WalletSecurityStage.Stage1A
+            balance >= MINIMUM_STAGE_ONE_BALANCE && !isBackupOn -> WalletSecurityStage.Stage1B
+            balance >= STAGE_TWO_THRESHOLD_BALANCE && !isBackupPasswordSet -> WalletSecurityStage.Stage2
+            balance >= SAFE_HOT_WALLET_BALANCE -> WalletSecurityStage.Stage3
             else -> null
         }
     }
 
     private fun isActionDisabled(securityStage: WalletSecurityStage): Boolean {
         val timestamp = disabledTimestamps[securityStage] ?: return false
-        if (timestamp < Calendar.getInstance()) {
+        if (timestamp.isAfterNow()) {
             return true
         }
 
@@ -95,119 +88,8 @@ class StagedWalletSecurityManager : CommonViewModel() {
         return false
     }
 
-    fun showPopUp(securityStage: WalletSecurityStage) {
-        when (securityStage) {
-            WalletSecurityStage.Stage1A -> showStage1APopUp()
-            WalletSecurityStage.Stage1B -> showStage1BPopUp()
-            WalletSecurityStage.Stage2 -> showStage2PopUp()
-            WalletSecurityStage.Stage3 -> showStage3PopUp()
-        }
-    }
-
-    private fun showStage1APopUp() {
-        showPopup(
-            BackupOnboardingArgs.StageOne(resourceManager, this::openStage1),
-            resourceManager.getString(R.string.staged_wallet_security_stages_1a_title),
-            resourceManager.getString(R.string.staged_wallet_security_stages_1a_subtitle),
-            null,
-            resourceManager.getString(R.string.staged_wallet_security_stages_1a_buttons_positive),
-            HtmlHelper.getSpannedText(resourceManager.getString(R.string.staged_wallet_security_stages_1a_message))
-        ) { openStage1() }
-    }
-
-    private fun openStage1() {
-        dismissDialog.postValue(Unit)
-        tariNavigator?.let {
-            it.toAllSettings()
-            it.toBackupSettings(false)
-            it.toWalletBackupWithRecoveryPhrase()
-        }
-    }
-
-    private fun showStage1BPopUp() {
-        showPopup(
-            BackupOnboardingArgs.StageTwo(resourceManager, this::openStage1B),
-            resourceManager.getString(R.string.staged_wallet_security_stages_1b_title),
-            resourceManager.getString(R.string.staged_wallet_security_stages_1b_subtitle),
-            resourceManager.getString(R.string.staged_wallet_security_stages_1b_message),
-            resourceManager.getString(R.string.staged_wallet_security_stages_1b_buttons_positive),
-        ) { openStage1() }
-    }
-
-    private fun openStage1B() {
-        dismissDialog.postValue(Unit)
-        tariNavigator?.let {
-            it.toAllSettings()
-            it.toBackupSettings(true)
-        }
-    }
-
-    private fun showStage2PopUp() {
-        showPopup(
-            BackupOnboardingArgs.StageThree(resourceManager, this::openStage2),
-            resourceManager.getString(R.string.staged_wallet_security_stages_2_title),
-            resourceManager.getString(R.string.staged_wallet_security_stages_2_subtitle),
-            resourceManager.getString(R.string.staged_wallet_security_stages_2_message),
-            resourceManager.getString(R.string.staged_wallet_security_stages_2_buttons_positive),
-        ) { openStage2() }
-    }
-
-    private fun openStage2() {
-        dismissDialog.postValue(Unit)
-        tariNavigator?.let {
-            it.toAllSettings()
-            it.toBackupSettings(false)
-            it.toChangePassword()
-        }
-    }
-
-    private fun showStage3PopUp() {
-        showPopup(
-            BackupOnboardingArgs.StageFour(resourceManager, this::openStage3),
-            resourceManager.getString(R.string.staged_wallet_security_stages_3_title),
-            resourceManager.getString(R.string.staged_wallet_security_stages_3_subtitle),
-            resourceManager.getString(R.string.staged_wallet_security_stages_3_message),
-            resourceManager.getString(R.string.staged_wallet_security_stages_3_buttons_positive),
-        ) { openStage3() }
-    }
-
-    private fun openStage3() {
-        dismissDialog.postValue(Unit)
-        //todo for future
-    }
-
-    private fun showPopup(
-        stage: BackupOnboardingArgs,
-        titleEmoji: String,
-        title: String,
-        body: String?,
-        positiveButtonTitle: String,
-        bodyHtml: Spanned? = null,
-        positiveAction: () -> Unit = {},
-    ) {
-        val args = ModularDialogArgs(
-            DialogArgs(), listOf(
-                SecurityStageHeadModule(titleEmoji, title) { showBackupInfo(stage) },
-                BodyModule(body, bodyHtml?.let { SpannableString(it) }),
-                ButtonModule(positiveButtonTitle, ButtonStyle.Normal) { positiveAction.invoke() },
-                ButtonModule(resourceManager.getString(R.string.staged_wallet_security_buttons_remind_me_later), ButtonStyle.Close)
-            )
-        )
-        modularDialog.postValue(args)
-    }
-
-    private fun showBackupInfo(stage: BackupOnboardingArgs) {
-        val args = ModularDialogArgs(DialogArgs(), listOf(
-            BackupOnboardingFlowItemModule(stage),
-            SpaceModule(20)
-        ))
-        modularDialog.postValue(args)
-    }
-
-    companion object {
-        val minimumStageOneBalance = MicroTari((BigDecimal.valueOf(10_000) * MicroTari.precisionValue).toBigInteger())
-        val stageTwoThresholdBalance = MicroTari((BigDecimal.valueOf(100_000) * MicroTari.precisionValue).toBigInteger())
-        val safeHotWalletBalance = MicroTari((BigDecimal.valueOf(500_000_000) * MicroTari.precisionValue).toBigInteger())
-        val maxHotWalletBalance = MicroTari((BigDecimal.valueOf(1_000_000_000) * MicroTari.precisionValue).toBigInteger())
+    sealed class StagedSecurityEffect {
+        data class ShowStagedSecurityPopUp(val stage: WalletSecurityStage) : StagedSecurityEffect()
+        object NoStagedSecurityPopUp : StagedSecurityEffect()
     }
 }

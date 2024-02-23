@@ -28,7 +28,7 @@ import com.tari.android.wallet.ui.fragment.utxos.list.module.DetailItemModule
 import com.tari.android.wallet.ui.fragment.utxos.list.module.ListItemModule
 import com.tari.android.wallet.ui.fragment.utxos.list.module.UtxoAmountModule
 import com.tari.android.wallet.ui.fragment.utxos.list.module.UtxoSplitModule
-import com.tari.android.wallet.util.TariBuild
+import com.tari.android.wallet.util.DebugConfig
 import java.math.BigInteger
 import kotlin.random.Random
 
@@ -165,7 +165,7 @@ class UtxosListViewModel : CommonViewModel() {
             wallet.getAllUtxos(error)
         }.itemsList.map { UtxosViewHolderItem(it) }.filter { it.isShowingStatus }.toMutableList()
 
-        if (TariBuild.MOCKED && allItems.isEmpty()) {
+        if (DebugConfig.mockedDataEnabled && allItems.isEmpty()) {
             for (i in 0 until 20) {
                 allItems.add(0, UtxosViewHolderItem(TariUtxo().apply {
                     value = MicroTari(BigInteger.valueOf(Random.nextLong(1, 100000) * 10000))

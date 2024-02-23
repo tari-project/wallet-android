@@ -1,2 +1,2 @@
 configurations.maybeCreate("default")
-artifacts.add("default", file('yat-lib-release.aar'))
+artifacts.add("default", file('yat-lib-development-snapshot.aar'))

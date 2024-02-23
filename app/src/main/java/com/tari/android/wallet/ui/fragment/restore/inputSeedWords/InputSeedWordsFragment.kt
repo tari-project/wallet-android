@@ -34,6 +34,8 @@ class InputSeedWordsFragment : CommonFragment<FragmentWalletInputSeedWordsBindin
     private val suggestionsAdapter = SuggestionsAdapter()
     private var keyboardRegistrar: Unregistrar? = null
 
+    override fun screenRecordingAlwaysDisable() = true
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
         FragmentWalletInputSeedWordsBinding.inflate(inflater, container, false).also { ui = it }.root
 
