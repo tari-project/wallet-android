@@ -49,6 +49,8 @@ object DebugConfig {
     private const val _useYatSandbox = false
     val yatEnvironment = if (_useYatSandbox && isDebug()) YatEnvironment.SANDBOX else YatEnvironment.PRODUCTION
 
+    val isBlockExplorerEnabled = false
+
     private fun isDebug() = BuildConfig.BUILD_TYPE == "debug"
 }
 

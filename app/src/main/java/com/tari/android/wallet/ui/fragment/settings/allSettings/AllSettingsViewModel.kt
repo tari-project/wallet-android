@@ -20,6 +20,7 @@ import com.tari.android.wallet.R.drawable.vector_all_settings_screen_recording_i
 import com.tari.android.wallet.R.drawable.vector_all_settings_select_base_node_icon
 import com.tari.android.wallet.R.drawable.vector_all_settings_select_network_icon
 import com.tari.android.wallet.R.drawable.vector_all_settings_select_theme_icon
+import com.tari.android.wallet.R.drawable.vector_all_settings_block_explorer_icon
 import com.tari.android.wallet.R.drawable.vector_all_settings_user_agreement_icon
 import com.tari.android.wallet.R.drawable.vector_all_settings_visit_tari_icon
 import com.tari.android.wallet.R.drawable.vector_all_settings_yat_icon
@@ -30,6 +31,7 @@ import com.tari.android.wallet.R.string.all_settings_biometrics
 import com.tari.android.wallet.R.string.all_settings_bluetooth_settings
 import com.tari.android.wallet.R.string.all_settings_bridge_configuration
 import com.tari.android.wallet.R.string.all_settings_connect_yats
+import com.tari.android.wallet.R.string.explorer_url
 import com.tari.android.wallet.R.string.all_settings_contribute
 import com.tari.android.wallet.R.string.all_settings_create_pin_code
 import com.tari.android.wallet.R.string.all_settings_data_collection
@@ -41,6 +43,7 @@ import com.tari.android.wallet.R.string.all_settings_report_a_bug
 import com.tari.android.wallet.R.string.all_settings_secondary_settings_label
 import com.tari.android.wallet.R.string.all_settings_security_label
 import com.tari.android.wallet.R.string.all_settings_select_base_node
+import com.tari.android.wallet.R.string.all_settings_explorer
 import com.tari.android.wallet.R.string.all_settings_select_network
 import com.tari.android.wallet.R.string.all_settings_select_theme
 import com.tari.android.wallet.R.string.all_settings_store
@@ -86,6 +89,7 @@ import com.tari.android.wallet.ui.fragment.settings.allSettings.title.SettingsTi
 import com.tari.android.wallet.ui.fragment.settings.allSettings.version.SettingsVersionViewHolderItem
 import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupSettingsRepository
 import com.tari.android.wallet.ui.fragment.settings.userAutorization.BiometricAuthenticationViewModel
+import com.tari.android.wallet.util.DebugConfig
 import com.tari.android.wallet.yat.YatAdapter
 import com.tari.android.wallet.yat.YatSharedRepository
 import javax.inject.Inject
@@ -116,8 +120,8 @@ class AllSettingsViewModel : CommonViewModel() {
     private val _openYatOnboarding = SingleLiveEvent<Unit>()
     val openYatOnboarding: LiveData<Unit> = _openYatOnboarding
 
-    private val _allSettingsOptions = MutableLiveData<MutableList<CommonViewHolderItem>>()
-    val allSettingsOptions: LiveData<MutableList<CommonViewHolderItem>> = _allSettingsOptions
+    private val _allSettingsOptions = MutableLiveData<List<CommonViewHolderItem>>()
+    val allSettingsOptions: LiveData<List<CommonViewHolderItem>> = _allSettingsOptions
 
     init {
         component.inject(this)
@@ -141,7 +145,7 @@ class AllSettingsViewModel : CommonViewModel() {
         val alias = settingsRepository.name.orEmpty() + " " + settingsRepository.surname.orEmpty()
         val pinCode = securityPrefRepository.pinCode
 
-        val allOptions = mutableListOf(
+        _allSettingsOptions.postValue(listOfNotNull(
             MyProfileViewHolderItem(settingsRepository.emojiId.orEmpty(), yatSharedPrefsRepository.connectedYat.orEmpty(), alias) {
                 navigation.postValue(AllSettingsNavigation.ToMyProfile)
             },
@@ -208,9 +212,9 @@ class AllSettingsViewModel : CommonViewModel() {
                 _openLink.postValue(resourceManager.getString(disclaimer_url))
             },
             DividerViewHolderItem(),
-//            ButtonViewDto(resourceManager.getString(all_settings_explorer), vector_all_settings_block_explorer_icon) {
-//                _openLink.postValue(resourceManager.getString(explorer_url))
-//            },
+            SettingsRowViewDto(resourceManager.getString(all_settings_explorer), vector_all_settings_block_explorer_icon) {
+                _openLink.postValue(resourceManager.getString(explorer_url))
+            }.takeIf { DebugConfig.isBlockExplorerEnabled },
             SettingsTitleViewHolderItem(resourceManager.getString(all_settings_advanced_settings_label)),
             SettingsRowViewDto(resourceManager.getString(all_settings_select_theme), vector_all_settings_select_theme_icon) {
                 navigation.postValue(AllSettingsNavigation.ToThemeSelection)
@@ -251,9 +255,8 @@ class AllSettingsViewModel : CommonViewModel() {
                 style = SettingsRowStyle.Warning,
             ) { navigation.postValue(AllSettingsNavigation.ToDeleteWallet) },
             DividerViewHolderItem(),
-            SettingsVersionViewHolderItem(versionText) { _copyToClipboard.postValue(versionArgs) }
+            SettingsVersionViewHolderItem(versionText) { _copyToClipboard.postValue(versionArgs) })
         )
-        _allSettingsOptions.postValue(allOptions)
     }
 
     private fun onBackupStateChanged(backupState: BackupsState?) {
