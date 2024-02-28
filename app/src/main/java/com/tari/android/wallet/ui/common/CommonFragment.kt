@@ -79,6 +79,7 @@ abstract class CommonFragment<Binding : ViewBinding, VM : CommonViewModel> : Fra
 
     override fun onResume() {
         super.onResume()
+        if (!isAdded) return
 
         if (blockScreenRecording) {
             requireActivity().window.setFlags(WindowManager.LayoutParams.FLAG_SECURE, WindowManager.LayoutParams.FLAG_SECURE)
