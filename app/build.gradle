@@ -38,6 +38,7 @@ android {
         buildConfigField("String", "YAT_ORGANIZATION_RETURN_URL", "\"${yatProperties.getProperty("yat.returnUrl")}\"")
         def dropboxProperties = loadDropboxProps()
         buildConfigField("String", "DROPBOX_ACCESS_TOKEN", "\"${dropboxProperties.getProperty("dropbox_key")}\"")
+        buildConfigField("String", "LIB_WALLET_MIN_VALID_VERSION", "\"$libwalletMinValidVersion\"")
     }
 
     flavorDimensions.add("privacy-mode")
