@@ -40,6 +40,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import com.daasuu.ei.Ease
 import com.daasuu.ei.EasingInterpolator
@@ -49,7 +50,7 @@ import com.tari.android.wallet.application.WalletState
 import com.tari.android.wallet.databinding.FragmentLocalAuthBinding
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.extension.addTo
-import com.tari.android.wallet.extension.observe
+import com.tari.android.wallet.extension.launchAndRepeatOnLifecycle
 import com.tari.android.wallet.infrastructure.security.biometric.BiometricAuthenticationException
 import com.tari.android.wallet.ui.common.CommonFragment
 import com.tari.android.wallet.ui.extension.doOnGlobalLayout
@@ -78,11 +79,15 @@ class LocalAuthFragment : CommonFragment<FragmentLocalAuthBinding, LocalAuthView
     }
 
     private fun observeUi() = with(viewModel) {
-        observe(secureState) {
-            ui.continueBtn.setVisible(it.pinCodeSecured)
-            ui.authTypeBiometrics.setVisible(it.biometricsAvailable)
-            ui.secureWithPasscode.setVisible(!it.pinCodeSecured)
-            ui.secureWithBiometrics.setVisible(it.biometricsAvailable && !it.biometricsSecured)
+        viewLifecycleOwner.launchAndRepeatOnLifecycle(Lifecycle.State.STARTED) {
+            launch {
+                secureState.collect { state ->
+                    ui.continueBtn.setVisible(state.pinCodeSecured)
+                    ui.authTypeBiometrics.setVisible(state.biometricsAvailable)
+                    ui.secureWithPasscode.setVisible(!state.pinCodeSecured)
+                    ui.secureWithBiometrics.setVisible(state.biometricsAvailable && !state.biometricsSecured)
+                }
+            }
         }
     }
 
@@ -122,10 +127,11 @@ class LocalAuthFragment : CommonFragment<FragmentLocalAuthBinding, LocalAuthView
         lifecycleScope.launch {
             try {
                 val subtitle = string(onboarding_auth_biometric_prompt)
-                if (viewModel.authService.authenticate(this@LocalAuthFragment, string(onboarding_auth_title), subtitle))
+                if (viewModel.authService.authenticate(this@LocalAuthFragment, string(onboarding_auth_title), subtitle)) {
                     viewModel.securedWithBiometrics()
+                }
             } catch (exception: BiometricAuthenticationException) {
-                viewModel.logger.i( exception.message + "Biometric authentication failed")
+                viewModel.logger.i(exception.message + "Biometric authentication failed")
             }
         }
     }
