@@ -106,7 +106,7 @@ class HomeFragmentViewModel : CommonViewModel() {
 
     private fun updateList() {
         val list = transactionRepository.list.value ?: return
-        txList.postValue(list.filterIsInstance<TransactionItem>().sortedBy { it.tx.timestamp }.takeLast(amountOfTransactions).toMutableList())
+        txList.postValue(list.filterIsInstance<TransactionItem>().sortedByDescending { it.tx.timestamp }.takeLast(TRANSACTION_AMOUNT_HOME_PAGE).toMutableList())
     }
 
     fun processItemClick(item: CommonViewHolderItem) {
@@ -328,6 +328,6 @@ class HomeFragmentViewModel : CommonViewModel() {
     }
 
     companion object {
-        val amountOfTransactions = 2
+        private const val TRANSACTION_AMOUNT_HOME_PAGE = 2
     }
 }
