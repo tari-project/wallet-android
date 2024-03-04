@@ -62,7 +62,7 @@ class FFIWallet(
     private val coroutineContext = Job()
     private var localScope = CoroutineScope(coroutineContext)
 
-    private val logVerbosity: Int = if (BuildConfig.BUILD_TYPE == "debug") 11 else 2
+    private val logVerbosity: Int = if (BuildConfig.BUILD_TYPE == "debug") 11 else 4
 
     companion object {
         private var atomicInstance = AtomicReference<FFIWallet>()
