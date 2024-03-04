@@ -81,7 +81,7 @@ class HomeFragmentViewModel : CommonViewModel() {
     private val _refreshBalanceInfo = SingleLiveEvent<Boolean>()
     val refreshBalanceInfo: SingleLiveEvent<Boolean> = _refreshBalanceInfo
 
-    val txList = MediatorLiveData<MutableList<CommonViewHolderItem>>()
+    val txList = MediatorLiveData<List<CommonViewHolderItem>>()
 
     val emoji = MutableLiveData<String>()
 
@@ -106,7 +106,7 @@ class HomeFragmentViewModel : CommonViewModel() {
 
     private fun updateList() {
         val list = transactionRepository.list.value ?: return
-        txList.postValue(list.filterIsInstance<TransactionItem>().sortedByDescending { it.tx.timestamp }.takeLast(TRANSACTION_AMOUNT_HOME_PAGE).toMutableList())
+        txList.postValue(list.filterIsInstance<TransactionItem>().sortedByDescending { it.tx.timestamp }.take(TRANSACTION_AMOUNT_HOME_PAGE))
     }
 
     fun processItemClick(item: CommonViewHolderItem) {
