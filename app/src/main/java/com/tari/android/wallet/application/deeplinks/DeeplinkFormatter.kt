@@ -24,7 +24,7 @@ class DeeplinkFormatter @Inject constructor(private val networkRepository: Netwo
 
         var paramentrs = uri.queryParameterNames.associateWith { uri.getQueryParameter(it).orEmpty() }.toMutableMap()
         val command = uri.path.orEmpty().trimStart('/')
-        if (command == DeepLink.Contacts.contactsCommand) {
+        if (command == DeepLink.Contacts.COMMAND_CONTACTS) {
             val values = uri.query.orEmpty().split("&").map {
                 val (key, value) = it.split("=")
                 key to value

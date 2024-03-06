@@ -15,10 +15,10 @@ import com.tari.android.wallet.ui.dialog.modular.DialogArgs
 import com.tari.android.wallet.ui.dialog.modular.ModularDialogArgs
 import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
 import com.tari.android.wallet.ui.dialog.modular.modules.input.InputModule
-import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.ContactDto
 import com.tari.android.wallet.ui.fragment.contact_book.root.ShareViewModel
 import com.tari.android.wallet.ui.fragment.contact_book.root.share.ShareType
 import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
+import com.tari.android.wallet.util.ContactUtil
 import com.tari.android.wallet.yat.YatAdapter
 import com.tari.android.wallet.yat.YatSharedRepository
 import kotlinx.coroutines.Dispatchers
@@ -38,6 +38,9 @@ class WalletInfoViewModel : CommonViewModel() {
 
     @Inject
     lateinit var deeplinkHandler: DeeplinkHandler
+
+    @Inject
+    lateinit var contactUtil: ContactUtil
 
     private val _emojiId: MutableLiveData<String> = MutableLiveData()
     val emojiId: LiveData<String> = _emojiId
@@ -103,11 +106,14 @@ class WalletInfoViewModel : CommonViewModel() {
     }
 
     fun shareData(type: ShareType) {
-        val name = alias.value.orEmpty()
-        val hex = ContactDto.normalizeAlias(sharedPrefsWrapper.publicKeyHexString.orEmpty(), TariWalletAddress().apply {
+        val walletAddress = TariWalletAddress().apply {
             hexString = sharedPrefsWrapper.publicKeyHexString.orEmpty()
             emojiId = sharedPrefsWrapper.emojiId.orEmpty()
-        })
+        }
+
+        val name = contactUtil.normalizeAlias(alias.value.orEmpty(), walletAddress)
+        val hex = sharedPrefsWrapper.publicKeyHexString.orEmpty()
+
         val deeplink = deeplinkHandler.getDeeplink(DeepLink.UserProfile(hex, name))
         ShareViewModel.currentInstant?.share(type, deeplink)
     }
