@@ -43,10 +43,8 @@ import androidx.activity.viewModels
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.tari.android.wallet.R
-import com.tari.android.wallet.application.MigrationManager
 import com.tari.android.wallet.application.deeplinks.DeeplinkHandler
 import com.tari.android.wallet.application.deeplinks.DeeplinkViewModel
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
@@ -55,24 +53,14 @@ import com.tari.android.wallet.data.sharedPrefs.security.SecurityPrefRepository
 import com.tari.android.wallet.data.sharedPrefs.tariSettings.TariSettingsSharedRepository
 import com.tari.android.wallet.databinding.ActivityHomeBinding
 import com.tari.android.wallet.di.DiContainer.appComponent
-import com.tari.android.wallet.extension.applyFontStyle
 import com.tari.android.wallet.extension.observe
 import com.tari.android.wallet.model.TxId
 import com.tari.android.wallet.service.connection.ServiceConnectionStatus
 import com.tari.android.wallet.service.service.WalletServiceLauncher
 import com.tari.android.wallet.ui.common.CommonActivity
 import com.tari.android.wallet.ui.common.domain.ResourceManager
-import com.tari.android.wallet.ui.component.tari.TariFont
-import com.tari.android.wallet.ui.dialog.modular.DialogArgs
-import com.tari.android.wallet.ui.dialog.modular.ModularDialog
-import com.tari.android.wallet.ui.dialog.modular.ModularDialogArgs
-import com.tari.android.wallet.ui.dialog.modular.modules.body.BodyModule
-import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonModule
-import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonStyle
-import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
 import com.tari.android.wallet.ui.extension.parcelable
 import com.tari.android.wallet.ui.extension.setVisible
-import com.tari.android.wallet.ui.extension.string
 import com.tari.android.wallet.ui.fragment.auth.AuthActivity
 import com.tari.android.wallet.ui.fragment.chat_list.ChatListFragment
 import com.tari.android.wallet.ui.fragment.contact_book.root.ContactBookFragment
@@ -83,7 +71,6 @@ import com.tari.android.wallet.ui.fragment.home.navigation.TariNavigator.Compani
 import com.tari.android.wallet.ui.fragment.home.navigation.TariNavigator.Companion.INDEX_HOME
 import com.tari.android.wallet.ui.fragment.home.navigation.TariNavigator.Companion.INDEX_SETTINGS
 import com.tari.android.wallet.ui.fragment.home.navigation.TariNavigator.Companion.NO_SMOOTH_SCROLL
-import com.tari.android.wallet.ui.fragment.onboarding.activity.OnboardingFlowActivity
 import com.tari.android.wallet.ui.fragment.settings.allSettings.AllSettingsFragment
 import com.tari.android.wallet.ui.fragment.settings.themeSelector.TariTheme
 import com.tari.android.wallet.ui.fragment.splash.SplashActivity
@@ -91,9 +78,6 @@ import com.tari.android.wallet.ui.fragment.store.StoreFragment
 import com.tari.android.wallet.ui.fragment.tx.HomeFragment
 import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.DebugConfig
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import java.lang.ref.WeakReference
 import javax.inject.Inject
 
@@ -116,9 +100,6 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>() {
 
     @Inject
     lateinit var resourceManager: ResourceManager
-
-    @Inject
-    lateinit var migrationManager: MigrationManager
 
     @Inject
     lateinit var tariSettingsRepository: TariSettingsSharedRepository
@@ -201,12 +182,6 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>() {
         }
         setupUi()
         subscribeUI()
-        lifecycleScope.launch(Dispatchers.IO) {
-            delay(3000)
-            launch(Dispatchers.Main) {
-                checkNetworkCompatibility()
-            }
-        }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             requestPermissions(arrayOf(POST_NOTIFICATIONS), 0)
@@ -307,57 +282,6 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>() {
     private fun enableNavigationView(view: ImageView) {
         arrayOf(ui.homeImageView, ui.storeImageView, ui.chatImageView, ui.settingsImageView).forEach { it.clearColorFilter() }
         view.setColorFilter(viewModel.paletteManager.getPurpleBrand(this))
-    }
-
-    private fun checkNetworkCompatibility() {
-        if (!networkRepository.supportedNetworks.contains(networkRepository.currentNetwork!!.network) && !networkRepository.incompatibleNetworkShown) {
-            networkRepository.incompatibleNetworkShown = true
-            displayIncompatibleNetworkDialog()
-        }
-    }
-
-    private fun displayIncompatibleNetworkDialog() {
-        if (this.isFinishing) return
-
-        val description = string(R.string.incompatible_network_description)
-            .applyFontStyle(
-                this@HomeActivity,
-                TariFont.AVENIR_LT_STD_MEDIUM,
-                listOf(
-                    string(R.string.incompatible_network_description_bold_part_1),
-                    string(R.string.incompatible_network_description_bold_part_2)
-                ),
-                TariFont.AVENIR_LT_STD_BLACK
-            )
-        val dialog = ModularDialog(this)
-        val args = ModularDialogArgs(
-            DialogArgs(true, canceledOnTouchOutside = false), modules = listOf(
-                HeadModule(string(R.string.incompatible_network_title)),
-                BodyModule(null, description),
-                ButtonModule(string(R.string.incompatible_network_reset_now), ButtonStyle.Normal) {
-                    deleteWallet()
-                    dialog.dismiss()
-                },
-                ButtonModule(string(R.string.incompatible_network_reset_later), ButtonStyle.Close)
-            )
-        )
-        dialog.applyArgs(args)
-        dialog.show()
-    }
-
-    private fun deleteWallet() {
-        // delete wallet
-        goToSplashScreen()
-        lifecycleScope.launch(Dispatchers.IO) {
-            walletServiceLauncher.stopAndDelete()
-        }
-    }
-
-    private fun goToSplashScreen() {
-        val intent = Intent(this, OnboardingFlowActivity::class.java)
-        intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
-        startActivity(intent)
-        finishAffinity()
     }
 
     private fun checkScreensDeeplink(intent: Intent) {
