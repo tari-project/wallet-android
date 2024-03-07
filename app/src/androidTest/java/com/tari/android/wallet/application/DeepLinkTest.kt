@@ -48,14 +48,14 @@ class DeepLinkTest {
 
     @Test
     fun assertBaseNodeName() {
-        val deeplink = "tari://${currentNetwork.uriComponent}/${DeepLink.AddBaseNode.addNodeCommand}?${DeepLink.AddBaseNode.nameKey}=base_node_test"
+        val deeplink = "tari://${currentNetwork.uriComponent}/${DeepLink.AddBaseNode.COMMAND_ADD_NODE}?${DeepLink.AddBaseNode.KEY_NAME}=base_node_test"
         val result = deeplinkHandler.handle(deeplink) as? DeepLink.AddBaseNode
         assertEquals(result!!.name, "base_node_test")
     }
 
     @Test
     fun assertBaseNodePeer() {
-        val deeplink = "tari://${currentNetwork.uriComponent}/${DeepLink.AddBaseNode.addNodeCommand}?${DeepLink.AddBaseNode.peerKey}=$PEER"
+        val deeplink = "tari://${currentNetwork.uriComponent}/${DeepLink.AddBaseNode.COMMAND_ADD_NODE}?${DeepLink.AddBaseNode.KEY_PEER}=$PEER"
         val result = deeplinkHandler.handle(deeplink) as? DeepLink.AddBaseNode
         assertEquals(result!!.peer, PEER)
     }

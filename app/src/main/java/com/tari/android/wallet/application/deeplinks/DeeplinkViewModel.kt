@@ -141,9 +141,6 @@ class DeeplinkViewModel : CommonViewModel() {
     }.getOrNull()
 
     private fun addContactsAction(contacts: List<ContactDto>, isQrData: Boolean) {
-        if (isQrData) {
-            backPressed.postValue(Unit)
-        }
         contacts.forEach { contactRepository.addContact(it) }
     }
 

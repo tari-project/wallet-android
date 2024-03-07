@@ -20,6 +20,7 @@ import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.MergedCont
 import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.PhoneContactDto
 import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.YatDto
 import com.tari.android.wallet.ui.fragment.contact_book.data.localStorage.ContactSharedPrefRepository
+import com.tari.android.wallet.util.ContactUtil
 import contacts.core.Contacts
 import contacts.core.Fields
 import contacts.core.entities.NewName
@@ -43,7 +44,8 @@ import kotlin.system.measureNanoTime
 @Singleton
 class ContactsRepository @Inject constructor(
     val context: Context,
-    private val contactSharedPrefRepository: ContactSharedPrefRepository
+    private val contactSharedPrefRepository: ContactSharedPrefRepository,
+    private val contactUtil: ContactUtil,
 ) : CommonViewModel() {
 
     val publishSubject = BehaviorSubject.create<MutableList<ContactDto>>()
@@ -223,9 +225,14 @@ class ContactsRepository @Inject constructor(
                     viewModelScope.launch(Dispatchers.IO) {
                         for (item in list.mapNotNull { it.getFFIDto() }) {
                             val error = WalletError()
-                            service.updateContact(item.walletAddress, item.getAlias(), item.isFavorite, error)
+                            service.updateContact(
+                                item.walletAddress,
+                                contactUtil.normalizeAlias(item.getAlias(), item.walletAddress),
+                                item.isFavorite,
+                                error,
+                            )
                             if (error.code != WalletError.NoError.code) {
-                                logger.i("Error updating contact: ${error.code}, ${error.code}")
+                                logger.i("Error updating contact: ${error.signature}")
                             }
                         }
                     }
@@ -454,14 +461,14 @@ class ContactsRepository @Inject constructor(
 
                             for (item in contacts) {
                                 val contact = PhoneContact(
-                                    item.id,
-                                    item.firstName,
-                                    item.surname,
-                                    item.displayName,
-                                    item.avatar,
-                                    item.yat,
-                                    item.phoneEmojiId,
-                                    item.isFavorite
+                                    id = item.id,
+                                    firstName = item.firstName,
+                                    surname = item.surname,
+                                    displayName = item.displayName,
+                                    yat = item.yat,
+                                    emojiId = item.phoneEmojiId,
+                                    avatar = item.avatar,
+                                    isFavorite = item.isFavorite,
                                 )
                                 saveNamesToPhoneBook(contact)
                                 saveStarredToPhoneBook(contact)
