@@ -846,6 +846,7 @@
     <string name="wallet_info_alias_edit_title">Edit Name</string>
     <string name="tx_details_contact_name">Contact name here</string>
     <string name="share_via_qr_code_title">Share QR Code</string>
+    <string name="contact_book_default_alias">Aurora user %s</string>
 
     <string name="share_via_bluetooth_title">Share via BLE</string>
     <string name="share_via_bluetooth_message">Bring the smartphone close to a BLE enabled device</string>

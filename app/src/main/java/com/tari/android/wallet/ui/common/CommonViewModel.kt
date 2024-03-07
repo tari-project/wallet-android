@@ -79,7 +79,7 @@ open class CommonViewModel : ViewModel() {
     private var authorizedAction: (() -> Unit)? = null
 
     val logger: Printer
-        get() = Logger.t(this::class.simpleName).t(LoggerTags.UI.name)
+        get() = Logger.t(this::class.simpleName)
 
     val currentTheme = SingleLiveEvent<TariTheme>()
 
