@@ -50,8 +50,6 @@ object DebugConfig {
     private const val _useYatSandbox = false
     val yatEnvironment = if (_useYatSandbox && isDebug()) YatEnvironment.SANDBOX else YatEnvironment.PRODUCTION
 
-    const val isBlockExplorerEnabled = false
-
     // Needed for testing resetting wallet on the network changed
     private const val _useStagenetNetwork = false
     val useStagenetNetwork = _useStagenetNetwork && isDebug()
