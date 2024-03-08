@@ -39,17 +39,22 @@ import yat.android.lib.YatIntegration
 /**
  *  Constants used for developing and debugging.
  */
+@Suppress("ConstPropertyName", "KotlinConstantConditions")
 object DebugConfig {
 
     private const val _mockedTurned = false
     val mockedDataEnabled = _mockedTurned && isDebug() // TODO split this flag to multiple different types of mocked data
 
-    val isChatEnabled = false
+    const val isChatEnabled = false
 
     private const val _useYatSandbox = false
     val yatEnvironment = if (_useYatSandbox && isDebug()) YatEnvironment.SANDBOX else YatEnvironment.PRODUCTION
 
-    val isBlockExplorerEnabled = false
+    const val isBlockExplorerEnabled = false
+
+    // Needed for testing resetting wallet on the network changed
+    private const val _useStagenetNetwork = false
+    val useStagenetNetwork = _useStagenetNetwork && isDebug()
 
     private fun isDebug() = BuildConfig.BUILD_TYPE == "debug"
 }

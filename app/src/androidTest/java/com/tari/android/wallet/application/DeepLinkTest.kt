@@ -68,14 +68,11 @@ class DeepLinkTest {
 
     class NetworkRepositoryMock : NetworkRepository {
         private val network: Network = Network.STAGENET
+        private val tariNetwork = TariNetwork(network, "xtr", true)
 
-        override var supportedNetworks: List<Network> = listOf(network)
-        override var currentNetwork: TariNetwork? = TariNetwork(network, "")
+        override val defaultNetwork: TariNetwork = tariNetwork
+        override var supportedNetworks: List<TariNetwork> = listOf(tariNetwork)
+        override var currentNetwork: TariNetwork? = TariNetwork(network, "", true)
         override var ffiNetwork: Network? = network
-        override var incompatibleNetworkShown: Boolean = false
-        override var recommendedNetworks: List<Network> = listOf(network)
-
-        override fun getAllNetworks(): List<TariNetwork> = listOf()
-
     }
 }

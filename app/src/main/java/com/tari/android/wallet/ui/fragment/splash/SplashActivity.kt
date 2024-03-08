@@ -39,6 +39,7 @@ import androidx.activity.addCallback
 import androidx.appcompat.app.AppCompatActivity
 import com.tari.android.wallet.data.WalletConfig
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
+import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
 import com.tari.android.wallet.data.sharedPrefs.security.SecurityPrefRepository
 import com.tari.android.wallet.di.DiContainer.appComponent
 import com.tari.android.wallet.service.service.WalletServiceLauncher
@@ -64,6 +65,9 @@ class SplashActivity : AppCompatActivity() {
     lateinit var securityPrefRepository: SecurityPrefRepository
 
     @Inject
+    lateinit var networkRepository: NetworkRepository
+
+    @Inject
     lateinit var walletServiceLauncher: WalletServiceLauncher
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -74,6 +78,10 @@ class SplashActivity : AppCompatActivity() {
 
         if (sharedPrefsRepository.checkIfIsDataCleared()) {
             walletServiceLauncher.stopAndDelete()
+        }
+
+        if (!networkRepository.isCurrentNetworkSupported()) {
+            networkRepository.setDefaultNetworkAsCurrent()
         }
 
         val exists = WalletUtil.walletExists(walletConfig) && sharedPrefsRepository.onboardingAuthSetupCompleted
