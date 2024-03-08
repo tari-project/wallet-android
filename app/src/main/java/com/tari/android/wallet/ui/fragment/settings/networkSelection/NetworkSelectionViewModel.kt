@@ -5,7 +5,6 @@ import androidx.lifecycle.MutableLiveData
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.WalletState
 import com.tari.android.wallet.data.WalletConfig
-import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
 import com.tari.android.wallet.data.sharedPrefs.network.TariNetwork
 import com.tari.android.wallet.di.DiContainer
 import com.tari.android.wallet.event.EventBus
@@ -26,8 +25,8 @@ class NetworkSelectionViewModel : CommonViewModel() {
     @Inject
     lateinit var walletServiceLauncher: WalletServiceLauncher
 
-    private val _networks = MutableLiveData<MutableList<CommonViewHolderItem>>()
-    val networks: LiveData<MutableList<CommonViewHolderItem>> = _networks
+    private val _networks = MutableLiveData<List<CommonViewHolderItem>>()
+    val networks: LiveData<List<CommonViewHolderItem>> = _networks
 
     private val _recreate = SingleLiveEvent<Unit>()
     val recreate: LiveData<Unit> = _recreate
@@ -38,10 +37,9 @@ class NetworkSelectionViewModel : CommonViewModel() {
     }
 
     private fun loadData() {
-        val networks = networkRepository.getAllNetworks()
+        val networks = networkRepository.supportedNetworks
         val currentNetwork = networkRepository.currentNetwork!!.network
-        val recommendedNetworks = networkRepository.recommendedNetworks
-        _networks.postValue(networks.map { NetworkViewHolderItem(it, recommendedNetworks.contains(it.network), currentNetwork) }.toMutableList())
+        _networks.postValue(networks.map { NetworkViewHolderItem(it, currentNetwork) })
     }
 
     fun selectNetwork(networkViewHolderItem: NetworkViewHolderItem) {

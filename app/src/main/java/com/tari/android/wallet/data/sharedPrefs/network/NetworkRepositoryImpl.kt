@@ -3,42 +3,40 @@ package com.tari.android.wallet.data.sharedPrefs.network
 import android.content.SharedPreferences
 import com.tari.android.wallet.application.Network
 import com.tari.android.wallet.data.repository.SimpleRepository
-import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefBooleanDelegate
 import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefGsonDelegate
+import com.tari.android.wallet.util.DebugConfig
 
 class NetworkRepositoryImpl(sharedPrefs: SharedPreferences) : NetworkRepository {
 
-    override var supportedNetworks: List<Network> = listOf(Network.NEXTNET)
+    override val defaultNetwork = if (DebugConfig.useStagenetNetwork) getStagenet() else getNextnet()
 
-    override var recommendedNetworks: List<Network> = listOf(Network.NEXTNET)
+    override var supportedNetworks: List<TariNetwork> = if (DebugConfig.useStagenetNetwork) listOf(getStagenet()) else listOf(getNextnet())
 
-    override var currentNetwork by SharedPrefGsonDelegate(sharedPrefs, SimpleRepository(this),  Keys.currentNetwork, TariNetwork::class.java)
+    override var currentNetwork by SharedPrefGsonDelegate(
+        prefs = sharedPrefs,
+        commonRepository = SimpleRepository(this),
+        name = Keys.CURRENT_NETWORK,
+        type = TariNetwork::class.java,
+        defValue = defaultNetwork,
+    )
 
-    init {
-        try {
-            currentNetwork!!.network.displayName
-        } catch (e: Throwable) {
-            currentNetwork = getNextnet()
-        }
-    }
-
-    override var ffiNetwork: Network? by SharedPrefGsonDelegate(sharedPrefs, SimpleRepository(this),  formatKey(Keys.ffiNetwork), Network::class.java)
-
-    override var incompatibleNetworkShown by SharedPrefBooleanDelegate(sharedPrefs, SimpleRepository(this),  formatKey(Keys.networkIncompatible), false)
-
-    override fun getAllNetworks(): List<TariNetwork> = listOf(getNextnet())
+    override var ffiNetwork: Network? by SharedPrefGsonDelegate(
+        prefs = sharedPrefs,
+        commonRepository = SimpleRepository(this),
+        name = formatKey(Keys.FFI_NETWORK),
+        type = Network::class.java,
+    )
 
     object Keys {
-        const val currentNetwork = "tari_current_network"
-        const val ffiNetwork = "ffi_tari_current_network"
-        const val networkIncompatible = "tari_network_incompatible_current_network"
+        const val CURRENT_NETWORK = "tari_current_network"
+        const val FFI_NETWORK = "ffi_tari_current_network"
     }
 
     companion object {
-        private const val mainNetThicker = "XTR"
-        private const val testNetThicker = "tXTR"
+        private const val TICKER_MAINNET = "XTR"
+        private const val TICKER_TESTNET = "tXTR"
 
-        fun getStagenet(): TariNetwork = TariNetwork(Network.STAGENET, testNetThicker)
-        fun getNextnet(): TariNetwork = TariNetwork(Network.NEXTNET, testNetThicker)
+        fun getStagenet(): TariNetwork = TariNetwork(Network.STAGENET, TICKER_TESTNET)
+        fun getNextnet(): TariNetwork = TariNetwork(Network.NEXTNET, TICKER_TESTNET, recommended = true)
     }
 }
