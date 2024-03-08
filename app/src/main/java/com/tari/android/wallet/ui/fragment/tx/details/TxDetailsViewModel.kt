@@ -149,9 +149,8 @@ class TxDetailsViewModel : CommonViewModel() {
     }
 
     private fun generateExplorerLink(tx: Tx) {
-        (tx as? CompletedTx)?.txKernel?.let {
-            val fullLink = resourceManager.getString(R.string.explorer_kernel_url) + it.publicNonce + "/" + it.signature
-            _explorerLink.postValue(fullLink)
+        (tx as? CompletedTx)?.txKernel?.let { txKernel ->
+            _explorerLink.postValue(resourceManager.getString(R.string.explorer_kernel_url, txKernel.publicNonce, txKernel.signature))
         }
     }
 
@@ -173,7 +172,13 @@ class TxDetailsViewModel : CommonViewModel() {
 
         var saveAction: () -> Boolean = { false }
 
-        val nameModule = InputModule(name, resourceManager.getString(R.string.contact_book_add_contact_first_name_hint), true, false) { saveAction.invoke() }
+        val nameModule =
+            InputModule(
+                value = name,
+                hint = resourceManager.getString(R.string.contact_book_add_contact_first_name_hint),
+                isFirst = true,
+                isEnd = false,
+            ) { saveAction.invoke() }
 
         val headModule = HeadModule(
             resourceManager.getString(R.string.contact_book_details_edit_title),
