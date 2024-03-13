@@ -1,8 +1,7 @@
 buildscript {
-    ext {
-        agp_version = '7.4.2'
-    }
-    ext.kotlin_version = '1.8.21'
+    ext.agp_version = '7.4.2' // TODO update to 8.* could lead to problems with AIDL classes
+    ext.kotlin_version = '1.9.22'
+
     ext.lifecycle_version = '2.6.2'
 
     // build & version
@@ -31,8 +30,9 @@ buildscript {
 
 plugins {
     id "de.undercouch.download" version "4.1.0"
+    id "com.google.devtools.ksp" version '1.9.23-1.0.19' apply false
 }
 
 tasks.register('clean', Delete) {
-    delete rootProject.buildDir
+    delete rootProject.layout.buildDirectory
 }
