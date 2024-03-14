@@ -187,7 +187,7 @@ class HomeFragment : CommonFragment<FragmentHomeBinding, HomeFragmentViewModel>(
     private fun updateBalanceInfoUI(restart: Boolean) {
         val balanceInfo = viewModel.balanceInfo.value!!
 
-        val availableBalance = WalletUtil.balanceFormatter.format(balanceInfo.availableToSpendBalance.tariValue)
+        val availableBalance = WalletUtil.balanceFormatter.format(balanceInfo.availableBalance.tariValue)
         ui.availableBalance.text = availableBalance
 
         if (restart) {
