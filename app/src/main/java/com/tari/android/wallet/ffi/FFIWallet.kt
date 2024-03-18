@@ -51,18 +51,20 @@ import java.util.concurrent.atomic.AtomicReference
  */
 
 class FFIWallet(
-    val sharedPrefsRepository: SharedPrefsRepository,
-    val securityPrefRepository: SecurityPrefRepository,
-    val seedPhraseRepository: SeedPhraseRepository,
-    val networkRepository: NetworkRepository,
-    val commsConfig: FFICommsConfig,
-    val logPath: String
+    private val sharedPrefsRepository: SharedPrefsRepository,
+    private val securityPrefRepository: SecurityPrefRepository,
+    private val seedPhraseRepository: SeedPhraseRepository,
+    private val networkRepository: NetworkRepository,
+    private val commsConfig: FFICommsConfig,
+    private val logPath: String
 ) : FFIBase() {
 
     private val coroutineContext = Job()
     private var localScope = CoroutineScope(coroutineContext)
 
+    // values for the wallet initialization
     private val logVerbosity: Int = if (BuildConfig.BUILD_TYPE == "debug") 11 else 4
+    private val isDnsSecureOn = false
 
     companion object {
         private var atomicInstance = AtomicReference<FFIWallet>()
@@ -80,6 +82,8 @@ class FFIWallet(
         passphrase: String?,
         network: String?,
         seedWords: FFISeedWords?,
+        dnsPeer: String,
+        isDnsSecureOn: Boolean,
         callbackReceivedTx: String,
         callbackReceivedTxSig: String,
         callbackReceivedTxReply: String,
@@ -246,6 +250,8 @@ class FFIWallet(
                 passphrase,
                 networkRepository.currentNetwork?.network?.uriComponent,
                 seedPhraseRepository.getPhrase()?.ffiSeedWords,
+                networkRepository.currentNetwork!!.dnsPeer,
+                isDnsSecureOn,
                 this::onTxReceived.name, "(J)V",
                 this::onTxReplyReceived.name, "(J)V",
                 this::onTxFinalized.name, "(J)V",
