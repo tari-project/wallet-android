@@ -39,13 +39,9 @@ package com.tari.android.wallet.application
  */
 
 sealed class WalletState {
-    object NotReady : WalletState()
-
-    object Initializing : WalletState()
-
-    object Started: WalletState()
-
-    object Running : WalletState()
-
-    class Failed(val exception: Exception) : WalletState()
+    data object NotReady : WalletState()
+    data object Initializing : WalletState()
+    data object Started : WalletState()
+    data object Running : WalletState()
+    data class Failed(val exception: Exception) : WalletState()
 }
