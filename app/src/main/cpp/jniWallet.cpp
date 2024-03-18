@@ -298,6 +298,8 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniCreate(
         jstring jPassphrase,
         jstring jNetwork,
         jobject jSeed_words,
+        jstring jDnsPeer,
+        jboolean isDnsSecureOn,
         jstring txReceivedCallbackMethodName,
         jstring txReceivedCallbackMethodSignature,
         jstring callback_received_tx_reply,
@@ -433,6 +435,11 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniCreate(
         pNetwork = jEnv->GetStringUTFChars(jNetwork, JNI_FALSE);
     }
 
+    const char *pDnsPeer = nullptr;
+    if (jDnsPeer != nullptr) {
+        pDnsPeer = jEnv->GetStringUTFChars(jDnsPeer, JNI_FALSE);
+    }
+
     bool jRecoveryInProgress = false;
     bool *pRecovery = &jRecoveryInProgress;
 
@@ -450,6 +457,8 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniCreate(
             pPassphrase,
             pSeedWords,
             pNetwork,
+            pDnsPeer,
+            isDnsSecureOn,
             txReceivedCallback,
             txReplyReceivedCallback,
             txFinalizedCallback,
@@ -892,7 +901,7 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniAddBaseNodePeer(
         auto pWallet = GetPointerField<TariWallet *>(jEnv, jThis);
         auto pPublicKey = GetPointerField<TariPublicKey *>(jEnv, jPublicKey);
         char *pAddress = const_cast<char *>(jEnv->GetStringUTFChars(jAddress, JNI_FALSE));
-        auto result = static_cast<jboolean>(  wallet_add_base_node_peer(pWallet, pPublicKey, pAddress, errorPointer) != 0);
+        auto result = static_cast<jboolean>(  wallet_set_base_node_peer(pWallet, pPublicKey, pAddress, errorPointer) != 0);
         jEnv->ReleaseStringUTFChars(jAddress, pAddress);
         return result;
     });

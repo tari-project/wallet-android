@@ -8,9 +8,9 @@ import com.tari.android.wallet.util.DebugConfig
 
 class NetworkRepositoryImpl(sharedPrefs: SharedPreferences) : NetworkRepository {
 
-    override val defaultNetwork = if (DebugConfig.useStagenetNetwork) getStagenet() else getNextnet()
+    override val defaultNetwork = if (DebugConfig.useStagenetNetwork) NETWORK_STAGENET else NETWORK_NEXTNET
 
-    override var supportedNetworks: List<TariNetwork> = if (DebugConfig.useStagenetNetwork) listOf(getStagenet()) else listOf(getNextnet())
+    override var supportedNetworks: List<TariNetwork> = if (DebugConfig.useStagenetNetwork) listOf(NETWORK_STAGENET) else listOf(NETWORK_NEXTNET)
 
     override var currentNetwork by SharedPrefGsonDelegate(
         prefs = sharedPrefs,
@@ -36,7 +36,16 @@ class NetworkRepositoryImpl(sharedPrefs: SharedPreferences) : NetworkRepository 
         private const val TICKER_MAINNET = "XTR"
         private const val TICKER_TESTNET = "tXTR"
 
-        fun getStagenet(): TariNetwork = TariNetwork(Network.STAGENET, TICKER_TESTNET)
-        fun getNextnet(): TariNetwork = TariNetwork(Network.NEXTNET, TICKER_TESTNET, recommended = true)
+        private val NETWORK_STAGENET: TariNetwork = TariNetwork(
+            network = Network.STAGENET,
+            dnsPeer = "seeds.stagenet.tari.com",
+            ticker = TICKER_TESTNET,
+        )
+        private val NETWORK_NEXTNET: TariNetwork = TariNetwork(
+            network = Network.NEXTNET,
+            dnsPeer = "seeds.nextnet.tari.com",
+            ticker = TICKER_TESTNET,
+            recommended = true,
+        )
     }
 }
