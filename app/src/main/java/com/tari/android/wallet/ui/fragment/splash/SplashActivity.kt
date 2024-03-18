@@ -37,11 +37,14 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.activity.addCallback
 import androidx.appcompat.app.AppCompatActivity
+import com.tari.android.wallet.application.WalletState
 import com.tari.android.wallet.data.WalletConfig
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
 import com.tari.android.wallet.data.sharedPrefs.security.SecurityPrefRepository
+import com.tari.android.wallet.di.DiContainer
 import com.tari.android.wallet.di.DiContainer.appComponent
+import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.service.service.WalletServiceLauncher
 import com.tari.android.wallet.ui.fragment.auth.AuthActivity
 import com.tari.android.wallet.ui.fragment.onboarding.activity.OnboardingFlowActivity
@@ -74,14 +77,14 @@ class SplashActivity : AppCompatActivity() {
         appComponent.inject(this)
         super.onCreate(savedInstanceState)
 
-        onBackPressedDispatcher.addCallback {  }
+        onBackPressedDispatcher.addCallback { }
 
         if (sharedPrefsRepository.checkIfIsDataCleared()) {
             walletServiceLauncher.stopAndDelete()
         }
 
         if (!networkRepository.isCurrentNetworkSupported()) {
-            networkRepository.setDefaultNetworkAsCurrent()
+            changeNetwork()
         }
 
         val exists = WalletUtil.walletExists(walletConfig) && sharedPrefsRepository.onboardingAuthSetupCompleted
@@ -95,6 +98,19 @@ class SplashActivity : AppCompatActivity() {
             return
         }
         launch(if (exists) AuthActivity::class.java else OnboardingFlowActivity::class.java)
+    }
+
+    private fun changeNetwork() {
+        networkRepository.setDefaultNetworkAsCurrent()
+
+        EventBus.walletState.subscribe(this) {
+            if (it is WalletState.NotReady) {
+                EventBus.clear()
+                DiContainer.reInitContainer()
+            }
+        }
+
+        walletServiceLauncher.stop()
     }
 
     private fun <T : Activity> launch(destination: Class<T>) {
