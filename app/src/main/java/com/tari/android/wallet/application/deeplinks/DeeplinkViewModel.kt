@@ -123,20 +123,20 @@ class DeeplinkViewModel : CommonViewModel() {
     private fun getData(deeplink: DeepLink.Contacts): List<ContactDto> = deeplink.contacts.mapNotNull {
         runCatching {
             val ffiWalletAddress = FFITariWalletAddress(HexString(it.hex))
-            val tariWalletAddress = TariWalletAddress(ffiWalletAddress.toString(), ffiWalletAddress.getEmojiId())
+            val tariWalletAddress = TariWalletAddress.createWalletAddress(ffiWalletAddress.toString(), ffiWalletAddress.getEmojiId())
             ContactDto(FFIContactDto(tariWalletAddress, it.alias))
         }.getOrNull()
     }
 
     private fun getData(deeplink: DeepLink.Send): ContactDto? = runCatching {
         val ffiWalletAddress = FFITariWalletAddress(HexString(deeplink.walletAddressHex))
-        val tariWalletAddress = TariWalletAddress(ffiWalletAddress.toString(), ffiWalletAddress.getEmojiId())
+        val tariWalletAddress = TariWalletAddress.createWalletAddress(ffiWalletAddress.toString(), ffiWalletAddress.getEmojiId())
         ContactDto(FFIContactDto(tariWalletAddress, ""))
     }.getOrNull()
 
     private fun getData(userProfile: DeepLink.UserProfile): ContactDto? = runCatching {
         val ffiWalletAddress = FFITariWalletAddress(HexString(userProfile.tariAddressHex))
-        val tariWalletAddress = TariWalletAddress(ffiWalletAddress.toString(), ffiWalletAddress.getEmojiId())
+        val tariWalletAddress = TariWalletAddress.createWalletAddress(ffiWalletAddress.toString(), ffiWalletAddress.getEmojiId())
         ContactDto(FFIContactDto(tariWalletAddress, userProfile.alias))
     }.getOrNull()
 

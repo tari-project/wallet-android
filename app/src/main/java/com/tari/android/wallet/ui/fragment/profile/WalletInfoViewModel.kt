@@ -106,10 +106,10 @@ class WalletInfoViewModel : CommonViewModel() {
     }
 
     fun shareData(type: ShareType) {
-        val walletAddress = TariWalletAddress().apply {
-            hexString = sharedPrefsWrapper.publicKeyHexString.orEmpty()
-            emojiId = sharedPrefsWrapper.emojiId.orEmpty()
-        }
+        val walletAddress = TariWalletAddress.createWalletAddress(
+            hexString = sharedPrefsWrapper.publicKeyHexString.orEmpty(),
+            emojiId = sharedPrefsWrapper.emojiId.orEmpty(),
+        )
 
         val name = contactUtil.normalizeAlias(alias.value.orEmpty(), walletAddress)
         val hex = sharedPrefsWrapper.publicKeyHexString.orEmpty()
