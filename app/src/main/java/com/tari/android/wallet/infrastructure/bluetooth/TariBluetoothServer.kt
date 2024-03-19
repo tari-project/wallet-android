@@ -142,10 +142,10 @@ class TariBluetoothServer @Inject constructor(
 
             fun initiateReading() {
                 if (shareChunkedData.isNotEmpty()) return
-                val myWalletAddress = TariWalletAddress().apply {
-                    hexString = sharedPrefsRepository.publicKeyHexString.orEmpty()
-                    emojiId = sharedPrefsRepository.emojiId.orEmpty()
-                }
+                val myWalletAddress = TariWalletAddress.createWalletAddress(
+                    hexString = sharedPrefsRepository.publicKeyHexString.orEmpty(),
+                    emojiId = sharedPrefsRepository.emojiId.orEmpty(),
+                )
                 val data = deeplinkHandler.getDeeplink(
                     DeepLink.UserProfile(
                         tariAddressHex = sharedPrefsRepository.publicKeyHexString.orEmpty(),

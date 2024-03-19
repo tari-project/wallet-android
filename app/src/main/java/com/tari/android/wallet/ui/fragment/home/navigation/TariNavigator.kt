@@ -390,7 +390,7 @@ class TariNavigator @Inject constructor(val prefs: SharedPrefsRepository, val ta
     }
 
     private fun walletAddressFromFFI(ffiTariWalletAddress: FFITariWalletAddress): TariWalletAddress =
-        TariWalletAddress(ffiTariWalletAddress.toString(), ffiTariWalletAddress.getEmojiId())
+        TariWalletAddress.createWalletAddress(ffiTariWalletAddress.toString(), ffiTariWalletAddress.getEmojiId())
 
     private fun sendToUser(recipientUser: ContactDto, amount: MicroTari? = null) {
         val bundle = Bundle().apply {
