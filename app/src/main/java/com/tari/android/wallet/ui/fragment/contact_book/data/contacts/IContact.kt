@@ -13,7 +13,6 @@ abstract class IContact(open var firstName: String = "", open var surname: Strin
 
     open fun getAlias(): String = "$firstName $surname"
 
-
     override fun equals(other: Any?): Boolean {
         if (other is IContact) {
             return firstName == other.firstName &&

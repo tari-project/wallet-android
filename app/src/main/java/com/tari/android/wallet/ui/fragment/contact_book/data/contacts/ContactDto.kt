@@ -7,9 +7,10 @@ import java.io.Serializable
 import java.util.UUID
 
 data class ContactDto(
-    var contact: IContact,
-    var uuid: String = UUID.randomUUID().toString(),
+    val contact: IContact,
+    val uuid: String = UUID.randomUUID().toString(),
     var lastUsedDate: SerializableTime? = null,
+    val yat: YatDto? = (contact as? PhoneContactDto)?.yatDto ?: (contact as? MergedContactDto)?.phoneContactDto?.yatDto
 ) : Serializable {
     fun filtered(text: String): Boolean = contact.filtered(text)
 
@@ -54,7 +55,7 @@ data class ContactDto(
         else -> R.drawable.vector_contact_book_type
     }
 
-    fun getYatDto(): YatDto? = (contact as? PhoneContactDto)?.yatDto ?: (contact as? MergedContactDto)?.phoneContactDto?.yatDto
+    fun getYatDto() = yat
 
     fun getFFIDto(): FFIContactDto? = (contact as? FFIContactDto) ?: (contact as? MergedContactDto)?.ffiContactDto
 

@@ -32,21 +32,21 @@
  */
 package com.tari.android.wallet.model
 
-import android.os.Parcel
 import android.os.Parcelable
 import com.tari.android.wallet.extension.toMicroTari
-import com.tari.android.wallet.ui.extension.readS
+import kotlinx.parcelize.Parcelize
 import java.io.Serializable
-import java.math.*
+import java.math.BigDecimal
+import java.math.BigInteger
+import java.math.RoundingMode
 
 /**
  * This wrapper is needed for amount parameters in AIDL methods.
  *
  * @author The Tari Development Team
  */
-class MicroTari() : Parcelable, Comparable<MicroTari>, Serializable {
-
-    var value = BigInteger("0")
+@Parcelize
+data class MicroTari(val value: BigInteger = BigInteger("0")) : Parcelable, Comparable<MicroTari>, Serializable {
 
     val tariValue: BigDecimal
         // Note: BigDecimal keeps track of both precision and scale, 1e6 != 1_000_000 in this case (scale 6, scale 0)
@@ -60,23 +60,11 @@ class MicroTari() : Parcelable, Comparable<MicroTari>, Serializable {
 
     private fun getFormattedValue(value: String): String = value.trimEnd { it == '0' }.trimEnd { it == '.' }.trimEnd { it == ',' }
 
-    constructor(value: BigInteger) : this() {
-        this.value = value
-    }
-
-    operator fun plusAssign(increment: MicroTari) {
-        this.value += increment.value
-    }
-
     operator fun plus(increment: MicroTari): MicroTari = MicroTari(this.value + increment.value)
 
     operator fun plus(increment: Int): MicroTari = this + increment.toMicroTari()
 
     operator fun plus(increment: Long): MicroTari = this + increment.toMicroTari()
-
-    operator fun minusAssign(decrement: MicroTari) {
-        this.value -= decrement.value
-    }
 
     operator fun minus(decrement: MicroTari): MicroTari = MicroTari(this.value - decrement.value)
 
@@ -84,29 +72,9 @@ class MicroTari() : Parcelable, Comparable<MicroTari>, Serializable {
 
     operator fun minus(decrement: Long): MicroTari = this - decrement.toMicroTari()
 
-
-    constructor(parcel: Parcel) : this() {
-        readFromParcel(parcel)
-    }
-
-    companion object CREATOR : Parcelable.Creator<MicroTari> {
-
-        val precisionValue: BigDecimal = BigDecimal.valueOf(1_000_000)
-
-        override fun createFromParcel(parcel: Parcel): MicroTari = MicroTari(parcel)
-
-        override fun newArray(size: Int): Array<MicroTari> = Array(size) { MicroTari() }
-    }
-
-    override fun writeToParcel(parcel: Parcel, flags: Int) {
-        parcel.writeSerializable(value)
-    }
-
-    private fun readFromParcel(inParcel: Parcel) {
-        value = inParcel.readS(BigInteger::class.java)
-    }
-
-    override fun describeContents(): Int = 0
-
     override fun compareTo(other: MicroTari): Int = this.value.compareTo(other.value)
+
+    companion object {
+        val precisionValue: BigDecimal = BigDecimal.valueOf(1_000_000)
+    }
 }

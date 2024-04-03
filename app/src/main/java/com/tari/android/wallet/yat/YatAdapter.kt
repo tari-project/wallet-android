@@ -5,7 +5,6 @@ import android.app.ActivityOptions
 import android.app.Application
 import android.content.Context
 import android.content.Intent
-import com.google.gson.Gson
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.BuildConfig
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
@@ -47,11 +46,11 @@ class YatAdapter(
         )
     }
 
-    fun searchTariYats(query: String): PaymentAddressResponse? =
-        kotlin.runCatching { YatLibApi.emojiIDApi.lookupEmojiIDPayment(query, "0x0103") }.getOrNull()
+    fun searchTariYats(emojiId: String): PaymentAddressResponse? =
+        kotlin.runCatching { YatLibApi.emojiIDApi.lookupEmojiIDPayment(emojiId, TYPE_XTR) }.getOrNull()
 
-    fun searchAnyYats(query: String): PaymentAddressResponse? =
-        kotlin.runCatching { YatLibApi.emojiIDApi.lookupEmojiIDPayment(query, null) }.getOrNull()
+    fun searchAnyYats(emojiId: String): PaymentAddressResponse? =
+        kotlin.runCatching { YatLibApi.emojiIDApi.lookupEmojiIDPayment(emojiId, null) }.getOrNull()
 
     fun openOnboarding(context: Context) {
         val address = commonRepository.publicKeyHexString.orEmpty()
@@ -61,12 +60,15 @@ class YatAdapter(
     fun showOutcomingFinalizeActivity(activity: Activity, transactionData: TransactionData) {
         val yatUser = transactionData.recipientContact?.getYatDto() ?: return
         val currentTicker = networkRepository.currentNetwork?.ticker.orEmpty()
-        val data = YatLibOutcomingTransactionData(transactionData.amount!!.tariValue.toDouble(), currentTicker, yatUser.yat)
+        val data = YatLibOutcomingTransactionData(
+            amount = transactionData.amount!!.tariValue.toDouble(),
+            currency = currentTicker,
+            yat = yatUser.yat,
+        )
 
         val intent = Intent(activity, YatFinalizeSendTxActivity::class.java)
-        intent.putExtra("YatLibDataKey", data as Serializable)
-        val gson = Gson().toJson(transactionData)
-        intent.putExtra(FinalizeSendTxViewModel.transactionDataKey, gson)
+        intent.putExtra(KEY_YATLIB_DATA, data as Serializable)
+        intent.putExtra(FinalizeSendTxViewModel.KEY_TRANSACTION_DATA, transactionData)
         intent.flags = Intent.FLAG_ACTIVITY_NO_ANIMATION
         activity.startActivity(intent, ActivityOptions.makeSceneTransitionAnimation(activity).toBundle())
     }
@@ -78,5 +80,10 @@ class YatAdapter(
 
     override fun onYatIntegrationFailed(failureType: YatIntegration.FailureType) {
         logger.d("Yat integration failed $failureType")
+    }
+
+    companion object {
+        private const val KEY_YATLIB_DATA = "YatLibDataKey"
+        private const val TYPE_XTR = "0x0103"
     }
 }

@@ -3,10 +3,10 @@ package com.tari.android.wallet.ui.fragment.send.finalize
 import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.lifecycle.lifecycleScope
-import com.google.gson.Gson
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.extension.observe
 import com.tari.android.wallet.extension.observeOnLoad
+import com.tari.android.wallet.ui.extension.parcelable
 import com.tari.android.wallet.ui.fragment.send.common.TransactionData
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -24,14 +24,12 @@ class YatFinalizeSendTxActivity : YatLibOutcomingTransactionActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        intent.getStringExtra(FinalizeSendTxViewModel.transactionDataKey)
-            ?.let { Gson().fromJson(it, TransactionData::class.java) }
-            ?.let { entity ->
-                viewModel.transactionData = entity
+        intent.parcelable<TransactionData>(FinalizeSendTxViewModel.KEY_TRANSACTION_DATA)?.let { transactionData ->
+            viewModel.transactionData = transactionData
 
-                subscribeOnUI()
-                launchObserver()
-            } ?: run {
+            subscribeOnUI()
+            launchObserver()
+        } ?: run {
             logger.e("Transaction data is null. Finishing activity.")
             finish()
             return
@@ -53,8 +51,10 @@ class YatFinalizeSendTxActivity : YatLibOutcomingTransactionActivity() {
         viewModel.start()
 
         lifecycleScope.launch(Dispatchers.IO) {
-            delay(200)
-            viewModel.checkStepStatus()
+            while (viewModel.txFailureReason.value == null && viewModel.isSuccess.value == null) {
+                delay(200)
+                viewModel.checkStepStatus()
+            }
         }
     }
 
