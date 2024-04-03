@@ -352,13 +352,9 @@ class TariNavigator @Inject constructor(val prefs: SharedPrefsRepository, val ta
     }
 
     private fun navigateBackFromTxSend(isYat: Boolean) {
-        if (isYat) {
-            activity.finish()
-        } else {
-            val fragmentsCount = activity.supportFragmentManager.fragments.size - 5
-            for (i in 0 until fragmentsCount) {
-                activity.supportFragmentManager.popBackStackImmediate()
-            }
+        val fragmentsCount = activity.supportFragmentManager.fragments.size - 5
+        for (i in 0 until fragmentsCount) {
+            activity.supportFragmentManager.popBackStackImmediate()
         }
     }
 

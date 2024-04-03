@@ -7,7 +7,7 @@ import yat.android.sdk.models.PaymentAddressResponseResult
 import java.io.Serializable
 import java.lang.reflect.Field
 
-class YatDto(var yat: String, var connectedWallets: List<ConnectedWallet> = listOf()) {
+class YatDto(var yat: String, var connectedWallets: List<ConnectedWallet> = listOf()) : Serializable {
 
     fun filtered(text: String): Boolean = yat.contains(text, true)
 
@@ -41,7 +41,7 @@ class YatDto(var yat: String, var connectedWallets: List<ConnectedWallet> = list
         }
 
         companion object {
-            val names = YatRecordType.values().associateBy { getSerializedName(it.javaClass.getField(it.name)) }
+            val names = YatRecordType.entries.associateBy { getSerializedName(it.javaClass.getField(it.name)) }
 
             private fun getSerializedName(enumField: Field): String? {
                 if (enumField.isAnnotationPresent(SerializedName::class.java)) {

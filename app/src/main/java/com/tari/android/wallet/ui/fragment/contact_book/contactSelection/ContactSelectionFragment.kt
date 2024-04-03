@@ -10,8 +10,6 @@ import android.os.Looper
 import android.text.Editable
 import android.text.InputType
 import android.text.TextWatcher
-import android.transition.TransitionManager
-import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -19,13 +17,14 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.Lifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.daasuu.ei.Ease
 import com.daasuu.ei.EasingInterpolator
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.deeplinks.DeeplinkViewModel
 import com.tari.android.wallet.databinding.FragmentContactsSelectionBinding
+import com.tari.android.wallet.extension.launchAndRepeatOnLifecycle
 import com.tari.android.wallet.extension.observe
 import com.tari.android.wallet.extension.observeOnLoad
 import com.tari.android.wallet.model.TariWalletAddress
@@ -41,11 +40,11 @@ import com.tari.android.wallet.ui.extension.setVisible
 import com.tari.android.wallet.ui.extension.string
 import com.tari.android.wallet.ui.extension.temporarilyDisableClick
 import com.tari.android.wallet.ui.extension.visible
+import com.tari.android.wallet.ui.fragment.contact_book.contactSelection.ContactSelectionModel.Effect
+import com.tari.android.wallet.ui.fragment.contact_book.contactSelection.ContactSelectionModel.YatState
 import com.tari.android.wallet.ui.fragment.contact_book.contacts.adapter.ContactListAdapter
 import com.tari.android.wallet.ui.fragment.contact_book.contacts.adapter.contact.ContactItem
 import com.tari.android.wallet.ui.fragment.contact_book.contacts.adapter.contact.ContactlessPaymentItem
-import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.YatDto
-import com.tari.android.wallet.ui.fragment.contact_book.root.ShareViewModel
 import com.tari.android.wallet.ui.fragment.qr.QRScannerActivity
 import com.tari.android.wallet.ui.fragment.qr.QrScannerSource
 import com.tari.android.wallet.util.Constants
@@ -53,7 +52,6 @@ import com.tari.android.wallet.util.EmojiUtil
 import com.tari.android.wallet.util.containsNonEmoji
 import com.tari.android.wallet.util.firstNCharactersAreEmojis
 import com.tari.android.wallet.util.numberOfEmojis
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import me.everything.android.ui.overscroll.OverScrollDecoratorHelper
 
@@ -69,15 +67,17 @@ open class ContactSelectionFragment : CommonFragment<FragmentContactsSelectionBi
      * Fields related to emoji id input masking.
      */
     private var isDeletingSeparatorAtIndex: Int? = null
-    private var textWatcherIsRunning = false
-    private var inputNormalLetterSpacing = 0.04f
-    private var inputEmojiIdLetterSpacing = 0.27f
 
+    private var textWatcherIsRunning = false
+    private val inputNormalLetterSpacing = 0.04f
+    private val inputEmojiIdLetterSpacing = 0.27f
     private val textChangedProcessDelayMs = 100L
+    private val addressSeparator
+        get() = string(R.string.emoji_id_chunk_separator)
+
     private val textChangedProcessHandler = Handler(Looper.getMainLooper())
     private var textChangedProcessRunnable = Runnable { processTextChanged() }
 
-    private var yatEyeState = true
     private var withToolbar = true
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
@@ -105,22 +105,33 @@ open class ContactSelectionFragment : CommonFragment<FragmentContactsSelectionBi
     }
 
     private fun subscribeViewModal() = with(viewModel) {
-        observe(list) { recyclerViewAdapter.update(it) }
+        observe(contactList) { recyclerViewAdapter.update(it) }
 
         observe(walletAddressViewModel.discoveredWalletAddressFromClipboard) { clipboardController.showClipboardData(it) }
 
-        observe(selectedTariWalletAddress) { putEmojiId(it.emojiId) }
+        observe(selectedTariWalletAddress) { address -> address?.emojiId?.let { putEmojiId(it) } }
 
-        observe(selectedUser) {
-            putEmojiId(it.contact.extractWalletAddress().emojiId)
-            ui.addFirstNameInput.setText((it.contact.firstName + " " + it.contact.surname).trim())
+        observe(selectedContact) { contactDto ->
+            putEmojiId(contactDto.contact.extractWalletAddress().emojiId)
+            ui.addFirstNameInput.setText((contactDto.contact.firstName + " " + contactDto.contact.surname).trim())
         }
 
-        observe(foundYatUser) { showYatUser(if (it.isPresent) it.get() else null) }
-
-        observe(goNext) { goToNext() }
-
         observeOnLoad(clipboardChecker)
+
+        viewLifecycleOwner.launchAndRepeatOnLifecycle(Lifecycle.State.STARTED) {
+            launch {
+                yatState.collect { state -> handleYatState(state) }
+            }
+
+            launch {
+                viewModel.effect.collect { effect ->
+                    when (effect) {
+                        is Effect.ShowNotValidEmojiId -> showNotValidEmojiId()
+                        is Effect.ShowNextButton -> showNextButton()
+                    }
+                }
+            }
+        }
     }
 
     private fun putEmojiId(emojiId: String) {
@@ -140,7 +151,7 @@ open class ContactSelectionFragment : CommonFragment<FragmentContactsSelectionBi
         val args = TariToolbarActionArg(title = string(R.string.common_done)) { goToNext() }
         ui.toolbar.setRightArgs(args)
         ui.continueButton.setOnClickListener { goToNext() }
-        ui.yatEyeButton.setOnClickListener { toggleYatEye() }
+        ui.yatEyeButton.setOnClickListener { viewModel.toggleYatEye() }
         ui.searchEditText.setRawInputType(InputType.TYPE_CLASS_TEXT)
         ui.searchEditText.addTextChangedListener(this@ContactSelectionFragment)
 
@@ -169,66 +180,47 @@ open class ContactSelectionFragment : CommonFragment<FragmentContactsSelectionBi
 
     private fun setupRecyclerView() {
         ui.contactsListRecyclerView.layoutManager = LinearLayoutManager(requireContext())
-        recyclerViewAdapter.setClickListener(CommonAdapter.ItemClickListener {
-            onItemClick(it as? ContactItem)
-            (it as? ContactlessPaymentItem)?.let { onContactlessPaymentClick() }
+        recyclerViewAdapter.setClickListener(CommonAdapter.ItemClickListener { holderItem ->
+            when (holderItem) {
+                is ContactItem -> viewModel.onContactClick(holderItem.contact)
+                is ContactlessPaymentItem -> viewModel.onContactlessPaymentClick()
+            }
         })
         ui.contactsListRecyclerView.adapter = recyclerViewAdapter
     }
 
-    private fun onContactlessPaymentClick() {
-        ShareViewModel.currentInstant?.doContactlessPayment()
+    private fun showNotValidEmojiId() {
+        ui.invalidEmojiIdTextView.text = string(R.string.add_recipient_invalid_emoji_id)
+        ui.invalidEmojiIdTextView.visible()
     }
 
-    private fun onItemClick(contactItem: ContactItem?) {
-        contactItem?.contact?.let { viewModel.selectedUser.value = it }
-    }
-
-    private fun toggleYatEye() {
-        setYatState(!yatEyeState)
-    }
-
-    private fun setYatState(isOpen: Boolean) {
-        if (!isOpen) {
-            ui.searchEditText.removeTextChangedListener(this)
-            ui.yatEyeButton.setImageDrawable(ContextCompat.getDrawable(requireContext(), R.drawable.vector_closed_eye))
-        } else {
-            ui.searchEditText.removeTextChangedListener(this)
-            ui.searchEditText.setSelectionToEnd()
-            ui.searchEditText.addTextChangedListener(this)
-            ui.yatEyeButton.setImageDrawable(ContextCompat.getDrawable(requireContext(), R.drawable.vector_opened_eye))
+    private fun showNextButton() {
+        ui.invalidEmojiIdTextView.gone()
+        ui.toolbar.setRightArgs(TariToolbarActionArg(title = string(R.string.contact_book_add_contact_next_button)) { goToNext() })
+        ui.toolbar.showRightActions()
+        if (!withToolbar) {
+            ui.continueButton.visible()
         }
-        yatEyeState = isOpen
+        activity?.hideKeyboard()
+        ui.searchEditText.clearFocus()
     }
 
-    private fun showYatUser(yatUser: YatDto?) {
-        val isExist = yatUser != null
-        ui.yatEyeButton.setVisible(isExist)
-        ui.yatIcon.setVisible(isExist)
+    private fun handleYatState(yatState: YatState) {
+        ui.yatEyeButton.setVisible(yatState.showYatIcons)
+        ui.yatIcon.setVisible(yatState.showYatIcons)
 
-        if (isExist) {
-            setYatState(true)
-            ui.searchEditText.postDelayed({
-                TransitionManager.beginDelayedTransition(ui.searchEditTextAnimateContainer)
-                ui.searchEditText.textAlignment = View.TEXT_ALIGNMENT_CENTER
-                ui.searchEditText.gravity = Gravity.CENTER
-            }, 100)
-
-            requireActivity().hideKeyboard()
-            ui.searchEditText.clearFocus()
-        } else {
-            ui.searchEditText.postDelayed({
-                ui.searchEditText.textAlignment = View.TEXT_ALIGNMENT_TEXT_START
-                ui.searchEditText.gravity = Gravity.CENTER_VERTICAL or Gravity.START
-            }, 100)
-        }
-    }
-
-    fun reset() {
-        // state is not initial if there's some character in the search input
-        if (ui.searchEditText.text.toString().isNotEmpty()) {
-            ui.searchEditText.setText("")
-            ui.toolbar.hideRightActions()
+        if (yatState.yatUser != null) {
+            if (yatState.eyeOpened) {
+                ui.searchEditText.removeTextChangedListener(this)
+                ui.yatEyeButton.setImageDrawable(ContextCompat.getDrawable(requireContext(), R.drawable.vector_closed_eye))
+                ui.searchEditText.setText(yatState.yatUser.hexAddress)
+            } else {
+                ui.searchEditText.removeTextChangedListener(this)
+                ui.searchEditText.setText(yatState.yatUser.yatName)
+                ui.searchEditText.setSelectionToEnd()
+                ui.searchEditText.addTextChangedListener(this)
+                ui.yatEyeButton.setImageDrawable(ContextCompat.getDrawable(requireContext(), R.drawable.vector_opened_eye))
+            }
         }
     }
 
@@ -282,7 +274,7 @@ open class ContactSelectionFragment : CommonFragment<FragmentContactsSelectionBi
 
     override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {
         isDeletingSeparatorAtIndex =
-            (if (count == 1 && after == 0 && s[start].toString() == string(R.string.emoji_id_chunk_separator)) start else null)
+            if (count == 1 && after == 0 && s[start].toString() == string(R.string.emoji_id_chunk_separator)) start else null
     }
 
     override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) = Unit
@@ -303,7 +295,6 @@ open class ContactSelectionFragment : CommonFragment<FragmentContactsSelectionBi
         textWatcherIsRunning = true
         val editable = ui.searchEditText.editableText
         var text = editable.toString()
-        viewModel.searchAndDisplayYatRecipients(text)
 
         ui.toolbar.hideRightActions()
         ui.continueButton.gone()
@@ -313,79 +304,49 @@ open class ContactSelectionFragment : CommonFragment<FragmentContactsSelectionBi
             // if deleting a separator, first get the index of the character before that separator
             // and delete that character
             if (isDeletingSeparatorAtIndex != null) {
-                val index =
-                    EmojiUtil.getStartIndexOfItemEndingAtIndex(text, isDeletingSeparatorAtIndex!!)
+                val index = EmojiUtil.getStartIndexOfItemEndingAtIndex(text, isDeletingSeparatorAtIndex!!)
                 editable.delete(index, isDeletingSeparatorAtIndex!!)
                 isDeletingSeparatorAtIndex = null
                 text = editable.toString()
             }
 
             // delete all separators first
-            val separator = string(R.string.emoji_id_chunk_separator)
-            for ((offset, index) in EmojiUtil.getExistingChunkSeparatorIndices(
-                text,
-                separator
-            ).withIndex()) {
-                val target = index - (offset * separator.length)
-                editable.delete(target, target + separator.length)
+            for ((offset, index) in EmojiUtil.getExistingChunkSeparatorIndices(text, addressSeparator).withIndex()) {
+                val target = index - (offset * addressSeparator.length)
+                editable.delete(target, target + addressSeparator.length)
             }
             val textWithoutSeparators = editable.toString()
             ui.searchEditText.textAlignment = View.TEXT_ALIGNMENT_CENTER
             ui.searchEditText.letterSpacing = inputEmojiIdLetterSpacing
             // add separators
-            for ((offset, index) in EmojiUtil.getNewChunkSeparatorIndices(textWithoutSeparators)
-                .withIndex()) {
+            for ((offset, index) in EmojiUtil.getNewChunkSeparatorIndices(textWithoutSeparators).withIndex()) {
                 val chunkSeparatorSpannable = EmojiUtil.getChunkSeparatorSpannable(
-                    separator,
-                    viewModel.paletteManager.getLightGray(requireContext())
+                    separator = addressSeparator,
+                    color = viewModel.paletteManager.getLightGray(requireContext()),
                 )
-                val target = index + (offset * separator.length)
+                val target = index + (offset * addressSeparator.length)
                 editable.insert(target, chunkSeparatorSpannable)
             }
             // check if valid emoji - don't search if not
             val emojisNumber = textWithoutSeparators.numberOfEmojis()
             if (textWithoutSeparators.containsNonEmoji() || emojisNumber > Constants.Wallet.emojiIdLength) {
-                viewModel.selectedTariWalletAddress.value = null
-                ui.invalidEmojiIdTextView.text = string(R.string.add_recipient_invalid_emoji_id)
-                ui.invalidEmojiIdTextView.visible()
+                viewModel.deselectTariWalletAddress()
+                showNotValidEmojiId()
             } else {
-                finishEntering(textWithoutSeparators)
+                viewModel.addressEntered(textWithoutSeparators)
             }
         } else if (viewModel.deeplinkHandler.handle(text) != null) {
             val deeplink = viewModel.deeplinkHandler.handle(text)!!
             deeplinkViewModel.execute(deeplink)
-            viewModel.selectedTariWalletAddress.value = null
+            viewModel.deselectTariWalletAddress()
         } else if (viewModel.walletAddressViewModel.checkForWalletAddressHex(text)) {
-            finishEntering(viewModel.walletAddressViewModel.discoveredWalletAddress!!.emojiId)
+            viewModel.addressEntered(viewModel.walletAddressViewModel.discoveredWalletAddress!!.emojiId)
         } else {
-            viewModel.selectedTariWalletAddress.value = null
+            viewModel.deselectTariWalletAddress()
             ui.searchEditText.textAlignment = View.TEXT_ALIGNMENT_TEXT_START
             ui.searchEditText.letterSpacing = inputNormalLetterSpacing
-            finishEntering(editable.toString())
+            viewModel.addressEntered(editable.toString())
         }
         textWatcherIsRunning = false
     }
-
-    private fun finishEntering(text: String) {
-        lifecycleScope.launch(Dispatchers.Main) {
-            viewModel.selectedTariWalletAddress.value = viewModel.walletAddressViewModel.getWalletAddressFromEmojiId(text)
-            if (viewModel.selectedTariWalletAddress.value == null) {
-                if (text.isNotEmpty()) {
-                    ui.invalidEmojiIdTextView.text = string(R.string.add_recipient_invalid_emoji_id)
-                    ui.invalidEmojiIdTextView.visible()
-                }
-            } else {
-                ui.invalidEmojiIdTextView.gone()
-                ui.toolbar.setRightArgs(TariToolbarActionArg(title = string(R.string.contact_book_add_contact_next_button)) { goToNext() })
-                ui.toolbar.showRightActions()
-                if (!withToolbar) {
-                    ui.continueButton.visible()
-                }
-                activity?.hideKeyboard()
-                ui.searchEditText.clearFocus()
-                viewModel.searchText.value = text
-            }
-        }
-    }
 }
-
