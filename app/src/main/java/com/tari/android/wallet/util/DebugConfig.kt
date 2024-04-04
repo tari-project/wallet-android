@@ -63,7 +63,7 @@ object MockDataStub {
     private const val HEX = "C05575BE00EF016A209B1F493D9027B0E330F3E25FE89BBE6FA66D966EE5B6356"
 
     private val EMOJI_ID_ZERO = (0..25).map { "\uD83C\uDF00" }.joinToString("")
-    private const val HEX_ZERO = TariWalletAddress.zero66Hex
+    private const val HEX_ZERO = TariWalletAddress.HEX_ZERO_66
 
     val WALLET_ADDRESS = TariWalletAddress(hexString = HEX, emojiId = EMOJI_ID)
     val WALLET_ADDRESS_ZERO = TariWalletAddress(HEX_ZERO, EMOJI_ID_ZERO)

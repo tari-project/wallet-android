@@ -279,7 +279,7 @@ class ContactsRepository @Inject constructor(
                         val actualContact = contacts.getAt(contactIndex)
 
                         val walletAddress = actualContact.getWalletAddress()
-                        val ffiWalletAddress = TariWalletAddress(walletAddress.toString(), walletAddress.getEmojiId())
+                        val ffiWalletAddress = TariWalletAddress.createWalletAddress(walletAddress.toString(), walletAddress.getEmojiId())
                         val alias = actualContact.getAlias()
                         val isFavorite = actualContact.getIsFavorite()
 

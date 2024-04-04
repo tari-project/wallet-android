@@ -352,13 +352,9 @@ class TariNavigator @Inject constructor(val prefs: SharedPrefsRepository, val ta
     }
 
     private fun navigateBackFromTxSend(isYat: Boolean) {
-        if (isYat) {
-            activity.finish()
-        } else {
-            val fragmentsCount = activity.supportFragmentManager.fragments.size - 5
-            for (i in 0 until fragmentsCount) {
-                activity.supportFragmentManager.popBackStackImmediate()
-            }
+        val fragmentsCount = activity.supportFragmentManager.fragments.size - 5
+        for (i in 0 until fragmentsCount) {
+            activity.supportFragmentManager.popBackStackImmediate()
         }
     }
 
@@ -390,7 +386,7 @@ class TariNavigator @Inject constructor(val prefs: SharedPrefsRepository, val ta
     }
 
     private fun walletAddressFromFFI(ffiTariWalletAddress: FFITariWalletAddress): TariWalletAddress =
-        TariWalletAddress(ffiTariWalletAddress.toString(), ffiTariWalletAddress.getEmojiId())
+        TariWalletAddress.createWalletAddress(ffiTariWalletAddress.toString(), ffiTariWalletAddress.getEmojiId())
 
     private fun sendToUser(recipientUser: ContactDto, amount: MicroTari? = null) {
         val bundle = Bundle().apply {

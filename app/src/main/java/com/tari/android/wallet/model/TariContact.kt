@@ -43,7 +43,7 @@ import com.tari.android.wallet.ui.extension.readP
  */
 class TariContact() : Parcelable {
 
-    var walletAddress = TariWalletAddress()
+    var walletAddress = TariWalletAddress.createWalletAddress()
     var isFavorite: Boolean = false
     var alias: String = ""
 
