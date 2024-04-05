@@ -34,7 +34,7 @@ package com.tari.android.wallet.data.sharedPrefs.tor
 
 import android.content.SharedPreferences
 import com.tari.android.wallet.data.repository.CommonRepository
-import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefGsonDelegate
+import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefGsonNullableDelegate
 import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefStringDelegate
 import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
 import com.tari.android.wallet.data.sharedPrefs.network.formatKey
@@ -52,14 +52,14 @@ class TorSharedRepository @Inject constructor(sharedPrefs: SharedPreferences, ne
         const val torrcBinPath = "tari_wallet_torrc_bin_path"
     }
 
-    var currentTorBridges: TorBridgeConfigurationList? by SharedPrefGsonDelegate(
+    var currentTorBridges: TorBridgeConfigurationList? by SharedPrefGsonNullableDelegate(
         sharedPrefs,
         this,
         formatKey(Key.currentTorBridge),
         TorBridgeConfigurationList::class.java
     )
 
-    var customTorBridges: TorBridgeConfigurationList? by SharedPrefGsonDelegate(
+    var customTorBridges: TorBridgeConfigurationList? by SharedPrefGsonNullableDelegate(
         sharedPrefs,
         this,
         formatKey(Key.customTorBridges),

@@ -7,12 +7,12 @@ import com.orhanobut.logger.Logger
 import com.tari.android.wallet.data.repository.CommonRepository
 import kotlin.reflect.KProperty
 
-class SharedPrefGsonDelegate<T>(
+class SharedPrefGsonNullableDelegate<T>(
     private val prefs: SharedPreferences,
     private val commonRepository: CommonRepository,
     private val name: String,
     private val type: Class<T>,
-    private val defValue: T,
+    private val defValue: T? = null,
 ) {
     private val gson = with(GsonBuilder()) {
         registerTypeAdapter(Uri::class.java, UriDeserializer())
@@ -23,7 +23,7 @@ class SharedPrefGsonDelegate<T>(
         commonRepository.updateNotifier.onNext(Unit)
     }
 
-    operator fun getValue(thisRef: Any?, property: KProperty<*>): T {
+    operator fun getValue(thisRef: Any?, property: KProperty<*>): T? {
         return if (prefs.contains(name)) {
             val savedValue = prefs.getString(name, "")
             try {
@@ -37,7 +37,7 @@ class SharedPrefGsonDelegate<T>(
         }
     }
 
-    operator fun setValue(thisRef: Any?, property: KProperty<*>, value: T) {
+    operator fun setValue(thisRef: Any?, property: KProperty<*>, value: T?) {
         prefs.edit().run {
             putString(name, gson.toJson(value, type))
             apply()
@@ -47,6 +47,6 @@ class SharedPrefGsonDelegate<T>(
 
     companion object {
         private val logger
-            get() = Logger.t(SharedPrefGsonDelegate::class.simpleName)
+            get() = Logger.t(SharedPrefGsonNullableDelegate::class.simpleName)
     }
 }

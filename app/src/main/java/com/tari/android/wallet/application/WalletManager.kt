@@ -214,7 +214,7 @@ class WalletManager(
             if (isNewInstallation) {
                 FFIWallet.instance?.setKeyValue(
                     WalletService.Companion.KeyValueStorageKeys.NETWORK,
-                    networkRepository.currentNetwork!!.network.uriComponent
+                    networkRepository.currentNetwork.network.uriComponent
                 )
             } else if (tariSettingsSharedRepository.isRestoredWallet && networkRepository.ffiNetwork == null) {
                 networkRepository.ffiNetwork = try {

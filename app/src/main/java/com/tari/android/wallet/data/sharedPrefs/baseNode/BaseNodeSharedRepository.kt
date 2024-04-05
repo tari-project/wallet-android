@@ -34,12 +34,8 @@ package com.tari.android.wallet.data.sharedPrefs.baseNode
 
 import android.content.SharedPreferences
 import com.tari.android.wallet.data.repository.CommonRepository
-import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodeSharedRepository.Key.baseNodeLastSyncResultField
-import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodeSharedRepository.Key.baseNodeStateField
-import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodeSharedRepository.Key.currentBaseNodeField
-import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodeSharedRepository.Key.userBaseNodeListField
 import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefBooleanNullableDelegate
-import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefGsonDelegate
+import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefGsonNullableDelegate
 import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefIntDelegate
 import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
 import com.tari.android.wallet.data.sharedPrefs.network.formatKey
@@ -49,23 +45,25 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class BaseNodeSharedRepository @Inject constructor(sharedPrefs: SharedPreferences, networkRepository: NetworkRepository) :
-    CommonRepository(networkRepository) {
+class BaseNodeSharedRepository @Inject constructor(
+    sharedPrefs: SharedPreferences,
+    networkRepository: NetworkRepository,
+) : CommonRepository(networkRepository) {
 
     private object Key {
-        const val currentBaseNodeField = "tari_wallet_current_base_node"
-        const val userBaseNodeListField = "tari_wallet_user_base_nodes"
-        const val baseNodeStateField = "tari_wallet_user_base_node_state"
-        const val baseNodeLastSyncResultField = "tari_wallet_base_node_last_sync_result"
+        const val CURRENT_BASE_NODE = "tari_wallet_current_base_node"
+        const val USER_BASE_NODE_LIST = "tari_wallet_user_base_nodes"
+        const val BASE_NODE_STATE = "tari_wallet_user_base_node_state"
+        const val BASE_NODE_LAST_SYNC_RESULT = "tari_wallet_base_node_last_sync_result"
     }
 
-    var currentBaseNode: BaseNodeDto? by SharedPrefGsonDelegate(sharedPrefs, this,  formatKey(currentBaseNodeField), BaseNodeDto::class.java)
+    var currentBaseNode: BaseNodeDto? by SharedPrefGsonNullableDelegate(sharedPrefs, this, formatKey(Key.CURRENT_BASE_NODE), BaseNodeDto::class.java)
 
-    var userBaseNodes: BaseNodeList? by SharedPrefGsonDelegate(sharedPrefs, this,  formatKey(userBaseNodeListField), BaseNodeList::class.java)
+    var userBaseNodes: BaseNodeList? by SharedPrefGsonNullableDelegate(sharedPrefs, this, formatKey(Key.USER_BASE_NODE_LIST), BaseNodeList::class.java)
 
-    var baseNodeLastSyncResult: Boolean? by SharedPrefBooleanNullableDelegate(sharedPrefs, this,  baseNodeLastSyncResultField)
+    var baseNodeLastSyncResult: Boolean? by SharedPrefBooleanNullableDelegate(sharedPrefs, this, Key.BASE_NODE_LAST_SYNC_RESULT)
 
-    var baseNodeState: Int by SharedPrefIntDelegate(sharedPrefs, this,  baseNodeStateField, 0)
+    var baseNodeState: Int by SharedPrefIntDelegate(sharedPrefs, this, Key.BASE_NODE_STATE, 0)
 
     init {
         EventBus.baseNodeState.post(BaseNodeState.parseInt(baseNodeState))
