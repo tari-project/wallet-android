@@ -5,7 +5,7 @@ import android.content.SharedPreferences
 import com.tari.android.wallet.data.repository.CommonRepository
 import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefBooleanDelegate
 import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefBooleanNullableDelegate
-import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefGsonDelegate
+import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefGsonNullableDelegate
 import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefStringSecuredDelegate
 import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
 import com.tari.android.wallet.data.sharedPrefs.network.formatKey
@@ -38,7 +38,7 @@ class SecurityPrefRepository @Inject constructor(
 
     var databasePassphrase: String? by SharedPrefStringSecuredDelegate(context, sharedPrefs, this, formatKey(walletDatabasePassphraseKey))
 
-    var attempts: LoginAttemptList? by SharedPrefGsonDelegate<LoginAttemptList>(
+    var attempts: LoginAttemptList? by SharedPrefGsonNullableDelegate<LoginAttemptList>(
         sharedPrefs,
         this,
         formatKey(loginAttemptsKey),

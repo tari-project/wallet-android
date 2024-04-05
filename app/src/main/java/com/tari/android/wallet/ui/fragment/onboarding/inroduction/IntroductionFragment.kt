@@ -105,7 +105,7 @@ class IntroductionFragment : CommonFragment<FragmentIntroductionBinding, Introdu
 
     override fun onResume() {
         super.onResume()
-        ui.selectNetworkButton.text = string(introduction_selected_wallet, viewModel.networkRepository.currentNetwork!!.network.displayName)
+        ui.selectNetworkButton.text = string(introduction_selected_wallet, viewModel.networkRepository.currentNetwork.network.displayName)
     }
 
     override fun onPause() {

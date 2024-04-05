@@ -59,7 +59,7 @@ class YatAdapter(
 
     fun showOutcomingFinalizeActivity(activity: Activity, transactionData: TransactionData) {
         val yatUser = transactionData.recipientContact?.getYatDto() ?: return
-        val currentTicker = networkRepository.currentNetwork?.ticker.orEmpty()
+        val currentTicker = networkRepository.currentNetwork.ticker
         val data = YatLibOutcomingTransactionData(
             amount = transactionData.amount!!.tariValue.toDouble(),
             currency = currentTicker,

@@ -48,7 +48,8 @@ class DeepLinkTest {
 
     @Test
     fun assertBaseNodeName() {
-        val deeplink = "tari://${currentNetwork.uriComponent}/${DeepLink.AddBaseNode.COMMAND_ADD_NODE}?${DeepLink.AddBaseNode.KEY_NAME}=base_node_test"
+        val deeplink =
+            "tari://${currentNetwork.uriComponent}/${DeepLink.AddBaseNode.COMMAND_ADD_NODE}?${DeepLink.AddBaseNode.KEY_NAME}=base_node_test"
         val result = deeplinkHandler.handle(deeplink) as? DeepLink.AddBaseNode
         assertEquals(result!!.name, "base_node_test")
     }
@@ -68,11 +69,11 @@ class DeepLinkTest {
 
     class NetworkRepositoryMock : NetworkRepository {
         private val network: Network = Network.STAGENET
-        private val tariNetwork = TariNetwork(network, "xtr", true)
+        private val tariNetwork = TariNetwork(network, "seeds.stagenet.tari.com", "xtr", true)
 
         override val defaultNetwork: TariNetwork = tariNetwork
         override var supportedNetworks: List<TariNetwork> = listOf(tariNetwork)
-        override var currentNetwork: TariNetwork? = TariNetwork(network, "", true)
+        override var currentNetwork: TariNetwork = TariNetwork(network, "seeds.stagenet.tari.com", "", true)
         override var ffiNetwork: Network? = network
     }
 }

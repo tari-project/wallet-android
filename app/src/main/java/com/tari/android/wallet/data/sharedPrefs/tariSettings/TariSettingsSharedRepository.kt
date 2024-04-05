@@ -35,7 +35,7 @@ package com.tari.android.wallet.data.sharedPrefs.tariSettings
 import android.content.SharedPreferences
 import com.tari.android.wallet.data.repository.CommonRepository
 import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefBooleanDelegate
-import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefGsonDelegate
+import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefGsonNullableDelegate
 import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
 import com.tari.android.wallet.data.sharedPrefs.network.formatKey
 import com.tari.android.wallet.ui.fragment.settings.themeSelector.TariTheme
@@ -65,7 +65,7 @@ class TariSettingsSharedRepository @Inject constructor(sharedPrefs: SharedPrefer
 
     var isOneSidePaymentEnabled: Boolean by SharedPrefBooleanDelegate(sharedPrefs, this, formatKey(Key.isOneSidePaymentEnabledKey), false)
 
-    var currentTheme: TariTheme? by SharedPrefGsonDelegate(sharedPrefs, this, Key.themeKey, TariTheme::class.java, TariTheme.AppBased)
+    var currentTheme: TariTheme? by SharedPrefGsonNullableDelegate(sharedPrefs, this, Key.themeKey, TariTheme::class.java, TariTheme.AppBased)
 
     fun clear() {
         isRestoredWallet = false

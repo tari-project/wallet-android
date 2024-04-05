@@ -18,7 +18,7 @@ class WalletConfig @Inject constructor(val context: Context, val networkReposito
     /**
      * The directory in which the wallet files reside.
      */
-    fun getWalletFilesDirPath(): String = context.filesDir.absolutePath + "/" + networkRepository.currentNetwork!!.network.uriComponent
+    fun getWalletFilesDirPath(): String = context.filesDir.absolutePath + "/" + networkRepository.currentNetwork.network.uriComponent
     val walletDatabaseFilePath: String = File(getWalletFilesDirPath(), walletDBFullFileName).absolutePath
 
     /**

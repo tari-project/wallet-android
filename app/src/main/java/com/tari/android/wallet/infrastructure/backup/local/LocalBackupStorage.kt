@@ -184,7 +184,7 @@ class LocalBackupStorage @Inject constructor(
 
     private fun getBackupFolder(): DocumentFile {
         val backupFolderURI = backupSettingsRepository.localBackupFolderURI ?: throw BackupStorageTamperedException("Backup storage not accessible.")
-        val networkFolder = networkRepository.currentNetwork!!.network.displayName
+        val networkFolder = networkRepository.currentNetwork.network.displayName
         var rootFolder = DocumentFile.fromTreeUri(context, backupFolderURI) ?: throw BackupStorageTamperedException("Backup storage is not a folder.")
         rootFolder = rootFolder.findFile(networkFolder) ?: (rootFolder.createDirectory(networkFolder) ?: rootFolder)
         return rootFolder

@@ -5,7 +5,7 @@ import com.tari.android.wallet.data.repository.CommonRepository
 import org.joda.time.DateTime
 import kotlin.reflect.KProperty
 
-class SharedPrefDateTimeDelegate(
+class SharedPrefDateTimeNullableDelegate(
     val prefs: SharedPreferences,
     val commonRepository: CommonRepository,
     val name: String,

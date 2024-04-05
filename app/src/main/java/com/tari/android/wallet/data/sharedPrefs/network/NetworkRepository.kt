@@ -8,11 +8,11 @@ interface NetworkRepository {
 
     var supportedNetworks: List<TariNetwork>
 
-    var currentNetwork: TariNetwork?
+    var currentNetwork: TariNetwork
 
     var ffiNetwork: Network?
 
-    fun isCurrentNetworkSupported(): Boolean = supportedNetworks.any { it.network == currentNetwork?.network }
+    fun isCurrentNetworkSupported(): Boolean = supportedNetworks.any { it.network == currentNetwork.network }
 
     fun setDefaultNetworkAsCurrent() {
         currentNetwork = defaultNetwork
