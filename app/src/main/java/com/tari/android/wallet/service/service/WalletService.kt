@@ -42,7 +42,7 @@ import com.orhanobut.logger.Logger
 import com.tari.android.wallet.application.TariWalletApplication
 import com.tari.android.wallet.application.WalletManager
 import com.tari.android.wallet.application.WalletState
-import com.tari.android.wallet.application.baseNodes.BaseNodes
+import com.tari.android.wallet.application.baseNodes.BaseNodesManager
 import com.tari.android.wallet.data.WalletConfig
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodeSharedRepository
@@ -104,7 +104,7 @@ class WalletService : Service() {
     lateinit var backupManager: BackupManager
 
     @Inject
-    lateinit var baseNodes: BaseNodes
+    lateinit var baseNodesManager: BaseNodesManager
 
     private var lifecycleObserver: ServiceLifecycleCallbacks? = null
     private val stubProxy = TariWalletServiceStubProxy()
@@ -186,7 +186,7 @@ class WalletService : Service() {
             wallet = FFIWallet.instance!!
             lifecycleObserver = ServiceLifecycleCallbacks(wallet)
             val impl =
-                FFIWalletListenerImpl(wallet, backupManager, notificationHelper, notificationService, app, baseNodeSharedPrefsRepository, baseNodes)
+                FFIWalletListenerImpl(wallet, backupManager, notificationHelper, notificationService, app, baseNodeSharedPrefsRepository, baseNodesManager)
             stubProxy.stub = TariWalletServiceStubImpl(wallet, baseNodeSharedPrefsRepository, impl)
             wallet.listener = impl
             EventBus.walletState.unsubscribe(this)

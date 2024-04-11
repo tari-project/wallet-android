@@ -65,27 +65,33 @@ class ConnectionIndicatorViewModel : CommonViewModel() {
         _state.value = when (_networkState.value) {
             NetworkConnectionState.UNKNOWN,
             NetworkConnectionState.DISCONNECTED -> ConnectionIndicatorState.Disconnected
+
             NetworkConnectionState.CONNECTED -> {
                 when (_torProxyState.value) {
                     is TorProxyState.Failed,
                     is TorProxyState.Initializing,
-                    TorProxyState.NotReady -> ConnectionIndicatorState.Disconnected
+                    is TorProxyState.NotReady -> ConnectionIndicatorState.Disconnected
+
                     is TorProxyState.Running -> {
                         when (_baseNodeState.value) {
-                            is BaseNodeState.Online,
-                            is BaseNodeState.Syncing -> {
+                            BaseNodeState.Online,
+                            BaseNodeState.Syncing -> {
                                 when (_syncState.value) {
                                     BaseNodeSyncState.Online,
                                     BaseNodeSyncState.Syncing -> ConnectionIndicatorState.Connected
+
                                     else -> ConnectionIndicatorState.ConnectedWithIssues
                                 }
                             }
+
                             else -> ConnectionIndicatorState.Disconnected
                         }
                     }
+
                     else -> ConnectionIndicatorState.Disconnected
                 }
             }
+
             else -> ConnectionIndicatorState.Disconnected
         }
 

@@ -4,7 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.tari.android.wallet.R
-import com.tari.android.wallet.application.baseNodes.BaseNodes
+import com.tari.android.wallet.application.baseNodes.BaseNodesManager
 import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodeDto
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.extension.addTo
@@ -34,7 +34,7 @@ class WalletRestoringFromSeedWordsViewModel : CommonViewModel() {
     lateinit var walletServiceLauncher: WalletServiceLauncher
 
     @Inject
-    lateinit var baseNodes: BaseNodes
+    lateinit var baseNodesManager: BaseNodesManager
 
     private lateinit var baseNodeIterator: Iterator<BaseNodeDto>
 
@@ -46,7 +46,7 @@ class WalletRestoringFromSeedWordsViewModel : CommonViewModel() {
     }
 
     fun startRestoring() = viewModelScope.launch(Dispatchers.IO) {
-        baseNodeIterator = baseNodes.baseNodeList.iterator()
+        baseNodeIterator = baseNodesManager.baseNodeList.iterator()
         tryNextBaseNode()
     }
 

@@ -3,7 +3,7 @@ package com.tari.android.wallet.service.service
 import com.orhanobut.logger.Logger
 import com.orhanobut.logger.Printer
 import com.tari.android.wallet.application.TariWalletApplication
-import com.tari.android.wallet.application.baseNodes.BaseNodes
+import com.tari.android.wallet.application.baseNodes.BaseNodesManager
 import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodeSharedRepository
 import com.tari.android.wallet.event.Event
 import com.tari.android.wallet.event.EventBus
@@ -46,7 +46,7 @@ class FFIWalletListenerImpl(
     private val notificationService: NotificationService,
     private val app: TariWalletApplication,
     private val baseNodeSharedPrefsRepository: BaseNodeSharedRepository,
-    private val baseNodes: BaseNodes
+    private val baseNodesManager: BaseNodesManager
 ) : FFIWalletListener {
 
     private val logger: Printer = Logger.t("FFIWalletListenerImpl")
@@ -210,22 +210,28 @@ class FFIWalletListenerImpl(
     }
 
     override fun onConnectivityStatus(status: Int) {
-        when (status) {
-            1 -> {
-                baseNodeSharedPrefsRepository.baseNodeState = BaseNodeState.Online.toInt()
+        when (ConnectivityStatus.entries[status]) {
+            ConnectivityStatus.CONNECTING -> {
+                /* do nothing */
+            }
+
+            ConnectivityStatus.ONLINE -> {
+                baseNodesManager.refreshBaseNodeList()
+                baseNodeSharedPrefsRepository.baseNodeState = BaseNodeState.Online
                 EventBus.baseNodeState.post(BaseNodeState.Online)
                 listeners.iterator().forEach { it.onBaseNodeSyncComplete(true) }
             }
 
-            2 -> {
+            ConnectivityStatus.OFFLINE -> {
                 val currentBaseNode = baseNodeSharedPrefsRepository.currentBaseNode
                 if (currentBaseNode == null || !currentBaseNode.isCustom) {
-                    baseNodes.setNextBaseNode()
+                    baseNodesManager.setNextBaseNode()
                 }
-                baseNodeSharedPrefsRepository.baseNodeState = BaseNodeState.Offline.toInt()
+                baseNodeSharedPrefsRepository.baseNodeState = BaseNodeState.Offline
                 EventBus.baseNodeState.post(BaseNodeState.Offline)
                 listeners.iterator().forEach { it.onBaseNodeSyncComplete(false) }
             }
+
         }
     }
 
@@ -285,7 +291,7 @@ class FFIWalletListenerImpl(
             baseNodeSharedPrefsRepository.baseNodeLastSyncResult = false
             val currentBaseNode = baseNodeSharedPrefsRepository.currentBaseNode
             if (currentBaseNode == null || !currentBaseNode.isCustom) {
-                baseNodes.setNextBaseNode()
+                baseNodesManager.setNextBaseNode()
             }
             EventBus.baseNodeSyncState.post(BaseNodeSyncState.Failed)
             listeners.iterator().forEach { it.onBaseNodeSyncComplete(false) }
@@ -320,5 +326,11 @@ class FFIWalletListenerImpl(
 
     override fun onWalletRestoration(result: WalletRestorationResult) {
         EventBus.walletRestorationState.post(result)
+    }
+
+    enum class ConnectivityStatus(val value: Int) {
+        CONNECTING(0),
+        ONLINE(1),
+        OFFLINE(2),
     }
 }
