@@ -32,68 +32,25 @@
  */
 package com.tari.android.wallet.model
 
-import android.os.Parcel
 import android.os.Parcelable
+import com.tari.android.wallet.ffi.FFIPublicKey
+import kotlinx.parcelize.Parcelize
 
 /**
  * This wrapper is needed for id parameters in AIDL methods.
  *
  * @author The Tari Development Team
  */
-class PublicKey() : Parcelable {
+@Parcelize
+data class PublicKey(
+    val hex: String = "",
+    val emojiId: String = "",
+) : Parcelable {
+    constructor(ffiPublicKey: FFIPublicKey) : this(hex = ffiPublicKey.getBytes().hexString.hex)
 
-    var hexString = ""
-    var emojiId = ""
+    override fun equals(other: Any?) = (other is PublicKey) && hex == other.hex
 
-    constructor(
-        hexString: String,
-        emojiId: String
-    ) : this() {
-        this.hexString = hexString
-        this.emojiId = emojiId
-    }
+    override fun hashCode() = hex.hashCode()
 
-    override fun equals(other: Any?): Boolean = (other is PublicKey)
-            && hexString == other.hexString
-
-    override fun hashCode(): Int {
-        return hexString.hashCode()
-    }
-
-    override fun toString(): String = "PublicKey(hexString='$hexString', emojiId='$emojiId')"
-
-    // region Parcelable
-
-    constructor(parcel: Parcel) : this() {
-        readFromParcel(parcel)
-    }
-
-    companion object CREATOR : Parcelable.Creator<PublicKey> {
-
-        override fun createFromParcel(parcel: Parcel): PublicKey {
-            return PublicKey(parcel)
-        }
-
-        override fun newArray(size: Int): Array<PublicKey> {
-            return Array(size) { PublicKey() }
-        }
-
-    }
-
-    override fun writeToParcel(parcel: Parcel, flags: Int) {
-        parcel.writeString(hexString)
-        parcel.writeString(emojiId)
-    }
-
-    private fun readFromParcel(inParcel: Parcel) {
-        hexString = inParcel.readString().orEmpty()
-        emojiId = inParcel.readString().orEmpty()
-    }
-
-    override fun describeContents(): Int {
-        return 0
-    }
-
-    // endregion
-
+    override fun toString() = "PublicKey(hexString='$hex', emojiId='$emojiId')"
 }
