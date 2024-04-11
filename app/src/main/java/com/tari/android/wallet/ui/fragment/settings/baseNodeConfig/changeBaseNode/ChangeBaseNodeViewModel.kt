@@ -3,7 +3,7 @@ package com.tari.android.wallet.ui.fragment.settings.baseNodeConfig.changeBaseNo
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.tari.android.wallet.R
-import com.tari.android.wallet.application.baseNodes.BaseNodes
+import com.tari.android.wallet.application.baseNodes.BaseNodesManager
 import com.tari.android.wallet.application.deeplinks.DeeplinkHandler
 import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodeDto
 import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodeSharedRepository
@@ -25,7 +25,7 @@ class ChangeBaseNodeViewModel : CommonViewModel() {
     lateinit var baseNodeSharedRepository: BaseNodeSharedRepository
 
     @Inject
-    lateinit var baseNodes: BaseNodes
+    lateinit var baseNodesManager: BaseNodesManager
 
     @Inject
     lateinit var deeplinkHandler: DeeplinkHandler
@@ -42,12 +42,12 @@ class ChangeBaseNodeViewModel : CommonViewModel() {
     }
 
     fun selectBaseNode(baseNodeDto: BaseNodeDto) {
-        baseNodes.setBaseNode(baseNodeDto)
+        baseNodesManager.setBaseNode(baseNodeDto)
         backPressed.postValue(Unit)
     }
 
     fun showQrCode(baseNodeDto: BaseNodeDto) {
-        val data = deeplinkHandler.getDeeplink(BaseNodeDto.getDeeplink(baseNodeDto))
+        val data = deeplinkHandler.getDeeplink(baseNodeDto.toDeeplink())
         val args = ModularDialogArgs(
             DialogArgs(true, canceledOnTouchOutside = true), listOf(
                 HeadModule(resourceManager.getString(R.string.share_via_qr_code_title)),
@@ -68,8 +68,8 @@ class ChangeBaseNodeViewModel : CommonViewModel() {
     private fun loadList() {
         val currentBaseNode = baseNodeSharedRepository.currentBaseNode
         val items = mutableListOf<CommonViewHolderItem>()
-        items.addAll(baseNodeSharedRepository.userBaseNodes.orEmpty().map { BaseNodeViewHolderItem(it, currentBaseNode, this::deleteBaseNode) })
-        items.addAll(baseNodes.baseNodeList.map { BaseNodeViewHolderItem(it, currentBaseNode, this::deleteBaseNode) })
+        items.addAll(baseNodeSharedRepository.userBaseNodes.map { BaseNodeViewHolderItem(it, currentBaseNode, this::deleteBaseNode) })
+        items.addAll(baseNodesManager.baseNodeList.map { BaseNodeViewHolderItem(it, currentBaseNode, this::deleteBaseNode) })
         _baseNodeList.postValue(items)
     }
 }

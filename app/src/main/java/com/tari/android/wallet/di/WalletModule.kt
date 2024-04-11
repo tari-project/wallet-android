@@ -32,9 +32,8 @@
  */
 package com.tari.android.wallet.di
 
-import android.content.Context
 import com.tari.android.wallet.application.WalletManager
-import com.tari.android.wallet.application.baseNodes.BaseNodes
+import com.tari.android.wallet.application.baseNodes.BaseNodesManager
 import com.tari.android.wallet.data.WalletConfig
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodeSharedRepository
@@ -64,7 +63,7 @@ class WalletModule {
         networkRepository: NetworkRepository,
         securityPrefRepository: SecurityPrefRepository,
         tariSettingsSharedRepository: TariSettingsSharedRepository,
-        baseNodes: BaseNodes
+        baseNodesManager: BaseNodesManager
     ): WalletManager = WalletManager(
         walletConfig,
         torProxyManager,
@@ -74,12 +73,7 @@ class WalletModule {
         networkRepository,
         tariSettingsSharedRepository,
         securityPrefRepository,
-        baseNodes,
+        baseNodesManager,
         torConfig
     )
-
-    @Provides
-    @Singleton
-    fun provideBaseNodes(context: Context, baseNodeSharedRepository: BaseNodeSharedRepository, networkRepository: NetworkRepository) =
-        BaseNodes(context, baseNodeSharedRepository, networkRepository)
 }

@@ -35,7 +35,7 @@ package com.tari.android.wallet.application
 import android.annotation.SuppressLint
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.BuildConfig
-import com.tari.android.wallet.application.baseNodes.BaseNodes
+import com.tari.android.wallet.application.baseNodes.BaseNodesManager
 import com.tari.android.wallet.data.WalletConfig
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodeSharedRepository
@@ -67,7 +67,7 @@ class WalletManager(
     private val networkRepository: NetworkRepository,
     private val tariSettingsSharedRepository: TariSettingsSharedRepository,
     private val securityPrefRepository: SecurityPrefRepository,
-    private val baseNodes: BaseNodes,
+    private val baseNodesManager: BaseNodesManager,
     private val torConfig: TorConfig
 ) {
 
@@ -119,7 +119,7 @@ class WalletManager(
     }
 
     private fun startWallet() {
-        if (EventBus.walletState.publishSubject.value == WalletState.NotReady || EventBus.walletState.publishSubject.value is WalletState.Failed) {
+        if (EventBus.walletState.publishSubject.value is WalletState.NotReady || EventBus.walletState.publishSubject.value is WalletState.Failed) {
             logger.i("Initialize wallet started")
             EventBus.walletState.post(WalletState.Initializing)
             coroutineScope.launch {
@@ -224,11 +224,13 @@ class WalletManager(
                 }
             }
             startLogFileObserver()
+
+            baseNodesManager.refreshBaseNodeList()
             val currentBaseNode = baseNodeSharedRepository.currentBaseNode
             if (currentBaseNode != null) {
-                baseNodes.startSync()
+                baseNodesManager.startSync()
             } else {
-                baseNodes.setNextBaseNode()
+                baseNodesManager.setNextBaseNode()
             }
             saveWalletPublicKeyHexToSharedPrefs()
         }
