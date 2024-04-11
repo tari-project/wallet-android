@@ -160,6 +160,8 @@ class FFIWallet(
 
     private external fun jniVerifyMessageSignature(publicKeyPtr: FFIPublicKey, message: String, signature: String, libError: FFIError): Boolean
 
+    private external fun jniGetBaseNodePeers(libError: FFIError): FFIPointer
+
     private external fun jniAddBaseNodePeer(publicKey: FFIPublicKey, address: String, libError: FFIError): Boolean
 
     private external fun jniStartTXOValidation(libError: FFIError): ByteArray
@@ -528,6 +530,12 @@ class FFIWallet(
     fun setPowerModeLow() = runWithError { jniPowerModeLow(it) }
 
     fun getSeedWords(): FFISeedWords = runWithError { FFISeedWords(jniGetSeedWords(it)) }
+
+    fun getBaseNodePeers(): List<PublicKey> = runWithError { error ->
+        FFIPublicKeys(jniGetBaseNodePeers(error)).let { ffiPublicKeys ->
+            List(ffiPublicKeys.getLength()) { index -> PublicKey(ffiPublicKeys.getAt(index)) }
+        }
+    }
 
     fun addBaseNodePeer(baseNodePublicKey: FFIPublicKey, baseNodeAddress: String): Boolean =
         runWithError { jniAddBaseNodePeer(baseNodePublicKey, baseNodeAddress, it) }

@@ -102,3 +102,37 @@ Java_com_tari_android_wallet_ffi_FFIPublicKey_jniDestroy(
     public_key_destroy(GetPointerField<TariPublicKey *>(jEnv, jThis));
     SetNullPointerField(jEnv, jThis);
 }
+
+extern "C"
+JNIEXPORT jint JNICALL
+Java_com_tari_android_wallet_ffi_FFIPublicKeys_jniGetLength(
+        JNIEnv *jEnv,
+        jobject jThis,
+        jobject error) {
+    return ExecuteWithError<int>(jEnv, error, [&](int *errorPointer) {
+        auto pPublicKeys = GetPointerField<TariPublicKeys *>(jEnv, jThis);
+        return public_keys_get_length(pPublicKeys, errorPointer);
+    });
+}
+
+extern "C"
+JNIEXPORT jlong JNICALL
+Java_com_tari_android_wallet_ffi_FFIPublicKeys_jniGetAt(
+        JNIEnv *jEnv,
+        jobject jThis,
+        jint jIndex,
+        jobject error) {
+    return ExecuteWithErrorAndCast<TariPublicKey *>(jEnv, error, [&](int *errorPointer) {
+        auto pPublicKeys = GetPointerField<TariPublicKeys *>(jEnv, jThis);
+        return public_keys_get_at(pPublicKeys, static_cast<unsigned int>(jIndex), errorPointer);
+    });
+}
+
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_tari_android_wallet_ffi_FFIPublicKeys_jniDestroy(
+        JNIEnv *jEnv,
+        jobject jThis) {
+    public_keys_destroy(GetPointerField<TariPublicKeys *>(jEnv, jThis));
+    SetNullPointerField(jEnv, jThis);
+}

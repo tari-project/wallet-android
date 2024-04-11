@@ -46,6 +46,9 @@ class FFIByteVector() : FFIBase() {
     private external fun jniDestroy()
     private external fun jniCreate(byteArray: ByteArray, error: FFIError)
 
+    val hexString: HexString
+        get() = HexString(this)
+
     constructor(pointer: FFIPointer) : this() {
         this.pointer = pointer
     }
