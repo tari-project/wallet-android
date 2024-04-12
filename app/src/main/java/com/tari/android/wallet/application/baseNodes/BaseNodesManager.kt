@@ -24,8 +24,10 @@ import org.apache.commons.io.IOUtils
 import javax.inject.Inject
 import javax.inject.Singleton
 
-private const val REGEX_ONION = "(.+::[A-Za-z0-9 ]{64}::/onion3/[A-Za-z0-9]+:[\\d]+)"
-private const val REGEX_IPV4 = "(.+::[A-Za-z0-9 ]{64}::/ip4/[0-9]{1,3}[.][0-9]{1,3}[.][0-9]{1,3}[.][0-9]{1,3}/tcp/[0-9]{2,6})"
+private const val REGEX_ONION_WITH_NAME = "(.+::[A-Za-z0-9 ]{64}::/onion3/[A-Za-z0-9]+:[\\d]+)"
+private const val REGEX_IPV4_WITH_NAME = "(.+::[A-Za-z0-9 ]{64}::/ip4/[0-9]{1,3}[.][0-9]{1,3}[.][0-9]{1,3}[.][0-9]{1,3}/tcp/[0-9]{2,6})"
+private const val REGEX_ONION = "([A-Za-z0-9 ]{64}::/onion3/[A-Za-z0-9]+:[\\d]+)"
+private const val REGEX_IPV4 = "([A-Za-z0-9 ]{64}::/ip4/[0-9]{1,3}[.][0-9]{1,3}[.][0-9]{1,3}[.][0-9]{1,3}/tcp/[0-9]{2,6})"
 
 @Singleton
 class BaseNodesManager @Inject constructor(
@@ -86,6 +88,14 @@ class BaseNodesManager @Inject constructor(
         startSync()
     }
 
+    fun addUserBaseNode(baseNode: BaseNodeDto) {
+        baseNodeSharedRepository.addUserBaseNode(baseNode)
+    }
+
+    fun deleteUserBaseNode(baseNode: BaseNodeDto) {
+        baseNodeSharedRepository.deleteUserBaseNode(baseNode)
+    }
+
     fun startSync() {
         //essential for wallet creation flow
         val baseNode = baseNodeSharedRepository.currentBaseNode ?: return
@@ -108,6 +118,13 @@ class BaseNodesManager @Inject constructor(
         }
     }
 
+    /**
+     * address should be in the format of hex::/onion3/{public_key} or hex::/ip4/{ip}/tcp/{port}
+     */
+    fun isValidBaseNode(address: String): Boolean {
+        return Regex(REGEX_ONION).matches(address) || Regex(REGEX_IPV4).matches(address)
+    }
+
     fun refreshBaseNodeList() {
         baseNodeSharedRepository.ffiBaseNodes = loadBaseNodesFromFFI()
     }
@@ -128,8 +145,8 @@ class BaseNodesManager @Inject constructor(
             .let { baseNodeListContent ->
                 logger.i("baseNodeList from local resource file: $baseNodeListContent")
                 listOf(
-                    findAndAddBaseNode(baseNodeListContent, REGEX_ONION),
-                    findAndAddBaseNode(baseNodeListContent, REGEX_IPV4)
+                    findAndAddBaseNode(baseNodeListContent, REGEX_ONION_WITH_NAME),
+                    findAndAddBaseNode(baseNodeListContent, REGEX_IPV4_WITH_NAME)
                 ).flatten().sortedBy { it.name }
             }
 

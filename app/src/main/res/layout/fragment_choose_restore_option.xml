@@ -43,6 +43,7 @@
                         android:layout_gravity="center_vertical|start"
                         android:clickable="true"
                         android:focusable="true"
+                        android:foreground="?attr/selectableItemBackground"
                         android:paddingHorizontal="@dimen/common_horizontal_margin">
 
                         <com.tari.android.wallet.ui.component.tari.TariTextView

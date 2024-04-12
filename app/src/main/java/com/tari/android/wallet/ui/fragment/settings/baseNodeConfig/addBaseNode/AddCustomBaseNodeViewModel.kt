@@ -5,7 +5,6 @@ import androidx.lifecycle.MutableLiveData
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.baseNodes.BaseNodesManager
 import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodeDto
-import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodeSharedRepository
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.dialog.error.ErrorDialogArgs
 import com.tari.android.wallet.ui.fragment.settings.baseNodeConfig.validator.OnionAddressValidator
@@ -14,8 +13,6 @@ import com.tari.android.wallet.ui.fragment.settings.baseNodeConfig.validator.Val
 import javax.inject.Inject
 
 class AddCustomBaseNodeViewModel : CommonViewModel() {
-    @Inject
-    lateinit var baseNodeSharedRepository: BaseNodeSharedRepository
 
     @Inject
     lateinit var baseNodesManager: BaseNodesManager
@@ -56,7 +53,7 @@ class AddCustomBaseNodeViewModel : CommonViewModel() {
         }
         try {
             val baseNodeDto = BaseNodeDto(name, publicKeyHex, address, true)
-            baseNodeSharedRepository.addUserBaseNode(baseNodeDto)
+            baseNodesManager.addUserBaseNode(baseNodeDto)
             baseNodesManager.setBaseNode(baseNodeDto)
             backPressed.postValue(Unit)
         } catch (e: Throwable) {
