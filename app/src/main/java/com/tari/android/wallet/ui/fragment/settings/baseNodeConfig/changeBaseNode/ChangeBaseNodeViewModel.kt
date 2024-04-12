@@ -61,7 +61,7 @@ class ChangeBaseNodeViewModel : CommonViewModel() {
     fun refresh() = loadList()
 
     private fun deleteBaseNode(baseNodeDto: BaseNodeDto) {
-        baseNodeSharedRepository.deleteUserBaseNode(baseNodeDto)
+        baseNodesManager.deleteUserBaseNode(baseNodeDto)
         loadList()
     }
 

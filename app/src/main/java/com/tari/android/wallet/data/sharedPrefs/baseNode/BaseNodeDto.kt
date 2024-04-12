@@ -10,7 +10,7 @@ data class BaseNodeDto(
     val isCustom: Boolean = false,
 ) : Serializable {
 
-    override fun toString() = "$name: $publicKeyHex::$address"
+    override fun toString() = ("$name: ").takeIf { name.isNotEmpty() }.orEmpty() + "$publicKeyHex::$address"
 
     fun toDeeplink(): DeepLink.AddBaseNode = DeepLink.AddBaseNode(name, "${publicKeyHex}::${address}")
 

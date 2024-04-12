@@ -541,6 +541,12 @@
     <string name="restore_from_seed_words_description">Enter your seed phrase to restore your wallet</string>
     <string name="restore_from_seed_words_select_node">Select base node</string>
     <string name="restore_from_seed_words_submit_title">Restore Wallet</string>
+    <string name="restore_from_seed_words_custom_node_name">Recovery Base Node</string>
+    <string name="restore_from_seed_words_button_select_base_node_select">Select Custom Base Node</string>
+    <string name="restore_from_seed_words_button_select_base_node_edit">Edit Base Node</string>
+    <string name="restore_from_seed_words_form_title">Enter Custom Base Node</string>
+    <string name="restore_from_seed_words_form_hint">Enter Base Node Address</string>
+    <string name="restore_from_seed_words_form_error_message">Oops, looks like the address you entered isn\'t good. We had to revert your change.</string>
 
     <string name="restore_from_seed_words_error_invalid_seed_word">At least one of the entered seed words is invalid. Please review them and try again</string>
     <string name="restore_from_seed_words_error_phrase_too_short">You entered not enough seed words. Please add some more and try again</string>
