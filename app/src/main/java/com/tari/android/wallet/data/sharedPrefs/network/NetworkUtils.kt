@@ -4,7 +4,7 @@ import com.google.gson.Gson
 import com.tari.android.wallet.data.repository.CommonRepository
 
 fun NetworkRepository.formatKey(key: String): String {
-    val catching = runCatching { key + "_" + this.currentNetwork!!.network.displayName }
+    val catching = runCatching { key + "_" + this.currentNetwork.network.displayName }
     if (catching.isSuccess) {
         return catching.getOrNull().orEmpty()
     } else {

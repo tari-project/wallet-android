@@ -38,12 +38,12 @@ class NetworkSelectionViewModel : CommonViewModel() {
 
     private fun loadData() {
         val networks = networkRepository.supportedNetworks
-        val currentNetwork = networkRepository.currentNetwork!!.network
+        val currentNetwork = networkRepository.currentNetwork.network
         _networks.postValue(networks.map { NetworkViewHolderItem(it, currentNetwork) })
     }
 
     fun selectNetwork(networkViewHolderItem: NetworkViewHolderItem) {
-        if (networkViewHolderItem.network.network == networkRepository.currentNetwork!!.network) {
+        if (networkViewHolderItem.network.network == networkRepository.currentNetwork.network) {
             backPressed.postValue(Unit)
             return
         }

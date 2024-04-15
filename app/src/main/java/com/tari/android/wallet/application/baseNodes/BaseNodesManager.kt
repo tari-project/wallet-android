@@ -7,6 +7,7 @@ import com.tari.android.wallet.R
 import com.tari.android.wallet.application.Network
 import com.tari.android.wallet.application.WalletState
 import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodeDto
+import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodeList
 import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodeSharedRepository
 import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
 import com.tari.android.wallet.event.EventBus
@@ -17,13 +18,19 @@ import com.tari.android.wallet.ffi.FFIWallet
 import com.tari.android.wallet.ffi.HexString
 import com.tari.android.wallet.service.connection.ServiceConnectionStatus
 import com.tari.android.wallet.service.connection.TariWalletServiceConnection
+import com.tari.android.wallet.util.DebugConfig
 import io.reactivex.disposables.CompositeDisposable
 import org.apache.commons.io.IOUtils
+import javax.inject.Inject
+import javax.inject.Singleton
 
-private const val REGEX_ONION = "(.+::[A-Za-z0-9 ]{64}::/onion3/[A-Za-z0-9]+:[\\d]+)"
-private const val REGEX_IPV4 = "(.+::[A-Za-z0-9 ]{64}::/ip4/[0-9]{1,3}[.][0-9]{1,3}[.][0-9]{1,3}[.][0-9]{1,3}/tcp/[0-9]{2,6})"
+private const val REGEX_ONION_WITH_NAME = "(.+::[A-Za-z0-9 ]{64}::/onion3/[A-Za-z0-9]+:[\\d]+)"
+private const val REGEX_IPV4_WITH_NAME = "(.+::[A-Za-z0-9 ]{64}::/ip4/[0-9]{1,3}[.][0-9]{1,3}[.][0-9]{1,3}[.][0-9]{1,3}/tcp/[0-9]{2,6})"
+private const val REGEX_ONION = "([A-Za-z0-9 ]{64}::/onion3/[A-Za-z0-9]+:[\\d]+)"
+private const val REGEX_IPV4 = "([A-Za-z0-9 ]{64}::/ip4/[0-9]{1,3}[.][0-9]{1,3}[.][0-9]{1,3}[.][0-9]{1,3}/tcp/[0-9]{2,6})"
 
-class BaseNodes(
+@Singleton
+class BaseNodesManager @Inject constructor(
     private val context: Context,
     private val baseNodeSharedRepository: BaseNodeSharedRepository,
     private val networkRepository: NetworkRepository,
@@ -51,30 +58,16 @@ class BaseNodes(
     }
 
     /**
-     * Returns the list of base nodes in the resource file base_nodes.txt as pairs of
+     * Returns the list of base nodes in the resource file base_nodes.txt as triples of
      * ({name}, {public_key_hex}, {public_address}).
      */
-    val baseNodeList by lazy {
-        val fileContent = IOUtils.toString(
-            context.resources.openRawResource(getBaseNodeResource(networkRepository.currentNetwork!!.network)),
-            "UTF-8"
-        )
-        logger.i("baseNodeList: $fileContent")
-        val list = mutableListOf<BaseNodeDto>()
-        val onionBaseNodes = findAndAddBaseNode(fileContent, REGEX_ONION).toList()
-        val ipV4BaseNodes = findAndAddBaseNode(fileContent, REGEX_IPV4).toList()
-        list.addAll(onionBaseNodes)
-        list.addAll(ipV4BaseNodes)
-        list.sortedBy { it.name }
-    }
-
-    private fun findAndAddBaseNode(fileContent: String, regex: String): Sequence<BaseNodeDto> {
-        return Regex(regex).findAll(fileContent).map { matchResult ->
-            val (name, publicKeyHex, address) = matchResult.value.split("::")
-            logger.i("baseNodeList0: $name, baseNodeList1: $publicKeyHex, baseNodeList2: $address")
-            BaseNodeDto(name, publicKeyHex, address)
+    val baseNodeList: List<BaseNodeDto>
+        get() = if (DebugConfig.hardcodedBaseNodes) {
+            loadBaseNodesFromResource()
+        } else {
+            baseNodeSharedRepository.ffiBaseNodes
         }
-    }
+
 
     /**
      * Select a base node randomly from the list of base nodes in base_nodes.tx, and sets
@@ -95,11 +88,19 @@ class BaseNodes(
         startSync()
     }
 
+    fun addUserBaseNode(baseNode: BaseNodeDto) {
+        baseNodeSharedRepository.addUserBaseNode(baseNode)
+    }
+
+    fun deleteUserBaseNode(baseNode: BaseNodeDto) {
+        baseNodeSharedRepository.deleteUserBaseNode(baseNode)
+    }
+
     fun startSync() {
+        //essential for wallet creation flow
+        val baseNode = baseNodeSharedRepository.currentBaseNode ?: return
         try {
             logger.i("startSync")
-            //essential for wallet creation flow
-            val baseNode = baseNodeSharedRepository.currentBaseNode ?: return
             serviceConnection.currentState.service ?: return
             if (EventBus.walletState.publishSubject.value != WalletState.Running) return
 
@@ -111,15 +112,53 @@ class BaseNodes(
             baseNodeKeyFFI.destroy()
             walletService.getWithError { error, wallet -> wallet.startBaseNodeSync(error) }
         } catch (e: Throwable) {
-            logger.i("startSync:error connecting to base node: ${e.message}")
+            logger.i("startSync:error connecting to base node $baseNode with an error: ${e.message}")
             setNextBaseNode()
             startSync()
         }
     }
+
+    /**
+     * address should be in the format of hex::/onion3/{public_key} or hex::/ip4/{ip}/tcp/{port}
+     */
+    fun isValidBaseNode(address: String): Boolean {
+        return Regex(REGEX_ONION).matches(address) || Regex(REGEX_IPV4).matches(address)
+    }
+
+    fun refreshBaseNodeList() {
+        baseNodeSharedRepository.ffiBaseNodes = loadBaseNodesFromFFI()
+    }
+
+    private fun loadBaseNodesFromFFI(): BaseNodeList = FFIWallet.instance?.getBaseNodePeers()
+        ?.mapIndexed { index, publicKey ->
+            BaseNodeDto(
+                name = "${networkRepository.currentNetwork.network.displayName} ${index + 1}",
+                publicKeyHex = publicKey.hex,
+            )
+        }?.toMutableList().orEmpty()
+        .let { BaseNodeList(it) }
+        .also { list -> logger.i("baseNodeList from FFI: \n${list.joinToString(separator = "\n")}") }
+
+
+    private fun loadBaseNodesFromResource(): List<BaseNodeDto> =
+        IOUtils.toString(context.resources.openRawResource(getBaseNodeResource(networkRepository.currentNetwork.network)), "UTF-8")
+            .let { baseNodeListContent ->
+                logger.i("baseNodeList from local resource file: $baseNodeListContent")
+                listOf(
+                    findAndAddBaseNode(baseNodeListContent, REGEX_ONION_WITH_NAME),
+                    findAndAddBaseNode(baseNodeListContent, REGEX_IPV4_WITH_NAME)
+                ).flatten().sortedBy { it.name }
+            }
 
     private fun getBaseNodeResource(network: Network): Int = when (network) {
         Network.STAGENET -> R.raw.stagenet_base_nodes
         Network.NEXTNET -> R.raw.nextnet_base_nodes
         else -> error("No base nodes for network: $network")
     }
+
+    private fun findAndAddBaseNode(fileContent: String, regex: String): List<BaseNodeDto> =
+        Regex(regex).findAll(fileContent).map { matchResult ->
+            val (name, publicKeyHex, address) = matchResult.value.split("::")
+            BaseNodeDto(name, publicKeyHex, address).also { logger.i(it.toString()) }
+        }.toList()
 }

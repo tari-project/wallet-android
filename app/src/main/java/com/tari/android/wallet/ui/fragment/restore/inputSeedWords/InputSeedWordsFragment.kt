@@ -8,9 +8,11 @@ import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.tari.android.wallet.R
 import com.tari.android.wallet.databinding.FragmentWalletInputSeedWordsBinding
+import com.tari.android.wallet.extension.launchAndRepeatOnLifecycle
 import com.tari.android.wallet.extension.observe
 import com.tari.android.wallet.extension.observeOnLoad
 import com.tari.android.wallet.model.seedPhrase.SeedPhrase
@@ -26,6 +28,8 @@ import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
 import com.tari.android.wallet.ui.fragment.restore.inputSeedWords.suggestions.SuggestionState
 import com.tari.android.wallet.ui.fragment.restore.inputSeedWords.suggestions.SuggestionViewHolderItem
 import com.tari.android.wallet.ui.fragment.restore.inputSeedWords.suggestions.SuggestionsAdapter
+import com.tari.android.wallet.util.DebugConfig
+import kotlinx.coroutines.launch
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent
 import net.yslibrary.android.keyboardvisibilityevent.Unregistrar
 
@@ -78,7 +82,10 @@ class InputSeedWordsFragment : CommonFragment<FragmentWalletInputSeedWordsBindin
             }
             true
         }
+        chooseBaseNodeButton.setVisible(DebugConfig.hardcodedBaseNodes)
+        chooseCustomBaseNodeButton.setVisible(!DebugConfig.hardcodedBaseNodes)
         chooseBaseNodeButton.setOnClickListener { viewModel.navigation.postValue(Navigation.InputSeedWordsNavigation.ToBaseNodeSelection) }
+        chooseCustomBaseNodeButton.setOnClickListener { viewModel.chooseCustomBaseNodeClick() }
         suggestionsAdapter.setClickListener(CommonAdapter.ItemClickListener { viewModel.selectSuggestion(it) })
         suggestions.adapter = suggestionsAdapter
         suggestions.layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
@@ -105,6 +112,17 @@ class InputSeedWordsFragment : CommonFragment<FragmentWalletInputSeedWordsBindin
 
         observeOnLoad(isAllEntered)
         observeOnLoad(isInProgress)
+
+        viewLifecycleOwner.launchAndRepeatOnLifecycle(Lifecycle.State.STARTED) {
+            launch {
+                customBaseNodeState.collect { state ->
+                    ui.chooseCustomBaseNodeButton.text = getText(
+                        if (state.isAddressSet) R.string.restore_from_seed_words_button_select_base_node_edit
+                        else R.string.restore_from_seed_words_button_select_base_node_select
+                    )
+                }
+            }
+        }
     }
 
     private fun showSuggestions(suggestions: SuggestionState) = when (suggestions) {
@@ -112,13 +130,16 @@ class InputSeedWordsFragment : CommonFragment<FragmentWalletInputSeedWordsBindin
             setSuggestionsState(false)
             ui.suggestionsLabel.setText(R.string.restore_from_seed_words_autocompletion_no_suggestions)
         }
+
         SuggestionState.Hidden -> {
             ui.seedWordsSuggestions.setVisible(false)
         }
+
         SuggestionState.NotStarted -> {
             setSuggestionsState(false)
             ui.suggestionsLabel.setText(R.string.restore_from_seed_words_autocompletion_start_typing)
         }
+
         is SuggestionState.Suggested -> {
             suggestionsAdapter.update(suggestions.list.map { SuggestionViewHolderItem(it) }.toMutableList())
             setSuggestionsState(true)

@@ -51,8 +51,11 @@ object DebugConfig {
     val yatEnvironment = if (_useYatSandbox && isDebug()) YatEnvironment.SANDBOX else YatEnvironment.PRODUCTION
 
     // Needed for testing resetting wallet on the network changed
-    private const val _useStagenetNetwork = false
-    val useStagenetNetwork = _useStagenetNetwork && isDebug()
+    private const val _mockNetwork = false
+    val mockNetwork = _mockNetwork && isDebug()
+
+    private const val _hardcodedBaseNode = false
+    val hardcodedBaseNodes = _hardcodedBaseNode && isDebug()
 
     private fun isDebug() = BuildConfig.BUILD_TYPE == "debug"
 }

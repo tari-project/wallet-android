@@ -34,12 +34,9 @@ package com.tari.android.wallet.data.sharedPrefs.baseNode
 
 import android.content.SharedPreferences
 import com.tari.android.wallet.data.repository.CommonRepository
-import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodeSharedRepository.Key.baseNodeLastSyncResultField
-import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodeSharedRepository.Key.baseNodeStateField
-import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodeSharedRepository.Key.currentBaseNodeField
-import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodeSharedRepository.Key.userBaseNodeListField
 import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefBooleanNullableDelegate
 import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefGsonDelegate
+import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefGsonNullableDelegate
 import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefIntDelegate
 import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
 import com.tari.android.wallet.data.sharedPrefs.network.formatKey
@@ -49,37 +46,74 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class BaseNodeSharedRepository @Inject constructor(sharedPrefs: SharedPreferences, networkRepository: NetworkRepository) :
-    CommonRepository(networkRepository) {
+class BaseNodeSharedRepository @Inject constructor(
+    sharedPrefs: SharedPreferences,
+    networkRepository: NetworkRepository,
+) : CommonRepository(networkRepository) {
 
     private object Key {
-        const val currentBaseNodeField = "tari_wallet_current_base_node"
-        const val userBaseNodeListField = "tari_wallet_user_base_nodes"
-        const val baseNodeStateField = "tari_wallet_user_base_node_state"
-        const val baseNodeLastSyncResultField = "tari_wallet_base_node_last_sync_result"
+        const val CURRENT_BASE_NODE = "tari_wallet_current_base_node"
+        const val USER_BASE_NODE_LIST = "tari_wallet_user_base_nodes"
+        const val BASE_NODE_STATE = "tari_wallet_user_base_node_state"
+        const val BASE_NODE_LAST_SYNC_RESULT = "tari_wallet_base_node_last_sync_result"
+        const val FFI_BASE_NODE_LIST = "FFI_BASE_NODE_LIST"
     }
 
-    var currentBaseNode: BaseNodeDto? by SharedPrefGsonDelegate(sharedPrefs, this,  formatKey(currentBaseNodeField), BaseNodeDto::class.java)
+    var currentBaseNode: BaseNodeDto? by SharedPrefGsonNullableDelegate(
+        prefs = sharedPrefs, commonRepository = this,
+        name = formatKey(Key.CURRENT_BASE_NODE),
+        type = BaseNodeDto::class.java,
+    )
 
-    var userBaseNodes: BaseNodeList? by SharedPrefGsonDelegate(sharedPrefs, this,  formatKey(userBaseNodeListField), BaseNodeList::class.java)
+    var ffiBaseNodes: BaseNodeList by SharedPrefGsonDelegate(
+        prefs = sharedPrefs,
+        commonRepository = this,
+        name = formatKey(Key.FFI_BASE_NODE_LIST),
+        type = BaseNodeList::class.java,
+        defValue = BaseNodeList(),
+    )
 
-    var baseNodeLastSyncResult: Boolean? by SharedPrefBooleanNullableDelegate(sharedPrefs, this,  baseNodeLastSyncResultField)
+    var userBaseNodes: BaseNodeList by SharedPrefGsonDelegate(
+        prefs = sharedPrefs,
+        commonRepository = this,
+        name = formatKey(Key.USER_BASE_NODE_LIST),
+        type = BaseNodeList::class.java,
+        defValue = BaseNodeList(),
+    )
 
-    var baseNodeState: Int by SharedPrefIntDelegate(sharedPrefs, this,  baseNodeStateField, 0)
+    var baseNodeLastSyncResult: Boolean? by SharedPrefBooleanNullableDelegate(
+        prefs = sharedPrefs,
+        commonRepository = this,
+        name = Key.BASE_NODE_LAST_SYNC_RESULT,
+    )
+
+    // ordinal value of BaseNodeState enum class
+    private var baseNodeStateOrdinal: Int by SharedPrefIntDelegate(
+        prefs = sharedPrefs,
+        commonRepository = this,
+        name = Key.BASE_NODE_STATE,
+        defValue = BaseNodeState.Syncing.ordinal,
+    )
+    var baseNodeState: BaseNodeState
+        get() = BaseNodeState.get(baseNodeStateOrdinal)
+        set(value) {
+            baseNodeStateOrdinal = value.ordinal
+        }
+
 
     init {
-        EventBus.baseNodeState.post(BaseNodeState.parseInt(baseNodeState))
+        EventBus.baseNodeState.post(baseNodeState)
     }
 
     fun deleteUserBaseNode(baseNodeDto: BaseNodeDto) {
-        userBaseNodes.orEmpty().apply {
+        userBaseNodes.apply {
             remove(baseNodeDto)
             userBaseNodes = this
         }
     }
 
     fun addUserBaseNode(baseNodeDto: BaseNodeDto) {
-        userBaseNodes.orEmpty().apply {
+        userBaseNodes.apply {
             add(baseNodeDto)
             userBaseNodes = this
         }
@@ -88,6 +122,7 @@ class BaseNodeSharedRepository @Inject constructor(sharedPrefs: SharedPreference
     fun clear() {
         baseNodeLastSyncResult = null
         currentBaseNode = null
-        userBaseNodes = null
+        userBaseNodes = BaseNodeList()
+        ffiBaseNodes = BaseNodeList()
     }
 }

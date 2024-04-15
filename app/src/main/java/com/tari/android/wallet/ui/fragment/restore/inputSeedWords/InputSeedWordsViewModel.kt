@@ -7,6 +7,8 @@ import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.WalletState
+import com.tari.android.wallet.application.baseNodes.BaseNodesManager
+import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodeDto
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.extension.addTo
 import com.tari.android.wallet.ffi.FFISeedWords
@@ -21,12 +23,19 @@ import com.tari.android.wallet.ui.common.domain.ResourceManager
 import com.tari.android.wallet.ui.component.loadingButton.LoadingButtonState
 import com.tari.android.wallet.ui.dialog.error.ErrorDialogArgs
 import com.tari.android.wallet.ui.dialog.error.WalletErrorArgs
+import com.tari.android.wallet.ui.dialog.modular.DialogArgs
+import com.tari.android.wallet.ui.dialog.modular.ModularDialogArgs
+import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
+import com.tari.android.wallet.ui.dialog.modular.modules.input.InputModule
 import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
 import com.tari.android.wallet.ui.fragment.restore.inputSeedWords.suggestions.SuggestionState
 import com.tari.android.wallet.ui.fragment.restore.inputSeedWords.suggestions.SuggestionViewHolderItem
 import io.reactivex.disposables.CompositeDisposable
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -39,6 +48,9 @@ class InputSeedWordsViewModel : CommonViewModel() {
 
     @Inject
     lateinit var walletServiceLauncher: WalletServiceLauncher
+
+    @Inject
+    lateinit var baseNodesManager: BaseNodesManager
 
     private val _suggestions = MediatorLiveData<SuggestionState>()
     val suggestions: LiveData<SuggestionState> = _suggestions.debounce(50)
@@ -67,6 +79,9 @@ class InputSeedWordsViewModel : CommonViewModel() {
 
     private val _continueButtonState = MediatorLiveData<LoadingButtonState>()
     val continueButtonState: LiveData<LoadingButtonState> = _continueButtonState
+
+    private val _customBaseNodeState = MutableStateFlow(CustomBaseNodeState())
+    val customBaseNodeState = _customBaseNodeState.asStateFlow()
 
     init {
         component.inject(this)
@@ -123,14 +138,20 @@ class InputSeedWordsViewModel : CommonViewModel() {
                     _inProgress.postValue(false)
                     clear()
                 }
+
                 WalletState.Running -> {
                     navigation.postValue(Navigation.InputSeedWordsNavigation.ToRestoreFormSeedWordsInProgress)
                     _inProgress.postValue(false)
                 }
+
                 else -> Unit
             }
         }.addTo(compositeDisposable)
 
+        customBaseNodeState.value.customBaseNode?.let {
+            baseNodesManager.addUserBaseNode(it)
+            baseNodesManager.setBaseNode(it)
+        }
         walletServiceLauncher.start()
     }
 
@@ -139,6 +160,7 @@ class InputSeedWordsViewModel : CommonViewModel() {
             is SeedPhrase.SeedPhraseCreationResult.Failed -> RestorationError.Unknown(resourceManager)
             SeedPhrase.SeedPhraseCreationResult.InvalidSeedPhrase,
             SeedPhrase.SeedPhraseCreationResult.InvalidSeedWord -> RestorationError.Invalid(resourceManager)
+
             SeedPhrase.SeedPhraseCreationResult.SeedPhraseNotCompleted -> RestorationError.SeedPhraseTooShort(resourceManager)
             else -> RestorationError.Unknown(resourceManager)
         }
@@ -211,9 +233,7 @@ class InputSeedWordsViewModel : CommonViewModel() {
 
     fun getFocusToNextElement(currentIndex: Int) {
         val list = _words.value!!
-        if (list.isEmpty() ||
-            list.isNotEmpty() && list.last().text.value!!.isNotEmpty() && list.size < SeedPhrase.SeedPhraseLength
-        ) {
+        if (list.isEmpty() || list.last().text.value!!.isNotEmpty() && list.size < SeedPhrase.SeedPhraseLength) {
             WordItemViewModel.create("", mnemonicList).apply {
                 list.add(this)
                 reindex()
@@ -227,7 +247,7 @@ class InputSeedWordsViewModel : CommonViewModel() {
     }
 
     fun getFocus(index: Int, isSilent: Boolean = false) {
-        if (!isSilent || isSilent && _focusedIndex.value != index) {
+        if (!isSilent || _focusedIndex.value != index) {
             _focusedIndex.value = index
         }
         val list = _words.value!!
@@ -298,6 +318,63 @@ class InputSeedWordsViewModel : CommonViewModel() {
             }
         }
         _suggestions.postValue(state)
+    }
+
+    fun chooseCustomBaseNodeClick() {
+        showEditAliasDialog()
+    }
+
+    private fun showEditAliasDialog() {
+
+        var saveAction: () -> Boolean = { false }
+        val title = HeadModule(
+            title = resourceManager.getString(R.string.restore_from_seed_words_form_title),
+            rightButtonTitle = resourceManager.getString(R.string.contact_book_add_contact_done_button),
+            rightButtonAction = { saveAction() },
+        )
+        val addressInput = InputModule(
+            value = customBaseNodeState.value.customBaseNode?.toString().orEmpty(),
+            hint = resourceManager.getString(R.string.restore_from_seed_words_form_hint),
+            isFirst = true,
+            isEnd = false,
+            onDoneAction = { saveAction() },
+        )
+        saveAction = {
+            customBaseNodeEntered(addressInput.value)
+            true
+        }
+
+        _inputDialog.postValue(
+            ModularDialogArgs(
+                dialogArgs = DialogArgs(),
+                modules = mutableListOf(
+                    title,
+                    addressInput,
+                )
+            )
+        )
+    }
+
+    private fun customBaseNodeEntered(enteredAddress: String) {
+        dismissDialog.postValue(Unit)
+        if (baseNodesManager.isValidBaseNode(enteredAddress)) {
+            val (hex, address) = enteredAddress.split("::")
+            val baseNode = BaseNodeDto(
+                name = resourceManager.getString(R.string.restore_from_seed_words_custom_node_name),
+                publicKeyHex = hex,
+                address = address,
+                isCustom = true,
+            )
+            _customBaseNodeState.update { it.copy(customBaseNode = baseNode) }
+        } else {
+            _customBaseNodeState.update { it.copy(customBaseNode = null) }
+            modularDialog.postValue(
+                ErrorDialogArgs(
+                    title = resourceManager.getString(R.string.common_error_title),
+                    description = resourceManager.getString(R.string.restore_from_seed_words_form_error_message),
+                ).getModular(resourceManager)
+            )
+        }
     }
 
     sealed class RestorationError(title: String, message: String) {

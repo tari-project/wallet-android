@@ -5,7 +5,7 @@ import com.tari.android.wallet.data.repository.CommonRepository
 import java.math.BigInteger
 import kotlin.reflect.KProperty
 
-class SharedPrefBigIntegerDelegate(
+class SharedPrefBigIntegerNullableDelegate(
     val prefs: SharedPreferences,
     val commonRepository: CommonRepository,
     val name: String,

@@ -3,7 +3,7 @@ package com.tari.android.wallet.ui.fragment.settings.torBridges
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.tari.android.wallet.R
-import com.tari.android.wallet.application.baseNodes.BaseNodes
+import com.tari.android.wallet.application.baseNodes.BaseNodesManager
 import com.tari.android.wallet.application.deeplinks.DeepLink
 import com.tari.android.wallet.application.deeplinks.DeeplinkHandler
 import com.tari.android.wallet.data.sharedPrefs.tor.TorBridgeConfigurationList
@@ -34,7 +34,7 @@ class TorBridgesSelectionViewModel : CommonViewModel() {
     lateinit var torProxyManager: TorProxyManager
 
     @Inject
-    lateinit var baseNodes: BaseNodes
+    lateinit var baseNodesManager: BaseNodesManager
 
     @Inject
     lateinit var deeplinkHandler: DeeplinkHandler
@@ -129,7 +129,7 @@ class TorBridgesSelectionViewModel : CommonViewModel() {
         torProxyManager.shutdown()
         subscribeToTorState()
         torProxyManager.run()
-        baseNodes.startSync()
+        baseNodesManager.startSync()
     }
 
     private fun subscribeToTorState() {

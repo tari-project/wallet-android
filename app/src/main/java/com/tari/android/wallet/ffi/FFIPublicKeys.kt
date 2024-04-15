@@ -33,37 +33,23 @@
 package com.tari.android.wallet.ffi
 
 /**
- * Wrapper for native public key type.
+ * Wrapper for native public key list type.
  *
  * @author The Tari Development Team
  */
-class FFIPublicKey() : FFIBase() {
+class FFIPublicKeys() : FFIBase() {
 
-    private external fun jniGetBytes(libError: FFIError): FFIPointer
+    private external fun jniGetLength(libError: FFIError): Int
+    private external fun jniGetAt(index: Int, libError: FFIError): FFIPointer
     private external fun jniDestroy()
-    private external fun jniCreate(byteVectorPtr: FFIByteVector, libError: FFIError)
-    private external fun jniFromHex(hexStr: String, libError: FFIError)
-    private external fun jniFromPrivateKey(privateKeyPtr: FFIPrivateKey, libError: FFIError)
 
     constructor(pointer: FFIPointer) : this() {
         this.pointer = pointer
     }
 
-    constructor(byteVector: FFIByteVector) : this() {
-        runWithError { jniCreate(byteVector, it) }
-    }
+    fun getLength(): Int = runWithError { jniGetLength(it) }
 
-    constructor(hex: HexString) : this() {
-        runWithError { jniFromHex(hex.hex, it) }
-    }
-
-    constructor(privateKey: FFIPrivateKey) : this() {
-        runWithError { jniFromPrivateKey(privateKey, it) }
-    }
-
-    fun getBytes(): FFIByteVector = runWithError { FFIByteVector(jniGetBytes(it)) }
-
-    override fun toString(): String = runWithError { FFIByteVector(jniGetBytes(it)).toString() }
+    fun getAt(index: Int): FFIPublicKey = runWithError { FFIPublicKey(jniGetAt(index, it)) }
 
     override fun destroy() = jniDestroy()
 }

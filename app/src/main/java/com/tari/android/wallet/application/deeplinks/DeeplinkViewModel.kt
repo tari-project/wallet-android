@@ -1,9 +1,8 @@
 package com.tari.android.wallet.application.deeplinks
 
 import com.tari.android.wallet.R
-import com.tari.android.wallet.application.baseNodes.BaseNodes
+import com.tari.android.wallet.application.baseNodes.BaseNodesManager
 import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodeDto
-import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodeSharedRepository
 import com.tari.android.wallet.data.sharedPrefs.tor.TorSharedRepository
 import com.tari.android.wallet.ffi.FFITariWalletAddress
 import com.tari.android.wallet.ffi.HexString
@@ -25,10 +24,7 @@ import javax.inject.Inject
 class DeeplinkViewModel : CommonViewModel() {
 
     @Inject
-    lateinit var baseNodes: BaseNodes
-
-    @Inject
-    lateinit var baseNodeRepository: BaseNodeSharedRepository
+    lateinit var baseNodesManager: BaseNodesManager
 
     @Inject
     lateinit var contactRepository: ContactsRepository
@@ -149,7 +145,7 @@ class DeeplinkViewModel : CommonViewModel() {
     }
 
     private fun addBaseNodeAction(baseNodeDto: BaseNodeDto, isQrData: Boolean) {
-        baseNodeRepository.addUserBaseNode(baseNodeDto)
-        baseNodes.setBaseNode(baseNodeDto)
+        baseNodesManager.addUserBaseNode(baseNodeDto)
+        baseNodesManager.setBaseNode(baseNodeDto)
     }
 }

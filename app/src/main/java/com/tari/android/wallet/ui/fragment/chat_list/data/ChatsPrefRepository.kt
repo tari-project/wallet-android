@@ -2,7 +2,7 @@ package com.tari.android.wallet.ui.fragment.chat_list.data
 
 import android.content.SharedPreferences
 import com.tari.android.wallet.data.repository.CommonRepository
-import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefGsonDelegate
+import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefGsonNullableDelegate
 import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
 import com.tari.android.wallet.data.sharedPrefs.network.formatKey
 import javax.inject.Inject
@@ -14,7 +14,7 @@ class ChatsPrefRepository @Inject constructor(
     val sharedPrefs: SharedPreferences
 ) : CommonRepository(networkRepository) {
 
-    private var savedChats: ChatList? by SharedPrefGsonDelegate(sharedPrefs, this, formatKey(KEY_SAVED_CHATS), ChatList::class.java, ChatList())
+    private var savedChats: ChatList? by SharedPrefGsonNullableDelegate(sharedPrefs, this, formatKey(KEY_SAVED_CHATS), ChatList::class.java, ChatList())
 
     fun getSavedChats(): List<ChatItemDto> = savedChats.orEmpty().map { it }
 
