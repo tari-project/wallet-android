@@ -6,12 +6,13 @@ buildscript {
     ext.lifecycle_version = '2.6.2'
 
     // build & version
-    ext.buildNumber = 288
-    ext.versionNumber = "0.25.2"
+    ext.buildNumber = 290
+    ext.versionNumber = "0.25.3"
 
     // JNI libs
     ext.libwalletHostURL = "https://github.com/tari-project/tari/releases/download/"
     ext.libwalletVersion = "v1.0.0-rc.5"
+    ext.libwalletMinValidVersion = "v1.0.0-rc.5"
     ext.libwalletx64A = "libminotari_wallet_ffi.android_x86_64.a"
     ext.libwalletArmA = "libminotari_wallet_ffi.android_aarch64.a"
     ext.libwalletHeader = "libminotari_wallet_ffi.h"

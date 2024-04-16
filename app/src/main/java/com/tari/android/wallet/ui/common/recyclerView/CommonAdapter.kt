@@ -11,7 +11,7 @@ abstract class CommonAdapter<T : CommonViewHolderItem> : ListAdapter<T, CommonVi
 
     abstract var viewHolderBuilders: List<ViewHolderBuilder>
 
-    fun update(newItems: MutableList<T>) {
+    fun update(newItems: List<T>) {
         submitList(newItems.toList())
     }
 

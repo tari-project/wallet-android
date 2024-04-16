@@ -6,6 +6,7 @@ apply plugin: "kotlin-android"
 apply plugin: "kotlin-kapt"
 apply from: "../download-libwallet.gradle"
 apply plugin: "io.sentry.android.gradle"
+apply plugin: "kotlin-parcelize"
 
 android {
     namespace "com.tari.android.wallet"
@@ -37,6 +38,7 @@ android {
         buildConfigField("String", "YAT_ORGANIZATION_RETURN_URL", "\"${yatProperties.getProperty("yat.returnUrl")}\"")
         def dropboxProperties = loadDropboxProps()
         buildConfigField("String", "DROPBOX_ACCESS_TOKEN", "\"${dropboxProperties.getProperty("dropbox_key")}\"")
+        buildConfigField("String", "LIB_WALLET_MIN_VALID_VERSION", "\"$libwalletMinValidVersion\"")
     }
 
     flavorDimensions.add("privacy-mode")

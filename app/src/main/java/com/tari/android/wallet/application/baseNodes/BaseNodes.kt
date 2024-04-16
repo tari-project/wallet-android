@@ -20,11 +20,16 @@ import com.tari.android.wallet.service.connection.TariWalletServiceConnection
 import io.reactivex.disposables.CompositeDisposable
 import org.apache.commons.io.IOUtils
 
+private const val REGEX_ONION = "(.+::[A-Za-z0-9 ]{64}::/onion3/[A-Za-z0-9]+:[\\d]+)"
+private const val REGEX_IPV4 = "(.+::[A-Za-z0-9 ]{64}::/ip4/[0-9]{1,3}[.][0-9]{1,3}[.][0-9]{1,3}[.][0-9]{1,3}/tcp/[0-9]{2,6})"
+
 class BaseNodes(
     private val context: Context,
     private val baseNodeSharedRepository: BaseNodeSharedRepository,
     private val networkRepository: NetworkRepository,
 ) {
+    private val logger = Logger.t(this::class.simpleName)
+
     private val compositeDisposable = CompositeDisposable()
 
     private val serviceConnection = TariWalletServiceConnection()
@@ -45,9 +50,6 @@ class BaseNodes(
         }.addTo(compositeDisposable)
     }
 
-    val onionRegex = "(.+::[A-Za-z0-9 ]{64}::/onion3/[A-Za-z0-9]+:[\\d]+)"
-    val ipV4Regex = "(.+::[A-Za-z0-9 ]{64}::/ip4/[0-9]{1,3}[.][0-9]{1,3}[.][0-9]{1,3}[.][0-9]{1,3}/tcp/[0-9]{2,6})"
-
     /**
      * Returns the list of base nodes in the resource file base_nodes.txt as pairs of
      * ({name}, {public_key_hex}, {public_address}).
@@ -57,10 +59,10 @@ class BaseNodes(
             context.resources.openRawResource(getBaseNodeResource(networkRepository.currentNetwork!!.network)),
             "UTF-8"
         )
-        Logger.t(this::class.simpleName).e("baseNodeList: $fileContent")
+        logger.i("baseNodeList: $fileContent")
         val list = mutableListOf<BaseNodeDto>()
-        val onionBaseNodes = findAndAddBaseNode(fileContent, onionRegex).toList()
-        val ipV4BaseNodes = findAndAddBaseNode(fileContent, ipV4Regex).toList()
+        val onionBaseNodes = findAndAddBaseNode(fileContent, REGEX_ONION).toList()
+        val ipV4BaseNodes = findAndAddBaseNode(fileContent, REGEX_IPV4).toList()
         list.addAll(onionBaseNodes)
         list.addAll(ipV4BaseNodes)
         list.sortedBy { it.name }
@@ -68,9 +70,9 @@ class BaseNodes(
 
     private fun findAndAddBaseNode(fileContent: String, regex: String): Sequence<BaseNodeDto> {
         return Regex(regex).findAll(fileContent).map { matchResult ->
-            val tripleString = matchResult.value.split("::")
-            Logger.t(this::class.simpleName).i("baseNodeList0: $tripleString, baseNodeList1: ${tripleString[1]}, baseNodeList2: ${tripleString[2]}")
-            BaseNodeDto(tripleString[0], tripleString[1], tripleString[2])
+            val (name, publicKeyHex, address) = matchResult.value.split("::")
+            logger.i("baseNodeList0: $name, baseNodeList1: $publicKeyHex, baseNodeList2: $address")
+            BaseNodeDto(name, publicKeyHex, address)
         }
     }
 
@@ -95,21 +97,21 @@ class BaseNodes(
 
     fun startSync() {
         try {
-            Logger.t(this::class.simpleName).i("startSync")
+            logger.i("startSync")
             //essential for wallet creation flow
             val baseNode = baseNodeSharedRepository.currentBaseNode ?: return
             serviceConnection.currentState.service ?: return
             if (EventBus.walletState.publishSubject.value != WalletState.Running) return
 
-            Logger.t(this::class.simpleName).i("startSync:publicKeyHex: ${baseNode.publicKeyHex}")
-            Logger.t(this::class.simpleName).i("startSync:address: ${baseNode.address}")
-            Logger.t(this::class.simpleName).i("startSync:address: ${Gson().toJson(baseNodeSharedRepository.userBaseNodes)}")
+            logger.i("startSync:publicKeyHex: ${baseNode.publicKeyHex}")
+            logger.i("startSync:address: ${baseNode.address}")
+            logger.i("startSync:userBaseNodes: ${Gson().toJson(baseNodeSharedRepository.userBaseNodes)}")
             val baseNodeKeyFFI = FFIPublicKey(HexString(baseNode.publicKeyHex))
             FFIWallet.instance?.addBaseNodePeer(baseNodeKeyFFI, baseNode.address)
             baseNodeKeyFFI.destroy()
             walletService.getWithError { error, wallet -> wallet.startBaseNodeSync(error) }
         } catch (e: Throwable) {
-            Logger.t(this::class.simpleName).i("startSync")
+            logger.i("startSync:error connecting to base node: ${e.message}")
             setNextBaseNode()
             startSync()
         }
