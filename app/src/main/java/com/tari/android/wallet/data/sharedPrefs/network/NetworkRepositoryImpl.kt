@@ -9,9 +9,9 @@ import com.tari.android.wallet.util.DebugConfig
 
 class NetworkRepositoryImpl(sharedPrefs: SharedPreferences) : NetworkRepository {
 
-    override val defaultNetwork = if (DebugConfig.mockNetwork) NETWORK_ESMERALDA else NETWORK_STAGENET
+    override val defaultNetwork = if (DebugConfig.mockNetwork) NETWORK_NEXTNET else NETWORK_STAGENET
 
-    override var supportedNetworks: List<TariNetwork> = if (DebugConfig.mockNetwork) listOf(NETWORK_ESMERALDA) else listOf(NETWORK_STAGENET)
+    override var supportedNetworks: List<TariNetwork> = if (DebugConfig.mockNetwork) listOf(NETWORK_NEXTNET) else listOf(NETWORK_STAGENET)
 
     override var currentNetwork by SharedPrefGsonDelegate(
         prefs = sharedPrefs,
@@ -40,19 +40,23 @@ class NetworkRepositoryImpl(sharedPrefs: SharedPreferences) : NetworkRepository 
         private val NETWORK_STAGENET: TariNetwork = TariNetwork(
             network = Network.STAGENET,
             dnsPeer = "seeds.stagenet.tari.com",
+            blockExplorerUrl = null,
             ticker = TICKER_TESTNET,
             recommended = true,
         )
         private val NETWORK_NEXTNET: TariNetwork = TariNetwork(
             network = Network.NEXTNET,
             dnsPeer = "seeds.nextnet.tari.com",
+            blockExplorerUrl = "https://explore-nextnet.tari.com",
             ticker = TICKER_TESTNET,
+            recommended = false,
         )
         private val NETWORK_ESMERALDA: TariNetwork = TariNetwork(
             network = Network.ESMERALDA,
             dnsPeer = "seeds.esmeralda.tari.com",
+            blockExplorerUrl = null,
             ticker = TICKER_TESTNET,
-            recommended = true,
+            recommended = false,
         )
     }
 }

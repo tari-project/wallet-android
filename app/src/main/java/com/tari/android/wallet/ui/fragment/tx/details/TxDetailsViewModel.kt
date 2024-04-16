@@ -150,7 +150,14 @@ class TxDetailsViewModel : CommonViewModel() {
 
     private fun generateExplorerLink(tx: Tx) {
         (tx as? CompletedTx)?.txKernel?.let { txKernel ->
-            _explorerLink.postValue(resourceManager.getString(R.string.explorer_kernel_url, txKernel.publicNonce, txKernel.signature))
+            _explorerLink.postValue(
+                resourceManager.getString(
+                    R.string.explorer_kernel_url,
+                    networkRepository.currentNetwork.blockExplorerUrl.orEmpty(),
+                    txKernel.publicNonce,
+                    txKernel.signature,
+                )
+            )
         }
     }
 
