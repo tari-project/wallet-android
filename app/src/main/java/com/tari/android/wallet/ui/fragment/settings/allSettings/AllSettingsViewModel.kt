@@ -56,7 +56,6 @@ import com.tari.android.wallet.R.string.back_up_wallet_backup_status_outdated
 import com.tari.android.wallet.R.string.back_up_wallet_backup_status_up_to_date
 import com.tari.android.wallet.R.string.check_backup_storage_status_error_title
 import com.tari.android.wallet.R.string.disclaimer_url
-import com.tari.android.wallet.R.string.explorer_url
 import com.tari.android.wallet.R.string.github_repo_url
 import com.tari.android.wallet.R.string.privacy_policy_url
 import com.tari.android.wallet.R.string.tari_about_title
@@ -212,8 +211,8 @@ class AllSettingsViewModel : CommonViewModel() {
             },
             DividerViewHolderItem(),
             SettingsRowViewDto(resourceManager.getString(all_settings_explorer), vector_all_settings_block_explorer_icon) {
-                _openLink.postValue(resourceManager.getString(explorer_url))
-            },
+                _openLink.postValue(networkRepository.currentNetwork.blockExplorerUrl)
+            }.takeIf { networkRepository.currentNetwork.isBlockExplorerAvailable },
             SettingsTitleViewHolderItem(resourceManager.getString(all_settings_advanced_settings_label)),
             SettingsRowViewDto(resourceManager.getString(all_settings_select_theme), vector_all_settings_select_theme_icon) {
                 navigation.postValue(AllSettingsNavigation.ToThemeSelection)

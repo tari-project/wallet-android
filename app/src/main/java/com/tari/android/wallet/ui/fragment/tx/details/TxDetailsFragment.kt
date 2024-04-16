@@ -162,7 +162,9 @@ class TxDetailsFragment : CommonFragment<FragmentTxDetailsBinding, TxDetailsView
         observe(cancellationReason) { setCancellationReason(it) }
 
         observe(explorerLink) { link ->
-            showExplorerLink(link)
+            if (networkRepository.currentNetwork.isBlockExplorerAvailable) {
+                showExplorerLink(link)
+            }
         }
     }
 
