@@ -211,7 +211,7 @@ class AllSettingsViewModel : CommonViewModel() {
             },
             DividerViewHolderItem(),
             SettingsRowViewDto(resourceManager.getString(all_settings_explorer), vector_all_settings_block_explorer_icon) {
-                _openLink.postValue(networkRepository.currentNetwork.blockExplorerUrl)
+                _openLink.postValue(networkRepository.currentNetwork.blockExplorerUrl.orEmpty())
             }.takeIf { networkRepository.currentNetwork.isBlockExplorerAvailable },
             SettingsTitleViewHolderItem(resourceManager.getString(all_settings_advanced_settings_label)),
             SettingsRowViewDto(resourceManager.getString(all_settings_select_theme), vector_all_settings_select_theme_icon) {
