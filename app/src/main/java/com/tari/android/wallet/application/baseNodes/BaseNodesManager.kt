@@ -24,10 +24,10 @@ import org.apache.commons.io.IOUtils
 import javax.inject.Inject
 import javax.inject.Singleton
 
-private const val REGEX_ONION_WITH_NAME = "(.+::[A-Za-z0-9 ]{64}::/onion3/[A-Za-z0-9]+:[\\d]+)"
-private const val REGEX_IPV4_WITH_NAME = "(.+::[A-Za-z0-9 ]{64}::/ip4/[0-9]{1,3}[.][0-9]{1,3}[.][0-9]{1,3}[.][0-9]{1,3}/tcp/[0-9]{2,6})"
-private const val REGEX_ONION = "([A-Za-z0-9 ]{64}::/onion3/[A-Za-z0-9]+:[\\d]+)"
-private const val REGEX_IPV4 = "([A-Za-z0-9 ]{64}::/ip4/[0-9]{1,3}[.][0-9]{1,3}[.][0-9]{1,3}[.][0-9]{1,3}/tcp/[0-9]{2,6})"
+private const val REGEX_ONION_WITH_NAME = "(.+::[A-Fa-f0-9 ]{64}::/onion3/[A-Fa-f0-9]+:[\\d]+)"
+private const val REGEX_IPV4_WITH_NAME = "(.+::[A-Fa-f0-9 ]{64}::/ip4/[0-9]{1,3}[.][0-9]{1,3}[.][0-9]{1,3}[.][0-9]{1,3}/tcp/[0-9]{2,6})"
+private const val REGEX_ONION = "([A-Fa-f0-9 ]{64}::/onion3/[A-Fa-f0-9]+:[\\d]+)"
+private const val REGEX_IPV4 = "([A-Fa-f0-9 ]{64}::/ip4/[0-9]{1,3}[.][0-9]{1,3}[.][0-9]{1,3}[.][0-9]{1,3}/tcp/[0-9]{2,6})"
 
 @Singleton
 class BaseNodesManager @Inject constructor(
