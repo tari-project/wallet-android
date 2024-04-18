@@ -32,12 +32,11 @@
  */
 package com.tari.android.wallet.model
 
-import android.os.Parcel
 import android.os.Parcelable
+import com.tari.android.wallet.extension.toMicroTari
 import com.tari.android.wallet.ffi.FFICompletedTx
 import com.tari.android.wallet.ffi.FFIPendingInboundTx
-import com.tari.android.wallet.ui.extension.readP
-import com.tari.android.wallet.ui.extension.readS
+import kotlinx.parcelize.Parcelize
 import java.math.BigInteger
 
 /**
@@ -45,76 +44,36 @@ import java.math.BigInteger
  *
  * @author The Tari Development Team
  */
-class PendingInboundTx() : Tx(), Parcelable {
+@Parcelize
+data class PendingInboundTx(
+    override val id: BigInteger = 0.toBigInteger(),
+    override val direction: Direction = Direction.INBOUND,
+    override val amount: MicroTari = 0.toMicroTari(),
+    override val timestamp: BigInteger = 0.toBigInteger(),
+    override val message: String = "",
+    override val status: TxStatus = TxStatus.PENDING,
+    override val tariContact: TariContact = TariContact(),
+) : Tx(id, direction, amount, timestamp, message, status, tariContact), Parcelable {
 
-    constructor(tx: FFICompletedTx) : this() {
-        this.id = tx.getId()
-        this.direction = tx.getDirection()
-        this.tariContact = tx.getContact()
-        this.amount = MicroTari(tx.getAmount())
-        this.timestamp = tx.getTimestamp()
-        this.message = tx.getMessage()
-        this.status = TxStatus.map(tx.getStatus())
-        tx.destroy()
-    }
+    constructor(tx: FFICompletedTx) : this(
+        id = tx.getId(),
+        direction = tx.getDirection(),
+        tariContact = tx.getContact(),
+        amount = tx.getAmount().toMicroTari(),
+        timestamp = tx.getTimestamp(),
+        message = tx.getMessage(),
+        status = TxStatus.map(tx.getStatus()),
+    )
 
-    constructor(tx: FFIPendingInboundTx) : this() {
-        this.id = tx.getId()
-        this.direction = tx.getDirection()
-        this.tariContact = tx.getContact()
-        this.amount = MicroTari(tx.getAmount())
-        this.timestamp = tx.getTimestamp()
-        this.message = tx.getMessage()
-        this.status = TxStatus.map(tx.getStatus())
-        tx.destroy()
-    }
+    constructor(tx: FFIPendingInboundTx) : this(
+        id = tx.getId(),
+        direction = tx.getDirection(),
+        tariContact = tx.getContact(),
+        amount = MicroTari(tx.getAmount()),
+        timestamp = tx.getTimestamp(),
+        message = tx.getMessage(),
+        status = TxStatus.map(tx.getStatus()),
+    )
 
-    override fun toString(): String {
-        return "PendingInboundTx(status=$status) ${super.toString()}"
-    }
-
-    // region Parcelable
-
-    constructor(parcel: Parcel) : this() {
-        readFromParcel(parcel)
-    }
-
-    companion object CREATOR : Parcelable.Creator<PendingInboundTx> {
-
-        override fun createFromParcel(parcel: Parcel): PendingInboundTx {
-            return PendingInboundTx(parcel)
-        }
-
-        override fun newArray(size: Int): Array<PendingInboundTx> {
-            return Array(size) { PendingInboundTx() }
-        }
-    }
-
-    override fun writeToParcel(parcel: Parcel, flags: Int) {
-        parcel.writeSerializable(id)
-        parcel.writeSerializable(direction)
-        parcel.writeSerializable(tariContact.javaClass)
-        parcel.writeParcelable(tariContact, flags)
-        parcel.writeParcelable(amount, flags)
-        parcel.writeSerializable(timestamp)
-        parcel.writeString(message)
-        parcel.writeSerializable(status)
-    }
-
-    private fun readFromParcel(inParcel: Parcel) {
-        id = inParcel.readS(BigInteger::class.java)
-        direction = inParcel.readS(Direction::class.java)
-        tariContact = inParcel.readP(TariContact::class.java)
-        amount = inParcel.readP(MicroTari::class.java)
-        timestamp = inParcel.readS(BigInteger::class.java)
-        message = inParcel.readString().orEmpty()
-        status = inParcel.readS(TxStatus::class.java)
-    }
-
-    override fun describeContents(): Int {
-        return 0
-    }
-
-    // endregion
-
+    override fun toString() = "PendingInboundTx(status=$status) ${super.toString()}"
 }

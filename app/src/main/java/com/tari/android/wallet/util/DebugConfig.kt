@@ -30,20 +30,40 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+@file:Suppress("MemberVisibilityCanBePrivate", "ConstPropertyName", "KotlinConstantConditions", "SameParameterValue")
+
 package com.tari.android.wallet.util
 
 import com.tari.android.wallet.BuildConfig
+import com.tari.android.wallet.model.CompletedTx
+import com.tari.android.wallet.model.MicroTari
+import com.tari.android.wallet.model.TariContact
+import com.tari.android.wallet.model.TariUtxo
 import com.tari.android.wallet.model.TariWalletAddress
+import com.tari.android.wallet.model.Tx
+import com.tari.android.wallet.model.TxStatus
+import com.tari.android.wallet.ui.common.gyphy.presentation.GIFViewModel
+import com.tari.android.wallet.ui.common.gyphy.repository.GIFRepository
+import com.tari.android.wallet.ui.common.recyclerView.items.TitleViewHolderItem
+import com.tari.android.wallet.ui.fragment.contact_book.data.ContactsRepository
+import com.tari.android.wallet.ui.fragment.tx.adapter.TransactionItem
+import com.tari.android.wallet.ui.fragment.utxos.list.adapters.UtxosViewHolderItem
+import org.joda.time.DateTime
 import yat.android.lib.YatIntegration
+import java.math.BigInteger
+import kotlin.random.Random
 
 /**
  *  Constants used for developing and debugging.
  */
-@Suppress("ConstPropertyName", "KotlinConstantConditions")
 object DebugConfig {
 
     private const val _mockedTurned = false
     val mockedDataEnabled = _mockedTurned && isDebug() // TODO split this flag to multiple different types of mocked data
+
+    val mockUtxos = valueIfDebug(true)
+
+    val mockTxs = valueIfDebug(false)
 
     const val isChatEnabled = false
 
@@ -57,6 +77,8 @@ object DebugConfig {
     val hardcodedBaseNodes = _hardcodedBaseNode && isDebug()
 
     private fun isDebug() = BuildConfig.BUILD_TYPE == "debug"
+
+    private fun valueIfDebug(value: Boolean) = isDebug() && value
 }
 
 object MockDataStub {
@@ -69,6 +91,63 @@ object MockDataStub {
 
     val WALLET_ADDRESS = TariWalletAddress(hexString = HEX, emojiId = EMOJI_ID)
     val WALLET_ADDRESS_ZERO = TariWalletAddress(HEX_ZERO, EMOJI_ID_ZERO)
+
+    fun createUtxoList() = List(20) { UtxosViewHolderItem(createUtxo()) }
+
+    fun createUtxo() = TariUtxo(
+        value = MicroTari(BigInteger.valueOf(Random.nextLong(1, 100000) * 10000)),
+        status = TariUtxo.UtxoStatus.entries.toTypedArray()[Random.nextInt(0, 3)],
+        timestamp = DateTime.now().toDate().time,
+        minedHeight = 12243,
+        commitment = "Mocked Tari UTXO!!!",
+    )
+
+    fun createTxList(
+        contactsRepository: ContactsRepository,
+        gifRepository: GIFRepository,
+        confirmationCount: Long,
+        title: String = "Mocked Transactions"
+    ) = listOf(
+        TitleViewHolderItem(title = title, isFirst = true),
+        createTx(
+            contactsRepository, gifRepository, confirmationCount,
+            amount = 1100000,
+            contactAlias = "Alice",
+        ),
+        createTx(
+            contactsRepository, gifRepository, confirmationCount,
+            amount = 1200000,
+            contactAlias = "Bob",
+        ),
+        createTx(
+            contactsRepository, gifRepository, confirmationCount,
+            amount = 1300000,
+            contactAlias = "Charlie",
+        ),
+    )
+
+    fun createTx(
+        contactsRepository: ContactsRepository,
+        gifRepository: GIFRepository,
+        confirmationCount: Long,
+        amount: Long = 100000,
+        contactAlias: String = "Test",
+    ) = TransactionItem(
+        tx = CompletedTx(
+            direction = Tx.Direction.INBOUND,
+            status = TxStatus.MINED_CONFIRMED,
+            amount = MicroTari(BigInteger.valueOf(amount)),
+            fee = MicroTari(BigInteger.valueOf(1000)),
+            message = "https://giphy.com/embed/5885nYOgBHdCw",
+            timestamp = BigInteger.valueOf(System.currentTimeMillis()),
+            id = BigInteger.valueOf(1),
+            tariContact = TariContact(WALLET_ADDRESS_ZERO, contactAlias),
+        ),
+        contact = contactsRepository.ffiBridge.getContactForTx(CompletedTx()),
+        position = 0,
+        viewModel = GIFViewModel(gifRepository),
+        requiredConfirmationCount = confirmationCount,
+    )
 }
 
 object YatEnvironment {

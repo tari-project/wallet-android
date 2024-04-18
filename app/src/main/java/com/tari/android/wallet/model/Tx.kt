@@ -40,28 +40,23 @@ import java.math.BigInteger
  *
  * @author The Tari Development Team
  */
-abstract class Tx : Parcelable {
+abstract class Tx(
+    open val id: BigInteger,
+    open val direction: Direction,
+    open val amount: MicroTari,
+    open val timestamp: BigInteger,
+    open val message: String,
+    open val status: TxStatus,
+    open val tariContact: TariContact, // This is the receiver for an outbound tx and sender for an inbound tx.
+): Parcelable {
 
     enum class Direction {
         INBOUND,
         OUTBOUND
     }
 
-    var id = BigInteger("0")
-    var direction = Direction.INBOUND
-    var amount = MicroTari(BigInteger("0"))
-    var timestamp = BigInteger("0")
-    var message = ""
-    var status = TxStatus.PENDING
-
-    /**
-     * This is the receiver for an outbound tx and sender for an inbound tx.
-     */
-    var tariContact = TariContact()
-
     val isOneSided
-        get() = tariContact.walletAddress.hexString.all{ it == '0' }
+        get() = tariContact.walletAddress.hexString.all { it == '0' }
 
-    override fun toString(): String = "Tx(id=$id, direction=$direction, amount=$amount, timestamp=$timestamp, message='$message', user=$tariContact)"
-
+    override fun toString() = "Tx(id=$id, direction=$direction, amount=$amount, timestamp=$timestamp, message='$message', user=$tariContact)"
 }
