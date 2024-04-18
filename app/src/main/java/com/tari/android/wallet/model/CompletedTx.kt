@@ -32,12 +32,11 @@
  */
 package com.tari.android.wallet.model
 
-import android.os.Parcel
 import android.os.Parcelable
+import com.tari.android.wallet.extension.toMicroTari
 import com.tari.android.wallet.ffi.FFICompletedTx
 import com.tari.android.wallet.ffi.FFIPointer
-import com.tari.android.wallet.ui.extension.readP
-import com.tari.android.wallet.ui.extension.readS
+import kotlinx.parcelize.Parcelize
 import java.math.BigInteger
 
 /**
@@ -45,83 +44,41 @@ import java.math.BigInteger
  *
  * @author The Tari Development Team
  */
-class CompletedTx() : Tx(), Parcelable {
+@Parcelize
+data class CompletedTx(
+    override val id: BigInteger = 0.toBigInteger(),
+    override val direction: Direction = Direction.INBOUND,
+    override val amount: MicroTari = 0.toMicroTari(),
+    override val timestamp: BigInteger = 0.toBigInteger(),
+    override val message: String = "",
+    override val status: TxStatus = TxStatus.PENDING,
+    override val tariContact: TariContact = TariContact(),
+    val fee: MicroTari = 0.toMicroTari(),
+    val confirmationCount: BigInteger = 0.toBigInteger(),
+    val txKernel: CompletedTransactionKernel? = null,
+) : Tx(id, direction, amount, timestamp, message, status, tariContact), Parcelable {
 
-    var fee = MicroTari(BigInteger("0"))
-    var confirmationCount = BigInteger("0")
-    var txKernel: CompletedTransactionKernel? = null
-
-    constructor(tx: FFICompletedTx) : this() {
-        this.id = tx.getId()
-        this.direction = tx.getDirection()
-        this.tariContact = tx.getContact()
-        this.amount = MicroTari(tx.getAmount())
-        this.fee = MicroTari(tx.getFee())
-        this.timestamp = tx.getTimestamp()
-        this.message = tx.getMessage()
-        this.status = TxStatus.map(tx.getStatus())
-        this.confirmationCount = tx.getConfirmationCount()
-        if (this.status != TxStatus.IMPORTED && this.status != TxStatus.PENDING) {
-            runCatching { tx.getTransactionKernel() }.getOrNull()?.let {
-                this.txKernel = CompletedTransactionKernel(it.getExcess(), it.getExcessPublicNonce(), it.getExcessSignature())
-            }
+    constructor(tx: FFICompletedTx) : this(
+        id = tx.getId(),
+        direction = tx.getDirection(),
+        amount = MicroTari(tx.getAmount()),
+        timestamp = tx.getTimestamp(),
+        message = tx.getMessage(),
+        status = TxStatus.map(tx.getStatus()),
+        tariContact = tx.getContact(),
+        fee = MicroTari(tx.getFee()),
+        confirmationCount = tx.getConfirmationCount(),
+        txKernel = try {
+            val status = TxStatus.map(tx.getStatus())
+            tx.takeIf { status != TxStatus.IMPORTED && status != TxStatus.PENDING }
+                ?.getTransactionKernel()
+                ?.let { CompletedTransactionKernel(it.getExcess(), it.getExcessPublicNonce(), it.getExcessSignature()) }
+        } catch (e: Exception) {
+            null
         }
-
-        tx.destroy()
-    }
+    )
 
     constructor(pointer: FFIPointer) : this(FFICompletedTx(pointer))
 
-
-    // region Parcelable
-
-    constructor(parcel: Parcel) : this() {
-        readFromParcel(parcel)
-    }
-
-    override fun toString(): String {
-        return "CompletedTx(fee=$fee, status=$status, confirmationCount=$confirmationCount) ${super.toString()}"
-    }
-
-    companion object CREATOR : Parcelable.Creator<CompletedTx> {
-
-        override fun createFromParcel(parcel: Parcel): CompletedTx {
-            return CompletedTx(parcel)
-        }
-
-        override fun newArray(size: Int): Array<CompletedTx> {
-            return Array(size) { CompletedTx() }
-        }
-    }
-
-    override fun writeToParcel(parcel: Parcel, flags: Int) {
-        parcel.writeSerializable(id)
-        parcel.writeSerializable(direction)
-        parcel.writeSerializable(tariContact.javaClass)
-        parcel.writeParcelable(tariContact, flags)
-        parcel.writeParcelable(amount, flags)
-        parcel.writeParcelable(fee, flags)
-        parcel.writeSerializable(timestamp)
-        parcel.writeString(message)
-        parcel.writeSerializable(status)
-        parcel.writeSerializable(confirmationCount)
-    }
-
-    private fun readFromParcel(inParcel: Parcel) {
-        id = inParcel.readS(BigInteger::class.java)
-        direction = inParcel.readS(Direction::class.java)
-        tariContact = inParcel.readP(TariContact::class.java)
-        amount = inParcel.readP(MicroTari::class.java)
-        fee = inParcel.readP(MicroTari::class.java)
-        timestamp = inParcel.readS(BigInteger::class.java)
-        message = inParcel.readString().orEmpty()
-        status = inParcel.readS(TxStatus::class.java)
-        confirmationCount = inParcel.readS(BigInteger::class.java)
-    }
-
-    override fun describeContents(): Int {
-        return 0
-    }
-
-    // endregion
+    override fun toString() = "CompletedTx(fee=$fee, status=$status, confirmationCount=$confirmationCount) ${super.toString()}"
 }

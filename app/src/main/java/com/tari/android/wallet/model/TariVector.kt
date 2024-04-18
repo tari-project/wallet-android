@@ -32,52 +32,22 @@
  */
 package com.tari.android.wallet.model
 
-import android.os.Parcel
 import android.os.Parcelable
 import com.tari.android.wallet.ffi.FFITariVector
-import com.tari.android.wallet.ui.extension.readList
+import kotlinx.parcelize.Parcelize
 
-class TariVector() : Parcelable {
+@Parcelize
+data class TariVector(
+    val len: Long = -1,
+    val cap: Long = -1,
+    val itemsList: List<TariUtxo> = emptyList(),
+    val longs: List<Long> = emptyList(),
+) : Parcelable {
 
-    var len: Long = -1
-    var cap: Long = -1
-    var itemsList = mutableListOf<TariUtxo>()
-    var longs = mutableListOf<Long>()
-
-    constructor(ffiTariVector: FFITariVector) : this() {
-        len = ffiTariVector.len
-        cap = ffiTariVector.cap
-        itemsList = ffiTariVector.itemsList.map { TariUtxo(it) }.toMutableList()
-        longs = ffiTariVector.longs.toMutableList()
-    }
-
-    constructor(parcel: Parcel) : this() {
-        len = parcel.readLong()
-        cap = parcel.readLong()
-        itemsList = parcel.readList(itemsList, TariUtxo::class.java).toMutableList()
-        val longArray = longArrayOf()
-        parcel.readLongArray(longArray)
-        longs = longArray.toMutableList()
-    }
-
-    override fun writeToParcel(parcel: Parcel, flags: Int) {
-        parcel.writeLong(len)
-        parcel.writeLong(cap)
-        parcel.writeParcelableList(itemsList, flags)
-        parcel.writeLongArray(longs.toLongArray())
-    }
-
-    override fun describeContents(): Int {
-        return 0
-    }
-
-    companion object CREATOR : Parcelable.Creator<TariVector> {
-        override fun createFromParcel(parcel: Parcel): TariVector {
-            return TariVector(parcel)
-        }
-
-        override fun newArray(size: Int): Array<TariVector?> {
-            return arrayOfNulls(size)
-        }
-    }
+    constructor(ffiTariVector: FFITariVector) : this(
+        len = ffiTariVector.len,
+        cap = ffiTariVector.cap,
+        itemsList = ffiTariVector.itemsList.map { TariUtxo(it) },
+        longs = ffiTariVector.longs,
+    )
 }
