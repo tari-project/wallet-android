@@ -136,7 +136,7 @@ class TransactionRepository @Inject constructor() : CommonViewModel() {
         val items = mutableListOf<CommonViewHolderItem>()
 
         if (DebugConfig.mockTxs) {
-            items.addAll(MockDataStub.createTxList(contactsRepository, gifRepository, confirmationCount))
+            items.addAll(MockDataStub.createTxList(gifRepository, confirmationCount))
         } else {
             val minedUnconfirmedTxs = completedTxs.filter { it.status == TxStatus.MINED_UNCONFIRMED }
             val nonMinedUnconfirmedCompletedTxs = completedTxs.filter { it.status != TxStatus.MINED_UNCONFIRMED }
@@ -145,14 +145,14 @@ class TransactionRepository @Inject constructor() : CommonViewModel() {
             val pendingTxs = (pendingInboundTxs + pendingOutboundTxs + minedUnconfirmedTxs).toMutableList()
             pendingTxs.sortWith(compareByDescending(Tx::timestamp).thenByDescending { it.id })
             if (pendingTxs.isNotEmpty()) {
-                items.add(TitleViewHolderItem(resourceManager.getString(R.string.home_pending_transactions_title), true))
+                items.add(TitleViewHolderItem(title = resourceManager.getString(R.string.home_pending_transactions_title), isFirst = true))
                 items.addAll(pendingTxs.mapIndexed { index, tx ->
                     TransactionItem(
-                        tx,
-                        contactsRepository.ffiBridge.getContactForTx(tx),
-                        index,
-                        GIFViewModel(gifRepository),
-                        confirmationCount
+                        tx = tx,
+                        contact = contactsRepository.ffiBridge.getContactForTx(tx),
+                        position = index,
+                        viewModel = GIFViewModel(gifRepository),
+                        requiredConfirmationCount = confirmationCount,
                     )
                 })
             }
@@ -161,7 +161,7 @@ class TransactionRepository @Inject constructor() : CommonViewModel() {
             val nonPendingTxs = (cancelledTxs + nonMinedUnconfirmedCompletedTxs).toMutableList()
             nonPendingTxs.sortWith(compareByDescending(Tx::timestamp).thenByDescending { it.id })
             if (nonPendingTxs.isNotEmpty()) {
-                items.add(TitleViewHolderItem(resourceManager.getString(R.string.home_completed_transactions_title), false))
+                items.add(TitleViewHolderItem(title = resourceManager.getString(R.string.home_completed_transactions_title), isFirst = false))
                 items.addAll(nonPendingTxs.mapIndexed { index, tx ->
                     TransactionItem(
                         tx = tx,

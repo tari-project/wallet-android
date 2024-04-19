@@ -47,11 +47,12 @@ enum class FFITxStatus {
     COINBASE,
     MINED_CONFIRMED,
     REJECTED,
-    FAUX_UNCONFIRMED,
-    FAUX_CONFIRMED,
+    ONE_SIDED_UNCONFIRMED,
+    ONE_SIDED_CONFIRMED,
     QUEUED,
     COINBASE_UNCONFIRMED,
     COINBASE_CONFIRMED,
+    COINBASE_NOT_IN_BLOCKCHAIN,
     UNKNOWN;
 
     companion object {
@@ -66,12 +67,13 @@ enum class FFITxStatus {
                 5 -> COINBASE
                 6 -> MINED_CONFIRMED
                 7 -> REJECTED
-                8 -> FAUX_UNCONFIRMED
-                9 -> FAUX_CONFIRMED
+                8 -> ONE_SIDED_UNCONFIRMED
+                9 -> ONE_SIDED_CONFIRMED
                 10 -> QUEUED
                 11 -> COINBASE_UNCONFIRMED
                 12 -> COINBASE_CONFIRMED
-                13 -> UNKNOWN
+                13 -> COINBASE_NOT_IN_BLOCKCHAIN
+                14 -> UNKNOWN
                 else -> throw FFIException(message = "Unexpected status: $status")
             }
         }

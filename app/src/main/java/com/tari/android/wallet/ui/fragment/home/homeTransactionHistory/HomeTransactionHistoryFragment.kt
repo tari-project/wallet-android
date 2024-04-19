@@ -7,7 +7,6 @@ import android.view.ViewGroup
 import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.tari.android.wallet.R
 import com.tari.android.wallet.databinding.FragmentHomeContactTransactionHistoryBinding
 import com.tari.android.wallet.extension.observe
 import com.tari.android.wallet.ui.common.CommonFragment
@@ -15,7 +14,6 @@ import com.tari.android.wallet.ui.common.recyclerView.AdapterFactory
 import com.tari.android.wallet.ui.common.recyclerView.CommonAdapter
 import com.tari.android.wallet.ui.common.recyclerView.CommonViewHolderItem
 import com.tari.android.wallet.ui.common.recyclerView.viewHolders.TitleViewHolder
-import com.tari.android.wallet.ui.component.tari.toolbar.TariToolbarActionArg
 import com.tari.android.wallet.ui.extension.setVisible
 import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
 import com.tari.android.wallet.ui.fragment.tx.adapter.TransactionItem
@@ -57,10 +55,6 @@ class HomeTransactionHistoryFragment : CommonFragment<FragmentHomeContactTransac
         list.adapter = adapter
         list.layoutManager = LinearLayoutManager(context)
         requestTariButton.setOnClickListener { viewModel.navigation.postValue(Navigation.AllSettingsNavigation.ToRequestTari) }
-
-        toolbar.setRightArgs(TariToolbarActionArg(icon = R.drawable.vector_wallet) {
-            viewModel.navigation.postValue(Navigation.TxListNavigation.ToUtxos)
-        })
 
         adapter.setClickListener(CommonAdapter.ItemClickListener { item ->
             if (item is TransactionItem) {

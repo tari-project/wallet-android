@@ -14,6 +14,7 @@ import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.extension.addTo
 import com.tari.android.wallet.extension.getWithError
 import com.tari.android.wallet.ffi.FFIPublicKey
+import com.tari.android.wallet.ffi.FFITariBaseNodeState
 import com.tari.android.wallet.ffi.FFIWallet
 import com.tari.android.wallet.ffi.HexString
 import com.tari.android.wallet.service.connection.ServiceConnectionStatus
@@ -21,6 +22,7 @@ import com.tari.android.wallet.service.connection.TariWalletServiceConnection
 import com.tari.android.wallet.util.DebugConfig
 import io.reactivex.disposables.CompositeDisposable
 import org.apache.commons.io.IOUtils
+import java.math.BigInteger
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -68,6 +70,8 @@ class BaseNodesManager @Inject constructor(
             baseNodeSharedRepository.ffiBaseNodes
         }
 
+    val networkBlockHeight: BigInteger
+        get() = baseNodeSharedRepository.baseNodeHeightOfLongestChain
 
     /**
      * Select a base node randomly from the list of base nodes in base_nodes.tx, and sets
@@ -89,11 +93,21 @@ class BaseNodesManager @Inject constructor(
     }
 
     fun addUserBaseNode(baseNode: BaseNodeDto) {
-        baseNodeSharedRepository.addUserBaseNode(baseNode)
+        baseNodeSharedRepository.userBaseNodes.apply {
+            add(baseNode)
+            baseNodeSharedRepository.userBaseNodes = this
+        }
     }
 
     fun deleteUserBaseNode(baseNode: BaseNodeDto) {
-        baseNodeSharedRepository.deleteUserBaseNode(baseNode)
+        baseNodeSharedRepository.userBaseNodes.apply {
+            remove(baseNode)
+            baseNodeSharedRepository.userBaseNodes = this
+        }
+    }
+
+    fun saveBaseNodeState(baseNodeState: FFITariBaseNodeState) {
+        baseNodeSharedRepository.baseNodeHeightOfLongestChain = baseNodeState.getHeightOfLongestChain()
     }
 
     fun startSync() {

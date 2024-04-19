@@ -6,6 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:animateLayoutChanges="true"
+    android:foreground="?attr/selectableItemBackground"
     android:orientation="horizontal"
     android:paddingHorizontal="30dp">
 
@@ -14,7 +15,7 @@
         android:layout_width="wrap_content"
         android:layout_height="24dp"
         android:layout_marginTop="12dp"
-        android:buttonTint="@color/white"
+        android:buttonTint="?attr/palette_brand_purple"
         android:visibility="gone"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />

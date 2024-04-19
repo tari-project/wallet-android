@@ -11,6 +11,7 @@ data class TariUtxo(
     val value: MicroTari = MicroTari(BigInteger.ZERO),
     val minedHeight: Long = -1,
     val timestamp: Long = -1,
+    val lockHeight: Long = -1,
     val status: UtxoStatus = UtxoStatus.Spent,
 ) : Parcelable {
 
@@ -19,6 +20,7 @@ data class TariUtxo(
         value = MicroTari(BigInteger.valueOf(ffiUtxo.value)),
         minedHeight = ffiUtxo.minedHeight,
         timestamp = ffiUtxo.minedTimestamp,
+        lockHeight = ffiUtxo.lockHeight,
         status = UtxoStatus.fromValue(ffiUtxo.status.toInt()),
     )
 

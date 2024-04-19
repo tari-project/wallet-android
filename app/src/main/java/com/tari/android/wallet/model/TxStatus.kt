@@ -49,13 +49,22 @@ enum class TxStatus {
     COINBASE,
     MINED_CONFIRMED,
     REJECTED,
-    FAUX_UNCONFIRMED,
-    FAUX_CONFIRMED,
+    ONE_SIDED_UNCONFIRMED,
+    ONE_SIDED_CONFIRMED,
     QUEUED,
     COINBASE_UNCONFIRMED,
     COINBASE_CONFIRMED,
+    COINBASE_NOT_IN_BLOCKCHAIN,
     UNKNOWN;
-    
+
+    fun isOneSided(): Boolean {
+        return this == ONE_SIDED_CONFIRMED || this == ONE_SIDED_UNCONFIRMED
+    }
+
+    fun isCoinbase(): Boolean {
+        return this == COINBASE || this == COINBASE_UNCONFIRMED || this == COINBASE_CONFIRMED || this == COINBASE_NOT_IN_BLOCKCHAIN
+    }
+
     companion object {
         fun map(ffiStatus: FFITxStatus): TxStatus {
             return when (ffiStatus) {
@@ -68,12 +77,13 @@ enum class TxStatus {
                 FFITxStatus.COINBASE -> COINBASE
                 FFITxStatus.MINED_CONFIRMED -> MINED_CONFIRMED
                 FFITxStatus.REJECTED -> REJECTED
-                FFITxStatus.FAUX_CONFIRMED -> FAUX_CONFIRMED
-                FFITxStatus.FAUX_UNCONFIRMED -> FAUX_UNCONFIRMED
+                FFITxStatus.ONE_SIDED_CONFIRMED -> ONE_SIDED_CONFIRMED
+                FFITxStatus.ONE_SIDED_UNCONFIRMED -> ONE_SIDED_UNCONFIRMED
                 FFITxStatus.QUEUED -> QUEUED
                 FFITxStatus.COINBASE_UNCONFIRMED -> COINBASE_UNCONFIRMED
                 FFITxStatus.COINBASE_CONFIRMED -> COINBASE_CONFIRMED
-                else -> UNKNOWN
+                FFITxStatus.COINBASE_NOT_IN_BLOCKCHAIN -> COINBASE_NOT_IN_BLOCKCHAIN
+                FFITxStatus.UNKNOWN -> UNKNOWN
             }
         }
     }

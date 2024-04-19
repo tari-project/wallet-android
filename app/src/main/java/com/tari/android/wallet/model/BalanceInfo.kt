@@ -49,5 +49,5 @@ data class BalanceInfo(
     val timeLockedBalance: MicroTari = 0.toMicroTari(),
 ) : Parcelable {
     val totalBalance: MicroTari
-        get() = availableBalance + pendingIncomingBalance
+        get() = availableBalance + pendingIncomingBalance + timeLockedBalance
 }

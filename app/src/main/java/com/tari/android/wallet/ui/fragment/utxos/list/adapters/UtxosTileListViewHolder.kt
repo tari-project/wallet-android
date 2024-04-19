@@ -27,10 +27,10 @@ class UtxosTileListViewHolder(view: ItemUtxosTileBinding) : CommonViewHolder<Utx
         ui.amount.text = amount
         ui.amountDecimal.text = decimal
         ui.dateTime.text = item.formattedDate
-        ui.dateTime.setVisible(item.isShowDate)
+        ui.dateTime.setVisible(item.showDate)
 
-        ui.status.setVisible(item.isShowingStatus)
-        if (item.isShowingStatus) {
+        ui.status.setVisible(item.showStatus)
+        if (item.showStatus) {
             ui.status.setImageResource(item.status!!.icon)
         }
 
@@ -43,7 +43,7 @@ class UtxosTileListViewHolder(view: ItemUtxosTileBinding) : CommonViewHolder<Utx
         shapeDrawable.setColor(newColor.toArgb())
         ui.colorContainer.background = shapeDrawable
 
-        ui.root.alpha = if (item.status == UtxosStatus.Mined) 1.0F else 0.4F
+        ui.rootCard.alpha = if (item.enabled) 1.0F else 0.4F
 
         setCheckedSilently(item)
         item.checked.afterTileChangeListener = { _, _ -> setCheckedSilently(item) }
