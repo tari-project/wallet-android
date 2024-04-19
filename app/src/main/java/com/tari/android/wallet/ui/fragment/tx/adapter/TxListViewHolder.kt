@@ -68,8 +68,11 @@ class TxListViewHolder(view: ItemTxListBinding) : CommonViewHolder<TransactionIt
         val avatar = (contact?.contact as? MergedContactDto)?.phoneContactDto?.avatar.orEmpty()
         if (avatar.isEmpty()) {
             // display first emoji of emoji id
-            val firstEmoji =
-                if (tx.isOneSided) string(R.string.tx_list_emoji_one_side_payment_placeholder) else tx.tariContact.walletAddress.emojiId.extractEmojis()[0]
+            val firstEmoji = when {
+                tx.isCoinbase -> string(R.string.tx_list_emoji_coinbase_payment_placeholder)
+                tx.isOneSided -> string(R.string.tx_list_emoji_one_side_payment_placeholder)
+                else -> tx.tariContact.walletAddress.emojiId.extractEmojis()[0]
+            }
             ui.firstEmojiTextView.text = firstEmoji
         } else {
             // display avatar
@@ -83,6 +86,13 @@ class TxListViewHolder(view: ItemTxListBinding) : CommonViewHolder<TransactionIt
         val txUser = tx.tariContact
         // display contact name or emoji id
         when {
+            tx.isCoinbase -> {
+                ui.participantTextView1.visible()
+                ui.participantTextView2.gone()
+                ui.participantEmojiIdView.root.gone()
+                ui.participantTextView1.text = string(R.string.tx_details_coinbase_placeholder)
+            }
+
             tx.isOneSided -> {
                 val title = string(R.string.tx_list_someone) + " " + string(R.string.tx_list_paid_you)
                 ui.participantTextView1.visible()

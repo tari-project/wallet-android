@@ -48,7 +48,7 @@ abstract class Tx(
     open val message: String,
     open val status: TxStatus,
     open val tariContact: TariContact, // This is the receiver for an outbound tx and sender for an inbound tx.
-): Parcelable {
+) : Parcelable {
 
     enum class Direction {
         INBOUND,
@@ -56,7 +56,10 @@ abstract class Tx(
     }
 
     val isOneSided
-        get() = tariContact.walletAddress.hexString.all { it == '0' }
+        get() = status.isOneSided()
+
+    val isCoinbase
+        get() = status.isCoinbase()
 
     override fun toString() = "Tx(id=$id, direction=$direction, amount=$amount, timestamp=$timestamp, message='$message', user=$tariContact)"
 }

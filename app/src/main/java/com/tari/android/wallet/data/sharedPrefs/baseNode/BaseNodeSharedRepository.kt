@@ -34,6 +34,7 @@ package com.tari.android.wallet.data.sharedPrefs.baseNode
 
 import android.content.SharedPreferences
 import com.tari.android.wallet.data.repository.CommonRepository
+import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefBigIntegerDelegate
 import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefBooleanNullableDelegate
 import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefGsonDelegate
 import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefGsonNullableDelegate
@@ -42,6 +43,7 @@ import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
 import com.tari.android.wallet.data.sharedPrefs.network.formatKey
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.service.baseNode.BaseNodeState
+import java.math.BigInteger
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -57,6 +59,7 @@ class BaseNodeSharedRepository @Inject constructor(
         const val BASE_NODE_STATE = "tari_wallet_user_base_node_state"
         const val BASE_NODE_LAST_SYNC_RESULT = "tari_wallet_base_node_last_sync_result"
         const val FFI_BASE_NODE_LIST = "FFI_BASE_NODE_LIST"
+        const val HEIGHT_OF_LONGEST_CHAIN = "HEIGHT_OF_LONGEST_CHAIN"
     }
 
     var currentBaseNode: BaseNodeDto? by SharedPrefGsonNullableDelegate(
@@ -100,23 +103,15 @@ class BaseNodeSharedRepository @Inject constructor(
             baseNodeStateOrdinal = value.ordinal
         }
 
+    var baseNodeHeightOfLongestChain: BigInteger by SharedPrefBigIntegerDelegate(
+        prefs = sharedPrefs,
+        commonRepository = this,
+        name = Key.HEIGHT_OF_LONGEST_CHAIN,
+        defValue = 0.toBigInteger(),
+    )
 
     init {
         EventBus.baseNodeState.post(baseNodeState)
-    }
-
-    fun deleteUserBaseNode(baseNodeDto: BaseNodeDto) {
-        userBaseNodes.apply {
-            remove(baseNodeDto)
-            userBaseNodes = this
-        }
-    }
-
-    fun addUserBaseNode(baseNodeDto: BaseNodeDto) {
-        userBaseNodes.apply {
-            add(baseNodeDto)
-            userBaseNodes = this
-        }
     }
 
     fun clear() {
