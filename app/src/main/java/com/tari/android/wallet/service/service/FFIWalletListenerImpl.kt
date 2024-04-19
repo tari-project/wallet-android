@@ -7,6 +7,7 @@ import com.tari.android.wallet.application.baseNodes.BaseNodesManager
 import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodeSharedRepository
 import com.tari.android.wallet.event.Event
 import com.tari.android.wallet.event.EventBus
+import com.tari.android.wallet.ffi.FFITariBaseNodeState
 import com.tari.android.wallet.ffi.FFIWallet
 import com.tari.android.wallet.ffi.FFIWalletListener
 import com.tari.android.wallet.ffi.TransactionValidationStatus
@@ -326,6 +327,10 @@ class FFIWalletListenerImpl(
 
     override fun onWalletRestoration(result: WalletRestorationResult) {
         EventBus.walletRestorationState.post(result)
+    }
+
+    override fun onBaseNodeStateChanged(baseNodeState: FFITariBaseNodeState) {
+        baseNodesManager.saveBaseNodeState(baseNodeState)
     }
 
     enum class ConnectivityStatus(val value: Int) {

@@ -36,11 +36,23 @@ import com.tari.android.wallet.BuildConfig
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
 import com.tari.android.wallet.data.sharedPrefs.security.SecurityPrefRepository
-import com.tari.android.wallet.model.*
+import com.tari.android.wallet.model.BalanceInfo
+import com.tari.android.wallet.model.CancelledTx
+import com.tari.android.wallet.model.CompletedTx
+import com.tari.android.wallet.model.PendingInboundTx
+import com.tari.android.wallet.model.PendingOutboundTx
+import com.tari.android.wallet.model.PublicKey
+import com.tari.android.wallet.model.TariCoinPreview
+import com.tari.android.wallet.model.TariUnblindedOutput
+import com.tari.android.wallet.model.TariVector
+import com.tari.android.wallet.model.TariWalletAddress
+import com.tari.android.wallet.model.Tx
 import com.tari.android.wallet.model.recovery.WalletRestorationResult
 import com.tari.android.wallet.service.seedPhrase.SeedPhraseRepository
 import com.tari.android.wallet.util.Constants
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 import java.math.BigInteger
 import java.util.concurrent.atomic.AtomicReference
 
@@ -50,6 +62,7 @@ import java.util.concurrent.atomic.AtomicReference
  * @author The Tari Development Team
  */
 
+@Suppress("MemberVisibilityCanBePrivate")
 class FFIWallet(
     private val sharedPrefsRepository: SharedPrefsRepository,
     private val securityPrefRepository: SecurityPrefRepository,
@@ -114,6 +127,8 @@ class FFIWallet(
         callbackTransactionValidationCompleteSig: String,
         callbackConnectivityStatus: String,
         callbackConnectivityStatusSig: String,
+        callbackBaseNodeStatusStatus: String,
+        callbackBaseNodeStatusSig: String,
         libError: FFIError
     )
 
@@ -269,6 +284,7 @@ class FFIWallet(
                 this::onBalanceUpdated.name, "(J)V",
                 this::onTxValidationComplete.name, "([B[B)V",
                 this::onConnectivityStatus.name, "([B)V",
+                this::onBaseNodeStatus.name, "(J)V",
                 error
             )
         } catch (e: Throwable) {
@@ -317,7 +333,6 @@ class FFIWallet(
 
     fun cancelPendingTx(id: BigInteger): Boolean = runWithError { jniCancelPendingTx(id.toString(), it) }
 
-    @Suppress("MemberVisibilityCanBePrivate")
     fun onTxReceived(pendingInboundTxPtr: FFIPointer) {
         val tx = FFIPendingInboundTx(pendingInboundTxPtr)
         logger.i("Tx received ${tx.getId()}")
@@ -328,7 +343,6 @@ class FFIWallet(
     /**
      * This callback function cannot be private due to JNI behaviour
      */
-    @Suppress("MemberVisibilityCanBePrivate")
     fun onTxReplyReceived(txPointer: FFIPointer) {
         val tx = FFICompletedTx(txPointer)
         logger.i("Tx reply received ${tx.getId()}")
@@ -336,10 +350,6 @@ class FFIWallet(
         localScope.launch { listener?.onTxReplyReceived(pendingOutboundTx) }
     }
 
-    /**
-     * This callback function cannot be private due to JNI behaviour.
-     */
-    @Suppress("MemberVisibilityCanBePrivate")
     fun onTxFinalized(completedTx: FFIPointer) {
         val tx = FFICompletedTx(completedTx)
         logger.i("Tx finalized ${tx.getId()}")
@@ -347,10 +357,6 @@ class FFIWallet(
         localScope.launch { listener?.onTxFinalized(pendingInboundTx) }
     }
 
-    /**
-     * This callback function cannot be private due to JNI behaviour.
-     */
-    @Suppress("MemberVisibilityCanBePrivate")
     fun onTxBroadcast(completedTxPtr: FFIPointer) {
         val tx = FFICompletedTx(completedTxPtr)
         logger.i("Tx broadcast ${tx.getId()}")
@@ -367,20 +373,12 @@ class FFIWallet(
         }
     }
 
-    /**
-     * This callback function cannot be private due to JNI behaviour.
-     */
-    @Suppress("MemberVisibilityCanBePrivate")
     fun onTxMined(completedTxPtr: FFIPointer) {
         val completed = CompletedTx(completedTxPtr)
         logger.i("Tx mined & confirmed ${completed.id}")
         localScope.launch { listener?.onTxMined(completed) }
     }
 
-    /**
-     * This callback function cannot be private due to JNI behaviour.
-     */
-    @Suppress("MemberVisibilityCanBePrivate")
     fun onTxMinedUnconfirmed(completedTxPtr: FFIPointer, confirmationCountBytes: ByteArray) {
         val confirmationCount = BigInteger(1, confirmationCountBytes).toInt()
         val completed = CompletedTx(completedTxPtr)
@@ -388,20 +386,18 @@ class FFIWallet(
         localScope.launch { listener?.onTxMinedUnconfirmed(completed, confirmationCount) }
     }
 
-    /**
-     * This callback function cannot be private due to JNI behaviour.
-     */
-    @Suppress("MemberVisibilityCanBePrivate")
     fun onTxFauxConfirmed(completedTxPtr: FFIPointer) {
         val completed = CompletedTx(completedTxPtr)
         logger.i("Tx faux confirmed ${completed.id}")
         localScope.launch { listener?.onTxMined(completed) }
     }
 
-    /**
-     * This callback function cannot be private due to JNI behaviour.
-     */
-    @Suppress("MemberVisibilityCanBePrivate")
+    fun onBaseNodeStatus(baseNodeStatePointer: FFIPointer) {
+        val baseNodeState = FFITariBaseNodeState(baseNodeStatePointer)
+        logger.i("Base node state updated (height of the longest chain is ${baseNodeState.getHeightOfLongestChain()})")
+        localScope.launch { listener?.onBaseNodeStateChanged(baseNodeState) }
+    }
+
     fun onTxFauxUnconfirmed(completedTxPtr: FFIPointer, confirmationCountBytes: ByteArray) {
         val confirmationCount = BigInteger(1, confirmationCountBytes).toInt()
         val completed = CompletedTx(completedTxPtr)
@@ -409,20 +405,12 @@ class FFIWallet(
         localScope.launch { listener?.onTxMinedUnconfirmed(completed, confirmationCount) }
     }
 
-    /**
-     * This callback function cannot be private due to JNI behaviour.
-     */
-    @Suppress("MemberVisibilityCanBePrivate")
     fun onDirectSendResult(bytes: ByteArray, pointer: FFIPointer) {
         val txId = BigInteger(1, bytes)
         logger.i("Tx direct send result $txId")
         localScope.launch { listener?.onDirectSendResult(txId, FFITransactionSendStatus(pointer).getStatus()) }
     }
 
-    /**
-     * This callback function cannot be private due to JNI behaviour.
-     */
-    @Suppress("MemberVisibilityCanBePrivate")
     fun onTxCancelled(completedTx: FFIPointer, rejectionReason: ByteArray) {
         val rejectionReasonInt = BigInteger(1, rejectionReason).toInt()
         val tx = FFICompletedTx(completedTx)
@@ -433,53 +421,34 @@ class FFIWallet(
         }
     }
 
-    /**
-     * This callback function cannot be private due to JNI behaviour.
-     */
-    @Suppress("MemberVisibilityCanBePrivate")
     fun onConnectivityStatus(bytes: ByteArray) {
         val connectivityStatus = BigInteger(1, bytes)
         localScope.launch { listener?.onConnectivityStatus(connectivityStatus.toInt()) }
         logger.i("ConnectivityStatus is [$connectivityStatus]")
     }
 
-    /**
-     * This callback function cannot be private due to JNI behaviour.
-     */
-    @Suppress("MemberVisibilityCanBePrivate")
     fun onBalanceUpdated(ptr: FFIPointer) {
         logger.i("Balance Updated")
         val balance = FFIBalance(ptr).runWithDestroy { BalanceInfo(it.getAvailable(), it.getIncoming(), it.getOutgoing(), it.getTimeLocked()) }
         localScope.launch { listener?.onBalanceUpdated(balance) }
     }
 
-    /**
-     * This callback function cannot be private due to JNI behaviour.
-     */
-    @Suppress("MemberVisibilityCanBePrivate")
     fun onTXOValidationComplete(bytes: ByteArray, statusBytes: ByteArray) {
         val requestId = BigInteger(1, bytes)
         val statusInteger = BigInteger(1, statusBytes).toInt()
-        val status = TransactionValidationStatus.values().firstOrNull { it.value == statusInteger } ?: return
+        val status = TransactionValidationStatus.entries.firstOrNull { it.value == statusInteger } ?: return
         logger.i("TXO validation [$requestId] complete. Result: $status")
         localScope.launch { listener?.onTXOValidationComplete(requestId, status) }
     }
 
-    /**
-     * This callback function cannot be private due to JNI behaviour.
-     */
-    @Suppress("MemberVisibilityCanBePrivate")
     fun onTxValidationComplete(requestIdBytes: ByteArray, statusBytes: ByteArray) {
         val requestId = BigInteger(1, requestIdBytes)
         val statusInteger = BigInteger(1, statusBytes).toInt()
-        val status = TransactionValidationStatus.values().firstOrNull { it.value == statusInteger } ?: return
+        val status = TransactionValidationStatus.entries.firstOrNull { it.value == statusInteger } ?: return
         logger.i("Tx validation [$requestId] complete. Result: $status")
         localScope.launch { listener?.onTxValidationComplete(requestId, status) }
     }
 
-    /**
-     * This callback function cannot be private due to JNI behaviour.
-     */
     @Suppress("MemberVisibilityCanBePrivate", "UNUSED_PARAMETER")
     fun onContactLivenessDataUpdated(livenessUpdate: FFIPointer) {
         logger.i("OnContactLivenessDataUpdated")
@@ -573,10 +542,6 @@ class FFIWallet(
         }
     }
 
-    /**
-     * This callback function cannot be private due to JNI behaviour.
-     */
-    @Suppress("MemberVisibilityCanBePrivate")
     fun onWalletRecovery(event: Int, firstArg: ByteArray, secondArg: ByteArray) {
         val result = WalletRestorationResult.create(event, firstArg, secondArg)
         logger.i("Wallet restored with $result")

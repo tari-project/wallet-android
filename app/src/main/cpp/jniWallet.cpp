@@ -98,6 +98,7 @@ jmethodID txoValidationCompleteCallbackMethodId;
 jmethodID transactionValidationCompleteCallbackMethodId;
 jmethodID recoveringProcessCompleteCallbackMethodId;
 jmethodID balanceUpdatedCallbackMethodId;
+jmethodID baseNodeStatusCallbackMethodId;
 
 void txBroadcastCallback(TariCompletedTransaction *pCompletedTransaction) {
     auto *jniEnv = getJNIEnv();
@@ -260,7 +261,13 @@ void storeAndForwardMessagesReceivedCallback() {
 }
 
 void baseNodeStatusCallback(TariBaseNodeState *pBaseNodeState) {
-    // no-op
+    auto *jniEnv = getJNIEnv();
+    if (jniEnv == nullptr || callbackHandler == nullptr) {
+        return;
+    }
+    auto jpBaseNodeState = reinterpret_cast<jlong>(pBaseNodeState);
+    jniEnv->CallVoidMethod(callbackHandler, baseNodeStatusCallbackMethodId, jpBaseNodeState);
+    g_vm->DetachCurrentThread();
 }
 
 
@@ -330,6 +337,8 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniCreate(
         jstring callback_transaction_validation_complete_sig,
         jstring callback_connectivity_status,
         jstring callback_connectivity_status_sig,
+        jstring callback_base_node_status,
+        jstring callback_base_node_status_sig,
         jobject error) {
 
     int errorCode = 0;
@@ -415,6 +424,11 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniCreate(
 
     balanceUpdatedCallbackMethodId = getMethodId(jEnv, jThis, callback_balance_updated, callback_balance_updated_sig);
     if (balanceUpdatedCallbackMethodId == nullptr) {
+        SetNullPointerField(jEnv, jThis);
+    }
+
+    baseNodeStatusCallbackMethodId = getMethodId(jEnv, jThis, callback_base_node_status, callback_base_node_status_sig);
+    if (baseNodeStatusCallbackMethodId == nullptr) {
         SetNullPointerField(jEnv, jThis);
     }
 
