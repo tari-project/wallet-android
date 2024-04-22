@@ -32,12 +32,11 @@
  */
 package com.tari.android.wallet.model
 
-import android.os.Parcel
 import android.os.Parcelable
+import com.tari.android.wallet.extension.toMicroTari
 import com.tari.android.wallet.ffi.FFICompletedTx
 import com.tari.android.wallet.ffi.FFITxCancellationReason
-import com.tari.android.wallet.ui.extension.readP
-import com.tari.android.wallet.ui.extension.readS
+import kotlinx.parcelize.Parcelize
 import java.math.BigInteger
 
 /**
@@ -45,60 +44,30 @@ import java.math.BigInteger
  *
  * @author The Tari Development Team
  */
-class CancelledTx() : Tx(), Parcelable {
+@Parcelize
+data class CancelledTx(
+    override val id: BigInteger = 0.toBigInteger(),
+    override val direction: Direction = Direction.INBOUND,
+    override val amount: MicroTari = 0.toMicroTari(),
+    override val timestamp: BigInteger = 0.toBigInteger(),
+    override val message: String = "",
+    override val status: TxStatus = TxStatus.PENDING,
+    override val tariContact: TariContact = TariContact(),
+    val fee: MicroTari = 0.toMicroTari(),
+    val cancellationReason: FFITxCancellationReason = FFITxCancellationReason.NotCancelled,
+) : Tx(id, direction, amount, timestamp, message, status, tariContact), Parcelable {
 
-    var fee: MicroTari = MicroTari(BigInteger("0"))
-    var cancellationReason: FFITxCancellationReason = FFITxCancellationReason.NotCancelled
+    constructor(tx: FFICompletedTx) : this(
+        id = tx.getId(),
+        direction = tx.getDirection(),
+        tariContact = tx.getContact(),
+        amount = MicroTari(tx.getAmount()),
+        timestamp = tx.getTimestamp(),
+        message = tx.getMessage(),
+        status = TxStatus.map(tx.getStatus()),
+        fee = MicroTari(tx.getFee()),
+        cancellationReason = tx.getCancellationReason(),
+    )
 
-    constructor(tx: FFICompletedTx) : this() {
-        this.id = tx.getId()
-        this.direction = tx.getDirection()
-        this.tariContact = tx.getContact()
-        this.amount = MicroTari(tx.getAmount())
-        this.fee = MicroTari(tx.getFee())
-        this.timestamp = tx.getTimestamp()
-        this.message = tx.getMessage()
-        this.status = TxStatus.map(tx.getStatus())
-        this.cancellationReason = tx.getCancellationReason()
-        tx.destroy()
-    }
-
-    // region Parcelable
-
-    constructor(parcel: Parcel) : this() {
-        id = parcel.readS(BigInteger::class.java)
-        direction = parcel.readS(Direction::class.java)
-        tariContact = parcel.readP(TariContact::class.java)
-        amount = parcel.readP(MicroTari::class.java)
-        fee = parcel.readP(MicroTari::class.java)
-        timestamp = parcel.readS(BigInteger::class.java)
-        message = parcel.readString().orEmpty()
-        status = parcel.readP(TxStatus::class.java)
-    }
-
-    override fun toString(): String = "CanceledTx(fee=$fee, status=$status) ${super.toString()}"
-
-    companion object CREATOR : Parcelable.Creator<CancelledTx> {
-
-        override fun createFromParcel(parcel: Parcel): CancelledTx = CancelledTx(parcel)
-
-        override fun newArray(size: Int): Array<CancelledTx?> = arrayOfNulls(size)
-    }
-
-    override fun writeToParcel(parcel: Parcel, flags: Int) {
-        parcel.writeSerializable(id)
-        parcel.writeSerializable(direction)
-        parcel.writeSerializable(tariContact.javaClass)
-        parcel.writeParcelable(tariContact, flags)
-        parcel.writeParcelable(amount, flags)
-        parcel.writeParcelable(fee, flags)
-        parcel.writeSerializable(timestamp)
-        parcel.writeString(message)
-        parcel.writeSerializable(status)
-    }
-
-    override fun describeContents(): Int = 0
-
-    // endregion
-
+    override fun toString() = "CanceledTx(fee=$fee, status=$status) ${super.toString()}"
 }

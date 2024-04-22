@@ -14,10 +14,10 @@ class FFITariVector(pointer: FFIPointer) : FFIBase() {
     init {
         this.pointer = pointer
         jniLoadData()
-        val vectorTag = TariVectorTag.values().firstOrNull { it.value == tag }
+        val vectorTag = TariVectorTag.entries.firstOrNull { it.value == tag }
         for (i in 0 until len) {
             val newItemPointer = jniGetItemAt(i.toInt())
-            when(vectorTag) {
+            when (vectorTag) {
                 TariVectorTag.Utxo -> itemsList.add(FFITariUtxo(newItemPointer))
                 TariVectorTag.U64 -> longs.add(newItemPointer)
                 else -> Unit

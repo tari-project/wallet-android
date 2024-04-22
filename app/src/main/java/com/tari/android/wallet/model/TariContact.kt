@@ -32,69 +32,22 @@
  */
 package com.tari.android.wallet.model
 
-import android.os.Parcel
 import android.os.Parcelable
-import com.tari.android.wallet.ui.extension.readP
+import kotlinx.parcelize.Parcelize
 
 /**
  * Contact is a user with an alias.
  *
  * @author The Tari Development Team
  */
-class TariContact() : Parcelable {
-
-    var walletAddress = TariWalletAddress.createWalletAddress()
-    var isFavorite: Boolean = false
-    var alias: String = ""
-
-    constructor(
-        tariWalletAddress: TariWalletAddress,
-        alias: String = "",
-        isFavorite: Boolean = false
-    ) : this() {
-        this.walletAddress = tariWalletAddress
-        this.alias = alias
-        this.isFavorite = isFavorite
-    }
+@Parcelize
+class TariContact(
+    val walletAddress: TariWalletAddress = TariWalletAddress.createWalletAddress(),
+    val alias: String = "",
+    val isFavorite: Boolean = false,
+) : Parcelable {
 
     fun filtered(text: String): Boolean = walletAddress.emojiId.contains(text, true) || alias.contains(text, true)
 
-    override fun toString(): String = "Contact(alias='$alias') ${super.toString()}"
-
-    // region Parcelable
-
-    constructor(parcel: Parcel) : this() {
-        readFromParcel(parcel)
-    }
-
-    companion object CREATOR : Parcelable.Creator<TariContact> {
-
-        override fun createFromParcel(parcel: Parcel): TariContact {
-            return TariContact(parcel)
-        }
-
-        override fun newArray(size: Int): Array<TariContact> {
-            return Array(size) { TariContact() }
-        }
-
-    }
-
-    override fun writeToParcel(parcel: Parcel, flags: Int) {
-        parcel.writeParcelable(walletAddress, flags)
-        parcel.writeString(alias)
-        parcel.writeBoolean(isFavorite)
-    }
-
-    private fun readFromParcel(inParcel: Parcel) {
-        walletAddress = inParcel.readP(TariWalletAddress::class.java)
-        alias = inParcel.readString().orEmpty()
-        isFavorite = inParcel.readBoolean()
-    }
-
-    override fun describeContents(): Int {
-        return 0
-    }
-
-    // endregion
-
+    override fun toString() = "Contact(alias='$alias') ${super.toString()}"
 }

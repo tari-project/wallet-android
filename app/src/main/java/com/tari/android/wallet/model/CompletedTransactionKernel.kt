@@ -1,3 +1,11 @@
 package com.tari.android.wallet.model
 
-class CompletedTransactionKernel(val excess: String, val publicNonce: String, val signature: String)
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
+
+@Parcelize
+data class CompletedTransactionKernel(
+    val excess: String,
+    val publicNonce: String,
+    val signature: String,
+) : Parcelable

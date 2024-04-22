@@ -57,4 +57,5 @@ interface FFIWalletListener {
     fun onBalanceUpdated(balanceInfo: BalanceInfo)
     fun onConnectivityStatus(status: Int)
     fun onWalletRestoration(result: WalletRestorationResult)
+    fun onBaseNodeStateChanged(baseNodeState: FFITariBaseNodeState)
 }

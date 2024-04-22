@@ -13,6 +13,7 @@
         android:layout_height="match_parent"
         android:layout_margin="6dp"
         android:clipChildren="false"
+        android:foreground="?attr/selectableItemBackground"
         app:cardBackgroundColor="?attr/palette_neutral_secondary"
         app:cardCornerRadius="11dp"
         app:cardElevation="0dp">
@@ -58,9 +59,9 @@
                             android:id="@+id/balance_gem_image_view"
                             android:layout_width="@dimen/home_balance_gem_width"
                             android:layout_height="@dimen/home_balance_gem_height"
-                            android:tint="@color/white"
                             android:layout_gravity="center_vertical"
-                            android:src="@drawable/vector_gem" />
+                            android:src="@drawable/vector_gem"
+                            android:tint="@color/white" />
 
                         <com.tari.android.wallet.ui.component.tari.TariTextView
                             android:id="@+id/amount"

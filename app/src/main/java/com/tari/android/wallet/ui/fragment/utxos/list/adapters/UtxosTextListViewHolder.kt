@@ -14,13 +14,13 @@ class UtxosTextListViewHolder(view: ItemUtxosTextBinding) : CommonViewHolder<Utx
 
         val amountText = item.amount + " XTR"
         ui.amount.text = amountText
-        val statusStr = if (item.isShowingStatus) itemView.context.getString(item.status!!.text) else ""
-        val dateStr = if (item.isShowDate) " | ${item.formattedDate} | ${item.formattedTime}" else ""
+        val statusStr = if (item.showStatus) itemView.context.getString(item.status!!.text) else ""
+        val dateStr = if (item.showDate) " | ${item.formattedDate} | ${item.formattedTime}" else ""
         val additionalDataText = statusStr + dateStr
         ui.additionalData.text = additionalDataText
         ui.hash.text = item.source.commitment
 
-        val drawable = if (item.isShowingStatus) ContextCompat.getDrawable(itemView.context, item.status!!.textIcon) else null
+        val drawable = if (item.showStatus) ContextCompat.getDrawable(itemView.context, item.status!!.textIcon) else null
         ui.additionalData.setCompoundDrawablesRelativeWithIntrinsicBounds(drawable, null, null, null)
 
         setCheckedSilently(item)
@@ -29,7 +29,7 @@ class UtxosTextListViewHolder(view: ItemUtxosTextBinding) : CommonViewHolder<Utx
         ui.checkedState.setVisible(item.selectionState.value)
         item.selectionState.beforeTextChangeListener = { _, newValue -> ui.checkedState.setVisible(newValue) }
 
-        ui.root.alpha = if (item.status == UtxosStatus.Mined) 1.0F else 0.4F
+        ui.root.alpha = if (item.enabled) 1.0F else 0.4F
     }
 
     private fun setCheckedSilently(item: UtxosViewHolderItem) {

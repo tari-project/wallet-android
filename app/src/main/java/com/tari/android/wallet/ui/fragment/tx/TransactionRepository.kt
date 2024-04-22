@@ -14,10 +14,8 @@ import com.tari.android.wallet.extension.getWithError
 import com.tari.android.wallet.extension.repopulate
 import com.tari.android.wallet.model.CancelledTx
 import com.tari.android.wallet.model.CompletedTx
-import com.tari.android.wallet.model.MicroTari
 import com.tari.android.wallet.model.PendingInboundTx
 import com.tari.android.wallet.model.PendingOutboundTx
-import com.tari.android.wallet.model.TariContact
 import com.tari.android.wallet.model.Tx
 import com.tari.android.wallet.model.TxId
 import com.tari.android.wallet.model.TxStatus
@@ -34,7 +32,6 @@ import com.tari.android.wallet.util.MockDataStub
 import io.reactivex.BackpressureStrategy
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import java.math.BigInteger
 import java.util.concurrent.CopyOnWriteArrayList
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -49,8 +46,8 @@ class TransactionRepository @Inject constructor() : CommonViewModel() {
     lateinit var gifRepository: GIFRepository
 
 
-    private val _list = MutableLiveData<MutableList<CommonViewHolderItem>>(mutableListOf())
-    val list: LiveData<MutableList<CommonViewHolderItem>> = _list
+    private val _list = MutableLiveData<List<CommonViewHolderItem>>(emptyList())
+    val list: LiveData<List<CommonViewHolderItem>> = _list
 
     private val _listUpdateTrigger = MediatorLiveData<Unit>()
     val listUpdateTrigger: LiveData<Unit> = _listUpdateTrigger
@@ -138,104 +135,43 @@ class TransactionRepository @Inject constructor() : CommonViewModel() {
 
         val items = mutableListOf<CommonViewHolderItem>()
 
-        val minedUnconfirmedTxs = completedTxs.filter { it.status == TxStatus.MINED_UNCONFIRMED }
-        val nonMinedUnconfirmedCompletedTxs = completedTxs.filter { it.status != TxStatus.MINED_UNCONFIRMED }
+        if (DebugConfig.mockTxs) {
+            items.addAll(MockDataStub.createTxList(gifRepository, confirmationCount))
+        } else {
+            val minedUnconfirmedTxs = completedTxs.filter { it.status == TxStatus.MINED_UNCONFIRMED }
+            val nonMinedUnconfirmedCompletedTxs = completedTxs.filter { it.status != TxStatus.MINED_UNCONFIRMED }
 
-        // sort and add pending txs
-        val pendingTxs = (pendingInboundTxs + pendingOutboundTxs + minedUnconfirmedTxs).toMutableList()
-        pendingTxs.sortWith(compareByDescending(Tx::timestamp).thenByDescending { it.id })
-        if (pendingTxs.isNotEmpty()) {
-            items.add(TitleViewHolderItem(resourceManager.getString(R.string.home_pending_transactions_title), true))
-            items.addAll(pendingTxs.mapIndexed { index, tx ->
-                TransactionItem(
-                    tx,
-                    contactsRepository.ffiBridge.getContactForTx(tx),
-                    index,
-                    GIFViewModel(gifRepository),
-                    confirmationCount
-                )
-            })
-        }
-
-        // sort and add non-pending txs
-        val nonPendingTxs = (cancelledTxs + nonMinedUnconfirmedCompletedTxs).toMutableList()
-        nonPendingTxs.sortWith(compareByDescending(Tx::timestamp).thenByDescending { it.id })
-        if (nonPendingTxs.isNotEmpty()) {
-            items.add(TitleViewHolderItem(resourceManager.getString(R.string.home_completed_transactions_title), false))
-            items.addAll(nonPendingTxs.mapIndexed { index, tx ->
-                TransactionItem(
-                    tx,
-                    contactsRepository.ffiBridge.getContactForTx(tx),
-                    index + pendingTxs.size,
-                    GIFViewModel(gifRepository),
-                    confirmationCount
-                )
-            })
-        }
-
-        if (DebugConfig.mockedDataEnabled) {
-
-            val title = TitleViewHolderItem("Mocked Transactions", true)
-            val messageGiphy = " https://giphy.com/embed/5885nYOgBHdCw"
-
-            val item = TransactionItem(
-                CompletedTx().apply {
-                    direction = Tx.Direction.INBOUND
-                    status = TxStatus.MINED_CONFIRMED
-                    amount = MicroTari(BigInteger.valueOf(100000))
-                    fee = MicroTari(BigInteger.valueOf(1000))
-                    message = messageGiphy
-                    timestamp = BigInteger.valueOf(System.currentTimeMillis())
-                    id = BigInteger.valueOf(1)
-                    tariContact = TariContact(MockDataStub.WALLET_ADDRESS_ZERO, "test1")
-                },
-                contactsRepository.ffiBridge.getContactForTx(CompletedTx()),
-                0,
-                GIFViewModel(gifRepository),
-                confirmationCount
-            )
-
-            val tx2 = CompletedTx().apply {
-                direction = Tx.Direction.INBOUND
-                status = TxStatus.MINED_CONFIRMED
-                amount = MicroTari(BigInteger.valueOf(110000))
-                fee = MicroTari(BigInteger.valueOf(1000))
-                timestamp = BigInteger.valueOf(System.currentTimeMillis())
-                id = BigInteger.valueOf(1)
-                message = messageGiphy
-                tariContact = TariContact(MockDataStub.WALLET_ADDRESS_ZERO, "test2")
+            // sort and add pending txs
+            val pendingTxs = (pendingInboundTxs + pendingOutboundTxs + minedUnconfirmedTxs).toMutableList()
+            pendingTxs.sortWith(compareByDescending(Tx::timestamp).thenByDescending { it.id })
+            if (pendingTxs.isNotEmpty()) {
+                items.add(TitleViewHolderItem(title = resourceManager.getString(R.string.home_pending_transactions_title), isFirst = true))
+                items.addAll(pendingTxs.mapIndexed { index, tx ->
+                    TransactionItem(
+                        tx = tx,
+                        contact = contactsRepository.ffiBridge.getContactForTx(tx),
+                        position = index,
+                        viewModel = GIFViewModel(gifRepository),
+                        requiredConfirmationCount = confirmationCount,
+                    )
+                })
             }
-            val item2 = TransactionItem(
-                tx2,
-                contactsRepository.ffiBridge.getContactForTx(tx2),
-                0,
-                GIFViewModel(gifRepository),
-                confirmationCount
-            )
 
-            val tx3 = CompletedTx().apply {
-                direction = Tx.Direction.INBOUND
-                status = TxStatus.MINED_CONFIRMED
-                message = messageGiphy
-                amount = MicroTari(BigInteger.valueOf(111000))
-                fee = MicroTari(BigInteger.valueOf(1000))
-                timestamp = BigInteger.valueOf(System.currentTimeMillis())
-                id = BigInteger.valueOf(1)
-                tariContact = TariContact(MockDataStub.WALLET_ADDRESS, "test3")
-
+            // sort and add non-pending txs
+            val nonPendingTxs = (cancelledTxs + nonMinedUnconfirmedCompletedTxs).toMutableList()
+            nonPendingTxs.sortWith(compareByDescending(Tx::timestamp).thenByDescending { it.id })
+            if (nonPendingTxs.isNotEmpty()) {
+                items.add(TitleViewHolderItem(title = resourceManager.getString(R.string.home_completed_transactions_title), isFirst = false))
+                items.addAll(nonPendingTxs.mapIndexed { index, tx ->
+                    TransactionItem(
+                        tx = tx,
+                        contact = contactsRepository.ffiBridge.getContactForTx(tx),
+                        position = index + pendingTxs.size,
+                        viewModel = GIFViewModel(gifRepository),
+                        requiredConfirmationCount = confirmationCount,
+                    )
+                })
             }
-            val item3 = TransactionItem(
-                tx3,
-                contactsRepository.ffiBridge.getContactForTx(tx3),
-                0,
-                GIFViewModel(gifRepository),
-                confirmationCount
-            )
-
-            items.add(title)
-            items.add(item)
-            items.add(item2)
-            items.add(item3)
         }
 
         _list.postValue(items)
@@ -247,21 +183,41 @@ class TransactionRepository @Inject constructor() : CommonViewModel() {
     }
 
     private fun onTxReplyReceived(tx: PendingOutboundTx) {
-        pendingOutboundTxs.firstOrNull { it.id == tx.id }?.status = tx.status
-        _listUpdateTrigger.postValue(Unit)
+        val index = pendingOutboundTxs.indexOfFirst { it.id == tx.id }
+        if (index != -1) {
+            pendingOutboundTxs[index] = pendingOutboundTxs[index].copy(status = tx.status)
+            _listUpdateTrigger.postValue(Unit)
+        } else {
+            logger.i("onTxReplyReceived: tx ${tx.id} not found in pendingOutboundTxs")
+        }
     }
 
     private fun onTxFinalized(tx: PendingInboundTx) {
-        pendingInboundTxs.firstOrNull { it.id == tx.id }?.status = tx.status
-        _listUpdateTrigger.postValue(Unit)
+        val index = pendingInboundTxs.indexOfFirst { it.id == tx.id }
+        if (index != -1) {
+            pendingInboundTxs[index] = pendingInboundTxs[index].copy(status = tx.status)
+            _listUpdateTrigger.postValue(Unit)
+        } else {
+            logger.i("onTxFinalized: tx ${tx.id} not found in pendingInboundTxs")
+        }
     }
 
     private fun onInboundTxBroadcast(tx: PendingInboundTx) {
-        pendingInboundTxs.firstOrNull { it.id == tx.id }?.status = TxStatus.BROADCAST
+        val index = pendingInboundTxs.indexOfFirst { it.id == tx.id }
+        if (index != -1) {
+            pendingInboundTxs[index] = pendingInboundTxs[index].copy(status = TxStatus.BROADCAST)
+        } else {
+            logger.i("onInboundTxBroadcast: tx ${tx.id} not found in pendingInboundTxs")
+        }
     }
 
     private fun onOutboundTxBroadcast(tx: PendingOutboundTx) {
-        pendingOutboundTxs.firstOrNull { it.id == tx.id }?.status = TxStatus.BROADCAST
+        val index = pendingOutboundTxs.indexOfFirst { it.id == tx.id }
+        if (index != -1) {
+            pendingOutboundTxs[index] = pendingOutboundTxs[index].copy(status = TxStatus.BROADCAST)
+        } else {
+            logger.i("onOutboundTxBroadcast: tx ${tx.id} not found in pendingOutboundTxs")
+        }
     }
 
     private fun onTxMinedUnconfirmed(tx: CompletedTx) {

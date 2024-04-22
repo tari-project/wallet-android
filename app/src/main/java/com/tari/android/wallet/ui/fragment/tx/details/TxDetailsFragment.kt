@@ -73,10 +73,10 @@ import com.tari.android.wallet.model.Tx.Direction.OUTBOUND
 import com.tari.android.wallet.model.TxId
 import com.tari.android.wallet.model.TxNote
 import com.tari.android.wallet.model.TxStatus.COINBASE
-import com.tari.android.wallet.model.TxStatus.FAUX_CONFIRMED
-import com.tari.android.wallet.model.TxStatus.FAUX_UNCONFIRMED
 import com.tari.android.wallet.model.TxStatus.IMPORTED
 import com.tari.android.wallet.model.TxStatus.MINED_CONFIRMED
+import com.tari.android.wallet.model.TxStatus.ONE_SIDED_CONFIRMED
+import com.tari.android.wallet.model.TxStatus.ONE_SIDED_UNCONFIRMED
 import com.tari.android.wallet.model.TxStatus.PENDING
 import com.tari.android.wallet.ui.animation.collapseAndHideAnimation
 import com.tari.android.wallet.ui.common.CommonFragment
@@ -210,7 +210,8 @@ class TxDetailsFragment : CommonFragment<FragmentTxDetailsBinding, TxDetailsView
     }
 
     private fun bindTxData(tx: Tx) {
-        ui.userContainer.setVisible(!tx.isOneSided)
+        ui.userContainer.setVisible(!tx.isOneSided && !tx.isCoinbase)
+        ui.contactContainerView.setVisible(!tx.isOneSided && !tx.isCoinbase)
 
         setTxStatusData(tx)
         setTxMetaData(tx)
@@ -284,7 +285,7 @@ class TxDetailsFragment : CommonFragment<FragmentTxDetailsBinding, TxDetailsView
             tx is CancelledTx -> ""
             state == TxState(INBOUND, PENDING) -> string(tx_detail_waiting_for_sender_to_complete)
             state == TxState(OUTBOUND, PENDING) -> string(tx_detail_waiting_for_recipient)
-            state == TxState(INBOUND, FAUX_UNCONFIRMED) || state == TxState(INBOUND, FAUX_CONFIRMED) -> ""
+            state == TxState(INBOUND, ONE_SIDED_UNCONFIRMED) || state == TxState(INBOUND, ONE_SIDED_CONFIRMED) -> ""
             state.status != MINED_CONFIRMED && state.status != COINBASE -> string(
                 tx_detail_completing_final_processing,
                 if (tx is CompletedTx) tx.confirmationCount.toInt() + 1 else 1,
