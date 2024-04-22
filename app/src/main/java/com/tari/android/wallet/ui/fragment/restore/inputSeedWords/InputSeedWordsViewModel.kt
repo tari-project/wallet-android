@@ -321,26 +321,35 @@ class InputSeedWordsViewModel : CommonViewModel() {
     }
 
     fun chooseCustomBaseNodeClick() {
-        showEditAliasDialog()
+        showEditBaseNodeDialog()
     }
 
-    private fun showEditAliasDialog() {
-
+    private fun showEditBaseNodeDialog() {
         var saveAction: () -> Boolean = { false }
         val title = HeadModule(
-            title = resourceManager.getString(R.string.restore_from_seed_words_form_title),
-            rightButtonTitle = resourceManager.getString(R.string.contact_book_add_contact_done_button),
+            title = resourceManager.getString(R.string.add_base_node_form_title),
+            rightButtonTitle = resourceManager.getString(R.string.add_base_node_action_button),
             rightButtonAction = { saveAction() },
         )
-        val addressInput = InputModule(
-            value = customBaseNodeState.value.customBaseNode?.toString().orEmpty(),
-            hint = resourceManager.getString(R.string.restore_from_seed_words_form_hint),
+        val nameInput = InputModule(
+            value = customBaseNodeState.value.customBaseNode?.name.orEmpty(),
+            hint = resourceManager.getString(R.string.add_base_node_name_hint),
             isFirst = true,
-            isEnd = false,
+            onDoneAction = { saveAction() },
+        )
+        val hexInput = InputModule(
+            value = customBaseNodeState.value.customBaseNode?.publicKeyHex.orEmpty(),
+            hint = resourceManager.getString(R.string.add_base_node_hex_hint),
+            onDoneAction = { saveAction() },
+        )
+        val addressInput = InputModule(
+            value = customBaseNodeState.value.customBaseNode?.address.orEmpty(),
+            hint = resourceManager.getString(R.string.add_base_node_address_hint),
+            isEnd = true,
             onDoneAction = { saveAction() },
         )
         saveAction = {
-            customBaseNodeEntered(addressInput.value)
+            customBaseNodeEntered(nameInput.value, hexInput.value, addressInput.value)
             true
         }
 
@@ -349,20 +358,21 @@ class InputSeedWordsViewModel : CommonViewModel() {
                 dialogArgs = DialogArgs(),
                 modules = mutableListOf(
                     title,
+                    nameInput,
+                    hexInput,
                     addressInput,
                 )
             )
         )
     }
 
-    private fun customBaseNodeEntered(enteredAddress: String) {
+    private fun customBaseNodeEntered(enteredName: String, enteredHex: String, enteredAddress: String) {
         dismissDialog.postValue(Unit)
-        if (baseNodesManager.isValidBaseNode(enteredAddress)) {
-            val (hex, address) = enteredAddress.split("::")
+        if (baseNodesManager.isValidBaseNode("$enteredHex::$enteredAddress")) {
             val baseNode = BaseNodeDto(
-                name = resourceManager.getString(R.string.restore_from_seed_words_custom_node_name),
-                publicKeyHex = hex,
-                address = address,
+                name = enteredName.takeIf { it.isNotBlank() } ?: resourceManager.getString(R.string.add_base_node_default_name_custom),
+                publicKeyHex = enteredHex,
+                address = enteredAddress,
                 isCustom = true,
             )
             _customBaseNodeState.update { it.copy(customBaseNode = baseNode) }

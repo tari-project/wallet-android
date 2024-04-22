@@ -545,8 +545,6 @@
     <string name="restore_from_seed_words_custom_node_name">Recovery Base Node</string>
     <string name="restore_from_seed_words_button_select_base_node_select">Select Custom Base Node</string>
     <string name="restore_from_seed_words_button_select_base_node_edit">Edit Base Node</string>
-    <string name="restore_from_seed_words_form_title">Enter Custom Base Node</string>
-    <string name="restore_from_seed_words_form_hint">Enter Base Node Address</string>
     <string name="restore_from_seed_words_form_error_message">Oops, looks like the address you entered isn\'t good. We had to revert your change.</string>
 
     <string name="restore_from_seed_words_error_invalid_seed_word">At least one of the entered seed words is invalid. Please review them and try again</string>
@@ -898,5 +896,13 @@
     <string name="pin_code_subtitle_auth">Enter your passcode to log in</string>
     <string name="pin_code_subtitle_feature_auth">Enter your passcode to proceed</string>
     <string name="pin_code_error_message">Wrong passcode</string>
+
+
+    <string name="add_base_node_form_title">Add Base Node</string>
+    <string name="add_base_node_address_hint">Address</string>
+    <string name="add_base_node_name_hint">Name</string>
+    <string name="add_base_node_hex_hint">Hex</string>
+    <string name="add_base_node_action_button">Save</string>
+    <string name="add_base_node_default_name_custom">Custom</string>
 
 </resources>

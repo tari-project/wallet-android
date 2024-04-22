@@ -2,7 +2,8 @@
 <com.tari.android.wallet.ui.component.tari.TariPrimaryBackground xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:foreground="?attr/selectableItemBackground">
 
     <com.tari.android.wallet.ui.component.tari.TariTextView
         android:id="@+id/tvName"
@@ -66,6 +67,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:background="@null"
+            android:foreground="?attr/selectableItemBackgroundBorderless"
             android:text="@string/common_delete"
             android:textAllCaps="false"
             android:textColor="?attr/palette_system_red"

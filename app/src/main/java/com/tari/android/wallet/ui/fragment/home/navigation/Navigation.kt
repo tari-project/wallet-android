@@ -31,10 +31,6 @@ sealed class Navigation {
         class ToSeedPhraseVerification(val seedWords: List<String>) : VerifySeedPhraseNavigation()
     }
 
-    sealed class BaseNodeNavigation : Navigation() {
-        object ToAddCustomBaseNode : BaseNodeNavigation()
-    }
-
     sealed class TorBridgeNavigation : Navigation() {
         object ToCustomBridges : TorBridgeNavigation()
     }
