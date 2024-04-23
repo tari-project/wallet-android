@@ -49,7 +49,6 @@ import com.tari.android.wallet.ui.fragment.home.homeTransactionHistory.HomeTrans
 import com.tari.android.wallet.ui.fragment.home.navigation.Navigation.AddAmountNavigation
 import com.tari.android.wallet.ui.fragment.home.navigation.Navigation.AllSettingsNavigation
 import com.tari.android.wallet.ui.fragment.home.navigation.Navigation.BackupSettingsNavigation
-import com.tari.android.wallet.ui.fragment.home.navigation.Navigation.BaseNodeNavigation
 import com.tari.android.wallet.ui.fragment.home.navigation.Navigation.ChatNavigation
 import com.tari.android.wallet.ui.fragment.home.navigation.Navigation.ChooseRestoreOptionNavigation
 import com.tari.android.wallet.ui.fragment.home.navigation.Navigation.ContactBookNavigation
@@ -83,7 +82,6 @@ import com.tari.android.wallet.ui.fragment.settings.backup.changeSecurePassword.
 import com.tari.android.wallet.ui.fragment.settings.backup.enterCurrentPassword.EnterCurrentPasswordFragment
 import com.tari.android.wallet.ui.fragment.settings.backup.verifySeedPhrase.VerifySeedPhraseFragment
 import com.tari.android.wallet.ui.fragment.settings.backup.writeDownSeedWords.WriteDownSeedPhraseFragment
-import com.tari.android.wallet.ui.fragment.settings.baseNodeConfig.addBaseNode.AddCustomBaseNodeFragment
 import com.tari.android.wallet.ui.fragment.settings.baseNodeConfig.changeBaseNode.ChangeBaseNodeFragment
 import com.tari.android.wallet.ui.fragment.settings.bluetoothSettings.BluetoothSettingsFragment
 import com.tari.android.wallet.ui.fragment.settings.dataCollection.DataCollectionFragment
@@ -162,7 +160,6 @@ class TariNavigator @Inject constructor(val prefs: SharedPrefsRepository, val ta
             is TxListNavigation.ToTransfer -> addFragment(TransferFragment())
             is TxListNavigation.HomeTransactionHistory -> addFragment(HomeTransactionHistoryFragment())
             is TorBridgeNavigation.ToCustomBridges -> toCustomTorBridges()
-            is BaseNodeNavigation.ToAddCustomBaseNode -> toAddCustomBaseNode()
             is VerifySeedPhraseNavigation.ToSeedPhraseVerificationComplete -> onSeedPhraseVerificationComplete()
             is VerifySeedPhraseNavigation.ToSeedPhraseVerification -> toSeedPhraseVerification(navigation.seedWords)
             is BackupSettingsNavigation.ToChangePassword -> toChangePassword()
@@ -253,8 +250,6 @@ class TariNavigator @Inject constructor(val prefs: SharedPrefsRepository, val ta
     private fun toCustomTorBridges() = addFragment(CustomTorBridgesFragment())
 
     private fun toNetworkSelection() = addFragment(NetworkSelectionFragment())
-
-    private fun toAddCustomBaseNode() = addFragment(AddCustomBaseNodeFragment())
 
     fun toWalletBackupWithRecoveryPhrase() = addFragment(WriteDownSeedPhraseFragment())
 
