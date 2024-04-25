@@ -1,7 +1,6 @@
 package com.tari.android.wallet.service.service
 
 import com.orhanobut.logger.Logger
-import com.orhanobut.logger.Printer
 import com.tari.android.wallet.application.TariWalletApplication
 import com.tari.android.wallet.application.baseNodes.BaseNodesManager
 import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodeSharedRepository
@@ -50,7 +49,8 @@ class FFIWalletListenerImpl(
     private val baseNodesManager: BaseNodesManager
 ) : FFIWalletListener {
 
-    private val logger: Printer = Logger.t("FFIWalletListenerImpl")
+    private val logger
+        get() = Logger.t("FFIWalletListenerImpl")
     var listeners = CopyOnWriteArrayList<TariWalletServiceListener>()
 
     /**
