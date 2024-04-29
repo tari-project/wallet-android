@@ -59,9 +59,12 @@ enum class TariFont(private val fileName: String) {
         private const val sScheme = "http://schemas.android.com/apk/res-auto"
         private const val sAttribute = "customFont"
 
+        /**
+         * Get font from attribute set. The default font is Medium.
+         */
         fun getFromAttributeSet(context: Context, attr: AttributeSet): Typeface {
-            val fontName = attr.getAttributeValue(sScheme, sAttribute).toInt()
-            val uiFont = UIFont.values()[fontName]
+            val fontName = attr.getAttributeValue(sScheme, sAttribute)?.toInt()
+            val uiFont = fontName?.let { UIFont.entries[it] } ?: UIFont.Medium
             return uiFont.toTariFont().asTypeface(context)
         }
     }

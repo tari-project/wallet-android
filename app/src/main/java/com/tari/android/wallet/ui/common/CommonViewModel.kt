@@ -27,6 +27,7 @@ import com.tari.android.wallet.ui.component.tari.toast.TariToastArgs
 import com.tari.android.wallet.ui.dialog.error.WalletErrorArgs
 import com.tari.android.wallet.ui.dialog.inProgress.ProgressDialogArgs
 import com.tari.android.wallet.ui.dialog.modular.DialogArgs
+import com.tari.android.wallet.ui.dialog.modular.IDialogModule
 import com.tari.android.wallet.ui.dialog.modular.ModularDialogArgs
 import com.tari.android.wallet.ui.dialog.modular.modules.body.BodyModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonModule
@@ -180,4 +181,24 @@ open class CommonViewModel : ViewModel() {
     }
 
     fun doOnBackground(action: suspend CoroutineScope.() -> Unit): Job = viewModelScope.launch { action() }
+
+    fun showModularDialog(args: ModularDialogArgs) {
+        modularDialog.postValue(args)
+    }
+
+    fun showModularDialog(vararg modules: IDialogModule) {
+        modularDialog.postValue(ModularDialogArgs(modules = modules.toList()))
+    }
+
+    fun showLoadingDialog(progressArgs: ProgressDialogArgs) {
+        _loadingDialog.postValue(progressArgs)
+    }
+
+    fun showInputModalDialog(inputArgs: ModularDialogArgs) {
+        _inputDialog.postValue(inputArgs)
+    }
+
+    fun hideDialog() {
+        dismissDialog.postValue(Unit)
+    }
 }
