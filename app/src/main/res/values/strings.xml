@@ -897,12 +897,19 @@
     <string name="pin_code_subtitle_feature_auth">Enter your passcode to proceed</string>
     <string name="pin_code_error_message">Wrong passcode</string>
 
-
     <string name="add_base_node_form_title">Add Base Node</string>
     <string name="add_base_node_address_hint">Address</string>
     <string name="add_base_node_name_hint">Name</string>
     <string name="add_base_node_hex_hint">Hex</string>
     <string name="add_base_node_action_button">Save</string>
     <string name="add_base_node_default_name_custom">Custom</string>
+
+    <string name="address_poisoning_title">Heads Up!</string>
+    <string name="address_poisoning_title_description">Looks like there are %s very similar addresses in your contact book. Please double check that you’re sending to the right one!</string>
+    <string name="address_poisoning_number_of_transactions">No of transactions: %s</string>
+    <string name="address_poisoning_last_transaction">Last transaction date: %s</string>
+    <string name="address_poisoning_last_transaction_never">Never</string>
+    <string name="address_poisoning_this_trust_account">This is a trusted contact</string>
+    <string name="address_poisoning_trust_disclaimer">Marking a contact as trusted means you trust this person and we won’t ask you to double check the address again.</string>
 
 </resources>

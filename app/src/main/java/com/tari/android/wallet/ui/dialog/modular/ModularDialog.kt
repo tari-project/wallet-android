@@ -17,6 +17,8 @@ import com.tari.android.wallet.data.sharedPrefs.securityStages.modules.SecurityS
 import com.tari.android.wallet.ui.component.networkStateIndicator.module.ConnectionStatusesModule
 import com.tari.android.wallet.ui.component.networkStateIndicator.module.ConnectionStatusesModuleView
 import com.tari.android.wallet.ui.dialog.TariDialog
+import com.tari.android.wallet.ui.dialog.modular.modules.addressPoisoning.AddressPoisoningModule
+import com.tari.android.wallet.ui.dialog.modular.modules.addressPoisoning.AddressPoisoningModuleView
 import com.tari.android.wallet.ui.dialog.modular.modules.body.BodyModule
 import com.tari.android.wallet.ui.dialog.modular.modules.body.BodyModuleView
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonModule
@@ -130,6 +132,7 @@ open class ModularDialog(val context: Context) : TariDialog {
                 is InputModule -> InputModuleView(context, module)
                 is ShortEmojiIdModule -> ShortEmojiModuleView(context, module)
                 is IconModule -> IconModuleView(context, module)
+                is AddressPoisoningModule -> AddressPoisoningModuleView(context, module)
                 else -> View(context)
             }
             root.addView(view)
