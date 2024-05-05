@@ -25,7 +25,7 @@ class FFIContactDto() : IContact() {
         setAlias(tariContact.alias)
     }
 
-    fun setAlias(alias: String) {
+    private fun setAlias(alias: String) {
         val (firstName, secondName) = alias.split(" ", limit = 2).toMutableList().apply { if (size == 1) this.add("") }
         this.firstName = firstName
         this.surname = secondName
