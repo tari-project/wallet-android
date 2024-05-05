@@ -55,7 +55,6 @@ import com.tari.android.wallet.databinding.ActivityHomeBinding
 import com.tari.android.wallet.di.DiContainer.appComponent
 import com.tari.android.wallet.extension.observe
 import com.tari.android.wallet.model.TxId
-import com.tari.android.wallet.service.connection.ServiceConnectionStatus
 import com.tari.android.wallet.service.service.WalletServiceLauncher
 import com.tari.android.wallet.ui.common.CommonActivity
 import com.tari.android.wallet.ui.common.domain.ResourceManager
@@ -170,7 +169,7 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>() {
 
         if (savedInstanceState == null) {
             enableNavigationView(ui.homeImageView)
-            viewModel.doOnConnected {
+            viewModel.doOnWalletServiceConnected {
                 ui.root.postDelayed({
                     processIntentDeepLink(intent)
                 }, Constants.UI.mediumDurationMs)
@@ -217,7 +216,7 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>() {
 
         // onNewIntent might get called before onCreate, so we anticipate that here
         checkScreensDeeplink(intent)
-        if (viewModel.serviceConnection.currentState.status == ServiceConnectionStatus.CONNECTED) {
+        if (viewModel.serviceConnection.isWalletServiceConnected()) {
             processIntentDeepLink(intent)
         } else {
             setIntent(intent)

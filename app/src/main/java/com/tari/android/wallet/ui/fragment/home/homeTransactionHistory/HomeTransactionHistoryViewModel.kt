@@ -2,13 +2,12 @@ package com.tari.android.wallet.ui.fragment.home.homeTransactionHistory
 
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.toLiveData
+import com.tari.android.wallet.extension.collectFlow
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.common.recyclerView.CommonViewHolderItem
 import com.tari.android.wallet.ui.fragment.contact_book.data.ContactsRepository
 import com.tari.android.wallet.ui.fragment.tx.TransactionRepository
 import com.tari.android.wallet.ui.fragment.tx.adapter.TransactionItem
-import io.reactivex.BackpressureStrategy
 import javax.inject.Inject
 
 class HomeTransactionHistoryViewModel : CommonViewModel() {
@@ -19,24 +18,23 @@ class HomeTransactionHistoryViewModel : CommonViewModel() {
     @Inject
     lateinit var contactsRepository: ContactsRepository
 
-    var list = MediatorLiveData<MutableList<CommonViewHolderItem>>()
-
-    val searchText = MutableLiveData("")
+    var list = MediatorLiveData<List<CommonViewHolderItem>>()
 
     val searchBarVisible = MutableLiveData(false)
-    val searchEmptyStateVisible = MutableLiveData(false)
     val txEmptyStateVisible = MutableLiveData(false)
     val txListVisible = MutableLiveData(false)
+
+    private val searchText = MutableLiveData("")
+    private val searchEmptyStateVisible = MutableLiveData(false)
 
     init {
         component.inject(this)
 
-        list.addSource(contactsRepository.publishSubject.toFlowable(BackpressureStrategy.LATEST).toLiveData()) {
+        collectFlow(contactsRepository.contactList) {
             updateList()
         }
 
         list.addSource(transactionRepository.list) { updateList() }
-
         list.addSource(searchText) { updateList() }
     }
 

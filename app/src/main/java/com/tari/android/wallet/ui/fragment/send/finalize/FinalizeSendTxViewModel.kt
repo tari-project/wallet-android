@@ -109,7 +109,7 @@ class FinalizeSendTxViewModel : CommonViewModel() {
             }
         }
 
-        override fun execute() = doOnConnected { onServiceConnected() }
+        override fun execute() = doOnWalletServiceConnected { onServiceConnected() }
 
         private fun onServiceConnected() {
             // start checking network connection

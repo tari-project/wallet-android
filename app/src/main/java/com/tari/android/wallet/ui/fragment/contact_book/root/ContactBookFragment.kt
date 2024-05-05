@@ -17,6 +17,7 @@ import com.google.android.material.tabs.TabLayoutMediator
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.deeplinks.DeeplinkViewModel
 import com.tari.android.wallet.databinding.FragmentContactBookRootBinding
+import com.tari.android.wallet.extension.collectFlow
 import com.tari.android.wallet.extension.observe
 import com.tari.android.wallet.model.TariWalletAddress
 import com.tari.android.wallet.ui.common.CommonFragment
@@ -61,9 +62,7 @@ class ContactBookFragment : CommonFragment<FragmentContactBookRootBinding, Conta
 
         subscribeUI()
 
-        grantPermission()
-
-//        initTests()
+        viewModel.grantPermission()
     }
 
     override fun onResume() {
@@ -80,9 +79,9 @@ class ContactBookFragment : CommonFragment<FragmentContactBookRootBinding, Conta
     }
 
     private fun subscribeUI() = with(viewModel) {
-        observe(contactsRepository.loadingState) {
-            ui.isSyncingProgressBar.setVisible(it.isLoading)
-            ui.syncingStatus.text = it.name + " " + it.time + "s"
+        collectFlow(contactsRepository.loadingState) { loadingState ->
+            ui.isSyncingProgressBar.setVisible(loadingState.isLoading)
+            ui.syncingStatus.text = getString(R.string.contact_book_loading_sec, loadingState.name, loadingState.time.toString())
         }
 
         observe(contactSelectionRepository.isSelectionState) { updateSharedState() }
@@ -96,19 +95,6 @@ class ContactBookFragment : CommonFragment<FragmentContactBookRootBinding, Conta
         observe(shareList) { updateShareList(it) }
 
         observe(query) { ui.searchView.setQuery(it, true) }
-    }
-
-    private fun grantPermission() {
-        viewModel.permissionManager.runWithPermission(listOf(android.Manifest.permission.READ_CONTACTS), true) {
-            viewModel.contactsRepository.contactPermission.value = true
-            viewModel.contactsRepository.phoneBookRepositoryBridge.loadFromPhoneBook()
-        }
-    }
-
-    private fun initTests() {
-        ui.testButtons.visibility = View.VISIBLE
-        ui.removeAllButton.setOnClickListener { viewModel.contactsRepository.phoneBookRepositoryBridge.clean() }
-        ui.add1000Button.setOnClickListener { viewModel.contactsRepository.phoneBookRepositoryBridge.addTestContacts() }
     }
 
     private fun setupUI() {

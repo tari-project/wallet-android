@@ -41,7 +41,7 @@ class ChatViewModel : CommonViewModel() {
     fun startWith(walletAddress: TariWalletAddress) {
         userAddress.postValue(walletAddress)
 
-        val contact = contactsRepository.ffiBridge.getContactByAddress(walletAddress)
+        val contact = contactsRepository.getContactByAddress(walletAddress)
         this.contact.postValue(contact)
 
         val chat = chatRepository.getByWalletAddress(walletAddress)
