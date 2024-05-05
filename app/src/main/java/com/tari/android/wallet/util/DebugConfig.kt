@@ -45,6 +45,7 @@ import com.tari.android.wallet.model.TxStatus
 import com.tari.android.wallet.ui.common.gyphy.presentation.GIFViewModel
 import com.tari.android.wallet.ui.common.gyphy.repository.GIFRepository
 import com.tari.android.wallet.ui.common.recyclerView.items.TitleViewHolderItem
+import com.tari.android.wallet.ui.fragment.contact_book.address_poisoning.SimilarAddressItem
 import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.ContactDto
 import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.FFIContactDto
 import com.tari.android.wallet.ui.fragment.tx.adapter.TransactionItem
@@ -65,6 +66,8 @@ object DebugConfig {
     val mockUtxos = valueIfDebug(false)
 
     val mockTxs = valueIfDebug(false)
+
+    val mockAddressPoisoning: Boolean = valueIfDebug(true)
 
     const val isChatEnabled = false
 
@@ -153,11 +156,11 @@ object MockDataStub {
             message = "https://giphy.com/embed/5885nYOgBHdCw",
             timestamp = BigInteger.valueOf(System.currentTimeMillis()),
             id = 1.toBigInteger(),
-            tariContact = TariContact(WALLET_ADDRESS_ZERO, contactAlias),
+            tariContact = TariContact(WALLET_ADDRESS, contactAlias),
         ),
         contact = ContactDto(
             contact = FFIContactDto(
-                walletAddress = WALLET_ADDRESS_ZERO,
+                walletAddress = WALLET_ADDRESS,
                 alias = contactAlias,
             ),
         ),
@@ -165,6 +168,26 @@ object MockDataStub {
         viewModel = GIFViewModel(gifRepository),
         requiredConfirmationCount = confirmationCount,
     )
+
+    fun createSimilarAddressList() = listOf(
+        createSimilarAddress(),
+        createSimilarAddress().copy(trusted = true),
+        createSimilarAddress().copy(lastItem = true),
+    )
+
+    fun createSimilarAddress(): SimilarAddressItem {
+        return SimilarAddressItem(
+            contact = ContactDto(
+                contact = FFIContactDto(
+                    walletAddress = WALLET_ADDRESS,
+                    alias = "Alice",
+                ),
+            ),
+            numberOfTransaction = 10,
+            lastTransactionDate = DateTime.now().toDate(),
+            trusted = false,
+        )
+    }
 }
 
 object YatEnvironment {
