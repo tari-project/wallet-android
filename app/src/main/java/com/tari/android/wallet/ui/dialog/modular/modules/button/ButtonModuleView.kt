@@ -9,7 +9,6 @@ import com.tari.android.wallet.R
 import com.tari.android.wallet.databinding.DialogModuleButtonBinding
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.component.common.CommonView
-import com.tari.android.wallet.ui.extension.dimenPx
 import com.tari.android.wallet.ui.extension.setOnThrottledClickListener
 
 class ButtonModuleView : CommonView<CommonViewModel, DialogModuleButtonBinding> {
@@ -47,8 +46,6 @@ class ButtonModuleView : CommonView<CommonViewModel, DialogModuleButtonBinding> 
                 ui.button.background = null
             }
         }
-        val dimen = if (buttonModule.style == ButtonStyle.Close) R.dimen.common_action_button_close_height else R.dimen.common_action_button_height
-        ui.button.layoutParams.height = context.dimenPx(dimen)
         ui.button.requestLayout()
         ui.button.setOnThrottledClickListener {
             buttonModule.action()

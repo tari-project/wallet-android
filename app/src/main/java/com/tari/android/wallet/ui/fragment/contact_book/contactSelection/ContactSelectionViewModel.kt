@@ -17,6 +17,7 @@ import com.tari.android.wallet.ui.common.recyclerView.CommonViewHolderItem
 import com.tari.android.wallet.ui.common.recyclerView.items.TitleViewHolderItem
 import com.tari.android.wallet.ui.component.clipboardController.WalletAddressViewModel
 import com.tari.android.wallet.ui.fragment.chat_list.data.ChatsRepository
+import com.tari.android.wallet.ui.fragment.contact_book.address_poisoning.AddressPoisoningChecker
 import com.tari.android.wallet.ui.fragment.contact_book.contactSelection.ContactSelectionModel.Effect
 import com.tari.android.wallet.ui.fragment.contact_book.contactSelection.ContactSelectionModel.YatState
 import com.tari.android.wallet.ui.fragment.contact_book.contacts.adapter.contact.ContactItem
@@ -57,6 +58,9 @@ class ContactSelectionViewModel : CommonViewModel() {
 
     @Inject
     lateinit var chatsRepository: ChatsRepository
+
+    @Inject
+    lateinit var addressPoisoningChecker: AddressPoisoningChecker
 
     var additionalFilter: (ContactItem) -> Boolean = { true }
 
@@ -223,6 +227,29 @@ class ContactSelectionViewModel : CommonViewModel() {
                 )
             }
         }
+    }
+
+    private fun showAddressPoisonedDialog(walletAddress: TariWalletAddress) {
+        showModularDialog(
+            AddressPoisoningModule(
+                addresses = addressPoisoningChecker.getSimilarContactList(walletAddress),
+            ),
+            ButtonModule(
+                text = resourceManager.getString(R.string.common_continue),
+                style = ButtonStyle.Normal,
+                action = {
+                    similarAddressDialogContinueClick()
+                }
+            ),
+            ButtonModule(
+                text = resourceManager.getString(R.string.common_cancel),
+                style = ButtonStyle.Close,
+            ),
+        )
+    }
+
+    private fun similarAddressDialogContinueClick() {
+        TODO("Not yet implemented")
     }
 
     companion object {

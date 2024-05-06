@@ -9,6 +9,7 @@
     <com.tari.android.wallet.ui.component.tari.TariButton
         android:id="@+id/button"
         android:layout_width="match_parent"
+        android:foreground="?attr/selectableItemBackground"
         android:layout_height="@dimen/common_action_button_height"
         android:layout_gravity="center_horizontal"
         android:layout_marginHorizontal="30dp"

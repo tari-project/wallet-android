@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <HorizontalScrollView
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:scrollbars="none">
+
+        <com.tari.android.wallet.ui.component.tari.TariTextView
+            android:id="@+id/text_emoji_address"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:lines="1"
+            android:maxLines="1"
+            android:paddingHorizontal="10dp"
+            android:paddingBottom="8dp"
+            android:scrollHorizontally="true"
+            android:textColor="?attr/palette_text_body"
+            android:textSize="18sp"
+            app:customFont="medium"
+            tools:text="🌋🌈🚧 l 🎓👙👻🎂🐑🌰🎬🍀🍴🎩🍑🌞🔪🐜🏆🐵👓🚜🎉🐶💨💼🐜💩🐛💺🐩l👙🎂💸" />
+    </HorizontalScrollView>
+
+    <com.tari.android.wallet.ui.component.tari.TariTextView
+        android:id="@+id/text_contact_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="10dp"
+        android:textColor="?attr/palette_text_body"
+        android:textSize="14sp"
+        app:customFont="heavy"
+        tools:text="John Doe" />
+
+    <com.tari.android.wallet.ui.component.tari.TariTextView
+        android:id="@+id/text_number_transactions"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="10dp"
+        android:layout_marginTop="4dp"
+        android:textColor="?attr/palette_text_body"
+        android:textSize="14sp"
+        app:customFont="medium"
+        tools:text="No of transactions: 3" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="10dp"
+        android:layout_marginTop="4dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <com.tari.android.wallet.ui.component.tari.TariTextView
+            android:id="@+id/text_last_transaction_date"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:textColor="?attr/palette_text_body"
+            android:textSize="14sp"
+            app:customFont="medium"
+            tools:text="Last transaction date: 25 Nov 2023" />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/icon_trusted"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/vector_shield_checkmark"
+            android:tint="?attr/palette_text_links" />
+    </LinearLayout>
+</LinearLayout>

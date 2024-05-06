@@ -37,7 +37,8 @@ class BaseNodesManager @Inject constructor(
     private val baseNodeSharedRepository: BaseNodeSharedRepository,
     private val networkRepository: NetworkRepository,
 ) {
-    private val logger = Logger.t(this::class.simpleName)
+    private val logger
+        get() = Logger.t(this::class.simpleName)
 
     private val compositeDisposable = CompositeDisposable()
 

@@ -59,7 +59,7 @@ import com.tari.android.wallet.ui.extension.visible
 import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.EmojiUtil
 import com.tari.android.wallet.util.EmojiUtil.Companion.getGraphemeLength
-import com.tari.android.wallet.util.EmojiUtil.Companion.smallEmojiIdSize
+import com.tari.android.wallet.util.EmojiUtil.Companion.SMALL_EMOJI_ID_SIZE
 import me.everything.android.ui.overscroll.OverScrollDecoratorHelper
 
 /**
@@ -280,7 +280,7 @@ class FullEmojiIdViewController(
     }
 
     private fun smoothScrollToStart() = with(ui.fullEmojiIdScrollView) {
-        if (_fullEmojiId.getGraphemeLength() > smallEmojiIdSize) {
+        if (_fullEmojiId.getGraphemeLength() > SMALL_EMOJI_ID_SIZE) {
             postDelayed({ smoothScrollTo(0, 0) }, Constants.UI.shortDurationMs + 20)
         }
     }

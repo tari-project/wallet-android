@@ -30,42 +30,47 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.tari.android.wallet.ui.component.tari
+package com.tari.android.wallet.data.sharedPrefs.addressPoisoning
 
-import android.content.Context
-import android.graphics.Typeface
-import android.util.AttributeSet
+import android.content.SharedPreferences
+import com.tari.android.wallet.data.repository.CommonRepository
+import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefGsonDelegate
+import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
+import com.tari.android.wallet.data.sharedPrefs.network.formatKey
+import javax.inject.Inject
+import javax.inject.Singleton
 
-/**
- * Custom font enumeration - used in layout files.
- *
- * @author The Tari Development Team
- */
-enum class TariFont(private val fileName: String) {
+@Singleton
+class AddressPoisoningSharedRepository @Inject constructor(
+    sharedPrefs: SharedPreferences,
+    networkRepository: NetworkRepository,
+) : CommonRepository(networkRepository) {
 
-    // font files
-    AVENIR_LT_STD_BLACK("fonts/AvenirLTStd-Black.otf"),
-    AVENIR_LT_STD_HEAVY("fonts/AvenirLTStd-Heavy.otf"),
-    AVENIR_LT_STD_MEDIUM("fonts/AvenirLTStd-Medium.otf"),
-    AVENIR_LT_STD_ROMAN("fonts/AvenirLTStd-Roman.otf"),
-    AVENIR_NEXT_LT_PRO_REGULAR("fonts/AvenirNextLTPro-Regular.otf"),
-    AVENIR_LT_STD_LIGHT("fonts/AvenirLTStd-Light.otf");
-
-    fun asTypeface(context: Context): Typeface {
-        return Typeface.createFromAsset(context.assets, fileName)
+    private object Key {
+        const val TRUSTED_CONTACT_LIST = "TRUSTED_CONTACT_LIST"
     }
 
-    companion object {
-        private const val sScheme = "http://schemas.android.com/apk/res-auto"
-        private const val sAttribute = "customFont"
+    private var trustedContactList: TrustedContactList by SharedPrefGsonDelegate(
+        prefs = sharedPrefs,
+        commonRepository = this,
+        name = formatKey(Key.TRUSTED_CONTACT_LIST),
+        type = TrustedContactList::class.java,
+        defValue = TrustedContactList(),
+    )
 
-        /**
-         * Get font from attribute set. The default font is Medium.
-         */
-        fun getFromAttributeSet(context: Context, attr: AttributeSet): Typeface {
-            val fontName = attr.getAttributeValue(sScheme, sAttribute)?.toInt()
-            val uiFont = fontName?.let { UIFont.entries[it] } ?: UIFont.Medium
-            return uiFont.toTariFont().asTypeface(context)
-        }
+    fun addTrustedContact(contact: String) {
+        trustedContactList = TrustedContactList(trustedContactList + contact)
+    }
+
+    fun removeTrustedContact(contact: String) {
+        trustedContactList = TrustedContactList(trustedContactList - contact)
+    }
+
+    fun getTrustedContactList(): List<String> {
+        return trustedContactList
+    }
+
+    fun clear() {
+        trustedContactList = TrustedContactList()
     }
 }
