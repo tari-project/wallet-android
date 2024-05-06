@@ -127,7 +127,7 @@ class ContactDetailsViewModel : CommonViewModel() {
         ContactAction.ToFavorite.let {
             if (availableActions.contains(it)) {
                 newList += SettingsRowViewDto(resourceManager.getString(it.title), iconId = R.drawable.tari_empty_drawable) {
-                    this.contact.value = contactsRepository.toggleFavorite(contact)
+                    toggleFavorite(contact)
                 }
                 newList += DividerViewHolderItem()
             }
@@ -136,7 +136,7 @@ class ContactDetailsViewModel : CommonViewModel() {
         ContactAction.ToUnFavorite.let {
             if (availableActions.contains(it)) {
                 newList += SettingsRowViewDto(resourceManager.getString(it.title), iconId = R.drawable.tari_empty_drawable) {
-                    this.contact.value = contactsRepository.toggleFavorite(contact)
+                    toggleFavorite(contact)
                 }
                 newList += DividerViewHolderItem()
             }
@@ -184,6 +184,12 @@ class ContactDetailsViewModel : CommonViewModel() {
         list.postValue(newList)
     }
 
+    private fun toggleFavorite(contactDto: ContactDto) {
+        viewModelScope.launch(Dispatchers.IO) {
+            contact.value = contactsRepository.toggleFavorite(contactDto)
+        }
+    }
+
     private fun updateYatInfo() = contact.value?.getYatDto()?.let {
         if (updatingJob != null || it.yat.isEmpty()) return@let
 
@@ -225,7 +231,7 @@ class ContactDetailsViewModel : CommonViewModel() {
         yatModule?.let { moduleList.add(it) }
 
         saveAction = {
-            saveDetails(nameModule.value,yatModule?.value ?: "")
+            saveDetails(nameModule.value, yatModule?.value ?: "")
             true
         }
 
@@ -249,13 +255,16 @@ class ContactDetailsViewModel : CommonViewModel() {
     }
 
     private fun saveDetails(newName: String, yat: String = "") {
-        val split = newName.split(" ")
-        val name = split.getOrNull(0).orEmpty().trim()
-        val surname = split.getOrNull(1).orEmpty().trim()
-        val contact = contact.value!!
         updatingJob = null
-        this.contact.value = contactsRepository.updateContactInfo(contact, name, surname, yat)
-        dismissDialog.postValue(Unit)
+        viewModelScope.launch(Dispatchers.IO) {
+            val split = newName.split(" ")
+            val name = split.getOrNull(0).orEmpty().trim()
+            val surname = split.getOrNull(1).orEmpty().trim()
+            val contactDto = contact.value!!
+
+            contact.value = contactsRepository.updateContactInfo(contactDto, name, surname, yat)
+            hideDialog()
+        }
     }
 
     private fun showUnlinkDialog() {
@@ -271,9 +280,11 @@ class ContactDetailsViewModel : CommonViewModel() {
             ShortEmojiIdModule(walletAddress),
             BodyModule(null, SpannableString(secondLineHtml)),
             ButtonModule(resourceManager.getString(common_confirm), Normal) {
-                contactsRepository.unlinkContact(contact.value!!)
-                dismissDialog.value = Unit
-                showUnlinkSuccessDialog()
+                viewModelScope.launch(Dispatchers.IO) {
+                    contactsRepository.unlinkContact(contact.value!!)
+                    hideDialog()
+                    showUnlinkSuccessDialog()
+                }
             },
             ButtonModule(resourceManager.getString(common_cancel), Close)
         )
@@ -281,23 +292,25 @@ class ContactDetailsViewModel : CommonViewModel() {
     }
 
     private fun showUnlinkSuccessDialog() {
-        val mergedDto = contact.value!!.contact as MergedContactDto
-        val walletAddress = mergedDto.ffiContactDto.walletAddress
-        val name = mergedDto.phoneContactDto.firstName
-        val firstLineHtml = HtmlHelper.getSpannedText(resourceManager.getString(contact_book_contacts_book_unlink_success_message_firstLine))
-        val secondLineHtml =
-            HtmlHelper.getSpannedText(resourceManager.getString(contact_book_contacts_book_unlink_success_message_secondLine, name))
+        viewModelScope.launch(Dispatchers.Main) {
+            val mergedDto = contact.value!!.contact as MergedContactDto
+            val walletAddress = mergedDto.ffiContactDto.walletAddress
+            val name = mergedDto.phoneContactDto.firstName
+            val firstLineHtml = HtmlHelper.getSpannedText(resourceManager.getString(contact_book_contacts_book_unlink_success_message_firstLine))
+            val secondLineHtml =
+                HtmlHelper.getSpannedText(resourceManager.getString(contact_book_contacts_book_unlink_success_message_secondLine, name))
 
-        val modules = listOf(
-            HeadModule(resourceManager.getString(contact_book_contacts_book_unlink_success_title)),
-            BodyModule(null, SpannableString(firstLineHtml)),
-            ShortEmojiIdModule(walletAddress),
-            BodyModule(null, SpannableString(secondLineHtml)),
-            ButtonModule(resourceManager.getString(common_close), Close)
-        )
-        modularDialog.postValue(ModularDialogArgs(DialogArgs {
-            navigation.value = Navigation.ContactBookNavigation.BackToContactBook
-        }, modules))
+            val modules = listOf(
+                HeadModule(resourceManager.getString(contact_book_contacts_book_unlink_success_title)),
+                BodyModule(null, SpannableString(firstLineHtml)),
+                ShortEmojiIdModule(walletAddress),
+                BodyModule(null, SpannableString(secondLineHtml)),
+                ButtonModule(resourceManager.getString(common_close), Close)
+            )
+            modularDialog.postValue(ModularDialogArgs(DialogArgs {
+                navigation.value = Navigation.ContactBookNavigation.BackToContactBook
+            }, modules))
+        }
     }
 
     private fun showDeleteContactDialog() {
@@ -305,9 +318,13 @@ class ContactDetailsViewModel : CommonViewModel() {
             HeadModule(resourceManager.getString(contact_book_details_delete_contact)),
             BodyModule(resourceManager.getString(contact_book_details_delete_message)),
             ButtonModule(resourceManager.getString(contact_book_details_delete_button_title), Warning) {
-                contactsRepository.deleteContact(contact.value!!)
-                dismissDialog.postValue(Unit)
-                navigation.value = Navigation.ContactBookNavigation.BackToContactBook
+                viewModelScope.launch(Dispatchers.IO) {
+                    contactsRepository.deleteContact(contact.value!!)
+                    viewModelScope.launch(Dispatchers.Main) {
+                        hideDialog()
+                        navigation.value = Navigation.ContactBookNavigation.BackToContactBook
+                    }
+                }
             },
             ButtonModule(resourceManager.getString(common_close), Close)
         )

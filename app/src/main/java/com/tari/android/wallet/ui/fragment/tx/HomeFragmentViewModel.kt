@@ -1,12 +1,12 @@
 package com.tari.android.wallet.ui.fragment.tx
 
 
+import android.os.Build
 import android.text.SpannableString
 import android.text.Spanned
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.toLiveData
 import androidx.lifecycle.viewModelScope
 import com.tari.android.wallet.R
 import com.tari.android.wallet.R.string.error_no_connection_description
@@ -22,10 +22,10 @@ import com.tari.android.wallet.data.sharedPrefs.sentry.SentryPrefRepository
 import com.tari.android.wallet.event.Event
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.extension.addTo
+import com.tari.android.wallet.extension.collectFlow
 import com.tari.android.wallet.extension.getWithError
 import com.tari.android.wallet.extension.safeCastTo
 import com.tari.android.wallet.model.BalanceInfo
-import com.tari.android.wallet.service.service.WalletServiceLauncher
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.common.SingleLiveEvent
 import com.tari.android.wallet.ui.common.recyclerView.CommonViewHolderItem
@@ -42,10 +42,8 @@ import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
 import com.tari.android.wallet.ui.fragment.send.finalize.TxFailureReason
 import com.tari.android.wallet.ui.fragment.settings.backup.backupOnboarding.item.BackupOnboardingArgs
 import com.tari.android.wallet.ui.fragment.settings.backup.backupOnboarding.module.BackupOnboardingFlowItemModule
-import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupSettingsRepository
 import com.tari.android.wallet.ui.fragment.tx.adapter.TransactionItem
 import com.tari.android.wallet.util.extractEmojis
-import io.reactivex.BackpressureStrategy
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import yat.android.ui.extension.HtmlHelper
@@ -55,13 +53,7 @@ import javax.inject.Inject
 class HomeFragmentViewModel : CommonViewModel() {
 
     @Inject
-    lateinit var backupSettingsRepository: BackupSettingsRepository
-
-    @Inject
     lateinit var sharedPrefsWrapper: SharedPrefsRepository
-
-    @Inject
-    lateinit var walletServiceLauncher: WalletServiceLauncher
 
     @Inject
     lateinit var contactsRepository: ContactsRepository
@@ -92,9 +84,9 @@ class HomeFragmentViewModel : CommonViewModel() {
 
         txList.addSource(transactionRepository.list) { updateList() }
 
-        txList.addSource(contactsRepository.publishSubject.toFlowable(BackpressureStrategy.LATEST).toLiveData()) { updateList() }
+        collectFlow(contactsRepository.contactList) { updateList() }
 
-        doOnConnectedToWallet { doOnConnected { runCatching { onServiceConnected() } } }
+        doOnWalletRunning { doOnWalletServiceConnected { runCatching { onServiceConnected() } } }
 
         val emojies = sharedPrefsWrapper.emojiId.orEmpty().extractEmojis()
         emojiMedium.postValue(emojies.take(3).joinToString(""))
@@ -103,16 +95,33 @@ class HomeFragmentViewModel : CommonViewModel() {
         checkForDataConsent()
     }
 
-
-    private fun updateList() {
-        val list = transactionRepository.list.value ?: return
-        txList.postValue(list.filterIsInstance<TransactionItem>().sortedByDescending { it.tx.timestamp }.take(TRANSACTION_AMOUNT_HOME_PAGE))
-    }
-
     fun processItemClick(item: CommonViewHolderItem) {
         if (item is TransactionItem) {
             navigation.postValue(Navigation.TxListNavigation.ToTxDetails(item.tx))
         }
+    }
+
+    fun checkPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            permissionManager.runWithPermission(listOf(android.Manifest.permission.POST_NOTIFICATIONS)) {
+                logger.i("notification permission checked successfully")
+            }
+        }
+
+        grantContactsPermission()
+    }
+    
+    fun grantContactsPermission() {
+       permissionManager.runWithPermission(listOf(android.Manifest.permission.READ_CONTACTS), true) {
+           viewModelScope.launch(Dispatchers.IO) {
+               contactsRepository.grantContactPermissionAndRefresh()
+           }
+        }
+    }
+
+    private fun updateList() {
+        val list = transactionRepository.list.value ?: return
+        txList.postValue(list.filterIsInstance<TransactionItem>().sortedByDescending { it.tx.timestamp }.take(TRANSACTION_AMOUNT_HOME_PAGE))
     }
 
     private fun checkForDataConsent() {
@@ -159,7 +168,7 @@ class HomeFragmentViewModel : CommonViewModel() {
         }
     }
 
-    fun refreshAllData(isRestarted: Boolean = false) {
+    private fun refreshAllData(isRestarted: Boolean = false) {
         viewModelScope.launch(Dispatchers.IO) {
             refreshBalance(isRestarted)
             transactionRepository.refreshAllData()

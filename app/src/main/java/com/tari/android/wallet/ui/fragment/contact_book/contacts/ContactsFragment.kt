@@ -37,7 +37,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.viewModelScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.tari.android.wallet.databinding.FragmentContactsBinding
 import com.tari.android.wallet.extension.observe
@@ -45,8 +44,6 @@ import com.tari.android.wallet.extension.observeOnLoad
 import com.tari.android.wallet.ui.common.CommonFragment
 import com.tari.android.wallet.ui.common.recyclerView.CommonAdapter
 import com.tari.android.wallet.ui.fragment.contact_book.contacts.adapter.ContactListAdapter
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 
 open class ContactsFragment : CommonFragment<FragmentContactsBinding, ContactsViewModel>() {
 
@@ -61,8 +58,6 @@ open class ContactsFragment : CommonFragment<FragmentContactsBinding, ContactsVi
         val viewModel: ContactsViewModel by viewModels()
         bindViewModel(viewModel)
 
-        viewModel.serviceConnection.reconnectToService()
-
         setupUI()
         observeUI()
     }
@@ -75,7 +70,7 @@ open class ContactsFragment : CommonFragment<FragmentContactsBinding, ContactsVi
             recyclerViewAdapter.update(it)
         }
 
-        observe(grantPermission) { grantPermission() }
+        observe(grantPermission) { viewModel.grantPermission() }
 
         observeOnLoad(listUpdateTrigger)
         observeOnLoad(debouncedList)
@@ -93,15 +88,6 @@ open class ContactsFragment : CommonFragment<FragmentContactsBinding, ContactsVi
         ui.contactsListRecyclerView.layoutManager = LinearLayoutManager(requireContext())
         recyclerViewAdapter.setClickListener(CommonAdapter.ItemClickListener { viewModel.processItemClick(it) })
         ui.contactsListRecyclerView.adapter = recyclerViewAdapter
-    }
-
-    private fun grantPermission() {
-        viewModel.permissionManager.runWithPermission(listOf(android.Manifest.permission.READ_CONTACTS), true) {
-            viewModel.viewModelScope.launch(Dispatchers.IO) {
-                viewModel.contactsRepository.contactPermission.postValue(true)
-                viewModel.contactsRepository.phoneBookRepositoryBridge.loadFromPhoneBook()
-            }
-        }
     }
 }
 

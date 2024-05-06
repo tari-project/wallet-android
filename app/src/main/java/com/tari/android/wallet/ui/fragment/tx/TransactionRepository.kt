@@ -4,11 +4,11 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.map
-import androidx.lifecycle.toLiveData
 import androidx.lifecycle.viewModelScope
 import com.tari.android.wallet.R
 import com.tari.android.wallet.event.Event
 import com.tari.android.wallet.event.EventBus
+import com.tari.android.wallet.extension.collectFlow
 import com.tari.android.wallet.extension.debounce
 import com.tari.android.wallet.extension.getWithError
 import com.tari.android.wallet.extension.repopulate
@@ -29,7 +29,6 @@ import com.tari.android.wallet.ui.fragment.contact_book.data.ContactsRepository
 import com.tari.android.wallet.ui.fragment.tx.adapter.TransactionItem
 import com.tari.android.wallet.util.DebugConfig
 import com.tari.android.wallet.util.MockDataStub
-import io.reactivex.BackpressureStrategy
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.util.concurrent.CopyOnWriteArrayList
@@ -73,15 +72,13 @@ class TransactionRepository @Inject constructor() : CommonViewModel() {
     init {
         component.inject(this)
 
-        doOnConnectedToWallet { doOnConnected { runCatching { onServiceConnected() } } }
+        doOnWalletRunning { doOnWalletServiceConnected { runCatching { onServiceConnected() } } }
     }
 
     private fun onServiceConnected() {
         subscribeToEventBus()
 
-        _listUpdateTrigger.addSource(
-            contactsRepository.publishSubject.toFlowable(BackpressureStrategy.LATEST).toLiveData()
-        ) { _listUpdateTrigger.postValue(Unit) }
+        collectFlow(contactsRepository.contactList) { _listUpdateTrigger.postValue(Unit) }
 
         viewModelScope.launch(Dispatchers.IO) {
             updateTxListData()
@@ -122,7 +119,7 @@ class TransactionRepository @Inject constructor() : CommonViewModel() {
     }
 
     private fun updateTxListData() {
-        doOnConnected {
+        doOnWalletServiceConnected {
             cancelledTxs.repopulate(it.getWithError { error, service -> service.getCancelledTxs(error) }.orEmpty())
             completedTxs.repopulate(it.getWithError { error, service -> service.getCompletedTxs(error) }.orEmpty())
             pendingInboundTxs.repopulate(it.getWithError { error, service -> service.getPendingInboundTxs(error) }.orEmpty())
@@ -149,7 +146,7 @@ class TransactionRepository @Inject constructor() : CommonViewModel() {
                 items.addAll(pendingTxs.mapIndexed { index, tx ->
                     TransactionItem(
                         tx = tx,
-                        contact = contactsRepository.ffiBridge.getContactForTx(tx),
+                        contact = contactsRepository.getContactForTx(tx),
                         position = index,
                         viewModel = GIFViewModel(gifRepository),
                         requiredConfirmationCount = confirmationCount,
@@ -165,7 +162,7 @@ class TransactionRepository @Inject constructor() : CommonViewModel() {
                 items.addAll(nonPendingTxs.mapIndexed { index, tx ->
                     TransactionItem(
                         tx = tx,
-                        contact = contactsRepository.ffiBridge.getContactForTx(tx),
+                        contact = contactsRepository.getContactForTx(tx),
                         position = index + pendingTxs.size,
                         viewModel = GIFViewModel(gifRepository),
                         requiredConfirmationCount = confirmationCount,

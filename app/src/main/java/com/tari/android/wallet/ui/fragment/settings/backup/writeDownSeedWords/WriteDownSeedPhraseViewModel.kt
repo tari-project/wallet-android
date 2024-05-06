@@ -15,7 +15,7 @@ class WriteDownSeedPhraseViewModel : CommonViewModel() {
 
     init {
         _seedWords.value = listOf()
-        doOnConnected { getSeedWords() }
+        doOnWalletServiceConnected { getSeedWords() }
     }
 
     private fun getSeedWords() {

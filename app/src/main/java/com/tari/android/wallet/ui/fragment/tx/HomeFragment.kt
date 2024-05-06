@@ -35,7 +35,6 @@ package com.tari.android.wallet.ui.fragment.tx
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
-import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -88,11 +87,9 @@ class HomeFragment : CommonFragment<FragmentHomeBinding, HomeFragmentViewModel>(
         val viewModel: HomeFragmentViewModel by viewModels()
         bindViewModel(viewModel)
 
-        viewModel.serviceConnection.reconnectToService()
-
         subscribeVM(deeplinkViewModel)
 
-        checkPermission()
+        viewModel.checkPermission()
         setupUI()
         subscribeToViewModel()
         observeUI()
@@ -130,25 +127,13 @@ class HomeFragment : CommonFragment<FragmentHomeBinding, HomeFragmentViewModel>(
 
     override fun onResume() {
         super.onResume()
-        grantPermission()
+        viewModel.grantContactsPermission()
     }
 
     override fun onDestroyView() {
         EventBus.unsubscribe(this)
         EventBus.networkConnectionState.unsubscribe(this)
         super.onDestroyView()
-    }
-
-    private fun checkPermission() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            viewModel.permissionManager.runWithPermission(listOf(android.Manifest.permission.POST_NOTIFICATIONS)) {
-                viewModel.logger.i("notification permission checked successfully")
-            }
-        }
-
-        viewModel.permissionManager.runWithPermission(listOf(android.Manifest.permission.READ_CONTACTS)) {
-            viewModel.contactsRepository.phoneBookRepositoryBridge.loadFromPhoneBook()
-        }
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -167,13 +152,6 @@ class HomeFragment : CommonFragment<FragmentHomeBinding, HomeFragmentViewModel>(
 
         ui.balanceQuestionMark.viewLifecycle = viewLifecycleOwner
         ui.balanceQuestionMark.bindViewModel(questionMarkViewModel)
-    }
-
-    private fun grantPermission() {
-        viewModel.permissionManager.runWithPermission(listOf(android.Manifest.permission.READ_CONTACTS), true) {
-            viewModel.contactsRepository.contactPermission.value = true
-            viewModel.contactsRepository.phoneBookRepositoryBridge.loadFromPhoneBook()
-        }
     }
 
     @Deprecated("Deprecated in Java")

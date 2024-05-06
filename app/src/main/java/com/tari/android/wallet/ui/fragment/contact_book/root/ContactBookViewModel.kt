@@ -1,6 +1,7 @@
 package com.tari.android.wallet.ui.fragment.contact_book.root
 
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.viewModelScope
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.deeplinks.DeepLink
 import com.tari.android.wallet.application.deeplinks.DeeplinkFormatter
@@ -13,6 +14,8 @@ import com.tari.android.wallet.ui.fragment.contact_book.root.share.ShareOptionAr
 import com.tari.android.wallet.ui.fragment.contact_book.root.share.ShareType
 import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
 import com.tari.android.wallet.util.ContactUtil
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 class ContactBookViewModel : CommonViewModel() {
@@ -44,24 +47,24 @@ class ContactBookViewModel : CommonViewModel() {
         val list = mutableListOf<ShareOptionArgs>()
         list.add(
             ShareOptionArgs(
-                ShareType.QR_CODE,
-                resourceManager.getString(R.string.share_contact_via_qr_code),
-                R.drawable.vector_share_qr_code,
-                true
+                type = ShareType.QR_CODE,
+                title = resourceManager.getString(R.string.share_contact_via_qr_code),
+                icon = R.drawable.vector_share_qr_code,
+                isSelected = true,
             ) { shareViaQrCode() }
         )
         list.add(
             ShareOptionArgs(
-                ShareType.LINK,
-                resourceManager.getString(R.string.share_contact_via_qr_link),
-                R.drawable.vector_share_link
+                type = ShareType.LINK,
+                title = resourceManager.getString(R.string.share_contact_via_qr_link),
+                icon = R.drawable.vector_share_link,
             ) { shareViaLink() }
         )
         list.add(
             ShareOptionArgs(
-                ShareType.BLE,
-                resourceManager.getString(R.string.share_contact_via_qr_ble),
-                R.drawable.vector_share_ble
+                type = ShareType.BLE,
+                title = resourceManager.getString(R.string.share_contact_via_qr_ble),
+                icon = R.drawable.vector_share_ble,
             ) { shareViaBLE() }
         )
 
@@ -83,22 +86,24 @@ class ContactBookViewModel : CommonViewModel() {
     }
 
     fun doSearch(query: String) {
-        doOnConnected {
+        doOnWalletServiceConnected {
             walletAddressViewModel.checkFromQuery(it, query)
         }
     }
 
     fun send() {
         val walletAddress = walletAddressViewModel.discoveredWalletAddressFromQuery.value!!
-        val contact = contactsRepository.ffiBridge.getContactByAddress(walletAddress)
+        val contact = contactsRepository.getContactByAddress(walletAddress)
         navigation.postValue(Navigation.TxListNavigation.ToSendTariToUser(contact))
     }
 
-    private fun shareViaQrCode() = setSelectedToShareType(ShareType.QR_CODE)
-
-    private fun shareViaLink() = setSelectedToShareType(ShareType.LINK)
-
-    private fun shareViaBLE() = setSelectedToShareType(ShareType.BLE)
+    fun grantPermission() {
+        permissionManager.runWithPermission(listOf(android.Manifest.permission.READ_CONTACTS), true) {
+            viewModelScope.launch(Dispatchers.IO) {
+                contactsRepository.grantContactPermissionAndRefresh()
+            }
+        }
+    }
 
     fun shareSelectedContacts() {
         val args = shareList.value!!.first { it.isSelected }
@@ -107,6 +112,12 @@ class ContactBookViewModel : CommonViewModel() {
         val deeplink = getDeeplink(selectedContacts)
         ShareViewModel.currentInstant?.share(args.type, deeplink)
     }
+
+    private fun shareViaQrCode() = setSelectedToShareType(ShareType.QR_CODE)
+
+    private fun shareViaLink() = setSelectedToShareType(ShareType.LINK)
+
+    private fun shareViaBLE() = setSelectedToShareType(ShareType.BLE)
 
     private fun getDeeplink(selectedContacts: List<ContactDto>): String {
         val contacts = selectedContacts.map {
@@ -125,5 +136,3 @@ class ContactBookViewModel : CommonViewModel() {
         shareList.postValue(values)
     }
 }
-
-

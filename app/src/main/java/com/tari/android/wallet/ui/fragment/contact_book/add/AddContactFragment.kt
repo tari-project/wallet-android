@@ -6,7 +6,7 @@ import com.tari.android.wallet.R
 import com.tari.android.wallet.ui.extension.string
 import com.tari.android.wallet.ui.extension.visible
 import com.tari.android.wallet.ui.fragment.contact_book.contactSelection.ContactSelectionFragment
-import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
+import com.tari.android.wallet.ui.fragment.contact_book.contactSelection.ContactSelectionViewModel.ContinueButtonEffect
 
 class AddContactFragment : ContactSelectionFragment() {
 
@@ -22,13 +22,6 @@ class AddContactFragment : ContactSelectionFragment() {
     override fun goToNext() {
         super.goToNext()
 
-        val user = viewModel.getUserDto()
-        val fullName = ui.addFirstNameInput.ui.editText.text.toString()
-        val split = fullName.split(" ")
-        val firstName = split.getOrNull(1).orEmpty().trim()
-        val surname = split.getOrNull(0).orEmpty().trim()
-
-        viewModel.contactsRepository.updateContactInfo(user, firstName, surname, "")
-        viewModel.navigation.postValue(Navigation.ContactBookNavigation.BackToContactBook)
+        viewModel.onContinueButtonClick(ContinueButtonEffect.AddContact(name = ui.addFirstNameInput.ui.editText.text.toString()))
     }
 }

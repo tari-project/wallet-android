@@ -6,7 +6,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.map
-import androidx.lifecycle.toLiveData
+import androidx.lifecycle.viewModelScope
 import com.tari.android.wallet.R
 import com.tari.android.wallet.R.string.contact_book_details_phone_contacts
 import com.tari.android.wallet.R.string.contact_book_empty_state_body
@@ -15,12 +15,10 @@ import com.tari.android.wallet.R.string.contact_book_empty_state_favorites_body
 import com.tari.android.wallet.R.string.contact_book_empty_state_favorites_title
 import com.tari.android.wallet.R.string.contact_book_empty_state_grant_access_button
 import com.tari.android.wallet.R.string.contact_book_empty_state_title
-import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
+import com.tari.android.wallet.extension.collectFlow
 import com.tari.android.wallet.extension.debounce
-import com.tari.android.wallet.service.service.WalletServiceLauncher
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.common.SingleLiveEvent
-import com.tari.android.wallet.ui.common.gyphy.repository.GIFRepository
 import com.tari.android.wallet.ui.common.recyclerView.CommonViewHolderItem
 import com.tari.android.wallet.ui.fragment.contact_book.contacts.adapter.contact.ContactItem
 import com.tari.android.wallet.ui.fragment.contact_book.contacts.adapter.contact.ContactlessPaymentItem
@@ -31,27 +29,12 @@ import com.tari.android.wallet.ui.fragment.contact_book.root.ContactSelectionRep
 import com.tari.android.wallet.ui.fragment.contact_book.root.ShareViewModel
 import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
 import com.tari.android.wallet.ui.fragment.settings.allSettings.title.SettingsTitleViewHolderItem
-import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupSettingsRepository
-import io.reactivex.BackpressureStrategy
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import yat.android.ui.extension.HtmlHelper
 import javax.inject.Inject
 
 class ContactsViewModel : CommonViewModel() {
-
-    @Inject
-    lateinit var repository: GIFRepository
-
-    @Inject
-    lateinit var gifRepository: GIFRepository
-
-    @Inject
-    lateinit var backupSettingsRepository: BackupSettingsRepository
-
-    @Inject
-    lateinit var sharedPrefsWrapper: SharedPrefsRepository
-
-    @Inject
-    lateinit var walletServiceLauncher: WalletServiceLauncher
 
     @Inject
     lateinit var contactsRepository: ContactsRepository
@@ -61,19 +44,19 @@ class ContactsViewModel : CommonViewModel() {
 
     var isFavorite = false
 
-    val badgeViewModel = BadgeViewModel()
-
     val grantPermission = SingleLiveEvent<Unit>()
-
-    val sourceList = MutableLiveData<MutableList<ContactItem>>(mutableListOf())
-
-    val filters = MutableLiveData<MutableList<(ContactItem) -> Boolean>>(mutableListOf())
-
-    val searchText = MutableLiveData("")
 
     val selectionTrigger: LiveData<Unit>
 
-    val list = MediatorLiveData<MutableList<CommonViewHolderItem>>()
+    val list = MediatorLiveData<List<CommonViewHolderItem>>()
+
+    private val badgeViewModel = BadgeViewModel()
+
+    private val sourceList = MutableLiveData<List<ContactItem>>(emptyList())
+
+    private val filters = MutableLiveData<List<(ContactItem) -> Boolean>>(emptyList())
+
+    private val searchText = MutableLiveData("")
 
     private val _listUpdateTrigger = MediatorLiveData<Unit>()
     val listUpdateTrigger: LiveData<Unit> = _listUpdateTrigger
@@ -95,7 +78,7 @@ class ContactsViewModel : CommonViewModel() {
 
         list.addSource(selectionTrigger) { _listUpdateTrigger.postValue(Unit) }
 
-        list.addSource(contactsRepository.publishSubject.toFlowable(BackpressureStrategy.LATEST).toLiveData()) { updateContacts() }
+        collectFlow(contactsRepository.contactList) { updateContacts() }
     }
 
     fun processItemClick(item: CommonViewHolderItem) {
@@ -116,22 +99,12 @@ class ContactsViewModel : CommonViewModel() {
         _listUpdateTrigger.postValue(Unit)
     }
 
-    private fun updateContacts() {
-        val newItems =
-            contactsRepository.publishSubject.value!!.filter(contactsRepository.filter).map { contactDto ->
-                ContactItem(
-                    contactDto.copy(contact = contactDto.contact.copy()),
-                    false,
-                    false,
-                    false,
-                    { _, _ ->
-                        //todo suppresed intentionally
-                    },
-                    badgeViewModel
-                )
+    fun grantPermission() {
+        permissionManager.runWithPermission(listOf(android.Manifest.permission.READ_CONTACTS), true) {
+            viewModelScope.launch(Dispatchers.IO) {
+                contactsRepository.grantContactPermissionAndRefresh()
             }
-                .toMutableList()
-        sourceList.postValue(newItems)
+        }
     }
 
     fun search(text: String) {
@@ -139,8 +112,27 @@ class ContactsViewModel : CommonViewModel() {
     }
 
     fun addFilter(filter: (ContactItem) -> Boolean) {
-        filters.value!!.add(filter)
-        filters.value = filters.value
+        filters.value = filters.value!! + filter
+    }
+
+    private fun updateContacts() {
+        collectFlow(contactsRepository.contactListFiltered) { contacts ->
+            val newItems = contacts.map { contactDto ->
+                ContactItem(
+                    contact = contactDto.copy(contact = contactDto.contact.copy()),
+                    isSimple = false,
+                    isSelectionState = false,
+                    isSelected = false,
+                    contactAction = { _, _ ->
+                        //todo suppresed intentionally
+                    },
+                    badgeViewModel = badgeViewModel,
+                )
+            }
+            viewModelScope.launch(Dispatchers.Main) {
+                sourceList.postValue(newItems)
+            }
+        }
     }
 
     private fun updateList() {
@@ -148,7 +140,7 @@ class ContactsViewModel : CommonViewModel() {
         var sourceList = sourceList.value ?: return
         val filters = filters.value ?: return
         val selectedItems = contactSelectionRepository.selectedContacts.map { it.contact.uuid }.toList()
-        sourceList = sourceList.map { it.copy() }.toMutableList()
+        sourceList = sourceList.map { it.copy() }
 
         val resultList = mutableListOf<CommonViewHolderItem>()
         resultList.add(ContactlessPaymentItem())
@@ -160,7 +152,7 @@ class ContactsViewModel : CommonViewModel() {
             item.isSelectionState = contactSelectionRepository.isSelectionState.value ?: false
         }
 
-        if (contactsRepository.contactPermission.value == false || filtered.isEmpty()) {
+        if (contactsRepository.contactPermissionGranted.not() || filtered.isEmpty()) {
             val emptyState = EmptyStateItem(getEmptyTitle(), getBody(), getEmptyImage(), getButtonTitle()) { grantPermission.postValue(Unit) }
             resultList += emptyState
         }
@@ -185,14 +177,14 @@ class ContactsViewModel : CommonViewModel() {
 
     private fun getBody(): SpannedString {
         val resource = if (isFavorite) contact_book_empty_state_favorites_body else
-            (if (contactsRepository.contactPermission.value == true) contact_book_empty_state_body else contact_book_empty_state_body_no_permissions)
+            (if (contactsRepository.contactPermissionGranted) contact_book_empty_state_body else contact_book_empty_state_body_no_permissions)
         return SpannedString(HtmlHelper.getSpannedText(resourceManager.getString(resource)))
     }
 
     private fun getEmptyImage(): Int = if (isFavorite) R.drawable.vector_contact_favorite_empty_state else R.drawable.vector_contact_empty_state
 
     private fun getButtonTitle(): String =
-        if (contactsRepository.contactPermission.value == true) "" else resourceManager.getString(contact_book_empty_state_grant_access_button)
+        if (contactsRepository.contactPermissionGranted) "" else resourceManager.getString(contact_book_empty_state_grant_access_button)
 
     companion object {
         private const val LIST_UPDATE_DEBOUNCE = 200L
