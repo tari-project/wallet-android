@@ -363,7 +363,7 @@ class TariNavigator @Inject constructor(val prefs: SharedPrefsRepository, val ta
 
     fun sendTariToUser(service: TariWalletService, sendDeeplink: DeepLink.Send) {
         val walletAddress = service.getWalletAddressFromHexString(sendDeeplink.walletAddressHex)
-        sendToUser((activity as HomeActivity).viewModel.contactsRepository.ffiBridge.getContactByAddress(walletAddress))
+        sendToUser((activity as HomeActivity).viewModel.contactsRepository.getContactByAddress(walletAddress))
     }
 
     private fun sendToUserByDeeplink(deeplink: DeepLink.Send) {
@@ -371,7 +371,7 @@ class TariNavigator @Inject constructor(val prefs: SharedPrefsRepository, val ta
         val address = FFITariWalletAddress(HexString(deeplink.walletAddressHex)).runWithDestroy {
             walletAddressFromFFI(it)
         }
-        val contact = (activity as HomeActivity).viewModel.contactsRepository.ffiBridge.getContactByAddress(address)
+        val contact = (activity as HomeActivity).viewModel.contactsRepository.getContactByAddress(address)
         val bundle = Bundle().apply {
             putSerializable(PARAMETER_CONTACT, contact)
             putParcelable(PARAMETER_AMOUNT, deeplink.amount)

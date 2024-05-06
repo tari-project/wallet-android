@@ -18,7 +18,6 @@ import com.tari.android.wallet.extension.addTo
 import com.tari.android.wallet.ffi.FFIWallet
 import com.tari.android.wallet.infrastructure.logging.LoggerTags
 import com.tari.android.wallet.service.TariWalletService
-import com.tari.android.wallet.service.connection.ServiceConnectionStatus
 import com.tari.android.wallet.service.connection.TariWalletServiceConnection
 import com.tari.android.wallet.ui.common.domain.PaletteManager
 import com.tari.android.wallet.ui.common.domain.ResourceManager
@@ -38,6 +37,7 @@ import com.tari.android.wallet.ui.fragment.home.navigation.TariNavigator
 import com.tari.android.wallet.ui.fragment.settings.themeSelector.TariTheme
 import io.reactivex.disposables.CompositeDisposable
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -49,9 +49,6 @@ open class CommonViewModel : ViewModel() {
     val component: ApplicationComponent
         get() = DiContainer.appComponent
 
-    val serviceConnection: TariWalletServiceConnection = TariWalletServiceConnection()
-    val walletService: TariWalletService
-        get() = serviceConnection.currentState.service!!
 
     @Inject
     lateinit var permissionManager: PermissionManager
@@ -76,6 +73,11 @@ open class CommonViewModel : ViewModel() {
 
     @Inject
     lateinit var securityPrefRepository: SecurityPrefRepository
+
+    @Inject
+    lateinit var serviceConnection: TariWalletServiceConnection
+    val walletService: TariWalletService
+        get() = serviceConnection.walletService
 
     private var authorizedAction: (() -> Unit)? = null
 
@@ -142,17 +144,16 @@ open class CommonViewModel : ViewModel() {
         EventBus.unsubscribeAll(this)
     }
 
-    fun doOnConnected(action: (walletService: TariWalletService) -> Unit) {
-        serviceConnection.connection.filter { it.status == ServiceConnectionStatus.CONNECTED }.take(1)
-            .doOnError { logger.i(it.toString()) }
-            .subscribe { action(it.service!!) }
-            .addTo(compositeDisposable)
+    fun doOnWalletServiceConnected(action: suspend (walletService: TariWalletService) -> Unit) {
+        viewModelScope.launch {
+            serviceConnection.doOnWalletServiceConnected(action)
+        }
     }
 
-    fun doOnConnectedToWallet(action: (walletService: FFIWallet) -> Unit) {
-        EventBus.walletState.publishSubject.filter { it == WalletState.Running }.take(1).doOnError { Logger.i(it.toString()) }
-            .subscribe { action(FFIWallet.instance!!) }
-            .addTo(compositeDisposable)
+    fun doOnWalletRunning(action: suspend (walletService: FFIWallet) -> Unit) {
+        viewModelScope.launch {
+            serviceConnection.doOnWalletRunning(action)
+        }
     }
 
     fun openWalletErrorDialog() {
@@ -199,6 +200,8 @@ open class CommonViewModel : ViewModel() {
     }
 
     fun hideDialog() {
-        dismissDialog.postValue(Unit)
+        viewModelScope.launch(Dispatchers.Main) {
+            dismissDialog.postValue(Unit)
+        }
     }
 }

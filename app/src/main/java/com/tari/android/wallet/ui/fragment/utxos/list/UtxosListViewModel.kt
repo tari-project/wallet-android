@@ -57,7 +57,7 @@ class UtxosListViewModel : CommonViewModel() {
         sortingMediator.addSource(ordering) { generateFromScratch() }
         setSelectionState(false)
 
-        doOnConnected { loadUtxosFromFFI() }
+        doOnWalletServiceConnected { loadUtxosFromFFI() }
 
         component.inject(this)
     }

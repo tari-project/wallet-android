@@ -5,10 +5,8 @@ import android.view.View
 import com.tari.android.wallet.R
 import com.tari.android.wallet.ui.extension.gone
 import com.tari.android.wallet.ui.extension.string
-import com.tari.android.wallet.ui.fragment.chat_list.data.ChatItemDto
 import com.tari.android.wallet.ui.fragment.contact_book.contactSelection.ContactSelectionFragment
-import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
-import java.util.UUID
+import com.tari.android.wallet.ui.fragment.contact_book.contactSelection.ContactSelectionViewModel.ContinueButtonEffect
 
 class AddChatFragment : ContactSelectionFragment() {
 
@@ -24,11 +22,6 @@ class AddChatFragment : ContactSelectionFragment() {
     override fun goToNext() {
         super.goToNext()
 
-        val user = viewModel.getUserDto()
-
-        val chatDto = ChatItemDto(UUID.randomUUID().toString(), listOf(), user.getFFIDto()!!.walletAddress)
-        viewModel.chatsRepository.addChat(chatDto)
-
-        viewModel.navigation.postValue(Navigation.ChatNavigation.ToChat(user.getFFIDto()?.walletAddress!!, true))
+        viewModel.onContinueButtonClick(ContinueButtonEffect.AddChat)
     }
 }

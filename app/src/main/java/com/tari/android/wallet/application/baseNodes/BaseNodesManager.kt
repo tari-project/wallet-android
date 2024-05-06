@@ -10,6 +10,7 @@ import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodeDto
 import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodeList
 import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodeSharedRepository
 import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
+import com.tari.android.wallet.di.ApplicationScope
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.extension.addTo
 import com.tari.android.wallet.extension.getWithError
@@ -17,10 +18,11 @@ import com.tari.android.wallet.ffi.FFIPublicKey
 import com.tari.android.wallet.ffi.FFITariBaseNodeState
 import com.tari.android.wallet.ffi.FFIWallet
 import com.tari.android.wallet.ffi.HexString
-import com.tari.android.wallet.service.connection.ServiceConnectionStatus
 import com.tari.android.wallet.service.connection.TariWalletServiceConnection
 import com.tari.android.wallet.util.DebugConfig
 import io.reactivex.disposables.CompositeDisposable
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import org.apache.commons.io.IOUtils
 import java.math.BigInteger
 import javax.inject.Inject
@@ -36,24 +38,20 @@ class BaseNodesManager @Inject constructor(
     private val context: Context,
     private val baseNodeSharedRepository: BaseNodeSharedRepository,
     private val networkRepository: NetworkRepository,
+    private val serviceConnection: TariWalletServiceConnection,
+    @ApplicationScope private val applicationScope: CoroutineScope,
 ) {
     private val logger
         get() = Logger.t(this::class.simpleName)
 
     private val compositeDisposable = CompositeDisposable()
 
-    private val serviceConnection = TariWalletServiceConnection()
-    private val walletService
-        get() = serviceConnection.currentState.service!!
-
     private lateinit var baseNodeIterator: Iterator<BaseNodeDto>
 
     init {
-        serviceConnection.connection.subscribe {
-            if (it.status == ServiceConnectionStatus.CONNECTED) {
-                startSync()
-            }
-        }.addTo(compositeDisposable)
+        applicationScope.launch {
+            serviceConnection.doOnWalletServiceConnected { startSync() }
+        }
 
         EventBus.walletState.publishSubject.subscribe {
             startSync()
@@ -116,7 +114,7 @@ class BaseNodesManager @Inject constructor(
         val baseNode = baseNodeSharedRepository.currentBaseNode ?: return
         try {
             logger.i("startSync")
-            serviceConnection.currentState.service ?: return
+            if (serviceConnection.isWalletServiceConnected().not()) return
             if (EventBus.walletState.publishSubject.value != WalletState.Running) return
 
             logger.i("startSync:publicKeyHex: ${baseNode.publicKeyHex}")
@@ -125,7 +123,7 @@ class BaseNodesManager @Inject constructor(
             val baseNodeKeyFFI = FFIPublicKey(HexString(baseNode.publicKeyHex))
             FFIWallet.instance?.addBaseNodePeer(baseNodeKeyFFI, baseNode.address)
             baseNodeKeyFFI.destroy()
-            walletService.getWithError { error, wallet -> wallet.startBaseNodeSync(error) }
+            serviceConnection.walletService.getWithError { error, wallet -> wallet.startBaseNodeSync(error) }
         } catch (e: Throwable) {
             logger.i("startSync:error connecting to base node $baseNode with an error: ${e.message}")
             setNextBaseNode()

@@ -4,7 +4,7 @@ import android.text.SpannableString
 import android.text.SpannedString
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.toLiveData
+import androidx.lifecycle.viewModelScope
 import com.tari.android.wallet.R
 import com.tari.android.wallet.R.string.common_cancel
 import com.tari.android.wallet.R.string.common_close
@@ -16,6 +16,7 @@ import com.tari.android.wallet.R.string.contact_book_contacts_book_link_success_
 import com.tari.android.wallet.R.string.contact_book_contacts_book_link_title
 import com.tari.android.wallet.R.string.contact_book_contacts_book_unlink_success_title
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
+import com.tari.android.wallet.extension.collectFlow
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.common.SingleLiveEvent
 import com.tari.android.wallet.ui.common.recyclerView.CommonViewHolderItem
@@ -34,23 +35,12 @@ import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.MergedCont
 import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.PhoneContactDto
 import com.tari.android.wallet.ui.fragment.contact_book.link.adapter.link_header.ContactLinkHeaderViewHolderItem
 import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
-import io.reactivex.BackpressureStrategy
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import yat.android.ui.extension.HtmlHelper
 import javax.inject.Inject
 
 class ContactLinkViewModel : CommonViewModel() {
-
-    val grantPermission = SingleLiveEvent<Unit>()
-
-    val contactListSource = MediatorLiveData<List<ContactItem>>()
-
-    val searchText = MutableLiveData("")
-
-    val list = MediatorLiveData<MutableList<CommonViewHolderItem>>()
-
-    val ffiContact = MutableLiveData<ContactDto>()
-
-    private var searchModule: ContactLinkHeaderViewHolderItem? = null
 
     @Inject
     lateinit var sharedPrefsWrapper: SharedPrefsRepository
@@ -58,15 +48,27 @@ class ContactLinkViewModel : CommonViewModel() {
     @Inject
     lateinit var contactsRepository: ContactsRepository
 
+    val grantPermission = SingleLiveEvent<Unit>()
+
+    val list = MediatorLiveData<List<CommonViewHolderItem>>()
+
+    private val ffiContact = MutableLiveData<ContactDto>()
+
+    private val contactListSource = MediatorLiveData<List<ContactItem>>()
+
+    private val searchText = MutableLiveData("")
+
+    private var searchModule: ContactLinkHeaderViewHolderItem? = null
+
     init {
         component.inject(this)
 
-        contactListSource.addSource(contactsRepository.publishSubject.toFlowable(BackpressureStrategy.LATEST).toLiveData()) {
-            contactListSource.value = it.filter(contactsRepository.filter).map { contactDto -> ContactItem(contactDto, true) }
-        }
-
         list.addSource(contactListSource) { updateList() }
         list.addSource(searchText) { updateList() }
+
+        collectFlow(contactsRepository.contactListFiltered) {
+            contactListSource.value = it.map { contactDto -> ContactItem(contact = contactDto, isSimple = true) }
+        }
     }
 
     fun initArgs(contact: ContactDto) {
@@ -79,7 +81,15 @@ class ContactLinkViewModel : CommonViewModel() {
         }
     }
 
-    fun onSearchQueryChanged(query: String) {
+    fun grantPermission() {
+        permissionManager.runWithPermission(listOf(android.Manifest.permission.READ_CONTACTS), true) {
+            viewModelScope.launch(Dispatchers.IO) {
+                contactsRepository.grantContactPermissionAndRefresh()
+            }
+        }
+    }
+
+    private fun onSearchQueryChanged(query: String) {
         searchText.value = query
     }
 
@@ -116,7 +126,7 @@ class ContactLinkViewModel : CommonViewModel() {
     private fun getBody(sourceList: List<ContactItem>): SpannedString {
         val noContacts = sourceList.none { it.contact.contact is PhoneContactDto }
         val noMergedContacts = sourceList.none { it.contact.contact is MergedContactDto }
-        val havePermission = contactsRepository.contactPermission.value == true
+        val havePermission = contactsRepository.contactPermissionGranted
 
         val resource = when {
             !havePermission -> R.string.contact_book_contacts_book_link_empty_state_no_access
@@ -131,7 +141,7 @@ class ContactLinkViewModel : CommonViewModel() {
     private fun getEmptyImage(): Int = R.drawable.vector_contact_favorite_empty_state
 
     private fun getButtonTitle(): String {
-        val havePermission = contactsRepository.contactPermission.value == true
+        val havePermission = contactsRepository.contactPermissionGranted
 
         return when {
             !havePermission -> resourceManager.getString(R.string.contact_book_contacts_book_link_empty_state_go_to_permission_settings)
@@ -140,7 +150,7 @@ class ContactLinkViewModel : CommonViewModel() {
     }
 
     private fun doAction() {
-        val havePermission = contactsRepository.contactPermission.value == true
+        val havePermission = contactsRepository.contactPermissionGranted
 
         if (!havePermission) {
             grantPermission.postValue(Unit)
@@ -161,9 +171,13 @@ class ContactLinkViewModel : CommonViewModel() {
             ShortEmojiIdModule(tariWalletAddress),
             BodyModule(null, SpannableString(secondLineHtml)),
             ButtonModule(resourceManager.getString(common_confirm), ButtonStyle.Normal) {
-                contactsRepository.linkContacts(ffiContact.value!!, phoneContactDto)
-                dismissDialog.postValue(Unit)
-                showLinkSuccessDialog(phoneContactDto)
+                viewModelScope.launch(Dispatchers.IO) {
+                    contactsRepository.linkContacts(ffiContact.value!!, phoneContactDto)
+                    viewModelScope.launch(Dispatchers.Main) {
+                        dismissDialog.postValue(Unit)
+                        showLinkSuccessDialog(phoneContactDto)
+                    }
+                }
             },
             ButtonModule(resourceManager.getString(common_cancel), ButtonStyle.Close)
         )

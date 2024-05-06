@@ -42,13 +42,13 @@ class AddAmountViewModel : CommonViewModel() {
     init {
         component.inject(this)
 
-        doOnConnected { _serviceConnected.postValue(Unit) }
+        doOnWalletServiceConnected { _serviceConnected.postValue(Unit) }
 
         loadFees()
         _isOneSidePaymentEnabled.postValue(tariSettingsSharedRepository.isOneSidePaymentEnabled)
     }
 
-    private fun loadFees() = doOnConnected {
+    private fun loadFees() = doOnWalletServiceConnected {
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 val stats = FFIWallet.instance!!.getFeePerGramStats()

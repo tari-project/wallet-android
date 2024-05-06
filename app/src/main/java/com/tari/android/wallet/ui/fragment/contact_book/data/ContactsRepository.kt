@@ -1,19 +1,12 @@
 package com.tari.android.wallet.ui.fragment.contact_book.data
 
-import android.content.ContentProviderOperation
 import android.content.Context
-import android.provider.ContactsContract
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.viewModelScope
+import com.orhanobut.logger.Logger
 import com.tari.android.wallet.data.sharedPrefs.delegates.SerializableTime
-import com.tari.android.wallet.event.Event
-import com.tari.android.wallet.event.EventBus
-import com.tari.android.wallet.ffi.FFIWallet
-import com.tari.android.wallet.model.TariContact
+import com.tari.android.wallet.di.ApplicationScope
 import com.tari.android.wallet.model.TariWalletAddress
 import com.tari.android.wallet.model.Tx
-import com.tari.android.wallet.model.WalletError
-import com.tari.android.wallet.ui.common.CommonViewModel
+import com.tari.android.wallet.service.connection.TariWalletServiceConnection
 import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.ContactDto
 import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.FFIContactDto
 import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.MergedContactDto
@@ -21,77 +14,75 @@ import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.PhoneConta
 import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.YatDto
 import com.tari.android.wallet.ui.fragment.contact_book.data.localStorage.ContactSharedPrefRepository
 import com.tari.android.wallet.util.ContactUtil
-import contacts.core.Contacts
-import contacts.core.Fields
-import contacts.core.entities.NewName
-import contacts.core.entities.NewOptions
-import contacts.core.entities.NewRawContact
-import contacts.core.equalTo
-import contacts.core.util.names
-import contacts.core.util.setName
-import contacts.core.util.setOptions
 import io.reactivex.subjects.BehaviorSubject
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.update
 import org.joda.time.DateTime
-import timber.log.Timber
 import yat.android.sdk.models.PaymentAddressResponseResult
 import javax.inject.Inject
 import javax.inject.Singleton
-import kotlin.random.Random
 import kotlin.system.measureNanoTime
 
 @Singleton
 class ContactsRepository @Inject constructor(
-    val context: Context,
+    context: Context,
+    contactUtil: ContactUtil,
+    tariWalletServiceConnection: TariWalletServiceConnection,
     private val contactSharedPrefRepository: ContactSharedPrefRepository,
-    private val contactUtil: ContactUtil,
-) : CommonViewModel() {
+    @ApplicationScope private val applicationScope: CoroutineScope,
+) {
+    private val logger
+        get() = Logger.t(ContactsRepository::class.simpleName)
 
-    val publishSubject = BehaviorSubject.create<MutableList<ContactDto>>()
+    val publishSubject = BehaviorSubject.create<List<ContactDto>>()
 
-    val filter: (ContactDto) -> Boolean = {
-        it.getPhoneDto()?.let { phoneContact ->
-            return@let phoneContact.displayName.isNotBlank()
-                    || phoneContact.firstName.isNotBlank()
-                    || phoneContact.surname.isNotBlank()
-        } ?: true
+    private val ffiBridge = FFIContactsRepositoryBridge(
+        contactsRepository = this,
+        tariWalletServiceConnection = tariWalletServiceConnection,
+        contactUtil = contactUtil,
+        externalScope = applicationScope,
+    )
+    private val phoneBookRepositoryBridge = PhoneBookRepositoryBridge(
+        contactsRepository = this,
+        context = context,
+    )
+
+    private val _loadingState = MutableStateFlow(LoadingState())
+    val loadingState = _loadingState.asStateFlow()
+
+    private val _contactList = MutableStateFlow(contactSharedPrefRepository.getSavedContacts())
+    val contactList = _contactList.asStateFlow()
+    val contactListFiltered = _contactList
+        .map {
+            it.filter { contact ->
+                contact.getPhoneDto()?.let { phoneContact ->
+                    return@let phoneContact.displayName.isNotBlank()
+                            || phoneContact.firstName.isNotBlank()
+                            || phoneContact.surname.isNotBlank()
+                } ?: true
+            }
+        }
+
+    private val contactPermission = MutableStateFlow(false)
+    val contactPermissionGranted: Boolean
+        get() = contactPermission.value
+
+    internal fun getContacts(): List<ContactDto> {
+        return this.contactList.value
     }
 
-    val ffiBridge = FFIContactsRepositoryBridge()
-    val phoneBookRepositoryBridge = PhoneBookRepositoryBridge()
+    suspend fun addContact(contact: ContactDto) {
+        if (contact.contactExistsByWalletAddress()) return
 
-    val loadingState = MutableLiveData<LoadingState>()
-
-    val contactPermission = MutableLiveData(false)
-
-    class LoadingState(val isLoading: Boolean, val name: String, val time: Double = 0.0)
-
-    init {
-        doWithLoading("Parsing from shared prefs") {
-            val saved = contactSharedPrefRepository.getSavedContacts()
-            this.publishSubject.onNext(saved.toMutableList())
+        updateContactList { contacts ->
+            contacts.add(contact)
         }
     }
 
-    private fun doWithLoading(name: String, action: () -> Unit) {
-        loadingState.postValue(LoadingState(true, name))
-        viewModelScope.launch(Dispatchers.IO) {
-            val time = measureNanoTime { runCatching { action() } } / 1_000_000_000.0
-            action()
-            loadingState.postValue(LoadingState(false, name, time))
-        }
-    }
-
-    fun addContact(contact: ContactDto) {
-        if (contactExistsByWalletAddress(contact)) return
-
-        withListUpdate {
-            it.add(contact)
-        }
-    }
-
-    fun toggleFavorite(contactDto: ContactDto): ContactDto {
+    suspend fun toggleFavorite(contactDto: ContactDto): ContactDto {
         updateContact(contactDto.uuid) {
             it.contact.isFavorite = !it.contact.isFavorite
             it.getPhoneDto()?.shouldUpdate = true
@@ -99,8 +90,8 @@ class ContactsRepository @Inject constructor(
         return getByUuid(contactDto.uuid)
     }
 
-    fun updateContactInfo(contact: ContactDto, firstName: String, surname: String, yat: String): ContactDto {
-        if (!contactExists(contact)) addContact(contact)
+    suspend fun updateContactInfo(contact: ContactDto, firstName: String, surname: String, yat: String): ContactDto {
+        if (contact.contactExists().not()) addContact(contact)
         updateContact(contact.uuid) {
             when (val user = it.contact) {
                 is FFIContactDto -> {
@@ -131,31 +122,44 @@ class ContactsRepository @Inject constructor(
         return getByUuid(contact.uuid)
     }
 
-    fun linkContacts(ffiContact: ContactDto, phoneContactDto: ContactDto) {
-        withListUpdate {
-            it.remove(getByUuid(ffiContact.uuid))
-            it.remove(getByUuid(phoneContactDto.uuid))
+    suspend fun linkContacts(ffiContact: ContactDto, phoneContactDto: ContactDto) {
+        updateContactList { contacts ->
+            contacts.remove(getByUuid(ffiContact.uuid))
+            contacts.remove(getByUuid(phoneContactDto.uuid))
+            contacts.add(ContactDto(MergedContactDto(ffiContact.contact as FFIContactDto, phoneContactDto.contact as PhoneContactDto)))
         }
-
-        val mergedContact = ContactDto(MergedContactDto(ffiContact.contact as FFIContactDto, phoneContactDto.contact as PhoneContactDto))
-        withListUpdate { list -> list.add(mergedContact) }
     }
 
-    fun unlinkContact(contact: ContactDto) {
+    suspend fun unlinkContact(contact: ContactDto) {
         (contact.contact as? MergedContactDto)?.let { mergedContact ->
-            withListUpdate { list ->
-                list.remove(getByUuid(contact.uuid))
-                list.add(ContactDto(mergedContact.phoneContactDto))
-                list.add(ContactDto(mergedContact.ffiContactDto))
+            updateContactList { contacts ->
+                contacts.remove(getByUuid(contact.uuid))
+                contacts.add(ContactDto(mergedContact.phoneContactDto))
+                contacts.add(ContactDto(mergedContact.ffiContactDto))
             }
         }
     }
 
-    fun updateRecentUsedTime(contact: ContactDto) {
-        val existContact = this.publishSubject.value.orEmpty().firstOrNull { it.uuid == contact.uuid }
-        if (existContact == null) {
-            withListUpdate { list ->
-                list.add(contact)
+    suspend fun deleteContact(contactDto: ContactDto) {
+        updateContactList { contacts ->
+            contactDto.getPhoneDto()?.let { phoneContactDto -> phoneBookRepositoryBridge.deleteFromContactBook(phoneContactDto) }
+            contactDto.getFFIDto()?.let { ffiContactDto -> ffiBridge.deleteContact(ffiContactDto) }
+            contacts.remove(getByUuid(contactDto.uuid))
+        }
+    }
+
+    suspend fun updateYatInfo(contactDto: ContactDto, entries: Map<String, PaymentAddressResponseResult>) {
+        updateContactList { contacts ->
+            val existContact = contacts.firstOrNull { it.uuid == contactDto.uuid }
+            existContact?.getYatDto()?.connectedWallets = entries.map { YatDto.ConnectedWallet(it.key, it.value) }
+        }
+    }
+
+    internal suspend fun updateRecentUsedTime(contact: ContactDto) {
+        val existingContact = getContacts().firstOrNull { it.uuid == contact.uuid }
+        if (existingContact == null) {
+            updateContactList { contacts ->
+                contacts.add(contact)
             }
         }
 
@@ -164,391 +168,52 @@ class ContactsRepository @Inject constructor(
         }
     }
 
-    fun deleteContact(contactDto: ContactDto) {
-        withListUpdate {
-            contactDto.getPhoneDto()?.let { phoneContactDto -> phoneBookRepositoryBridge.deleteFromContactBook(phoneContactDto) }
-            contactDto.getFFIDto()?.let { ffiContactDto -> ffiBridge.deleteContact(ffiContactDto) }
-            it.remove(getByUuid(contactDto.uuid))
+    internal suspend fun doWithLoading(name: String, action: suspend () -> Unit) {
+        _loadingState.update { it.copy(isLoading = true, name = name) }
+        val time = measureNanoTime { runCatching { action() } } / 1_000_000_000.0
+        action()
+        logger.i("Action $name took $time seconds")
+        _loadingState.update { it.copy(isLoading = false, name = name, time = time) }
+    }
+
+    private suspend fun updateContact(contactUuid: String, silently: Boolean = false, updateAction: suspend (contact: ContactDto) -> Unit) {
+        updateContactList(silently) { contacts ->
+            contacts.firstOrNull { it.uuid == contactUuid }?.let { updateAction(it) }
         }
     }
 
-    fun updateYatInfo(contactDto: ContactDto, entries: Map<String, PaymentAddressResponseResult>) {
-        withListUpdate {
-            val existContact = it.firstOrNull { it.uuid == contactDto.uuid }
-            existContact?.getYatDto()?.connectedWallets = entries.map { YatDto.ConnectedWallet(it.key, it.value) }
-        }
-    }
-
-    private fun updateContact(contactUuid: String, silently: Boolean = false, updateAction: (contact: ContactDto) -> Unit) {
-        withListUpdate(silently) {
-            val foundContact = it.firstOrNull { it.uuid == contactUuid }
-            foundContact?.let { contact -> updateAction.invoke(contact) }
-        }
-    }
-
-    fun getByUuid(uuid: String): ContactDto = this.publishSubject.value!!.first { it.uuid == uuid }
-
-    private fun contactExists(contact: ContactDto): Boolean = this.publishSubject.value!!.any { it.uuid == contact.uuid }
-
-    private fun contactExistsByWalletAddress(contact: ContactDto): Boolean =
-        this.publishSubject.value!!.any { it.contact.extractWalletAddress() == contact.contact.extractWalletAddress() }
-
-    @Synchronized
-    private fun withListUpdate(silently: Boolean = false, updateAction: (list: MutableList<ContactDto>) -> Unit) {
-        val value = this.publishSubject.value!!
-        val silentlyLocal = silently
-        updateAction.invoke(value)
-        viewModelScope.launch(Dispatchers.Main) {
-            this@ContactsRepository.publishSubject.onNext(value)
-        }
+    internal suspend fun updateContactList(silently: Boolean = false, updateAction: suspend (contacts: MutableList<ContactDto>) -> Unit) {
+        val updatedContacts = getContacts().toMutableList().also { updateAction(it) }.toList()
+        _contactList.update { updatedContacts }
 
         doWithLoading("Updating contact changes to phone and FFI") {
-            contactSharedPrefRepository.saveContacts(value)
-            if (silentlyLocal.not()) {
-                ffiBridge.updateToFFI(value)
+            contactSharedPrefRepository.saveContacts(updatedContacts)
+            if (silently.not()) {
+                ffiBridge.updateToFFI(updatedContacts)
                 phoneBookRepositoryBridge.updateToPhoneBook()
             }
         }
     }
 
-    inner class FFIContactsRepositoryBridge {
-        init {
-            viewModelScope.launch(Dispatchers.IO) {
-                publishSubject.blockingFirst()
-                doOnConnectedToWallet { doOnConnected { subscribeToActions() } }
-            }
-        }
-
-        fun updateToFFI(list: List<ContactDto>) {
-            doOnConnectedToWallet {
-                doOnConnected { service ->
-                    viewModelScope.launch(Dispatchers.IO) {
-                        for (item in list.mapNotNull { it.getFFIDto() }) {
-                            val error = WalletError()
-                            service.updateContact(
-                                item.walletAddress,
-                                contactUtil.normalizeAlias(item.getAlias(), item.walletAddress),
-                                item.isFavorite,
-                                error,
-                            )
-                            if (error.code != WalletError.NoError.code) {
-                                logger.i("Error updating contact: ${error.signature}")
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        fun getContactForTx(tx: Tx): ContactDto = getContactByAddress(tx.tariContact.walletAddress)
-
-        fun getContactByAddress(address: TariWalletAddress): ContactDto =
-            this@ContactsRepository.publishSubject.value!!.firstOrNull { it.getFFIDto()?.walletAddress == address }
-                ?: ContactDto(FFIContactDto(address))
-
-        private fun subscribeToActions() {
-            EventBus.subscribe<Event.Transaction.TxReceived>(this) { updateRecentUsedTime(it.tx.tariContact) }
-            EventBus.subscribe<Event.Transaction.TxReplyReceived>(this) { updateRecentUsedTime(it.tx.tariContact) }
-            EventBus.subscribe<Event.Transaction.TxFinalized>(this) { updateRecentUsedTime(it.tx.tariContact) }
-            EventBus.subscribe<Event.Transaction.InboundTxBroadcast>(this) { updateRecentUsedTime(it.tx.tariContact) }
-            EventBus.subscribe<Event.Transaction.OutboundTxBroadcast>(this) { updateRecentUsedTime(it.tx.tariContact) }
-            EventBus.subscribe<Event.Transaction.TxMinedUnconfirmed>(this) { updateRecentUsedTime(it.tx.tariContact) }
-            EventBus.subscribe<Event.Transaction.TxMined>(this) { updateRecentUsedTime(it.tx.tariContact) }
-            EventBus.subscribe<Event.Transaction.TxFauxMinedUnconfirmed>(this) { updateRecentUsedTime(it.tx.tariContact) }
-            EventBus.subscribe<Event.Transaction.TxFauxConfirmed>(this) { updateRecentUsedTime(it.tx.tariContact) }
-            EventBus.subscribe<Event.Transaction.TxCancelled>(this) { updateRecentUsedTime(it.tx.tariContact) }
-        }
-
-        private fun updateRecentUsedTime(tariContact: TariContact) {
-            doWithLoading("Updating contact changes to phone and FFI") {
-                updateFFIContacts()
-
-                val existContact =
-                    this@ContactsRepository.publishSubject.value.orEmpty()
-                        .firstOrNull { it.contact.extractWalletAddress() == tariContact.walletAddress }
-                val contact = existContact ?: ContactDto(FFIContactDto(tariContact.walletAddress, tariContact.alias, tariContact.isFavorite))
-                updateRecentUsedTime(contact)
-            }
-        }
-
-        private fun updateFFIContacts() {
-            doWithLoading("Updating FFI contacts") {
-                try {
-                    val contacts = FFIWallet.instance!!.getContacts()
-                    for (contactIndex in 0 until contacts.getLength()) {
-                        val actualContact = contacts.getAt(contactIndex)
-
-                        val walletAddress = actualContact.getWalletAddress()
-                        val ffiWalletAddress = TariWalletAddress.createWalletAddress(walletAddress.toString(), walletAddress.getEmojiId())
-                        val alias = actualContact.getAlias()
-                        val isFavorite = actualContact.getIsFavorite()
-
-                        onFFIContactAddedOrUpdated(ffiWalletAddress, alias, isFavorite)
-                    }
-                } catch (e: Throwable) {
-                    e.printStackTrace()
-                }
-
-                try {
-                    serviceConnection.currentState.service?.let {
-                        val allTxes =
-                            it.getCompletedTxs(WalletError()) + it.getCancelledTxs(WalletError()) + it.getPendingInboundTxs(WalletError()) + it.getPendingOutboundTxs(
-                                WalletError()
-                            )
-                        val allUsers = allTxes.map { it.tariContact }.distinctBy { it.walletAddress }
-                        for (user in allUsers) {
-                            onFFIContactAddedOrUpdated(user.walletAddress, user.alias, user.isFavorite)
-                        }
-                    }
-                } catch (e: Throwable) {
-                    e.printStackTrace()
-                }
-            }
-        }
-
-        fun deleteContact(contact: FFIContactDto) {
-            doWithLoading("Deleting contact") {
-                doOnConnectedToWallet {
-                    doOnConnected { service ->
-                        viewModelScope.launch(Dispatchers.IO) {
-                            service.updateContact(contact.walletAddress, "", false, WalletError())
-                        }
-                    }
-                }
-            }
-        }
-
-        private fun onFFIContactAddedOrUpdated(contact: TariWalletAddress, alias: String, isFavorite: Boolean) {
-            if (ffiContactExist(contact)) {
-                //turn off updated because of name erasing
-//                withFFIContact(contact) {
-//                    it.getFFIDto()?.let { ffiContactDto ->
-//                        ffiContactDto.setAlias(alias)
-//                        ffiContactDto.isFavorite = isFavorite
-//                    }
-//                }
-            } else {
-                withListUpdate {
-                    it.add(ContactDto(FFIContactDto(contact, alias, isFavorite)))
-                }
-            }
-        }
-
-        private fun ffiContactExist(walletAddress: TariWalletAddress): Boolean =
-            this@ContactsRepository.publishSubject.value!!.any { it.contact.extractWalletAddress() == walletAddress }
-
-        private fun withFFIContact(walletAddress: TariWalletAddress, updateAction: (contact: ContactDto) -> Unit) {
-            withListUpdate {
-                val foundContact = it.firstOrNull { it.contact.extractWalletAddress() == walletAddress }
-                foundContact?.let { contact -> updateAction.invoke(contact) }
-            }
-        }
+    suspend fun grantContactPermissionAndRefresh() {
+        contactPermission.value = true
+        phoneBookRepositoryBridge.updateContactListWithPhoneBook()
     }
 
-    inner class PhoneBookRepositoryBridge {
+    private fun ContactDto.contactExists() = getContacts().any { it.uuid == this.uuid }
 
-        val contacts = Contacts(context)
+    private fun ContactDto.contactExistsByWalletAddress() =
+        getContacts().any { it.contact.extractWalletAddress() == this.contact.extractWalletAddress() }
 
-        fun clean() {
-            doWithLoading("cleaning") {
-                try {
-                    val contactsIds = contacts.query().include(Fields.DataId).find().map { it.id }
+    fun getContactForTx(tx: Tx): ContactDto = getContactByAddress(tx.tariContact.walletAddress)
 
-                    Timber.e(contactsIds.joinToString(", ") + " would be removed")
+    fun getContactByAddress(address: TariWalletAddress): ContactDto =
+        getContacts().firstOrNull { it.getFFIDto()?.walletAddress == address }
+            ?: ContactDto(FFIContactDto(address))
 
-                    contacts.delete().contactsWithId(contactsIds).commit()
-                } catch (e: Throwable) {
-                    e.printStackTrace()
-                }
+    fun getByUuid(uuid: String): ContactDto = getContacts().first { it.uuid == uuid }
 
-                withListUpdate {
-                    it.removeAll { it.getPhoneDto() != null }
-                }
-            }
-        }
-
-        fun addTestContacts() {
-            doWithLoading("Adding test contacts") {
-                try {
-                    val newContacts = (1..100).map {
-                        PhoneContact(
-                            it.toString(),
-                            it.toString(),
-                            (it * 1000).toString(),
-                            (it.toString() + (it * 1000).toString()),
-                            "",
-                            "",
-                            "",
-                            Random.nextBoolean()
-                        )
-                    }
-
-                    val rawContacts = newContacts.map {
-                        NewRawContact().apply {
-                            this.name = NewName().apply {
-                                this.givenName = it.firstName
-                                this.familyName = it.surname
-                                this.displayName = it.displayName
-                            }
-                        }
-                    }
-
-                    contacts.insert()
-                        .rawContacts(rawContacts)
-                        .commit()
-
-                } catch (e: Throwable) {
-                    e.printStackTrace()
-                }
-
-                loadFromPhoneBook()
-            }
-        }
-
-        fun loadFromPhoneBook() {
-            if (contactPermission.value != true) return
-
-            doWithLoading("Loading contacts from phone book") {
-                val contacts = getPhoneContacts()
-
-                withListUpdate {
-                    contacts.forEach { phoneContact ->
-                        val existContact = it.firstOrNull { it.getPhoneDto()?.id == phoneContact.id }
-                        if (existContact == null) {
-                            it.add(ContactDto(phoneContact.toPhoneContactDto()))
-                        } else {
-                            existContact.getPhoneDto()?.let {
-                                it.avatar = phoneContact.avatar
-                                it.firstName = phoneContact.firstName
-                                it.surname = phoneContact.surname
-                                it.displayName = phoneContact.displayName
-                                it.isFavorite = phoneContact.isFavorite
-//                                it.yat = phoneContact.yat
-//                                it.phoneEmojiId = phoneContact.emojiId
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        private fun getPhoneContacts(): MutableList<PhoneContact> {
-
-            val phoneContacts = contacts.query().include(Fields.all()).find()
-            val contacts = phoneContacts.map {
-                val name = it.names().firstOrNull()
-                PhoneContact(
-                    it.id.toString(),
-                    name?.givenName.orEmpty(),
-                    name?.familyName.orEmpty(),
-                    name?.displayName.orEmpty(),
-                    "",
-                    "",
-                    it.photoUri?.toString().orEmpty(),
-                    it.options?.starred ?: false
-                )
-            }
-
-            return contacts.toMutableList()
-        }
-
-        fun updateToPhoneBook() {
-            if (contactPermission.value == true) {
-                doWithLoading("Saving updates to contact book") {
-                    try {
-                        withListUpdate(true) { list ->
-                            val contacts = list.mapNotNull { it.getPhoneDto() }.filter { it.shouldUpdate }
-
-                            for (item in contacts) {
-                                val contact = PhoneContact(
-                                    id = item.id,
-                                    firstName = item.firstName,
-                                    surname = item.surname,
-                                    displayName = item.displayName,
-                                    yat = item.yat,
-                                    emojiId = item.phoneEmojiId,
-                                    avatar = item.avatar,
-                                    isFavorite = item.isFavorite,
-                                )
-                                saveNamesToPhoneBook(contact)
-                                saveStarredToPhoneBook(contact)
-//                                saveCustomFieldsToPhoneBook(contact)
-                                item.shouldUpdate = false
-                            }
-                        }
-                    } catch (e: Throwable) {
-                        e.printStackTrace()
-                    }
-                }
-            }
-        }
-
-        private fun saveNamesToPhoneBook(contact: PhoneContact) {
-            val phoneContact = contacts.query().include(Fields.all()).where { Contact.Id equalTo contact.id }.find().firstOrNull()
-
-            val updatedContact = phoneContact?.mutableCopy {
-                val name = this.names().firstOrNull()?.redactedCopy()?.apply {
-                    this.givenName = contact.firstName
-                    this.familyName = contact.surname
-                    this.displayName = contact.displayName
-                }
-
-                setName(name)
-            }
-
-            updatedContact?.let {
-                contacts.update()
-                    .contacts(it)
-                    .commit()
-            }
-        }
-
-        private fun saveStarredToPhoneBook(contact: PhoneContact) {
-            val phoneContact = contacts.query().include(Fields.all()).where { Contact.Id equalTo contact.id }.find().firstOrNull()
-
-            val updatedContact = phoneContact?.mutableCopy {
-                if (options == null) {
-                    setOptions(NewOptions(starred = contact.isFavorite))
-                } else {
-                    val copy = options!!.redactedCopy()
-                    copy.starred = contact.isFavorite
-                    setOptions(copy)
-                }
-            }
-
-            updatedContact?.let {
-                contacts.update()
-                    .contacts(it)
-                    .commit()
-            }
-        }
-
-        private fun saveCustomFieldsToPhoneBook(contact: PhoneContact) {
-            runCatching {
-                val operations = arrayListOf<ContentProviderOperation>()
-
-                ContentProviderOperation.newInsert(ContactsContract.Data.CONTENT_URI)
-                    .withValueBackReference(ContactsContract.Data.RAW_CONTACT_ID, contact.id.toInt())
-                    .withValue(ContactsContract.Data.MIMETYPE, "vnd.android.cursor.item/com.tari.android.wallet.yat")
-                    .withValue("data1", contact.yat)
-                    .build().apply { operations.add(this) }
-
-                ContentProviderOperation.newInsert(ContactsContract.Data.CONTENT_URI)
-                    .withValueBackReference(ContactsContract.Data.RAW_CONTACT_ID, contact.id.toInt())
-                    .withValue(ContactsContract.Data.MIMETYPE, "vnd.android.cursor.item/com.tari.android.wallet.emojiId")
-                    .withValue("data1", contact.emojiId)
-                    .build().apply { operations.add(this) }
-
-                context.contentResolver.applyBatch(ContactsContract.AUTHORITY, operations)
-            }
-        }
-
-        fun deleteFromContactBook(contact: PhoneContactDto) {
-            doWithLoading("Deleting contact from contact book") {
-                contacts.delete().contactsWithId(contact.id.toLong()).commit()
-            }
-        }
-    }
+    data class LoadingState(val isLoading: Boolean = false, val name: String = "", val time: Double = 0.0)
 
     data class PhoneContact(
         val id: String,

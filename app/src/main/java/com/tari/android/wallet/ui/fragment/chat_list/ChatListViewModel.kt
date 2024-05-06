@@ -26,23 +26,23 @@ class ChatListViewModel : CommonViewModel() {
     init {
         component.inject(this)
 
-        list.addSource(chatsRepository.list) {
-            list.postValue(it.map {
-                val firstEmoji = it.walletAddress.emojiId.extractEmojis().first()
-                val contact = contactsRepository.ffiBridge.getContactByAddress(it.walletAddress)
-                val lastMessage = it.messages.sortedBy { it.date }.lastOrNull()
-                val unreadCount = it.messages.count { it.isRead.not() }
+        list.addSource(chatsRepository.list) { chats ->
+            list.postValue(chats.map { chat ->
+                val firstEmoji = chat.walletAddress.emojiId.extractEmojis().first()
+                val contact = contactsRepository.getContactByAddress(chat.walletAddress)
+                val lastMessage = chat.messages.maxByOrNull { it.date }
+                val unreadCount = chat.messages.count { it.isRead.not() }
                 ChatItemViewHolderItem(
-                    it.walletAddress,
-                    it.uuid,
-                    firstEmoji,
-                    contact.getPhoneDto()?.avatar.orEmpty(),
-                    contact.contact.getAlias(),
-                    it.walletAddress.emojiId,
-                    lastMessage?.message.orEmpty(),
-                    lastMessage?.date.orEmpty(),
-                    unreadCount,
-                    true
+                    walletAddress = chat.walletAddress,
+                    uuid = chat.uuid,
+                    firstEmoji = firstEmoji,
+                    avatar = contact.getPhoneDto()?.avatar.orEmpty(),
+                    alias = contact.contact.getAlias(),
+                    emojiId = chat.walletAddress.emojiId,
+                    subtitle = lastMessage?.message.orEmpty(),
+                    dateMessage = lastMessage?.date.orEmpty(),
+                    unreadCount = unreadCount,
+                    isOnline = true,
                 )
             }.toMutableList())
         }

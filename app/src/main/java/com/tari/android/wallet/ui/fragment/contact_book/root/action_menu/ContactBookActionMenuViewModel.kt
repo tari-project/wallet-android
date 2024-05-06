@@ -1,6 +1,7 @@
 package com.tari.android.wallet.ui.fragment.contact_book.root.action_menu
 
 import android.text.SpannableString
+import androidx.lifecycle.viewModelScope
 import com.tari.android.wallet.R
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.common.SingleLiveEvent
@@ -16,6 +17,8 @@ import com.tari.android.wallet.ui.fragment.contact_book.data.ContactsRepository
 import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.ContactDto
 import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.MergedContactDto
 import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import yat.android.ui.extension.HtmlHelper
 import javax.inject.Inject
 
@@ -46,9 +49,11 @@ class ContactBookActionMenuViewModel : CommonViewModel() {
         }
     }
 
-    private fun runWithUpdate(action: () -> Unit) {
-        action()
+    private fun runWithUpdate(action: suspend () -> Unit) {
+        viewModelScope.launch(Dispatchers.IO) {
+            action()
 //        refresh()
+        }
     }
 
     private fun showUnlinkDialog(contact: ContactDto) {
@@ -64,9 +69,13 @@ class ContactBookActionMenuViewModel : CommonViewModel() {
             ShortEmojiIdModule(walletAddress),
             BodyModule(null, SpannableString(secondLineHtml)),
             ButtonModule(resourceManager.getString(R.string.common_confirm), ButtonStyle.Normal) {
-                contactsRepository.unlinkContact(contact)
-                dismissDialog.value = Unit
-                showUnlinkSuccessDialog(contact)
+                viewModelScope.launch(Dispatchers.IO) {
+                    contactsRepository.unlinkContact(contact)
+                    viewModelScope.launch(Dispatchers.Main) {
+                        hideDialog()
+                        showUnlinkSuccessDialog(contact)
+                    }
+                }
             },
             ButtonModule(resourceManager.getString(R.string.common_cancel), ButtonStyle.Close)
         )

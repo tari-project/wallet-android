@@ -123,7 +123,8 @@ import javax.inject.Singleton
         ServiceModule::class,
         TorModule::class,
         PresentationModule::class,
-        YatModule::class
+        YatModule::class,
+        CoroutinesDispatchersModule::class,
     ]
 )
 
