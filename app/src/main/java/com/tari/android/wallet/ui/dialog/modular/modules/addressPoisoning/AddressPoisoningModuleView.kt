@@ -10,9 +10,9 @@ import com.tari.android.wallet.databinding.DialogModuleAddressPoisoningBinding
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.common.recyclerView.CommonAdapter
 import com.tari.android.wallet.ui.component.common.CommonView
+import com.tari.android.wallet.ui.dialog.modular.modules.addressPoisoning.adapter.SimilarAddressItem
 import com.tari.android.wallet.ui.dialog.modular.modules.addressPoisoning.adapter.SimilarAddressListAdapter
 import com.tari.android.wallet.ui.extension.string
-import com.tari.android.wallet.ui.fragment.contact_book.address_poisoning.SimilarAddressItem
 
 
 @SuppressLint("ViewConstructor")
@@ -29,8 +29,11 @@ class AddressPoisoningModuleView(
     override fun setup() = Unit
 
     init {
-        ui.titleDescription.text = string(R.string.address_poisoning_title_description, addressPoisoningModule.addresses.size)
+        ui.titleDescription.text = string(R.string.address_poisoning_title_description, addressPoisoningModule.addressItems.size)
         setupRecyclerView()
+        ui.trustedCheckbox.setOnCheckedChangeListener { _, isChecked ->
+            addressPoisoningModule.markAsTrusted = isChecked
+        }
     }
 
     private fun setupRecyclerView() {
@@ -38,16 +41,16 @@ class AddressPoisoningModuleView(
         recyclerViewAdapter.setClickListener(CommonAdapter.ItemClickListener { holderItem ->
             when (holderItem) {
                 is SimilarAddressItem -> {
-                    addressPoisoningModule.selectedAddress?.let {
+                    addressPoisoningModule.selectedAddressItem.let {
                         it.selected = false
-                        recyclerViewAdapter.notifyItemChanged(addressPoisoningModule.addresses.indexOf(it))
+                        recyclerViewAdapter.notifyItemChanged(addressPoisoningModule.addressItems.indexOf(it))
                     }
                     holderItem.selected = !holderItem.selected
-                    recyclerViewAdapter.notifyItemChanged(addressPoisoningModule.addresses.indexOf(holderItem))
+                    recyclerViewAdapter.notifyItemChanged(addressPoisoningModule.addressItems.indexOf(holderItem))
                 }
             }
         })
         ui.similarAddressListRecyclerView.adapter = recyclerViewAdapter
-        recyclerViewAdapter.update(addressPoisoningModule.addresses)
+        recyclerViewAdapter.update(addressPoisoningModule.addressItems)
     }
 }

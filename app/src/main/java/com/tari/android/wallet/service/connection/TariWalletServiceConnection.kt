@@ -99,11 +99,26 @@ class TariWalletServiceConnection @Inject constructor(
             } ?: logger.i("Wallet service is not connected")
     }
 
+    suspend fun <T> doOnWalletServiceConnectedWithValue(action: suspend (walletService: TariWalletService) -> T): T = withContext(Dispatchers.IO) {
+        connectionState.firstOrNull { it is ServiceConnectionState.Connected }
+            ?.safeCastTo<ServiceConnectionState.Connected>()?.service
+            ?.let {
+                action(it)
+            } ?: error("Wallet service is not connected")
+    }
+
     suspend fun doOnWalletRunning(action: suspend (walletService: FFIWallet) -> Unit) = withContext(Dispatchers.IO) {
         EventBus.walletState.publishSubject.asFlow().firstOrNull { it == WalletState.Running }
             ?.let {
                 action(FFIWallet.instance!!)
             } ?: logger.i("Wallet service is not connected")
+    }
+
+    suspend fun <T> doOnWalletRunningWithValue(action: suspend (walletService: FFIWallet) -> T): T = withContext(Dispatchers.IO) {
+        EventBus.walletState.publishSubject.asFlow().firstOrNull { it == WalletState.Running }
+            ?.let {
+                action(FFIWallet.instance!!)
+            } ?: error("Wallet service is not connected")
     }
 }
 

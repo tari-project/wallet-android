@@ -44,7 +44,7 @@ abstract class Tx(
     open val id: BigInteger,
     open val direction: Direction,
     open val amount: MicroTari,
-    open val timestamp: BigInteger,
+    open val timestamp: BigInteger, // Seconds
     open val message: String,
     open val status: TxStatus,
     open val tariContact: TariContact, // This is the receiver for an outbound tx and sender for an inbound tx.

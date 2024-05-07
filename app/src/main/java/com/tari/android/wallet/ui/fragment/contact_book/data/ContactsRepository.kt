@@ -14,7 +14,6 @@ import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.PhoneConta
 import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.YatDto
 import com.tari.android.wallet.ui.fragment.contact_book.data.localStorage.ContactSharedPrefRepository
 import com.tari.android.wallet.util.ContactUtil
-import io.reactivex.subjects.BehaviorSubject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -36,8 +35,6 @@ class ContactsRepository @Inject constructor(
 ) {
     private val logger
         get() = Logger.t(ContactsRepository::class.simpleName)
-
-    val publishSubject = BehaviorSubject.create<List<ContactDto>>()
 
     private val ffiBridge = FFIContactsRepositoryBridge(
         contactsRepository = this,
@@ -65,14 +62,12 @@ class ContactsRepository @Inject constructor(
                 } ?: true
             }
         }
+    val currentContactList: List<ContactDto>
+        get() = _contactList.value
 
     private val contactPermission = MutableStateFlow(false)
     val contactPermissionGranted: Boolean
         get() = contactPermission.value
-
-    internal fun getContacts(): List<ContactDto> {
-        return this.contactList.value
-    }
 
     suspend fun addContact(contact: ContactDto) {
         if (contact.contactExistsByWalletAddress()) return
@@ -156,7 +151,7 @@ class ContactsRepository @Inject constructor(
     }
 
     internal suspend fun updateRecentUsedTime(contact: ContactDto) {
-        val existingContact = getContacts().firstOrNull { it.uuid == contact.uuid }
+        val existingContact = currentContactList.firstOrNull { it.uuid == contact.uuid }
         if (existingContact == null) {
             updateContactList { contacts ->
                 contacts.add(contact)
@@ -183,7 +178,7 @@ class ContactsRepository @Inject constructor(
     }
 
     internal suspend fun updateContactList(silently: Boolean = false, updateAction: suspend (contacts: MutableList<ContactDto>) -> Unit) {
-        val updatedContacts = getContacts().toMutableList().also { updateAction(it) }.toList()
+        val updatedContacts = currentContactList.toMutableList().also { updateAction(it) }.toList()
         _contactList.update { updatedContacts }
 
         doWithLoading("Updating contact changes to phone and FFI") {
@@ -200,18 +195,18 @@ class ContactsRepository @Inject constructor(
         phoneBookRepositoryBridge.updateContactListWithPhoneBook()
     }
 
-    private fun ContactDto.contactExists() = getContacts().any { it.uuid == this.uuid }
+    private fun ContactDto.contactExists() = currentContactList.any { it.uuid == this.uuid }
 
     private fun ContactDto.contactExistsByWalletAddress() =
-        getContacts().any { it.contact.extractWalletAddress() == this.contact.extractWalletAddress() }
+        currentContactList.any { it.contact.extractWalletAddress() == this.contact.extractWalletAddress() }
 
     fun getContactForTx(tx: Tx): ContactDto = getContactByAddress(tx.tariContact.walletAddress)
 
     fun getContactByAddress(address: TariWalletAddress): ContactDto =
-        getContacts().firstOrNull { it.getFFIDto()?.walletAddress == address }
+        currentContactList.firstOrNull { it.getFFIDto()?.walletAddress == address }
             ?: ContactDto(FFIContactDto(address))
 
-    fun getByUuid(uuid: String): ContactDto = getContacts().first { it.uuid == uuid }
+    fun getByUuid(uuid: String): ContactDto = currentContactList.first { it.uuid == uuid }
 
     data class LoadingState(val isLoading: Boolean = false, val name: String = "", val time: Double = 0.0)
 

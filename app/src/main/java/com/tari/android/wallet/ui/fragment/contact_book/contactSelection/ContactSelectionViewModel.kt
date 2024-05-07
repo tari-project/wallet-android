@@ -22,6 +22,7 @@ import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonStyle
 import com.tari.android.wallet.ui.fragment.chat_list.data.ChatItemDto
 import com.tari.android.wallet.ui.fragment.chat_list.data.ChatsRepository
 import com.tari.android.wallet.ui.fragment.contact_book.address_poisoning.AddressPoisoningChecker
+import com.tari.android.wallet.ui.fragment.contact_book.address_poisoning.SimilarAddressDto
 import com.tari.android.wallet.ui.fragment.contact_book.contactSelection.ContactSelectionModel.Effect
 import com.tari.android.wallet.ui.fragment.contact_book.contactSelection.ContactSelectionModel.YatState
 import com.tari.android.wallet.ui.fragment.contact_book.contacts.adapter.contact.ContactItem
@@ -158,8 +159,8 @@ class ContactSelectionViewModel : CommonViewModel() {
             val walletAddress = walletAddressViewModel.getWalletAddressFromEmojiId(addressText)
             selectedTariWalletAddress.postValue(walletAddress)
 
-            if (walletAddress != null && addressPoisoningChecker.isPoisoned(walletAddress)) {
-                showAddressPoisonedDialog(walletAddress)
+            addressPoisoningChecker.doOnAddressPoisoned(walletAddress) { addresses ->
+                showAddressPoisonedDialog(addresses)
             }
 
             if (yatUser == null && walletAddress == null) {
@@ -269,27 +270,40 @@ class ContactSelectionViewModel : CommonViewModel() {
         }
     }
 
-    private fun showAddressPoisonedDialog(walletAddress: TariWalletAddress) {
+    private fun showAddressPoisonedDialog(similarAddressList: List<SimilarAddressDto>) {
+        val addressPoisoningModule = AddressPoisoningModule(
+            addresses = similarAddressList,
+        )
+        val continueButtonModule = ButtonModule(
+            text = resourceManager.getString(R.string.common_continue),
+            style = ButtonStyle.Normal,
+            action = {
+                similarAddressDialogContinueClick(
+                    selectedAddressItem = addressPoisoningModule.selectedAddress,
+                    markAsTrusted = addressPoisoningModule.markAsTrusted,
+                )
+            }
+        )
+        val cancelButtonModule = ButtonModule(
+            text = resourceManager.getString(R.string.common_cancel),
+            style = ButtonStyle.Close,
+        )
+
         showModularDialog(
-            AddressPoisoningModule(
-                addresses = addressPoisoningChecker.getSimilarContactList(walletAddress),
-            ),
-            ButtonModule(
-                text = resourceManager.getString(R.string.common_continue),
-                style = ButtonStyle.Normal,
-                action = {
-                    similarAddressDialogContinueClick()
-                }
-            ),
-            ButtonModule(
-                text = resourceManager.getString(R.string.common_cancel),
-                style = ButtonStyle.Close,
-            ),
+            addressPoisoningModule,
+            continueButtonModule,
+            cancelButtonModule,
         )
     }
 
-    private fun similarAddressDialogContinueClick() {
-        TODO("Not yet implemented")
+    private fun similarAddressDialogContinueClick(selectedAddressItem: SimilarAddressDto, markAsTrusted: Boolean) {
+        selectedAddressItem.contactDto.walletAddress.let { selectedAddress ->
+            addressPoisoningChecker.markAsTrusted(selectedAddress, markAsTrusted)
+            viewModelScope.launch(Dispatchers.Main) {
+                hideDialog()
+                _effect.send(Effect.GoToNext)
+            }
+        }
     }
 
     companion object {

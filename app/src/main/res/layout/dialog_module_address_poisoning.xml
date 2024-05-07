@@ -52,7 +52,7 @@
     </com.tari.android.wallet.ui.component.tari.TariSecondaryBackground>
 
     <com.tari.android.wallet.ui.component.tari.TariCheckbox
-        android:id="@+id/checkbox"
+        android:id="@+id/trusted_checkbox"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="14dp"

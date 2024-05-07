@@ -45,7 +45,7 @@ import com.tari.android.wallet.model.TxStatus
 import com.tari.android.wallet.ui.common.gyphy.presentation.GIFViewModel
 import com.tari.android.wallet.ui.common.gyphy.repository.GIFRepository
 import com.tari.android.wallet.ui.common.recyclerView.items.TitleViewHolderItem
-import com.tari.android.wallet.ui.fragment.contact_book.address_poisoning.SimilarAddressItem
+import com.tari.android.wallet.ui.fragment.contact_book.address_poisoning.SimilarAddressDto
 import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.ContactDto
 import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.FFIContactDto
 import com.tari.android.wallet.ui.fragment.tx.adapter.TransactionItem
@@ -67,7 +67,8 @@ object DebugConfig {
 
     val mockTxs = valueIfDebug(false)
 
-    val mockAddressPoisoning: Boolean = valueIfDebug(true)
+    val mockEveryAddressPoisoned: Boolean = valueIfDebug(false)
+    val mockPoisonedAddresses: Boolean = valueIfDebug(false)
 
     const val isChatEnabled = false
 
@@ -172,19 +173,19 @@ object MockDataStub {
     fun createSimilarAddressList() = listOf(
         createSimilarAddress(),
         createSimilarAddress().copy(trusted = true),
-        createSimilarAddress().copy(lastItem = true),
+        createSimilarAddress(),
     )
 
-    fun createSimilarAddress(): SimilarAddressItem {
-        return SimilarAddressItem(
-            contact = ContactDto(
+    fun createSimilarAddress(): SimilarAddressDto {
+        return SimilarAddressDto(
+            contactDto = ContactDto(
                 contact = FFIContactDto(
                     walletAddress = WALLET_ADDRESS,
                     alias = "Alice",
                 ),
             ),
             numberOfTransaction = 10,
-            lastTransactionDate = DateTime.now().toDate(),
+            lastTransactionTimestampMillis = System.currentTimeMillis(),
             trusted = false,
         )
     }
