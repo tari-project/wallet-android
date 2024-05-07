@@ -34,7 +34,20 @@ class AuthViewModel : CommonViewModel() {
     init {
         component.inject(this)
 
-        migrationManager.validateVersion({ goAuth.postValue(Unit) }, { showIncompatibleVersionDialog() })
+        viewModelScope.launch(Dispatchers.IO) {
+            migrationManager.validateVersion(
+                onValid = {
+                    viewModelScope.launch(Dispatchers.Main) {
+                        goAuth.postValue(Unit)
+                    }
+                },
+                onError = {
+                    viewModelScope.launch(Dispatchers.Main) {
+                        showIncompatibleVersionDialog()
+                    }
+                }
+            )
+        }
     }
 
     private fun showIncompatibleVersionDialog() {
