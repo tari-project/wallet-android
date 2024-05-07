@@ -9,9 +9,9 @@ import com.tari.android.wallet.util.DebugConfig
 
 class NetworkRepositoryImpl(sharedPrefs: SharedPreferences) : NetworkRepository {
 
-    override val defaultNetwork = if (DebugConfig.mockNetwork) NETWORK_NEXTNET else NETWORK_STAGENET
+    override val defaultNetwork = if (DebugConfig.mockNetwork) NETWORK_NEXTNET else NETWORK_NEXTNET
 
-    override var supportedNetworks: List<TariNetwork> = if (DebugConfig.mockNetwork) listOf(NETWORK_NEXTNET) else listOf(NETWORK_STAGENET)
+    override var supportedNetworks: List<TariNetwork> = if (DebugConfig.mockNetwork) listOf(NETWORK_NEXTNET) else listOf(NETWORK_NEXTNET)
 
     override var currentNetwork by SharedPrefGsonDelegate(
         prefs = sharedPrefs,
