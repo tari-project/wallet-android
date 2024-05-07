@@ -128,6 +128,7 @@ open class ContactSelectionFragment : CommonFragment<FragmentContactsSelectionBi
                     when (effect) {
                         is Effect.ShowNotValidEmojiId -> showNotValidEmojiId()
                         is Effect.ShowNextButton -> showNextButton()
+                        is Effect.GoToNext -> goToNext()
                     }
                 }
             }

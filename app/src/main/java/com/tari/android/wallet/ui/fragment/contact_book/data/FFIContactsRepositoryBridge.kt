@@ -80,7 +80,7 @@ class FFIContactsRepositoryBridge(
             contactsRepository.doWithLoading("Updating contact changes to phone and FFI") {
                 updateFFIContacts()
 
-                val existingContact = contactsRepository.getContacts()
+                val existingContact = contactsRepository.currentContactList
                     .firstOrNull { it.contact.extractWalletAddress() == tariContact.walletAddress }
                 val contact = existingContact ?: ContactDto(FFIContactDto(tariContact.walletAddress, tariContact.alias, tariContact.isFavorite))
                 contactsRepository.updateRecentUsedTime(contact)
@@ -145,5 +145,5 @@ class FFIContactsRepositoryBridge(
     }
 
     private fun ffiContactExist(walletAddress: TariWalletAddress): Boolean =
-        contactsRepository.getContacts().any { it.contact.extractWalletAddress() == walletAddress }
+        contactsRepository.currentContactList.any { it.contact.extractWalletAddress() == walletAddress }
 }
