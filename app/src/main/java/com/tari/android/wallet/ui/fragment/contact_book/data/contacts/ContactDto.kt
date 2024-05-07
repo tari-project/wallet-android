@@ -2,6 +2,7 @@ package com.tari.android.wallet.ui.fragment.contact_book.data.contacts
 
 import com.tari.android.wallet.R
 import com.tari.android.wallet.data.sharedPrefs.delegates.SerializableTime
+import com.tari.android.wallet.model.TariWalletAddress
 import com.tari.android.wallet.ui.fragment.contact_book.data.ContactAction
 import java.io.Serializable
 import java.util.UUID
@@ -12,6 +13,9 @@ data class ContactDto(
     var lastUsedDate: SerializableTime? = null,
     val yat: YatDto? = (contact as? PhoneContactDto)?.yatDto ?: (contact as? MergedContactDto)?.phoneContactDto?.yatDto
 ) : Serializable {
+    val walletAddress: TariWalletAddress
+        get() = contact.extractWalletAddress()
+
     fun filtered(text: String): Boolean = contact.filtered(text)
 
     fun getContactActions(): List<ContactAction> {

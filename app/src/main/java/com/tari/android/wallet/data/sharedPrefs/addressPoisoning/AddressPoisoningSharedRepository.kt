@@ -50,7 +50,7 @@ class AddressPoisoningSharedRepository @Inject constructor(
         const val TRUSTED_CONTACT_LIST = "TRUSTED_CONTACT_LIST"
     }
 
-    private var trustedContactList: TrustedContactList by SharedPrefGsonDelegate(
+    private var trustedContactHexList: TrustedContactList by SharedPrefGsonDelegate(
         prefs = sharedPrefs,
         commonRepository = this,
         name = formatKey(Key.TRUSTED_CONTACT_LIST),
@@ -58,19 +58,23 @@ class AddressPoisoningSharedRepository @Inject constructor(
         defValue = TrustedContactList(),
     )
 
-    fun addTrustedContact(contact: String) {
-        trustedContactList = TrustedContactList(trustedContactList + contact)
+    fun addTrustedContactHex(hex: String) {
+        trustedContactHexList = TrustedContactList(trustedContactHexList + hex)
     }
 
-    fun removeTrustedContact(contact: String) {
-        trustedContactList = TrustedContactList(trustedContactList - contact)
+    fun removeTrustedContactHex(hex: String) {
+        trustedContactHexList = TrustedContactList(trustedContactHexList - hex)
     }
 
-    fun getTrustedContactList(): List<String> {
-        return trustedContactList
+    fun getTrustedContactHexList(): List<String> {
+        return trustedContactHexList
     }
 
     fun clear() {
-        trustedContactList = TrustedContactList()
+        trustedContactHexList = TrustedContactList()
     }
+}
+
+private class TrustedContactList(trustedContacts: List<String>) : ArrayList<String>(trustedContacts) {
+    constructor() : this(emptyList())
 }

@@ -25,6 +25,7 @@ object ContactSelectionModel {
     sealed interface Effect {
         data object ShowNotValidEmojiId : Effect
         data object ShowNextButton : Effect
+        data object GoToNext : Effect
     }
 
 }
