@@ -259,16 +259,16 @@ class FFIWallet(
 
         try {
             jniCreate(
-                commsConfig,
-                logPath,
-                logVerbosity,
-                Constants.Wallet.maxNumberOfRollingLogFiles,
-                Constants.Wallet.rollingLogFileMaxSizeBytes,
-                passphrase,
-                networkRepository.currentNetwork.network.uriComponent,
-                seedPhraseRepository.getPhrase()?.ffiSeedWords,
-                networkRepository.currentNetwork.dnsPeer,
-                isDnsSecureOn,
+                commsConfig = commsConfig,
+                logPath = logPath,
+                logVerbosity = logVerbosity,
+                maxNumberOfRollingLogFiles = Constants.Wallet.maxNumberOfRollingLogFiles,
+                rollingLogFileMaxSizeBytes = Constants.Wallet.rollingLogFileMaxSizeBytes,
+                passphrase = passphrase,
+                network = networkRepository.currentNetwork.network.uriComponent,
+                seedWords = seedPhraseRepository.getPhrase()?.ffiSeedWords,
+                dnsPeer = networkRepository.currentNetwork.dnsPeer,
+                isDnsSecureOn = isDnsSecureOn,
                 this::onTxReceived.name, "(J)V",
                 this::onTxReplyReceived.name, "(J)V",
                 this::onTxFinalized.name, "(J)V",
@@ -285,7 +285,7 @@ class FFIWallet(
                 this::onTxValidationComplete.name, "([B[B)V",
                 this::onConnectivityStatus.name, "([B)V",
                 this::onBaseNodeStatus.name, "(J)V",
-                error
+                libError = error,
             )
         } catch (e: Throwable) {
             logger.e(e, "jniCreate was failed")

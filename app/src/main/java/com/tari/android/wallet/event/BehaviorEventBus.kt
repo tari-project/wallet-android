@@ -3,7 +3,7 @@ package com.tari.android.wallet.event
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.subjects.BehaviorSubject
 
-open class BehaviorEventBus<Consumer: Any> {
+open class BehaviorEventBus<Consumer : Any> {
     var disposables = mutableMapOf<Any, CompositeDisposable>()
         private set
 
@@ -11,7 +11,10 @@ open class BehaviorEventBus<Consumer: Any> {
         private set
 
     fun subscribe(subscriber: Any, consumer: (Consumer) -> Unit) {
-        val observer = publishSubject.subscribe(consumer)
+        val observer = publishSubject.subscribe(
+            /* onNext = */ consumer,
+            /* onError = */ { it.printStackTrace() },
+        )
         val disposable = disposables[subscriber] ?: CompositeDisposable().apply { disposables[subscriber] = this }
         disposable.add(observer)
     }

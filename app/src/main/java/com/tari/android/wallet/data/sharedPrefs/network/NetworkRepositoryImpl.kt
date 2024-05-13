@@ -13,13 +13,18 @@ class NetworkRepositoryImpl(sharedPrefs: SharedPreferences) : NetworkRepository 
 
     override var supportedNetworks: List<TariNetwork> = if (DebugConfig.mockNetwork) listOf(NETWORK_NEXTNET) else listOf(NETWORK_NEXTNET)
 
-    override var currentNetwork by SharedPrefGsonDelegate(
+    private var _currentNetwork: Network by SharedPrefGsonDelegate(
         prefs = sharedPrefs,
         commonRepository = SimpleRepository(this),
         name = Keys.CURRENT_NETWORK,
-        type = TariNetwork::class.java,
-        defValue = defaultNetwork,
+        type = Network::class.java,
+        defValue = defaultNetwork.network,
     )
+    override var currentNetwork: TariNetwork
+        get() = supportedNetworks.firstOrNull { it.network == _currentNetwork } ?: defaultNetwork
+        set(value) {
+            _currentNetwork = value.network
+        }
 
     override var ffiNetwork: Network? by SharedPrefGsonNullableDelegate(
         prefs = sharedPrefs,
@@ -29,7 +34,7 @@ class NetworkRepositoryImpl(sharedPrefs: SharedPreferences) : NetworkRepository 
     )
 
     object Keys {
-        const val CURRENT_NETWORK = "tari_current_network"
+        const val CURRENT_NETWORK = "tari_current_network_type"
         const val FFI_NETWORK = "ffi_tari_current_network"
     }
 
