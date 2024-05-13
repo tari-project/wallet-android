@@ -27,7 +27,7 @@ class SharedPrefGsonDelegate<T>(
         return if (prefs.contains(name)) {
             val savedValue = prefs.getString(name, "")
             try {
-                gson.fromJson(savedValue, type) as T
+                (gson.fromJson(savedValue, type) as T) ?: defValue
             } catch (e: Throwable) {
                 logger.i(e.toString())
                 defValue
