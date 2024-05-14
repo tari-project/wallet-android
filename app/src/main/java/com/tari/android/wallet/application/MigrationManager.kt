@@ -43,6 +43,6 @@ class MigrationManager @Inject constructor(
     }
 
     companion object {
-        const val PEER_DB_MIGRATION_MIN_VERSION = "v1.0.0-rc.8"
+        const val PEER_DB_MIGRATION_MIN_VERSION = "1.0.0-rc.8"
     }
 }
