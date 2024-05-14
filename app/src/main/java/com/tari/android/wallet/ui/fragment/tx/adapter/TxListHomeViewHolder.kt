@@ -45,6 +45,13 @@ class TxListHomeViewHolder(view: ItemHomeTxListBinding) : CommonViewHolder<Trans
         val txUser = tx.tariContact
         // display contact name or emoji id
         when {
+            tx.isCoinbase -> {
+                ui.participantTextView1.visible()
+                ui.participantTextView2.gone()
+                ui.participantEmojiIdView.gone()
+                ui.participantTextView1.text = string(R.string.tx_details_coinbase_placeholder)
+            }
+
             tx.isOneSided -> {
                 val title = string(R.string.tx_list_someone) + " " + string(R.string.tx_list_paid_you)
                 ui.participantTextView1.visible()

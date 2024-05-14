@@ -18,13 +18,13 @@ class DeeplinkFormatter @Inject constructor(private val networkRepository: Netwo
 
         val uri = runCatching { Uri.parse(URLDecoder.decode(deepLink, "UTF-8")) }.getOrNull() ?: return null
 
-        if (!uri.authority.equals(networkRepository.currentNetwork!!.network.uriComponent)) {
+        if (!uri.authority.equals(networkRepository.currentNetwork.network.uriComponent)) {
             return null
         }
 
         var paramentrs = uri.queryParameterNames.associateWith { uri.getQueryParameter(it).orEmpty() }.toMutableMap()
         val command = uri.path.orEmpty().trimStart('/')
-        if (command == DeepLink.Contacts.contactsCommand) {
+        if (command == DeepLink.Contacts.COMMAND_CONTACTS) {
             val values = uri.query.orEmpty().split("&").map {
                 val (key, value) = it.split("=")
                 key to value
@@ -53,7 +53,7 @@ class DeeplinkFormatter @Inject constructor(private val networkRepository: Netwo
 
         val fullPart = Uri.Builder()
             .scheme(scheme)
-            .authority(networkRepository.currentNetwork!!.network.uriComponent)
+            .authority(networkRepository.currentNetwork.network.uriComponent)
             .appendPath(deepLink.getCommand())
 
         deepLink.getParams().forEach { (key, value) ->

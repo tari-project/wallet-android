@@ -5,7 +5,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.viewModelScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.tari.android.wallet.databinding.FragmentContactsLinkBinding
 import com.tari.android.wallet.extension.observe
@@ -15,8 +14,6 @@ import com.tari.android.wallet.ui.extension.serializable
 import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.ContactDto
 import com.tari.android.wallet.ui.fragment.contact_book.link.adapter.LinkContactAdapter
 import com.tari.android.wallet.ui.fragment.home.navigation.TariNavigator.Companion.PARAMETER_CONTACT
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 
 class ContactLinkFragment : CommonFragment<FragmentContactsLinkBinding, ContactLinkViewModel>() {
 
@@ -40,7 +37,7 @@ class ContactLinkFragment : CommonFragment<FragmentContactsLinkBinding, ContactL
     private fun observeUI() = with(viewModel) {
         observe(list) { adapter.update(it) }
 
-        observe(grantPermission) { grantPermission() }
+        observe(grantPermission) { viewModel.grantPermission() }
     }
 
     private fun initUI() = with(ui) {
@@ -48,15 +45,6 @@ class ContactLinkFragment : CommonFragment<FragmentContactsLinkBinding, ContactL
         listUi.layoutManager = LinearLayoutManager(context)
 
         adapter.setClickListener(CommonAdapter.ItemClickListener { item -> viewModel.onContactClick(item) })
-    }
-
-    private fun grantPermission() {
-        viewModel.permissionManager.runWithPermission(listOf(android.Manifest.permission.READ_CONTACTS), true) {
-            viewModel.viewModelScope.launch(Dispatchers.IO) {
-                viewModel.contactsRepository.contactPermission.postValue(true)
-                viewModel.contactsRepository.phoneBookRepositoryBridge.loadFromPhoneBook()
-            }
-        }
     }
 
     companion object {

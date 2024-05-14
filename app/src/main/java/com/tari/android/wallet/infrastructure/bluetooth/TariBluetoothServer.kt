@@ -13,7 +13,7 @@ import com.tari.android.wallet.data.sharedPrefs.bluetooth.BluetoothServerState
 import com.tari.android.wallet.data.sharedPrefs.bluetooth.ShareSettingsRepository
 import com.tari.android.wallet.extension.addTo
 import com.tari.android.wallet.model.TariWalletAddress
-import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.ContactDto
+import com.tari.android.wallet.util.ContactUtil
 import com.welie.blessed.BluetoothCentral
 import com.welie.blessed.BluetoothPeripheralManager
 import com.welie.blessed.BluetoothPeripheralManagerCallback
@@ -30,7 +30,8 @@ import javax.inject.Singleton
 @Singleton
 class TariBluetoothServer @Inject constructor(
     private val shareSettingsRepository: ShareSettingsRepository,
-    val deeplinkHandler: DeeplinkHandler,
+    private val deeplinkHandler: DeeplinkHandler,
+    private val contactUtil: ContactUtil,
 ) : TariBluetoothAdapter() {
 
     private var bluetoothGattServer: BluetoothGattServer? = null
@@ -141,14 +142,17 @@ class TariBluetoothServer @Inject constructor(
 
             fun initiateReading() {
                 if (shareChunkedData.isNotEmpty()) return
-                val myWalletAddress = TariWalletAddress().apply {
-                    hexString = sharedPrefsRepository.publicKeyHexString.orEmpty()
-                    emojiId = sharedPrefsRepository.emojiId.orEmpty()
-                }
+                val myWalletAddress = TariWalletAddress.createWalletAddress(
+                    hexString = sharedPrefsRepository.publicKeyHexString.orEmpty(),
+                    emojiId = sharedPrefsRepository.emojiId.orEmpty(),
+                )
                 val data = deeplinkHandler.getDeeplink(
                     DeepLink.UserProfile(
-                        sharedPrefsRepository.publicKeyHexString.orEmpty(),
-                        ContactDto.normalizeAlias((sharedPrefsRepository.name.orEmpty() + " " + sharedPrefsRepository.surname).trim(), myWalletAddress),
+                        tariAddressHex = sharedPrefsRepository.publicKeyHexString.orEmpty(),
+                        alias = contactUtil.normalizeAlias(
+                            alias = (sharedPrefsRepository.name.orEmpty() + " " + sharedPrefsRepository.surname).trim(),
+                            walletAddress = myWalletAddress,
+                        ),
                     )
                 )
                 logger.i("contactlessPayment: read: whole data: $data")

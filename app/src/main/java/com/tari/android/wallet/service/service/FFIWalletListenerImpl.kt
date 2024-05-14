@@ -1,12 +1,12 @@
 package com.tari.android.wallet.service.service
 
 import com.orhanobut.logger.Logger
-import com.orhanobut.logger.Printer
 import com.tari.android.wallet.application.TariWalletApplication
-import com.tari.android.wallet.application.baseNodes.BaseNodes
+import com.tari.android.wallet.application.baseNodes.BaseNodesManager
 import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodeSharedRepository
 import com.tari.android.wallet.event.Event
 import com.tari.android.wallet.event.EventBus
+import com.tari.android.wallet.ffi.FFITariBaseNodeState
 import com.tari.android.wallet.ffi.FFIWallet
 import com.tari.android.wallet.ffi.FFIWalletListener
 import com.tari.android.wallet.ffi.TransactionValidationStatus
@@ -46,10 +46,11 @@ class FFIWalletListenerImpl(
     private val notificationService: NotificationService,
     private val app: TariWalletApplication,
     private val baseNodeSharedPrefsRepository: BaseNodeSharedRepository,
-    private val baseNodes: BaseNodes
+    private val baseNodesManager: BaseNodesManager
 ) : FFIWalletListener {
 
-    private val logger: Printer = Logger.t("FFIWalletListenerImpl")
+    private val logger
+        get() = Logger.t("FFIWalletListenerImpl")
     var listeners = CopyOnWriteArrayList<TariWalletServiceListener>()
 
     /**
@@ -73,92 +74,92 @@ class FFIWalletListenerImpl(
     val outboundTxIdsToBePushNotified = CopyOnWriteArraySet<Pair<BigInteger, String>>()
 
     override fun onTxReceived(pendingInboundTx: PendingInboundTx) {
-        pendingInboundTx.tariContact = getUserByWalletAddress(pendingInboundTx.tariContact.walletAddress)
+        val newTx = pendingInboundTx.copy(tariContact = getUserByWalletAddress(pendingInboundTx.tariContact.walletAddress))
         // post event to bus for the listeners
-        EventBus.post(Event.Transaction.TxReceived(pendingInboundTx))
+        EventBus.post(Event.Transaction.TxReceived(newTx))
         // manage notifications
-        postTxNotification(pendingInboundTx)
-        listeners.forEach { it.onTxReceived(pendingInboundTx) }
+        postTxNotification(newTx)
+        listeners.forEach { it.onTxReceived(newTx) }
         // schedule a backup
         backupManager.backupNow()
     }
 
     override fun onTxReplyReceived(pendingOutboundTx: PendingOutboundTx) {
-        pendingOutboundTx.tariContact = getUserByWalletAddress(pendingOutboundTx.tariContact.walletAddress)
+        val newTx = pendingOutboundTx.copy(tariContact = getUserByWalletAddress(pendingOutboundTx.tariContact.walletAddress))
         // post event to bus for the listeners
-        EventBus.post(Event.Transaction.TxReplyReceived(pendingOutboundTx))
+        EventBus.post(Event.Transaction.TxReplyReceived(newTx))
         // notify external listeners
-        listeners.iterator().forEach { it.onTxReplyReceived(pendingOutboundTx) }
+        listeners.iterator().forEach { it.onTxReplyReceived(newTx) }
         // schedule a backup
         backupManager.backupNow()
     }
 
     override fun onTxFinalized(pendingInboundTx: PendingInboundTx) {
-        pendingInboundTx.tariContact = getUserByWalletAddress(pendingInboundTx.tariContact.walletAddress)
+        val newTx = pendingInboundTx.copy(tariContact = getUserByWalletAddress(pendingInboundTx.tariContact.walletAddress))
         // post event to bus for the listeners
-        EventBus.post(Event.Transaction.TxFinalized(pendingInboundTx))
+        EventBus.post(Event.Transaction.TxFinalized(newTx))
         // notify external listeners
-        listeners.iterator().forEach { it.onTxFinalized(pendingInboundTx) }
+        listeners.iterator().forEach { it.onTxFinalized(newTx) }
         // schedule a backup
         backupManager.backupNow()
     }
 
     override fun onInboundTxBroadcast(pendingInboundTx: PendingInboundTx) {
-        pendingInboundTx.tariContact = getUserByWalletAddress(pendingInboundTx.tariContact.walletAddress)
+        val newTx = pendingInboundTx.copy(tariContact = getUserByWalletAddress(pendingInboundTx.tariContact.walletAddress))
         // post event to bus for the listeners
-        EventBus.post(Event.Transaction.InboundTxBroadcast(pendingInboundTx))
+        EventBus.post(Event.Transaction.InboundTxBroadcast(newTx))
         // notify external listeners
-        listeners.iterator().forEach { it.onInboundTxBroadcast(pendingInboundTx) }
+        listeners.iterator().forEach { it.onInboundTxBroadcast(newTx) }
         // schedule a backup
         backupManager.backupNow()
     }
 
     override fun onOutboundTxBroadcast(pendingOutboundTx: PendingOutboundTx) {
-        pendingOutboundTx.tariContact = getUserByWalletAddress(pendingOutboundTx.tariContact.walletAddress)
+        val newTx = pendingOutboundTx.copy(tariContact = getUserByWalletAddress(pendingOutboundTx.tariContact.walletAddress))
         // post event to bus for the listeners
-        EventBus.post(Event.Transaction.OutboundTxBroadcast(pendingOutboundTx))
+        EventBus.post(Event.Transaction.OutboundTxBroadcast(newTx))
         // notify external listeners
-        listeners.iterator().forEach { it.onOutboundTxBroadcast(pendingOutboundTx) }
+        listeners.iterator().forEach { it.onOutboundTxBroadcast(newTx) }
         // schedule a backup
         backupManager.backupNow()
     }
 
     override fun onTxMined(completedTx: CompletedTx) {
-        completedTx.tariContact = getUserByWalletAddress(completedTx.tariContact.walletAddress)
+        val newTx = completedTx.copy(tariContact = getUserByWalletAddress(completedTx.tariContact.walletAddress))
         // post event to bus for the listeners
-        EventBus.post(Event.Transaction.TxMined(completedTx))
+        EventBus.post(Event.Transaction.TxMined(newTx))
         // notify external listeners
-        listeners.iterator().forEach { it.onTxMined(completedTx) }
+        listeners.iterator().forEach { it.onTxMined(newTx) }
         // schedule a backup
         backupManager.backupNow()
     }
 
     override fun onTxMinedUnconfirmed(completedTx: CompletedTx, confirmationCount: Int) {
-        completedTx.tariContact = getUserByWalletAddress(completedTx.tariContact.walletAddress)
+        val newTx = completedTx.copy(tariContact = getUserByWalletAddress(completedTx.tariContact.walletAddress))
         // post event to bus for the listeners
-        EventBus.post(Event.Transaction.TxMinedUnconfirmed(completedTx))
+        EventBus.post(Event.Transaction.TxMinedUnconfirmed(newTx))
         // notify external listeners
-        listeners.iterator().forEach { it.onTxMinedUnconfirmed(completedTx, confirmationCount) }
+        listeners.iterator().forEach { it.onTxMinedUnconfirmed(newTx, confirmationCount) }
         // schedule a backup
         backupManager.backupNow()
     }
 
     override fun onTxFauxConfirmed(completedTx: CompletedTx) {
-        completedTx.tariContact = getUserByWalletAddress(completedTx.tariContact.walletAddress)
+        val newTx = completedTx.copy(tariContact = getUserByWalletAddress(completedTx.tariContact.walletAddress))
         // post event to bus for the listeners
-        EventBus.post(Event.Transaction.TxFauxConfirmed(completedTx))
+        EventBus.post(Event.Transaction.TxFauxConfirmed(newTx))
         // notify external listeners
-        listeners.iterator().forEach { it.onTxFauxConfirmed(completedTx) }
+        listeners.iterator().forEach { it.onTxFauxConfirmed(newTx) }
         // schedule a backup
         backupManager.backupNow()
     }
 
     override fun onTxFauxUnconfirmed(completedTx: CompletedTx, confirmationCount: Int) {
-        completedTx.tariContact = getUserByWalletAddress(completedTx.tariContact.walletAddress)
+        val newTx = completedTx.copy(tariContact = getUserByWalletAddress(completedTx.tariContact.walletAddress))
         // post event to bus for the listeners
-        EventBus.post(Event.Transaction.TxFauxMinedUnconfirmed(completedTx))
+        EventBus.post(Event.Transaction.TxFauxMinedUnconfirmed(newTx))
         // notify external listeners
-        listeners.iterator().forEach { it.onTxFauxUnconfirmed(completedTx, confirmationCount) }
+        listeners.iterator().forEach { it.onTxFauxUnconfirmed(newTx, confirmationCount) }
         // schedule a backup
         backupManager.backupNow()
     }
@@ -177,16 +178,16 @@ class FFIWalletListenerImpl(
     }
 
     override fun onTxCancelled(cancelledTx: CancelledTx, rejectionReason: Int) {
-        cancelledTx.tariContact = getUserByWalletAddress(cancelledTx.tariContact.walletAddress)
+        val newTx = cancelledTx.copy(tariContact = getUserByWalletAddress(cancelledTx.tariContact.walletAddress))
         // post event to bus
-        EventBus.post(Event.Transaction.TxCancelled(cancelledTx))
+        EventBus.post(Event.Transaction.TxCancelled(newTx))
         val currentActivity = app.currentActivity
         if (cancelledTx.direction == Tx.Direction.INBOUND && !(app.isInForeground && currentActivity is HomeActivity && currentActivity.willNotifyAboutNewTx())
         ) {
-            notificationHelper.postTxCanceledNotification(cancelledTx)
+            notificationHelper.postTxCanceledNotification(newTx)
         }
         // notify external listeners
-        listeners.iterator().forEach { listener -> listener.onTxCancelled(cancelledTx) }
+        listeners.iterator().forEach { listener -> listener.onTxCancelled(newTx) }
         // schedule a backup
         backupManager.backupNow()
     }
@@ -210,22 +211,28 @@ class FFIWalletListenerImpl(
     }
 
     override fun onConnectivityStatus(status: Int) {
-        when (status) {
-            1 -> {
-                baseNodeSharedPrefsRepository.baseNodeState = BaseNodeState.Online.toInt()
+        when (ConnectivityStatus.entries[status]) {
+            ConnectivityStatus.CONNECTING -> {
+                /* do nothing */
+            }
+
+            ConnectivityStatus.ONLINE -> {
+                baseNodesManager.refreshBaseNodeList()
+                baseNodeSharedPrefsRepository.baseNodeState = BaseNodeState.Online
                 EventBus.baseNodeState.post(BaseNodeState.Online)
                 listeners.iterator().forEach { it.onBaseNodeSyncComplete(true) }
             }
 
-            2 -> {
+            ConnectivityStatus.OFFLINE -> {
                 val currentBaseNode = baseNodeSharedPrefsRepository.currentBaseNode
                 if (currentBaseNode == null || !currentBaseNode.isCustom) {
-                    baseNodes.setNextBaseNode()
+                    baseNodesManager.setNextBaseNode()
                 }
-                baseNodeSharedPrefsRepository.baseNodeState = BaseNodeState.Offline.toInt()
+                baseNodeSharedPrefsRepository.baseNodeState = BaseNodeState.Offline
                 EventBus.baseNodeState.post(BaseNodeState.Offline)
                 listeners.iterator().forEach { it.onBaseNodeSyncComplete(false) }
             }
+
         }
     }
 
@@ -285,7 +292,7 @@ class FFIWalletListenerImpl(
             baseNodeSharedPrefsRepository.baseNodeLastSyncResult = false
             val currentBaseNode = baseNodeSharedPrefsRepository.currentBaseNode
             if (currentBaseNode == null || !currentBaseNode.isCustom) {
-                baseNodes.setNextBaseNode()
+                baseNodesManager.setNextBaseNode()
             }
             EventBus.baseNodeSyncState.post(BaseNodeSyncState.Failed)
             listeners.iterator().forEach { it.onBaseNodeSyncComplete(false) }
@@ -320,5 +327,15 @@ class FFIWalletListenerImpl(
 
     override fun onWalletRestoration(result: WalletRestorationResult) {
         EventBus.walletRestorationState.post(result)
+    }
+
+    override fun onBaseNodeStateChanged(baseNodeState: FFITariBaseNodeState) {
+        baseNodesManager.saveBaseNodeState(baseNodeState)
+    }
+
+    enum class ConnectivityStatus(val value: Int) {
+        CONNECTING(0),
+        ONLINE(1),
+        OFFLINE(2),
     }
 }

@@ -6,14 +6,18 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
+import com.orhanobut.logger.Logger
 import com.tari.android.wallet.ui.component.common.CommonView
+
+private val logger
+    get() = Logger.t("ViewModelExtension")
 
 fun <T> Fragment.observe(liveData: LiveData<T>, action: (data: T) -> Unit) {
     liveData.observe(this.viewLifecycleOwner) {
         try {
             action.invoke(it)
         } catch (e: Exception) {
-            println(e)
+            logger.i(e.toString())
         }
     }
 }
@@ -27,7 +31,7 @@ fun <T> AppCompatActivity.observe(liveData: LiveData<T>, action: (data: T) -> Un
         try {
             action.invoke(it)
         } catch (e: Exception) {
-            println(e)
+            logger.i(e.toString())
         }
     }
 }
@@ -41,7 +45,7 @@ fun <T> CommonView<*, *>.observe(liveData: LiveData<T>, action: (data: T) -> Uni
         try {
             action.invoke(it)
         } catch (e: Exception) {
-            println(e)
+            logger.i(e.toString())
         }
     }
 }

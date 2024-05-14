@@ -33,7 +33,7 @@
 package com.tari.android.wallet.ffi
 
 /**
- * Wrapper for native private key type.
+ * Wrapper for native public key type.
  *
  * @author The Tari Development Team
  */

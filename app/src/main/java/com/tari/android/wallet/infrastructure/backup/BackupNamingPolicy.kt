@@ -39,7 +39,7 @@ import javax.inject.Singleton
 @Singleton
 class BackupNamingPolicy @Inject constructor(val networkRepository: NetworkRepository) {
 
-    private val backupFileNamePrefix = "Tari-Aurora-Backup-${networkRepository.currentNetwork!!.network.uriComponent}"
+    private val backupFileNamePrefix = "Tari-Aurora-Backup-${networkRepository.currentNetwork.network.uriComponent}"
 
     val regex = Regex("$backupFileNamePrefix.*")
 

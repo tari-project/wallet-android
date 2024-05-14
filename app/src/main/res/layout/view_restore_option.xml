@@ -8,6 +8,7 @@
     android:layout_height="64dp"
     android:clickable="true"
     android:focusable="true"
+    android:foreground="?attr/selectableItemBackground"
     android:paddingHorizontal="@dimen/common_horizontal_margin">
 
     <FrameLayout

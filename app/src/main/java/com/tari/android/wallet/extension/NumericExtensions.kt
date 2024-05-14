@@ -44,16 +44,8 @@ fun Float.remap(from1: Float, to1: Float, from2: Float, to2: Float): Float {
     return (this - from1) / (to1 - from1) * (to2 - from2) + from2
 }
 
-/**
- * Int to MicroTari.
- */
-fun Int.toMicroTari(): MicroTari {
-    return MicroTari(BigInteger.valueOf(this.toLong()))
-}
+fun Int.toMicroTari() = BigInteger.valueOf(this.toLong()).toMicroTari()
 
-/**
- * Long to MicroTari.
- */
-fun Long.toMicroTari(): MicroTari {
-    return MicroTari(BigInteger.valueOf(this))
-}
+fun Long.toMicroTari() = BigInteger.valueOf(this).toMicroTari()
+
+fun BigInteger.toMicroTari() = MicroTari(this)

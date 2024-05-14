@@ -48,14 +48,15 @@ class DeepLinkTest {
 
     @Test
     fun assertBaseNodeName() {
-        val deeplink = "tari://${currentNetwork.uriComponent}/${DeepLink.AddBaseNode.addNodeCommand}?${DeepLink.AddBaseNode.nameKey}=base_node_test"
+        val deeplink =
+            "tari://${currentNetwork.uriComponent}/${DeepLink.AddBaseNode.COMMAND_ADD_NODE}?${DeepLink.AddBaseNode.KEY_NAME}=base_node_test"
         val result = deeplinkHandler.handle(deeplink) as? DeepLink.AddBaseNode
         assertEquals(result!!.name, "base_node_test")
     }
 
     @Test
     fun assertBaseNodePeer() {
-        val deeplink = "tari://${currentNetwork.uriComponent}/${DeepLink.AddBaseNode.addNodeCommand}?${DeepLink.AddBaseNode.peerKey}=$PEER"
+        val deeplink = "tari://${currentNetwork.uriComponent}/${DeepLink.AddBaseNode.COMMAND_ADD_NODE}?${DeepLink.AddBaseNode.KEY_PEER}=$PEER"
         val result = deeplinkHandler.handle(deeplink) as? DeepLink.AddBaseNode
         assertEquals(result!!.peer, PEER)
     }
@@ -68,14 +69,11 @@ class DeepLinkTest {
 
     class NetworkRepositoryMock : NetworkRepository {
         private val network: Network = Network.STAGENET
+        private val tariNetwork = TariNetwork(network, "seeds.stagenet.tari.com", "xtr", true)
 
-        override var supportedNetworks: List<Network> = listOf(network)
-        override var currentNetwork: TariNetwork? = TariNetwork(network, "")
+        override val defaultNetwork: TariNetwork = tariNetwork
+        override var supportedNetworks: List<TariNetwork> = listOf(tariNetwork)
+        override var currentNetwork: TariNetwork = TariNetwork(network, "seeds.stagenet.tari.com", "", true)
         override var ffiNetwork: Network? = network
-        override var incompatibleNetworkShown: Boolean = false
-        override var recommendedNetworks: List<Network> = listOf(network)
-
-        override fun getAllNetworks(): List<TariNetwork> = listOf()
-
     }
 }

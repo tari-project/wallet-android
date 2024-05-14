@@ -31,7 +31,7 @@ class WalletAddressViewModel : CommonViewModel() {
     }
 
     fun tryToCheckClipboard() {
-        doOnConnected {
+        doOnWalletServiceConnected {
             checkClipboardForValidEmojiId(it)
         }
     }
@@ -39,7 +39,7 @@ class WalletAddressViewModel : CommonViewModel() {
     fun checkClipboardForValidEmojiId(walletService: TariWalletService) {
         val clipboardString = clipboardManager.primaryClip?.getItemAt(0)?.text?.toString() ?: return
 
-        doOnConnectedToWallet {
+        doOnWalletRunning {
             runCatching {
                 checkForValidEmojiId(walletService, clipboardString)
 
@@ -49,7 +49,7 @@ class WalletAddressViewModel : CommonViewModel() {
     }
 
     fun checkFromQuery(walletService: TariWalletService, query: String) {
-        doOnConnectedToWallet {
+        doOnWalletRunning {
             checkForValidEmojiId(walletService, query)
             discoveredWalletAddressFromQuery.postValue(discoveredWalletAddress)
         }

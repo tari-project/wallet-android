@@ -11,8 +11,7 @@
     <string name="user_agreement_url">https://www.tari.com/user_agreement/</string>
     <string name="privacy_policy_url">https://www.tari.com/privacy_policy/</string>
     <string name="disclaimer_url">https://www.tari.com/disclaimer/</string>
-    <string name="explorer_url">https://explore.tari.com/</string>
-    <string name="explorer_kernel_url">https://explore.tari.com/kernel/</string>
+    <string name="explorer_kernel_url">%s/kernel_search?nonces=%s&amp;signatures=%s</string>
     <string name="tor_bridges_url">https://bridges.torproject.org/bridges</string>
     <string name="tari_lab_university_url" translatable="false">https://tlu.tarilabs.com/</string>
 
@@ -236,6 +235,7 @@
     <string name="tx_list_loading_gif">Loading GIF</string>
     <string name="tx_list_retry_loading_gif">Retry loading GIF</string>
     <string name="tx_list_emoji_one_side_payment_placeholder">➡️</string>
+    <string name="tx_list_emoji_coinbase_payment_placeholder">🪙</string>
     <string name="tx_list_someone">Someone</string>
     <string name="tx_list_you_received_one_side_payment">You received a one side payment</string>
 
@@ -339,6 +339,7 @@
     <string name="tx_details_cancel_dialog_not_cancel">Not now</string>
     <string name="tx_details_error_tx_not_found_title">Requested transaction was not found</string>
     <string name="tx_details_error_tx_not_found_desc">Please try again later</string>
+    <string name="tx_details_coinbase_placeholder">🪙 Coinbase</string>
 
     <string name="tx_details_cancellation_reason_unknown">The transaction failed for an unknown reason.</string>
     <string name="tx_details_cancellation_reason_user_cancelled">The transaction was canceled by the sender.</string>
@@ -541,6 +542,10 @@
     <string name="restore_from_seed_words_description">Enter your seed phrase to restore your wallet</string>
     <string name="restore_from_seed_words_select_node">Select base node</string>
     <string name="restore_from_seed_words_submit_title">Restore Wallet</string>
+    <string name="restore_from_seed_words_custom_node_name">Recovery Base Node</string>
+    <string name="restore_from_seed_words_button_select_base_node_select">Select Custom Base Node</string>
+    <string name="restore_from_seed_words_button_select_base_node_edit">Edit Base Node</string>
+    <string name="restore_from_seed_words_form_error_message">Oops, looks like the address you entered isn\'t good. We had to revert your change.</string>
 
     <string name="restore_from_seed_words_error_invalid_seed_word">At least one of the entered seed words is invalid. Please review them and try again</string>
     <string name="restore_from_seed_words_error_phrase_too_short">You entered not enough seed words. Please add some more and try again</string>
@@ -711,6 +716,7 @@
     <string name="utxos_detailed_status">Status:</string>
     <string name="utxos_detailed_commitment">Commitment:</string>
     <string name="utxos_detailed_block_height">Block Height:</string>
+    <string name="utxos_detailed_lock_height">Lock Height:</string>
     <string name="utxos_detailed_date">Date:</string>
     <string name="utxos_split_preview_fee">Estimated Fee:</string>
     <string name="utxos_split_preview_break">Break</string>
@@ -837,6 +843,7 @@
     <string name="contact_book_type_ffi">Tari Contact</string>
     <string name="contact_book_type_contact_book">Phone Contact</string>
     <string name="contact_book_type_merged">Linked Contact</string>
+    <string name="contact_book_loading_sec">%s %ss</string>
     <string name="remove_all">Remove all contacts</string>
     <string name="add_1000_contacts">Add 1000 contacts</string>
     <string name="share_contact_via_qr_code">QR Code</string>
@@ -846,6 +853,7 @@
     <string name="wallet_info_alias_edit_title">Edit Name</string>
     <string name="tx_details_contact_name">Contact name here</string>
     <string name="share_via_qr_code_title">Share QR Code</string>
+    <string name="contact_book_default_alias">Aurora user %s</string>
 
     <string name="share_via_bluetooth_title">Share via BLE</string>
     <string name="share_via_bluetooth_message">Bring the smartphone close to a BLE enabled device</string>
@@ -889,5 +897,20 @@
     <string name="pin_code_subtitle_auth">Enter your passcode to log in</string>
     <string name="pin_code_subtitle_feature_auth">Enter your passcode to proceed</string>
     <string name="pin_code_error_message">Wrong passcode</string>
+
+    <string name="add_base_node_form_title">Add Base Node</string>
+    <string name="add_base_node_address_hint">Address</string>
+    <string name="add_base_node_name_hint">Name</string>
+    <string name="add_base_node_hex_hint">Hex</string>
+    <string name="add_base_node_action_button">Save</string>
+    <string name="add_base_node_default_name_custom">Custom</string>
+
+    <string name="address_poisoning_title">Heads Up!</string>
+    <string name="address_poisoning_title_description">Looks like there are %s very similar addresses in your contact book. Please double check that you’re sending to the right one!</string>
+    <string name="address_poisoning_number_of_transactions">No of transactions: %s</string>
+    <string name="address_poisoning_last_transaction">Last transaction date: %s</string>
+    <string name="address_poisoning_last_transaction_never">Never</string>
+    <string name="address_poisoning_this_trust_account">This is a trusted contact</string>
+    <string name="address_poisoning_trust_disclaimer">Marking a contact as trusted means you trust this person and we won’t ask you to double check the address again.</string>
 
 </resources>

@@ -88,8 +88,23 @@
                             android:layout_width="match_parent"
                             android:layout_height="@dimen/common_action_button_height"
                             android:layout_marginHorizontal="25dp"
+                            android:visibility="gone"
                             android:layout_marginTop="60dp"
                             app:title="@string/restore_from_seed_words_select_node" />
+
+                        <com.tari.android.wallet.ui.component.tari.TariTextView
+                            android:id="@+id/choose_custom_base_node_button"
+                            android:layout_width="match_parent"
+                            android:layout_height="@dimen/common_action_button_height"
+                            android:layout_gravity="center"
+                            android:layout_marginHorizontal="25dp"
+                            android:layout_marginTop="60dp"
+                            android:foreground="?attr/selectableItemBackground"
+                            android:gravity="center"
+                            android:text="@string/restore_from_seed_words_button_select_base_node_select"
+                            android:textColor="?attr/palette_brand_purple"
+                            android:textSize="13sp"
+                            app:customFont="heavy" />
 
                         <com.tari.android.wallet.ui.component.loadingButton.LoadingButtonView
                             android:id="@+id/continue_cta_view"

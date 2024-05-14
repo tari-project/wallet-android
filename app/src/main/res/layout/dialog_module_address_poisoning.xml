@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/root"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="8dp"
+    android:layout_marginBottom="20dp"
+    android:orientation="vertical">
+
+    <com.tari.android.wallet.ui.component.tari.TariTextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="32dp"
+        android:layout_marginBottom="22dp"
+        android:gravity="center"
+        android:letterSpacing="0.01"
+        android:lineSpacingExtra="8dp"
+        android:text="@string/address_poisoning_title"
+        android:textColor="?attr/palette_text_heading"
+        android:textSize="18sp"
+        app:customFont="medium" />
+
+    <com.tari.android.wallet.ui.component.tari.TariTextView
+        android:id="@+id/title_description"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="32dp"
+        android:gravity="center"
+        android:letterSpacing="0.01"
+        android:lineSpacingExtra="8dp"
+        android:textColor="?attr/palette_text_body"
+        android:textSize="14sp"
+        app:customFont="medium"
+        tools:text="Looks like there are 3 very similar addresses in your contact book. Please double check that you’re sending to the right one!" />
+
+    <com.tari.android.wallet.ui.component.tari.TariSecondaryBackground
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="20dp"
+        android:layout_marginTop="24dp"
+        android:paddingVertical="5dp"
+        app:cornerRadius="10dp">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/similar_address_list_recycler_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            tools:itemCount="3"
+            tools:listitem="@layout/item_similar_address" />
+    </com.tari.android.wallet.ui.component.tari.TariSecondaryBackground>
+
+    <com.tari.android.wallet.ui.component.tari.TariCheckbox
+        android:id="@+id/trusted_checkbox"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="14dp"
+        android:layout_marginTop="16dp"
+        android:paddingStart="10dp"
+        android:text="@string/address_poisoning_this_trust_account"
+        android:textColor="?attr/palette_text_links"
+        app:customFont="medium" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="20dp"
+        android:layout_marginTop="8dp"
+        android:orientation="horizontal">
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/vector_shield_checkmark"
+            android:tint="?attr/palette_text_light" />
+
+        <com.tari.android.wallet.ui.component.tari.TariTextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:letterSpacing="0.01"
+            android:lineSpacingExtra="8dp"
+            android:text="@string/address_poisoning_trust_disclaimer"
+            android:textColor="?attr/palette_text_body"
+            android:textSize="11sp"
+            app:customFont="medium" />
+
+    </LinearLayout>
+</LinearLayout>

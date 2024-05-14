@@ -19,13 +19,13 @@ abstract class FFITxBase() : FFIBase() {
             getDestinationPublicKey().runWithDestroy {
                 val destinationHex = it.toString()
                 val destinationEmoji = it.getEmojiId()
-                TariWalletAddress(destinationHex, destinationEmoji)
+                TariWalletAddress.createWalletAddress(destinationHex, destinationEmoji)
             }
         } else {
             getSourcePublicKey().runWithDestroy {
                 val sourceHex = it.toString()
                 val sourceEmoji = it.getEmojiId()
-                TariWalletAddress(sourceHex, sourceEmoji)
+                TariWalletAddress.createWalletAddress(sourceHex, sourceEmoji)
             }
         }
         return TariContact(publicKey)

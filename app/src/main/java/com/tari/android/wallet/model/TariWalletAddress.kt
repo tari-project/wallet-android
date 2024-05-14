@@ -32,8 +32,8 @@
  */
 package com.tari.android.wallet.model
 
-import android.os.Parcel
 import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
 import java.io.Serializable
 
 /**
@@ -41,24 +41,10 @@ import java.io.Serializable
  *
  * @author The Tari Development Team
  */
-class TariWalletAddress() : Parcelable, Serializable {
+@Parcelize
+data class TariWalletAddress(val hexString: String = "", val emojiId: String = "") : Parcelable, Serializable {
 
-    var hexString = ""
-    var emojiId = ""
-
-    constructor(hexString: String, emojiId: String) : this() {
-        // crunch fix for not crashing on action related to wallet address
-        if (hexString == zeroHex) {
-            this.hexString = zero66Hex
-            this.emojiId =
-                "\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF57"
-        } else {
-            this.hexString = hexString
-            this.emojiId = emojiId
-        }
-    }
-
-    fun isZeros(): Boolean = hexString == zeroHex || hexString == zero66Hex || hexString.all { it == '0' }
+    fun isZeros(): Boolean = hexString == HEX_ZERO || hexString == HEX_ZERO_66 || hexString.all { it == '0' }
 
     override fun equals(other: Any?): Boolean = (other is TariWalletAddress) && hexString == other.hexString
 
@@ -66,41 +52,27 @@ class TariWalletAddress() : Parcelable, Serializable {
 
     override fun toString(): String = "TariWalletAddress(hexString='$hexString', emojiId='$emojiId')"
 
-    // region Parcelable
+    companion object {
+        const val HEX_ZERO = "0000000000000000000000000000000000000000000000000000000000000026"
+        const val HEX_ZERO_66 = "000000000000000000000000000000000000000000000000000000000000000026"
+        const val EMOJI_ZERO =
+            "\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF57"
 
-    constructor(parcel: Parcel) : this() {
-        readFromParcel(parcel)
-    }
-
-    companion object CREATOR : Parcelable.Creator<TariWalletAddress> {
-
-        const val zeroHex = "0000000000000000000000000000000000000000000000000000000000000026"
-        const val zero66Hex = "000000000000000000000000000000000000000000000000000000000000000026"
-
-        override fun createFromParcel(parcel: Parcel): TariWalletAddress {
-            return TariWalletAddress(parcel)
-        }
-
-        override fun newArray(size: Int): Array<TariWalletAddress> {
-            return Array(size) { TariWalletAddress() }
+        fun createWalletAddress(hexString: String = HEX_ZERO, emojiId: String = ""): TariWalletAddress {
+            // crunch fix for not crashing on action related to wallet address
+            return if (hexString == HEX_ZERO) {
+                TariWalletAddress(
+                    hexString = HEX_ZERO_66,
+                    emojiId = EMOJI_ZERO,
+                )
+            } else {
+                TariWalletAddress(
+                    hexString = hexString,
+                    emojiId = emojiId,
+                )
+            }
         }
 
         fun validate(addressHex: String): Boolean = addressHex.length > 64
     }
-
-    override fun writeToParcel(parcel: Parcel, flags: Int) {
-        parcel.writeString(hexString)
-        parcel.writeString(emojiId)
-    }
-
-    private fun readFromParcel(inParcel: Parcel) {
-        hexString = inParcel.readString().orEmpty()
-        emojiId = inParcel.readString().orEmpty()
-    }
-
-    override fun describeContents(): Int {
-        return 0
-    }
-
-    // endregion
 }

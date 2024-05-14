@@ -151,7 +151,7 @@ class EmojiUtil {
 
     companion object {
 
-        const val smallEmojiIdSize = 6
+        const val SMALL_EMOJI_ID_SIZE = 6
 
         val emojiSet by lazy {
             val emojis = mutableSetOf<String>()
@@ -203,7 +203,7 @@ class EmojiUtil {
          */
         fun getNewChunkSeparatorIndices(string: String): ArrayList<Int> {
             val newIndices = ArrayList<Int>()
-            if (string.getGraphemeLength() < smallEmojiIdSize) return newIndices
+            if (string.getGraphemeLength() < SMALL_EMOJI_ID_SIZE) return newIndices
             var currentIndex = 0
             // prep the iterator
             val it: BreakIterator = BreakIterator.getCharacterInstance()
@@ -260,10 +260,10 @@ class EmojiUtil {
 
         fun getFullEmojiIdSpannable(emojiId: String, separator: String, darkColor: Int, lightColor: Int): SpannableString {
             val spannable = getChunkedEmojiId(emojiId, separator).applyColorStyle(
-                darkColor,
-                listOf(separator),
-                lightColor,
-                applyToOnlyFirstOccurrence = false
+                defaultColor = darkColor,
+                search = listOf(separator),
+                styleColor = lightColor,
+                applyToOnlyFirstOccurrence = false,
             )
             spannable.applyLetterSpacingStyle(separator, Constants.UI.emojiIdChunkSeparatorLetterSpacing)
             spannable.applyRelativeTextSizeStyle(separator, Constants.UI.emojiIdChunkSeparatorRelativeScale, applyToOnlyFirstOccurrence = false)
@@ -280,5 +280,4 @@ class EmojiUtil {
             return count
         }
     }
-
 }

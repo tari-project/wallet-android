@@ -10,5 +10,6 @@ class TariCheckbox(context: Context, attrs: AttributeSet) : AppCompatCheckBox(co
 
     init {
         buttonTintList = ColorStateList.valueOf(PaletteManager().getPurpleBrand(context))
+        typeface = TariFont.getFromAttributeSet(context, attrs)
     }
 }

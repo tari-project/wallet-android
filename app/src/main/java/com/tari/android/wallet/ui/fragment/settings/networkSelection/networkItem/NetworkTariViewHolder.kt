@@ -11,7 +11,7 @@ class NetworkTariViewHolder(view: ItemNetworkBinding) : CommonViewHolder<Network
     override fun bind(item: NetworkViewHolderItem) {
         super.bind(item)
 
-        val recommendedText = if (item.isRecommended) " " + itemView.context.getString(R.string.all_settings_select_network_recommended) else ""
+        val recommendedText = if (item.network.recommended) " " + itemView.context.getString(R.string.all_settings_select_network_recommended) else ""
         val networkText = item.network.network.displayName + recommendedText
         ui.tvName.text = networkText
 

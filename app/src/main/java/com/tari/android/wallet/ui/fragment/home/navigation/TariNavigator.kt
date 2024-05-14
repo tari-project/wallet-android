@@ -49,7 +49,6 @@ import com.tari.android.wallet.ui.fragment.home.homeTransactionHistory.HomeTrans
 import com.tari.android.wallet.ui.fragment.home.navigation.Navigation.AddAmountNavigation
 import com.tari.android.wallet.ui.fragment.home.navigation.Navigation.AllSettingsNavigation
 import com.tari.android.wallet.ui.fragment.home.navigation.Navigation.BackupSettingsNavigation
-import com.tari.android.wallet.ui.fragment.home.navigation.Navigation.BaseNodeNavigation
 import com.tari.android.wallet.ui.fragment.home.navigation.Navigation.ChatNavigation
 import com.tari.android.wallet.ui.fragment.home.navigation.Navigation.ChooseRestoreOptionNavigation
 import com.tari.android.wallet.ui.fragment.home.navigation.Navigation.ContactBookNavigation
@@ -83,7 +82,6 @@ import com.tari.android.wallet.ui.fragment.settings.backup.changeSecurePassword.
 import com.tari.android.wallet.ui.fragment.settings.backup.enterCurrentPassword.EnterCurrentPasswordFragment
 import com.tari.android.wallet.ui.fragment.settings.backup.verifySeedPhrase.VerifySeedPhraseFragment
 import com.tari.android.wallet.ui.fragment.settings.backup.writeDownSeedWords.WriteDownSeedPhraseFragment
-import com.tari.android.wallet.ui.fragment.settings.baseNodeConfig.addBaseNode.AddCustomBaseNodeFragment
 import com.tari.android.wallet.ui.fragment.settings.baseNodeConfig.changeBaseNode.ChangeBaseNodeFragment
 import com.tari.android.wallet.ui.fragment.settings.bluetoothSettings.BluetoothSettingsFragment
 import com.tari.android.wallet.ui.fragment.settings.dataCollection.DataCollectionFragment
@@ -162,7 +160,6 @@ class TariNavigator @Inject constructor(val prefs: SharedPrefsRepository, val ta
             is TxListNavigation.ToTransfer -> addFragment(TransferFragment())
             is TxListNavigation.HomeTransactionHistory -> addFragment(HomeTransactionHistoryFragment())
             is TorBridgeNavigation.ToCustomBridges -> toCustomTorBridges()
-            is BaseNodeNavigation.ToAddCustomBaseNode -> toAddCustomBaseNode()
             is VerifySeedPhraseNavigation.ToSeedPhraseVerificationComplete -> onSeedPhraseVerificationComplete()
             is VerifySeedPhraseNavigation.ToSeedPhraseVerification -> toSeedPhraseVerification(navigation.seedWords)
             is BackupSettingsNavigation.ToChangePassword -> toChangePassword()
@@ -253,8 +250,6 @@ class TariNavigator @Inject constructor(val prefs: SharedPrefsRepository, val ta
     private fun toCustomTorBridges() = addFragment(CustomTorBridgesFragment())
 
     private fun toNetworkSelection() = addFragment(NetworkSelectionFragment())
-
-    private fun toAddCustomBaseNode() = addFragment(AddCustomBaseNodeFragment())
 
     fun toWalletBackupWithRecoveryPhrase() = addFragment(WriteDownSeedPhraseFragment())
 
@@ -352,13 +347,9 @@ class TariNavigator @Inject constructor(val prefs: SharedPrefsRepository, val ta
     }
 
     private fun navigateBackFromTxSend(isYat: Boolean) {
-        if (isYat) {
-            activity.finish()
-        } else {
-            val fragmentsCount = activity.supportFragmentManager.fragments.size - 5
-            for (i in 0 until fragmentsCount) {
-                activity.supportFragmentManager.popBackStackImmediate()
-            }
+        val fragmentsCount = activity.supportFragmentManager.fragments.size - 5
+        for (i in 0 until fragmentsCount) {
+            activity.supportFragmentManager.popBackStackImmediate()
         }
     }
 
@@ -372,7 +363,7 @@ class TariNavigator @Inject constructor(val prefs: SharedPrefsRepository, val ta
 
     fun sendTariToUser(service: TariWalletService, sendDeeplink: DeepLink.Send) {
         val walletAddress = service.getWalletAddressFromHexString(sendDeeplink.walletAddressHex)
-        sendToUser((activity as HomeActivity).viewModel.contactsRepository.ffiBridge.getContactByAddress(walletAddress))
+        sendToUser((activity as HomeActivity).viewModel.contactsRepository.getContactByAddress(walletAddress))
     }
 
     private fun sendToUserByDeeplink(deeplink: DeepLink.Send) {
@@ -380,7 +371,7 @@ class TariNavigator @Inject constructor(val prefs: SharedPrefsRepository, val ta
         val address = FFITariWalletAddress(HexString(deeplink.walletAddressHex)).runWithDestroy {
             walletAddressFromFFI(it)
         }
-        val contact = (activity as HomeActivity).viewModel.contactsRepository.ffiBridge.getContactByAddress(address)
+        val contact = (activity as HomeActivity).viewModel.contactsRepository.getContactByAddress(address)
         val bundle = Bundle().apply {
             putSerializable(PARAMETER_CONTACT, contact)
             putParcelable(PARAMETER_AMOUNT, deeplink.amount)
@@ -390,7 +381,7 @@ class TariNavigator @Inject constructor(val prefs: SharedPrefsRepository, val ta
     }
 
     private fun walletAddressFromFFI(ffiTariWalletAddress: FFITariWalletAddress): TariWalletAddress =
-        TariWalletAddress(ffiTariWalletAddress.toString(), ffiTariWalletAddress.getEmojiId())
+        TariWalletAddress.createWalletAddress(ffiTariWalletAddress.toString(), ffiTariWalletAddress.getEmojiId())
 
     private fun sendToUser(recipientUser: ContactDto, amount: MicroTari? = null) {
         val bundle = Bundle().apply {

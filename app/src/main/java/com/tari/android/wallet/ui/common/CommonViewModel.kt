@@ -18,7 +18,6 @@ import com.tari.android.wallet.extension.addTo
 import com.tari.android.wallet.ffi.FFIWallet
 import com.tari.android.wallet.infrastructure.logging.LoggerTags
 import com.tari.android.wallet.service.TariWalletService
-import com.tari.android.wallet.service.connection.ServiceConnectionStatus
 import com.tari.android.wallet.service.connection.TariWalletServiceConnection
 import com.tari.android.wallet.ui.common.domain.PaletteManager
 import com.tari.android.wallet.ui.common.domain.ResourceManager
@@ -27,6 +26,7 @@ import com.tari.android.wallet.ui.component.tari.toast.TariToastArgs
 import com.tari.android.wallet.ui.dialog.error.WalletErrorArgs
 import com.tari.android.wallet.ui.dialog.inProgress.ProgressDialogArgs
 import com.tari.android.wallet.ui.dialog.modular.DialogArgs
+import com.tari.android.wallet.ui.dialog.modular.IDialogModule
 import com.tari.android.wallet.ui.dialog.modular.ModularDialogArgs
 import com.tari.android.wallet.ui.dialog.modular.modules.body.BodyModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonModule
@@ -37,6 +37,7 @@ import com.tari.android.wallet.ui.fragment.home.navigation.TariNavigator
 import com.tari.android.wallet.ui.fragment.settings.themeSelector.TariTheme
 import io.reactivex.disposables.CompositeDisposable
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -48,9 +49,6 @@ open class CommonViewModel : ViewModel() {
     val component: ApplicationComponent
         get() = DiContainer.appComponent
 
-    val serviceConnection: TariWalletServiceConnection = TariWalletServiceConnection()
-    val walletService: TariWalletService
-        get() = serviceConnection.currentState.service!!
 
     @Inject
     lateinit var permissionManager: PermissionManager
@@ -76,10 +74,15 @@ open class CommonViewModel : ViewModel() {
     @Inject
     lateinit var securityPrefRepository: SecurityPrefRepository
 
+    @Inject
+    lateinit var serviceConnection: TariWalletServiceConnection
+    val walletService: TariWalletService
+        get() = serviceConnection.walletService
+
     private var authorizedAction: (() -> Unit)? = null
 
     val logger: Printer
-        get() = Logger.t(this::class.simpleName).t(LoggerTags.UI.name)
+        get() = Logger.t(this::class.simpleName)
 
     val currentTheme = SingleLiveEvent<TariTheme>()
 
@@ -141,17 +144,16 @@ open class CommonViewModel : ViewModel() {
         EventBus.unsubscribeAll(this)
     }
 
-    fun doOnConnected(action: (walletService: TariWalletService) -> Unit) {
-        serviceConnection.connection.filter { it.status == ServiceConnectionStatus.CONNECTED }.take(1)
-            .doOnError { logger.i(it.toString()) }
-            .subscribe { action(it.service!!) }
-            .addTo(compositeDisposable)
+    fun doOnWalletServiceConnected(action: suspend (walletService: TariWalletService) -> Unit) {
+        viewModelScope.launch {
+            serviceConnection.doOnWalletServiceConnected(action)
+        }
     }
 
-    fun doOnConnectedToWallet(action: (walletService: FFIWallet) -> Unit) {
-        EventBus.walletState.publishSubject.filter { it == WalletState.Running }.take(1).doOnError { Logger.i(it.toString()) }
-            .subscribe { action(FFIWallet.instance!!) }
-            .addTo(compositeDisposable)
+    fun doOnWalletRunning(action: suspend (walletService: FFIWallet) -> Unit) {
+        viewModelScope.launch {
+            serviceConnection.doOnWalletRunning(action)
+        }
     }
 
     fun openWalletErrorDialog() {
@@ -180,4 +182,26 @@ open class CommonViewModel : ViewModel() {
     }
 
     fun doOnBackground(action: suspend CoroutineScope.() -> Unit): Job = viewModelScope.launch { action() }
+
+    fun showModularDialog(args: ModularDialogArgs) {
+        modularDialog.postValue(args)
+    }
+
+    fun showModularDialog(vararg modules: IDialogModule) {
+        modularDialog.postValue(ModularDialogArgs(modules = modules.toList()))
+    }
+
+    fun showLoadingDialog(progressArgs: ProgressDialogArgs) {
+        _loadingDialog.postValue(progressArgs)
+    }
+
+    fun showInputModalDialog(inputArgs: ModularDialogArgs) {
+        _inputDialog.postValue(inputArgs)
+    }
+
+    fun hideDialog() {
+        viewModelScope.launch(Dispatchers.Main) {
+            dismissDialog.postValue(Unit)
+        }
+    }
 }

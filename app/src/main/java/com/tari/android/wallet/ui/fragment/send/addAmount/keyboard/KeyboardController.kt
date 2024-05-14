@@ -293,6 +293,7 @@ class KeyboardController {
     ): TextView {
         val inflater = LayoutInflater.from(context)
         return if (enteringFirstDigit) { // first digit :: use the existing view
+            elements[0] = elements[0].copy(first = digit)
             elements[0].second
         } else { // inflate text view
             val textView = inflater.inflate(

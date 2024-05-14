@@ -95,7 +95,7 @@ class FinalizeSendTxViewModel : CommonViewModel() {
             connectionCheckStartTime ?: return
 
             val secondsElapsed = Seconds.secondsBetween(connectionCheckStartTime, DateTime.now()).seconds
-            if (secondsElapsed >= connectionTimeoutSecs) {
+            if (secondsElapsed >= CONNECTION_TIMEOUT_SEC) {
                 val networkConnectionState = EventBus.networkConnectionState.publishSubject.value
                 if (networkConnectionState != NetworkConnectionState.CONNECTED) {
                     // internet connection problem
@@ -109,7 +109,7 @@ class FinalizeSendTxViewModel : CommonViewModel() {
             }
         }
 
-        override fun execute() = doOnConnected { onServiceConnected() }
+        override fun execute() = doOnWalletServiceConnected { onServiceConnected() }
 
         private fun onServiceConnected() {
             // start checking network connection
@@ -224,7 +224,7 @@ class FinalizeSendTxViewModel : CommonViewModel() {
     }
 
     companion object {
-        const val transactionDataKey = "Finalize_send_tx_fragment_key"
-        const val connectionTimeoutSecs = 30
+        const val KEY_TRANSACTION_DATA = "Finalize_send_tx_fragment_key"
+        const val CONNECTION_TIMEOUT_SEC = 30
     }
 }

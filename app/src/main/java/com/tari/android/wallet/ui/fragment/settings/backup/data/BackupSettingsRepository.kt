@@ -6,7 +6,7 @@ import android.net.Uri
 import com.dropbox.core.oauth.DbxCredential
 import com.tari.android.wallet.BuildConfig
 import com.tari.android.wallet.data.repository.CommonRepository
-import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefGsonDelegate
+import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefGsonNullableDelegate
 import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefStringSecuredDelegate
 import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
 import com.tari.android.wallet.data.sharedPrefs.network.formatKey
@@ -23,19 +23,19 @@ class BackupSettingsRepository @Inject constructor(
 ) :
     CommonRepository(networkRepository) {
 
-    var localFileOption: BackupOptionDto? by SharedPrefGsonDelegate(sharedPrefs, this,  formatKey(Keys.localFileOptionsKey), BackupOptionDto::class.java)
+    var localFileOption: BackupOptionDto? by SharedPrefGsonNullableDelegate(sharedPrefs, this,  formatKey(Keys.localFileOptionsKey), BackupOptionDto::class.java)
 
-    var googleDriveOption: BackupOptionDto? by SharedPrefGsonDelegate(sharedPrefs, this,  formatKey(Keys.googleDriveOptionKey), BackupOptionDto::class.java)
+    var googleDriveOption: BackupOptionDto? by SharedPrefGsonNullableDelegate(sharedPrefs, this,  formatKey(Keys.googleDriveOptionKey), BackupOptionDto::class.java)
 
-    var dropboxOption: BackupOptionDto? by SharedPrefGsonDelegate(sharedPrefs, this,  formatKey(Keys.dropboxOptionsKey), BackupOptionDto::class.java)
+    var dropboxOption: BackupOptionDto? by SharedPrefGsonNullableDelegate(sharedPrefs, this,  formatKey(Keys.dropboxOptionsKey), BackupOptionDto::class.java)
 
-    var dropboxCredential: DbxCredential? by SharedPrefGsonDelegate(sharedPrefs, this,  formatKey(Keys.dropboxCredentialKey), DbxCredential::class.java)
+    var dropboxCredential: DbxCredential? by SharedPrefGsonNullableDelegate(sharedPrefs, this,  formatKey(Keys.dropboxCredentialKey), DbxCredential::class.java)
 
     var backupPassword: String? by SharedPrefStringSecuredDelegate(context, sharedPrefs, this, formatKey(Keys.backupPassword))
 
-    var localBackupFolderURI: Uri? by SharedPrefGsonDelegate(sharedPrefs, this,  formatKey(Keys.localBackupFolderURI), Uri::class.java)
+    var localBackupFolderURI: Uri? by SharedPrefGsonNullableDelegate(sharedPrefs, this,  formatKey(Keys.localBackupFolderURI), Uri::class.java)
 
-    var restoredTxs: BackupUtxos? by SharedPrefGsonDelegate(sharedPrefs, this,  formatKey(Keys.lastRestoredTxs), BackupUtxos::class.java, null)
+    var restoredTxs: BackupUtxos? by SharedPrefGsonNullableDelegate(sharedPrefs, this,  formatKey(Keys.lastRestoredTxs), BackupUtxos::class.java, null)
 
     init {
         localFileOption = localFileOption ?: BackupOptionDto(BackupOptions.Local)

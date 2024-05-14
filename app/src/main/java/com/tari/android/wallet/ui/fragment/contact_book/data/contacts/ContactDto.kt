@@ -4,15 +4,18 @@ import com.tari.android.wallet.R
 import com.tari.android.wallet.data.sharedPrefs.delegates.SerializableTime
 import com.tari.android.wallet.model.TariWalletAddress
 import com.tari.android.wallet.ui.fragment.contact_book.data.ContactAction
-import com.tari.android.wallet.util.extractEmojis
 import java.io.Serializable
 import java.util.UUID
 
 data class ContactDto(
-    var contact: IContact,
-    var uuid: String = UUID.randomUUID().toString(),
+    val contact: IContact,
+    val uuid: String = UUID.randomUUID().toString(),
     var lastUsedDate: SerializableTime? = null,
+    val yat: YatDto? = (contact as? PhoneContactDto)?.yatDto ?: (contact as? MergedContactDto)?.phoneContactDto?.yatDto
 ) : Serializable {
+    val walletAddress: TariWalletAddress
+        get() = contact.extractWalletAddress()
+
     fun filtered(text: String): Boolean = contact.filtered(text)
 
     fun getContactActions(): List<ContactAction> {
@@ -56,22 +59,13 @@ data class ContactDto(
         else -> R.drawable.vector_contact_book_type
     }
 
-    fun getYatDto(): YatDto? = (contact as? PhoneContactDto)?.yatDto ?: (contact as? MergedContactDto)?.phoneContactDto?.yatDto
+    fun getYatDto() = yat
 
     fun getFFIDto(): FFIContactDto? = (contact as? FFIContactDto) ?: (contact as? MergedContactDto)?.ffiContactDto
 
     fun getPhoneDto(): PhoneContactDto? = (contact as? PhoneContactDto) ?: (contact as? MergedContactDto)?.phoneContactDto
 
     fun getMergedDto(): MergedContactDto? = (contact as? MergedContactDto)
-
-    companion object {
-        fun getDefaultAlias(walletAddress: TariWalletAddress): String =
-            "Aurora User " + walletAddress.emojiId.extractEmojis().take(3).joinToString("")
-
-        fun normalizeAlias(alias: String?, walletAddress: TariWalletAddress): String {
-            return alias.orEmpty().ifBlank { getDefaultAlias(walletAddress) }
-        }
-    }
 
     override fun hashCode(): Int = HashcodeUtils.generate(contact, uuid, lastUsedDate)
 }

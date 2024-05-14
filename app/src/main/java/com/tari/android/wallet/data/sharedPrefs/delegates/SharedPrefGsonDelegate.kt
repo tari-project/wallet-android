@@ -12,7 +12,7 @@ class SharedPrefGsonDelegate<T>(
     private val commonRepository: CommonRepository,
     private val name: String,
     private val type: Class<T>,
-    private val defValue: T? = null,
+    private val defValue: T,
 ) {
     private val gson = with(GsonBuilder()) {
         registerTypeAdapter(Uri::class.java, UriDeserializer())
@@ -23,11 +23,11 @@ class SharedPrefGsonDelegate<T>(
         commonRepository.updateNotifier.onNext(Unit)
     }
 
-    operator fun getValue(thisRef: Any?, property: KProperty<*>): T? {
+    operator fun getValue(thisRef: Any?, property: KProperty<*>): T {
         return if (prefs.contains(name)) {
             val savedValue = prefs.getString(name, "")
             try {
-                gson.fromJson(savedValue, type) as T
+                (gson.fromJson(savedValue, type) as T) ?: defValue
             } catch (e: Throwable) {
                 logger.i(e.toString())
                 defValue
@@ -37,7 +37,7 @@ class SharedPrefGsonDelegate<T>(
         }
     }
 
-    operator fun setValue(thisRef: Any?, property: KProperty<*>, value: T?) {
+    operator fun setValue(thisRef: Any?, property: KProperty<*>, value: T) {
         prefs.edit().run {
             putString(name, gson.toJson(value, type))
             apply()

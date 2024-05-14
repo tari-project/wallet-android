@@ -6,6 +6,7 @@ class FFITariUtxo(pointer: FFIPointer) : FFIBase() {
     var value: Long = -1
     var minedHeight: Long = -1
     var minedTimestamp: Long = -1
+    var lockHeight: Long = -1
     var status: Byte = -1
 
     private external fun jniLoadData()

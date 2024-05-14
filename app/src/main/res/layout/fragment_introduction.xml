@@ -117,7 +117,8 @@
         android:layout_marginLeft="@dimen/common_horizontal_margin"
         android:layout_marginTop="@dimen/introduction_selected_network_button_margin_top"
         android:layout_marginRight="@dimen/common_horizontal_margin"
-        android:background="@drawable/vector_gradient_button_bg">
+        android:background="@drawable/vector_gradient_button_bg"
+        android:foreground="?attr/selectableItemBackground">
 
         <com.tari.android.wallet.ui.component.tari.TariTextView
             android:id="@+id/select_network_button"
@@ -134,10 +135,13 @@
 
     <com.tari.android.wallet.ui.component.tari.TariTextView
         android:id="@+id/restore_wallet_cta_view"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/common_action_button_height"
         android:layout_gravity="center"
-        android:layout_marginTop="25dp"
+        android:layout_marginLeft="@dimen/common_horizontal_margin"
+        android:layout_marginTop="8dp"
+        android:layout_marginRight="@dimen/common_horizontal_margin"
+        android:foreground="?attr/selectableItemBackground"
         android:gravity="center"
         android:text="@string/create_wallet_restore_wallet_cta"
         android:textColor="@color/white"

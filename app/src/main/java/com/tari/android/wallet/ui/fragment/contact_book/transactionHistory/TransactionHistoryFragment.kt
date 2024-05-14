@@ -49,7 +49,7 @@ class TransactionHistoryFragment : CommonFragment<FragmentContactTransactionHist
         observe(selectedContact) { setContactText(it) }
     }
 
-    private fun updateList(items: MutableList<CommonViewHolderItem>) {
+    private fun updateList(items: List<CommonViewHolderItem>) {
         ui.list.setVisible(items.isNotEmpty())
         ui.descriptionView.setVisible(items.isNotEmpty())
         ui.emptyState.setVisible(items.isEmpty())

@@ -6,6 +6,7 @@ import com.tari.android.wallet.R
 import com.tari.android.wallet.R.drawable.vector_all_settings_about_icon
 import com.tari.android.wallet.R.drawable.vector_all_settings_background_service_icon
 import com.tari.android.wallet.R.drawable.vector_all_settings_backup_options_icon
+import com.tari.android.wallet.R.drawable.vector_all_settings_block_explorer_icon
 import com.tari.android.wallet.R.drawable.vector_all_settings_bluetooth
 import com.tari.android.wallet.R.drawable.vector_all_settings_bridge_configuration_icon
 import com.tari.android.wallet.R.drawable.vector_all_settings_cart
@@ -20,7 +21,6 @@ import com.tari.android.wallet.R.drawable.vector_all_settings_screen_recording_i
 import com.tari.android.wallet.R.drawable.vector_all_settings_select_base_node_icon
 import com.tari.android.wallet.R.drawable.vector_all_settings_select_network_icon
 import com.tari.android.wallet.R.drawable.vector_all_settings_select_theme_icon
-import com.tari.android.wallet.R.drawable.vector_all_settings_block_explorer_icon
 import com.tari.android.wallet.R.drawable.vector_all_settings_user_agreement_icon
 import com.tari.android.wallet.R.drawable.vector_all_settings_visit_tari_icon
 import com.tari.android.wallet.R.drawable.vector_all_settings_yat_icon
@@ -31,19 +31,19 @@ import com.tari.android.wallet.R.string.all_settings_biometrics
 import com.tari.android.wallet.R.string.all_settings_bluetooth_settings
 import com.tari.android.wallet.R.string.all_settings_bridge_configuration
 import com.tari.android.wallet.R.string.all_settings_connect_yats
-import com.tari.android.wallet.R.string.explorer_url
 import com.tari.android.wallet.R.string.all_settings_contribute
 import com.tari.android.wallet.R.string.all_settings_create_pin_code
 import com.tari.android.wallet.R.string.all_settings_data_collection
 import com.tari.android.wallet.R.string.all_settings_delete_wallet
 import com.tari.android.wallet.R.string.all_settings_disclaimer
+import com.tari.android.wallet.R.string.all_settings_explorer
 import com.tari.android.wallet.R.string.all_settings_pin_code
 import com.tari.android.wallet.R.string.all_settings_privacy_policy
 import com.tari.android.wallet.R.string.all_settings_report_a_bug
+import com.tari.android.wallet.R.string.all_settings_screen_recording
 import com.tari.android.wallet.R.string.all_settings_secondary_settings_label
 import com.tari.android.wallet.R.string.all_settings_security_label
 import com.tari.android.wallet.R.string.all_settings_select_base_node
-import com.tari.android.wallet.R.string.all_settings_explorer
 import com.tari.android.wallet.R.string.all_settings_select_network
 import com.tari.android.wallet.R.string.all_settings_select_theme
 import com.tari.android.wallet.R.string.all_settings_store
@@ -62,7 +62,6 @@ import com.tari.android.wallet.R.string.tari_about_title
 import com.tari.android.wallet.R.string.tari_url
 import com.tari.android.wallet.R.string.ttl_store_url
 import com.tari.android.wallet.R.string.user_agreement_url
-import com.tari.android.wallet.R.string.all_settings_screen_recording
 import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.extension.addTo
@@ -82,14 +81,13 @@ import com.tari.android.wallet.ui.fragment.settings.allSettings.PresentationBack
 import com.tari.android.wallet.ui.fragment.settings.allSettings.PresentationBackupState.BackupStateStatus.Success
 import com.tari.android.wallet.ui.fragment.settings.allSettings.PresentationBackupState.BackupStateStatus.Warning
 import com.tari.android.wallet.ui.fragment.settings.allSettings.backupOptions.SettingsBackupOptionViewHolderItem
+import com.tari.android.wallet.ui.fragment.settings.allSettings.myProfile.MyProfileViewHolderItem
 import com.tari.android.wallet.ui.fragment.settings.allSettings.row.SettingsRowStyle
 import com.tari.android.wallet.ui.fragment.settings.allSettings.row.SettingsRowViewDto
-import com.tari.android.wallet.ui.fragment.settings.allSettings.myProfile.MyProfileViewHolderItem
 import com.tari.android.wallet.ui.fragment.settings.allSettings.title.SettingsTitleViewHolderItem
 import com.tari.android.wallet.ui.fragment.settings.allSettings.version.SettingsVersionViewHolderItem
 import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupSettingsRepository
 import com.tari.android.wallet.ui.fragment.settings.userAutorization.BiometricAuthenticationViewModel
-import com.tari.android.wallet.util.DebugConfig
 import com.tari.android.wallet.yat.YatAdapter
 import com.tari.android.wallet.yat.YatSharedRepository
 import javax.inject.Inject
@@ -213,8 +211,8 @@ class AllSettingsViewModel : CommonViewModel() {
             },
             DividerViewHolderItem(),
             SettingsRowViewDto(resourceManager.getString(all_settings_explorer), vector_all_settings_block_explorer_icon) {
-                _openLink.postValue(resourceManager.getString(explorer_url))
-            }.takeIf { DebugConfig.isBlockExplorerEnabled },
+                _openLink.postValue(networkRepository.currentNetwork.blockExplorerUrl.orEmpty())
+            }.takeIf { networkRepository.currentNetwork.isBlockExplorerAvailable },
             SettingsTitleViewHolderItem(resourceManager.getString(all_settings_advanced_settings_label)),
             SettingsRowViewDto(resourceManager.getString(all_settings_select_theme), vector_all_settings_select_theme_icon) {
                 navigation.postValue(AllSettingsNavigation.ToThemeSelection)

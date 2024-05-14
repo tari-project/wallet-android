@@ -87,7 +87,6 @@ import com.tari.android.wallet.ui.fragment.settings.backup.backupSettings.option
 import com.tari.android.wallet.ui.fragment.settings.backup.changeSecurePassword.ChangeSecurePasswordViewModel
 import com.tari.android.wallet.ui.fragment.settings.backup.enterCurrentPassword.EnterCurrentPasswordViewModel
 import com.tari.android.wallet.ui.fragment.settings.backup.verifySeedPhrase.VerifySeedPhraseViewModel
-import com.tari.android.wallet.ui.fragment.settings.baseNodeConfig.addBaseNode.AddCustomBaseNodeViewModel
 import com.tari.android.wallet.ui.fragment.settings.baseNodeConfig.changeBaseNode.ChangeBaseNodeViewModel
 import com.tari.android.wallet.ui.fragment.settings.bluetoothSettings.BluetoothSettingsViewModel
 import com.tari.android.wallet.ui.fragment.settings.bugReporting.BugsReportingViewModel
@@ -124,7 +123,8 @@ import javax.inject.Singleton
         ServiceModule::class,
         TorModule::class,
         PresentationModule::class,
-        YatModule::class
+        YatModule::class,
+        CoroutinesDispatchersModule::class,
     ]
 )
 
@@ -158,7 +158,6 @@ interface ApplicationComponent {
     fun inject(viewModel: BackupSettingsViewModel)
     fun inject(viewModel: BiometricAuthenticationViewModel)
     fun inject(viewModel: ChangeBaseNodeViewModel)
-    fun inject(viewModel: AddCustomBaseNodeViewModel)
     fun inject(viewModel: NetworkSelectionViewModel)
     fun inject(viewModel: AllSettingsViewModel)
     fun inject(viewModel: FinalizeSendTxViewModel)

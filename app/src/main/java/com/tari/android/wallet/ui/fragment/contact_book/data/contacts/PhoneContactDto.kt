@@ -40,7 +40,7 @@ class PhoneContactDto(
 
     override fun filtered(text: String): Boolean = getAlias().contains(text, true)
 
-    override fun extractWalletAddress(): TariWalletAddress = TariWalletAddress()
+    override fun extractWalletAddress(): TariWalletAddress = TariWalletAddress.createWalletAddress()
 
     override fun copy(): IContact = PhoneContactDto(id, avatar, firstName, surname, yat, isFavorite)
 }

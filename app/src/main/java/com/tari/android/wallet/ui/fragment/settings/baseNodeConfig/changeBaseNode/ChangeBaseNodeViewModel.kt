@@ -3,20 +3,26 @@ package com.tari.android.wallet.ui.fragment.settings.baseNodeConfig.changeBaseNo
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.tari.android.wallet.R
-import com.tari.android.wallet.application.baseNodes.BaseNodes
+import com.tari.android.wallet.application.baseNodes.BaseNodesManager
 import com.tari.android.wallet.application.deeplinks.DeeplinkHandler
 import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodeDto
 import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodeSharedRepository
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.common.recyclerView.CommonViewHolderItem
+import com.tari.android.wallet.ui.dialog.error.ErrorDialogArgs
 import com.tari.android.wallet.ui.dialog.modular.DialogArgs
 import com.tari.android.wallet.ui.dialog.modular.ModularDialogArgs
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonStyle
 import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
+import com.tari.android.wallet.ui.dialog.modular.modules.input.InputModule
+import com.tari.android.wallet.ui.fragment.restore.inputSeedWords.CustomBaseNodeState
 import com.tari.android.wallet.ui.fragment.send.shareQr.ShareQrCodeModule
 import com.tari.android.wallet.ui.fragment.settings.baseNodeConfig.changeBaseNode.adapter.BaseNodeViewHolderItem
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 
 class ChangeBaseNodeViewModel : CommonViewModel() {
@@ -25,13 +31,16 @@ class ChangeBaseNodeViewModel : CommonViewModel() {
     lateinit var baseNodeSharedRepository: BaseNodeSharedRepository
 
     @Inject
-    lateinit var baseNodes: BaseNodes
+    lateinit var baseNodesManager: BaseNodesManager
 
     @Inject
     lateinit var deeplinkHandler: DeeplinkHandler
 
     private val _baseNodeList = MutableLiveData<MutableList<CommonViewHolderItem>>()
     val baseNodeList: LiveData<MutableList<CommonViewHolderItem>> = _baseNodeList
+
+    private val _customBaseNodeState = MutableStateFlow(CustomBaseNodeState())
+    val customBaseNodeState = _customBaseNodeState.asStateFlow()
 
     init {
         component.inject(this)
@@ -42,12 +51,12 @@ class ChangeBaseNodeViewModel : CommonViewModel() {
     }
 
     fun selectBaseNode(baseNodeDto: BaseNodeDto) {
-        baseNodes.setBaseNode(baseNodeDto)
+        baseNodesManager.setBaseNode(baseNodeDto)
         backPressed.postValue(Unit)
     }
 
     fun showQrCode(baseNodeDto: BaseNodeDto) {
-        val data = deeplinkHandler.getDeeplink(BaseNodeDto.getDeeplink(baseNodeDto))
+        val data = deeplinkHandler.getDeeplink(baseNodeDto.toDeeplink())
         val args = ModularDialogArgs(
             DialogArgs(true, canceledOnTouchOutside = true), listOf(
                 HeadModule(resourceManager.getString(R.string.share_via_qr_code_title)),
@@ -61,15 +70,87 @@ class ChangeBaseNodeViewModel : CommonViewModel() {
     fun refresh() = loadList()
 
     private fun deleteBaseNode(baseNodeDto: BaseNodeDto) {
-        baseNodeSharedRepository.deleteUserBaseNode(baseNodeDto)
+        baseNodesManager.deleteUserBaseNode(baseNodeDto)
         loadList()
     }
 
     private fun loadList() {
         val currentBaseNode = baseNodeSharedRepository.currentBaseNode
         val items = mutableListOf<CommonViewHolderItem>()
-        items.addAll(baseNodeSharedRepository.userBaseNodes.orEmpty().map { BaseNodeViewHolderItem(it, currentBaseNode, this::deleteBaseNode) })
-        items.addAll(baseNodes.baseNodeList.map { BaseNodeViewHolderItem(it, currentBaseNode, this::deleteBaseNode) })
+        items.addAll(baseNodeSharedRepository.userBaseNodes.map { BaseNodeViewHolderItem(it, currentBaseNode, this::deleteBaseNode) })
+        items.addAll(baseNodesManager.baseNodeList.map { BaseNodeViewHolderItem(it, currentBaseNode, this::deleteBaseNode) })
         _baseNodeList.postValue(items)
     }
+
+    fun chooseCustomBaseNodeClick() {
+        showEditBaseNodeDialog()
+    }
+
+    private fun showEditBaseNodeDialog() {
+        var saveAction: () -> Boolean = { false }
+        val title = HeadModule(
+            title = resourceManager.getString(R.string.add_base_node_form_title),
+            rightButtonTitle = resourceManager.getString(R.string.add_base_node_action_button),
+            rightButtonAction = { saveAction() },
+        )
+        val nameInput = InputModule(
+            value = customBaseNodeState.value.customBaseNode?.name.orEmpty(),
+            hint = resourceManager.getString(R.string.add_base_node_name_hint),
+            isFirst = true,
+            onDoneAction = { saveAction() },
+        )
+        val hexInput = InputModule(
+            value = customBaseNodeState.value.customBaseNode?.publicKeyHex.orEmpty(),
+            hint = resourceManager.getString(R.string.add_base_node_hex_hint),
+            onDoneAction = { saveAction() },
+        )
+        val addressInput = InputModule(
+            value = customBaseNodeState.value.customBaseNode?.address.orEmpty(),
+            hint = resourceManager.getString(R.string.add_base_node_address_hint),
+            isEnd = true,
+            onDoneAction = { saveAction() },
+        )
+        saveAction = {
+            customBaseNodeEntered(nameInput.value, hexInput.value, addressInput.value)
+            true
+        }
+
+        _inputDialog.postValue(
+            ModularDialogArgs(
+                dialogArgs = DialogArgs(),
+                modules = mutableListOf(
+                    title,
+                    nameInput,
+                    hexInput,
+                    addressInput,
+                )
+            )
+        )
+    }
+
+    private fun customBaseNodeEntered(enteredName: String, enteredHex: String, enteredAddress: String) {
+        if (baseNodesManager.isValidBaseNode("$enteredHex::$enteredAddress")) {
+            val baseNode = BaseNodeDto(
+                name = enteredName.takeIf { it.isNotBlank() } ?: resourceManager.getString(R.string.add_base_node_default_name_custom),
+                publicKeyHex = enteredHex,
+                address = enteredAddress,
+                isCustom = true,
+            )
+            _customBaseNodeState.update { it.copy(customBaseNode = baseNode) }
+
+            baseNodesManager.addUserBaseNode(baseNode)
+            baseNodesManager.setBaseNode(baseNode)
+            dismissDialog.postValue(Unit)
+            loadList()
+        } else {
+            _customBaseNodeState.update { it.copy(customBaseNode = null) }
+            modularDialog.postValue(
+                ErrorDialogArgs(
+                    title = resourceManager.getString(R.string.common_error_title),
+                    description = resourceManager.getString(R.string.restore_from_seed_words_form_error_message),
+                ).getModular(resourceManager)
+            )
+        }
+    }
+
 }

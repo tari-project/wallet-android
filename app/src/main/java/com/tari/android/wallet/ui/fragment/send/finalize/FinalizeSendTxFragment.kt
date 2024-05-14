@@ -70,7 +70,7 @@ class FinalizeSendTxFragment : CommonFragment<FragmentFinalizeSendTxBinding, Fin
         val viewModel: FinalizeSendTxViewModel by viewModels()
         bindViewModel(viewModel)
 
-        viewModel.transactionData = requireArguments().parcelable(FinalizeSendTxViewModel.transactionDataKey)!!
+        viewModel.transactionData = requireArguments().parcelable(FinalizeSendTxViewModel.KEY_TRANSACTION_DATA)!!
         viewModel.start()
         setupUi()
         subscribeUI()
@@ -205,10 +205,7 @@ class FinalizeSendTxFragment : CommonFragment<FragmentFinalizeSendTxBinding, Fin
                     ui.lottieAnimationView.alpha = 0f
 
                     viewModel.txFailureReason.value?.let {
-                       viewModel.tariNavigator.onSendTxFailure(
-                           false,
-                           it
-                       )
+                       viewModel.tariNavigator.onSendTxFailure(isYat = false, txFailureReason = it)
                     }
                 }
             })
@@ -238,10 +235,7 @@ class FinalizeSendTxFragment : CommonFragment<FragmentFinalizeSendTxBinding, Fin
                     removeAllListeners()
                     ui.lottieAnimationView.alpha = 0f
                     viewModel.sentTxId.value?.let {
-                        viewModel.tariNavigator.onSendTxSuccessful(
-                            false,
-                            it
-                        )
+                        viewModel.tariNavigator.onSendTxSuccessful(isYat = false, txId = it)
                     }
                 }
             })
@@ -257,7 +251,7 @@ class FinalizeSendTxFragment : CommonFragment<FragmentFinalizeSendTxBinding, Fin
         fun create(transactionData: TransactionData): FinalizeSendTxFragment {
             return FinalizeSendTxFragment().apply {
                 arguments = Bundle().apply {
-                    putParcelable(FinalizeSendTxViewModel.transactionDataKey, transactionData)
+                    putParcelable(FinalizeSendTxViewModel.KEY_TRANSACTION_DATA, transactionData)
                 }
             }
         }
