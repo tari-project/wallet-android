@@ -14,7 +14,6 @@ import com.tari.android.wallet.extension.observe
 import com.tari.android.wallet.infrastructure.security.biometric.BiometricAuthenticationException
 import com.tari.android.wallet.ui.common.CommonFragment
 import com.tari.android.wallet.ui.extension.string
-import com.tari.android.wallet.util.DebugConfig
 import kotlinx.coroutines.launch
 
 class ChangeBiometricsFragment : CommonFragment<FragmentChangeBiometricsBinding, ChangeBiometricsViewModel>() {
@@ -45,16 +44,13 @@ class ChangeBiometricsFragment : CommonFragment<FragmentChangeBiometricsBinding,
             viewModel.startAuth(isTurningOn)
             lifecycleScope.launch {
                 try {
-                    if (!DebugConfig.mockedDataEnabled) {
-                        // prompt system authentication dialog
-                        viewModel.authService.authenticate(
-                            this@ChangeBiometricsFragment,
-                            title = string(auth_title),
-                            subtitle =
-                            if (viewModel.authService.isBiometricAuthAvailable) string(auth_biometric_prompt)
-                            else string(auth_device_lock_code_prompt)
-                        )
-                    }
+                    // prompt system authentication dialog
+                    viewModel.authService.authenticate(
+                        fragment = this@ChangeBiometricsFragment,
+                        title = string(auth_title),
+                        subtitle = if (viewModel.authService.isBiometricAuthAvailable) string(auth_biometric_prompt)
+                        else string(auth_device_lock_code_prompt),
+                    )
                     authSuccess(isTurningOn)
                 } catch (e: BiometricAuthenticationException) {
                     authFailed(isTurningOn)

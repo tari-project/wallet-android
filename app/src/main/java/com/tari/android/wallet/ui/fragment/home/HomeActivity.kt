@@ -154,15 +154,17 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>() {
         }
         ui = ActivityHomeBinding.inflate(layoutInflater).also { setContentView(it.root) }
 
-        val buttonBg = when(tariSettingsRepository.currentTheme) {
+        val buttonBg = when (tariSettingsRepository.currentTheme) {
             TariTheme.AppBased -> {
                 when (resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) {
-                    Configuration.UI_MODE_NIGHT_YES ->  R.drawable.vector_disable_able_gradient_button_bg_external_dark
+                    Configuration.UI_MODE_NIGHT_YES -> R.drawable.vector_disable_able_gradient_button_bg_external_dark
                     else -> R.drawable.vector_disable_able_gradient_button_bg_external
                 }
             }
+
             null,
             TariTheme.Light -> R.drawable.vector_disable_able_gradient_button_bg_external
+
             else -> R.drawable.vector_disable_able_gradient_button_bg_external_dark
         }
         ui.sendButtonExternalContainer.setBackgroundResource(buttonBg)

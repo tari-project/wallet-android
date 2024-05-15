@@ -6,7 +6,7 @@ class SeedPhrase(private val seedWords: List<String>) : Iterable<String> {
     val length
         get() = seedWords.size
 
-    private fun sorted(): SeedPhrase = SeedPhrase(if (DebugConfig.mockedDataEnabled) seedWords else seedWords.sorted())
+    private fun sorted(): SeedPhrase = SeedPhrase(if (DebugConfig.mockSeedPhraseSorting) seedWords else seedWords.sorted())
 
     fun consistsOf(result: List<String>): Boolean = seedWords == result
 

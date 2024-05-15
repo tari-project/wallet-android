@@ -14,7 +14,6 @@ data class ChatItemViewHolderItem(
     val dateMessage: String,
     val unreadCount: Int,
     val isOnline: Boolean,
-) :
-    CommonViewHolderItem() {
+) : CommonViewHolderItem() {
     override val viewHolderUUID: String = ""
 }

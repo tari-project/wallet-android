@@ -26,7 +26,7 @@ class ChatsRepository @Inject constructor(private val chatsPrefRepository: Chats
     private fun updateList() {
         val list = chatsPrefRepository.getSavedChats().toMutableList()
 
-        if (DebugConfig.mockedDataEnabled && list.isEmpty()) {
+        if (DebugConfig.mockChatMessages && list.isEmpty()) {
             val mockedList = mutableListOf(
                 ChatItemDto(
                     UUID.randomUUID().toString(),

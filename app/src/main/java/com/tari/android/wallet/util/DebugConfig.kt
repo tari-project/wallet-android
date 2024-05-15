@@ -60,26 +60,27 @@ import kotlin.random.Random
  */
 object DebugConfig {
 
-    private const val _mockedTurned = false
-    val mockedDataEnabled = _mockedTurned && isDebug() // TODO split this flag to multiple different types of mocked data
-
     val mockUtxos = valueIfDebug(false)
 
     val mockTxs = valueIfDebug(false)
+
+    val mockChatMessages = valueIfDebug(false)
+
+    val suppressAddAmountErrors = valueIfDebug(false)
+
+    val mockSeedPhraseSorting = valueIfDebug(false)
 
     val mockEveryAddressPoisoned: Boolean = valueIfDebug(false)
     val mockPoisonedAddresses: Boolean = valueIfDebug(false)
 
     const val isChatEnabled = false
 
-    private const val _useYatSandbox = false
-    val yatEnvironment = if (_useYatSandbox && isDebug()) YatEnvironment.SANDBOX else YatEnvironment.PRODUCTION
+    private val _useYatSandbox = valueIfDebug(false)
+    val yatEnvironment = if (_useYatSandbox) YatEnvironment.SANDBOX else YatEnvironment.PRODUCTION
 
-    private const val _mockNetwork = false
-    val mockNetwork = _mockNetwork && isDebug()
+    val mockNetwork = valueIfDebug(true)
 
-    private const val _hardcodedBaseNode = false
-    val hardcodedBaseNodes = _hardcodedBaseNode && isDebug()
+    val hardcodedBaseNodes = valueIfDebug(false)
 
     private fun isDebug() = BuildConfig.BUILD_TYPE == "debug"
 
