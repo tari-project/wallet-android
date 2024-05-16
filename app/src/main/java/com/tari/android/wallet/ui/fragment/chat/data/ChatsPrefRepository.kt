@@ -1,8 +1,8 @@
-package com.tari.android.wallet.ui.fragment.chat_list.data
+package com.tari.android.wallet.ui.fragment.chat.data
 
 import android.content.SharedPreferences
 import com.tari.android.wallet.data.repository.CommonRepository
-import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefGsonNullableDelegate
+import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefGsonDelegate
 import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
 import com.tari.android.wallet.data.sharedPrefs.network.formatKey
 import javax.inject.Inject
@@ -14,9 +14,15 @@ class ChatsPrefRepository @Inject constructor(
     val sharedPrefs: SharedPreferences
 ) : CommonRepository(networkRepository) {
 
-    private var savedChats: ChatList? by SharedPrefGsonNullableDelegate(sharedPrefs, this, formatKey(KEY_SAVED_CHATS), ChatList::class.java, ChatList())
+    private var savedChats: ChatList by SharedPrefGsonDelegate(
+        prefs = sharedPrefs,
+        commonRepository = this,
+        name = formatKey(KEY_SAVED_CHATS),
+        type = ChatList::class.java,
+        defValue = ChatList(),
+    )
 
-    fun getSavedChats(): List<ChatItemDto> = savedChats.orEmpty().map { it }
+    fun getSavedChats(): List<ChatItemDto> = savedChats.map { it }
 
     @Synchronized
     fun saveChats(list: List<ChatItemDto>) {
@@ -25,13 +31,13 @@ class ChatsPrefRepository @Inject constructor(
 
     @Synchronized
     fun addChat(chatItemDto: ChatItemDto) {
-        val list = savedChats?.toMutableList() ?: mutableListOf()
+        val list = savedChats
         list.add(chatItemDto)
         saveChats(list.toList())
     }
 
     fun saveMessage(chatItemDto: ChatItemDto?, messageItemDto: ChatMessageItemDto) {
-        val list = savedChats?.toMutableList() ?: mutableListOf()
+        val list = savedChats
         val index = list.indexOfFirst { it.uuid == chatItemDto?.uuid }
         if (index != -1) {
             val chatItem = list[index]
@@ -43,10 +49,14 @@ class ChatsPrefRepository @Inject constructor(
     }
 
     fun clear() {
-        savedChats = null
+        savedChats = ChatList()
     }
 
     companion object {
         const val KEY_SAVED_CHATS = "KEY_SAVED_CHATS"
     }
+}
+
+class ChatList(list: List<ChatItemDto>) : ArrayList<ChatItemDto>(list) {
+    constructor() : this(emptyList())
 }

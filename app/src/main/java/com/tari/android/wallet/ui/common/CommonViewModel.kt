@@ -25,7 +25,6 @@ import com.tari.android.wallet.ui.common.permission.PermissionManager
 import com.tari.android.wallet.ui.component.tari.toast.TariToastArgs
 import com.tari.android.wallet.ui.dialog.error.WalletErrorArgs
 import com.tari.android.wallet.ui.dialog.inProgress.ProgressDialogArgs
-import com.tari.android.wallet.ui.dialog.modular.DialogArgs
 import com.tari.android.wallet.ui.dialog.modular.IDialogModule
 import com.tari.android.wallet.ui.dialog.modular.ModularDialogArgs
 import com.tari.android.wallet.ui.dialog.modular.modules.body.BodyModule
@@ -48,7 +47,6 @@ open class CommonViewModel : ViewModel() {
 
     val component: ApplicationComponent
         get() = DiContainer.appComponent
-
 
     @Inject
     lateinit var permissionManager: PermissionManager
@@ -127,8 +125,7 @@ open class CommonViewModel : ViewModel() {
         EventBus.walletState.publishSubject.filter { it is WalletState.Failed }
             .subscribe({
                 val exception = (it as WalletState.Failed).exception
-                val errorArgs = WalletErrorArgs(resourceManager, exception).getErrorArgs().getModular(resourceManager, true)
-                modularDialog.postValue(errorArgs)
+                showModularDialog(WalletErrorArgs(resourceManager, exception).getErrorArgs().getModular(resourceManager, true))
             }, {
                 logger.i(it.toString())
                 logger.i("on showing error dialog from wallet")
@@ -157,14 +154,11 @@ open class CommonViewModel : ViewModel() {
     }
 
     fun openWalletErrorDialog() {
-        val modularArgs = ModularDialogArgs(
-            DialogArgs(), listOf(
-                HeadModule(resourceManager.getString(R.string.common_error_title)),
-                BodyModule(resourceManager.getString(R.string.contact_book_details_connected_wallets_no_application)),
-                ButtonModule(resourceManager.getString(R.string.common_close), ButtonStyle.Close)
-            )
+        showModularDialog(
+            HeadModule(resourceManager.getString(R.string.common_error_title)),
+            BodyModule(resourceManager.getString(R.string.contact_book_details_connected_wallets_no_application)),
+            ButtonModule(resourceManager.getString(R.string.common_close), ButtonStyle.Close),
         )
-        modularDialog.postValue(modularArgs)
     }
 
     fun runWithAuthorization(action: () -> Unit) {

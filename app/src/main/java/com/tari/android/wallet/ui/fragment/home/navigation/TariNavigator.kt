@@ -34,8 +34,8 @@ import com.tari.android.wallet.ui.extension.showInternetConnectionErrorDialog
 import com.tari.android.wallet.ui.extension.string
 import com.tari.android.wallet.ui.fragment.auth.FeatureAuthFragment
 import com.tari.android.wallet.ui.fragment.biometrics.ChangeBiometricsFragment
-import com.tari.android.wallet.ui.fragment.chat_list.addChat.AddChatFragment
-import com.tari.android.wallet.ui.fragment.chat_list.chat.ChatFragment
+import com.tari.android.wallet.ui.fragment.chat.addChat.AddChatFragment
+import com.tari.android.wallet.ui.fragment.chat.chatDetail.ChatDetailFragment
 import com.tari.android.wallet.ui.fragment.contact_book.add.AddContactFragment
 import com.tari.android.wallet.ui.fragment.contact_book.add.SelectUserContactFragment
 import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.ContactDto
@@ -167,14 +167,7 @@ class TariNavigator @Inject constructor(val prefs: SharedPrefsRepository, val ta
             is BackupSettingsNavigation.ToWalletBackupWithRecoveryPhrase -> toWalletBackupWithRecoveryPhrase()
             is BackupSettingsNavigation.ToLearnMore -> toBackupOnboardingFlow()
             is CustomBridgeNavigation.UploadQrCode -> Unit
-            is ChatNavigation.ToChat -> {
-                if (navigation.isNew) {
-                    onBackPressed()
-                }
-
-                addFragment(ChatFragment.newInstance(navigation.walletAddress))
-            }
-
+            is ChatNavigation.ToChat -> toChatDetail(navigation.walletAddress, navigation.isNew)
             is ChatNavigation.ToAddChat -> addFragment(AddChatFragment())
         }
     }
@@ -395,6 +388,13 @@ class TariNavigator @Inject constructor(val prefs: SharedPrefsRepository, val ta
         addFragment(AddAmountFragment(), bundle)
     }
 
+    private fun toChatDetail(walletAddress: TariWalletAddress, isNew: Boolean) {
+        if (isNew) {
+            onBackPressed()
+        }
+
+        addFragment(ChatDetailFragment.newInstance(walletAddress))
+    }
 
     private fun addFragment(fragment: CommonFragment<*, *>, bundle: Bundle? = null, isRoot: Boolean = false, withAnimation: Boolean = true) =
         activity.addFragment(fragment, bundle, isRoot, withAnimation)

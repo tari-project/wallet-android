@@ -61,7 +61,7 @@ import com.tari.android.wallet.ui.common.domain.ResourceManager
 import com.tari.android.wallet.ui.extension.parcelable
 import com.tari.android.wallet.ui.extension.setVisible
 import com.tari.android.wallet.ui.fragment.auth.AuthActivity
-import com.tari.android.wallet.ui.fragment.chat_list.ChatListFragment
+import com.tari.android.wallet.ui.fragment.chat.chatList.ChatListFragment
 import com.tari.android.wallet.ui.fragment.contact_book.root.ContactBookFragment
 import com.tari.android.wallet.ui.fragment.contact_book.root.action_menu.ContactBookActionMenuViewModel
 import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
@@ -245,8 +245,7 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>() {
 
     private fun setupBottomNavigation() {
         enableNavigationView(ui.homeImageView)
-        ui.viewPager.adapter = if (DebugConfig.isChatEnabled) HomeChatAdapter(supportFragmentManager, this.lifecycle)
-        else HomeStoreAdapter(supportFragmentManager, this.lifecycle)
+        ui.viewPager.adapter = getBottomMenuAdapter()
         ui.viewPager.isUserInputEnabled = false
         ui.viewPager.offscreenPageLimit = 3
         ui.homeView.setOnClickListener {
@@ -311,12 +310,18 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>() {
         viewModelStore.clear()
     }
 
-    class HomeStoreAdapter(fm: FragmentManager, lifecycle: Lifecycle) : FragmentStateAdapter(fm, lifecycle) {
+    private fun getBottomMenuAdapter(): FragmentStateAdapter = if (DebugConfig.isChatEnabled) {
+        HomeChatAdapter(supportFragmentManager, this.lifecycle)
+    } else {
+        HomeStoreAdapter(supportFragmentManager, this.lifecycle)
+    }
+
+    private class HomeStoreAdapter(fm: FragmentManager, lifecycle: Lifecycle) : FragmentStateAdapter(fm, lifecycle) {
 
         override fun createFragment(position: Int): Fragment = when (position) {
             INDEX_HOME -> HomeFragment()
-            INDEX_CHAT -> ContactBookFragment()
             INDEX_CONTACT_BOOK -> StoreFragment.newInstance()
+            INDEX_CHAT -> ContactBookFragment()
             INDEX_SETTINGS -> AllSettingsFragment.newInstance()
             else -> error("Unexpected position: $position")
         }
@@ -324,12 +329,12 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>() {
         override fun getItemCount(): Int = 4
     }
 
-    class HomeChatAdapter(fm: FragmentManager, lifecycle: Lifecycle) : FragmentStateAdapter(fm, lifecycle) {
+    private class HomeChatAdapter(fm: FragmentManager, lifecycle: Lifecycle) : FragmentStateAdapter(fm, lifecycle) {
 
         override fun createFragment(position: Int): Fragment = when (position) {
             INDEX_HOME -> HomeFragment()
-            INDEX_CHAT -> ChatListFragment()
             INDEX_CONTACT_BOOK -> ContactBookFragment()
+            INDEX_CHAT -> ChatListFragment()
             INDEX_SETTINGS -> AllSettingsFragment.newInstance()
             else -> error("Unexpected position: $position")
         }

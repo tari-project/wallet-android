@@ -1,4 +1,4 @@
-package com.tari.android.wallet.ui.fragment.chat_list.chat
+package com.tari.android.wallet.ui.fragment.chat.chatDetail
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -7,19 +7,19 @@ import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.tari.android.wallet.databinding.FragmentChatBinding
-import com.tari.android.wallet.extension.observe
+import com.tari.android.wallet.extension.collectFlow
 import com.tari.android.wallet.model.TariWalletAddress
 import com.tari.android.wallet.ui.common.CommonFragment
 import com.tari.android.wallet.ui.common.recyclerView.AdapterFactory
 import com.tari.android.wallet.ui.common.recyclerView.CommonViewHolderItem
-import com.tari.android.wallet.ui.extension.parcelable
 import com.tari.android.wallet.ui.extension.setVisible
-import com.tari.android.wallet.ui.fragment.chat_list.chat.cells.MessageCellViewHolder
+import com.tari.android.wallet.ui.fragment.chat.chatDetail.ChatDetailModel.WALLET_ADDRESS
+import com.tari.android.wallet.ui.fragment.chat.chatDetail.adapter.ChatMessageViewHolder
 import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.ContactDto
 
-class ChatFragment : CommonFragment<FragmentChatBinding, ChatViewModel>() {
+class ChatDetailFragment : CommonFragment<FragmentChatBinding, ChatDetailViewModel>() {
 
-    private val adapter = AdapterFactory.generate<CommonViewHolderItem>(MessageCellViewHolder.getBuilder())
+    private val adapter = AdapterFactory.generate<CommonViewHolderItem>(ChatMessageViewHolder.getBuilder())
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
         FragmentChatBinding.inflate(inflater, container, false).also { ui = it }.root
@@ -27,11 +27,8 @@ class ChatFragment : CommonFragment<FragmentChatBinding, ChatViewModel>() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val viewModel: ChatViewModel by viewModels()
+        val viewModel: ChatDetailViewModel by viewModels()
         bindViewModel(viewModel)
-
-        val walletAddress = arguments?.parcelable<TariWalletAddress>(WALLET_ADDRESS)!!
-        viewModel.startWith(walletAddress)
 
         initUI()
         observeUI()
@@ -49,13 +46,13 @@ class ChatFragment : CommonFragment<FragmentChatBinding, ChatViewModel>() {
         ui.attachButton.setOnClickListener { viewModel.showOptions() }
     }
 
-    private fun observeUI() = with(viewModel) {
-        observe(contact) { showContact(it) }
+    private fun observeUI() {
+        collectFlow(viewModel.uiState) { uiState ->
+            showContact(uiState.contact)
 
-        observe(messages) {
-            adapter.update(it)
-            ui.emptyState.setVisible(it.isEmpty())
-            ui.list.setVisible(it.isNotEmpty())
+            adapter.update(uiState.messages)
+            ui.emptyState.setVisible(uiState.showEmptyState)
+            ui.list.setVisible(!uiState.showEmptyState)
         }
     }
 
@@ -64,9 +61,7 @@ class ChatFragment : CommonFragment<FragmentChatBinding, ChatViewModel>() {
     }
 
     companion object {
-        const val WALLET_ADDRESS = "Wallet address key"
-
-        fun newInstance(walletAddress: TariWalletAddress) = ChatFragment().apply {
+        fun newInstance(walletAddress: TariWalletAddress) = ChatDetailFragment().apply {
             arguments = Bundle().apply {
                 putParcelable(WALLET_ADDRESS, walletAddress)
             }

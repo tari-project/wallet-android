@@ -1,4 +1,4 @@
-package com.tari.android.wallet.ui.fragment.chat_list.adapter
+package com.tari.android.wallet.ui.fragment.chat.chatList.adapter
 
 import com.bumptech.glide.Glide
 import com.tari.android.wallet.databinding.ItemChatItemBinding
