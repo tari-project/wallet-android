@@ -19,8 +19,8 @@ import com.tari.android.wallet.ui.component.clipboardController.WalletAddressVie
 import com.tari.android.wallet.ui.dialog.modular.modules.addressPoisoning.AddressPoisoningModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonStyle
-import com.tari.android.wallet.ui.fragment.chat_list.data.ChatItemDto
-import com.tari.android.wallet.ui.fragment.chat_list.data.ChatsRepository
+import com.tari.android.wallet.ui.fragment.chat.data.ChatItemDto
+import com.tari.android.wallet.ui.fragment.chat.data.ChatsRepository
 import com.tari.android.wallet.ui.fragment.contact_book.address_poisoning.AddressPoisoningChecker
 import com.tari.android.wallet.ui.fragment.contact_book.address_poisoning.SimilarAddressDto
 import com.tari.android.wallet.ui.fragment.contact_book.contactSelection.ContactSelectionModel.Effect

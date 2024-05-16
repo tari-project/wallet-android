@@ -45,6 +45,8 @@ import com.tari.android.wallet.model.TxStatus
 import com.tari.android.wallet.ui.common.gyphy.presentation.GIFViewModel
 import com.tari.android.wallet.ui.common.gyphy.repository.GIFRepository
 import com.tari.android.wallet.ui.common.recyclerView.items.TitleViewHolderItem
+import com.tari.android.wallet.ui.fragment.chat.data.ChatItemDto
+import com.tari.android.wallet.ui.fragment.chat.data.ChatMessageItemDto
 import com.tari.android.wallet.ui.fragment.contact_book.address_poisoning.SimilarAddressDto
 import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.ContactDto
 import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.FFIContactDto
@@ -53,6 +55,7 @@ import com.tari.android.wallet.ui.fragment.utxos.list.adapters.UtxosViewHolderIt
 import org.joda.time.DateTime
 import yat.android.lib.YatIntegration
 import java.math.BigInteger
+import java.util.UUID
 import kotlin.random.Random
 
 /**
@@ -60,26 +63,27 @@ import kotlin.random.Random
  */
 object DebugConfig {
 
-    private const val _mockedTurned = false
-    val mockedDataEnabled = _mockedTurned && isDebug() // TODO split this flag to multiple different types of mocked data
-
     val mockUtxos = valueIfDebug(false)
 
     val mockTxs = valueIfDebug(false)
+
+    val mockChatMessages = valueIfDebug(false)
+
+    val suppressAddAmountErrors = valueIfDebug(false)
+
+    val mockSeedPhraseSorting = valueIfDebug(false)
 
     val mockEveryAddressPoisoned: Boolean = valueIfDebug(false)
     val mockPoisonedAddresses: Boolean = valueIfDebug(false)
 
     const val isChatEnabled = false
 
-    private const val _useYatSandbox = false
-    val yatEnvironment = if (_useYatSandbox && isDebug()) YatEnvironment.SANDBOX else YatEnvironment.PRODUCTION
+    private val _useYatSandbox = valueIfDebug(false)
+    val yatEnvironment = if (_useYatSandbox) YatEnvironment.SANDBOX else YatEnvironment.PRODUCTION
 
-    private const val _mockNetwork = false
-    val mockNetwork = _mockNetwork && isDebug()
+    val mockNetwork = valueIfDebug(true)
 
-    private const val _hardcodedBaseNode = false
-    val hardcodedBaseNodes = _hardcodedBaseNode && isDebug()
+    val hardcodedBaseNodes = valueIfDebug(false)
 
     private fun isDebug() = BuildConfig.BUILD_TYPE == "debug"
 
@@ -187,6 +191,24 @@ object MockDataStub {
             numberOfTransaction = 10,
             lastTransactionTimestampMillis = System.currentTimeMillis(),
             trusted = false,
+        )
+    }
+
+    fun createChatList(count: Int = 20) = List(count) {
+        ChatItemDto(
+            uuid = UUID.randomUUID().toString(),
+            messages = createChatMessages(Random.nextInt(1, 20)),
+            walletAddress = WALLET_ADDRESS,
+        )
+    }
+
+    fun createChatMessages(count: Int = 20) = List(count) {
+        ChatMessageItemDto(
+            uuid = UUID.randomUUID().toString(),
+            message = "Message $it",
+            date = "2 days ago",
+            isMine = Random.nextBoolean(),
+            isRead = Random.nextBoolean(),
         )
     }
 }

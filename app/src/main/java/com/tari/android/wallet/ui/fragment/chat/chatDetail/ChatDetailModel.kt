@@ -1,0 +1,19 @@
+package com.tari.android.wallet.ui.fragment.chat.chatDetail
+
+import com.tari.android.wallet.model.TariWalletAddress
+import com.tari.android.wallet.ui.common.recyclerView.CommonViewHolderItem
+import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.ContactDto
+
+
+object ChatDetailModel {
+    const val WALLET_ADDRESS = "WALLET_ADDRESS"
+
+    data class UiState(
+        val walletAddress: TariWalletAddress,
+        val contact: ContactDto,
+        val messages: List<CommonViewHolderItem> = emptyList(),
+    ) {
+        val showEmptyState: Boolean
+            get() = messages.isEmpty()
+    }
+}

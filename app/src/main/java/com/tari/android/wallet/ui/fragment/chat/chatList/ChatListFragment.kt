@@ -1,4 +1,4 @@
-package com.tari.android.wallet.ui.fragment.chat_list
+package com.tari.android.wallet.ui.fragment.chat.chatList
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -8,16 +8,15 @@ import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.tari.android.wallet.R
 import com.tari.android.wallet.databinding.FragmentChatListBinding
-import com.tari.android.wallet.extension.observe
+import com.tari.android.wallet.extension.collectFlow
 import com.tari.android.wallet.ui.common.CommonFragment
 import com.tari.android.wallet.ui.common.recyclerView.AdapterFactory
 import com.tari.android.wallet.ui.common.recyclerView.CommonAdapter
 import com.tari.android.wallet.ui.common.recyclerView.CommonViewHolderItem
 import com.tari.android.wallet.ui.component.tari.toolbar.TariToolbarActionArg
 import com.tari.android.wallet.ui.extension.setVisible
-import com.tari.android.wallet.ui.fragment.chat_list.adapter.ChatItemViewHolder
-import com.tari.android.wallet.ui.fragment.chat_list.adapter.ChatItemViewHolderItem
-import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
+import com.tari.android.wallet.ui.fragment.chat.chatList.adapter.ChatItemViewHolder
+import com.tari.android.wallet.ui.fragment.chat.chatList.adapter.ChatItemViewHolderItem
 
 class ChatListFragment : CommonFragment<FragmentChatListBinding, ChatListViewModel>() {
 
@@ -43,21 +42,20 @@ class ChatListFragment : CommonFragment<FragmentChatListBinding, ChatListViewMod
 
         adapter.setClickListener(CommonAdapter.ItemClickListener {
             if (it is ChatItemViewHolderItem) {
-                viewModel.navigation.postValue(Navigation.ChatNavigation.ToChat(it.walletAddress, false))
+                viewModel.onChatClicked(it)
             }
         })
 
-        val right = TariToolbarActionArg(R.drawable.vector_chat_add) {
-            viewModel.navigation.postValue(Navigation.ChatNavigation.ToAddChat)
-        }
-        toolbar.setRightArgs(right)
+        toolbar.setRightArgs(TariToolbarActionArg(R.drawable.vector_chat_add) {
+            viewModel.onAddChatClicked()
+        })
     }
 
     private fun subscribeUI() = with(viewModel) {
-        observe(list) {
-            adapter.submitList(it)
-            ui.list.setVisible(it.isNotEmpty())
-            ui.emptyState.setVisible(it.isEmpty())
+        collectFlow(uiState) { uiState ->
+            adapter.submitList(uiState.chatList)
+            ui.list.setVisible(!uiState.showEmpty)
+            ui.emptyState.setVisible(uiState.showEmpty)
         }
     }
 }

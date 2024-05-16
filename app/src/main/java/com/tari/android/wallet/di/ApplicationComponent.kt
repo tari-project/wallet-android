@@ -43,8 +43,8 @@ import com.tari.android.wallet.ui.component.networkStateIndicator.ConnectionIndi
 import com.tari.android.wallet.ui.fragment.auth.AuthActivity
 import com.tari.android.wallet.ui.fragment.auth.AuthViewModel
 import com.tari.android.wallet.ui.fragment.biometrics.ChangeBiometricsViewModel
-import com.tari.android.wallet.ui.fragment.chat_list.ChatListViewModel
-import com.tari.android.wallet.ui.fragment.chat_list.chat.ChatViewModel
+import com.tari.android.wallet.ui.fragment.chat.chatList.ChatListViewModel
+import com.tari.android.wallet.ui.fragment.chat.chatDetail.ChatDetailViewModel
 import com.tari.android.wallet.ui.fragment.contact_book.contactSelection.ContactSelectionViewModel
 import com.tari.android.wallet.ui.fragment.contact_book.contacts.ContactsViewModel
 import com.tari.android.wallet.ui.fragment.contact_book.details.ContactDetailsViewModel
@@ -204,7 +204,7 @@ interface ApplicationComponent {
     fun inject(viewModel: TransferFragment)
     fun inject(viewModel: ContactBookActionMenuViewModel)
     fun inject(viewModel: ChatListViewModel)
-    fun inject(viewModel: ChatViewModel)
+    fun inject(viewModel: ChatDetailViewModel)
     fun inject(viewModel: DataCollectionViewModel)
     fun inject(viewModel: EnterPinCodeViewModel)
     fun inject(viewModel: ChangeBiometricsViewModel)

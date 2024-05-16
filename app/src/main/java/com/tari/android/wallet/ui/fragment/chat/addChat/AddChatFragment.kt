@@ -1,4 +1,4 @@
-package com.tari.android.wallet.ui.fragment.chat_list.addChat
+package com.tari.android.wallet.ui.fragment.chat.addChat
 
 import android.os.Bundle
 import android.view.View
