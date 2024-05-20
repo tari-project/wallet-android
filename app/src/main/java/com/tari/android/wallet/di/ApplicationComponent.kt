@@ -119,11 +119,9 @@ import javax.inject.Singleton
 @Component(
     modules = [
         ApplicationModule::class,
-        WalletModule::class,
         ServiceModule::class,
         TorModule::class,
         PresentationModule::class,
-        YatModule::class,
         CoroutinesDispatchersModule::class,
     ]
 )

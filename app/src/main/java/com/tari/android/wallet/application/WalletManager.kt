@@ -42,15 +42,27 @@ import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodeSharedRepositor
 import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
 import com.tari.android.wallet.data.sharedPrefs.security.SecurityPrefRepository
 import com.tari.android.wallet.data.sharedPrefs.tariSettings.TariSettingsSharedRepository
+import com.tari.android.wallet.di.ApplicationScope
 import com.tari.android.wallet.event.EventBus
-import com.tari.android.wallet.ffi.*
+import com.tari.android.wallet.ffi.FFIByteVector
+import com.tari.android.wallet.ffi.FFICommsConfig
+import com.tari.android.wallet.ffi.FFIException
+import com.tari.android.wallet.ffi.FFITariTransportConfig
+import com.tari.android.wallet.ffi.FFIWallet
+import com.tari.android.wallet.ffi.LogFileObserver
+import com.tari.android.wallet.ffi.NetAddressString
 import com.tari.android.wallet.service.seedPhrase.SeedPhraseRepository
 import com.tari.android.wallet.service.service.WalletService
-import com.tari.android.wallet.tor.*
+import com.tari.android.wallet.tor.TorConfig
+import com.tari.android.wallet.tor.TorProxyManager
+import com.tari.android.wallet.tor.TorProxyState
 import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.WalletUtil
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import java.io.File
+import javax.inject.Inject
+import javax.inject.Singleton
 
 /**
  * Utilized to asynchronous manage the sometimes-long-running task of instantiation and start-up
@@ -58,7 +70,8 @@ import java.io.File
  *
  * @author The Tari Development Team
  */
-class WalletManager(
+@Singleton
+class WalletManager @Inject constructor(
     private val walletConfig: WalletConfig,
     private val torManager: TorProxyManager,
     private val sharedPrefsWrapper: SharedPrefsRepository,
@@ -68,14 +81,13 @@ class WalletManager(
     private val tariSettingsSharedRepository: TariSettingsSharedRepository,
     private val securityPrefRepository: SecurityPrefRepository,
     private val baseNodesManager: BaseNodesManager,
-    private val torConfig: TorConfig
+    private val torConfig: TorConfig,
+    @ApplicationScope private val applicationScope: CoroutineScope,
 ) {
 
     private var logFileObserver: LogFileObserver? = null
     private val logger
         get() = Logger.t(WalletManager::class.simpleName)
-
-    val coroutineScope = CoroutineScope(Dispatchers.IO)
 
     init {
         // post initial wallet state
@@ -111,8 +123,9 @@ class WalletManager(
     @SuppressLint("CheckResult")
     private fun onTorProxyStateChanged(torProxyState: TorProxyState) {
         logger.i("Tor proxy state has changed: $torProxyState")
-        // if I'm trying to use Initializing status, then wallet would fail with
-        // java.io.FileNotFoundException: /data/user/0/com.tari.android.wallet/app_tor_data/control_auth_cookie
+        // TODO
+        //  if I'm trying to use Initializing status, then wallet would fail with
+        //  java.io.FileNotFoundException: /data/user/0/com.tari.android.wallet/app_tor_data/control_auth_cookie
         if (torProxyState is TorProxyState.Running) {
             startWallet()
         }
@@ -122,7 +135,7 @@ class WalletManager(
         if (EventBus.walletState.publishSubject.value is WalletState.NotReady || EventBus.walletState.publishSubject.value is WalletState.Failed) {
             logger.i("Initialize wallet started")
             EventBus.walletState.post(WalletState.Initializing)
-            coroutineScope.launch {
+            applicationScope.launch {
                 try {
                     initWallet()
                     EventBus.walletState.post(WalletState.Started)
