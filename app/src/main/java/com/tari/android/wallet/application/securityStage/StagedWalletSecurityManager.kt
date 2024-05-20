@@ -3,13 +3,13 @@ package com.tari.android.wallet.application.securityStage
 import com.tari.android.wallet.application.securityStage.StagedWalletSecurityManager.StagedSecurityEffect.NoStagedSecurityPopUp
 import com.tari.android.wallet.application.securityStage.StagedWalletSecurityManager.StagedSecurityEffect.ShowStagedSecurityPopUp
 import com.tari.android.wallet.data.sharedPrefs.securityStages.DisabledTimestampsDto
-import com.tari.android.wallet.data.sharedPrefs.securityStages.SecurityStagesRepository
+import com.tari.android.wallet.data.sharedPrefs.securityStages.SecurityStagesPrefRepository
 import com.tari.android.wallet.data.sharedPrefs.securityStages.WalletSecurityStage
-import com.tari.android.wallet.data.sharedPrefs.tariSettings.TariSettingsSharedRepository
+import com.tari.android.wallet.data.sharedPrefs.tariSettings.TariSettingsPrefRepository
 import com.tari.android.wallet.extension.isAfterNow
 import com.tari.android.wallet.model.BalanceInfo
 import com.tari.android.wallet.model.MicroTari
-import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupSettingsRepository
+import com.tari.android.wallet.data.sharedPrefs.backup.BackupPrefRepository
 import java.math.BigDecimal
 import java.util.Calendar
 import javax.inject.Inject
@@ -22,9 +22,9 @@ val MAX_HOT_WALLET_BALANCE = MicroTari((BigDecimal.valueOf(1_000_000_000) * Micr
 
 @Singleton
 class StagedWalletSecurityManager @Inject constructor(
-    private val securityStagesRepository: SecurityStagesRepository,
-    private val backupPrefsRepository: BackupSettingsRepository,
-    private val tariSettingsSharedRepository: TariSettingsSharedRepository,
+    private val securityStagesRepository: SecurityStagesPrefRepository,
+    private val backupPrefsRepository: BackupPrefRepository,
+    private val tariSettingsSharedRepository: TariSettingsPrefRepository,
 ) {
     private val hasVerifiedSeedPhrase
         get() = tariSettingsSharedRepository.hasVerifiedSeedWords

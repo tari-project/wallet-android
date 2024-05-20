@@ -1,4 +1,4 @@
-package com.tari.android.wallet.data.sharedPrefs.securityStages.modules
+package com.tari.android.wallet.ui.dialog.modular.modules.securityStages
 
 import com.tari.android.wallet.ui.dialog.modular.IDialogModule
 

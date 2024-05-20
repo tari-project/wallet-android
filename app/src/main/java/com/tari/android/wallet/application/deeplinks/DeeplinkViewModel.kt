@@ -4,7 +4,7 @@ import androidx.lifecycle.viewModelScope
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.baseNodes.BaseNodesManager
 import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodeDto
-import com.tari.android.wallet.data.sharedPrefs.tor.TorSharedRepository
+import com.tari.android.wallet.data.sharedPrefs.tor.TorPrefRepository
 import com.tari.android.wallet.ffi.FFITariWalletAddress
 import com.tari.android.wallet.ffi.HexString
 import com.tari.android.wallet.model.TariWalletAddress
@@ -36,7 +36,7 @@ class DeeplinkViewModel : CommonViewModel() {
     lateinit var deeplinkHandler: DeeplinkHandler
 
     @Inject
-    lateinit var torSharedRepository: TorSharedRepository
+    lateinit var torSharedRepository: TorPrefRepository
 
     init {
         component.inject(this)

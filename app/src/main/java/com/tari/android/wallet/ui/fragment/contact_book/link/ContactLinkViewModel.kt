@@ -15,7 +15,7 @@ import com.tari.android.wallet.R.string.contact_book_contacts_book_link_success_
 import com.tari.android.wallet.R.string.contact_book_contacts_book_link_success_message_secondLine
 import com.tari.android.wallet.R.string.contact_book_contacts_book_link_title
 import com.tari.android.wallet.R.string.contact_book_contacts_book_unlink_success_title
-import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
+import com.tari.android.wallet.data.sharedPrefs.CorePrefRepository
 import com.tari.android.wallet.extension.collectFlow
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.common.SingleLiveEvent
@@ -43,7 +43,7 @@ import javax.inject.Inject
 class ContactLinkViewModel : CommonViewModel() {
 
     @Inject
-    lateinit var sharedPrefsWrapper: SharedPrefsRepository
+    lateinit var sharedPrefsWrapper: CorePrefRepository
 
     @Inject
     lateinit var contactsRepository: ContactsRepository

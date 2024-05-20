@@ -3,7 +3,7 @@ package com.tari.android.wallet.ui.fragment.home
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.fragment.contact_book.data.ContactsRepository
 import com.tari.android.wallet.ui.fragment.contact_book.root.ShareViewModel
-import com.tari.android.wallet.yat.YatAdapter
+import com.tari.android.wallet.application.YatAdapter
 import javax.inject.Inject
 
 class HomeViewModel: CommonViewModel() {

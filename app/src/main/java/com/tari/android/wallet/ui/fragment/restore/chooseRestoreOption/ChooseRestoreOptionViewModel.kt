@@ -28,7 +28,7 @@ import com.tari.android.wallet.ui.dialog.error.WalletErrorArgs
 import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
 import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupOptionDto
 import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupOptions
-import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupSettingsRepository
+import com.tari.android.wallet.data.sharedPrefs.backup.BackupPrefRepository
 import com.tari.android.wallet.util.WalletUtil
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -42,7 +42,7 @@ class ChooseRestoreOptionViewModel : CommonViewModel() {
     lateinit var backupManager: BackupManager
 
     @Inject
-    lateinit var backupSettingsRepository: BackupSettingsRepository
+    lateinit var backupSettingsRepository: BackupPrefRepository
 
     @Inject
     lateinit var walletManager: WalletManager

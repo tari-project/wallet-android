@@ -7,7 +7,7 @@ import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefGsonDelegate
 import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefGsonNullableDelegate
 import com.tari.android.wallet.util.DebugConfig
 
-class NetworkRepositoryImpl(sharedPrefs: SharedPreferences) : NetworkRepository {
+class NetworkPrefRepositoryImpl(sharedPrefs: SharedPreferences) : NetworkPrefRepository {
 
     override val defaultNetwork = if (DebugConfig.mockNetwork) NETWORK_ESMERALDA else NETWORK_NEXTNET
 

@@ -14,7 +14,7 @@ import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.common.SingleLiveEvent
 import com.tari.android.wallet.ui.dialog.error.ErrorDialogArgs
 import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
-import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupSettingsRepository
+import com.tari.android.wallet.data.sharedPrefs.backup.BackupPrefRepository
 import com.tari.android.wallet.util.WalletUtil
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -31,7 +31,7 @@ class EnterRestorationPasswordViewModel : CommonViewModel() {
     lateinit var walletConfig: WalletConfig
 
     @Inject
-    lateinit var backupSettingsRepository: BackupSettingsRepository
+    lateinit var backupSettingsRepository: BackupPrefRepository
 
     @Inject
     lateinit var walletServiceLauncher: WalletServiceLauncher

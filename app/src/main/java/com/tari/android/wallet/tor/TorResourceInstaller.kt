@@ -33,7 +33,7 @@
 package com.tari.android.wallet.tor
 
 import android.content.Context
-import com.tari.android.wallet.data.sharedPrefs.tor.TorSharedRepository
+import com.tari.android.wallet.data.sharedPrefs.tor.TorPrefRepository
 import java.io.*
 import java.util.zip.ZipInputStream
 
@@ -45,7 +45,7 @@ import java.util.zip.ZipInputStream
  */
 class TorResourceInstaller(
     private val context: Context,
-    private val sharedTorSharedRepository: TorSharedRepository,
+    private val sharedTorSharedRepository: TorPrefRepository,
     private val torConfig: TorConfig
 ) {
 
@@ -151,13 +151,13 @@ class TorResourceInstaller(
             append("Socks5ProxyUsername ${torConfig.sock5Username}\n")
             append("Socks5ProxyPassword ${torConfig.sock5Password}\n")
 
-            sharedTorSharedRepository.currentTorBridges.orEmpty().forEach {
+            sharedTorSharedRepository.currentTorBridges.forEach {
                 append("Bridge ${it}\n")
                 if (it.transportTechnology.isNotBlank()) {
                     append("ClientTransportPlugin ${it.transportTechnology} socks5 127.0.0.1:47351\n")
                 }
             }
-            if (sharedTorSharedRepository.currentTorBridges.orEmpty().isNotEmpty()) {
+            if (sharedTorSharedRepository.currentTorBridges.isNotEmpty()) {
                 append("UseBridges 1\n")
             }
         }

@@ -39,7 +39,7 @@ import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefBooleanNulla
 import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefGsonDelegate
 import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefGsonNullableDelegate
 import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefIntDelegate
-import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
+import com.tari.android.wallet.data.sharedPrefs.network.NetworkPrefRepository
 import com.tari.android.wallet.data.sharedPrefs.network.formatKey
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.service.baseNode.BaseNodeState
@@ -48,9 +48,9 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class BaseNodeSharedRepository @Inject constructor(
+class BaseNodePrefRepository @Inject constructor(
     sharedPrefs: SharedPreferences,
-    networkRepository: NetworkRepository,
+    networkRepository: NetworkPrefRepository,
 ) : CommonRepository(networkRepository) {
 
     private object Key {
@@ -120,4 +120,8 @@ class BaseNodeSharedRepository @Inject constructor(
         userBaseNodes = BaseNodeList()
         ffiBaseNodes = BaseNodeList()
     }
+}
+
+class BaseNodeList(baseNodes: List<BaseNodeDto>) : ArrayList<BaseNodeDto>(baseNodes) {
+    constructor() : this(emptyList())
 }

@@ -33,7 +33,6 @@
 package com.tari.android.wallet.di
 
 import android.content.Context
-import com.tari.android.wallet.data.sharedPrefs.tor.TorSharedRepository
 import com.tari.android.wallet.tor.TorConfig
 import com.tari.android.wallet.tor.TorProxyManager
 import dagger.Module

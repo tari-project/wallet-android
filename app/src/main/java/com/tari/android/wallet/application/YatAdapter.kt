@@ -1,4 +1,4 @@
-package com.tari.android.wallet.yat
+package com.tari.android.wallet.application
 
 import android.app.Activity
 import android.app.ActivityOptions
@@ -7,8 +7,9 @@ import android.content.Context
 import android.content.Intent
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.BuildConfig
-import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
-import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
+import com.tari.android.wallet.data.sharedPrefs.CorePrefRepository
+import com.tari.android.wallet.data.sharedPrefs.network.NetworkPrefRepository
+import com.tari.android.wallet.data.sharedPrefs.yat.YatPrefRepository
 import com.tari.android.wallet.ui.fragment.send.common.TransactionData
 import com.tari.android.wallet.ui.fragment.send.finalize.FinalizeSendTxViewModel
 import com.tari.android.wallet.ui.fragment.send.finalize.YatFinalizeSendTxActivity
@@ -21,11 +22,14 @@ import yat.android.lib.YatLibApi
 import yat.android.sdk.models.PaymentAddressResponse
 import yat.android.ui.transactions.outcoming.YatLibOutcomingTransactionData
 import java.io.Serializable
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class YatAdapter(
-    private val yatSharedRepository: YatSharedRepository,
-    private val networkRepository: NetworkRepository,
-    private val commonRepository: SharedPrefsRepository
+@Singleton
+class YatAdapter @Inject constructor(
+    private val yatSharedRepository: YatPrefRepository,
+    private val networkRepository: NetworkPrefRepository,
+    private val commonRepository: CorePrefRepository
 ) : YatIntegration.Delegate {
 
     private val logger

@@ -1,5 +1,5 @@
 package com.tari.android.wallet.data.repository
 
-import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
+import com.tari.android.wallet.data.sharedPrefs.network.NetworkPrefRepository
 
-class SimpleRepository(networkRepository: NetworkRepository): CommonRepository(networkRepository)
+class SimpleRepository(networkRepository: NetworkPrefRepository): CommonRepository(networkRepository)

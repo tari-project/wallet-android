@@ -2,7 +2,7 @@ package com.tari.android.wallet.data.sharedPrefs.network
 
 import com.tari.android.wallet.application.Network
 
-interface NetworkRepository {
+interface NetworkPrefRepository {
     // defaultNetwork is the network that will be used if the current network is not set or is not supported
     val defaultNetwork: TariNetwork
 

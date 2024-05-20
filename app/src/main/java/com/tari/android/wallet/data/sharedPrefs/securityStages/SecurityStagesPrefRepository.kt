@@ -30,31 +30,33 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.tari.android.wallet.di
+package com.tari.android.wallet.data.sharedPrefs.securityStages
 
 import android.content.SharedPreferences
-import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
-import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
-import com.tari.android.wallet.yat.YatAdapter
-import com.tari.android.wallet.yat.YatSharedRepository
-import dagger.Module
-import dagger.Provides
+import com.tari.android.wallet.data.repository.CommonRepository
+import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefGsonNullableDelegate
+import com.tari.android.wallet.data.sharedPrefs.network.NetworkPrefRepository
+import com.tari.android.wallet.data.sharedPrefs.network.formatKey
+import javax.inject.Inject
 import javax.inject.Singleton
 
-@Module
-class YatModule {
+@Singleton
+class SecurityStagesPrefRepository @Inject constructor(sharedPrefs: SharedPreferences, networkRepository: NetworkPrefRepository) :
+    CommonRepository(networkRepository) {
 
-    @Provides
-    @Singleton
-    fun provideYatSharedRepository(sharedPreferences: SharedPreferences, networkRepository: NetworkRepository): YatSharedRepository =
-        YatSharedRepository(sharedPreferences, networkRepository)
+    private object Key {
+        const val DISABLED_TIMESTAMPS = "tari_disabled_timestamp"
+    }
 
-    @Provides
-    @Singleton
-    fun provideYatAdapter(
-        yatSharedRepository: YatSharedRepository,
-        commonRepository: SharedPrefsRepository,
-        networkRepository: NetworkRepository
-    ): YatAdapter = YatAdapter(yatSharedRepository, networkRepository, commonRepository)
+    var disabledTimestamps: DisabledTimestampsDto? by SharedPrefGsonNullableDelegate(
+        prefs = sharedPrefs,
+        commonRepository = this,
+        name = formatKey(Key.DISABLED_TIMESTAMPS),
+        type = DisabledTimestampsDto::class.java,
+        defValue = DisabledTimestampsDto(mutableMapOf()),
+    )
 
+    fun clear() {
+        disabledTimestamps = null
+    }
 }

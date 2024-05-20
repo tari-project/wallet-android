@@ -6,7 +6,7 @@ import com.tari.android.wallet.R
 import com.tari.android.wallet.application.baseNodes.BaseNodesManager
 import com.tari.android.wallet.application.deeplinks.DeeplinkHandler
 import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodeDto
-import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodeSharedRepository
+import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodePrefRepository
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.common.recyclerView.CommonViewHolderItem
@@ -28,7 +28,7 @@ import javax.inject.Inject
 class ChangeBaseNodeViewModel : CommonViewModel() {
 
     @Inject
-    lateinit var baseNodeSharedRepository: BaseNodeSharedRepository
+    lateinit var baseNodeSharedRepository: BaseNodePrefRepository
 
     @Inject
     lateinit var baseNodesManager: BaseNodesManager

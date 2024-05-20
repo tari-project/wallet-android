@@ -7,10 +7,10 @@ import com.orhanobut.logger.Logger
 import com.orhanobut.logger.Printer
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.WalletState
-import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
-import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
+import com.tari.android.wallet.data.sharedPrefs.CorePrefRepository
+import com.tari.android.wallet.data.sharedPrefs.network.NetworkPrefRepository
 import com.tari.android.wallet.data.sharedPrefs.security.SecurityPrefRepository
-import com.tari.android.wallet.data.sharedPrefs.tariSettings.TariSettingsSharedRepository
+import com.tari.android.wallet.data.sharedPrefs.tariSettings.TariSettingsPrefRepository
 import com.tari.android.wallet.di.ApplicationComponent
 import com.tari.android.wallet.di.DiContainer
 import com.tari.android.wallet.event.EventBus
@@ -55,10 +55,10 @@ open class CommonViewModel : ViewModel() {
     lateinit var resourceManager: ResourceManager
 
     @Inject
-    lateinit var networkRepository: NetworkRepository
+    lateinit var networkRepository: NetworkPrefRepository
 
     @Inject
-    lateinit var tariSettingsSharedRepository: TariSettingsSharedRepository
+    lateinit var tariSettingsSharedRepository: TariSettingsPrefRepository
 
     @Inject
     lateinit var paletteManager: PaletteManager
@@ -67,7 +67,7 @@ open class CommonViewModel : ViewModel() {
     lateinit var tariNavigator: TariNavigator
 
     @Inject
-    lateinit var sharedPrefsRepository: SharedPrefsRepository
+    lateinit var sharedPrefsRepository: CorePrefRepository
 
     @Inject
     lateinit var securityPrefRepository: SecurityPrefRepository
@@ -114,7 +114,7 @@ open class CommonViewModel : ViewModel() {
         @Suppress("LeakingThis")
         component.inject(this)
 
-        currentTheme.value = tariSettingsSharedRepository.currentTheme!!
+        currentTheme.value = tariSettingsSharedRepository.currentTheme
 
         logger.t(LoggerTags.Navigation.name).i(this::class.simpleName + " was started")
 

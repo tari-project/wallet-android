@@ -3,7 +3,7 @@ package com.tari.android.wallet.service.service
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.application.TariWalletApplication
 import com.tari.android.wallet.application.baseNodes.BaseNodesManager
-import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodeSharedRepository
+import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodePrefRepository
 import com.tari.android.wallet.event.Event
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.ffi.FFITariBaseNodeState
@@ -45,7 +45,7 @@ class FFIWalletListenerImpl(
     private val notificationHelper: NotificationHelper,
     private val notificationService: NotificationService,
     private val app: TariWalletApplication,
-    private val baseNodeSharedPrefsRepository: BaseNodeSharedRepository,
+    private val baseNodeSharedPrefsRepository: BaseNodePrefRepository,
     private val baseNodesManager: BaseNodesManager
 ) : FFIWalletListener {
 

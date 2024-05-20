@@ -44,8 +44,8 @@ import com.tari.android.wallet.application.WalletManager
 import com.tari.android.wallet.application.WalletState
 import com.tari.android.wallet.application.baseNodes.BaseNodesManager
 import com.tari.android.wallet.data.WalletConfig
-import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
-import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodeSharedRepository
+import com.tari.android.wallet.data.sharedPrefs.CorePrefRepository
+import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodePrefRepository
 import com.tari.android.wallet.di.DiContainer
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.ffi.FFIWallet
@@ -92,10 +92,10 @@ class WalletService : Service() {
     lateinit var notificationHelper: NotificationHelper
 
     @Inject
-    lateinit var sharedPrefsWrapper: SharedPrefsRepository
+    lateinit var sharedPrefsWrapper: CorePrefRepository
 
     @Inject
-    lateinit var baseNodeSharedPrefsRepository: BaseNodeSharedRepository
+    lateinit var baseNodeSharedPrefsRepository: BaseNodePrefRepository
 
     @Inject
     lateinit var walletManager: WalletManager

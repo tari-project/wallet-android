@@ -7,7 +7,7 @@ import com.tari.android.wallet.application.baseNodes.BaseNodesManager
 import com.tari.android.wallet.application.deeplinks.DeepLink
 import com.tari.android.wallet.application.deeplinks.DeeplinkHandler
 import com.tari.android.wallet.data.sharedPrefs.tor.TorBridgeConfigurationList
-import com.tari.android.wallet.data.sharedPrefs.tor.TorSharedRepository
+import com.tari.android.wallet.data.sharedPrefs.tor.TorPrefRepository
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.tor.TorProxyManager
 import com.tari.android.wallet.tor.TorProxyState
@@ -28,7 +28,7 @@ import javax.inject.Inject
 class TorBridgesSelectionViewModel : CommonViewModel() {
 
     @Inject
-    lateinit var torSharedRepository: TorSharedRepository
+    lateinit var torSharedRepository: TorPrefRepository
 
     @Inject
     lateinit var torProxyManager: TorProxyManager
@@ -55,12 +55,12 @@ class TorBridgesSelectionViewModel : CommonViewModel() {
         val customBridges = TorBridgeViewHolderItem.CustomBridges(resourceManager)
 
         val bridges = mutableListOf<TorBridgeViewHolderItem.Bridge>()
-        bridges.addAll(torSharedRepository.customTorBridges.orEmpty().map { TorBridgeViewHolderItem.Bridge(it, false) })
-        if (torSharedRepository.currentTorBridges.isNullOrEmpty()) {
+        bridges.addAll(torSharedRepository.customTorBridges.map { TorBridgeViewHolderItem.Bridge(it, false) })
+        if (torSharedRepository.currentTorBridges.isEmpty()) {
             noBridges.isSelected = true
         } else {
             bridges.forEach {
-                if (torSharedRepository.currentTorBridges.orEmpty().contains(it.bridgeConfiguration)) {
+                if (torSharedRepository.currentTorBridges.contains(it.bridgeConfiguration)) {
                     it.isSelected = true
                 }
             }
@@ -109,7 +109,7 @@ class TorBridgesSelectionViewModel : CommonViewModel() {
     fun connect() {
         val selectedBridges = _torBridges.value.orEmpty().filter { it.isSelected }
         if (selectedBridges.any { it is TorBridgeViewHolderItem.Empty }) {
-            torSharedRepository.currentTorBridges = null
+            torSharedRepository.currentTorBridges = TorBridgeConfigurationList(emptyList())
         } else {
             torSharedRepository.currentTorBridges =
                 TorBridgeConfigurationList(selectedBridges.map { (it as TorBridgeViewHolderItem.Bridge).bridgeConfiguration })
@@ -120,8 +120,8 @@ class TorBridgesSelectionViewModel : CommonViewModel() {
 
     private fun restartTor() {
         val progressArgs = ProgressDialogArgs(
-            resourceManager.getString(R.string.tor_bridges_connection_progress_title),
-            resourceManager.getString(R.string.tor_bridges_connection_progress_description),
+            title = resourceManager.getString(R.string.tor_bridges_connection_progress_title),
+            description = resourceManager.getString(R.string.tor_bridges_connection_progress_description),
             closeButtonText = resourceManager.getString(R.string.common_cancel),
             cancelable = true
         ) { stopConnecting() }
@@ -138,8 +138,8 @@ class TorBridgesSelectionViewModel : CommonViewModel() {
                 is TorProxyState.Failed -> {
                     EventBus.torProxyState.unsubscribe(this)
                     val errorArgs = ErrorDialogArgs(
-                        resourceManager.getString(R.string.tor_bridges_connecting_error_title),
-                        resourceManager.getString(R.string.tor_bridges_connecting_error_description, it.e.message.orEmpty()),
+                        title = resourceManager.getString(R.string.tor_bridges_connecting_error_title),
+                        description = resourceManager.getString(R.string.tor_bridges_connecting_error_description, it.e.message.orEmpty()),
                         cancelable = true
                     ) { stopConnecting() }
                     modularDialog.postValue(errorArgs.getModular(resourceManager))
@@ -149,11 +149,11 @@ class TorBridgesSelectionViewModel : CommonViewModel() {
                     if (it.bootstrapStatus.progress == 100) {
                         EventBus.torProxyState.unsubscribe(this)
                         var description = resourceManager.getString(R.string.tor_bridges_connection_progress_successful_description)
-                        if (torSharedRepository.currentTorBridges.orEmpty().isEmpty()) {
+                        if (torSharedRepository.currentTorBridges.isEmpty()) {
                             description += resourceManager.getString(R.string.tor_bridges_connection_progress_successful_no_bridges)
                         } else {
                             description += resourceManager.getString(R.string.tor_bridges_connection_progress_successful_used_bridges)
-                            for (bridge in torSharedRepository.currentTorBridges.orEmpty()) {
+                            for (bridge in torSharedRepository.currentTorBridges) {
                                 description += "${bridge.ip}:${bridge.port}\n"
                             }
                         }

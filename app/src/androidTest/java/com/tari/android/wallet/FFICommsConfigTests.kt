@@ -40,7 +40,7 @@ package com.tari.android.wallet
 import android.content.Context
 import androidx.test.core.app.ApplicationProvider.getApplicationContext
 import com.tari.android.wallet.data.WalletConfig
-import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepositoryImpl
+import com.tari.android.wallet.data.sharedPrefs.network.NetworkPrefRepositoryImpl
 import com.tari.android.wallet.di.ApplicationModule
 import com.tari.android.wallet.ffi.FFICommsConfig
 import com.tari.android.wallet.ffi.FFIException
@@ -64,7 +64,7 @@ class FFICommsConfigTests {
         private var walletDir = ""
         private val context = getApplicationContext<Context>()
         private val prefs = context.getSharedPreferences(ApplicationModule.sharedPrefsFileName, Context.MODE_PRIVATE)
-        private val networkRepository = NetworkRepositoryImpl(prefs)
+        private val networkRepository = NetworkPrefRepositoryImpl(prefs)
 
         @BeforeClass
         @JvmStatic

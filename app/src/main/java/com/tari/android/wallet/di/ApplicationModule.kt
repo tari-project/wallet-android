@@ -42,9 +42,9 @@ import androidx.core.content.ContextCompat
 import com.tari.android.wallet.BuildConfig
 import com.tari.android.wallet.application.TariWalletApplication
 import com.tari.android.wallet.data.WalletConfig
-import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
-import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepositoryImpl
-import com.tari.android.wallet.data.sharedPrefs.tariSettings.TariSettingsSharedRepository
+import com.tari.android.wallet.data.sharedPrefs.network.NetworkPrefRepository
+import com.tari.android.wallet.data.sharedPrefs.network.NetworkPrefRepositoryImpl
+import com.tari.android.wallet.data.sharedPrefs.tariSettings.TariSettingsPrefRepository
 import com.tari.android.wallet.infrastructure.security.biometric.BiometricAuthenticationService
 import com.tari.android.wallet.notification.NotificationHelper
 import com.tari.android.wallet.service.service.WalletServiceLauncher
@@ -82,7 +82,7 @@ class ApplicationModule(private val app: TariWalletApplication) {
 
     @Provides
     @Singleton
-    fun provideNetworkRepository(prefs: SharedPreferences): NetworkRepository = NetworkRepositoryImpl(prefs)
+    fun provideNetworkRepository(prefs: SharedPreferences): NetworkPrefRepository = NetworkPrefRepositoryImpl(prefs)
 
     @Provides
     @Singleton
@@ -92,7 +92,7 @@ class ApplicationModule(private val app: TariWalletApplication) {
     @Singleton
     fun provideWalletServiceLauncher(
         context: Context,
-        tariSettingsSharedRepository: TariSettingsSharedRepository,
+        tariSettingsSharedRepository: TariSettingsPrefRepository,
         walletConfig: WalletConfig
     ): WalletServiceLauncher = WalletServiceLauncher(context, walletConfig, tariSettingsSharedRepository)
 

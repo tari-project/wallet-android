@@ -34,67 +34,72 @@ package com.tari.android.wallet.data.sharedPrefs.tor
 
 import android.content.SharedPreferences
 import com.tari.android.wallet.data.repository.CommonRepository
-import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefGsonNullableDelegate
+import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefGsonDelegate
 import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefStringDelegate
-import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
+import com.tari.android.wallet.data.sharedPrefs.network.NetworkPrefRepository
 import com.tari.android.wallet.data.sharedPrefs.network.formatKey
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class TorSharedRepository @Inject constructor(sharedPrefs: SharedPreferences, networkRepository: NetworkRepository) :
+class TorPrefRepository @Inject constructor(sharedPrefs: SharedPreferences, networkRepository: NetworkPrefRepository) :
     CommonRepository(networkRepository) {
 
     private object Key {
-        const val currentTorBridge = "tari_current_tor_bridge"
-        const val customTorBridges = "tari_custom_tor_bridges"
-        const val torBinPath = "tari_wallet_tor_bin_path"
-        const val torrcBinPath = "tari_wallet_torrc_bin_path"
+        const val CURRENT_TOR_BRIDGE = "tari_current_tor_bridge"
+        const val CUSTOM_TOR_BRIDGES = "tari_custom_tor_bridges"
+        const val TOR_BIN_PATH = "tari_wallet_tor_bin_path"
+        const val TORRC_BIN_PATH = "tari_wallet_torrc_bin_path"
     }
 
-    var currentTorBridges: TorBridgeConfigurationList? by SharedPrefGsonNullableDelegate(
-        sharedPrefs,
-        this,
-        formatKey(Key.currentTorBridge),
-        TorBridgeConfigurationList::class.java
+    var currentTorBridges: TorBridgeConfigurationList by SharedPrefGsonDelegate(
+        prefs = sharedPrefs,
+        commonRepository = this,
+        name = formatKey(Key.CURRENT_TOR_BRIDGE),
+        type = TorBridgeConfigurationList::class.java,
+        defValue = TorBridgeConfigurationList(),
     )
 
-    var customTorBridges: TorBridgeConfigurationList? by SharedPrefGsonNullableDelegate(
-        sharedPrefs,
-        this,
-        formatKey(Key.customTorBridges),
-        TorBridgeConfigurationList::class.java
+    var customTorBridges: TorBridgeConfigurationList by SharedPrefGsonDelegate(
+        prefs = sharedPrefs,
+        commonRepository = this,
+        name = formatKey(Key.CUSTOM_TOR_BRIDGES),
+        type = TorBridgeConfigurationList::class.java,
+        defValue = TorBridgeConfigurationList(),
     )
 
-    var torBinPath: String? by SharedPrefStringDelegate(sharedPrefs, this,  formatKey(Key.torBinPath))
+    var torBinPath: String? by SharedPrefStringDelegate(sharedPrefs, this, formatKey(Key.TOR_BIN_PATH))
 
-    var torrcBinPath: String? by SharedPrefStringDelegate(sharedPrefs, this,  formatKey(Key.torrcBinPath))
+    var torrcBinPath: String? by SharedPrefStringDelegate(sharedPrefs, this, formatKey(Key.TORRC_BIN_PATH))
 
     fun clear() {
-        currentTorBridges = null
+        currentTorBridges = TorBridgeConfigurationList()
         customTorBridges = TorBridgeConfigurationList()
         torBinPath = null
     }
 
     fun addTorBridgeConfiguration(torBridgeConfiguration: TorBridgeConfiguration) {
-        customTorBridges.orEmpty().apply {
+        customTorBridges.apply {
             add(torBridgeConfiguration)
             customTorBridges = TorBridgeConfigurationList(this.distinct())
         }
     }
 
     fun addCurrentTorBridge(torBridgeConfiguration: TorBridgeConfiguration) {
-        currentTorBridges.orEmpty().apply {
+        currentTorBridges.apply {
             add(torBridgeConfiguration)
             currentTorBridges = TorBridgeConfigurationList(this.distinct())
         }
     }
 
     fun removeCurrentTorBridge(torBridgeConfiguration: TorBridgeConfiguration) {
-        currentTorBridges.orEmpty().apply {
+        currentTorBridges.apply {
             remove(torBridgeConfiguration)
             currentTorBridges = TorBridgeConfigurationList(this.distinct())
         }
     }
 }
 
+class TorBridgeConfigurationList(configs: List<TorBridgeConfiguration>) : ArrayList<TorBridgeConfiguration>(configs) {
+    constructor() : this(emptyList())
+}

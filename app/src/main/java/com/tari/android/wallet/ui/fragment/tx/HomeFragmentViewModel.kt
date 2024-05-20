@@ -15,9 +15,9 @@ import com.tari.android.wallet.R.string.error_node_unreachable_description
 import com.tari.android.wallet.R.string.error_node_unreachable_title
 import com.tari.android.wallet.application.securityStage.StagedWalletSecurityManager
 import com.tari.android.wallet.application.securityStage.StagedWalletSecurityManager.StagedSecurityEffect
-import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
+import com.tari.android.wallet.data.sharedPrefs.CorePrefRepository
 import com.tari.android.wallet.data.sharedPrefs.securityStages.WalletSecurityStage
-import com.tari.android.wallet.data.sharedPrefs.securityStages.modules.SecurityStageHeadModule
+import com.tari.android.wallet.ui.dialog.modular.modules.securityStages.SecurityStageHeadModule
 import com.tari.android.wallet.data.sharedPrefs.sentry.SentryPrefRepository
 import com.tari.android.wallet.event.Event
 import com.tari.android.wallet.event.EventBus
@@ -53,7 +53,7 @@ import javax.inject.Inject
 class HomeFragmentViewModel : CommonViewModel() {
 
     @Inject
-    lateinit var sharedPrefsWrapper: SharedPrefsRepository
+    lateinit var sharedPrefsWrapper: CorePrefRepository
 
     @Inject
     lateinit var contactsRepository: ContactsRepository

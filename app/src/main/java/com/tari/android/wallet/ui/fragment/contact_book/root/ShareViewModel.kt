@@ -5,7 +5,7 @@ import com.tari.android.wallet.R
 import com.tari.android.wallet.application.deeplinks.DeepLink
 import com.tari.android.wallet.application.deeplinks.DeeplinkHandler
 import com.tari.android.wallet.application.deeplinks.DeeplinkViewModel
-import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
+import com.tari.android.wallet.data.sharedPrefs.CorePrefRepository
 import com.tari.android.wallet.ffi.FFITariWalletAddress
 import com.tari.android.wallet.ffi.HexString
 import com.tari.android.wallet.infrastructure.bluetooth.TariBluetoothClient
@@ -44,7 +44,7 @@ class ShareViewModel : CommonViewModel() {
     lateinit var contactsRepository: ContactsRepository
 
     @Inject
-    lateinit var sharePrefRepository: SharedPrefsRepository
+    lateinit var sharePrefRepository: CorePrefRepository
 
     val deeplinkViewModel = DeeplinkViewModel()
 

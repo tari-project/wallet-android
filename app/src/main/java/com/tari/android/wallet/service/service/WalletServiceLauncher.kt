@@ -5,13 +5,13 @@ import android.content.Intent
 import androidx.core.content.ContextCompat
 import com.tari.android.wallet.application.TariWalletApplication
 import com.tari.android.wallet.data.WalletConfig
-import com.tari.android.wallet.data.sharedPrefs.tariSettings.TariSettingsSharedRepository
+import com.tari.android.wallet.data.sharedPrefs.tariSettings.TariSettingsPrefRepository
 import com.tari.android.wallet.util.WalletUtil
 
 class WalletServiceLauncher(
     private val context: Context,
     val walletConfig: WalletConfig,
-    val tariSettingsSharedRepository: TariSettingsSharedRepository
+    val tariSettingsSharedRepository: TariSettingsPrefRepository
 ) {
     fun startIfExist() {
         if (WalletUtil.walletExists(walletConfig)) {

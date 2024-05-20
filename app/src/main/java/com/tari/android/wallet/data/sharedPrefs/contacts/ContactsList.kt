@@ -1,4 +1,4 @@
-package com.tari.android.wallet.ui.fragment.contact_book.data.localStorage
+package com.tari.android.wallet.data.sharedPrefs.contacts
 
 import com.tari.android.wallet.data.sharedPrefs.delegates.SerializableTime
 import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.ContactDto
@@ -8,13 +8,9 @@ import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.MergedCont
 import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.PhoneContactDto
 import java.io.Serializable
 
-class ContactsList() : ArrayList<ContactDtoSerializable>(), Serializable {
-    constructor(list: List<ContactDtoSerializable>) : this() {
-        this.addAll(list)
-    }
+class ContactsList(contacts: List<ContactDtoSerializable>) : ArrayList<ContactDtoSerializable>(contacts), Serializable {
+    constructor() : this(emptyList())
 }
-
-fun ContactsList?.orEmpty(): ContactsList = this ?: ContactsList()
 
 class ContactDtoSerializable() : Serializable {
 

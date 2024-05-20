@@ -40,23 +40,23 @@ package com.tari.android.wallet
 import android.content.Context
 import androidx.test.core.app.ApplicationProvider.getApplicationContext
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
-import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodeSharedRepository
-import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepositoryImpl
+import com.tari.android.wallet.data.sharedPrefs.CorePrefRepository
+import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodePrefRepository
+import com.tari.android.wallet.data.sharedPrefs.network.NetworkPrefRepositoryImpl
 import com.tari.android.wallet.data.sharedPrefs.security.SecurityPrefRepository
-import com.tari.android.wallet.data.sharedPrefs.securityStages.SecurityStagesRepository
+import com.tari.android.wallet.data.sharedPrefs.securityStages.SecurityStagesPrefRepository
 import com.tari.android.wallet.data.sharedPrefs.sentry.SentryPrefRepository
-import com.tari.android.wallet.data.sharedPrefs.tariSettings.TariSettingsSharedRepository
-import com.tari.android.wallet.data.sharedPrefs.tor.TorSharedRepository
+import com.tari.android.wallet.data.sharedPrefs.tariSettings.TariSettingsPrefRepository
+import com.tari.android.wallet.data.sharedPrefs.tor.TorPrefRepository
 import com.tari.android.wallet.di.ApplicationModule
 import com.tari.android.wallet.ffi.*
 import com.tari.android.wallet.model.*
 import com.tari.android.wallet.model.recovery.WalletRestorationResult
 import com.tari.android.wallet.service.seedPhrase.SeedPhraseRepository
-import com.tari.android.wallet.ui.fragment.contact_book.data.localStorage.ContactSharedPrefRepository
-import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupSettingsRepository
+import com.tari.android.wallet.data.sharedPrefs.contacts.ContactPrefRepository
+import com.tari.android.wallet.data.sharedPrefs.backup.BackupPrefRepository
 import com.tari.android.wallet.util.Constants
-import com.tari.android.wallet.yat.YatSharedRepository
+import com.tari.android.wallet.data.sharedPrefs.yat.YatPrefRepository
 import org.junit.After
 import org.junit.Assert.*
 import org.junit.Before
@@ -72,17 +72,17 @@ class FFIWalletTests {
     private lateinit var listener: TestAddRecipientAddNodeListener
     private val context = getApplicationContext<Context>()
     private val prefs = context.getSharedPreferences(ApplicationModule.sharedPrefsFileName, Context.MODE_PRIVATE)
-    private val networkRepository = NetworkRepositoryImpl(prefs)
-    private val baseNodeSharedPrefsRepository = BaseNodeSharedRepository(prefs, networkRepository)
-    private val backupSettingsRepository = BackupSettingsRepository(context, prefs, networkRepository)
-    private val yatSharedPrefsRepository = YatSharedRepository(prefs, networkRepository)
-    private val tariSettingsRepository = TariSettingsSharedRepository(prefs, networkRepository)
-    private val securityStagesRepository = SecurityStagesRepository(prefs, networkRepository)
-    private val contactSharedPrefRepository = ContactSharedPrefRepository(networkRepository, prefs)
+    private val networkRepository = NetworkPrefRepositoryImpl(prefs)
+    private val baseNodeSharedPrefsRepository = BaseNodePrefRepository(prefs, networkRepository)
+    private val backupSettingsRepository = BackupPrefRepository(context, prefs, networkRepository)
+    private val yatSharedPrefsRepository = YatPrefRepository(prefs, networkRepository)
+    private val tariSettingsRepository = TariSettingsPrefRepository(prefs, networkRepository)
+    private val securityStagesRepository = SecurityStagesPrefRepository(prefs, networkRepository)
+    private val contactSharedPrefRepository = ContactPrefRepository(networkRepository, prefs)
     private val sentryPrefRepository: SentryPrefRepository = SentryPrefRepository(prefs, networkRepository)
-    private val torSharedRepository = TorSharedRepository(prefs, networkRepository)
+    private val torSharedRepository = TorPrefRepository(prefs, networkRepository)
     private val securityPrefRepository = SecurityPrefRepository(context, prefs, networkRepository)
-    private val sharedPrefsRepository = SharedPrefsRepository(
+    private val sharedPrefsRepository = CorePrefRepository(
         prefs,
         networkRepository,
         backupSettingsRepository,

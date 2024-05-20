@@ -8,8 +8,8 @@ import com.tari.android.wallet.application.Network
 import com.tari.android.wallet.application.WalletState
 import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodeDto
 import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodeList
-import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodeSharedRepository
-import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
+import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodePrefRepository
+import com.tari.android.wallet.data.sharedPrefs.network.NetworkPrefRepository
 import com.tari.android.wallet.di.ApplicationScope
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.extension.addTo
@@ -36,8 +36,8 @@ private const val REGEX_IPV4 = "([A-Fa-f0-9 ]{64}::/ip4/[0-9]{1,3}[.][0-9]{1,3}[
 @Singleton
 class BaseNodesManager @Inject constructor(
     private val context: Context,
-    private val baseNodeSharedRepository: BaseNodeSharedRepository,
-    private val networkRepository: NetworkRepository,
+    private val baseNodeSharedRepository: BaseNodePrefRepository,
+    private val networkRepository: NetworkPrefRepository,
     private val serviceConnection: TariWalletServiceConnection,
     @ApplicationScope private val applicationScope: CoroutineScope,
 ) {

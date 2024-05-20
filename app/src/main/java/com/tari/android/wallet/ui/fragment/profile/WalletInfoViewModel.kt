@@ -8,7 +8,7 @@ import androidx.lifecycle.viewModelScope
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.deeplinks.DeepLink
 import com.tari.android.wallet.application.deeplinks.DeeplinkHandler
-import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
+import com.tari.android.wallet.data.sharedPrefs.CorePrefRepository
 import com.tari.android.wallet.model.TariWalletAddress
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.dialog.modular.DialogArgs
@@ -19,8 +19,8 @@ import com.tari.android.wallet.ui.fragment.contact_book.root.ShareViewModel
 import com.tari.android.wallet.ui.fragment.contact_book.root.share.ShareType
 import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
 import com.tari.android.wallet.util.ContactUtil
-import com.tari.android.wallet.yat.YatAdapter
-import com.tari.android.wallet.yat.YatSharedRepository
+import com.tari.android.wallet.application.YatAdapter
+import com.tari.android.wallet.data.sharedPrefs.yat.YatPrefRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -28,10 +28,10 @@ import javax.inject.Inject
 class WalletInfoViewModel : CommonViewModel() {
 
     @Inject
-    lateinit var sharedPrefsWrapper: SharedPrefsRepository
+    lateinit var sharedPrefsWrapper: CorePrefRepository
 
     @Inject
-    lateinit var yatSharedPrefsRepository: YatSharedRepository
+    lateinit var yatSharedPrefsRepository: YatPrefRepository
 
     @Inject
     lateinit var yatAdapter: YatAdapter

@@ -37,11 +37,11 @@ import com.orhanobut.logger.Logger
 import com.tari.android.wallet.BuildConfig
 import com.tari.android.wallet.application.baseNodes.BaseNodesManager
 import com.tari.android.wallet.data.WalletConfig
-import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
-import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodeSharedRepository
-import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
+import com.tari.android.wallet.data.sharedPrefs.CorePrefRepository
+import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodePrefRepository
+import com.tari.android.wallet.data.sharedPrefs.network.NetworkPrefRepository
 import com.tari.android.wallet.data.sharedPrefs.security.SecurityPrefRepository
-import com.tari.android.wallet.data.sharedPrefs.tariSettings.TariSettingsSharedRepository
+import com.tari.android.wallet.data.sharedPrefs.tariSettings.TariSettingsPrefRepository
 import com.tari.android.wallet.di.ApplicationScope
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.ffi.FFIByteVector
@@ -74,11 +74,11 @@ import javax.inject.Singleton
 class WalletManager @Inject constructor(
     private val walletConfig: WalletConfig,
     private val torManager: TorProxyManager,
-    private val sharedPrefsWrapper: SharedPrefsRepository,
-    private val baseNodeSharedRepository: BaseNodeSharedRepository,
+    private val sharedPrefsWrapper: CorePrefRepository,
+    private val baseNodeSharedRepository: BaseNodePrefRepository,
     private val seedPhraseRepository: SeedPhraseRepository,
-    private val networkRepository: NetworkRepository,
-    private val tariSettingsSharedRepository: TariSettingsSharedRepository,
+    private val networkRepository: NetworkPrefRepository,
+    private val tariSettingsSharedRepository: TariSettingsPrefRepository,
     private val securityPrefRepository: SecurityPrefRepository,
     private val baseNodesManager: BaseNodesManager,
     private val torConfig: TorConfig,

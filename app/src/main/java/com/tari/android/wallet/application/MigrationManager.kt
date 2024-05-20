@@ -1,7 +1,7 @@
 package com.tari.android.wallet.application
 
 import com.tari.android.wallet.BuildConfig
-import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
+import com.tari.android.wallet.data.sharedPrefs.network.NetworkPrefRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion
@@ -13,7 +13,7 @@ import javax.inject.Singleton
 class MigrationManager @Inject constructor(
     private val walletManager: WalletManager,
     private val application: TariWalletApplication,
-    private val networkRepository: NetworkRepository,
+    private val networkRepository: NetworkPrefRepository,
 ) {
 
     suspend fun validateVersion(onValid: () -> Unit, onError: () -> Unit) {

@@ -6,8 +6,8 @@ import android.os.Bundle
 import android.provider.ContactsContract
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.deeplinks.DeepLink
-import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
-import com.tari.android.wallet.data.sharedPrefs.tariSettings.TariSettingsSharedRepository
+import com.tari.android.wallet.data.sharedPrefs.CorePrefRepository
+import com.tari.android.wallet.data.sharedPrefs.tariSettings.TariSettingsPrefRepository
 import com.tari.android.wallet.event.Event
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.ffi.FFITariWalletAddress
@@ -102,7 +102,7 @@ import javax.inject.Singleton
 
 // TODO: move navigation logic to only the navigate() method and make all navigation methods private
 @Singleton
-class TariNavigator @Inject constructor(val prefs: SharedPrefsRepository, val tariSettingsSharedRepository: TariSettingsSharedRepository) {
+class TariNavigator @Inject constructor(val prefs: CorePrefRepository, val tariSettingsSharedRepository: TariSettingsPrefRepository) {
 
     lateinit var activity: CommonActivity<*, *>
 

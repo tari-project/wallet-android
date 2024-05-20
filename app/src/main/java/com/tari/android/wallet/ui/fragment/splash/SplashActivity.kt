@@ -39,8 +39,8 @@ import androidx.activity.addCallback
 import androidx.appcompat.app.AppCompatActivity
 import com.tari.android.wallet.application.WalletState
 import com.tari.android.wallet.data.WalletConfig
-import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
-import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
+import com.tari.android.wallet.data.sharedPrefs.CorePrefRepository
+import com.tari.android.wallet.data.sharedPrefs.network.NetworkPrefRepository
 import com.tari.android.wallet.data.sharedPrefs.security.SecurityPrefRepository
 import com.tari.android.wallet.di.DiContainer
 import com.tari.android.wallet.di.DiContainer.appComponent
@@ -62,13 +62,13 @@ class SplashActivity : AppCompatActivity() {
     lateinit var walletConfig: WalletConfig
 
     @Inject
-    lateinit var sharedPrefsRepository: SharedPrefsRepository
+    lateinit var sharedPrefsRepository: CorePrefRepository
 
     @Inject
     lateinit var securityPrefRepository: SecurityPrefRepository
 
     @Inject
-    lateinit var networkRepository: NetworkRepository
+    lateinit var networkRepository: NetworkPrefRepository
 
     @Inject
     lateinit var walletServiceLauncher: WalletServiceLauncher

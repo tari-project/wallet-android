@@ -30,33 +30,36 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.tari.android.wallet.data.sharedPrefs.securityStages
+package com.tari.android.wallet.data.sharedPrefs.bluetooth
 
 import android.content.SharedPreferences
 import com.tari.android.wallet.data.repository.CommonRepository
-import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefGsonNullableDelegate
-import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
+import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefGsonDelegate
+import com.tari.android.wallet.data.sharedPrefs.network.NetworkPrefRepository
 import com.tari.android.wallet.data.sharedPrefs.network.formatKey
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class SecurityStagesRepository @Inject constructor(sharedPrefs: SharedPreferences, networkRepository: NetworkRepository) :
-    CommonRepository(networkRepository) {
+class BluetoothPrefRepository @Inject constructor(
+    sharedPrefs: SharedPreferences,
+    networkRepository: NetworkPrefRepository,
+) : CommonRepository(networkRepository) {
 
     private object Key {
-        const val disabledTimestamps = "tari_disabled_timestamp"
+        const val BLUETOOTH_SETTINGS_KEY = "tari_bluetooth_server_settings"
     }
 
-    var disabledTimestamps: DisabledTimestampsDto? by SharedPrefGsonNullableDelegate(
-        sharedPrefs,
-        this,
-        formatKey(Key.disabledTimestamps),
-        DisabledTimestampsDto::class.java,
-        DisabledTimestampsDto(mutableMapOf())
+    var bluetoothSettingsState: BluetoothServerState by SharedPrefGsonDelegate(
+        prefs = sharedPrefs,
+        commonRepository = this,
+        name = formatKey(Key.BLUETOOTH_SETTINGS_KEY),
+        type = BluetoothServerState::class.java,
+        defValue = BluetoothServerState.ENABLED,
     )
 
     fun clear() {
-        disabledTimestamps = null
+        bluetoothSettingsState = BluetoothServerState.ENABLED
     }
 }
+
