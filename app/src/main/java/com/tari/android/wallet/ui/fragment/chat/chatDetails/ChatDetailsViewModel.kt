@@ -1,4 +1,4 @@
-package com.tari.android.wallet.ui.fragment.chat.chatDetail
+package com.tari.android.wallet.ui.fragment.chat.chatDetails
 
 import androidx.lifecycle.SavedStateHandle
 import com.tari.android.wallet.R
@@ -7,8 +7,8 @@ import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonStyle
 import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
-import com.tari.android.wallet.ui.fragment.chat.chatDetail.ChatDetailModel.WALLET_ADDRESS
-import com.tari.android.wallet.ui.fragment.chat.chatDetail.adapter.ChatMessageViewHolderItem
+import com.tari.android.wallet.ui.fragment.chat.chatDetails.ChatDetailsModel.WALLET_ADDRESS
+import com.tari.android.wallet.ui.fragment.chat.chatDetails.adapter.ChatMessageViewHolderItem
 import com.tari.android.wallet.ui.fragment.chat.data.ChatMessageItemDto
 import com.tari.android.wallet.ui.fragment.chat.data.ChatsRepository
 import com.tari.android.wallet.ui.fragment.contact_book.data.ContactsRepository
@@ -17,10 +17,10 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
-import java.util.UUID
+import java.util.Date
 import javax.inject.Inject
 
-class ChatDetailViewModel(savedState: SavedStateHandle) : CommonViewModel() {
+class ChatDetailsViewModel(savedState: SavedStateHandle) : CommonViewModel() {
 
     @Inject
     lateinit var contactsRepository: ContactsRepository
@@ -36,17 +36,22 @@ class ChatDetailViewModel(savedState: SavedStateHandle) : CommonViewModel() {
 
     // should be after the init block
     private val _uiState = MutableStateFlow(
-        ChatDetailModel.UiState(
+        ChatDetailsModel.UiState(
             walletAddress = walletAddress,
             contact = contactsRepository.getContactByAddress(walletAddress),
             messages = chatRepository.getChatByWalletAddress(walletAddress)?.messages.orEmpty().map { ChatMessageViewHolderItem(it) }
         )
     )
-    val uiState: StateFlow<ChatDetailModel.UiState> = _uiState.asStateFlow()
+    val uiState: StateFlow<ChatDetailsModel.UiState> = _uiState.asStateFlow()
 
     fun sendMessage(message: String) {
         //todo send to backend
-        val dto = ChatMessageItemDto(UUID.randomUUID().toString(), message, "date", true, false)
+        val dto = ChatMessageItemDto(
+            message = message,
+            date = Date(),
+            isMine = true,
+            isRead = false,
+        )
         chatRepository.addMessage(uiState.value.walletAddress, dto)
         _uiState.update {
             it.copy(messages = it.messages + ChatMessageViewHolderItem(dto))

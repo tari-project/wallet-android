@@ -1,6 +1,8 @@
 package com.tari.android.wallet.ui.fragment.chat.chatList.adapter
 
+import com.tari.android.wallet.extension.formatToRelativeTime
 import com.tari.android.wallet.model.TariWalletAddress
+import com.tari.android.wallet.ui.common.domain.ResourceManager
 import com.tari.android.wallet.ui.common.recyclerView.CommonViewHolderItem
 import com.tari.android.wallet.ui.fragment.chat.data.ChatItemDto
 import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.ContactDto
@@ -23,6 +25,8 @@ data class ChatItemViewHolderItem(
     constructor(
         dto: ChatItemDto,
         contact: ContactDto,
+        isOnline: Boolean,
+        resourceManager: ResourceManager,
     ) : this(
         walletAddress = dto.walletAddress,
         uuid = dto.uuid,
@@ -31,8 +35,8 @@ data class ChatItemViewHolderItem(
         alias = contact.contact.getAlias(),
         emojiId = dto.walletAddress.emojiId,
         subtitle = dto.lastMessage?.message.orEmpty(),
-        dateMessage = dto.lastMessage?.date.orEmpty(),
+        dateMessage = dto.lastMessage?.date?.formatToRelativeTime(resourceManager).orEmpty(),
         unreadCount = dto.messages.count { it.isRead.not() },
-        isOnline = true,
+        isOnline = isOnline,
     )
 }

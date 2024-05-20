@@ -35,7 +35,7 @@ import com.tari.android.wallet.ui.extension.string
 import com.tari.android.wallet.ui.fragment.auth.FeatureAuthFragment
 import com.tari.android.wallet.ui.fragment.biometrics.ChangeBiometricsFragment
 import com.tari.android.wallet.ui.fragment.chat.addChat.AddChatFragment
-import com.tari.android.wallet.ui.fragment.chat.chatDetail.ChatDetailFragment
+import com.tari.android.wallet.ui.fragment.chat.chatDetails.ChatDetailsFragment
 import com.tari.android.wallet.ui.fragment.contact_book.add.AddContactFragment
 import com.tari.android.wallet.ui.fragment.contact_book.add.SelectUserContactFragment
 import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.ContactDto
@@ -393,7 +393,7 @@ class TariNavigator @Inject constructor(val prefs: SharedPrefsRepository, val ta
             onBackPressed()
         }
 
-        addFragment(ChatDetailFragment.newInstance(walletAddress))
+        addFragment(ChatDetailsFragment.newInstance(walletAddress))
     }
 
     private fun addFragment(fragment: CommonFragment<*, *>, bundle: Bundle? = null, isRoot: Boolean = false, withAnimation: Boolean = true) =

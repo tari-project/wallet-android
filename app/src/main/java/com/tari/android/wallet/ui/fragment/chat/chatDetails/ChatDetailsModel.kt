@@ -1,11 +1,11 @@
-package com.tari.android.wallet.ui.fragment.chat.chatDetail
+package com.tari.android.wallet.ui.fragment.chat.chatDetails
 
 import com.tari.android.wallet.model.TariWalletAddress
 import com.tari.android.wallet.ui.common.recyclerView.CommonViewHolderItem
 import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.ContactDto
 
 
-object ChatDetailModel {
+object ChatDetailsModel {
     const val WALLET_ADDRESS = "WALLET_ADDRESS"
 
     data class UiState(

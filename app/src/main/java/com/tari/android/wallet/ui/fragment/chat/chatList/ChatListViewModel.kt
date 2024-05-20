@@ -7,6 +7,8 @@ import com.tari.android.wallet.ui.fragment.chat.data.ChatItemDto
 import com.tari.android.wallet.ui.fragment.chat.data.ChatsRepository
 import com.tari.android.wallet.ui.fragment.contact_book.data.ContactsRepository
 import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
+import com.tari.android.wallet.util.DebugConfig
+import com.tari.android.wallet.util.MockDataStub
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -31,14 +33,22 @@ class ChatListViewModel : CommonViewModel() {
     }
 
     private fun updateChatList(chats: List<ChatItemDto>) {
-        _uiState.update {
-            it.copy(
-                chatList = chats.map { chat ->
-                    ChatItemViewHolderItem(
-                        dto = chat,
-                        contact = contactsRepository.getContactByAddress(chat.walletAddress),
-                    )
-                }
+        _uiState.update { state ->
+            state.copy(
+                chatList = chats
+                    .sortedByDescending { it.lastMessage?.date }
+                    .map { chat ->
+                        ChatItemViewHolderItem(
+                            dto = chat,
+                            contact = if (DebugConfig.mockChatMessages) {
+                                MockDataStub.createContact()
+                            } else {
+                                contactsRepository.getContactByAddress(chat.walletAddress)
+                            },
+                            isOnline = contactsRepository.isContactOnline(chat.walletAddress),
+                            resourceManager = resourceManager,
+                        )
+                    }
             )
         }
     }
