@@ -22,7 +22,6 @@ import com.tari.android.wallet.ui.common.debounce
 import com.tari.android.wallet.ui.common.domain.ResourceManager
 import com.tari.android.wallet.ui.component.loadingButton.LoadingButtonState
 import com.tari.android.wallet.ui.dialog.error.ErrorDialogArgs
-import com.tari.android.wallet.ui.dialog.error.WalletErrorArgs
 import com.tari.android.wallet.ui.dialog.modular.DialogArgs
 import com.tari.android.wallet.ui.dialog.modular.ModularDialogArgs
 import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
@@ -133,7 +132,7 @@ class InputSeedWordsViewModel : CommonViewModel() {
                     if (walletError == WalletError.NoError) {
                         onError(RestorationError.Unknown(resourceManager))
                     } else {
-                        modularDialog.postValue(WalletErrorArgs(resourceManager, it.exception).getErrorArgs().getModular(resourceManager))
+                        showErrorDialog(it.exception)
                     }
                     _inProgress.postValue(false)
                     clear()

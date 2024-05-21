@@ -17,6 +17,7 @@ import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.extension.addTo
 import com.tari.android.wallet.ffi.FFIWallet
 import com.tari.android.wallet.infrastructure.logging.LoggerTags
+import com.tari.android.wallet.model.CoreError
 import com.tari.android.wallet.service.TariWalletService
 import com.tari.android.wallet.service.connection.TariWalletServiceConnection
 import com.tari.android.wallet.ui.common.domain.PaletteManager
@@ -111,7 +112,6 @@ open class CommonViewModel : ViewModel() {
     val navigation: SingleLiveEvent<Navigation> = SingleLiveEvent()
 
     init {
-        @Suppress("LeakingThis")
         component.inject(this)
 
         currentTheme.value = tariSettingsSharedRepository.currentTheme
@@ -125,7 +125,8 @@ open class CommonViewModel : ViewModel() {
         EventBus.walletState.publishSubject.filter { it is WalletState.Failed }
             .subscribe({
                 val exception = (it as WalletState.Failed).exception
-                showModularDialog(WalletErrorArgs(resourceManager, exception).getErrorArgs().getModular(resourceManager, true))
+                hideDialog()
+                showErrorDialog(exception)
             }, {
                 logger.i(it.toString())
                 logger.i("on showing error dialog from wallet")
@@ -191,6 +192,14 @@ open class CommonViewModel : ViewModel() {
 
     fun showInputModalDialog(inputArgs: ModularDialogArgs) {
         _inputDialog.postValue(inputArgs)
+    }
+
+    fun showErrorDialog(error: CoreError) {
+        showModularDialog(WalletErrorArgs(resourceManager, error).getErrorArgs().getModular(resourceManager))
+    }
+
+    fun showErrorDialog(exception: Throwable) {
+        showModularDialog(WalletErrorArgs(resourceManager, exception).getErrorArgs().getModular(resourceManager))
     }
 
     fun hideDialog() {
