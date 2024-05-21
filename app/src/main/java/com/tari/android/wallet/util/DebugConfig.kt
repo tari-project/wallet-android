@@ -35,6 +35,7 @@
 package com.tari.android.wallet.util
 
 import com.tari.android.wallet.BuildConfig
+import com.tari.android.wallet.extension.minusHours
 import com.tari.android.wallet.extension.toMicroTari
 import com.tari.android.wallet.model.CompletedTx
 import com.tari.android.wallet.model.TariContact
@@ -55,6 +56,7 @@ import com.tari.android.wallet.ui.fragment.utxos.list.adapters.UtxosViewHolderIt
 import org.joda.time.DateTime
 import yat.android.lib.YatIntegration
 import java.math.BigInteger
+import java.util.Date
 import java.util.UUID
 import kotlin.random.Random
 
@@ -100,6 +102,28 @@ object MockDataStub {
 
     val WALLET_ADDRESS = TariWalletAddress(hexString = HEX, emojiId = EMOJI_ID)
     val WALLET_ADDRESS_ZERO = TariWalletAddress(HEX_ZERO, EMOJI_ID_ZERO)
+
+    private val RANDOM_MESSAGES = listOf(
+        "Hello, how are you?",
+        "I'm fine, thank you!",
+        "What are you doing?",
+        "I'm working on a new feature.",
+        "That's great!",
+        "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+        "Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+        "Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
+        "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.",
+    )
+
+    fun createContact(
+        walletAddress: TariWalletAddress = WALLET_ADDRESS,
+        alias: String = "Alice",
+    ) = ContactDto(
+        contact = FFIContactDto(
+            walletAddress = walletAddress,
+            alias = alias,
+        ),
+    )
 
     fun createUtxoList() = List(20) {
         UtxosViewHolderItem(
@@ -163,12 +187,7 @@ object MockDataStub {
             id = 1.toBigInteger(),
             tariContact = TariContact(WALLET_ADDRESS, contactAlias),
         ),
-        contact = ContactDto(
-            contact = FFIContactDto(
-                walletAddress = WALLET_ADDRESS,
-                alias = contactAlias,
-            ),
-        ),
+        contact = createContact(alias = contactAlias),
         position = 0,
         viewModel = GIFViewModel(gifRepository),
         requiredConfirmationCount = confirmationCount,
@@ -182,12 +201,7 @@ object MockDataStub {
 
     fun createSimilarAddress(): SimilarAddressDto {
         return SimilarAddressDto(
-            contactDto = ContactDto(
-                contact = FFIContactDto(
-                    walletAddress = WALLET_ADDRESS,
-                    alias = "Alice",
-                ),
-            ),
+            contactDto = createContact(),
             numberOfTransaction = 10,
             lastTransactionTimestampMillis = System.currentTimeMillis(),
             trusted = false,
@@ -204,14 +218,15 @@ object MockDataStub {
 
     fun createChatMessages(count: Int = 20) = List(count) {
         ChatMessageItemDto(
-            uuid = UUID.randomUUID().toString(),
-            message = "Message $it",
-            date = "2 days ago",
+            message = RANDOM_MESSAGES.random(),
+            date = Date().minusHours(Random.nextInt(0, 100)),
             isMine = Random.nextBoolean(),
-            isRead = Random.nextBoolean(),
+            isRead = Random.nextBoolean(0.9),
         )
     }
 }
+
+fun Random.nextBoolean(probability: Double): Boolean = nextDouble() <= probability
 
 object YatEnvironment {
     val SANDBOX = YatIntegration.Environment("https://a.yat.fyi/", "https://yat.fyi/")

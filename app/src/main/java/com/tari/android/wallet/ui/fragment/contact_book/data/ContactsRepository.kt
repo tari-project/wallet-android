@@ -14,6 +14,7 @@ import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.PhoneConta
 import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.YatDto
 import com.tari.android.wallet.ui.fragment.contact_book.data.localStorage.ContactSharedPrefRepository
 import com.tari.android.wallet.util.ContactUtil
+import com.tari.android.wallet.util.nextBoolean
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -23,6 +24,7 @@ import org.joda.time.DateTime
 import yat.android.sdk.models.PaymentAddressResponseResult
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlin.random.Random
 import kotlin.system.measureNanoTime
 
 @Singleton
@@ -148,6 +150,11 @@ class ContactsRepository @Inject constructor(
             val existContact = contacts.firstOrNull { it.uuid == contactDto.uuid }
             existContact?.getYatDto()?.connectedWallets = entries.map { YatDto.ConnectedWallet(it.key, it.value) }
         }
+    }
+
+    fun isContactOnline(contact: TariWalletAddress): Boolean {
+        // TODO not implemented
+        return Random.nextBoolean(0.2)
     }
 
     internal suspend fun updateRecentUsedTime(contact: ContactDto) {

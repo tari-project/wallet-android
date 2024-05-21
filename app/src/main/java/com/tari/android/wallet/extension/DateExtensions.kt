@@ -32,8 +32,13 @@
  */
 package com.tari.android.wallet.extension
 
+import com.tari.android.wallet.R
+import com.tari.android.wallet.ui.common.domain.ResourceManager
+import java.text.DateFormat
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Calendar
+import java.util.Date
+import java.util.Locale
 
 /**
  * Contains Date functions.
@@ -58,4 +63,32 @@ fun Date.txFormattedDate(): String {
 
 fun Calendar.isAfterNow(): Boolean {
     return this.after(Calendar.getInstance())
+}
+
+fun Date.formatToRelativeTime(resourceManager: ResourceManager): String {
+    val now = Date().time
+    val diff = now - time
+
+    // Calculate time difference in seconds, minutes, hours, and days
+    val seconds = diff / 1000
+    val minutes = seconds / 60
+    val hours = minutes / 60
+    val days = hours / 24
+
+    // Format the relative time string
+    return when {
+        days > 2 -> DateFormat.getDateInstance().format(this)
+        days > 0 -> resourceManager.getString(R.string.tx_list_days_ago, days)
+        hours > 0 -> resourceManager.getString(R.string.tx_list_hours_ago, hours)
+        minutes > 0 -> resourceManager.getString(R.string.tx_list_minutes_ago, minutes)
+        seconds > 0 -> resourceManager.getString(R.string.tx_list_seconds_ago, minutes)
+        else -> resourceManager.getString(R.string.tx_list_just_now)
+    }
+}
+
+fun Date.minusHours(hours: Int): Date {
+    val calendar = Calendar.getInstance()
+    calendar.time = this
+    calendar.add(Calendar.HOUR_OF_DAY, -hours)
+    return calendar.time
 }

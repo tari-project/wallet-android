@@ -1,4 +1,4 @@
-package com.tari.android.wallet.ui.fragment.chat.chatDetail
+package com.tari.android.wallet.ui.fragment.chat.chatDetails
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -13,11 +13,11 @@ import com.tari.android.wallet.ui.common.CommonFragment
 import com.tari.android.wallet.ui.common.recyclerView.AdapterFactory
 import com.tari.android.wallet.ui.common.recyclerView.CommonViewHolderItem
 import com.tari.android.wallet.ui.extension.setVisible
-import com.tari.android.wallet.ui.fragment.chat.chatDetail.ChatDetailModel.WALLET_ADDRESS
-import com.tari.android.wallet.ui.fragment.chat.chatDetail.adapter.ChatMessageViewHolder
+import com.tari.android.wallet.ui.fragment.chat.chatDetails.ChatDetailsModel.WALLET_ADDRESS
+import com.tari.android.wallet.ui.fragment.chat.chatDetails.adapter.ChatMessageViewHolder
 import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.ContactDto
 
-class ChatDetailFragment : CommonFragment<FragmentChatBinding, ChatDetailViewModel>() {
+class ChatDetailsFragment : CommonFragment<FragmentChatBinding, ChatDetailsViewModel>() {
 
     private val adapter = AdapterFactory.generate<CommonViewHolderItem>(ChatMessageViewHolder.getBuilder())
 
@@ -27,7 +27,7 @@ class ChatDetailFragment : CommonFragment<FragmentChatBinding, ChatDetailViewMod
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val viewModel: ChatDetailViewModel by viewModels()
+        val viewModel: ChatDetailsViewModel by viewModels()
         bindViewModel(viewModel)
 
         initUI()
@@ -61,7 +61,7 @@ class ChatDetailFragment : CommonFragment<FragmentChatBinding, ChatDetailViewMod
     }
 
     companion object {
-        fun newInstance(walletAddress: TariWalletAddress) = ChatDetailFragment().apply {
+        fun newInstance(walletAddress: TariWalletAddress) = ChatDetailsFragment().apply {
             arguments = Bundle().apply {
                 putParcelable(WALLET_ADDRESS, walletAddress)
             }

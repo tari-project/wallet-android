@@ -1,4 +1,4 @@
-package com.tari.android.wallet.ui.fragment.chat.chatDetail.adapter
+package com.tari.android.wallet.ui.fragment.chat.chatDetails.adapter
 
 import com.tari.android.wallet.databinding.ItemChatMessageItemBinding
 import com.tari.android.wallet.ui.common.recyclerView.CommonViewHolder
