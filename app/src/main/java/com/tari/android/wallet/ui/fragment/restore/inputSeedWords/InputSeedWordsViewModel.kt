@@ -124,7 +124,7 @@ class InputSeedWordsViewModel : CommonViewModel() {
         _inProgress.postValue(true)
 
         viewModelScope.launch(Dispatchers.IO) {
-            serviceConnection.doOnWalletFailed { exception ->
+            walletStateHandler.doOnWalletFailed { exception ->
                 if (WalletError.createFromException(exception) == WalletError.NoError) {
                     onError(RestorationError.Unknown(resourceManager))
                 } else {
@@ -136,7 +136,7 @@ class InputSeedWordsViewModel : CommonViewModel() {
         }
 
         viewModelScope.launch(Dispatchers.IO) {
-            serviceConnection.doOnWalletRunning {
+            walletStateHandler.doOnWalletRunning {
                 navigation.postValue(Navigation.InputSeedWordsNavigation.ToRestoreFormSeedWordsInProgress)
                 _inProgress.postValue(false)
             }

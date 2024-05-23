@@ -30,7 +30,10 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.tari.android.wallet.application
+package com.tari.android.wallet.application.walletManager
+
+import com.tari.android.wallet.extension.safeCastTo
+import com.tari.android.wallet.ffi.FFIException
 
 /**
  * Used for async observation of the wallet state.
@@ -44,4 +47,7 @@ sealed class WalletState {
     data object Started : WalletState()
     data object Running : WalletState()
     data class Failed(val exception: Exception) : WalletState()
+
+    val errorCode: Int?
+        get() = this.safeCastTo<Failed>()?.exception?.safeCastTo<FFIException>()?.error?.code
 }

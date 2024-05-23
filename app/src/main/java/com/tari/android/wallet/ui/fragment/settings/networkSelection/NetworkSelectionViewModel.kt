@@ -67,7 +67,7 @@ class NetworkSelectionViewModel : CommonViewModel() {
         loadData()
 
         viewModelScope.launch {
-            serviceConnection.doOnWalletNotReady {
+            walletStateHandler.doOnWalletNotReady {
                 EventBus.clear()
                 DiContainer.reInitContainer()
                 _recreate.postValue(Unit)

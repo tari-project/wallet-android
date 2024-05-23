@@ -48,7 +48,7 @@ class LocalAuthViewModel : CommonViewModel() {
 
     fun proceedToMain() {
         viewModelScope.launch {
-            serviceConnection.doOnWalletRunning {
+            walletStateHandler.doOnWalletRunning {
                 securityPrefRepository.isAuthenticated = true
                 sharedPrefsRepository.onboardingAuthSetupCompleted = true
                 backupManager.backupNow()

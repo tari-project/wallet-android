@@ -55,10 +55,10 @@ import com.tari.android.wallet.R.dimen.onboarding_see_full_emoji_id_button_visib
 import com.tari.android.wallet.R.string.create_wallet_your_emoji_id_text_label
 import com.tari.android.wallet.R.string.create_wallet_your_emoji_id_text_label_bold_part
 import com.tari.android.wallet.R.string.emoji_id_chunk_separator
+import com.tari.android.wallet.application.walletManager.WalletStateHandler
 import com.tari.android.wallet.databinding.FragmentCreateWalletBinding
 import com.tari.android.wallet.di.DiContainer
 import com.tari.android.wallet.extension.applyFontStyle
-import com.tari.android.wallet.service.connection.TariWalletServiceConnection
 import com.tari.android.wallet.ui.common.CommonFragment
 import com.tari.android.wallet.ui.component.fullEmojiId.EmojiIdSummaryViewController
 import com.tari.android.wallet.ui.component.tari.TariFont
@@ -91,7 +91,7 @@ import javax.inject.Inject
 class CreateWalletFragment : CommonFragment<FragmentCreateWalletBinding, CreateWalletViewModel>() {
 
     @Inject
-    lateinit var serviceConnection: TariWalletServiceConnection
+    lateinit var walletStateHandler: WalletStateHandler
 
     private lateinit var emojiIdSummaryController: EmojiIdSummaryViewController
 
@@ -216,7 +216,7 @@ class CreateWalletFragment : CommonFragment<FragmentCreateWalletBinding, CreateW
                     // TODO it's a potential bug. Checking wallet creation in the onViewCreated instead
                     // TODO I think this could cause the bug where the checkmark animation is not shown and the wallet process is endless
                     lifecycleScope.launch(Dispatchers.IO) {
-                        serviceConnection.doOnWalletRunning {
+                        walletStateHandler.doOnWalletRunning {
                             lifecycleScope.launch(Dispatchers.Main) {
                                 startCheckMarkAnimation()
                             }

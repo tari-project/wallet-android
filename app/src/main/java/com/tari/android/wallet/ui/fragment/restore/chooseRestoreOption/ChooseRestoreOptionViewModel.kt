@@ -55,7 +55,7 @@ class ChooseRestoreOptionViewModel : CommonViewModel() {
         options.postValue(backupPrefRepository.getOptionList)
 
         viewModelScope.launch(Dispatchers.IO) {
-            serviceConnection.doOnWalletRunning {
+            walletStateHandler.doOnWalletRunning {
                 if (WalletUtil.walletExists(walletConfig) && state.value != null) {
                     backupPrefRepository.restoredTxs?.let {
                         if (it.utxos.orEmpty().isEmpty()) return@let
@@ -78,7 +78,7 @@ class ChooseRestoreOptionViewModel : CommonViewModel() {
         }
 
         viewModelScope.launch(Dispatchers.IO) {
-            serviceConnection.doOnWalletFailed {
+            walletStateHandler.doOnWalletFailed {
                 handleException(WalletStartFailedException(it))
             }
         }

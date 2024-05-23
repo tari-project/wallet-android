@@ -1,6 +1,7 @@
 package com.tari.android.wallet.application
 
 import com.tari.android.wallet.BuildConfig
+import com.tari.android.wallet.application.walletManager.WalletManager
 import com.tari.android.wallet.data.sharedPrefs.network.NetworkPrefRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext

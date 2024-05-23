@@ -5,6 +5,7 @@ import com.google.gson.Gson
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.Network
+import com.tari.android.wallet.application.walletManager.WalletStateHandler
 import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodeDto
 import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodeList
 import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodePrefRepository
@@ -36,6 +37,7 @@ class BaseNodesManager @Inject constructor(
     private val baseNodeSharedRepository: BaseNodePrefRepository,
     private val networkRepository: NetworkPrefRepository,
     private val serviceConnection: TariWalletServiceConnection,
+    private val walletStateHandler: WalletStateHandler,
     @ApplicationScope private val applicationScope: CoroutineScope,
 ) {
     private val logger
@@ -101,7 +103,7 @@ class BaseNodesManager @Inject constructor(
 
         applicationScope.launch(Dispatchers.IO) {
             serviceConnection.doOnWalletServiceConnected { walletService ->
-                serviceConnection.doOnWalletRunning { ffiWallet ->
+                walletStateHandler.doOnWalletRunning { ffiWallet ->
                     while (currentBaseNode != null) {
                         try {
                             currentBaseNode?.let {

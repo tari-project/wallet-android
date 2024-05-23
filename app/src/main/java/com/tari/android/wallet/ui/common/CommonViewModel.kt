@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.orhanobut.logger.Logger
 import com.orhanobut.logger.Printer
 import com.tari.android.wallet.R
+import com.tari.android.wallet.application.walletManager.WalletStateHandler
 import com.tari.android.wallet.data.sharedPrefs.CorePrefRepository
 import com.tari.android.wallet.data.sharedPrefs.network.NetworkPrefRepository
 import com.tari.android.wallet.data.sharedPrefs.security.SecurityPrefRepository
@@ -77,6 +78,9 @@ open class CommonViewModel : ViewModel() {
     val walletService: TariWalletService
         get() = serviceConnection.walletService
 
+    @Inject
+    lateinit var walletStateHandler: WalletStateHandler
+
     private var authorizedAction: (() -> Unit)? = null
 
     val logger: Printer
@@ -122,7 +126,7 @@ open class CommonViewModel : ViewModel() {
         }.addTo(compositeDisposable)
 
         viewModelScope.launch {
-            serviceConnection.doOnWalletFailed {
+            walletStateHandler.doOnWalletFailed {
                 showErrorDialog(it)
             }
         }
@@ -144,7 +148,7 @@ open class CommonViewModel : ViewModel() {
 
     fun doOnWalletRunning(action: suspend (walletService: FFIWallet) -> Unit) {
         viewModelScope.launch {
-            serviceConnection.doOnWalletRunning(action)
+            walletStateHandler.doOnWalletRunning(action)
         }
     }
 

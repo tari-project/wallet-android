@@ -40,19 +40,17 @@ import android.os.Looper
 import androidx.lifecycle.ProcessLifecycleOwner
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.application.TariWalletApplication
-import com.tari.android.wallet.application.WalletManager
-import com.tari.android.wallet.application.WalletState
 import com.tari.android.wallet.application.baseNodes.BaseNodesManager
+import com.tari.android.wallet.application.walletManager.WalletManager
+import com.tari.android.wallet.application.walletManager.WalletStateHandler
 import com.tari.android.wallet.data.WalletConfig
 import com.tari.android.wallet.data.sharedPrefs.CorePrefRepository
 import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodePrefRepository
 import com.tari.android.wallet.di.DiContainer
-import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.ffi.FFIWallet
 import com.tari.android.wallet.infrastructure.backup.BackupManager
 import com.tari.android.wallet.notification.NotificationHelper
 import com.tari.android.wallet.service.ServiceRestartBroadcastReceiver
-import com.tari.android.wallet.service.connection.TariWalletServiceConnection
 import com.tari.android.wallet.service.notification.NotificationService
 import com.tari.android.wallet.service.service.WalletServiceLauncher.Companion.startAction
 import com.tari.android.wallet.service.service.WalletServiceLauncher.Companion.stopAction
@@ -64,6 +62,10 @@ import com.tari.android.wallet.util.WalletUtil
 import io.reactivex.Observable
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
 import org.joda.time.DateTime
 import org.joda.time.Hours
 import org.joda.time.Minutes
@@ -108,7 +110,7 @@ class WalletService : Service() {
     lateinit var baseNodesManager: BaseNodesManager
 
     @Inject
-    lateinit var serviceConnection: TariWalletServiceConnection
+    lateinit var walletStateHandler: WalletStateHandler
 
     private var lifecycleObserver: ServiceLifecycleCallbacks? = null
     private val stubProxy = TariWalletServiceStubProxy()
@@ -116,6 +118,9 @@ class WalletService : Service() {
     @Suppress("unused")
     private val logFilesManager = LogFilesManager()
     private lateinit var wallet: FFIWallet
+
+    private val job = SupervisorJob()
+    private val scope = CoroutineScope(Dispatchers.IO + job)
 
     private val logger
         get() = Logger.t(WalletService::class.simpleName)
@@ -159,10 +164,9 @@ class WalletService : Service() {
         //todo total crutch. Service is auto-creating during the bind func. Need to refactor this first
         DiContainer.appComponent.inject(this)
 
-        // TODO for some reason this is working only when it's subscribed to the walletState
-        EventBus.walletState.subscribe(this){
-            if (it == WalletState.Started) {
-                onWalletStarted(FFIWallet.instance!!)
+        scope.launch {
+            walletStateHandler.doOnWalletStarted {
+                onWalletStarted(it)
             }
         }
         walletManager.start()
@@ -180,7 +184,6 @@ class WalletService : Service() {
         walletManager.stop()
         stopSelfResult(startId)
         // stop wallet manager on a separate thread & unsubscribe from events
-        EventBus.walletState.unsubscribe(this)
         lifecycleObserver?.let { ProcessLifecycleOwner.get().lifecycle.removeObserver(it) }
     }
 
@@ -204,7 +207,6 @@ class WalletService : Service() {
         )
         stubProxy.stub = TariWalletServiceStubImpl(wallet, baseNodeSharedPrefsRepository, impl)
         wallet.listener = impl
-        EventBus.walletState.unsubscribe(this)
         scheduleExpirationCheck()
         Handler(Looper.getMainLooper()).post { ProcessLifecycleOwner.get().lifecycle.addObserver(lifecycleObserver!!) }
         walletManager.onWalletStarted()
@@ -246,6 +248,7 @@ class WalletService : Service() {
         logger.i("Wallet service destroyed")
         txExpirationCheckSubscription?.dispose()
         sendBroadcast(Intent(this, ServiceRestartBroadcastReceiver::class.java))
+        job.cancel()
         super.onDestroy()
     }
 

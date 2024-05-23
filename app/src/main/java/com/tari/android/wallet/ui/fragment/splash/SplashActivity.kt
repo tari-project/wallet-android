@@ -38,6 +38,7 @@ import android.os.Bundle
 import androidx.activity.addCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.coroutineScope
+import com.tari.android.wallet.application.walletManager.WalletStateHandler
 import com.tari.android.wallet.data.WalletConfig
 import com.tari.android.wallet.data.sharedPrefs.CorePrefRepository
 import com.tari.android.wallet.data.sharedPrefs.network.NetworkPrefRepository
@@ -45,7 +46,6 @@ import com.tari.android.wallet.data.sharedPrefs.security.SecurityPrefRepository
 import com.tari.android.wallet.di.DiContainer
 import com.tari.android.wallet.di.DiContainer.appComponent
 import com.tari.android.wallet.event.EventBus
-import com.tari.android.wallet.service.connection.TariWalletServiceConnection
 import com.tari.android.wallet.service.service.WalletServiceLauncher
 import com.tari.android.wallet.ui.fragment.auth.AuthActivity
 import com.tari.android.wallet.ui.fragment.onboarding.activity.OnboardingFlowActivity
@@ -76,7 +76,7 @@ class SplashActivity : AppCompatActivity() {
     lateinit var walletServiceLauncher: WalletServiceLauncher
 
     @Inject
-    lateinit var serviceConnection: TariWalletServiceConnection
+    lateinit var walletStateHandler: WalletStateHandler
 
     override fun onCreate(savedInstanceState: Bundle?) {
         appComponent.inject(this)
@@ -109,7 +109,7 @@ class SplashActivity : AppCompatActivity() {
         networkRepository.setDefaultNetworkAsCurrent()
 
         lifecycle.coroutineScope.launch {
-            serviceConnection.doOnWalletNotReady {
+            walletStateHandler.doOnWalletNotReady {
                 EventBus.clear()
                 DiContainer.reInitContainer()
             }

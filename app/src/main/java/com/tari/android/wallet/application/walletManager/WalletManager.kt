@@ -30,11 +30,12 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.tari.android.wallet.application
+package com.tari.android.wallet.application.walletManager
 
 import android.annotation.SuppressLint
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.BuildConfig
+import com.tari.android.wallet.application.Network
 import com.tari.android.wallet.application.baseNodes.BaseNodesManager
 import com.tari.android.wallet.data.WalletConfig
 import com.tari.android.wallet.data.sharedPrefs.CorePrefRepository
@@ -44,6 +45,7 @@ import com.tari.android.wallet.data.sharedPrefs.security.SecurityPrefRepository
 import com.tari.android.wallet.data.sharedPrefs.tariSettings.TariSettingsPrefRepository
 import com.tari.android.wallet.di.ApplicationScope
 import com.tari.android.wallet.event.EventBus
+import com.tari.android.wallet.extension.safeCastTo
 import com.tari.android.wallet.ffi.FFIByteVector
 import com.tari.android.wallet.ffi.FFICommsConfig
 import com.tari.android.wallet.ffi.FFIException
@@ -82,22 +84,13 @@ class WalletManager @Inject constructor(
     private val securityPrefRepository: SecurityPrefRepository,
     private val baseNodesManager: BaseNodesManager,
     private val torConfig: TorConfig,
+    private val walletStateHandler: WalletStateHandler,
     @ApplicationScope private val applicationScope: CoroutineScope,
 ) {
 
     private var logFileObserver: LogFileObserver? = null
     private val logger
         get() = Logger.t(WalletManager::class.simpleName)
-
-    init {
-        // post initial wallet state
-        setWalletState(WalletState.NotReady)
-    }
-
-    private fun setWalletState(state: WalletState) {
-        EventBus.walletState.post(state)
-        logger.i("Wallet state has changed: $state")
-    }
 
     /**
      * Start tor and init wallet.
@@ -117,68 +110,16 @@ class WalletManager @Inject constructor(
         // destroy FFI wallet object
         FFIWallet.instance?.destroy()
         FFIWallet.instance = null
-        setWalletState(WalletState.NotReady)
+        walletStateHandler.setWalletState(WalletState.NotReady)
         EventBus.torProxyState.post(TorProxyState.NotReady)
         // stop tor proxy
         EventBus.torProxyState.unsubscribe(this)
         torManager.shutdown()
-        setWalletState(WalletState.NotReady) // todo Don't understand why it's twice. Probable could cause the bug with endless wallet creation
-    }
-
-    @SuppressLint("CheckResult")
-    private fun onTorProxyStateChanged(torProxyState: TorProxyState) {
-        logger.i("Tor proxy state has changed: $torProxyState")
-        // TODO
-        //  if I'm trying to use Initializing status, then wallet would fail with
-        //  java.io.FileNotFoundException: /data/user/0/com.tari.android.wallet/app_tor_data/control_auth_cookie
-        if (torProxyState is TorProxyState.Running) {
-            startWallet()
-        }
-    }
-
-    private fun startWallet() {
-        if (EventBus.walletState.publishSubject.value is WalletState.NotReady || EventBus.walletState.publishSubject.value is WalletState.Failed) {
-            logger.i("Initialize wallet started")
-            setWalletState(WalletState.Initializing)
-            applicationScope.launch {
-                try {
-                    initWallet()
-                    setWalletState(WalletState.Started)
-                    logger.i("Wallet was started")
-                } catch (e: Exception) {
-                    val oldCode = ((EventBus.walletState.publishSubject.value as? WalletState.Failed)?.exception as? FFIException)?.error?.code
-                    val newCode = (e as? FFIException)?.error?.code
-
-                    if (oldCode == null || oldCode != newCode) {
-                        logger.e(e, "Wallet was failed")
-                    }
-                    setWalletState(WalletState.Failed(e))
-                }
-            }.start()
-        }
+        walletStateHandler.setWalletState(WalletState.NotReady) // todo Don't understand why it's twice. Probable could cause the bug with endless wallet creation
     }
 
     fun onWalletStarted() {
-        setWalletState(WalletState.Running)
-    }
-
-    /**
-     * Instantiates the Tor transport for the wallet.
-     */
-    private fun getTorTransport(): FFITariTransportConfig {
-        val cookieFile = File(torConfig.cookieFilePath)
-        if (!cookieFile.exists()) {
-            cookieFile.createNewFile()
-        }
-        val cookieString: ByteArray = cookieFile.readBytes()
-        val torCookie = FFIByteVector(cookieString)
-        return FFITariTransportConfig(
-            NetAddressString(torConfig.controlHost, torConfig.controlPort),
-            torCookie,
-            torConfig.connectionPort,
-            torConfig.sock5Username,
-            torConfig.sock5Password
-        )
+        walletStateHandler.setWalletState(WalletState.Running)
     }
 
     /**
@@ -192,6 +133,58 @@ class WalletManager @Inject constructor(
         Constants.Wallet.discoveryTimeoutSec,
         Constants.Wallet.storeAndForwardMessageDurationSec,
     )
+
+    @SuppressLint("CheckResult")
+    private fun onTorProxyStateChanged(torProxyState: TorProxyState) {
+        logger.i("Tor proxy state has changed: $torProxyState")
+        // TODO
+        //  if I'm trying to use Initializing status, then wallet would fail with
+        //  java.io.FileNotFoundException: /data/user/0/com.tari.android.wallet/app_tor_data/control_auth_cookie
+        if (torProxyState is TorProxyState.Running) {
+            startWallet()
+        }
+    }
+
+    private fun startWallet() {
+        if (walletStateHandler.walletState.value is WalletState.NotReady || walletStateHandler.walletState.value is WalletState.Failed) {
+            logger.i("Initialize wallet started")
+            walletStateHandler.setWalletState(WalletState.Initializing)
+            applicationScope.launch {
+                try {
+                    initWallet()
+                    walletStateHandler.setWalletState(WalletState.Started)
+                    logger.i("Wallet was started")
+                } catch (e: Exception) {
+                    val oldCode = walletStateHandler.walletState.value.errorCode
+                    val newCode = e.safeCastTo<FFIException>()?.error?.code
+
+                    if (oldCode == null || oldCode != newCode) {
+                        logger.e(e, "Wallet was failed")
+                    }
+                    walletStateHandler.setWalletState(WalletState.Failed(e))
+                }
+            }.start()
+        }
+    }
+
+    /**
+     * Instantiates the Tor transport for the wallet.
+     */
+    private fun getTorTransport(): FFITariTransportConfig {
+        val cookieFile = File(torConfig.cookieFilePath)
+        if (!cookieFile.exists()) {
+            cookieFile.createNewFile()
+        }
+        val cookieString: ByteArray = cookieFile.readBytes()
+        val torCookie = FFIByteVector(cookieString)
+        return FFITariTransportConfig(
+            controlAddress = NetAddressString(torConfig.controlHost, torConfig.controlPort),
+            torCookie = torCookie,
+            torPort = torConfig.connectionPort,
+            socksUsername = torConfig.sock5Username,
+            socksPassword = torConfig.sock5Password,
+        )
+    }
 
     /**
      * Starts the log file observer only in debug mode.

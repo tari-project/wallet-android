@@ -1,6 +1,7 @@
 package com.tari.android.wallet.ui.fragment.contact_book.data
 
 import com.orhanobut.logger.Logger
+import com.tari.android.wallet.application.walletManager.WalletStateHandler
 import com.tari.android.wallet.event.Event
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.ffi.FFIWallet
@@ -17,6 +18,7 @@ import kotlinx.coroutines.launch
 class FFIContactsRepositoryBridge(
     private val contactsRepository: ContactsRepository,
     private val tariWalletServiceConnection: TariWalletServiceConnection,
+    private val walletStateHandler: WalletStateHandler,
     private val contactUtil: ContactUtil,
     private val externalScope: CoroutineScope,
 ) {
@@ -25,7 +27,7 @@ class FFIContactsRepositoryBridge(
 
     init {
         externalScope.launch {
-            tariWalletServiceConnection.doOnWalletRunning {
+            walletStateHandler.doOnWalletRunning {
                 tariWalletServiceConnection.doOnWalletServiceConnected {
                     subscribeToActions()
                 }
@@ -34,7 +36,7 @@ class FFIContactsRepositoryBridge(
     }
 
     suspend fun updateToFFI(list: List<ContactDto>) {
-        tariWalletServiceConnection.doOnWalletRunning {
+        walletStateHandler.doOnWalletRunning {
             tariWalletServiceConnection.doOnWalletServiceConnected { service ->
                 for (item in list.mapNotNull { it.getFFIDto() }) {
                     val error = WalletError()
@@ -54,7 +56,7 @@ class FFIContactsRepositoryBridge(
 
     suspend fun deleteContact(contact: FFIContactDto) {
         contactsRepository.doWithLoading("Deleting contact") {
-            tariWalletServiceConnection.doOnWalletRunning {
+            walletStateHandler.doOnWalletRunning {
                 tariWalletServiceConnection.doOnWalletServiceConnected { service ->
                     service.updateContact(contact.walletAddress, "", false, WalletError())
                 }

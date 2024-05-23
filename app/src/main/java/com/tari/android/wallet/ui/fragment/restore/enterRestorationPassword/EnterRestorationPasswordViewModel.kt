@@ -36,7 +36,7 @@ class EnterRestorationPasswordViewModel : CommonViewModel() {
         component.inject(this)
 
         viewModelScope.launch {
-            serviceConnection.doOnWalletRunning {
+            walletStateHandler.doOnWalletRunning {
                 if (WalletUtil.walletExists(walletConfig)) {
                     val dto = backupSettingsRepository.getOptionDto(backupManager.currentOption!!)!!.copy(isEnable = true)
                     backupSettingsRepository.updateOption(dto)
@@ -48,7 +48,7 @@ class EnterRestorationPasswordViewModel : CommonViewModel() {
         }
 
         viewModelScope.launch {
-            serviceConnection.doOnWalletFailed {
+            walletStateHandler.doOnWalletFailed {
                 handleRestorationFailure(WalletStartFailedException(it))
             }
         }
