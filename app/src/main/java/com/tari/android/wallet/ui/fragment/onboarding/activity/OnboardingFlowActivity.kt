@@ -52,7 +52,7 @@ import com.tari.android.wallet.ui.fragment.onboarding.createWallet.CreateWalletL
 import com.tari.android.wallet.ui.fragment.onboarding.inroduction.IntroductionFragment
 import com.tari.android.wallet.ui.fragment.onboarding.inroduction.IntroductionListener
 import com.tari.android.wallet.ui.fragment.onboarding.localAuth.LocalAuthFragment
-import com.tari.android.wallet.ui.fragment.onboarding.localAuth.LocalAuthListener
+import com.tari.android.wallet.ui.fragment.onboarding.localAuth.LocalAuthModel
 import com.tari.android.wallet.ui.fragment.settings.networkSelection.NetworkSelectionFragment
 import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.Constants.UI.CreateWallet
@@ -67,7 +67,8 @@ import javax.inject.Inject
  *
  * @author The Tari Development Team
  */
-class OnboardingFlowActivity : CommonActivity<ActivityOnboardingFlowBinding, CommonViewModel>(), IntroductionListener, CreateWalletListener, LocalAuthListener {
+class OnboardingFlowActivity : CommonActivity<ActivityOnboardingFlowBinding, CommonViewModel>(), IntroductionListener, CreateWalletListener,
+    LocalAuthModel.LocalAuthListener {
 
     @Inject
     lateinit var walletConfig: WalletConfig
@@ -99,6 +100,7 @@ class OnboardingFlowActivity : CommonActivity<ActivityOnboardingFlowBinding, Com
                 walletServiceLauncher.start()
                 loadFragment(LocalAuthFragment())
             }
+
             sharedPrefsWrapper.onboardingWasInterrupted -> {
                 // start wallet service
                 walletServiceLauncher.start()
@@ -106,6 +108,7 @@ class OnboardingFlowActivity : CommonActivity<ActivityOnboardingFlowBinding, Com
                 WalletUtil.clearWalletFiles(walletConfig.getWalletFilesDirPath())
                 loadFragment(CreateWalletFragment())
             }
+
             else -> loadFragment(IntroductionFragment())
         }
     }

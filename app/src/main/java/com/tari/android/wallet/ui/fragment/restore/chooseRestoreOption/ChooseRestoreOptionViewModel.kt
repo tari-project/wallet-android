@@ -5,11 +5,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.tari.android.wallet.R
-import com.tari.android.wallet.application.WalletState
 import com.tari.android.wallet.data.WalletConfig
 import com.tari.android.wallet.data.sharedPrefs.backup.BackupPrefRepository
-import com.tari.android.wallet.event.EventBus
-import com.tari.android.wallet.extension.addTo
 import com.tari.android.wallet.ffi.FFITariWalletAddress
 import com.tari.android.wallet.ffi.HexString
 import com.tari.android.wallet.infrastructure.backup.BackupFileIsEncryptedException
@@ -31,7 +28,6 @@ import com.tari.android.wallet.util.WalletUtil
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.io.IOException
-import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 class ChooseRestoreOptionViewModel : CommonViewModel() {
@@ -58,34 +54,34 @@ class ChooseRestoreOptionViewModel : CommonViewModel() {
 
         options.postValue(backupPrefRepository.getOptionList)
 
-        EventBus.walletState.publishSubject.filter { it is WalletState.Running }.subscribe {
-            if (WalletUtil.walletExists(walletConfig) && state.value != null) {
-                backupPrefRepository.restoredTxs?.let {
-                    if (it.utxos.orEmpty().isEmpty()) return@let
+        viewModelScope.launch(Dispatchers.IO) {
+            serviceConnection.doOnWalletRunning {
+                if (WalletUtil.walletExists(walletConfig) && state.value != null) {
+                    backupPrefRepository.restoredTxs?.let {
+                        if (it.utxos.orEmpty().isEmpty()) return@let
 
-                    val sourceAddress = FFITariWalletAddress(HexString(it.source))
-                    val tariWalletAddress = TariWalletAddress.createWalletAddress(it.source, sourceAddress.getEmojiId())
-                    val message = resourceManager.getString(R.string.backup_restored_tx)
-                    val error = WalletError()
-                    walletService.restoreWithUnbindedOutputs(it.utxos, tariWalletAddress, message, error)
-                    throwIf(error)
+                        val sourceAddress = FFITariWalletAddress(HexString(it.source))
+                        val tariWalletAddress = TariWalletAddress.createWalletAddress(it.source, sourceAddress.getEmojiId())
+                        val message = resourceManager.getString(R.string.backup_restored_tx)
+                        val error = WalletError()
+                        walletService.restoreWithUnbindedOutputs(it.utxos, tariWalletAddress, message, error)
+                        throwIf(error)
+                    }
+
+                    val dto = backupPrefRepository.getOptionDto(state.value!!.backupOptions)!!.copy(isEnable = true)
+                    backupPrefRepository.updateOption(dto)
+                    backupManager.backupNow()
+
+                    navigation.postValue(Navigation.ChooseRestoreOptionNavigation.OnRestoreCompleted)
                 }
-
-                val dto = backupPrefRepository.getOptionDto(state.value!!.backupOptions)!!.copy(isEnable = true)
-                backupPrefRepository.updateOption(dto)
-                backupManager.backupNow()
-
-                navigation.postValue(Navigation.ChooseRestoreOptionNavigation.OnRestoreCompleted)
             }
-        }.addTo(compositeDisposable)
+        }
 
-        EventBus.walletState.publishSubject.filter { it is WalletState.Failed }
-            .map { it as WalletState.Failed }
-            .debounce(300L, TimeUnit.MILLISECONDS).subscribe {
-                viewModelScope.launch(Dispatchers.IO) {
-                    handleException(WalletStartFailedException(it.exception))
-                }
-            }.addTo(compositeDisposable)
+        viewModelScope.launch(Dispatchers.IO) {
+            serviceConnection.doOnWalletFailed {
+                handleException(WalletStartFailedException(it))
+            }
+        }
     }
 
     fun startRestore(options: BackupOptions) {

@@ -74,11 +74,11 @@ import javax.inject.Singleton
 class WalletManager @Inject constructor(
     private val walletConfig: WalletConfig,
     private val torManager: TorProxyManager,
-    private val sharedPrefsWrapper: CorePrefRepository,
-    private val baseNodeSharedRepository: BaseNodePrefRepository,
+    private val corePrefRepository: CorePrefRepository,
+    private val baseNodePrefRepository: BaseNodePrefRepository,
     private val seedPhraseRepository: SeedPhraseRepository,
-    private val networkRepository: NetworkPrefRepository,
-    private val tariSettingsSharedRepository: TariSettingsPrefRepository,
+    private val networkPrefRepository: NetworkPrefRepository,
+    private val tariSettingsPrefRepository: TariSettingsPrefRepository,
     private val securityPrefRepository: SecurityPrefRepository,
     private val baseNodesManager: BaseNodesManager,
     private val torConfig: TorConfig,
@@ -91,7 +91,12 @@ class WalletManager @Inject constructor(
 
     init {
         // post initial wallet state
-        EventBus.walletState.post(WalletState.NotReady)
+        setWalletState(WalletState.NotReady)
+    }
+
+    private fun setWalletState(state: WalletState) {
+        EventBus.walletState.post(state)
+        logger.i("Wallet state has changed: $state")
     }
 
     /**
@@ -112,12 +117,12 @@ class WalletManager @Inject constructor(
         // destroy FFI wallet object
         FFIWallet.instance?.destroy()
         FFIWallet.instance = null
-        EventBus.walletState.post(WalletState.NotReady)
+        setWalletState(WalletState.NotReady)
         EventBus.torProxyState.post(TorProxyState.NotReady)
         // stop tor proxy
         EventBus.torProxyState.unsubscribe(this)
         torManager.shutdown()
-        EventBus.walletState.post(WalletState.NotReady)
+        setWalletState(WalletState.NotReady) // todo Don't understand why it's twice. Probable could cause the bug with endless wallet creation
     }
 
     @SuppressLint("CheckResult")
@@ -134,11 +139,11 @@ class WalletManager @Inject constructor(
     private fun startWallet() {
         if (EventBus.walletState.publishSubject.value is WalletState.NotReady || EventBus.walletState.publishSubject.value is WalletState.Failed) {
             logger.i("Initialize wallet started")
-            EventBus.walletState.post(WalletState.Initializing)
+            setWalletState(WalletState.Initializing)
             applicationScope.launch {
                 try {
                     initWallet()
-                    EventBus.walletState.post(WalletState.Started)
+                    setWalletState(WalletState.Started)
                     logger.i("Wallet was started")
                 } catch (e: Exception) {
                     val oldCode = ((EventBus.walletState.publishSubject.value as? WalletState.Failed)?.exception as? FFIException)?.error?.code
@@ -147,10 +152,14 @@ class WalletManager @Inject constructor(
                     if (oldCode == null || oldCode != newCode) {
                         logger.e(e, "Wallet was failed")
                     }
-                    EventBus.walletState.post(WalletState.Failed(e))
+                    setWalletState(WalletState.Failed(e))
                 }
             }.start()
         }
+    }
+
+    fun onWalletStarted() {
+        setWalletState(WalletState.Running)
     }
 
     /**
@@ -202,8 +211,8 @@ class WalletManager @Inject constructor(
     private fun saveWalletPublicKeyHexToSharedPrefs() {
         // set shared preferences values after instantiation
         FFIWallet.instance?.getWalletAddress()?.let { ffiTariWalletAddress ->
-            sharedPrefsWrapper.publicKeyHexString = ffiTariWalletAddress.toString()
-            sharedPrefsWrapper.emojiId = ffiTariWalletAddress.getEmojiId()
+            corePrefRepository.publicKeyHexString = ffiTariWalletAddress.toString()
+            corePrefRepository.emojiId = ffiTariWalletAddress.getEmojiId()
             ffiTariWalletAddress.destroy()
         }
     }
@@ -216,21 +225,21 @@ class WalletManager @Inject constructor(
             // store network info in shared preferences if it's a new wallet
             val isNewInstallation = !WalletUtil.walletExists(walletConfig)
             val wallet = FFIWallet(
-                sharedPrefsWrapper,
-                securityPrefRepository,
-                seedPhraseRepository,
-                networkRepository,
-                getCommsConfig(),
-                walletConfig.getWalletLogFilePath()
+                sharedPrefsRepository = corePrefRepository,
+                securityPrefRepository = securityPrefRepository,
+                seedPhraseRepository = seedPhraseRepository,
+                networkRepository = networkPrefRepository,
+                commsConfig = getCommsConfig(),
+                logPath = walletConfig.getWalletLogFilePath(),
             )
             FFIWallet.instance = wallet
             if (isNewInstallation) {
                 FFIWallet.instance?.setKeyValue(
-                    WalletService.Companion.KeyValueStorageKeys.NETWORK,
-                    networkRepository.currentNetwork.network.uriComponent
+                    key = WalletService.Companion.KeyValueStorageKeys.NETWORK,
+                    value = networkPrefRepository.currentNetwork.network.uriComponent,
                 )
-            } else if (tariSettingsSharedRepository.isRestoredWallet && networkRepository.ffiNetwork == null) {
-                networkRepository.ffiNetwork = try {
+            } else if (tariSettingsPrefRepository.isRestoredWallet && networkPrefRepository.ffiNetwork == null) {
+                networkPrefRepository.ffiNetwork = try {
                     Network.from(FFIWallet.instance?.getKeyValue(WalletService.Companion.KeyValueStorageKeys.NETWORK) ?: "")
                 } catch (exception: Exception) {
                     null
@@ -239,14 +248,14 @@ class WalletManager @Inject constructor(
             startLogFileObserver()
 
             baseNodesManager.refreshBaseNodeList()
-            val currentBaseNode = baseNodeSharedRepository.currentBaseNode
+            val currentBaseNode = baseNodePrefRepository.currentBaseNode
             if (currentBaseNode != null) {
                 baseNodesManager.startSync()
             } else {
                 baseNodesManager.setNextBaseNode()
+                baseNodesManager.startSync()
             }
             saveWalletPublicKeyHexToSharedPrefs()
         }
     }
-
 }

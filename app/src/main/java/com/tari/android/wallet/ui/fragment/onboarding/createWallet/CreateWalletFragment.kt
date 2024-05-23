@@ -37,13 +37,13 @@ import android.animation.AnimatorListenerAdapter
 import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
 import android.animation.ValueAnimator
+import android.content.Context
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.os.postDelayed
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.daasuu.ei.Ease
@@ -55,11 +55,10 @@ import com.tari.android.wallet.R.dimen.onboarding_see_full_emoji_id_button_visib
 import com.tari.android.wallet.R.string.create_wallet_your_emoji_id_text_label
 import com.tari.android.wallet.R.string.create_wallet_your_emoji_id_text_label_bold_part
 import com.tari.android.wallet.R.string.emoji_id_chunk_separator
-import com.tari.android.wallet.application.WalletState
 import com.tari.android.wallet.databinding.FragmentCreateWalletBinding
-import com.tari.android.wallet.event.EventBus
-import com.tari.android.wallet.extension.addTo
+import com.tari.android.wallet.di.DiContainer
 import com.tari.android.wallet.extension.applyFontStyle
+import com.tari.android.wallet.service.connection.TariWalletServiceConnection
 import com.tari.android.wallet.ui.common.CommonFragment
 import com.tari.android.wallet.ui.component.fullEmojiId.EmojiIdSummaryViewController
 import com.tari.android.wallet.ui.component.tari.TariFont
@@ -82,6 +81,7 @@ import com.tari.android.wallet.util.EmojiUtil
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import me.everything.android.ui.overscroll.OverScrollDecoratorHelper
+import javax.inject.Inject
 
 /**
  * onBoarding flow : wallet creation step.
@@ -90,11 +90,19 @@ import me.everything.android.ui.overscroll.OverScrollDecoratorHelper
  */
 class CreateWalletFragment : CommonFragment<FragmentCreateWalletBinding, CreateWalletViewModel>() {
 
+    @Inject
+    lateinit var serviceConnection: TariWalletServiceConnection
+
     private lateinit var emojiIdSummaryController: EmojiIdSummaryViewController
 
     private val uiHandler = Handler(Looper.getMainLooper())
 
     private var emojiIdContinueButtonHasBeenDisplayed = false
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        DiContainer.appComponent.inject(this)
+    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
         FragmentCreateWalletBinding.inflate(inflater, container, false).also { ui = it }.root
@@ -205,10 +213,14 @@ class CreateWalletFragment : CommonFragment<FragmentCreateWalletBinding, CreateW
                     super.onAnimationEnd(animation)
                     // if the wallet is not ready wait until it gets ready,
                     // otherwise display the checkmark anim & move on
-                    uiHandler.postDelayed(CreateEmojiId.viewChangeAnimDelayMs) {
-                        EventBus.walletState.publishSubject.filter { it == WalletState.Running }
-                            .subscribe { startCheckMarkAnimation() }
-                            .addTo(viewModel.compositeDisposable)
+                    // TODO it's a potential bug. Checking wallet creation in the onViewCreated instead
+                    // TODO I think this could cause the bug where the checkmark animation is not shown and the wallet process is endless
+                    lifecycleScope.launch(Dispatchers.IO) {
+                        serviceConnection.doOnWalletRunning {
+                            lifecycleScope.launch(Dispatchers.Main) {
+                                startCheckMarkAnimation()
+                            }
+                        }
                     }
                 }
             })

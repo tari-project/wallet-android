@@ -6,11 +6,8 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
 import com.tari.android.wallet.R
-import com.tari.android.wallet.application.WalletState
 import com.tari.android.wallet.application.baseNodes.BaseNodesManager
 import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodeDto
-import com.tari.android.wallet.event.EventBus
-import com.tari.android.wallet.extension.addTo
 import com.tari.android.wallet.ffi.FFISeedWords
 import com.tari.android.wallet.model.WalletError
 import com.tari.android.wallet.model.seedPhrase.SeedPhrase
@@ -125,27 +122,25 @@ class InputSeedWordsViewModel : CommonViewModel() {
 
     private fun startRestoring() {
         _inProgress.postValue(true)
-        EventBus.walletState.publishSubject.distinct().subscribe {
-            when (it) {
-                is WalletState.Failed -> {
-                    val walletError = WalletError.createFromException(it.exception)
-                    if (walletError == WalletError.NoError) {
-                        onError(RestorationError.Unknown(resourceManager))
-                    } else {
-                        showErrorDialog(it.exception)
-                    }
-                    _inProgress.postValue(false)
-                    clear()
-                }
 
-                WalletState.Running -> {
-                    navigation.postValue(Navigation.InputSeedWordsNavigation.ToRestoreFormSeedWordsInProgress)
-                    _inProgress.postValue(false)
+        viewModelScope.launch(Dispatchers.IO) {
+            serviceConnection.doOnWalletFailed { exception ->
+                if (WalletError.createFromException(exception) == WalletError.NoError) {
+                    onError(RestorationError.Unknown(resourceManager))
+                } else {
+                    showErrorDialog(exception)
                 }
-
-                else -> Unit
+                _inProgress.postValue(false)
+                clear()
             }
-        }.addTo(compositeDisposable)
+        }
+
+        viewModelScope.launch(Dispatchers.IO) {
+            serviceConnection.doOnWalletRunning {
+                navigation.postValue(Navigation.InputSeedWordsNavigation.ToRestoreFormSeedWordsInProgress)
+                _inProgress.postValue(false)
+            }
+        }
 
         customBaseNodeState.value.customBaseNode?.let {
             baseNodesManager.addUserBaseNode(it)

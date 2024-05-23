@@ -49,6 +49,7 @@ import com.tari.android.wallet.service.service.WalletService
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.rx2.asFlow
@@ -107,18 +108,41 @@ class TariWalletServiceConnection @Inject constructor(
             } ?: error("Wallet service is not connected")
     }
 
-    suspend fun doOnWalletRunning(action: suspend (walletService: FFIWallet) -> Unit) = withContext(Dispatchers.IO) {
-        EventBus.walletState.publishSubject.asFlow().firstOrNull { it == WalletState.Running }
+    suspend fun doOnWalletStarted(action: suspend (ffiWallet: FFIWallet) -> Unit) = withContext(Dispatchers.IO) {
+        EventBus.walletState.publishSubject.asFlow().firstOrNull { it is WalletState.Started }
             ?.let {
                 action(FFIWallet.instance!!)
             } ?: logger.i("Wallet service is not connected")
     }
 
-    suspend fun <T> doOnWalletRunningWithValue(action: suspend (walletService: FFIWallet) -> T): T = withContext(Dispatchers.IO) {
-        EventBus.walletState.publishSubject.asFlow().firstOrNull { it == WalletState.Running }
+    suspend fun doOnWalletRunning(action: suspend (ffiWallet: FFIWallet) -> Unit) = withContext(Dispatchers.IO) {
+        EventBus.walletState.publishSubject.asFlow().firstOrNull { it is WalletState.Running }
+            ?.let {
+                action(FFIWallet.instance!!)
+            } ?: logger.i("Wallet service is not connected")
+    }
+
+    suspend fun <T> doOnWalletRunningWithValue(action: suspend (ffiWallet: FFIWallet) -> T): T = withContext(Dispatchers.IO) {
+        EventBus.walletState.publishSubject.asFlow().firstOrNull { it is WalletState.Running }
             ?.let {
                 action(FFIWallet.instance!!)
             } ?: error("Wallet service is not connected")
+    }
+
+    suspend fun doOnWalletFailed(action: suspend (exception: Exception) -> Unit) = withContext(Dispatchers.IO) {
+        EventBus.walletState.publishSubject.asFlow()
+            .debounce(300L) // todo this is a workaround for the issue that the wallet service is not connected yet
+            .firstOrNull { it is WalletState.Failed }
+            ?.let {
+                action((it as WalletState.Failed).exception)
+            } ?: logger.i("Wallet service is not connected")
+    }
+
+    suspend fun doOnWalletNotReady(action: suspend () -> Unit) = withContext(Dispatchers.IO) {
+        EventBus.walletState.publishSubject.asFlow().firstOrNull { it is WalletState.NotReady }
+            ?.let {
+                action()
+            } ?: logger.i("Wallet service is not connected")
     }
 }
 

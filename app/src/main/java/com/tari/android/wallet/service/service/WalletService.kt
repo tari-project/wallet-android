@@ -52,6 +52,7 @@ import com.tari.android.wallet.ffi.FFIWallet
 import com.tari.android.wallet.infrastructure.backup.BackupManager
 import com.tari.android.wallet.notification.NotificationHelper
 import com.tari.android.wallet.service.ServiceRestartBroadcastReceiver
+import com.tari.android.wallet.service.connection.TariWalletServiceConnection
 import com.tari.android.wallet.service.notification.NotificationService
 import com.tari.android.wallet.service.service.WalletServiceLauncher.Companion.startAction
 import com.tari.android.wallet.service.service.WalletServiceLauncher.Companion.stopAction
@@ -106,6 +107,9 @@ class WalletService : Service() {
     @Inject
     lateinit var baseNodesManager: BaseNodesManager
 
+    @Inject
+    lateinit var serviceConnection: TariWalletServiceConnection
+
     private var lifecycleObserver: ServiceLifecycleCallbacks? = null
     private val stubProxy = TariWalletServiceStubProxy()
 
@@ -154,8 +158,13 @@ class WalletService : Service() {
     private fun startService() {
         //todo total crutch. Service is auto-creating during the bind func. Need to refactor this first
         DiContainer.appComponent.inject(this)
-        // start wallet manager on a separate thread & listen to events
-        EventBus.walletState.subscribe(this, this::onWalletStateChanged)
+
+        // TODO for some reason this is working only when it's subscribed to the walletState
+        EventBus.walletState.subscribe(this){
+            if (it == WalletState.Started) {
+                onWalletStarted(FFIWallet.instance!!)
+            }
+        }
         walletManager.start()
         logger.i("Wallet service started")
     }
@@ -181,19 +190,24 @@ class WalletService : Service() {
         backupManager.turnOffAll()
     }
 
-    private fun onWalletStateChanged(walletState: WalletState) {
-        if (walletState == WalletState.Started) {
-            wallet = FFIWallet.instance!!
-            lifecycleObserver = ServiceLifecycleCallbacks(wallet)
-            val impl =
-                FFIWalletListenerImpl(wallet, backupManager, notificationHelper, notificationService, app, baseNodeSharedPrefsRepository, baseNodesManager)
-            stubProxy.stub = TariWalletServiceStubImpl(wallet, baseNodeSharedPrefsRepository, impl)
-            wallet.listener = impl
-            EventBus.walletState.unsubscribe(this)
-            scheduleExpirationCheck()
-            Handler(Looper.getMainLooper()).post { ProcessLifecycleOwner.get().lifecycle.addObserver(lifecycleObserver!!) }
-            EventBus.walletState.post(WalletState.Running)
-        }
+    private fun onWalletStarted(ffiWallet: FFIWallet) {
+        wallet = ffiWallet
+        lifecycleObserver = ServiceLifecycleCallbacks(wallet)
+        val impl = FFIWalletListenerImpl(
+            wallet = wallet,
+            backupManager = backupManager,
+            notificationHelper = notificationHelper,
+            notificationService = notificationService,
+            app = app,
+            baseNodeSharedPrefsRepository = baseNodeSharedPrefsRepository,
+            baseNodesManager = baseNodesManager,
+        )
+        stubProxy.stub = TariWalletServiceStubImpl(wallet, baseNodeSharedPrefsRepository, impl)
+        wallet.listener = impl
+        EventBus.walletState.unsubscribe(this)
+        scheduleExpirationCheck()
+        Handler(Looper.getMainLooper()).post { ProcessLifecycleOwner.get().lifecycle.addObserver(lifecycleObserver!!) }
+        walletManager.onWalletStarted()
     }
 
     private fun scheduleExpirationCheck() {

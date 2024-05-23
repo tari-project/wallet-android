@@ -3,10 +3,8 @@ package com.tari.android.wallet.ui.fragment.restore.enterRestorationPassword
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.viewModelScope
 import com.tari.android.wallet.R
-import com.tari.android.wallet.application.WalletState
 import com.tari.android.wallet.data.WalletConfig
-import com.tari.android.wallet.event.EventBus
-import com.tari.android.wallet.extension.addTo
+import com.tari.android.wallet.data.sharedPrefs.backup.BackupPrefRepository
 import com.tari.android.wallet.infrastructure.backup.BackupManager
 import com.tari.android.wallet.infrastructure.backup.WalletStartFailedException
 import com.tari.android.wallet.service.service.WalletServiceLauncher
@@ -14,12 +12,10 @@ import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.common.SingleLiveEvent
 import com.tari.android.wallet.ui.dialog.error.ErrorDialogArgs
 import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
-import com.tari.android.wallet.data.sharedPrefs.backup.BackupPrefRepository
 import com.tari.android.wallet.util.WalletUtil
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.security.GeneralSecurityException
-import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 class EnterRestorationPasswordViewModel : CommonViewModel() {
@@ -39,23 +35,23 @@ class EnterRestorationPasswordViewModel : CommonViewModel() {
     init {
         component.inject(this)
 
-        EventBus.walletState.publishSubject.filter { it is WalletState.Running }.subscribe {
-            if (WalletUtil.walletExists(walletConfig)) {
-                val dto = backupSettingsRepository.getOptionDto(backupManager.currentOption!!)!!.copy(isEnable = true)
-                backupSettingsRepository.updateOption(dto)
-                backupManager.backupNow()
+        viewModelScope.launch {
+            serviceConnection.doOnWalletRunning {
+                if (WalletUtil.walletExists(walletConfig)) {
+                    val dto = backupSettingsRepository.getOptionDto(backupManager.currentOption!!)!!.copy(isEnable = true)
+                    backupSettingsRepository.updateOption(dto)
+                    backupManager.backupNow()
 
-                navigation.postValue(Navigation.EnterRestorationPasswordNavigation.OnRestore)
-            }
-        }.addTo(compositeDisposable)
-
-        EventBus.walletState.publishSubject.filter { it is WalletState.Failed }
-            .map { it as WalletState.Failed }
-            .debounce(300L, TimeUnit.MILLISECONDS).subscribe {
-                viewModelScope.launch(Dispatchers.IO) {
-                    handleRestorationFailure(WalletStartFailedException(it.exception))
+                    navigation.postValue(Navigation.EnterRestorationPasswordNavigation.OnRestore)
                 }
-            }.addTo(compositeDisposable)
+            }
+        }
+
+        viewModelScope.launch {
+            serviceConnection.doOnWalletFailed {
+                handleRestorationFailure(WalletStartFailedException(it))
+            }
+        }
     }
 
     private val _state = SingleLiveEvent<EnterRestorationPasswordState>()
@@ -106,6 +102,6 @@ class EnterRestorationPasswordViewModel : CommonViewModel() {
             cancelable = false,
             canceledOnTouchOutside = false,
             onClose = { backPressed.call() })
-        modularDialog.postValue(args.getModular(resourceManager))
+        showModularDialog(args.getModular(resourceManager))
     }
 }

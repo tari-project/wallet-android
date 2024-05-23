@@ -6,7 +6,6 @@ import androidx.lifecycle.viewModelScope
 import com.orhanobut.logger.Logger
 import com.orhanobut.logger.Printer
 import com.tari.android.wallet.R
-import com.tari.android.wallet.application.WalletState
 import com.tari.android.wallet.data.sharedPrefs.CorePrefRepository
 import com.tari.android.wallet.data.sharedPrefs.network.NetworkPrefRepository
 import com.tari.android.wallet.data.sharedPrefs.security.SecurityPrefRepository
@@ -122,16 +121,11 @@ open class CommonViewModel : ViewModel() {
             checkAuthorization()
         }.addTo(compositeDisposable)
 
-        EventBus.walletState.publishSubject.filter { it is WalletState.Failed }
-            .subscribe({
-                val exception = (it as WalletState.Failed).exception
-                hideDialog()
-                showErrorDialog(exception)
-            }, {
-                logger.i(it.toString())
-                logger.i("on showing error dialog from wallet")
-            })
-            .addTo(compositeDisposable)
+        viewModelScope.launch {
+            serviceConnection.doOnWalletFailed {
+                showErrorDialog(it)
+            }
+        }
     }
 
     override fun onCleared() {

@@ -22,13 +22,13 @@ class WalletErrorArgs(
     val description: String
         get() {
             val id = when (error) {
-                 WalletError.DatabaseDataError -> R.string.error_wallet_message_114
-                 WalletError.TransactionNotFoundError -> R.string.error_wallet_message_204
-                 WalletError.ContactNotFoundError -> R.string.error_wallet_message_401
-                 WalletError.InvalidPassphraseEncryptionCypherError -> R.string.error_wallet_message_420
-                 WalletError.InvalidPassphraseError -> R.string.error_wallet_message_428
-                 WalletError.SeedWordsInvalidDataError -> R.string.error_wallet_message_429
-                 WalletError.SeedWordsVersionMismatchError -> R.string.error_wallet_message_430
+                WalletError.DatabaseDataError -> R.string.error_wallet_message_114
+                WalletError.TransactionNotFoundError -> R.string.error_wallet_message_204
+                WalletError.ContactNotFoundError -> R.string.error_wallet_message_401
+                WalletError.InvalidPassphraseEncryptionCypherError -> R.string.error_wallet_message_420
+                WalletError.InvalidPassphraseError -> R.string.error_wallet_message_428
+                WalletError.SeedWordsInvalidDataError -> R.string.error_wallet_message_429
+                WalletError.SeedWordsVersionMismatchError -> R.string.error_wallet_message_430
                 else -> R.string.error_wallet_message_generic
             }
             return resourceManager.getString(id)

@@ -227,6 +227,7 @@ class FFIWalletListenerImpl(
                 val currentBaseNode = baseNodeSharedPrefsRepository.currentBaseNode
                 if (currentBaseNode == null || !currentBaseNode.isCustom) {
                     baseNodesManager.setNextBaseNode()
+                    baseNodesManager.startSync()
                 }
                 baseNodeSharedPrefsRepository.baseNodeState = BaseNodeState.Offline
                 EventBus.baseNodeState.post(BaseNodeState.Offline)
@@ -293,6 +294,7 @@ class FFIWalletListenerImpl(
             val currentBaseNode = baseNodeSharedPrefsRepository.currentBaseNode
             if (currentBaseNode == null || !currentBaseNode.isCustom) {
                 baseNodesManager.setNextBaseNode()
+                baseNodesManager.startSync()
             }
             EventBus.baseNodeSyncState.post(BaseNodeSyncState.Failed)
             listeners.iterator().forEach { it.onBaseNodeSyncComplete(false) }
