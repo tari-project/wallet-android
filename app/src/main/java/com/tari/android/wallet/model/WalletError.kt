@@ -1,12 +1,15 @@
 package com.tari.android.wallet.model
 
+import android.os.Parcelable
 import com.tari.android.wallet.ffi.FFIError
 import com.tari.android.wallet.ffi.FFIException
+import kotlinx.parcelize.Parcelize
 
+@Parcelize
 open class WalletError(
     override var code: Int = NoError.code,
     override var domain: String = "FFI",
-) : CoreError(code, domain) {
+) : CoreError(code, domain), Parcelable {
 
     object DatabaseDataError : WalletError(114)
     object TransactionNotFoundError : WalletError(204)
