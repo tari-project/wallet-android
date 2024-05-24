@@ -59,7 +59,6 @@ import com.tari.android.wallet.application.walletManager.WalletStateHandler
 import com.tari.android.wallet.databinding.FragmentCreateWalletBinding
 import com.tari.android.wallet.di.DiContainer
 import com.tari.android.wallet.extension.applyFontStyle
-import com.tari.android.wallet.ui.common.CommonFragment
 import com.tari.android.wallet.ui.component.fullEmojiId.EmojiIdSummaryViewController
 import com.tari.android.wallet.ui.component.tari.TariFont
 import com.tari.android.wallet.ui.extension.animateClick
@@ -75,6 +74,7 @@ import com.tari.android.wallet.ui.extension.setTopMargin
 import com.tari.android.wallet.ui.extension.string
 import com.tari.android.wallet.ui.extension.temporarilyDisableClick
 import com.tari.android.wallet.ui.extension.visible
+import com.tari.android.wallet.ui.fragment.onboarding.activity.OnboardingFlowFragment
 import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.Constants.UI.CreateEmojiId
 import com.tari.android.wallet.util.EmojiUtil
@@ -88,7 +88,7 @@ import javax.inject.Inject
  *
  * @author The Tari Development Team
  */
-class CreateWalletFragment : CommonFragment<FragmentCreateWalletBinding, CreateWalletViewModel>() {
+class CreateWalletFragment : OnboardingFlowFragment<FragmentCreateWalletBinding, CreateWalletViewModel>() {
 
     @Inject
     lateinit var walletStateHandler: WalletStateHandler
@@ -581,7 +581,7 @@ class CreateWalletFragment : CommonFragment<FragmentCreateWalletBinding, CreateW
         viewModel.sharedPrefsWrapper.onboardingCompleted = true
         ui.continueButton.animateClick {
             viewModel.sharedPrefsWrapper.onboardingAuthSetupStarted = true
-            (requireActivity() as? CreateWalletListener)?.continueToEnableAuth()
+            onboardingListener.continueToEnableAuth()
         }
     }
 

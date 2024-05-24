@@ -48,11 +48,8 @@ import com.tari.android.wallet.ui.common.CommonActivity
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.fragment.home.HomeActivity
 import com.tari.android.wallet.ui.fragment.onboarding.createWallet.CreateWalletFragment
-import com.tari.android.wallet.ui.fragment.onboarding.createWallet.CreateWalletListener
 import com.tari.android.wallet.ui.fragment.onboarding.inroduction.IntroductionFragment
-import com.tari.android.wallet.ui.fragment.onboarding.inroduction.IntroductionListener
 import com.tari.android.wallet.ui.fragment.onboarding.localAuth.LocalAuthFragment
-import com.tari.android.wallet.ui.fragment.onboarding.localAuth.LocalAuthModel
 import com.tari.android.wallet.ui.fragment.settings.networkSelection.NetworkSelectionFragment
 import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.Constants.UI.CreateWallet
@@ -67,8 +64,7 @@ import javax.inject.Inject
  *
  * @author The Tari Development Team
  */
-class OnboardingFlowActivity : CommonActivity<ActivityOnboardingFlowBinding, CommonViewModel>(), IntroductionListener, CreateWalletListener,
-    LocalAuthModel.LocalAuthListener {
+class OnboardingFlowActivity : CommonActivity<ActivityOnboardingFlowBinding, CommonViewModel>(), OnboardingFlowListener {
 
     @Inject
     lateinit var walletConfig: WalletConfig
@@ -113,7 +109,34 @@ class OnboardingFlowActivity : CommonActivity<ActivityOnboardingFlowBinding, Com
         }
     }
 
-    fun navigateToNetworkSelection() = loadFragment(NetworkSelectionFragment(), true)
+    override fun continueToEnableAuth() {
+        (supportFragmentManager.findFragmentById(R.id.onboarding_fragment_container_2) as? CreateWalletFragment)?.fadeOutAllViewAnimation()
+        supportFragmentManager
+            .beginTransaction()
+            .setCustomAnimations(R.anim.fade_in, R.anim.fade_out)
+            .add(R.id.onboarding_fragment_container_1, LocalAuthFragment())
+            .commit()
+
+        removeContainer2Fragment()
+    }
+
+    override fun continueToCreateWallet() {
+        sharedPrefsWrapper.onboardingStarted = true
+        supportFragmentManager.beginTransaction()
+            .add(R.id.onboarding_fragment_container_2, CreateWalletFragment())
+            .commit()
+
+        removeContainer1Fragment()
+    }
+
+    override fun onAuthSuccess() {
+        val intent = Intent(this, HomeActivity::class.java)
+        intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
+        startActivity(intent)
+        finish()
+    }
+
+    override fun navigateToNetworkSelection() = loadFragment(NetworkSelectionFragment(), true)
 
     private fun loadFragment(fragment: Fragment, isAnimated: Boolean = false) {
         supportFragmentManager
@@ -128,14 +151,6 @@ class OnboardingFlowActivity : CommonActivity<ActivityOnboardingFlowBinding, Com
             .commit()
     }
 
-    override fun continueToCreateWallet() {
-        sharedPrefsWrapper.onboardingStarted = true
-        supportFragmentManager.beginTransaction()
-            .add(R.id.onboarding_fragment_container_2, CreateWalletFragment())
-            .commit()
-        removeContainer1Fragment()
-    }
-
     private fun removeContainer1Fragment() {
         lifecycleScope.launch(Dispatchers.IO) {
             delay(CreateWallet.removeFragmentDelayDuration)
@@ -147,17 +162,6 @@ class OnboardingFlowActivity : CommonActivity<ActivityOnboardingFlowBinding, Com
         }
     }
 
-    override fun continueToEnableAuth() {
-        (supportFragmentManager.findFragmentById(R.id.onboarding_fragment_container_2) as? CreateWalletFragment)?.fadeOutAllViewAnimation()
-        supportFragmentManager
-            .beginTransaction()
-            .setCustomAnimations(R.anim.fade_in, R.anim.fade_out)
-            .add(R.id.onboarding_fragment_container_1, LocalAuthFragment())
-            .commit()
-
-        removeContainer2Fragment()
-    }
-
     private fun removeContainer2Fragment() {
         lifecycleScope.launch(Dispatchers.IO) {
             delay(Constants.UI.longDurationMs)
@@ -167,12 +171,5 @@ class OnboardingFlowActivity : CommonActivity<ActivityOnboardingFlowBinding, Com
                 }
             }
         }
-    }
-
-    override fun onAuthSuccess() {
-        val intent = Intent(this, HomeActivity::class.java)
-        intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
-        startActivity(intent)
-        finish()
     }
 }

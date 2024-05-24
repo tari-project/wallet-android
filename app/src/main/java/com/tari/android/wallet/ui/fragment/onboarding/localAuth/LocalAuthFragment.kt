@@ -48,18 +48,17 @@ import com.tari.android.wallet.R.string.onboarding_auth_biometric_prompt
 import com.tari.android.wallet.R.string.onboarding_auth_title
 import com.tari.android.wallet.databinding.FragmentLocalAuthBinding
 import com.tari.android.wallet.extension.launchAndRepeatOnLifecycle
-import com.tari.android.wallet.extension.safeCastTo
 import com.tari.android.wallet.infrastructure.security.biometric.BiometricAuthenticationException
-import com.tari.android.wallet.ui.common.CommonFragment
 import com.tari.android.wallet.ui.extension.doOnGlobalLayout
 import com.tari.android.wallet.ui.extension.setOnThrottledClickListener
 import com.tari.android.wallet.ui.extension.setVisible
 import com.tari.android.wallet.ui.extension.string
+import com.tari.android.wallet.ui.fragment.onboarding.activity.OnboardingFlowFragment
 import com.tari.android.wallet.ui.fragment.onboarding.localAuth.LocalAuthModel.Effect
 import com.tari.android.wallet.util.Constants.UI.Auth
 import kotlinx.coroutines.launch
 
-class LocalAuthFragment : CommonFragment<FragmentLocalAuthBinding, LocalAuthViewModel>() {
+class LocalAuthFragment : OnboardingFlowFragment<FragmentLocalAuthBinding, LocalAuthViewModel>() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
         FragmentLocalAuthBinding.inflate(inflater, container, false).also { ui = it }.root
@@ -90,7 +89,7 @@ class LocalAuthFragment : CommonFragment<FragmentLocalAuthBinding, LocalAuthView
                 viewModel.effect.collect { effect ->
                     when (effect) {
                         is Effect.OnAuthSuccess -> {
-                            requireActivity().safeCastTo<LocalAuthModel.LocalAuthListener>()?.onAuthSuccess()
+                            onboardingListener.onAuthSuccess()
                         }
                     }
                 }
