@@ -40,7 +40,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import com.tari.android.wallet.R
 import com.tari.android.wallet.data.WalletConfig
-import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
+import com.tari.android.wallet.data.sharedPrefs.CorePrefRepository
 import com.tari.android.wallet.databinding.ActivityOnboardingFlowBinding
 import com.tari.android.wallet.di.DiContainer.appComponent
 import com.tari.android.wallet.service.service.WalletServiceLauncher
@@ -52,7 +52,7 @@ import com.tari.android.wallet.ui.fragment.onboarding.createWallet.CreateWalletL
 import com.tari.android.wallet.ui.fragment.onboarding.inroduction.IntroductionFragment
 import com.tari.android.wallet.ui.fragment.onboarding.inroduction.IntroductionListener
 import com.tari.android.wallet.ui.fragment.onboarding.localAuth.LocalAuthFragment
-import com.tari.android.wallet.ui.fragment.onboarding.localAuth.LocalAuthListener
+import com.tari.android.wallet.ui.fragment.onboarding.localAuth.LocalAuthModel
 import com.tari.android.wallet.ui.fragment.settings.networkSelection.NetworkSelectionFragment
 import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.Constants.UI.CreateWallet
@@ -67,13 +67,14 @@ import javax.inject.Inject
  *
  * @author The Tari Development Team
  */
-class OnboardingFlowActivity : CommonActivity<ActivityOnboardingFlowBinding, CommonViewModel>(), IntroductionListener, CreateWalletListener, LocalAuthListener {
+class OnboardingFlowActivity : CommonActivity<ActivityOnboardingFlowBinding, CommonViewModel>(), IntroductionListener, CreateWalletListener,
+    LocalAuthModel.LocalAuthListener {
 
     @Inject
     lateinit var walletConfig: WalletConfig
 
     @Inject
-    lateinit var sharedPrefsWrapper: SharedPrefsRepository
+    lateinit var sharedPrefsWrapper: CorePrefRepository
 
     @Inject
     lateinit var walletServiceLauncher: WalletServiceLauncher
@@ -99,6 +100,7 @@ class OnboardingFlowActivity : CommonActivity<ActivityOnboardingFlowBinding, Com
                 walletServiceLauncher.start()
                 loadFragment(LocalAuthFragment())
             }
+
             sharedPrefsWrapper.onboardingWasInterrupted -> {
                 // start wallet service
                 walletServiceLauncher.start()
@@ -106,6 +108,7 @@ class OnboardingFlowActivity : CommonActivity<ActivityOnboardingFlowBinding, Com
                 WalletUtil.clearWalletFiles(walletConfig.getWalletFilesDirPath())
                 loadFragment(CreateWalletFragment())
             }
+
             else -> loadFragment(IntroductionFragment())
         }
     }

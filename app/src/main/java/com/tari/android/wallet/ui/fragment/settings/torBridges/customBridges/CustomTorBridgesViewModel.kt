@@ -4,7 +4,7 @@ import com.tari.android.wallet.R
 import com.tari.android.wallet.application.deeplinks.DeepLink
 import com.tari.android.wallet.application.deeplinks.DeeplinkHandler
 import com.tari.android.wallet.data.sharedPrefs.tor.TorBridgeConfiguration
-import com.tari.android.wallet.data.sharedPrefs.tor.TorSharedRepository
+import com.tari.android.wallet.data.sharedPrefs.tor.TorPrefRepository
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.common.SingleLiveEvent
 import com.tari.android.wallet.ui.dialog.error.ErrorDialogArgs
@@ -14,7 +14,7 @@ import javax.inject.Inject
 class CustomTorBridgesViewModel : CommonViewModel() {
 
     @Inject
-    lateinit var torSharedRepository: TorSharedRepository
+    lateinit var torSharedRepository: TorPrefRepository
 
     @Inject
     lateinit var deeplinkHandler: DeeplinkHandler

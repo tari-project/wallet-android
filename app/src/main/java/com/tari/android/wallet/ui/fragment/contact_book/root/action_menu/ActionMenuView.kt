@@ -20,7 +20,7 @@ import androidx.core.view.children
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator
 import com.bumptech.glide.Glide
 import com.tari.android.wallet.R
-import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
+import com.tari.android.wallet.data.sharedPrefs.CorePrefRepository
 import com.tari.android.wallet.databinding.ViewActionMenuBinding
 import com.tari.android.wallet.databinding.ViewActionMenuItemBinding
 import com.tari.android.wallet.ui.common.CommonViewModel
@@ -56,7 +56,7 @@ class ActionMenuView : CommonView<CommonViewModel, ViewActionMenuBinding> {
     val baseTime = 100L
 
     var side = false
-    lateinit var sharedPrefsRepository: SharedPrefsRepository
+    lateinit var sharedPrefsRepository: CorePrefRepository
 
     val avatar = ui.rootAvatarContainer
     val firstCircle = ui.firstCircle
@@ -69,7 +69,7 @@ class ActionMenuView : CommonView<CommonViewModel, ViewActionMenuBinding> {
 
     val itemsView = mutableListOf<View>()
 
-    fun init(sharedPrefsRepository: SharedPrefsRepository) {
+    fun init(sharedPrefsRepository: CorePrefRepository) {
         this.sharedPrefsRepository = sharedPrefsRepository
         side = !sharedPrefsRepository.actionMenuSide
         changeSide()

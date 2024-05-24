@@ -38,8 +38,8 @@ import android.content.Intent
 import android.os.Build
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.data.WalletConfig
-import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepositoryImpl
-import com.tari.android.wallet.data.sharedPrefs.tariSettings.TariSettingsSharedRepository
+import com.tari.android.wallet.data.sharedPrefs.network.NetworkPrefRepositoryImpl
+import com.tari.android.wallet.data.sharedPrefs.tariSettings.TariSettingsPrefRepository
 import com.tari.android.wallet.di.ApplicationModule
 import com.tari.android.wallet.service.service.WalletServiceLauncher
 
@@ -61,8 +61,8 @@ class BootDeviceReceiver : BroadcastReceiver() {
         logger.i("Boot device broadcast received")
         if (Intent.ACTION_BOOT_COMPLETED == intent.action) {
             val sharedPreferences = context.getSharedPreferences(ApplicationModule.sharedPrefsFileName, Context.MODE_PRIVATE)
-            val networkRepository = NetworkRepositoryImpl(sharedPreferences)
-            val tariSettingsSharedRepository = TariSettingsSharedRepository(sharedPreferences, networkRepository)
+            val networkRepository = NetworkPrefRepositoryImpl(sharedPreferences)
+            val tariSettingsSharedRepository = TariSettingsPrefRepository(sharedPreferences, networkRepository)
             WalletServiceLauncher(context, WalletConfig(context, networkRepository), tariSettingsSharedRepository).startIfExist()
         }
     }

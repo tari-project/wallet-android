@@ -15,7 +15,7 @@ import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.dialog.error.ErrorDialogArgs
 import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
 import com.tari.android.wallet.ui.fragment.settings.backup.backupSettings.option.BackupOptionViewModel
-import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupSettingsRepository
+import com.tari.android.wallet.data.sharedPrefs.backup.BackupPrefRepository
 import com.tari.android.wallet.ui.fragment.settings.userAutorization.BiometricAuthenticationViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -28,7 +28,7 @@ class BackupSettingsViewModel : CommonViewModel() {
     lateinit var backupManager: BackupManager
 
     @Inject
-    lateinit var backupSettingsRepository: BackupSettingsRepository
+    lateinit var backupSettingsRepository: BackupPrefRepository
 
     lateinit var biometricAuthenticationViewModel: BiometricAuthenticationViewModel
 

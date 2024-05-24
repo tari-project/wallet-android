@@ -47,10 +47,10 @@ import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.deeplinks.DeeplinkHandler
 import com.tari.android.wallet.application.deeplinks.DeeplinkViewModel
-import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
-import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
+import com.tari.android.wallet.data.sharedPrefs.CorePrefRepository
+import com.tari.android.wallet.data.sharedPrefs.network.NetworkPrefRepository
 import com.tari.android.wallet.data.sharedPrefs.security.SecurityPrefRepository
-import com.tari.android.wallet.data.sharedPrefs.tariSettings.TariSettingsSharedRepository
+import com.tari.android.wallet.data.sharedPrefs.tariSettings.TariSettingsPrefRepository
 import com.tari.android.wallet.databinding.ActivityHomeBinding
 import com.tari.android.wallet.di.DiContainer.appComponent
 import com.tari.android.wallet.extension.observe
@@ -83,7 +83,7 @@ import javax.inject.Inject
 class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>() {
 
     @Inject
-    lateinit var sharedPrefsRepository: SharedPrefsRepository
+    lateinit var sharedPrefsRepository: CorePrefRepository
 
     @Inject
     lateinit var securityPrefRepository: SecurityPrefRepository
@@ -92,7 +92,7 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>() {
     lateinit var walletServiceLauncher: WalletServiceLauncher
 
     @Inject
-    lateinit var networkRepository: NetworkRepository
+    lateinit var networkRepository: NetworkPrefRepository
 
     @Inject
     lateinit var deeplinkHandler: DeeplinkHandler
@@ -101,7 +101,7 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>() {
     lateinit var resourceManager: ResourceManager
 
     @Inject
-    lateinit var tariSettingsRepository: TariSettingsSharedRepository
+    lateinit var tariSettingsRepository: TariSettingsPrefRepository
 
     val deeplinkViewModel: DeeplinkViewModel by viewModels()
 
@@ -162,7 +162,6 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>() {
                 }
             }
 
-            null,
             TariTheme.Light -> R.drawable.vector_disable_able_gradient_button_bg_external
 
             else -> R.drawable.vector_disable_able_gradient_button_bg_external_dark

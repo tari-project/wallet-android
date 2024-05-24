@@ -34,14 +34,14 @@ package com.tari.android.wallet.application
 
 import com.tari.android.wallet.application.deeplinks.DeepLink
 import com.tari.android.wallet.application.deeplinks.DeeplinkHandler
-import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
+import com.tari.android.wallet.data.sharedPrefs.network.NetworkPrefRepository
 import com.tari.android.wallet.data.sharedPrefs.network.TariNetwork
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
 class DeepLinkTest {
 
-    private val networkRepository: NetworkRepository = NetworkRepositoryMock()
+    private val networkRepository: NetworkPrefRepository = NetworkRepositoryMock()
     private val deeplinkHandler: DeeplinkHandler = DeeplinkHandler(networkRepository)
     private val currentNetwork = Network.STAGENET
 
@@ -67,7 +67,7 @@ class DeepLinkTest {
             "3e0321c0928ca559ab3c0a396272dfaea705efce88440611a38ff3898b097217::/onion3/sl5ledjoaisst6d4fh7kde746dwweuge4m4mf5nkzdhmy57uwgtb7qqd:18141"
     }
 
-    class NetworkRepositoryMock : NetworkRepository {
+    class NetworkRepositoryMock : NetworkPrefRepository {
         private val network: Network = Network.STAGENET
         private val tariNetwork = TariNetwork(network, "seeds.stagenet.tari.com", "xtr", true)
 

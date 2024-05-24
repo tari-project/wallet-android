@@ -55,7 +55,7 @@ import com.tari.android.wallet.infrastructure.backup.BackupStorage
 import com.tari.android.wallet.infrastructure.backup.BackupStorageAuthRevokedException
 import com.tari.android.wallet.infrastructure.backup.BackupStorageSetupCancelled
 import com.tari.android.wallet.infrastructure.backup.BackupStorageTamperedException
-import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupSettingsRepository
+import com.tari.android.wallet.data.sharedPrefs.backup.BackupPrefRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.joda.time.DateTime
@@ -69,7 +69,7 @@ import javax.inject.Singleton
 class DropboxBackupStorage @Inject constructor(
     private val context: Context,
     private val namingPolicy: BackupNamingPolicy,
-    private val backupSettingsRepository: BackupSettingsRepository,
+    private val backupSettingsRepository: BackupPrefRepository,
     private val walletConfig: WalletConfig,
     private val backupFileProcessor: BackupFileProcessor
 ) : BackupStorage {

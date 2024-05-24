@@ -35,7 +35,7 @@ package com.tari.android.wallet.tor
 import android.app.Service
 import android.content.Context
 import com.orhanobut.logger.Logger
-import com.tari.android.wallet.data.sharedPrefs.tor.TorSharedRepository
+import com.tari.android.wallet.data.sharedPrefs.tor.TorPrefRepository
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.infrastructure.logging.LoggerTags
 import java.io.BufferedReader
@@ -52,7 +52,7 @@ import javax.inject.Singleton
 @Singleton
 class TorProxyManager @Inject constructor(
     private val context: Context,
-    private val torSharedRepository: TorSharedRepository,
+    private val torSharedRepository: TorPrefRepository,
     private val torConfig: TorConfig
 ) {
 

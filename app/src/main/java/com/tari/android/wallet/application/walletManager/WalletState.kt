@@ -30,33 +30,24 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.tari.android.wallet.data.sharedPrefs.securityStages
+package com.tari.android.wallet.application.walletManager
 
-import android.content.SharedPreferences
-import com.tari.android.wallet.data.repository.CommonRepository
-import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefGsonNullableDelegate
-import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
-import com.tari.android.wallet.data.sharedPrefs.network.formatKey
-import javax.inject.Inject
-import javax.inject.Singleton
+import com.tari.android.wallet.extension.safeCastTo
+import com.tari.android.wallet.ffi.FFIException
 
-@Singleton
-class SecurityStagesRepository @Inject constructor(sharedPrefs: SharedPreferences, networkRepository: NetworkRepository) :
-    CommonRepository(networkRepository) {
+/**
+ * Used for async observation of the wallet state.
+ *
+ * @author The Tari Development Team
+ */
 
-    private object Key {
-        const val disabledTimestamps = "tari_disabled_timestamp"
-    }
+sealed class WalletState {
+    data object NotReady : WalletState()
+    data object Initializing : WalletState()
+    data object Started : WalletState()
+    data object Running : WalletState()
+    data class Failed(val exception: Exception) : WalletState()
 
-    var disabledTimestamps: DisabledTimestampsDto? by SharedPrefGsonNullableDelegate(
-        sharedPrefs,
-        this,
-        formatKey(Key.disabledTimestamps),
-        DisabledTimestampsDto::class.java,
-        DisabledTimestampsDto(mutableMapOf())
-    )
-
-    fun clear() {
-        disabledTimestamps = null
-    }
+    val errorCode: Int?
+        get() = this.safeCastTo<Failed>()?.exception?.safeCastTo<FFIException>()?.error?.code
 }

@@ -46,19 +46,16 @@ import com.daasuu.ei.Ease
 import com.daasuu.ei.EasingInterpolator
 import com.tari.android.wallet.R.string.onboarding_auth_biometric_prompt
 import com.tari.android.wallet.R.string.onboarding_auth_title
-import com.tari.android.wallet.application.WalletState
 import com.tari.android.wallet.databinding.FragmentLocalAuthBinding
-import com.tari.android.wallet.event.EventBus
-import com.tari.android.wallet.extension.addTo
 import com.tari.android.wallet.extension.launchAndRepeatOnLifecycle
+import com.tari.android.wallet.extension.safeCastTo
 import com.tari.android.wallet.infrastructure.security.biometric.BiometricAuthenticationException
 import com.tari.android.wallet.ui.common.CommonFragment
 import com.tari.android.wallet.ui.extension.doOnGlobalLayout
 import com.tari.android.wallet.ui.extension.setOnThrottledClickListener
 import com.tari.android.wallet.ui.extension.setVisible
 import com.tari.android.wallet.ui.extension.string
-import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
-import com.tari.android.wallet.ui.fragment.pinCode.PinCodeScreenBehavior
+import com.tari.android.wallet.ui.fragment.onboarding.localAuth.LocalAuthModel.Effect
 import com.tari.android.wallet.util.Constants.UI.Auth
 import kotlinx.coroutines.launch
 
@@ -88,15 +85,25 @@ class LocalAuthFragment : CommonFragment<FragmentLocalAuthBinding, LocalAuthView
                     ui.secureWithBiometrics.setVisible(state.biometricsAvailable && !state.biometricsSecured)
                 }
             }
+
+            launch {
+                viewModel.effect.collect { effect ->
+                    when (effect) {
+                        is Effect.OnAuthSuccess -> {
+                            requireActivity().safeCastTo<LocalAuthModel.LocalAuthListener>()?.onAuthSuccess()
+                        }
+                    }
+                }
+            }
         }
     }
 
-    private fun setupUi() = with(ui) {
-        ui.continueBtn.setOnThrottledClickListener { proceedToMain() }
+    private fun setupUi() {
+        ui.continueBtn.setOnThrottledClickListener { viewModel.proceedToMain() }
         ui.secureWithBiometrics.setOnThrottledClickListener { doBiometricAuth() }
         ui.authTypeBiometrics.setOnThrottledClickListener { doBiometricAuth() }
-        ui.authTypePasscode.setOnThrottledClickListener { viewModel.navigation.postValue(Navigation.EnterPinCodeNavigation(PinCodeScreenBehavior.Create)) }
-        ui.secureWithPasscode.setOnThrottledClickListener { viewModel.navigation.postValue(Navigation.EnterPinCodeNavigation(PinCodeScreenBehavior.Create)) }
+        ui.authTypePasscode.setOnThrottledClickListener { viewModel.goToEnterPinCode() }
+        ui.secureWithPasscode.setOnThrottledClickListener { viewModel.goToEnterPinCode() }
     }
 
     private fun playStartUpAnim() {
@@ -134,17 +141,5 @@ class LocalAuthFragment : CommonFragment<FragmentLocalAuthBinding, LocalAuthView
                 viewModel.logger.i(exception.message + "Biometric authentication failed")
             }
         }
-    }
-
-    private fun proceedToMain() {
-        EventBus.walletState.publishSubject
-            .filter { it == WalletState.Running }
-            .subscribe {
-                viewModel.securityPrefRepository.isAuthenticated = true
-                viewModel.sharedPrefsRepository.onboardingAuthSetupCompleted = true
-                viewModel.backupManager.backupNow()
-                viewModel.navigation.postValue(Navigation.EnterPinCodeNavigation(PinCodeScreenBehavior.CreateConfirm))
-                (requireActivity() as? LocalAuthListener)?.onAuthSuccess()
-            }.addTo(viewModel.compositeDisposable)
     }
 }

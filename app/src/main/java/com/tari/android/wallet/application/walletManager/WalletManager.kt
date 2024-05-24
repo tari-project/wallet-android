@@ -30,27 +30,41 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.tari.android.wallet.application
+package com.tari.android.wallet.application.walletManager
 
 import android.annotation.SuppressLint
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.BuildConfig
+import com.tari.android.wallet.application.Network
 import com.tari.android.wallet.application.baseNodes.BaseNodesManager
 import com.tari.android.wallet.data.WalletConfig
-import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
-import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodeSharedRepository
-import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
+import com.tari.android.wallet.data.sharedPrefs.CorePrefRepository
+import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodePrefRepository
+import com.tari.android.wallet.data.sharedPrefs.network.NetworkPrefRepository
 import com.tari.android.wallet.data.sharedPrefs.security.SecurityPrefRepository
-import com.tari.android.wallet.data.sharedPrefs.tariSettings.TariSettingsSharedRepository
+import com.tari.android.wallet.data.sharedPrefs.tariSettings.TariSettingsPrefRepository
+import com.tari.android.wallet.di.ApplicationScope
 import com.tari.android.wallet.event.EventBus
-import com.tari.android.wallet.ffi.*
+import com.tari.android.wallet.extension.safeCastTo
+import com.tari.android.wallet.ffi.FFIByteVector
+import com.tari.android.wallet.ffi.FFICommsConfig
+import com.tari.android.wallet.ffi.FFIException
+import com.tari.android.wallet.ffi.FFITariTransportConfig
+import com.tari.android.wallet.ffi.FFIWallet
+import com.tari.android.wallet.ffi.LogFileObserver
+import com.tari.android.wallet.ffi.NetAddressString
 import com.tari.android.wallet.service.seedPhrase.SeedPhraseRepository
 import com.tari.android.wallet.service.service.WalletService
-import com.tari.android.wallet.tor.*
+import com.tari.android.wallet.tor.TorConfig
+import com.tari.android.wallet.tor.TorProxyManager
+import com.tari.android.wallet.tor.TorProxyState
 import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.WalletUtil
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import java.io.File
+import javax.inject.Inject
+import javax.inject.Singleton
 
 /**
  * Utilized to asynchronous manage the sometimes-long-running task of instantiation and start-up
@@ -58,29 +72,25 @@ import java.io.File
  *
  * @author The Tari Development Team
  */
-class WalletManager(
+@Singleton
+class WalletManager @Inject constructor(
     private val walletConfig: WalletConfig,
     private val torManager: TorProxyManager,
-    private val sharedPrefsWrapper: SharedPrefsRepository,
-    private val baseNodeSharedRepository: BaseNodeSharedRepository,
+    private val corePrefRepository: CorePrefRepository,
+    private val baseNodePrefRepository: BaseNodePrefRepository,
     private val seedPhraseRepository: SeedPhraseRepository,
-    private val networkRepository: NetworkRepository,
-    private val tariSettingsSharedRepository: TariSettingsSharedRepository,
+    private val networkPrefRepository: NetworkPrefRepository,
+    private val tariSettingsPrefRepository: TariSettingsPrefRepository,
     private val securityPrefRepository: SecurityPrefRepository,
     private val baseNodesManager: BaseNodesManager,
-    private val torConfig: TorConfig
+    private val torConfig: TorConfig,
+    private val walletStateHandler: WalletStateHandler,
+    @ApplicationScope private val applicationScope: CoroutineScope,
 ) {
 
     private var logFileObserver: LogFileObserver? = null
     private val logger
         get() = Logger.t(WalletManager::class.simpleName)
-
-    val coroutineScope = CoroutineScope(Dispatchers.IO)
-
-    init {
-        // post initial wallet state
-        EventBus.walletState.post(WalletState.NotReady)
-    }
 
     /**
      * Start tor and init wallet.
@@ -100,41 +110,58 @@ class WalletManager(
         // destroy FFI wallet object
         FFIWallet.instance?.destroy()
         FFIWallet.instance = null
-        EventBus.walletState.post(WalletState.NotReady)
+        walletStateHandler.setWalletState(WalletState.NotReady)
         EventBus.torProxyState.post(TorProxyState.NotReady)
         // stop tor proxy
         EventBus.torProxyState.unsubscribe(this)
         torManager.shutdown()
-        EventBus.walletState.post(WalletState.NotReady)
+        walletStateHandler.setWalletState(WalletState.NotReady) // todo Don't understand why it's twice. Probable could cause the bug with endless wallet creation
     }
+
+    fun onWalletStarted() {
+        walletStateHandler.setWalletState(WalletState.Running)
+    }
+
+    /**
+     * Instantiates the comms configuration for the wallet.
+     */
+    fun getCommsConfig(): FFICommsConfig = FFICommsConfig(
+        NetAddressString("127.0.0.1", 39069).toString(),
+        getTorTransport(),
+        walletConfig.walletDBName,
+        walletConfig.getWalletFilesDirPath(),
+        Constants.Wallet.discoveryTimeoutSec,
+        Constants.Wallet.storeAndForwardMessageDurationSec,
+    )
 
     @SuppressLint("CheckResult")
     private fun onTorProxyStateChanged(torProxyState: TorProxyState) {
         logger.i("Tor proxy state has changed: $torProxyState")
-        // if I'm trying to use Initializing status, then wallet would fail with
-        // java.io.FileNotFoundException: /data/user/0/com.tari.android.wallet/app_tor_data/control_auth_cookie
+        // TODO
+        //  if I'm trying to use Initializing status, then wallet would fail with
+        //  java.io.FileNotFoundException: /data/user/0/com.tari.android.wallet/app_tor_data/control_auth_cookie
         if (torProxyState is TorProxyState.Running) {
             startWallet()
         }
     }
 
     private fun startWallet() {
-        if (EventBus.walletState.publishSubject.value is WalletState.NotReady || EventBus.walletState.publishSubject.value is WalletState.Failed) {
+        if (walletStateHandler.walletState.value is WalletState.NotReady || walletStateHandler.walletState.value is WalletState.Failed) {
             logger.i("Initialize wallet started")
-            EventBus.walletState.post(WalletState.Initializing)
-            coroutineScope.launch {
+            walletStateHandler.setWalletState(WalletState.Initializing)
+            applicationScope.launch {
                 try {
                     initWallet()
-                    EventBus.walletState.post(WalletState.Started)
+                    walletStateHandler.setWalletState(WalletState.Started)
                     logger.i("Wallet was started")
                 } catch (e: Exception) {
-                    val oldCode = ((EventBus.walletState.publishSubject.value as? WalletState.Failed)?.exception as? FFIException)?.error?.code
-                    val newCode = (e as? FFIException)?.error?.code
+                    val oldCode = walletStateHandler.walletState.value.errorCode
+                    val newCode = e.safeCastTo<FFIException>()?.error?.code
 
                     if (oldCode == null || oldCode != newCode) {
                         logger.e(e, "Wallet was failed")
                     }
-                    EventBus.walletState.post(WalletState.Failed(e))
+                    walletStateHandler.setWalletState(WalletState.Failed(e))
                 }
             }.start()
         }
@@ -151,25 +178,13 @@ class WalletManager(
         val cookieString: ByteArray = cookieFile.readBytes()
         val torCookie = FFIByteVector(cookieString)
         return FFITariTransportConfig(
-            NetAddressString(torConfig.controlHost, torConfig.controlPort),
-            torCookie,
-            torConfig.connectionPort,
-            torConfig.sock5Username,
-            torConfig.sock5Password
+            controlAddress = NetAddressString(torConfig.controlHost, torConfig.controlPort),
+            torCookie = torCookie,
+            torPort = torConfig.connectionPort,
+            socksUsername = torConfig.sock5Username,
+            socksPassword = torConfig.sock5Password,
         )
     }
-
-    /**
-     * Instantiates the comms configuration for the wallet.
-     */
-    fun getCommsConfig(): FFICommsConfig = FFICommsConfig(
-        NetAddressString("127.0.0.1", 39069).toString(),
-        getTorTransport(),
-        walletConfig.walletDBName,
-        walletConfig.getWalletFilesDirPath(),
-        Constants.Wallet.discoveryTimeoutSec,
-        Constants.Wallet.storeAndForwardMessageDurationSec,
-    )
 
     /**
      * Starts the log file observer only in debug mode.
@@ -189,8 +204,8 @@ class WalletManager(
     private fun saveWalletPublicKeyHexToSharedPrefs() {
         // set shared preferences values after instantiation
         FFIWallet.instance?.getWalletAddress()?.let { ffiTariWalletAddress ->
-            sharedPrefsWrapper.publicKeyHexString = ffiTariWalletAddress.toString()
-            sharedPrefsWrapper.emojiId = ffiTariWalletAddress.getEmojiId()
+            corePrefRepository.publicKeyHexString = ffiTariWalletAddress.toString()
+            corePrefRepository.emojiId = ffiTariWalletAddress.getEmojiId()
             ffiTariWalletAddress.destroy()
         }
     }
@@ -203,21 +218,21 @@ class WalletManager(
             // store network info in shared preferences if it's a new wallet
             val isNewInstallation = !WalletUtil.walletExists(walletConfig)
             val wallet = FFIWallet(
-                sharedPrefsWrapper,
-                securityPrefRepository,
-                seedPhraseRepository,
-                networkRepository,
-                getCommsConfig(),
-                walletConfig.getWalletLogFilePath()
+                sharedPrefsRepository = corePrefRepository,
+                securityPrefRepository = securityPrefRepository,
+                seedPhraseRepository = seedPhraseRepository,
+                networkRepository = networkPrefRepository,
+                commsConfig = getCommsConfig(),
+                logPath = walletConfig.getWalletLogFilePath(),
             )
             FFIWallet.instance = wallet
             if (isNewInstallation) {
                 FFIWallet.instance?.setKeyValue(
-                    WalletService.Companion.KeyValueStorageKeys.NETWORK,
-                    networkRepository.currentNetwork.network.uriComponent
+                    key = WalletService.Companion.KeyValueStorageKeys.NETWORK,
+                    value = networkPrefRepository.currentNetwork.network.uriComponent,
                 )
-            } else if (tariSettingsSharedRepository.isRestoredWallet && networkRepository.ffiNetwork == null) {
-                networkRepository.ffiNetwork = try {
+            } else if (tariSettingsPrefRepository.isRestoredWallet && networkPrefRepository.ffiNetwork == null) {
+                networkPrefRepository.ffiNetwork = try {
                     Network.from(FFIWallet.instance?.getKeyValue(WalletService.Companion.KeyValueStorageKeys.NETWORK) ?: "")
                 } catch (exception: Exception) {
                     null
@@ -226,14 +241,14 @@ class WalletManager(
             startLogFileObserver()
 
             baseNodesManager.refreshBaseNodeList()
-            val currentBaseNode = baseNodeSharedRepository.currentBaseNode
+            val currentBaseNode = baseNodePrefRepository.currentBaseNode
             if (currentBaseNode != null) {
                 baseNodesManager.startSync()
             } else {
                 baseNodesManager.setNextBaseNode()
+                baseNodesManager.startSync()
             }
             saveWalletPublicKeyHexToSharedPrefs()
         }
     }
-
 }

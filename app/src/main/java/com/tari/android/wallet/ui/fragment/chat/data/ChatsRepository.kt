@@ -1,5 +1,6 @@
 package com.tari.android.wallet.ui.fragment.chat.data
 
+import com.tari.android.wallet.data.sharedPrefs.chat.ChatsPrefRepository
 import com.tari.android.wallet.di.ApplicationScope
 import com.tari.android.wallet.model.TariWalletAddress
 import com.tari.android.wallet.util.DebugConfig

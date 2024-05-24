@@ -12,8 +12,8 @@ import android.widget.LinearLayout
 import androidx.appcompat.widget.LinearLayoutCompat
 import androidx.core.animation.doOnEnd
 import com.tari.android.wallet.R
-import com.tari.android.wallet.data.sharedPrefs.securityStages.modules.SecurityStageHeadModule
-import com.tari.android.wallet.data.sharedPrefs.securityStages.modules.SecurityStageHeadModuleView
+import com.tari.android.wallet.ui.dialog.modular.modules.securityStages.SecurityStageHeadModule
+import com.tari.android.wallet.ui.dialog.modular.modules.securityStages.SecurityStageHeadModuleView
 import com.tari.android.wallet.ui.component.networkStateIndicator.module.ConnectionStatusesModule
 import com.tari.android.wallet.ui.component.networkStateIndicator.module.ConnectionStatusesModuleView
 import com.tari.android.wallet.ui.dialog.TariDialog

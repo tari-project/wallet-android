@@ -22,7 +22,7 @@ import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonStyle
 import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
 import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupOptionDto
 import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupOptions
-import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupSettingsRepository
+import com.tari.android.wallet.data.sharedPrefs.backup.BackupPrefRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.joda.time.DateTime
@@ -33,7 +33,7 @@ import javax.inject.Inject
 class BackupOptionViewModel : CommonViewModel() {
 
     @Inject
-    lateinit var backupSettingsRepository: BackupSettingsRepository
+    lateinit var backupSettingsRepository: BackupPrefRepository
 
     @Inject
     lateinit var backupManager: BackupManager

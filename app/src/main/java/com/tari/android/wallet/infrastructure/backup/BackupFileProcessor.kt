@@ -42,7 +42,7 @@ import com.tari.android.wallet.ffi.FFIWallet
 import com.tari.android.wallet.ffi.HexString
 import com.tari.android.wallet.infrastructure.backup.compress.CompressionMethod
 import com.tari.android.wallet.infrastructure.security.encryption.SymmetricEncryptionAlgorithm
-import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupSettingsRepository
+import com.tari.android.wallet.data.sharedPrefs.backup.BackupPrefRepository
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -53,7 +53,7 @@ import javax.inject.Singleton
 
 @Singleton
 class BackupFileProcessor @Inject constructor(
-    private val backupSettingsRepository: BackupSettingsRepository,
+    private val backupSettingsRepository: BackupPrefRepository,
     private val securityPrefRepository: SecurityPrefRepository,
     private val walletConfig: WalletConfig,
     private val namingPolicy: BackupNamingPolicy,

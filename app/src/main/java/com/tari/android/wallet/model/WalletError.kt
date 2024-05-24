@@ -1,17 +1,12 @@
 package com.tari.android.wallet.model
 
-import android.os.Parcel
-import android.os.Parcelable
 import com.tari.android.wallet.ffi.FFIError
 import com.tari.android.wallet.ffi.FFIException
 
-open class WalletError : CoreError {
-
-    constructor() : super(NoError.code, "FFI")
-
-    constructor(code: Int) : super(code, "FFI")
-
-    constructor(parcel: Parcel) : super(parcel)
+open class WalletError(
+    override var code: Int = NoError.code,
+    override var domain: String = "FFI",
+) : CoreError(code, domain) {
 
     object DatabaseDataError : WalletError(114)
     object TransactionNotFoundError : WalletError(204)
@@ -24,21 +19,7 @@ open class WalletError : CoreError {
     object UnknownError : WalletError(-1)
     object NoError : WalletError(0)
 
-    override fun writeToParcel(parcel: Parcel, flags: Int) {
-        parcel.writeInt(code)
-        parcel.writeString(domain)
-    }
-
-    override fun describeContents(): Int = 0
-
     companion object {
-        @JvmField
-        val CREATOR = object : Parcelable.Creator<CoreError> {
-            override fun createFromParcel(parcel: Parcel): CoreError = CoreError(parcel)
-
-            override fun newArray(size: Int): Array<CoreError?> = arrayOfNulls(size)
-        }
-
         fun createFromFFI(error: FFIError): WalletError = WalletError(error.code)
 
         fun createFromFFI(error: FFIException): WalletError = WalletError(error.error?.code ?: NoError.code)

@@ -1,7 +1,7 @@
 package com.tari.android.wallet.service.service
 
 import com.orhanobut.logger.Logger
-import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodeSharedRepository
+import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodePrefRepository
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.ffi.FFIContact
 import com.tari.android.wallet.ffi.FFIError
@@ -34,7 +34,7 @@ import java.util.Locale
 
 class TariWalletServiceStubImpl(
     private val wallet: FFIWallet,
-    private val baseNodeSharedPrefsRepository: BaseNodeSharedRepository,
+    private val baseNodeSharedPrefsRepository: BaseNodePrefRepository,
     private val walletServiceListener: FFIWalletListenerImpl
 ) : TariWalletService.Stub() {
 

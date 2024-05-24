@@ -1,13 +1,13 @@
 package com.tari.android.wallet.data
 
 import android.content.Context
-import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
+import com.tari.android.wallet.data.sharedPrefs.network.NetworkPrefRepository
 import java.io.File
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class WalletConfig @Inject constructor(val context: Context, val networkRepository: NetworkRepository) {
+class WalletConfig @Inject constructor(val context: Context, val networkRepository: NetworkPrefRepository) {
     val walletDBName: String = "tari_wallet"
     val walletDBFullFileName: String = "$walletDBName.sqlite3"
 

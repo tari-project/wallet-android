@@ -7,7 +7,7 @@ import com.tari.android.wallet.R
 import com.tari.android.wallet.application.deeplinks.DeepLink
 import com.tari.android.wallet.application.deeplinks.DeeplinkFormatter
 import com.tari.android.wallet.application.deeplinks.DeeplinkHandler
-import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
+import com.tari.android.wallet.data.sharedPrefs.CorePrefRepository
 import com.tari.android.wallet.event.EffectChannelFlow
 import com.tari.android.wallet.extension.collectFlow
 import com.tari.android.wallet.model.MicroTari
@@ -35,7 +35,7 @@ import com.tari.android.wallet.ui.fragment.contact_book.root.ShareViewModel
 import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
 import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.EmojiUtil.Companion.getGraphemeLength
-import com.tari.android.wallet.yat.YatAdapter
+import com.tari.android.wallet.application.YatAdapter
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -54,7 +54,7 @@ class ContactSelectionViewModel : CommonViewModel() {
     lateinit var contactsRepository: ContactsRepository
 
     @Inject
-    lateinit var sharedPrefsWrapper: SharedPrefsRepository
+    lateinit var sharedPrefsWrapper: CorePrefRepository
 
     @Inject
     lateinit var deeplinkHandler: DeeplinkHandler

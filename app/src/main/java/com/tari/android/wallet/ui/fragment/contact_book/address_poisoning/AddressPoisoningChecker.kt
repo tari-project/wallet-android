@@ -1,7 +1,7 @@
 package com.tari.android.wallet.ui.fragment.contact_book.address_poisoning
 
 import androidx.annotation.VisibleForTesting
-import com.tari.android.wallet.data.sharedPrefs.addressPoisoning.AddressPoisoningSharedRepository
+import com.tari.android.wallet.data.sharedPrefs.addressPoisoning.AddressPoisoningPrefRepository
 import com.tari.android.wallet.model.TariWalletAddress
 import com.tari.android.wallet.model.Tx
 import com.tari.android.wallet.model.WalletError
@@ -20,7 +20,7 @@ private const val USED_PREFIX_SUFFIX_CHARS = Constants.Wallet.emojiFormatterChun
 
 @Singleton
 class AddressPoisoningChecker @Inject constructor(
-    private val addressPoisoningSharedRepository: AddressPoisoningSharedRepository,
+    private val addressPoisoningSharedRepository: AddressPoisoningPrefRepository,
     private val contactsRepository: ContactsRepository,
     private val tariWalletServiceConnection: TariWalletServiceConnection,
 ) {

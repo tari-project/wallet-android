@@ -1,7 +1,7 @@
 package com.tari.android.wallet.application.deeplinks
 
 import android.net.Uri
-import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
+import com.tari.android.wallet.data.sharedPrefs.network.NetworkPrefRepository
 import com.tari.android.wallet.data.sharedPrefs.tor.TorBridgeConfiguration
 import com.tari.android.wallet.model.TariWalletAddress
 import java.net.URLDecoder
@@ -9,7 +9,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class DeeplinkFormatter @Inject constructor(private val networkRepository: NetworkRepository) {
+class DeeplinkFormatter @Inject constructor(private val networkRepository: NetworkPrefRepository) {
     fun parse(deepLink: String): DeepLink? {
         val torBridges = getTorDeeplink(deepLink)
         if (torBridges.isNotEmpty()) {

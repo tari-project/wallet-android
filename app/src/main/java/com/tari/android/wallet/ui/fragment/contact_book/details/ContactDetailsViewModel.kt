@@ -50,7 +50,7 @@ import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
 import com.tari.android.wallet.ui.fragment.settings.allSettings.row.SettingsRowStyle
 import com.tari.android.wallet.ui.fragment.settings.allSettings.row.SettingsRowViewDto
 import com.tari.android.wallet.ui.fragment.settings.allSettings.title.SettingsTitleViewHolderItem
-import com.tari.android.wallet.yat.YatAdapter
+import com.tari.android.wallet.application.YatAdapter
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job

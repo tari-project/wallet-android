@@ -37,10 +37,11 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.activity.addCallback
 import androidx.appcompat.app.AppCompatActivity
-import com.tari.android.wallet.application.WalletState
+import androidx.lifecycle.coroutineScope
+import com.tari.android.wallet.application.walletManager.WalletStateHandler
 import com.tari.android.wallet.data.WalletConfig
-import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
-import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
+import com.tari.android.wallet.data.sharedPrefs.CorePrefRepository
+import com.tari.android.wallet.data.sharedPrefs.network.NetworkPrefRepository
 import com.tari.android.wallet.data.sharedPrefs.security.SecurityPrefRepository
 import com.tari.android.wallet.di.DiContainer
 import com.tari.android.wallet.di.DiContainer.appComponent
@@ -49,6 +50,7 @@ import com.tari.android.wallet.service.service.WalletServiceLauncher
 import com.tari.android.wallet.ui.fragment.auth.AuthActivity
 import com.tari.android.wallet.ui.fragment.onboarding.activity.OnboardingFlowActivity
 import com.tari.android.wallet.util.WalletUtil
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 /**
@@ -62,16 +64,19 @@ class SplashActivity : AppCompatActivity() {
     lateinit var walletConfig: WalletConfig
 
     @Inject
-    lateinit var sharedPrefsRepository: SharedPrefsRepository
+    lateinit var sharedPrefsRepository: CorePrefRepository
 
     @Inject
     lateinit var securityPrefRepository: SecurityPrefRepository
 
     @Inject
-    lateinit var networkRepository: NetworkRepository
+    lateinit var networkRepository: NetworkPrefRepository
 
     @Inject
     lateinit var walletServiceLauncher: WalletServiceLauncher
+
+    @Inject
+    lateinit var walletStateHandler: WalletStateHandler
 
     override fun onCreate(savedInstanceState: Bundle?) {
         appComponent.inject(this)
@@ -94,17 +99,17 @@ class SplashActivity : AppCompatActivity() {
             sharedPrefsRepository.clear()
         }
         if (securityPrefRepository.pinCode == null) {
-            launch(OnboardingFlowActivity::class.java)
+            launchActivity(OnboardingFlowActivity::class.java)
             return
         }
-        launch(if (exists) AuthActivity::class.java else OnboardingFlowActivity::class.java)
+        launchActivity(if (exists) AuthActivity::class.java else OnboardingFlowActivity::class.java)
     }
 
     private fun changeNetwork() {
         networkRepository.setDefaultNetworkAsCurrent()
 
-        EventBus.walletState.subscribe(this) {
-            if (it is WalletState.NotReady) {
+        lifecycle.coroutineScope.launch {
+            walletStateHandler.doOnWalletNotReady {
                 EventBus.clear()
                 DiContainer.reInitContainer()
             }
@@ -113,7 +118,7 @@ class SplashActivity : AppCompatActivity() {
         walletServiceLauncher.stop()
     }
 
-    private fun <T : Activity> launch(destination: Class<T>) {
+    private fun <T : Activity> launchActivity(destination: Class<T>) {
         val intent = Intent(this, destination)
         intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
         this.intent.data?.let(intent::setData)

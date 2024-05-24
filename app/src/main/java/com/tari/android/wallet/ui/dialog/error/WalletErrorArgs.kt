@@ -5,12 +5,15 @@ import com.tari.android.wallet.model.CoreError
 import com.tari.android.wallet.model.WalletError
 import com.tari.android.wallet.ui.common.domain.ResourceManager
 
-class WalletErrorArgs(val resourceManager: ResourceManager, val error: CoreError, val dismissAction: () -> Unit = {}) {
-
+class WalletErrorArgs(
+    val resourceManager: ResourceManager,
+    val error: CoreError,
+    val dismissAction: () -> Unit = {},
+) {
     constructor(resourceManager: ResourceManager, exception: Throwable, dismissAction: () -> Unit = { }) : this(
-        resourceManager,
-        WalletError.createFromException(exception),
-        dismissAction
+        resourceManager = resourceManager,
+        error = WalletError.createFromException(exception),
+        dismissAction = dismissAction,
     )
 
     val title: String
@@ -31,5 +34,5 @@ class WalletErrorArgs(val resourceManager: ResourceManager, val error: CoreError
             return resourceManager.getString(id)
         }
 
-    fun getErrorArgs() : ErrorDialogArgs = ErrorDialogArgs(title, description, onClose = dismissAction)
+    fun getErrorArgs(): ErrorDialogArgs = ErrorDialogArgs(title, description, onClose = dismissAction)
 }

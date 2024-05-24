@@ -5,9 +5,9 @@ import android.content.SharedPreferences
 import com.tari.android.wallet.data.repository.CommonRepository
 import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefBooleanDelegate
 import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefBooleanNullableDelegate
-import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefGsonNullableDelegate
+import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefGsonDelegate
 import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefStringSecuredDelegate
-import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
+import com.tari.android.wallet.data.sharedPrefs.network.NetworkPrefRepository
 import com.tari.android.wallet.data.sharedPrefs.network.formatKey
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -16,42 +16,42 @@ import javax.inject.Singleton
 class SecurityPrefRepository @Inject constructor(
     context: Context,
     sharedPrefs: SharedPreferences,
-    networkRepository: NetworkRepository,
+    networkRepository: NetworkPrefRepository,
 ) : CommonRepository(networkRepository) {
 
     companion object Key {
-        const val isAuthenticatedKey = "tari_wallet_is_authenticated"
-        const val isFeatureAuthenticatedKey = "tari_wallet_is_feature_authenticated"
-        const val pinCodeKey = "tari_is_pincode"
-        const val biometricsKey = "tari_is_biometrics"
-        const val walletDatabasePassphraseKey = "tari_wallet_database_passphrase"
-        const val loginAttemptsKey = "tari_login_attempts"
+        const val IS_AUTHENTICATED = "tari_wallet_is_authenticated"
+        const val IS_FEATURE_AUTHENTICATED = "tari_wallet_is_feature_authenticated"
+        const val PIN_CODE = "tari_is_pincode"
+        const val BIOMETRICS = "tari_is_biometrics"
+        const val WALLET_DATABASE_PASSPHRASE = "tari_wallet_database_passphrase"
+        const val LOGIN_ATTEMPTS = "tari_login_attempts"
     }
 
-    var isAuthenticated: Boolean by SharedPrefBooleanDelegate(sharedPrefs, this, formatKey(isAuthenticatedKey))
+    var isAuthenticated: Boolean by SharedPrefBooleanDelegate(sharedPrefs, this, formatKey(IS_AUTHENTICATED))
 
-    var isFeatureAuthenticated: Boolean by SharedPrefBooleanDelegate(sharedPrefs, this, formatKey(isFeatureAuthenticatedKey))
+    var isFeatureAuthenticated: Boolean by SharedPrefBooleanDelegate(sharedPrefs, this, formatKey(IS_FEATURE_AUTHENTICATED))
 
-    var pinCode: String? by SharedPrefStringSecuredDelegate(context, sharedPrefs, this, formatKey(pinCodeKey), null)
+    var pinCode: String? by SharedPrefStringSecuredDelegate(context, sharedPrefs, this, formatKey(PIN_CODE), null)
 
-    var biometricsAuth: Boolean? by SharedPrefBooleanNullableDelegate(sharedPrefs, this, formatKey(biometricsKey))
+    var biometricsAuth: Boolean? by SharedPrefBooleanNullableDelegate(sharedPrefs, this, formatKey(BIOMETRICS))
 
-    var databasePassphrase: String? by SharedPrefStringSecuredDelegate(context, sharedPrefs, this, formatKey(walletDatabasePassphraseKey))
+    var databasePassphrase: String? by SharedPrefStringSecuredDelegate(context, sharedPrefs, this, formatKey(WALLET_DATABASE_PASSPHRASE))
 
-    var attempts: LoginAttemptList? by SharedPrefGsonNullableDelegate<LoginAttemptList>(
-        sharedPrefs,
-        this,
-        formatKey(loginAttemptsKey),
-        LoginAttemptList::class.java,
-        LoginAttemptList()
+    var attempts: LoginAttemptList by SharedPrefGsonDelegate<LoginAttemptList>(
+        prefs = sharedPrefs,
+        commonRepository = this,
+        name = formatKey(LOGIN_ATTEMPTS),
+        type = LoginAttemptList::class.java,
+        defValue = LoginAttemptList(),
     )
 
     fun saveAttempt(attempt: LoginAttemptDto) {
-         this.attempts = attempts.orEmpty().apply {
-             add(attempt)
-         }
+        this.attempts = attempts.apply {
+            add(attempt)
+        }
         if (attempt.isSuccessful) {
-            attempts = null
+            attempts = LoginAttemptList(emptyList())
         }
     }
 
@@ -61,6 +61,6 @@ class SecurityPrefRepository @Inject constructor(
         isFeatureAuthenticated = false
         pinCode = null
         biometricsAuth = null
-        attempts = null
+        attempts = LoginAttemptList(emptyList())
     }
 }

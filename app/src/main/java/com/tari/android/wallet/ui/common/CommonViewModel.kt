@@ -6,17 +6,18 @@ import androidx.lifecycle.viewModelScope
 import com.orhanobut.logger.Logger
 import com.orhanobut.logger.Printer
 import com.tari.android.wallet.R
-import com.tari.android.wallet.application.WalletState
-import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
-import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
+import com.tari.android.wallet.application.walletManager.WalletStateHandler
+import com.tari.android.wallet.data.sharedPrefs.CorePrefRepository
+import com.tari.android.wallet.data.sharedPrefs.network.NetworkPrefRepository
 import com.tari.android.wallet.data.sharedPrefs.security.SecurityPrefRepository
-import com.tari.android.wallet.data.sharedPrefs.tariSettings.TariSettingsSharedRepository
+import com.tari.android.wallet.data.sharedPrefs.tariSettings.TariSettingsPrefRepository
 import com.tari.android.wallet.di.ApplicationComponent
 import com.tari.android.wallet.di.DiContainer
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.extension.addTo
 import com.tari.android.wallet.ffi.FFIWallet
 import com.tari.android.wallet.infrastructure.logging.LoggerTags
+import com.tari.android.wallet.model.CoreError
 import com.tari.android.wallet.service.TariWalletService
 import com.tari.android.wallet.service.connection.TariWalletServiceConnection
 import com.tari.android.wallet.ui.common.domain.PaletteManager
@@ -55,10 +56,10 @@ open class CommonViewModel : ViewModel() {
     lateinit var resourceManager: ResourceManager
 
     @Inject
-    lateinit var networkRepository: NetworkRepository
+    lateinit var networkRepository: NetworkPrefRepository
 
     @Inject
-    lateinit var tariSettingsSharedRepository: TariSettingsSharedRepository
+    lateinit var tariSettingsSharedRepository: TariSettingsPrefRepository
 
     @Inject
     lateinit var paletteManager: PaletteManager
@@ -67,7 +68,7 @@ open class CommonViewModel : ViewModel() {
     lateinit var tariNavigator: TariNavigator
 
     @Inject
-    lateinit var sharedPrefsRepository: SharedPrefsRepository
+    lateinit var sharedPrefsRepository: CorePrefRepository
 
     @Inject
     lateinit var securityPrefRepository: SecurityPrefRepository
@@ -76,6 +77,9 @@ open class CommonViewModel : ViewModel() {
     lateinit var serviceConnection: TariWalletServiceConnection
     val walletService: TariWalletService
         get() = serviceConnection.walletService
+
+    @Inject
+    lateinit var walletStateHandler: WalletStateHandler
 
     private var authorizedAction: (() -> Unit)? = null
 
@@ -111,10 +115,9 @@ open class CommonViewModel : ViewModel() {
     val navigation: SingleLiveEvent<Navigation> = SingleLiveEvent()
 
     init {
-        @Suppress("LeakingThis")
         component.inject(this)
 
-        currentTheme.value = tariSettingsSharedRepository.currentTheme!!
+        currentTheme.value = tariSettingsSharedRepository.currentTheme
 
         logger.t(LoggerTags.Navigation.name).i(this::class.simpleName + " was started")
 
@@ -122,15 +125,11 @@ open class CommonViewModel : ViewModel() {
             checkAuthorization()
         }.addTo(compositeDisposable)
 
-        EventBus.walletState.publishSubject.filter { it is WalletState.Failed }
-            .subscribe({
-                val exception = (it as WalletState.Failed).exception
-                showModularDialog(WalletErrorArgs(resourceManager, exception).getErrorArgs().getModular(resourceManager, true))
-            }, {
-                logger.i(it.toString())
-                logger.i("on showing error dialog from wallet")
-            })
-            .addTo(compositeDisposable)
+        viewModelScope.launch {
+            walletStateHandler.doOnWalletFailed {
+                showErrorDialog(it)
+            }
+        }
     }
 
     override fun onCleared() {
@@ -149,7 +148,7 @@ open class CommonViewModel : ViewModel() {
 
     fun doOnWalletRunning(action: suspend (walletService: FFIWallet) -> Unit) {
         viewModelScope.launch {
-            serviceConnection.doOnWalletRunning(action)
+            walletStateHandler.doOnWalletRunning(action)
         }
     }
 
@@ -191,6 +190,14 @@ open class CommonViewModel : ViewModel() {
 
     fun showInputModalDialog(inputArgs: ModularDialogArgs) {
         _inputDialog.postValue(inputArgs)
+    }
+
+    fun showErrorDialog(error: CoreError) {
+        showModularDialog(WalletErrorArgs(resourceManager, error).getErrorArgs().getModular(resourceManager))
+    }
+
+    fun showErrorDialog(exception: Throwable) {
+        showModularDialog(WalletErrorArgs(resourceManager, exception).getErrorArgs().getModular(resourceManager))
     }
 
     fun hideDialog() {

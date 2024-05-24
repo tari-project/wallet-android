@@ -8,7 +8,7 @@ import com.tari.android.wallet.ui.fragment.settings.themeSelector.adapter.ThemeV
 
 class ThemeSelectorViewModel : CommonViewModel() {
 
-    val themes: MutableLiveData<MutableList<ThemeViewHolderItem>> = MutableLiveData()
+    val themes: MutableLiveData<List<ThemeViewHolderItem>> = MutableLiveData()
 
     val newTheme = SingleLiveEvent<TariTheme>()
 
@@ -29,8 +29,8 @@ class ThemeSelectorViewModel : CommonViewModel() {
     fun refresh() = loadList()
 
     private fun loadList() {
-        val currentTheme = tariSettingsSharedRepository.currentTheme!!
-        val list = TariTheme.values().map { ThemeViewHolderItem(it, currentTheme) { isChecked -> if (isChecked) selectTheme(it) } }.toMutableList()
+        val currentTheme = tariSettingsSharedRepository.currentTheme
+        val list = TariTheme.entries.map { ThemeViewHolderItem(it, currentTheme) { isChecked -> if (isChecked) selectTheme(it) } }
         themes.postValue(list)
     }
 }

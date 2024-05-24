@@ -38,8 +38,8 @@ import android.os.Bundle
 import androidx.activity.viewModels
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.MigrationManager
-import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
-import com.tari.android.wallet.data.sharedPrefs.tariSettings.TariSettingsSharedRepository
+import com.tari.android.wallet.data.sharedPrefs.CorePrefRepository
+import com.tari.android.wallet.data.sharedPrefs.tariSettings.TariSettingsPrefRepository
 import com.tari.android.wallet.databinding.ActivityWalletBackupBinding
 import com.tari.android.wallet.di.DiContainer.appComponent
 import com.tari.android.wallet.service.service.WalletServiceLauncher
@@ -50,22 +50,22 @@ import javax.inject.Inject
 class WalletRestoreActivity : CommonActivity<ActivityWalletBackupBinding, WalletRestoreViewModel>() {
 
     @Inject
-    lateinit var prefs: SharedPrefsRepository
+    lateinit var prefs: CorePrefRepository
 
     @Inject
-    lateinit var tariSettingsSharedRepository: TariSettingsSharedRepository
+    lateinit var tariSettingsSharedRepository: TariSettingsPrefRepository
 
     @Inject
     lateinit var walletServiceLauncher: WalletServiceLauncher
 
     @Inject
-    lateinit var sharedPrefsWrapper: SharedPrefsRepository
+    lateinit var sharedPrefsWrapper: CorePrefRepository
 
     @Inject
     lateinit var migrationManager: MigrationManager
 
     @Inject
-    lateinit var tariSettingsRepository: TariSettingsSharedRepository
+    lateinit var tariSettingsRepository: TariSettingsPrefRepository
 
     override fun onCreate(savedInstanceState: Bundle?) {
         appComponent.inject(this)

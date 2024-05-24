@@ -1,12 +1,20 @@
 package com.tari.android.wallet.ui.fragment.onboarding.localAuth
 
+import androidx.lifecycle.viewModelScope
+import com.tari.android.wallet.event.EffectChannelFlow
 import com.tari.android.wallet.extension.addTo
 import com.tari.android.wallet.infrastructure.backup.BackupManager
 import com.tari.android.wallet.infrastructure.security.biometric.BiometricAuthenticationService
 import com.tari.android.wallet.ui.common.CommonViewModel
+import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
+import com.tari.android.wallet.ui.fragment.onboarding.localAuth.LocalAuthModel.Effect
+import com.tari.android.wallet.ui.fragment.pinCode.PinCodeScreenBehavior
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 class LocalAuthViewModel : CommonViewModel() {
@@ -20,6 +28,9 @@ class LocalAuthViewModel : CommonViewModel() {
     private val _secureState = MutableStateFlow(SecureState())
     val secureState = _secureState.asStateFlow()
 
+    private val _effect = EffectChannelFlow<Effect>()
+    val effect: Flow<Effect> = _effect.flow
+
     init {
         component.inject(this)
         sharedPrefsRepository.onboardingAuthSetupStarted = true
@@ -30,6 +41,29 @@ class LocalAuthViewModel : CommonViewModel() {
         }.addTo(compositeDisposable)
     }
 
+    fun securedWithBiometrics() {
+        securityPrefRepository.biometricsAuth = true
+        _secureState.update { it.copy(biometricsSecured = true) }
+    }
+
+    fun proceedToMain() {
+        viewModelScope.launch {
+            walletStateHandler.doOnWalletRunning {
+                securityPrefRepository.isAuthenticated = true
+                sharedPrefsRepository.onboardingAuthSetupCompleted = true
+                backupManager.backupNow()
+                navigation.postValue(Navigation.EnterPinCodeNavigation(PinCodeScreenBehavior.CreateConfirm))
+                viewModelScope.launch(Dispatchers.Main) {
+                    _effect.send(Effect.OnAuthSuccess)
+                }
+            }
+        }
+    }
+
+    fun goToEnterPinCode() {
+        navigation.postValue(Navigation.EnterPinCodeNavigation(PinCodeScreenBehavior.Create))
+    }
+
     private fun updateState() {
         _secureState.update {
             SecureState(
@@ -38,10 +72,5 @@ class LocalAuthViewModel : CommonViewModel() {
                 biometricsSecured = securityPrefRepository.biometricsAuth == true,
             )
         }
-    }
-
-    fun securedWithBiometrics() {
-        securityPrefRepository.biometricsAuth = true
-        _secureState.update { it.copy(biometricsSecured = true) }
     }
 }

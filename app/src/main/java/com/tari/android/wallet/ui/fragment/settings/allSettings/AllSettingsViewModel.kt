@@ -62,7 +62,7 @@ import com.tari.android.wallet.R.string.tari_about_title
 import com.tari.android.wallet.R.string.tari_url
 import com.tari.android.wallet.R.string.ttl_store_url
 import com.tari.android.wallet.R.string.user_agreement_url
-import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
+import com.tari.android.wallet.data.sharedPrefs.CorePrefRepository
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.extension.addTo
 import com.tari.android.wallet.infrastructure.backup.BackupManager
@@ -86,10 +86,10 @@ import com.tari.android.wallet.ui.fragment.settings.allSettings.row.SettingsRowS
 import com.tari.android.wallet.ui.fragment.settings.allSettings.row.SettingsRowViewDto
 import com.tari.android.wallet.ui.fragment.settings.allSettings.title.SettingsTitleViewHolderItem
 import com.tari.android.wallet.ui.fragment.settings.allSettings.version.SettingsVersionViewHolderItem
-import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupSettingsRepository
+import com.tari.android.wallet.data.sharedPrefs.backup.BackupPrefRepository
 import com.tari.android.wallet.ui.fragment.settings.userAutorization.BiometricAuthenticationViewModel
-import com.tari.android.wallet.yat.YatAdapter
-import com.tari.android.wallet.yat.YatSharedRepository
+import com.tari.android.wallet.application.YatAdapter
+import com.tari.android.wallet.data.sharedPrefs.yat.YatPrefRepository
 import javax.inject.Inject
 
 class AllSettingsViewModel : CommonViewModel() {
@@ -104,16 +104,16 @@ class AllSettingsViewModel : CommonViewModel() {
     lateinit var yatAdapter: YatAdapter
 
     @Inject
-    lateinit var backupSettingsRepository: BackupSettingsRepository
+    lateinit var backupSettingsRepository: BackupPrefRepository
 
     @Inject
     lateinit var backupManager: BackupManager
 
     @Inject
-    lateinit var settingsRepository: SharedPrefsRepository
+    lateinit var settingsRepository: CorePrefRepository
 
     @Inject
-    lateinit var yatSharedPrefsRepository: YatSharedRepository
+    lateinit var yatSharedPrefsRepository: YatPrefRepository
 
     private val _openYatOnboarding = SingleLiveEvent<Unit>()
     val openYatOnboarding: LiveData<Unit> = _openYatOnboarding

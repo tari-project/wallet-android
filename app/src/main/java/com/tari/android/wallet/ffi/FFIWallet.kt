@@ -33,8 +33,8 @@
 package com.tari.android.wallet.ffi
 
 import com.tari.android.wallet.BuildConfig
-import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
-import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
+import com.tari.android.wallet.data.sharedPrefs.CorePrefRepository
+import com.tari.android.wallet.data.sharedPrefs.network.NetworkPrefRepository
 import com.tari.android.wallet.data.sharedPrefs.security.SecurityPrefRepository
 import com.tari.android.wallet.model.BalanceInfo
 import com.tari.android.wallet.model.CancelledTx
@@ -64,10 +64,10 @@ import java.util.concurrent.atomic.AtomicReference
 
 @Suppress("MemberVisibilityCanBePrivate")
 class FFIWallet(
-    private val sharedPrefsRepository: SharedPrefsRepository,
+    private val sharedPrefsRepository: CorePrefRepository,
     private val securityPrefRepository: SecurityPrefRepository,
     private val seedPhraseRepository: SeedPhraseRepository,
-    private val networkRepository: NetworkRepository,
+    private val networkRepository: NetworkPrefRepository,
     private val commsConfig: FFICommsConfig,
     private val logPath: String
 ) : FFIBase() {

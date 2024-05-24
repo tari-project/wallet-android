@@ -46,7 +46,7 @@ import com.tari.android.wallet.infrastructure.backup.local.LocalBackupStorage
 import com.tari.android.wallet.notification.NotificationHelper
 import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupOptionDto
 import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupOptions
-import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupSettingsRepository
+import com.tari.android.wallet.data.sharedPrefs.backup.BackupPrefRepository
 import io.reactivex.subjects.BehaviorSubject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
@@ -62,7 +62,7 @@ import javax.inject.Singleton
 @Singleton
 class BackupManager @Inject constructor(
     private val context: Context,
-    private val backupSettingsRepository: BackupSettingsRepository,
+    private val backupSettingsRepository: BackupPrefRepository,
     private val localFileBackupStorage: LocalBackupStorage,
     private val googleDriveBackupStorage: GoogleDriveBackupStorage,
     private val dropboxBackupStorage: DropboxBackupStorage,

@@ -30,34 +30,51 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.tari.android.wallet.data.sharedPrefs.bluetooth
+package com.tari.android.wallet.data.sharedPrefs.addressPoisoning
 
 import android.content.SharedPreferences
 import com.tari.android.wallet.data.repository.CommonRepository
-import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefGsonNullableDelegate
-import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
+import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefGsonDelegate
+import com.tari.android.wallet.data.sharedPrefs.network.NetworkPrefRepository
 import com.tari.android.wallet.data.sharedPrefs.network.formatKey
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class ShareSettingsRepository @Inject constructor(sharedPrefs: SharedPreferences, networkRepository: NetworkRepository) :
-    CommonRepository(networkRepository) {
+class AddressPoisoningPrefRepository @Inject constructor(
+    sharedPrefs: SharedPreferences,
+    networkRepository: NetworkPrefRepository,
+) : CommonRepository(networkRepository) {
 
     private object Key {
-        const val bluetoothSettingsKey = "tari_bluetooth_server_settings"
+        const val TRUSTED_CONTACT_LIST = "TRUSTED_CONTACT_LIST"
     }
 
-    var bluetoothSettingsState: BluetoothServerState? by SharedPrefGsonNullableDelegate(
-        sharedPrefs,
-        this,
-        formatKey(Key.bluetoothSettingsKey),
-        BluetoothServerState::class.java,
-        BluetoothServerState.ENABLED
+    private var trustedContactHexList: TrustedContactList by SharedPrefGsonDelegate(
+        prefs = sharedPrefs,
+        commonRepository = this,
+        name = formatKey(Key.TRUSTED_CONTACT_LIST),
+        type = TrustedContactList::class.java,
+        defValue = TrustedContactList(),
     )
 
+    fun addTrustedContactHex(hex: String) {
+        trustedContactHexList = TrustedContactList(trustedContactHexList + hex)
+    }
+
+    fun removeTrustedContactHex(hex: String) {
+        trustedContactHexList = TrustedContactList(trustedContactHexList - hex)
+    }
+
+    fun getTrustedContactHexList(): List<String> {
+        return trustedContactHexList
+    }
+
     fun clear() {
-        bluetoothSettingsState = null
+        trustedContactHexList = TrustedContactList()
     }
 }
 
+private class TrustedContactList(trustedContacts: List<String>) : ArrayList<String>(trustedContacts) {
+    constructor() : this(emptyList())
+}

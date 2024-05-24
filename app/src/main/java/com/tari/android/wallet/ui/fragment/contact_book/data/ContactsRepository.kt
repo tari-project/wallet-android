@@ -2,6 +2,8 @@ package com.tari.android.wallet.ui.fragment.contact_book.data
 
 import android.content.Context
 import com.orhanobut.logger.Logger
+import com.tari.android.wallet.application.walletManager.WalletStateHandler
+import com.tari.android.wallet.data.sharedPrefs.contacts.ContactPrefRepository
 import com.tari.android.wallet.data.sharedPrefs.delegates.SerializableTime
 import com.tari.android.wallet.di.ApplicationScope
 import com.tari.android.wallet.model.TariWalletAddress
@@ -12,7 +14,6 @@ import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.FFIContact
 import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.MergedContactDto
 import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.PhoneContactDto
 import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.YatDto
-import com.tari.android.wallet.ui.fragment.contact_book.data.localStorage.ContactSharedPrefRepository
 import com.tari.android.wallet.util.ContactUtil
 import com.tari.android.wallet.util.nextBoolean
 import kotlinx.coroutines.CoroutineScope
@@ -32,7 +33,8 @@ class ContactsRepository @Inject constructor(
     context: Context,
     contactUtil: ContactUtil,
     tariWalletServiceConnection: TariWalletServiceConnection,
-    private val contactSharedPrefRepository: ContactSharedPrefRepository,
+    walletStateHandler: WalletStateHandler,
+    private val contactSharedPrefRepository: ContactPrefRepository,
     @ApplicationScope private val applicationScope: CoroutineScope,
 ) {
     private val logger
@@ -41,6 +43,7 @@ class ContactsRepository @Inject constructor(
     private val ffiBridge = FFIContactsRepositoryBridge(
         contactsRepository = this,
         tariWalletServiceConnection = tariWalletServiceConnection,
+        walletStateHandler = walletStateHandler,
         contactUtil = contactUtil,
         externalScope = applicationScope,
     )
