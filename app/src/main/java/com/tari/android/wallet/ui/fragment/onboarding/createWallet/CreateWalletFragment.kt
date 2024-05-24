@@ -127,10 +127,10 @@ class CreateWalletFragment : OnboardingFlowFragment<FragmentCreateWalletBinding,
         emojiIdSummaryController = EmojiIdSummaryViewController(ui.emojiIdSummaryView.root)
         ui.apply {
             yourEmojiIdTitleTextView.text = string(create_wallet_your_emoji_id_text_label).applyFontStyle(
-                requireActivity(),
-                TariFont.AVENIR_LT_STD_LIGHT,
-                listOf(string(create_wallet_your_emoji_id_text_label_bold_part)),
-                TariFont.AVENIR_LT_STD_BLACK
+                context = requireActivity(),
+                defaultFont = TariFont.AVENIR_LT_STD_LIGHT,
+                search = listOf(string(create_wallet_your_emoji_id_text_label_bold_part)),
+                tariFont = TariFont.AVENIR_LT_STD_BLACK,
             )
             bottomSpinnerLottieAnimationView.alpha = 0f
             bottomSpinnerLottieAnimationView.scaleX = 0.5F
@@ -153,8 +153,10 @@ class CreateWalletFragment : OnboardingFlowFragment<FragmentCreateWalletBinding,
             continueButton.setOnClickListener { onContinueButtonClick() }
             createEmojiIdButton.setOnClickListener { onCreateEmojiIdButtonClick() }
             emojiIdTextView.setOnClickListener { fullEmojiIdTextViewClicked(it) }
-            arrayOf(seeFullEmojiIdButton, emojiIdSummaryContainerView)
-                .forEach { it.setOnClickListener(this@CreateWalletFragment::onSeeFullEmojiIdButtonClicked) }
+            arrayOf(
+                seeFullEmojiIdButton,
+                emojiIdSummaryContainerView
+            ).forEach { it.setOnClickListener(this@CreateWalletFragment::onSeeFullEmojiIdButtonClicked) }
         }
     }
 
@@ -257,12 +259,12 @@ class CreateWalletFragment : OnboardingFlowFragment<FragmentCreateWalletBinding,
                 override fun onAnimationEnd(animation: Animator) {
                     super.onAnimationEnd(animation)
                     runCatching {
-                        val emojiId = viewModel.sharedPrefsWrapper.emojiId!!
+                        val emojiId = viewModel.corePrefRepository.emojiId!!
                         ui.emojiIdTextView.text = EmojiUtil.getFullEmojiIdSpannable(
-                            emojiId,
-                            string(emoji_id_chunk_separator),
-                            PaletteManager.getBlack(requireContext()),
-                            PaletteManager.getLightGray(requireContext())
+                            emojiId = emojiId,
+                            separator = string(emoji_id_chunk_separator),
+                            darkColor = PaletteManager.getBlack(requireContext()),
+                            lightColor = PaletteManager.getLightGray(requireContext()),
                         )
                         emojiIdSummaryController.display(emojiId)
 
@@ -292,19 +294,13 @@ class CreateWalletFragment : OnboardingFlowFragment<FragmentCreateWalletBinding,
         }
 
         val createNowAnim: ObjectAnimator = ObjectAnimator.ofFloat(
-            ui.createYourEmojiIdLine2TextView,
-            View.TRANSLATION_Y,
-            0f,
-            -ui.createYourEmojiIdLine2TextView.height.toFloat()
+            ui.createYourEmojiIdLine2TextView, View.TRANSLATION_Y, 0f, -ui.createYourEmojiIdLine2TextView.height.toFloat()
         ).apply {
             duration = CreateEmojiId.awesomeTextAnimDurationMs
         }
 
         val awesomeAnim: ObjectAnimator = ObjectAnimator.ofFloat(
-            ui.createYourEmojiIdLine1TextView,
-            View.TRANSLATION_Y,
-            0f,
-            -ui.createYourEmojiIdLine1TextView.height.toFloat()
+            ui.createYourEmojiIdLine1TextView, View.TRANSLATION_Y, 0f, -ui.createYourEmojiIdLine1TextView.height.toFloat()
         ).apply {
             duration = CreateEmojiId.awesomeTextAnimDurationMs
         }
@@ -377,8 +373,7 @@ class CreateWalletFragment : OnboardingFlowFragment<FragmentCreateWalletBinding,
         }
 
         uiHandler.postDelayed(
-            { startYourEmojiIdViewAnimation() },
-            ui.emojiWheelLottieAnimationView.duration - CreateEmojiId.awesomeTextAnimDurationMs
+            { startYourEmojiIdViewAnimation() }, ui.emojiWheelLottieAnimationView.duration - CreateEmojiId.awesomeTextAnimDurationMs
         )
     }
 
@@ -426,13 +421,9 @@ class CreateWalletFragment : OnboardingFlowFragment<FragmentCreateWalletBinding,
             duration = CreateEmojiId.continueButtonAnimDurationMs
         }
 
-
         AnimatorSet().apply {
             playTogether(
-                buttonFadeInAnim,
-                emojiIdContainerViewScaleAnim,
-                fadeInAnim,
-                yourEmojiTitleAnim
+                buttonFadeInAnim, emojiIdContainerViewScaleAnim, fadeInAnim, yourEmojiTitleAnim
             )
             duration = CreateEmojiId.emojiIdCreationViewAnimDurationMs
             interpolator = EasingInterpolator(Ease.QUINT_IN)
@@ -448,7 +439,6 @@ class CreateWalletFragment : OnboardingFlowFragment<FragmentCreateWalletBinding,
                 }
             })
         }
-
     }
 
     private fun elevateEmojiIdContainerView() {
@@ -530,7 +520,6 @@ class CreateWalletFragment : OnboardingFlowFragment<FragmentCreateWalletBinding,
                 }
             })
         }
-
     }
 
     /**
@@ -578,10 +567,9 @@ class CreateWalletFragment : OnboardingFlowFragment<FragmentCreateWalletBinding,
     }
 
     private fun onContinueButtonClick() {
+        viewModel.onContinueButtonClick()
         ui.continueButton.temporarilyDisableClick()
-        viewModel.sharedPrefsWrapper.onboardingCompleted = true
         ui.continueButton.animateClick {
-            viewModel.sharedPrefsWrapper.onboardingAuthSetupStarted = true
             onboardingListener.continueToEnableAuth()
         }
     }
@@ -607,4 +595,3 @@ class CreateWalletFragment : OnboardingFlowFragment<FragmentCreateWalletBinding,
         }
     }
 }
-

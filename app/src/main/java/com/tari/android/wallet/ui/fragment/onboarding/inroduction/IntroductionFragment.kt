@@ -58,6 +58,7 @@ import com.tari.android.wallet.R.string.privacy_policy_url
 import com.tari.android.wallet.R.string.user_agreement_url
 import com.tari.android.wallet.databinding.FragmentIntroductionBinding
 import com.tari.android.wallet.extension.applyURLStyle
+import com.tari.android.wallet.extension.collectFlow
 import com.tari.android.wallet.ui.extension.addAnimatorListener
 import com.tari.android.wallet.ui.extension.animateClick
 import com.tari.android.wallet.ui.extension.doOnGlobalLayout
@@ -72,7 +73,6 @@ import com.tari.android.wallet.ui.extension.temporarilyDisableClick
 import com.tari.android.wallet.ui.extension.visible
 import com.tari.android.wallet.ui.fragment.onboarding.activity.OnboardingFlowFragment
 import com.tari.android.wallet.ui.fragment.restore.activity.WalletRestoreActivity
-import com.tari.android.wallet.ui.fragment.settings.allSettings.TariVersionModel
 import com.tari.android.wallet.util.Constants
 import kotlin.math.min
 
@@ -119,7 +119,7 @@ class IntroductionFragment : OnboardingFlowFragment<FragmentIntroductionBinding,
 
     override fun onResume() {
         super.onResume()
-        ui.selectNetworkButton.text = string(introduction_selected_wallet, viewModel.networkRepository.currentNetwork.network.displayName)
+        ui.selectNetworkButton.text = string(introduction_selected_wallet, viewModel.uiState.value.networkName)
     }
 
     override fun onPause() {
@@ -130,39 +130,42 @@ class IntroductionFragment : OnboardingFlowFragment<FragmentIntroductionBinding,
 
     private fun setupUi() {
         ui.createWalletProgressBar.setWhite()
-        ui.apply {
-            tariLogoLottieAnimationView.alpha = 0f
-            tariLogoLottieAnimationView.scaleX = 0.84f
-            tariLogoLottieAnimationView.scaleY = 0.84f
-            networkInfoTextView.alpha = 0f
-            smallGemImageView.alpha = 0f
-            createWalletContainerView.alpha = 0f
-            selectNetworkContainerView.alpha = 0f
-            headerLineTopTextView.alpha = 0f
-            headerLineBottomTextView.alpha = 0f
-            userAgreementAndPrivacyPolicyTextView.alpha = 0f
-            restoreWalletCtaView.alpha = 0f
-            ui.restoreWalletCtaView.setOnClickListener {
-                activity?.let {
-                    it.startActivity(WalletRestoreActivity.navigationIntent(it))
+        collectFlow(viewModel.uiState) { uiState ->
+            ui.apply {
+                tariLogoLottieAnimationView.alpha = 0f
+                tariLogoLottieAnimationView.scaleX = 0.84f
+                tariLogoLottieAnimationView.scaleY = 0.84f
+                networkInfoTextView.alpha = 0f
+                smallGemImageView.alpha = 0f
+                createWalletContainerView.alpha = 0f
+                selectNetworkContainerView.alpha = 0f
+                headerLineTopTextView.alpha = 0f
+                headerLineBottomTextView.alpha = 0f
+                userAgreementAndPrivacyPolicyTextView.alpha = 0f
+                restoreWalletCtaView.alpha = 0f
+                ui.restoreWalletCtaView.setOnClickListener {
+                    activity?.let {
+                        it.startActivity(WalletRestoreActivity.navigationIntent(it))
+                    }
                 }
-            }
-            networkInfoTextView.text = TariVersionModel(viewModel.networkRepository).versionInfo
-            // highlight links
-            userAgreementAndPrivacyPolicyTextView.text =
-                SpannableString(string(create_wallet_user_agreement_and_privacy_policy)).apply {
-                    applyURLStyle(string(create_wallet_user_agreement), string(user_agreement_url))
-                    applyURLStyle(string(create_wallet_privacy_policy), string(privacy_policy_url))
+                networkInfoTextView.text = uiState.versionInfo
+                // highlight links
+                userAgreementAndPrivacyPolicyTextView.text =
+                    SpannableString(string(create_wallet_user_agreement_and_privacy_policy)).apply {
+                        applyURLStyle(string(create_wallet_user_agreement), string(user_agreement_url))
+                        applyURLStyle(string(create_wallet_privacy_policy), string(privacy_policy_url))
+                    }
+                // make the links clickable
+                userAgreementAndPrivacyPolicyTextView.movementMethod = LinkMovementMethod.getInstance()
+                rootView.doOnGlobalLayout {
+                    runStartupAnimation()
+                    setupAndStartVideo()
                 }
-            // make the links clickable
-            userAgreementAndPrivacyPolicyTextView.movementMethod = LinkMovementMethod.getInstance()
-            rootView.doOnGlobalLayout {
-                runStartupAnimation()
-                setupAndStartVideo()
+                createWalletButton.setOnThrottledClickListener { onCreateWalletClick() }
+                selectNetworkContainerView.setOnThrottledClickListener { onboardingListener.navigateToNetworkSelection() }
             }
-            createWalletButton.setOnThrottledClickListener { onCreateWalletClick() }
-            selectNetworkContainerView.setOnThrottledClickListener { onboardingListener.navigateToNetworkSelection() }
         }
+
     }
 
     private fun setupAndStartVideo() {
@@ -224,7 +227,7 @@ class IntroductionFragment : OnboardingFlowFragment<FragmentIntroductionBinding,
         restoreWalletCtaView.setOnClickListener(null)
         createWalletButton.gone()
         createWalletProgressBar.visible()
-        viewModel.walletServiceLauncher.start()
+        viewModel.onCreateWalletClick()
         createWalletContainerView.animateClick {
             selectNetworkContainerView.isEnabled = false
             rootView.postDelayed(createWalletArtificialDelay) { startTariWalletViewAnimation() }
