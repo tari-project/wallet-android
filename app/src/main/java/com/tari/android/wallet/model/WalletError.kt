@@ -11,18 +11,18 @@ open class WalletError(
     override var domain: String = "FFI",
 ) : CoreError(code, domain), Parcelable {
 
-    object DatabaseDataError : WalletError(114)
-    object TransactionNotFoundError : WalletError(204)
-    object ContactNotFoundError : WalletError(401)
-    object InvalidPassphraseEncryptionCypherError : WalletError(420)
-    object InvalidPassphraseError : WalletError(428)
-    object ValuesNotFound : WalletError(424)
-    object SeedWordsInvalidDataError : WalletError(429)
-    object SeedWordsVersionMismatchError : WalletError(430)
-    object UnknownError : WalletError(-1)
-    object NoError : WalletError(0)
-
     companion object {
+        val DatabaseDataError = WalletError(114)
+        val TransactionNotFoundError = WalletError(204)
+        val ContactNotFoundError = WalletError(401)
+        val InvalidPassphraseEncryptionCypherError = WalletError(420)
+        val InvalidPassphraseError = WalletError(428)
+        val ValuesNotFound = WalletError(424)
+        val SeedWordsInvalidDataError = WalletError(429)
+        val SeedWordsVersionMismatchError = WalletError(430)
+        val UnknownError = WalletError(-1)
+        val NoError = WalletError(0)
+
         fun createFromFFI(error: FFIError): WalletError = WalletError(error.code)
 
         fun createFromFFI(error: FFIException): WalletError = WalletError(error.error?.code ?: NoError.code)
