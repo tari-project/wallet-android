@@ -10,7 +10,7 @@ import com.tari.android.wallet.ui.extension.runRecycle
 class TariPrimaryBackground(context: Context, attrs: AttributeSet) : TariBackground(context, attrs) {
 
     init {
-        val backColor = PaletteManager().getBackgroundPrimary(context)
+        val backColor = PaletteManager.getBackgroundPrimary(context)
 
         obtain(attrs, R.styleable.TariPrimaryBackground).runRecycle {
             val r = getDimension(R.styleable.TariPrimaryBackground_cornerRadius, 0.0F)

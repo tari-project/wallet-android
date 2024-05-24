@@ -37,12 +37,11 @@ class RoundButtonWithIconView @JvmOverloads constructor(
             width = backSize
         }
         ui.text.text = text
-        val paletteManager = PaletteManager()
-        val textColor = if (isSelected) paletteManager.getTextHeading(context) else paletteManager.getTextBody(context)
+        val textColor = if (isSelected) PaletteManager.getTextHeading(context) else PaletteManager.getTextBody(context)
         ui.text.setTextColor(textColor)
-        val backgroundColor = if (isSelected) paletteManager.getPurpleBrand(context) else paletteManager.getBackgroundPrimary(context)
+        val backgroundColor = if (isSelected) PaletteManager.getPurpleBrand(context) else PaletteManager.getBackgroundPrimary(context)
         ui.optionBackground.updateBack(backColor = backgroundColor)
-        val iconColor = if (isSelected) paletteManager.getBackgroundPrimary(context) else paletteManager.getTextHeading(context)
+        val iconColor = if (isSelected) PaletteManager.getBackgroundPrimary(context) else PaletteManager.getTextHeading(context)
         ui.icon.setColorFilter(iconColor)
     }
 

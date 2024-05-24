@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import com.tari.android.wallet.databinding.ViewAmountBinding
 import com.tari.android.wallet.model.MicroTari
 import com.tari.android.wallet.ui.common.CommonViewModel
+import com.tari.android.wallet.ui.common.domain.PaletteManager
 import com.tari.android.wallet.ui.component.common.CommonView
 
 class AmountView : CommonView<CommonViewModel, ViewAmountBinding> {
@@ -32,8 +33,8 @@ class AmountView : CommonView<CommonViewModel, ViewAmountBinding> {
 
     fun setupArgs(style: AmountStyle) {
         val color = when(style) {
-            AmountStyle.Normal -> paletteManager.getTextHeading(context)
-            AmountStyle.Warning -> paletteManager.getRed(context)
+            AmountStyle.Normal -> PaletteManager.getTextHeading(context)
+            AmountStyle.Warning -> PaletteManager.getRed(context)
         }
         ui.gem.setColorFilter(color)
         ui.balanceView.setTextColor(color)

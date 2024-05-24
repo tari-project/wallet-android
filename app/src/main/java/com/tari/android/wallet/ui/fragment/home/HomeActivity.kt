@@ -57,6 +57,7 @@ import com.tari.android.wallet.extension.observe
 import com.tari.android.wallet.model.TxId
 import com.tari.android.wallet.service.service.WalletServiceLauncher
 import com.tari.android.wallet.ui.common.CommonActivity
+import com.tari.android.wallet.ui.common.domain.PaletteManager
 import com.tari.android.wallet.ui.common.domain.ResourceManager
 import com.tari.android.wallet.ui.extension.parcelable
 import com.tari.android.wallet.ui.extension.setVisible
@@ -280,7 +281,7 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>() {
 
     private fun enableNavigationView(view: ImageView) {
         arrayOf(ui.homeImageView, ui.storeImageView, ui.chatImageView, ui.settingsImageView).forEach { it.clearColorFilter() }
-        view.setColorFilter(viewModel.paletteManager.getPurpleBrand(this))
+        view.setColorFilter(PaletteManager.getPurpleBrand(this))
     }
 
     private fun checkScreensDeeplink(intent: Intent) {

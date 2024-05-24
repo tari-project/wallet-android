@@ -12,8 +12,6 @@ import com.tari.android.wallet.ui.extension.setVisible
 
 class WordTextView : FrameLayout {
 
-    val paletteManager = PaletteManager()
-
     constructor(context: Context) : super(context, null) {
         init()
     }
@@ -50,7 +48,7 @@ class WordTextView : FrameLayout {
         }
         ui.root.background = background?.let { ContextCompat.getDrawable(context, it) }
 
-        val textColor = if (isFocused || isValid) paletteManager.getTextHeading(context) else paletteManager.getRed(context)
+        val textColor = if (isFocused || isValid) PaletteManager.getTextHeading(context) else PaletteManager.getRed(context)
         ui.text.setTextColor(textColor)
 
         val deleteTintColor = ContextCompat.getDrawable(context, if (isFocused || isValid) R.drawable.vector_close else R.drawable.vector_close_error)

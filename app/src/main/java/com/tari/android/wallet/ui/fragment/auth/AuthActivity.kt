@@ -49,6 +49,7 @@ import com.tari.android.wallet.databinding.ActivityAuthBinding
 import com.tari.android.wallet.extension.observe
 import com.tari.android.wallet.infrastructure.security.biometric.BiometricAuthenticationException
 import com.tari.android.wallet.ui.common.CommonActivity
+import com.tari.android.wallet.ui.common.domain.PaletteManager
 import com.tari.android.wallet.ui.extension.setColor
 import com.tari.android.wallet.ui.extension.string
 import com.tari.android.wallet.ui.extension.visible
@@ -151,7 +152,7 @@ class AuthActivity : CommonActivity<ActivityAuthBinding, AuthViewModel>() {
         viewModel.securityPrefRepository.saveAttempt(LoginAttemptDto(System.currentTimeMillis(), true))
         lifecycleScope.launch(Dispatchers.Main) {
             ui.loader.visible()
-            ui.progressBar.setColor(viewModel.paletteManager.getPurpleBrand(this@AuthActivity))
+            ui.progressBar.setColor(PaletteManager.getPurpleBrand(this@AuthActivity))
             continueToHomeActivity()
         }
     }

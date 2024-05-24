@@ -20,7 +20,6 @@ import com.tari.android.wallet.infrastructure.logging.LoggerTags
 import com.tari.android.wallet.model.CoreError
 import com.tari.android.wallet.service.TariWalletService
 import com.tari.android.wallet.service.connection.TariWalletServiceConnection
-import com.tari.android.wallet.ui.common.domain.PaletteManager
 import com.tari.android.wallet.ui.common.domain.ResourceManager
 import com.tari.android.wallet.ui.common.permission.PermissionManager
 import com.tari.android.wallet.ui.component.tari.toast.TariToastArgs
@@ -60,9 +59,6 @@ open class CommonViewModel : ViewModel() {
 
     @Inject
     lateinit var tariSettingsSharedRepository: TariSettingsPrefRepository
-
-    @Inject
-    lateinit var paletteManager: PaletteManager
 
     @Inject
     lateinit var tariNavigator: TariNavigator

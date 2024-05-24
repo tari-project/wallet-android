@@ -12,7 +12,7 @@ class TariSwitchedBackground(context: Context, attrs: AttributeSet) : TariBackgr
     private var isTurnedOn = false
 
     init {
-        val backColor = PaletteManager().getBackgroundPrimary(context)
+        val backColor = PaletteManager.getBackgroundPrimary(context)
 
         obtain(attrs, R.styleable.TariQrBackground).runRecycle {
             isTurnedOn = getBoolean(R.styleable.TariSwitchedBackground_turnedOn, false)

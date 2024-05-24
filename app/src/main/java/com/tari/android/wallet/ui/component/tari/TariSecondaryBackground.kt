@@ -10,7 +10,7 @@ import com.tari.android.wallet.ui.extension.runRecycle
 class TariSecondaryBackground(context: Context, attrs: AttributeSet) : TariBackground(context, attrs) {
 
     init {
-        val backColor = PaletteManager().getBackgroundSecondary(context)
+        val backColor = PaletteManager.getBackgroundSecondary(context)
 
         obtain(attrs, R.styleable.TariSecondaryBackground).runRecycle {
             val r = getDimension(R.styleable.TariSecondaryBackground_cornerRadius, 0.0F)

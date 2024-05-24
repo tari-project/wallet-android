@@ -11,7 +11,6 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.viewbinding.ViewBinding
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.common.DialogManager
-import com.tari.android.wallet.ui.common.domain.PaletteManager
 import com.tari.android.wallet.ui.component.tari.toast.TariToast
 import com.tari.android.wallet.ui.dialog.modular.ModularDialog
 
@@ -23,8 +22,6 @@ abstract class CommonView<VM : CommonViewModel, VB : ViewBinding> : LinearLayout
         private set
 
     private val dialogManager = DialogManager()
-
-    val paletteManager = PaletteManager()
 
     abstract fun bindingInflate(layoutInflater: LayoutInflater, parent: ViewGroup?, attachToRoot: Boolean): VB
 

@@ -7,6 +7,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.updateLayoutParams
 import com.tari.android.wallet.R
 import com.tari.android.wallet.databinding.ItemUtxosTileBinding
+import com.tari.android.wallet.ui.common.domain.PaletteManager
 import com.tari.android.wallet.ui.common.recyclerView.CommonViewHolder
 import com.tari.android.wallet.ui.common.recyclerView.ViewHolderBuilder
 import com.tari.android.wallet.ui.extension.dpToPx
@@ -36,7 +37,7 @@ class UtxosTileListViewHolder(view: ItemUtxosTileBinding) : CommonViewHolder<Utx
 
         ui.root.updateLayoutParams<ViewGroup.LayoutParams> { this.height = itemView.context.dpToPx(item.height.toFloat()).toInt() }
 
-        val baseColor = Color.valueOf(paletteManager.getPurpleBrand(itemView.context))
+        val baseColor = Color.valueOf(PaletteManager.getPurpleBrand(itemView.context))
         val newColor = Color.valueOf(getNext(baseColor.red()), getNext(baseColor.green()), getNext(baseColor.blue()))
 
         val shapeDrawable = ContextCompat.getDrawable(itemView.context, R.drawable.vector_utxos_list_tile_bg) as GradientDrawable
@@ -62,7 +63,7 @@ class UtxosTileListViewHolder(view: ItemUtxosTileBinding) : CommonViewHolder<Utx
             val outlineDrawable = ContextCompat.getDrawable(itemView.context, R.drawable.vector_utxos_list_tile_outline_bg)
             ui.outlineContainer.background = outlineDrawable
         } else {
-            ui.outlineContainer.setBackgroundColor(paletteManager.getNeutralSecondary(itemView.context))
+            ui.outlineContainer.setBackgroundColor(PaletteManager.getNeutralSecondary(itemView.context))
         }
     }
 

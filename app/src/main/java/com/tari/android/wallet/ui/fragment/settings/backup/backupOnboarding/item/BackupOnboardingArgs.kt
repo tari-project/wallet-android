@@ -81,9 +81,6 @@ sealed class BackupOnboardingArgs(
 
 
     companion object {
-
-        private val paletteManager = PaletteManager()
-
         private fun getTitle(resourceManager: ResourceManager, firstPartInt: Int, secondPartInt: Int): SpannableString {
             val firstPart = resourceManager.getString(firstPartInt)
             val secondPart = resourceManager.getString(secondPartInt)
@@ -112,7 +109,7 @@ sealed class BackupOnboardingArgs(
                 )
             }
             val spannable = SpannableString("$firstPart $highlighted$part3")
-            spannable.applyColorStyle(highlighted, paletteManager.getTextLinks(HomeActivity.instance.get()!!))
+            spannable.applyColorStyle(highlighted, PaletteManager.getTextLinks(HomeActivity.instance.get()!!))
             spannable.applyCenterAlignment()
             return spannable
         }

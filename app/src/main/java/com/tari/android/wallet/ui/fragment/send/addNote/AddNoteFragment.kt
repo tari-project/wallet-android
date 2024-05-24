@@ -69,6 +69,7 @@ import com.tari.android.wallet.model.MicroTari
 import com.tari.android.wallet.model.TxNote
 import com.tari.android.wallet.network.NetworkConnectionState
 import com.tari.android.wallet.ui.common.CommonFragment
+import com.tari.android.wallet.ui.common.domain.PaletteManager
 import com.tari.android.wallet.ui.common.gyphy.repository.GIFItem
 import com.tari.android.wallet.ui.component.fullEmojiId.EmojiIdSummaryViewController
 import com.tari.android.wallet.ui.component.fullEmojiId.FullEmojiIdViewController
@@ -207,7 +208,7 @@ class AddNoteFragment : CommonFragment<FragmentAddNoteBinding, AddNoteViewModel>
         // disable "send" slider
         disableCallToAction()
         focusEditTextAndShowKeyboard()
-        ui.promptTextView.setTextColor(viewModel.paletteManager.getTextHeading(requireContext()))
+        ui.promptTextView.setTextColor(PaletteManager.getTextHeading(requireContext()))
         ui.noteEditText.imeOptions = EditorInfo.IME_ACTION_DONE
         ui.thumbnailGifsRecyclerView.also {
             val margin = dimen(add_note_gif_inner_margin).toInt()
@@ -219,10 +220,10 @@ class AddNoteFragment : CommonFragment<FragmentAddNoteBinding, AddNoteViewModel>
 
     private fun updateSliderState() {
         if (ui.noteEditText.text?.toString().isNullOrEmpty() && gifContainer.gifItem == null) {
-            ui.promptTextView.setTextColor(viewModel.paletteManager.getTextHeading(requireContext()))
+            ui.promptTextView.setTextColor(PaletteManager.getTextHeading(requireContext()))
             disableCallToAction()
         } else {
-            ui.promptTextView.setTextColor(viewModel.paletteManager.getTextBody(requireContext()))
+            ui.promptTextView.setTextColor(PaletteManager.getTextBody(requireContext()))
             enableCallToAction()
         }
     }

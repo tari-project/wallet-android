@@ -59,6 +59,7 @@ import com.tari.android.wallet.application.walletManager.WalletStateHandler
 import com.tari.android.wallet.databinding.FragmentCreateWalletBinding
 import com.tari.android.wallet.di.DiContainer
 import com.tari.android.wallet.extension.applyFontStyle
+import com.tari.android.wallet.ui.common.domain.PaletteManager
 import com.tari.android.wallet.ui.component.fullEmojiId.EmojiIdSummaryViewController
 import com.tari.android.wallet.ui.component.tari.TariFont
 import com.tari.android.wallet.ui.extension.animateClick
@@ -260,8 +261,8 @@ class CreateWalletFragment : OnboardingFlowFragment<FragmentCreateWalletBinding,
                         ui.emojiIdTextView.text = EmojiUtil.getFullEmojiIdSpannable(
                             emojiId,
                             string(emoji_id_chunk_separator),
-                            viewModel.paletteManager.getBlack(requireContext()),
-                            viewModel.paletteManager.getLightGray(requireContext())
+                            PaletteManager.getBlack(requireContext()),
+                            PaletteManager.getLightGray(requireContext())
                         )
                         emojiIdSummaryController.display(emojiId)
 

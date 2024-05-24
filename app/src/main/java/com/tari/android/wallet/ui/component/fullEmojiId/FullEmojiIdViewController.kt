@@ -58,8 +58,8 @@ import com.tari.android.wallet.ui.extension.string
 import com.tari.android.wallet.ui.extension.visible
 import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.EmojiUtil
-import com.tari.android.wallet.util.EmojiUtil.Companion.getGraphemeLength
 import com.tari.android.wallet.util.EmojiUtil.Companion.SMALL_EMOJI_ID_SIZE
+import com.tari.android.wallet.util.EmojiUtil.Companion.getGraphemeLength
 import me.everything.android.ui.overscroll.OverScrollDecoratorHelper
 
 /**
@@ -74,7 +74,6 @@ class FullEmojiIdViewController(
     private val listener: Listener? = null
 ) {
     private val emojiIdCopiedViewController = EmojiIdCopiedViewController(ui.emojiIdCopiedView)
-    private val paletteManager = PaletteManager()
     private val summaryParent = summary.root.parent as View
     private var _fullEmojiId = ""
 
@@ -296,8 +295,8 @@ class FullEmojiIdViewController(
         ui.fullEmojiIdTextView.text = EmojiUtil.getFullEmojiIdSpannable(
             _fullEmojiId,
             string(R.string.emoji_id_chunk_separator),
-            paletteManager.getBlack(context),
-            paletteManager.getLightGray(context)
+            PaletteManager.getBlack(context),
+            PaletteManager.getLightGray(context)
         )
     }
 

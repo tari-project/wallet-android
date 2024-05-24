@@ -50,6 +50,7 @@ import com.tari.android.wallet.databinding.FragmentFeatureAuthBinding
 import com.tari.android.wallet.extension.observe
 import com.tari.android.wallet.infrastructure.security.biometric.BiometricAuthenticationException
 import com.tari.android.wallet.ui.common.CommonFragment
+import com.tari.android.wallet.ui.common.domain.PaletteManager
 import com.tari.android.wallet.ui.extension.setColor
 import com.tari.android.wallet.ui.extension.string
 import com.tari.android.wallet.ui.extension.visible
@@ -146,7 +147,7 @@ class FeatureAuthFragment : CommonFragment<FragmentFeatureAuthBinding, AuthViewM
         viewModel.securityPrefRepository.saveAttempt(LoginAttemptDto(System.currentTimeMillis(), true))
         lifecycleScope.launch(Dispatchers.Main) {
             ui.loader.visible()
-            ui.progressBar.setColor(viewModel.paletteManager.getPurpleBrand(requireContext()))
+            ui.progressBar.setColor(PaletteManager.getPurpleBrand(requireContext()))
 
             viewModel.securityPrefRepository.isFeatureAuthenticated = true
         }

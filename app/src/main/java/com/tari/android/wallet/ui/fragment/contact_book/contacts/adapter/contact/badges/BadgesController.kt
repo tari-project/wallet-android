@@ -23,7 +23,7 @@ class BadgesController(val view: ItemContactBinding) {
     private var lastAnimator: ValueAnimator? = null
 
     init {
-        view.profileBadgesContainer.updateBack(backColor = PaletteManager().getPurpleBrand(view.root.context))
+        view.profileBadgesContainer.updateBack(backColor = PaletteManager.getPurpleBrand(view.root.context))
         view.profileBadgesContainer.switch(false)
         view.profileBadgesContainerInner.outlineProvider = view.profileBadgesContainer.outlineProvider
 
