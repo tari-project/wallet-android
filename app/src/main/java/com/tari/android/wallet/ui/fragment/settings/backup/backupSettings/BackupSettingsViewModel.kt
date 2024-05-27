@@ -5,6 +5,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.tari.android.wallet.R
+import com.tari.android.wallet.data.sharedPrefs.backup.BackupPrefRepository
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.infrastructure.backup.BackupManager
 import com.tari.android.wallet.infrastructure.backup.BackupState
@@ -15,7 +16,6 @@ import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.dialog.error.ErrorDialogArgs
 import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
 import com.tari.android.wallet.ui.fragment.settings.backup.backupSettings.option.BackupOptionViewModel
-import com.tari.android.wallet.data.sharedPrefs.backup.BackupPrefRepository
 import com.tari.android.wallet.ui.fragment.settings.userAutorization.BiometricAuthenticationViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -113,14 +113,16 @@ class BackupSettingsViewModel : CommonViewModel() {
             exception is BackupStorageFullException -> resourceManager.getString(
                 R.string.backup_wallet_storage_full_desc
             )
+
             exception is BackupStorageAuthRevokedException -> resourceManager.getString(
                 R.string.check_backup_storage_status_auth_revoked_error_description
             )
+
             exception is UnknownHostException -> resourceManager.getString(R.string.error_no_connection_title)
             exception?.message == null -> resourceManager.getString(R.string.back_up_wallet_backing_up_unknown_error)
             else -> resourceManager.getString(R.string.back_up_wallet_backing_up_error_desc, exception.message!!)
         }
-        modularDialog.postValue(ErrorDialogArgs(errorTitle, errorDescription).getModular(resourceManager))
+        showModularDialog(ErrorDialogArgs(errorTitle, errorDescription).getModular(resourceManager))
     }
 }
 

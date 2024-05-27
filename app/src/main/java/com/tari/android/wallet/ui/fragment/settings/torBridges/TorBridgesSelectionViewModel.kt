@@ -96,14 +96,15 @@ class TorBridgesSelectionViewModel : CommonViewModel() {
     fun showBridgeQrCode(torBridgeItem: TorBridgeViewHolderItem) {
         if (torBridgeItem !is TorBridgeViewHolderItem.Bridge) return
         val data = deeplinkHandler.getDeeplink(DeepLink.TorBridges(listOf(torBridgeItem.bridgeConfiguration)))
-        val args = ModularDialogArgs(
-            DialogArgs(true, canceledOnTouchOutside = true), listOf(
-                HeadModule(resourceManager.getString(R.string.share_via_qr_code_title)),
-                ShareQrCodeModule(data),
-                ButtonModule(resourceManager.getString(R.string.common_close), ButtonStyle.Close)
+        showModularDialog(
+            ModularDialogArgs(
+                DialogArgs(true, canceledOnTouchOutside = true), listOf(
+                    HeadModule(resourceManager.getString(R.string.share_via_qr_code_title)),
+                    ShareQrCodeModule(data),
+                    ButtonModule(resourceManager.getString(R.string.common_close), ButtonStyle.Close),
+                )
             )
         )
-        modularDialog.postValue(args)
     }
 
     fun connect() {
@@ -125,7 +126,7 @@ class TorBridgesSelectionViewModel : CommonViewModel() {
             closeButtonText = resourceManager.getString(R.string.common_cancel),
             cancelable = true
         ) { stopConnecting() }
-        _loadingDialog.postValue(progressArgs)
+        showLoadingDialog(progressArgs)
         torProxyManager.shutdown()
         subscribeToTorState()
         torProxyManager.run()
@@ -137,12 +138,15 @@ class TorBridgesSelectionViewModel : CommonViewModel() {
             when (it) {
                 is TorProxyState.Failed -> {
                     EventBus.torProxyState.unsubscribe(this)
-                    val errorArgs = ErrorDialogArgs(
-                        title = resourceManager.getString(R.string.tor_bridges_connecting_error_title),
-                        description = resourceManager.getString(R.string.tor_bridges_connecting_error_description, it.e.message.orEmpty()),
-                        cancelable = true
-                    ) { stopConnecting() }
-                    modularDialog.postValue(errorArgs.getModular(resourceManager))
+
+                    showModularDialog(
+                        ErrorDialogArgs(
+                            title = resourceManager.getString(R.string.tor_bridges_connecting_error_title),
+                            description = resourceManager.getString(R.string.tor_bridges_connecting_error_description, it.e.message.orEmpty()),
+                            cancelable = true,
+                            onClose = { stopConnecting() },
+                        ).getModular(resourceManager)
+                    )
                 }
 
                 is TorProxyState.Running -> {
@@ -157,17 +161,18 @@ class TorBridgesSelectionViewModel : CommonViewModel() {
                                 description += "${bridge.ip}:${bridge.port}\n"
                             }
                         }
-                        val args = ModularDialogArgs(
-                            DialogArgs(false, canceledOnTouchOutside = false), modules = listOf(
-                                HeadModule(resourceManager.getString(R.string.tor_bridges_connection_progress_successful_title)),
-                                BodyModule(description),
-                                ButtonModule(resourceManager.getString(R.string.common_confirm), ButtonStyle.Normal) {
-                                    dismissDialog.postValue(Unit)
-                                    backPressed.postValue(Unit)
-                                },
+                        showModularDialog(
+                            ModularDialogArgs(
+                                DialogArgs(false, canceledOnTouchOutside = false), modules = listOf(
+                                    HeadModule(resourceManager.getString(R.string.tor_bridges_connection_progress_successful_title)),
+                                    BodyModule(description),
+                                    ButtonModule(resourceManager.getString(R.string.common_confirm), ButtonStyle.Normal) {
+                                        hideDialog()
+                                        backPressed.postValue(Unit)
+                                    },
+                                )
                             )
                         )
-                        modularDialog.postValue(args)
                     } else {
                         val description = resourceManager.getString(
                             R.string.tor_bridges_connection_progress_description_full,
@@ -175,12 +180,12 @@ class TorBridgesSelectionViewModel : CommonViewModel() {
                             it.bootstrapStatus.progress.toString()
                         )
                         val nextArgs = ProgressDialogArgs(
-                            resourceManager.getString(R.string.tor_bridges_connection_progress_title),
-                            description,
+                            title = resourceManager.getString(R.string.tor_bridges_connection_progress_title),
+                            description = description,
                             closeButtonText = resourceManager.getString(R.string.common_cancel),
                             cancelable = true
                         ) { stopConnecting() }
-                        _loadingDialog.postValue(nextArgs)
+                        showLoadingDialog(nextArgs)
                     }
                 }
 
@@ -192,6 +197,6 @@ class TorBridgesSelectionViewModel : CommonViewModel() {
     private fun stopConnecting() {
         EventBus.torProxyState.unsubscribe(this)
         torSharedRepository.currentTorBridges = TorBridgeConfigurationList()
-        dismissDialog.postValue(Unit)
+        hideDialog()
     }
 }

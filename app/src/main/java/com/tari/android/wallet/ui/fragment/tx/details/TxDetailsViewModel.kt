@@ -82,11 +82,12 @@ class TxDetailsViewModel : CommonViewModel() {
     fun cancelTransaction() {
         val isCancelled = walletService.getWithError { error, wallet -> wallet.cancelPendingTx(TxId(this.tx.value!!.id), error) }
         if (!isCancelled) {
-            val errorDialogArgs = ErrorDialogArgs(
-                resourceManager.getString(R.string.tx_detail_cancellation_error_title),
-                resourceManager.getString(R.string.tx_detail_cancellation_error_description)
+            showModularDialog(
+                ErrorDialogArgs(
+                    title = resourceManager.getString(R.string.tx_detail_cancellation_error_title),
+                    description = resourceManager.getString(R.string.tx_detail_cancellation_error_description),
+                ).getModular(resourceManager)
             )
-            modularDialog.postValue(errorDialogArgs.getModular(resourceManager))
         }
     }
 
@@ -140,11 +141,13 @@ class TxDetailsViewModel : CommonViewModel() {
         val foundTx = findTxById(txId!!, walletService)
 
         if (foundTx == null) {
-            val errorArgs = ErrorDialogArgs(
-                resourceManager.getString(R.string.tx_details_error_tx_not_found_title),
-                resourceManager.getString(R.string.tx_details_error_tx_not_found_desc)
-            ) { backPressed.call() }
-            modularDialog.postValue(errorArgs.getModular(resourceManager))
+            showModularDialog(
+                ErrorDialogArgs(
+                    title = resourceManager.getString(R.string.tx_details_error_tx_not_found_title),
+                    description = resourceManager.getString(R.string.tx_details_error_tx_not_found_desc),
+                    onClose = { backPressed.call() },
+                ).getModular(resourceManager)
+            )
         } else {
             foundTx.let { _txObject.onNext(it) }
             generateExplorerLink(foundTx)
@@ -202,8 +205,7 @@ class TxDetailsViewModel : CommonViewModel() {
             true
         }
 
-        val args = ModularDialogArgs(DialogArgs(), moduleList)
-        _inputDialog.postValue(args)
+        showInputModalDialog(ModularDialogArgs(DialogArgs(), moduleList))
     }
 
     private fun saveDetails(newName: String) {

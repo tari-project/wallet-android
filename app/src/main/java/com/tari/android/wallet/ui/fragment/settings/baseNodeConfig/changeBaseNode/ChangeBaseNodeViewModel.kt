@@ -57,14 +57,15 @@ class ChangeBaseNodeViewModel : CommonViewModel() {
 
     fun showQrCode(baseNodeDto: BaseNodeDto) {
         val data = deeplinkHandler.getDeeplink(baseNodeDto.toDeeplink())
-        val args = ModularDialogArgs(
-            DialogArgs(true, canceledOnTouchOutside = true), listOf(
-                HeadModule(resourceManager.getString(R.string.share_via_qr_code_title)),
-                ShareQrCodeModule(data),
-                ButtonModule(resourceManager.getString(R.string.common_close), ButtonStyle.Close)
+        showModularDialog(
+            ModularDialogArgs(
+                DialogArgs(true, canceledOnTouchOutside = true), listOf(
+                    HeadModule(resourceManager.getString(R.string.share_via_qr_code_title)),
+                    ShareQrCodeModule(data),
+                    ButtonModule(resourceManager.getString(R.string.common_close), ButtonStyle.Close),
+                )
             )
         )
-        modularDialog.postValue(args)
     }
 
     fun refresh() = loadList()
@@ -115,16 +116,11 @@ class ChangeBaseNodeViewModel : CommonViewModel() {
             true
         }
 
-        _inputDialog.postValue(
-            ModularDialogArgs(
-                dialogArgs = DialogArgs(),
-                modules = mutableListOf(
-                    title,
-                    nameInput,
-                    hexInput,
-                    addressInput,
-                )
-            )
+        showInputModalDialog(
+            title,
+            nameInput,
+            hexInput,
+            addressInput,
         )
     }
 
@@ -140,11 +136,11 @@ class ChangeBaseNodeViewModel : CommonViewModel() {
 
             baseNodesManager.addUserBaseNode(baseNode)
             baseNodesManager.setBaseNode(baseNode)
-            dismissDialog.postValue(Unit)
+            hideDialog()
             loadList()
         } else {
             _customBaseNodeState.update { it.copy(customBaseNode = null) }
-            modularDialog.postValue(
+            showModularDialog(
                 ErrorDialogArgs(
                     title = resourceManager.getString(R.string.common_error_title),
                     description = resourceManager.getString(R.string.restore_from_seed_words_form_error_message),

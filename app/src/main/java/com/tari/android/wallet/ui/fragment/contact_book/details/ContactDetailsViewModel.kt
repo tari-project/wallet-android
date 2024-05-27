@@ -22,6 +22,7 @@ import com.tari.android.wallet.R.string.contact_book_details_delete_button_title
 import com.tari.android.wallet.R.string.contact_book_details_delete_contact
 import com.tari.android.wallet.R.string.contact_book_details_delete_message
 import com.tari.android.wallet.R.string.contact_book_details_edit_title
+import com.tari.android.wallet.application.YatAdapter
 import com.tari.android.wallet.databinding.ViewEmojiIdWithYatSummaryBinding
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.common.SingleLiveEvent
@@ -50,7 +51,6 @@ import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
 import com.tari.android.wallet.ui.fragment.settings.allSettings.row.SettingsRowStyle
 import com.tari.android.wallet.ui.fragment.settings.allSettings.row.SettingsRowViewDto
 import com.tari.android.wallet.ui.fragment.settings.allSettings.title.SettingsTitleViewHolderItem
-import com.tari.android.wallet.application.YatAdapter
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -235,8 +235,7 @@ class ContactDetailsViewModel : CommonViewModel() {
             true
         }
 
-        val args = ModularDialogArgs(DialogArgs(), moduleList)
-        _inputDialog.postValue(args)
+        showInputModalDialog(ModularDialogArgs(DialogArgs(), moduleList))
     }
 
     private suspend fun yatSearchAction(yat: String): Boolean {
@@ -274,7 +273,7 @@ class ContactDetailsViewModel : CommonViewModel() {
         val firstLineHtml = HtmlHelper.getSpannedText(resourceManager.getString(contact_book_contacts_book_unlink_message_firstLine))
         val secondLineHtml = HtmlHelper.getSpannedText(resourceManager.getString(contact_book_contacts_book_unlink_message_secondLine, name))
 
-        val modules = listOf(
+        showModularDialog(
             HeadModule(resourceManager.getString(contact_book_contacts_book_unlink_title)),
             BodyModule(null, SpannableString(firstLineHtml)),
             ShortEmojiIdModule(walletAddress),
@@ -288,7 +287,6 @@ class ContactDetailsViewModel : CommonViewModel() {
             },
             ButtonModule(resourceManager.getString(common_cancel), Close)
         )
-        modularDialog.postValue(ModularDialogArgs(DialogArgs(), modules))
     }
 
     private fun showUnlinkSuccessDialog() {
@@ -307,14 +305,14 @@ class ContactDetailsViewModel : CommonViewModel() {
                 BodyModule(null, SpannableString(secondLineHtml)),
                 ButtonModule(resourceManager.getString(common_close), Close)
             )
-            modularDialog.postValue(ModularDialogArgs(DialogArgs {
+            showModularDialog(ModularDialogArgs(DialogArgs {
                 navigation.value = Navigation.ContactBookNavigation.BackToContactBook
             }, modules))
         }
     }
 
     private fun showDeleteContactDialog() {
-        val modules = listOf(
+        showModularDialog(
             HeadModule(resourceManager.getString(contact_book_details_delete_contact)),
             BodyModule(resourceManager.getString(contact_book_details_delete_message)),
             ButtonModule(resourceManager.getString(contact_book_details_delete_button_title), Warning) {
@@ -328,6 +326,5 @@ class ContactDetailsViewModel : CommonViewModel() {
             },
             ButtonModule(resourceManager.getString(common_close), Close)
         )
-        modularDialog.postValue(ModularDialogArgs(DialogArgs(), modules))
     }
 }

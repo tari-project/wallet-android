@@ -62,7 +62,10 @@ import com.tari.android.wallet.R.string.tari_about_title
 import com.tari.android.wallet.R.string.tari_url
 import com.tari.android.wallet.R.string.ttl_store_url
 import com.tari.android.wallet.R.string.user_agreement_url
+import com.tari.android.wallet.application.YatAdapter
 import com.tari.android.wallet.data.sharedPrefs.CorePrefRepository
+import com.tari.android.wallet.data.sharedPrefs.backup.BackupPrefRepository
+import com.tari.android.wallet.data.sharedPrefs.yat.YatPrefRepository
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.extension.addTo
 import com.tari.android.wallet.infrastructure.backup.BackupManager
@@ -86,10 +89,7 @@ import com.tari.android.wallet.ui.fragment.settings.allSettings.row.SettingsRowS
 import com.tari.android.wallet.ui.fragment.settings.allSettings.row.SettingsRowViewDto
 import com.tari.android.wallet.ui.fragment.settings.allSettings.title.SettingsTitleViewHolderItem
 import com.tari.android.wallet.ui.fragment.settings.allSettings.version.SettingsVersionViewHolderItem
-import com.tari.android.wallet.data.sharedPrefs.backup.BackupPrefRepository
 import com.tari.android.wallet.ui.fragment.settings.userAutorization.BiometricAuthenticationViewModel
-import com.tari.android.wallet.application.YatAdapter
-import com.tari.android.wallet.data.sharedPrefs.yat.YatPrefRepository
 import javax.inject.Inject
 
 class AllSettingsViewModel : CommonViewModel() {
@@ -281,8 +281,7 @@ class AllSettingsViewModel : CommonViewModel() {
     }
 
     private fun showBackupStorageCheckFailedDialog(message: String) {
-        val errorArgs = ErrorDialogArgs(resourceManager.getString(check_backup_storage_status_error_title), message)
-        modularDialog.postValue(errorArgs.getModular(resourceManager))
+        showModularDialog(ErrorDialogArgs(resourceManager.getString(check_backup_storage_status_error_title), message).getModular(resourceManager))
     }
 }
 

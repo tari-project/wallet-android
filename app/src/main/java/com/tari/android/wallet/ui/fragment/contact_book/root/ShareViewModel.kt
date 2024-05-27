@@ -70,29 +70,31 @@ class ShareViewModel : CommonViewModel() {
     }
 
     fun startBLESharing() {
-        val args = ModularDialogArgs(
-            DialogArgs(canceledOnTouchOutside = false, cancelable = false) { tariBluetoothClient.stopSharing() }, listOf(
-                IconModule(R.drawable.vector_sharing_via_ble),
-                HeadModule(resourceManager.getString(R.string.share_via_bluetooth_title)),
-                BodyModule(resourceManager.getString(R.string.share_via_bluetooth_message)),
-                ButtonModule(resourceManager.getString(R.string.common_close), ButtonStyle.Close)
+        showModularDialog(
+            ModularDialogArgs(
+                DialogArgs(canceledOnTouchOutside = false, cancelable = false) { tariBluetoothClient.stopSharing() }, listOf(
+                    IconModule(R.drawable.vector_sharing_via_ble),
+                    HeadModule(resourceManager.getString(R.string.share_via_bluetooth_title)),
+                    BodyModule(resourceManager.getString(R.string.share_via_bluetooth_message)),
+                    ButtonModule(resourceManager.getString(R.string.common_close), ButtonStyle.Close),
+                )
             )
         )
-        modularDialog.postValue(args)
         tariBluetoothClient.startSharing(shareInfo.value.orEmpty())
     }
 
     fun doContactlessPayment() {
         permissionManager.runWithPermission(tariBluetoothClient.bluetoothPermissions) {
-            val args = ModularDialogArgs(
-                DialogArgs(canceledOnTouchOutside = false, cancelable = false) { tariBluetoothClient.stopSharing() }, listOf(
-                    IconModule(R.drawable.vector_sharing_via_ble),
-                    HeadModule(resourceManager.getString(R.string.contactless_payment_title)),
-                    BodyModule(resourceManager.getString(R.string.contactless_payment_description)),
-                    ButtonModule(resourceManager.getString(R.string.common_close), ButtonStyle.Close)
+            showModularDialog(
+                ModularDialogArgs(
+                    DialogArgs(canceledOnTouchOutside = false, cancelable = false) { tariBluetoothClient.stopSharing() }, listOf(
+                        IconModule(R.drawable.vector_sharing_via_ble),
+                        HeadModule(resourceManager.getString(R.string.contactless_payment_title)),
+                        BodyModule(resourceManager.getString(R.string.contactless_payment_description)),
+                        ButtonModule(resourceManager.getString(R.string.common_close), ButtonStyle.Close),
+                    )
                 )
             )
-            modularDialog.postValue(args)
             tariBluetoothClient.startDeviceScanning {
                 successfullDeviceFoundSharing(it)
             }
@@ -110,30 +112,28 @@ class ShareViewModel : CommonViewModel() {
             contactDto.contact.extractWalletAddress().emojiId.extractEmojis().take(3).joinToString("")
         }
 
-        val args = ModularDialogArgs(
-            DialogArgs(), listOf(
-                IconModule(R.drawable.vector_sharing_via_ble),
-                HeadModule(resourceManager.getString(R.string.contactless_payment_success_title)),
-                BodyModule(resourceManager.getString(R.string.contactless_payment_success_description, name)),
-                ButtonModule(resourceManager.getString(R.string.common_lets_do_it_2), ButtonStyle.Normal) {
-                    navigation.postValue(Navigation.TxListNavigation.ToSendTariToUser(contactDto))
-                    dismissDialog.postValue(Unit)
-                },
-                ButtonModule(resourceManager.getString(R.string.common_no_2), ButtonStyle.Close)
-            )
+        showModularDialog(
+            IconModule(R.drawable.vector_sharing_via_ble),
+            HeadModule(resourceManager.getString(R.string.contactless_payment_success_title)),
+            BodyModule(resourceManager.getString(R.string.contactless_payment_success_description, name)),
+            ButtonModule(resourceManager.getString(R.string.common_lets_do_it_2), ButtonStyle.Normal) {
+                navigation.postValue(Navigation.TxListNavigation.ToSendTariToUser(contactDto))
+                hideDialog()
+            },
+            ButtonModule(resourceManager.getString(R.string.common_no_2), ButtonStyle.Close),
         )
-        modularDialog.postValue(args)
     }
 
     private fun doShareViaQrCode(deeplink: String) {
-        val args = ModularDialogArgs(
-            DialogArgs(true, canceledOnTouchOutside = true), listOf(
-                HeadModule(resourceManager.getString(R.string.share_via_qr_code_title)),
-                ShareQrCodeModule(deeplink),
-                ButtonModule(resourceManager.getString(R.string.common_close), ButtonStyle.Close)
+        showModularDialog(
+            ModularDialogArgs(
+                DialogArgs(true, canceledOnTouchOutside = true), listOf(
+                    HeadModule(resourceManager.getString(R.string.share_via_qr_code_title)),
+                    ShareQrCodeModule(deeplink),
+                    ButtonModule(resourceManager.getString(R.string.common_close), ButtonStyle.Close),
+                )
             )
         )
-        modularDialog.postValue(args)
     }
 
     private fun doShareViaLink(deeplink: String) {
@@ -148,27 +148,21 @@ class ShareViewModel : CommonViewModel() {
     }
 
     private fun showShareSuccessDialog() {
-        val args = ModularDialogArgs(
-            DialogArgs(), listOf(
-                IconModule(R.drawable.vector_sharing_success),
-                HeadModule(resourceManager.getString(R.string.share_success_title)),
-                BodyModule(resourceManager.getString(R.string.share_success_message)),
-                ButtonModule(resourceManager.getString(R.string.common_close), ButtonStyle.Close)
-            )
+        showModularDialog(
+            IconModule(R.drawable.vector_sharing_success),
+            HeadModule(resourceManager.getString(R.string.share_success_title)),
+            BodyModule(resourceManager.getString(R.string.share_success_message)),
+            ButtonModule(resourceManager.getString(R.string.common_close), ButtonStyle.Close),
         )
-        modularDialog.postValue(args)
     }
 
     private fun showShareErrorDialog(message: String) {
-        val args = ModularDialogArgs(
-            DialogArgs(), listOf(
-                IconModule(R.drawable.vector_sharing_failed),
-                HeadModule(resourceManager.getString(R.string.common_error_title)),
-                BodyModule(message),
-                ButtonModule(resourceManager.getString(R.string.common_close), ButtonStyle.Close)
-            )
+        showModularDialog(
+            IconModule(R.drawable.vector_sharing_failed),
+            HeadModule(resourceManager.getString(R.string.common_error_title)),
+            BodyModule(message),
+            ButtonModule(resourceManager.getString(R.string.common_close), ButtonStyle.Close),
         )
-        modularDialog.postValue(args)
     }
 
     private fun onReceived(data: List<DeepLink.Contacts.DeeplinkContact>) {

@@ -90,6 +90,7 @@ class WalletRestoringFromSeedWordsViewModel : CommonViewModel() {
                         onError(RestorationError.RecoveryInternalError(resourceManager, this@WalletRestoringFromSeedWordsViewModel::onErrorClosed))
                     }
                 }
+
                 is WalletRestorationResult.Completed -> onSuccessRestoration()
             }
         }.addTo(compositeDisposable)
@@ -107,7 +108,7 @@ class WalletRestoringFromSeedWordsViewModel : CommonViewModel() {
 
     private fun onError(restorationError: RestorationError) {
         walletServiceLauncher.stopAndDelete()
-        modularDialog.postValue(restorationError.args.getModular(resourceManager))
+        showModularDialog(restorationError.args.getModular(resourceManager))
     }
 
     private fun onSuccessRestoration() {

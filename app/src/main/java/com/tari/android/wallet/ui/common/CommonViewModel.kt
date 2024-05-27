@@ -95,15 +95,17 @@ open class CommonViewModel : ViewModel() {
     protected val _copyToClipboard = SingleLiveEvent<ClipboardArgs>()
     val copyToClipboard: LiveData<ClipboardArgs> = _copyToClipboard
 
-    val modularDialog = SingleLiveEvent<ModularDialogArgs>()
+    private val _modularDialog = SingleLiveEvent<ModularDialogArgs>()
+    val modularDialog: LiveData<ModularDialogArgs> = _modularDialog
 
-    protected val _inputDialog = SingleLiveEvent<ModularDialogArgs>()
+    private val _inputDialog = SingleLiveEvent<ModularDialogArgs>()
     val inputDialog: LiveData<ModularDialogArgs> = _inputDialog
 
-    protected val _loadingDialog = SingleLiveEvent<ProgressDialogArgs>()
+    private val _loadingDialog = SingleLiveEvent<ProgressDialogArgs>()
     val loadingDialog: LiveData<ProgressDialogArgs> = _loadingDialog
 
-    val dismissDialog: SingleLiveEvent<Unit> = SingleLiveEvent()
+    private val _dismissDialog = SingleLiveEvent<Unit>()
+    val dismissDialog: LiveData<Unit> = _dismissDialog
 
     protected val _blockedBackPressed = SingleLiveEvent<Boolean>()
     val blockedBackPressed: LiveData<Boolean> = _blockedBackPressed
@@ -173,11 +175,11 @@ open class CommonViewModel : ViewModel() {
     fun doOnBackground(action: suspend CoroutineScope.() -> Unit): Job = viewModelScope.launch { action() }
 
     fun showModularDialog(args: ModularDialogArgs) {
-        modularDialog.postValue(args)
+        _modularDialog.postValue(args)
     }
 
     fun showModularDialog(vararg modules: IDialogModule) {
-        modularDialog.postValue(ModularDialogArgs(modules = modules.toList()))
+        _modularDialog.postValue(ModularDialogArgs(modules = modules.toList()))
     }
 
     fun showLoadingDialog(progressArgs: ProgressDialogArgs) {
@@ -186,6 +188,10 @@ open class CommonViewModel : ViewModel() {
 
     fun showInputModalDialog(inputArgs: ModularDialogArgs) {
         _inputDialog.postValue(inputArgs)
+    }
+
+    fun showInputModalDialog(vararg modules: IDialogModule) {
+        _inputDialog.postValue(ModularDialogArgs(modules = modules.toList()))
     }
 
     fun showErrorDialog(error: CoreError) {
@@ -198,7 +204,7 @@ open class CommonViewModel : ViewModel() {
 
     fun hideDialog() {
         viewModelScope.launch(Dispatchers.Main) {
-            dismissDialog.postValue(Unit)
+            _dismissDialog.postValue(Unit)
         }
     }
 }

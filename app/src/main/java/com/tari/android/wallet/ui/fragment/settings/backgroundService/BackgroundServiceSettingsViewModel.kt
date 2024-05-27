@@ -28,13 +28,14 @@ class BackgroundServiceSettingsViewModel : CommonViewModel() {
             turnSwitcher(true)
         } else {
             _switchState.value = TariLoadingSwitchState(isChecked = true, isLoading = true)
-            modularDialog.value = ConfirmDialogArgs(
-                resourceManager.getString(R.string.background_service_button_confirmation_title),
-                resourceManager.getString(R.string.background_service_button_confirmation_description),
-                onConfirm = { turnSwitcher(false) },
-                onCancel = { _switchState.value = TariLoadingSwitchState(isChecked = true, isLoading = false) },
-                onDismiss = { _switchState.value = TariLoadingSwitchState(isChecked = _switchState.value!!.isChecked, isLoading = false) }).getModular(
-                resourceManager
+            showModularDialog(
+                ConfirmDialogArgs(
+                    title = resourceManager.getString(R.string.background_service_button_confirmation_title),
+                    description = resourceManager.getString(R.string.background_service_button_confirmation_description),
+                    onConfirm = { turnSwitcher(false) },
+                    onCancel = { _switchState.value = TariLoadingSwitchState(isChecked = true, isLoading = false) },
+                    onDismiss = { _switchState.value = TariLoadingSwitchState(isChecked = _switchState.value!!.isChecked, isLoading = false) }
+                ).getModular(resourceManager)
             )
         }
     }
@@ -42,7 +43,7 @@ class BackgroundServiceSettingsViewModel : CommonViewModel() {
     private fun turnSwitcher(isTurnedOn: Boolean) {
         tariSettingsSharedRepository.backgroundServiceTurnedOn = isTurnedOn
         _switchState.value = TariLoadingSwitchState(isTurnedOn, false)
-        dismissDialog.postValue(Unit)
+        hideDialog()
         serviceLauncher.startIfExist()
     }
 }

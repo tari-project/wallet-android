@@ -108,14 +108,14 @@ class UtxosListViewModel : CommonViewModel() {
         modules.addAll(listOptions)
         modules.add(ButtonModule(resourceManager.getString(R.string.common_apply), ButtonStyle.Normal) {
             ordering.postValue(listOptions.firstOrNull { it.isSelected }?.ordering)
-            dismissDialog.postValue(Unit)
+            hideDialog()
         })
         modules.add(ButtonModule(resourceManager.getString(R.string.common_cancel), ButtonStyle.Close))
         val modularDialogArgs = ModularDialogArgs(
             DialogArgs(),
             modules
         )
-        modularDialog.postValue(modularDialogArgs)
+        showModularDialog(modularDialogArgs)
     }
 
     fun join() {
@@ -123,7 +123,7 @@ class UtxosListViewModel : CommonViewModel() {
             walletService.getWithError { error, wallet ->
                 val selectedUtxos = textList.value.orEmpty().filter { it.checked.value }.map { it.source }.toList()
                 wallet.joinUtxos(selectedUtxos, error)
-                dismissDialog.postValue(Unit)
+                hideDialog()
                 loadUtxosFromFFI()
                 EventBus.post(Event.Transaction.Updated)
                 showSuccessJoinDialog()
@@ -139,27 +139,24 @@ class UtxosListViewModel : CommonViewModel() {
         }
         val title = if (selectedUtxos.count() > 1) R.string.utxos_combine_and_break_title else R.string.utxos_break_title
         val buttonText = if (selectedUtxos.count() > 1) R.string.utxos_combine_and_break_button else R.string.utxos_break_button
-        val modularDialogArgs = ModularDialogArgs(
-            DialogArgs(), listOf(
-                HeadModule(resourceManager.getString(title)),
-                BodyModule(resourceManager.getString(R.string.utxos_combine_and_break_description)),
-                splitModule,
-                ButtonModule(resourceManager.getString(buttonText), ButtonStyle.Normal) {
-                    dismissDialog.postValue(Unit)
-                    showConfirmDialog(R.string.utxos_break_description) {
-                        walletService.getWithError { error, wallet ->
-                            wallet.splitUtxos(selectedUtxos, splitModule.count, error)
-                            dismissDialog.postValue(Unit)
-                            loadUtxosFromFFI()
-                            EventBus.post(Event.Transaction.Updated)
-                            showSuccessSplitDialog()
-                        }
+        showModularDialog(
+            HeadModule(resourceManager.getString(title)),
+            BodyModule(resourceManager.getString(R.string.utxos_combine_and_break_description)),
+            splitModule,
+            ButtonModule(resourceManager.getString(buttonText), ButtonStyle.Normal) {
+                hideDialog()
+                showConfirmDialog(R.string.utxos_break_description) {
+                    walletService.getWithError { error, wallet ->
+                        wallet.splitUtxos(selectedUtxos, splitModule.count, error)
+                        hideDialog()
+                        loadUtxosFromFFI()
+                        EventBus.post(Event.Transaction.Updated)
+                        showSuccessSplitDialog()
                     }
-                },
-                ButtonModule(resourceManager.getString(R.string.common_cancel), ButtonStyle.Close)
-            )
+                }
+            },
+            ButtonModule(resourceManager.getString(R.string.common_cancel), ButtonStyle.Close),
         )
-        modularDialog.postValue(modularDialogArgs)
     }
 
     private fun loadUtxosFromFFI() {
@@ -244,15 +241,12 @@ class UtxosListViewModel : CommonViewModel() {
     }
 
     private fun showConfirmDialog(message: Int, action: () -> Unit) {
-        val modularArgs = ModularDialogArgs(
-            DialogArgs(), listOf(
-                HeadModule(resourceManager.getString(R.string.common_are_you_sure)),
-                BodyModule(resourceManager.getString(message)),
-                ButtonModule(resourceManager.getString(R.string.common_lets_do_it), ButtonStyle.Normal, action),
-                ButtonModule(resourceManager.getString(R.string.common_cancel), ButtonStyle.Close)
-            )
+        showModularDialog(
+            HeadModule(resourceManager.getString(R.string.common_are_you_sure)),
+            BodyModule(resourceManager.getString(message)),
+            ButtonModule(resourceManager.getString(R.string.common_lets_do_it), ButtonStyle.Normal, action),
+            ButtonModule(resourceManager.getString(R.string.common_cancel), ButtonStyle.Close),
         )
-        modularDialog.postValue(modularArgs)
     }
 
     private fun showDetailedDialog(utxoItem: UtxosViewHolderItem) {
@@ -281,14 +275,14 @@ class UtxosListViewModel : CommonViewModel() {
         if (utxoItem.selectable) {
             modules.add(
                 ButtonModule(resourceManager.getString(R.string.utxos_break_button), ButtonStyle.Normal) {
-                    dismissDialog.postValue(Unit)
+                    hideDialog()
                     split(utxoItem)
                 },
             )
         }
         modules.add(ButtonModule(resourceManager.getString(R.string.common_cancel), ButtonStyle.Close))
         val modularArgs = ModularDialogArgs(DialogArgs(), modules)
-        modularDialog.postValue(modularArgs)
+        showModularDialog(modularArgs)
     }
 
     private fun showSuccessSplitDialog() = showSuccessDialog(R.string.utxos_success_split_description)
@@ -296,16 +290,17 @@ class UtxosListViewModel : CommonViewModel() {
     private fun showSuccessJoinDialog() = showSuccessDialog(R.string.utxos_success_join_description)
 
     private fun showSuccessDialog(descriptionId: Int) {
-        val modularArgs = ModularDialogArgs(
-            DialogArgs {
-                setSelectionState(false)
-            }, listOf(
-                ImageModule(R.drawable.tari_utxos_succes_popper),
-                HeadModule(resourceManager.getString(R.string.utxos_success_title)),
-                BodyModule(resourceManager.getString(descriptionId)),
-                ButtonModule(resourceManager.getString(R.string.common_close), ButtonStyle.Close)
+        showModularDialog(
+            ModularDialogArgs(
+                DialogArgs {
+                    setSelectionState(false)
+                }, listOf(
+                    ImageModule(R.drawable.tari_utxos_succes_popper),
+                    HeadModule(resourceManager.getString(R.string.utxos_success_title)),
+                    BodyModule(resourceManager.getString(descriptionId)),
+                    ButtonModule(resourceManager.getString(R.string.common_close), ButtonStyle.Close),
+                )
             )
         )
-        modularDialog.postValue(modularArgs)
     }
 }

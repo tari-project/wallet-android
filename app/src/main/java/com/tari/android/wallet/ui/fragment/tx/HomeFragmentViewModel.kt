@@ -17,7 +17,6 @@ import com.tari.android.wallet.application.securityStage.StagedWalletSecurityMan
 import com.tari.android.wallet.application.securityStage.StagedWalletSecurityManager.StagedSecurityEffect
 import com.tari.android.wallet.data.sharedPrefs.CorePrefRepository
 import com.tari.android.wallet.data.sharedPrefs.securityStages.WalletSecurityStage
-import com.tari.android.wallet.ui.dialog.modular.modules.securityStages.SecurityStageHeadModule
 import com.tari.android.wallet.data.sharedPrefs.sentry.SentryPrefRepository
 import com.tari.android.wallet.event.Event
 import com.tari.android.wallet.event.EventBus
@@ -36,6 +35,7 @@ import com.tari.android.wallet.ui.dialog.modular.modules.body.BodyModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonStyle
 import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
+import com.tari.android.wallet.ui.dialog.modular.modules.securityStages.SecurityStageHeadModule
 import com.tari.android.wallet.ui.dialog.modular.modules.space.SpaceModule
 import com.tari.android.wallet.ui.fragment.contact_book.data.ContactsRepository
 import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
@@ -110,12 +110,12 @@ class HomeFragmentViewModel : CommonViewModel() {
 
         grantContactsPermission()
     }
-    
+
     fun grantContactsPermission() {
-       permissionManager.runWithPermission(listOf(android.Manifest.permission.READ_CONTACTS), true) {
-           viewModelScope.launch(Dispatchers.IO) {
-               contactsRepository.grantContactPermissionAndRefresh()
-           }
+        permissionManager.runWithPermission(listOf(android.Manifest.permission.READ_CONTACTS), true) {
+            viewModelScope.launch(Dispatchers.IO) {
+                contactsRepository.grantContactPermissionAndRefresh()
+            }
         }
     }
 
@@ -127,19 +127,20 @@ class HomeFragmentViewModel : CommonViewModel() {
     private fun checkForDataConsent() {
         if (sentryPrefRepository.isEnabled == null) {
             sentryPrefRepository.isEnabled = false
-            val args = ModularDialogArgs(DialogArgs(cancelable = false, canceledOnTouchOutside = false), listOf(
-                HeadModule(resourceManager.getString(R.string.data_collection_dialog_title)),
-                BodyModule(resourceManager.getString(R.string.data_collection_dialog_description)),
-                ButtonModule(resourceManager.getString(R.string.data_collection_dialog_positive), ButtonStyle.Normal) {
-                    sentryPrefRepository.isEnabled = true
-                    dismissDialog.postValue(Unit)
-                },
-                ButtonModule(resourceManager.getString(R.string.data_collection_dialog_negative), ButtonStyle.Close) {
-                    sentryPrefRepository.isEnabled = false
-                    dismissDialog.postValue(Unit)
-                }
-            ))
-            modularDialog.postValue(args)
+            showModularDialog(
+                ModularDialogArgs(DialogArgs(cancelable = false, canceledOnTouchOutside = false), listOf(
+                    HeadModule(resourceManager.getString(R.string.data_collection_dialog_title)),
+                    BodyModule(resourceManager.getString(R.string.data_collection_dialog_description)),
+                    ButtonModule(resourceManager.getString(R.string.data_collection_dialog_positive), ButtonStyle.Normal) {
+                        sentryPrefRepository.isEnabled = true
+                        hideDialog()
+                    },
+                    ButtonModule(resourceManager.getString(R.string.data_collection_dialog_negative), ButtonStyle.Close) {
+                        sentryPrefRepository.isEnabled = false
+                        hideDialog()
+                    }
+                ))
+            )
         }
     }
 
@@ -210,19 +211,21 @@ class HomeFragmentViewModel : CommonViewModel() {
     }
 
     private fun displayNetworkConnectionErrorDialog() {
-        val errorDialogArgs = ErrorDialogArgs(
-            resourceManager.getString(error_no_connection_title),
-            resourceManager.getString(error_no_connection_description),
+        showModularDialog(
+            ErrorDialogArgs(
+                resourceManager.getString(error_no_connection_title),
+                resourceManager.getString(error_no_connection_description),
+            ).getModular(resourceManager)
         )
-        modularDialog.postValue(errorDialogArgs.getModular(resourceManager))
     }
 
     private fun displayBaseNodeConnectionErrorDialog() {
-        val errorDialogArgs = ErrorDialogArgs(
-            resourceManager.getString(error_node_unreachable_title),
-            resourceManager.getString(error_node_unreachable_description),
+        showModularDialog(
+            ErrorDialogArgs(
+                resourceManager.getString(error_node_unreachable_title),
+                resourceManager.getString(error_node_unreachable_description),
+            ).getModular(resourceManager)
         )
-        modularDialog.postValue(errorDialogArgs.getModular(resourceManager))
     }
 
     /**
@@ -275,7 +278,7 @@ class HomeFragmentViewModel : CommonViewModel() {
     }
 
     private fun openStage1() {
-        dismissDialog.postValue(Unit)
+        hideDialog()
         tariNavigator.let {
             it.toAllSettings()
             it.toBackupSettings(false)
@@ -284,7 +287,7 @@ class HomeFragmentViewModel : CommonViewModel() {
     }
 
     private fun openStage1B() {
-        dismissDialog.postValue(Unit)
+        hideDialog()
         tariNavigator.let {
             it.toAllSettings()
             it.toBackupSettings(true)
@@ -292,7 +295,7 @@ class HomeFragmentViewModel : CommonViewModel() {
     }
 
     private fun openStage2() {
-        dismissDialog.postValue(Unit)
+        hideDialog()
         tariNavigator.let {
             it.toAllSettings()
             it.toBackupSettings(false)
@@ -301,7 +304,7 @@ class HomeFragmentViewModel : CommonViewModel() {
     }
 
     private fun openStage3() {
-        dismissDialog.postValue(Unit)
+        hideDialog()
         //todo for future
     }
 
@@ -314,25 +317,18 @@ class HomeFragmentViewModel : CommonViewModel() {
         bodyHtml: Spanned? = null,
         positiveAction: () -> Unit = {},
     ) {
-        val args = ModularDialogArgs(
-            DialogArgs(), listOf(
-                SecurityStageHeadModule(titleEmoji, title) { showBackupInfo(stage) },
-                BodyModule(body, bodyHtml?.let { SpannableString(it) }),
-                ButtonModule(positiveButtonTitle, ButtonStyle.Normal) { positiveAction.invoke() },
-                ButtonModule(resourceManager.getString(R.string.staged_wallet_security_buttons_remind_me_later), ButtonStyle.Close)
-            )
+        showModularDialog(
+            SecurityStageHeadModule(titleEmoji, title) { showBackupInfo(stage) },
+            BodyModule(body, bodyHtml?.let { SpannableString(it) }),
+            ButtonModule(positiveButtonTitle, ButtonStyle.Normal) { positiveAction.invoke() },
+            ButtonModule(resourceManager.getString(R.string.staged_wallet_security_buttons_remind_me_later), ButtonStyle.Close),
         )
-        modularDialog.postValue(args)
     }
 
     private fun showBackupInfo(stage: BackupOnboardingArgs) {
-        modularDialog.postValue(
-            ModularDialogArgs(
-                DialogArgs(), listOf(
-                    BackupOnboardingFlowItemModule(stage),
-                    SpaceModule(20),
-                )
-            )
+        showModularDialog(
+            BackupOnboardingFlowItemModule(stage),
+            SpaceModule(20),
         )
     }
 

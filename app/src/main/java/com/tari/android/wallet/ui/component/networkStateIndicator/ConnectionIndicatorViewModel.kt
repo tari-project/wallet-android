@@ -44,14 +44,15 @@ class ConnectionIndicatorViewModel : CommonViewModel() {
         _baseNodeState.value ?: return
         _syncState.value ?: return
 
-        val args = ModularDialogArgs(
-            DialogArgs(isRefreshing = isRefreshing), listOf(
-                HeadModule(resourceManager.getString(R.string.connection_status_dialog_title)),
-                ConnectionStatusesModule(_networkState.value!!, _torProxyState.value!!, _baseNodeState.value!!, _syncState.value!!),
-                ButtonModule(resourceManager.getString(R.string.common_close), ButtonStyle.Close)
+        showModularDialog(
+            ModularDialogArgs(
+                DialogArgs(isRefreshing = isRefreshing), listOf(
+                    HeadModule(resourceManager.getString(R.string.connection_status_dialog_title)),
+                    ConnectionStatusesModule(_networkState.value!!, _torProxyState.value!!, _baseNodeState.value!!, _syncState.value!!),
+                    ButtonModule(resourceManager.getString(R.string.common_close), ButtonStyle.Close),
+                )
             )
         )
-        modularDialog.postValue(args)
     }
 
     private fun subscribeOnEventBus() {

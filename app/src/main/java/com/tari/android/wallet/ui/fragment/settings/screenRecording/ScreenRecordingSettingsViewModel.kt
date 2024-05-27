@@ -22,19 +22,21 @@ class ScreenRecordingSettingsViewModel : CommonViewModel() {
             turnSwitcher(false)
         } else {
             _switchState.update { it.startLoading() }
-            modularDialog.value = ConfirmDialogArgs(
-                resourceManager.getString(R.string.screen_recording_button_confirmation_title),
-                resourceManager.getString(R.string.screen_recording_button_confirmation_description),
-                onConfirm = { turnSwitcher(true) },
-                onCancel = { _switchState.update { it.stopLoading() } },
-                onDismiss = { _switchState.update { it.stopLoading() } }
-            ).getModular(resourceManager)
+            showModularDialog(
+                ConfirmDialogArgs(
+                    title = resourceManager.getString(R.string.screen_recording_button_confirmation_title),
+                    description = resourceManager.getString(R.string.screen_recording_button_confirmation_description),
+                    onConfirm = { turnSwitcher(true) },
+                    onCancel = { _switchState.update { it.stopLoading() } },
+                    onDismiss = { _switchState.update { it.stopLoading() } },
+                ).getModular(resourceManager)
+            )
         }
     }
 
     private fun turnSwitcher(isTurnedOn: Boolean) {
         tariSettingsSharedRepository.screenRecordingTurnedOn = isTurnedOn
         _switchState.update { TariLoadingSwitchState(isTurnedOn, false) }
-        dismissDialog.postValue(Unit)
+        hideDialog()
     }
 }

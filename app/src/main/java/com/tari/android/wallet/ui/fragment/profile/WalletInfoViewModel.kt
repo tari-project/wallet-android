@@ -6,9 +6,11 @@ import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.tari.android.wallet.R
+import com.tari.android.wallet.application.YatAdapter
 import com.tari.android.wallet.application.deeplinks.DeepLink
 import com.tari.android.wallet.application.deeplinks.DeeplinkHandler
 import com.tari.android.wallet.data.sharedPrefs.CorePrefRepository
+import com.tari.android.wallet.data.sharedPrefs.yat.YatPrefRepository
 import com.tari.android.wallet.model.TariWalletAddress
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.dialog.modular.DialogArgs
@@ -19,8 +21,6 @@ import com.tari.android.wallet.ui.fragment.contact_book.root.ShareViewModel
 import com.tari.android.wallet.ui.fragment.contact_book.root.share.ShareType
 import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
 import com.tari.android.wallet.util.ContactUtil
-import com.tari.android.wallet.application.YatAdapter
-import com.tari.android.wallet.data.sharedPrefs.yat.YatPrefRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -137,8 +137,7 @@ class WalletInfoViewModel : CommonViewModel() {
             true
         }
 
-        val args = ModularDialogArgs(DialogArgs(), moduleList)
-        _inputDialog.postValue(args)
+        showInputModalDialog(ModularDialogArgs(DialogArgs(), moduleList))
     }
 
     fun openRequestTari() {
@@ -150,6 +149,6 @@ class WalletInfoViewModel : CommonViewModel() {
         sharedPrefsWrapper.name = split.getOrNull(0).orEmpty().trim()
         sharedPrefsWrapper.surname = split.getOrNull(1).orEmpty().trim()
         alias.postValue(name)
-        dismissDialog.postValue(Unit)
+        hideDialog()
     }
 }
