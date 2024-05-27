@@ -12,6 +12,7 @@ import androidx.viewbinding.ViewBinding
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.common.DialogManager
 import com.tari.android.wallet.ui.component.tari.toast.TariToast
+import com.tari.android.wallet.ui.dialog.inProgress.TariProgressDialog
 import com.tari.android.wallet.ui.dialog.modular.ModularDialog
 
 abstract class CommonView<VM : CommonViewModel, VB : ViewBinding> : LinearLayout {
@@ -21,7 +22,7 @@ abstract class CommonView<VM : CommonViewModel, VB : ViewBinding> : LinearLayout
     lateinit var ui: VB
         private set
 
-    private val dialogManager = DialogManager()
+    private var dialogManager: DialogManager? = null
 
     abstract fun bindingInflate(layoutInflater: LayoutInflater, parent: ViewGroup?, attachToRoot: Boolean): VB
 
@@ -46,25 +47,32 @@ abstract class CommonView<VM : CommonViewModel, VB : ViewBinding> : LinearLayout
     private fun init() {
         ui = bindingInflate(LayoutInflater.from(context), this, true)
 
-        dialogManager.context = context
         setup()
     }
 
     abstract fun setup()
 
-    open fun bindViewModel(viewModel: VM) {
-        this.viewModel = viewModel
+    open fun bindViewModel(viewModel: VM) = with(viewModel) {
+        this@CommonView.viewModel = viewModel
 
-        viewModel.openLink.observe(viewLifecycle) { context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(it))) }
+        dialogManager = viewModel.dialogManager
 
-        viewModel.modularDialog.observe(viewLifecycle) { dialogManager.replace(ModularDialog(context, it)) }
+        openLink.observe(viewLifecycle) { context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(it))) }
 
-        viewModel.dismissDialog.observe(viewLifecycle) { dialogManager.dismiss() }
+        modularDialog.observe(viewLifecycle) { dialogManager.replace(ModularDialog(context, it)) }
 
-        viewModel.loadingDialog.observe(viewLifecycle) { dialogManager.handleProgress(it) }
+        dismissDialog.observe(viewLifecycle) { dialogManager.dismiss() }
 
-        viewModel.showToast.observe(viewLifecycle) { TariToast(context, it) }
+        loadingDialog.observe(viewLifecycle) { progressDialogArgs ->
+            if (progressDialogArgs.isShow) {
+                dialogManager.replace(TariProgressDialog(context, progressDialogArgs))
+            } else {
+                dialogManager.dismiss()
+            }
+        }
 
-        viewModel.navigation.observe(viewLifecycle) { viewModel.tariNavigator.navigate(it) }
+        showToast.observe(viewLifecycle) { TariToast(context, it) }
+
+        navigation.observe(viewLifecycle) { viewModel.tariNavigator.navigate(it) }
     }
 }

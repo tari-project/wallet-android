@@ -2,7 +2,6 @@ package com.tari.android.wallet.ui.common
 
 import android.content.ClipData
 import android.content.ClipboardManager
-import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -23,6 +22,7 @@ import com.tari.android.wallet.extension.observe
 import com.tari.android.wallet.ui.component.mainList.MutedBackPressedCallback
 import com.tari.android.wallet.ui.component.tari.toast.TariToast
 import com.tari.android.wallet.ui.component.tari.toast.TariToastArgs
+import com.tari.android.wallet.ui.dialog.inProgress.TariProgressDialog
 import com.tari.android.wallet.ui.dialog.modular.InputModularDialog
 import com.tari.android.wallet.ui.dialog.modular.ModularDialog
 import com.tari.android.wallet.ui.extension.string
@@ -31,13 +31,13 @@ abstract class CommonFragment<Binding : ViewBinding, VM : CommonViewModel> : Fra
 
     private lateinit var clipboardManager: ClipboardManager
 
-    private val dialogManager = DialogManager()
-
     protected var blockingBackPressDispatcher = MutedBackPressedCallback(false)
 
     protected lateinit var ui: Binding
 
     lateinit var viewModel: VM
+
+    private var dialogManager: DialogManager? = null
 
     //TODO make viewModel not lateinit. Sometimes it's not initialized in time and causes crashes, so we need to check if it's initialized
     private val blockScreenRecording
@@ -66,11 +66,6 @@ abstract class CommonFragment<Binding : ViewBinding, VM : CommonViewModel> : Fra
         clipboardManager = DiContainer.appComponent.getClipboardManager()
     }
 
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        dialogManager.context = context
-    }
-
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, blockingBackPressDispatcher)
 
@@ -92,6 +87,8 @@ abstract class CommonFragment<Binding : ViewBinding, VM : CommonViewModel> : Fra
         this@CommonFragment.viewModel = this
 
         subscribeVM(viewModel)
+
+        dialogManager = viewModel.dialogManager
     }
 
     override fun onDetach() {
@@ -120,7 +117,13 @@ abstract class CommonFragment<Binding : ViewBinding, VM : CommonViewModel> : Fra
 
         observe(inputDialog) { dialogManager.replace(InputModularDialog(requireContext(), it)) }
 
-        observe(loadingDialog) { dialogManager.handleProgress(it) }
+        observe(loadingDialog) { progressDialogArgs ->
+            if (progressDialogArgs.isShow) {
+                dialogManager.replace(TariProgressDialog(requireContext(), progressDialogArgs))
+            } else {
+                dialogManager.dismiss()
+            }
+        }
 
         observe(dismissDialog) { dialogManager.dismiss() }
 
@@ -179,7 +182,7 @@ abstract class CommonFragment<Binding : ViewBinding, VM : CommonViewModel> : Fra
     }
 
     override fun onDestroy() {
-        dialogManager.dismiss()
+        dialogManager?.dismiss()
         super.onDestroy()
     }
 }

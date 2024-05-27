@@ -77,6 +77,9 @@ open class CommonViewModel : ViewModel() {
     @Inject
     lateinit var walletStateHandler: WalletStateHandler
 
+    @Inject
+    lateinit var dialogManager: DialogManager
+
     private var authorizedAction: (() -> Unit)? = null
 
     val logger: Printer
@@ -195,11 +198,11 @@ open class CommonViewModel : ViewModel() {
     }
 
     fun showErrorDialog(error: CoreError) {
-        showModularDialog(WalletErrorArgs(resourceManager, error).getErrorArgs().getModular(resourceManager))
+        showModularDialog(WalletErrorArgs(resourceManager, error).getErrorArgs().getModular(resourceManager, isRefreshing = true))
     }
 
     fun showErrorDialog(exception: Throwable) {
-        showModularDialog(WalletErrorArgs(resourceManager, exception).getErrorArgs().getModular(resourceManager))
+        showModularDialog(WalletErrorArgs(resourceManager, exception).getErrorArgs().getModular(resourceManager, isRefreshing = true))
     }
 
     fun hideDialog() {
