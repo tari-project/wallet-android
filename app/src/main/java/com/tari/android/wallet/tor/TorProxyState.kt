@@ -38,11 +38,8 @@ package com.tari.android.wallet.tor
  * @author The Tari Development Team
  */
 sealed class TorProxyState {
-    object NotReady : TorProxyState()
-
+    data object NotReady : TorProxyState()
     data class Initializing(val bootstrapStatus: TorBootstrapStatus? = null) : TorProxyState()
-
     data class Running(val bootstrapStatus: TorBootstrapStatus) : TorProxyState()
-
-    class Failed(val e: Throwable) : TorProxyState()
+    data class Failed(val e: Throwable) : TorProxyState()
 }

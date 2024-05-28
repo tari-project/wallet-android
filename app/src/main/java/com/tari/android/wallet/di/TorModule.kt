@@ -51,7 +51,7 @@ class TorModule {
     @Provides
     @Singleton
     fun provideTorConfig(context: Context): TorConfig {
-        val cookieFilePath = File(context.getDir(TorProxyManager.torDataDirectoryName, Context.MODE_PRIVATE), "control_auth_cookie").absolutePath
+        val cookieFilePath = File(context.getDir(TorProxyManager.TOR_DATA_DIRECTORY_NAME, Context.MODE_PRIVATE), "control_auth_cookie").absolutePath
 
         return TorConfig(
             controlPort = 39069,
