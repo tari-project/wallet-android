@@ -5,6 +5,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.tari.android.wallet.R
+import com.tari.android.wallet.data.sharedPrefs.backup.BackupPrefRepository
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.extension.addTo
 import com.tari.android.wallet.infrastructure.backup.BackupException
@@ -22,7 +23,6 @@ import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonStyle
 import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
 import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupOptionDto
 import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupOptions
-import com.tari.android.wallet.data.sharedPrefs.backup.BackupPrefRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.joda.time.DateTime
@@ -114,7 +114,7 @@ class BackupOptionViewModel : CommonViewModel() {
             viewModelScope.launch(Dispatchers.IO) {
                 try {
                     backupManager.turnOff(_option.value!!.type)
-                    dismissDialog.postValue(Unit)
+                    hideDialog()
                 } catch (exception: Exception) {
                     logger.i(exception.toString())
                 }
@@ -126,20 +126,21 @@ class BackupOptionViewModel : CommonViewModel() {
             _switchChecked.postValue(true)
         }
 
-        val args = ModularDialogArgs(
-            DialogArgs(true, canceledOnTouchOutside = false), listOf(
-                HeadModule(resourceManager.getString(R.string.back_up_wallet_turn_off_backup_warning_title)),
-                BodyModule(resourceManager.getString(R.string.back_up_wallet_turn_off_backup_warning_description)),
-                ButtonModule(resourceManager.getString(R.string.common_confirm), ButtonStyle.Warning) {
-                    onAcceptAction()
-                },
-                ButtonModule(resourceManager.getString(R.string.common_cancel), ButtonStyle.Close) {
-                    onDismissAction()
-                    dismissDialog.value = Unit
-                }
-            ))
-
-        modularDialog.postValue(args)
+        showModularDialog(
+            ModularDialogArgs(
+                DialogArgs(true, canceledOnTouchOutside = false), listOf(
+                    HeadModule(resourceManager.getString(R.string.back_up_wallet_turn_off_backup_warning_title)),
+                    BodyModule(resourceManager.getString(R.string.back_up_wallet_turn_off_backup_warning_description)),
+                    ButtonModule(resourceManager.getString(R.string.common_confirm), ButtonStyle.Warning) {
+                        onAcceptAction()
+                    },
+                    ButtonModule(resourceManager.getString(R.string.common_cancel), ButtonStyle.Close) {
+                        onDismissAction()
+                        hideDialog()
+                    }
+                )
+            )
+        )
     }
 
     private fun showBackupStorageSetupFailedDialog(exception: Throwable? = null) {
@@ -152,7 +153,7 @@ class BackupOptionViewModel : CommonViewModel() {
             is BackupException -> exception.message.orEmpty()
             else -> resourceManager.getString(R.string.back_up_wallet_storage_setup_error_desc)
         }
-        modularDialog.postValue(ErrorDialogArgs(errorTitle, errorDescription) {
+        showModularDialog(ErrorDialogArgs(errorTitle, errorDescription) {
             _switchChecked.postValue(false)
             _inProgress.postValue(false)
         }.getModular(resourceManager))

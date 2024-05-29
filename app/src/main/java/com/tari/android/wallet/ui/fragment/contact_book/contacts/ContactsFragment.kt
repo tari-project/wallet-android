@@ -42,6 +42,7 @@ import com.tari.android.wallet.databinding.FragmentContactsBinding
 import com.tari.android.wallet.extension.observe
 import com.tari.android.wallet.extension.observeOnLoad
 import com.tari.android.wallet.ui.common.CommonFragment
+import com.tari.android.wallet.ui.common.domain.PaletteManager
 import com.tari.android.wallet.ui.common.recyclerView.CommonAdapter
 import com.tari.android.wallet.ui.fragment.contact_book.contacts.adapter.ContactListAdapter
 
@@ -80,7 +81,7 @@ open class ContactsFragment : CommonFragment<FragmentContactsBinding, ContactsVi
     private fun setupUI() = with(ui) {
         setupRecyclerView()
         swipeRefreshLayout.setOnRefreshListener { viewModel.refresh() }
-        swipeRefreshLayout.setColorSchemeColors(viewModel.paletteManager.getPurpleBrand(requireContext()))
+        swipeRefreshLayout.setColorSchemeColors(PaletteManager.getPurpleBrand(requireContext()))
     }
 
     private fun setupRecyclerView() {

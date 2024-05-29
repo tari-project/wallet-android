@@ -60,8 +60,8 @@ class YatInputModuleView(context: Context, private val inputModule: YatInputModu
 
             launch(Dispatchers.Main) {
                 isLoading(false)
-                ui.yat.imageTintList = if (yatInfo) createColorStateList(PaletteManager().getIconDefault(context))
-                else createColorStateList(PaletteManager().getIconInactive(context))
+                ui.yat.imageTintList = if (yatInfo) createColorStateList(PaletteManager.getIconDefault(context))
+                else createColorStateList(PaletteManager.getIconInactive(context))
             }
         }
     }

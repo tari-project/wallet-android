@@ -10,22 +10,21 @@ class CheckedController(val view: TextView) {
     private var checked: AtomicBoolean = AtomicBoolean(false)
 
     var toggleCallback: (Boolean) -> Unit = {}
-    val paletteManager = PaletteManager()
 
     fun toggleChecked() {
         setChecked(!checked.get())
     }
 
     fun setChecked(checked: Boolean) {
-        if(checked == this.checked.get()) return
+        if (checked == this.checked.get()) return
         this.checked.set(checked)
         toggleCallback(checked)
         if (this.checked.get()) {
             view.setText(R.string.common_cancel)
-            view.setTextColor(paletteManager.getTextLinks(view.context))
+            view.setTextColor(PaletteManager.getTextLinks(view.context))
         } else {
             view.setText(R.string.utxos_selecting)
-            view.setTextColor(paletteManager.getTextHeading(view.context))
+            view.setTextColor(PaletteManager.getTextHeading(view.context))
         }
     }
 }

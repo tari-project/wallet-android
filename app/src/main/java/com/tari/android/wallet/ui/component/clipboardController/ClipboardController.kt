@@ -44,6 +44,7 @@ import com.daasuu.ei.EasingInterpolator
 import com.tari.android.wallet.R
 import com.tari.android.wallet.databinding.ViewClipboardWalletBinding
 import com.tari.android.wallet.model.TariWalletAddress
+import com.tari.android.wallet.ui.common.domain.PaletteManager
 import com.tari.android.wallet.ui.extension.dimenPx
 import com.tari.android.wallet.ui.extension.gone
 import com.tari.android.wallet.ui.extension.hideKeyboard
@@ -102,10 +103,10 @@ class ClipboardController(
      */
     private fun showPasteEmojiIdViews(emojiId: String) {
         ui.emojiIdTextView.text = EmojiUtil.getFullEmojiIdSpannable(
-            emojiId,
-            context.string(R.string.emoji_id_chunk_separator),
-            viewModel.paletteManager.getBlack(context),
-            viewModel.paletteManager.getLightGray(context)
+            emojiId = emojiId,
+            separator = context.string(R.string.emoji_id_chunk_separator),
+            darkColor = PaletteManager.getBlack(context),
+            lightColor = PaletteManager.getLightGray(context)
         )
         ui.emojiIdContainerView.setBottomMargin(-context.dimenPx(R.dimen.add_recipient_clipboard_emoji_id_container_height))
         ui.emojiIdContainerView.visible()

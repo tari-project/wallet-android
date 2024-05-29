@@ -1,5 +1,6 @@
 package com.tari.android.wallet.extension
 
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
@@ -15,6 +16,14 @@ inline fun LifecycleOwner.launchAndRepeatOnLifecycle(
     state: Lifecycle.State,
     crossinline block: suspend CoroutineScope.() -> Unit,
 ) = lifecycleScope.launch { repeatOnLifecycle(state) { block() } }
+
+fun <T> AppCompatActivity.collectFlow(stateFlow: Flow<T>, action: (T) -> Unit) {
+    launchAndRepeatOnLifecycle(Lifecycle.State.STARTED) {
+        stateFlow.collect { state ->
+            action(state)
+        }
+    }
+}
 
 fun <T> Fragment.collectFlow(stateFlow: Flow<T>, action: (T) -> Unit) {
     viewLifecycleOwner.launchAndRepeatOnLifecycle(Lifecycle.State.STARTED) {

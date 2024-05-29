@@ -19,8 +19,6 @@ import com.tari.android.wallet.ui.common.debounce
 import com.tari.android.wallet.ui.common.domain.ResourceManager
 import com.tari.android.wallet.ui.component.loadingButton.LoadingButtonState
 import com.tari.android.wallet.ui.dialog.error.ErrorDialogArgs
-import com.tari.android.wallet.ui.dialog.modular.DialogArgs
-import com.tari.android.wallet.ui.dialog.modular.ModularDialogArgs
 import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
 import com.tari.android.wallet.ui.dialog.modular.modules.input.InputModule
 import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
@@ -161,7 +159,7 @@ class InputSeedWordsViewModel : CommonViewModel() {
         onError(errorDialogArgs)
     }
 
-    private fun onError(restorationError: RestorationError) = modularDialog.postValue(restorationError.args.getModular(resourceManager))
+    private fun onError(restorationError: RestorationError) = showModularDialog(restorationError.args.getModular(resourceManager))
 
     private fun clear() {
         walletServiceLauncher.stopAndDelete()
@@ -347,21 +345,16 @@ class InputSeedWordsViewModel : CommonViewModel() {
             true
         }
 
-        _inputDialog.postValue(
-            ModularDialogArgs(
-                dialogArgs = DialogArgs(),
-                modules = mutableListOf(
-                    title,
-                    nameInput,
-                    hexInput,
-                    addressInput,
-                )
-            )
+        showInputModalDialog(
+            title,
+            nameInput,
+            hexInput,
+            addressInput,
         )
     }
 
     private fun customBaseNodeEntered(enteredName: String, enteredHex: String, enteredAddress: String) {
-        dismissDialog.postValue(Unit)
+        hideDialog()
         if (baseNodesManager.isValidBaseNode("$enteredHex::$enteredAddress")) {
             val baseNode = BaseNodeDto(
                 name = enteredName.takeIf { it.isNotBlank() } ?: resourceManager.getString(R.string.add_base_node_default_name_custom),
@@ -372,7 +365,7 @@ class InputSeedWordsViewModel : CommonViewModel() {
             _customBaseNodeState.update { it.copy(customBaseNode = baseNode) }
         } else {
             _customBaseNodeState.update { it.copy(customBaseNode = null) }
-            modularDialog.postValue(
+            showModularDialog(
                 ErrorDialogArgs(
                     title = resourceManager.getString(R.string.common_error_title),
                     description = resourceManager.getString(R.string.restore_from_seed_words_form_error_message),

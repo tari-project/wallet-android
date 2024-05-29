@@ -49,6 +49,7 @@ import com.tari.android.wallet.R.string.enter_backup_password_page_desc_highligh
 import com.tari.android.wallet.databinding.FragmentEnterRestorePasswordBinding
 import com.tari.android.wallet.extension.observe
 import com.tari.android.wallet.ui.common.CommonFragment
+import com.tari.android.wallet.ui.common.domain.PaletteManager
 import com.tari.android.wallet.ui.extension.colorFromAttribute
 import com.tari.android.wallet.ui.extension.gone
 import com.tari.android.wallet.ui.extension.hideKeyboard
@@ -133,7 +134,7 @@ class EnterRestorationPasswordFragment : CommonFragment<FragmentEnterRestorePass
     private fun setPageDescription() {
         val generalPart = string(enter_backup_password_page_desc_general_part)
         val highlightedPart = SpannableString(string(enter_backup_password_page_desc_highlighted_part))
-        val spanColor = ForegroundColorSpan(viewModel.paletteManager.getTextHeading(requireContext()))
+        val spanColor = ForegroundColorSpan(PaletteManager.getTextHeading(requireContext()))
         highlightedPart.setSpan(spanColor, 0, highlightedPart.length, SPAN_EXCLUSIVE_EXCLUSIVE)
         ui.pageDescriptionTextView.text = SpannableStringBuilder().apply {
             insert(0, generalPart)

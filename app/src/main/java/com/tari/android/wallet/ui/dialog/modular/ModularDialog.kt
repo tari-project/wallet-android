@@ -12,8 +12,6 @@ import android.widget.LinearLayout
 import androidx.appcompat.widget.LinearLayoutCompat
 import androidx.core.animation.doOnEnd
 import com.tari.android.wallet.R
-import com.tari.android.wallet.ui.dialog.modular.modules.securityStages.SecurityStageHeadModule
-import com.tari.android.wallet.ui.dialog.modular.modules.securityStages.SecurityStageHeadModuleView
 import com.tari.android.wallet.ui.component.networkStateIndicator.module.ConnectionStatusesModule
 import com.tari.android.wallet.ui.component.networkStateIndicator.module.ConnectionStatusesModuleView
 import com.tari.android.wallet.ui.dialog.TariDialog
@@ -41,6 +39,8 @@ import com.tari.android.wallet.ui.dialog.modular.modules.input.InputModule
 import com.tari.android.wallet.ui.dialog.modular.modules.input.InputModuleView
 import com.tari.android.wallet.ui.dialog.modular.modules.option.OptionModule
 import com.tari.android.wallet.ui.dialog.modular.modules.option.OptionModuleView
+import com.tari.android.wallet.ui.dialog.modular.modules.securityStages.SecurityStageHeadModule
+import com.tari.android.wallet.ui.dialog.modular.modules.securityStages.SecurityStageHeadModuleView
 import com.tari.android.wallet.ui.dialog.modular.modules.shortEmoji.ShortEmojiIdModule
 import com.tari.android.wallet.ui.dialog.modular.modules.shortEmoji.ShortEmojiModuleView
 import com.tari.android.wallet.ui.dialog.modular.modules.space.SpaceModule
@@ -181,3 +181,6 @@ open class ModularDialog(val context: Context) : TariDialog {
         }
     }
 }
+
+val TariDialog?.isRefreshing: Boolean
+    get() = this is ModularDialog && args.dialogArgs.isRefreshing

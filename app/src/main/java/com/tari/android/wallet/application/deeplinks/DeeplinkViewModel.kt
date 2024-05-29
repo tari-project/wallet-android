@@ -10,8 +10,6 @@ import com.tari.android.wallet.ffi.HexString
 import com.tari.android.wallet.model.TariWalletAddress
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.dialog.confirm.ConfirmDialogArgs
-import com.tari.android.wallet.ui.dialog.modular.DialogArgs
-import com.tari.android.wallet.ui.dialog.modular.ModularDialogArgs
 import com.tari.android.wallet.ui.dialog.modular.modules.body.BodyModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonStyle
@@ -59,16 +57,16 @@ class DeeplinkViewModel : CommonViewModel() {
     private fun addBaseNode(deeplink: DeepLink.AddBaseNode, isQrData: Boolean = true) {
         val baseNode = getData(deeplink)
         val args = ConfirmDialogArgs(
-            resourceManager.getString(R.string.home_custom_base_node_title),
-            resourceManager.getString(R.string.home_custom_base_node_description),
-            resourceManager.getString(R.string.home_custom_base_node_no_button),
-            resourceManager.getString(R.string.common_lets_do_it),
+            title = resourceManager.getString(R.string.home_custom_base_node_title),
+            description = resourceManager.getString(R.string.home_custom_base_node_description),
+            cancelButtonText = resourceManager.getString(R.string.home_custom_base_node_no_button),
+            confirmButtonText = resourceManager.getString(R.string.common_lets_do_it),
             onConfirm = {
                 hideDialog()
                 addBaseNodeAction(baseNode, isQrData)
-            }
+            },
         ).getModular(baseNode, resourceManager)
-        modularDialog.postValue(args)
+        showModularDialog(args)
     }
 
     private fun addUserProfile(deeplink: DeepLink.UserProfile, isQrData: Boolean) {
@@ -87,18 +85,15 @@ class DeeplinkViewModel : CommonViewModel() {
         val contactDtos = getData(contacts)
         if (contactDtos.isEmpty()) return
         val names = contactDtos.joinToString(", ") { it.contact.getAlias().trim() }
-        val args = ModularDialogArgs(
-            DialogArgs(), listOf(
-                HeadModule(resourceManager.getString(R.string.contact_deeplink_title)),
-                BodyModule(resourceManager.getString(R.string.contact_deeplink_message, contactDtos.size.toString()) + ". " + names),
-                ButtonModule(resourceManager.getString(R.string.common_confirm), ButtonStyle.Normal) {
-                    addContactsAction(contactDtos, isQrData)
-                    hideDialog()
-                },
-                ButtonModule(resourceManager.getString(R.string.common_cancel), ButtonStyle.Close)
-            )
+        showModularDialog(
+            HeadModule(resourceManager.getString(R.string.contact_deeplink_title)),
+            BodyModule(resourceManager.getString(R.string.contact_deeplink_message, contactDtos.size.toString()) + ". " + names),
+            ButtonModule(resourceManager.getString(R.string.common_confirm), ButtonStyle.Normal) {
+                addContactsAction(contactDtos, isQrData)
+                hideDialog()
+            },
+            ButtonModule(resourceManager.getString(R.string.common_cancel), ButtonStyle.Close)
         )
-        modularDialog.postValue(args)
     }
 
     fun addTorBridges(deeplink: DeepLink.TorBridges, isQrData: Boolean) {

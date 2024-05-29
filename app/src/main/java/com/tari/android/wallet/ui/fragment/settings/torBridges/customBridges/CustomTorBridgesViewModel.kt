@@ -75,10 +75,11 @@ class CustomTorBridgesViewModel : CommonViewModel() {
     }
 
     private fun incorrectFormat() {
-        val args = ErrorDialogArgs(
-            resourceManager.getString(R.string.common_error_title),
-            resourceManager.getString(R.string.tor_bridges_incorrect_format)
+        showModularDialog(
+            ErrorDialogArgs(
+                resourceManager.getString(R.string.common_error_title),
+                resourceManager.getString(R.string.tor_bridges_incorrect_format)
+            ).getModular(resourceManager)
         )
-        modularDialog.postValue(args.getModular(resourceManager))
     }
 }

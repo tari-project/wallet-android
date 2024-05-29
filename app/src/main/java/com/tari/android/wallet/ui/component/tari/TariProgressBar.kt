@@ -8,13 +8,11 @@ import com.tari.android.wallet.ui.extension.setColor
 
 class TariProgressBar(context: Context, attrs: AttributeSet) : ProgressBar(context, attrs) {
 
-    private val paletteManager = PaletteManager()
-
     init {
-        setColor(paletteManager.getPurpleBrand(context))
+        setColor(PaletteManager.getPurpleBrand(context))
     }
 
-    fun setWhite() = setColor(paletteManager.getWhite(context))
+    fun setWhite() = setColor(PaletteManager.getWhite(context))
 
-    fun setError() = setColor(paletteManager.getRed(context))
+    fun setError() = setColor(PaletteManager.getRed(context))
 }

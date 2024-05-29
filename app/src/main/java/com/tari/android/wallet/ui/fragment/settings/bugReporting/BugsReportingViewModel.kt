@@ -4,8 +4,6 @@ import androidx.lifecycle.viewModelScope
 import com.tari.android.wallet.R
 import com.tari.android.wallet.infrastructure.logging.BugReportingService
 import com.tari.android.wallet.ui.common.CommonViewModel
-import com.tari.android.wallet.ui.dialog.modular.DialogArgs
-import com.tari.android.wallet.ui.dialog.modular.ModularDialogArgs
 import com.tari.android.wallet.ui.dialog.modular.modules.body.BodyModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonStyle
@@ -27,15 +25,11 @@ class BugsReportingViewModel : CommonViewModel() {
             bugReportingService.share(name, email, bugDescription)
             backPressed.postValue(Unit)
         } catch (e: Exception) {
-            val args = ModularDialogArgs(
-                DialogArgs(),
-                listOf(
-                    HeadModule(resourceManager.getString(R.string.common_error_title)),
-                    BodyModule(resourceManager.getString(R.string.common_unknown_error)),
-                    ButtonModule(resourceManager.getString(R.string.common_ok), ButtonStyle.Close)
-                )
+            showModularDialog(
+                HeadModule(resourceManager.getString(R.string.common_error_title)),
+                BodyModule(resourceManager.getString(R.string.common_unknown_error)),
+                ButtonModule(resourceManager.getString(R.string.common_ok), ButtonStyle.Close),
             )
-            modularDialog.postValue(args)
         }
     }
 }

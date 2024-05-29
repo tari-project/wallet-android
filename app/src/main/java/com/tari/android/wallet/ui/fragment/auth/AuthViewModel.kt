@@ -7,8 +7,6 @@ import com.tari.android.wallet.infrastructure.security.biometric.BiometricAuthen
 import com.tari.android.wallet.service.service.WalletServiceLauncher
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.common.SingleLiveEvent
-import com.tari.android.wallet.ui.dialog.modular.DialogArgs
-import com.tari.android.wallet.ui.dialog.modular.ModularDialogArgs
 import com.tari.android.wallet.ui.dialog.modular.modules.body.BodyModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonStyle
@@ -51,20 +49,18 @@ class AuthViewModel : CommonViewModel() {
     }
 
     private fun showIncompatibleVersionDialog() {
-        val args = ModularDialogArgs(
-            DialogArgs(), listOf(
-                HeadModule(resourceManager.getString(R.string.ffi_validation_error_title)),
-                BodyModule(resourceManager.getString(R.string.ffi_validation_error_message)),
-                ButtonModule(resourceManager.getString(R.string.ffi_validation_error_delete), ButtonStyle.Warning) {
-                    dismissDialog.postValue(Unit)
-                    deleteWallet()
-                },
-                ButtonModule(resourceManager.getString(R.string.ffi_validation_error_cancel), ButtonStyle.Close) {
-                    goAuth.postValue(Unit)
-                    dismissDialog.postValue(Unit)
-                }
-            ))
-        modularDialog.postValue(args)
+        showModularDialog(
+            HeadModule(resourceManager.getString(R.string.ffi_validation_error_title)),
+            BodyModule(resourceManager.getString(R.string.ffi_validation_error_message)),
+            ButtonModule(resourceManager.getString(R.string.ffi_validation_error_delete), ButtonStyle.Warning) {
+                hideDialog()
+                deleteWallet()
+            },
+            ButtonModule(resourceManager.getString(R.string.ffi_validation_error_cancel), ButtonStyle.Close) {
+                goAuth.postValue(Unit)
+                hideDialog()
+            }
+        )
     }
 
     private fun deleteWallet() {

@@ -41,7 +41,7 @@ abstract class TariBackground(context: Context, attrs: AttributeSet) : Constrain
         when {
             backElevation != 0.0F -> {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-                    val shadowColor = PaletteManager().getShadowBox(context)
+                    val shadowColor = PaletteManager.getShadowBox(context)
                     outlineSpotShadowColor = shadowColor
                     this.outlineProvider = object : ViewOutlineProvider() {
                         override fun getOutline(view: View?, outline: Outline?) {

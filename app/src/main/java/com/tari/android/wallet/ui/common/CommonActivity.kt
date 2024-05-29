@@ -22,6 +22,7 @@ import com.tari.android.wallet.extension.safeCastTo
 import com.tari.android.wallet.ui.component.networkStateIndicator.ConnectionIndicatorViewModel
 import com.tari.android.wallet.ui.component.tari.toast.TariToast
 import com.tari.android.wallet.ui.component.tari.toast.TariToastArgs
+import com.tari.android.wallet.ui.dialog.inProgress.TariProgressDialog
 import com.tari.android.wallet.ui.dialog.modular.DialogArgs
 import com.tari.android.wallet.ui.dialog.modular.ModularDialog
 import com.tari.android.wallet.ui.dialog.modular.ModularDialogArgs
@@ -41,12 +42,13 @@ import yat.android.lib.YatIntegration
 
 abstract class CommonActivity<Binding : ViewBinding, VM : CommonViewModel> : AppCompatActivity(), ShakeDetector.Listener, FragmentPoppedListener {
 
-    private val dialogManager = DialogManager()
     private var containerId: Int? = null
 
     lateinit var ui: Binding
 
     lateinit var viewModel: VM
+
+    private  var dialogManager : DialogManager? = null
 
     private val shakeDetector by lazy { ShakeDetector(this) }
 
@@ -67,6 +69,8 @@ abstract class CommonActivity<Binding : ViewBinding, VM : CommonViewModel> : App
         setTariTheme(viewModel.tariSettingsSharedRepository.currentTheme)
 
         subscribeToCommon(viewModel)
+
+        dialogManager = viewModel.dialogManager
     }
 
     fun subscribeToCommon(commonViewModel: CommonViewModel) = with(commonViewModel) {
@@ -78,7 +82,13 @@ abstract class CommonActivity<Binding : ViewBinding, VM : CommonViewModel> : App
 
         observe(dismissDialog) { dialogManager.dismiss() }
 
-        observe(loadingDialog) { dialogManager.handleProgress(it) }
+        observe(loadingDialog) { progressDialogArgs ->
+            if (progressDialogArgs.isShow) {
+                dialogManager.replace(TariProgressDialog(this@CommonActivity, progressDialogArgs))
+            } else {
+                dialogManager.dismiss()
+            }
+        }
 
         observe(showToast) { TariToast(this@CommonActivity, it) }
 
@@ -142,7 +152,7 @@ abstract class CommonActivity<Binding : ViewBinding, VM : CommonViewModel> : App
 
     override fun onStop() {
         shakeDetector.stop()
-        dialogManager.dismiss()
+        dialogManager?.dismiss()
         super.onStop()
     }
 
@@ -153,7 +163,6 @@ abstract class CommonActivity<Binding : ViewBinding, VM : CommonViewModel> : App
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        dialogManager.context = this
 
         subscribeToCommon(connectionStateViewModel)
     }
@@ -205,14 +214,14 @@ abstract class CommonActivity<Binding : ViewBinding, VM : CommonViewModel> : App
                 OptionModule(getString(R.string.debug_dialog_logs)) { openActivity(DebugNavigation.Logs) },
                 OptionModule(getString(R.string.debug_dialog_report)) { openActivity(DebugNavigation.BugReport) },
                 OptionModule(getString(R.string.debug_dialog_connection_status)) {
-                    dialogManager.dismiss()
+                    dialogManager?.dismiss()
                     connectionStateViewModel.showStatesDialog()
                 },
                 BodyModule(versionInfo),
                 ButtonModule(getString(R.string.common_close), ButtonStyle.Close),
             )
         )
-        dialogManager.replace(ModularDialog(this, modularDialogArgs))
+        dialogManager?.replace(ModularDialog(this, modularDialogArgs))
     }
 
     protected fun shareViaText(text: String) {
@@ -228,7 +237,7 @@ abstract class CommonActivity<Binding : ViewBinding, VM : CommonViewModel> : App
     }
 
     private fun openActivity(navigation: DebugNavigation) {
-        dialogManager.dismiss()
+        dialogManager?.dismiss()
         DebugActivity.launch(this, navigation)
     }
 }

@@ -8,6 +8,7 @@ import com.tari.android.wallet.infrastructure.security.biometric.BiometricAuthen
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
 import com.tari.android.wallet.ui.fragment.onboarding.localAuth.LocalAuthModel.Effect
+import com.tari.android.wallet.ui.fragment.onboarding.localAuth.LocalAuthModel.SecureState
 import com.tari.android.wallet.ui.fragment.pinCode.PinCodeScreenBehavior
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow

@@ -140,6 +140,8 @@
     <string name="introduction_selected_wallet">Selected Network: %s</string>
 
     <!-- onboarding - create wallet -->
+    <string name="create_wallet_cancel_dialog_title">Cancel Wallet Creation</string>
+    <string name="create_wallet_cancel_dialog_description">Are you sure you want to cancel wallet creation? You will lose all progress.</string>
     <!-- screen #1 -->
     <string name="create_wallet_just_a_sec_label" tools:ignore="TypographyEllipsis">Hold on a sec...</string>
     <string name="create_wallet_just_sec_desc_text">We’re creating your wallet.</string>

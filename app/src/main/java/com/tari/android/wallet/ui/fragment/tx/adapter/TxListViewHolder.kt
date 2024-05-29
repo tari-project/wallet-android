@@ -17,6 +17,7 @@ import com.tari.android.wallet.model.PendingOutboundTx
 import com.tari.android.wallet.model.Tx
 import com.tari.android.wallet.model.TxNote
 import com.tari.android.wallet.model.TxStatus
+import com.tari.android.wallet.ui.common.domain.PaletteManager
 import com.tari.android.wallet.ui.common.gyphy.presentation.GIFStateConsumer
 import com.tari.android.wallet.ui.common.gyphy.presentation.GlideGIFListener
 import com.tari.android.wallet.ui.common.gyphy.repository.GIFItem
@@ -145,20 +146,20 @@ class TxListViewHolder(view: ItemTxListBinding) : CommonViewHolder<TransactionIt
         val (amountText, textColor, backgroundColor) = when {
             tx is CancelledTx -> Triple(
                 amount,
-                paletteManager.getTextBody(context),
-                paletteManager.getBackgroundPrimary(context)
+                PaletteManager.getTextBody(context),
+                PaletteManager.getBackgroundPrimary(context)
             )
 
             tx is PendingInboundTx -> Triple(
                 "+$amount",
-                paletteManager.getYellow(context),
-                paletteManager.getSecondaryYellow(context)
+                PaletteManager.getYellow(context),
+                PaletteManager.getSecondaryYellow(context)
             )
 
             tx is PendingOutboundTx -> Triple(
                 "-$amount",
-                paletteManager.getYellow(context),
-                paletteManager.getSecondaryYellow(context)
+                PaletteManager.getYellow(context),
+                PaletteManager.getSecondaryYellow(context)
             )
 
             tx is CompletedTx && tx.status == TxStatus.MINED_UNCONFIRMED -> Triple(
@@ -166,20 +167,20 @@ class TxListViewHolder(view: ItemTxListBinding) : CommonViewHolder<TransactionIt
                     Tx.Direction.OUTBOUND -> "-$amount"
                     Tx.Direction.INBOUND -> "+$amount"
                 },
-                paletteManager.getYellow(context),
-                paletteManager.getSecondaryYellow(context)
+                PaletteManager.getYellow(context),
+                PaletteManager.getSecondaryYellow(context)
             )
 
             tx.direction == Tx.Direction.INBOUND -> Triple(
                 "+$amount",
-                paletteManager.getGreen(context),
-                paletteManager.getSecondaryGreen(context)
+                PaletteManager.getGreen(context),
+                PaletteManager.getSecondaryGreen(context)
             )
 
             else -> Triple(
                 "-$amount",
-                paletteManager.getRed(context),
-                paletteManager.getSecondaryRed(context)
+                PaletteManager.getRed(context),
+                PaletteManager.getSecondaryRed(context)
             )
         }
         ui.amountTextView.text = amountText

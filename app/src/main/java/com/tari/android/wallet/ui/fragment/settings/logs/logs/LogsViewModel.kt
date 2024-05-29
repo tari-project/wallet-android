@@ -52,7 +52,7 @@ class LogsViewModel : CommonViewModel() {
             ) {
                 backPressed.postValue(Unit)
             }
-            modularDialog.postValue(errorArgs.getModular(resourceManager))
+            showModularDialog(errorArgs.getModular(resourceManager))
             logger.i(e.message + "Out of memory on reading big log file")
         }
     }
@@ -60,9 +60,9 @@ class LogsViewModel : CommonViewModel() {
     fun showFilters() {
         val currentLevelFilters = logLevelFilters.value!!
         val currentSourceFilters = logSourceFilters.value!!
-        val levelFilterModules = LogLevelFilters.values()
+        val levelFilterModules = LogLevelFilters.entries
             .map { LogLevelCheckedModule(it, CheckedModule(resourceManager.getString(it.title), currentLevelFilters.contains(it))) }
-        val sourceFiltersModules = LogSourceFilters.values()
+        val sourceFiltersModules = LogSourceFilters.entries
             .map { LogSourceCheckedModule(it, CheckedModule(resourceManager.getString(it.title), currentSourceFilters.contains(it))) }
         val modules = mutableListOf<IDialogModule>()
         modules.add(HeadModule(resourceManager.getString(R.string.debug_log_filter_title)))
@@ -71,14 +71,14 @@ class LogsViewModel : CommonViewModel() {
         modules.addAll(sourceFiltersModules)
         modules.add(SpaceModule(12))
         modules.add(ButtonModule(resourceManager.getString(R.string.debug_log_filter_apply), ButtonStyle.Normal) {
-            dismissDialog.postValue(Unit)
+            hideDialog()
             logLevelFilters.postValue(levelFilterModules.filter { it.checkedModule.isChecked }.map { it.logFilter }.toMutableList())
             logSourceFilters.postValue(sourceFiltersModules.filter { it.checkedModule.isChecked }.map { it.logFilter }.toMutableList())
         })
         modules.add(ButtonModule(resourceManager.getString(R.string.common_close), ButtonStyle.Close))
 
         val modularDialogArgs = ModularDialogArgs(DialogArgs(), modules)
-        modularDialog.postValue(modularDialogArgs)
+        showModularDialog(modularDialogArgs)
     }
 
     fun copyToClipboard(item: LogViewHolderItem) {

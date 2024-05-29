@@ -9,8 +9,6 @@ import com.tari.android.wallet.ffi.FFIWallet
 import com.tari.android.wallet.model.MicroTari
 import com.tari.android.wallet.model.WalletError
 import com.tari.android.wallet.ui.common.CommonViewModel
-import com.tari.android.wallet.ui.dialog.modular.DialogArgs
-import com.tari.android.wallet.ui.dialog.modular.ModularDialogArgs
 import com.tari.android.wallet.ui.dialog.modular.modules.body.BodyModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonStyle
@@ -67,18 +65,21 @@ class AddAmountViewModel : CommonViewModel() {
                         mediumOption = elements[0].getAverage()
                         fastOption = elements[0].getMax()
                     }
+
                     2 -> {
                         networkSpeed = NetworkSpeed.Medium
                         slowOption = elements[1].getAverage()
                         mediumOption = elements[0].getMin()
                         fastOption = elements[0].getMax()
                     }
+
                     3 -> {
                         networkSpeed = NetworkSpeed.Fast
                         slowOption = elements[2].getAverage()
                         mediumOption = elements[1].getAverage()
                         fastOption = elements[0].getMax()
                     }
+
                     else -> throw Exception("Unexpected block count")
                 }
                 _feePerGrams.postValue(FeePerGramOptions(networkSpeed, MicroTari(slowOption), MicroTari(mediumOption), MicroTari(fastOption)))
@@ -95,21 +96,17 @@ class AddAmountViewModel : CommonViewModel() {
 
     fun showFeeDialog() {
         val feeModule = FeeModule(MicroTari(), feeData, selectedSpeed)
-        val args = ModularDialogArgs(
-            DialogArgs(),
-            listOf(
-                HeadModule(resourceManager.getString(R.string.add_amount_modify_fee_title)),
-                BodyModule(resourceManager.getString(R.string.add_amount_modify_fee_description)),
-                feeModule,
-                ButtonModule(resourceManager.getString(R.string.add_amount_modify_fee_use), ButtonStyle.Normal) {
-                    selectedSpeed = feeModule.selectedSpeed
-                    selectedFeeData = feeModule.feePerGram
-                    dismissDialog.postValue(Unit)
-                },
-                ButtonModule(resourceManager.getString(R.string.common_cancel), ButtonStyle.Close)
-            )
+        showModularDialog(
+            HeadModule(resourceManager.getString(R.string.add_amount_modify_fee_title)),
+            BodyModule(resourceManager.getString(R.string.add_amount_modify_fee_description)),
+            feeModule,
+            ButtonModule(resourceManager.getString(R.string.add_amount_modify_fee_use), ButtonStyle.Normal) {
+                selectedSpeed = feeModule.selectedSpeed
+                selectedFeeData = feeModule.feePerGram
+                hideDialog()
+            },
+            ButtonModule(resourceManager.getString(R.string.common_cancel), ButtonStyle.Close)
         )
-        modularDialog.postValue(args)
     }
 
     fun calculateFee(amount: MicroTari, walletError: WalletError) {
@@ -133,7 +130,7 @@ class AddAmountViewModel : CommonViewModel() {
             feeData = listOf(FeeData(grams.slow, slowFee), FeeData(grams.medium, mediumFee), FeeData(grams.fast, fastFee))
             selectedFeeData = feeData[1]
         } catch (e: Throwable) {
-            logger.i(e.message +"calculate fees")
+            logger.i(e.message + "calculate fees")
         }
     }
 

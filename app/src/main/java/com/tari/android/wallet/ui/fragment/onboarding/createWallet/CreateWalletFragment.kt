@@ -59,7 +59,9 @@ import com.tari.android.wallet.application.walletManager.WalletStateHandler
 import com.tari.android.wallet.databinding.FragmentCreateWalletBinding
 import com.tari.android.wallet.di.DiContainer
 import com.tari.android.wallet.extension.applyFontStyle
-import com.tari.android.wallet.ui.common.CommonFragment
+import com.tari.android.wallet.extension.collectFlow
+import com.tari.android.wallet.tor.TorProxyState
+import com.tari.android.wallet.ui.common.domain.PaletteManager
 import com.tari.android.wallet.ui.component.fullEmojiId.EmojiIdSummaryViewController
 import com.tari.android.wallet.ui.component.tari.TariFont
 import com.tari.android.wallet.ui.extension.animateClick
@@ -75,6 +77,7 @@ import com.tari.android.wallet.ui.extension.setTopMargin
 import com.tari.android.wallet.ui.extension.string
 import com.tari.android.wallet.ui.extension.temporarilyDisableClick
 import com.tari.android.wallet.ui.extension.visible
+import com.tari.android.wallet.ui.fragment.onboarding.activity.OnboardingFlowFragment
 import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.Constants.UI.CreateEmojiId
 import com.tari.android.wallet.util.EmojiUtil
@@ -88,7 +91,7 @@ import javax.inject.Inject
  *
  * @author The Tari Development Team
  */
-class CreateWalletFragment : CommonFragment<FragmentCreateWalletBinding, CreateWalletViewModel>() {
+class CreateWalletFragment : OnboardingFlowFragment<FragmentCreateWalletBinding, CreateWalletViewModel>() {
 
     @Inject
     lateinit var walletStateHandler: WalletStateHandler
@@ -126,10 +129,10 @@ class CreateWalletFragment : CommonFragment<FragmentCreateWalletBinding, CreateW
         emojiIdSummaryController = EmojiIdSummaryViewController(ui.emojiIdSummaryView.root)
         ui.apply {
             yourEmojiIdTitleTextView.text = string(create_wallet_your_emoji_id_text_label).applyFontStyle(
-                requireActivity(),
-                TariFont.AVENIR_LT_STD_LIGHT,
-                listOf(string(create_wallet_your_emoji_id_text_label_bold_part)),
-                TariFont.AVENIR_LT_STD_BLACK
+                context = requireActivity(),
+                defaultFont = TariFont.AVENIR_LT_STD_LIGHT,
+                search = listOf(string(create_wallet_your_emoji_id_text_label_bold_part)),
+                tariFont = TariFont.AVENIR_LT_STD_BLACK,
             )
             bottomSpinnerLottieAnimationView.alpha = 0f
             bottomSpinnerLottieAnimationView.scaleX = 0.5F
@@ -152,8 +155,14 @@ class CreateWalletFragment : CommonFragment<FragmentCreateWalletBinding, CreateW
             continueButton.setOnClickListener { onContinueButtonClick() }
             createEmojiIdButton.setOnClickListener { onCreateEmojiIdButtonClick() }
             emojiIdTextView.setOnClickListener { fullEmojiIdTextViewClicked(it) }
-            arrayOf(seeFullEmojiIdButton, emojiIdSummaryContainerView)
-                .forEach { it.setOnClickListener(this@CreateWalletFragment::onSeeFullEmojiIdButtonClicked) }
+            arrayOf(
+                seeFullEmojiIdButton,
+                emojiIdSummaryContainerView
+            ).forEach { it.setOnClickListener(this@CreateWalletFragment::onSeeFullEmojiIdButtonClicked) }
+        }
+
+        collectFlow(viewModel.uiState) { uiState ->
+            ui.torProgressStatusTextView.text = uiState.torState.formatProgressText()
         }
     }
 
@@ -207,6 +216,7 @@ class CreateWalletFragment : CommonFragment<FragmentCreateWalletBinding, CreateW
                     super.onAnimationStart(animation)
                     ui.justSecDescTextView.visible()
                     ui.justSecTitleTextView.visible()
+                    ui.torProgressStatusTextView.visible()
                 }
 
                 override fun onAnimationEnd(animation: Animator) {
@@ -250,18 +260,19 @@ class CreateWalletFragment : CommonFragment<FragmentCreateWalletBinding, CreateW
                 val alpha = valueAnimator.animatedValue as Float
                 ui.justSecDescTextView.alpha = alpha
                 ui.justSecTitleTextView.alpha = alpha
+                ui.torProgressStatusTextView.alpha = alpha
             }
 
             addListener(object : AnimatorListenerAdapter() {
                 override fun onAnimationEnd(animation: Animator) {
                     super.onAnimationEnd(animation)
                     runCatching {
-                        val emojiId = viewModel.sharedPrefsWrapper.emojiId!!
+                        val emojiId = viewModel.corePrefRepository.emojiId!!
                         ui.emojiIdTextView.text = EmojiUtil.getFullEmojiIdSpannable(
-                            emojiId,
-                            string(emoji_id_chunk_separator),
-                            viewModel.paletteManager.getBlack(requireContext()),
-                            viewModel.paletteManager.getLightGray(requireContext())
+                            emojiId = emojiId,
+                            separator = string(emoji_id_chunk_separator),
+                            darkColor = PaletteManager.getBlack(requireContext()),
+                            lightColor = PaletteManager.getLightGray(requireContext()),
                         )
                         emojiIdSummaryController.display(emojiId)
 
@@ -291,19 +302,13 @@ class CreateWalletFragment : CommonFragment<FragmentCreateWalletBinding, CreateW
         }
 
         val createNowAnim: ObjectAnimator = ObjectAnimator.ofFloat(
-            ui.createYourEmojiIdLine2TextView,
-            View.TRANSLATION_Y,
-            0f,
-            -ui.createYourEmojiIdLine2TextView.height.toFloat()
+            ui.createYourEmojiIdLine2TextView, View.TRANSLATION_Y, 0f, -ui.createYourEmojiIdLine2TextView.height.toFloat()
         ).apply {
             duration = CreateEmojiId.awesomeTextAnimDurationMs
         }
 
         val awesomeAnim: ObjectAnimator = ObjectAnimator.ofFloat(
-            ui.createYourEmojiIdLine1TextView,
-            View.TRANSLATION_Y,
-            0f,
-            -ui.createYourEmojiIdLine1TextView.height.toFloat()
+            ui.createYourEmojiIdLine1TextView, View.TRANSLATION_Y, 0f, -ui.createYourEmojiIdLine1TextView.height.toFloat()
         ).apply {
             duration = CreateEmojiId.awesomeTextAnimDurationMs
         }
@@ -376,8 +381,7 @@ class CreateWalletFragment : CommonFragment<FragmentCreateWalletBinding, CreateW
         }
 
         uiHandler.postDelayed(
-            { startYourEmojiIdViewAnimation() },
-            ui.emojiWheelLottieAnimationView.duration - CreateEmojiId.awesomeTextAnimDurationMs
+            { startYourEmojiIdViewAnimation() }, ui.emojiWheelLottieAnimationView.duration - CreateEmojiId.awesomeTextAnimDurationMs
         )
     }
 
@@ -425,13 +429,9 @@ class CreateWalletFragment : CommonFragment<FragmentCreateWalletBinding, CreateW
             duration = CreateEmojiId.continueButtonAnimDurationMs
         }
 
-
         AnimatorSet().apply {
             playTogether(
-                buttonFadeInAnim,
-                emojiIdContainerViewScaleAnim,
-                fadeInAnim,
-                yourEmojiTitleAnim
+                buttonFadeInAnim, emojiIdContainerViewScaleAnim, fadeInAnim, yourEmojiTitleAnim
             )
             duration = CreateEmojiId.emojiIdCreationViewAnimDurationMs
             interpolator = EasingInterpolator(Ease.QUINT_IN)
@@ -447,7 +447,6 @@ class CreateWalletFragment : CommonFragment<FragmentCreateWalletBinding, CreateW
                 }
             })
         }
-
     }
 
     private fun elevateEmojiIdContainerView() {
@@ -529,7 +528,6 @@ class CreateWalletFragment : CommonFragment<FragmentCreateWalletBinding, CreateW
                 }
             })
         }
-
     }
 
     /**
@@ -577,11 +575,10 @@ class CreateWalletFragment : CommonFragment<FragmentCreateWalletBinding, CreateW
     }
 
     private fun onContinueButtonClick() {
+        viewModel.onContinueButtonClick()
         ui.continueButton.temporarilyDisableClick()
-        viewModel.sharedPrefsWrapper.onboardingCompleted = true
         ui.continueButton.animateClick {
-            viewModel.sharedPrefsWrapper.onboardingAuthSetupStarted = true
-            (requireActivity() as? CreateWalletListener)?.continueToEnableAuth()
+            onboardingListener.continueToEnableAuth()
         }
     }
 
@@ -605,5 +602,11 @@ class CreateWalletFragment : CommonFragment<FragmentCreateWalletBinding, CreateW
             start()
         }
     }
-}
 
+    private fun TorProxyState.formatProgressText(): String = when (this) {
+        is TorProxyState.NotReady -> "Tor proxy not ready"
+        is TorProxyState.Initializing -> "Tor proxy initializing...${bootstrapStatus?.let { "\n${it.summary}\n${it.progress} %" } ?: ""}"
+        is TorProxyState.Running -> "Tor proxy running\n${bootstrapStatus.summary}\n${bootstrapStatus.progress} %"
+        is TorProxyState.Failed -> "Tor proxy failed\n${e.message}"
+    }
+}

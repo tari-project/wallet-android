@@ -36,7 +36,6 @@ import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
 import android.animation.ValueAnimator
 import android.media.AudioManager
-import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -51,14 +50,29 @@ import androidx.fragment.app.viewModels
 import com.daasuu.ei.Ease
 import com.daasuu.ei.EasingInterpolator
 import com.tari.android.wallet.R
-import com.tari.android.wallet.R.string.*
+import com.tari.android.wallet.R.string.create_wallet_privacy_policy
+import com.tari.android.wallet.R.string.create_wallet_user_agreement
+import com.tari.android.wallet.R.string.create_wallet_user_agreement_and_privacy_policy
+import com.tari.android.wallet.R.string.introduction_selected_wallet
+import com.tari.android.wallet.R.string.privacy_policy_url
+import com.tari.android.wallet.R.string.user_agreement_url
 import com.tari.android.wallet.databinding.FragmentIntroductionBinding
 import com.tari.android.wallet.extension.applyURLStyle
-import com.tari.android.wallet.ui.common.CommonFragment
-import com.tari.android.wallet.ui.extension.*
-import com.tari.android.wallet.ui.fragment.onboarding.activity.OnboardingFlowActivity
+import com.tari.android.wallet.extension.collectFlow
+import com.tari.android.wallet.ui.extension.addAnimatorListener
+import com.tari.android.wallet.ui.extension.animateClick
+import com.tari.android.wallet.ui.extension.doOnGlobalLayout
+import com.tari.android.wallet.ui.extension.getResourceUri
+import com.tari.android.wallet.ui.extension.gone
+import com.tari.android.wallet.ui.extension.invisible
+import com.tari.android.wallet.ui.extension.postDelayed
+import com.tari.android.wallet.ui.extension.setLayoutSize
+import com.tari.android.wallet.ui.extension.setOnThrottledClickListener
+import com.tari.android.wallet.ui.extension.string
+import com.tari.android.wallet.ui.extension.temporarilyDisableClick
+import com.tari.android.wallet.ui.extension.visible
+import com.tari.android.wallet.ui.fragment.onboarding.activity.OnboardingFlowFragment
 import com.tari.android.wallet.ui.fragment.restore.activity.WalletRestoreActivity
-import com.tari.android.wallet.ui.fragment.settings.allSettings.TariVersionModel
 import com.tari.android.wallet.util.Constants
 import kotlin.math.min
 
@@ -70,7 +84,7 @@ import kotlin.math.min
  * @author The Tari Development Team
  */
 
-class IntroductionFragment : CommonFragment<FragmentIntroductionBinding, IntroductionViewModel>() {
+class IntroductionFragment : OnboardingFlowFragment<FragmentIntroductionBinding, IntroductionViewModel>() {
 
     private val handler = Handler(Looper.getMainLooper())
 
@@ -105,7 +119,7 @@ class IntroductionFragment : CommonFragment<FragmentIntroductionBinding, Introdu
 
     override fun onResume() {
         super.onResume()
-        ui.selectNetworkButton.text = string(introduction_selected_wallet, viewModel.networkRepository.currentNetwork.network.displayName)
+        ui.selectNetworkButton.text = string(introduction_selected_wallet, viewModel.uiState.value.networkName)
     }
 
     override fun onPause() {
@@ -116,48 +130,49 @@ class IntroductionFragment : CommonFragment<FragmentIntroductionBinding, Introdu
 
     private fun setupUi() {
         ui.createWalletProgressBar.setWhite()
-        ui.apply {
-            tariLogoLottieAnimationView.alpha = 0f
-            tariLogoLottieAnimationView.scaleX = 0.84f
-            tariLogoLottieAnimationView.scaleY = 0.84f
-            networkInfoTextView.alpha = 0f
-            smallGemImageView.alpha = 0f
-            createWalletContainerView.alpha = 0f
-            selectNetworkContainerView.alpha = 0f
-            headerLineTopTextView.alpha = 0f
-            headerLineBottomTextView.alpha = 0f
-            userAgreementAndPrivacyPolicyTextView.alpha = 0f
-            restoreWalletCtaView.alpha = 0f
-            ui.restoreWalletCtaView.setOnClickListener {
-                activity?.let {
-                    it.startActivity(WalletRestoreActivity.navigationIntent(it))
+        collectFlow(viewModel.uiState) { uiState ->
+            ui.apply {
+                tariLogoLottieAnimationView.alpha = 0f
+                tariLogoLottieAnimationView.scaleX = 0.84f
+                tariLogoLottieAnimationView.scaleY = 0.84f
+                networkInfoTextView.alpha = 0f
+                smallGemImageView.alpha = 0f
+                createWalletContainerView.alpha = 0f
+                selectNetworkContainerView.alpha = 0f
+                headerLineTopTextView.alpha = 0f
+                headerLineBottomTextView.alpha = 0f
+                userAgreementAndPrivacyPolicyTextView.alpha = 0f
+                restoreWalletCtaView.alpha = 0f
+                ui.restoreWalletCtaView.setOnClickListener {
+                    activity?.let {
+                        it.startActivity(WalletRestoreActivity.navigationIntent(it))
+                    }
                 }
-            }
-            networkInfoTextView.text = TariVersionModel(viewModel.networkRepository).versionInfo
-            // highlight links
-            userAgreementAndPrivacyPolicyTextView.text =
-                SpannableString(string(create_wallet_user_agreement_and_privacy_policy)).apply {
-                    applyURLStyle(string(create_wallet_user_agreement), string(user_agreement_url))
-                    applyURLStyle(string(create_wallet_privacy_policy), string(privacy_policy_url))
+                networkInfoTextView.text = uiState.versionInfo
+                // highlight links
+                userAgreementAndPrivacyPolicyTextView.text =
+                    SpannableString(string(create_wallet_user_agreement_and_privacy_policy)).apply {
+                        applyURLStyle(string(create_wallet_user_agreement), string(user_agreement_url))
+                        applyURLStyle(string(create_wallet_privacy_policy), string(privacy_policy_url))
+                    }
+                // make the links clickable
+                userAgreementAndPrivacyPolicyTextView.movementMethod = LinkMovementMethod.getInstance()
+                rootView.doOnGlobalLayout {
+                    runStartupAnimation()
+                    setupAndStartVideo()
                 }
-            // make the links clickable
-            userAgreementAndPrivacyPolicyTextView.movementMethod = LinkMovementMethod.getInstance()
-            rootView.doOnGlobalLayout {
-                runStartupAnimation()
-                setupAndStartVideo()
+                createWalletButton.setOnThrottledClickListener { onCreateWalletClick() }
+                selectNetworkContainerView.setOnThrottledClickListener { onboardingListener.navigateToNetworkSelection() }
             }
-            createWalletButton.setOnThrottledClickListener { onCreateWalletClick() }
-            selectNetworkContainerView.setOnThrottledClickListener { (requireActivity() as OnboardingFlowActivity).navigateToNetworkSelection() }
         }
+
     }
 
     private fun setupAndStartVideo() {
         val size = min(ui.videoOuterContainerView.width, ui.videoOuterContainerView.height)
         ui.videoInnerContainerView.setLayoutSize(size, size)
         ui.rainAnimationVideoView.setVideoURI(requireContext().getResourceUri(R.raw.purple_orb))
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            ui.rainAnimationVideoView.setAudioFocusRequest(AudioManager.AUDIOFOCUS_NONE)
-        }
+        ui.rainAnimationVideoView.setAudioFocusRequest(AudioManager.AUDIOFOCUS_NONE)
         startVideo()
         videoViewHasBeenSetup = true
     }
@@ -212,7 +227,7 @@ class IntroductionFragment : CommonFragment<FragmentIntroductionBinding, Introdu
         restoreWalletCtaView.setOnClickListener(null)
         createWalletButton.gone()
         createWalletProgressBar.visible()
-        viewModel.walletServiceLauncher.start()
+        viewModel.onCreateWalletClick()
         createWalletContainerView.animateClick {
             selectNetworkContainerView.isEnabled = false
             rootView.postDelayed(createWalletArtificialDelay) { startTariWalletViewAnimation() }
@@ -228,7 +243,7 @@ class IntroductionFragment : CommonFragment<FragmentIntroductionBinding, Introdu
             addListener(onEnd = { playTariWalletLottieAnimation() })
         }
 
-        ui.tariLogoLottieAnimationView.addAnimatorListener(onEnd = { (requireActivity() as? IntroductionListener)?.continueToCreateWallet() })
+        ui.tariLogoLottieAnimationView.addAnimatorListener(onEnd = { onboardingListener.continueToCreateWallet() })
 
         val tariViewScaleAnim = ValueAnimator.ofFloat(ui.tariLogoLottieAnimationView.scaleX, 1f).apply {
             duration = Constants.UI.CreateWallet.tariTextAnimViewDurationMs

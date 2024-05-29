@@ -57,10 +57,10 @@ class TorProxyManager @Inject constructor(
 ) {
 
     companion object {
-        const val torDataDirectoryName = "tor_data"
+        const val TOR_DATA_DIRECTORY_NAME = "tor_data"
     }
 
-    private val appCacheHome = context.getDir(torDataDirectoryName, Service.MODE_PRIVATE)
+    private val appCacheHome = context.getDir(TOR_DATA_DIRECTORY_NAME, Service.MODE_PRIVATE)
     private val torProxyControl: TorProxyControl
     private val logger
         get() = Logger.t(LoggerTags.Connection.name)

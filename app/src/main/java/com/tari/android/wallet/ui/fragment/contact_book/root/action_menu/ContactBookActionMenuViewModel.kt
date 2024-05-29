@@ -63,7 +63,7 @@ class ContactBookActionMenuViewModel : CommonViewModel() {
         val firstLineHtml = HtmlHelper.getSpannedText(resourceManager.getString(R.string.contact_book_contacts_book_unlink_message_firstLine))
         val secondLineHtml = HtmlHelper.getSpannedText(resourceManager.getString(R.string.contact_book_contacts_book_unlink_message_secondLine, name))
 
-        val modules = listOf(
+        showModularDialog(
             HeadModule(resourceManager.getString(R.string.contact_book_contacts_book_unlink_title)),
             BodyModule(null, SpannableString(firstLineHtml)),
             ShortEmojiIdModule(walletAddress),
@@ -79,7 +79,6 @@ class ContactBookActionMenuViewModel : CommonViewModel() {
             },
             ButtonModule(resourceManager.getString(R.string.common_cancel), ButtonStyle.Close)
         )
-        modularDialog.postValue(ModularDialogArgs(DialogArgs(), modules))
     }
 
     private fun showUnlinkSuccessDialog(contact: ContactDto) {
@@ -97,7 +96,7 @@ class ContactBookActionMenuViewModel : CommonViewModel() {
             BodyModule(null, SpannableString(secondLineHtml)),
             ButtonModule(resourceManager.getString(R.string.common_cancel), ButtonStyle.Close)
         )
-        modularDialog.postValue(ModularDialogArgs(DialogArgs {
+        showModularDialog(ModularDialogArgs(DialogArgs {
             navigation.value = Navigation.ContactBookNavigation.BackToContactBook
         }, modules))
     }

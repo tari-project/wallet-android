@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import com.tari.android.wallet.R
 import com.tari.android.wallet.databinding.ViewSettingsRowBinding
 import com.tari.android.wallet.ui.common.CommonViewModel
+import com.tari.android.wallet.ui.common.domain.PaletteManager
 import com.tari.android.wallet.ui.component.common.CommonView
 import com.tari.android.wallet.ui.extension.setVisible
 
@@ -35,8 +36,8 @@ class SettingsRowView : CommonView<CommonViewModel, ViewSettingsRowBinding> {
         }
 
         val color = when (dto.style) {
-            SettingsRowStyle.Normal -> paletteManager.getTextHeading(context)
-            SettingsRowStyle.Warning -> paletteManager.getRed(context)
+            SettingsRowStyle.Normal -> PaletteManager.getTextHeading(context)
+            SettingsRowStyle.Warning -> PaletteManager.getRed(context)
         }
 
         ui.title.setTextColor(color)

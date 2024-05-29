@@ -245,7 +245,26 @@
                     android:textColor="?attr/palette_text_heading"
                     android:textSize="18sp"
                     android:visibility="invisible"
-                    app:customFont="roman" />
+                    app:customFont="roman"
+                    tools:visibility="visible" />
+
+                <com.tari.android.wallet.ui.component.tari.TariTextView
+                    android:id="@+id/tor_progress_status_text_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/just_sec_desc_text_view"
+                    android:layout_gravity="center"
+                    android:layout_marginHorizontal="20dp"
+                    android:layout_marginTop="20dp"
+                    android:gravity="center"
+                    android:letterSpacing="-0.03"
+                    android:lineSpacingExtra="8dp"
+                    android:textColor="?attr/palette_text_body"
+                    android:textSize="14sp"
+                    android:visibility="invisible"
+                    app:customFont="light"
+                    tools:text="Tor is connecting... \n66 %"
+                    tools:visibility="visible" />
 
                 <View
                     android:id="@+id/just_sec_desc_back_view"

@@ -28,10 +28,11 @@ class WriteDownSeedPhraseViewModel : CommonViewModel() {
     }
 
     private fun showError() {
-        val args = ErrorDialogArgs(
-            resourceManager.getString(R.string.common_error_title),
-            resourceManager.getString(R.string.back_up_seed_phrase_error)
+        showModularDialog(
+            ErrorDialogArgs(
+                title = resourceManager.getString(R.string.common_error_title),
+                description = resourceManager.getString(R.string.back_up_seed_phrase_error),
+            ).getModular(resourceManager)
         )
-        modularDialog.postValue(args.getModular(resourceManager))
     }
 }

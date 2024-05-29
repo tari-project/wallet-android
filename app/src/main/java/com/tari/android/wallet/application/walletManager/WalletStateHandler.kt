@@ -1,7 +1,6 @@
 package com.tari.android.wallet.application.walletManager
 
 import com.orhanobut.logger.Logger
-import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.ffi.FFIWallet
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -12,7 +11,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import javax.inject.Singleton
-
 
 @Singleton
 class WalletStateHandler @Inject constructor() {

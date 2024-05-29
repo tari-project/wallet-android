@@ -34,27 +34,28 @@ package com.tari.android.wallet.ui.fragment.onboarding.activity
 
 import android.content.Intent
 import android.os.Bundle
-import androidx.activity.addCallback
 import androidx.activity.viewModels
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
+import androidx.fragment.app.FragmentTransaction
 import androidx.lifecycle.lifecycleScope
 import com.tari.android.wallet.R
+import com.tari.android.wallet.application.walletManager.WalletStateHandler
 import com.tari.android.wallet.data.WalletConfig
 import com.tari.android.wallet.data.sharedPrefs.CorePrefRepository
 import com.tari.android.wallet.databinding.ActivityOnboardingFlowBinding
 import com.tari.android.wallet.di.DiContainer.appComponent
+import com.tari.android.wallet.extension.collectFlow
+import com.tari.android.wallet.extension.safeCastTo
 import com.tari.android.wallet.service.service.WalletServiceLauncher
 import com.tari.android.wallet.ui.common.CommonActivity
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.fragment.home.HomeActivity
+import com.tari.android.wallet.ui.fragment.onboarding.activity.OnboardingFlowModel.Effect
 import com.tari.android.wallet.ui.fragment.onboarding.createWallet.CreateWalletFragment
-import com.tari.android.wallet.ui.fragment.onboarding.createWallet.CreateWalletListener
 import com.tari.android.wallet.ui.fragment.onboarding.inroduction.IntroductionFragment
-import com.tari.android.wallet.ui.fragment.onboarding.inroduction.IntroductionListener
 import com.tari.android.wallet.ui.fragment.onboarding.localAuth.LocalAuthFragment
-import com.tari.android.wallet.ui.fragment.onboarding.localAuth.LocalAuthModel
 import com.tari.android.wallet.ui.fragment.settings.networkSelection.NetworkSelectionFragment
-import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.Constants.UI.CreateWallet
 import com.tari.android.wallet.util.WalletUtil
 import kotlinx.coroutines.Dispatchers
@@ -63,32 +64,33 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 /**
- * onBoarding activity class : contain  splash screen and loading sequence
+ * onBoarding activity class : contain  splash screen and loading sequence.
+ *
+ * The onboarding flow consists of the following steps:
+ * 1. IntroductionFragment
+ * 2. CreateWalletFragment
+ * 3. LocalAuthFragment
  *
  * @author The Tari Development Team
  */
-class OnboardingFlowActivity : CommonActivity<ActivityOnboardingFlowBinding, CommonViewModel>(), IntroductionListener, CreateWalletListener,
-    LocalAuthModel.LocalAuthListener {
+class OnboardingFlowActivity : CommonActivity<ActivityOnboardingFlowBinding, CommonViewModel>(), OnboardingFlowListener {
 
     @Inject
     lateinit var walletConfig: WalletConfig
 
     @Inject
-    lateinit var sharedPrefsWrapper: CorePrefRepository
+    lateinit var corePrefRepository: CorePrefRepository
 
     @Inject
     lateinit var walletServiceLauncher: WalletServiceLauncher
+
+    @Inject
+    lateinit var walletStateHandler: WalletStateHandler
 
     override fun onCreate(savedInstanceState: Bundle?) {
         appComponent.inject(this)
         super.onCreate(savedInstanceState)
         ui = ActivityOnboardingFlowBinding.inflate(layoutInflater).apply { setContentView(root) }
-
-        onBackPressedDispatcher.addCallback {
-            if (supportFragmentManager.backStackEntryCount > 1) {
-                supportFragmentManager.popBackStack()
-            }
-        }
 
         val viewModel: OnboardingFlowViewModel by viewModels()
         bindViewModel(viewModel)
@@ -96,12 +98,12 @@ class OnboardingFlowActivity : CommonActivity<ActivityOnboardingFlowBinding, Com
         setContainerId(R.id.onboarding_fragment_container_1)
 
         when {
-            sharedPrefsWrapper.onboardingAuthWasInterrupted -> {
+            corePrefRepository.onboardingAuthWasInterrupted -> {
                 walletServiceLauncher.start()
                 loadFragment(LocalAuthFragment())
             }
 
-            sharedPrefsWrapper.onboardingWasInterrupted -> {
+            corePrefRepository.onboardingWasInterrupted -> {
                 // start wallet service
                 walletServiceLauncher.start()
                 // clean existing files & restart onboarding
@@ -111,62 +113,43 @@ class OnboardingFlowActivity : CommonActivity<ActivityOnboardingFlowBinding, Com
 
             else -> loadFragment(IntroductionFragment())
         }
-    }
 
-    fun navigateToNetworkSelection() = loadFragment(NetworkSelectionFragment(), true)
-
-    private fun loadFragment(fragment: Fragment, isAnimated: Boolean = false) {
-        supportFragmentManager
-            .beginTransaction()
-            .apply {
-                if (isAnimated) {
-                    setCustomAnimations(R.anim.enter_from_right, R.anim.exit_to_left, R.anim.enter_from_left, R.anim.exit_to_right)
+        collectFlow(viewModel.effect) { effect ->
+            when (effect) {
+                Effect.ResetFlow -> {
+                    resetFlow()
                 }
             }
-            .add(R.id.onboarding_fragment_container_1, fragment, fragment.javaClass.simpleName)
-            .addToBackStack(null)
-            .commit()
-    }
+        }
 
-    override fun continueToCreateWallet() {
-        sharedPrefsWrapper.onboardingStarted = true
-        supportFragmentManager.beginTransaction()
-            .add(R.id.onboarding_fragment_container_2, CreateWalletFragment())
-            .commit()
-        removeContainer1Fragment()
-    }
-
-    private fun removeContainer1Fragment() {
-        lifecycleScope.launch(Dispatchers.IO) {
-            delay(CreateWallet.removeFragmentDelayDuration)
-            launch(Dispatchers.Main) {
-                supportFragmentManager.findFragmentById(R.id.onboarding_fragment_container_1)?.let {
-                    supportFragmentManager.beginTransaction().remove(it).commit()
-                }
+        lifecycleScope.launch {
+            walletStateHandler.doOnWalletFailed {
+                resetFlow()
             }
+        }
+    }
+
+    override fun onBackPressed() {
+        if (supportFragmentManager.backStackEntryCount > 1) {
+            viewModel.safeCastTo<OnboardingFlowViewModel>()?.showResetFlowDialog()
         }
     }
 
     override fun continueToEnableAuth() {
-        (supportFragmentManager.findFragmentById(R.id.onboarding_fragment_container_2) as? CreateWalletFragment)?.fadeOutAllViewAnimation()
-        supportFragmentManager
-            .beginTransaction()
-            .setCustomAnimations(R.anim.fade_in, R.anim.fade_out)
-            .add(R.id.onboarding_fragment_container_1, LocalAuthFragment())
-            .commit()
+        supportFragmentManager.findFragmentById(R.id.onboarding_fragment_container_2)?.safeCastTo<CreateWalletFragment>()?.fadeOutAllViewAnimation()
 
-        removeContainer2Fragment()
+        loadFragment(
+            fragment = LocalAuthFragment(),
+            applyTransaction = {
+                it.setCustomAnimations(R.anim.fade_in, R.anim.fade_out)
+            },
+        )
     }
 
-    private fun removeContainer2Fragment() {
-        lifecycleScope.launch(Dispatchers.IO) {
-            delay(Constants.UI.longDurationMs)
-            launch(Dispatchers.Main) {
-                supportFragmentManager.findFragmentById(R.id.onboarding_fragment_container_2)?.let {
-                    supportFragmentManager.beginTransaction().remove(it).commit()
-                }
-            }
-        }
+    override fun continueToCreateWallet() {
+        corePrefRepository.onboardingStarted = true
+
+        loadFragment(CreateWalletFragment(), transparentBg = true)
     }
 
     override fun onAuthSuccess() {
@@ -174,5 +157,56 @@ class OnboardingFlowActivity : CommonActivity<ActivityOnboardingFlowBinding, Com
         intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
         startActivity(intent)
         finish()
+    }
+
+    override fun navigateToNetworkSelection() {
+        loadFragment(
+            fragment = NetworkSelectionFragment(),
+            applyTransaction = {
+                it.setCustomAnimations(R.anim.enter_from_right, R.anim.exit_to_left, R.anim.enter_from_left, R.anim.exit_to_right)
+            },
+        )
+    }
+
+    private fun resetFlow() {
+        walletServiceLauncher.stopAndDelete()
+        clearBackStack()
+        WalletUtil.clearWalletFiles(walletConfig.getWalletFilesDirPath())
+        loadFragment(IntroductionFragment())
+    }
+
+    private fun loadFragment(
+        fragment: Fragment,
+        transparentBg: Boolean = false,
+        applyTransaction: ((fragmentTransaction: FragmentTransaction) -> FragmentTransaction)? = null,
+    ) {
+        removeContainerFragment(if (transparentBg) R.id.onboarding_fragment_container_1 else R.id.onboarding_fragment_container_2)
+
+        supportFragmentManager
+            .beginTransaction()
+            .apply { applyTransaction?.invoke(this) }
+            .add(
+                if (!transparentBg) R.id.onboarding_fragment_container_1 else R.id.onboarding_fragment_container_2,
+                fragment, fragment.javaClass.simpleName,
+            )
+            .addToBackStack(null)
+            .commit()
+    }
+
+    private fun clearBackStack() {
+        if (supportFragmentManager.backStackEntryCount > 0) {
+            supportFragmentManager.popBackStack(supportFragmentManager.getBackStackEntryAt(0).id, FragmentManager.POP_BACK_STACK_INCLUSIVE)
+        }
+    }
+
+    private fun removeContainerFragment(containerId: Int) {
+        lifecycleScope.launch(Dispatchers.IO) {
+            delay(CreateWallet.removeFragmentDelayDuration)
+            launch(Dispatchers.Main) {
+                supportFragmentManager.findFragmentById(containerId)?.let {
+                    supportFragmentManager.beginTransaction().remove(it).commit()
+                }
+            }
+        }
     }
 }

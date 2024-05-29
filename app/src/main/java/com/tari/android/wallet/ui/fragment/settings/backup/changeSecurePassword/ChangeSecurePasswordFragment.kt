@@ -62,6 +62,7 @@ import com.tari.android.wallet.infrastructure.backup.BackupState
 import com.tari.android.wallet.infrastructure.backup.BackupState.BackupFailed
 import com.tari.android.wallet.infrastructure.backup.BackupState.BackupUpToDate
 import com.tari.android.wallet.ui.common.CommonFragment
+import com.tari.android.wallet.ui.common.domain.PaletteManager
 import com.tari.android.wallet.ui.dialog.error.ErrorDialogArgs
 import com.tari.android.wallet.ui.dialog.modular.ModularDialog
 import com.tari.android.wallet.ui.extension.animateClick
@@ -135,7 +136,7 @@ class ChangeSecurePasswordFragment : CommonFragment<FragmentChangeSecurePassword
     private fun setPageDescription() {
         val generalPart = string(change_password_page_description_general_part)
         val highlightedPart = SpannableString(string(change_password_page_description_highlight_part))
-        val spanColor = ForegroundColorSpan(viewModel.paletteManager.getTextHeading(requireContext()))
+        val spanColor = ForegroundColorSpan(PaletteManager.getTextHeading(requireContext()))
         highlightedPart.setSpan(spanColor, 0, highlightedPart.length, SPAN_EXCLUSIVE_EXCLUSIVE)
         ui.pageDescriptionTextView.text = SpannableStringBuilder().apply {
             insert(0, generalPart)
@@ -205,19 +206,19 @@ class ChangeSecurePasswordFragment : CommonFragment<FragmentChangeSecurePassword
 
     private fun setPlainInputState(errorLabel: TextView, inputTextViews: Iterable<TextView>) {
         errorLabel.gone()
-        inputTextViews.forEach { it.setTextColor(viewModel.paletteManager.getTextHeading(requireContext())) }
+        inputTextViews.forEach { it.setTextColor(PaletteManager.getTextHeading(requireContext())) }
     }
 
     private fun setPasswordTooShortErrorState() {
         ui.passwordTooShortLabelView.visible()
-        ui.enterPasswordLabelTextView.setTextColor(viewModel.paletteManager.getRed(requireContext()))
-        passwordInput.setTextColor(viewModel.paletteManager.getRed(requireContext()))
+        ui.enterPasswordLabelTextView.setTextColor(PaletteManager.getRed(requireContext()))
+        passwordInput.setTextColor(PaletteManager.getRed(requireContext()))
     }
 
     private fun setPasswordMatchErrorState() {
         ui.passwordsNotMatchLabelView.visible()
-        ui.confirmPasswordLabelTextView.setTextColor(viewModel.paletteManager.getRed(requireContext()))
-        confirmInput.setTextColor(viewModel.paletteManager.getRed(requireContext()))
+        ui.confirmPasswordLabelTextView.setTextColor(PaletteManager.getRed(requireContext()))
+        confirmInput.setTextColor(PaletteManager.getRed(requireContext()))
     }
 
     private fun setVerifyButtonState(isEnabled: Boolean) {

@@ -29,6 +29,7 @@ import com.tari.android.wallet.extension.observe
 import com.tari.android.wallet.extension.observeOnLoad
 import com.tari.android.wallet.model.TariWalletAddress
 import com.tari.android.wallet.ui.common.CommonFragment
+import com.tari.android.wallet.ui.common.domain.PaletteManager
 import com.tari.android.wallet.ui.common.recyclerView.CommonAdapter
 import com.tari.android.wallet.ui.component.clipboardController.ClipboardController
 import com.tari.android.wallet.ui.component.tari.toolbar.TariToolbarActionArg
@@ -323,7 +324,7 @@ open class ContactSelectionFragment : CommonFragment<FragmentContactsSelectionBi
             for ((offset, index) in EmojiUtil.getNewChunkSeparatorIndices(textWithoutSeparators).withIndex()) {
                 val chunkSeparatorSpannable = EmojiUtil.getChunkSeparatorSpannable(
                     separator = addressSeparator,
-                    color = viewModel.paletteManager.getLightGray(requireContext()),
+                    color = PaletteManager.getLightGray(requireContext()),
                 )
                 val target = index + (offset * addressSeparator.length)
                 editable.insert(target, chunkSeparatorSpannable)
