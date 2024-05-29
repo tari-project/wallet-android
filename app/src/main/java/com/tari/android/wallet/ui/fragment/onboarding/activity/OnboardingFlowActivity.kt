@@ -132,7 +132,12 @@ class OnboardingFlowActivity : CommonActivity<ActivityOnboardingFlowBinding, Com
     override fun onBackPressed() {
         if (supportFragmentManager.backStackEntryCount > 1) {
             viewModel.safeCastTo<OnboardingFlowViewModel>()?.showResetFlowDialog()
+            return
+        } else {
+            /* do nothing */
+            return
         }
+        super.onBackPressed()
     }
 
     override fun continueToEnableAuth() {
