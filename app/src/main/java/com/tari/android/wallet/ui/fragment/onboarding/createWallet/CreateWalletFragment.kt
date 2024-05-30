@@ -45,7 +45,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.lifecycleScope
 import com.daasuu.ei.Ease
 import com.daasuu.ei.EasingInterpolator
 import com.tari.android.wallet.R.dimen.common_horizontal_margin
@@ -78,11 +77,10 @@ import com.tari.android.wallet.ui.extension.string
 import com.tari.android.wallet.ui.extension.temporarilyDisableClick
 import com.tari.android.wallet.ui.extension.visible
 import com.tari.android.wallet.ui.fragment.onboarding.activity.OnboardingFlowFragment
+import com.tari.android.wallet.ui.fragment.onboarding.createWallet.CreateWalletModel.Effect
 import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.Constants.UI.CreateEmojiId
 import com.tari.android.wallet.util.EmojiUtil
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import me.everything.android.ui.overscroll.OverScrollDecoratorHelper
 import javax.inject.Inject
 
@@ -117,6 +115,12 @@ class CreateWalletFragment : OnboardingFlowFragment<FragmentCreateWalletBinding,
         bindViewModel(viewModel)
 
         setupUi()
+
+        collectFlow(viewModel.effect) { effect ->
+            when (effect) {
+                is Effect.StartCheckmarkAnimation -> startCheckMarkAnimation()
+            }
+        }
     }
 
     override fun onDestroyView() {
@@ -221,24 +225,14 @@ class CreateWalletFragment : OnboardingFlowFragment<FragmentCreateWalletBinding,
 
                 override fun onAnimationEnd(animation: Animator) {
                     super.onAnimationEnd(animation)
-                    // if the wallet is not ready wait until it gets ready,
-                    // otherwise display the checkmark anim & move on
-                    // TODO it's a potential bug. Checking wallet creation in the onViewCreated instead
-                    // TODO I think this could cause the bug where the checkmark animation is not shown and the wallet process is endless
-                    lifecycleScope.launch(Dispatchers.IO) {
-                        walletStateHandler.doOnWalletRunning {
-                            lifecycleScope.launch(Dispatchers.Main) {
-                                startCheckMarkAnimation()
-                            }
-                        }
-                    }
+                    viewModel.waitUntilWalletCreated()
                 }
             })
             start()
         }
     }
 
-    private fun startCheckMarkAnimation() = lifecycleScope.launch(Dispatchers.Main) {
+    private fun startCheckMarkAnimation() {
         ui.justSecDescBackView.gone()
         ui.justSecTitleBackView.gone()
 
@@ -266,8 +260,7 @@ class CreateWalletFragment : OnboardingFlowFragment<FragmentCreateWalletBinding,
             addListener(object : AnimatorListenerAdapter() {
                 override fun onAnimationEnd(animation: Animator) {
                     super.onAnimationEnd(animation)
-                    runCatching {
-                        val emojiId = viewModel.corePrefRepository.emojiId!!
+                    viewModel.corePrefRepository.emojiId?.let { emojiId ->
                         ui.emojiIdTextView.text = EmojiUtil.getFullEmojiIdSpannable(
                             emojiId = emojiId,
                             separator = string(emoji_id_chunk_separator),
@@ -278,6 +271,9 @@ class CreateWalletFragment : OnboardingFlowFragment<FragmentCreateWalletBinding,
 
                         ui.checkmarkLottieAnimationView.visible()
                         ui.checkmarkLottieAnimationView.playAnimation()
+                    } ?: run {
+                        viewModel.logger.i("Emoji id is null during checkmark animation in the onboarding flow.")
+                        onboardingListener.resetFlow()
                     }
                 }
             })
