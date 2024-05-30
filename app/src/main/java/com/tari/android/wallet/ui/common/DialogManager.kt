@@ -18,8 +18,9 @@ class DialogManager @Inject constructor() {
     fun replace(newDialog: TariDialog) {
         currentDialog.let { currentDialog ->
             when {
-                currentDialog != null && newDialog.isRefreshing -> {
-                    /* do nothing */
+                currentDialog == null && newDialog.isRefreshing -> {
+                    // do nothing if no dialog showing,
+                    // else go further and refresh dialog
                     return
                 }
 
