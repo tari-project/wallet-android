@@ -6,7 +6,7 @@ buildscript {
     ext.coroutines_version = '1.8.0'
 
     // build & version
-    ext.buildNumber = 292
+    ext.buildNumber = 293
     ext.versionNumber = "0.26.0"
 
     // JNI libs
