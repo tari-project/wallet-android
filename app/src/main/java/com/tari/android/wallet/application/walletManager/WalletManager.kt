@@ -99,10 +99,7 @@ class WalletManager @Inject constructor(
         torManager.run()
 
         applicationScope.launch {
-            // TODO Comment from Alex:
-            //  if I'm trying to use Initializing status, then wallet would fail with
-            //  java.io.FileNotFoundException: /data/user/0/com.tari.android.wallet/app_tor_data/control_auth_cookie
-            torProxyStateHandler.doOnTorRunning {
+            torProxyStateHandler.doOnTorReadyForWallet {
                 startWallet()
             }
         }

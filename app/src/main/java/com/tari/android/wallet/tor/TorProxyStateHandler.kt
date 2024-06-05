@@ -31,12 +31,12 @@ class TorProxyStateHandler @Inject constructor() {
             } ?: logger.i("Unable to reach Tor bootstrapped state")
     }
 
-    suspend fun doOnTorRunning(action: suspend (torState: TorProxyState.Running) -> Unit) = withContext(Dispatchers.IO) {
-        torProxyState.firstOrNull { it is TorProxyState.Running }
-            ?.safeCastTo<TorProxyState.Running>()
+    suspend fun doOnTorReadyForWallet(action: suspend (torState: TorProxyState.ReadyForWallet) -> Unit) = withContext(Dispatchers.IO) {
+        torProxyState.firstOrNull { it is TorProxyState.ReadyForWallet }
+            ?.safeCastTo<TorProxyState.ReadyForWallet>()
             ?.let {
                 action(it)
-            } ?: logger.i("Unable to reach Tor running state")
+            } ?: logger.i("Unable to reach Tor ready for wallet state")
     }
 
     suspend fun doOnTorFailed(action: suspend (torState: TorProxyState.Failed) -> Unit) = withContext(Dispatchers.IO) {

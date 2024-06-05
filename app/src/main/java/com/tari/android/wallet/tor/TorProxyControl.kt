@@ -58,6 +58,10 @@ class TorProxyControl @Inject constructor(
             socket = Socket(torConfig.controlHost, torConfig.controlPort)
             controlConnection = TorControlConnection(socket)
             controlConnection.authenticate(File(torConfig.cookieFilePath).readBytes())
+
+            // We can start the wallet creation process when cookie files for Tor are created
+            updateState(TorProxyState.ReadyForWallet)
+
             checkTorStatus()
         } catch (throwable: Throwable) {
             val initializationElapsedMs = System.currentTimeMillis() - monitoringStartTimeMs
