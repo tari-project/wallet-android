@@ -59,7 +59,6 @@ import com.tari.android.wallet.databinding.FragmentCreateWalletBinding
 import com.tari.android.wallet.di.DiContainer
 import com.tari.android.wallet.extension.applyFontStyle
 import com.tari.android.wallet.extension.collectFlow
-import com.tari.android.wallet.tor.TorProxyState
 import com.tari.android.wallet.ui.common.domain.PaletteManager
 import com.tari.android.wallet.ui.component.fullEmojiId.EmojiIdSummaryViewController
 import com.tari.android.wallet.ui.component.tari.TariFont
@@ -164,10 +163,6 @@ class CreateWalletFragment : OnboardingFlowFragment<FragmentCreateWalletBinding,
                 emojiIdSummaryContainerView
             ).forEach { it.setOnClickListener(this@CreateWalletFragment::onSeeFullEmojiIdButtonClicked) }
         }
-
-        collectFlow(viewModel.uiState) { uiState ->
-            ui.torProgressStatusTextView.text = uiState.torState.formatProgressText()
-        }
     }
 
     private fun playStartupWhiteBgAnimation() {
@@ -220,7 +215,6 @@ class CreateWalletFragment : OnboardingFlowFragment<FragmentCreateWalletBinding,
                     super.onAnimationStart(animation)
                     ui.justSecDescTextView.visible()
                     ui.justSecTitleTextView.visible()
-                    ui.torProgressStatusTextView.visible()
                 }
 
                 override fun onAnimationEnd(animation: Animator) {
@@ -254,7 +248,6 @@ class CreateWalletFragment : OnboardingFlowFragment<FragmentCreateWalletBinding,
                 val alpha = valueAnimator.animatedValue as Float
                 ui.justSecDescTextView.alpha = alpha
                 ui.justSecTitleTextView.alpha = alpha
-                ui.torProgressStatusTextView.alpha = alpha
             }
 
             addListener(object : AnimatorListenerAdapter() {
@@ -597,12 +590,5 @@ class CreateWalletFragment : OnboardingFlowFragment<FragmentCreateWalletBinding,
             duration = Constants.UI.mediumDurationMs
             start()
         }
-    }
-
-    private fun TorProxyState.formatProgressText(): String = when (this) {
-        is TorProxyState.NotReady -> "Tor proxy not ready"
-        is TorProxyState.Initializing -> "Tor proxy initializing...${bootstrapStatus?.let { "\n${it.summary}\n${it.progress} %" } ?: ""}"
-        is TorProxyState.Running -> "Tor proxy running\n${bootstrapStatus.summary}\n${bootstrapStatus.progress} %"
-        is TorProxyState.Failed -> "Tor proxy failed\n${e.message}"
     }
 }

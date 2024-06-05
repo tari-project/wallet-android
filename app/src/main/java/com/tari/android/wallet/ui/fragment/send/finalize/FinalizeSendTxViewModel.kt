@@ -2,10 +2,16 @@ package com.tari.android.wallet.ui.fragment.send.finalize
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import com.tari.android.wallet.R.string.*
+import com.tari.android.wallet.R.string.finalize_send_tx_sending_step_1_desc_line_1
+import com.tari.android.wallet.R.string.finalize_send_tx_sending_step_1_desc_line_2
+import com.tari.android.wallet.R.string.finalize_send_tx_sending_step_2_desc_line_1
+import com.tari.android.wallet.R.string.finalize_send_tx_sending_step_2_desc_line_2
+import com.tari.android.wallet.R.string.finalize_send_tx_sending_step_3_desc_line_1
+import com.tari.android.wallet.R.string.finalize_send_tx_sending_step_3_desc_line_2
 import com.tari.android.wallet.event.Event
 import com.tari.android.wallet.event.EventBus
-import com.tari.android.wallet.extension.addTo
+import com.tari.android.wallet.extension.launchOnIo
+import com.tari.android.wallet.extension.launchOnMain
 import com.tari.android.wallet.model.TariContact
 import com.tari.android.wallet.model.TransactionSendStatus
 import com.tari.android.wallet.model.TxId
@@ -13,6 +19,7 @@ import com.tari.android.wallet.model.WalletError
 import com.tari.android.wallet.network.NetworkConnectionState
 import com.tari.android.wallet.tor.TorBootstrapStatus
 import com.tari.android.wallet.tor.TorProxyState
+import com.tari.android.wallet.tor.TorProxyStateHandler
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.common.domain.ResourceManager
 import com.tari.android.wallet.ui.fragment.send.common.TransactionData
@@ -21,8 +28,12 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.joda.time.DateTime
 import org.joda.time.Seconds
+import javax.inject.Inject
 
 class FinalizeSendTxViewModel : CommonViewModel() {
+
+    @Inject
+    lateinit var torProxyStateHandler: TorProxyStateHandler
 
     lateinit var transactionData: TransactionData
 
@@ -117,18 +128,9 @@ class FinalizeSendTxViewModel : CommonViewModel() {
             checkConnectionStatus()
         }
 
-        private fun onTorProxyStateChanged(torProxyState: TorProxyState) {
-            if (torProxyState is TorProxyState.Running) {
-                if (torProxyState.bootstrapStatus.progress == TorBootstrapStatus.maxProgress) {
-                    EventBus.torProxyState.unsubscribe(this)
-                    checkConnectionStatus()
-                }
-            }
-        }
-
         private fun checkConnectionStatus() {
             val networkConnectionState = EventBus.networkConnectionState.publishSubject.value
-            val torProxyState = EventBus.torProxyState.publishSubject.value
+            val torProxyState = torProxyStateHandler.torProxyState.value
             // check internet connection
             if (networkConnectionState != NetworkConnectionState.CONNECTED) {
                 // either not connected or Tor proxy is not running
@@ -144,9 +146,14 @@ class FinalizeSendTxViewModel : CommonViewModel() {
                 return
             }
             // check Tor bootstrap status
-            if (torProxyState.bootstrapStatus.progress < TorBootstrapStatus.maxProgress) {
-                // subscribe to Tor proxy state changes - start waiting on it
-                EventBus.torProxyState.publishSubject.subscribe { state -> onTorProxyStateChanged(state) }.addTo(compositeDisposable)
+            if (torProxyState.bootstrapStatus.progress < TorBootstrapStatus.MAX_PROGRESS) {
+                launchOnIo {
+                    torProxyStateHandler.doOnTorBootstrapped {
+                        launchOnMain {
+                            checkConnectionStatus()
+                        }
+                    }
+                }
             } else {
                 isCompleted = true
             }

@@ -6,8 +6,13 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.ui.component.common.CommonView
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 private val logger
     get() = Logger.t("ViewModelExtension")
@@ -65,5 +70,21 @@ fun <T> LiveData<T>.debounce(duration: Long = 1000L) = MediatorLiveData<T>().als
     mld.addSource(source) {
         handler.removeCallbacks(runnable)
         handler.postDelayed(runnable, duration)
+    }
+}
+
+fun ViewModel.launchOnIo(action: suspend () -> Unit) {
+    viewModelScope.launch {
+        withContext(Dispatchers.IO) {
+            action()
+        }
+    }
+}
+
+fun ViewModel.launchOnMain(action: suspend () -> Unit) {
+    viewModelScope.launch {
+        withContext(Dispatchers.Main) {
+            action()
+        }
     }
 }

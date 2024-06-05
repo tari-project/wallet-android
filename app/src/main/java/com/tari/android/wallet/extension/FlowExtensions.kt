@@ -9,6 +9,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 
@@ -17,24 +18,24 @@ inline fun LifecycleOwner.launchAndRepeatOnLifecycle(
     crossinline block: suspend CoroutineScope.() -> Unit,
 ) = lifecycleScope.launch { repeatOnLifecycle(state) { block() } }
 
-fun <T> AppCompatActivity.collectFlow(stateFlow: Flow<T>, action: (T) -> Unit) {
-    launchAndRepeatOnLifecycle(Lifecycle.State.STARTED) {
+fun <T> AppCompatActivity.collectFlow(stateFlow: Flow<T>, action: (T) -> Unit): Job {
+    return launchAndRepeatOnLifecycle(Lifecycle.State.STARTED) {
         stateFlow.collect { state ->
             action(state)
         }
     }
 }
 
-fun <T> Fragment.collectFlow(stateFlow: Flow<T>, action: (T) -> Unit) {
-    viewLifecycleOwner.launchAndRepeatOnLifecycle(Lifecycle.State.STARTED) {
+fun <T> Fragment.collectFlow(stateFlow: Flow<T>, action: (T) -> Unit): Job {
+    return viewLifecycleOwner.launchAndRepeatOnLifecycle(Lifecycle.State.STARTED) {
         stateFlow.collect { state ->
             action(state)
         }
     }
 }
 
-fun <T> ViewModel.collectFlow(stateFlow: Flow<T>, action: (T) -> Unit) {
-    viewModelScope.launch {
+fun <T> ViewModel.collectFlow(stateFlow: Flow<T>, action: (T) -> Unit): Job {
+    return viewModelScope.launch {
         stateFlow.collect { state ->
             action(state)
         }
