@@ -32,7 +32,6 @@
  */
 package com.tari.android.wallet.application.walletManager
 
-import android.annotation.SuppressLint
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.BuildConfig
 import com.tari.android.wallet.application.Network
@@ -44,7 +43,6 @@ import com.tari.android.wallet.data.sharedPrefs.network.NetworkPrefRepository
 import com.tari.android.wallet.data.sharedPrefs.security.SecurityPrefRepository
 import com.tari.android.wallet.data.sharedPrefs.tariSettings.TariSettingsPrefRepository
 import com.tari.android.wallet.di.ApplicationScope
-import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.extension.safeCastTo
 import com.tari.android.wallet.ffi.FFIByteVector
 import com.tari.android.wallet.ffi.FFICommsConfig
@@ -57,7 +55,7 @@ import com.tari.android.wallet.service.seedPhrase.SeedPhraseRepository
 import com.tari.android.wallet.service.service.WalletService
 import com.tari.android.wallet.tor.TorConfig
 import com.tari.android.wallet.tor.TorProxyManager
-import com.tari.android.wallet.tor.TorProxyState
+import com.tari.android.wallet.tor.TorProxyStateHandler
 import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.WalletUtil
 import kotlinx.coroutines.CoroutineScope
@@ -85,6 +83,7 @@ class WalletManager @Inject constructor(
     private val baseNodesManager: BaseNodesManager,
     private val torConfig: TorConfig,
     private val walletStateHandler: WalletStateHandler,
+    private val torProxyStateHandler: TorProxyStateHandler,
     @ApplicationScope private val applicationScope: CoroutineScope,
 ) {
 
@@ -98,8 +97,15 @@ class WalletManager @Inject constructor(
     @Synchronized
     fun start() {
         torManager.run()
-        // subscribe to Tor proxy state changes
-        EventBus.torProxyState.subscribe(this, this::onTorProxyStateChanged)
+
+        applicationScope.launch {
+            // TODO Comment from Alex:
+            //  if I'm trying to use Initializing status, then wallet would fail with
+            //  java.io.FileNotFoundException: /data/user/0/com.tari.android.wallet/app_tor_data/control_auth_cookie
+            torProxyStateHandler.doOnTorRunning {
+                startWallet()
+            }
+        }
     }
 
     /**
@@ -111,11 +117,9 @@ class WalletManager @Inject constructor(
         FFIWallet.instance?.destroy()
         FFIWallet.instance = null
         walletStateHandler.setWalletState(WalletState.NotReady)
-        EventBus.torProxyState.post(TorProxyState.NotReady)
         // stop tor proxy
-        EventBus.torProxyState.unsubscribe(this)
         torManager.shutdown()
-        walletStateHandler.setWalletState(WalletState.NotReady) // todo Don't understand why it's twice. Probable could cause the bug with endless wallet creation
+        walletStateHandler.setWalletState(WalletState.NotReady) // todo Don't understand why it's twice
     }
 
     fun onWalletStarted() {
@@ -126,24 +130,13 @@ class WalletManager @Inject constructor(
      * Instantiates the comms configuration for the wallet.
      */
     fun getCommsConfig(): FFICommsConfig = FFICommsConfig(
-        NetAddressString("127.0.0.1", 39069).toString(),
-        getTorTransport(),
-        walletConfig.walletDBName,
-        walletConfig.getWalletFilesDirPath(),
-        Constants.Wallet.discoveryTimeoutSec,
-        Constants.Wallet.storeAndForwardMessageDurationSec,
+        publicAddress = NetAddressString(address = "127.0.0.1", port = 39069).toString(),
+        transport = getTorTransport(),
+        databaseName = walletConfig.walletDBName,
+        datastorePath = walletConfig.getWalletFilesDirPath(),
+        discoveryTimeoutSec = Constants.Wallet.discoveryTimeoutSec,
+        safMessageDurationSec = Constants.Wallet.storeAndForwardMessageDurationSec,
     )
-
-    @SuppressLint("CheckResult")
-    private fun onTorProxyStateChanged(torProxyState: TorProxyState) {
-        logger.i("Tor proxy state has changed: $torProxyState")
-        // TODO
-        //  if I'm trying to use Initializing status, then wallet would fail with
-        //  java.io.FileNotFoundException: /data/user/0/com.tari.android.wallet/app_tor_data/control_auth_cookie
-        if (torProxyState is TorProxyState.Running) {
-            startWallet()
-        }
-    }
 
     private fun startWallet() {
         if (walletStateHandler.walletState.value is WalletState.NotReady || walletStateHandler.walletState.value is WalletState.Failed) {

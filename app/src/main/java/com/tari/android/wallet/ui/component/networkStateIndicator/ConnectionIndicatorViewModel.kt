@@ -5,10 +5,12 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.map
 import com.tari.android.wallet.R
 import com.tari.android.wallet.event.EventBus
+import com.tari.android.wallet.extension.collectFlow
 import com.tari.android.wallet.network.NetworkConnectionState
 import com.tari.android.wallet.service.baseNode.BaseNodeState
 import com.tari.android.wallet.service.baseNode.BaseNodeSyncState
 import com.tari.android.wallet.tor.TorProxyState
+import com.tari.android.wallet.tor.TorProxyStateHandler
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.component.networkStateIndicator.module.ConnectionStatusesModule
 import com.tari.android.wallet.ui.dialog.modular.DialogArgs
@@ -16,8 +18,12 @@ import com.tari.android.wallet.ui.dialog.modular.ModularDialogArgs
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonStyle
 import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
+import javax.inject.Inject
 
 class ConnectionIndicatorViewModel : CommonViewModel() {
+
+    @Inject
+    lateinit var torProxyStateHandler: TorProxyStateHandler
 
     private val _networkState = MutableLiveData<NetworkConnectionState>()
     private val _torProxyState = MutableLiveData<TorProxyState>()
@@ -56,10 +62,11 @@ class ConnectionIndicatorViewModel : CommonViewModel() {
     }
 
     private fun subscribeOnEventBus() {
-        EventBus.torProxyState.subscribe(this) { _torProxyState.postValue(it) }
         EventBus.networkConnectionState.subscribe(this) { _networkState.postValue(it) }
         EventBus.baseNodeState.subscribe(this) { _baseNodeState.postValue(it) }
         EventBus.baseNodeSyncState.subscribe(this) { _syncState.postValue(it) }
+
+        collectFlow(torProxyStateHandler.torProxyState) { _torProxyState.postValue(it) }
     }
 
     private fun updateConnectionState() {

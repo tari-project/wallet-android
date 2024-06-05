@@ -38,7 +38,6 @@ import com.tari.android.wallet.model.recovery.WalletRestorationResult
 import com.tari.android.wallet.network.NetworkConnectionState
 import com.tari.android.wallet.service.baseNode.BaseNodeState
 import com.tari.android.wallet.service.baseNode.BaseNodeSyncState
-import com.tari.android.wallet.tor.TorProxyState
 
 /**
  * Event bus for the pub/sub model.
@@ -50,9 +49,6 @@ import com.tari.android.wallet.tor.TorProxyState
  * }
  */
 object EventBus : GeneralEventBus() {
-
-    //todo looks like better to have it into appropriate classes than here
-    val torProxyState = BehaviorEventBus<TorProxyState>()
 
     val balanceState = BehaviorEventBus<BalanceInfo>()
 
@@ -72,7 +68,6 @@ object EventBus : GeneralEventBus() {
 
     fun unsubscribeAll(subscriber: Any) {
         EventBus.unsubscribe(subscriber)
-        torProxyState.unsubscribe(subscriber)
         networkConnectionState.unsubscribe(subscriber)
         backupState.unsubscribe(subscriber)
         baseNodeState.unsubscribe(subscriber)
@@ -82,7 +77,6 @@ object EventBus : GeneralEventBus() {
 
     override fun clear() {
         super.clear()
-        torProxyState.clear()
         networkConnectionState.clear()
         backupState.clear()
         baseNodeState.clear()

@@ -55,9 +55,9 @@ class TorResourceInstaller(
     private val appSourceDir: File = File(context.applicationInfo.sourceDir)
 
     lateinit var fileTor: File
-    lateinit var fileTorrcCustom: File
-    lateinit var fileTorControlPort: File
     lateinit var fileTorrc: File
+    private lateinit var fileTorrcCustom: File
+    private lateinit var fileTorControlPort: File
 
     fun installResources() {
         if (!appFilesDir.exists())
@@ -90,7 +90,7 @@ class TorResourceInstaller(
             }
 
             val insStream: InputStream = FileInputStream(fileTor)
-            streamToFile(insStream, fileTor, false, true)
+            streamToFile(insStream, fileTor, append = false, isZipped = true)
             makeFileExecutable(fileTor)
 
             if (fileTor.exists() && fileTor.canExecute())
