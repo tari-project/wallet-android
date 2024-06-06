@@ -61,8 +61,6 @@ abstract class CommonView<VM : CommonViewModel, VB : ViewBinding> : LinearLayout
 
         modularDialog.observe(viewLifecycle) { dialogManager.replace(ModularDialog(context, it)) }
 
-        dismissDialog.observe(viewLifecycle) { dialogManager.dismiss() }
-
         loadingDialog.observe(viewLifecycle) { progressDialogArgs ->
             if (progressDialogArgs.isShow) {
                 dialogManager.replace(TariProgressDialog(context, progressDialogArgs))
