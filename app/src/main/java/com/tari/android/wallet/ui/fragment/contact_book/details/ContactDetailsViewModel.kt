@@ -24,6 +24,7 @@ import com.tari.android.wallet.R.string.contact_book_details_delete_message
 import com.tari.android.wallet.R.string.contact_book_details_edit_title
 import com.tari.android.wallet.application.YatAdapter
 import com.tari.android.wallet.databinding.ViewEmojiIdWithYatSummaryBinding
+import com.tari.android.wallet.extension.launchOnMain
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.common.SingleLiveEvent
 import com.tari.android.wallet.ui.common.recyclerView.CommonViewHolderItem
@@ -185,7 +186,7 @@ class ContactDetailsViewModel : CommonViewModel() {
     }
 
     private fun toggleFavorite(contactDto: ContactDto) {
-        viewModelScope.launch(Dispatchers.IO) {
+        launchOnMain {
             contact.value = contactsRepository.toggleFavorite(contactDto)
         }
     }
