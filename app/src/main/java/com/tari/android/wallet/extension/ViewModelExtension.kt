@@ -11,6 +11,7 @@ import androidx.lifecycle.viewModelScope
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.ui.component.common.CommonView
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -73,16 +74,16 @@ fun <T> LiveData<T>.debounce(duration: Long = 1000L) = MediatorLiveData<T>().als
     }
 }
 
-fun ViewModel.launchOnIo(action: suspend () -> Unit) {
-    viewModelScope.launch {
+fun ViewModel.launchOnIo(action: suspend () -> Unit): Job {
+    return viewModelScope.launch {
         withContext(Dispatchers.IO) {
             action()
         }
     }
 }
 
-fun ViewModel.launchOnMain(action: suspend () -> Unit) {
-    viewModelScope.launch {
+fun ViewModel.launchOnMain(action: suspend () -> Unit): Job {
+    return viewModelScope.launch {
         withContext(Dispatchers.Main) {
             action()
         }
