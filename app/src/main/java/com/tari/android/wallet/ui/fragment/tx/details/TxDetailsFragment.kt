@@ -335,7 +335,7 @@ class TxDetailsFragment : CommonFragment<FragmentTxDetailsBinding, TxDetailsView
     }
 
     private fun onTransactionCancel() {
-        val tx = viewModel.tx.value!!
+        val tx = viewModel.txValue
         if (tx is PendingOutboundTx && tx.direction == OUTBOUND && tx.status == PENDING)
             showTxCancelDialog()
     }

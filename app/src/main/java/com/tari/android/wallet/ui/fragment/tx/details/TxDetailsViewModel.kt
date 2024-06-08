@@ -38,8 +38,9 @@ class TxDetailsViewModel : CommonViewModel() {
     private var txId: TxId? = null
 
     private val _txObject = BehaviorSubject.create<Tx>()
-
     val tx: LiveData<Tx> = _txObject.toFlowable(BackpressureStrategy.LATEST).toLiveData()
+    val txValue: Tx
+        get() = _txObject.value ?: error("Tx object is not initialized")
 
     private val _cancellationReason = MutableLiveData<String>()
     val cancellationReason: LiveData<String> = _cancellationReason
@@ -58,7 +59,7 @@ class TxDetailsViewModel : CommonViewModel() {
         doOnWalletServiceConnected {
             fetchRequiredConfirmationCount()
             findTxAndUpdateUI()
-            _txObject.onNext(_txObject.value!!)
+            _txObject.value?.let { _txObject.onNext(it) } // TODO why invoke the same value??
         }
 
         observeTxUpdates()
@@ -80,7 +81,7 @@ class TxDetailsViewModel : CommonViewModel() {
     }
 
     fun cancelTransaction() {
-        val isCancelled = walletService.getWithError { error, wallet -> wallet.cancelPendingTx(TxId(this.tx.value!!.id), error) }
+        val isCancelled = walletService.getWithError { error, wallet -> wallet.cancelPendingTx(TxId(this.txValue.id), error) }
         if (!isCancelled) {
             showModularDialog(
                 ErrorDialogArgs(
@@ -98,9 +99,10 @@ class TxDetailsViewModel : CommonViewModel() {
     }
 
     private fun updateContact() {
-        val tx = this.tx.value ?: return
-        val contact = contactsRepository.getContactForTx(tx)
-        this.contact.postValue(contact)
+        this.tx.value?.let { tx ->
+            val contact = contactsRepository.getContactForTx(tx)
+            this.contact.postValue(contact)
+        }
     }
 
     private fun getCancellationReason(tx: Tx): String {
@@ -149,7 +151,7 @@ class TxDetailsViewModel : CommonViewModel() {
                 ).getModular(resourceManager)
             )
         } else {
-            foundTx.let { _txObject.onNext(it) }
+            _txObject.onNext(foundTx)
             generateExplorerLink(foundTx)
         }
     }
