@@ -8,9 +8,12 @@ import com.tari.android.wallet.application.deeplinks.DeepLink
 import com.tari.android.wallet.application.deeplinks.DeeplinkHandler
 import com.tari.android.wallet.data.sharedPrefs.tor.TorBridgeConfigurationList
 import com.tari.android.wallet.data.sharedPrefs.tor.TorPrefRepository
-import com.tari.android.wallet.event.EventBus
+import com.tari.android.wallet.extension.collectFlow
+import com.tari.android.wallet.extension.launchOnIo
+import com.tari.android.wallet.extension.launchOnMain
 import com.tari.android.wallet.tor.TorProxyManager
 import com.tari.android.wallet.tor.TorProxyState
+import com.tari.android.wallet.tor.TorProxyStateHandler
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.dialog.error.ErrorDialogArgs
 import com.tari.android.wallet.ui.dialog.inProgress.ProgressDialogArgs
@@ -23,6 +26,9 @@ import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
 import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
 import com.tari.android.wallet.ui.fragment.send.shareQr.ShareQrCodeModule
 import com.tari.android.wallet.ui.fragment.settings.torBridges.torItem.TorBridgeViewHolderItem
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 class TorBridgesSelectionViewModel : CommonViewModel() {
@@ -39,14 +45,16 @@ class TorBridgesSelectionViewModel : CommonViewModel() {
     @Inject
     lateinit var deeplinkHandler: DeeplinkHandler
 
-    init {
-        component.inject(this)
-    }
+    @Inject
+    lateinit var torProxyStateHandler: TorProxyStateHandler
 
     private val _torBridges = MutableLiveData<MutableList<TorBridgeViewHolderItem>>()
     val torBridges: LiveData<MutableList<TorBridgeViewHolderItem>> = _torBridges
 
+    private var torStateCollectingJob: Job? = null
+
     init {
+        component.inject(this)
         loadData()
     }
 
@@ -134,11 +142,9 @@ class TorBridgesSelectionViewModel : CommonViewModel() {
     }
 
     private fun subscribeToTorState() {
-        EventBus.torProxyState.subscribe(this) {
-            when (it) {
-                is TorProxyState.Failed -> {
-                    EventBus.torProxyState.unsubscribe(this)
-
+        launchOnIo {
+            torProxyStateHandler.doOnTorFailed {
+                launchOnMain {
                     showModularDialog(
                         ErrorDialogArgs(
                             title = resourceManager.getString(R.string.tor_bridges_connecting_error_title),
@@ -148,54 +154,59 @@ class TorBridgesSelectionViewModel : CommonViewModel() {
                         ).getModular(resourceManager)
                     )
                 }
+            }
+        }
 
-                is TorProxyState.Running -> {
-                    if (it.bootstrapStatus.progress == 100) {
-                        EventBus.torProxyState.unsubscribe(this)
-                        var description = resourceManager.getString(R.string.tor_bridges_connection_progress_successful_description)
-                        if (torSharedRepository.currentTorBridges.isEmpty()) {
-                            description += resourceManager.getString(R.string.tor_bridges_connection_progress_successful_no_bridges)
-                        } else {
-                            description += resourceManager.getString(R.string.tor_bridges_connection_progress_successful_used_bridges)
-                            for (bridge in torSharedRepository.currentTorBridges) {
-                                description += "${bridge.ip}:${bridge.port}\n"
-                            }
+        torStateCollectingJob = collectFlow(
+            torProxyStateHandler.torProxyState
+                .filter { it is TorProxyState.Running }
+                .map { it as TorProxyState.Running }
+        ) {
+            launchOnMain {
+                if (it.bootstrapStatus.progress == 100) {
+                    var description = resourceManager.getString(R.string.tor_bridges_connection_progress_successful_description)
+                    if (torSharedRepository.currentTorBridges.isEmpty()) {
+                        description += resourceManager.getString(R.string.tor_bridges_connection_progress_successful_no_bridges)
+                    } else {
+                        description += resourceManager.getString(R.string.tor_bridges_connection_progress_successful_used_bridges)
+                        for (bridge in torSharedRepository.currentTorBridges) {
+                            description += "${bridge.ip}:${bridge.port}\n"
                         }
-                        showModularDialog(
-                            ModularDialogArgs(
-                                DialogArgs(false, canceledOnTouchOutside = false), modules = listOf(
-                                    HeadModule(resourceManager.getString(R.string.tor_bridges_connection_progress_successful_title)),
-                                    BodyModule(description),
-                                    ButtonModule(resourceManager.getString(R.string.common_confirm), ButtonStyle.Normal) {
-                                        hideDialog()
-                                        backPressed.postValue(Unit)
-                                    },
-                                )
+                    }
+                    showModularDialog(
+                        ModularDialogArgs(
+                            DialogArgs(false, canceledOnTouchOutside = false), modules = listOf(
+                                HeadModule(resourceManager.getString(R.string.tor_bridges_connection_progress_successful_title)),
+                                BodyModule(description),
+                                ButtonModule(resourceManager.getString(R.string.common_confirm), ButtonStyle.Normal) {
+                                    hideDialog()
+                                    backPressed.postValue(Unit)
+                                },
                             )
                         )
-                    } else {
-                        val description = resourceManager.getString(
-                            R.string.tor_bridges_connection_progress_description_full,
-                            it.bootstrapStatus.summary + ", " + it.bootstrapStatus.warning.orEmpty(),
-                            it.bootstrapStatus.progress.toString()
-                        )
-                        val nextArgs = ProgressDialogArgs(
-                            title = resourceManager.getString(R.string.tor_bridges_connection_progress_title),
-                            description = description,
-                            closeButtonText = resourceManager.getString(R.string.common_cancel),
-                            cancelable = true
-                        ) { stopConnecting() }
-                        showLoadingDialog(nextArgs)
-                    }
+                    )
+                    torStateCollectingJob?.cancel()
+                } else {
+                    val description = resourceManager.getString(
+                        R.string.tor_bridges_connection_progress_description_full,
+                        it.bootstrapStatus.summary + ", " + it.bootstrapStatus.warning.orEmpty(),
+                        it.bootstrapStatus.progress.toString()
+                    )
+                    val nextArgs = ProgressDialogArgs(
+                        title = resourceManager.getString(R.string.tor_bridges_connection_progress_title),
+                        description = description,
+                        closeButtonText = resourceManager.getString(R.string.common_cancel),
+                        cancelable = true,
+                        onClose = { stopConnecting() },
+                    )
+                    showLoadingDialog(nextArgs)
                 }
-
-                else -> Unit
             }
         }
     }
 
     private fun stopConnecting() {
-        EventBus.torProxyState.unsubscribe(this)
+        torStateCollectingJob?.cancel()
         torSharedRepository.currentTorBridges = TorBridgeConfigurationList()
         hideDialog()
     }

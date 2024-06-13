@@ -45,7 +45,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.lifecycleScope
 import com.daasuu.ei.Ease
 import com.daasuu.ei.EasingInterpolator
 import com.tari.android.wallet.R.dimen.common_horizontal_margin
@@ -60,7 +59,6 @@ import com.tari.android.wallet.databinding.FragmentCreateWalletBinding
 import com.tari.android.wallet.di.DiContainer
 import com.tari.android.wallet.extension.applyFontStyle
 import com.tari.android.wallet.extension.collectFlow
-import com.tari.android.wallet.tor.TorProxyState
 import com.tari.android.wallet.ui.common.domain.PaletteManager
 import com.tari.android.wallet.ui.component.fullEmojiId.EmojiIdSummaryViewController
 import com.tari.android.wallet.ui.component.tari.TariFont
@@ -78,11 +76,10 @@ import com.tari.android.wallet.ui.extension.string
 import com.tari.android.wallet.ui.extension.temporarilyDisableClick
 import com.tari.android.wallet.ui.extension.visible
 import com.tari.android.wallet.ui.fragment.onboarding.activity.OnboardingFlowFragment
+import com.tari.android.wallet.ui.fragment.onboarding.createWallet.CreateWalletModel.Effect
 import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.Constants.UI.CreateEmojiId
 import com.tari.android.wallet.util.EmojiUtil
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import me.everything.android.ui.overscroll.OverScrollDecoratorHelper
 import javax.inject.Inject
 
@@ -117,6 +114,12 @@ class CreateWalletFragment : OnboardingFlowFragment<FragmentCreateWalletBinding,
         bindViewModel(viewModel)
 
         setupUi()
+
+        collectFlow(viewModel.effect) { effect ->
+            when (effect) {
+                is Effect.StartCheckmarkAnimation -> startCheckMarkAnimation()
+            }
+        }
     }
 
     override fun onDestroyView() {
@@ -159,10 +162,6 @@ class CreateWalletFragment : OnboardingFlowFragment<FragmentCreateWalletBinding,
                 seeFullEmojiIdButton,
                 emojiIdSummaryContainerView
             ).forEach { it.setOnClickListener(this@CreateWalletFragment::onSeeFullEmojiIdButtonClicked) }
-        }
-
-        collectFlow(viewModel.uiState) { uiState ->
-            ui.torProgressStatusTextView.text = uiState.torState.formatProgressText()
         }
     }
 
@@ -216,29 +215,18 @@ class CreateWalletFragment : OnboardingFlowFragment<FragmentCreateWalletBinding,
                     super.onAnimationStart(animation)
                     ui.justSecDescTextView.visible()
                     ui.justSecTitleTextView.visible()
-                    ui.torProgressStatusTextView.visible()
                 }
 
                 override fun onAnimationEnd(animation: Animator) {
                     super.onAnimationEnd(animation)
-                    // if the wallet is not ready wait until it gets ready,
-                    // otherwise display the checkmark anim & move on
-                    // TODO it's a potential bug. Checking wallet creation in the onViewCreated instead
-                    // TODO I think this could cause the bug where the checkmark animation is not shown and the wallet process is endless
-                    lifecycleScope.launch(Dispatchers.IO) {
-                        walletStateHandler.doOnWalletRunning {
-                            lifecycleScope.launch(Dispatchers.Main) {
-                                startCheckMarkAnimation()
-                            }
-                        }
-                    }
+                    viewModel.waitUntilWalletCreated()
                 }
             })
             start()
         }
     }
 
-    private fun startCheckMarkAnimation() = lifecycleScope.launch(Dispatchers.Main) {
+    private fun startCheckMarkAnimation() {
         ui.justSecDescBackView.gone()
         ui.justSecTitleBackView.gone()
 
@@ -260,14 +248,12 @@ class CreateWalletFragment : OnboardingFlowFragment<FragmentCreateWalletBinding,
                 val alpha = valueAnimator.animatedValue as Float
                 ui.justSecDescTextView.alpha = alpha
                 ui.justSecTitleTextView.alpha = alpha
-                ui.torProgressStatusTextView.alpha = alpha
             }
 
             addListener(object : AnimatorListenerAdapter() {
                 override fun onAnimationEnd(animation: Animator) {
                     super.onAnimationEnd(animation)
-                    runCatching {
-                        val emojiId = viewModel.corePrefRepository.emojiId!!
+                    viewModel.corePrefRepository.emojiId?.let { emojiId ->
                         ui.emojiIdTextView.text = EmojiUtil.getFullEmojiIdSpannable(
                             emojiId = emojiId,
                             separator = string(emoji_id_chunk_separator),
@@ -278,6 +264,9 @@ class CreateWalletFragment : OnboardingFlowFragment<FragmentCreateWalletBinding,
 
                         ui.checkmarkLottieAnimationView.visible()
                         ui.checkmarkLottieAnimationView.playAnimation()
+                    } ?: run {
+                        viewModel.logger.i("Emoji id is null during checkmark animation in the onboarding flow.")
+                        onboardingListener.resetFlow()
                     }
                 }
             })
@@ -601,12 +590,5 @@ class CreateWalletFragment : OnboardingFlowFragment<FragmentCreateWalletBinding,
             duration = Constants.UI.mediumDurationMs
             start()
         }
-    }
-
-    private fun TorProxyState.formatProgressText(): String = when (this) {
-        is TorProxyState.NotReady -> "Tor proxy not ready"
-        is TorProxyState.Initializing -> "Tor proxy initializing...${bootstrapStatus?.let { "\n${it.summary}\n${it.progress} %" } ?: ""}"
-        is TorProxyState.Running -> "Tor proxy running\n${bootstrapStatus.summary}\n${bootstrapStatus.progress} %"
-        is TorProxyState.Failed -> "Tor proxy failed\n${e.message}"
     }
 }

@@ -107,9 +107,6 @@ open class CommonViewModel : ViewModel() {
     private val _loadingDialog = SingleLiveEvent<ProgressDialogArgs>()
     val loadingDialog: LiveData<ProgressDialogArgs> = _loadingDialog
 
-    private val _dismissDialog = SingleLiveEvent<Unit>()
-    val dismissDialog: LiveData<Unit> = _dismissDialog
-
     protected val _blockedBackPressed = SingleLiveEvent<Boolean>()
     val blockedBackPressed: LiveData<Boolean> = _blockedBackPressed
 
@@ -207,7 +204,7 @@ open class CommonViewModel : ViewModel() {
 
     fun hideDialog() {
         viewModelScope.launch(Dispatchers.Main) {
-            _dismissDialog.postValue(Unit)
+            dialogManager.dismiss()
         }
     }
 }

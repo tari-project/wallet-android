@@ -80,8 +80,6 @@ abstract class CommonActivity<Binding : ViewBinding, VM : CommonViewModel> : App
 
         observe(modularDialog) { dialogManager.replace(ModularDialog(this@CommonActivity, it)) }
 
-        observe(dismissDialog) { dialogManager.dismiss() }
-
         observe(loadingDialog) { progressDialogArgs ->
             if (progressDialogArgs.isShow) {
                 dialogManager.replace(TariProgressDialog(this@CommonActivity, progressDialogArgs))

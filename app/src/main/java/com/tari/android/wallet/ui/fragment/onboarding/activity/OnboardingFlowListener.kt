@@ -5,4 +5,5 @@ interface OnboardingFlowListener {
     fun continueToCreateWallet()
     fun onAuthSuccess()
     fun navigateToNetworkSelection()
+    fun resetFlow()
 }

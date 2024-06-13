@@ -48,7 +48,7 @@ class AddressPoisoningChecker @Inject constructor(
             this.hexString !in addressPoisoningSharedRepository.getTrustedContactHexList()
         } else {
             this.hexString !in addressPoisoningSharedRepository.getTrustedContactHexList()
-                    && similarContactList.isNotEmpty()
+                    && similarContactList.size > 1 // because the current wallet address is always similar to itself
         }
     }
 
@@ -65,7 +65,9 @@ class AddressPoisoningChecker @Inject constructor(
                 ).flatten()
             }
 
-            return contactsRepository.currentContactList
+            return (contactsRepository.currentContactList
+                    // add the current wallet address to the list because it may not exist if there were no interactions with it
+                    + contactsRepository.getContactByAddress(this))
                 .filter { it.walletAddress.isSimilarTo(this) }
                 .map { contactDto ->
                     SimilarAddressDto(

@@ -125,8 +125,6 @@ abstract class CommonFragment<Binding : ViewBinding, VM : CommonViewModel> : Fra
             }
         }
 
-        observe(dismissDialog) { dialogManager.dismiss() }
-
         observe(showToast) { TariToast(requireContext(), it) }
 
         observe(blockedBackPressed) {

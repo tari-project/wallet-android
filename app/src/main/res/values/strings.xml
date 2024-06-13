@@ -608,6 +608,7 @@
     <string name="connection_status_dialog_network_status_disconnected">Disconnected from the Internet</string>
     <string name="connection_status_dialog_network_status_connected">Connected to the Internet</string>
     <string name="connection_status_dialog_tor_status_disconnected">Disconnected from Tor</string>
+    <string name="connection_status_dialog_tor_status_ready_for_wallet">Ready for Wallet Creation</string>
     <string name="connection_status_dialog_tor_status_connecting">Connecting with Tor</string>
     <string name="connection_status_dialog_tor_status_connected">Connected with Tor</string>
     <string name="connection_status_dialog_tor_status_failed">Failed to connect with Tor</string>

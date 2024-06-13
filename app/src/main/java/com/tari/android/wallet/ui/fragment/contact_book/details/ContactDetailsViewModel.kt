@@ -24,6 +24,8 @@ import com.tari.android.wallet.R.string.contact_book_details_delete_message
 import com.tari.android.wallet.R.string.contact_book_details_edit_title
 import com.tari.android.wallet.application.YatAdapter
 import com.tari.android.wallet.databinding.ViewEmojiIdWithYatSummaryBinding
+import com.tari.android.wallet.extension.launchOnIo
+import com.tari.android.wallet.extension.launchOnMain
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.common.SingleLiveEvent
 import com.tari.android.wallet.ui.common.recyclerView.CommonViewHolderItem
@@ -185,7 +187,7 @@ class ContactDetailsViewModel : CommonViewModel() {
     }
 
     private fun toggleFavorite(contactDto: ContactDto) {
-        viewModelScope.launch(Dispatchers.IO) {
+        launchOnMain {
             contact.value = contactsRepository.toggleFavorite(contactDto)
         }
     }
@@ -255,14 +257,16 @@ class ContactDetailsViewModel : CommonViewModel() {
 
     private fun saveDetails(newName: String, yat: String = "") {
         updatingJob = null
-        viewModelScope.launch(Dispatchers.IO) {
+        launchOnIo {
             val split = newName.split(" ")
             val name = split.getOrNull(0).orEmpty().trim()
             val surname = split.getOrNull(1).orEmpty().trim()
             val contactDto = contact.value!!
 
-            contact.value = contactsRepository.updateContactInfo(contactDto, name, surname, yat)
-            hideDialog()
+            launchOnMain {
+                contact.value = contactsRepository.updateContactInfo(contactDto, name, surname, yat)
+                hideDialog()
+            }
         }
     }
 
@@ -279,10 +283,12 @@ class ContactDetailsViewModel : CommonViewModel() {
             ShortEmojiIdModule(walletAddress),
             BodyModule(null, SpannableString(secondLineHtml)),
             ButtonModule(resourceManager.getString(common_confirm), Normal) {
-                viewModelScope.launch(Dispatchers.IO) {
+                launchOnIo {
                     contactsRepository.unlinkContact(contact.value!!)
-                    hideDialog()
-                    showUnlinkSuccessDialog()
+                    launchOnMain {
+                        hideDialog()
+                        showUnlinkSuccessDialog()
+                    }
                 }
             },
             ButtonModule(resourceManager.getString(common_cancel), Close)
@@ -290,7 +296,7 @@ class ContactDetailsViewModel : CommonViewModel() {
     }
 
     private fun showUnlinkSuccessDialog() {
-        viewModelScope.launch(Dispatchers.Main) {
+        launchOnMain {
             val mergedDto = contact.value!!.contact as MergedContactDto
             val walletAddress = mergedDto.ffiContactDto.walletAddress
             val name = mergedDto.phoneContactDto.firstName
@@ -316,9 +322,9 @@ class ContactDetailsViewModel : CommonViewModel() {
             HeadModule(resourceManager.getString(contact_book_details_delete_contact)),
             BodyModule(resourceManager.getString(contact_book_details_delete_message)),
             ButtonModule(resourceManager.getString(contact_book_details_delete_button_title), Warning) {
-                viewModelScope.launch(Dispatchers.IO) {
+                launchOnIo {
                     contactsRepository.deleteContact(contact.value!!)
-                    viewModelScope.launch(Dispatchers.Main) {
+                    launchOnMain {
                         hideDialog()
                         navigation.value = Navigation.ContactBookNavigation.BackToContactBook
                     }

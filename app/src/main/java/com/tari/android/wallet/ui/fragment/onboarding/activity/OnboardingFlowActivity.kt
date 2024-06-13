@@ -56,10 +56,7 @@ import com.tari.android.wallet.ui.fragment.onboarding.createWallet.CreateWalletF
 import com.tari.android.wallet.ui.fragment.onboarding.inroduction.IntroductionFragment
 import com.tari.android.wallet.ui.fragment.onboarding.localAuth.LocalAuthFragment
 import com.tari.android.wallet.ui.fragment.settings.networkSelection.NetworkSelectionFragment
-import com.tari.android.wallet.util.Constants.UI.CreateWallet
 import com.tari.android.wallet.util.WalletUtil
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -95,7 +92,7 @@ class OnboardingFlowActivity : CommonActivity<ActivityOnboardingFlowBinding, Com
         val viewModel: OnboardingFlowViewModel by viewModels()
         bindViewModel(viewModel)
 
-        setContainerId(R.id.onboarding_fragment_container_1)
+        setContainerId(R.id.onboarding_fragment_container)
 
         when {
             corePrefRepository.onboardingAuthWasInterrupted -> {
@@ -130,13 +127,15 @@ class OnboardingFlowActivity : CommonActivity<ActivityOnboardingFlowBinding, Com
     }
 
     override fun onBackPressed() {
-        if (supportFragmentManager.backStackEntryCount > 1) {
+        if (supportFragmentManager.findFragmentById(R.id.onboarding_fragment_container) is NetworkSelectionFragment) {
+            super.onBackPressed()
+        } else if (!showingIntroductionFragment()) {
             viewModel.safeCastTo<OnboardingFlowViewModel>()?.showResetFlowDialog()
         }
     }
 
     override fun continueToEnableAuth() {
-        supportFragmentManager.findFragmentById(R.id.onboarding_fragment_container_2)?.safeCastTo<CreateWalletFragment>()?.fadeOutAllViewAnimation()
+        supportFragmentManager.findFragmentById(R.id.onboarding_fragment_container)?.safeCastTo<CreateWalletFragment>()?.fadeOutAllViewAnimation()
 
         loadFragment(
             fragment = LocalAuthFragment(),
@@ -168,11 +167,15 @@ class OnboardingFlowActivity : CommonActivity<ActivityOnboardingFlowBinding, Com
         )
     }
 
-    private fun resetFlow() {
+    override fun resetFlow() {
         walletServiceLauncher.stopAndDelete()
         clearBackStack()
         WalletUtil.clearWalletFiles(walletConfig.getWalletFilesDirPath())
         loadFragment(IntroductionFragment())
+    }
+
+    private fun showingIntroductionFragment(): Boolean {
+        return supportFragmentManager.fragments.size == 1 && supportFragmentManager.fragments[0] is IntroductionFragment
     }
 
     private fun loadFragment(
@@ -180,15 +183,12 @@ class OnboardingFlowActivity : CommonActivity<ActivityOnboardingFlowBinding, Com
         transparentBg: Boolean = false,
         applyTransaction: ((fragmentTransaction: FragmentTransaction) -> FragmentTransaction)? = null,
     ) {
-        removeContainerFragment(if (transparentBg) R.id.onboarding_fragment_container_1 else R.id.onboarding_fragment_container_2)
+        ui.onboardingFragmentContainer.setBackgroundColor(if (transparentBg) getColor(R.color.transparent) else getColor(R.color.black))
 
         supportFragmentManager
             .beginTransaction()
             .apply { applyTransaction?.invoke(this) }
-            .add(
-                if (!transparentBg) R.id.onboarding_fragment_container_1 else R.id.onboarding_fragment_container_2,
-                fragment, fragment.javaClass.simpleName,
-            )
+            .add(R.id.onboarding_fragment_container, fragment, fragment.javaClass.simpleName)
             .addToBackStack(null)
             .commit()
     }
@@ -196,17 +196,6 @@ class OnboardingFlowActivity : CommonActivity<ActivityOnboardingFlowBinding, Com
     private fun clearBackStack() {
         if (supportFragmentManager.backStackEntryCount > 0) {
             supportFragmentManager.popBackStack(supportFragmentManager.getBackStackEntryAt(0).id, FragmentManager.POP_BACK_STACK_INCLUSIVE)
-        }
-    }
-
-    private fun removeContainerFragment(containerId: Int) {
-        lifecycleScope.launch(Dispatchers.IO) {
-            delay(CreateWallet.removeFragmentDelayDuration)
-            launch(Dispatchers.Main) {
-                supportFragmentManager.findFragmentById(containerId)?.let {
-                    supportFragmentManager.beginTransaction().remove(it).commit()
-                }
-            }
         }
     }
 }
