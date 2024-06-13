@@ -17,7 +17,6 @@ import com.google.android.material.tabs.TabLayoutMediator
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.deeplinks.DeeplinkViewModel
 import com.tari.android.wallet.databinding.FragmentContactBookRootBinding
-import com.tari.android.wallet.extension.collectFlow
 import com.tari.android.wallet.extension.observe
 import com.tari.android.wallet.model.TariWalletAddress
 import com.tari.android.wallet.ui.common.CommonFragment
@@ -79,11 +78,6 @@ class ContactBookFragment : CommonFragment<FragmentContactBookRootBinding, Conta
     }
 
     private fun subscribeUI() = with(viewModel) {
-        collectFlow(contactsRepository.loadingState) { loadingState ->
-            ui.isSyncingProgressBar.setVisible(loadingState.isLoading)
-            ui.syncingStatus.text = getString(R.string.contact_book_loading_sec, loadingState.name, loadingState.time.toString())
-        }
-
         observe(contactSelectionRepository.isSelectionState) { updateSharedState() }
 
         observe(walletAddressViewModel.discoveredWalletAddressFromClipboard) { clipboardController.showClipboardData(it) }
@@ -106,7 +100,8 @@ class ContactBookFragment : CommonFragment<FragmentContactBookRootBinding, Conta
             tab.setText(
                 when (position) {
                     0 -> R.string.contact_book_contacts_title
-                    else -> R.string.contact_book_favorites_title
+                    1 -> R.string.contact_book_favorites_title
+                    else -> error("Invalid tab position")
                 }
             )
         }.attach()

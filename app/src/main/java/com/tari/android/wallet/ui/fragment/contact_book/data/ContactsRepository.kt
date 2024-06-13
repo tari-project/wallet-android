@@ -26,7 +26,6 @@ import yat.android.sdk.models.PaymentAddressResponseResult
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.random.Random
-import kotlin.system.measureNanoTime
 
 @Singleton
 class ContactsRepository @Inject constructor(
@@ -51,9 +50,6 @@ class ContactsRepository @Inject constructor(
         contactsRepository = this,
         context = context,
     )
-
-    private val _loadingState = MutableStateFlow(LoadingState())
-    val loadingState = _loadingState.asStateFlow()
 
     private val _contactList = MutableStateFlow(contactSharedPrefRepository.getSavedContacts())
     val contactList = _contactList.asStateFlow()
@@ -173,14 +169,6 @@ class ContactsRepository @Inject constructor(
         }
     }
 
-    internal suspend fun doWithLoading(name: String, action: suspend () -> Unit) {
-        _loadingState.update { it.copy(isLoading = true, name = name) }
-        val time = measureNanoTime { runCatching { action() } } / 1_000_000_000.0
-        action()
-        logger.i("Action $name took $time seconds")
-        _loadingState.update { it.copy(isLoading = false, name = name, time = time) }
-    }
-
     private suspend fun updateContact(contactUuid: String, silently: Boolean = false, updateAction: suspend (contact: ContactDto) -> Unit) {
         updateContactList(silently) { contacts ->
             contacts.firstOrNull { it.uuid == contactUuid }?.let { updateAction(it) }
@@ -191,12 +179,11 @@ class ContactsRepository @Inject constructor(
         val updatedContacts = currentContactList.toMutableList().also { updateAction(it) }.toList()
         _contactList.update { updatedContacts }
 
-        doWithLoading("Updating contact changes to phone and FFI") {
-            contactSharedPrefRepository.saveContacts(updatedContacts)
-            if (silently.not()) {
-                ffiBridge.updateToFFI(updatedContacts)
-                phoneBookRepositoryBridge.updateToPhoneBook()
-            }
+        logger.i("ContactsRepository: Updating contact list")
+        contactSharedPrefRepository.saveContacts(updatedContacts)
+        if (silently.not()) {
+            ffiBridge.updateToFFI(updatedContacts)
+            phoneBookRepositoryBridge.updateToPhoneBook()
         }
     }
 
@@ -217,8 +204,6 @@ class ContactsRepository @Inject constructor(
             ?: ContactDto(FFIContactDto(address))
 
     fun getByUuid(uuid: String): ContactDto = currentContactList.first { it.uuid == uuid }
-
-    data class LoadingState(val isLoading: Boolean = false, val name: String = "", val time: Double = 0.0)
 
     data class PhoneContact(
         val id: String,

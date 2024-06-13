@@ -3,6 +3,7 @@ package com.tari.android.wallet.ui.fragment.contact_book.data
 import android.content.ContentProviderOperation
 import android.content.Context
 import android.provider.ContactsContract
+import com.orhanobut.logger.Logger
 import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.ContactDto
 import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.PhoneContactDto
 import contacts.core.Contacts
@@ -17,30 +18,31 @@ class PhoneBookRepositoryBridge(
     private val contactsRepository: ContactsRepository,
     private val context: Context,
 ) {
+    private val logger
+        get() = Logger.t(this::class.simpleName)
 
     private val phoneContactsSource = Contacts(context)
 
     internal suspend fun updateContactListWithPhoneBook() {
         if (!contactsRepository.contactPermissionGranted) return
 
-        contactsRepository.doWithLoading("Loading contacts from phone book") {
-            val phoneContacts = getPhoneContacts()
+        logger.i("ContactsRepository: Loading contacts from phone book")
+        val phoneContacts = getPhoneContacts()
 
-            contactsRepository.updateContactList { contacts ->
-                phoneContacts.forEach { phoneContact ->
-                    val existingContact = contacts.firstOrNull { it.getPhoneDto()?.id == phoneContact.id }
-                    if (existingContact == null) {
-                        contacts.add(ContactDto(phoneContact.toPhoneContactDto()))
-                    } else {
-                        existingContact.getPhoneDto()?.let {
-                            it.avatar = phoneContact.avatar
-                            it.firstName = phoneContact.firstName
-                            it.surname = phoneContact.surname
-                            it.displayName = phoneContact.displayName
-                            it.isFavorite = phoneContact.isFavorite
+        contactsRepository.updateContactList { contacts ->
+            phoneContacts.forEach { phoneContact ->
+                val existingContact = contacts.firstOrNull { it.getPhoneDto()?.id == phoneContact.id }
+                if (existingContact == null) {
+                    contacts.add(ContactDto(phoneContact.toPhoneContactDto()))
+                } else {
+                    existingContact.getPhoneDto()?.let {
+                        it.avatar = phoneContact.avatar
+                        it.firstName = phoneContact.firstName
+                        it.surname = phoneContact.surname
+                        it.displayName = phoneContact.displayName
+                        it.isFavorite = phoneContact.isFavorite
 //                                it.yat = phoneContact.yat
 //                                it.phoneEmojiId = phoneContact.emojiId
-                        }
                     }
                 }
             }
@@ -49,39 +51,37 @@ class PhoneBookRepositoryBridge(
 
     internal suspend fun updateToPhoneBook() {
         if (contactsRepository.contactPermissionGranted) {
-            contactsRepository.doWithLoading("Saving updates to contact book") {
-                try {
-                    contactsRepository.updateContactList(silently = true) { contacts ->
-                        val phoneContacts = contacts.mapNotNull { it.getPhoneDto() }.filter { it.shouldUpdate }
+            logger.i("ContactsRepository: Saving updates to contact book")
+            try {
+                contactsRepository.updateContactList(silently = true) { contacts ->
+                    val phoneContacts = contacts.mapNotNull { it.getPhoneDto() }.filter { it.shouldUpdate }
 
-                        for (item in phoneContacts) {
-                            val contact = ContactsRepository.PhoneContact(
-                                id = item.id,
-                                firstName = item.firstName,
-                                surname = item.surname,
-                                displayName = item.displayName,
-                                yat = item.yat,
-                                emojiId = item.phoneEmojiId,
-                                avatar = item.avatar,
-                                isFavorite = item.isFavorite,
-                            )
-                            saveNamesToPhoneBook(contact)
-                            saveStarredToPhoneBook(contact)
+                    for (item in phoneContacts) {
+                        val contact = ContactsRepository.PhoneContact(
+                            id = item.id,
+                            firstName = item.firstName,
+                            surname = item.surname,
+                            displayName = item.displayName,
+                            yat = item.yat,
+                            emojiId = item.phoneEmojiId,
+                            avatar = item.avatar,
+                            isFavorite = item.isFavorite,
+                        )
+                        saveNamesToPhoneBook(contact)
+                        saveStarredToPhoneBook(contact)
 //                                saveCustomFieldsToPhoneBook(contact) // todo why it's  commented? Should we store Yat and EmojiID custom fields in the phone book?
-                            item.shouldUpdate = false
-                        }
+                        item.shouldUpdate = false
                     }
-                } catch (e: Throwable) {
-                    e.printStackTrace()
                 }
+            } catch (e: Throwable) {
+                e.printStackTrace()
             }
         }
     }
 
     internal suspend fun deleteFromContactBook(contact: PhoneContactDto) {
-        contactsRepository.doWithLoading("Deleting contact from contact book") {
-            phoneContactsSource.delete().contactsWithId(contact.id.toLong()).commit()
-        }
+        logger.i("ContactsRepository: Deleting contact from contact book")
+        phoneContactsSource.delete().contactsWithId(contact.id.toLong()).commit()
     }
 
     private fun saveNamesToPhoneBook(contact: ContactsRepository.PhoneContact) {

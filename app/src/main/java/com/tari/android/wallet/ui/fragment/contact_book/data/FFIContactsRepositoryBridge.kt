@@ -55,11 +55,10 @@ class FFIContactsRepositoryBridge(
     }
 
     suspend fun deleteContact(contact: FFIContactDto) {
-        contactsRepository.doWithLoading("Deleting contact") {
-            walletStateHandler.doOnWalletRunning {
-                tariWalletServiceConnection.doOnWalletServiceConnected { service ->
-                    service.updateContact(contact.walletAddress, "", false, WalletError())
-                }
+        logger.i("ContactsRepository: Deleting contact")
+        walletStateHandler.doOnWalletRunning {
+            tariWalletServiceConnection.doOnWalletServiceConnected { service ->
+                service.updateContact(contact.walletAddress, "", false, WalletError())
             }
         }
     }
@@ -79,47 +78,45 @@ class FFIContactsRepositoryBridge(
 
     private fun updateContactChange(tariContact: TariContact) {
         externalScope.launch {
-            contactsRepository.doWithLoading("Updating contact changes to phone and FFI") {
-                updateFFIContacts()
+            logger.i("ContactsRepository: Updating contact changes to phone and FFI")
+            updateFFIContacts()
 
-                val existingContact = contactsRepository.currentContactList
-                    .firstOrNull { it.contact.extractWalletAddress() == tariContact.walletAddress }
-                val contact = existingContact ?: ContactDto(FFIContactDto(tariContact.walletAddress, tariContact.alias, tariContact.isFavorite))
-                contactsRepository.updateRecentUsedTime(contact)
-            }
+            val existingContact = contactsRepository.currentContactList
+                .firstOrNull { it.contact.extractWalletAddress() == tariContact.walletAddress }
+            val contact = existingContact ?: ContactDto(FFIContactDto(tariContact.walletAddress, tariContact.alias, tariContact.isFavorite))
+            contactsRepository.updateRecentUsedTime(contact)
         }
     }
 
     private suspend fun updateFFIContacts() {
-        contactsRepository.doWithLoading("Updating FFI contacts") {
-            try {
-                val contacts = FFIWallet.instance!!.getContacts()
-                for (contactIndex in 0 until contacts.getLength()) {
-                    val actualContact = contacts.getAt(contactIndex)
+        logger.i("ContactsRepository: Updating FFI contacts")
+        try {
+            val contacts = FFIWallet.instance!!.getContacts()
+            for (contactIndex in 0 until contacts.getLength()) {
+                val actualContact = contacts.getAt(contactIndex)
 
-                    val walletAddress = actualContact.getWalletAddress()
-                    val ffiWalletAddress = TariWalletAddress.createWalletAddress(walletAddress.toString(), walletAddress.getEmojiId())
-                    val alias = actualContact.getAlias()
-                    val isFavorite = actualContact.getIsFavorite()
+                val walletAddress = actualContact.getWalletAddress()
+                val ffiWalletAddress = TariWalletAddress.createWalletAddress(walletAddress.toString(), walletAddress.getEmojiId())
+                val alias = actualContact.getAlias()
+                val isFavorite = actualContact.getIsFavorite()
 
-                    onFFIContactAddedOrUpdated(ffiWalletAddress, alias, isFavorite)
-                }
-            } catch (e: Throwable) {
-                e.printStackTrace()
+                onFFIContactAddedOrUpdated(ffiWalletAddress, alias, isFavorite)
             }
+        } catch (e: Throwable) {
+            e.printStackTrace()
+        }
 
-            try {
-                tariWalletServiceConnection.doOnWalletServiceConnected { service ->
-                    val allTxs = service.getCompletedTxs(WalletError()) + service.getCancelledTxs(WalletError()) +
-                            service.getPendingInboundTxs(WalletError()) + service.getPendingOutboundTxs(WalletError())
-                    val allUsers = allTxs.map { it.tariContact }.distinctBy { it.walletAddress }
-                    for (user in allUsers) {
-                        onFFIContactAddedOrUpdated(user.walletAddress, user.alias, user.isFavorite)
-                    }
+        try {
+            tariWalletServiceConnection.doOnWalletServiceConnected { service ->
+                val allTxs = service.getCompletedTxs(WalletError()) + service.getCancelledTxs(WalletError()) +
+                        service.getPendingInboundTxs(WalletError()) + service.getPendingOutboundTxs(WalletError())
+                val allUsers = allTxs.map { it.tariContact }.distinctBy { it.walletAddress }
+                for (user in allUsers) {
+                    onFFIContactAddedOrUpdated(user.walletAddress, user.alias, user.isFavorite)
                 }
-            } catch (e: Throwable) {
-                e.printStackTrace()
             }
+        } catch (e: Throwable) {
+            e.printStackTrace()
         }
     }
 
