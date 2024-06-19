@@ -10,7 +10,7 @@ import com.tari.android.wallet.databinding.FragmentContactsLinkBinding
 import com.tari.android.wallet.extension.observe
 import com.tari.android.wallet.ui.common.CommonFragment
 import com.tari.android.wallet.ui.common.recyclerView.CommonAdapter
-import com.tari.android.wallet.ui.extension.serializable
+import com.tari.android.wallet.ui.extension.parcelable
 import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.ContactDto
 import com.tari.android.wallet.ui.fragment.contact_book.link.adapter.LinkContactAdapter
 import com.tari.android.wallet.ui.fragment.home.navigation.TariNavigator.Companion.PARAMETER_CONTACT
@@ -28,7 +28,7 @@ class ContactLinkFragment : CommonFragment<FragmentContactsLinkBinding, ContactL
         val viewModel: ContactLinkViewModel by viewModels()
         bindViewModel(viewModel)
 
-        viewModel.initArgs(requireArguments().serializable(PARAMETER_CONTACT)!!)
+        viewModel.initArgs(requireArguments().parcelable<ContactDto>(PARAMETER_CONTACT)!!)
 
         initUI()
         observeUI()
@@ -49,7 +49,7 @@ class ContactLinkFragment : CommonFragment<FragmentContactsLinkBinding, ContactL
 
     companion object {
         fun createFragment(args: ContactDto): ContactLinkFragment = ContactLinkFragment().apply {
-            arguments = Bundle().apply { putSerializable(PARAMETER_CONTACT, args) }
+            arguments = Bundle().apply { putParcelable(PARAMETER_CONTACT, args) }
         }
     }
 }

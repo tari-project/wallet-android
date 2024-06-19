@@ -183,7 +183,7 @@ class TxDetailsViewModel : CommonViewModel() {
     private fun showEditNameInputs() {
         val contact = contact.value!!
 
-        val name = (contact.contact.firstName + " " + contact.contact.surname).trim()
+        val name = (contact.contactInfo.firstName + " " + contact.contactInfo.lastName).trim()
 
         var saveAction: () -> Boolean = { false }
 
@@ -196,8 +196,8 @@ class TxDetailsViewModel : CommonViewModel() {
             ) { saveAction.invoke() }
 
         val headModule = HeadModule(
-            resourceManager.getString(R.string.contact_book_details_edit_title),
-            rightButtonTitle = resourceManager.getString(R.string.contact_book_add_contact_done_button)
+            title = resourceManager.getString(R.string.contact_book_details_edit_title),
+            rightButtonTitle = resourceManager.getString(R.string.contact_book_add_contact_done_button),
         ) { saveAction.invoke() }
 
         val moduleList = mutableListOf(headModule, nameModule)

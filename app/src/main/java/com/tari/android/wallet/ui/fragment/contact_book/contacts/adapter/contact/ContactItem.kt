@@ -19,7 +19,7 @@ data class ContactItem(
     override val viewHolderUUID
         get() = contact.uuid
 
-    override fun hashCode(): Int = HashcodeUtils.generate(contact, isSimple, isSelectionState, isSelected, contact.contact.isFavorite)
+    override fun hashCode(): Int = HashcodeUtils.generate(contact, isSimple, isSelectionState, isSelected, contact.contactInfo.isFavorite)
 
     override fun equals(other: Any?): Boolean {
         if (other is ContactItem) {

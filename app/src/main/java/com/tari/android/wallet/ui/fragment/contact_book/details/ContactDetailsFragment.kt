@@ -15,7 +15,7 @@ import com.tari.android.wallet.ui.component.fullEmojiId.FullEmojiIdViewControlle
 import com.tari.android.wallet.ui.component.tari.toolbar.TariToolbarActionArg
 import com.tari.android.wallet.ui.extension.doOnGlobalLayout
 import com.tari.android.wallet.ui.extension.gone
-import com.tari.android.wallet.ui.extension.serializable
+import com.tari.android.wallet.ui.extension.parcelable
 import com.tari.android.wallet.ui.extension.setLayoutHeight
 import com.tari.android.wallet.ui.extension.setLayoutWidth
 import com.tari.android.wallet.ui.extension.setTopMargin
@@ -39,7 +39,7 @@ class ContactDetailsFragment : CommonFragment<FragmentContactsDetailsBinding, Co
         val viewModel: ContactDetailsViewModel by viewModels()
         bindViewModel(viewModel)
 
-        viewModel.initArgs(requireArguments().serializable(PARAMETER_CONTACT)!!)
+        viewModel.initArgs(requireArguments().parcelable<ContactDto>(PARAMETER_CONTACT)!!)
 
         setupUI()
         observeUI()
@@ -63,7 +63,7 @@ class ContactDetailsFragment : CommonFragment<FragmentContactsDetailsBinding, Co
                 binding.emojiIdSummaryView,
                 requireContext()
             )
-            viewModel.contact.value?.contact?.extractWalletAddress()?.let {
+            viewModel.contact.value?.contactInfo?.extractWalletAddress()?.let {
                 fullEmojiIdViewController?.fullEmojiId = it.emojiId
                 fullEmojiIdViewController?.emojiIdHex = it.hexString
             }
@@ -83,7 +83,7 @@ class ContactDetailsFragment : CommonFragment<FragmentContactsDetailsBinding, Co
     }
 
     private fun applyContact(contact: ContactDto) {
-        val address = contact.contact.extractWalletAddress()
+        val address = contact.contactInfo.extractWalletAddress()
         fullEmojiIdViewController?.fullEmojiId = address.emojiId
         fullEmojiIdViewController?.emojiIdHex = address.hexString
 
@@ -104,7 +104,7 @@ class ContactDetailsFragment : CommonFragment<FragmentContactsDetailsBinding, Co
     companion object {
 
         fun createFragment(args: ContactDto): ContactDetailsFragment = ContactDetailsFragment().apply {
-            arguments = Bundle().apply { putSerializable(PARAMETER_CONTACT, args) }
+            arguments = Bundle().apply { putParcelable(PARAMETER_CONTACT, args) }
         }
     }
 }

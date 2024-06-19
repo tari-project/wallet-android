@@ -11,9 +11,9 @@ import com.tari.android.wallet.ui.extension.gone
 import com.tari.android.wallet.ui.extension.setVisible
 import com.tari.android.wallet.ui.extension.visible
 import com.tari.android.wallet.ui.fragment.contact_book.contacts.adapter.contact.badges.BadgesController
-import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.FFIContactDto
-import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.MergedContactDto
-import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.PhoneContactDto
+import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.FFIContactInfo
+import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.MergedContactInfo
+import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.PhoneContactInfo
 import com.tari.android.wallet.util.containsNonEmoji
 import com.tari.android.wallet.util.extractEmojis
 
@@ -27,8 +27,8 @@ class ContactItemViewHolder(view: ItemContactBinding) : CommonViewHolder<Contact
         super.bind(item)
         badgesController.bind(item)
 
-        when (val dto = item.contact.contact) {
-            is FFIContactDto -> {
+        when (val dto = item.contact.contactInfo) {
+            is FFIContactInfo -> {
                 displayFirstEmojiOrText(dto.walletAddress.emojiId.extractEmojis()[0])
                 if (dto.getAlias().isEmpty()) {
                     displayEmojiId(dto.walletAddress.emojiId)
@@ -37,28 +37,28 @@ class ContactItemViewHolder(view: ItemContactBinding) : CommonViewHolder<Contact
                 }
             }
 
-            is MergedContactDto -> {
-                if (dto.phoneContactDto.avatar.isNotEmpty() && hasContactPermission()) displayAvatar(dto.phoneContactDto.avatar) else
-                    displayFirstEmojiOrText(dto.ffiContactDto.walletAddress.emojiId.extractEmojis()[0])
-                displayAlias(dto.phoneContactDto.getAlias())
-                displayYat(dto.phoneContactDto.yat)
+            is MergedContactInfo -> {
+                if (dto.phoneContactInfo.avatar.isNotEmpty() && hasContactPermission()) displayAvatar(dto.phoneContactInfo.avatar) else
+                    displayFirstEmojiOrText(dto.ffiContactInfo.walletAddress.emojiId.extractEmojis()[0])
+                displayAlias(dto.phoneContactInfo.getAlias())
+                displayYat(dto.phoneContactInfo.yatDto?.yat.orEmpty())
             }
 
-            is PhoneContactDto -> {
+            is PhoneContactInfo -> {
                 if (dto.avatar.isNotEmpty() && hasContactPermission()) displayAvatar(dto.avatar) else {
                     var name = ""
                     dto.firstName.firstOrNull()?.let { name += it }
-                    dto.surname.firstOrNull()?.let { name += it }
+                    dto.lastName.firstOrNull()?.let { name += it }
                     displayFirstEmojiOrText(name.ifEmpty { "C" })
                 }
                 displayAlias(dto.getAlias())
-                displayYat(dto.yat)
+                displayYat(dto.yatDto?.yat.orEmpty())
             }
         }
 
         ui.contactIconType.setImageResource(item.contact.getTypeIcon())
-        ui.starred.setVisible(item.contact.contact.isFavorite)
-        ui.checkbox.setVisible(item.isSelectionState && item.contact.getFFIDto() != null)
+        ui.starred.setVisible(item.contact.contactInfo.isFavorite)
+        ui.checkbox.setVisible(item.isSelectionState && item.contact.getFFIContactInfo() != null)
         ui.checkbox.isChecked = item.isSelected
     }
 

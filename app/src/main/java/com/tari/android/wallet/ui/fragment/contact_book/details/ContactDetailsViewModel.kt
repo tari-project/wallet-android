@@ -45,7 +45,7 @@ import com.tari.android.wallet.ui.dialog.modular.modules.yatInput.YatInputModule
 import com.tari.android.wallet.ui.fragment.contact_book.data.ContactAction
 import com.tari.android.wallet.ui.fragment.contact_book.data.ContactsRepository
 import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.ContactDto
-import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.MergedContactDto
+import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.MergedContactInfo
 import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.YatDto
 import com.tari.android.wallet.ui.fragment.contact_book.details.adapter.contactType.ContactTypeViewHolderItem
 import com.tari.android.wallet.ui.fragment.contact_book.details.adapter.profile.ContactProfileViewHolderItem
@@ -119,7 +119,7 @@ class ContactDetailsViewModel : CommonViewModel() {
             }
         }
 
-        if (contact.getFFIDto() != null) {
+        if (contact.getFFIContactInfo() != null) {
             newList += SettingsRowViewDto(resourceManager.getString(R.string.contact_details_transaction_history)) {
                 navigation.postValue(Navigation.ContactBookNavigation.ToContactTransactionHistory(contact))
             }
@@ -211,33 +211,49 @@ class ContactDetailsViewModel : CommonViewModel() {
     fun onEditClick() {
         val contact = contact.value!!
 
-        val name = (contact.contact.firstName + " " + contact.contact.surname).trim()
-        val phoneDto = contact.getPhoneDto()
+        val name = (contact.contactInfo.firstName + " " + contact.contactInfo.lastName).trim()
+        val phoneDto = contact.getPhoneContactInfo()
         val yatDto = contact.getYatDto()
 
         var saveAction: () -> Boolean = { false }
 
-        val nameModule = InputModule(name, resourceManager.getString(contact_book_add_contact_first_name_hint), true, true) { saveAction.invoke() }
+        val nameModule = InputModule(
+            value = name,
+            hint = resourceManager.getString(contact_book_add_contact_first_name_hint),
+            isFirst = true,
+            isEnd = true,
+        ) { saveAction.invoke() }
+
         val yatModule = phoneDto?.let {
-            YatInputModule(this::yatSearchAction, yatDto?.yat.orEmpty(), resourceManager.getString(contact_book_add_contact_yat_hint), false, true) {
-                saveAction.invoke()
-            }
+            YatInputModule(
+                search = this::yatSearchAction,
+                value = yatDto?.yat.orEmpty(),
+                hint = resourceManager.getString(contact_book_add_contact_yat_hint),
+                isFirst = false,
+                isEnd = true,
+            ) { saveAction.invoke() }
         }
 
         val headModule = HeadModule(
-            resourceManager.getString(contact_book_details_edit_title),
+            title = resourceManager.getString(contact_book_details_edit_title),
             rightButtonTitle = resourceManager.getString(contact_book_add_contact_done_button)
         ) { saveAction.invoke() }
-
-        val moduleList = mutableListOf(headModule, nameModule)
-        yatModule?.let { moduleList.add(it) }
 
         saveAction = {
             saveDetails(nameModule.value, yatModule?.value ?: "")
             true
         }
 
-        showInputModalDialog(ModularDialogArgs(DialogArgs(), moduleList))
+        showInputModalDialog(
+            ModularDialogArgs(
+                DialogArgs(),
+                listOfNotNull(
+                    headModule,
+                    nameModule,
+                    yatModule.takeIf { it != null },
+                ),
+            )
+        )
     }
 
     private suspend fun yatSearchAction(yat: String): Boolean {
@@ -271,9 +287,9 @@ class ContactDetailsViewModel : CommonViewModel() {
     }
 
     private fun showUnlinkDialog() {
-        val mergedDto = contact.value!!.contact as MergedContactDto
-        val walletAddress = mergedDto.ffiContactDto.walletAddress
-        val name = mergedDto.phoneContactDto.firstName
+        val mergedDto = contact.value!!.contactInfo as MergedContactInfo
+        val walletAddress = mergedDto.ffiContactInfo.walletAddress
+        val name = mergedDto.phoneContactInfo.firstName
         val firstLineHtml = HtmlHelper.getSpannedText(resourceManager.getString(contact_book_contacts_book_unlink_message_firstLine))
         val secondLineHtml = HtmlHelper.getSpannedText(resourceManager.getString(contact_book_contacts_book_unlink_message_secondLine, name))
 
@@ -297,9 +313,9 @@ class ContactDetailsViewModel : CommonViewModel() {
 
     private fun showUnlinkSuccessDialog() {
         launchOnMain {
-            val mergedDto = contact.value!!.contact as MergedContactDto
-            val walletAddress = mergedDto.ffiContactDto.walletAddress
-            val name = mergedDto.phoneContactDto.firstName
+            val mergedDto = contact.value!!.contactInfo as MergedContactInfo
+            val walletAddress = mergedDto.ffiContactInfo.walletAddress
+            val name = mergedDto.phoneContactInfo.firstName
             val firstLineHtml = HtmlHelper.getSpannedText(resourceManager.getString(contact_book_contacts_book_unlink_success_message_firstLine))
             val secondLineHtml =
                 HtmlHelper.getSpannedText(resourceManager.getString(contact_book_contacts_book_unlink_success_message_secondLine, name))

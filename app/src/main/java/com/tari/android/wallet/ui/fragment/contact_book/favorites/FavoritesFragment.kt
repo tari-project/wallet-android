@@ -41,7 +41,7 @@ class FavoritesFragment : ContactsFragment() {
         super.onViewCreated(view, savedInstanceState)
 
         viewModel.isFavorite = true
-        viewModel.addFilter { contactItem -> contactItem.contact.contact.isFavorite }
+        viewModel.addFilter { contactItem -> contactItem.contact.contactInfo.isFavorite }
     }
 }
 
@@ -50,6 +50,6 @@ class AddContactListFragment : ContactsFragment() {
         super.onViewCreated(view, savedInstanceState)
 
         viewModel.isFavorite = true
-        viewModel.addFilter { contactItem -> contactItem.contact.contact.isFavorite }
+        viewModel.addFilter { contactItem -> contactItem.contact.contactInfo.isFavorite }
     }
 }

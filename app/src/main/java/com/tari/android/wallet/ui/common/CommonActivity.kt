@@ -54,8 +54,8 @@ abstract class CommonActivity<Binding : ViewBinding, VM : CommonViewModel> : App
 
     private val connectionStateViewModel: ConnectionIndicatorViewModel by viewModels()
 
-    val launcher = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
-        val (granted, nonGranted) = it.toList().partition { it.second }
+    private val launcher = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
+        val (granted, nonGranted) = permissions.toList().partition { it.second }
         if (nonGranted.isEmpty()) {
             viewModel.permissionManager.grantedAction()
         } else {

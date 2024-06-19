@@ -14,7 +14,7 @@ import com.tari.android.wallet.ui.common.recyclerView.AdapterFactory
 import com.tari.android.wallet.ui.common.recyclerView.CommonAdapter
 import com.tari.android.wallet.ui.common.recyclerView.CommonViewHolderItem
 import com.tari.android.wallet.ui.common.recyclerView.viewHolders.TitleViewHolder
-import com.tari.android.wallet.ui.extension.serializable
+import com.tari.android.wallet.ui.extension.parcelable
 import com.tari.android.wallet.ui.extension.setVisible
 import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.ContactDto
 import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
@@ -37,7 +37,7 @@ class TransactionHistoryFragment : CommonFragment<FragmentContactTransactionHist
         val viewModel: TransactionHistoryViewModel by viewModels()
         bindViewModel(viewModel)
 
-        viewModel.selectedContact.postValue(requireArguments().serializable(TariNavigator.PARAMETER_CONTACT)!!)
+        viewModel.selectedContact.postValue(requireArguments().parcelable<ContactDto>(TariNavigator.PARAMETER_CONTACT)!!)
 
         initUI()
         observeUI()
@@ -74,8 +74,8 @@ class TransactionHistoryFragment : CommonFragment<FragmentContactTransactionHist
     }
 
     private fun setContactText(contactDto: ContactDto) {
-        val name = contactDto.contact.getAlias().ifBlank {
-            contactDto.contact.extractWalletAddress().let {
+        val name = contactDto.contactInfo.getAlias().ifBlank {
+            contactDto.contactInfo.extractWalletAddress().let {
                 val emojiId = it.emojiId.extractEmojis()
                 val shortEmojiId = emojiId.take(3) + getString(R.string.emoji_id_bullet_separator) + emojiId.takeLast(3)
                 shortEmojiId.joinToString("")
@@ -90,7 +90,7 @@ class TransactionHistoryFragment : CommonFragment<FragmentContactTransactionHist
 
     companion object {
         fun createFragment(args: ContactDto): TransactionHistoryFragment = TransactionHistoryFragment().apply {
-            arguments = Bundle().apply { putSerializable(TariNavigator.PARAMETER_CONTACT, args) }
+            arguments = Bundle().apply { putParcelable(TariNavigator.PARAMETER_CONTACT, args) }
         }
     }
 }

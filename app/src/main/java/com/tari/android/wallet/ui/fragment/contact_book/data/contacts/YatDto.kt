@@ -1,17 +1,27 @@
 package com.tari.android.wallet.ui.fragment.contact_book.data.contacts
 
+import android.os.Parcelable
 import com.google.gson.annotations.SerializedName
 import com.tari.android.wallet.R
+import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.YatDto.ConnectedWallet
+import kotlinx.parcelize.Parcelize
 import yat.android.data.YatRecordType
 import yat.android.sdk.models.PaymentAddressResponseResult
-import java.io.Serializable
 import java.lang.reflect.Field
 
-class YatDto(var yat: String, var connectedWallets: List<ConnectedWallet> = listOf()) : Serializable {
+@Parcelize
+data class YatDto(
+    val yat: String,
+    val connectedWallets: List<ConnectedWallet> = listOf(),
+) : Parcelable {
 
     fun filtered(text: String): Boolean = yat.contains(text, true)
 
-    class ConnectedWallet(val key: String, val value: PaymentAddressResponseResult) : Serializable {
+    @Parcelize
+    data class ConnectedWallet(
+        val key: String,
+        val value: PaymentAddressResponseResult,
+    ) : Parcelable {
 
         private val yatRecordType: YatRecordType?
             get() = names[key]
@@ -53,3 +63,6 @@ class YatDto(var yat: String, var connectedWallets: List<ConnectedWallet> = list
         }
     }
 }
+
+fun YatDto?.withConnectedWallets(connectedWallets: Map<String, PaymentAddressResponseResult>): YatDto? =
+    this?.copy(connectedWallets = connectedWallets.map { ConnectedWallet(it.key, it.value) })

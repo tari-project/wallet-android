@@ -4,10 +4,10 @@ import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.tari.android.wallet.R
+import com.tari.android.wallet.application.YatAdapter
 import com.tari.android.wallet.application.deeplinks.DeepLink
 import com.tari.android.wallet.application.deeplinks.DeeplinkFormatter
 import com.tari.android.wallet.application.deeplinks.DeeplinkHandler
-import com.tari.android.wallet.data.sharedPrefs.CorePrefRepository
 import com.tari.android.wallet.event.EffectChannelFlow
 import com.tari.android.wallet.extension.collectFlow
 import com.tari.android.wallet.model.MicroTari
@@ -29,13 +29,12 @@ import com.tari.android.wallet.ui.fragment.contact_book.contacts.adapter.contact
 import com.tari.android.wallet.ui.fragment.contact_book.contacts.adapter.contact.ContactlessPaymentItem
 import com.tari.android.wallet.ui.fragment.contact_book.data.ContactsRepository
 import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.ContactDto
-import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.FFIContactDto
+import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.FFIContactInfo
 import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.YatDto
 import com.tari.android.wallet.ui.fragment.contact_book.root.ShareViewModel
 import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
 import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.EmojiUtil.Companion.getGraphemeLength
-import com.tari.android.wallet.application.YatAdapter
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -52,9 +51,6 @@ class ContactSelectionViewModel : CommonViewModel() {
 
     @Inject
     lateinit var contactsRepository: ContactsRepository
-
-    @Inject
-    lateinit var sharedPrefsWrapper: CorePrefRepository
 
     @Inject
     lateinit var deeplinkHandler: DeeplinkHandler
@@ -131,7 +127,7 @@ class ContactSelectionViewModel : CommonViewModel() {
 
         if (hex.isEmpty()) return
         val walletAddress = walletService.getWalletAddressFromHexString(hex)
-        selectedContact.value = ContactDto(FFIContactDto(walletAddress), name)
+        selectedContact.value = ContactDto(FFIContactInfo(walletAddress), uuid = name)
         _yatState.update { it.copy(yatUser = null) }
     }
 
@@ -198,10 +194,10 @@ class ContactSelectionViewModel : CommonViewModel() {
 
             is ContinueButtonEffect.AddChat -> {
                 val user = getUserDto()
-                val chatDto = ChatItemDto(UUID.randomUUID().toString(), listOf(), user.getFFIDto()!!.walletAddress)
+                val chatDto = ChatItemDto(UUID.randomUUID().toString(), listOf(), user.getFFIContactInfo()!!.walletAddress)
                 chatsRepository.addChat(chatDto)
 
-                navigation.postValue(Navigation.ChatNavigation.ToChat(user.getFFIDto()?.walletAddress!!, true))
+                navigation.postValue(Navigation.ChatNavigation.ToChat(user.getFFIContactInfo()?.walletAddress!!, true))
             }
         }
     }
@@ -209,7 +205,7 @@ class ContactSelectionViewModel : CommonViewModel() {
     private fun getUserDto(): ContactDto =
         yatState.value.yatUser?.let {
             ContactDto(
-                contact = FFIContactDto(it.walletAddress),
+                contactInfo = FFIContactInfo(it.walletAddress),
                 yat = YatDto(
                     yat = it.yatName,
                     connectedWallets = it.connectedWallets,
@@ -217,8 +213,9 @@ class ContactSelectionViewModel : CommonViewModel() {
             )
         }
             ?: selectedContact.value
-            ?: contactListSource.value.orEmpty().firstOrNull { it.contact.contact.extractWalletAddress() == selectedTariWalletAddress.value }?.contact
-            ?: ContactDto(FFIContactDto(selectedTariWalletAddress.value!!))
+            ?: contactListSource.value.orEmpty()
+                .firstOrNull { it.contact.contactInfo.extractWalletAddress() == selectedTariWalletAddress.value }?.contact
+            ?: ContactDto(FFIContactInfo(selectedTariWalletAddress.value!!))
 
     private fun updateContactList() {
         val source = contactListSource.value ?: return
@@ -245,7 +242,7 @@ class ContactSelectionViewModel : CommonViewModel() {
         }
         result.addAll(resentUsed)
 
-        val restOfContact = list.filter { !resentUsed.contains(it) }.sortedBy { it.contact.contact.getAlias().lowercase() }
+        val restOfContact = list.filter { !resentUsed.contains(it) }.sortedBy { it.contact.contactInfo.getAlias().lowercase() }
         if (restOfContact.isNotEmpty() && resentUsed.isNotEmpty()) {
             result.add(TitleViewHolderItem(resourceManager.getString(R.string.add_recipient_my_contacts)))
         }

@@ -16,7 +16,7 @@ class AddContactFragment : ContactSelectionFragment() {
         ui.toolbar.ui.toolbarTitle.text = string(R.string.contact_book_add_contact_title)
         ui.addFirstNameInput.visible()
 
-        viewModel.additionalFilter = { it.contact.getFFIDto() != null && it.contact.contact.getAlias().isEmpty() }
+        viewModel.additionalFilter = { it.contact.getFFIContactInfo() != null && it.contact.contactInfo.getAlias().isEmpty() }
     }
 
     override fun goToNext() {

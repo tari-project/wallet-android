@@ -112,7 +112,7 @@ class HomeFragmentViewModel : CommonViewModel() {
     }
 
     fun grantContactsPermission() {
-        permissionManager.runWithPermission(listOf(android.Manifest.permission.READ_CONTACTS), true) {
+        permissionManager.runWithPermission(listOf(android.Manifest.permission.READ_CONTACTS), silently = true) {
             viewModelScope.launch(Dispatchers.IO) {
                 contactsRepository.grantContactPermissionAndRefresh()
             }

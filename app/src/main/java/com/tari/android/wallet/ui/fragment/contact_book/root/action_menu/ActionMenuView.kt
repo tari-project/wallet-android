@@ -159,12 +159,12 @@ class ActionMenuView : CommonView<CommonViewModel, ViewActionMenuBinding> {
     }
 
     fun showContact(contact: ContactDto) {
-        val pictureUrl = contact.getPhoneDto()?.avatar
+        val pictureUrl = contact.getPhoneContactInfo()?.avatar
         ui.avatar.setVisible(pictureUrl.isNullOrEmpty())
         ui.avatarImageCardView.setVisible(!pictureUrl.isNullOrEmpty())
         if (pictureUrl.isNullOrEmpty()) {
-            val avatar = contact.getFFIDto()?.extractWalletAddress()?.emojiId?.extractEmojis()?.take(1)?.joinToString()
-                ?: contact.contact.getAlias().firstOrNull()?.toString() ?: ""
+            val avatar = contact.getFFIContactInfo()?.extractWalletAddress()?.emojiId?.extractEmojis()?.take(1)?.joinToString()
+                ?: contact.contactInfo.getAlias().firstOrNull()?.toString() ?: ""
             ui.avatar.text = avatar
         } else {
             Glide.with(this).load(pictureUrl).into(ui.avatarImage)

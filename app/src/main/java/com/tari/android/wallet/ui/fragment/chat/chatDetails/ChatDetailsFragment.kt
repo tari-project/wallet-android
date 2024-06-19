@@ -57,7 +57,7 @@ class ChatDetailsFragment : CommonFragment<FragmentChatBinding, ChatDetailsViewM
     }
 
     private fun showContact(contact: ContactDto) {
-        ui.toolbar.setText(contact.contact.getAlias())
+        ui.toolbar.setText(contact.contactInfo.getAlias())
     }
 
     companion object {

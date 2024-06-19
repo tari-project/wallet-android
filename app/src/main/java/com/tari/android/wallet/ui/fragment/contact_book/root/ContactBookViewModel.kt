@@ -98,7 +98,7 @@ class ContactBookViewModel : CommonViewModel() {
     }
 
     fun grantPermission() {
-        permissionManager.runWithPermission(listOf(android.Manifest.permission.READ_CONTACTS), true) {
+        permissionManager.runWithPermission(listOf(android.Manifest.permission.READ_CONTACTS), silently = true) {
             viewModelScope.launch(Dispatchers.IO) {
                 contactsRepository.grantContactPermissionAndRefresh()
             }
@@ -122,8 +122,8 @@ class ContactBookViewModel : CommonViewModel() {
     private fun getDeeplink(selectedContacts: List<ContactDto>): String {
         val contacts = selectedContacts.map {
             DeepLink.Contacts.DeeplinkContact(
-                alias = contactUtil.normalizeAlias(it.contact.getAlias(), it.contact.extractWalletAddress()),
-                hex = it.contact.extractWalletAddress().hexString,
+                alias = contactUtil.normalizeAlias(it.contactInfo.getAlias(), it.contactInfo.extractWalletAddress()),
+                hex = it.contactInfo.extractWalletAddress().hexString,
             )
         }
         return deeplinkHandler.getDeeplink(DeepLink.Contacts(contacts))

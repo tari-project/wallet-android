@@ -29,7 +29,7 @@ class SelectUserContactFragment : ContactSelectionFragment() {
         ui.addFirstNameInput.gone()
 
         viewModel.isContactlessPayment.postValue(true)
-        viewModel.additionalFilter = { it.contact.getFFIDto() != null }
+        viewModel.additionalFilter = { it.contact.getFFIContactInfo() != null }
     }
 
     override fun startQRCodeActivity() {

@@ -50,7 +50,7 @@ import com.tari.android.wallet.ui.fragment.chat.data.ChatItemDto
 import com.tari.android.wallet.ui.fragment.chat.data.ChatMessageItemDto
 import com.tari.android.wallet.ui.fragment.contact_book.address_poisoning.SimilarAddressDto
 import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.ContactDto
-import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.FFIContactDto
+import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.FFIContactInfo
 import com.tari.android.wallet.ui.fragment.tx.adapter.TransactionItem
 import com.tari.android.wallet.ui.fragment.utxos.list.adapters.UtxosViewHolderItem
 import org.joda.time.DateTime
@@ -119,7 +119,7 @@ object MockDataStub {
         walletAddress: TariWalletAddress = WALLET_ADDRESS,
         alias: String = "Alice",
     ) = ContactDto(
-        contact = FFIContactDto(
+        contactInfo = FFIContactInfo(
             walletAddress = walletAddress,
             alias = alias,
         ),

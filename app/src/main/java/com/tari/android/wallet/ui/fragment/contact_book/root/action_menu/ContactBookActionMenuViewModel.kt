@@ -15,7 +15,7 @@ import com.tari.android.wallet.ui.dialog.modular.modules.shortEmoji.ShortEmojiId
 import com.tari.android.wallet.ui.fragment.contact_book.data.ContactAction
 import com.tari.android.wallet.ui.fragment.contact_book.data.ContactsRepository
 import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.ContactDto
-import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.MergedContactDto
+import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.MergedContactInfo
 import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -57,9 +57,9 @@ class ContactBookActionMenuViewModel : CommonViewModel() {
     }
 
     private fun showUnlinkDialog(contact: ContactDto) {
-        val mergedDto = contact.contact as MergedContactDto
-        val walletAddress = mergedDto.ffiContactDto.walletAddress
-        val name = mergedDto.phoneContactDto.firstName
+        val mergedDto = contact.contactInfo as MergedContactInfo
+        val walletAddress = mergedDto.ffiContactInfo.walletAddress
+        val name = mergedDto.phoneContactInfo.firstName
         val firstLineHtml = HtmlHelper.getSpannedText(resourceManager.getString(R.string.contact_book_contacts_book_unlink_message_firstLine))
         val secondLineHtml = HtmlHelper.getSpannedText(resourceManager.getString(R.string.contact_book_contacts_book_unlink_message_secondLine, name))
 
@@ -82,9 +82,9 @@ class ContactBookActionMenuViewModel : CommonViewModel() {
     }
 
     private fun showUnlinkSuccessDialog(contact: ContactDto) {
-        val mergedDto = contact.contact as MergedContactDto
-        val walletAddress = mergedDto.ffiContactDto.walletAddress
-        val name = mergedDto.phoneContactDto.firstName
+        val mergedDto = contact.contactInfo as MergedContactInfo
+        val walletAddress = mergedDto.ffiContactInfo.walletAddress
+        val name = mergedDto.phoneContactInfo.firstName
         val firstLineHtml = HtmlHelper.getSpannedText(resourceManager.getString(R.string.contact_book_contacts_book_unlink_success_message_firstLine))
         val secondLineHtml =
             HtmlHelper.getSpannedText(resourceManager.getString(R.string.contact_book_contacts_book_unlink_success_message_secondLine, name))

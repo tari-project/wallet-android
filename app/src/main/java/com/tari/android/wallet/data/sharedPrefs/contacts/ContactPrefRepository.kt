@@ -15,26 +15,29 @@ class ContactPrefRepository @Inject constructor(
     val sharedPrefs: SharedPreferences
 ) : CommonRepository(networkRepository) {
 
-    private var savedContacts: ContactsList by SharedPrefGsonDelegate(
+    private var _savedContacts: ContactList by SharedPrefGsonDelegate(
         prefs = sharedPrefs,
         commonRepository = this,
         name = formatKey(KEY_SAVED_CONTACTS),
-        type = ContactsList::class.java,
-        defValue = ContactsList(),
+        type = ContactList::class.java,
+        defValue = ContactList(),
     )
-
-    fun getSavedContacts(): List<ContactDto> = savedContacts.map { ContactDtoSerializable.toContactDto(it) }
-
-    @Synchronized
-    fun saveContacts(list: List<ContactDto>) {
-        savedContacts = ContactsList(list.map { ContactDtoSerializable.fromContactDto(it) })
-    }
+    var savedContacts: List<ContactDto>
+        // Return empty list if failed to get contacts because of old data format
+        get() = runCatching { _savedContacts }.getOrDefault(emptyList())
+        set(value) {
+            _savedContacts = ContactList(value)
+        }
 
     fun clear() {
-        savedContacts = ContactsList(emptyList())
+        _savedContacts = ContactList(emptyList())
     }
 
     companion object {
         const val KEY_SAVED_CONTACTS = "KEY_SAVED_CONTACTS"
     }
+}
+
+class ContactList(contacts: List<ContactDto>) : ArrayList<ContactDto>(contacts) {
+    constructor() : this(emptyList())
 }

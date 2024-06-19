@@ -20,11 +20,12 @@ import com.tari.android.wallet.extension.debounce
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.common.SingleLiveEvent
 import com.tari.android.wallet.ui.common.recyclerView.CommonViewHolderItem
+import com.tari.android.wallet.ui.common.recyclerView.items.SpaceVerticalViewHolderItem
 import com.tari.android.wallet.ui.fragment.contact_book.contacts.adapter.contact.ContactItem
 import com.tari.android.wallet.ui.fragment.contact_book.contacts.adapter.contact.ContactlessPaymentItem
 import com.tari.android.wallet.ui.fragment.contact_book.contacts.adapter.emptyState.EmptyStateItem
 import com.tari.android.wallet.ui.fragment.contact_book.data.ContactsRepository
-import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.PhoneContactDto
+import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.PhoneContactInfo
 import com.tari.android.wallet.ui.fragment.contact_book.root.ContactSelectionRepository
 import com.tari.android.wallet.ui.fragment.contact_book.root.ShareViewModel
 import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
@@ -100,7 +101,7 @@ class ContactsViewModel : CommonViewModel() {
     }
 
     fun grantPermission() {
-        permissionManager.runWithPermission(listOf(android.Manifest.permission.READ_CONTACTS), true) {
+        permissionManager.runWithPermission(listOf(android.Manifest.permission.READ_CONTACTS), silently = false) {
             viewModelScope.launch(Dispatchers.IO) {
                 contactsRepository.grantContactPermissionAndRefresh()
             }
@@ -116,15 +117,15 @@ class ContactsViewModel : CommonViewModel() {
     }
 
     private fun updateContacts() {
-        collectFlow(contactsRepository.contactListFiltered) { contacts ->
+        collectFlow(contactsRepository.contactList) { contacts ->
             val newItems = contacts.map { contactDto ->
                 ContactItem(
-                    contact = contactDto.copy(contact = contactDto.contact.copy()),
+                    contact = contactDto.copy(),
                     isSimple = false,
                     isSelectionState = false,
                     isSelected = false,
                     contactAction = { _, _ ->
-                        //todo suppresed intentionally
+                        //todo suppressed intentionally
                     },
                     badgeViewModel = badgeViewModel,
                 )
@@ -157,15 +158,17 @@ class ContactsViewModel : CommonViewModel() {
             resultList += emptyState
         }
 
-        val sorted = filtered.sortedBy { it.contact.contact.getAlias().lowercase() }
+        val sorted = filtered.sortedBy { it.contact.contactInfo.getAlias().lowercase() }
 
-        val (phoneContacts, notPhoneContact) = sorted.partition { it.contact.contact is PhoneContactDto }
+        val (phoneContacts, notPhoneContact) = sorted.partition { it.contact.contactInfo is PhoneContactInfo }
 
         resultList.addAll(notPhoneContact)
         if (phoneContacts.isNotEmpty()) {
             resultList.add(SettingsTitleViewHolderItem(resourceManager.getString(contact_book_details_phone_contacts)))
             resultList.addAll(phoneContacts)
         }
+
+        resultList += SpaceVerticalViewHolderItem(60)
 
         list.postValue(resultList)
     }

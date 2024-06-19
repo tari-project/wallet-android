@@ -36,3 +36,7 @@ fun <T> MutableList<T>.repopulate(replacement: Iterable<T>) {
     this.clear()
     this.addAll(replacement)
 }
+
+fun <T> List<T>.replaceItem(condition: (T) -> Boolean, replace: (T) -> T): List<T> {
+    return map { if (condition(it)) replace(it) else it }
+}

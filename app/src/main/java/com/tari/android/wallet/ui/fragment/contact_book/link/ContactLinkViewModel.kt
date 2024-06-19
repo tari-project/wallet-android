@@ -31,8 +31,8 @@ import com.tari.android.wallet.ui.fragment.contact_book.contacts.adapter.contact
 import com.tari.android.wallet.ui.fragment.contact_book.contacts.adapter.emptyState.EmptyStateItem
 import com.tari.android.wallet.ui.fragment.contact_book.data.ContactsRepository
 import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.ContactDto
-import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.MergedContactDto
-import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.PhoneContactDto
+import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.MergedContactInfo
+import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.PhoneContactInfo
 import com.tari.android.wallet.ui.fragment.contact_book.link.adapter.link_header.ContactLinkHeaderViewHolderItem
 import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
 import kotlinx.coroutines.Dispatchers
@@ -41,9 +41,6 @@ import yat.android.ui.extension.HtmlHelper
 import javax.inject.Inject
 
 class ContactLinkViewModel : CommonViewModel() {
-
-    @Inject
-    lateinit var sharedPrefsWrapper: CorePrefRepository
 
     @Inject
     lateinit var contactsRepository: ContactsRepository
@@ -82,7 +79,7 @@ class ContactLinkViewModel : CommonViewModel() {
     }
 
     fun grantPermission() {
-        permissionManager.runWithPermission(listOf(android.Manifest.permission.READ_CONTACTS), true) {
+        permissionManager.runWithPermission(listOf(android.Manifest.permission.READ_CONTACTS), silently = true) {
             viewModelScope.launch(Dispatchers.IO) {
                 contactsRepository.grantContactPermissionAndRefresh()
             }
@@ -98,16 +95,16 @@ class ContactLinkViewModel : CommonViewModel() {
         val searchText = searchText.value ?: return
 
         if (searchModule == null) {
-            searchModule = ContactLinkHeaderViewHolderItem(::onSearchQueryChanged, ffiContact.value!!.contact.extractWalletAddress())
+            searchModule = ContactLinkHeaderViewHolderItem(::onSearchQueryChanged, ffiContact.value!!.contactInfo.extractWalletAddress())
         }
 
-        var list = source.filter { it.contact.contact is PhoneContactDto }
+        var list = source.filter { it.contact.contactInfo is PhoneContactInfo }
 
         if (searchText.isNotEmpty()) {
             list = list.filter { it.filtered(searchText) }
         }
 
-        list = list.sortedBy { it.contact.contact.getAlias().lowercase() }
+        list = list.sortedBy { it.contact.contactInfo.getAlias().lowercase() }
 
         val endList: MutableList<CommonViewHolderItem> = list.toMutableList()
 
@@ -124,8 +121,8 @@ class ContactLinkViewModel : CommonViewModel() {
         SpannedString(HtmlHelper.getSpannedText(resourceManager.getString(R.string.contact_book_contacts_book_link_empty_state_title)))
 
     private fun getBody(sourceList: List<ContactItem>): SpannedString {
-        val noContacts = sourceList.none { it.contact.contact is PhoneContactDto }
-        val noMergedContacts = sourceList.none { it.contact.contact is MergedContactDto }
+        val noContacts = sourceList.none { it.contact.contactInfo is PhoneContactInfo }
+        val noMergedContacts = sourceList.none { it.contact.contactInfo is MergedContactInfo }
         val havePermission = contactsRepository.contactPermissionGranted
 
         val resource = when {
@@ -160,8 +157,8 @@ class ContactLinkViewModel : CommonViewModel() {
     }
 
     private fun showLinkDialog(phoneContactDto: ContactDto) {
-        val tariWalletAddress = ffiContact.value!!.contact.extractWalletAddress()
-        val name = (phoneContactDto.contact as PhoneContactDto).firstName
+        val tariWalletAddress = ffiContact.value!!.contactInfo.extractWalletAddress()
+        val name = (phoneContactDto.contactInfo as PhoneContactInfo).firstName
         val firstLineHtml = HtmlHelper.getSpannedText(resourceManager.getString(contact_book_contacts_book_link_message_firstLine))
         val secondLineHtml = HtmlHelper.getSpannedText(resourceManager.getString(contact_book_contacts_book_link_message_secondLine, name))
 
@@ -184,8 +181,8 @@ class ContactLinkViewModel : CommonViewModel() {
     }
 
     private fun showLinkSuccessDialog(phoneContactDto: ContactDto) {
-        val tariWalletAddress = ffiContact.value!!.contact.extractWalletAddress()
-        val name = (phoneContactDto.contact as PhoneContactDto).firstName
+        val tariWalletAddress = ffiContact.value!!.contactInfo.extractWalletAddress()
+        val name = (phoneContactDto.contactInfo as PhoneContactInfo).firstName
         val firstLineHtml = HtmlHelper.getSpannedText(resourceManager.getString(contact_book_contacts_book_link_success_message_firstLine))
         val secondLineHtml = HtmlHelper.getSpannedText(resourceManager.getString(contact_book_contacts_book_link_success_message_secondLine, name))
 

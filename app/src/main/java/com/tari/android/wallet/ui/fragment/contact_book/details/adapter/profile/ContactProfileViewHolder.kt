@@ -7,9 +7,9 @@ import com.tari.android.wallet.ui.common.recyclerView.ViewHolderBuilder
 import com.tari.android.wallet.ui.component.fullEmojiId.EmojiIdWithYatSummaryViewController
 import com.tari.android.wallet.ui.extension.gone
 import com.tari.android.wallet.ui.extension.setVisible
-import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.FFIContactDto
-import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.MergedContactDto
-import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.PhoneContactDto
+import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.FFIContactInfo
+import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.MergedContactInfo
+import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.PhoneContactInfo
 import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.YatDto
 import com.tari.android.wallet.util.containsNonEmoji
 import com.tari.android.wallet.util.extractEmojis
@@ -28,23 +28,23 @@ class ContactProfileViewHolder(view: ItemContactProfileBinding) :
 
         item.init(ui.participantEmojiIdView)
 
-        when (val dto = item.contactDto.contact) {
-            is FFIContactDto -> {
+        when (val dto = item.contactDto.contactInfo) {
+            is FFIContactInfo -> {
                 showFirstCharOrAvatar(dto.walletAddress.emojiId.extractEmojis()[0])
                 showEmojiId(dto.walletAddress.emojiId)
                 showAlias(dto.getAlias())
             }
 
-            is MergedContactDto -> {
+            is MergedContactInfo -> {
                 val yat = item.contactDto.getYatDto()?.yat.orEmpty()
                 emojiIdSummaryController.yat = yat
-                showFirstCharOrAvatar(dto.ffiContactDto.walletAddress.emojiId.extractEmojis()[0], dto.phoneContactDto.avatar)
-                showEmojiId(dto.ffiContactDto.walletAddress.emojiId)
-                showAlias(dto.phoneContactDto.getAlias())
-                showYat(dto.phoneContactDto.yatDto)
+                showFirstCharOrAvatar(dto.ffiContactInfo.walletAddress.emojiId.extractEmojis()[0], dto.phoneContactInfo.avatar)
+                showEmojiId(dto.ffiContactInfo.walletAddress.emojiId)
+                showAlias(dto.phoneContactInfo.getAlias())
+                showYat(dto.phoneContactInfo.yatDto)
             }
 
-            is PhoneContactDto -> {
+            is PhoneContactInfo -> {
                 showFirstCharOrAvatar(dto.getAlias().firstOrNull()?.toString() ?: "C", dto.avatar)
                 showEmojiId("")
                 showAlias(dto.getAlias())

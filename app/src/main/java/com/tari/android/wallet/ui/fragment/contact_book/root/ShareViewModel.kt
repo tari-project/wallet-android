@@ -5,7 +5,6 @@ import com.tari.android.wallet.R
 import com.tari.android.wallet.application.deeplinks.DeepLink
 import com.tari.android.wallet.application.deeplinks.DeeplinkHandler
 import com.tari.android.wallet.application.deeplinks.DeeplinkViewModel
-import com.tari.android.wallet.data.sharedPrefs.CorePrefRepository
 import com.tari.android.wallet.ffi.FFITariWalletAddress
 import com.tari.android.wallet.ffi.HexString
 import com.tari.android.wallet.infrastructure.bluetooth.TariBluetoothClient
@@ -22,7 +21,7 @@ import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
 import com.tari.android.wallet.ui.dialog.modular.modules.icon.IconModule
 import com.tari.android.wallet.ui.fragment.contact_book.data.ContactsRepository
 import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.ContactDto
-import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.FFIContactDto
+import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.FFIContactInfo
 import com.tari.android.wallet.ui.fragment.contact_book.root.share.ShareType
 import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
 import com.tari.android.wallet.ui.fragment.send.shareQr.ShareQrCodeModule
@@ -42,9 +41,6 @@ class ShareViewModel : CommonViewModel() {
 
     @Inject
     lateinit var contactsRepository: ContactsRepository
-
-    @Inject
-    lateinit var sharePrefRepository: CorePrefRepository
 
     val deeplinkViewModel = DeeplinkViewModel()
 
@@ -96,20 +92,20 @@ class ShareViewModel : CommonViewModel() {
                 )
             )
             tariBluetoothClient.startDeviceScanning {
-                successfullDeviceFoundSharing(it)
+                successfulDeviceFoundSharing(it)
             }
         }
     }
 
-    fun successfullDeviceFoundSharing(userProfile: DeepLink.UserProfile) {
+    private fun successfulDeviceFoundSharing(userProfile: DeepLink.UserProfile) {
         val contactDto = runCatching {
             val ffiWalletAddress = FFITariWalletAddress(HexString(userProfile.tariAddressHex))
             val tariWalletAddress = TariWalletAddress.createWalletAddress(ffiWalletAddress.toString(), ffiWalletAddress.getEmojiId())
-            ContactDto(FFIContactDto(tariWalletAddress, userProfile.alias))
+            ContactDto(FFIContactInfo(walletAddress = tariWalletAddress, alias = userProfile.alias))
         }.getOrNull() ?: return
 
         val name = userProfile.alias.ifEmpty {
-            contactDto.contact.extractWalletAddress().emojiId.extractEmojis().take(3).joinToString("")
+            contactDto.contactInfo.extractWalletAddress().emojiId.extractEmojis().take(3).joinToString("")
         }
 
         showModularDialog(

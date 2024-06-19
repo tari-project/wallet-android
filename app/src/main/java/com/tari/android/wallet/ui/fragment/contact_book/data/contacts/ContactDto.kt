@@ -1,71 +1,46 @@
 package com.tari.android.wallet.ui.fragment.contact_book.data.contacts
 
-import com.tari.android.wallet.R
+import android.os.Parcelable
 import com.tari.android.wallet.data.sharedPrefs.delegates.SerializableTime
 import com.tari.android.wallet.model.TariWalletAddress
 import com.tari.android.wallet.ui.fragment.contact_book.data.ContactAction
-import java.io.Serializable
+import kotlinx.parcelize.Parcelize
 import java.util.UUID
 
+@Parcelize
 data class ContactDto(
-    val contact: IContact,
+    val contactInfo: ContactInfo,
     val uuid: String = UUID.randomUUID().toString(),
     var lastUsedDate: SerializableTime? = null,
-    val yat: YatDto? = (contact as? PhoneContactDto)?.yatDto ?: (contact as? MergedContactDto)?.phoneContactDto?.yatDto
-) : Serializable {
+    val yat: YatDto? = contactInfo.yatDto // TODO could be not in contactInfo ?
+) : Parcelable {
     val walletAddress: TariWalletAddress
-        get() = contact.extractWalletAddress()
+        get() = contactInfo.extractWalletAddress()
 
-    fun filtered(text: String): Boolean = contact.filtered(text)
+    fun filtered(text: String): Boolean = contactInfo.filtered(text)
 
-    fun getContactActions(): List<ContactAction> {
-        val actions = mutableListOf<ContactAction>()
+    fun getContactActions(): List<ContactAction> = contactInfo.getContactActions()
 
-        if (contact is FFIContactDto || contact is MergedContactDto) {
-            actions.add(ContactAction.Send)
-        }
+    fun getTypeName(): Int = contactInfo.getTypeName()
 
-        if (contact is FFIContactDto) {
-            actions.add(ContactAction.Link)
-        }
-
-        if (contact is MergedContactDto) {
-            actions.add(ContactAction.Unlink)
-        }
-
-        actions.add(ContactAction.OpenProfile)
-        actions.add(ContactAction.EditName)
-
-        if (contact.isFavorite) {
-            actions.add(ContactAction.ToUnFavorite)
-        } else {
-            actions.add(ContactAction.ToFavorite)
-        }
-
-        actions.add(ContactAction.Delete)
-
-        return actions
-    }
-
-    fun getTypeName(): Int = when (contact) {
-        is FFIContactDto -> R.string.contact_book_type_ffi
-        is MergedContactDto -> R.string.contact_book_type_merged
-        else -> R.string.contact_book_type_contact_book
-    }
-
-    fun getTypeIcon(): Int = when (contact) {
-        is FFIContactDto -> R.drawable.vector_gem
-        is MergedContactDto -> R.drawable.vector_contact_type_link
-        else -> R.drawable.vector_contact_book_type
-    }
+    fun getTypeIcon(): Int = contactInfo.getTypeIcon()
 
     fun getYatDto() = yat
 
-    fun getFFIDto(): FFIContactDto? = (contact as? FFIContactDto) ?: (contact as? MergedContactDto)?.ffiContactDto
+    fun getFFIContactInfo(): FFIContactInfo? = (contactInfo as? FFIContactInfo) ?: (contactInfo as? MergedContactInfo)?.ffiContactInfo
 
-    fun getPhoneDto(): PhoneContactDto? = (contact as? PhoneContactDto) ?: (contact as? MergedContactDto)?.phoneContactDto
+    fun getPhoneContactInfo(): PhoneContactInfo? = (contactInfo as? PhoneContactInfo) ?: (contactInfo as? MergedContactInfo)?.phoneContactInfo
 
-    fun getMergedDto(): MergedContactDto? = (contact as? MergedContactDto)
+    // TODO I'm not sure we need this method
+    override fun equals(other: Any?): Boolean {
+        if (other is ContactDto) {
+            return contactInfo == other.contactInfo &&
+                    uuid == other.uuid &&
+                    lastUsedDate == other.lastUsedDate
+        }
+        return false
+    }
 
-    override fun hashCode(): Int = HashcodeUtils.generate(contact, uuid, lastUsedDate)
+    // TODO I'm not sure we need this method
+    override fun hashCode(): Int = HashcodeUtils.generate(contactInfo, uuid, lastUsedDate)
 }

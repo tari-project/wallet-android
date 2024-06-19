@@ -29,7 +29,7 @@ import com.tari.android.wallet.ui.dialog.modular.modules.body.BodyModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonStyle
 import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
-import com.tari.android.wallet.ui.extension.serializable
+import com.tari.android.wallet.ui.extension.parcelable
 import com.tari.android.wallet.ui.extension.showInternetConnectionErrorDialog
 import com.tari.android.wallet.ui.extension.string
 import com.tari.android.wallet.ui.fragment.auth.FeatureAuthFragment
@@ -366,7 +366,7 @@ class TariNavigator @Inject constructor(val prefs: CorePrefRepository, val tariS
         }
         val contact = (activity as HomeActivity).viewModel.contactsRepository.getContactByAddress(address)
         val bundle = Bundle().apply {
-            putSerializable(PARAMETER_CONTACT, contact)
+            putParcelable(PARAMETER_CONTACT, contact)
             putParcelable(PARAMETER_AMOUNT, deeplink.amount)
         }
 
@@ -378,11 +378,11 @@ class TariNavigator @Inject constructor(val prefs: CorePrefRepository, val tariS
 
     private fun sendToUser(recipientUser: ContactDto, amount: MicroTari? = null) {
         val bundle = Bundle().apply {
-            putSerializable(PARAMETER_CONTACT, recipientUser)
+            putParcelable(PARAMETER_CONTACT, recipientUser)
             val innerAmount = (activity.intent.getDoubleExtra(PARAMETER_AMOUNT, Double.MIN_VALUE))
             val tariAmount = amount ?: if (innerAmount != Double.MIN_VALUE) MicroTari(BigInteger.valueOf(innerAmount.toLong())) else null
             tariAmount?.let { putParcelable(PARAMETER_AMOUNT, it) }
-            activity.intent.serializable<ContactDto>(PARAMETER_CONTACT)?.let { putSerializable(PARAMETER_CONTACT, it) }
+            activity.intent.parcelable<ContactDto>(PARAMETER_CONTACT)?.let { putParcelable(PARAMETER_CONTACT, it) }
         }
 
         addFragment(AddAmountFragment(), bundle)

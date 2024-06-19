@@ -4,13 +4,12 @@ import com.orhanobut.logger.Logger
 import com.tari.android.wallet.application.walletManager.WalletStateHandler
 import com.tari.android.wallet.event.Event
 import com.tari.android.wallet.event.EventBus
-import com.tari.android.wallet.ffi.FFIWallet
 import com.tari.android.wallet.model.TariContact
 import com.tari.android.wallet.model.TariWalletAddress
 import com.tari.android.wallet.model.WalletError
 import com.tari.android.wallet.service.connection.TariWalletServiceConnection
 import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.ContactDto
-import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.FFIContactDto
+import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.FFIContactInfo
 import com.tari.android.wallet.util.ContactUtil
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -35,15 +34,15 @@ class FFIContactsRepositoryBridge(
         }
     }
 
-    suspend fun updateToFFI(list: List<ContactDto>) {
+    suspend fun updateToFFI(contacts: List<ContactDto>) {
         walletStateHandler.doOnWalletRunning {
             tariWalletServiceConnection.doOnWalletServiceConnected { service ->
-                for (item in list.mapNotNull { it.getFFIDto() }) {
+                contacts.mapNotNull { it.getFFIContactInfo() }.forEach { ffiContactInfo ->
                     val error = WalletError()
                     service.updateContact(
-                        item.walletAddress,
-                        contactUtil.normalizeAlias(item.getAlias(), item.walletAddress),
-                        item.isFavorite,
+                        ffiContactInfo.walletAddress,
+                        contactUtil.normalizeAlias(ffiContactInfo.getAlias(), ffiContactInfo.walletAddress),
+                        ffiContactInfo.isFavorite,
                         error,
                     )
                     if (error.code != WalletError.NoError.code) {
@@ -54,8 +53,8 @@ class FFIContactsRepositoryBridge(
         }
     }
 
-    suspend fun deleteContact(contact: FFIContactDto) {
-        logger.i("ContactsRepository: Deleting contact")
+    suspend fun deleteContact(contact: FFIContactInfo) {
+        logger.i("Contacts repository event: Deleting contact")
         walletStateHandler.doOnWalletRunning {
             tariWalletServiceConnection.doOnWalletServiceConnected { service ->
                 service.updateContact(contact.walletAddress, "", false, WalletError())
@@ -78,71 +77,62 @@ class FFIContactsRepositoryBridge(
 
     private fun updateContactChange(tariContact: TariContact) {
         externalScope.launch {
-            logger.i("ContactsRepository: Updating contact changes to phone and FFI")
+            logger.i("Contacts repository event: Updating contact changes to phone and FFI")
             updateFFIContacts()
 
-            val existingContact = contactsRepository.currentContactList
-                .firstOrNull { it.contact.extractWalletAddress() == tariContact.walletAddress }
-            val contact = existingContact ?: ContactDto(FFIContactDto(tariContact.walletAddress, tariContact.alias, tariContact.isFavorite))
-            contactsRepository.updateRecentUsedTime(contact)
+            contactsRepository.updateRecentUsedTime(ContactDto(FFIContactInfo(tariContact.walletAddress, tariContact.alias, tariContact.isFavorite)))
         }
     }
 
     private suspend fun updateFFIContacts() {
-        logger.i("ContactsRepository: Updating FFI contacts")
-        try {
-            val contacts = FFIWallet.instance!!.getContacts()
-            for (contactIndex in 0 until contacts.getLength()) {
-                val actualContact = contacts.getAt(contactIndex)
+        logger.i("Contacts repository event: Updating FFI contacts")
 
-                val walletAddress = actualContact.getWalletAddress()
-                val ffiWalletAddress = TariWalletAddress.createWalletAddress(walletAddress.toString(), walletAddress.getEmojiId())
-                val alias = actualContact.getAlias()
-                val isFavorite = actualContact.getIsFavorite()
-
-                onFFIContactAddedOrUpdated(ffiWalletAddress, alias, isFavorite)
+        val walletContacts: List<ContactDto> = try {
+            walletStateHandler.doOnWalletRunningWithValue { walletService ->
+                walletService.getContacts().items()
+                    .map { ffiContact ->
+                        val walletAddress = ffiContact.getWalletAddress()
+                        ContactDto(
+                            FFIContactInfo(
+                                walletAddress = TariWalletAddress.createWalletAddress(walletAddress.toString(), walletAddress.getEmojiId()),
+                                alias = ffiContact.getAlias(),
+                                isFavorite = ffiContact.getIsFavorite(),
+                            )
+                        )
+                    }
             }
         } catch (e: Throwable) {
+            logger.i("Error getting contacts from FFI: ${e.message}")
             e.printStackTrace()
+            emptyList()
         }
 
-        try {
-            tariWalletServiceConnection.doOnWalletServiceConnected { service ->
-                val allTxs = service.getCompletedTxs(WalletError()) + service.getCancelledTxs(WalletError()) +
-                        service.getPendingInboundTxs(WalletError()) + service.getPendingOutboundTxs(WalletError())
-                val allUsers = allTxs.map { it.tariContact }.distinctBy { it.walletAddress }
-                for (user in allUsers) {
-                    onFFIContactAddedOrUpdated(user.walletAddress, user.alias, user.isFavorite)
-                }
+        val txContacts: List<ContactDto> = try {
+            tariWalletServiceConnection.doOnWalletServiceConnectedWithValue { walletService ->
+                listOf(
+                    walletService.getCompletedTxs(WalletError()),
+                    walletService.getCancelledTxs(WalletError()),
+                    walletService.getPendingInboundTxs(WalletError()),
+                    walletService.getPendingOutboundTxs(WalletError()),
+                ).flatten()
+                    .map { it.tariContact }
+                    .distinctBy { it.walletAddress }
+                    .map { tariContact ->
+                        ContactDto(
+                            FFIContactInfo(
+                                walletAddress = tariContact.walletAddress,
+                                alias = tariContact.alias,
+                                isFavorite = tariContact.isFavorite,
+                            )
+                        )
+                    }
             }
         } catch (e: Throwable) {
+            logger.i("Error getting contacts from transactions: ${e.message}")
             e.printStackTrace()
+            emptyList()
         }
-    }
 
-    private suspend fun onFFIContactAddedOrUpdated(contact: TariWalletAddress, alias: String, isFavorite: Boolean) {
-        if (ffiContactExist(contact)) {
-            // TODO turn off updated because of name erasing
-//                withFFIContact(contact) {
-//                    it.getFFIDto()?.let { ffiContactDto ->
-//                        ffiContactDto.setAlias(alias)
-//                        ffiContactDto.isFavorite = isFavorite
-//                    }
-//                }
-        } else {
-            contactsRepository.updateContactList { contacts ->
-                contacts.add(ContactDto(FFIContactDto(contact, alias, isFavorite)))
-            }
-        }
+        contactsRepository.addContactList(walletContacts + txContacts)
     }
-
-    private suspend fun withFFIContact(walletAddress: TariWalletAddress, updateAction: (contact: ContactDto) -> Unit) {
-        contactsRepository.updateContactList { contacts ->
-            contacts.firstOrNull { it.contact.extractWalletAddress() == walletAddress }
-                ?.let { contact -> updateAction.invoke(contact) }
-        }
-    }
-
-    private fun ffiContactExist(walletAddress: TariWalletAddress): Boolean =
-        contactsRepository.currentContactList.any { it.contact.extractWalletAddress() == walletAddress }
 }

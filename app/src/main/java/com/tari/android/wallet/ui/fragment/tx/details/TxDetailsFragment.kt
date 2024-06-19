@@ -169,10 +169,10 @@ class TxDetailsFragment : CommonFragment<FragmentTxDetailsBinding, TxDetailsView
     }
 
     private fun updateContactInfo(contact: ContactDto) {
-        val alias = contact.contact.getAlias()
+        val alias = contact.contactInfo.getAlias()
         val addEditText = if (alias.isEmpty()) tx_detail_add_contact else tx_detail_edit
         ui.editContactLabelTextView.text = getString(addEditText)
-        ui.contactNameTextView.setText(contact.contact.getAlias())
+        ui.contactNameTextView.setText(contact.contactInfo.getAlias())
     }
 
     private fun setCancellationReason(text: String) {

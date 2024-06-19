@@ -41,7 +41,7 @@ class TransactionHistoryViewModel : CommonViewModel() {
 
         val filtered = transactionRepository.list.value?.filter {
             if (it is TransactionItem) {
-                it.tx.tariContact.walletAddress == selectedContact.value?.contact?.extractWalletAddress()
+                it.tx.tariContact.walletAddress == selectedContact.value?.contactInfo?.extractWalletAddress()
             } else {
                 false
             }
