@@ -206,7 +206,7 @@ class ContactSelectionViewModel : CommonViewModel() {
         yatState.value.yatUser?.let {
             ContactDto(
                 contactInfo = FFIContactInfo(it.walletAddress),
-                yat = YatDto(
+                yatDto = YatDto(
                     yat = it.yatName,
                     connectedWallets = it.connectedWallets,
                 ),

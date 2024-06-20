@@ -322,7 +322,7 @@ class TariNavigator @Inject constructor(val prefs: CorePrefRepository, val tariS
     }
 
     fun continueToFinalizeSendTx(transactionData: TransactionData) {
-        if (transactionData.recipientContact?.getYatDto() != null) {
+        if (transactionData.recipientContact?.yatDto != null) {
             (activity as HomeActivity).viewModel.yatAdapter.showOutcomingFinalizeActivity(this.activity, transactionData)
         } else {
             addFragment(FinalizeSendTxFragment.create(transactionData))

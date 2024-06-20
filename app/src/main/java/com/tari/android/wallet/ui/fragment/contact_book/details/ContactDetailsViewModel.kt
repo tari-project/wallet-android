@@ -166,8 +166,8 @@ class ContactDetailsViewModel : CommonViewModel() {
             }
         }
 
-        contact.getYatDto()?.let {
-            val connectedWallets = it.connectedWallets.filter { it.name != null }
+        contact.yatDto?.let { yatDto ->
+            val connectedWallets = yatDto.connectedWallets.filter { it.name != null }
             if (connectedWallets.isNotEmpty()) {
                 newList.add(SettingsTitleViewHolderItem(resourceManager.getString(contact_book_details_connected_wallets)))
                 for (connectedWallet in connectedWallets) {
@@ -192,7 +192,7 @@ class ContactDetailsViewModel : CommonViewModel() {
         }
     }
 
-    private fun updateYatInfo() = contact.value?.getYatDto()?.let {
+    private fun updateYatInfo() = contact.value?.yatDto?.let {
         if (updatingJob != null || it.yat.isEmpty()) return@let
 
         updatingJob = viewModelScope.launch(Dispatchers.IO) {
@@ -213,7 +213,7 @@ class ContactDetailsViewModel : CommonViewModel() {
 
         val name = (contact.contactInfo.firstName + " " + contact.contactInfo.lastName).trim()
         val phoneDto = contact.getPhoneContactInfo()
-        val yatDto = contact.getYatDto()
+        val yatDto = contact.yatDto
 
         var saveAction: () -> Boolean = { false }
 
@@ -272,7 +272,7 @@ class ContactDetailsViewModel : CommonViewModel() {
     }
 
     private fun saveDetails(newName: String, yat: String = "") {
-        updatingJob = null
+        updatingJob?.cancel()
         launchOnIo {
             val split = newName.split(" ")
             val name = split.getOrNull(0).orEmpty().trim()

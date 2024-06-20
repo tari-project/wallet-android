@@ -111,7 +111,6 @@ class ContactsRepository @Inject constructor(
                                     contact.contactInfo.copy(
                                         firstName = firstName,
                                         lastName = lastName,
-                                        yatDto = yat.toYatDto(),
                                     )
 
                                 is PhoneContactInfo ->
@@ -119,11 +118,9 @@ class ContactsRepository @Inject constructor(
                                         firstName = firstName,
                                         lastName = lastName,
                                         shouldUpdate = true,
-                                        yatDto = yat.toYatDto(),
                                     )
 
                                 is MergedContactInfo ->
-                                    // TODO why save name 3 times?
                                     contact.contactInfo.copy(
                                         ffiContactInfo = contact.contactInfo.ffiContactInfo.copy(
                                             firstName = firstName,
@@ -136,9 +133,9 @@ class ContactsRepository @Inject constructor(
                                         ),
                                         firstName = firstName,
                                         lastName = lastName,
-                                        yatDto = yat.toYatDto(), // TODO extract to ContactDto
                                     )
-                            }
+                            },
+                            yatDto = yat.toYatDto(),
                         )
                     }
                 )
@@ -179,25 +176,8 @@ class ContactsRepository @Inject constructor(
             currentList
                 .replaceItem(
                     condition = { it.uuid == contactDto.uuid },
-                    replace = { contact ->
-                        contact.copy(
-                            contactInfo = when (val contactInfo = contact.contactInfo) { // TODO move yat to ContactDto
-                                is FFIContactInfo -> contactInfo.copy(yatDto = contactInfo.yatDto.withConnectedWallets(connectedWallets))
-                                is PhoneContactInfo -> contactInfo.copy(yatDto = contactInfo.yatDto.withConnectedWallets(connectedWallets))
-                                is MergedContactInfo -> contactInfo.copy(
-                                    ffiContactInfo = contactInfo.ffiContactInfo.copy(yatDto = contactInfo.yatDto.withConnectedWallets(connectedWallets)),
-                                    phoneContactInfo = contactInfo.phoneContactInfo.copy(
-                                        yatDto = contactInfo.yatDto.withConnectedWallets(
-                                            connectedWallets
-                                        )
-                                    ),
-                                    yatDto = contactInfo.yatDto.withConnectedWallets(connectedWallets),
-                                )
-                            }
-                        )
-                    }
+                    replace = { contact -> contact.copy(yatDto = contact.yatDto.withConnectedWallets(connectedWallets)) }
                 )
-
         }
     }
 

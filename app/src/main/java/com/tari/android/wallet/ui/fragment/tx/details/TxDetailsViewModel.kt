@@ -216,7 +216,7 @@ class TxDetailsViewModel : CommonViewModel() {
             val name = split.getOrNull(0).orEmpty().trim()
             val surname = split.getOrNull(1).orEmpty().trim()
             val contactDto = contact.value!!
-            contact.value = contactsRepository.updateContactInfo(contactDto, name, surname, contactDto.getYatDto()?.yat.orEmpty())
+            contact.value = contactsRepository.updateContactInfo(contactDto, name, surname, contactDto.yatDto?.yat.orEmpty())
             hideDialog()
         }
     }

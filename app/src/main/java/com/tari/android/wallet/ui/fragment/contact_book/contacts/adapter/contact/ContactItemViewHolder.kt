@@ -27,32 +27,32 @@ class ContactItemViewHolder(view: ItemContactBinding) : CommonViewHolder<Contact
         super.bind(item)
         badgesController.bind(item)
 
-        when (val dto = item.contact.contactInfo) {
+        when (val contactInfo = item.contact.contactInfo) {
             is FFIContactInfo -> {
-                displayFirstEmojiOrText(dto.walletAddress.emojiId.extractEmojis()[0])
-                if (dto.getAlias().isEmpty()) {
-                    displayEmojiId(dto.walletAddress.emojiId)
+                displayFirstEmojiOrText(contactInfo.walletAddress.emojiId.extractEmojis()[0])
+                if (contactInfo.getAlias().isEmpty()) {
+                    displayEmojiId(contactInfo.walletAddress.emojiId)
                 } else {
-                    displayAlias(dto.getAlias())
+                    displayAlias(contactInfo.getAlias())
                 }
             }
 
             is MergedContactInfo -> {
-                if (dto.phoneContactInfo.avatar.isNotEmpty() && hasContactPermission()) displayAvatar(dto.phoneContactInfo.avatar) else
-                    displayFirstEmojiOrText(dto.ffiContactInfo.walletAddress.emojiId.extractEmojis()[0])
-                displayAlias(dto.phoneContactInfo.getAlias())
-                displayYat(dto.phoneContactInfo.yatDto?.yat.orEmpty())
+                if (contactInfo.phoneContactInfo.avatar.isNotEmpty() && hasContactPermission()) displayAvatar(contactInfo.phoneContactInfo.avatar) else
+                    displayFirstEmojiOrText(contactInfo.ffiContactInfo.walletAddress.emojiId.extractEmojis()[0])
+                displayAlias(contactInfo.phoneContactInfo.getAlias())
+                displayYat(item.contact.yatDto?.yat.orEmpty())
             }
 
             is PhoneContactInfo -> {
-                if (dto.avatar.isNotEmpty() && hasContactPermission()) displayAvatar(dto.avatar) else {
+                if (contactInfo.avatar.isNotEmpty() && hasContactPermission()) displayAvatar(contactInfo.avatar) else {
                     var name = ""
-                    dto.firstName.firstOrNull()?.let { name += it }
-                    dto.lastName.firstOrNull()?.let { name += it }
+                    contactInfo.firstName.firstOrNull()?.let { name += it }
+                    contactInfo.lastName.firstOrNull()?.let { name += it }
                     displayFirstEmojiOrText(name.ifEmpty { "C" })
                 }
-                displayAlias(dto.getAlias())
-                displayYat(dto.yatDto?.yat.orEmpty())
+                displayAlias(contactInfo.getAlias())
+                displayYat(item.contact.yatDto?.yat.orEmpty())
             }
         }
 

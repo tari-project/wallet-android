@@ -45,7 +45,6 @@ class PhoneBookRepositoryBridge(
                                 firstName = phoneContact.firstName,
                                 lastName = phoneContact.lastName,
                                 displayName = phoneContact.displayName,
-                                yatDto = phoneContact.yatDto,
                                 phoneEmojiId = phoneContact.phoneEmojiId,
                                 isFavorite = phoneContact.isFavorite,
                             )
@@ -59,7 +58,6 @@ class PhoneBookRepositoryBridge(
                                     firstName = phoneContact.firstName,
                                     lastName = phoneContact.lastName,
                                     displayName = phoneContact.displayName,
-                                    yatDto = phoneContact.yatDto,
                                     phoneEmojiId = phoneContact.phoneEmojiId,
                                     isFavorite = phoneContact.isFavorite,
                                 )
@@ -152,7 +150,6 @@ class PhoneBookRepositoryBridge(
                     firstName = name?.givenName.orEmpty(),
                     lastName = name?.familyName.orEmpty(),
                     displayName = name?.displayName.orEmpty(),
-                    yatDto = null,
                     phoneEmojiId = "",
                     avatar = it.photoUri?.toString().orEmpty(),
                     isFavorite = it.options?.starred ?: false,

@@ -11,7 +11,6 @@ sealed class ContactInfo(
     open val firstName: String,
     open val lastName: String,
     open val isFavorite: Boolean,
-    open val yatDto: YatDto? = null,
 ) : Parcelable {
     abstract fun filtered(text: String): Boolean
     abstract fun extractWalletAddress(): TariWalletAddress
@@ -41,7 +40,6 @@ sealed class ContactInfo(
         is PhoneContactInfo -> R.drawable.vector_contact_book_type
     }
 
-    // TODO I'm not sure we need this method
     override fun equals(other: Any?): Boolean {
         if (other is ContactInfo) {
             return firstName == other.firstName &&
@@ -51,7 +49,6 @@ sealed class ContactInfo(
         return false
     }
 
-    // TODO I'm not sure we need this method
     override fun hashCode(): Int = HashcodeUtils.generate(firstName, lastName, isFavorite)
 }
 
@@ -61,8 +58,7 @@ data class FFIContactInfo(
     @Transient override val firstName: String = "",
     @Transient override val lastName: String = "",
     @Transient override val isFavorite: Boolean = false,
-    @Transient override val yatDto: YatDto? = null,
-) : ContactInfo(firstName, lastName, isFavorite, yatDto) {
+) : ContactInfo(firstName, lastName, isFavorite) {
 
     constructor(walletAddress: TariWalletAddress, alias: String = "", isFavorite: Boolean = false) : this(
         walletAddress = walletAddress,
@@ -95,12 +91,10 @@ data class PhoneContactInfo(
     @Transient override val firstName: String = "",
     @Transient override val lastName: String = "",
     @Transient override val isFavorite: Boolean = false,
-    @Transient override val yatDto: YatDto? = null,
 ) : ContactInfo(
     firstName = firstName.ifEmpty { parseAlias(displayName).first },
     lastName = lastName.ifEmpty { parseAlias(displayName).second },
     isFavorite = isFavorite,
-    yatDto = yatDto,
 ) {
     override fun filtered(text: String): Boolean = getAlias().contains(text, ignoreCase = true)
 
@@ -116,15 +110,12 @@ data class MergedContactInfo(
     @Transient override val firstName: String = phoneContactInfo.firstName,
     @Transient override val lastName: String = phoneContactInfo.lastName,
     @Transient override val isFavorite: Boolean = phoneContactInfo.isFavorite,
-    @Transient override val yatDto: YatDto? = ffiContactInfo.yatDto ?: phoneContactInfo.yatDto,
-) : ContactInfo(firstName, lastName, isFavorite, yatDto) {
+) : ContactInfo(firstName, lastName, isFavorite) {
     override fun filtered(text: String): Boolean = ffiContactInfo.filtered(text) || phoneContactInfo.filtered(text)
 
     override fun extractWalletAddress(): TariWalletAddress = ffiContactInfo.walletAddress
 
     override fun getAlias(): String = phoneContactInfo.firstName
 }
-
-fun String.toYatDto(): YatDto? = this.takeIf { it.isNotEmpty() }?.let { YatDto(it) }
 
 private fun parseAlias(alias: String): Pair<String, String> = alias.split(" ", limit = 2).let { it[0] to if (it.size > 1) it[1] else "" }

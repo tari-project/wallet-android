@@ -12,7 +12,7 @@ data class ContactDto(
     val contactInfo: ContactInfo,
     val uuid: String = UUID.randomUUID().toString(),
     var lastUsedDate: SerializableTime? = null,
-    val yat: YatDto? = contactInfo.yatDto // TODO could be not in contactInfo ?
+    val yatDto: YatDto? = null,
 ) : Parcelable {
     val walletAddress: TariWalletAddress
         get() = contactInfo.extractWalletAddress()
@@ -25,13 +25,10 @@ data class ContactDto(
 
     fun getTypeIcon(): Int = contactInfo.getTypeIcon()
 
-    fun getYatDto() = yat
-
     fun getFFIContactInfo(): FFIContactInfo? = (contactInfo as? FFIContactInfo) ?: (contactInfo as? MergedContactInfo)?.ffiContactInfo
 
     fun getPhoneContactInfo(): PhoneContactInfo? = (contactInfo as? PhoneContactInfo) ?: (contactInfo as? MergedContactInfo)?.phoneContactInfo
 
-    // TODO I'm not sure we need this method
     override fun equals(other: Any?): Boolean {
         if (other is ContactDto) {
             return contactInfo == other.contactInfo &&
@@ -41,6 +38,7 @@ data class ContactDto(
         return false
     }
 
-    // TODO I'm not sure we need this method
     override fun hashCode(): Int = HashcodeUtils.generate(contactInfo, uuid, lastUsedDate)
 }
+
+fun String.toYatDto(): YatDto? = this.takeIf { it.isNotEmpty() }?.let { YatDto(it) }

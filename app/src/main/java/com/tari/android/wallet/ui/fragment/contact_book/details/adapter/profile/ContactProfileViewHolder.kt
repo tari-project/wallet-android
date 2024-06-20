@@ -28,27 +28,27 @@ class ContactProfileViewHolder(view: ItemContactProfileBinding) :
 
         item.init(ui.participantEmojiIdView)
 
-        when (val dto = item.contactDto.contactInfo) {
+        when (val contactInfo = item.contactDto.contactInfo) {
             is FFIContactInfo -> {
-                showFirstCharOrAvatar(dto.walletAddress.emojiId.extractEmojis()[0])
-                showEmojiId(dto.walletAddress.emojiId)
-                showAlias(dto.getAlias())
+                showFirstCharOrAvatar(contactInfo.walletAddress.emojiId.extractEmojis()[0])
+                showEmojiId(contactInfo.walletAddress.emojiId)
+                showAlias(contactInfo.getAlias())
             }
 
             is MergedContactInfo -> {
-                val yat = item.contactDto.getYatDto()?.yat.orEmpty()
+                val yat = item.contactDto.yatDto?.yat.orEmpty()
                 emojiIdSummaryController.yat = yat
-                showFirstCharOrAvatar(dto.ffiContactInfo.walletAddress.emojiId.extractEmojis()[0], dto.phoneContactInfo.avatar)
-                showEmojiId(dto.ffiContactInfo.walletAddress.emojiId)
-                showAlias(dto.phoneContactInfo.getAlias())
-                showYat(dto.phoneContactInfo.yatDto)
+                showFirstCharOrAvatar(contactInfo.ffiContactInfo.walletAddress.emojiId.extractEmojis()[0], contactInfo.phoneContactInfo.avatar)
+                showEmojiId(contactInfo.ffiContactInfo.walletAddress.emojiId)
+                showAlias(contactInfo.phoneContactInfo.getAlias())
+                showYat(item.contactDto.yatDto)
             }
 
             is PhoneContactInfo -> {
-                showFirstCharOrAvatar(dto.getAlias().firstOrNull()?.toString() ?: "C", dto.avatar)
+                showFirstCharOrAvatar(contactInfo.getAlias().firstOrNull()?.toString() ?: "C", contactInfo.avatar)
                 showEmojiId("")
-                showAlias(dto.getAlias())
-                showYat(dto.yatDto)
+                showAlias(contactInfo.getAlias())
+                showYat(item.contactDto.yatDto)
             }
         }
     }
