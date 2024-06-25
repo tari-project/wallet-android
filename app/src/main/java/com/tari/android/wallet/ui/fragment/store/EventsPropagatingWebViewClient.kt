@@ -38,9 +38,13 @@ import android.webkit.WebResourceError
 import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import com.orhanobut.logger.Logger
+import com.orhanobut.logger.Printer
 
 class EventsPropagatingWebViewClient(private val urlOverrideStrategy: URLOverrideStrategy = NoURLOverride) :
     WebViewClient() {
+    private val logger: Printer
+        get() = Logger.t(EventsPropagatingWebViewClient::class.java.simpleName)
 
     private val listeners = mutableListOf<WebViewEventListener>()
 
@@ -54,18 +58,29 @@ class EventsPropagatingWebViewClient(private val urlOverrideStrategy: URLOverrid
         onPageFinished: (WebView, String) -> Unit = { _, _ -> },
         onReceivedError: (WebView, WebResourceRequest, WebResourceError) -> Unit = { _, _, _ -> }
     ): WebViewEventListener = object : WebViewEventListener {
-        override fun onPageStarted(view: WebView, url: String, favicon: Bitmap?) =
+        override fun onPageStarted(view: WebView, url: String, favicon: Bitmap?) {
+            logger.i("onPageStarted: $url")
+
             onPageStarted(view, url, favicon)
+        }
 
-        override fun onPageCommitVisible(view: WebView, url: String) =
+        override fun onPageCommitVisible(view: WebView, url: String) {
+            logger.i("onPageCommitVisible: $url")
+
             onPageCommitVisible(view, url)
+        }
 
-        override fun onPageFinished(view: WebView, url: String) = onPageFinished(view, url)
-        override fun onReceivedError(
-            view: WebView,
-            request: WebResourceRequest,
-            error: WebResourceError
-        ) = onReceivedError(view, request, error)
+        override fun onPageFinished(view: WebView, url: String) {
+            logger.i("onPageFinished: $url")
+
+            onPageFinished(view, url)
+        }
+
+        override fun onReceivedError(view: WebView, request: WebResourceRequest, error: WebResourceError) {
+            logger.i("onReceivedError: ${request.url}, error: $error")
+
+            onReceivedError(view, request, error)
+        }
     }.also(this::addListener)
 
     override fun onPageStarted(view: WebView, url: String, favicon: Bitmap?) {
