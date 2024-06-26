@@ -50,7 +50,6 @@ class FFIContactsRepositoryBridge(
             tariWalletServiceConnection.doOnWalletServiceConnected { service ->
                 contacts.mapNotNull { it.getFFIContactInfo() }.forEach { ffiContactInfo ->
                     val error = WalletError()
-                    // TODO it doesn't work, error -1
                     service.updateContact(
                         ffiContactInfo.walletAddress,
                         contactUtil.normalizeAlias(ffiContactInfo.getAlias(), ffiContactInfo.walletAddress),
@@ -141,7 +140,7 @@ class FFIContactsRepositoryBridge(
         walletStateHandler.doOnWalletRunning {
             tariWalletServiceConnection.doOnWalletServiceConnected { service ->
                 val error = WalletError()
-                service.updateContact(contact.walletAddress, "", false, error)
+                service.removeContact(contact.walletAddress, error)
                 if (error.code != WalletError.NoError.code) {
                     logger.e("Contacts repository event: Error deleting contact from FFI: ${error.signature}")
                 }

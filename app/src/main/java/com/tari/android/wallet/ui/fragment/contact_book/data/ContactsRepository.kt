@@ -183,7 +183,7 @@ class ContactsRepository @Inject constructor(
     suspend fun deleteContact(contactDto: ContactDto) {
         contactDto.getPhoneContactInfo()?.let { phoneBookBridge.deleteFromContactBook(it) }
         contactDto.getFFIContactInfo()?.let { ffiBridge.deleteContact(it) }
-        refreshContactList()
+        refreshContactList(currentContactList.filter { it.uuid != contactDto.uuid })
     }
 
     // TODO save yats to shared prefs

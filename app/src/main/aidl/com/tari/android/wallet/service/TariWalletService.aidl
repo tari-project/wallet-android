@@ -93,7 +93,7 @@ interface TariWalletService {
 
     boolean updateContact(in TariWalletAddress address, in String alias, boolean isFavorite, out WalletError error);
 
-    boolean removeContact(in TariContact contact, out WalletError error);
+    boolean removeContact(in TariWalletAddress address, out WalletError error);
 
     /**
     * Two functions below to get the public key from emoji id and public key hex string

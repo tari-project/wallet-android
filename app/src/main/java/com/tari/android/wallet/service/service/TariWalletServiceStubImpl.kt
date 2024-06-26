@@ -183,12 +183,12 @@ class TariWalletServiceStubImpl(
         TxId(recipientAddress)
     }
 
-    override fun removeContact(tariContact: TariContact, error: WalletError): Boolean = runMapping(error) {
+    override fun removeContact(walletAddress: TariWalletAddress,  error: WalletError): Boolean = runMapping(error) {
         val contactsFFI = wallet.getContacts()
         for (i in 0 until contactsFFI.getLength()) {
             val contactFFI = contactsFFI.getAt(i)
             val ffiTariWalletAddress = contactFFI.getWalletAddress()
-            if (ffiTariWalletAddress.toString() == tariContact.walletAddress.hexString) {
+            if (ffiTariWalletAddress.toString() == walletAddress.hexString) {
                 return@runMapping wallet.removeContact(contactFFI).also {
                     ffiTariWalletAddress.destroy()
                     contactFFI.destroy()
