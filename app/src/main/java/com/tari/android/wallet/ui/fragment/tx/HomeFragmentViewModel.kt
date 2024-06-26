@@ -37,7 +37,7 @@ import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonStyle
 import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
 import com.tari.android.wallet.ui.dialog.modular.modules.securityStages.SecurityStageHeadModule
 import com.tari.android.wallet.ui.dialog.modular.modules.space.SpaceModule
-import com.tari.android.wallet.ui.fragment.contact_book.data.ContactsRepository
+import com.tari.android.wallet.ui.fragment.contactBook.data.ContactsRepository
 import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
 import com.tari.android.wallet.ui.fragment.send.finalize.TxFailureReason
 import com.tari.android.wallet.ui.fragment.settings.backup.backupOnboarding.item.BackupOnboardingArgs

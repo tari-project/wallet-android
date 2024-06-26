@@ -3,8 +3,8 @@ package com.tari.android.wallet.ui.fragment.tx.adapter
 import com.tari.android.wallet.model.Tx
 import com.tari.android.wallet.ui.common.gyphy.presentation.GIFViewModel
 import com.tari.android.wallet.ui.common.recyclerView.CommonViewHolderItem
-import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.ContactDto
-import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.HashcodeUtils
+import com.tari.android.wallet.ui.fragment.contactBook.data.contacts.ContactDto
+import com.tari.android.wallet.ui.fragment.contactBook.data.contacts.HashcodeUtils
 
 data class TransactionItem(
     val tx: Tx,

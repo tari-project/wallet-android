@@ -15,7 +15,7 @@ import com.tari.android.wallet.ui.common.recyclerView.CommonViewHolderItem
 import com.tari.android.wallet.ui.extension.setVisible
 import com.tari.android.wallet.ui.fragment.chat.chatDetails.ChatDetailsModel.WALLET_ADDRESS
 import com.tari.android.wallet.ui.fragment.chat.chatDetails.adapter.ChatMessageViewHolder
-import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.ContactDto
+import com.tari.android.wallet.ui.fragment.contactBook.data.contacts.ContactDto
 
 class ChatDetailsFragment : CommonFragment<FragmentChatBinding, ChatDetailsViewModel>() {
 

@@ -25,7 +25,7 @@ import com.tari.android.wallet.ui.common.gyphy.presentation.GIFViewModel
 import com.tari.android.wallet.ui.common.gyphy.repository.GIFRepository
 import com.tari.android.wallet.ui.common.recyclerView.CommonViewHolderItem
 import com.tari.android.wallet.ui.common.recyclerView.items.TitleViewHolderItem
-import com.tari.android.wallet.ui.fragment.contact_book.data.ContactsRepository
+import com.tari.android.wallet.ui.fragment.contactBook.data.ContactsRepository
 import com.tari.android.wallet.ui.fragment.tx.adapter.TransactionItem
 import com.tari.android.wallet.util.DebugConfig
 import com.tari.android.wallet.util.MockDataStub

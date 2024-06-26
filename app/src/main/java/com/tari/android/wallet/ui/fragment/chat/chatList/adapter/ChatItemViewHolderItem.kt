@@ -5,7 +5,7 @@ import com.tari.android.wallet.model.TariWalletAddress
 import com.tari.android.wallet.ui.common.domain.ResourceManager
 import com.tari.android.wallet.ui.common.recyclerView.CommonViewHolderItem
 import com.tari.android.wallet.ui.fragment.chat.data.ChatItemDto
-import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.ContactDto
+import com.tari.android.wallet.ui.fragment.contactBook.data.contacts.ContactDto
 import com.tari.android.wallet.util.extractEmojis
 
 data class ChatItemViewHolderItem(

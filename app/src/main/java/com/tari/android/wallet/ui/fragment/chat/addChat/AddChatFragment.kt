@@ -5,8 +5,8 @@ import android.view.View
 import com.tari.android.wallet.R
 import com.tari.android.wallet.ui.extension.gone
 import com.tari.android.wallet.ui.extension.string
-import com.tari.android.wallet.ui.fragment.contact_book.contactSelection.ContactSelectionFragment
-import com.tari.android.wallet.ui.fragment.contact_book.contactSelection.ContactSelectionViewModel.ContinueButtonEffect
+import com.tari.android.wallet.ui.fragment.contactBook.contactSelection.ContactSelectionFragment
+import com.tari.android.wallet.ui.fragment.contactBook.contactSelection.ContactSelectionViewModel.ContinueButtonEffect
 
 class AddChatFragment : ContactSelectionFragment() {
 

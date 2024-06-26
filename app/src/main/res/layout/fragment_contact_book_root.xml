@@ -104,7 +104,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
 
-            <com.tari.android.wallet.ui.fragment.contact_book.root.share.ShareOptionView
+            <com.tari.android.wallet.ui.fragment.contactBook.root.share.ShareOptionView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"

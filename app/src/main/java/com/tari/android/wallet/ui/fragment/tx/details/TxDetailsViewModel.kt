@@ -23,8 +23,8 @@ import com.tari.android.wallet.ui.dialog.modular.DialogArgs
 import com.tari.android.wallet.ui.dialog.modular.ModularDialogArgs
 import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
 import com.tari.android.wallet.ui.dialog.modular.modules.input.InputModule
-import com.tari.android.wallet.ui.fragment.contact_book.data.ContactsRepository
-import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.ContactDto
+import com.tari.android.wallet.ui.fragment.contactBook.data.ContactsRepository
+import com.tari.android.wallet.ui.fragment.contactBook.data.contacts.ContactDto
 import io.reactivex.BackpressureStrategy
 import io.reactivex.subjects.BehaviorSubject
 import kotlinx.coroutines.launch

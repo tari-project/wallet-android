@@ -103,7 +103,7 @@ import com.tari.android.wallet.ui.extension.setVisible
 import com.tari.android.wallet.ui.extension.string
 import com.tari.android.wallet.ui.extension.temporarilyDisableClick
 import com.tari.android.wallet.ui.extension.visible
-import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.ContactDto
+import com.tari.android.wallet.ui.fragment.contactBook.data.contacts.ContactDto
 import com.tari.android.wallet.ui.fragment.tx.details.gif.GIFView
 import com.tari.android.wallet.ui.fragment.tx.details.gif.GIFViewModel
 import com.tari.android.wallet.ui.fragment.tx.details.gif.TxState
