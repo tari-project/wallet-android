@@ -14,7 +14,7 @@ class MergedContactsRepositoryBridge {
                 val phoneContactInfo = phoneContact.contactInfo as PhoneContactInfo
                 val ffiContactInfo = contacts.mapNotNull { it.contactInfo as? FFIContactInfo }
                     .find { it.walletAddress.emojiId == phoneContactInfo.phoneEmojiId }
-                    ?: error("FFI contact with address ${phoneContact.walletAddress} not found")
+                    ?: return@map phoneContact
 
                 phoneContact.copy(
                     contactInfo = MergedContactInfo(

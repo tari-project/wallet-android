@@ -116,7 +116,6 @@ class FFIContactsRepositoryBridge(
                     walletService.getPendingOutboundTxs(WalletError()),
                 ).asSequence().flatten()
                     .sortedByDescending { it.timestamp }
-                    .distinctBy { it.tariContact.walletAddress }
                     .map { tx ->
                         FFIContactInfo(
                             walletAddress = tx.tariContact.walletAddress,
@@ -132,7 +131,9 @@ class FFIContactsRepositoryBridge(
             emptyList()
         }
 
-        return walletContacts + txContacts
+        return txContacts // tx ones should be first because of lastUsedTimeMillis
+            .plus(walletContacts)
+            .distinctBy { it.walletAddress }
     }
 
     suspend fun deleteContact(contact: FFIContactInfo) {
