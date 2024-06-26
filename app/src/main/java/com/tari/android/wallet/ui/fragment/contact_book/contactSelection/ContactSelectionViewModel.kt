@@ -233,8 +233,8 @@ class ContactSelectionViewModel : CommonViewModel() {
             result.add(ContactlessPaymentItem())
         }
 
-        val resentUsed = list.filter { it.contact.lastUsedDate != null }
-            .sortedBy { item -> item.contact.lastUsedDate?.date }
+        val resentUsed = list.filter { it.contact.getFFIContactInfo()?.lastUsedTimeMillis != null }
+            .sortedBy { it.contact.getFFIContactInfo()?.lastUsedTimeMillis }
             .take(Constants.Contacts.recentContactCount)
 
         if (resentUsed.isNotEmpty()) {

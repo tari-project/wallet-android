@@ -1,18 +1,21 @@
 package com.tari.android.wallet.ui.fragment.contact_book.data
 
-import android.content.ContentProviderOperation
 import android.content.Context
-import android.provider.ContactsContract
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.ContactDto
 import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.MergedContactInfo
 import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.PhoneContactInfo
+import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.toYatDto
 import contacts.core.Contacts
 import contacts.core.Fields
+import contacts.core.entities.NewNote
 import contacts.core.entities.NewOptions
+import contacts.core.entities.Note
 import contacts.core.equalTo
 import contacts.core.util.names
+import contacts.core.util.notes
 import contacts.core.util.setName
+import contacts.core.util.setNote
 import contacts.core.util.setOptions
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -26,7 +29,7 @@ class PhoneBookRepositoryBridge(
 
     private val phoneContactsSource = Contacts(context)
 
-    internal suspend fun updateContactListWithPhoneBook(contacts: List<ContactDto>): List<ContactDto> {
+    internal suspend fun updateContactsWithPhoneBook(contacts: List<ContactDto>): List<ContactDto> {
         if (!contactsRepository.contactPermissionGranted) return contacts
 
         logger.i("Contacts repository event: Loading contacts from phone book")
@@ -39,29 +42,13 @@ class PhoneBookRepositoryBridge(
                 phoneContacts.firstOrNull { it.id == contact.getPhoneContactInfo()?.id }?.let { phoneContact ->
                     when (contact.contactInfo) {
                         is PhoneContactInfo -> contact.copy(
-                            contactInfo = contact.contactInfo.copy(
-                                id = phoneContact.id,
-                                avatar = phoneContact.avatar,
-                                firstName = phoneContact.firstName,
-                                lastName = phoneContact.lastName,
-                                displayName = phoneContact.displayName,
-                                phoneEmojiId = phoneContact.phoneEmojiId,
-                                isFavorite = phoneContact.isFavorite,
-                            )
+                            contactInfo = phoneContact,
+                            yatDto = phoneContact.phoneEmojiId.toYatDto(),
                         )
 
                         is MergedContactInfo -> contact.copy(
-                            contactInfo = contact.contactInfo.copy(
-                                phoneContactInfo = contact.contactInfo.phoneContactInfo.copy(
-                                    id = phoneContact.id,
-                                    avatar = phoneContact.avatar,
-                                    firstName = phoneContact.firstName,
-                                    lastName = phoneContact.lastName,
-                                    displayName = phoneContact.displayName,
-                                    phoneEmojiId = phoneContact.phoneEmojiId,
-                                    isFavorite = phoneContact.isFavorite,
-                                )
-                            )
+                            contactInfo = contact.contactInfo.copy(phoneContactInfo = phoneContact),
+                            yatDto = phoneContact.phoneEmojiId.toYatDto(),
                         )
 
                         else -> contact
@@ -75,50 +62,26 @@ class PhoneBookRepositoryBridge(
             )
     }
 
-    internal suspend fun updateToPhoneBook(contacts: List<ContactDto>): List<ContactDto> {
-        if (!contactsRepository.contactPermissionGranted) return contacts
+    internal suspend fun updateToPhoneBook(contacts: List<ContactDto>) {
+        if (!contactsRepository.contactPermissionGranted) return
 
         logger.i("Contacts repository event: Saving updates to contact book")
         try {
-            return contacts.map { contact ->
+            contacts.map { contact ->
                 contact.getPhoneContactInfo()?.takeIf { it.shouldUpdate }?.let { phoneContact ->
                     saveNamesToPhoneBook(phoneContact)
                     saveStarredToPhoneBook(phoneContact)
-//                                saveCustomFieldsToPhoneBook(phoneContact) // todo why it's  commented? Should we store Yat and EmojiID custom fields in the phone book?
-
-                    when (contact.contactInfo) {
-                        is PhoneContactInfo -> {
-                            contact.copy(
-                                contactInfo = contact.contactInfo.copy(
-                                    shouldUpdate = false
-                                )
-                            )
-                        }
-
-                        is MergedContactInfo -> {
-                            contact.copy(
-                                contactInfo = contact.contactInfo.copy(
-                                    phoneContactInfo = contact.contactInfo.phoneContactInfo.copy(
-                                        shouldUpdate = false
-                                    )
-                                )
-                            )
-                        }
-
-                        else -> contact
-                    }
-                } ?: contact
+                    saveCustomFieldsToPhoneBook(
+                        contactId = phoneContact.id.toInt(),
+                        yat = phoneContact.phoneYat,
+                        emojiId = phoneContact.phoneEmojiId,
+                    )
+                }
             }
         } catch (e: Throwable) {
             logger.e("Contacts repository event: Failed to save updates to contact book")
             e.printStackTrace()
-            return contacts
         }
-    }
-
-    internal suspend fun deleteFromContactBook(contact: PhoneContactInfo) = withContext(Dispatchers.IO) {
-        logger.i("Contacts repository event: Deleting contact from contact book")
-        phoneContactsSource.delete().contactsWithId(contact.id.toLong()).commit()
     }
 
     private suspend fun saveNamesToPhoneBook(contact: PhoneContactInfo) = withContext(Dispatchers.IO) {
@@ -141,23 +104,6 @@ class PhoneBookRepositoryBridge(
         }
     }
 
-    private suspend fun getPhoneContacts(): List<PhoneContactInfo> = withContext(Dispatchers.IO) {
-        phoneContactsSource.query().include(Fields.all()).find()
-            .map {
-                val name = it.names().firstOrNull()
-                PhoneContactInfo(
-                    id = it.id.toString(),
-                    firstName = name?.givenName.orEmpty(),
-                    lastName = name?.familyName.orEmpty(),
-                    displayName = name?.displayName.orEmpty(),
-                    phoneEmojiId = "",
-                    avatar = it.photoUri?.toString().orEmpty(),
-                    isFavorite = it.options?.starred ?: false,
-                )
-            }
-    }
-
-
     private suspend fun saveStarredToPhoneBook(contact: PhoneContactInfo) = withContext(Dispatchers.IO) {
         val phoneContact = phoneContactsSource.query().include(Fields.all()).where { Contact.Id equalTo contact.id }.find().firstOrNull()
 
@@ -179,22 +125,57 @@ class PhoneBookRepositoryBridge(
     }
 
     private suspend fun saveCustomFieldsToPhoneBook(contactId: Int, yat: String, emojiId: String) = withContext(Dispatchers.IO) {
-        runCatching {
-            val operations = arrayListOf<ContentProviderOperation>()
+        val phoneContact = phoneContactsSource.query().include(Fields.all()).where { Contact.Id equalTo contactId }.find().firstOrNull()
 
-            ContentProviderOperation.newInsert(ContactsContract.Data.CONTENT_URI)
-                .withValueBackReference(ContactsContract.Data.RAW_CONTACT_ID, contactId)
-                .withValue(ContactsContract.Data.MIMETYPE, "vnd.android.cursor.item/com.tari.android.wallet.yat")
-                .withValue("data1", yat)
-                .build().apply { operations.add(this) }
-
-            ContentProviderOperation.newInsert(ContactsContract.Data.CONTENT_URI)
-                .withValueBackReference(ContactsContract.Data.RAW_CONTACT_ID, contactId)
-                .withValue(ContactsContract.Data.MIMETYPE, "vnd.android.cursor.item/com.tari.android.wallet.emojiId")
-                .withValue("data1", emojiId)
-                .build().apply { operations.add(this) }
-
-            context.contentResolver.applyBatch(ContactsContract.AUTHORITY, operations)
+        val updatedContact = phoneContact?.mutableCopy {
+            setNote(generateCustomFields(yat, emojiId))
         }
+
+        updatedContact?.let {
+            phoneContactsSource.update()
+                .contacts(it)
+                .commit()
+        }
+    }
+
+    private fun generateCustomFields(yat: String, emojiId: String): NewNote? {
+        val formattedYat = if (yat.isNotEmpty()) "Yat: $yat" else ""
+        val formattedEmojiId = if (emojiId.isNotEmpty()) "Tari address: $emojiId" else ""
+
+        return NewNote(
+            note = listOf(formattedYat, formattedEmojiId).filter { it.isNotEmpty() }.joinToString("\n"),
+        ).takeIf { it.note?.isNotEmpty() == true }
+    }
+
+    private fun parseCustomFields(note: Note?): Pair<String?, String?> {
+        return note?.note?.split("\n")
+            ?.map { it.split(": ") }
+            ?.associate { it.first() to it.last() }
+            ?.let { it["Yat"] to it["Tari address"] } ?: ("" to "")
+    }
+
+    private suspend fun getPhoneContacts(): List<PhoneContactInfo> = withContext(Dispatchers.IO) {
+        phoneContactsSource.query().include(Fields.all()).find()
+            .map { contact ->
+                val name = contact.names().firstOrNull()
+                val (yat, emojiId) = parseCustomFields(contact.notes().firstOrNull())
+
+                PhoneContactInfo(
+                    id = contact.id.toString(),
+                    firstName = name?.givenName.orEmpty(),
+                    lastName = name?.familyName.orEmpty(),
+                    displayName = name?.displayName.orEmpty(),
+                    phoneEmojiId = emojiId.orEmpty(),
+                    phoneYat = yat.orEmpty(),
+                    avatar = contact.photoUri?.toString().orEmpty(),
+                    isFavorite = contact.options?.starred ?: false,
+                )
+            }
+    }
+
+    internal suspend fun deleteFromContactBook(contact: PhoneContactInfo) = withContext(Dispatchers.IO) {
+        logger.i("Contacts repository event: Deleting contact from contact book")
+
+        phoneContactsSource.delete().contactsWithId(contact.id.toLong()).commit()
     }
 }

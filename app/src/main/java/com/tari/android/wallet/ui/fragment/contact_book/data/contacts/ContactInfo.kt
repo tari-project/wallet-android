@@ -39,29 +39,20 @@ sealed class ContactInfo(
         is MergedContactInfo -> R.drawable.vector_contact_type_link
         is PhoneContactInfo -> R.drawable.vector_contact_book_type
     }
-
-    override fun equals(other: Any?): Boolean {
-        if (other is ContactInfo) {
-            return firstName == other.firstName &&
-                    lastName == other.lastName &&
-                    isFavorite == other.isFavorite
-        }
-        return false
-    }
-
-    override fun hashCode(): Int = HashcodeUtils.generate(firstName, lastName, isFavorite)
 }
 
 @Parcelize
 data class FFIContactInfo(
     val walletAddress: TariWalletAddress,
-    @Transient override val firstName: String = "",
-    @Transient override val lastName: String = "",
-    @Transient override val isFavorite: Boolean = false,
+    val lastUsedTimeMillis: Long = 0L,
+    override val firstName: String = "",
+    override val lastName: String = "",
+    override val isFavorite: Boolean = false,
 ) : ContactInfo(firstName, lastName, isFavorite) {
 
-    constructor(walletAddress: TariWalletAddress, alias: String = "", isFavorite: Boolean = false) : this(
+    constructor(walletAddress: TariWalletAddress, lastUsedTimeMillis: Long = 0L, alias: String = "", isFavorite: Boolean = false) : this(
         walletAddress = walletAddress,
+        lastUsedTimeMillis = lastUsedTimeMillis,
         firstName = parseAlias(alias).first,
         lastName = parseAlias(alias).second,
         isFavorite = isFavorite,
@@ -86,11 +77,12 @@ data class PhoneContactInfo(
     val id: String,
     val avatar: String,
     val phoneEmojiId: String = "",
+    val phoneYat: String = "",
     val shouldUpdate: Boolean = false,
     val displayName: String,
-    @Transient override val firstName: String = "",
-    @Transient override val lastName: String = "",
-    @Transient override val isFavorite: Boolean = false,
+    override val firstName: String = "",
+    override val lastName: String = "",
+    override val isFavorite: Boolean = false,
 ) : ContactInfo(
     firstName = firstName.ifEmpty { parseAlias(displayName).first },
     lastName = lastName.ifEmpty { parseAlias(displayName).second },
@@ -107,9 +99,9 @@ data class PhoneContactInfo(
 data class MergedContactInfo(
     val ffiContactInfo: FFIContactInfo,
     val phoneContactInfo: PhoneContactInfo,
-    @Transient override val firstName: String = phoneContactInfo.firstName,
-    @Transient override val lastName: String = phoneContactInfo.lastName,
-    @Transient override val isFavorite: Boolean = phoneContactInfo.isFavorite,
+    override val firstName: String = phoneContactInfo.firstName,
+    override val lastName: String = phoneContactInfo.lastName,
+    override val isFavorite: Boolean = phoneContactInfo.isFavorite,
 ) : ContactInfo(firstName, lastName, isFavorite) {
     override fun filtered(text: String): Boolean = ffiContactInfo.filtered(text) || phoneContactInfo.filtered(text)
 

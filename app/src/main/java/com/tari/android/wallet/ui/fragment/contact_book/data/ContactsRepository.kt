@@ -3,9 +3,6 @@ package com.tari.android.wallet.ui.fragment.contact_book.data
 import android.content.Context
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.application.walletManager.WalletStateHandler
-import com.tari.android.wallet.data.sharedPrefs.contacts.ContactList
-import com.tari.android.wallet.data.sharedPrefs.contacts.ContactPrefRepository
-import com.tari.android.wallet.data.sharedPrefs.delegates.SerializableTime
 import com.tari.android.wallet.di.ApplicationScope
 import com.tari.android.wallet.extension.replaceItem
 import com.tari.android.wallet.model.TariWalletAddress
@@ -24,7 +21,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
-import org.joda.time.DateTime
+import kotlinx.coroutines.launch
 import yat.android.sdk.models.PaymentAddressResponseResult
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -36,7 +33,6 @@ class ContactsRepository @Inject constructor(
     contactUtil: ContactUtil,
     tariWalletServiceConnection: TariWalletServiceConnection,
     walletStateHandler: WalletStateHandler,
-    private val contactSharedPrefRepository: ContactPrefRepository,
     @ApplicationScope private val applicationScope: CoroutineScope,
 ) {
     private val logger
@@ -49,12 +45,13 @@ class ContactsRepository @Inject constructor(
         contactUtil = contactUtil,
         externalScope = applicationScope,
     )
-    private val phoneBookRepositoryBridge = PhoneBookRepositoryBridge(
+    private val phoneBookBridge = PhoneBookRepositoryBridge(
         contactsRepository = this,
         context = context,
     )
+    private val mergedBridge = MergedContactsRepositoryBridge()
 
-    private val _contactList: MutableStateFlow<List<ContactDto>> = MutableStateFlow(contactSharedPrefRepository.savedContacts)
+    private val _contactList: MutableStateFlow<List<ContactDto>> = MutableStateFlow(emptyList())
     val contactList = _contactList.asStateFlow()
     val contactListFiltered = _contactList
         .map {
@@ -72,6 +69,12 @@ class ContactsRepository @Inject constructor(
     private val contactPermission = MutableStateFlow(false)
     val contactPermissionGranted: Boolean
         get() = contactPermission.value
+
+    init {
+        applicationScope.launch {
+            refreshContactList()
+        }
+    }
 
     /**
      * Add contacts to the contact list if they do not exist already
@@ -98,7 +101,12 @@ class ContactsRepository @Inject constructor(
         return getByUuid(contactDto.uuid)
     }
 
-    suspend fun updateContactInfo(contactToUpdate: ContactDto, firstName: String, lastName: String, yat: String): ContactDto {
+    suspend fun updateContactInfo(
+        contactToUpdate: ContactDto,
+        firstName: String,
+        lastName: String,
+        yat: String
+    ): ContactDto {
         updateContactList { currentList ->
             currentList
                 .withItemIfNotExists(contactToUpdate)
@@ -118,6 +126,7 @@ class ContactsRepository @Inject constructor(
                                         firstName = firstName,
                                         lastName = lastName,
                                         shouldUpdate = true,
+                                        phoneYat = yat,
                                     )
 
                                 is MergedContactInfo ->
@@ -130,9 +139,8 @@ class ContactsRepository @Inject constructor(
                                             firstName = firstName,
                                             lastName = lastName,
                                             shouldUpdate = true,
+                                            phoneYat = yat,
                                         ),
-                                        firstName = firstName,
-                                        lastName = lastName,
                                     )
                             },
                             yatDto = yat.toYatDto(),
@@ -151,7 +159,14 @@ class ContactsRepository @Inject constructor(
         updateContactList { currentList ->
             currentList
                 .filter { it.uuid != ffiContactDto.uuid && it.uuid != phoneContactDto.uuid }
-                .plus(ContactDto(MergedContactInfo(ffiContactInfo, phoneContactInfo)))
+                .plus(
+                    ContactDto(
+                        MergedContactInfo(
+                            ffiContactInfo = ffiContactInfo,
+                            phoneContactInfo = phoneContactInfo.copy(phoneEmojiId = ffiContactInfo.walletAddress.emojiId, shouldUpdate = true),
+                        )
+                    )
+                )
         }
     }
 
@@ -160,17 +175,18 @@ class ContactsRepository @Inject constructor(
 
         updateContactList { currentList ->
             currentList.filter { it.uuid != contact.uuid }
-                .plus(ContactDto(mergedContact.phoneContactInfo))
+                .plus(ContactDto(mergedContact.phoneContactInfo.copy(phoneEmojiId = "", shouldUpdate = true)))
                 .plus(ContactDto(mergedContact.ffiContactInfo))
         }
     }
 
     suspend fun deleteContact(contactDto: ContactDto) {
-        contactDto.getPhoneContactInfo()?.let { phoneBookRepositoryBridge.deleteFromContactBook(it) }
+        contactDto.getPhoneContactInfo()?.let { phoneBookBridge.deleteFromContactBook(it) }
         contactDto.getFFIContactInfo()?.let { ffiBridge.deleteContact(it) }
-        updateContactList { list -> list.filter { it.uuid != contactDto.uuid } }
+        refreshContactList()
     }
 
+    // TODO save yats to shared prefs
     suspend fun updateYatInfo(contactDto: ContactDto, connectedWallets: Map<String, PaymentAddressResponseResult>) {
         updateContactList { currentList ->
             currentList
@@ -186,28 +202,40 @@ class ContactsRepository @Inject constructor(
         return Random.nextBoolean(0.2)
     }
 
-    internal suspend fun updateRecentUsedTime(contact: ContactDto) {
-        updateContactList { currentList ->
-            currentList
-                .withItemIfNotExists(contact)
-                .replaceItem(
-                    condition = { it.uuid == contact.uuid },
-                    replace = { it.copy(lastUsedDate = SerializableTime(DateTime.now())) }
-                )
+    fun onNewTxReceived() {
+        applicationScope.launch {
+            logger.i("Contacts repository event: Updating contact changes to phone and FFI")
+
+            refreshContactList()
         }
     }
 
     private suspend fun updateContactList(update: suspend (List<ContactDto>) -> List<ContactDto>) {
         logger.i("Contacts repository event: Updating contact list")
 
+        // TODO filter only updated contacts
         val updatedContactList = update(currentContactList)
-            .let { phoneBookRepositoryBridge.updateToPhoneBook(it) } // update fields with need shouldUpdate flag and set it false
 
+        phoneBookBridge.updateToPhoneBook(updatedContactList)
         ffiBridge.updateToFFI(updatedContactList)
 
-        contactSharedPrefRepository.savedContacts = ContactList(updatedContactList)
+        refreshContactList(updatedContactList)
+    }
 
-        _contactList.update { updatedContactList }
+    private suspend fun refreshContactList(
+        currentContactList: List<ContactDto> = this.currentContactList,
+        also: suspend (List<ContactDto>) -> List<ContactDto> = { it },
+    ) {
+        logger.i("Contacts repository event: Refreshing contact list")
+
+        _contactList.update {
+            currentContactList
+                .let { ffiBridge.updateContactsWithFFIContacts(it) }
+                .let { phoneBookBridge.updateContactsWithPhoneBook(it) }
+                .let { mergedBridge.updateContactsWithMergedContacts(it) }
+                // TODO read yats from shared prefs (and store them before)
+                .let { also(it) }
+        }
     }
 
     /**
@@ -216,7 +244,7 @@ class ContactsRepository @Inject constructor(
     suspend fun grantContactPermissionAndRefresh() {
         if (!contactPermission.value) {
             contactPermission.value = true
-            updateContactList { phoneBookRepositoryBridge.updateContactListWithPhoneBook(it) }
+            refreshContactList()
         }
     }
 

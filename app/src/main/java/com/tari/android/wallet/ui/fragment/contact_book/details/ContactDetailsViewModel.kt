@@ -200,7 +200,7 @@ class ContactDetailsViewModel : CommonViewModel() {
                 val entries = yatAdapter.searchAnyYats(it.yat)?.result?.entries
                 entries ?: return@launch
                 val map = entries.associate { entry -> entry.key to entry.value }
-                contactsRepository.updateYatInfo(contact.value!!, map)
+                contactsRepository.updateYatInfo(contactDto = contact.value!!, connectedWallets = map)
                 contact.postValue(contactsRepository.getByUuid(contact.value!!.uuid))
             } catch (e: Throwable) {
                 e.printStackTrace()

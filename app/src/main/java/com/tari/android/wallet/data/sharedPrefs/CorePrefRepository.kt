@@ -35,7 +35,9 @@ package com.tari.android.wallet.data.sharedPrefs
 import android.content.SharedPreferences
 import com.tari.android.wallet.data.repository.CommonRepository
 import com.tari.android.wallet.data.sharedPrefs.addressPoisoning.AddressPoisoningPrefRepository
+import com.tari.android.wallet.data.sharedPrefs.backup.BackupPrefRepository
 import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodePrefRepository
+import com.tari.android.wallet.data.sharedPrefs.chat.ChatsPrefRepository
 import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefBooleanDelegate
 import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefStringDelegate
 import com.tari.android.wallet.data.sharedPrefs.network.NetworkPrefRepository
@@ -45,9 +47,6 @@ import com.tari.android.wallet.data.sharedPrefs.securityStages.SecurityStagesPre
 import com.tari.android.wallet.data.sharedPrefs.sentry.SentryPrefRepository
 import com.tari.android.wallet.data.sharedPrefs.tariSettings.TariSettingsPrefRepository
 import com.tari.android.wallet.data.sharedPrefs.tor.TorPrefRepository
-import com.tari.android.wallet.data.sharedPrefs.contacts.ContactPrefRepository
-import com.tari.android.wallet.data.sharedPrefs.backup.BackupPrefRepository
-import com.tari.android.wallet.data.sharedPrefs.chat.ChatsPrefRepository
 import com.tari.android.wallet.data.sharedPrefs.yat.YatPrefRepository
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -58,7 +57,6 @@ import kotlin.random.Random
  *
  * @author The Tari Development Team
  */
-//todo Need to thing about reactive realization
 
 @Singleton
 class CorePrefRepository @Inject constructor(
@@ -70,7 +68,6 @@ class CorePrefRepository @Inject constructor(
     private val torSharedRepository: TorPrefRepository,
     private val tariSettingsSharedRepository: TariSettingsPrefRepository,
     private val securityStagesRepository: SecurityStagesPrefRepository,
-    private val contactSharedPrefRepository: ContactPrefRepository,
     private val sentryPrefRepository: SentryPrefRepository,
     private val securityPrefRepository: SecurityPrefRepository,
     private val addressPoisoningSharedRepository: AddressPoisoningPrefRepository,
@@ -126,7 +123,6 @@ class CorePrefRepository @Inject constructor(
         torSharedRepository.clear()
         tariSettingsSharedRepository.clear()
         securityStagesRepository.clear()
-        contactSharedPrefRepository.clear()
         sentryPrefRepository.clear()
         securityPrefRepository.clear()
         addressPoisoningSharedRepository.clear()
