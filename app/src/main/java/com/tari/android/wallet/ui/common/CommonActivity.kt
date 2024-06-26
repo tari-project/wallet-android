@@ -48,7 +48,9 @@ abstract class CommonActivity<Binding : ViewBinding, VM : CommonViewModel> : App
 
     lateinit var viewModel: VM
 
-    private  var dialogManager : DialogManager? = null
+    // TODO sometimes it's null even if it's initialized and VM isn't null
+    private var dialogManager: DialogManager? = null
+        get() = field ?: viewModel.dialogManager
 
     private val shakeDetector by lazy { ShakeDetector(this) }
 
@@ -202,7 +204,7 @@ abstract class CommonActivity<Binding : ViewBinding, VM : CommonViewModel> : App
 
     override fun hearShake() = showDebugDialog()
 
-    fun showDebugDialog() {
+    private fun showDebugDialog() {
         val versionInfo = TariVersionModel(viewModel.networkRepository).versionInfo
 
         val modularDialogArgs = ModularDialogArgs(
