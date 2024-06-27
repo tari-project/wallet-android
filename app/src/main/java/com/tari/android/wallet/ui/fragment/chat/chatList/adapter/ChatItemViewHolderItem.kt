@@ -5,7 +5,7 @@ import com.tari.android.wallet.model.TariWalletAddress
 import com.tari.android.wallet.ui.common.domain.ResourceManager
 import com.tari.android.wallet.ui.common.recyclerView.CommonViewHolderItem
 import com.tari.android.wallet.ui.fragment.chat.data.ChatItemDto
-import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.ContactDto
+import com.tari.android.wallet.ui.fragment.contactBook.data.contacts.ContactDto
 import com.tari.android.wallet.util.extractEmojis
 
 data class ChatItemViewHolderItem(
@@ -31,8 +31,8 @@ data class ChatItemViewHolderItem(
         walletAddress = dto.walletAddress,
         uuid = dto.uuid,
         firstEmoji = dto.walletAddress.emojiId.extractEmojis().first(),
-        avatar = contact.getPhoneDto()?.avatar.orEmpty(),
-        alias = contact.contact.getAlias(),
+        avatar = contact.getPhoneContactInfo()?.avatar.orEmpty(),
+        alias = contact.contactInfo.getAlias(),
         emojiId = dto.walletAddress.emojiId,
         subtitle = dto.lastMessage?.message.orEmpty(),
         dateMessage = dto.lastMessage?.date?.formatToRelativeTime(resourceManager).orEmpty(),

@@ -85,7 +85,7 @@ import com.tari.android.wallet.ui.extension.setStartMargin
 import com.tari.android.wallet.ui.extension.showInternetConnectionErrorDialog
 import com.tari.android.wallet.ui.extension.temporarilyDisableClick
 import com.tari.android.wallet.ui.extension.visible
-import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.ContactDto
+import com.tari.android.wallet.ui.fragment.contactBook.data.contacts.ContactDto
 import com.tari.android.wallet.ui.fragment.home.navigation.TariNavigator.Companion.PARAMETER_NOTE
 import com.tari.android.wallet.ui.fragment.home.navigation.TariNavigator.Companion.PARAMETER_TRANSACTION
 import com.tari.android.wallet.ui.fragment.send.addNote.gif.ChooseGIFDialogFragment
@@ -197,7 +197,7 @@ class AddNoteFragment : CommonFragment<FragmentAddNoteBinding, AddNoteViewModel>
             requireContext(),
             fullEmojiIdListener
         )
-        val walletAddress = recipientUser.contact.extractWalletAddress()
+        val walletAddress = recipientUser.contactInfo.extractWalletAddress()
         fullEmojiIdViewController.fullEmojiId = walletAddress.emojiId
         fullEmojiIdViewController.emojiIdHex = walletAddress.hexString
 
@@ -267,8 +267,8 @@ class AddNoteFragment : CommonFragment<FragmentAddNoteBinding, AddNoteViewModel>
     }
 
     private fun displayAliasOrEmojiId() {
-        val alias = recipientUser.contact.getAlias()
-        if (alias.isEmpty()) displayEmojiId(recipientUser.contact.extractWalletAddress().emojiId) else displayAlias(alias)
+        val alias = recipientUser.contactInfo.getAlias()
+        if (alias.isEmpty()) displayEmojiId(recipientUser.contactInfo.extractWalletAddress().emojiId) else displayAlias(alias)
     }
 
     private fun displayAlias(alias: String) {

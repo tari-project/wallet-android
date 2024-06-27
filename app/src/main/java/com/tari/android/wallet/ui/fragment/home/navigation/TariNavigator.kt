@@ -29,21 +29,21 @@ import com.tari.android.wallet.ui.dialog.modular.modules.body.BodyModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonStyle
 import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
-import com.tari.android.wallet.ui.extension.serializable
+import com.tari.android.wallet.ui.extension.parcelable
 import com.tari.android.wallet.ui.extension.showInternetConnectionErrorDialog
 import com.tari.android.wallet.ui.extension.string
 import com.tari.android.wallet.ui.fragment.auth.FeatureAuthFragment
 import com.tari.android.wallet.ui.fragment.biometrics.ChangeBiometricsFragment
 import com.tari.android.wallet.ui.fragment.chat.addChat.AddChatFragment
 import com.tari.android.wallet.ui.fragment.chat.chatDetails.ChatDetailsFragment
-import com.tari.android.wallet.ui.fragment.contact_book.add.AddContactFragment
-import com.tari.android.wallet.ui.fragment.contact_book.add.SelectUserContactFragment
-import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.ContactDto
-import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.YatDto
-import com.tari.android.wallet.ui.fragment.contact_book.details.ContactDetailsFragment
-import com.tari.android.wallet.ui.fragment.contact_book.link.ContactLinkFragment
-import com.tari.android.wallet.ui.fragment.contact_book.root.ContactBookFragment
-import com.tari.android.wallet.ui.fragment.contact_book.transactionHistory.TransactionHistoryFragment
+import com.tari.android.wallet.ui.fragment.contactBook.add.AddContactFragment
+import com.tari.android.wallet.ui.fragment.contactBook.add.SelectUserContactFragment
+import com.tari.android.wallet.ui.fragment.contactBook.data.contacts.ContactDto
+import com.tari.android.wallet.ui.fragment.contactBook.data.contacts.YatDto
+import com.tari.android.wallet.ui.fragment.contactBook.details.ContactDetailsFragment
+import com.tari.android.wallet.ui.fragment.contactBook.link.ContactLinkFragment
+import com.tari.android.wallet.ui.fragment.contactBook.root.ContactBookFragment
+import com.tari.android.wallet.ui.fragment.contactBook.transactionHistory.TransactionHistoryFragment
 import com.tari.android.wallet.ui.fragment.home.HomeActivity
 import com.tari.android.wallet.ui.fragment.home.homeTransactionHistory.HomeTransactionHistoryFragment
 import com.tari.android.wallet.ui.fragment.home.navigation.Navigation.AddAmountNavigation
@@ -322,7 +322,7 @@ class TariNavigator @Inject constructor(val prefs: CorePrefRepository, val tariS
     }
 
     fun continueToFinalizeSendTx(transactionData: TransactionData) {
-        if (transactionData.recipientContact?.getYatDto() != null) {
+        if (transactionData.recipientContact?.yatDto != null) {
             (activity as HomeActivity).viewModel.yatAdapter.showOutcomingFinalizeActivity(this.activity, transactionData)
         } else {
             addFragment(FinalizeSendTxFragment.create(transactionData))
@@ -366,7 +366,7 @@ class TariNavigator @Inject constructor(val prefs: CorePrefRepository, val tariS
         }
         val contact = (activity as HomeActivity).viewModel.contactsRepository.getContactByAddress(address)
         val bundle = Bundle().apply {
-            putSerializable(PARAMETER_CONTACT, contact)
+            putParcelable(PARAMETER_CONTACT, contact)
             putParcelable(PARAMETER_AMOUNT, deeplink.amount)
         }
 
@@ -378,11 +378,11 @@ class TariNavigator @Inject constructor(val prefs: CorePrefRepository, val tariS
 
     private fun sendToUser(recipientUser: ContactDto, amount: MicroTari? = null) {
         val bundle = Bundle().apply {
-            putSerializable(PARAMETER_CONTACT, recipientUser)
+            putParcelable(PARAMETER_CONTACT, recipientUser)
             val innerAmount = (activity.intent.getDoubleExtra(PARAMETER_AMOUNT, Double.MIN_VALUE))
             val tariAmount = amount ?: if (innerAmount != Double.MIN_VALUE) MicroTari(BigInteger.valueOf(innerAmount.toLong())) else null
             tariAmount?.let { putParcelable(PARAMETER_AMOUNT, it) }
-            activity.intent.serializable<ContactDto>(PARAMETER_CONTACT)?.let { putSerializable(PARAMETER_CONTACT, it) }
+            activity.intent.parcelable<ContactDto>(PARAMETER_CONTACT)?.let { putParcelable(PARAMETER_CONTACT, it) }
         }
 
         addFragment(AddAmountFragment(), bundle)

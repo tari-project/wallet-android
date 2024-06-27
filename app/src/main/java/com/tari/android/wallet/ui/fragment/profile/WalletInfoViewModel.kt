@@ -17,8 +17,8 @@ import com.tari.android.wallet.ui.dialog.modular.DialogArgs
 import com.tari.android.wallet.ui.dialog.modular.ModularDialogArgs
 import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
 import com.tari.android.wallet.ui.dialog.modular.modules.input.InputModule
-import com.tari.android.wallet.ui.fragment.contact_book.root.ShareViewModel
-import com.tari.android.wallet.ui.fragment.contact_book.root.share.ShareType
+import com.tari.android.wallet.ui.fragment.contactBook.root.ShareViewModel
+import com.tari.android.wallet.ui.fragment.contactBook.root.share.ShareType
 import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
 import com.tari.android.wallet.util.ContactUtil
 import kotlinx.coroutines.Dispatchers

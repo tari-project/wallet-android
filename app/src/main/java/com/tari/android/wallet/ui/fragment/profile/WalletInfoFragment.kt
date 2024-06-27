@@ -53,9 +53,9 @@ import com.tari.android.wallet.ui.extension.setTopMargin
 import com.tari.android.wallet.ui.extension.setVisible
 import com.tari.android.wallet.ui.extension.string
 import com.tari.android.wallet.ui.extension.temporarilyDisableClick
-import com.tari.android.wallet.ui.fragment.contact_book.root.share.ShareOptionArgs
-import com.tari.android.wallet.ui.fragment.contact_book.root.share.ShareOptionView
-import com.tari.android.wallet.ui.fragment.contact_book.root.share.ShareType
+import com.tari.android.wallet.ui.fragment.contactBook.root.share.ShareOptionArgs
+import com.tari.android.wallet.ui.fragment.contactBook.root.share.ShareOptionView
+import com.tari.android.wallet.ui.fragment.contactBook.root.share.ShareType
 import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
 
 class WalletInfoFragment : CommonFragment<FragmentWalletInfoBinding, WalletInfoViewModel>() {

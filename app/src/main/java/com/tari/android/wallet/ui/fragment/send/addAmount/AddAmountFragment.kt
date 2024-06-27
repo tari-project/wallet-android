@@ -35,26 +35,44 @@ package com.tari.android.wallet.ui.fragment.send.addAmount
 import android.animation.ValueAnimator
 import android.annotation.SuppressLint
 import android.os.Bundle
-import android.view.*
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.daasuu.ei.Ease
 import com.daasuu.ei.EasingInterpolator
 import com.tari.android.wallet.R
-import com.tari.android.wallet.R.string.*
+import com.tari.android.wallet.R.string.add_amount_funds_pending
+import com.tari.android.wallet.R.string.add_amount_not_enough_available_balance
+import com.tari.android.wallet.R.string.add_amount_one_side_payment_question_mark
+import com.tari.android.wallet.R.string.add_amount_one_side_payment_switcher
+import com.tari.android.wallet.R.string.add_amount_wallet_balance
+import com.tari.android.wallet.R.string.error_fee_more_than_amount_description
+import com.tari.android.wallet.R.string.error_fee_more_than_amount_title
+import com.tari.android.wallet.R.string.tx_detail_fee_tooltip_desc
+import com.tari.android.wallet.R.string.tx_detail_fee_tooltip_transaction_fee
 import com.tari.android.wallet.databinding.FragmentAddAmountBinding
 import com.tari.android.wallet.extension.getWithError
 import com.tari.android.wallet.extension.observe
-import com.tari.android.wallet.model.*
+import com.tari.android.wallet.model.BalanceInfo
+import com.tari.android.wallet.model.MicroTari
+import com.tari.android.wallet.model.WalletError
 import com.tari.android.wallet.ui.common.CommonFragment
 import com.tari.android.wallet.ui.component.fullEmojiId.EmojiIdSummaryViewController
 import com.tari.android.wallet.ui.component.fullEmojiId.FullEmojiIdViewController
 import com.tari.android.wallet.ui.dialog.error.ErrorDialogArgs
 import com.tari.android.wallet.ui.dialog.modular.ModularDialog
 import com.tari.android.wallet.ui.dialog.tooltipDialog.TooltipDialogArgs
-import com.tari.android.wallet.ui.extension.*
-import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.ContactDto
+import com.tari.android.wallet.ui.extension.gone
+import com.tari.android.wallet.ui.extension.invisible
+import com.tari.android.wallet.ui.extension.parcelable
+import com.tari.android.wallet.ui.extension.setVisible
+import com.tari.android.wallet.ui.extension.string
+import com.tari.android.wallet.ui.extension.temporarilyDisableClick
+import com.tari.android.wallet.ui.extension.visible
+import com.tari.android.wallet.ui.fragment.contactBook.data.contacts.ContactDto
 import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
 import com.tari.android.wallet.ui.fragment.home.navigation.TariNavigator.Companion.PARAMETER_AMOUNT
 import com.tari.android.wallet.ui.fragment.home.navigation.TariNavigator.Companion.PARAMETER_CONTACT
@@ -62,7 +80,9 @@ import com.tari.android.wallet.ui.fragment.send.addAmount.feeModule.NetworkSpeed
 import com.tari.android.wallet.ui.fragment.send.addAmount.keyboard.KeyboardController
 import com.tari.android.wallet.ui.fragment.send.amountView.AmountStyle
 import com.tari.android.wallet.ui.fragment.send.common.TransactionData
-import com.tari.android.wallet.util.*
+import com.tari.android.wallet.util.Constants
+import com.tari.android.wallet.util.DebugConfig
+import com.tari.android.wallet.util.WalletUtil
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -115,7 +135,7 @@ class AddAmountFragment : CommonFragment<FragmentAddAmountBinding, AddAmountView
     private fun setupUI() {
         val amount = arguments?.parcelable<MicroTari>(PARAMETER_AMOUNT)
         keyboardController.setup(requireContext(), AmountCheckRunnable(), ui.numpad, ui.amount, amount?.tariValue?.toDouble() ?: Double.MIN_VALUE)
-        contactDto = arguments?.serializable(PARAMETER_CONTACT)
+        contactDto = arguments?.parcelable<ContactDto>(PARAMETER_CONTACT)
         // hide tx fee
         ui.txFeeContainerView.invisible()
 
@@ -138,7 +158,7 @@ class AddAmountFragment : CommonFragment<FragmentAddAmountBinding, AddAmountView
             requireContext(),
             fullEmojiIdListener
         )
-        val walletAddress = contactDto?.contact?.extractWalletAddress()
+        val walletAddress = contactDto?.contactInfo?.extractWalletAddress()
         fullEmojiIdViewController.fullEmojiId = walletAddress?.emojiId.orEmpty()
         fullEmojiIdViewController.emojiIdHex = walletAddress?.hexString.orEmpty()
 
@@ -147,9 +167,9 @@ class AddAmountFragment : CommonFragment<FragmentAddAmountBinding, AddAmountView
     }
 
     private fun displayAliasOrEmojiId() {
-        val alias = contactDto?.contact?.getAlias().orEmpty()
+        val alias = contactDto?.contactInfo?.getAlias().orEmpty()
         if (alias.isEmpty()) {
-            displayEmojiId(contactDto?.contact?.extractWalletAddress()?.emojiId.orEmpty())
+            displayEmojiId(contactDto?.contactInfo?.extractWalletAddress()?.emojiId.orEmpty())
         } else {
             displayAlias(alias)
         }

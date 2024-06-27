@@ -94,11 +94,11 @@ class FinalizeSendTxViewModel : CommonViewModel() {
     }
 
     inner class ConnectionCheckStep(resourceManager: ResourceManager) : FinalizingStep(
-        resourceManager,
-        finalize_send_tx_sending_step_1_desc_line_1,
-        finalize_send_tx_sending_step_1_desc_line_2
+        resourceManager = resourceManager,
+        descLine1Res = finalize_send_tx_sending_step_1_desc_line_1,
+        descLine2Res = finalize_send_tx_sending_step_1_desc_line_2,
     ) {
-        var connectionCheckStartTime: DateTime? = null
+        private var connectionCheckStartTime: DateTime? = null
 
         override fun check() {
             super.check()
@@ -162,9 +162,9 @@ class FinalizeSendTxViewModel : CommonViewModel() {
 
     open inner class DiscoveryStep(resourceManager: ResourceManager) :
         FinalizingStep(
-            resourceManager,
-            finalize_send_tx_sending_step_2_desc_line_1,
-            finalize_send_tx_sending_step_2_desc_line_2
+            resourceManager = resourceManager,
+            descLine1Res = finalize_send_tx_sending_step_2_desc_line_1,
+            descLine2Res = finalize_send_tx_sending_step_2_desc_line_2,
         ) {
 
         init {
@@ -178,7 +178,7 @@ class FinalizeSendTxViewModel : CommonViewModel() {
             viewModelScope.launch(Dispatchers.IO) {
                 val error = WalletError()
                 val txId = walletService.sendTari(
-                    TariContact(transactionData.recipientContact!!.contact.extractWalletAddress()),
+                    TariContact(transactionData.recipientContact!!.contactInfo.extractWalletAddress()),
                     transactionData.amount,
                     transactionData.feePerGram ?: Constants.Wallet.defaultFeePerGram,
                     transactionData.note.orEmpty(),
@@ -199,9 +199,9 @@ class FinalizeSendTxViewModel : CommonViewModel() {
 
     inner class SentStep(resourceManager: ResourceManager) :
         FinalizingStep(
-            resourceManager,
-            finalize_send_tx_sending_step_3_desc_line_1,
-            finalize_send_tx_sending_step_3_desc_line_2
+            resourceManager = resourceManager,
+            descLine1Res = finalize_send_tx_sending_step_3_desc_line_1,
+            descLine2Res = finalize_send_tx_sending_step_3_desc_line_2,
         ) {
 
         init {

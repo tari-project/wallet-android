@@ -63,8 +63,8 @@ import com.tari.android.wallet.ui.extension.parcelable
 import com.tari.android.wallet.ui.extension.setVisible
 import com.tari.android.wallet.ui.fragment.auth.AuthActivity
 import com.tari.android.wallet.ui.fragment.chat.chatList.ChatListFragment
-import com.tari.android.wallet.ui.fragment.contact_book.root.ContactBookFragment
-import com.tari.android.wallet.ui.fragment.contact_book.root.action_menu.ContactBookActionMenuViewModel
+import com.tari.android.wallet.ui.fragment.contactBook.root.ContactBookFragment
+import com.tari.android.wallet.ui.fragment.contactBook.root.action_menu.ContactBookActionMenuViewModel
 import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
 import com.tari.android.wallet.ui.fragment.home.navigation.TariNavigator.Companion.INDEX_CHAT
 import com.tari.android.wallet.ui.fragment.home.navigation.TariNavigator.Companion.INDEX_CONTACT_BOOK

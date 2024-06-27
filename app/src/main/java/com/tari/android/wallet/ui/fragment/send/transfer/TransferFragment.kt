@@ -13,7 +13,7 @@ import com.google.android.material.tabs.TabLayoutMediator
 import com.tari.android.wallet.R
 import com.tari.android.wallet.databinding.FragmentTransferBinding
 import com.tari.android.wallet.ui.common.CommonFragment
-import com.tari.android.wallet.ui.fragment.contact_book.add.SelectUserContactFragment
+import com.tari.android.wallet.ui.fragment.contactBook.add.SelectUserContactFragment
 import com.tari.android.wallet.ui.fragment.send.requestTari.RequestTariFragment
 import com.tari.android.wallet.ui.fragment.send.requestTari.RequestTariViewModel
 

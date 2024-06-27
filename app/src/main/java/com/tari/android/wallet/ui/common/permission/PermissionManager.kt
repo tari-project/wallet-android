@@ -24,12 +24,11 @@ class PermissionManager @Inject constructor(val resourceManager: ResourceManager
 
     var grantedAction: () -> Unit = {}
 
-    var silently = false
-
     val openSettings = SingleLiveEvent<Unit>()
 
-    val waitingPermissions = mutableListOf<String>()
-    var lastAskedTime: DateTime? = null
+    private var silently = false
+    private val waitingPermissions = mutableListOf<String>()
+    private var lastAskedTime: DateTime? = null
 
     fun runWithPermission(permissions: List<String>, silently: Boolean = false, action: () -> Unit) {
         this.silently = silently
@@ -48,11 +47,11 @@ class PermissionManager @Inject constructor(val resourceManager: ResourceManager
             action()
         }
 
-        val shouldShowRationable = notGranted.any {
+        val shouldShowRationale = notGranted.any {
             HomeActivity.instance.get()!!.shouldShowRequestPermissionRationale(it)
         }
 
-        if (shouldShowRationable) {
+        if (shouldShowRationale) {
             if (!silently) {
                 showPermissionRequiredDialog(notGranted)
             }

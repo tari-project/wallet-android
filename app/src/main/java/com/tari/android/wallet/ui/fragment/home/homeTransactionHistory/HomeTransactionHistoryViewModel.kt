@@ -5,7 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import com.tari.android.wallet.extension.collectFlow
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.common.recyclerView.CommonViewHolderItem
-import com.tari.android.wallet.ui.fragment.contact_book.data.ContactsRepository
+import com.tari.android.wallet.ui.fragment.contactBook.data.ContactsRepository
 import com.tari.android.wallet.ui.fragment.tx.TransactionRepository
 import com.tari.android.wallet.ui.fragment.tx.adapter.TransactionItem
 import javax.inject.Inject

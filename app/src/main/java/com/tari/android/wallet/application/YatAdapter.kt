@@ -62,7 +62,7 @@ class YatAdapter @Inject constructor(
     }
 
     fun showOutcomingFinalizeActivity(activity: Activity, transactionData: TransactionData) {
-        val yatUser = transactionData.recipientContact?.getYatDto() ?: return
+        val yatUser = transactionData.recipientContact?.yatDto ?: return
         val currentTicker = networkRepository.currentNetwork.ticker
         val data = YatLibOutcomingTransactionData(
             amount = transactionData.amount!!.tariValue.toDouble(),

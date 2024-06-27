@@ -31,8 +31,8 @@ import com.tari.android.wallet.ui.extension.setTopMargin
 import com.tari.android.wallet.ui.extension.setVisible
 import com.tari.android.wallet.ui.extension.string
 import com.tari.android.wallet.ui.extension.visible
-import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.ContactDto
-import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.MergedContactDto
+import com.tari.android.wallet.ui.fragment.contactBook.data.contacts.ContactDto
+import com.tari.android.wallet.ui.fragment.contactBook.data.contacts.MergedContactInfo
 import com.tari.android.wallet.util.WalletUtil
 import com.tari.android.wallet.util.extractEmojis
 import org.joda.time.DateTime
@@ -66,7 +66,7 @@ class TxListViewHolder(view: ItemTxListBinding) : CommonViewHolder<TransactionIt
     }
 
     private fun displayFirstEmojiOrAvatar(tx: Tx, contact: ContactDto?) {
-        val avatar = (contact?.contact as? MergedContactDto)?.phoneContactDto?.avatar.orEmpty()
+        val avatar = (contact?.contactInfo as? MergedContactInfo)?.phoneContactInfo?.avatar.orEmpty()
         if (avatar.isEmpty()) {
             // display first emoji of emoji id
             val firstEmoji = when {
@@ -102,8 +102,8 @@ class TxListViewHolder(view: ItemTxListBinding) : CommonViewHolder<TransactionIt
                 ui.participantTextView1.text = title
             }
 
-            contact != null && contact.contact.getAlias().isNotEmpty() || txUser.walletAddress.isZeros() -> {
-                val alias = contact?.contact?.getAlias().orEmpty().ifBlank { itemView.context.getString(R.string.unknown_source) }
+            contact != null && contact.contactInfo.getAlias().isNotEmpty() || txUser.walletAddress.isZeros() -> {
+                val alias = contact?.contactInfo?.getAlias().orEmpty().ifBlank { itemView.context.getString(R.string.unknown_source) }
                 val fullText = when (tx.direction) {
                     Tx.Direction.INBOUND -> string(R.string.tx_list_sent_a_payment, alias)
                     Tx.Direction.OUTBOUND -> string(R.string.tx_list_you_paid_with_alias, alias)

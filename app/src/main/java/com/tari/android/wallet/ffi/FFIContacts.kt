@@ -52,5 +52,8 @@ class FFIContacts() : FFIBase() {
 
     fun getAt(index: Int): FFIContact = runWithError { FFIContact(jniGetAt(index, it)) }
 
+    // TODO maybe need to remove this method because we need to destroy objects after using
+    fun items(): List<FFIContact> = (0 until getLength()).map { getAt(it) }
+
     override fun destroy() = jniDestroy()
 }

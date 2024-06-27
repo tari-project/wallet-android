@@ -58,6 +58,7 @@ data class TariWalletAddress(val hexString: String = "", val emojiId: String = "
         const val EMOJI_ZERO =
             "\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF57"
 
+        // TODO I don't like this
         fun createWalletAddress(hexString: String = HEX_ZERO, emojiId: String = ""): TariWalletAddress {
             // crunch fix for not crashing on action related to wallet address
             return if (hexString == HEX_ZERO) {

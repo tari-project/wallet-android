@@ -103,7 +103,7 @@ import com.tari.android.wallet.ui.extension.setVisible
 import com.tari.android.wallet.ui.extension.string
 import com.tari.android.wallet.ui.extension.temporarilyDisableClick
 import com.tari.android.wallet.ui.extension.visible
-import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.ContactDto
+import com.tari.android.wallet.ui.fragment.contactBook.data.contacts.ContactDto
 import com.tari.android.wallet.ui.fragment.tx.details.gif.GIFView
 import com.tari.android.wallet.ui.fragment.tx.details.gif.GIFViewModel
 import com.tari.android.wallet.ui.fragment.tx.details.gif.TxState
@@ -169,10 +169,10 @@ class TxDetailsFragment : CommonFragment<FragmentTxDetailsBinding, TxDetailsView
     }
 
     private fun updateContactInfo(contact: ContactDto) {
-        val alias = contact.contact.getAlias()
+        val alias = contact.contactInfo.getAlias()
         val addEditText = if (alias.isEmpty()) tx_detail_add_contact else tx_detail_edit
         ui.editContactLabelTextView.text = getString(addEditText)
-        ui.contactNameTextView.setText(contact.contact.getAlias())
+        ui.contactNameTextView.setText(contact.contactInfo.getAlias())
     }
 
     private fun setCancellationReason(text: String) {
