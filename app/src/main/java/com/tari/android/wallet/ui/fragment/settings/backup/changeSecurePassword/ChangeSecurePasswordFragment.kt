@@ -63,7 +63,7 @@ import com.tari.android.wallet.infrastructure.backup.BackupState.BackupFailed
 import com.tari.android.wallet.infrastructure.backup.BackupState.BackupUpToDate
 import com.tari.android.wallet.ui.common.CommonFragment
 import com.tari.android.wallet.ui.common.domain.PaletteManager
-import com.tari.android.wallet.ui.dialog.error.ErrorDialogArgs
+import com.tari.android.wallet.ui.dialog.modular.SimpleDialogArgs
 import com.tari.android.wallet.ui.dialog.modular.ModularDialog
 import com.tari.android.wallet.ui.extension.animateClick
 import com.tari.android.wallet.ui.extension.gone
@@ -295,11 +295,12 @@ class ChangeSecurePasswordFragment : CommonFragment<FragmentChangeSecurePassword
     }
 
     private fun showBackupErrorDialog(message: String, onClose: () -> Unit) {
-        val args = ErrorDialogArgs(
-            string(back_up_wallet_backing_up_error_title), message,
+        val args = SimpleDialogArgs(
+            title = string(back_up_wallet_backing_up_error_title),
+            description = message,
             cancelable = false,
             canceledOnTouchOutside = false,
-            onClose = onClose
+            onClose = onClose,
         )
         ModularDialog(requireContext(), args.getModular(viewModel.resourceManager)).show()
     }

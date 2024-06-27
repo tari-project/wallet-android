@@ -1,45 +1,25 @@
 package com.tari.android.wallet.ui.common
 
-import com.tari.android.wallet.ui.dialog.TariDialog
-import com.tari.android.wallet.ui.dialog.inProgress.TariProgressDialog
 import com.tari.android.wallet.ui.dialog.modular.ModularDialog
-import com.tari.android.wallet.ui.dialog.modular.isRefreshing
+import com.tari.android.wallet.ui.dialog.modular.ModularDialogArgs.DialogId
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class DialogManager @Inject constructor() {
 
-    private val dialogQueue = mutableListOf<TariDialog>()
+    private val dialogQueue = mutableListOf<ModularDialog>()
 
-    private val currentDialog: TariDialog?
+    private val currentDialog: ModularDialog?
         get() = dialogQueue.lastOrNull()
 
-    fun replace(newDialog: TariDialog) {
-        currentDialog.let { currentDialog ->
-            when {
-                currentDialog == null && newDialog.isRefreshing -> {
-                    // do nothing if no dialog showing,
-                    // else go further and refresh dialog
-                    return
-                }
-
-                currentDialog is TariProgressDialog && newDialog is TariProgressDialog && currentDialog.isShowing() -> {
-                    currentDialog.applyArgs(newDialog.progressDialogArgs)
-                    return
-                }
-
-                currentDialog is ModularDialog && newDialog is ModularDialog && currentDialog.args::class.java == newDialog.args::class.java -> {
-                    currentDialog.applyArgs(newDialog.args)
-                    return
-                }
-
-                else -> {
-                    newDialog.addDismissListener { dialogQueue.remove(newDialog) }
-                    dialogQueue.add(newDialog)
-                    newDialog.show()
-                }
-            }
+    fun replace(newDialog: ModularDialog) {
+        if (isDialogShowing(newDialog.args.dialogId)) {
+            getDialog(newDialog.args.dialogId)?.applyArgs(newDialog.args)
+        } else {
+            newDialog.addDismissListener { dialogQueue.remove(newDialog) }
+            dialogQueue.add(newDialog)
+            newDialog.show()
         }
     }
 
@@ -47,4 +27,9 @@ class DialogManager @Inject constructor() {
         currentDialog?.dismiss()
         dialogQueue.removeLastOrNull()
     }
+
+    fun isDialogShowing(dialogId: Int) = dialogId != DialogId.NO_ID && dialogQueue.any { it.args.dialogId == dialogId }
+
+    private fun getDialog(dialogId: Int): ModularDialog? =
+        if (dialogId != DialogId.NO_ID) dialogQueue.firstOrNull { it.args.dialogId == dialogId } else null
 }

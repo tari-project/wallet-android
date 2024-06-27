@@ -6,7 +6,7 @@ import com.tari.android.wallet.R
 import com.tari.android.wallet.extension.getWithError
 import com.tari.android.wallet.model.WalletError
 import com.tari.android.wallet.ui.common.CommonViewModel
-import com.tari.android.wallet.ui.dialog.error.ErrorDialogArgs
+import com.tari.android.wallet.ui.dialog.modular.SimpleDialogArgs
 
 class WriteDownSeedPhraseViewModel : CommonViewModel() {
 
@@ -29,7 +29,7 @@ class WriteDownSeedPhraseViewModel : CommonViewModel() {
 
     private fun showError() {
         showModularDialog(
-            ErrorDialogArgs(
+            SimpleDialogArgs(
                 title = resourceManager.getString(R.string.common_error_title),
                 description = resourceManager.getString(R.string.back_up_seed_phrase_error),
             ).getModular(resourceManager)

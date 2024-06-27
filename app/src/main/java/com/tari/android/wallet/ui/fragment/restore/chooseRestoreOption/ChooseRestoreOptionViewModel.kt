@@ -20,7 +20,7 @@ import com.tari.android.wallet.model.throwIf
 import com.tari.android.wallet.service.service.WalletServiceLauncher
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.common.SingleLiveEvent
-import com.tari.android.wallet.ui.dialog.error.ErrorDialogArgs
+import com.tari.android.wallet.ui.dialog.modular.SimpleDialogArgs
 import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
 import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupOptionDto
 import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupOptions
@@ -166,7 +166,7 @@ class ChooseRestoreOptionViewModel : CommonViewModel() {
 
     private fun showBackupFileNotFoundDialog() {
         showModularDialog(
-            ErrorDialogArgs(
+            SimpleDialogArgs(
                 title = resourceManager.getString(R.string.restore_wallet_error_title),
                 description = resourceManager.getString(R.string.restore_wallet_error_file_not_found),
                 onClose = { backPressed.call() },
@@ -176,7 +176,7 @@ class ChooseRestoreOptionViewModel : CommonViewModel() {
 
     private fun showRestoreFailedDialog(message: String? = null) {
         showModularDialog(
-            ErrorDialogArgs(
+            SimpleDialogArgs(
                 title = resourceManager.getString(R.string.restore_wallet_error_title),
                 description = resourceManager.getString(R.string.restore_wallet_error_desc, message.orEmpty())
             ).getModular(resourceManager)
@@ -185,7 +185,7 @@ class ChooseRestoreOptionViewModel : CommonViewModel() {
 
     private fun showAuthFailedDialog() {
         showModularDialog(
-            ErrorDialogArgs(
+            SimpleDialogArgs(
                 title = resourceManager.getString(R.string.restore_wallet_error_title),
                 description = resourceManager.getString(R.string.back_up_wallet_storage_setup_error_desc),
             ).getModular(resourceManager)

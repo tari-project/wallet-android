@@ -62,7 +62,7 @@ import com.tari.android.wallet.model.WalletError
 import com.tari.android.wallet.ui.common.CommonFragment
 import com.tari.android.wallet.ui.component.fullEmojiId.EmojiIdSummaryViewController
 import com.tari.android.wallet.ui.component.fullEmojiId.FullEmojiIdViewController
-import com.tari.android.wallet.ui.dialog.error.ErrorDialogArgs
+import com.tari.android.wallet.ui.dialog.modular.SimpleDialogArgs
 import com.tari.android.wallet.ui.dialog.modular.ModularDialog
 import com.tari.android.wallet.ui.dialog.tooltipDialog.TooltipDialogArgs
 import com.tari.android.wallet.ui.extension.gone
@@ -255,9 +255,9 @@ class AddAmountFragment : CommonFragment<FragmentAddAmountBinding, AddAmountView
             } else {
                 lifecycleScope.launch(Dispatchers.Main) {
                     if (fee > amount && !DebugConfig.suppressAddAmountErrors) {
-                        val args = ErrorDialogArgs(
-                            string(error_fee_more_than_amount_title),
-                            string(error_fee_more_than_amount_description)
+                        val args = SimpleDialogArgs(
+                            title = string(error_fee_more_than_amount_title),
+                            description = string(error_fee_more_than_amount_description),
                         )
                         ModularDialog(requireContext(), args.getModular(viewModel.resourceManager)).show()
                         ui.continueButton.isClickable = true

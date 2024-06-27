@@ -24,7 +24,6 @@ import com.tari.android.wallet.ui.common.domain.ResourceManager
 import com.tari.android.wallet.ui.common.permission.PermissionManager
 import com.tari.android.wallet.ui.component.tari.toast.TariToastArgs
 import com.tari.android.wallet.ui.dialog.error.WalletErrorArgs
-import com.tari.android.wallet.ui.dialog.inProgress.ProgressDialogArgs
 import com.tari.android.wallet.ui.dialog.modular.IDialogModule
 import com.tari.android.wallet.ui.dialog.modular.ModularDialogArgs
 import com.tari.android.wallet.ui.dialog.modular.modules.body.BodyModule
@@ -104,9 +103,6 @@ open class CommonViewModel : ViewModel() {
     private val _inputDialog = SingleLiveEvent<ModularDialogArgs>()
     val inputDialog: LiveData<ModularDialogArgs> = _inputDialog
 
-    private val _loadingDialog = SingleLiveEvent<ProgressDialogArgs>()
-    val loadingDialog: LiveData<ProgressDialogArgs> = _loadingDialog
-
     protected val _blockedBackPressed = SingleLiveEvent<Boolean>()
     val blockedBackPressed: LiveData<Boolean> = _blockedBackPressed
 
@@ -182,10 +178,6 @@ open class CommonViewModel : ViewModel() {
         _modularDialog.postValue(ModularDialogArgs(modules = modules.toList()))
     }
 
-    fun showLoadingDialog(progressArgs: ProgressDialogArgs) {
-        _loadingDialog.postValue(progressArgs)
-    }
-
     fun showInputModalDialog(inputArgs: ModularDialogArgs) {
         _inputDialog.postValue(inputArgs)
     }
@@ -195,11 +187,11 @@ open class CommonViewModel : ViewModel() {
     }
 
     fun showErrorDialog(error: CoreError) {
-        showModularDialog(WalletErrorArgs(resourceManager, error).getErrorArgs().getModular(resourceManager, isRefreshing = true))
+        showModularDialog(WalletErrorArgs(resourceManager, error).getModular())
     }
 
     fun showErrorDialog(exception: Throwable) {
-        showModularDialog(WalletErrorArgs(resourceManager, exception).getErrorArgs().getModular(resourceManager, isRefreshing = true))
+        showModularDialog(WalletErrorArgs(resourceManager, exception).getModular())
     }
 
     fun hideDialog() {

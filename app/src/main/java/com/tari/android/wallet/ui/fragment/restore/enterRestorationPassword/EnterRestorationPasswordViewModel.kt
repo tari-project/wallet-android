@@ -10,7 +10,7 @@ import com.tari.android.wallet.infrastructure.backup.WalletStartFailedException
 import com.tari.android.wallet.service.service.WalletServiceLauncher
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.common.SingleLiveEvent
-import com.tari.android.wallet.ui.dialog.error.ErrorDialogArgs
+import com.tari.android.wallet.ui.dialog.modular.SimpleDialogArgs
 import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
 import com.tari.android.wallet.util.WalletUtil
 import kotlinx.coroutines.Dispatchers
@@ -97,7 +97,7 @@ class EnterRestorationPasswordViewModel : CommonViewModel() {
     }
 
     private fun showUnrecoverableExceptionDialog(message: String) {
-        val args = ErrorDialogArgs(title = resourceManager.getString(R.string.restore_wallet_error_title),
+        val args = SimpleDialogArgs(title = resourceManager.getString(R.string.restore_wallet_error_title),
             description = message,
             cancelable = false,
             canceledOnTouchOutside = false,

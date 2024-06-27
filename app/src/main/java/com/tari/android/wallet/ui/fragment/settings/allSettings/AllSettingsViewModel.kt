@@ -76,7 +76,7 @@ import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.common.SingleLiveEvent
 import com.tari.android.wallet.ui.common.recyclerView.CommonViewHolderItem
 import com.tari.android.wallet.ui.common.recyclerView.items.DividerViewHolderItem
-import com.tari.android.wallet.ui.dialog.error.ErrorDialogArgs
+import com.tari.android.wallet.ui.dialog.modular.SimpleDialogArgs
 import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
 import com.tari.android.wallet.ui.fragment.home.navigation.Navigation.AllSettingsNavigation
 import com.tari.android.wallet.ui.fragment.pinCode.PinCodeScreenBehavior
@@ -281,7 +281,7 @@ class AllSettingsViewModel : CommonViewModel() {
     }
 
     private fun showBackupStorageCheckFailedDialog(message: String) {
-        showModularDialog(ErrorDialogArgs(resourceManager.getString(check_backup_storage_status_error_title), message).getModular(resourceManager))
+        showModularDialog(SimpleDialogArgs(resourceManager.getString(check_backup_storage_status_error_title), message).getModular(resourceManager))
     }
 }
 

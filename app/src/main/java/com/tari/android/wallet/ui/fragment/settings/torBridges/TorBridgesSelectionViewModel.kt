@@ -15,8 +15,7 @@ import com.tari.android.wallet.tor.TorProxyManager
 import com.tari.android.wallet.tor.TorProxyState
 import com.tari.android.wallet.tor.TorProxyStateHandler
 import com.tari.android.wallet.ui.common.CommonViewModel
-import com.tari.android.wallet.ui.dialog.error.ErrorDialogArgs
-import com.tari.android.wallet.ui.dialog.inProgress.ProgressDialogArgs
+import com.tari.android.wallet.ui.dialog.modular.SimpleDialogArgs
 import com.tari.android.wallet.ui.dialog.modular.DialogArgs
 import com.tari.android.wallet.ui.dialog.modular.ModularDialogArgs
 import com.tari.android.wallet.ui.dialog.modular.modules.body.BodyModule
@@ -128,13 +127,15 @@ class TorBridgesSelectionViewModel : CommonViewModel() {
     }
 
     private fun restartTor() {
-        val progressArgs = ProgressDialogArgs(
-            title = resourceManager.getString(R.string.tor_bridges_connection_progress_title),
-            description = resourceManager.getString(R.string.tor_bridges_connection_progress_description),
-            closeButtonText = resourceManager.getString(R.string.common_cancel),
-            cancelable = true
-        ) { stopConnecting() }
-        showLoadingDialog(progressArgs)
+        showModularDialog(
+            SimpleDialogArgs(
+                title = resourceManager.getString(R.string.tor_bridges_connection_progress_title),
+                description = resourceManager.getString(R.string.tor_bridges_connection_progress_description),
+                closeButtonTextRes = R.string.common_cancel,
+                cancelable = true,
+                onClose = { stopConnecting() },
+            ).getModular(resourceManager)
+        )
         torProxyManager.shutdown()
         subscribeToTorState()
         torProxyManager.run()
@@ -146,7 +147,7 @@ class TorBridgesSelectionViewModel : CommonViewModel() {
             torProxyStateHandler.doOnTorFailed {
                 launchOnMain {
                     showModularDialog(
-                        ErrorDialogArgs(
+                        SimpleDialogArgs(
                             title = resourceManager.getString(R.string.tor_bridges_connecting_error_title),
                             description = resourceManager.getString(R.string.tor_bridges_connecting_error_description, it.e.message.orEmpty()),
                             cancelable = true,
@@ -175,7 +176,7 @@ class TorBridgesSelectionViewModel : CommonViewModel() {
                     }
                     showModularDialog(
                         ModularDialogArgs(
-                            DialogArgs(false, canceledOnTouchOutside = false), modules = listOf(
+                            DialogArgs(cancelable = false, canceledOnTouchOutside = false), modules = listOf(
                                 HeadModule(resourceManager.getString(R.string.tor_bridges_connection_progress_successful_title)),
                                 BodyModule(description),
                                 ButtonModule(resourceManager.getString(R.string.common_confirm), ButtonStyle.Normal) {
@@ -192,14 +193,15 @@ class TorBridgesSelectionViewModel : CommonViewModel() {
                         it.bootstrapStatus.summary + ", " + it.bootstrapStatus.warning.orEmpty(),
                         it.bootstrapStatus.progress.toString()
                     )
-                    val nextArgs = ProgressDialogArgs(
-                        title = resourceManager.getString(R.string.tor_bridges_connection_progress_title),
-                        description = description,
-                        closeButtonText = resourceManager.getString(R.string.common_cancel),
-                        cancelable = true,
-                        onClose = { stopConnecting() },
+                    showModularDialog(
+                        SimpleDialogArgs(
+                            title = resourceManager.getString(R.string.tor_bridges_connection_progress_title),
+                            description = description,
+                            closeButtonTextRes = R.string.common_cancel,
+                            cancelable = true,
+                            onClose = { stopConnecting() },
+                        ).getModular(resourceManager)
                     )
-                    showLoadingDialog(nextArgs)
                 }
             }
         }

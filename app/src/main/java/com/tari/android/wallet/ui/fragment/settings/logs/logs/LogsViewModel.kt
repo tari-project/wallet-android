@@ -6,10 +6,10 @@ import androidx.lifecycle.viewModelScope
 import com.tari.android.wallet.R
 import com.tari.android.wallet.ui.common.ClipboardArgs
 import com.tari.android.wallet.ui.common.CommonViewModel
-import com.tari.android.wallet.ui.dialog.error.ErrorDialogArgs
 import com.tari.android.wallet.ui.dialog.modular.DialogArgs
 import com.tari.android.wallet.ui.dialog.modular.IDialogModule
 import com.tari.android.wallet.ui.dialog.modular.ModularDialogArgs
+import com.tari.android.wallet.ui.dialog.modular.SimpleDialogArgs
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonStyle
 import com.tari.android.wallet.ui.dialog.modular.modules.checked.CheckedModule
@@ -46,12 +46,11 @@ class LogsViewModel : CommonViewModel() {
             val lines = file?.inputStream()?.bufferedReader()?.readLines()?.toMutableList() ?: return@launch
             logs.postValue(lines.map { LogViewHolderItem(DebugLog(it)) }.reversed().toMutableList())
         } catch (e: Throwable) {
-            val errorArgs = ErrorDialogArgs(
-                resourceManager.getString(R.string.common_error_title),
-                resourceManager.getString(R.string.debug_logs_cant_open_file),
-            ) {
-                backPressed.postValue(Unit)
-            }
+            val errorArgs = SimpleDialogArgs(
+                title = resourceManager.getString(R.string.common_error_title),
+                description = resourceManager.getString(R.string.debug_logs_cant_open_file),
+                onClose = { backPressed.postValue(Unit) },
+            )
             showModularDialog(errorArgs.getModular(resourceManager))
             logger.i(e.message + "Out of memory on reading big log file")
         }

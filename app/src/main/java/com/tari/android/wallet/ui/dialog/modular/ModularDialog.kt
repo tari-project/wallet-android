@@ -14,7 +14,6 @@ import androidx.core.animation.doOnEnd
 import com.tari.android.wallet.R
 import com.tari.android.wallet.ui.component.networkStateIndicator.module.ConnectionStatusesModule
 import com.tari.android.wallet.ui.component.networkStateIndicator.module.ConnectionStatusesModuleView
-import com.tari.android.wallet.ui.dialog.TariDialog
 import com.tari.android.wallet.ui.dialog.modular.modules.addressPoisoning.AddressPoisoningModule
 import com.tari.android.wallet.ui.dialog.modular.modules.addressPoisoning.AddressPoisoningModuleView
 import com.tari.android.wallet.ui.dialog.modular.modules.body.BodyModule
@@ -64,7 +63,7 @@ import com.tari.android.wallet.ui.fragment.utxos.list.module.UtxoAmountModuleVie
 import com.tari.android.wallet.ui.fragment.utxos.list.module.UtxoSplitModule
 import com.tari.android.wallet.ui.fragment.utxos.list.module.UtxoSplitModuleView
 
-open class ModularDialog(val context: Context) : TariDialog {
+open class ModularDialog(val context: Context) {
 
     lateinit var args: ModularDialogArgs
 
@@ -81,6 +80,25 @@ open class ModularDialog(val context: Context) : TariDialog {
             it.setLayout(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT)
             it.setGravity(Gravity.BOTTOM)
         }
+    }
+
+    fun show() {
+        dialog.show()
+        showAnimation(true)
+    }
+
+    fun dismiss() {
+        showAnimation(false) {
+            runCatching {
+                if (context !is Activity || !context.isFinishing) {
+                    dialog.dismiss()
+                }
+            }
+        }
+    }
+
+    fun addDismissListener(onDismiss: () -> Unit) {
+        onDismissListeners.add(onDismiss)
     }
 
     fun applyArgs(args: ModularDialogArgs) {
@@ -139,27 +157,6 @@ open class ModularDialog(val context: Context) : TariDialog {
         }
     }
 
-    override fun show() {
-        dialog.show()
-        showAnimation(true)
-    }
-
-    override fun dismiss() {
-        showAnimation(false) {
-            runCatching {
-                if (context !is Activity || !context.isFinishing) {
-                    dialog.dismiss()
-                }
-            }
-        }
-    }
-
-    override fun isShowing(): Boolean = dialog.isShowing
-
-    override fun addDismissListener(onDismiss: () -> Unit) {
-        onDismissListeners.add(onDismiss)
-    }
-
     private fun showAnimation(forward: Boolean, endAction: () -> Unit = {}) {
         val back = dialog.findViewById<View>(R.id.back)
         val content = dialog.findViewById<View>(R.id.root)
@@ -181,6 +178,3 @@ open class ModularDialog(val context: Context) : TariDialog {
         }
     }
 }
-
-val TariDialog?.isRefreshing: Boolean
-    get() = this is ModularDialog && args.dialogArgs.isRefreshing

@@ -13,7 +13,6 @@ import com.tari.android.wallet.tor.TorProxyState
 import com.tari.android.wallet.tor.TorProxyStateHandler
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.component.networkStateIndicator.module.ConnectionStatusesModule
-import com.tari.android.wallet.ui.dialog.modular.DialogArgs
 import com.tari.android.wallet.ui.dialog.modular.ModularDialogArgs
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonStyle
@@ -50,15 +49,18 @@ class ConnectionIndicatorViewModel : CommonViewModel() {
         _baseNodeState.value ?: return
         _syncState.value ?: return
 
-        showModularDialog(
-            ModularDialogArgs(
-                DialogArgs(isRefreshing = isRefreshing), listOf(
-                    HeadModule(resourceManager.getString(R.string.connection_status_dialog_title)),
-                    ConnectionStatusesModule(_networkState.value!!, _torProxyState.value!!, _baseNodeState.value!!, _syncState.value!!),
-                    ButtonModule(resourceManager.getString(R.string.common_close), ButtonStyle.Close),
+        if (!isRefreshing || dialogManager.isDialogShowing(ModularDialogArgs.DialogId.CONNECTION_STATUS)) {
+            showModularDialog(
+                ModularDialogArgs(
+                    dialogId = ModularDialogArgs.DialogId.CONNECTION_STATUS,
+                    modules = listOf(
+                        HeadModule(resourceManager.getString(R.string.connection_status_dialog_title)),
+                        ConnectionStatusesModule(_networkState.value!!, _torProxyState.value!!, _baseNodeState.value!!, _syncState.value!!),
+                        ButtonModule(resourceManager.getString(R.string.common_close), ButtonStyle.Close),
+                    ),
                 )
             )
-        )
+        }
     }
 
     private fun subscribeOnEventBus() {
