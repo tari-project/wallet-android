@@ -77,7 +77,7 @@ class EventsPropagatingWebViewClient(private val urlOverrideStrategy: URLOverrid
         }
 
         override fun onReceivedError(view: WebView, request: WebResourceRequest, error: WebResourceError) {
-            logger.i("onReceivedError: ${request.url}, error: $error")
+            logger.i("onReceivedError: ${request.url}, error: ${error.errorCode} ${error.description}")
 
             onReceivedError(view, request, error)
         }
