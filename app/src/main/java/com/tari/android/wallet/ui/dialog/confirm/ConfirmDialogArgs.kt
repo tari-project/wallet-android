@@ -23,7 +23,7 @@ class ConfirmDialogArgs(
     val onDismiss: () -> Unit = {}
 ) {
     fun getModular(resourceManager: ResourceManager): ModularDialogArgs = ModularDialogArgs(
-        DialogArgs(cancelable, canceledOnTouchOutside, false, onDismiss), modules = listOf(
+        DialogArgs(cancelable, canceledOnTouchOutside, onDismiss), modules = listOf(
             HeadModule(title.toString()),
             BodyModule(description.toString()),
             ButtonModule(confirmButtonText?.toString() ?: resourceManager.getString(R.string.common_confirm), ButtonStyle.Normal, onConfirm),
@@ -32,7 +32,7 @@ class ConfirmDialogArgs(
     )
 
     fun getModular(baseNode: BaseNodeDto, resourceManager: ResourceManager): ModularDialogArgs = ModularDialogArgs(
-        DialogArgs(cancelable, canceledOnTouchOutside, false, onDismiss), modules = listOf(
+        DialogArgs(cancelable, canceledOnTouchOutside, onDismiss), modules = listOf(
             HeadModule(title.toString()),
             BodyModule(description.toString()),
             CustomBaseNodeBodyModule(baseNode),

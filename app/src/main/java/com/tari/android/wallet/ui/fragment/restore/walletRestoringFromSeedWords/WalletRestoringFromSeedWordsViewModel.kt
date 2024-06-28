@@ -16,7 +16,7 @@ import com.tari.android.wallet.service.seedPhrase.SeedPhraseRepository
 import com.tari.android.wallet.service.service.WalletServiceLauncher
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.common.domain.ResourceManager
-import com.tari.android.wallet.ui.dialog.error.ErrorDialogArgs
+import com.tari.android.wallet.ui.dialog.modular.SimpleDialogArgs
 import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
 import io.reactivex.disposables.CompositeDisposable
 import kotlinx.coroutines.Dispatchers
@@ -122,7 +122,7 @@ class WalletRestoringFromSeedWordsViewModel : CommonViewModel() {
 
     sealed class RestorationError(title: String, message: String, dismissAction: () -> Unit) {
 
-        val args = ErrorDialogArgs(title, message, onClose = dismissAction)
+        val args = SimpleDialogArgs(title, message, onClose = dismissAction)
 
         class ConnectionFailed(resourceManager: ResourceManager, dismissAction: () -> Unit) : RestorationError(
             resourceManager.getString(R.string.restore_from_seed_words_overlay_error_title),

@@ -4,6 +4,7 @@ import com.tari.android.wallet.R
 import com.tari.android.wallet.model.CoreError
 import com.tari.android.wallet.model.WalletError
 import com.tari.android.wallet.ui.common.domain.ResourceManager
+import com.tari.android.wallet.ui.dialog.modular.SimpleDialogArgs
 
 class WalletErrorArgs(
     val resourceManager: ResourceManager,
@@ -34,5 +35,5 @@ class WalletErrorArgs(
             return resourceManager.getString(id)
         }
 
-    fun getErrorArgs(): ErrorDialogArgs = ErrorDialogArgs(title, description, onClose = dismissAction)
+    fun getModular() = SimpleDialogArgs(title, description, onClose = dismissAction).getModular(resourceManager)
 }

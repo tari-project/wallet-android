@@ -10,7 +10,7 @@ import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodePrefRepository
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.common.recyclerView.CommonViewHolderItem
-import com.tari.android.wallet.ui.dialog.error.ErrorDialogArgs
+import com.tari.android.wallet.ui.dialog.modular.SimpleDialogArgs
 import com.tari.android.wallet.ui.dialog.modular.DialogArgs
 import com.tari.android.wallet.ui.dialog.modular.ModularDialogArgs
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonModule
@@ -141,7 +141,7 @@ class ChangeBaseNodeViewModel : CommonViewModel() {
         } else {
             _customBaseNodeState.update { it.copy(customBaseNode = null) }
             showModularDialog(
-                ErrorDialogArgs(
+                SimpleDialogArgs(
                     title = resourceManager.getString(R.string.common_error_title),
                     description = resourceManager.getString(R.string.restore_from_seed_words_form_error_message),
                 ).getModular(resourceManager)

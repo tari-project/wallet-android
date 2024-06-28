@@ -13,7 +13,7 @@ import com.tari.android.wallet.infrastructure.backup.BackupStorageAuthRevokedExc
 import com.tari.android.wallet.infrastructure.backup.BackupStorageFullException
 import com.tari.android.wallet.infrastructure.backup.BackupsState
 import com.tari.android.wallet.ui.common.CommonViewModel
-import com.tari.android.wallet.ui.dialog.error.ErrorDialogArgs
+import com.tari.android.wallet.ui.dialog.modular.SimpleDialogArgs
 import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
 import com.tari.android.wallet.ui.fragment.settings.backup.backupSettings.option.BackupOptionViewModel
 import com.tari.android.wallet.ui.fragment.settings.userAutorization.BiometricAuthenticationViewModel
@@ -122,7 +122,7 @@ class BackupSettingsViewModel : CommonViewModel() {
             exception?.message == null -> resourceManager.getString(R.string.back_up_wallet_backing_up_unknown_error)
             else -> resourceManager.getString(R.string.back_up_wallet_backing_up_error_desc, exception.message!!)
         }
-        showModularDialog(ErrorDialogArgs(errorTitle, errorDescription).getModular(resourceManager))
+        showModularDialog(SimpleDialogArgs(errorTitle, errorDescription).getModular(resourceManager))
     }
 }
 

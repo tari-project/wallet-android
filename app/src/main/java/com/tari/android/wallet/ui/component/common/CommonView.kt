@@ -12,7 +12,6 @@ import androidx.viewbinding.ViewBinding
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.common.DialogManager
 import com.tari.android.wallet.ui.component.tari.toast.TariToast
-import com.tari.android.wallet.ui.dialog.inProgress.TariProgressDialog
 import com.tari.android.wallet.ui.dialog.modular.ModularDialog
 
 abstract class CommonView<VM : CommonViewModel, VB : ViewBinding> : LinearLayout {
@@ -60,14 +59,6 @@ abstract class CommonView<VM : CommonViewModel, VB : ViewBinding> : LinearLayout
         openLink.observe(viewLifecycle) { context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(it))) }
 
         modularDialog.observe(viewLifecycle) { dialogManager.replace(ModularDialog(context, it)) }
-
-        loadingDialog.observe(viewLifecycle) { progressDialogArgs ->
-            if (progressDialogArgs.isShow) {
-                dialogManager.replace(TariProgressDialog(context, progressDialogArgs))
-            } else {
-                dialogManager.dismiss()
-            }
-        }
 
         showToast.observe(viewLifecycle) { TariToast(context, it) }
 

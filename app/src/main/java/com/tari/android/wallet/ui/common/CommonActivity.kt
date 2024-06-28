@@ -22,8 +22,6 @@ import com.tari.android.wallet.extension.safeCastTo
 import com.tari.android.wallet.ui.component.networkStateIndicator.ConnectionIndicatorViewModel
 import com.tari.android.wallet.ui.component.tari.toast.TariToast
 import com.tari.android.wallet.ui.component.tari.toast.TariToastArgs
-import com.tari.android.wallet.ui.dialog.inProgress.TariProgressDialog
-import com.tari.android.wallet.ui.dialog.modular.DialogArgs
 import com.tari.android.wallet.ui.dialog.modular.ModularDialog
 import com.tari.android.wallet.ui.dialog.modular.ModularDialogArgs
 import com.tari.android.wallet.ui.dialog.modular.modules.body.BodyModule
@@ -48,9 +46,8 @@ abstract class CommonActivity<Binding : ViewBinding, VM : CommonViewModel> : App
 
     lateinit var viewModel: VM
 
-    // TODO sometimes it's null even if it's initialized and VM isn't null
-    private var dialogManager: DialogManager? = null
-        get() = field ?: viewModel.dialogManager
+    private val dialogManager: DialogManager
+        get() = viewModel.dialogManager
 
     private val shakeDetector by lazy { ShakeDetector(this) }
 
@@ -71,8 +68,6 @@ abstract class CommonActivity<Binding : ViewBinding, VM : CommonViewModel> : App
         setTariTheme(viewModel.tariSettingsSharedRepository.currentTheme)
 
         subscribeToCommon(viewModel)
-
-        dialogManager = viewModel.dialogManager
     }
 
     fun subscribeToCommon(commonViewModel: CommonViewModel) = with(commonViewModel) {
@@ -81,14 +76,6 @@ abstract class CommonActivity<Binding : ViewBinding, VM : CommonViewModel> : App
         observe(openLink) { startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(it))) }
 
         observe(modularDialog) { dialogManager.replace(ModularDialog(this@CommonActivity, it)) }
-
-        observe(loadingDialog) { progressDialogArgs ->
-            if (progressDialogArgs.isShow) {
-                dialogManager.replace(TariProgressDialog(this@CommonActivity, progressDialogArgs))
-            } else {
-                dialogManager.dismiss()
-            }
-        }
 
         observe(showToast) { TariToast(this@CommonActivity, it) }
 
@@ -152,7 +139,7 @@ abstract class CommonActivity<Binding : ViewBinding, VM : CommonViewModel> : App
 
     override fun onStop() {
         shakeDetector.stop()
-        dialogManager?.dismiss()
+        dialogManager.dismiss()
         super.onStop()
     }
 
@@ -208,20 +195,21 @@ abstract class CommonActivity<Binding : ViewBinding, VM : CommonViewModel> : App
         val versionInfo = TariVersionModel(viewModel.networkRepository).versionInfo
 
         val modularDialogArgs = ModularDialogArgs(
-            DialogArgs(), listOf(
+            dialogId = ModularDialogArgs.DialogId.DEBUG_MENU,
+            modules = listOf(
                 HeadModule(getString(R.string.debug_dialog_title)),
                 SpaceModule(8),
                 OptionModule(getString(R.string.debug_dialog_logs)) { openActivity(DebugNavigation.Logs) },
                 OptionModule(getString(R.string.debug_dialog_report)) { openActivity(DebugNavigation.BugReport) },
                 OptionModule(getString(R.string.debug_dialog_connection_status)) {
-                    dialogManager?.dismiss()
+                    dialogManager.dismiss()
                     connectionStateViewModel.showStatesDialog()
                 },
                 BodyModule(versionInfo),
                 ButtonModule(getString(R.string.common_close), ButtonStyle.Close),
-            )
+            ),
         )
-        dialogManager?.replace(ModularDialog(this, modularDialogArgs))
+        dialogManager.replace(ModularDialog(this, modularDialogArgs))
     }
 
     protected fun shareViaText(text: String) {
@@ -237,7 +225,7 @@ abstract class CommonActivity<Binding : ViewBinding, VM : CommonViewModel> : App
     }
 
     private fun openActivity(navigation: DebugNavigation) {
-        dialogManager?.dismiss()
+        dialogManager.dismiss()
         DebugActivity.launch(this, navigation)
     }
 }

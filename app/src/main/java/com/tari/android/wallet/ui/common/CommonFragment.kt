@@ -22,7 +22,6 @@ import com.tari.android.wallet.extension.observe
 import com.tari.android.wallet.ui.component.mainList.MutedBackPressedCallback
 import com.tari.android.wallet.ui.component.tari.toast.TariToast
 import com.tari.android.wallet.ui.component.tari.toast.TariToastArgs
-import com.tari.android.wallet.ui.dialog.inProgress.TariProgressDialog
 import com.tari.android.wallet.ui.dialog.modular.InputModularDialog
 import com.tari.android.wallet.ui.dialog.modular.ModularDialog
 import com.tari.android.wallet.ui.extension.string
@@ -116,14 +115,6 @@ abstract class CommonFragment<Binding : ViewBinding, VM : CommonViewModel> : Fra
         observe(modularDialog) { dialogManager.replace(ModularDialog(requireContext(), it)) }
 
         observe(inputDialog) { dialogManager.replace(InputModularDialog(requireContext(), it)) }
-
-        observe(loadingDialog) { progressDialogArgs ->
-            if (progressDialogArgs.isShow) {
-                dialogManager.replace(TariProgressDialog(requireContext(), progressDialogArgs))
-            } else {
-                dialogManager.dismiss()
-            }
-        }
 
         observe(showToast) { TariToast(requireContext(), it) }
 

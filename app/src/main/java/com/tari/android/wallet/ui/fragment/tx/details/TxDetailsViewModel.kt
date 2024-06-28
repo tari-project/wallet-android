@@ -18,7 +18,7 @@ import com.tari.android.wallet.model.TxId
 import com.tari.android.wallet.model.WalletError
 import com.tari.android.wallet.service.TariWalletService
 import com.tari.android.wallet.ui.common.CommonViewModel
-import com.tari.android.wallet.ui.dialog.error.ErrorDialogArgs
+import com.tari.android.wallet.ui.dialog.modular.SimpleDialogArgs
 import com.tari.android.wallet.ui.dialog.modular.DialogArgs
 import com.tari.android.wallet.ui.dialog.modular.ModularDialogArgs
 import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
@@ -84,7 +84,7 @@ class TxDetailsViewModel : CommonViewModel() {
         val isCancelled = walletService.getWithError { error, wallet -> wallet.cancelPendingTx(TxId(this.txValue.id), error) }
         if (!isCancelled) {
             showModularDialog(
-                ErrorDialogArgs(
+                SimpleDialogArgs(
                     title = resourceManager.getString(R.string.tx_detail_cancellation_error_title),
                     description = resourceManager.getString(R.string.tx_detail_cancellation_error_description),
                 ).getModular(resourceManager)
@@ -144,7 +144,7 @@ class TxDetailsViewModel : CommonViewModel() {
 
         if (foundTx == null) {
             showModularDialog(
-                ErrorDialogArgs(
+                SimpleDialogArgs(
                     title = resourceManager.getString(R.string.tx_details_error_tx_not_found_title),
                     description = resourceManager.getString(R.string.tx_details_error_tx_not_found_desc),
                     onClose = { backPressed.call() },
