@@ -32,7 +32,7 @@
             android:background="@drawable/vector_view_elevation_bottom_gradient"
             app:layout_constraintBottom_toTopOf="@id/bottom_navigation_view" />
 
-        <com.tari.android.wallet.ui.component.tari.TariPrimaryBackground
+        <com.tari.android.wallet.ui.component.tari.background.obsolete.TariPrimaryBackgroundConstraint
             android:id="@+id/bottom_navigation_view"
             android:layout_width="0dp"
             android:layout_height="64dp"
@@ -110,9 +110,9 @@
 
             </LinearLayout>
 
-        </com.tari.android.wallet.ui.component.tari.TariPrimaryBackground>
+        </com.tari.android.wallet.ui.component.tari.background.obsolete.TariPrimaryBackgroundConstraint>
 
-        <com.tari.android.wallet.ui.component.tari.TariAlphaBackground
+        <com.tari.android.wallet.ui.component.tari.background.obsolete.TariAlphaBackgroundConstraint
             android:id="@+id/send_button_container"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -151,7 +151,7 @@
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
-        </com.tari.android.wallet.ui.component.tari.TariAlphaBackground>
+        </com.tari.android.wallet.ui.component.tari.background.obsolete.TariAlphaBackgroundConstraint>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

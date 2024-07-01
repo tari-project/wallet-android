@@ -1,4 +1,4 @@
-package com.tari.android.wallet.ui.component.tari
+package com.tari.android.wallet.ui.component.tari.background
 
 import android.content.Context
 import android.util.AttributeSet

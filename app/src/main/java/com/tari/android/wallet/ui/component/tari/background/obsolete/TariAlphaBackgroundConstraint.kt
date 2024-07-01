@@ -30,7 +30,7 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.tari.android.wallet.ui.component.tari
+package com.tari.android.wallet.ui.component.tari.background.obsolete
 
 import android.content.Context
 import android.util.AttributeSet
@@ -39,7 +39,8 @@ import com.tari.android.wallet.R
 import com.tari.android.wallet.ui.extension.obtain
 import com.tari.android.wallet.ui.extension.runRecycle
 
-class TariAlphaBackground(context: Context, attrs: AttributeSet) : TariBackground(context, attrs) {
+@Deprecated("This is an obsolete class inheriting ConstraintLayout. Use TariAlphaBackground instead.")
+class TariAlphaBackgroundConstraint(context: Context, attrs: AttributeSet) : TariBackgroundConstraint(context, attrs) {
 
     init {
         obtain(attrs, R.styleable.TariAlphaBackground).runRecycle {

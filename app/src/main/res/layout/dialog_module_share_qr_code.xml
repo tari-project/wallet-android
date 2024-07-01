@@ -6,7 +6,7 @@
     android:layout_height="wrap_content"
     android:orientation="vertical">
 
-    <com.tari.android.wallet.ui.component.tari.TariQrBackground
+    <com.tari.android.wallet.ui.component.tari.background.obsolete.TariQrBackgroundConstraint
         android:id="@+id/qr_container_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -27,6 +27,6 @@
             android:background="?attr/palette_qr_background"
             android:padding="2dp" />
 
-    </com.tari.android.wallet.ui.component.tari.TariQrBackground>
+    </com.tari.android.wallet.ui.component.tari.background.obsolete.TariQrBackgroundConstraint>
 
 </LinearLayout>

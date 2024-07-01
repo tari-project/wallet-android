@@ -22,7 +22,7 @@
         android:layout_centerHorizontal="true"
         android:layout_marginTop="0dp">
 
-        <com.tari.android.wallet.ui.component.tari.TariPrimaryBackground
+        <com.tari.android.wallet.ui.component.tari.background.obsolete.TariPrimaryBackgroundConstraint
             android:id="@+id/add_recipient_txt_paste_emoji_id"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -39,7 +39,7 @@
                 android:textSize="14sp"
                 app:customFont="heavy" />
 
-        </com.tari.android.wallet.ui.component.tari.TariPrimaryBackground>
+        </com.tari.android.wallet.ui.component.tari.background.obsolete.TariPrimaryBackgroundConstraint>
 
         <Button
             android:id="@+id/paste_emoji_id_button"
@@ -61,7 +61,7 @@
 
     </RelativeLayout>
 
-    <com.tari.android.wallet.ui.component.tari.TariPrimaryBackground
+    <com.tari.android.wallet.ui.component.tari.background.obsolete.TariPrimaryBackgroundConstraint
         android:id="@+id/emoji_id_container_view"
         android:layout_width="match_parent"
         android:layout_height="@dimen/add_recipient_clipboard_emoji_id_container_height"
@@ -91,6 +91,6 @@
 
         </HorizontalScrollView>
 
-    </com.tari.android.wallet.ui.component.tari.TariPrimaryBackground>
+    </com.tari.android.wallet.ui.component.tari.background.obsolete.TariPrimaryBackgroundConstraint>
 
 </RelativeLayout>

@@ -7,14 +7,14 @@
     android:clickable="true"
     android:focusable="true">
 
-    <com.tari.android.wallet.ui.component.tari.TariPrimaryBackground
+    <com.tari.android.wallet.ui.component.tari.background.obsolete.TariPrimaryBackgroundConstraint
         android:id="@+id/root_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:animateLayoutChanges="true"
         android:paddingStart="22dp">
 
-        <com.tari.android.wallet.ui.component.tari.TariSwitchedBackground
+        <com.tari.android.wallet.ui.component.tari.background.obsolete.TariSwitchedBackgroundConstraint
             android:id="@+id/profile_badges_container"
             android:layout_width="wrap_content"
             android:layout_height="52dp"
@@ -37,7 +37,7 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent">
 
-                <com.tari.android.wallet.ui.component.tari.TariPrimaryBackground
+                <com.tari.android.wallet.ui.component.tari.background.obsolete.TariPrimaryBackgroundConstraint
                     android:id="@+id/profile_container"
                     android:layout_width="42dp"
                     android:layout_height="42dp"
@@ -70,11 +70,11 @@
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent" />
 
-                </com.tari.android.wallet.ui.component.tari.TariPrimaryBackground>
+                </com.tari.android.wallet.ui.component.tari.background.obsolete.TariPrimaryBackgroundConstraint>
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
-        </com.tari.android.wallet.ui.component.tari.TariSwitchedBackground>
+        </com.tari.android.wallet.ui.component.tari.background.obsolete.TariSwitchedBackgroundConstraint>
 
         <!-- participant -->
         <LinearLayout
@@ -110,7 +110,7 @@
 
         </LinearLayout>
 
-    </com.tari.android.wallet.ui.component.tari.TariPrimaryBackground>
+    </com.tari.android.wallet.ui.component.tari.background.obsolete.TariPrimaryBackgroundConstraint>
 
     <com.tari.android.wallet.ui.component.tari.TariDivider
         android:id="@+id/separator"
