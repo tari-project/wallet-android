@@ -44,29 +44,26 @@ import android.view.ViewGroup
 import android.webkit.WebResourceError
 import android.widget.Toast
 import androidx.fragment.app.Fragment
-import com.tari.android.wallet.R.drawable.*
+import com.tari.android.wallet.R.drawable.vector_store_reload
+import com.tari.android.wallet.R.drawable.vector_store_share
 import com.tari.android.wallet.R.string.store_no_application_to_open_the_link_error
 import com.tari.android.wallet.R.string.ttl_store_url
 import com.tari.android.wallet.databinding.FragmentStoreBinding
-import com.tari.android.wallet.event.EventBus
-import com.tari.android.wallet.network.NetworkConnectionState
+import com.tari.android.wallet.extension.collectFlow
 import com.tari.android.wallet.ui.component.tari.toast.TariToast
 import com.tari.android.wallet.ui.component.tari.toast.TariToastArgs
 import com.tari.android.wallet.ui.component.tari.toolbar.TariToolbarActionArg
-import com.tari.android.wallet.ui.extension.*
+import com.tari.android.wallet.ui.extension.gone
+import com.tari.android.wallet.ui.extension.string
 import com.tari.android.wallet.ui.fragment.store.EventsPropagatingWebViewClient.ExternalSiteOverride
-import io.reactivex.Observable
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.disposables.Disposable
-import io.reactivex.functions.BiFunction
-import io.reactivex.subjects.PublishSubject
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.update
 
 class StoreFragment : Fragment() {
 
-    private val webViewStatePublisher = PublishSubject.create<WebViewState>()
+    private val webViewState = MutableStateFlow(WebViewState())
     private lateinit var ui: FragmentStoreBinding
     private lateinit var animation: NavigationPanelAnimation
-    private var subscription: Disposable? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
         FragmentStoreBinding.inflate(LayoutInflater.from(context), container, false).also { ui = it }.root
@@ -74,13 +71,19 @@ class StoreFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setupUi()
-        reloadWebViewOnErrorAndConnectedState()
+
+        collectFlow(webViewState) {
+            val args = listOfNotNull(
+                TariToolbarActionArg(icon = vector_store_share) { shareStoreLink() }.takeIf { !webViewState.value.hasError },
+                TariToolbarActionArg(icon = vector_store_reload) { ui.webView.reload() }.takeIf { webViewState.value.hasError },
+            )
+            ui.toolbar.setRightArgs(*args.toTypedArray())
+        }
     }
 
     override fun onDestroyView() {
         ui.webView.destroy()
         animation.dispose()
-        subscription?.dispose()
         super.onDestroyView()
     }
 
@@ -89,19 +92,6 @@ class StoreFragment : Fragment() {
         configureWebView()
         ui.browserBackCtaView.setOnClickListener { ui.webView.apply { if (canGoBack()) goBack() } }
         ui.browserForwardCtaView.setOnClickListener { ui.webView.apply { if (canGoForward()) goForward() } }
-        val args = TariToolbarActionArg(icon = vector_store_share) { shareStoreLink() }
-        ui.toolbar.setRightArgs(args)
-    }
-
-    private fun reloadWebViewOnErrorAndConnectedState() {
-        subscription = Observable.combineLatest(
-            EventBus.networkConnectionState.publishSubject.distinctUntilChanged(),
-            webViewStatePublisher.distinctUntilChanged(),
-            BiFunction<NetworkConnectionState, WebViewState, Pair<NetworkConnectionState, WebViewState>>(::Pair)
-        )
-            .filter { it.first == NetworkConnectionState.CONNECTED && it.second.hasError }
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe { ui.webView.reload() }
     }
 
     @SuppressLint("SetJavaScriptEnabled")
@@ -116,14 +106,16 @@ class StoreFragment : Fragment() {
                 }
             ).apply {
                 addListener(
-                    onPageStarted = { _, _, _ -> },
+                    onPageStarted = { _, _, _ ->
+                        webViewState.update { WebViewState() }
+                    },
                     onPageCommitVisible = { _, _ -> ui.webView.scrollTo(0, 0) },
                     onPageFinished = { webView, _ ->
                         ui.progressBar.gone()
                         ui.toolbar.ui.toolbarTitle.text = webView.title
                     },
                     onReceivedError = { _, _, error ->
-                        webViewStatePublisher.onNext(WebViewState(PageLoadingException(error)))
+                        webViewState.update { WebViewState(PageLoadingException(error)) }
                     }
                 )
             }
@@ -147,7 +139,7 @@ class StoreFragment : Fragment() {
         }
     }
 
-    private class WebViewState(val error: Exception?) {
+    private data class WebViewState(val error: Exception? = null) {
         val hasError
             get() = error != null
     }
