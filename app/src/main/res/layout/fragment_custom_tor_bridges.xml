@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<com.tari.android.wallet.ui.component.tari.TariPrimaryBackground xmlns:android="http://schemas.android.com/apk/res/android"
+<com.tari.android.wallet.ui.component.tari.background.obsolete.TariPrimaryBackgroundConstraint xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/root_view"
@@ -40,7 +40,7 @@
                     android:textSize="14sp"
                     app:customFont="heavy" />
 
-                <com.tari.android.wallet.ui.component.tari.TariSecondaryBackground
+                <com.tari.android.wallet.ui.component.tari.background.obsolete.TariSecondaryBackgroundConstraint
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="26dp"
@@ -56,9 +56,9 @@
                         app:hintText="@string/tor_bridges_hint"
                         app:singleLine="false" />
 
-                </com.tari.android.wallet.ui.component.tari.TariSecondaryBackground>
+                </com.tari.android.wallet.ui.component.tari.background.obsolete.TariSecondaryBackgroundConstraint>
 
-                <com.tari.android.wallet.ui.component.tari.TariSecondaryBackground
+                <com.tari.android.wallet.ui.component.tari.background.obsolete.TariSecondaryBackgroundConstraint
                     android:id="@+id/request_bridges_cta"
                     android:layout_width="match_parent"
                     android:layout_height="@dimen/menu_item_height"
@@ -89,9 +89,9 @@
 
                     </FrameLayout>
 
-                </com.tari.android.wallet.ui.component.tari.TariSecondaryBackground>
+                </com.tari.android.wallet.ui.component.tari.background.obsolete.TariSecondaryBackgroundConstraint>
 
-                <com.tari.android.wallet.ui.component.tari.TariSecondaryBackground
+                <com.tari.android.wallet.ui.component.tari.background.obsolete.TariSecondaryBackgroundConstraint
                     android:id="@+id/scan_qr_cta"
                     android:layout_width="match_parent"
                     android:layout_height="@dimen/menu_item_height"
@@ -121,9 +121,9 @@
 
                     </FrameLayout>
 
-                </com.tari.android.wallet.ui.component.tari.TariSecondaryBackground>
+                </com.tari.android.wallet.ui.component.tari.background.obsolete.TariSecondaryBackgroundConstraint>
 
-                <com.tari.android.wallet.ui.component.tari.TariSecondaryBackground
+                <com.tari.android.wallet.ui.component.tari.background.obsolete.TariSecondaryBackgroundConstraint
                     android:id="@+id/upload_qr_cta"
                     android:layout_width="match_parent"
                     android:layout_height="@dimen/menu_item_height"
@@ -156,7 +156,7 @@
 
                     </FrameLayout>
 
-                </com.tari.android.wallet.ui.component.tari.TariSecondaryBackground>
+                </com.tari.android.wallet.ui.component.tari.background.obsolete.TariSecondaryBackgroundConstraint>
 
             </androidx.appcompat.widget.LinearLayoutCompat>
 
@@ -164,4 +164,4 @@
 
     </androidx.appcompat.widget.LinearLayoutCompat>
 
-</com.tari.android.wallet.ui.component.tari.TariPrimaryBackground>
+</com.tari.android.wallet.ui.component.tari.background.obsolete.TariPrimaryBackgroundConstraint>

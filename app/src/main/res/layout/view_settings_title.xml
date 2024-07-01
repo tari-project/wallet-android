@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<com.tari.android.wallet.ui.component.tari.TariSecondaryBackground
+<com.tari.android.wallet.ui.component.tari.background.obsolete.TariSecondaryBackgroundConstraint
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
@@ -20,4 +20,4 @@
         android:textSize="17sp"
         app:customFont="black" />
 
-</com.tari.android.wallet.ui.component.tari.TariSecondaryBackground>
+</com.tari.android.wallet.ui.component.tari.background.obsolete.TariSecondaryBackgroundConstraint>

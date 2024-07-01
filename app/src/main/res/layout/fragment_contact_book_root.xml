@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.tari.android.wallet.ui.component.tari.TariPrimaryBackground xmlns:android="http://schemas.android.com/apk/res/android"
+<com.tari.android.wallet.ui.component.tari.background.obsolete.TariPrimaryBackgroundConstraint xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/root_view"
@@ -58,7 +58,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
-    <com.tari.android.wallet.ui.component.tari.TariSecondaryBackground
+    <com.tari.android.wallet.ui.component.tari.background.obsolete.TariSecondaryBackgroundConstraint
         android:id="@+id/search_bar_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -112,7 +112,7 @@
 
         </androidx.appcompat.widget.LinearLayoutCompat>
 
-        <com.tari.android.wallet.ui.component.tari.TariPrimaryBackground
+        <com.tari.android.wallet.ui.component.tari.background.obsolete.TariPrimaryBackgroundConstraint
             android:id="@+id/search_view_container"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -135,7 +135,7 @@
                 app:queryBackground="@null"
                 tools:text="Search" />
 
-        </com.tari.android.wallet.ui.component.tari.TariPrimaryBackground>
+        </com.tari.android.wallet.ui.component.tari.background.obsolete.TariPrimaryBackgroundConstraint>
 
         <!-- QR code button -->
         <androidx.appcompat.widget.AppCompatImageButton
@@ -164,6 +164,6 @@
             app:layout_constraintBottom_toBottomOf="@+id/search_bar_container"
             app:layout_constraintEnd_toEndOf="parent" />
 
-    </com.tari.android.wallet.ui.component.tari.TariSecondaryBackground>
+    </com.tari.android.wallet.ui.component.tari.background.obsolete.TariSecondaryBackgroundConstraint>
 
-</com.tari.android.wallet.ui.component.tari.TariPrimaryBackground>
+</com.tari.android.wallet.ui.component.tari.background.obsolete.TariPrimaryBackgroundConstraint>

@@ -7,7 +7,7 @@
     android:clickable="true"
     android:focusable="true">
 
-    <com.tari.android.wallet.ui.component.tari.TariPrimaryBackground
+    <com.tari.android.wallet.ui.component.tari.background.obsolete.TariPrimaryBackgroundConstraint
         android:id="@+id/root_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -27,7 +27,7 @@
             app:layout_constraintTop_toTopOf="parent"
             tools:visibility="visible" />
 
-        <com.tari.android.wallet.ui.component.tari.TariSwitchedBackground
+        <com.tari.android.wallet.ui.component.tari.background.obsolete.TariSwitchedBackgroundConstraint
             android:id="@+id/profile_badges_container"
             android:layout_width="wrap_content"
             android:layout_height="52dp"
@@ -50,7 +50,7 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent">
 
-                <com.tari.android.wallet.ui.component.tari.TariPrimaryBackground
+                <com.tari.android.wallet.ui.component.tari.background.obsolete.TariPrimaryBackgroundConstraint
                     android:id="@+id/profile_container"
                     android:layout_width="42dp"
                     android:layout_height="42dp"
@@ -95,7 +95,7 @@
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent" />
 
-                </com.tari.android.wallet.ui.component.tari.TariPrimaryBackground>
+                </com.tari.android.wallet.ui.component.tari.background.obsolete.TariPrimaryBackgroundConstraint>
 
                 <androidx.appcompat.widget.LinearLayoutCompat
                     android:id="@+id/badges_container"
@@ -109,7 +109,7 @@
                     app:layout_constraintStart_toEndOf="@+id/profile_container"
                     app:layout_constraintTop_toTopOf="parent" />
 
-                <com.tari.android.wallet.ui.component.tari.TariPrimaryBackground
+                <com.tari.android.wallet.ui.component.tari.background.obsolete.TariPrimaryBackgroundConstraint
                     android:layout_width="18dp"
                     android:layout_height="18dp"
                     android:layout_marginStart="-12dp"
@@ -119,7 +119,7 @@
                     app:layout_constraintBottom_toBottomOf="@+id/profile_container"
                     app:layout_constraintStart_toEndOf="@+id/profile_container">
 
-                    <com.tari.android.wallet.ui.component.tari.TariAlphaBackground
+                    <com.tari.android.wallet.ui.component.tari.background.obsolete.TariAlphaBackgroundConstraint
                         android:layout_width="16dp"
                         android:layout_height="16dp"
                         app:alphaBackground="1"
@@ -138,13 +138,13 @@
                             android:src="@drawable/vector_contact_type_link"
                             android:tint="?attr/palette_background_primary" />
 
-                    </com.tari.android.wallet.ui.component.tari.TariAlphaBackground>
+                    </com.tari.android.wallet.ui.component.tari.background.obsolete.TariAlphaBackgroundConstraint>
 
-                </com.tari.android.wallet.ui.component.tari.TariPrimaryBackground>
+                </com.tari.android.wallet.ui.component.tari.background.obsolete.TariPrimaryBackgroundConstraint>
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
-        </com.tari.android.wallet.ui.component.tari.TariSwitchedBackground>
+        </com.tari.android.wallet.ui.component.tari.background.obsolete.TariSwitchedBackgroundConstraint>
 
         <!-- participant -->
         <LinearLayout
@@ -191,7 +191,7 @@
 
         </LinearLayout>
 
-    </com.tari.android.wallet.ui.component.tari.TariPrimaryBackground>
+    </com.tari.android.wallet.ui.component.tari.background.obsolete.TariPrimaryBackgroundConstraint>
 
     <com.tari.android.wallet.ui.component.tari.TariDivider
         android:id="@+id/separator"

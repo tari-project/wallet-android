@@ -1,4 +1,4 @@
-package com.tari.android.wallet.ui.component.tari
+package com.tari.android.wallet.ui.component.tari.background
 
 import android.content.Context
 import android.graphics.Outline
@@ -9,10 +9,10 @@ import android.util.AttributeSet
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewOutlineProvider
-import androidx.constraintlayout.widget.ConstraintLayout
+import android.widget.FrameLayout
 import com.tari.android.wallet.ui.common.domain.PaletteManager
 
-abstract class TariBackground(context: Context, attrs: AttributeSet) : ConstraintLayout(context, attrs) {
+abstract class TariBackground(context: Context, attrs: AttributeSet) : FrameLayout(context, attrs) {
 
     protected var radius = 0.0F
     protected var backColor: Int? = null

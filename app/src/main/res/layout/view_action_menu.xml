@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<com.tari.android.wallet.ui.component.tari.TariAlphaBackground xmlns:android="http://schemas.android.com/apk/res/android"
+<com.tari.android.wallet.ui.component.tari.background.obsolete.TariAlphaBackgroundConstraint xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -8,7 +8,7 @@
     app:alphaBackground="0.7"
     app:backgroundColor="@color/black">
 
-    <com.tari.android.wallet.ui.component.tari.TariAlphaBackground
+    <com.tari.android.wallet.ui.component.tari.background.obsolete.TariAlphaBackgroundConstraint
         android:id="@+id/close_button"
         android:layout_width="50dp"
         android:layout_height="50dp"
@@ -28,9 +28,9 @@
             android:padding="16dp"
             android:src="@drawable/vector_close_opposite" />
 
-    </com.tari.android.wallet.ui.component.tari.TariAlphaBackground>
+    </com.tari.android.wallet.ui.component.tari.background.obsolete.TariAlphaBackgroundConstraint>
 
-    <com.tari.android.wallet.ui.component.tari.TariAlphaBackground
+    <com.tari.android.wallet.ui.component.tari.background.obsolete.TariAlphaBackgroundConstraint
         android:id="@+id/change_side_button"
         android:layout_width="62dp"
         android:layout_height="62dp"
@@ -52,7 +52,7 @@
             android:src="@drawable/vector_sunny"
             android:tint="@color/black" />
 
-    </com.tari.android.wallet.ui.component.tari.TariAlphaBackground>
+    </com.tari.android.wallet.ui.component.tari.background.obsolete.TariAlphaBackgroundConstraint>
 
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -88,7 +88,7 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <!--    avatar-->
-        <com.tari.android.wallet.ui.component.tari.TariAlphaBackground
+        <com.tari.android.wallet.ui.component.tari.background.obsolete.TariAlphaBackgroundConstraint
             android:id="@+id/root_avatar_container"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -155,7 +155,7 @@
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
-        </com.tari.android.wallet.ui.component.tari.TariAlphaBackground>
+        </com.tari.android.wallet.ui.component.tari.background.obsolete.TariAlphaBackgroundConstraint>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -170,4 +170,4 @@
 
     </FrameLayout>
 
-</com.tari.android.wallet.ui.component.tari.TariAlphaBackground>
+</com.tari.android.wallet.ui.component.tari.background.obsolete.TariAlphaBackgroundConstraint>

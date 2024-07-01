@@ -7,7 +7,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
-    <com.tari.android.wallet.ui.component.tari.TariSecondaryBackground
+    <com.tari.android.wallet.ui.component.tari.background.obsolete.TariSecondaryBackgroundConstraint
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="16dp"
@@ -25,6 +25,6 @@
             app:customFont="medium"
             tools:text="Full text description \n description" />
 
-    </com.tari.android.wallet.ui.component.tari.TariSecondaryBackground>
+    </com.tari.android.wallet.ui.component.tari.background.obsolete.TariSecondaryBackgroundConstraint>
 
 </FrameLayout>

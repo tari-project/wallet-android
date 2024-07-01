@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<com.tari.android.wallet.ui.component.tari.TariAlphaBackground xmlns:android="http://schemas.android.com/apk/res/android"
+<com.tari.android.wallet.ui.component.tari.background.obsolete.TariAlphaBackgroundConstraint xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="42dp"
     android:layout_height="42dp"
@@ -21,4 +21,4 @@
         android:src="@drawable/vector_contact_action_send"
         android:tint="?attr/palette_button_primary_text" />
 
-</com.tari.android.wallet.ui.component.tari.TariAlphaBackground>
+</com.tari.android.wallet.ui.component.tari.background.obsolete.TariAlphaBackgroundConstraint>

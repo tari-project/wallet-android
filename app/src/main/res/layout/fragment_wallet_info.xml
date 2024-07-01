@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<com.tari.android.wallet.ui.component.tari.TariSecondaryBackground xmlns:android="http://schemas.android.com/apk/res/android"
+<com.tari.android.wallet.ui.component.tari.background.obsolete.TariSecondaryBackgroundConstraint xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
@@ -18,7 +18,7 @@
             android:scrollbars="vertical">
 
             <!--android:clipChildren="false" is needed for correct elevation shadow rendering-->
-            <com.tari.android.wallet.ui.component.tari.TariSecondaryBackground
+            <com.tari.android.wallet.ui.component.tari.background.obsolete.TariSecondaryBackgroundConstraint
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:clipChildren="false">
@@ -32,7 +32,7 @@
                     app:layout_constraintTop_toTopOf="parent"
                     app:text="@string/wallet_info_my_profile" />
 
-                <com.tari.android.wallet.ui.component.tari.TariSecondaryBackground
+                <com.tari.android.wallet.ui.component.tari.background.obsolete.TariSecondaryBackgroundConstraint
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:paddingTop="20dp"
@@ -170,9 +170,9 @@
 
                     </androidx.appcompat.widget.LinearLayoutCompat>
 
-                </com.tari.android.wallet.ui.component.tari.TariSecondaryBackground>
+                </com.tari.android.wallet.ui.component.tari.background.obsolete.TariSecondaryBackgroundConstraint>
 
-            </com.tari.android.wallet.ui.component.tari.TariSecondaryBackground>
+            </com.tari.android.wallet.ui.component.tari.background.obsolete.TariSecondaryBackgroundConstraint>
 
         </ScrollView>
 
@@ -185,4 +185,4 @@
 
     </FrameLayout>
 
-</com.tari.android.wallet.ui.component.tari.TariSecondaryBackground>
+</com.tari.android.wallet.ui.component.tari.background.obsolete.TariSecondaryBackgroundConstraint>

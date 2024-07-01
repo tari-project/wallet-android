@@ -7,7 +7,7 @@ import android.view.WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE
 import androidx.core.view.updateLayoutParams
 import androidx.core.view.updateMargins
 import com.tari.android.wallet.R
-import com.tari.android.wallet.ui.component.tari.TariPrimaryBackground
+import com.tari.android.wallet.ui.component.tari.background.obsolete.TariPrimaryBackgroundConstraint
 
 
 class InputModularDialog(context: Context) : ModularDialog(context) {
@@ -18,7 +18,7 @@ class InputModularDialog(context: Context) : ModularDialog(context) {
     }
 
     private fun modifyDialog() {
-        dialog.findViewById<TariPrimaryBackground>(R.id.root)?.apply {
+        dialog.findViewById<TariPrimaryBackgroundConstraint>(R.id.root)?.apply {
             elevation = 0F
             updateBack(0F, 0F)
             updateLayoutParams<ViewGroup.MarginLayoutParams> {

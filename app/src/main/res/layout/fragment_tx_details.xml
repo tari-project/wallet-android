@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<com.tari.android.wallet.ui.component.tari.TariPrimaryBackground xmlns:android="http://schemas.android.com/apk/res/android"
+<com.tari.android.wallet.ui.component.tari.background.obsolete.TariPrimaryBackgroundConstraint xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/root_view"
@@ -91,7 +91,7 @@
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
-                <com.tari.android.wallet.ui.component.tari.TariPrimaryBackground
+                <com.tari.android.wallet.ui.component.tari.background.obsolete.TariPrimaryBackgroundConstraint
                     android:id="@+id/status_container_view"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -120,7 +120,7 @@
                         app:layout_constraintTop_toTopOf="parent"
                         tools:text="Hello world" />
 
-                </com.tari.android.wallet.ui.component.tari.TariPrimaryBackground>
+                </com.tari.android.wallet.ui.component.tari.background.obsolete.TariPrimaryBackgroundConstraint>
 
                 <FrameLayout
                     android:id="@+id/cancel_tx_container_view"
@@ -252,7 +252,7 @@
                         android:textSize="13sp"
                         app:customFont="medium" />
 
-                    <com.tari.android.wallet.ui.component.tari.TariPrimaryBackground
+                    <com.tari.android.wallet.ui.component.tari.background.obsolete.TariPrimaryBackgroundConstraint
                         android:id="@+id/emoji_id_summary_container_view"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -285,7 +285,7 @@
                             android:layout_height="wrap_content"
                             android:layout_gravity="center" />
 
-                    </com.tari.android.wallet.ui.component.tari.TariPrimaryBackground>
+                    </com.tari.android.wallet.ui.component.tari.background.obsolete.TariPrimaryBackgroundConstraint>
 
                 </RelativeLayout>
 
@@ -467,4 +467,4 @@
 
     </RelativeLayout>
 
-</com.tari.android.wallet.ui.component.tari.TariPrimaryBackground>
+</com.tari.android.wallet.ui.component.tari.background.obsolete.TariPrimaryBackgroundConstraint>
