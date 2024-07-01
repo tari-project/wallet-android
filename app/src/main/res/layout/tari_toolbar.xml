@@ -18,18 +18,17 @@
         android:id="@+id/toolbar_title"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginHorizontal="16dp"
         android:layout_marginTop="24dp"
         android:layout_marginBottom="16dp"
         android:gravity="center_horizontal"
-        android:text="@string/dummy_text"
         android:textColor="?attr/palette_text_heading"
         android:textSize="16sp"
         app:customFont="heavy"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintEnd_toStartOf="@+id/toolbar_right_actions"
+        app:layout_constraintStart_toEndOf="@+id/toolbar_left_actions"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="Tari toolbar title" />
 
     <androidx.appcompat.widget.LinearLayoutCompat
         android:id="@+id/toolbar_right_actions"

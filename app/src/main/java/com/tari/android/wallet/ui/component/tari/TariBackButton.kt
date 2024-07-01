@@ -12,10 +12,9 @@ class TariBackButton(context: Context, attrs: AttributeSet) : FrameLayout(contex
 
     var backPressedAction: () -> Unit = { (context as? Activity)?.onBackPressed() }
 
-    val ui: TariBackButtonBinding
+    val ui: TariBackButtonBinding = TariBackButtonBinding.inflate(LayoutInflater.from(context), this, false)
 
     init {
-        ui = TariBackButtonBinding.inflate(LayoutInflater.from(context), this, false)
         addView(ui.root)
 
         ui.backCtaView.setOnThrottledClickListener { backPressedAction.invoke() }
