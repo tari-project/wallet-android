@@ -10,9 +10,6 @@ class DialogManager @Inject constructor() {
 
     private val dialogQueue = mutableListOf<ModularDialog>()
 
-    private val currentDialog: ModularDialog?
-        get() = dialogQueue.lastOrNull()
-
     fun replace(newDialog: ModularDialog) {
         if (isDialogShowing(newDialog.args.dialogId)) {
             getDialog(newDialog.args.dialogId)?.applyArgs(newDialog.args)
@@ -23,9 +20,17 @@ class DialogManager @Inject constructor() {
         }
     }
 
-    fun dismiss() {
-        currentDialog?.dismiss()
-        dialogQueue.removeLastOrNull()
+    /**
+     * Dismisses the dialog with the given dialogId. If dialogId is [DialogId.NO_ID], the last dialog in the queue will be dismissed.
+     */
+    fun dismiss(dialogId: Int = DialogId.NO_ID) {
+        val dialogToDismiss = if (isDialogShowing(dialogId)) {
+            getDialog(dialogId)
+        } else {
+            dialogQueue.lastOrNull()
+        }
+        dialogToDismiss?.dismiss()
+        dialogQueue.remove(dialogToDismiss)
     }
 
     fun isDialogShowing(dialogId: Int) = dialogId != DialogId.NO_ID && dialogQueue.any { it.args.dialogId == dialogId }

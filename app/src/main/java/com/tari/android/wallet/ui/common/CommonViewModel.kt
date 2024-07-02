@@ -23,6 +23,7 @@ import com.tari.android.wallet.service.connection.TariWalletServiceConnection
 import com.tari.android.wallet.ui.common.domain.ResourceManager
 import com.tari.android.wallet.ui.common.permission.PermissionManager
 import com.tari.android.wallet.ui.component.tari.toast.TariToastArgs
+import com.tari.android.wallet.ui.dialog.confirm.ConfirmDialogArgs
 import com.tari.android.wallet.ui.dialog.error.WalletErrorArgs
 import com.tari.android.wallet.ui.dialog.modular.IDialogModule
 import com.tari.android.wallet.ui.dialog.modular.ModularDialogArgs
@@ -31,6 +32,7 @@ import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonStyle
 import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
 import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
+import com.tari.android.wallet.ui.fragment.home.navigation.Navigation.AllSettingsNavigation
 import com.tari.android.wallet.ui.fragment.home.navigation.TariNavigator
 import com.tari.android.wallet.ui.fragment.settings.themeSelector.TariTheme
 import io.reactivex.disposables.CompositeDisposable
@@ -106,6 +108,7 @@ open class CommonViewModel : ViewModel() {
     protected val _blockedBackPressed = SingleLiveEvent<Boolean>()
     val blockedBackPressed: LiveData<Boolean> = _blockedBackPressed
 
+    // TODO don't use it. Use tariNavigator.navigate() instead
     val navigation: SingleLiveEvent<Navigation> = SingleLiveEvent()
 
     init {
@@ -194,9 +197,26 @@ open class CommonViewModel : ViewModel() {
         showModularDialog(WalletErrorArgs(resourceManager, exception).getModular())
     }
 
-    fun hideDialog() {
+    fun hideDialog(dialogId: Int = ModularDialogArgs.DialogId.NO_ID) {
         viewModelScope.launch(Dispatchers.Main) {
-            dialogManager.dismiss()
+            dialogManager.dismiss(dialogId)
+        }
+    }
+
+    internal fun onScreenCaptured() {
+        if (!tariSettingsSharedRepository.screenRecordingTurnedOn) {
+            showModularDialog(
+                ConfirmDialogArgs(
+                    dialogId = ModularDialogArgs.DialogId.SCREEN_RECORDING,
+                    title = resourceManager.getString(R.string.screen_recording_disabled_dialog_title),
+                    description = resourceManager.getString(R.string.screen_recording_disabled_dialog_description),
+                    confirmButtonText = resourceManager.getString(R.string.screen_recording_disabled_dialog_confirm_button),
+                    cancelButtonText = resourceManager.getString(R.string.screen_recording_disabled_dialog_cancel_button),
+                    onConfirm = { hideDialog(ModularDialogArgs.DialogId.SCREEN_RECORDING) },
+                    onCancel = { tariNavigator.navigate(AllSettingsNavigation.ToScreenRecording) },
+                    onDismiss = { },
+                ).getModular(resourceManager)
+            )
         }
     }
 }
