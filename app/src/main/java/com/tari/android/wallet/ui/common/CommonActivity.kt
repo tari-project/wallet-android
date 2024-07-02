@@ -1,6 +1,7 @@
 package com.tari.android.wallet.ui.common
 
 import android.app.Activity
+import android.app.Activity.ScreenCaptureCallback
 import android.content.Intent
 import android.content.res.Configuration.UI_MODE_NIGHT_MASK
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
@@ -52,6 +53,11 @@ abstract class CommonActivity<Binding : ViewBinding, VM : CommonViewModel> : App
     private val shakeDetector by lazy { ShakeDetector(this) }
 
     private val connectionStateViewModel: ConnectionIndicatorViewModel by viewModels()
+
+    private val screenCaptureCallback: ScreenCaptureCallback? =
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.UPSIDE_DOWN_CAKE) { // Android 14
+            ScreenCaptureCallback { viewModel.onScreenCaptured() }
+        } else null
 
     private val launcher = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
         val (granted, nonGranted) = permissions.toList().partition { it.second }
@@ -118,6 +124,7 @@ abstract class CommonActivity<Binding : ViewBinding, VM : CommonViewModel> : App
     override fun onStart() {
         (getSystemService(SENSOR_SERVICE) as? SensorManager)?.let(shakeDetector::start)
         super.onStart()
+        screenCaptureCallback?.let { registerScreenCaptureCallback(mainExecutor, it) }
     }
 
     fun <T : Activity> launch(destination: Class<T>) {
@@ -141,6 +148,7 @@ abstract class CommonActivity<Binding : ViewBinding, VM : CommonViewModel> : App
         shakeDetector.stop()
         dialogManager.dismiss()
         super.onStop()
+        screenCaptureCallback?.let { unregisterScreenCaptureCallback(it) }
     }
 
     override fun onNewIntent(intent: Intent) {

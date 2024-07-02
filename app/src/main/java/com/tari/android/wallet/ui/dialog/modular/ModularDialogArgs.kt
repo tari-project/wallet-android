@@ -12,5 +12,6 @@ data class ModularDialogArgs(
         const val NO_ID = -1
         const val CONNECTION_STATUS = 601
         const val DEBUG_MENU = 602
+        const val SCREEN_RECORDING = 603
     }
 }
