@@ -45,7 +45,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <!--    avatar-->
-    <com.tari.android.wallet.ui.component.tari.TariAlphaBackground
+    <com.tari.android.wallet.ui.component.tari.background.obsolete.TariAlphaBackgroundConstraint
         android:id="@+id/root_avatar_container"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -96,7 +96,7 @@
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
-    </com.tari.android.wallet.ui.component.tari.TariAlphaBackground>
+    </com.tari.android.wallet.ui.component.tari.background.obsolete.TariAlphaBackgroundConstraint>
 
     <com.tari.android.wallet.ui.component.tari.TariButton
         android:id="@+id/view_all_txs_button"

@@ -69,7 +69,7 @@
                     app:customFont="light" />
             </LinearLayout>
 
-            <com.tari.android.wallet.ui.component.tari.TariRound
+            <com.tari.android.wallet.ui.component.tari.background.obsolete.TariRoundBackgroundConstraint
                 android:id="@+id/amount_text_view_round"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -89,7 +89,7 @@
                     app:customFont="black"
                     tools:text="+63.75" />
 
-            </com.tari.android.wallet.ui.component.tari.TariRound>
+            </com.tari.android.wallet.ui.component.tari.background.obsolete.TariRoundBackgroundConstraint>
 
         </LinearLayout>
 

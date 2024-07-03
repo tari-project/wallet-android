@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<com.tari.android.wallet.ui.component.tari.TariPrimaryBackground xmlns:android="http://schemas.android.com/apk/res/android"
+<com.tari.android.wallet.ui.component.tari.background.obsolete.TariPrimaryBackgroundConstraint xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
@@ -21,7 +21,7 @@
                 android:layout_height="wrap_content"
                 app:text="@string/restore_from_seed_words_title" />
 
-            <com.tari.android.wallet.ui.component.tari.TariPrimaryBackground
+            <com.tari.android.wallet.ui.component.tari.background.obsolete.TariPrimaryBackgroundConstraint
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
 
@@ -49,7 +49,7 @@
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toTopOf="parent" />
 
-                        <com.tari.android.wallet.ui.component.tari.TariSecondaryBackground
+                        <com.tari.android.wallet.ui.component.tari.background.obsolete.TariSecondaryBackgroundConstraint
                             android:id="@+id/seed_words_container"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
@@ -81,7 +81,7 @@
                                 android:layout_marginTop="15dp"
                                 app:flexWrap="wrap" />
 
-                        </com.tari.android.wallet.ui.component.tari.TariSecondaryBackground>
+                        </com.tari.android.wallet.ui.component.tari.background.obsolete.TariSecondaryBackgroundConstraint>
 
                         <com.tari.android.wallet.ui.component.tari.TariGradientButton
                             android:id="@+id/choose_base_node_button"
@@ -119,11 +119,11 @@
 
                 </ScrollView>
 
-            </com.tari.android.wallet.ui.component.tari.TariPrimaryBackground>
+            </com.tari.android.wallet.ui.component.tari.background.obsolete.TariPrimaryBackgroundConstraint>
 
         </LinearLayout>
 
-        <com.tari.android.wallet.ui.component.tari.TariPrimaryBackground
+        <com.tari.android.wallet.ui.component.tari.background.obsolete.TariPrimaryBackgroundConstraint
             android:id="@+id/seed_words_suggestions"
             android:layout_width="match_parent"
             android:layout_height="45dp"
@@ -167,8 +167,8 @@
 
             </RelativeLayout>
 
-        </com.tari.android.wallet.ui.component.tari.TariPrimaryBackground>
+        </com.tari.android.wallet.ui.component.tari.background.obsolete.TariPrimaryBackgroundConstraint>
 
     </RelativeLayout>
 
-</com.tari.android.wallet.ui.component.tari.TariPrimaryBackground>
+</com.tari.android.wallet.ui.component.tari.background.obsolete.TariPrimaryBackgroundConstraint>

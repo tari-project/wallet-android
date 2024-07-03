@@ -18,7 +18,7 @@
 
     <!-- height and width of this view will be set dynamically at runtime -->
 
-    <com.tari.android.wallet.ui.component.tari.TariPrimaryBackground
+    <com.tari.android.wallet.ui.component.tari.background.obsolete.TariPrimaryBackgroundConstraint
         android:id="@+id/full_emoji_id_container_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -65,7 +65,7 @@
 
         </FrameLayout>
 
-    </com.tari.android.wallet.ui.component.tari.TariPrimaryBackground>
+    </com.tari.android.wallet.ui.component.tari.background.obsolete.TariPrimaryBackgroundConstraint>
 
     <!-- copy emoji id button -->
     <RelativeLayout
@@ -84,7 +84,7 @@
             android:src="@drawable/tari_speech_notch_up"
             android:tint="?attr/palette_background_primary" />
 
-        <com.tari.android.wallet.ui.component.tari.TariPrimaryBackground
+        <com.tari.android.wallet.ui.component.tari.background.obsolete.TariPrimaryBackgroundConstraint
             android:id="@+id/copy_emoji_id_text_view_container"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -103,7 +103,7 @@
                 android:textSize="14sp"
                 app:customFont="heavy" />
 
-        </com.tari.android.wallet.ui.component.tari.TariPrimaryBackground>
+        </com.tari.android.wallet.ui.component.tari.background.obsolete.TariPrimaryBackgroundConstraint>
 
         <com.tari.android.wallet.ui.component.tari.TariButton
             android:id="@+id/copy_emoji_id_button"
@@ -118,7 +118,7 @@
 
     </RelativeLayout>
 
-    <com.tari.android.wallet.ui.component.tari.TariPrimaryBackground
+    <com.tari.android.wallet.ui.component.tari.background.obsolete.TariPrimaryBackgroundConstraint
         android:id="@+id/long_press_hint_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -145,6 +145,6 @@
             android:textSize="14sp"
             app:customFont="medium" />
 
-    </com.tari.android.wallet.ui.component.tari.TariPrimaryBackground>
+    </com.tari.android.wallet.ui.component.tari.background.obsolete.TariPrimaryBackgroundConstraint>
 
 </RelativeLayout>

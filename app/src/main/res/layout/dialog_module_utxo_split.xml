@@ -24,7 +24,7 @@
             android:padding="10dp"
             android:src="@drawable/vector_utxos_minus" />
 
-        <com.tari.android.wallet.ui.component.tari.TariSecondaryBackground
+        <com.tari.android.wallet.ui.component.tari.background.obsolete.TariSecondaryBackgroundConstraint
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
@@ -44,7 +44,7 @@
                 app:customFont="black"
                 tools:text="10" />
 
-        </com.tari.android.wallet.ui.component.tari.TariSecondaryBackground>
+        </com.tari.android.wallet.ui.component.tari.background.obsolete.TariSecondaryBackgroundConstraint>
 
         <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/plus_button"
@@ -63,7 +63,7 @@
         android:layout_marginTop="12dp"
         android:layout_marginBottom="20dp" />
 
-    <com.tari.android.wallet.ui.component.tari.TariSecondaryBackground
+    <com.tari.android.wallet.ui.component.tari.background.obsolete.TariSecondaryBackgroundConstraint
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingHorizontal="20dp"
@@ -186,6 +186,6 @@
 
         </LinearLayout>
 
-    </com.tari.android.wallet.ui.component.tari.TariSecondaryBackground>
+    </com.tari.android.wallet.ui.component.tari.background.obsolete.TariSecondaryBackgroundConstraint>
 
 </LinearLayout>

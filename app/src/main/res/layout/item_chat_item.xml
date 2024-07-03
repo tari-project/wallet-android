@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<com.tari.android.wallet.ui.component.tari.background.TariSecondaryBackground xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -16,7 +16,7 @@
         android:animateLayoutChanges="true"
         android:orientation="horizontal">
 
-        <com.tari.android.wallet.ui.component.tari.TariSwitchedBackground
+        <com.tari.android.wallet.ui.component.tari.background.TariSwitchedBackground
             android:id="@+id/profile_badges_container"
             android:layout_width="wrap_content"
             android:layout_height="52dp"
@@ -25,18 +25,12 @@
             app:cornerRadius="50dp"
             app:elevation="4dp">
 
-            <androidx.constraintlayout.widget.ConstraintLayout
+            <FrameLayout
                 android:id="@+id/profile_badges_container_inner"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:clipToPadding="false"
-                android:orientation="horizontal"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent">
+                android:layout_height="match_parent">
 
-                <com.tari.android.wallet.ui.component.tari.TariPrimaryBackground
+                <com.tari.android.wallet.ui.component.tari.background.TariPrimaryBackground
                     android:id="@+id/profile_container"
                     android:layout_width="42dp"
                     android:layout_height="42dp"
@@ -49,10 +43,7 @@
                     android:elevation="2dp"
                     android:focusable="true"
                     app:cornerRadius="21dp"
-                    app:elevation="2dp"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent">
+                    app:elevation="2dp">
 
                     <androidx.appcompat.widget.AppCompatImageView
                         android:id="@+id/avatar"
@@ -61,29 +52,21 @@
                         android:clipToPadding="true"
                         android:elevation="2dp"
                         android:gravity="center"
-                        android:src="@color/yat_lib_blue"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
+                        android:src="@color/yat_lib_blue" />
 
                     <com.tari.android.wallet.ui.component.tari.TariTextView
                         android:id="@+id/first_emoji_text_view"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
                         android:elevation="2dp"
                         android:gravity="center"
                         android:textColor="?attr/palette_text_light"
                         android:textSize="20sp"
-                        app:customFont="heavy"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
+                        app:customFont="heavy" />
 
-                </com.tari.android.wallet.ui.component.tari.TariPrimaryBackground>
+                </com.tari.android.wallet.ui.component.tari.background.TariPrimaryBackground>
 
-                <com.tari.android.wallet.ui.component.tari.TariAlphaBackground
+                <com.tari.android.wallet.ui.component.tari.background.TariAlphaBackground
                     android:id="@+id/online_status"
                     android:layout_width="18dp"
                     android:layout_height="18dp"
@@ -92,27 +75,22 @@
                     android:elevation="2dp"
                     app:backgroundColor="?attr/palette_system_green"
                     app:cornerRadius="9dp"
-                    app:layout_constraintStart_toEndOf="@+id/profile_container"
-                    app:layout_constraintTop_toTopOf="@+id/profile_container">
+                    android:layout_gravity="top|end">
 
-                    <com.tari.android.wallet.ui.component.tari.TariAlphaBackground
+                    <com.tari.android.wallet.ui.component.tari.background.TariAlphaBackground
                         android:layout_width="16dp"
                         android:layout_height="16dp"
                         app:alphaBackground="1"
                         app:backgroundColor="?attr/palette_system_green"
-                        app:cornerRadius="8dp"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent">
+                        app:cornerRadius="8dp">
 
-                    </com.tari.android.wallet.ui.component.tari.TariAlphaBackground>
+                    </com.tari.android.wallet.ui.component.tari.background.TariAlphaBackground>
 
-                </com.tari.android.wallet.ui.component.tari.TariAlphaBackground>
+                </com.tari.android.wallet.ui.component.tari.background.TariAlphaBackground>
 
-            </androidx.constraintlayout.widget.ConstraintLayout>
+            </FrameLayout>
 
-        </com.tari.android.wallet.ui.component.tari.TariSwitchedBackground>
+        </com.tari.android.wallet.ui.component.tari.background.TariSwitchedBackground>
 
         <LinearLayout
             android:id="@+id/emoji_id_participant_container"
@@ -152,7 +130,6 @@
                 tools:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin lobortis nisl ac sem lacinia varius vel at urna. Cras condimentum tortor vel purus egestas, ut sollicitudin eros scelerisque" />
 
         </LinearLayout>
-
 
         <LinearLayout
             android:layout_width="wrap_content"
@@ -207,4 +184,4 @@
         android:layout_gravity="bottom"
         android:layout_marginHorizontal="24dp" />
 
-</FrameLayout>
+</com.tari.android.wallet.ui.component.tari.background.TariSecondaryBackground>

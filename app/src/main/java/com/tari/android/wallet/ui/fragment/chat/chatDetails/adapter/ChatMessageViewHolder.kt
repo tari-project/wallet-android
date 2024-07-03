@@ -9,7 +9,7 @@ class ChatMessageViewHolder(ui: ItemChatMessageItemBinding) : CommonViewHolder<C
     override fun bind(item: ChatMessageViewHolderItem) {
         super.bind(item)
 
-        //todo
+        ui.message.text = item.message
     }
 
     companion object {

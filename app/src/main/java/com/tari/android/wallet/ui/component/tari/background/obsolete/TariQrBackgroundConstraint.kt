@@ -1,4 +1,4 @@
-package com.tari.android.wallet.ui.component.tari
+package com.tari.android.wallet.ui.component.tari.background.obsolete
 
 import android.content.Context
 import android.util.AttributeSet
@@ -7,7 +7,8 @@ import com.tari.android.wallet.ui.common.domain.PaletteManager
 import com.tari.android.wallet.ui.extension.obtain
 import com.tari.android.wallet.ui.extension.runRecycle
 
-class TariQrBackground(context: Context, attrs: AttributeSet) : TariBackground(context, attrs) {
+@Deprecated("This is an obsolete class inheriting ConstraintLayout. Use TariQrBackground instead.")
+class TariQrBackgroundConstraint(context: Context, attrs: AttributeSet) : TariBackgroundConstraint(context, attrs) {
 
     init {
         val backColor = PaletteManager.getBackgroundQr(context)
