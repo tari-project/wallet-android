@@ -43,12 +43,12 @@ class PhoneBookRepositoryBridge(
                     when (contact.contactInfo) {
                         is PhoneContactInfo -> contact.copy(
                             contactInfo = phoneContact,
-                            yatDto = phoneContact.phoneEmojiId.toYatDto(),
+                            yatDto = phoneContact.phoneYat.toYatDto(),
                         )
 
                         is MergedContactInfo -> contact.copy(
                             contactInfo = contact.contactInfo.copy(phoneContactInfo = phoneContact),
-                            yatDto = phoneContact.phoneEmojiId.toYatDto(),
+                            yatDto = phoneContact.phoneYat.toYatDto(),
                         )
 
                         else -> contact
