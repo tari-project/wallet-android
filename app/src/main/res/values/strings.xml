@@ -466,6 +466,10 @@
     <string name="screen_recording_button_title">Allow screen recording</string>
     <string name="screen_recording_button_confirmation_title">Screen recording will be enabled</string>
     <string name="screen_recording_button_confirmation_description">You will be able to record your screen. Are you sure you want to proceed?</string>
+    <string name="screen_recording_disabled_dialog_title">Screenshots Disabled</string>
+    <string name="screen_recording_disabled_dialog_description">Oops! Screenshots are disabled in this app to keep your information safe. Thanks for keeping things secure!</string>
+    <string name="screen_recording_disabled_dialog_confirm_button">No problem, mate!</string>
+    <string name="screen_recording_disabled_dialog_cancel_button">Enable screenshots</string>
 
     <!-- Bluetooth settings -->
     <string name="bluetooth_settings_title">Bluetooth Settings</string>

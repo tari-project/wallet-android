@@ -12,6 +12,7 @@ import com.tari.android.wallet.ui.dialog.modular.modules.customBaseNodeBody.Cust
 import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
 
 class ConfirmDialogArgs(
+    val dialogId: Int = ModularDialogArgs.DialogId.NO_ID,
     val title: CharSequence,
     val description: CharSequence,
     val cancelButtonText: CharSequence? = null,
@@ -23,7 +24,9 @@ class ConfirmDialogArgs(
     val onDismiss: () -> Unit = {}
 ) {
     fun getModular(resourceManager: ResourceManager): ModularDialogArgs = ModularDialogArgs(
-        DialogArgs(cancelable, canceledOnTouchOutside, onDismiss), modules = listOf(
+        dialogId = dialogId,
+        dialogArgs = DialogArgs(cancelable, canceledOnTouchOutside, onDismiss),
+        modules = listOf(
             HeadModule(title.toString()),
             BodyModule(description.toString()),
             ButtonModule(confirmButtonText?.toString() ?: resourceManager.getString(R.string.common_confirm), ButtonStyle.Normal, onConfirm),
@@ -32,7 +35,9 @@ class ConfirmDialogArgs(
     )
 
     fun getModular(baseNode: BaseNodeDto, resourceManager: ResourceManager): ModularDialogArgs = ModularDialogArgs(
-        DialogArgs(cancelable, canceledOnTouchOutside, onDismiss), modules = listOf(
+        dialogId = dialogId,
+        dialogArgs = DialogArgs(cancelable, canceledOnTouchOutside, onDismiss),
+        modules = listOf(
             HeadModule(title.toString()),
             BodyModule(description.toString()),
             CustomBaseNodeBodyModule(baseNode),

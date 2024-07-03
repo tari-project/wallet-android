@@ -37,11 +37,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Lifecycle
 import com.tari.android.wallet.databinding.FragmentScreenRecordingSettingsBinding
-import com.tari.android.wallet.extension.launchAndRepeatOnLifecycle
+import com.tari.android.wallet.extension.collectFlow
 import com.tari.android.wallet.ui.common.CommonFragment
-import kotlinx.coroutines.launch
 
 class ScreenRecordingSettingsFragment : CommonFragment<FragmentScreenRecordingSettingsBinding, ScreenRecordingSettingsViewModel>() {
 
@@ -63,13 +61,9 @@ class ScreenRecordingSettingsFragment : CommonFragment<FragmentScreenRecordingSe
         loadingSwitchView.setOnCheckedChangeListener { viewModel.toggleScreenRecordingEnable(it) }
     }
 
-    private fun observeUI() = with(viewModel) {
-        viewLifecycleOwner.launchAndRepeatOnLifecycle(Lifecycle.State.STARTED) {
-            launch {
-                switchState.collect { state ->
-                    ui.loadingSwitchView.setState(state)
-                }
-            }
+    private fun observeUI() {
+        collectFlow(viewModel.switchState) { state ->
+            ui.loadingSwitchView.setState(state)
         }
     }
 }
