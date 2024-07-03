@@ -268,16 +268,16 @@ class TariWalletServiceStubImpl(
         result
     }
 
-    override fun getUnbindedOutputs(error: WalletError): MutableList<TariUnblindedOutput> {
+    override fun getUnbindedOutputs(error: WalletError): List<TariUnblindedOutput> {
         return runMapping(error) {
             val ffiError = FFIError()
             val outputs = wallet.getUnbindedOutputs(ffiError)
             error.code = ffiError.code
             outputs
-        }.orEmpty().toMutableList()
+        }.orEmpty()
     }
 
-    override fun restoreWithUnbindedOutputs(jsons: MutableList<String>, address: TariWalletAddress, message: String, error: WalletError) {
+    override fun restoreWithUnbindedOutputs(jsons: List<String>, address: TariWalletAddress, message: String, error: WalletError) {
         runMapping(error) {
             val ffiError = FFIError()
             wallet.restoreWithUnbindedOutputs(jsons, address, message, ffiError)

@@ -107,8 +107,8 @@ class TariWalletServiceStubProxy : TariWalletService.Stub() {
 
     override fun splitUtxos(utxos: List<TariUtxo>, splitCount: Int, error: WalletError) = stub?.splitUtxos(utxos, splitCount, error) ?: Unit
 
-    override fun getUnbindedOutputs(error: WalletError): MutableList<TariUnblindedOutput> = stub?.getUnbindedOutputs(error) ?: mutableListOf()
+    override fun getUnbindedOutputs(error: WalletError): List<TariUnblindedOutput> = stub?.getUnbindedOutputs(error) ?: listOf()
 
-    override fun restoreWithUnbindedOutputs(jsons: MutableList<String>, address: TariWalletAddress, message: String, error: WalletError) =
+    override fun restoreWithUnbindedOutputs(jsons: List<String>, address: TariWalletAddress, message: String, error: WalletError) =
         stub?.restoreWithUnbindedOutputs(jsons, address, message, error) ?: Unit
 }

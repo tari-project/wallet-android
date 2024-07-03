@@ -526,7 +526,7 @@ class FFIWallet(
 
     fun getFeePerGramStats(): FFIFeePerGramStats = runWithError { FFIFeePerGramStats(jniWalletGetFeePerGramStats(3, it)) }
 
-    fun getUnbindedOutputs(error: FFIError): MutableList<TariUnblindedOutput> {
+    fun getUnbindedOutputs(error: FFIError): List<TariUnblindedOutput> {
         val outputs = FFITariUnblindedOutputs(jniWalletGetUnspentOutputs(error))
         val txs = mutableListOf<TariUnblindedOutput>()
         for (i in 0 until outputs.getLength()) {
@@ -535,7 +535,7 @@ class FFIWallet(
         return txs
     }
 
-    fun restoreWithUnbindedOutputs(jsons: MutableList<String>, address: TariWalletAddress, message: String, error: FFIError) {
+    fun restoreWithUnbindedOutputs(jsons: List<String>, address: TariWalletAddress, message: String, error: FFIError) {
         for (json in jsons) {
             val output = FFITariUnblindedOutput(json)
             jniImportExternalUtxoAsNonRewindable(output, FFITariWalletAddress(address.emojiId), message, error)
