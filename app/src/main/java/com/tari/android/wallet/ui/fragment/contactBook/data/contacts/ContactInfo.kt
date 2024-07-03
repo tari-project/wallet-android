@@ -90,7 +90,7 @@ data class PhoneContactInfo(
 ) {
     override fun filtered(text: String): Boolean = getAlias().contains(text, ignoreCase = true)
 
-    override fun extractWalletAddress(): TariWalletAddress = TariWalletAddress.createWalletAddress()
+    override fun extractWalletAddress(): TariWalletAddress = TariWalletAddress.EMPTY_ADDRESS
 
     fun extractDisplayName(): String = displayName.ifEmpty { "$firstName $lastName" }
 }

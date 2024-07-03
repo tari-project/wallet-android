@@ -106,7 +106,7 @@ class WalletInfoViewModel : CommonViewModel() {
     }
 
     fun shareData(type: ShareType) {
-        val walletAddress = TariWalletAddress.createWalletAddress(
+        val walletAddress = TariWalletAddress(
             hexString = sharedPrefsWrapper.publicKeyHexString.orEmpty(),
             emojiId = sharedPrefsWrapper.emojiId.orEmpty(),
         )
@@ -123,13 +123,19 @@ class WalletInfoViewModel : CommonViewModel() {
 
         var saveAction: () -> Boolean = { false }
 
-        val nameModule =
-            InputModule(name, resourceManager.getString(R.string.contact_book_add_contact_first_name_hint), true, false) { saveAction.invoke() }
+        val nameModule = InputModule(
+            value = name,
+            hint = resourceManager.getString(R.string.contact_book_add_contact_first_name_hint),
+            isFirst = true,
+            isEnd = false,
+            onDoneAction = { saveAction() },
+        )
 
         val headModule = HeadModule(
-            resourceManager.getString(R.string.wallet_info_alias_edit_title),
-            rightButtonTitle = resourceManager.getString(R.string.contact_book_add_contact_done_button)
-        ) { saveAction.invoke() }
+            title = resourceManager.getString(R.string.wallet_info_alias_edit_title),
+            rightButtonTitle = resourceManager.getString(R.string.contact_book_add_contact_done_button),
+            rightButtonAction = { saveAction() },
+        )
 
         val moduleList = mutableListOf(headModule, nameModule)
         saveAction = {

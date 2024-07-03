@@ -50,7 +50,7 @@ class TariWalletServiceStubImpl(
             for (i in 0 until contactsFFI.getLength()) {
                 val contactFFI = contactsFFI.getAt(i)
                 val ffiTariWalletAddress = contactFFI.getWalletAddress()
-                tariContacts.add(TariContact(walletAddressFromFFI(ffiTariWalletAddress), contactFFI.getAlias(), contactFFI.getIsFavorite()))
+                tariContacts.add(TariContact(TariWalletAddress(ffiTariWalletAddress), contactFFI.getAlias(), contactFFI.getIsFavorite()))
                 // destroy native objects
                 ffiTariWalletAddress.destroy()
                 contactFFI.destroy()
@@ -214,10 +214,10 @@ class TariWalletServiceStubImpl(
     } ?: false
 
     override fun getWalletAddressFromEmojiId(emojiId: String?): TariWalletAddress? =
-        runCatching { FFITariWalletAddress(emojiId.orEmpty()).runWithDestroy { walletAddressFromFFI(it) } }.getOrNull()
+        runCatching { FFITariWalletAddress(emojiId.orEmpty()).runWithDestroy { TariWalletAddress(it) } }.getOrNull()
 
     override fun getWalletAddressFromHexString(walletAddressHex: String?): TariWalletAddress? =
-        runCatching { FFITariWalletAddress(HexString(walletAddressHex ?: "")).runWithDestroy { walletAddressFromFFI(it) } }.getOrNull()
+        runCatching { FFITariWalletAddress(HexString(walletAddressHex ?: "")).runWithDestroy { TariWalletAddress(it) } }.getOrNull()
 
     override fun setKeyValue(key: String, value: String, error: WalletError): Boolean = runMapping(error) { wallet.setKeyValue(key, value) } ?: false
 
@@ -294,9 +294,6 @@ class TariWalletServiceStubImpl(
         }
         walletError.code = WalletError.UnknownError.code
     }
-
-    private fun walletAddressFromFFI(ffiTariWalletAddress: FFITariWalletAddress): TariWalletAddress =
-        TariWalletAddress.createWalletAddress(ffiTariWalletAddress.toString(), ffiTariWalletAddress.getEmojiId())
 
     private fun <T> runMapping(walletError: WalletError, onError: (Throwable) -> (Unit) = {}, action: () -> T?): T? {
         return try {

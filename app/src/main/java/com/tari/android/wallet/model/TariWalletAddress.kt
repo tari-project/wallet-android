@@ -33,6 +33,7 @@
 package com.tari.android.wallet.model
 
 import android.os.Parcelable
+import com.tari.android.wallet.ffi.FFITariWalletAddress
 import kotlinx.parcelize.Parcelize
 import java.io.Serializable
 
@@ -42,7 +43,9 @@ import java.io.Serializable
  * @author The Tari Development Team
  */
 @Parcelize
-data class TariWalletAddress(val hexString: String = "", val emojiId: String = "") : Parcelable, Serializable {
+data class TariWalletAddress(val hexString: String = "", val emojiId: String = "") : Parcelable {
+
+    constructor(ffiWalletAddress: FFITariWalletAddress) : this(ffiWalletAddress.toString(), ffiWalletAddress.getEmojiId())
 
     fun isZeros(): Boolean = hexString == HEX_ZERO || hexString == HEX_ZERO_66 || hexString.all { it == '0' }
 
@@ -53,26 +56,13 @@ data class TariWalletAddress(val hexString: String = "", val emojiId: String = "
     override fun toString(): String = "TariWalletAddress(hexString='$hexString', emojiId='$emojiId')"
 
     companion object {
-        const val HEX_ZERO = "0000000000000000000000000000000000000000000000000000000000000026"
-        const val HEX_ZERO_66 = "000000000000000000000000000000000000000000000000000000000000000026"
-        const val EMOJI_ZERO =
+        private const val HEX_ZERO = "0000000000000000000000000000000000000000000000000000000000000026"
+        private const val HEX_ZERO_66 = "000000000000000000000000000000000000000000000000000000000000000026"
+        private const val EMOJI_ZERO =
             "\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF57"
 
-        // TODO I don't like this
-        fun createWalletAddress(hexString: String = HEX_ZERO, emojiId: String = ""): TariWalletAddress {
-            // crunch fix for not crashing on action related to wallet address
-            return if (hexString == HEX_ZERO) {
-                TariWalletAddress(
-                    hexString = HEX_ZERO_66,
-                    emojiId = EMOJI_ZERO,
-                )
-            } else {
-                TariWalletAddress(
-                    hexString = hexString,
-                    emojiId = emojiId,
-                )
-            }
-        }
+        // Empty wallet address for cases such one-sided payment or phone contact
+        val EMPTY_ADDRESS = TariWalletAddress(hexString = HEX_ZERO_66, emojiId = EMOJI_ZERO)
 
         fun validate(addressHex: String): Boolean = addressHex.length > 64
     }

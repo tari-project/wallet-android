@@ -94,7 +94,7 @@ class FFIContactsRepositoryBridge(
                     .map { ffiContact ->
                         val walletAddress = ffiContact.getWalletAddress()
                         FFIContactInfo(
-                            walletAddress = TariWalletAddress.createWalletAddress(walletAddress.toString(), walletAddress.getEmojiId()),
+                            walletAddress = TariWalletAddress(walletAddress.toString(), walletAddress.getEmojiId()),
                             alias = ffiContact.getAlias(),
                             isFavorite = ffiContact.getIsFavorite(),
                         )

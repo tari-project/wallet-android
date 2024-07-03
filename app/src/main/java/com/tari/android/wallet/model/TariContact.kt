@@ -42,7 +42,7 @@ import kotlinx.parcelize.Parcelize
  */
 @Parcelize
 class TariContact(
-    val walletAddress: TariWalletAddress = TariWalletAddress.createWalletAddress(),
+    val walletAddress: TariWalletAddress = TariWalletAddress.EMPTY_ADDRESS,
     val alias: String = "",
     val isFavorite: Boolean = false,
 ) : Parcelable {

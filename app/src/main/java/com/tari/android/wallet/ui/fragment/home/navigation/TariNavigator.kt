@@ -361,9 +361,7 @@ class TariNavigator @Inject constructor(val prefs: CorePrefRepository, val tariS
 
     private fun sendToUserByDeeplink(deeplink: DeepLink.Send) {
         FFIWallet.instance?.getWalletAddress()
-        val address = FFITariWalletAddress(HexString(deeplink.walletAddressHex)).runWithDestroy {
-            walletAddressFromFFI(it)
-        }
+        val address = FFITariWalletAddress(HexString(deeplink.walletAddressHex)).runWithDestroy { TariWalletAddress(it) }
         val contact = (activity as HomeActivity).viewModel.contactsRepository.getContactByAddress(address)
         val bundle = Bundle().apply {
             putParcelable(PARAMETER_CONTACT, contact)
@@ -372,9 +370,6 @@ class TariNavigator @Inject constructor(val prefs: CorePrefRepository, val tariS
 
         addFragment(AddAmountFragment(), bundle)
     }
-
-    private fun walletAddressFromFFI(ffiTariWalletAddress: FFITariWalletAddress): TariWalletAddress =
-        TariWalletAddress.createWalletAddress(ffiTariWalletAddress.toString(), ffiTariWalletAddress.getEmojiId())
 
     private fun sendToUser(recipientUser: ContactDto, amount: MicroTari? = null) {
         val bundle = Bundle().apply {
