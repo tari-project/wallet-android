@@ -23,8 +23,8 @@ sealed class ContactInfo(
         ContactAction.Unlink.takeIf { this is MergedContactInfo },
         ContactAction.OpenProfile,
         ContactAction.EditName,
-        ContactAction.ToUnFavorite.takeIf { this.isFavorite },
-        ContactAction.ToFavorite.takeIf { !this.isFavorite },
+        ContactAction.ToUnFavorite.takeIf { (this is FFIContactInfo || this is MergedContactInfo) && this.isFavorite },
+        ContactAction.ToFavorite.takeIf { (this is FFIContactInfo || this is MergedContactInfo) && !this.isFavorite },
         ContactAction.Delete,
     )
 
