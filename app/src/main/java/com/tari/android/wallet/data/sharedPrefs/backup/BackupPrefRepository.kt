@@ -5,7 +5,7 @@ import android.content.SharedPreferences
 import android.net.Uri
 import com.dropbox.core.oauth.DbxCredential
 import com.tari.android.wallet.BuildConfig
-import com.tari.android.wallet.data.repository.CommonRepository
+import com.tari.android.wallet.data.sharedPrefs.CommonPrefRepository
 import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefGsonNullableDelegate
 import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefStringSecuredDelegate
 import com.tari.android.wallet.data.sharedPrefs.network.NetworkPrefRepository
@@ -22,7 +22,7 @@ class BackupPrefRepository @Inject constructor(
     context: Context,
     sharedPrefs: SharedPreferences,
     networkRepository: NetworkPrefRepository
-) : CommonRepository(networkRepository) {
+) : CommonPrefRepository(networkRepository) {
 
     var localFileOption: BackupOptionDto? by SharedPrefGsonNullableDelegate(sharedPrefs, this,  formatKey(Keys.localFileOptionsKey), BackupOptionDto::class.java)
 

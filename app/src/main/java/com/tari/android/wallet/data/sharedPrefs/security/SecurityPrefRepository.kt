@@ -2,7 +2,7 @@ package com.tari.android.wallet.data.sharedPrefs.security
 
 import android.content.Context
 import android.content.SharedPreferences
-import com.tari.android.wallet.data.repository.CommonRepository
+import com.tari.android.wallet.data.sharedPrefs.CommonPrefRepository
 import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefBooleanDelegate
 import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefBooleanNullableDelegate
 import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefGsonDelegate
@@ -17,7 +17,7 @@ class SecurityPrefRepository @Inject constructor(
     context: Context,
     sharedPrefs: SharedPreferences,
     networkRepository: NetworkPrefRepository,
-) : CommonRepository(networkRepository) {
+) : CommonPrefRepository(networkRepository) {
 
     companion object Key {
         const val IS_AUTHENTICATED = "tari_wallet_is_authenticated"

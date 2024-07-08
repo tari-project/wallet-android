@@ -33,7 +33,7 @@
 package com.tari.android.wallet.data.sharedPrefs.baseNode
 
 import android.content.SharedPreferences
-import com.tari.android.wallet.data.repository.CommonRepository
+import com.tari.android.wallet.data.sharedPrefs.CommonPrefRepository
 import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefBigIntegerDelegate
 import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefBooleanNullableDelegate
 import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefGsonDelegate
@@ -51,7 +51,7 @@ import javax.inject.Singleton
 class BaseNodePrefRepository @Inject constructor(
     sharedPrefs: SharedPreferences,
     networkRepository: NetworkPrefRepository,
-) : CommonRepository(networkRepository) {
+) : CommonPrefRepository(networkRepository) {
 
     private object Key {
         const val CURRENT_BASE_NODE = "tari_wallet_current_base_node"

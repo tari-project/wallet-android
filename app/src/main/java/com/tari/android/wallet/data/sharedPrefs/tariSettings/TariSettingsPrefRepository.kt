@@ -33,7 +33,7 @@
 package com.tari.android.wallet.data.sharedPrefs.tariSettings
 
 import android.content.SharedPreferences
-import com.tari.android.wallet.data.repository.CommonRepository
+import com.tari.android.wallet.data.sharedPrefs.CommonPrefRepository
 import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefBooleanDelegate
 import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefGsonDelegate
 import com.tari.android.wallet.data.sharedPrefs.network.NetworkPrefRepository
@@ -44,7 +44,7 @@ import javax.inject.Singleton
 
 @Singleton
 class TariSettingsPrefRepository @Inject constructor(sharedPrefs: SharedPreferences, networkRepository: NetworkPrefRepository) :
-    CommonRepository(networkRepository) {
+    CommonPrefRepository(networkRepository) {
 
     private object Key {
         const val IS_RESTORED_WALLET = "tari_is_restored_wallet"
