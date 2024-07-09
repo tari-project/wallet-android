@@ -35,7 +35,6 @@ package com.tari.android.wallet.model
 import android.os.Parcelable
 import com.tari.android.wallet.ffi.FFITariWalletAddress
 import kotlinx.parcelize.Parcelize
-import java.io.Serializable
 
 /**
  * This wrapper is needed for id parameters in AIDL methods.
@@ -63,7 +62,5 @@ data class TariWalletAddress(val hexString: String = "", val emojiId: String = "
 
         // Empty wallet address for cases such one-sided payment or phone contact
         val EMPTY_ADDRESS = TariWalletAddress(hexString = HEX_ZERO_66, emojiId = EMOJI_ZERO)
-
-        fun validate(addressHex: String): Boolean = addressHex.length > 64
     }
 }

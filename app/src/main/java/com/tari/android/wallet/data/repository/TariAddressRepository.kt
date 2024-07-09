@@ -46,4 +46,8 @@ class TariAddressRepository @Inject constructor(
 
     private fun TariWalletService.walletAddressFromEmojiId(emojiId: String): Result<TariWalletAddress> =
         this.getResultWithError { error, service -> service.getWalletAddressFromEmojiId(emojiId, error) }
+
+    companion object {
+        fun validateHex(addressHex: String): Boolean = addressHex.length > 64
+    }
 }

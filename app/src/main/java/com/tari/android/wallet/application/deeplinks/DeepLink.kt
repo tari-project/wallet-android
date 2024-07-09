@@ -32,9 +32,9 @@
  */
 package com.tari.android.wallet.application.deeplinks
 
+import com.tari.android.wallet.data.repository.TariAddressRepository
 import com.tari.android.wallet.data.sharedPrefs.tor.TorBridgeConfiguration
 import com.tari.android.wallet.model.MicroTari
-import com.tari.android.wallet.model.TariWalletAddress
 import com.tari.android.wallet.util.parseToBigInteger
 
 /**
@@ -59,7 +59,7 @@ sealed class DeepLink {
                     val hex = param.value.firstOrNull { it.name == KEY_HEX }?.value.orEmpty()
                     DeeplinkContact(alias, hex)
                 }
-                .filter { TariWalletAddress.validate(it.hex) },
+                .filter { TariAddressRepository.validateHex(it.hex) },
         )
 
         override fun getParams(): Map<String, String> = hashMapOf<String, String>().apply {
