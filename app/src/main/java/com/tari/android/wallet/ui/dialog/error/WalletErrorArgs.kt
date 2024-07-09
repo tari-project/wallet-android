@@ -13,7 +13,7 @@ class WalletErrorArgs(
 ) {
     constructor(resourceManager: ResourceManager, exception: Throwable, dismissAction: () -> Unit = { }) : this(
         resourceManager = resourceManager,
-        error = WalletError.createFromException(exception),
+        error = WalletError(exception),
         dismissAction = dismissAction,
     )
 

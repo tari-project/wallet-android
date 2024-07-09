@@ -1,15 +1,34 @@
 package com.tari.android.wallet.model
 
+import android.os.Parcel
 import android.os.Parcelable
 import com.tari.android.wallet.ffi.FFIError
 import com.tari.android.wallet.ffi.FFIException
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
-open class WalletError(
+data class WalletError(
     override var code: Int = NoError.code,
     override var domain: String = "FFI",
 ) : CoreError(code, domain), Parcelable {
+
+    constructor(ffiError: FFIError) : this(code = ffiError.code)
+
+    constructor(ffiException: FFIException) : this(code = ffiException.error?.code ?: NoError.code)
+
+    constructor(e: Throwable?) : this(
+        code = when (e) {
+            is FFIException -> e.error?.code ?: NoError.code
+            is WalletException -> e.walletError.code
+            else -> UnknownError.code
+        },
+    )
+
+    // This method is required despite of the @Parcelize annotation because it's used in AIDL declaration
+    fun readFromParcel(inParcel: Parcel) {
+        code = inParcel.readInt()
+        domain = inParcel.readString().orEmpty()
+    }
 
     companion object {
         val DatabaseDataError = WalletError(114)
@@ -22,19 +41,6 @@ open class WalletError(
         val SeedWordsVersionMismatchError = WalletError(430)
         val UnknownError = WalletError(-1)
         val NoError = WalletError(0)
-
-        fun createFromFFI(error: FFIError): WalletError = WalletError(error.code)
-
-        fun createFromFFI(error: FFIException): WalletError = WalletError(error.error?.code ?: NoError.code)
-
-        fun createFromException(e: Throwable?): WalletError {
-            if (e is FFIException) {
-                return createFromFFI(e)
-            } else if (e is WalletException) {
-                return WalletError(e.walletError.code)
-            }
-            return UnknownError
-        }
     }
 }
 

@@ -138,7 +138,7 @@ class ChooseRestoreOptionViewModel : CommonViewModel() {
                 viewModelScope.launch(Dispatchers.Main) {
                     walletServiceLauncher.stopAndDelete()
                 }
-                val cause = WalletError.createFromException(exception.cause)
+                val cause = WalletError(exception.cause)
                 if (cause == WalletError.DatabaseDataError) {
                     showRestoreFailedDialog(resourceManager.getString(R.string.restore_wallet_error_file_not_supported))
                 } else if (cause != WalletError.NoError) {
