@@ -54,6 +54,7 @@ import com.tari.android.wallet.util.containsNonEmoji
 import com.tari.android.wallet.util.firstNCharactersAreEmojis
 import com.tari.android.wallet.util.numberOfEmojis
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import me.everything.android.ui.overscroll.OverScrollDecoratorHelper
 
 open class ContactSelectionFragment : CommonFragment<FragmentContactsSelectionBinding, ContactSelectionViewModel>(), TextWatcher {
@@ -341,13 +342,17 @@ open class ContactSelectionFragment : CommonFragment<FragmentContactsSelectionBi
             val deeplink = viewModel.deeplinkHandler.handle(text)!!
             deeplinkViewModel.execute(deeplink)
             viewModel.deselectTariWalletAddress()
-        } else if (viewModel.walletAddressViewModel.checkForWalletAddressHex(text)) {
-            viewModel.addressEntered(viewModel.walletAddressViewModel.discoveredWalletAddress!!.emojiId)
         } else {
-            viewModel.deselectTariWalletAddress()
-            ui.searchEditText.textAlignment = View.TEXT_ALIGNMENT_TEXT_START
-            ui.searchEditText.letterSpacing = inputNormalLetterSpacing
-            viewModel.addressEntered(editable.toString())
+            // TODO: the whole this functionally should be moved to the view model. runBlocking is a replacement for current implementation
+            val walletAddress = runBlocking { viewModel.walletAddressViewModel.tariAddressRepository.parseValidWalletAddress(text) }
+            if (walletAddress != null) {
+                viewModel.addressEntered(walletAddress.emojiId)
+            } else {
+                viewModel.deselectTariWalletAddress()
+                ui.searchEditText.textAlignment = View.TEXT_ALIGNMENT_TEXT_START
+                ui.searchEditText.letterSpacing = inputNormalLetterSpacing
+                viewModel.addressEntered(editable.toString())
+            }
         }
         textWatcherIsRunning = false
     }

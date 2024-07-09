@@ -78,9 +78,10 @@ class TariWalletServiceStubProxy : TariWalletService.Stub() {
     override fun removeContact(contactPublicKey: TariWalletAddress, error: WalletError): Boolean =
         stub?.removeContact(contactPublicKey, error) ?: false
 
-    override fun getWalletAddressFromHexString(hex: String): TariWalletAddress? = stub?.getWalletAddressFromHexString(hex)
+    override fun getWalletAddressFromHexString(hex: String, error: WalletError): TariWalletAddress? = stub?.getWalletAddressFromHexString(hex, error)
 
-    override fun getWalletAddressFromEmojiId(emojiId: String): TariWalletAddress? = stub?.getWalletAddressFromEmojiId(emojiId)
+    override fun getWalletAddressFromEmojiId(emojiId: String, error: WalletError): TariWalletAddress? =
+        stub?.getWalletAddressFromEmojiId(emojiId, error)
 
     override fun setKeyValue(key: String, value: String, error: WalletError): Boolean = stub?.setKeyValue(key, value, error) ?: false
 

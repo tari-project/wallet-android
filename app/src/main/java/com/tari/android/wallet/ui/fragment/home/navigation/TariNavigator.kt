@@ -19,7 +19,6 @@ import com.tari.android.wallet.model.TariWalletAddress
 import com.tari.android.wallet.model.Tx
 import com.tari.android.wallet.model.TxId
 import com.tari.android.wallet.network.NetworkConnectionState
-import com.tari.android.wallet.service.TariWalletService
 import com.tari.android.wallet.ui.common.CommonActivity
 import com.tari.android.wallet.ui.common.CommonFragment
 import com.tari.android.wallet.ui.dialog.modular.DialogArgs
@@ -352,11 +351,6 @@ class TariNavigator @Inject constructor(val prefs: CorePrefRepository, val tariS
 
     private fun onSeedPhraseVerificationComplete() {
         popUpTo(BackupSettingsFragment::class.java.simpleName)
-    }
-
-    fun sendTariToUser(service: TariWalletService, sendDeeplink: DeepLink.Send) {
-        val walletAddress = service.getWalletAddressFromHexString(sendDeeplink.walletAddressHex)
-        sendToUser((activity as HomeActivity).viewModel.contactsRepository.getContactByAddress(walletAddress))
     }
 
     private fun sendToUserByDeeplink(deeplink: DeepLink.Send) {

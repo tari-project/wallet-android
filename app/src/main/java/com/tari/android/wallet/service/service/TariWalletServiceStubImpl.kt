@@ -213,11 +213,11 @@ class TariWalletServiceStubImpl(
         }
     } ?: false
 
-    override fun getWalletAddressFromEmojiId(emojiId: String?): TariWalletAddress? =
-        runCatching { FFITariWalletAddress(emojiId.orEmpty()).runWithDestroy { TariWalletAddress(it) } }.getOrNull()
+    override fun getWalletAddressFromEmojiId(emojiId: String?, error: WalletError): TariWalletAddress? =
+        runMapping(error) { FFITariWalletAddress(emojiId.orEmpty()).runWithDestroy { TariWalletAddress(it) } }
 
-    override fun getWalletAddressFromHexString(walletAddressHex: String?): TariWalletAddress? =
-        runCatching { FFITariWalletAddress(HexString(walletAddressHex ?: "")).runWithDestroy { TariWalletAddress(it) } }.getOrNull()
+    override fun getWalletAddressFromHexString(walletAddressHex: String?,error: WalletError): TariWalletAddress? =
+        runMapping(error) { FFITariWalletAddress(HexString(walletAddressHex ?: "")).runWithDestroy { TariWalletAddress(it) } }
 
     override fun setKeyValue(key: String, value: String, error: WalletError): Boolean = runMapping(error) { wallet.setKeyValue(key, value) } ?: false
 

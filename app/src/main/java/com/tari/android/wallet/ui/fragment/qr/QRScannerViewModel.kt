@@ -6,6 +6,9 @@ import com.tari.android.wallet.R
 import com.tari.android.wallet.application.deeplinks.DeepLink
 import com.tari.android.wallet.application.deeplinks.DeeplinkHandler
 import com.tari.android.wallet.application.deeplinks.DeeplinkViewModel
+import com.tari.android.wallet.data.repository.TariAddressRepository
+import com.tari.android.wallet.extension.launchOnIo
+import com.tari.android.wallet.extension.launchOnMain
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.common.SingleLiveEvent
 import com.tari.android.wallet.ui.fragment.home.HomeActivity
@@ -19,6 +22,9 @@ class QRScannerViewModel : CommonViewModel() {
 
     @Inject
     lateinit var deeplinkHandler: DeeplinkHandler
+
+    @Inject
+    lateinit var tariAddressRepository: TariAddressRepository
 
     init {
         component.inject(this)
@@ -129,18 +135,23 @@ class QRScannerViewModel : CommonViewModel() {
     }
 
     private fun setAlternativeText(deepLink: DeepLink) {
-        val text = when (deepLink) {
-            is DeepLink.Send -> {
-                val emojiId = walletService.getWalletAddressFromHexString(deepLink.walletAddressHex).emojiId.extractEmojis().take(3).joinToString("")
-                resourceManager.getString(R.string.qr_code_scanner_labels_actions_transaction_send, emojiId)
-            }
+        launchOnIo {
+            val text = when (deepLink) {
+                is DeepLink.Send -> {
+                    val walletAddress = tariAddressRepository.walletAddressFromHex(deepLink.walletAddressHex).getOrNull() ?: return@launchOnIo
+                    val emojiId = walletAddress.emojiId.extractEmojis().take(3).joinToString("")
+                    resourceManager.getString(R.string.qr_code_scanner_labels_actions_transaction_send, emojiId)
+                }
 
-            is DeepLink.UserProfile -> resourceManager.getString(R.string.qr_code_scanner_labels_actions_profile)
-            is DeepLink.Contacts -> resourceManager.getString(R.string.qr_code_scanner_labels_actions_contacts)
-            is DeepLink.AddBaseNode -> resourceManager.getString(R.string.qr_code_scanner_labels_actions_base_node_add)
-            is DeepLink.TorBridges -> resourceManager.getString(R.string.qr_code_scanner_labels_actions_tor_bridges)
+                is DeepLink.UserProfile -> resourceManager.getString(R.string.qr_code_scanner_labels_actions_profile)
+                is DeepLink.Contacts -> resourceManager.getString(R.string.qr_code_scanner_labels_actions_contacts)
+                is DeepLink.AddBaseNode -> resourceManager.getString(R.string.qr_code_scanner_labels_actions_base_node_add)
+                is DeepLink.TorBridges -> resourceManager.getString(R.string.qr_code_scanner_labels_actions_tor_bridges)
+            }
+            launchOnMain {
+                alternativeText.postValue(text)
+            }
         }
-        alternativeText.postValue(text)
     }
 
     private fun navigateBack(deepLink: DeepLink) {

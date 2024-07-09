@@ -27,5 +27,4 @@ object ContactSelectionModel {
         data object ShowNextButton : Effect
         data object GoToNext : Effect
     }
-
 }
