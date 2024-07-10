@@ -2,7 +2,7 @@ package com.tari.android.wallet.data.sharedPrefs.network
 
 import android.content.SharedPreferences
 import com.tari.android.wallet.application.Network
-import com.tari.android.wallet.data.repository.SimpleRepository
+import com.tari.android.wallet.data.sharedPrefs.SimplePrefRepository
 import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefGsonDelegate
 import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefGsonNullableDelegate
 import com.tari.android.wallet.util.DebugConfig
@@ -15,7 +15,7 @@ class NetworkPrefRepositoryImpl(sharedPrefs: SharedPreferences) : NetworkPrefRep
 
     private var _currentNetwork: Network by SharedPrefGsonDelegate(
         prefs = sharedPrefs,
-        commonRepository = SimpleRepository(this),
+        commonRepository = SimplePrefRepository(this),
         name = Keys.CURRENT_NETWORK,
         type = Network::class.java,
         defValue = defaultNetwork.network,
@@ -28,7 +28,7 @@ class NetworkPrefRepositoryImpl(sharedPrefs: SharedPreferences) : NetworkPrefRep
 
     override var ffiNetwork: Network? by SharedPrefGsonNullableDelegate(
         prefs = sharedPrefs,
-        commonRepository = SimpleRepository(this),
+        commonRepository = SimplePrefRepository(this),
         name = formatKey(Keys.FFI_NETWORK),
         type = Network::class.java,
     )

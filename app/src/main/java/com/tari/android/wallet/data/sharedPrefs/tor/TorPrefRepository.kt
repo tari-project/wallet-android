@@ -33,7 +33,7 @@
 package com.tari.android.wallet.data.sharedPrefs.tor
 
 import android.content.SharedPreferences
-import com.tari.android.wallet.data.repository.CommonRepository
+import com.tari.android.wallet.data.sharedPrefs.CommonPrefRepository
 import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefGsonDelegate
 import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefStringDelegate
 import com.tari.android.wallet.data.sharedPrefs.network.NetworkPrefRepository
@@ -43,7 +43,7 @@ import javax.inject.Singleton
 
 @Singleton
 class TorPrefRepository @Inject constructor(sharedPrefs: SharedPreferences, networkRepository: NetworkPrefRepository) :
-    CommonRepository(networkRepository) {
+    CommonPrefRepository(networkRepository) {
 
     private object Key {
         const val CURRENT_TOR_BRIDGE = "tari_current_tor_bridge"

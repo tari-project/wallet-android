@@ -50,7 +50,7 @@ class TariWalletServiceStubImpl(
             for (i in 0 until contactsFFI.getLength()) {
                 val contactFFI = contactsFFI.getAt(i)
                 val ffiTariWalletAddress = contactFFI.getWalletAddress()
-                tariContacts.add(TariContact(walletAddressFromFFI(ffiTariWalletAddress), contactFFI.getAlias(), contactFFI.getIsFavorite()))
+                tariContacts.add(TariContact(TariWalletAddress(ffiTariWalletAddress), contactFFI.getAlias(), contactFFI.getIsFavorite()))
                 // destroy native objects
                 ffiTariWalletAddress.destroy()
                 contactFFI.destroy()
@@ -213,11 +213,11 @@ class TariWalletServiceStubImpl(
         }
     } ?: false
 
-    override fun getWalletAddressFromEmojiId(emojiId: String?): TariWalletAddress? =
-        runCatching { FFITariWalletAddress(emojiId.orEmpty()).runWithDestroy { walletAddressFromFFI(it) } }.getOrNull()
+    override fun getWalletAddressFromEmojiId(emojiId: String?, error: WalletError): TariWalletAddress? =
+        runMapping(error) { FFITariWalletAddress(emojiId.orEmpty()).runWithDestroy { TariWalletAddress(it) } }
 
-    override fun getWalletAddressFromHexString(walletAddressHex: String?): TariWalletAddress? =
-        runCatching { FFITariWalletAddress(HexString(walletAddressHex ?: "")).runWithDestroy { walletAddressFromFFI(it) } }.getOrNull()
+    override fun getWalletAddressFromHexString(walletAddressHex: String?,error: WalletError): TariWalletAddress? =
+        runMapping(error) { FFITariWalletAddress(HexString(walletAddressHex ?: "")).runWithDestroy { TariWalletAddress(it) } }
 
     override fun setKeyValue(key: String, value: String, error: WalletError): Boolean = runMapping(error) { wallet.setKeyValue(key, value) } ?: false
 
@@ -268,16 +268,16 @@ class TariWalletServiceStubImpl(
         result
     }
 
-    override fun getUnbindedOutputs(error: WalletError): MutableList<TariUnblindedOutput> {
+    override fun getUnbindedOutputs(error: WalletError): List<TariUnblindedOutput> {
         return runMapping(error) {
             val ffiError = FFIError()
             val outputs = wallet.getUnbindedOutputs(ffiError)
             error.code = ffiError.code
             outputs
-        }.orEmpty().toMutableList()
+        }.orEmpty()
     }
 
-    override fun restoreWithUnbindedOutputs(jsons: MutableList<String>, address: TariWalletAddress, message: String, error: WalletError) {
+    override fun restoreWithUnbindedOutputs(jsons: List<String>, address: TariWalletAddress, message: String, error: WalletError) {
         runMapping(error) {
             val ffiError = FFIError()
             wallet.restoreWithUnbindedOutputs(jsons, address, message, ffiError)
@@ -294,9 +294,6 @@ class TariWalletServiceStubImpl(
         }
         walletError.code = WalletError.UnknownError.code
     }
-
-    private fun walletAddressFromFFI(ffiTariWalletAddress: FFITariWalletAddress): TariWalletAddress =
-        TariWalletAddress.createWalletAddress(ffiTariWalletAddress.toString(), ffiTariWalletAddress.getEmojiId())
 
     private fun <T> runMapping(walletError: WalletError, onError: (Throwable) -> (Unit) = {}, action: () -> T?): T? {
         return try {

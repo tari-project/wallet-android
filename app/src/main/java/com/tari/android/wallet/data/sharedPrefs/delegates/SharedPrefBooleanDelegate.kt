@@ -1,12 +1,12 @@
 package com.tari.android.wallet.data.sharedPrefs.delegates
 
 import android.content.SharedPreferences
-import com.tari.android.wallet.data.repository.CommonRepository
+import com.tari.android.wallet.data.sharedPrefs.CommonPrefRepository
 import kotlin.reflect.KProperty
 
 class SharedPrefBooleanDelegate(
     val prefs: SharedPreferences,
-    val commonRepository: CommonRepository,
+    val commonRepository: CommonPrefRepository,
     val name: String,
     val defValue: Boolean = false
 ) {

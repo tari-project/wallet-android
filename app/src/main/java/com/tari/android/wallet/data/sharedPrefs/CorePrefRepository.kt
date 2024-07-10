@@ -33,7 +33,6 @@
 package com.tari.android.wallet.data.sharedPrefs
 
 import android.content.SharedPreferences
-import com.tari.android.wallet.data.repository.CommonRepository
 import com.tari.android.wallet.data.sharedPrefs.addressPoisoning.AddressPoisoningPrefRepository
 import com.tari.android.wallet.data.sharedPrefs.backup.BackupPrefRepository
 import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodePrefRepository
@@ -72,7 +71,7 @@ class CorePrefRepository @Inject constructor(
     private val securityPrefRepository: SecurityPrefRepository,
     private val addressPoisoningSharedRepository: AddressPoisoningPrefRepository,
     private val chatPrefRepository: ChatsPrefRepository,
-) : CommonRepository(networkRepository) {
+) : CommonPrefRepository(networkRepository) {
 
     private object Key {
         const val PUBLIC_KEY_HEX_STRING = "tari_wallet_public_key_hex_string"

@@ -97,11 +97,10 @@ interface TariWalletService {
 
     /**
     * Two functions below to get the public key from emoji id and public key hex string
-    * do not accept out error parameters - they will just return null if a public key
-    * cannot be constructed from input parameters.
+    * do not accept out error parameters.
     */
-    TariWalletAddress getWalletAddressFromEmojiId(in String emojiId);
-    TariWalletAddress getWalletAddressFromHexString(in String hex);
+    TariWalletAddress getWalletAddressFromEmojiId(in String emojiId, out WalletError error);
+    TariWalletAddress getWalletAddressFromHexString(in String hex, out WalletError error);
 
     /**
     * Key-value storage functions.

@@ -123,7 +123,7 @@ class InputSeedWordsViewModel : CommonViewModel() {
 
         viewModelScope.launch(Dispatchers.IO) {
             walletStateHandler.doOnWalletFailed { exception ->
-                if (WalletError.createFromException(exception) == WalletError.NoError) {
+                if (WalletError(exception) == WalletError.NoError) {
                     onError(RestorationError.Unknown(resourceManager))
                 } else {
                     showErrorDialog(exception)

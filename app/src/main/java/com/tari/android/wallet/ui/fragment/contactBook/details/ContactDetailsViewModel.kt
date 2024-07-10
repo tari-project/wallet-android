@@ -23,6 +23,7 @@ import com.tari.android.wallet.R.string.contact_book_details_delete_contact
 import com.tari.android.wallet.R.string.contact_book_details_delete_message
 import com.tari.android.wallet.R.string.contact_book_details_edit_title
 import com.tari.android.wallet.application.YatAdapter
+import com.tari.android.wallet.data.repository.TariAddressRepository
 import com.tari.android.wallet.databinding.ViewEmojiIdWithYatSummaryBinding
 import com.tari.android.wallet.extension.launchOnIo
 import com.tari.android.wallet.extension.launchOnMain
@@ -68,6 +69,9 @@ class ContactDetailsViewModel : CommonViewModel() {
 
     @Inject
     lateinit var yatAdapter: YatAdapter
+
+    @Inject
+    lateinit var tariAddressRepository: TariAddressRepository
 
     private var searchingJob: Deferred<YatDto?>? = null
     private var updatingJob: Job? = null
@@ -265,7 +269,8 @@ class ContactDetailsViewModel : CommonViewModel() {
             val entries = yatAdapter.searchTariYats(yat)?.result?.entries?.firstOrNull()
             entries ?: return@async null
             val pubkey = entries.value.address
-            val address = walletService.getWalletAddressFromHexString(pubkey) ?: return@async null
+            // TODO: Weird code. Returns nothing, don't understand the purpose of this.
+            val address = tariAddressRepository.walletAddressFromHex(pubkey).getOrNull() ?: return@async null
             YatDto(yat)
         }
         return searchingJob?.await() != null

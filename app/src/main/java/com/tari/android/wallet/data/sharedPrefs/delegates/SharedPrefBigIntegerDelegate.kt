@@ -1,13 +1,13 @@
 package com.tari.android.wallet.data.sharedPrefs.delegates
 
 import android.content.SharedPreferences
-import com.tari.android.wallet.data.repository.CommonRepository
+import com.tari.android.wallet.data.sharedPrefs.CommonPrefRepository
 import java.math.BigInteger
 import kotlin.reflect.KProperty
 
 class SharedPrefBigIntegerDelegate(
     val prefs: SharedPreferences,
-    val commonRepository: CommonRepository,
+    val commonRepository: CommonPrefRepository,
     val name: String,
     val defValue: BigInteger,
 ) {

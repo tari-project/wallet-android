@@ -78,9 +78,10 @@ class TariWalletServiceStubProxy : TariWalletService.Stub() {
     override fun removeContact(contactPublicKey: TariWalletAddress, error: WalletError): Boolean =
         stub?.removeContact(contactPublicKey, error) ?: false
 
-    override fun getWalletAddressFromHexString(hex: String): TariWalletAddress? = stub?.getWalletAddressFromHexString(hex)
+    override fun getWalletAddressFromHexString(hex: String, error: WalletError): TariWalletAddress? = stub?.getWalletAddressFromHexString(hex, error)
 
-    override fun getWalletAddressFromEmojiId(emojiId: String): TariWalletAddress? = stub?.getWalletAddressFromEmojiId(emojiId)
+    override fun getWalletAddressFromEmojiId(emojiId: String, error: WalletError): TariWalletAddress? =
+        stub?.getWalletAddressFromEmojiId(emojiId, error)
 
     override fun setKeyValue(key: String, value: String, error: WalletError): Boolean = stub?.setKeyValue(key, value, error) ?: false
 
@@ -107,8 +108,8 @@ class TariWalletServiceStubProxy : TariWalletService.Stub() {
 
     override fun splitUtxos(utxos: List<TariUtxo>, splitCount: Int, error: WalletError) = stub?.splitUtxos(utxos, splitCount, error) ?: Unit
 
-    override fun getUnbindedOutputs(error: WalletError): MutableList<TariUnblindedOutput> = stub?.getUnbindedOutputs(error) ?: mutableListOf()
+    override fun getUnbindedOutputs(error: WalletError): List<TariUnblindedOutput> = stub?.getUnbindedOutputs(error) ?: listOf()
 
-    override fun restoreWithUnbindedOutputs(jsons: MutableList<String>, address: TariWalletAddress, message: String, error: WalletError) =
+    override fun restoreWithUnbindedOutputs(jsons: List<String>, address: TariWalletAddress, message: String, error: WalletError) =
         stub?.restoreWithUnbindedOutputs(jsons, address, message, error) ?: Unit
 }

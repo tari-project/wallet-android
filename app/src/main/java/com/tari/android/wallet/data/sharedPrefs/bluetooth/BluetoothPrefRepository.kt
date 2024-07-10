@@ -33,7 +33,7 @@
 package com.tari.android.wallet.data.sharedPrefs.bluetooth
 
 import android.content.SharedPreferences
-import com.tari.android.wallet.data.repository.CommonRepository
+import com.tari.android.wallet.data.sharedPrefs.CommonPrefRepository
 import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefGsonDelegate
 import com.tari.android.wallet.data.sharedPrefs.network.NetworkPrefRepository
 import com.tari.android.wallet.data.sharedPrefs.network.formatKey
@@ -44,7 +44,7 @@ import javax.inject.Singleton
 class BluetoothPrefRepository @Inject constructor(
     sharedPrefs: SharedPreferences,
     networkRepository: NetworkPrefRepository,
-) : CommonRepository(networkRepository) {
+) : CommonPrefRepository(networkRepository) {
 
     private object Key {
         const val BLUETOOTH_SETTINGS_KEY = "tari_bluetooth_server_settings"

@@ -141,7 +141,7 @@ class TariBluetoothServer @Inject constructor(
 
             fun initiateReading() {
                 if (shareChunkedData.isNotEmpty()) return
-                val myWalletAddress = TariWalletAddress.createWalletAddress(
+                val myWalletAddress = TariWalletAddress(
                     hexString = sharedPrefsRepository.publicKeyHexString.orEmpty(),
                     emojiId = sharedPrefsRepository.emojiId.orEmpty(),
                 )
