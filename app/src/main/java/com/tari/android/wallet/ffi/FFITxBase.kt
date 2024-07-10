@@ -17,15 +17,11 @@ abstract class FFITxBase() : FFIBase() {
     fun getContact(): TariContact {
         val publicKey = if (isOutbound()) {
             getDestinationPublicKey().runWithDestroy {
-                val destinationHex = it.toString()
-                val destinationEmoji = it.getEmojiId()
-                TariWalletAddress(destinationHex, destinationEmoji)
+                TariWalletAddress(it)
             }
         } else {
             getSourcePublicKey().runWithDestroy {
-                val sourceHex = it.toString()
-                val sourceEmoji = it.getEmojiId()
-                TariWalletAddress(sourceHex, sourceEmoji)
+                TariWalletAddress(it)
             }
         }
         return TariContact(publicKey)
