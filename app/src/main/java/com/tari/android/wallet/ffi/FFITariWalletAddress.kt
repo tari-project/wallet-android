@@ -63,11 +63,7 @@ class FFITariWalletAddress() : FFIBase() {
         runWithError { jniFromEmojiId(emojiId, it) }
     }
 
-    constructor(privateKey: FFIPrivateKey) : this() {
-        runWithError { jniFromPrivateKey(privateKey, it) }
-    }
-
-    fun getBytes(): FFIByteVector = runWithError { FFIByteVector(jniGetBytes(it)) }
+    fun getByteVector(): FFIByteVector = runWithError { FFIByteVector(jniGetBytes(it)) } // todo rename to get vector
 
     fun getEmojiId(): String = runWithError { jniGetEmojiId(it) }
 

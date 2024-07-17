@@ -46,7 +46,7 @@ data class PublicKey(
     val hex: String = "",
     val emojiId: String = "",
 ) : Parcelable {
-    constructor(ffiPublicKey: FFIPublicKey) : this(hex = ffiPublicKey.getBytes().hexString.hex)
+    constructor(ffiPublicKey: FFIPublicKey) : this(hex = HexString(ffiPublicKey.getByteVector()).hex)
 
     override fun equals(other: Any?) = (other is PublicKey) && hex == other.hex
 

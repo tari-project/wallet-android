@@ -158,7 +158,7 @@ class EmojiUtil {
             val emojiSetFFI = FFIEmojiSet()
             for (i in 0 until emojiSetFFI.getLength()) {
                 val emojiFFI = emojiSetFFI.getAt(i)
-                val emojiBytes = emojiFFI.getBytes()
+                val emojiBytes = emojiFFI.byteArray()
                 val emoji = String(emojiBytes)
                 emojis.add(emoji)
                 emojiFFI.destroy()

@@ -79,7 +79,7 @@ class BackupFileProcessor @Inject constructor(
 
             val ffiWallet = FFIWallet.instance!!
             val outputs = ffiWallet.getUnbindedOutputs(FFIError())
-            val hexString = HexString(ffiWallet.getWalletAddress().getBytes())
+            val hexString = HexString(ffiWallet.getWalletAddress().getByteVector()) // TODO don't hex, I think
             val jsonObject = BackupUtxos(outputs.map { it.json }, hexString.hex)
             val json = Gson().toJson(jsonObject)
 

@@ -72,7 +72,7 @@ class FFIByteVector() : FFIBase() {
 
     fun getLength(): Int = runWithError { jniGetLength(it) }
 
-    fun getBytes(): ByteArray {
+    fun byteArray(): ByteArray {
         val length = getLength()
         val byteArray = ByteArray(length)
         for (i in byteArray.indices) {

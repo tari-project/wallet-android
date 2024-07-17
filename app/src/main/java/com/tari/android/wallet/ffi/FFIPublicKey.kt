@@ -61,7 +61,7 @@ class FFIPublicKey() : FFIBase() {
         runWithError { jniFromPrivateKey(privateKey, it) }
     }
 
-    fun getBytes(): FFIByteVector = runWithError { FFIByteVector(jniGetBytes(it)) }
+    fun getByteVector(): FFIByteVector = runWithError { FFIByteVector(jniGetBytes(it)) }
 
     override fun toString(): String = runWithError { FFIByteVector(jniGetBytes(it)).toString() }
 

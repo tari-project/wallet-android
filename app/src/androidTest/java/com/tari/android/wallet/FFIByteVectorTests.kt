@@ -56,10 +56,10 @@ class FFIByteVectorTests {
     }
 
     @Test
-    fun getBytes_assertThatTheArrayIsEqualToTheByteArrayGivenToTheConstructor() {
+    fun byteArray_assertThatTheArrayIsEqualToTheByteArrayGivenToTheConstructor() {
         val byteArray: ByteArray = "Test".toByteArray()
         val byteVector = FFIByteVector(byteArray)
-        assertArrayEquals(byteArray, byteVector.getBytes())
+        assertArrayEquals(byteArray, byteVector.byteArray())
         byteVector.destroy()
     }
 }
