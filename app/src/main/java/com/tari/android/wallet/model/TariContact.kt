@@ -47,7 +47,7 @@ data class TariContact(
     val isFavorite: Boolean = false,
 ) : Parcelable {
 
-    fun filtered(text: String): Boolean = walletAddress.emojiId.contains(text, ignoreCase = true) || alias.contains(text, ignoreCase = true)
+    fun filtered(text: String): Boolean = walletAddress.fullEmojiId.contains(text, ignoreCase = true) || alias.contains(text, ignoreCase = true)
 
     override fun toString() = "Contact(alias='$alias') ${super.toString()}"
 }

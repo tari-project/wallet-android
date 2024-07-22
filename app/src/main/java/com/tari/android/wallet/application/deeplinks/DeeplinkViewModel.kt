@@ -5,8 +5,6 @@ import com.tari.android.wallet.R
 import com.tari.android.wallet.application.baseNodes.BaseNodesManager
 import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodeDto
 import com.tari.android.wallet.data.sharedPrefs.tor.TorPrefRepository
-import com.tari.android.wallet.ffi.FFITariWalletAddress
-import com.tari.android.wallet.ffi.HexString
 import com.tari.android.wallet.model.TariWalletAddress
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.dialog.confirm.ConfirmDialogArgs
@@ -73,8 +71,8 @@ class DeeplinkViewModel : CommonViewModel() {
         val contact = DeepLink.Contacts(
             listOf(
                 DeepLink.Contacts.DeeplinkContact(
-                    deeplink.alias,
-                    deeplink.tariAddressHex
+                    alias = deeplink.alias,
+                    base58 = deeplink.tariAddressBase58,
                 )
             )
         )
@@ -116,21 +114,18 @@ class DeeplinkViewModel : CommonViewModel() {
 
     private fun getData(deeplink: DeepLink.Contacts): List<ContactDto> = deeplink.contacts.mapNotNull {
         runCatching {
-            val ffiWalletAddress = FFITariWalletAddress(HexString(it.hex))
-            val tariWalletAddress = TariWalletAddress(ffiWalletAddress)
+            val tariWalletAddress = TariWalletAddress.fromBase58(it.base58)
             ContactDto(FFIContactInfo(walletAddress = tariWalletAddress, alias = it.alias))
         }.getOrNull()
     }
 
     private fun getData(deeplink: DeepLink.Send): ContactDto? = runCatching {
-        val ffiWalletAddress = FFITariWalletAddress(HexString(deeplink.walletAddressHex))
-        val tariWalletAddress = TariWalletAddress(ffiWalletAddress)
+        val tariWalletAddress = TariWalletAddress.fromBase58(deeplink.walletAddressBase58)
         ContactDto(FFIContactInfo(walletAddress = tariWalletAddress, alias = ""))
     }.getOrNull()
 
     private fun getData(userProfile: DeepLink.UserProfile): ContactDto? = runCatching {
-        val ffiWalletAddress = FFITariWalletAddress(HexString(userProfile.tariAddressHex))
-        val tariWalletAddress = TariWalletAddress(ffiWalletAddress)
+        val tariWalletAddress = TariWalletAddress.fromBase58(userProfile.tariAddressBase58)
         ContactDto(FFIContactInfo(walletAddress = tariWalletAddress, alias = userProfile.alias))
     }.getOrNull()
 

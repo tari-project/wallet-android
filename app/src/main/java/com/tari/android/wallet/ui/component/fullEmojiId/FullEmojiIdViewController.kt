@@ -45,6 +45,7 @@ import com.daasuu.ei.EasingInterpolator
 import com.tari.android.wallet.R
 import com.tari.android.wallet.databinding.ViewEmojiIdSummaryBinding
 import com.tari.android.wallet.databinding.ViewFullEmojiIdBinding
+import com.tari.android.wallet.ffi.Base58
 import com.tari.android.wallet.ui.common.domain.PaletteManager
 import com.tari.android.wallet.ui.extension.dimenPx
 import com.tari.android.wallet.ui.extension.doOnGlobalLayout
@@ -83,7 +84,7 @@ class FullEmojiIdViewController(
             displayFullEmojiId()
         }
         get() = _fullEmojiId
-    var emojiIdHex: String = ""
+    var base58: Base58 = ""
 
     init {
         ui.dimmerView.setOnClickListener { hideFullEmojiIdAnimated() }
@@ -307,7 +308,7 @@ class FullEmojiIdViewController(
     }
 
     private fun onCopyEmojiIdButtonLongClicked(): Boolean {
-        completeCopyEmojiId(emojiIdHex)
+        completeCopyEmojiId(base58)
         return true
     }
 

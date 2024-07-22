@@ -5,8 +5,6 @@ import com.tari.android.wallet.R
 import com.tari.android.wallet.application.deeplinks.DeepLink
 import com.tari.android.wallet.application.deeplinks.DeeplinkHandler
 import com.tari.android.wallet.application.deeplinks.DeeplinkViewModel
-import com.tari.android.wallet.ffi.FFITariWalletAddress
-import com.tari.android.wallet.ffi.HexString
 import com.tari.android.wallet.infrastructure.bluetooth.TariBluetoothClient
 import com.tari.android.wallet.infrastructure.bluetooth.TariBluetoothServer
 import com.tari.android.wallet.model.TariWalletAddress
@@ -99,13 +97,11 @@ class ShareViewModel : CommonViewModel() {
 
     private fun successfulDeviceFoundSharing(userProfile: DeepLink.UserProfile) {
         val contactDto = runCatching {
-            val ffiWalletAddress = FFITariWalletAddress(HexString(userProfile.tariAddressHex))
-            val tariWalletAddress = TariWalletAddress(ffiWalletAddress)
-            ContactDto(FFIContactInfo(walletAddress = tariWalletAddress, alias = userProfile.alias))
+            ContactDto(FFIContactInfo(walletAddress = TariWalletAddress.fromBase58(userProfile.tariAddressBase58), alias = userProfile.alias))
         }.getOrNull() ?: return
 
         val name = userProfile.alias.ifEmpty {
-            contactDto.contactInfo.extractWalletAddress().emojiId.extractEmojis().take(3).joinToString("")
+            contactDto.contactInfo.extractWalletAddress().fullEmojiId.extractEmojis().take(3).joinToString("")
         }
 
         showModularDialog(

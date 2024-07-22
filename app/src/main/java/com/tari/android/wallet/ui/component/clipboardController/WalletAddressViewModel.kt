@@ -56,13 +56,13 @@ class WalletAddressViewModel : CommonViewModel() {
         }
     }
 
-    private suspend fun findValidEmojiId(query: String): TariWalletAddress? {
+    private fun findValidEmojiId(query: String): TariWalletAddress? {
         return when (val deepLink = deeplinkHandler.handle(query)) {
-            is DeepLink.Send -> deepLink.walletAddressHex
-            is DeepLink.UserProfile -> deepLink.tariAddressHex
-            is DeepLink.Contacts -> deepLink.contacts.firstOrNull()?.hex
+            is DeepLink.Send -> deepLink.walletAddressBase58
+            is DeepLink.UserProfile -> deepLink.tariAddressBase58
+            is DeepLink.Contacts -> deepLink.contacts.firstOrNull()?.base58
             else -> null
-        }?.let { deeplinkHex -> tariAddressRepository.walletAddressFromHex(deeplinkHex).getOrNull() }
+        }?.let { deeplinkBase58 -> TariWalletAddress.fromBase58OrNull(deeplinkBase58) }
             ?: tariAddressRepository.parseValidWalletAddress(query)
     }
 }

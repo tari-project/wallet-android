@@ -168,6 +168,7 @@ class FFIWallet(
         feePerGram: String,
         message: String,
         oneSided: Boolean,
+        paymentId: String,
         libError: FFIError
     ): ByteArray
 
@@ -458,14 +459,21 @@ class FFIWallet(
         BigInteger(1, jniEstimateTxFee(amount.toString(), gramFee.toString(), kernelCount.toString(), outputCount.toString(), it))
     }
 
-    fun sendTx(destination: FFITariWalletAddress, amount: BigInteger, feePerGram: BigInteger, message: String, isOneSided: Boolean): BigInteger {
+    fun sendTx(
+        destination: FFITariWalletAddress,
+        amount: BigInteger,
+        feePerGram: BigInteger,
+        message: String,
+        isOneSided: Boolean,
+        paymentId: String,
+    ): BigInteger {
         if (amount < BigInteger.valueOf(0L)) {
             throw FFIException(message = "Amount is less than 0.")
         }
         if (destination == getWalletAddress()) {
             throw FFIException(message = "Tx source and destination are the same.")
         }
-        val bytes = runWithError { jniSendTx(destination, amount.toString(), feePerGram.toString(), message, isOneSided, it) }
+        val bytes = runWithError { jniSendTx(destination, amount.toString(), feePerGram.toString(), message, isOneSided, paymentId, it) }
         return BigInteger(1, bytes)
     }
 
@@ -538,7 +546,7 @@ class FFIWallet(
     fun restoreWithUnbindedOutputs(jsons: List<String>, address: TariWalletAddress, message: String, error: FFIError) {
         for (json in jsons) {
             val output = FFITariUnblindedOutput(json)
-            jniImportExternalUtxoAsNonRewindable(output, FFITariWalletAddress(address.emojiId), message, error)
+            jniImportExternalUtxoAsNonRewindable(output, FFITariWalletAddress(emojiId = address.fullEmojiId), message, error)
         }
     }
 

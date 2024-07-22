@@ -37,6 +37,7 @@ package com.tari.android.wallet.ffi
  *
  * @author The Tari Development Team
  */
+// TODO remove because it is not used anymore
 class FFIPrivateKey private constructor() : FFIBase() {
 
     private external fun jniGetBytes(libError: FFIError): FFIPointer
@@ -55,7 +56,7 @@ class FFIPrivateKey private constructor() : FFIBase() {
 
     fun getBytes(): FFIByteVector = runWithError { FFIByteVector(jniGetBytes(it)) }
 
-    override fun toString(): String = runWithError { FFIByteVector(jniGetBytes(it)).toString() }
+    override fun toString(): String = runWithError { FFIByteVector(jniGetBytes(it)).hex() }
 
     override fun destroy() = jniDestroy()
 

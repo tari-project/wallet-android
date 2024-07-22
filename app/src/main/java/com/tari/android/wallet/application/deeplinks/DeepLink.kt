@@ -34,6 +34,7 @@ package com.tari.android.wallet.application.deeplinks
 
 import com.tari.android.wallet.data.repository.TariAddressRepository
 import com.tari.android.wallet.data.sharedPrefs.tor.TorBridgeConfiguration
+import com.tari.android.wallet.ffi.Base58
 import com.tari.android.wallet.model.MicroTari
 import com.tari.android.wallet.util.parseToBigInteger
 
@@ -59,13 +60,13 @@ sealed class DeepLink {
                     val hex = param.value.firstOrNull { it.name == KEY_HEX }?.value.orEmpty()
                     DeeplinkContact(alias, hex)
                 }
-                .filter { TariAddressRepository.validateHex(it.hex) },
+                .filter { TariAddressRepository.validateHex(it.base58) },
         )
 
         override fun getParams(): Map<String, String> = hashMapOf<String, String>().apply {
             contacts.forEachIndexed { index, contact ->
                 put("list[$index][$KEY_ALIAS]", contact.alias)
-                put("list[$index][$KEY_HEX]", contact.hex)
+                put("list[$index][$KEY_HEX]", contact.base58)
             }
         }
 
@@ -74,10 +75,10 @@ sealed class DeepLink {
         companion object {
             const val COMMAND_CONTACTS = "contacts"
             const val KEY_ALIAS = "alias"
-            const val KEY_HEX = "hex"
+            const val KEY_HEX = "hex" // todo change to base58
         }
 
-        data class DeeplinkContact(val alias: String, val hex: String)
+        data class DeeplinkContact(val alias: String, val base58: String)
 
         class FormatExtractor(val key: String, val value: String = "") {
             val index: Int
@@ -95,7 +96,7 @@ sealed class DeepLink {
         }
     }
 
-    data class Send(val walletAddressHex: String = "", val amount: MicroTari? = null, val note: String = "") : DeepLink() {
+    data class Send(val walletAddressBase58: Base58 = "", val amount: MicroTari? = null, val note: String = "") : DeepLink() {
 
         constructor(params: Map<String, String>) : this(
             params[KEY_TARI_ADDRESS].orEmpty(),
@@ -104,7 +105,7 @@ sealed class DeepLink {
         )
 
         override fun getParams(): Map<String, String> = hashMapOf<String, String>().apply {
-            put(KEY_TARI_ADDRESS, walletAddressHex)
+            put(KEY_TARI_ADDRESS, walletAddressBase58)
             put(KEY_AMOUNT, amount?.formattedValue.orEmpty())
             put(KEY_NOTE, note)
         }
@@ -120,7 +121,8 @@ sealed class DeepLink {
     }
 
 
-    data class UserProfile(val tariAddressHex: String = "", val alias: String = "") : DeepLink() {
+    //TODO change to base58
+    data class UserProfile(val tariAddressBase58: Base58 = "", val alias: String = "") : DeepLink() {
 
         constructor(params: Map<String, String>) : this(
             params[KEY_WALLET_ADDRESS].orEmpty(),
@@ -128,7 +130,7 @@ sealed class DeepLink {
         )
 
         override fun getParams(): Map<String, String> = hashMapOf<String, String>().apply {
-            put(KEY_WALLET_ADDRESS, tariAddressHex)
+            put(KEY_WALLET_ADDRESS, tariAddressBase58)
             put(KEY_ALIAS, alias)
         }
 

@@ -178,12 +178,13 @@ class FinalizeSendTxViewModel : CommonViewModel() {
             viewModelScope.launch(Dispatchers.IO) {
                 val error = WalletError()
                 val txId = walletService.sendTari(
-                    TariContact(transactionData.recipientContact!!.contactInfo.extractWalletAddress()),
-                    transactionData.amount,
-                    transactionData.feePerGram ?: Constants.Wallet.defaultFeePerGram,
-                    transactionData.note.orEmpty(),
-                    transactionData.isOneSidePayment,
-                    error
+                    /* contact = */ TariContact(transactionData.recipientContact!!.contactInfo.extractWalletAddress()),
+                    /* amount = */ transactionData.amount,
+                    /* feePerGram = */ transactionData.feePerGram ?: Constants.Wallet.defaultFeePerGram,
+                    /* message = */ transactionData.note.orEmpty(),
+                    /* isOneSidePayment = */ transactionData.isOneSidePayment,
+                    /* paymentId = */ "", // TODO add this to the transaction data when it is available
+                    /* error = */ error,
                 )
                 // if success, just wait for the callback to happen
                 // if failed, just show the failed info & return

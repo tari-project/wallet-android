@@ -189,6 +189,7 @@ Properties loadProps(fileName) {
     return properties
 }
 
+// Comment this line if you want to disable the automatic download and use the native libraries of your choice
 preBuild.dependsOn("downloadLibwallet")
 
 dependencies {

@@ -93,7 +93,7 @@ class ClipboardController(
     fun showClipboardData(data: TariWalletAddress) {
         ui.root.postDelayed({
             hidePasteEmojiIdViewsOnTextChanged = true
-            showPasteEmojiIdViews(data.emojiId)
+            showPasteEmojiIdViews(data.fullEmojiId)
             listener?.focusOnEditText(true)
         }, 100)
     }

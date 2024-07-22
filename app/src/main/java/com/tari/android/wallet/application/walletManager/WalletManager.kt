@@ -51,6 +51,7 @@ import com.tari.android.wallet.ffi.FFITariTransportConfig
 import com.tari.android.wallet.ffi.FFIWallet
 import com.tari.android.wallet.ffi.LogFileObserver
 import com.tari.android.wallet.ffi.NetAddressString
+import com.tari.android.wallet.model.fullBase58
 import com.tari.android.wallet.service.seedPhrase.SeedPhraseRepository
 import com.tari.android.wallet.service.service.WalletService
 import com.tari.android.wallet.tor.TorConfig
@@ -194,7 +195,7 @@ class WalletManager @Inject constructor(
     private fun saveWalletPublicKeyHexToSharedPrefs() {
         // set shared preferences values after instantiation
         FFIWallet.instance?.getWalletAddress()?.let { ffiTariWalletAddress ->
-            corePrefRepository.publicKeyHexString = ffiTariWalletAddress.toString()
+            corePrefRepository.walletAddressBase58 = ffiTariWalletAddress.fullBase58()
             corePrefRepository.emojiId = ffiTariWalletAddress.getEmojiId()
             ffiTariWalletAddress.destroy()
         }

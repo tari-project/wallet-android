@@ -21,6 +21,7 @@ import com.tari.android.wallet.model.TariWalletAddress
 import com.tari.android.wallet.model.TransactionSendStatus
 import com.tari.android.wallet.model.Tx
 import com.tari.android.wallet.model.TxId
+import com.tari.android.wallet.model.fullBase58
 import com.tari.android.wallet.model.recovery.WalletRestorationResult
 import com.tari.android.wallet.notification.NotificationHelper
 import com.tari.android.wallet.service.TariWalletServiceListener
@@ -32,7 +33,6 @@ import io.reactivex.Observable
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import java.math.BigInteger
-import java.util.Locale
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.ConcurrentMap
 import java.util.concurrent.CopyOnWriteArrayList
@@ -241,10 +241,11 @@ class FFIWalletListenerImpl(
         val contactsFFI = wallet.getContacts()
         for (i in 0 until contactsFFI.getLength()) {
             val contactFFI = contactsFFI.getAt(i)
-            val publicKeyFFI = contactFFI.getWalletAddress()
-            val hex = publicKeyFFI.toString()
-            val tariContact = if (hex == address.hexString) TariContact(address, contactFFI.getAlias(), contactFFI.getIsFavorite()) else null
-            publicKeyFFI.destroy()
+            val walletAddressFFI = contactFFI.getWalletAddress()
+            val tariContact =
+                if (TariWalletAddress(walletAddressFFI) == address) TariContact(address, contactFFI.getAlias(), contactFFI.getIsFavorite())
+                else null
+            walletAddressFFI.destroy()
             contactFFI.destroy()
             if (tariContact != null) {
                 contactsFFI.destroy()
@@ -276,10 +277,10 @@ class FFIWalletListenerImpl(
                 }
     }
 
-    private fun sendPushNotificationToTxRecipient(recipientPublicKeyHex: String) {
-        // the push notification server accepts lower-case hex strings as of now
-        val fromPublicKeyHex = wallet.getWalletAddress().toString().lowercase(Locale.ENGLISH)
-        notificationService.notifyRecipient(recipientPublicKeyHex, fromPublicKeyHex, wallet::signMessage)
+    private fun sendPushNotificationToTxRecipient(recipientBase58: String) {
+        // TODO use hex of the spend key
+        val senderBase58 = wallet.getWalletAddress().fullBase58()
+        notificationService.notifyRecipient(recipientBase58, senderBase58, wallet::signMessage)
     }
 
     private fun checkBaseNodeSyncCompletion() {

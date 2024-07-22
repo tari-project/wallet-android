@@ -163,7 +163,7 @@ class ActionMenuView : CommonView<CommonViewModel, ViewActionMenuBinding> {
         ui.avatar.setVisible(pictureUrl.isNullOrEmpty())
         ui.avatarImageCardView.setVisible(!pictureUrl.isNullOrEmpty())
         if (pictureUrl.isNullOrEmpty()) {
-            val avatar = contact.getFFIContactInfo()?.extractWalletAddress()?.emojiId?.extractEmojis()?.take(1)?.joinToString()
+            val avatar = contact.getFFIContactInfo()?.extractWalletAddress()?.avatarEmoji
                 ?: contact.contactInfo.getAlias().firstOrNull()?.toString() ?: ""
             ui.avatar.text = avatar
         } else {

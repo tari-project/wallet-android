@@ -35,8 +35,8 @@ data class TransactionItem(
         } else false
     }
 
-    fun isContains(text: String): Boolean = tx.tariContact.walletAddress.emojiId.contains(text)
-            || tx.tariContact.walletAddress.hexString.contains(text)
+    fun isContains(text: String): Boolean = tx.tariContact.walletAddress.fullEmojiId.contains(text)
+            || tx.tariContact.walletAddress.fullBase58.contains(text)
             || tx.message.contains(text)
             || contact?.contactInfo?.getAlias()?.contains(text) ?: false
 }

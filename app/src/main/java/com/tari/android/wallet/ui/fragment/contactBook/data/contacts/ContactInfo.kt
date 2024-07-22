@@ -65,7 +65,7 @@ data class FFIContactInfo(
         isFavorite = tariContact.isFavorite,
     )
 
-    override fun filtered(text: String): Boolean = walletAddress.emojiId.contains(text, true) || getAlias().contains(text, true)
+    override fun filtered(text: String): Boolean = walletAddress.fullEmojiId.contains(text, true) || getAlias().contains(text, true)
 
     override fun extractWalletAddress(): TariWalletAddress = walletAddress
 

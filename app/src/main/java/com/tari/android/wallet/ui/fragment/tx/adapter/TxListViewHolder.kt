@@ -72,7 +72,7 @@ class TxListViewHolder(view: ItemTxListBinding) : CommonViewHolder<TransactionIt
             val firstEmoji = when {
                 tx.isCoinbase -> string(R.string.tx_list_emoji_coinbase_payment_placeholder)
                 tx.isOneSided -> string(R.string.tx_list_emoji_one_side_payment_placeholder)
-                else -> tx.tariContact.walletAddress.emojiId.extractEmojis()[0]
+                else -> tx.tariContact.walletAddress.avatarEmoji
             }
             ui.firstEmojiTextView.text = firstEmoji
         } else {
@@ -102,7 +102,7 @@ class TxListViewHolder(view: ItemTxListBinding) : CommonViewHolder<TransactionIt
                 ui.participantTextView1.text = title
             }
 
-            contact != null && contact.contactInfo.getAlias().isNotEmpty() || txUser.walletAddress.isZeros() -> {
+            contact != null && contact.contactInfo.getAlias().isNotEmpty() || txUser.walletAddress.isUnknownUser() -> {
                 val alias = contact?.contactInfo?.getAlias().orEmpty().ifBlank { itemView.context.getString(R.string.unknown_source) }
                 val fullText = when (tx.direction) {
                     Tx.Direction.INBOUND -> string(R.string.tx_list_sent_a_payment, alias)
@@ -121,7 +121,7 @@ class TxListViewHolder(view: ItemTxListBinding) : CommonViewHolder<TransactionIt
 
             else -> { // display emoji id
                 ui.participantEmojiIdView.root.visible()
-                emojiIdSummaryController.display(txUser.walletAddress.emojiId, showEmojisFromEachEnd = 3)
+                emojiIdSummaryController.display(txUser.walletAddress.fullEmojiId, showEmojisFromEachEnd = 3)
                 when (tx.direction) {
                     Tx.Direction.INBOUND -> {
                         ui.participantTextView1.gone()

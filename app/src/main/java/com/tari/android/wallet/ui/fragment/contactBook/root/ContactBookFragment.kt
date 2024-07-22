@@ -130,7 +130,7 @@ class ContactBookFragment : CommonFragment<FragmentContactBookRootBinding, Conta
         clipboardController.listener = object : ClipboardController.ClipboardControllerListener {
 
             override fun onPaste(walletAddress: TariWalletAddress) {
-                ui.searchView.setQuery(viewModel.walletAddressViewModel.discoveredWalletAddressFromClipboard.value?.emojiId, false)
+                ui.searchView.setQuery(viewModel.walletAddressViewModel.discoveredWalletAddressFromClipboard.value?.fullEmojiId, false)
             }
 
             override fun focusOnEditText(isFocused: Boolean) {

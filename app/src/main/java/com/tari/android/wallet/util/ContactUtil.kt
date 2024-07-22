@@ -10,10 +10,11 @@ import javax.inject.Singleton
 class ContactUtil @Inject constructor(
     private val resourceManager: ResourceManager,
 ) {
+    // TODO check where it's used and use it after reading contacts from FFI
     fun normalizeAlias(alias: String?, walletAddress: TariWalletAddress): String {
         return alias.orEmpty().ifBlank { getDefaultAlias(walletAddress) }
     }
 
     private fun getDefaultAlias(walletAddress: TariWalletAddress): String =
-        resourceManager.getString(R.string.contact_book_default_alias, walletAddress.emojiId.extractEmojis().take(3).joinToString(""))
+        resourceManager.getString(R.string.contact_book_default_alias, walletAddress.fullEmojiId.extractEmojis().take(3).joinToString(""))
 }

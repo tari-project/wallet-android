@@ -31,7 +31,7 @@ class TariWalletServiceStubProxy : TariWalletService.Stub() {
 
     override fun unregisterListener(listener: TariWalletServiceListener): Boolean = stub?.unregisterListener(listener) ?: false
 
-    override fun getWalletAddressHexString(error: WalletError): String? = stub?.getWalletAddressHexString(error)
+    override fun getWalletAddressBase58(error: WalletError): String? = stub?.getWalletAddressBase58(error)
 
     override fun getBalanceInfo(error: WalletError): BalanceInfo? = stub?.getBalanceInfo(error)
 
@@ -69,8 +69,9 @@ class TariWalletServiceStubProxy : TariWalletService.Stub() {
         feePerGram: MicroTari,
         message: String,
         isOneSidePayment: Boolean,
-        error: WalletError
-    ): TxId? = stub?.sendTari(contact, amount, feePerGram, message, isOneSidePayment, error)
+        paymentId: String,
+        error: WalletError,
+    ): TxId? = stub?.sendTari(contact, amount, feePerGram, message, isOneSidePayment, paymentId, error)
 
     override fun updateContact(contactPublicKey: TariWalletAddress, alias: String, isFavorite: Boolean, error: WalletError): Boolean =
         stub?.updateContact(contactPublicKey, alias, isFavorite, error) ?: false
@@ -78,7 +79,7 @@ class TariWalletServiceStubProxy : TariWalletService.Stub() {
     override fun removeContact(contactPublicKey: TariWalletAddress, error: WalletError): Boolean =
         stub?.removeContact(contactPublicKey, error) ?: false
 
-    override fun getWalletAddressFromHexString(hex: String, error: WalletError): TariWalletAddress? = stub?.getWalletAddressFromHexString(hex, error)
+    override fun getWalletAddressFromBase58(hex: String, error: WalletError): TariWalletAddress? = stub?.getWalletAddressFromBase58(hex, error)
 
     override fun getWalletAddressFromEmojiId(emojiId: String, error: WalletError): TariWalletAddress? =
         stub?.getWalletAddressFromEmojiId(emojiId, error)

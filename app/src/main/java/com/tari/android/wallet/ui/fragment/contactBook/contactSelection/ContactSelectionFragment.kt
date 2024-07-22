@@ -54,7 +54,6 @@ import com.tari.android.wallet.util.containsNonEmoji
 import com.tari.android.wallet.util.firstNCharactersAreEmojis
 import com.tari.android.wallet.util.numberOfEmojis
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import me.everything.android.ui.overscroll.OverScrollDecoratorHelper
 
 open class ContactSelectionFragment : CommonFragment<FragmentContactsSelectionBinding, ContactSelectionViewModel>(), TextWatcher {
@@ -111,10 +110,10 @@ open class ContactSelectionFragment : CommonFragment<FragmentContactsSelectionBi
 
         observe(walletAddressViewModel.discoveredWalletAddressFromClipboard) { clipboardController.showClipboardData(it) }
 
-        observe(selectedTariWalletAddress) { address -> address?.emojiId?.let { putEmojiId(it) } }
+        observe(selectedTariWalletAddress) { address -> address?.fullEmojiId?.let { putEmojiId(it) } }
 
         observe(selectedContact) { contactDto ->
-            putEmojiId(contactDto.contactInfo.extractWalletAddress().emojiId)
+            putEmojiId(contactDto.contactInfo.extractWalletAddress().fullEmojiId)
             ui.addFirstNameInput.setText((contactDto.contactInfo.firstName + " " + contactDto.contactInfo.lastName).trim())
         }
 
@@ -164,7 +163,7 @@ open class ContactSelectionFragment : CommonFragment<FragmentContactsSelectionBi
                 ui.searchEditText.scaleX = 0f
                 ui.searchEditText.scaleY = 0f
                 ui.searchEditText.setText(
-                    viewModel.walletAddressViewModel.discoveredWalletAddressFromClipboard.value?.emojiId,
+                    viewModel.walletAddressViewModel.discoveredWalletAddressFromClipboard.value?.fullEmojiId,
                     TextView.BufferType.EDITABLE
                 )
                 ui.searchEditText.setSelection(ui.searchEditText.text?.length ?: 0)
@@ -334,7 +333,7 @@ open class ContactSelectionFragment : CommonFragment<FragmentContactsSelectionBi
             val emojisNumber = textWithoutSeparators.numberOfEmojis()
             if (textWithoutSeparators.containsNonEmoji() || emojisNumber > Constants.Wallet.emojiIdLength) {
                 viewModel.deselectTariWalletAddress()
-                showNotValidEmojiId()
+                showNotValidEmojiId() // todo check by constructor
             } else {
                 viewModel.addressEntered(textWithoutSeparators)
             }
@@ -343,10 +342,9 @@ open class ContactSelectionFragment : CommonFragment<FragmentContactsSelectionBi
             deeplinkViewModel.execute(deeplink)
             viewModel.deselectTariWalletAddress()
         } else {
-            // TODO: the whole this functionally should be moved to the view model. runBlocking is a replacement for current implementation
-            val walletAddress = runBlocking { viewModel.walletAddressViewModel.tariAddressRepository.parseValidWalletAddress(text) }
+            val walletAddress = viewModel.walletAddressViewModel.tariAddressRepository.parseValidWalletAddress(text)
             if (walletAddress != null) {
-                viewModel.addressEntered(walletAddress.emojiId)
+                viewModel.addressEntered(walletAddress.fullEmojiId)
             } else {
                 viewModel.deselectTariWalletAddress()
                 ui.searchEditText.textAlignment = View.TEXT_ALIGNMENT_TEXT_START

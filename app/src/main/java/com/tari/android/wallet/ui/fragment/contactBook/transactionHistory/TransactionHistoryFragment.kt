@@ -76,8 +76,8 @@ class TransactionHistoryFragment : CommonFragment<FragmentContactTransactionHist
     private fun setContactText(contactDto: ContactDto) {
         val name = contactDto.contactInfo.getAlias().ifBlank {
             contactDto.contactInfo.extractWalletAddress().let {
-                val emojiId = it.emojiId.extractEmojis()
-                val shortEmojiId = emojiId.take(3) + getString(R.string.emoji_id_bullet_separator) + emojiId.takeLast(3)
+                val emojiId = it.fullEmojiId.extractEmojis()
+                val shortEmojiId = emojiId.take(3) + getString(R.string.emoji_id_bullet_separator) + emojiId.takeLast(3) // TODO put alias methods to a helper class
                 shortEmojiId.joinToString("")
             }
         }
