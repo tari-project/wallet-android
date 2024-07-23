@@ -14,7 +14,7 @@ class TariAddressRepository @Inject constructor() {
      * Try to find a valid Emoji ID or HEX in the given text and parse it to a [TariWalletAddress]. Returns null if no valid address is found.
      */
     fun parseValidWalletAddress(text: String): TariWalletAddress? {
-        return text.trim().extractEmojis().windowed(size = Constants.Wallet.emojiIdLength, step = 1)
+        return text.trim().extractEmojis().windowed(size = Constants.Wallet.EMOJI_ID_LENGTH, step = 1)
             .map { it.joinToString("") }
             .firstNotNullOfOrNull { TariWalletAddress.fromEmojiIdOrNull(it) }
             ?: Regex("([A-Za-z0-9]{66})").findAll(text)

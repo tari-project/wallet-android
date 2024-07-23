@@ -264,7 +264,7 @@ class WalletService : Service() {
             val tx = pendingInboundTxs.getAt(i)
             val txDate = DateTime(tx.getTimestamp().toLong() * 1000L).toLocalDateTime()
             val hoursPassed = Hours.hoursBetween(txDate, now).hours
-            if (hoursPassed >= Constants.Wallet.pendingTxExpirationPeriodHours) {
+            if (hoursPassed >= Constants.Wallet.PENDING_TX_EXPIRATION_PERIOD_HOURS) {
                 wallet.cancelPendingTx(tx.getId())
             }
             tx.destroy()
@@ -284,7 +284,7 @@ class WalletService : Service() {
             val tx = pendingOutboundTxs.getAt(i)
             val txDate = DateTime(tx.getTimestamp().toLong() * 1000L).toLocalDateTime()
             val hoursPassed = Hours.hoursBetween(txDate, now).hours
-            if (hoursPassed >= Constants.Wallet.pendingTxExpirationPeriodHours) {
+            if (hoursPassed >= Constants.Wallet.PENDING_TX_EXPIRATION_PERIOD_HOURS) {
                 wallet.cancelPendingTx(tx.getId())
             }
             tx.destroy()

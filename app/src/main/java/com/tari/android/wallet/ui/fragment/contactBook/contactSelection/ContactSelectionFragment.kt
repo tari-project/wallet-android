@@ -276,7 +276,7 @@ open class ContactSelectionFragment : CommonFragment<FragmentContactsSelectionBi
 
     override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {
         isDeletingSeparatorAtIndex =
-            if (count == 1 && after == 0 && s[start].toString() == string(R.string.emoji_id_chunk_separator)) start else null
+            if (count == 1 && after == 0 && s[start].toString() == addressSeparator) start else null
     }
 
     override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) = Unit
@@ -302,7 +302,7 @@ open class ContactSelectionFragment : CommonFragment<FragmentContactsSelectionBi
         ui.continueButton.gone()
         ui.invalidEmojiIdTextView.gone()
 
-        if (editable.toString().firstNCharactersAreEmojis(Constants.Wallet.emojiFormatterChunkSize)) {
+        if (editable.toString().firstNCharactersAreEmojis(Constants.Wallet.EMOJI_FORMATTER_CHUNK_SIZE)) {
             // if deleting a separator, first get the index of the character before that separator
             // and delete that character
             if (isDeletingSeparatorAtIndex != null) {
@@ -331,7 +331,7 @@ open class ContactSelectionFragment : CommonFragment<FragmentContactsSelectionBi
             }
             // check if valid emoji - don't search if not
             val emojisNumber = textWithoutSeparators.numberOfEmojis()
-            if (textWithoutSeparators.containsNonEmoji() || emojisNumber > Constants.Wallet.emojiIdLength) {
+            if (textWithoutSeparators.containsNonEmoji() || emojisNumber > Constants.Wallet.EMOJI_ID_LENGTH) {
                 viewModel.deselectTariWalletAddress()
                 showNotValidEmojiId() // todo check by constructor
             } else {

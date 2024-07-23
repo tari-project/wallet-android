@@ -180,7 +180,7 @@ class FinalizeSendTxViewModel : CommonViewModel() {
                 val txId = walletService.sendTari(
                     /* contact = */ TariContact(transactionData.recipientContact!!.contactInfo.extractWalletAddress()),
                     /* amount = */ transactionData.amount,
-                    /* feePerGram = */ transactionData.feePerGram ?: Constants.Wallet.defaultFeePerGram,
+                    /* feePerGram = */ transactionData.feePerGram ?: Constants.Wallet.DEFAULT_FEE_PER_GRAM,
                     /* message = */ transactionData.note.orEmpty(),
                     /* isOneSidePayment = */ transactionData.isOneSidePayment,
                     /* paymentId = */ "", // TODO add this to the transaction data when it is available
