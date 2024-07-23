@@ -127,6 +127,10 @@ data class TariWalletAddress(
          */
         @Throws(FFIException::class)
         fun makeTariAddress(input: String): TariWalletAddress = runCatching { fromBase58(input) }.recoverCatching { fromEmojiId(input) }.getOrThrow()
+
+        fun validateBase58(base58: Base58): Boolean = fromBase58OrNull(base58) != null
+
+        fun validateEmojiId(emojiId: EmojiId): Boolean = fromEmojiIdOrNull(emojiId) != null
     }
 
     enum class Network {

@@ -6,9 +6,9 @@ import com.tari.android.wallet.R
 import com.tari.android.wallet.application.deeplinks.DeepLink
 import com.tari.android.wallet.application.deeplinks.DeeplinkHandler
 import com.tari.android.wallet.application.deeplinks.DeeplinkViewModel
-import com.tari.android.wallet.data.repository.TariAddressRepository
 import com.tari.android.wallet.extension.launchOnIo
 import com.tari.android.wallet.extension.launchOnMain
+import com.tari.android.wallet.model.TariWalletAddress
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.common.SingleLiveEvent
 import com.tari.android.wallet.ui.fragment.home.HomeActivity
@@ -22,9 +22,6 @@ class QRScannerViewModel : CommonViewModel() {
 
     @Inject
     lateinit var deeplinkHandler: DeeplinkHandler
-
-    @Inject
-    lateinit var tariAddressRepository: TariAddressRepository
 
     init {
         component.inject(this)
@@ -138,7 +135,7 @@ class QRScannerViewModel : CommonViewModel() {
         launchOnIo {
             val text = when (deepLink) {
                 is DeepLink.Send -> {
-                    val walletAddress = tariAddressRepository.walletAddressFromHex(deepLink.walletAddressBase58).getOrNull() ?: return@launchOnIo
+                    val walletAddress = TariWalletAddress.fromBase58OrNull(deepLink.walletAddressBase58) ?: return@launchOnIo
                     val emojiId = walletAddress.fullEmojiId.extractEmojis().take(3).joinToString("") // TODO put alias methods to a helper class
                     resourceManager.getString(R.string.qr_code_scanner_labels_actions_transaction_send, emojiId)
                 }
