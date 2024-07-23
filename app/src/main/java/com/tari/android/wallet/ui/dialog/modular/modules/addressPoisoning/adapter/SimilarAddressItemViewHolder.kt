@@ -22,7 +22,7 @@ class SimilarAddressItemViewHolder(view: ItemSimilarAddressBinding) : CommonView
 
         val emojiId = item.ffiContact?.let { ffiContact ->
             EmojiUtil.getFullEmojiIdSpannable(
-                emojiId = ffiContact.walletAddress.emojiId,
+                emojiId = ffiContact.walletAddress.fullEmojiId,
                 separator = string(R.string.emoji_id_chunk_separator),
                 darkColor = PaletteManager.getBlack(itemView.context),
                 lightColor = PaletteManager.getLightGray(itemView.context),

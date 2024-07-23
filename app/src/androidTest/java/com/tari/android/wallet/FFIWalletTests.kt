@@ -220,7 +220,7 @@ class FFIWalletTests {
         val emojiSet = FFIEmojiSet()
         assertTrue(emojiSet.getLength() > 0)
         val emoji = emojiSet.getAt(0)
-        assertTrue(emoji.toString().isNotEmpty())
+        assertTrue(emoji.hex().isNotEmpty())
         emoji.destroy()
         emojiSet.destroy()
         assertEquals(nullptr, emojiSet.pointer)

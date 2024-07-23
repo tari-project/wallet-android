@@ -79,12 +79,13 @@ class CustomTxNotificationViewHolder(val context: Context, tx: Tx) : RemoteViews
         setViewVisibility(R.id.notification_tx_received_txt_contact_alias, View.INVISIBLE)
         val emojis = ArrayList<String>()
         val it: BreakIterator = BreakIterator.getCharacterInstance()
-        it.setText(tariContact.walletAddress.emojiId)
+        it.setText(tariContact.walletAddress.fullEmojiId)
+        // TODO move it to EmojiUtil
         var previous = 0
         while (it.next() != BreakIterator.DONE) {
             val builder = StringBuilder()
             for (i in previous until it.current()) {
-                builder.append(tariContact.walletAddress.emojiId[i])
+                builder.append(tariContact.walletAddress.fullEmojiId[i])
             }
             emojis.add(builder.toString())
             previous = it.current()

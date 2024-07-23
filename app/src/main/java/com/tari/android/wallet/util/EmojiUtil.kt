@@ -41,10 +41,11 @@ import com.tari.android.wallet.extension.applyLetterSpacingStyle
 import com.tari.android.wallet.extension.applyRelativeTextSizeStyle
 import com.tari.android.wallet.ffi.FFIEmojiSet
 
+typealias EmojiId = String
 /**
  * Number of emojis from the Tari emoji set in a string.
  */
-fun String.numberOfEmojis(emojiSet: Set<String> = EmojiUtil.emojiSet): Int {
+fun EmojiId.numberOfEmojis(emojiSet: Set<EmojiId> = EmojiUtil.FFI_EMOJI_SET): Int {
     val it: BreakIterator = BreakIterator.getCharacterInstance()
     it.setText(this)
     var emojiCount = 0
@@ -67,7 +68,7 @@ fun String.numberOfEmojis(emojiSet: Set<String> = EmojiUtil.emojiSet): Int {
 /**
  * @return true if there is at least 1 character that is not included in the Tari emoji set.
  */
-fun String.containsNonEmoji(emojiSet: Set<String> = EmojiUtil.emojiSet): Boolean {
+fun EmojiId.containsNonEmoji(emojiSet: Set<EmojiId> = EmojiUtil.FFI_EMOJI_SET): Boolean {
     // iterate through the string
     val it: BreakIterator = BreakIterator.getCharacterInstance()
     it.setText(this)
@@ -91,7 +92,7 @@ fun String.containsNonEmoji(emojiSet: Set<String> = EmojiUtil.emojiSet): Boolean
 /**
  * @return emojis in the string that are from the Tari emoji set
  */
-fun String.extractEmojis(emojiSet: Set<String> = EmojiUtil.emojiSet): List<String> {
+fun String.extractEmojis(emojiSet: Set<String> = EmojiUtil.FFI_EMOJI_SET): List<String> {
     // iterate through the codepoints
     val it: BreakIterator = BreakIterator.getCharacterInstance()
     it.setText(this)
@@ -116,7 +117,7 @@ fun String.extractEmojis(emojiSet: Set<String> = EmojiUtil.emojiSet): List<Strin
  * Checks whether a given number of first characters of the string are emojis from the Tari
  * emoji set.
  */
-fun String.firstNCharactersAreEmojis(n: Int, emojiSet: Set<String> = EmojiUtil.emojiSet): Boolean {
+fun String.firstNCharactersAreEmojis(n: Int, emojiSet: Set<String> = EmojiUtil.FFI_EMOJI_SET): Boolean {
     // iterate through the string
     val it: BreakIterator = BreakIterator.getCharacterInstance()
     it.setText(this)
@@ -142,6 +143,10 @@ fun String.firstNCharactersAreEmojis(n: Int, emojiSet: Set<String> = EmojiUtil.e
     return false
 }
 
+fun Int.tariEmoji(): EmojiId {
+    return EmojiUtil.FFI_EMOJI_SET.elementAt(this)
+}
+
 /**
  * Emoji utility functions.
  *
@@ -153,8 +158,8 @@ class EmojiUtil {
 
         const val SMALL_EMOJI_ID_SIZE = 6
 
-        val emojiSet by lazy {
-            val emojis = mutableSetOf<String>()
+        val FFI_EMOJI_SET: Set<EmojiId> by lazy {
+            val emojis = mutableSetOf<EmojiId>()
             val emojiSetFFI = FFIEmojiSet()
             for (i in 0 until emojiSetFFI.getLength()) {
                 val emojiFFI = emojiSetFFI.getAt(i)
@@ -240,7 +245,7 @@ class EmojiUtil {
             return -1
         }
 
-        private fun getChunkedEmojiId(emojiId: String, separator: String): String {
+        private fun getChunkedEmojiId(emojiId: EmojiId, separator: String): String {
             // make chunks
             val separatorIndices = getNewChunkSeparatorIndices(emojiId)
             val builder = java.lang.StringBuilder(emojiId)
@@ -258,7 +263,7 @@ class EmojiUtil {
             return spannable
         }
 
-        fun getFullEmojiIdSpannable(emojiId: String, separator: String, darkColor: Int, lightColor: Int): SpannableString {
+        fun getFullEmojiIdSpannable(emojiId: EmojiId, separator: String, darkColor: Int, lightColor: Int): SpannableString {
             val spannable = getChunkedEmojiId(emojiId, separator).applyColorStyle(
                 defaultColor = darkColor,
                 search = listOf(separator),
@@ -270,7 +275,7 @@ class EmojiUtil {
             return spannable
         }
 
-        fun String.getGraphemeLength(): Int {
+        fun EmojiId.getGraphemeLength(): Int {
             val it: BreakIterator = BreakIterator.getCharacterInstance()
             it.setText(this)
             var count = 0

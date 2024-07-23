@@ -95,6 +95,21 @@ Java_com_tari_android_wallet_ffi_FFIPublicKey_jniGetBytes(
 }
 
 extern "C"
+JNIEXPORT jstring JNICALL
+Java_com_tari_android_wallet_ffi_FFIPublicKey_jniGetEmojiId(
+        JNIEnv *jEnv,
+        jobject jThis,
+        jobject error) {
+    return ExecuteWithError<jstring>(jEnv, error, [&](int *errorPointer) {
+        auto pPublicKey = GetPointerField<TariPublicKey *>(jEnv, jThis);
+        const char *pEmojiId = public_key_get_emoji_encoding(pPublicKey, errorPointer);
+        jstring result = jEnv->NewStringUTF(pEmojiId);
+        string_destroy(const_cast<char *>(pEmojiId));
+        return result;
+    });
+}
+
+extern "C"
 JNIEXPORT void JNICALL
 Java_com_tari_android_wallet_ffi_FFIPublicKey_jniDestroy(
         JNIEnv *jEnv,

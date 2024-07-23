@@ -64,8 +64,8 @@ class ContactDetailsFragment : CommonFragment<FragmentContactsDetailsBinding, Co
                 requireContext()
             )
             viewModel.contact.value?.contactInfo?.extractWalletAddress()?.let {
-                fullEmojiIdViewController?.fullEmojiId = it.emojiId
-                fullEmojiIdViewController?.emojiIdHex = it.hexString
+                fullEmojiIdViewController?.fullEmojiId = it.fullEmojiId
+                fullEmojiIdViewController?.base58 = it.fullBase58
             }
         }
 
@@ -84,8 +84,8 @@ class ContactDetailsFragment : CommonFragment<FragmentContactsDetailsBinding, Co
 
     private fun applyContact(contact: ContactDto) {
         val address = contact.contactInfo.extractWalletAddress()
-        fullEmojiIdViewController?.fullEmojiId = address.emojiId
-        fullEmojiIdViewController?.emojiIdHex = address.hexString
+        fullEmojiIdViewController?.fullEmojiId = address.fullEmojiId
+        fullEmojiIdViewController?.base58 = address.fullBase58
 
         if (contact.getContactActions().contains(ContactAction.EditName)) {
             ui.toolbar.setRightArgs(TariToolbarActionArg(title = getString(R.string.contact_book_details_edit)) {

@@ -20,6 +20,6 @@ class ShortEmojiModuleView(context: Context, buttonModule: ShortEmojiIdModule) :
     override fun setup() = Unit
 
     init {
-        emojiController.display(buttonModule.tariWalletAddress.emojiId)
+        emojiController.display(buttonModule.tariWalletAddress.fullEmojiId)
     }
 }

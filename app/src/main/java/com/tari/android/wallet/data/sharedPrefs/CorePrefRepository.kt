@@ -47,6 +47,7 @@ import com.tari.android.wallet.data.sharedPrefs.sentry.SentryPrefRepository
 import com.tari.android.wallet.data.sharedPrefs.tariSettings.TariSettingsPrefRepository
 import com.tari.android.wallet.data.sharedPrefs.tor.TorPrefRepository
 import com.tari.android.wallet.data.sharedPrefs.yat.YatPrefRepository
+import com.tari.android.wallet.ffi.Base58
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.random.Random
@@ -74,7 +75,7 @@ class CorePrefRepository @Inject constructor(
 ) : CommonPrefRepository(networkRepository) {
 
     private object Key {
-        const val PUBLIC_KEY_HEX_STRING = "tari_wallet_public_key_hex_string"
+        const val WALLET_ADDRESS_BASE58 = "tari_wallet_public_key_hex_string"
         const val EMOJI_ID = "tari_wallet_emoji_id_"
         const val NAME = "tari_wallet_name_"
         const val SURNAME = "tari_wallet_surname_"
@@ -87,7 +88,7 @@ class CorePrefRepository @Inject constructor(
         const val IS_DATA_CLEARED = "tari_is_data_cleared"
     }
 
-    var publicKeyHexString: String? by SharedPrefStringDelegate(sharedPrefs, this, formatKey(Key.PUBLIC_KEY_HEX_STRING))
+    var walletAddressBase58: Base58? by SharedPrefStringDelegate(sharedPrefs, this, formatKey(Key.WALLET_ADDRESS_BASE58))
 
     var emojiId: String? by SharedPrefStringDelegate(sharedPrefs, this, formatKey(Key.EMOJI_ID))
 
@@ -126,7 +127,7 @@ class CorePrefRepository @Inject constructor(
         securityPrefRepository.clear()
         addressPoisoningSharedRepository.clear()
         chatPrefRepository.clear()
-        publicKeyHexString = null
+        walletAddressBase58 = null
         emojiId = null
         onboardingStarted = false
         onboardingCompleted = false

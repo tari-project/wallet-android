@@ -244,8 +244,8 @@ class TxDetailsFragment : CommonFragment<FragmentTxDetailsBinding, TxDetailsView
     }
 
     private fun setFullEmojiId(tx: Tx) {
-        fullEmojiIdViewController.fullEmojiId = tx.tariContact.walletAddress.emojiId
-        fullEmojiIdViewController.emojiIdHex = tx.tariContact.walletAddress.hexString
+        fullEmojiIdViewController.fullEmojiId = tx.tariContact.walletAddress.fullEmojiId
+        fullEmojiIdViewController.base58 = tx.tariContact.walletAddress.fullBase58
     }
 
     private fun setFeeData(fee: MicroTari) {
@@ -268,13 +268,13 @@ class TxDetailsFragment : CommonFragment<FragmentTxDetailsBinding, TxDetailsView
     private fun setTxAddresseeData(tx: Tx) {
         val state = TxState.from(tx)
         ui.fromTextView.text = if (state.direction == INBOUND) string(common_from) else string(common_to)
-        if (tx.tariContact.walletAddress.isZeros()) {
+        if (tx.tariContact.walletAddress.isUnknownUser()) {
             ui.emojiIdSummaryView.root.gone()
             ui.unknownSource.visible()
         } else {
             ui.emojiIdSummaryView.root.visible()
             ui.unknownSource.gone()
-            emojiIdSummaryController.display(tx.tariContact.walletAddress.emojiId)
+            emojiIdSummaryController.display(tx.tariContact.walletAddress.fullEmojiId)
         }
     }
 

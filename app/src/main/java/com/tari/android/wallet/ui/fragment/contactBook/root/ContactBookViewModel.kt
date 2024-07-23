@@ -80,14 +80,14 @@ class ContactBookViewModel : CommonViewModel() {
     fun handleDeeplink(deeplinkString: String) {
         launchOnIo {
             when (val deeplink = deeplinkFormatter.parse(deeplinkString)) {
-                is DeepLink.Contacts -> deeplink.contacts.firstOrNull()?.hex
-                is DeepLink.Send -> deeplink.walletAddressHex
-                is DeepLink.UserProfile -> deeplink.tariAddressHex
+                is DeepLink.Contacts -> deeplink.contacts.firstOrNull()?.base58
+                is DeepLink.Send -> deeplink.walletAddressBase58
+                is DeepLink.UserProfile -> deeplink.tariAddressBase58
                 else -> null
             }?.let { tariAddressRepository.walletAddressFromHex(it).getOrNull() }
                 ?.let { walletAddress ->
                     launchOnMain {
-                        query.postValue(walletAddress.emojiId)
+                        query.postValue(walletAddress.fullEmojiId)
                     }
                 }
         }
@@ -129,7 +129,7 @@ class ContactBookViewModel : CommonViewModel() {
         val contacts = selectedContacts.map {
             DeepLink.Contacts.DeeplinkContact(
                 alias = contactUtil.normalizeAlias(it.contactInfo.getAlias(), it.contactInfo.extractWalletAddress()),
-                hex = it.contactInfo.extractWalletAddress().hexString,
+                base58 = it.contactInfo.extractWalletAddress().fullBase58,
             )
         }
         return deeplinkHandler.getDeeplink(DeepLink.Contacts(contacts))

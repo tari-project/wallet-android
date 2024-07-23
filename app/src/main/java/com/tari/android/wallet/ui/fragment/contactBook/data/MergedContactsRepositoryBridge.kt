@@ -13,7 +13,7 @@ class MergedContactsRepositoryBridge {
             .map { phoneContact ->
                 val phoneContactInfo = phoneContact.contactInfo as PhoneContactInfo
                 val ffiContactInfo = contacts.mapNotNull { it.contactInfo as? FFIContactInfo }
-                    .find { it.walletAddress.emojiId == phoneContactInfo.phoneEmojiId }
+                    .find { it.walletAddress.fullEmojiId == phoneContactInfo.phoneEmojiId } // todo use proper comparison
                     ?: return@map phoneContact
 
                 phoneContact.copy(

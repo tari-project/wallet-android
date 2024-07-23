@@ -66,11 +66,7 @@ class FFIContact() : FFIBase() {
 
     fun getIsFavorite(): Boolean = runWithError { jniGetIsFavorite(it) }
 
-    override fun toString(): String = StringBuilder()
-        .append(getAlias())
-        .append("|")
-        .append(getWalletAddress().toString())
-        .toString()
+    override fun toString(): String = "${getAlias()}|${getWalletAddress()}"
 
     override fun destroy() = jniDestroy()
 }

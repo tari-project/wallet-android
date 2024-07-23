@@ -11,6 +11,7 @@ import com.tari.android.wallet.application.deeplinks.DeepLink
 import com.tari.android.wallet.application.deeplinks.DeeplinkHandler
 import com.tari.android.wallet.data.sharedPrefs.CorePrefRepository
 import com.tari.android.wallet.data.sharedPrefs.yat.YatPrefRepository
+import com.tari.android.wallet.ffi.Base58
 import com.tari.android.wallet.model.TariWalletAddress
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.dialog.modular.DialogArgs
@@ -28,7 +29,7 @@ import javax.inject.Inject
 class WalletInfoViewModel : CommonViewModel() {
 
     @Inject
-    lateinit var sharedPrefsWrapper: CorePrefRepository
+    lateinit var corePrefRepository: CorePrefRepository
 
     @Inject
     lateinit var yatSharedPrefsRepository: YatPrefRepository
@@ -45,8 +46,8 @@ class WalletInfoViewModel : CommonViewModel() {
     private val _emojiId: MutableLiveData<String> = MutableLiveData()
     val emojiId: LiveData<String> = _emojiId
 
-    private val _publicKeyHex: MutableLiveData<String> = MutableLiveData()
-    val publicKeyHex: LiveData<String> = _publicKeyHex
+    private val _base58: MutableLiveData<Base58> = MutableLiveData()
+    val base58: LiveData<Base58> = _base58
 
     private val _yat: MutableLiveData<String> = MutableLiveData()
     val yat: LiveData<String> = _yat
@@ -68,11 +69,11 @@ class WalletInfoViewModel : CommonViewModel() {
     }
 
     fun refreshData() {
-        _emojiId.postValue(sharedPrefsWrapper.emojiId)
-        _publicKeyHex.postValue(sharedPrefsWrapper.publicKeyHexString)
+        _emojiId.postValue(corePrefRepository.emojiId)
+        _base58.postValue(corePrefRepository.walletAddressBase58)
         _yat.postValue(yatSharedPrefsRepository.connectedYat.orEmpty())
         _yatDisconnected.postValue(yatSharedPrefsRepository.yatWasDisconnected)
-        alias.postValue(sharedPrefsWrapper.name.orEmpty() + " " + sharedPrefsWrapper.surname.orEmpty())
+        alias.postValue(corePrefRepository.name.orEmpty() + " " + corePrefRepository.surname.orEmpty())
 
         checkEmojiIdConnection()
     }
@@ -88,7 +89,7 @@ class WalletInfoViewModel : CommonViewModel() {
                 yatAdapter.searchTariYats(connectedYat).let {
                     if (it?.status == true) {
                         it.result?.entries?.firstOrNull()?.let { response ->
-                            val wasDisconnected = response.value.address.lowercase() != sharedPrefsWrapper.publicKeyHexString.orEmpty().lowercase()
+                            val wasDisconnected = response.value.address.lowercase() != corePrefRepository.walletAddressBase58.orEmpty().lowercase()
                             yatSharedPrefsRepository.yatWasDisconnected = wasDisconnected
                             _yatDisconnected.postValue(wasDisconnected)
                         }
@@ -106,20 +107,18 @@ class WalletInfoViewModel : CommonViewModel() {
     }
 
     fun shareData(type: ShareType) {
-        val walletAddress = TariWalletAddress(
-            hexString = sharedPrefsWrapper.publicKeyHexString.orEmpty(),
-            emojiId = sharedPrefsWrapper.emojiId.orEmpty(),
-        )
+        // TODO maybe use FFIWallet.getWalletAddress() ?
+        val walletAddress = TariWalletAddress.fromBase58(corePrefRepository.walletAddressBase58.orEmpty())
 
         val name = contactUtil.normalizeAlias(alias.value.orEmpty(), walletAddress)
-        val hex = sharedPrefsWrapper.publicKeyHexString.orEmpty()
+        val hex = corePrefRepository.walletAddressBase58.orEmpty()
 
         val deeplink = deeplinkHandler.getDeeplink(DeepLink.UserProfile(hex, name))
         ShareViewModel.currentInstant?.share(type, deeplink)
     }
 
     fun showEditAliasDialog() {
-        val name = (sharedPrefsWrapper.name.orEmpty() + " " + sharedPrefsWrapper.surname.orEmpty()).trim()
+        val name = (corePrefRepository.name.orEmpty() + " " + corePrefRepository.surname.orEmpty()).trim()
 
         var saveAction: () -> Boolean = { false }
 
@@ -152,8 +151,8 @@ class WalletInfoViewModel : CommonViewModel() {
 
     private fun saveDetails(name: String) {
         val split = name.split(" ")
-        sharedPrefsWrapper.name = split.getOrNull(0).orEmpty().trim()
-        sharedPrefsWrapper.surname = split.getOrNull(1).orEmpty().trim()
+        corePrefRepository.name = split.getOrNull(0).orEmpty().trim()
+        corePrefRepository.surname = split.getOrNull(1).orEmpty().trim()
         alias.postValue(name)
         hideDialog()
     }

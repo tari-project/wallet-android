@@ -163,7 +163,7 @@ class ContactsRepository @Inject constructor(
                     ContactDto(
                         MergedContactInfo(
                             ffiContactInfo = ffiContactInfo,
-                            phoneContactInfo = phoneContactInfo.copy(phoneEmojiId = ffiContactInfo.walletAddress.emojiId, shouldUpdate = true),
+                            phoneContactInfo = phoneContactInfo.copy(phoneEmojiId = ffiContactInfo.walletAddress.fullEmojiId, shouldUpdate = true),
                         )
                     )
                 )

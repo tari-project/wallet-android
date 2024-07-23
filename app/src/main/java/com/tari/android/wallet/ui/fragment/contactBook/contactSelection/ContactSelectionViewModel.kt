@@ -114,9 +114,9 @@ class ContactSelectionViewModel : CommonViewModel() {
         launchOnIo {
             val deeplink = deeplinkFormatter.parse(deeplinkString)
             val hex = when (deeplink) {
-                is DeepLink.Contacts -> deeplink.contacts.firstOrNull()?.hex
-                is DeepLink.Send -> deeplink.walletAddressHex
-                is DeepLink.UserProfile -> deeplink.tariAddressHex
+                is DeepLink.Contacts -> deeplink.contacts.firstOrNull()?.base58
+                is DeepLink.Send -> deeplink.walletAddressBase58
+                is DeepLink.UserProfile -> deeplink.tariAddressBase58
                 else -> null
             }
 

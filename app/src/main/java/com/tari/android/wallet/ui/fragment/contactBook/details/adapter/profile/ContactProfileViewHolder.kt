@@ -30,16 +30,16 @@ class ContactProfileViewHolder(view: ItemContactProfileBinding) :
 
         when (val contactInfo = item.contactDto.contactInfo) {
             is FFIContactInfo -> {
-                showFirstCharOrAvatar(contactInfo.walletAddress.emojiId.extractEmojis()[0])
-                showEmojiId(contactInfo.walletAddress.emojiId)
+                showFirstCharOrAvatar(contactInfo.walletAddress.avatarEmoji)
+                showEmojiId(contactInfo.walletAddress.fullEmojiId)
                 showAlias(contactInfo.getAlias())
             }
 
             is MergedContactInfo -> {
                 val yat = item.contactDto.yatDto?.yat.orEmpty()
                 emojiIdSummaryController.yat = yat
-                showFirstCharOrAvatar(contactInfo.ffiContactInfo.walletAddress.emojiId.extractEmojis()[0], contactInfo.phoneContactInfo.avatar)
-                showEmojiId(contactInfo.ffiContactInfo.walletAddress.emojiId)
+                showFirstCharOrAvatar(contactInfo.ffiContactInfo.walletAddress.avatarEmoji, contactInfo.phoneContactInfo.avatar)
+                showEmojiId(contactInfo.ffiContactInfo.walletAddress.fullEmojiId)
                 showAlias(contactInfo.phoneContactInfo.getAlias())
                 showYat(item.contactDto.yatDto)
             }

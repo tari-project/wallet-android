@@ -37,6 +37,7 @@ import com.tari.android.wallet.data.sharedPrefs.CommonPrefRepository
 import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefGsonDelegate
 import com.tari.android.wallet.data.sharedPrefs.network.NetworkPrefRepository
 import com.tari.android.wallet.data.sharedPrefs.network.formatKey
+import com.tari.android.wallet.model.TariWalletAddress
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -50,7 +51,7 @@ class AddressPoisoningPrefRepository @Inject constructor(
         const val TRUSTED_CONTACT_LIST = "TRUSTED_CONTACT_LIST"
     }
 
-    private var trustedContactHexList: TrustedContactList by SharedPrefGsonDelegate(
+    private var trustedContactList: TrustedContactList by SharedPrefGsonDelegate(
         prefs = sharedPrefs,
         commonRepository = this,
         name = formatKey(Key.TRUSTED_CONTACT_LIST),
@@ -58,23 +59,23 @@ class AddressPoisoningPrefRepository @Inject constructor(
         defValue = TrustedContactList(),
     )
 
-    fun addTrustedContactHex(hex: String) {
-        trustedContactHexList = TrustedContactList(trustedContactHexList + hex)
+    fun addTrustedContact(address: TariWalletAddress) {
+        trustedContactList = TrustedContactList(trustedContactList + address)
     }
 
-    fun removeTrustedContactHex(hex: String) {
-        trustedContactHexList = TrustedContactList(trustedContactHexList - hex)
+    fun removeTrustedContact(address: TariWalletAddress) {
+        trustedContactList = TrustedContactList(trustedContactList - address)
     }
 
-    fun getTrustedContactHexList(): List<String> {
-        return trustedContactHexList
+    fun getTrustedContactList(): List<TariWalletAddress> {
+        return trustedContactList
     }
 
     fun clear() {
-        trustedContactHexList = TrustedContactList()
+        trustedContactList = TrustedContactList()
     }
 }
 
-private class TrustedContactList(trustedContacts: List<String>) : ArrayList<String>(trustedContacts) {
+private class TrustedContactList(trustedContacts: List<TariWalletAddress>) : ArrayList<TariWalletAddress>(trustedContacts) {
     constructor() : this(emptyList())
 }

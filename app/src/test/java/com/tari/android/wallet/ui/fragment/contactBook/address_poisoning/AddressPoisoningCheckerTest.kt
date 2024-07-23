@@ -7,7 +7,7 @@ import org.junit.Test
 
 class AddressPoisoningCheckerTest {
 
-    private fun TariWalletAddress.emojiIdSymbols(): List<String> = emojiId.map { it.toString() }
+    private fun TariWalletAddress.emojiIdSymbols(): List<String> = fullEmojiId.map { it.toString() }
 
     @Test
     fun `assert that same texts`() {

@@ -60,8 +60,7 @@ class ChooseRestoreOptionViewModel : CommonViewModel() {
                     backupPrefRepository.restoredTxs?.let {
                         if (it.utxos.orEmpty().isEmpty()) return@let
 
-                        val sourceAddress = FFITariWalletAddress(HexString(it.source))
-                        val tariWalletAddress = TariWalletAddress(it.source, sourceAddress.getEmojiId())
+                        val tariWalletAddress = TariWalletAddress.fromBase58(it.sourceBase58)
                         val message = resourceManager.getString(R.string.backup_restored_tx)
                         val error = WalletError()
                         walletService.restoreWithUnbindedOutputs(it.utxos, tariWalletAddress, message, error)

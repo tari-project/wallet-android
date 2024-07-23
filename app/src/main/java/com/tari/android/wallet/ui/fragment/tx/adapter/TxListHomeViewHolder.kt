@@ -61,7 +61,7 @@ class TxListHomeViewHolder(view: ItemHomeTxListBinding) : CommonViewHolder<Trans
                 ui.participantTextView1.text = title
             }
 
-            contact != null && contact.contactInfo.getAlias().isNotEmpty() || txUser.walletAddress.isZeros() -> {
+            contact != null && contact.contactInfo.getAlias().isNotEmpty() || txUser.walletAddress.isUnknownUser() -> {
                 val alias = contact?.contactInfo?.getAlias().orEmpty().ifBlank { itemView.context.getString(R.string.unknown_source) }
                 val fullText = when (tx.direction) {
                     Tx.Direction.INBOUND -> string(R.string.tx_list_sent_a_payment, alias)
@@ -80,7 +80,8 @@ class TxListHomeViewHolder(view: ItemHomeTxListBinding) : CommonViewHolder<Trans
 
             else -> { // display emoji id
                 ui.participantEmojiIdView.visible()
-                ui.participantEmojiIdView.text = txUser.walletAddress.emojiId.extractEmojis().take(3).joinToString("")
+                // TODO put alias methods to a helper class
+                ui.participantEmojiIdView.text = txUser.walletAddress.fullEmojiId.extractEmojis().take(3).joinToString("")
                 when (tx.direction) {
                     Tx.Direction.INBOUND -> {
                         ui.participantTextView1.gone()

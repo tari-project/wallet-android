@@ -86,7 +86,7 @@ class WalletInfoFragment : CommonFragment<FragmentWalletInfoBinding, WalletInfoV
             fullEmojiIdViewController.fullEmojiId = it
         }
 
-        observe(publicKeyHex) { fullEmojiIdViewController.emojiIdHex = it }
+        observe(base58) { fullEmojiIdViewController.base58 = it }
 
         observe(yat) { emojiIdSummaryController.yat = it }
 

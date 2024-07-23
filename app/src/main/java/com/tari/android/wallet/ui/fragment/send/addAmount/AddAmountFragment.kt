@@ -159,8 +159,8 @@ class AddAmountFragment : CommonFragment<FragmentAddAmountBinding, AddAmountView
             fullEmojiIdListener
         )
         val walletAddress = contactDto?.contactInfo?.extractWalletAddress()
-        fullEmojiIdViewController.fullEmojiId = walletAddress?.emojiId.orEmpty()
-        fullEmojiIdViewController.emojiIdHex = walletAddress?.hexString.orEmpty()
+        fullEmojiIdViewController.fullEmojiId = walletAddress?.fullEmojiId.orEmpty()
+        fullEmojiIdViewController.base58 = walletAddress?.fullBase58.orEmpty()
 
         displayAliasOrEmojiId()
         setActionBindings()
@@ -169,7 +169,7 @@ class AddAmountFragment : CommonFragment<FragmentAddAmountBinding, AddAmountView
     private fun displayAliasOrEmojiId() {
         val alias = contactDto?.contactInfo?.getAlias().orEmpty()
         if (alias.isEmpty()) {
-            displayEmojiId(contactDto?.contactInfo?.extractWalletAddress()?.emojiId.orEmpty())
+            displayEmojiId(contactDto?.contactInfo?.extractWalletAddress()?.fullEmojiId.orEmpty())
         } else {
             displayAlias(alias)
         }

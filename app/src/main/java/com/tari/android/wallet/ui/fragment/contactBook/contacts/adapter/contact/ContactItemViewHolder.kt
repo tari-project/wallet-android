@@ -29,17 +29,17 @@ class ContactItemViewHolder(view: ItemContactBinding) : CommonViewHolder<Contact
 
         when (val contactInfo = item.contact.contactInfo) {
             is FFIContactInfo -> {
-                displayFirstEmojiOrText(contactInfo.walletAddress.emojiId.extractEmojis()[0])
+                displayFirstEmojiOrText(contactInfo.walletAddress.avatarEmoji)
                 if (contactInfo.getAlias().isEmpty()) {
-                    displayEmojiId(contactInfo.walletAddress.emojiId)
+                    displayEmojiId(contactInfo.walletAddress.fullEmojiId)
                 } else {
                     displayAlias(contactInfo.getAlias())
                 }
             }
 
             is MergedContactInfo -> {
-                if (contactInfo.phoneContactInfo.avatar.isNotEmpty() && hasContactPermission()) displayAvatar(contactInfo.phoneContactInfo.avatar) else
-                    displayFirstEmojiOrText(contactInfo.ffiContactInfo.walletAddress.emojiId.extractEmojis()[0])
+                if (contactInfo.phoneContactInfo.avatar.isNotEmpty() && hasContactPermission()) displayAvatar(contactInfo.phoneContactInfo.avatar)
+                else displayFirstEmojiOrText(contactInfo.ffiContactInfo.walletAddress.avatarEmoji)
                 displayAlias(contactInfo.phoneContactInfo.getAlias())
                 displayYat(item.contact.yatDto?.yat.orEmpty())
             }

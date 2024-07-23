@@ -355,7 +355,7 @@ class TariNavigator @Inject constructor(val prefs: CorePrefRepository, val tariS
 
     private fun sendToUserByDeeplink(deeplink: DeepLink.Send) {
         FFIWallet.instance?.getWalletAddress()
-        val address = FFITariWalletAddress(HexString(deeplink.walletAddressHex)).runWithDestroy { TariWalletAddress(it) }
+        val address = TariWalletAddress.fromBase58(deeplink.walletAddressBase58)
         val contact = (activity as HomeActivity).viewModel.contactsRepository.getContactByAddress(address)
         val bundle = Bundle().apply {
             putParcelable(PARAMETER_CONTACT, contact)

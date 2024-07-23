@@ -29,7 +29,8 @@ class ContactLinkHeaderViewHolder(view: ItemContactLinkHeaderBinding) :
         ui.searchView.requestFocus()
         (ui.searchView.context as? Activity)?.showKeyboard(ui.searchView)
 
-        val emojiId = item.walletAddress.emojiId.extractEmojis()
+        val emojiId = item.walletAddress.fullEmojiId.extractEmojis()
+        // TODO move it to a helper function
         val shortEmojiId = emojiId.take(3) + itemView.context.getString(R.string.emoji_id_bullet_separator) + emojiId.takeLast(3)
         val shortString = shortEmojiId.joinToString("")
         ui.linkContactMessage.text = itemView.context.getString(R.string.contact_book_contacts_book_link_message, shortString)
