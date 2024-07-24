@@ -33,6 +33,7 @@
 package com.tari.android.wallet.model
 
 import android.os.Parcelable
+import com.tari.android.wallet.extension.flag
 import com.tari.android.wallet.ffi.Base58
 import com.tari.android.wallet.ffi.Base58String
 import com.tari.android.wallet.ffi.FFIException
@@ -51,7 +52,7 @@ import kotlinx.parcelize.Parcelize
 @Parcelize
 data class TariWalletAddress(
     val network: Network,
-    val features: Features,
+    val features: List<Feature>,
 
     val networkEmoji: EmojiId,
     val featuresEmoji: EmojiId,
@@ -67,7 +68,7 @@ data class TariWalletAddress(
 
     constructor(ffiWalletAddress: FFITariWalletAddress) : this(
         network = Network.get(ffiWalletAddress.getNetwork()),
-        features = Features.get(ffiWalletAddress.getFeatures()),
+        features = Feature.get(ffiWalletAddress.getFeatures()),
         networkEmoji = ffiWalletAddress.getNetwork().tariEmoji(),
         featuresEmoji = ffiWalletAddress.getFeatures().tariEmoji(),
         viewKeyEmojis = ffiWalletAddress.getViewKey().getEmojiId(),
@@ -101,7 +102,7 @@ data class TariWalletAddress(
         // Empty wallet address for cases such one-sided payment or phone contact
         val EMPTY_ADDRESS = TariWalletAddress(
             network = TariWalletAddress.Network.TESTNET,
-            features = TariWalletAddress.Features.ONE_SIDED,
+            features = emptyList(),
             networkEmoji = EMOJI_ZERO,
             featuresEmoji = EMOJI_ZERO,
             viewKeyEmojis = EMOJI_ZERO,
@@ -149,16 +150,12 @@ data class TariWalletAddress(
         }
     }
 
-    enum class Features {
-        ONE_SIDED,
-        INTERACTIVE;
+    enum class Feature(val mask: Byte) {
+        ONE_SIDED(0b00000001),
+        INTERACTIVE(0b00000010);
 
         companion object {
-            fun get(value: Int) = when (value) {
-                0b00000001 -> ONE_SIDED
-                0b00000010 -> INTERACTIVE
-                else -> throw IllegalArgumentException("Unknown value: $value")
-            }
+            fun get(features: Int): List<Feature> = entries.filter { features.toByte().flag(it.mask) }
         }
     }
 }
