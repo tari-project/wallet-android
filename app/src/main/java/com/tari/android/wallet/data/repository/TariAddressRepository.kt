@@ -6,7 +6,7 @@ import com.tari.android.wallet.util.extractEmojis
 import javax.inject.Inject
 import javax.inject.Singleton
 
-// TODO remove this class and use TariWalletAddress constructors
+// TODO remove this class and put this method to the Deeplink code
 @Singleton
 class TariAddressRepository @Inject constructor() {
 

@@ -78,7 +78,7 @@ class FFITariWalletAddress() : FFIBase() {
 
     fun getFeatures(): Int = runWithError { jniGetFeatures(it) }
 
-    fun getViewKey(): FFIPublicKey = runWithError { FFIPublicKey(jniGetViewKey(it)) }
+    fun getViewKey(): FFIPublicKey? = runWithError { jniGetViewKey(it) }.takeIf { !it.isNull() }?.let { FFIPublicKey(it) }
 
     fun getSpendKey(): FFIPublicKey = runWithError { FFIPublicKey(jniGetSpendKey(it)) }
 

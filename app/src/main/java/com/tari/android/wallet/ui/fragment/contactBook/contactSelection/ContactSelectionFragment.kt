@@ -52,7 +52,6 @@ import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.EmojiUtil
 import com.tari.android.wallet.util.containsNonEmoji
 import com.tari.android.wallet.util.firstNCharactersAreEmojis
-import com.tari.android.wallet.util.numberOfEmojis
 import kotlinx.coroutines.launch
 import me.everything.android.ui.overscroll.OverScrollDecoratorHelper
 
@@ -330,10 +329,9 @@ open class ContactSelectionFragment : CommonFragment<FragmentContactsSelectionBi
                 editable.insert(target, chunkSeparatorSpannable)
             }
             // check if valid emoji - don't search if not
-            val emojisNumber = textWithoutSeparators.numberOfEmojis()
-            if (textWithoutSeparators.containsNonEmoji() || emojisNumber > Constants.Wallet.EMOJI_ID_LENGTH) {
+            if (textWithoutSeparators.containsNonEmoji()) {
                 viewModel.deselectTariWalletAddress()
-                showNotValidEmojiId() // todo check by constructor
+                showNotValidEmojiId()
             } else {
                 viewModel.addressEntered(textWithoutSeparators)
             }
@@ -342,7 +340,7 @@ open class ContactSelectionFragment : CommonFragment<FragmentContactsSelectionBi
             deeplinkViewModel.execute(deeplink)
             viewModel.deselectTariWalletAddress()
         } else {
-            val walletAddress = viewModel.walletAddressViewModel.tariAddressRepository.parseValidWalletAddress(text)
+            val walletAddress = TariWalletAddress.fromBase58OrNull(text)
             if (walletAddress != null) {
                 viewModel.addressEntered(walletAddress.fullEmojiId)
             } else {

@@ -56,7 +56,7 @@ data class TariWalletAddress(
 
     val networkEmoji: EmojiId,
     val featuresEmoji: EmojiId,
-    val viewKeyEmojis: EmojiId,
+    val viewKeyEmojis: EmojiId?,
     val spendKeyEmojis: EmojiId,
     val checksumEmoji: EmojiId,
 
@@ -71,7 +71,7 @@ data class TariWalletAddress(
         features = Feature.get(ffiWalletAddress.getFeatures()),
         networkEmoji = ffiWalletAddress.getNetwork().tariEmoji(),
         featuresEmoji = ffiWalletAddress.getFeatures().tariEmoji(),
-        viewKeyEmojis = ffiWalletAddress.getViewKey().getEmojiId(),
+        viewKeyEmojis = ffiWalletAddress.getViewKey()?.getEmojiId(),
         spendKeyEmojis = ffiWalletAddress.getSpendKey().getEmojiId(),
         checksumEmoji = ffiWalletAddress.getChecksum().tariEmoji(),
         fullBase58 = ffiWalletAddress.fullBase58(),
@@ -128,6 +128,8 @@ data class TariWalletAddress(
          */
         @Throws(FFIException::class)
         fun makeTariAddress(input: String): TariWalletAddress = runCatching { fromBase58(input) }.recoverCatching { fromEmojiId(input) }.getOrThrow()
+
+        fun makeTariAddressOrNull(input: String): TariWalletAddress? = runCatching { makeTariAddress(input) }.getOrNull()
 
         fun validateBase58(base58: Base58): Boolean = fromBase58OrNull(base58) != null
 
