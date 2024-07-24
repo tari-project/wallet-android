@@ -54,6 +54,7 @@ class FFISeedWords() : FFIBase() {
     }
 
     constructor(pointer: FFIPointer) : this() {
+        if (pointer.isNull()) error("Pointer must not be null")
         this.pointer = pointer
     }
 

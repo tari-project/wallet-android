@@ -47,6 +47,7 @@ class FFIPublicKey() : FFIBase() {
     private external fun jniGetEmojiId(libError: FFIError): String
 
     constructor(pointer: FFIPointer) : this() {
+        if (pointer.isNull()) error("Pointer must not be null")
         this.pointer = pointer
     }
 

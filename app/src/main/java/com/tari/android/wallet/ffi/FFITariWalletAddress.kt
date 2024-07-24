@@ -54,6 +54,7 @@ class FFITariWalletAddress() : FFIBase() {
     private external fun jniGetChecksum(libError: FFIError): Int
 
     constructor(pointer: FFIPointer) : this() {
+        if (pointer.isNull()) error("Pointer must not be null")
         this.pointer = pointer
     }
 

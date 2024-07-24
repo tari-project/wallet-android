@@ -49,6 +49,7 @@ class FFIContact() : FFIBase() {
     private external fun jniCreate(alias: String, isFavorite: Boolean, publicKeyPtr: FFITariWalletAddress, libError: FFIError)
 
     constructor(pointer: FFIPointer) : this() {
+        if (pointer.isNull()) error("Pointer must not be null")
         this.pointer = pointer
     }
 

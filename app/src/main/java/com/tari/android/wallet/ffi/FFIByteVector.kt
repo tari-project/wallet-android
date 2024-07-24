@@ -45,6 +45,7 @@ class FFIByteVector() : FFIBase() {
     private external fun jniCreate(byteArray: ByteArray, error: FFIError)
 
     constructor(pointer: FFIPointer) : this() {
+        if (pointer.isNull()) error("Pointer must not be null")
         this.pointer = pointer
     }
 

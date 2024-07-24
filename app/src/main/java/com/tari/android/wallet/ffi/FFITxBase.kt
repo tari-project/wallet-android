@@ -7,6 +7,7 @@ import com.tari.android.wallet.model.Tx
 abstract class FFITxBase() : FFIBase() {
 
     constructor(pointer: FFIPointer) : this() {
+        if (pointer.isNull()) error("Pointer must not be null")
         this.pointer = pointer
     }
 
