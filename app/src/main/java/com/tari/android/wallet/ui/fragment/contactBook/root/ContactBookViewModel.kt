@@ -7,8 +7,7 @@ import com.tari.android.wallet.application.deeplinks.DeepLink
 import com.tari.android.wallet.application.deeplinks.DeeplinkFormatter
 import com.tari.android.wallet.application.deeplinks.DeeplinkHandler
 import com.tari.android.wallet.data.repository.TariAddressRepository
-import com.tari.android.wallet.extension.launchOnIo
-import com.tari.android.wallet.extension.launchOnMain
+import com.tari.android.wallet.model.TariWalletAddress
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.component.clipboardController.WalletAddressViewModel
 import com.tari.android.wallet.ui.fragment.contactBook.data.ContactsRepository
@@ -78,19 +77,15 @@ class ContactBookViewModel : CommonViewModel() {
     }
 
     fun handleDeeplink(deeplinkString: String) {
-        launchOnIo {
-            when (val deeplink = deeplinkFormatter.parse(deeplinkString)) {
-                is DeepLink.Contacts -> deeplink.contacts.firstOrNull()?.base58
-                is DeepLink.Send -> deeplink.walletAddressBase58
-                is DeepLink.UserProfile -> deeplink.tariAddressBase58
-                else -> null
-            }?.let { tariAddressRepository.walletAddressFromHex(it).getOrNull() }
-                ?.let { walletAddress ->
-                    launchOnMain {
-                        query.postValue(walletAddress.fullEmojiId)
-                    }
-                }
-        }
+        when (val deeplink = deeplinkFormatter.parse(deeplinkString)) {
+            is DeepLink.Contacts -> deeplink.contacts.firstOrNull()?.base58
+            is DeepLink.Send -> deeplink.walletAddressBase58
+            is DeepLink.UserProfile -> deeplink.tariAddressBase58
+            else -> null
+        }?.let { TariWalletAddress.fromBase58OrNull(it) }
+            ?.let { walletAddress ->
+                query.postValue(walletAddress.fullEmojiId)
+            }
     }
 
     fun doSearch(query: String) {

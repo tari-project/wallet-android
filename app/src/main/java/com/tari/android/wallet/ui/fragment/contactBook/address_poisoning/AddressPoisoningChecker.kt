@@ -16,7 +16,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 private const val MIN_SAME_CHARS = 3
-private const val USED_PREFIX_SUFFIX_CHARS = Constants.Wallet.emojiFormatterChunkSize
+private const val USED_PREFIX_SUFFIX_CHARS = Constants.Wallet.EMOJI_FORMATTER_CHUNK_SIZE
 
 
 @Singleton

@@ -132,8 +132,8 @@ class WalletManager @Inject constructor(
         transport = getTorTransport(),
         databaseName = walletConfig.walletDBName,
         datastorePath = walletConfig.getWalletFilesDirPath(),
-        discoveryTimeoutSec = Constants.Wallet.discoveryTimeoutSec,
-        safMessageDurationSec = Constants.Wallet.storeAndForwardMessageDurationSec,
+        discoveryTimeoutSec = Constants.Wallet.DISCOVERY_TIMEOUT_SEC,
+        safMessageDurationSec = Constants.Wallet.STORE_AND_FORWARD_MESSAGE_DURATION_SEC,
     )
 
     private fun startWallet() {

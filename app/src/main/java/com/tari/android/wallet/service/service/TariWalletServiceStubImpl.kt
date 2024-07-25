@@ -78,7 +78,7 @@ class TariWalletServiceStubImpl(
     override fun estimateTxFee(amount: MicroTari, error: WalletError, feePerGram: MicroTari?): MicroTari? = runMapping(error) {
         val defaultKernelCount = BigInteger("1")
         val defaultOutputCount = BigInteger("2")
-        val gram = feePerGram?.value ?: Constants.Wallet.defaultFeePerGram.value
+        val gram = feePerGram?.value ?: Constants.Wallet.DEFAULT_FEE_PER_GRAM.value
         MicroTari(wallet.estimateTxFee(amount.value, gram, defaultKernelCount, defaultOutputCount))
     }
 
@@ -252,19 +252,19 @@ class TariWalletServiceStubImpl(
 
     override fun joinUtxos(utxos: List<TariUtxo>, walletError: WalletError) = runMapping(walletError) {
         val ffiError = FFIError()
-        wallet.joinUtxos(utxos.map { it.commitment }.toTypedArray(), Constants.Wallet.defaultFeePerGram.value, ffiError)
+        wallet.joinUtxos(utxos.map { it.commitment }.toTypedArray(), Constants.Wallet.DEFAULT_FEE_PER_GRAM.value, ffiError)
         walletError.code = ffiError.code
     } ?: Unit
 
     override fun splitUtxos(utxos: List<TariUtxo>, splitCount: Int, walletError: WalletError) = runMapping(walletError) {
         val ffiError = FFIError()
-        wallet.splitUtxos(utxos.map { it.commitment }.toTypedArray(), splitCount, Constants.Wallet.defaultFeePerGram.value, ffiError)
+        wallet.splitUtxos(utxos.map { it.commitment }.toTypedArray(), splitCount, Constants.Wallet.DEFAULT_FEE_PER_GRAM.value, ffiError)
         walletError.code = ffiError.code
     } ?: Unit
 
     override fun previewJoinUtxos(utxos: List<TariUtxo>, walletError: WalletError): TariCoinPreview? = runMapping(walletError) {
         val ffiError = FFIError()
-        val result = wallet.joinPreviewUtxos(utxos.map { it.commitment }.toTypedArray(), Constants.Wallet.defaultFeePerGram.value, ffiError)
+        val result = wallet.joinPreviewUtxos(utxos.map { it.commitment }.toTypedArray(), Constants.Wallet.DEFAULT_FEE_PER_GRAM.value, ffiError)
         walletError.code = ffiError.code
         result
     }
@@ -272,7 +272,7 @@ class TariWalletServiceStubImpl(
     override fun previewSplitUtxos(utxos: List<TariUtxo>, splitCount: Int, walletError: WalletError): TariCoinPreview? = runMapping(walletError) {
         val ffiError = FFIError()
         val result = wallet.splitPreviewUtxos(
-            utxos.map { it.commitment }.toTypedArray(), splitCount, Constants.Wallet.defaultFeePerGram.value, ffiError
+            utxos.map { it.commitment }.toTypedArray(), splitCount, Constants.Wallet.DEFAULT_FEE_PER_GRAM.value, ffiError
         )
         walletError.code = ffiError.code
         result

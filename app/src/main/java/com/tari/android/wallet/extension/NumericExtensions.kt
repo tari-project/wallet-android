@@ -49,3 +49,5 @@ fun Int.toMicroTari() = BigInteger.valueOf(this.toLong()).toMicroTari()
 fun Long.toMicroTari() = BigInteger.valueOf(this).toMicroTari()
 
 fun BigInteger.toMicroTari() = MicroTari(this)
+
+fun Byte.flag(bitmask: Byte): Boolean = (this.toInt() and bitmask.toInt()) == bitmask.toInt()

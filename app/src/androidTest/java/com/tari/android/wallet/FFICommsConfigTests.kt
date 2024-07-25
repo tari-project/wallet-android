@@ -87,8 +87,8 @@ class FFICommsConfigTests {
             transport,
             DB_NAME,
             walletDir,
-            Constants.Wallet.discoveryTimeoutSec,
-            Constants.Wallet.storeAndForwardMessageDurationSec
+            Constants.Wallet.DISCOVERY_TIMEOUT_SEC,
+            Constants.Wallet.STORE_AND_FORWARD_MESSAGE_DURATION_SEC
         )
         assertNotEquals(nullptr, commsConfig.pointer)
         commsConfig.destroy()
@@ -104,8 +104,8 @@ class FFICommsConfigTests {
                 transport,
                 DB_NAME,
                 "${walletDir}_invalid_target",
-                Constants.Wallet.discoveryTimeoutSec,
-                Constants.Wallet.storeAndForwardMessageDurationSec
+                Constants.Wallet.DISCOVERY_TIMEOUT_SEC,
+                Constants.Wallet.STORE_AND_FORWARD_MESSAGE_DURATION_SEC
             )
         } catch (e: Throwable) {
             transport.destroy()

@@ -136,9 +136,9 @@ class AddAmountViewModel : CommonViewModel() {
 
     private fun calculateDefaultFees(amount: MicroTari, walletError: WalletError) {
         val calculatedFee = walletService.getWithError(this::showFeeError) { _, wallet ->
-            wallet.estimateTxFee(amount, walletError, Constants.Wallet.defaultFeePerGram)
+            wallet.estimateTxFee(amount, walletError, Constants.Wallet.DEFAULT_FEE_PER_GRAM)
         } ?: return
-        selectedFeeData = FeeData(Constants.Wallet.defaultFeePerGram, calculatedFee)
+        selectedFeeData = FeeData(Constants.Wallet.DEFAULT_FEE_PER_GRAM, calculatedFee)
     }
 
     private fun showFeeError(walletError: WalletError) {

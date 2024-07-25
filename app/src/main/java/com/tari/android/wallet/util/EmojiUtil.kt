@@ -223,7 +223,7 @@ class EmojiUtil {
                 }
                 noOfElements++
                 if (currentIndex < string.length
-                    && noOfElements % Constants.Wallet.emojiFormatterChunkSize == 0
+                    && noOfElements % Constants.Wallet.EMOJI_FORMATTER_CHUNK_SIZE == 0
                 ) {
                     newIndices.add(currentIndex)
                 }

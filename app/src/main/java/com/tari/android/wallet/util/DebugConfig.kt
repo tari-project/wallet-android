@@ -94,14 +94,14 @@ object DebugConfig {
 }
 
 object MockDataStub {
-    private const val EMOJI_ID : EmojiId =
+    private const val EMOJI_ID: EmojiId =
         "\uD83C\uDF34\uD83C\uDF0D\uD83C\uDFB5\uD83C\uDFBA\uD83D\uDDFD\uD83C\uDF37\uD83D\uDE91\uD83C\uDF45\uD83D\uDC60\uD83C\uDF1F\uD83D\uDC8C\uD83D\uDE97\uD83D\uDC40\uD83D\uDD29\uD83C\uDF08\uD83D\uDC1D\uD83C\uDF37\uD83C\uDF70\uD83C\uDF38\uD83C\uDF81\uD83C\uDF55\uD83D\uDEBF\uD83D\uDC34\uD83D\uDCA6\uD83D\uDE0E\uD83D\uDEAA\uD83C\uDFE0\uD83D\uDD29\uD83C\uDFE0\uD83D\uDE82\uD83C\uDFBA\uD83C\uDFC6\uD83C\uDFB3"
     private const val BASE58: Base58 = "C05575BE00EF016A209B1F493D9027B0E330F3E25FE89BBE6FA66D966EE5B6356"
 
     // TODO make better mock stub
     val WALLET_ADDRESS = TariWalletAddress(
         network = TariWalletAddress.Network.NEXTNET,
-        features = TariWalletAddress.Features.INTERACTIVE,
+        features = listOf(TariWalletAddress.Feature.INTERACTIVE),
         networkEmoji = EMOJI_ID,
         featuresEmoji = EMOJI_ID,
         viewKeyEmojis = EMOJI_ID,

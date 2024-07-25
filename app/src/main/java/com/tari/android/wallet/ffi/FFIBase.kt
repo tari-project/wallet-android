@@ -61,3 +61,5 @@ abstract class FFIBase {
         }
     }
 }
+
+fun FFIPointer.isNull(): Boolean = this == nullptr
