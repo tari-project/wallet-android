@@ -9,7 +9,13 @@ import kotlinx.parcelize.Parcelize
 data class TransactionData(
     val recipientContact: ContactDto?,
     val amount: MicroTari?,
-    val note: String?,
+    private val note: String?,
     val feePerGram: MicroTari?,
     val isOneSidePayment: Boolean,
-) : Parcelable
+) : Parcelable {
+    val message: String
+        get() = if (isOneSidePayment) "" else note.orEmpty()
+
+    val paymentId: String
+        get() = if (isOneSidePayment) note.orEmpty() else ""
+}

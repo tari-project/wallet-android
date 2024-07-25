@@ -181,9 +181,9 @@ class FinalizeSendTxViewModel : CommonViewModel() {
                     /* contact = */ TariContact(transactionData.recipientContact!!.contactInfo.extractWalletAddress()),
                     /* amount = */ transactionData.amount,
                     /* feePerGram = */ transactionData.feePerGram ?: Constants.Wallet.DEFAULT_FEE_PER_GRAM,
-                    /* message = */ transactionData.note.orEmpty(),
+                    /* message = */ transactionData.message,
                     /* isOneSidePayment = */ transactionData.isOneSidePayment,
-                    /* paymentId = */ "", // TODO add this to the transaction data when it is available
+                    /* paymentId = */ transactionData.paymentId,
                     /* error = */ error,
                 )
                 // if success, just wait for the callback to happen
