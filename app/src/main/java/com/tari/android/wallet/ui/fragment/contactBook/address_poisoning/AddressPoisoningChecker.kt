@@ -91,14 +91,10 @@ class AddressPoisoningChecker @Inject constructor(
     }
 }
 
-private fun TariWalletAddress.isSimilarTo(walletAddress: TariWalletAddress): Boolean {
-    return this.fullEmojiId.isSimilarEmojiId(walletAddress.fullEmojiId)  // TODO  check only spend key
-}
-
 @VisibleForTesting
-fun EmojiId.isSimilarEmojiId(other: EmojiId): Boolean {
-    val thisEmojis = this.extractEmojis()
-    val otherEmojis = other.extractEmojis()
+fun TariWalletAddress.isSimilarTo(other: TariWalletAddress): Boolean {
+    val thisEmojis = this.spendKeyEmojis.extractEmojis()
+    val otherEmojis = other.spendKeyEmojis.extractEmojis()
 
     if (thisEmojis.size != otherEmojis.size || thisEmojis.size < (USED_PREFIX_SUFFIX_CHARS * 2)) {
         return false
