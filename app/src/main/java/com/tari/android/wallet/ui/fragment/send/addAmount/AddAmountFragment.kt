@@ -62,8 +62,8 @@ import com.tari.android.wallet.model.WalletError
 import com.tari.android.wallet.ui.common.CommonFragment
 import com.tari.android.wallet.ui.component.fullEmojiId.EmojiIdSummaryViewController
 import com.tari.android.wallet.ui.component.fullEmojiId.FullEmojiIdViewController
-import com.tari.android.wallet.ui.dialog.modular.SimpleDialogArgs
 import com.tari.android.wallet.ui.dialog.modular.ModularDialog
+import com.tari.android.wallet.ui.dialog.modular.SimpleDialogArgs
 import com.tari.android.wallet.ui.dialog.tooltipDialog.TooltipDialogArgs
 import com.tari.android.wallet.ui.extension.gone
 import com.tari.android.wallet.ui.extension.invisible
@@ -294,11 +294,8 @@ class AddAmountFragment : CommonFragment<FragmentAddAmountBinding, AddAmountView
             feePerGram = viewModel.selectedFeeData!!.feePerGram,
             isOneSidePayment = isOneSidePayment,
         )
-        if (isOneSidePayment) {
-            viewModel.navigation.postValue(Navigation.AddAmountNavigation.ContinueToFinalizing(transactionData))
-        } else {
-            viewModel.navigation.postValue(Navigation.AddAmountNavigation.ContinueToAddNote(transactionData))
-        }
+
+        viewModel.navigation.postValue(Navigation.AddAmountNavigation.ContinueToAddNote(transactionData))
     }
 
     /**
