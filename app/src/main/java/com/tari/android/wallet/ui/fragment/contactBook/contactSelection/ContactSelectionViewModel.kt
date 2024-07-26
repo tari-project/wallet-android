@@ -8,6 +8,7 @@ import com.tari.android.wallet.application.YatAdapter
 import com.tari.android.wallet.application.deeplinks.DeepLink
 import com.tari.android.wallet.application.deeplinks.DeeplinkFormatter
 import com.tari.android.wallet.application.deeplinks.DeeplinkHandler
+import com.tari.android.wallet.data.sharedPrefs.CorePrefRepository
 import com.tari.android.wallet.event.EffectChannelFlow
 import com.tari.android.wallet.extension.collectFlow
 import com.tari.android.wallet.extension.launchOnIo
@@ -65,6 +66,9 @@ class ContactSelectionViewModel : CommonViewModel() {
 
     @Inject
     lateinit var addressPoisoningChecker: AddressPoisoningChecker
+
+    @Inject
+    lateinit var corePrefRepository: CorePrefRepository
 
     var additionalFilter: (ContactItem) -> Boolean = { true }
 
@@ -181,10 +185,14 @@ class ContactSelectionViewModel : CommonViewModel() {
                 val firstName = split.getOrNull(1).orEmpty().trim()
                 val surname = split.getOrNull(0).orEmpty().trim()
 
-                viewModelScope.launch(Dispatchers.IO) {
-                    contactsRepository.updateContactInfo(user, firstName, surname, "")
-                    viewModelScope.launch(Dispatchers.Main) {
-                        navigation.postValue(Navigation.ContactBookNavigation.BackToContactBook)
+                if (user.walletAddress == corePrefRepository.walletAddress) {
+                    showCantAddYourselfDialog()
+                } else {
+                    viewModelScope.launch(Dispatchers.IO) {
+                        contactsRepository.updateContactInfo(user, firstName, surname, "")
+                        viewModelScope.launch(Dispatchers.Main) {
+                            navigation.postValue(Navigation.ContactBookNavigation.BackToContactBook)
+                        }
                     }
                 }
             }
@@ -202,6 +210,13 @@ class ContactSelectionViewModel : CommonViewModel() {
                 navigation.postValue(Navigation.ChatNavigation.ToChat(user.getFFIContactInfo()?.walletAddress!!, true))
             }
         }
+    }
+
+    private fun showCantAddYourselfDialog() {
+        showSimpleDialog(
+            title = resourceManager.getString(R.string.contact_book_add_contact_cant_add_yourself_title),
+            description = resourceManager.getString(R.string.contact_book_add_contact_cant_add_yourself_description),
+        )
     }
 
     private fun getUserDto(): ContactDto =

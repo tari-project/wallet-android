@@ -27,6 +27,7 @@ import com.tari.android.wallet.ui.dialog.confirm.ConfirmDialogArgs
 import com.tari.android.wallet.ui.dialog.error.WalletErrorArgs
 import com.tari.android.wallet.ui.dialog.modular.IDialogModule
 import com.tari.android.wallet.ui.dialog.modular.ModularDialogArgs
+import com.tari.android.wallet.ui.dialog.modular.SimpleDialogArgs
 import com.tari.android.wallet.ui.dialog.modular.modules.body.BodyModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonStyle
@@ -195,6 +196,20 @@ open class CommonViewModel : ViewModel() {
 
     fun showErrorDialog(exception: Throwable) {
         showModularDialog(WalletErrorArgs(resourceManager, exception).getModular())
+    }
+
+    fun showSimpleDialog(
+        title: CharSequence,
+        description: CharSequence,
+        cancelable: Boolean = true,
+        canceledOnTouchOutside: Boolean = true,
+        closeButtonTextRes: Int = R.string.common_close,
+        onClose: () -> Unit = {},
+    ) {
+        showModularDialog(
+            SimpleDialogArgs(title, description, cancelable, canceledOnTouchOutside, closeButtonTextRes, onClose)
+                .getModular(resourceManager)
+        )
     }
 
     fun hideDialog(dialogId: Int = ModularDialogArgs.DialogId.NO_ID) {

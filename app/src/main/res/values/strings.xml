@@ -825,6 +825,8 @@
     <string name="contact_book_add_contact_first_name_hint">Add Name</string>
     <string name="contact_book_add_contact_yat_hint">Yat</string>
     <string name="contact_book_add_contact_placeholder">Enter Emoji ID, Contact Name or Yat</string>
+    <string name="contact_book_add_contact_cant_add_yourself_title">Can’t add yourself</string>
+    <string name="contact_book_add_contact_cant_add_yourself_description">You can’t add your own Tari wallet address to your contact book</string>
     <string name="contact_book_search_hint">Find Contact</string>
     <string name="contact_book_details_send_tari">Send Tari</string>
     <string name="transaction_send_to">Send To</string>
