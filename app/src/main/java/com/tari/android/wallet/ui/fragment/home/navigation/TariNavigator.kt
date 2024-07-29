@@ -10,10 +10,7 @@ import com.tari.android.wallet.data.sharedPrefs.CorePrefRepository
 import com.tari.android.wallet.data.sharedPrefs.tariSettings.TariSettingsPrefRepository
 import com.tari.android.wallet.event.Event
 import com.tari.android.wallet.event.EventBus
-import com.tari.android.wallet.ffi.FFITariWalletAddress
 import com.tari.android.wallet.ffi.FFIWallet
-import com.tari.android.wallet.ffi.HexString
-import com.tari.android.wallet.ffi.runWithDestroy
 import com.tari.android.wallet.model.MicroTari
 import com.tari.android.wallet.model.TariWalletAddress
 import com.tari.android.wallet.model.Tx
@@ -355,7 +352,7 @@ class TariNavigator @Inject constructor(val prefs: CorePrefRepository, val tariS
 
     private fun sendToUserByDeeplink(deeplink: DeepLink.Send) {
         FFIWallet.instance?.getWalletAddress()
-        val address = TariWalletAddress.fromBase58(deeplink.walletAddressBase58)
+        val address = TariWalletAddress.fromBase58(deeplink.walletAddress)
         val contact = (activity as HomeActivity).viewModel.contactsRepository.getContactByAddress(address)
         val bundle = Bundle().apply {
             putParcelable(PARAMETER_CONTACT, contact)

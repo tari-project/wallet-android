@@ -97,7 +97,7 @@ class ShareViewModel : CommonViewModel() {
 
     private fun successfulDeviceFoundSharing(userProfile: DeepLink.UserProfile) {
         val contactDto = runCatching {
-            ContactDto(FFIContactInfo(walletAddress = TariWalletAddress.fromBase58(userProfile.tariAddressBase58), alias = userProfile.alias))
+            ContactDto(FFIContactInfo(walletAddress = TariWalletAddress.fromBase58(userProfile.tariAddress), alias = userProfile.alias))
         }.getOrNull() ?: return
 
         val name = userProfile.alias.ifEmpty {

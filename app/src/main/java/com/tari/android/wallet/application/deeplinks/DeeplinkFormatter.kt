@@ -34,8 +34,8 @@ class DeeplinkFormatter @Inject constructor(private val networkRepository: Netwo
 
         return DeepLink.getByCommand(command, paramentrs)?.takeIf {
             when (it) {
-                is DeepLink.Send -> TariWalletAddress.validateBase58(it.walletAddressBase58)
-                is DeepLink.UserProfile -> TariWalletAddress.validateBase58(it.tariAddressBase58)
+                is DeepLink.Send -> TariWalletAddress.validateBase58(it.walletAddress)
+                is DeepLink.UserProfile -> TariWalletAddress.validateBase58(it.tariAddress)
                 else -> true // Handle other DeepLink types or consider returning null if they shouldn't be valid
             }
         }

@@ -114,9 +114,9 @@ class ContactSelectionViewModel : CommonViewModel() {
     fun handleDeeplink(deeplinkString: String) {
         val deeplink = deeplinkFormatter.parse(deeplinkString)
         val deeplinkBase58 = when (deeplink) {
-            is DeepLink.Contacts -> deeplink.contacts.firstOrNull()?.base58
-            is DeepLink.Send -> deeplink.walletAddressBase58
-            is DeepLink.UserProfile -> deeplink.tariAddressBase58
+            is DeepLink.Contacts -> deeplink.contacts.firstOrNull()?.tariAddress
+            is DeepLink.Send -> deeplink.walletAddress
+            is DeepLink.UserProfile -> deeplink.tariAddress
             else -> null
         }
 

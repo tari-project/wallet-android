@@ -58,9 +58,9 @@ class WalletAddressViewModel : CommonViewModel() {
 
     private fun findValidEmojiId(query: String): TariWalletAddress? {
         return when (val deepLink = deeplinkHandler.handle(query)) {
-            is DeepLink.Send -> deepLink.walletAddressBase58
-            is DeepLink.UserProfile -> deepLink.tariAddressBase58
-            is DeepLink.Contacts -> deepLink.contacts.firstOrNull()?.base58
+            is DeepLink.Send -> deepLink.walletAddress
+            is DeepLink.UserProfile -> deepLink.tariAddress
+            is DeepLink.Contacts -> deepLink.contacts.firstOrNull()?.tariAddress
             else -> null
         }?.let { deeplinkBase58 -> TariWalletAddress.fromBase58OrNull(deeplinkBase58) }
             ?: tariAddressRepository.parseValidWalletAddress(query)

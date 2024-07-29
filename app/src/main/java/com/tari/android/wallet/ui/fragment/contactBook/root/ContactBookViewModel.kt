@@ -78,9 +78,9 @@ class ContactBookViewModel : CommonViewModel() {
 
     fun handleDeeplink(deeplinkString: String) {
         when (val deeplink = deeplinkFormatter.parse(deeplinkString)) {
-            is DeepLink.Contacts -> deeplink.contacts.firstOrNull()?.base58
-            is DeepLink.Send -> deeplink.walletAddressBase58
-            is DeepLink.UserProfile -> deeplink.tariAddressBase58
+            is DeepLink.Contacts -> deeplink.contacts.firstOrNull()?.tariAddress
+            is DeepLink.Send -> deeplink.walletAddress
+            is DeepLink.UserProfile -> deeplink.tariAddress
             else -> null
         }?.let { TariWalletAddress.fromBase58OrNull(it) }
             ?.let { walletAddress ->
@@ -124,7 +124,7 @@ class ContactBookViewModel : CommonViewModel() {
         val contacts = selectedContacts.map {
             DeepLink.Contacts.DeeplinkContact(
                 alias = contactUtil.normalizeAlias(it.contactInfo.getAlias(), it.contactInfo.extractWalletAddress()),
-                base58 = it.contactInfo.extractWalletAddress().fullBase58,
+                tariAddress = it.contactInfo.extractWalletAddress().fullBase58,
             )
         }
         return deeplinkHandler.getDeeplink(DeepLink.Contacts(contacts))

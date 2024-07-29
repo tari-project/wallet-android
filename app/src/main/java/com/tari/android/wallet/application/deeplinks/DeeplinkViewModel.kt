@@ -72,7 +72,7 @@ class DeeplinkViewModel : CommonViewModel() {
             listOf(
                 DeepLink.Contacts.DeeplinkContact(
                     alias = deeplink.alias,
-                    base58 = deeplink.tariAddressBase58,
+                    tariAddress = deeplink.tariAddress,
                 )
             )
         )
@@ -114,18 +114,18 @@ class DeeplinkViewModel : CommonViewModel() {
 
     private fun getData(deeplink: DeepLink.Contacts): List<ContactDto> = deeplink.contacts.mapNotNull {
         runCatching {
-            val tariWalletAddress = TariWalletAddress.fromBase58(it.base58)
+            val tariWalletAddress = TariWalletAddress.fromBase58(it.tariAddress)
             ContactDto(FFIContactInfo(walletAddress = tariWalletAddress, alias = it.alias))
         }.getOrNull()
     }
 
     private fun getData(deeplink: DeepLink.Send): ContactDto? = runCatching {
-        val tariWalletAddress = TariWalletAddress.fromBase58(deeplink.walletAddressBase58)
+        val tariWalletAddress = TariWalletAddress.fromBase58(deeplink.walletAddress)
         ContactDto(FFIContactInfo(walletAddress = tariWalletAddress, alias = ""))
     }.getOrNull()
 
     private fun getData(userProfile: DeepLink.UserProfile): ContactDto? = runCatching {
-        val tariWalletAddress = TariWalletAddress.fromBase58(userProfile.tariAddressBase58)
+        val tariWalletAddress = TariWalletAddress.fromBase58(userProfile.tariAddress)
         ContactDto(FFIContactInfo(walletAddress = tariWalletAddress, alias = userProfile.alias))
     }.getOrNull()
 

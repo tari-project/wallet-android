@@ -12,7 +12,6 @@ import com.tari.android.wallet.application.deeplinks.DeeplinkHandler
 import com.tari.android.wallet.data.sharedPrefs.CorePrefRepository
 import com.tari.android.wallet.data.sharedPrefs.yat.YatPrefRepository
 import com.tari.android.wallet.ffi.Base58
-import com.tari.android.wallet.model.TariWalletAddress
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.dialog.modular.DialogArgs
 import com.tari.android.wallet.ui.dialog.modular.ModularDialogArgs
@@ -107,13 +106,15 @@ class WalletInfoViewModel : CommonViewModel() {
     }
 
     fun shareData(type: ShareType) {
-        // TODO maybe use FFIWallet.getWalletAddress() ?
-        val walletAddress = TariWalletAddress.fromBase58(corePrefRepository.walletAddressBase58.orEmpty())
+        val walletAddress = corePrefRepository.walletAddress
 
-        val name = contactUtil.normalizeAlias(alias.value.orEmpty(), walletAddress)
-        val hex = corePrefRepository.walletAddressBase58.orEmpty()
+        val deeplink = deeplinkHandler.getDeeplink(
+            DeepLink.UserProfile(
+                tariAddress = corePrefRepository.walletAddressBase58.orEmpty(),
+                alias = contactUtil.normalizeAlias(alias.value.orEmpty(), walletAddress),
+            )
+        )
 
-        val deeplink = deeplinkHandler.getDeeplink(DeepLink.UserProfile(hex, name))
         ShareViewModel.currentInstant?.share(type, deeplink)
     }
 

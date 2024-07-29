@@ -141,11 +141,10 @@ class TariBluetoothServer @Inject constructor(
 
             fun initiateReading() {
                 if (shareChunkedData.isNotEmpty()) return
-                // TODO maybe use FFIWallet.getWalletAddress() ?
-                val myWalletAddress = TariWalletAddress.fromBase58(sharedPrefsRepository.walletAddressBase58.orEmpty())
+                val myWalletAddress = sharedPrefsRepository.walletAddress
                 val data = deeplinkHandler.getDeeplink(
                     DeepLink.UserProfile(
-                        tariAddressBase58 = sharedPrefsRepository.walletAddressBase58.orEmpty(),
+                        tariAddress = sharedPrefsRepository.walletAddressBase58.orEmpty(),
                         alias = contactUtil.normalizeAlias(
                             alias = (sharedPrefsRepository.name.orEmpty() + " " + sharedPrefsRepository.surname).trim(),
                             walletAddress = myWalletAddress,
