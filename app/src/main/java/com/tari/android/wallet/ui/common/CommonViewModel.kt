@@ -198,7 +198,16 @@ open class CommonViewModel : ViewModel() {
         showModularDialog(WalletErrorArgs(resourceManager, exception).getModular())
     }
 
+    fun showNotReadyYetDialog() {
+        showSimpleDialog(
+            iconRes = R.drawable.tari_construction,
+            title = resourceManager.getString(R.string.common_not_ready_yet_dialog_title),
+            description = resourceManager.getString(R.string.common_not_ready_yet_dialog_description),
+        )
+    }
+
     fun showSimpleDialog(
+        iconRes: Int? = null,
         title: CharSequence,
         description: CharSequence,
         cancelable: Boolean = true,
@@ -207,7 +216,7 @@ open class CommonViewModel : ViewModel() {
         onClose: () -> Unit = {},
     ) {
         showModularDialog(
-            SimpleDialogArgs(title, description, cancelable, canceledOnTouchOutside, closeButtonTextRes, onClose)
+            SimpleDialogArgs(iconRes, title, description, cancelable, canceledOnTouchOutside, closeButtonTextRes, onClose)
                 .getModular(resourceManager)
         )
     }

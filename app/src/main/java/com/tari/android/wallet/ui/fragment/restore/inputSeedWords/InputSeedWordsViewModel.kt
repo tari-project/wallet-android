@@ -376,7 +376,7 @@ class InputSeedWordsViewModel : CommonViewModel() {
 
     sealed class RestorationError(title: String, message: String) {
 
-        val args = SimpleDialogArgs(title, message)
+        val args = SimpleDialogArgs(title = title, description = message)
 
         class Invalid(resourceManager: ResourceManager) : RestorationError(
             resourceManager.getString(R.string.common_error_title),

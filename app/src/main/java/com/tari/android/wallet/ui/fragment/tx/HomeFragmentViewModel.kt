@@ -211,20 +211,16 @@ class HomeFragmentViewModel : CommonViewModel() {
     }
 
     private fun displayNetworkConnectionErrorDialog() {
-        showModularDialog(
-            SimpleDialogArgs(
-                resourceManager.getString(error_no_connection_title),
-                resourceManager.getString(error_no_connection_description),
-            ).getModular(resourceManager)
+        showSimpleDialog(
+            title = resourceManager.getString(error_no_connection_title),
+            description = resourceManager.getString(error_no_connection_description),
         )
     }
 
     private fun displayBaseNodeConnectionErrorDialog() {
-        showModularDialog(
-            SimpleDialogArgs(
-                resourceManager.getString(error_node_unreachable_title),
-                resourceManager.getString(error_node_unreachable_description),
-            ).getModular(resourceManager)
+        showSimpleDialog(
+            title = resourceManager.getString(error_node_unreachable_title),
+            description = resourceManager.getString(error_node_unreachable_description),
         )
     }
 

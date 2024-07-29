@@ -161,11 +161,11 @@ class ContactLinkViewModel : CommonViewModel() {
         val firstLineHtml = HtmlHelper.getSpannedText(resourceManager.getString(contact_book_contacts_book_link_message_firstLine))
         val secondLineHtml = HtmlHelper.getSpannedText(resourceManager.getString(contact_book_contacts_book_link_message_secondLine, name))
 
-       showModularDialog(
+        showModularDialog(
             HeadModule(resourceManager.getString(contact_book_contacts_book_link_title)),
-            BodyModule(null, SpannableString(firstLineHtml)),
+            BodyModule(textSpannable = SpannableString(firstLineHtml)),
             ShortEmojiIdModule(tariWalletAddress),
-            BodyModule(null, SpannableString(secondLineHtml)),
+            BodyModule(textSpannable = SpannableString(secondLineHtml)),
             ButtonModule(resourceManager.getString(common_confirm), ButtonStyle.Normal) {
                 viewModelScope.launch(Dispatchers.IO) {
                     contactsRepository.linkContacts(ffiContact.value!!, phoneContactDto)
@@ -187,12 +187,12 @@ class ContactLinkViewModel : CommonViewModel() {
 
         val modules = listOf(
             HeadModule(resourceManager.getString(contact_book_contacts_book_unlink_success_title)),
-            BodyModule(null, SpannableString(firstLineHtml)),
+            BodyModule(textSpannable = SpannableString(firstLineHtml)),
             ShortEmojiIdModule(tariWalletAddress),
-            BodyModule(null, SpannableString(secondLineHtml)),
+            BodyModule(textSpannable = SpannableString(secondLineHtml)),
             ButtonModule(resourceManager.getString(common_close), ButtonStyle.Close)
         )
-      showModularDialog(ModularDialogArgs(DialogArgs {
+        showModularDialog(ModularDialogArgs(DialogArgs {
             navigation.value = Navigation.ContactBookNavigation.BackToContactBook
         }, modules))
     }

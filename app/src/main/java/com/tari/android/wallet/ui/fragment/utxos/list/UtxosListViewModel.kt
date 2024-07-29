@@ -15,7 +15,6 @@ import com.tari.android.wallet.ui.dialog.modular.modules.body.BodyModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonStyle
 import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
-import com.tari.android.wallet.ui.dialog.modular.modules.imageModule.ImageModule
 import com.tari.android.wallet.ui.fragment.utxos.list.adapters.UtxosViewHolderItem
 import com.tari.android.wallet.ui.fragment.utxos.list.adapters.UtxosViewHolderItem.Companion.MAX_TILE_HEIGHT
 import com.tari.android.wallet.ui.fragment.utxos.list.adapters.UtxosViewHolderItem.Companion.MIN_TILE_HEIGHT
@@ -290,17 +289,11 @@ class UtxosListViewModel : CommonViewModel() {
     private fun showSuccessJoinDialog() = showSuccessDialog(R.string.utxos_success_join_description)
 
     private fun showSuccessDialog(descriptionId: Int) {
-        showModularDialog(
-            ModularDialogArgs(
-                DialogArgs {
-                    setSelectionState(false)
-                }, listOf(
-                    ImageModule(R.drawable.tari_utxos_succes_popper),
-                    HeadModule(resourceManager.getString(R.string.utxos_success_title)),
-                    BodyModule(resourceManager.getString(descriptionId)),
-                    ButtonModule(resourceManager.getString(R.string.common_close), ButtonStyle.Close),
-                )
-            )
+        showSimpleDialog(
+            iconRes = R.drawable.tari_utxos_succes_popper,
+            title = resourceManager.getString(R.string.utxos_success_title),
+            description = resourceManager.getString(descriptionId),
+            onClose = { setSelectionState(false) },
         )
     }
 }

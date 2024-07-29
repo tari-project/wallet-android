@@ -105,6 +105,8 @@
     <string name="common_no_2">Nah, not now</string>
     <string name="common_are_you_sure">Are you sure?</string>
     <string name="common_next">Next</string>
+    <string name="common_not_ready_yet_dialog_title">Hang tight, coming soon!</string>
+    <string name="common_not_ready_yet_dialog_description">This feature is currently under construction. We\'re working hard to bring it to you soon. Stay tuned!</string>
 
     <!-- emoji id copied view -->
     <string name="emoji_id_copied">COPIED</string>

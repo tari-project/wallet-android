@@ -281,7 +281,10 @@ class AllSettingsViewModel : CommonViewModel() {
     }
 
     private fun showBackupStorageCheckFailedDialog(message: String) {
-        showModularDialog(SimpleDialogArgs(resourceManager.getString(check_backup_storage_status_error_title), message).getModular(resourceManager))
+        showSimpleDialog(
+            title = resourceManager.getString(check_backup_storage_status_error_title),
+            description = message,
+        )
     }
 }
 
