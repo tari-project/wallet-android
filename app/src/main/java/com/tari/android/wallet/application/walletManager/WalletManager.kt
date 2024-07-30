@@ -189,10 +189,10 @@ class WalletManager @Inject constructor(
     }
 
     /**
-     * Stores wallet's public key hex and emoji id's into the shared prefs
+     * Stores wallet's Base58 address and emoji id into the shared prefs
      * for future convenience.
      */
-    private fun saveWalletPublicKeyHexToSharedPrefs() {
+    private fun saveWalletAddressToSharedPrefs() {
         // set shared preferences values after instantiation
         FFIWallet.instance?.getWalletAddress()?.let { ffiTariWalletAddress ->
             corePrefRepository.walletAddressBase58 = ffiTariWalletAddress.fullBase58()
@@ -239,7 +239,7 @@ class WalletManager @Inject constructor(
                 baseNodesManager.setNextBaseNode()
                 baseNodesManager.startSync()
             }
-            saveWalletPublicKeyHexToSharedPrefs()
+            saveWalletAddressToSharedPrefs()
         }
     }
 }

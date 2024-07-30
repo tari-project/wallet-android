@@ -21,7 +21,6 @@ import com.tari.android.wallet.model.TariWalletAddress
 import com.tari.android.wallet.model.TransactionSendStatus
 import com.tari.android.wallet.model.Tx
 import com.tari.android.wallet.model.TxId
-import com.tari.android.wallet.model.fullBase58
 import com.tari.android.wallet.model.recovery.WalletRestorationResult
 import com.tari.android.wallet.notification.NotificationHelper
 import com.tari.android.wallet.service.TariWalletServiceListener
@@ -68,10 +67,7 @@ class FFIWalletListenerImpl(
 
     private var txBroadcastRestarted = false
 
-    /**
-     * Pairs of <tx id, recipient public key hex>.
-     */
-    val outboundTxIdsToBePushNotified = CopyOnWriteArraySet<Pair<BigInteger, String>>()
+    val outboundTxIdsToBePushNotified = CopyOnWriteArraySet<OutboundTxNotification>()
 
     override fun onTxReceived(pendingInboundTx: PendingInboundTx) {
         val newTx = pendingInboundTx.copy(tariContact = getUserByWalletAddress(pendingInboundTx.tariContact.walletAddress))
@@ -167,9 +163,9 @@ class FFIWalletListenerImpl(
     override fun onDirectSendResult(txId: BigInteger, status: TransactionSendStatus) {
         // post event to bus
         EventBus.post(Event.Transaction.DirectSendResult(TxId(txId), status))
-        outboundTxIdsToBePushNotified.firstOrNull { it.first == txId }?.let {
+        outboundTxIdsToBePushNotified.firstOrNull { it.txId == txId }?.let {
             outboundTxIdsToBePushNotified.remove(it)
-            sendPushNotificationToTxRecipient(it.second)
+            sendPushNotificationToTxRecipient(it.recipientPublicKeyHex)
         }
         // schedule a backup
         backupManager.backupNow()
@@ -277,10 +273,9 @@ class FFIWalletListenerImpl(
                 }
     }
 
-    private fun sendPushNotificationToTxRecipient(recipientBase58: String) {
-        // TODO use hex of the spend key
-        val senderBase58 = wallet.getWalletAddress().fullBase58()
-        notificationService.notifyRecipient(recipientBase58, senderBase58, wallet::signMessage)
+    private fun sendPushNotificationToTxRecipient(recipientHex: String) {
+        val senderHex = wallet.getWalletAddress().notificationHex()
+        notificationService.notifyRecipient(recipientHex, senderHex, wallet::signMessage)
     }
 
     private fun checkBaseNodeSyncCompletion() {
@@ -341,4 +336,6 @@ class FFIWalletListenerImpl(
         ONLINE(1),
         OFFLINE(2),
     }
+
+    data class OutboundTxNotification(val txId: BigInteger, val recipientPublicKeyHex: String)
 }

@@ -45,7 +45,7 @@ import com.tari.android.wallet.util.tariEmoji
 import kotlinx.parcelize.Parcelize
 
 /**
- * This wrapper is needed for id parameters in AIDL methods. // todo check aidl
+ * This wrapper is needed for id parameters in AIDL methods.
  *
  * @author The Tari Development Team
  */

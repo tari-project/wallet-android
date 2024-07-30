@@ -152,8 +152,8 @@ class TariWalletServiceStubImpl(
     override fun cancelPendingTx(id: TxId, error: WalletError): Boolean = runMapping(error) { wallet.cancelPendingTx(id.value) } ?: false
 
     override fun addBaseNodePeer(baseNodePublicKey: String, baseNodeAddress: String, error: WalletError): Boolean = runMapping(error) {
-        Logger.t(this::class.simpleName).e("walletServiceStub:addBaseNodePeer:publicKeyHex: ${baseNodePublicKey}")
-        Logger.t(this::class.simpleName).e("walletServiceStub:addBaseNodePeer:address: ${baseNodeAddress}")
+        Logger.t(this::class.simpleName).e("walletServiceStub:addBaseNodePeer:publicKeyHex: $baseNodePublicKey")
+        Logger.t(this::class.simpleName).e("walletServiceStub:addBaseNodePeer:address: $baseNodeAddress")
         val result = FFIPublicKey(HexString(baseNodePublicKey)).runWithDestroy { wallet.addBaseNodePeer(it, baseNodeAddress) }
         if (result) {
             walletServiceListener.baseNodeValidationStatusMap.clear()
@@ -184,12 +184,18 @@ class TariWalletServiceStubImpl(
         paymentId: String,
         error: WalletError,
     ): TxId? = runMapping(error) {
-        val recipientAddressBase58: Base58 = tariContact.walletAddress.fullBase58
-        val recipientAddress = FFITariWalletAddress(Base58String(recipientAddressBase58)).runWithDestroy {
-            wallet.sendTx(it, amount.value, feePerGram.value, message, isOneSidePayment, paymentId)
-        }
-        walletServiceListener.outboundTxIdsToBePushNotified.add(Pair(recipientAddress, recipientAddressBase58.lowercase(Locale.ENGLISH))) // TODO remove lowercasing
-        TxId(recipientAddress)
+        val recipientAddress = FFITariWalletAddress(tariContact.walletAddress.fullBase58)
+        val txId = wallet.sendTx(recipientAddress, amount.value, feePerGram.value, message, isOneSidePayment, paymentId)
+
+        walletServiceListener.outboundTxIdsToBePushNotified.add(
+            FFIWalletListenerImpl.OutboundTxNotification(
+                txId = txId,
+                recipientPublicKeyHex = recipientAddress.notificationHex().lowercase(Locale.ENGLISH),
+            )
+        )
+
+        recipientAddress.destroy()
+        TxId(txId)
     }
 
     override fun removeContact(walletAddress: TariWalletAddress, error: WalletError): Boolean = runMapping(error) {

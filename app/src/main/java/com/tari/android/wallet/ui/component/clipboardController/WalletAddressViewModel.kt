@@ -3,7 +3,6 @@ package com.tari.android.wallet.ui.component.clipboardController
 import android.content.ClipboardManager
 import com.tari.android.wallet.application.deeplinks.DeepLink
 import com.tari.android.wallet.application.deeplinks.DeeplinkHandler
-import com.tari.android.wallet.data.repository.TariAddressRepository
 import com.tari.android.wallet.extension.launchOnIo
 import com.tari.android.wallet.extension.launchOnMain
 import com.tari.android.wallet.model.TariWalletAddress
@@ -18,9 +17,6 @@ class WalletAddressViewModel : CommonViewModel() {
 
     @Inject
     lateinit var deeplinkHandler: DeeplinkHandler
-
-    @Inject
-    lateinit var tariAddressRepository: TariAddressRepository
 
     val discoveredWalletAddressFromClipboard = SingleLiveEvent<TariWalletAddress>()
 
@@ -63,6 +59,6 @@ class WalletAddressViewModel : CommonViewModel() {
             is DeepLink.Contacts -> deepLink.contacts.firstOrNull()?.tariAddress
             else -> null
         }?.let { deeplinkBase58 -> TariWalletAddress.fromBase58OrNull(deeplinkBase58) }
-            ?: tariAddressRepository.parseValidWalletAddress(query)
+            ?: TariWalletAddress.makeTariAddressOrNull(query)
     }
 }

@@ -6,7 +6,6 @@ import com.tari.android.wallet.R
 import com.tari.android.wallet.application.deeplinks.DeepLink
 import com.tari.android.wallet.application.deeplinks.DeeplinkFormatter
 import com.tari.android.wallet.application.deeplinks.DeeplinkHandler
-import com.tari.android.wallet.data.repository.TariAddressRepository
 import com.tari.android.wallet.model.TariWalletAddress
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.component.clipboardController.WalletAddressViewModel
@@ -36,9 +35,6 @@ class ContactBookViewModel : CommonViewModel() {
 
     @Inject
     lateinit var contactUtil: ContactUtil
-
-    @Inject
-    lateinit var tariAddressRepository: TariAddressRepository
 
     val shareList = MutableLiveData<List<ShareOptionArgs>>()
 

@@ -84,6 +84,8 @@ class FFITariWalletAddress() : FFIBase() {
 
     fun getChecksum(): Int = runWithError { jniGetChecksum(it) }
 
+    fun notificationHex(): String = getSpendKey().getByteVector().hex()
+
     override fun toString(): String = getEmojiId()
 
     override fun destroy() = jniDestroy()
