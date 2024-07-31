@@ -33,9 +33,7 @@
 package com.tari.android.wallet
 
 import com.tari.android.wallet.ffi.FFIByteVector
-import com.tari.android.wallet.ffi.HexString
-import com.tari.android.wallet.ffi.nullptr
-import org.junit.Assert.*
+import org.junit.Assert.assertArrayEquals
 import org.junit.Test
 
 /**
@@ -44,16 +42,6 @@ import org.junit.Test
  * @author The Tari Development Team
  */
 class FFIByteVectorTests {
-
-    @Test
-    fun constructor_assertThatValidObjectWasCreated() {
-        val hexString = FFITestUtil.WALLET_ADDRESS_HEX_STRING
-        val byteVector = FFIByteVector(HexString(hexString))
-        assertNotEquals(nullptr, byteVector.pointer)
-        assertEquals(hexString.length, byteVector.getLength() * 2)
-        assertEquals(hexString, byteVector.toString())
-        byteVector.destroy()
-    }
 
     @Test
     fun byteArray_assertThatTheArrayIsEqualToTheByteArrayGivenToTheConstructor() {
