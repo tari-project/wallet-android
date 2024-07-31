@@ -76,7 +76,6 @@ import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.common.SingleLiveEvent
 import com.tari.android.wallet.ui.common.recyclerView.CommonViewHolderItem
 import com.tari.android.wallet.ui.common.recyclerView.items.DividerViewHolderItem
-import com.tari.android.wallet.ui.dialog.modular.SimpleDialogArgs
 import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
 import com.tari.android.wallet.ui.fragment.home.navigation.Navigation.AllSettingsNavigation
 import com.tari.android.wallet.ui.fragment.pinCode.PinCodeScreenBehavior
@@ -140,7 +139,7 @@ class AllSettingsViewModel : CommonViewModel() {
             resourceManager.getString(all_settings_version_text_copy_toast_message)
         )
 
-        val alias = settingsRepository.name.orEmpty() + " " + settingsRepository.surname.orEmpty()
+        val alias = settingsRepository.firstName.orEmpty() + " " + settingsRepository.lastName.orEmpty()
         val pinCode = securityPrefRepository.pinCode
 
         _allSettingsOptions.postValue(listOfNotNull(

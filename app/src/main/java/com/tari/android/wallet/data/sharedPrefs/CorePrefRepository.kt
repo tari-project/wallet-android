@@ -93,9 +93,9 @@ class CorePrefRepository @Inject constructor(
 
     var emojiId: String? by SharedPrefStringDelegate(sharedPrefs, this, formatKey(Key.EMOJI_ID))
 
-    var name: String? by SharedPrefStringDelegate(sharedPrefs, this, formatKey(Key.NAME))
+    var firstName: String? by SharedPrefStringDelegate(sharedPrefs, this, formatKey(Key.NAME))
 
-    var surname: String? by SharedPrefStringDelegate(sharedPrefs, this, formatKey(Key.SURNAME))
+    var lastName: String? by SharedPrefStringDelegate(sharedPrefs, this, formatKey(Key.SURNAME))
 
     var onboardingStarted: Boolean by SharedPrefBooleanDelegate(sharedPrefs, this, formatKey(Key.ONBOARDING_STARTED))
 

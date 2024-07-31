@@ -197,7 +197,7 @@ class AddNoteFragment : CommonFragment<FragmentAddNoteBinding, AddNoteViewModel>
             requireContext(),
             fullEmojiIdListener
         )
-        val walletAddress = recipientUser.contactInfo.extractWalletAddress()
+        val walletAddress = recipientUser.contactInfo.requireWalletAddress()
         fullEmojiIdViewController.fullEmojiId = walletAddress.fullEmojiId
         fullEmojiIdViewController.base58 = walletAddress.fullBase58
 
@@ -268,7 +268,7 @@ class AddNoteFragment : CommonFragment<FragmentAddNoteBinding, AddNoteViewModel>
 
     private fun displayAliasOrEmojiId() {
         val alias = recipientUser.contactInfo.getAlias()
-        if (alias.isEmpty()) displayEmojiId(recipientUser.contactInfo.extractWalletAddress().fullEmojiId) else displayAlias(alias)
+        if (alias.isEmpty()) displayEmojiId(recipientUser.contactInfo.requireWalletAddress().fullEmojiId) else displayAlias(alias)
     }
 
     private fun displayAlias(alias: String) {

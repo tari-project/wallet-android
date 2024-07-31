@@ -101,6 +101,9 @@ class ContactsRepository @Inject constructor(
         return getByUuid(contactDto.uuid)
     }
 
+    /**
+     * Update contact info or add a new contact if it does not exist
+     */
     suspend fun updateContactInfo(
         contactToUpdate: ContactDto,
         firstName: String,

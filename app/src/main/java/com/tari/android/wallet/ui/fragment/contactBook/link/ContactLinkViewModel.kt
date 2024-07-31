@@ -94,7 +94,7 @@ class ContactLinkViewModel : CommonViewModel() {
         val searchText = searchText.value ?: return
 
         if (searchModule == null) {
-            searchModule = ContactLinkHeaderViewHolderItem(::onSearchQueryChanged, ffiContact.value!!.contactInfo.extractWalletAddress())
+            searchModule = ContactLinkHeaderViewHolderItem(::onSearchQueryChanged, ffiContact.value!!.contactInfo.requireWalletAddress())
         }
 
         var list = source.filter { it.contact.contactInfo is PhoneContactInfo }
@@ -156,7 +156,7 @@ class ContactLinkViewModel : CommonViewModel() {
     }
 
     private fun showLinkDialog(phoneContactDto: ContactDto) {
-        val tariWalletAddress = ffiContact.value!!.contactInfo.extractWalletAddress()
+        val tariWalletAddress = ffiContact.value!!.contactInfo.requireWalletAddress()
         val name = (phoneContactDto.contactInfo as PhoneContactInfo).firstName
         val firstLineHtml = HtmlHelper.getSpannedText(resourceManager.getString(contact_book_contacts_book_link_message_firstLine))
         val secondLineHtml = HtmlHelper.getSpannedText(resourceManager.getString(contact_book_contacts_book_link_message_secondLine, name))
@@ -180,7 +180,7 @@ class ContactLinkViewModel : CommonViewModel() {
     }
 
     private fun showLinkSuccessDialog(phoneContactDto: ContactDto) {
-        val tariWalletAddress = ffiContact.value!!.contactInfo.extractWalletAddress()
+        val tariWalletAddress = ffiContact.value!!.contactInfo.requireWalletAddress()
         val name = (phoneContactDto.contactInfo as PhoneContactInfo).firstName
         val firstLineHtml = HtmlHelper.getSpannedText(resourceManager.getString(contact_book_contacts_book_link_success_message_firstLine))
         val secondLineHtml = HtmlHelper.getSpannedText(resourceManager.getString(contact_book_contacts_book_link_success_message_secondLine, name))

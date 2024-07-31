@@ -119,8 +119,8 @@ class ContactBookViewModel : CommonViewModel() {
     private fun getDeeplink(selectedContacts: List<ContactDto>): String {
         val contacts = selectedContacts.map {
             DeepLink.Contacts.DeeplinkContact(
-                alias = contactUtil.normalizeAlias(it.contactInfo.getAlias(), it.contactInfo.extractWalletAddress()),
-                tariAddress = it.contactInfo.extractWalletAddress().fullBase58,
+                alias = contactUtil.normalizeAlias(it.contactInfo.getAlias(), it.contactInfo.requireWalletAddress()),
+                tariAddress = it.contactInfo.requireWalletAddress().fullBase58,
             )
         }
         return deeplinkHandler.getDeeplink(DeepLink.Contacts(contacts))

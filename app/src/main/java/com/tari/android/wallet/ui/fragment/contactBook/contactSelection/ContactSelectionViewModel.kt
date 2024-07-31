@@ -12,6 +12,7 @@ import com.tari.android.wallet.data.sharedPrefs.CorePrefRepository
 import com.tari.android.wallet.event.EffectChannelFlow
 import com.tari.android.wallet.extension.collectFlow
 import com.tari.android.wallet.extension.launchOnIo
+import com.tari.android.wallet.extension.launchOnMain
 import com.tari.android.wallet.model.MicroTari
 import com.tari.android.wallet.model.TariWalletAddress
 import com.tari.android.wallet.ui.common.CommonViewModel
@@ -33,6 +34,7 @@ import com.tari.android.wallet.ui.fragment.contactBook.data.ContactsRepository
 import com.tari.android.wallet.ui.fragment.contactBook.data.contacts.ContactDto
 import com.tari.android.wallet.ui.fragment.contactBook.data.contacts.FFIContactInfo
 import com.tari.android.wallet.ui.fragment.contactBook.data.contacts.YatDto
+import com.tari.android.wallet.ui.fragment.contactBook.data.contacts.splitAlias
 import com.tari.android.wallet.ui.fragment.contactBook.root.ShareViewModel
 import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
 import com.tari.android.wallet.util.Constants
@@ -181,16 +183,15 @@ class ContactSelectionViewModel : CommonViewModel() {
             is ContinueButtonEffect.AddContact -> {
                 val user = getUserDto()
                 val fullName = effect.name
-                val split = fullName.split(" ")
-                val firstName = split.getOrNull(1).orEmpty().trim()
-                val surname = split.getOrNull(0).orEmpty().trim()
+                val firstName = splitAlias(fullName).firstName
+                val lastName = splitAlias(fullName).lastName
 
                 if (user.walletAddress == corePrefRepository.walletAddress) {
                     showCantAddYourselfDialog()
                 } else {
-                    viewModelScope.launch(Dispatchers.IO) {
-                        contactsRepository.updateContactInfo(user, firstName, surname, "")
-                        viewModelScope.launch(Dispatchers.Main) {
+                    launchOnIo {
+                        contactsRepository.updateContactInfo(user, firstName, lastName, "")
+                        launchOnMain {
                             navigation.postValue(Navigation.ContactBookNavigation.BackToContactBook)
                         }
                     }
@@ -312,7 +313,7 @@ class ContactSelectionViewModel : CommonViewModel() {
     }
 
     private fun similarAddressDialogContinueClick(selectedAddressItem: SimilarAddressDto, markAsTrusted: Boolean) {
-        selectedAddressItem.contactDto.walletAddress.let { selectedAddress ->
+        selectedAddressItem.contactDto.contactInfo.requireWalletAddress().let { selectedAddress ->
             addressPoisoningChecker.markAsTrusted(selectedAddress, markAsTrusted)
             viewModelScope.launch(Dispatchers.Main) {
                 hideDialog()

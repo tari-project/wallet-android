@@ -12,7 +12,6 @@ import com.tari.android.wallet.application.deeplinks.DeeplinkHandler
 import com.tari.android.wallet.data.sharedPrefs.bluetooth.BluetoothServerState
 import com.tari.android.wallet.data.sharedPrefs.bluetooth.BluetoothPrefRepository
 import com.tari.android.wallet.extension.addTo
-import com.tari.android.wallet.model.TariWalletAddress
 import com.tari.android.wallet.util.ContactUtil
 import com.welie.blessed.BluetoothCentral
 import com.welie.blessed.BluetoothPeripheralManager
@@ -146,7 +145,7 @@ class TariBluetoothServer @Inject constructor(
                     DeepLink.UserProfile(
                         tariAddress = sharedPrefsRepository.walletAddressBase58.orEmpty(),
                         alias = contactUtil.normalizeAlias(
-                            alias = (sharedPrefsRepository.name.orEmpty() + " " + sharedPrefsRepository.surname).trim(),
+                            alias = (sharedPrefsRepository.firstName.orEmpty() + " " + sharedPrefsRepository.lastName).trim(),
                             walletAddress = myWalletAddress,
                         ),
                     )

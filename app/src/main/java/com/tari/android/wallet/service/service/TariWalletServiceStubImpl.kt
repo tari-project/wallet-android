@@ -3,7 +3,6 @@ package com.tari.android.wallet.service.service
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodePrefRepository
 import com.tari.android.wallet.event.EventBus
-import com.tari.android.wallet.ffi.Base58
 import com.tari.android.wallet.ffi.Base58String
 import com.tari.android.wallet.ffi.FFIContact
 import com.tari.android.wallet.ffi.FFIError
@@ -52,10 +51,8 @@ class TariWalletServiceStubImpl(
             val tariContacts = mutableListOf<TariContact>()
             for (i in 0 until contactsFFI.getLength()) {
                 val contactFFI = contactsFFI.getAt(i)
-                val ffiTariWalletAddress = contactFFI.getWalletAddress()
-                tariContacts.add(TariContact(TariWalletAddress(ffiTariWalletAddress), contactFFI.getAlias(), contactFFI.getIsFavorite()))
+                tariContacts.add(TariContact(contactFFI))
                 // destroy native objects
-                ffiTariWalletAddress.destroy()
                 contactFFI.destroy()
             }
             // destroy native collection
@@ -184,7 +181,7 @@ class TariWalletServiceStubImpl(
         paymentId: String,
         error: WalletError,
     ): TxId? = runMapping(error) {
-        val recipientAddress = FFITariWalletAddress(tariContact.walletAddress.fullBase58)
+        val recipientAddress = FFITariWalletAddress(Base58String(tariContact.walletAddress.fullBase58))
         val txId = wallet.sendTx(recipientAddress, amount.value, feePerGram.value, message, isOneSidePayment, paymentId)
 
         walletServiceListener.outboundTxIdsToBePushNotified.add(
@@ -230,10 +227,10 @@ class TariWalletServiceStubImpl(
         } ?: false
 
     override fun getWalletAddressFromEmojiId(emojiId: String?, error: WalletError): TariWalletAddress? =
-        runMapping(error) { FFITariWalletAddress(emojiId.orEmpty()).runWithDestroy { TariWalletAddress(it) } }
+        runMapping(error) { FFITariWalletAddress(emojiId = emojiId.orEmpty()).runWithDestroy { TariWalletAddress(it) } }
 
     override fun getWalletAddressFromBase58(walletAddressBase58: String?, error: WalletError): TariWalletAddress? =
-        runMapping(error) { FFITariWalletAddress(Base58String(walletAddressBase58 ?: "")).runWithDestroy { TariWalletAddress(it) } }
+        runMapping(error) { FFITariWalletAddress(base58 = Base58String(walletAddressBase58 ?: "")).runWithDestroy { TariWalletAddress(it) } }
 
     override fun setKeyValue(key: String, value: String, error: WalletError): Boolean = runMapping(error) { wallet.setKeyValue(key, value) } ?: false
 

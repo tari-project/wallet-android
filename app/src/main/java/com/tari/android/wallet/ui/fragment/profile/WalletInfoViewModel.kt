@@ -17,6 +17,7 @@ import com.tari.android.wallet.ui.dialog.modular.DialogArgs
 import com.tari.android.wallet.ui.dialog.modular.ModularDialogArgs
 import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
 import com.tari.android.wallet.ui.dialog.modular.modules.input.InputModule
+import com.tari.android.wallet.ui.fragment.contactBook.data.contacts.splitAlias
 import com.tari.android.wallet.ui.fragment.contactBook.root.ShareViewModel
 import com.tari.android.wallet.ui.fragment.contactBook.root.share.ShareType
 import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
@@ -72,7 +73,7 @@ class WalletInfoViewModel : CommonViewModel() {
         _base58.postValue(corePrefRepository.walletAddressBase58)
         _yat.postValue(yatSharedPrefsRepository.connectedYat.orEmpty())
         _yatDisconnected.postValue(yatSharedPrefsRepository.yatWasDisconnected)
-        alias.postValue(corePrefRepository.name.orEmpty() + " " + corePrefRepository.surname.orEmpty())
+        alias.postValue(corePrefRepository.firstName.orEmpty() + " " + corePrefRepository.lastName.orEmpty())
 
         checkEmojiIdConnection()
     }
@@ -119,7 +120,7 @@ class WalletInfoViewModel : CommonViewModel() {
     }
 
     fun showEditAliasDialog() {
-        val name = (corePrefRepository.name.orEmpty() + " " + corePrefRepository.surname.orEmpty()).trim()
+        val name = (corePrefRepository.firstName.orEmpty() + " " + corePrefRepository.lastName.orEmpty()).trim()
 
         var saveAction: () -> Boolean = { false }
 
@@ -151,9 +152,8 @@ class WalletInfoViewModel : CommonViewModel() {
     }
 
     private fun saveDetails(name: String) {
-        val split = name.split(" ")
-        corePrefRepository.name = split.getOrNull(0).orEmpty().trim()
-        corePrefRepository.surname = split.getOrNull(1).orEmpty().trim()
+        corePrefRepository.firstName = splitAlias(name).firstName
+        corePrefRepository.lastName = splitAlias(name).lastName
         alias.postValue(name)
         hideDialog()
     }

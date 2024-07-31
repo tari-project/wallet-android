@@ -23,7 +23,7 @@ import com.tari.android.wallet.ui.fragment.contactBook.data.contacts.FFIContactI
 import com.tari.android.wallet.ui.fragment.contactBook.root.share.ShareType
 import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
 import com.tari.android.wallet.ui.fragment.send.shareQr.ShareQrCodeModule
-import com.tari.android.wallet.util.extractEmojis
+import com.tari.android.wallet.util.ContactUtil
 import javax.inject.Inject
 
 class ShareViewModel : CommonViewModel() {
@@ -39,6 +39,9 @@ class ShareViewModel : CommonViewModel() {
 
     @Inject
     lateinit var contactsRepository: ContactsRepository
+
+    @Inject
+    lateinit var contactUtil: ContactUtil
 
     val deeplinkViewModel = DeeplinkViewModel()
 
@@ -100,9 +103,7 @@ class ShareViewModel : CommonViewModel() {
             ContactDto(FFIContactInfo(walletAddress = TariWalletAddress.fromBase58(userProfile.tariAddress), alias = userProfile.alias))
         }.getOrNull() ?: return
 
-        val name = userProfile.alias.ifEmpty {
-            contactDto.contactInfo.extractWalletAddress().fullEmojiId.extractEmojis().take(3).joinToString("")
-        }
+        val name = contactUtil.normalizeAlias(userProfile.alias, contactDto.contactInfo.requireWalletAddress())
 
         showModularDialog(
             IconModule(R.drawable.vector_sharing_via_ble),

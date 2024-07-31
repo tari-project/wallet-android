@@ -14,7 +14,7 @@ data class ContactDto(
 ) : Parcelable {
     constructor(contactInfo: PhoneContactInfo) : this(contactInfo, yatDto = contactInfo.phoneYat.toYatDto())
 
-    val walletAddress: TariWalletAddress
+    val walletAddress: TariWalletAddress?
         get() = contactInfo.extractWalletAddress()
 
     fun filtered(text: String): Boolean = contactInfo.filtered(text)

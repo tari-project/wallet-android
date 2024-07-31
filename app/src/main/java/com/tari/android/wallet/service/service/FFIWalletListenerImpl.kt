@@ -238,9 +238,7 @@ class FFIWalletListenerImpl(
         for (i in 0 until contactsFFI.getLength()) {
             val contactFFI = contactsFFI.getAt(i)
             val walletAddressFFI = contactFFI.getWalletAddress()
-            val tariContact =
-                if (TariWalletAddress(walletAddressFFI) == address) TariContact(address, contactFFI.getAlias(), contactFFI.getIsFavorite())
-                else null
+            val tariContact = if (TariWalletAddress(walletAddressFFI) == address) TariContact(contactFFI) else null
             walletAddressFFI.destroy()
             contactFFI.destroy()
             if (tariContact != null) {

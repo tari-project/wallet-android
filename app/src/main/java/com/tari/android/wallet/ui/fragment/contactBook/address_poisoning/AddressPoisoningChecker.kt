@@ -9,7 +9,6 @@ import com.tari.android.wallet.service.connection.TariWalletServiceConnection
 import com.tari.android.wallet.ui.fragment.contactBook.data.ContactsRepository
 import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.DebugConfig
-import com.tari.android.wallet.util.EmojiId
 import com.tari.android.wallet.util.MockDataStub
 import com.tari.android.wallet.util.extractEmojis
 import javax.inject.Inject
@@ -73,10 +72,10 @@ class AddressPoisoningChecker @Inject constructor(
                 .map { contactDto ->
                     SimilarAddressDto(
                         contactDto = contactDto,
-                        numberOfTransaction = allTxs.filterByWalletAddress(contactDto.walletAddress).size,
-                        lastTransactionTimestampMillis = allTxs.filterByWalletAddress(contactDto.walletAddress).maxOfOrNull { it.timestamp }
+                        numberOfTransaction = allTxs.filterByWalletAddress(contactDto.contactInfo.requireWalletAddress()).size,
+                        lastTransactionTimestampMillis = allTxs.filterByWalletAddress(contactDto.contactInfo.requireWalletAddress()).maxOfOrNull { it.timestamp }
                             ?.let { it.toLong() * 1000L },
-                        trusted = addressPoisoningSharedRepository.getTrustedContactList().contains(contactDto.walletAddress),
+                        trusted = addressPoisoningSharedRepository.getTrustedContactList().contains(contactDto.contactInfo.requireWalletAddress()),
                     )
                 }.let { similarContacts ->
                     // put the current wallet address to the first place
@@ -92,7 +91,9 @@ class AddressPoisoningChecker @Inject constructor(
 }
 
 @VisibleForTesting
-fun TariWalletAddress.isSimilarTo(other: TariWalletAddress): Boolean {
+fun TariWalletAddress?.isSimilarTo(other: TariWalletAddress): Boolean {
+    if (this == null) return false
+
     val thisEmojis = this.spendKeyEmojis.extractEmojis()
     val otherEmojis = other.spendKeyEmojis.extractEmojis()
 
