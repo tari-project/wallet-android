@@ -122,7 +122,7 @@ class WalletRestoringFromSeedWordsViewModel : CommonViewModel() {
 
     sealed class RestorationError(title: String, message: String, dismissAction: () -> Unit) {
 
-        val args = SimpleDialogArgs(title, message, onClose = dismissAction)
+        val args = SimpleDialogArgs(title = title, description = message, onClose = dismissAction)
 
         class ConnectionFailed(resourceManager: ResourceManager, dismissAction: () -> Unit) : RestorationError(
             resourceManager.getString(R.string.restore_from_seed_words_overlay_error_title),

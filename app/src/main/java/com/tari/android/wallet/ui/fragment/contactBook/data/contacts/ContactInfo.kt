@@ -13,7 +13,10 @@ sealed class ContactInfo(
     open val isFavorite: Boolean,
 ) : Parcelable {
     abstract fun filtered(text: String): Boolean
-    abstract fun extractWalletAddress(): TariWalletAddress
+    abstract fun extractWalletAddress(): TariWalletAddress?
+
+    fun requireWalletAddress(): TariWalletAddress = extractWalletAddress()
+        ?: error("Wallet address is required, but is null. Most probably this is a PhoneContactInfo which does not have a wallet address.")
 
     open fun getAlias(): String = "$firstName $lastName"
 
@@ -53,15 +56,15 @@ data class FFIContactInfo(
     constructor(walletAddress: TariWalletAddress, lastUsedTimeMillis: Long = 0L, alias: String = "", isFavorite: Boolean = false) : this(
         walletAddress = walletAddress,
         lastUsedTimeMillis = lastUsedTimeMillis,
-        firstName = parseAlias(alias).first,
-        lastName = parseAlias(alias).second,
+        firstName = splitAlias(alias).firstName,
+        lastName = splitAlias(alias).lastName,
         isFavorite = isFavorite,
     )
 
     constructor(tariContact: TariContact) : this(
         walletAddress = tariContact.walletAddress,
-        firstName = parseAlias(tariContact.alias).first,
-        lastName = parseAlias(tariContact.alias).second,
+        firstName = splitAlias(tariContact.alias).firstName,
+        lastName = splitAlias(tariContact.alias).lastName,
         isFavorite = tariContact.isFavorite,
     )
 
@@ -84,13 +87,13 @@ data class PhoneContactInfo(
     override val lastName: String = "",
     override val isFavorite: Boolean = false,
 ) : ContactInfo(
-    firstName = firstName.ifEmpty { parseAlias(displayName).first },
-    lastName = lastName.ifEmpty { parseAlias(displayName).second },
+    firstName = firstName.ifEmpty { splitAlias(displayName).firstName },
+    lastName = lastName.ifEmpty { splitAlias(displayName).lastName },
     isFavorite = isFavorite,
 ) {
     override fun filtered(text: String): Boolean = getAlias().contains(text, ignoreCase = true)
 
-    override fun extractWalletAddress(): TariWalletAddress = TariWalletAddress.EMPTY_ADDRESS
+    override fun extractWalletAddress(): TariWalletAddress? = null
 
     fun extractDisplayName(): String = displayName.ifEmpty { "$firstName $lastName" }
 }
@@ -110,4 +113,7 @@ data class MergedContactInfo(
     override fun getAlias(): String = phoneContactInfo.firstName
 }
 
-private fun parseAlias(alias: String): Pair<String, String> = alias.split(" ", limit = 2).let { it[0] to if (it.size > 1) it[1] else "" }
+fun splitAlias(alias: String): ParsedAlias = alias.split(" ", limit = 2)
+    .let { ParsedAlias(firstName = it[0], lastName = if (it.size > 1) it[1] else "") }
+
+data class ParsedAlias(val firstName: String, val lastName: String)

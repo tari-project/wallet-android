@@ -12,8 +12,8 @@ import javax.inject.Singleton
 
 @Singleton
 class ChatsPrefRepository @Inject constructor(
-    networkRepository: NetworkPrefRepository,
     val sharedPrefs: SharedPreferences,
+    networkRepository: NetworkPrefRepository,
 ) : CommonPrefRepository(networkRepository) {
 
     private var savedChats: ChatList by SharedPrefGsonDelegate(

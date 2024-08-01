@@ -83,7 +83,7 @@ class ContactDetailsFragment : CommonFragment<FragmentContactsDetailsBinding, Co
     }
 
     private fun applyContact(contact: ContactDto) {
-        val address = contact.contactInfo.extractWalletAddress()
+        val address = contact.contactInfo.requireWalletAddress()
         fullEmojiIdViewController?.fullEmojiId = address.fullEmojiId
         fullEmojiIdViewController?.base58 = address.fullBase58
 

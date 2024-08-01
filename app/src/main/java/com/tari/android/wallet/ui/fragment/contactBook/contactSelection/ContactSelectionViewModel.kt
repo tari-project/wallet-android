@@ -8,9 +8,11 @@ import com.tari.android.wallet.application.YatAdapter
 import com.tari.android.wallet.application.deeplinks.DeepLink
 import com.tari.android.wallet.application.deeplinks.DeeplinkFormatter
 import com.tari.android.wallet.application.deeplinks.DeeplinkHandler
+import com.tari.android.wallet.data.sharedPrefs.CorePrefRepository
 import com.tari.android.wallet.event.EffectChannelFlow
 import com.tari.android.wallet.extension.collectFlow
 import com.tari.android.wallet.extension.launchOnIo
+import com.tari.android.wallet.extension.launchOnMain
 import com.tari.android.wallet.model.MicroTari
 import com.tari.android.wallet.model.TariWalletAddress
 import com.tari.android.wallet.ui.common.CommonViewModel
@@ -32,6 +34,7 @@ import com.tari.android.wallet.ui.fragment.contactBook.data.ContactsRepository
 import com.tari.android.wallet.ui.fragment.contactBook.data.contacts.ContactDto
 import com.tari.android.wallet.ui.fragment.contactBook.data.contacts.FFIContactInfo
 import com.tari.android.wallet.ui.fragment.contactBook.data.contacts.YatDto
+import com.tari.android.wallet.ui.fragment.contactBook.data.contacts.splitAlias
 import com.tari.android.wallet.ui.fragment.contactBook.root.ShareViewModel
 import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
 import com.tari.android.wallet.util.Constants
@@ -65,6 +68,9 @@ class ContactSelectionViewModel : CommonViewModel() {
 
     @Inject
     lateinit var addressPoisoningChecker: AddressPoisoningChecker
+
+    @Inject
+    lateinit var corePrefRepository: CorePrefRepository
 
     var additionalFilter: (ContactItem) -> Boolean = { true }
 
@@ -110,9 +116,9 @@ class ContactSelectionViewModel : CommonViewModel() {
     fun handleDeeplink(deeplinkString: String) {
         val deeplink = deeplinkFormatter.parse(deeplinkString)
         val deeplinkBase58 = when (deeplink) {
-            is DeepLink.Contacts -> deeplink.contacts.firstOrNull()?.base58
-            is DeepLink.Send -> deeplink.walletAddressBase58
-            is DeepLink.UserProfile -> deeplink.tariAddressBase58
+            is DeepLink.Contacts -> deeplink.contacts.firstOrNull()?.tariAddress
+            is DeepLink.Send -> deeplink.walletAddress
+            is DeepLink.UserProfile -> deeplink.tariAddress
             else -> null
         }
 
@@ -177,14 +183,17 @@ class ContactSelectionViewModel : CommonViewModel() {
             is ContinueButtonEffect.AddContact -> {
                 val user = getUserDto()
                 val fullName = effect.name
-                val split = fullName.split(" ")
-                val firstName = split.getOrNull(1).orEmpty().trim()
-                val surname = split.getOrNull(0).orEmpty().trim()
+                val firstName = splitAlias(fullName).firstName
+                val lastName = splitAlias(fullName).lastName
 
-                viewModelScope.launch(Dispatchers.IO) {
-                    contactsRepository.updateContactInfo(user, firstName, surname, "")
-                    viewModelScope.launch(Dispatchers.Main) {
-                        navigation.postValue(Navigation.ContactBookNavigation.BackToContactBook)
+                if (user.walletAddress == corePrefRepository.walletAddress) {
+                    showCantAddYourselfDialog()
+                } else {
+                    launchOnIo {
+                        contactsRepository.updateContactInfo(user, firstName, lastName, "")
+                        launchOnMain {
+                            navigation.postValue(Navigation.ContactBookNavigation.BackToContactBook)
+                        }
                     }
                 }
             }
@@ -202,6 +211,13 @@ class ContactSelectionViewModel : CommonViewModel() {
                 navigation.postValue(Navigation.ChatNavigation.ToChat(user.getFFIContactInfo()?.walletAddress!!, true))
             }
         }
+    }
+
+    private fun showCantAddYourselfDialog() {
+        showSimpleDialog(
+            title = resourceManager.getString(R.string.contact_book_add_contact_cant_add_yourself_title),
+            description = resourceManager.getString(R.string.contact_book_add_contact_cant_add_yourself_description),
+        )
     }
 
     private fun getUserDto(): ContactDto =
@@ -297,7 +313,7 @@ class ContactSelectionViewModel : CommonViewModel() {
     }
 
     private fun similarAddressDialogContinueClick(selectedAddressItem: SimilarAddressDto, markAsTrusted: Boolean) {
-        selectedAddressItem.contactDto.walletAddress.let { selectedAddress ->
+        selectedAddressItem.contactDto.contactInfo.requireWalletAddress().let { selectedAddress ->
             addressPoisoningChecker.markAsTrusted(selectedAddress, markAsTrusted)
             viewModelScope.launch(Dispatchers.Main) {
                 hideDialog()

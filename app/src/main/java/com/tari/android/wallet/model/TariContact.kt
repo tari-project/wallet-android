@@ -33,6 +33,7 @@
 package com.tari.android.wallet.model
 
 import android.os.Parcelable
+import com.tari.android.wallet.ffi.FFIContact
 import kotlinx.parcelize.Parcelize
 
 /**
@@ -42,10 +43,18 @@ import kotlinx.parcelize.Parcelize
  */
 @Parcelize
 data class TariContact(
-    val walletAddress: TariWalletAddress = TariWalletAddress.EMPTY_ADDRESS,
+    val walletAddress: TariWalletAddress,
     val alias: String = "",
     val isFavorite: Boolean = false,
 ) : Parcelable {
+
+    // TODO create a constructor that takes an wallet address only and use normalized alias
+
+    constructor(ffiContact: FFIContact) : this(
+        walletAddress = TariWalletAddress(ffiContact.getWalletAddress()),
+        alias = ffiContact.getAlias(),
+        isFavorite = ffiContact.getIsFavorite()
+    )
 
     fun filtered(text: String): Boolean = walletAddress.fullEmojiId.contains(text, ignoreCase = true) || alias.contains(text, ignoreCase = true)
 

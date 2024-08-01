@@ -113,6 +113,7 @@ class FFIContactsRepositoryBridge(
                     walletService.getPendingInboundTxs(WalletError()),
                     walletService.getPendingOutboundTxs(WalletError()),
                 ).asSequence().flatten()
+                    .filter { !it.tariContact.walletAddress.isUnknownUser() }
                     .sortedByDescending { it.timestamp }
                     .map { tx ->
                         FFIContactInfo(

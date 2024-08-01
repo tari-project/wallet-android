@@ -45,7 +45,7 @@ import com.tari.android.wallet.util.tariEmoji
 import kotlinx.parcelize.Parcelize
 
 /**
- * This wrapper is needed for id parameters in AIDL methods. // todo check aidl
+ * This wrapper is needed for id parameters in AIDL methods.
  *
  * @author The Tari Development Team
  */
@@ -94,30 +94,12 @@ data class TariWalletAddress(
     override fun toString(): String = "TariWalletAddress(base58='$fullBase58', emojiId='$fullEmojiId')"
 
     companion object {
-        private const val HEX_ZERO = "0000000000000000000000000000000000000000000000000000000000000026"
-        private const val HEX_ZERO_66 = "000000000000000000000000000000000000000000000000000000000000000026"
-        private const val EMOJI_ZERO =
-            "\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF57"
-
-        // Empty wallet address for cases such one-sided payment or phone contact
-        val EMPTY_ADDRESS = TariWalletAddress(
-            network = TariWalletAddress.Network.TESTNET,
-            features = emptyList(),
-            networkEmoji = EMOJI_ZERO,
-            featuresEmoji = EMOJI_ZERO,
-            viewKeyEmojis = EMOJI_ZERO,
-            spendKeyEmojis = EMOJI_ZERO,
-            checksumEmoji = EMOJI_ZERO,
-            fullBase58 = HEX_ZERO_66,
-            fullEmojiId = EMOJI_ZERO,
-            unknownAddress = true,
-        ) // TODO remove it and make it nullable
 
         @Throws(FFIException::class)
-        fun fromBase58(base58: Base58) = FFITariWalletAddress(Base58String(base58)).runWithDestroy { TariWalletAddress(it) }
+        fun fromBase58(base58: Base58) = FFITariWalletAddress(base58 = Base58String(base58)).runWithDestroy { TariWalletAddress(it) }
 
         @Throws(FFIException::class)
-        fun fromEmojiId(emojiId: EmojiId) = FFITariWalletAddress(emojiId).runWithDestroy { TariWalletAddress(it) }
+        fun fromEmojiId(emojiId: EmojiId) = FFITariWalletAddress(emojiId = emojiId).runWithDestroy { TariWalletAddress(it) }
 
         fun fromBase58OrNull(base58: Base58): TariWalletAddress? = runCatching { fromBase58(base58) }.getOrNull()
 

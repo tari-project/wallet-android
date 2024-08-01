@@ -12,12 +12,12 @@ import com.tari.android.wallet.application.deeplinks.DeeplinkHandler
 import com.tari.android.wallet.data.sharedPrefs.CorePrefRepository
 import com.tari.android.wallet.data.sharedPrefs.yat.YatPrefRepository
 import com.tari.android.wallet.ffi.Base58
-import com.tari.android.wallet.model.TariWalletAddress
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.dialog.modular.DialogArgs
 import com.tari.android.wallet.ui.dialog.modular.ModularDialogArgs
 import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
 import com.tari.android.wallet.ui.dialog.modular.modules.input.InputModule
+import com.tari.android.wallet.ui.fragment.contactBook.data.contacts.splitAlias
 import com.tari.android.wallet.ui.fragment.contactBook.root.ShareViewModel
 import com.tari.android.wallet.ui.fragment.contactBook.root.share.ShareType
 import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
@@ -73,7 +73,7 @@ class WalletInfoViewModel : CommonViewModel() {
         _base58.postValue(corePrefRepository.walletAddressBase58)
         _yat.postValue(yatSharedPrefsRepository.connectedYat.orEmpty())
         _yatDisconnected.postValue(yatSharedPrefsRepository.yatWasDisconnected)
-        alias.postValue(corePrefRepository.name.orEmpty() + " " + corePrefRepository.surname.orEmpty())
+        alias.postValue(corePrefRepository.firstName.orEmpty() + " " + corePrefRepository.lastName.orEmpty())
 
         checkEmojiIdConnection()
     }
@@ -107,18 +107,20 @@ class WalletInfoViewModel : CommonViewModel() {
     }
 
     fun shareData(type: ShareType) {
-        // TODO maybe use FFIWallet.getWalletAddress() ?
-        val walletAddress = TariWalletAddress.fromBase58(corePrefRepository.walletAddressBase58.orEmpty())
+        val walletAddress = corePrefRepository.walletAddress
 
-        val name = contactUtil.normalizeAlias(alias.value.orEmpty(), walletAddress)
-        val hex = corePrefRepository.walletAddressBase58.orEmpty()
+        val deeplink = deeplinkHandler.getDeeplink(
+            DeepLink.UserProfile(
+                tariAddress = corePrefRepository.walletAddressBase58.orEmpty(),
+                alias = contactUtil.normalizeAlias(alias.value.orEmpty(), walletAddress),
+            )
+        )
 
-        val deeplink = deeplinkHandler.getDeeplink(DeepLink.UserProfile(hex, name))
         ShareViewModel.currentInstant?.share(type, deeplink)
     }
 
     fun showEditAliasDialog() {
-        val name = (corePrefRepository.name.orEmpty() + " " + corePrefRepository.surname.orEmpty()).trim()
+        val name = (corePrefRepository.firstName.orEmpty() + " " + corePrefRepository.lastName.orEmpty()).trim()
 
         var saveAction: () -> Boolean = { false }
 
@@ -150,9 +152,8 @@ class WalletInfoViewModel : CommonViewModel() {
     }
 
     private fun saveDetails(name: String) {
-        val split = name.split(" ")
-        corePrefRepository.name = split.getOrNull(0).orEmpty().trim()
-        corePrefRepository.surname = split.getOrNull(1).orEmpty().trim()
+        corePrefRepository.firstName = splitAlias(name).firstName
+        corePrefRepository.lastName = splitAlias(name).lastName
         alias.postValue(name)
         hideDialog()
     }

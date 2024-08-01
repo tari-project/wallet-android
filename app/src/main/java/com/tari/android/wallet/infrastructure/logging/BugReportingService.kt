@@ -63,15 +63,16 @@ class BugReportingService @Inject constructor(private val sharedPrefsWrapper: Co
     private fun getZippedLogs(): File? {
         // delete if zipped file exists
         return runCatching {
-            val publicKeyHex = sharedPrefsWrapper.walletAddressBase58
+            val walletAddress = sharedPrefsWrapper.walletAddressBase58
+
             val logFilesDirPath = walletConfig.getWalletLogFilesDirPath()
-            val zipFile = File(logFilesDirPath, "ffi_logs_${publicKeyHex}.zip")
+            val zipFile = File(logFilesDirPath, "ffi_logs_${walletAddress}.zip")
             if (zipFile.exists()) {
                 zipFile.delete()
             }
             val fileOutStream = FileOutputStream(zipFile)
             // zip!
-            val allLogFiles = WalletUtil.getLogFilesFromDirectory(logFilesDirPath).toMutableList()
+            val allLogFiles = WalletUtil.getLogFilesFromDirectory(logFilesDirPath)
             ZipOutputStream(BufferedOutputStream(fileOutStream)).use { out ->
                 for (file in allLogFiles) {
                     FileInputStream(file).use { inputStream ->

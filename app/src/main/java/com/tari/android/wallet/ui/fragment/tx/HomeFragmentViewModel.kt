@@ -28,7 +28,6 @@ import com.tari.android.wallet.model.BalanceInfo
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.common.SingleLiveEvent
 import com.tari.android.wallet.ui.common.recyclerView.CommonViewHolderItem
-import com.tari.android.wallet.ui.dialog.modular.SimpleDialogArgs
 import com.tari.android.wallet.ui.dialog.modular.DialogArgs
 import com.tari.android.wallet.ui.dialog.modular.ModularDialogArgs
 import com.tari.android.wallet.ui.dialog.modular.modules.body.BodyModule
@@ -211,20 +210,16 @@ class HomeFragmentViewModel : CommonViewModel() {
     }
 
     private fun displayNetworkConnectionErrorDialog() {
-        showModularDialog(
-            SimpleDialogArgs(
-                resourceManager.getString(error_no_connection_title),
-                resourceManager.getString(error_no_connection_description),
-            ).getModular(resourceManager)
+        showSimpleDialog(
+            title = resourceManager.getString(error_no_connection_title),
+            description = resourceManager.getString(error_no_connection_description),
         )
     }
 
     private fun displayBaseNodeConnectionErrorDialog() {
-        showModularDialog(
-            SimpleDialogArgs(
-                resourceManager.getString(error_node_unreachable_title),
-                resourceManager.getString(error_node_unreachable_description),
-            ).getModular(resourceManager)
+        showSimpleDialog(
+            title = resourceManager.getString(error_node_unreachable_title),
+            description = resourceManager.getString(error_node_unreachable_description),
         )
     }
 

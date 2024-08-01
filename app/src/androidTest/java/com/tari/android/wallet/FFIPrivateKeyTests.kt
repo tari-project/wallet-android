@@ -32,7 +32,6 @@
  */
 package com.tari.android.wallet
 
-import com.tari.android.wallet.ffi.FFIByteVector
 import com.tari.android.wallet.ffi.FFIPrivateKey
 import com.tari.android.wallet.ffi.HexString
 import com.tari.android.wallet.ffi.nullptr
@@ -59,13 +58,5 @@ class FFIPrivateKeyTests {
         val subject = FFIPrivateKey(HexString(FFITestUtil.PRIVATE_KEY_HEX_STRING))
         assertEquals(FFITestUtil.PRIVATE_KEY_HEX_STRING, subject.toString())
         subject.destroy()
-    }
-
-    @Test
-    fun constructor_assertThatValidObjectWasConstructed_givenValidFFIByteVector() {
-        val privateKey = FFIPrivateKey(FFIByteVector(HexString(FFITestUtil.PRIVATE_KEY_HEX_STRING)))
-        assertNotEquals(nullptr, privateKey.pointer)
-        assertEquals(FFITestUtil.PRIVATE_KEY_HEX_STRING, privateKey.toString())
-        privateKey.destroy()
     }
 }

@@ -14,7 +14,6 @@ import com.tari.android.wallet.infrastructure.backup.BackupState
 import com.tari.android.wallet.infrastructure.backup.BackupStorageFullException
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.common.SingleLiveEvent
-import com.tari.android.wallet.ui.dialog.modular.SimpleDialogArgs
 import com.tari.android.wallet.ui.dialog.modular.DialogArgs
 import com.tari.android.wallet.ui.dialog.modular.ModularDialogArgs
 import com.tari.android.wallet.ui.dialog.modular.modules.body.BodyModule
@@ -153,10 +152,14 @@ class BackupOptionViewModel : CommonViewModel() {
             is BackupException -> exception.message.orEmpty()
             else -> resourceManager.getString(R.string.back_up_wallet_storage_setup_error_desc)
         }
-        showModularDialog(SimpleDialogArgs(errorTitle, errorDescription) {
-            _switchChecked.postValue(false)
-            _inProgress.postValue(false)
-        }.getModular(resourceManager))
+        showSimpleDialog(
+            title = errorTitle,
+            description = errorDescription,
+            onClose = {
+                _switchChecked.postValue(false)
+                _inProgress.postValue(false)
+            },
+        )
     }
 
     fun onBackupStateChanged(backupState: BackupState?) {

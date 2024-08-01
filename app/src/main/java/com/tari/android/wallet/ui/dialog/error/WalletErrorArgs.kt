@@ -35,5 +35,9 @@ class WalletErrorArgs(
             return resourceManager.getString(id)
         }
 
-    fun getModular() = SimpleDialogArgs(title, description, onClose = dismissAction).getModular(resourceManager)
+    fun getModular() = SimpleDialogArgs(
+        title = title,
+        description = description,
+        onClose = dismissAction,
+    ).getModular(resourceManager)
 }

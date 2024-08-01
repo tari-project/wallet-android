@@ -32,7 +32,11 @@
  */
 package com.tari.android.wallet
 
-import com.tari.android.wallet.ffi.*
+import com.tari.android.wallet.ffi.Base58String
+import com.tari.android.wallet.ffi.FFIContact
+import com.tari.android.wallet.ffi.FFIException
+import com.tari.android.wallet.ffi.FFITariWalletAddress
+import com.tari.android.wallet.ffi.nullptr
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -46,7 +50,7 @@ class FFITariContactTests {
 
     @Test
     fun constructor_assertThatConstructedContactIsValid() {
-        val ffiTariWalletAddress = FFITariWalletAddress(HexString(FFITestUtil.WALLET_ADDRESS_HEX_STRING))
+        val ffiTariWalletAddress = FFITariWalletAddress(Base58String(FFITestUtil.WALLET_ADDRESS_HEX_STRING))
         val alias = FFITestUtil.generateRandomAlphanumericString(16)
         val contact = FFIContact(alias, ffiTariWalletAddress)
         assertTrue(contact.pointer != nullptr)
@@ -57,7 +61,7 @@ class FFITariContactTests {
 
     @Test
     fun getPublicKey_assertThatContactPublicKeyIsEqualToTheGivenPublicKeyHexString() {
-        val ffiTariWalletAddress = FFITariWalletAddress(HexString(FFITestUtil.WALLET_ADDRESS_HEX_STRING))
+        val ffiTariWalletAddress = FFITariWalletAddress(Base58String(FFITestUtil.WALLET_ADDRESS_HEX_STRING))
         val contact = FFIContact(FFITestUtil.generateRandomAlphanumericString(16), ffiTariWalletAddress)
         assertEquals(FFITestUtil.WALLET_ADDRESS_HEX_STRING, contact.getWalletAddress().toString())
         contact.destroy()
@@ -66,6 +70,6 @@ class FFITariContactTests {
 
     @Test(expected = FFIException::class)
     fun constructor_assertThat() {
-        FFIContact("", FFITariWalletAddress(HexString(FFITestUtil.WALLET_ADDRESS_HEX_STRING)))
+        FFIContact("", FFITariWalletAddress(Base58String(FFITestUtil.WALLET_ADDRESS_HEX_STRING)))
     }
 }

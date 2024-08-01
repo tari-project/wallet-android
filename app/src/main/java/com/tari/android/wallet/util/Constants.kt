@@ -129,7 +129,6 @@ object Constants {
         const val ROLLING_LOG_FILE_MAX_SIZE_BYTES = 10 * 1024 * 1024
         const val DISCOVERY_TIMEOUT_SEC = 20L
         const val STORE_AND_FORWARD_MESSAGE_DURATION_SEC = 10800L
-        const val EMOJI_ID_LENGTH = 33 // TODO don't check valid emojiId by length
         const val EMOJI_FORMATTER_CHUNK_SIZE = 3
         const val PUSH_NOTIFICATION_SERVER_URL = "https://push.tari.com"
         const val PENDING_TX_EXPIRATION_PERIOD_HOURS = 3 * 24

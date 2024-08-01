@@ -4,12 +4,12 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.toLiveData
-import androidx.lifecycle.viewModelScope
 import com.tari.android.wallet.R
 import com.tari.android.wallet.event.Event
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.extension.collectFlow
 import com.tari.android.wallet.extension.getWithError
+import com.tari.android.wallet.extension.launchOnMain
 import com.tari.android.wallet.ffi.FFITxCancellationReason
 import com.tari.android.wallet.model.CancelledTx
 import com.tari.android.wallet.model.CompletedTx
@@ -18,16 +18,16 @@ import com.tari.android.wallet.model.TxId
 import com.tari.android.wallet.model.WalletError
 import com.tari.android.wallet.service.TariWalletService
 import com.tari.android.wallet.ui.common.CommonViewModel
-import com.tari.android.wallet.ui.dialog.modular.SimpleDialogArgs
 import com.tari.android.wallet.ui.dialog.modular.DialogArgs
 import com.tari.android.wallet.ui.dialog.modular.ModularDialogArgs
+import com.tari.android.wallet.ui.dialog.modular.SimpleDialogArgs
 import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
 import com.tari.android.wallet.ui.dialog.modular.modules.input.InputModule
 import com.tari.android.wallet.ui.fragment.contactBook.data.ContactsRepository
 import com.tari.android.wallet.ui.fragment.contactBook.data.contacts.ContactDto
+import com.tari.android.wallet.ui.fragment.contactBook.data.contacts.splitAlias
 import io.reactivex.BackpressureStrategy
 import io.reactivex.subjects.BehaviorSubject
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 class TxDetailsViewModel : CommonViewModel() {
@@ -211,12 +211,11 @@ class TxDetailsViewModel : CommonViewModel() {
     }
 
     private fun saveDetails(newName: String) {
-        viewModelScope.launch {
-            val split = newName.split(" ")
-            val name = split.getOrNull(0).orEmpty().trim()
-            val surname = split.getOrNull(1).orEmpty().trim()
+        launchOnMain {
+            val firstName = splitAlias(newName).firstName
+            val lastName = splitAlias(newName).lastName
             val contactDto = contact.value!!
-            contact.value = contactsRepository.updateContactInfo(contactDto, name, surname, contactDto.yatDto?.yat.orEmpty())
+            contact.value = contactsRepository.updateContactInfo(contactDto, firstName, lastName, contactDto.yatDto?.yat.orEmpty())
             hideDialog()
         }
     }

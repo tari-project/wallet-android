@@ -135,7 +135,7 @@ class QRScannerViewModel : CommonViewModel() {
         launchOnIo {
             val text = when (deepLink) {
                 is DeepLink.Send -> {
-                    val walletAddress = TariWalletAddress.fromBase58OrNull(deepLink.walletAddressBase58) ?: return@launchOnIo
+                    val walletAddress = TariWalletAddress.fromBase58OrNull(deepLink.walletAddress) ?: return@launchOnIo
                     val emojiId = walletAddress.fullEmojiId.extractEmojis().take(3).joinToString("") // TODO put alias methods to a helper class
                     resourceManager.getString(R.string.qr_code_scanner_labels_actions_transaction_send, emojiId)
                 }

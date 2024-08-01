@@ -32,13 +32,11 @@
  */
 package com.tari.android.wallet.service.notification
 
-import com.tari.android.wallet.ffi.Base58
-
 interface NotificationService {
 
     fun notifyRecipient(
-        recipientBase58: Base58,
-        senderBase58: Base58,
+        recipientHex: String,
+        senderHex: String,
         signer: (String) -> String,
         onSuccess: () -> Unit = {},
         onFailure: (Throwable) -> Unit = {}

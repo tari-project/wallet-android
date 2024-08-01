@@ -48,6 +48,7 @@ import com.tari.android.wallet.data.sharedPrefs.tariSettings.TariSettingsPrefRep
 import com.tari.android.wallet.data.sharedPrefs.tor.TorPrefRepository
 import com.tari.android.wallet.data.sharedPrefs.yat.YatPrefRepository
 import com.tari.android.wallet.ffi.Base58
+import com.tari.android.wallet.model.TariWalletAddress
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.random.Random
@@ -92,9 +93,9 @@ class CorePrefRepository @Inject constructor(
 
     var emojiId: String? by SharedPrefStringDelegate(sharedPrefs, this, formatKey(Key.EMOJI_ID))
 
-    var name: String? by SharedPrefStringDelegate(sharedPrefs, this, formatKey(Key.NAME))
+    var firstName: String? by SharedPrefStringDelegate(sharedPrefs, this, formatKey(Key.NAME))
 
-    var surname: String? by SharedPrefStringDelegate(sharedPrefs, this, formatKey(Key.SURNAME))
+    var lastName: String? by SharedPrefStringDelegate(sharedPrefs, this, formatKey(Key.SURNAME))
 
     var onboardingStarted: Boolean by SharedPrefBooleanDelegate(sharedPrefs, this, formatKey(Key.ONBOARDING_STARTED))
 
@@ -115,6 +116,9 @@ class CorePrefRepository @Inject constructor(
     var onboardingDisplayedAtHome: Boolean by SharedPrefBooleanDelegate(sharedPrefs, this, formatKey(Key.ONBOARDING_DISPLAYED_AT_HOME))
 
     var isDataCleared: Boolean by SharedPrefBooleanDelegate(sharedPrefs, this, formatKey(Key.IS_DATA_CLEARED), true)
+
+    val walletAddress: TariWalletAddress
+        get() = TariWalletAddress.fromBase58(walletAddressBase58!!)
 
     fun clear() {
         baseNodeSharedRepository.clear()

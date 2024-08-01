@@ -48,6 +48,7 @@ import com.tari.android.wallet.ui.fragment.contactBook.data.ContactsRepository
 import com.tari.android.wallet.ui.fragment.contactBook.data.contacts.ContactDto
 import com.tari.android.wallet.ui.fragment.contactBook.data.contacts.MergedContactInfo
 import com.tari.android.wallet.ui.fragment.contactBook.data.contacts.YatDto
+import com.tari.android.wallet.ui.fragment.contactBook.data.contacts.splitAlias
 import com.tari.android.wallet.ui.fragment.contactBook.details.adapter.contactType.ContactTypeViewHolderItem
 import com.tari.android.wallet.ui.fragment.contactBook.details.adapter.profile.ContactProfileViewHolderItem
 import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
@@ -276,13 +277,12 @@ class ContactDetailsViewModel : CommonViewModel() {
     private fun saveDetails(newName: String, yat: String = "") {
         updatingJob?.cancel()
         launchOnIo {
-            val split = newName.split(" ")
-            val name = split.getOrNull(0).orEmpty().trim()
-            val surname = split.getOrNull(1).orEmpty().trim()
+            val firstName = splitAlias(newName).firstName
+            val lastName = splitAlias(newName).lastName
             val contactDto = contact.value!!
 
             launchOnMain {
-                contact.value = contactsRepository.updateContactInfo(contactDto, name, surname, yat)
+                contact.value = contactsRepository.updateContactInfo(contactDto, firstName, lastName, yat)
                 hideDialog()
             }
         }

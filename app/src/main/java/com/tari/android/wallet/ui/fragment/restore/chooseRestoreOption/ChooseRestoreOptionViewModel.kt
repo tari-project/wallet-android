@@ -7,8 +7,6 @@ import androidx.lifecycle.viewModelScope
 import com.tari.android.wallet.R
 import com.tari.android.wallet.data.WalletConfig
 import com.tari.android.wallet.data.sharedPrefs.backup.BackupPrefRepository
-import com.tari.android.wallet.ffi.FFITariWalletAddress
-import com.tari.android.wallet.ffi.HexString
 import com.tari.android.wallet.infrastructure.backup.BackupFileIsEncryptedException
 import com.tari.android.wallet.infrastructure.backup.BackupManager
 import com.tari.android.wallet.infrastructure.backup.BackupStorageAuthRevokedException

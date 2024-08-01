@@ -52,7 +52,7 @@ data class PendingInboundTx(
     override val timestamp: BigInteger = 0.toBigInteger(),
     override val message: String = "",
     override val status: TxStatus = TxStatus.PENDING,
-    override val tariContact: TariContact = TariContact(),
+    override val tariContact: TariContact,
 ) : Tx(id, direction, amount, timestamp, message, status, tariContact), Parcelable {
 
     constructor(tx: FFICompletedTx) : this(
