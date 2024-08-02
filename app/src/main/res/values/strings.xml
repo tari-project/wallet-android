@@ -107,6 +107,7 @@
     <string name="common_next">Next</string>
     <string name="common_not_ready_yet_dialog_title">Hang tight, coming soon!</string>
     <string name="common_not_ready_yet_dialog_description">This feature is currently under construction. We\'re working hard to bring it to you soon. Stay tuned!</string>
+    <string name="common_copied_to_clipboard">Copied to clipboard</string>
 
     <!-- emoji id copied view -->
     <string name="emoji_id_copied">COPIED</string>
@@ -317,6 +318,18 @@
     <string name="wallet_info_my_aurora_title">My Aurora</string>
     <string name="wallet_info_wallet_button">Wallet</string>
     <string name="wallet_info_connect_yat_button">Connect Yats</string>
+    <string name="wallet_info_address_details_title">Address Details</string>
+    <string name="wallet_info_address_network">Network:</string>
+    <string name="wallet_info_address_features">Features:</string>
+    <string name="wallet_info_address_view_key">View Key:</string>
+    <string name="wallet_info_address_spend_key">Core Address:</string>
+    <string name="wallet_info_address_checksum">Checksum:</string>
+    <string name="wallet_info_address_copy_address">Copy Address:</string>
+    <string name="wallet_info_address_button_copy_base58">Copy Base58</string>
+    <string name="wallet_info_address_button_copy_emoji">Copy Emojis</string>
+    <string name="wallet_info_address_one_side_payment">One Sided Payments</string>
+    <string name="wallet_info_address_interactive_payment">Interactive Payments</string>
+    <string name="wallet_info_address_copy_address_to_clipboard_label">Tari Wallet Identity</string>
 
     <!-- tx failed dialog -->
     <string name="tx_failed_title">Sorry, you can\'t send tXTR to offline users</string>

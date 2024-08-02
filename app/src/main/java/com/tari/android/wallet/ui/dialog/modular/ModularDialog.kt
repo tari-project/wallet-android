@@ -14,6 +14,8 @@ import androidx.core.animation.doOnEnd
 import com.tari.android.wallet.R
 import com.tari.android.wallet.ui.component.networkStateIndicator.module.ConnectionStatusesModule
 import com.tari.android.wallet.ui.component.networkStateIndicator.module.ConnectionStatusesModuleView
+import com.tari.android.wallet.ui.dialog.modular.modules.addressDetails.AddressDetailsModule
+import com.tari.android.wallet.ui.dialog.modular.modules.addressDetails.AddressDetailsModuleView
 import com.tari.android.wallet.ui.dialog.modular.modules.addressPoisoning.AddressPoisoningModule
 import com.tari.android.wallet.ui.dialog.modular.modules.addressPoisoning.AddressPoisoningModuleView
 import com.tari.android.wallet.ui.dialog.modular.modules.body.BodyModule
@@ -151,6 +153,7 @@ open class ModularDialog(val context: Context) {
                 is ShortEmojiIdModule -> ShortEmojiModuleView(context, module)
                 is IconModule -> IconModuleView(context, module)
                 is AddressPoisoningModule -> AddressPoisoningModuleView(context, module)
+                is AddressDetailsModule -> AddressDetailsModuleView(context, module)
                 else -> View(context)
             }
             root.addView(view)

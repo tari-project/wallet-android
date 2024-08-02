@@ -56,7 +56,7 @@ enum class Network(val uriComponent: String, val displayName: String) {
 
     companion object {
         fun from(uriComponent: String): Network {
-            return values().firstOrNull { it.uriComponent.lowercase() == uriComponent.lowercase() }
+            return entries.firstOrNull { it.uriComponent.lowercase() == uriComponent.lowercase() }
                 ?: throw RuntimeException("Unknown network: $uriComponent")
         }
     }

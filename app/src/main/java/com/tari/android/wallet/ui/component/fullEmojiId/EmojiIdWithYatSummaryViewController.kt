@@ -1,10 +1,7 @@
 package com.tari.android.wallet.ui.component.fullEmojiId
 
-import android.icu.text.BreakIterator
-import android.view.View
 import androidx.core.content.ContextCompat
 import com.tari.android.wallet.R
-import com.tari.android.wallet.databinding.ViewEmojiIdSummaryBinding
 import com.tari.android.wallet.databinding.ViewEmojiIdWithYatSummaryBinding
 import com.tari.android.wallet.ui.extension.setVisible
 
@@ -13,6 +10,7 @@ import com.tari.android.wallet.ui.extension.setVisible
  *
  * @author The Tari Development Team
  */
+// TODO check we don't use it anymore and delete
 class EmojiIdWithYatSummaryViewController(private val ui: ViewEmojiIdWithYatSummaryBinding) {
 
     var isYatForegrounded = false

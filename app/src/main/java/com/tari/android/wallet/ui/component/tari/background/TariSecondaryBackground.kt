@@ -4,11 +4,10 @@ import android.content.Context
 import android.util.AttributeSet
 import com.tari.android.wallet.R
 import com.tari.android.wallet.ui.common.domain.PaletteManager
-import com.tari.android.wallet.ui.component.tari.background.obsolete.TariBackgroundConstraint
 import com.tari.android.wallet.ui.extension.obtain
 import com.tari.android.wallet.ui.extension.runRecycle
 
-class TariSecondaryBackground(context: Context, attrs: AttributeSet) : TariBackgroundConstraint(context, attrs) {
+class TariSecondaryBackground(context: Context, attrs: AttributeSet) : TariBackground(context, attrs) {
 
     init {
         val backColor = PaletteManager.getBackgroundSecondary(context)

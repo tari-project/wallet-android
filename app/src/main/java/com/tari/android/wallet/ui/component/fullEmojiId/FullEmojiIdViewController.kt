@@ -68,6 +68,7 @@ import me.everything.android.ui.overscroll.OverScrollDecoratorHelper
  *
  * @author The Tari Development Team
  */
+// TODO check we don't use it anymore and delete
 class FullEmojiIdViewController(
     private val ui: ViewFullEmojiIdBinding,
     summary: ViewEmojiIdSummaryBinding,
@@ -315,7 +316,7 @@ class FullEmojiIdViewController(
     private fun completeCopyEmojiId(clipboardString: String) = with(ui) {
         dimmerView.isClickable = false
         copyEmojiIdButton.isEnabled = false
-        val clipBoard = ContextCompat.getSystemService(context, ClipboardManager::class.java)
+        val clipBoard = ContextCompat.getSystemService(context, ClipboardManager::class.java) // todo
         val clipboardData = ClipData.newPlainText("Tari Wallet Identity", clipboardString)
         clipBoard?.setPrimaryClip(clipboardData)
 
