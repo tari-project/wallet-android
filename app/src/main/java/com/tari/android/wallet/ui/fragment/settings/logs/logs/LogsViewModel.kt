@@ -4,7 +4,6 @@ import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.tari.android.wallet.R
-import com.tari.android.wallet.ui.common.ClipboardArgs
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.dialog.modular.DialogArgs
 import com.tari.android.wallet.ui.dialog.modular.IDialogModule
@@ -81,12 +80,10 @@ class LogsViewModel : CommonViewModel() {
     }
 
     fun copyToClipboard(item: LogViewHolderItem) {
-        _copyToClipboard.postValue(
-            ClipboardArgs(
-                resourceManager.getString(R.string.debug_logs_title),
-                item.log.line,
-                resourceManager.getString(R.string.debug_logs_clipboard_text)
-            )
+        copyToClipboard(
+            clipLabel = resourceManager.getString(R.string.debug_logs_title),
+            clipText = item.log.line,
+            toastMessage = resourceManager.getString(R.string.debug_logs_clipboard_text),
         )
     }
 

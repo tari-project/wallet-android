@@ -71,7 +71,6 @@ import com.tari.android.wallet.extension.addTo
 import com.tari.android.wallet.infrastructure.backup.BackupManager
 import com.tari.android.wallet.infrastructure.backup.BackupState
 import com.tari.android.wallet.infrastructure.backup.BackupsState
-import com.tari.android.wallet.ui.common.ClipboardArgs
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.common.SingleLiveEvent
 import com.tari.android.wallet.ui.common.recyclerView.CommonViewHolderItem
@@ -134,10 +133,6 @@ class AllSettingsViewModel : CommonViewModel() {
 
     private fun initOptions() {
         val versionText = TariVersionModel(networkRepository).versionInfo
-        val versionArgs = ClipboardArgs(
-            resourceManager.getString(all_settings_version_text_copy_title), versionText,
-            resourceManager.getString(all_settings_version_text_copy_toast_message)
-        )
 
         val alias = settingsRepository.firstName.orEmpty() + " " + settingsRepository.lastName.orEmpty()
         val pinCode = securityPrefRepository.pinCode
@@ -252,7 +247,13 @@ class AllSettingsViewModel : CommonViewModel() {
                 style = SettingsRowStyle.Warning,
             ) { navigation.postValue(AllSettingsNavigation.ToDeleteWallet) },
             DividerViewHolderItem(),
-            SettingsVersionViewHolderItem(versionText) { _copyToClipboard.postValue(versionArgs) })
+            SettingsVersionViewHolderItem(versionText) {
+                copyToClipboard(
+                    clipLabel = resourceManager.getString(all_settings_version_text_copy_title),
+                    clipText = versionText,
+                    toastMessage = resourceManager.getString(all_settings_version_text_copy_toast_message),
+                )
+            })
         )
     }
 

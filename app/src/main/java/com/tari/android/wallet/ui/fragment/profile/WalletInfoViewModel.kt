@@ -4,17 +4,18 @@ import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.viewModelScope
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.YatAdapter
 import com.tari.android.wallet.application.deeplinks.DeepLink
 import com.tari.android.wallet.application.deeplinks.DeeplinkHandler
 import com.tari.android.wallet.data.sharedPrefs.CorePrefRepository
 import com.tari.android.wallet.data.sharedPrefs.yat.YatPrefRepository
+import com.tari.android.wallet.extension.launchOnIo
 import com.tari.android.wallet.ffi.Base58
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.dialog.modular.DialogArgs
 import com.tari.android.wallet.ui.dialog.modular.ModularDialogArgs
+import com.tari.android.wallet.ui.dialog.modular.modules.addressDetails.AddressDetailsModule
 import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
 import com.tari.android.wallet.ui.dialog.modular.modules.input.InputModule
 import com.tari.android.wallet.ui.fragment.contactBook.data.contacts.splitAlias
@@ -22,8 +23,6 @@ import com.tari.android.wallet.ui.fragment.contactBook.root.ShareViewModel
 import com.tari.android.wallet.ui.fragment.contactBook.root.share.ShareType
 import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
 import com.tari.android.wallet.util.ContactUtil
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 class WalletInfoViewModel : CommonViewModel() {
@@ -85,7 +84,7 @@ class WalletInfoViewModel : CommonViewModel() {
     private fun checkEmojiIdConnection() {
         val connectedYat = yatSharedPrefsRepository.connectedYat.orEmpty()
         if (connectedYat.isNotEmpty()) {
-            viewModelScope.launch(Dispatchers.IO) {
+            launchOnIo {
                 yatAdapter.searchTariYats(connectedYat).let {
                     if (it?.status == true) {
                         it.result?.entries?.firstOrNull()?.let { response ->
@@ -156,5 +155,31 @@ class WalletInfoViewModel : CommonViewModel() {
         corePrefRepository.lastName = splitAlias(name).lastName
         alias.postValue(name)
         hideDialog()
+    }
+
+    fun onAddressDetailsClicked() {
+        val walletAddress = corePrefRepository.walletAddress
+        showModularDialog(
+            HeadModule(
+                title = resourceManager.getString(R.string.wallet_info_address_details_title),
+                rightButtonIcon = R.drawable.vector_common_close,
+                rightButtonAction = { hideDialog() },
+            ),
+            AddressDetailsModule(
+                tariWalletAddress = walletAddress,
+                copyBase58 = {
+                    copyToClipboard(
+                        clipLabel = resourceManager.getString(R.string.wallet_info_address_copy_address_to_clipboard_label),
+                        clipText = walletAddress.fullBase58,
+                    )
+                },
+                copyEmojis = {
+                    copyToClipboard(
+                        clipLabel = resourceManager.getString(R.string.wallet_info_address_copy_address_to_clipboard_label),
+                        clipText = walletAddress.fullEmojiId,
+                    )
+                },
+            )
+        )
     }
 }

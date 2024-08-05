@@ -26,5 +26,8 @@ class HeadModuleView(context: Context, buttonModule: HeadModule) : CommonView<Co
         ui.button.ui.button.updateLayoutParams<MarginLayoutParams> {
             setMargins(0, 0, 0, 0)
         }
+        ui.buttonIcon.setVisible(buttonModule.rightButtonIcon != null)
+        ui.buttonIcon.setImageResource(buttonModule.rightButtonIcon ?: 0)
+        ui.buttonIcon.setOnClickListener { buttonModule.rightButtonAction() }
     }
 }

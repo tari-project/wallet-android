@@ -97,7 +97,7 @@ open class CommonViewModel : ViewModel() {
     protected val _showToast = SingleLiveEvent<TariToastArgs>()
     val showToast: LiveData<TariToastArgs> = _showToast
 
-    protected val _copyToClipboard = SingleLiveEvent<ClipboardArgs>()
+    private val _copyToClipboard = SingleLiveEvent<ClipboardArgs>()
     val copyToClipboard: LiveData<ClipboardArgs> = _copyToClipboard
 
     private val _modularDialog = SingleLiveEvent<ModularDialogArgs>()
@@ -242,5 +242,13 @@ open class CommonViewModel : ViewModel() {
                 ).getModular(resourceManager)
             )
         }
+    }
+
+    internal fun copyToClipboard(
+        clipLabel: String,
+        clipText: String,
+        toastMessage: String = resourceManager.getString(R.string.common_copied_to_clipboard)
+    ) {
+        _copyToClipboard.postValue(ClipboardArgs(clipLabel, clipText, toastMessage))
     }
 }

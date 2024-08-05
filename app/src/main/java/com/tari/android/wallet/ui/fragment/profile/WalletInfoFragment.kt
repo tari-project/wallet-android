@@ -52,7 +52,6 @@ import com.tari.android.wallet.ui.extension.setOnThrottledClickListener
 import com.tari.android.wallet.ui.extension.setTopMargin
 import com.tari.android.wallet.ui.extension.setVisible
 import com.tari.android.wallet.ui.extension.string
-import com.tari.android.wallet.ui.extension.temporarilyDisableClick
 import com.tari.android.wallet.ui.fragment.contactBook.root.share.ShareOptionArgs
 import com.tari.android.wallet.ui.fragment.contactBook.root.share.ShareOptionView
 import com.tari.android.wallet.ui.fragment.contactBook.root.share.ShareType
@@ -102,7 +101,7 @@ class WalletInfoFragment : CommonFragment<FragmentWalletInfoBinding, WalletInfoV
     }
 
     private fun setupUI() {
-        ui.emojiIdSummaryWithYatView.emojiIdSummaryContainerView.setOnClickListener(this::onEmojiSummaryClicked)
+        ui.emojiIdSummaryWithYatView.emojiIdSummaryContainerView.setOnClickListener { onEmojiSummaryClicked() }
 
         val qrCodeArgs = ShareOptionArgs(ShareType.QR_CODE, string(R.string.share_contact_via_qr_code), R.drawable.vector_share_qr_code) {
             viewModel.shareData(ShareType.QR_CODE)
@@ -153,9 +152,8 @@ class WalletInfoFragment : CommonFragment<FragmentWalletInfoBinding, WalletInfoV
         ui.requestTari.setOnClickListener { viewModel.openRequestTari() }
     }
 
-    private fun onEmojiSummaryClicked(view: View) {
-        view.temporarilyDisableClick()
-        fullEmojiIdViewController.showFullEmojiId()
+    private fun onEmojiSummaryClicked() {
+        viewModel.onAddressDetailsClicked()
     }
 
     private fun updateAlias(alias: String?) {
