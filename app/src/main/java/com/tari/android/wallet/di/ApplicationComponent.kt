@@ -51,7 +51,7 @@ import com.tari.android.wallet.ui.fragment.contactBook.details.ContactDetailsVie
 import com.tari.android.wallet.ui.fragment.contactBook.link.ContactLinkViewModel
 import com.tari.android.wallet.ui.fragment.contactBook.root.ContactBookViewModel
 import com.tari.android.wallet.ui.fragment.contactBook.root.ShareViewModel
-import com.tari.android.wallet.ui.fragment.contactBook.root.action_menu.ContactBookActionMenuViewModel
+import com.tari.android.wallet.ui.fragment.contactBook.root.actionMenu.ContactBookActionMenuViewModel
 import com.tari.android.wallet.ui.fragment.contactBook.transactionHistory.TransactionHistoryViewModel
 import com.tari.android.wallet.ui.fragment.home.HomeActivity
 import com.tari.android.wallet.ui.fragment.home.HomeViewModel

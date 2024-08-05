@@ -33,8 +33,6 @@
 package com.tari.android.wallet.util
 
 import com.tari.android.wallet.extension.toMicroTari
-import com.tari.android.wallet.model.MicroTari
-import java.math.BigInteger
 
 /**
  * Contains application-wide constant values.
@@ -58,8 +56,8 @@ object Constants {
 
         const val scrollDepthShadowViewMaxOpacity = 0.75f
 
-        const val emojiIdChunkSeparatorRelativeScale = 0.9f
-        const val emojiIdChunkSeparatorLetterSpacing = 1f
+        const val EMOJI_ID_CHUNK_SEPARATOR_RELATIVE_SCALE = 0.9f
+        const val EMOJI_ID_CHUNK_SEPARATOR_LETTER_SPACING = 1f
 
         object Button {
             const val clickScaleAnimFullScale = 1f

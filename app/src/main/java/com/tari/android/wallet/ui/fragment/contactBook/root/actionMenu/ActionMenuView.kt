@@ -1,4 +1,4 @@
-package com.tari.android.wallet.ui.fragment.contactBook.root.action_menu
+package com.tari.android.wallet.ui.fragment.contactBook.root.actionMenu
 
 import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
@@ -33,7 +33,6 @@ import com.tari.android.wallet.ui.extension.visible
 import com.tari.android.wallet.ui.fragment.contactBook.contacts.adapter.contact.badges.BadgesController
 import com.tari.android.wallet.ui.fragment.contactBook.data.contacts.ContactDto
 import com.tari.android.wallet.ui.fragment.home.HomeActivity
-import com.tari.android.wallet.util.extractEmojis
 import kotlin.math.asin
 import kotlin.math.cos
 import kotlin.math.pow

@@ -40,8 +40,10 @@ import com.tari.android.wallet.extension.applyColorStyle
 import com.tari.android.wallet.extension.applyLetterSpacingStyle
 import com.tari.android.wallet.extension.applyRelativeTextSizeStyle
 import com.tari.android.wallet.ffi.FFIEmojiSet
+import com.tari.android.wallet.model.TariWalletAddress
 
 typealias EmojiId = String
+
 /**
  * Number of emojis from the Tari emoji set in a string.
  */
@@ -92,7 +94,7 @@ fun EmojiId.containsNonEmoji(emojiSet: Set<EmojiId> = EmojiUtil.FFI_EMOJI_SET): 
 /**
  * @return emojis in the string that are from the Tari emoji set
  */
-fun String.extractEmojis(emojiSet: Set<String> = EmojiUtil.FFI_EMOJI_SET): List<String> {
+fun EmojiId.extractEmojis(emojiSet: Set<String> = EmojiUtil.FFI_EMOJI_SET): List<EmojiId> {
     // iterate through the codepoints
     val it: BreakIterator = BreakIterator.getCharacterInstance()
     it.setText(this)
@@ -258,8 +260,8 @@ class EmojiUtil {
         fun getChunkSeparatorSpannable(separator: String, color: Int): SpannableString {
             val spannable = SpannableString(separator)
             spannable.setSpan(ForegroundColorSpan(color), 0, separator.length, Spanned.SPAN_INTERMEDIATE)
-            spannable.applyRelativeTextSizeStyle(separator, Constants.UI.emojiIdChunkSeparatorRelativeScale)
-            spannable.applyLetterSpacingStyle(separator, Constants.UI.emojiIdChunkSeparatorLetterSpacing)
+            spannable.applyRelativeTextSizeStyle(separator, Constants.UI.EMOJI_ID_CHUNK_SEPARATOR_RELATIVE_SCALE)
+            spannable.applyLetterSpacingStyle(separator, Constants.UI.EMOJI_ID_CHUNK_SEPARATOR_LETTER_SPACING)
             return spannable
         }
 
@@ -270,8 +272,8 @@ class EmojiUtil {
                 styleColor = lightColor,
                 applyToOnlyFirstOccurrence = false,
             )
-            spannable.applyLetterSpacingStyle(separator, Constants.UI.emojiIdChunkSeparatorLetterSpacing)
-            spannable.applyRelativeTextSizeStyle(separator, Constants.UI.emojiIdChunkSeparatorRelativeScale, applyToOnlyFirstOccurrence = false)
+            spannable.applyLetterSpacingStyle(separator, Constants.UI.EMOJI_ID_CHUNK_SEPARATOR_LETTER_SPACING)
+            spannable.applyRelativeTextSizeStyle(separator, Constants.UI.EMOJI_ID_CHUNK_SEPARATOR_RELATIVE_SCALE, applyToOnlyFirstOccurrence = false)
             return spannable
         }
 
@@ -285,4 +287,27 @@ class EmojiUtil {
             return count
         }
     }
+}
+
+/* new address format */
+
+/**
+ * Returns the prefix of the address in the format "| prefix | address1 ••• address2". E.g. "| 🐢💤| 🐉🔋😎 ••• 🍭🎤💍".
+ */
+fun TariWalletAddress.addressPrefixEmojis(): EmojiId {
+    return this.networkEmoji + this.featuresEmoji
+}
+
+/**
+ * Returns the first 3 emojis of the address in the format "| prefix | address1 ••• address2". E.g. "| 🐢💤| 🐉🔋😎 ••• 🍭🎤💍".
+ */
+fun TariWalletAddress.addressFirstEmojis(): EmojiId {
+    return this.spendKeyEmojis.extractEmojis().take(3).joinToString("")
+}
+
+/**
+ * Returns the last 3 emojis of the address in the format "| prefix | address1 ••• address2". E.g. "| 🐢💤| 🐉🔋😎 ••• 🍭🎤💍".
+ */
+fun TariWalletAddress.addressLastEmojis(): EmojiId {
+    return this.spendKeyEmojis.extractEmojis().takeLast(3).joinToString("")
 }
