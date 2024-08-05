@@ -1,4 +1,4 @@
-package com.tari.android.wallet.ui.fragment.contactBook.root.action_menu
+package com.tari.android.wallet.ui.fragment.contactBook.root.actionMenu
 
 import android.text.SpannableString
 import androidx.lifecycle.viewModelScope
