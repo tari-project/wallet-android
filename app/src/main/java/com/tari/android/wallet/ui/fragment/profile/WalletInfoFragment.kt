@@ -39,28 +39,20 @@ import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import com.tari.android.wallet.R
 import com.tari.android.wallet.databinding.FragmentWalletInfoBinding
+import com.tari.android.wallet.extension.collectFlow
 import com.tari.android.wallet.extension.observe
 import com.tari.android.wallet.extension.observeOnLoad
 import com.tari.android.wallet.ui.common.CommonFragment
-import com.tari.android.wallet.ui.component.fullEmojiId.EmojiIdWithYatSummaryViewController
-import com.tari.android.wallet.ui.component.fullEmojiId.FullEmojiIdViewController
 import com.tari.android.wallet.ui.component.tari.toolbar.TariToolbarActionArg
-import com.tari.android.wallet.ui.extension.doOnGlobalLayout
-import com.tari.android.wallet.ui.extension.setLayoutHeight
-import com.tari.android.wallet.ui.extension.setLayoutWidth
 import com.tari.android.wallet.ui.extension.setOnThrottledClickListener
-import com.tari.android.wallet.ui.extension.setTopMargin
 import com.tari.android.wallet.ui.extension.setVisible
 import com.tari.android.wallet.ui.extension.string
-import com.tari.android.wallet.ui.fragment.contactBook.root.share.ShareOptionArgs
-import com.tari.android.wallet.ui.fragment.contactBook.root.share.ShareOptionView
-import com.tari.android.wallet.ui.fragment.contactBook.root.share.ShareType
 import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
+import com.tari.android.wallet.util.addressFirstEmojis
+import com.tari.android.wallet.util.addressLastEmojis
+import com.tari.android.wallet.util.addressPrefixEmojis
 
 class WalletInfoFragment : CommonFragment<FragmentWalletInfoBinding, WalletInfoViewModel>() {
-
-    private lateinit var emojiIdSummaryController: EmojiIdWithYatSummaryViewController
-    private lateinit var fullEmojiIdViewController: FullEmojiIdViewController
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         ui = FragmentWalletInfoBinding.inflate(inflater, container, false)
@@ -80,15 +72,6 @@ class WalletInfoFragment : CommonFragment<FragmentWalletInfoBinding, WalletInfoV
     }
 
     private fun subscribeUI() = with(viewModel) {
-        observe(emojiId) {
-            emojiIdSummaryController.emojiId = it
-            fullEmojiIdViewController.fullEmojiId = it
-        }
-
-        observe(base58) { fullEmojiIdViewController.base58 = it }
-
-        observe(yat) { emojiIdSummaryController.yat = it }
-
         observe(reconnectVisibility) {
             val text = if (it) R.string.wallet_info_yat_disconnected_description else R.string.wallet_info_qr_code_desc
             ui.descTextView.setText(text)
@@ -97,26 +80,17 @@ class WalletInfoFragment : CommonFragment<FragmentWalletInfoBinding, WalletInfoV
 
         observeOnLoad(yatDisconnected)
 
-        observe(alias) { updateAlias(it) }
+        collectFlow(uiState) { uiState ->
+            ui.emojiIdSummaryView.textViewEmojiPrefix.text = uiState.walletAddress.addressPrefixEmojis()
+            ui.emojiIdSummaryView.textViewEmojiFirstPart.text = uiState.walletAddress.addressFirstEmojis()
+            ui.emojiIdSummaryView.textViewEmojiLastPart.text = uiState.walletAddress.addressLastEmojis()
+            // TODO show yat
+            updateAlias(uiState.alias)
+        }
     }
 
     private fun setupUI() {
-        ui.emojiIdSummaryWithYatView.emojiIdSummaryContainerView.setOnClickListener { onEmojiSummaryClicked() }
-
-        val qrCodeArgs = ShareOptionArgs(ShareType.QR_CODE, string(R.string.share_contact_via_qr_code), R.drawable.vector_share_qr_code) {
-            viewModel.shareData(ShareType.QR_CODE)
-        }
-
-        val linkArgs = ShareOptionArgs(ShareType.LINK, string(R.string.share_contact_via_qr_link), R.drawable.vector_share_link) {
-            viewModel.shareData(ShareType.LINK)
-        }
-        val bleArgs = ShareOptionArgs(ShareType.BLE, string(R.string.share_contact_via_qr_ble), R.drawable.vector_share_ble) {
-            viewModel.shareData(ShareType.BLE)
-        }
-
-        ui.shareTypeFirstRow.addView(ShareOptionView(requireContext()).apply { setArgs(qrCodeArgs, ShareOptionView.Size.Medium) })
-        ui.shareTypeFirstRow.addView(ShareOptionView(requireContext()).apply { setArgs(linkArgs, ShareOptionView.Size.Medium) })
-        ui.shareTypeFirstRow.addView(ShareOptionView(requireContext()).apply { setArgs(bleArgs, ShareOptionView.Size.Medium) })
+        ui.emojiIdSummaryContainerView.setOnClickListener { onEmojiSummaryClicked() }
 
         ui.auroraContainer.addView(RoundButtonWithIconView(requireContext()).apply {
             setArgs(getString(R.string.wallet_info_wallet_button), R.drawable.vector_wallet_wallet, {
@@ -131,25 +105,10 @@ class WalletInfoFragment : CommonFragment<FragmentWalletInfoBinding, WalletInfoV
 
         ui.toolbar.setRightArgs(TariToolbarActionArg(title = string(R.string.tx_detail_edit)) { viewModel.showEditAliasDialog() })
 
-        emojiIdSummaryController = EmojiIdWithYatSummaryViewController(ui.emojiIdSummaryWithYatView)
-
-        fullEmojiIdViewController = FullEmojiIdViewController(
-            ui.emojiIdOuterContainer,
-            ui.emojiIdSummaryWithYatView.emojiIdSummaryView,
-            requireContext()
-        )
-
-        ui.root.doOnGlobalLayout {
-            ui.emojiIdOuterContainer.fullEmojiIdContainerView.apply {
-                setTopMargin(ui.emojiIdSummaryWithYatView.root.top)
-                setLayoutHeight(ui.emojiIdSummaryWithYatView.root.height)
-                setLayoutWidth(ui.emojiIdSummaryWithYatView.root.width)
-            }
-        }
-
         ui.reconnectButton.setOnThrottledClickListener { viewModel.openYatOnboarding(requireContext()) }
+        ui.buttonShareAddress.setOnClickListener { viewModel.onShareAddressClicked() }
 
-        ui.requestTari.setOnClickListener { viewModel.openRequestTari() }
+        viewModel.getQrCodeBitmap()?.let { ui.qrImageView.setImageBitmap(it) }
     }
 
     private fun onEmojiSummaryClicked() {

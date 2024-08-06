@@ -4,6 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_gravity="center_horizontal"
+    android:foreground="?attr/selectableItemBackground"
     android:orientation="vertical"
     android:paddingHorizontal="8dp"
     android:paddingTop="8dp">
@@ -14,7 +15,6 @@
         android:layout_height="46dp"
         android:layout_gravity="center_horizontal"
         android:elevation="8dp"
-        android:foreground="?attr/selectableItemBackground"
         android:padding="12dp"
         app:alpha="1"
         app:backgroundColor="?attr/palette_background_primary"

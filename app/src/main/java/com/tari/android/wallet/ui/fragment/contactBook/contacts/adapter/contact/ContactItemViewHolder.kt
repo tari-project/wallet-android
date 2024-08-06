@@ -1,7 +1,5 @@
 package com.tari.android.wallet.ui.fragment.contactBook.contacts.adapter.contact
 
-import android.Manifest.permission.READ_CONTACTS
-import android.content.pm.PackageManager
 import com.tari.android.wallet.databinding.ItemContactBinding
 import com.tari.android.wallet.model.TariWalletAddress
 import com.tari.android.wallet.ui.common.recyclerView.CommonViewHolder
@@ -62,15 +60,15 @@ class ContactItemViewHolder(view: ItemContactBinding) : CommonViewHolder<Contact
     private fun displayAlias(alias: String) {
         ui.alias.text = alias
         ui.alias.visible()
-        ui.emojiIdViewContainer.gone()
+        ui.emojiIdViewContainer.root.gone()
     }
 
     private fun displayEmojiId(address: TariWalletAddress) {
-        ui.emojiIdViewContainer.visible()
+        ui.emojiIdViewContainer.root.visible()
         ui.alias.gone()
-        ui.textViewEmojiPrefix.text = address.addressPrefixEmojis()
-        ui.textViewEmojiFirstPart.text = address.addressFirstEmojis()
-        ui.textViewEmojiLastPart.text = address.addressLastEmojis()
+        ui.emojiIdViewContainer.textViewEmojiPrefix.text = address.addressPrefixEmojis()
+        ui.emojiIdViewContainer.textViewEmojiFirstPart.text = address.addressFirstEmojis()
+        ui.emojiIdViewContainer.textViewEmojiLastPart.text = address.addressLastEmojis()
     }
 
     companion object {

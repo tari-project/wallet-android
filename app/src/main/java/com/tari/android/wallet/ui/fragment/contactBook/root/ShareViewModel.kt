@@ -26,6 +26,7 @@ import com.tari.android.wallet.ui.fragment.send.shareQr.ShareQrCodeModule
 import com.tari.android.wallet.util.ContactUtil
 import javax.inject.Inject
 
+// TODO make it not VM, but a singleton service
 class ShareViewModel : CommonViewModel() {
 
     @Inject
