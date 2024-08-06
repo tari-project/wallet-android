@@ -311,7 +311,7 @@
 
     <!-- wallet info -->
     <string name="wallet_info_my_profile">My Profile</string>
-    <string name="wallet_info_qr_code_desc">Easily receive tXTR from others by sharing your profile via one of the methods below:</string>
+    <string name="wallet_info_qr_code_desc">Transacting in person? Others can scan this QR code from the Tari Aurora App to send you tXTR.</string>
     <string name="wallet_info_yat_disconnected_description">You\'ve previously connected this Yat.\n Do you want to re-connect it to your wallet?</string>
     <string name="wallet_info_yat_disconnected_reconnect">Reconnect Yat</string>
     <string name="wallet_info_share_profile_title">Share Profile</string>
@@ -330,6 +330,9 @@
     <string name="wallet_info_address_one_side_payment">One Sided Payments</string>
     <string name="wallet_info_address_interactive_payment">Interactive Payments</string>
     <string name="wallet_info_address_copy_address_to_clipboard_label">Tari Wallet Identity</string>
+    <string name="wallet_info_share_profile">Share my address</string>
+    <string name="wallet_info_share_address_title">Share Address</string>
+    <string name="wallet_info_share_address_description">Easily receive tXTR from others by sharing your profile via one of the following methods:</string>
 
     <!-- tx failed dialog -->
     <string name="tx_failed_title">Sorry, you can\'t send tXTR to offline users</string>
