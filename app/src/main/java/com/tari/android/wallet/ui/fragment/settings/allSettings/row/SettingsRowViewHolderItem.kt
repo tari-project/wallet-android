@@ -2,7 +2,7 @@ package com.tari.android.wallet.ui.fragment.settings.allSettings.row
 
 import com.tari.android.wallet.ui.common.recyclerView.CommonViewHolderItem
 
-class SettingsRowViewDto(
+class SettingsRowViewHolderItem(
     val title: String,
     val leftIconId: Int? = null,
     val iconId: Int? = null,

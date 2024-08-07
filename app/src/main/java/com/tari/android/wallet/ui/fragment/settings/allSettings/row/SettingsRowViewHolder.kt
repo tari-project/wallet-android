@@ -4,15 +4,15 @@ import com.tari.android.wallet.databinding.ItemSettingsRowBinding
 import com.tari.android.wallet.ui.common.recyclerView.CommonViewHolder
 import com.tari.android.wallet.ui.common.recyclerView.ViewHolderBuilder
 
-class SettingsRowViewHolder(view: ItemSettingsRowBinding) : CommonViewHolder<SettingsRowViewDto, ItemSettingsRowBinding>(view) {
+class SettingsRowViewHolder(view: ItemSettingsRowBinding) : CommonViewHolder<SettingsRowViewHolderItem, ItemSettingsRowBinding>(view) {
 
-    override fun bind(item: SettingsRowViewDto) {
+    override fun bind(item: SettingsRowViewHolderItem) {
         super.bind(item)
         ui.button.initDto(item)
     }
 
     companion object {
-        fun getBuilder(): ViewHolderBuilder = ViewHolderBuilder(ItemSettingsRowBinding::inflate, SettingsRowViewDto::class.java) {
+        fun getBuilder(): ViewHolderBuilder = ViewHolderBuilder(ItemSettingsRowBinding::inflate, SettingsRowViewHolderItem::class.java) {
             SettingsRowViewHolder(it as ItemSettingsRowBinding)
         }
     }
