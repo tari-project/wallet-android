@@ -44,7 +44,7 @@ class TransactionRepository @Inject constructor() : CommonViewModel() {
     @Inject
     lateinit var gifRepository: GIFRepository
 
-
+    // TODO Repository should not return ViewHolders!!!
     private val _list = MutableLiveData<List<CommonViewHolderItem>>(emptyList())
     val list: LiveData<List<CommonViewHolderItem>> = _list
 
@@ -93,9 +93,7 @@ class TransactionRepository @Inject constructor() : CommonViewModel() {
 
     private fun subscribeToEventBus() {
         EventBus.subscribe<Event.Transaction.Updated>(this) { refreshAllData() }
-        EventBus.subscribe<Event.Transaction.TxReceived>(this) {
-            onTxReceived(it.tx)
-        }
+        EventBus.subscribe<Event.Transaction.TxReceived>(this) { onTxReceived(it.tx) }
         EventBus.subscribe<Event.Transaction.TxReplyReceived>(this) { onTxReplyReceived(it.tx) }
         EventBus.subscribe<Event.Transaction.TxFinalized>(this) { onTxFinalized(it.tx) }
         EventBus.subscribe<Event.Transaction.InboundTxBroadcast>(this) { onInboundTxBroadcast(it.tx) }
@@ -104,10 +102,7 @@ class TransactionRepository @Inject constructor() : CommonViewModel() {
         EventBus.subscribe<Event.Transaction.TxMined>(this) { onTxMined(it.tx) }
         EventBus.subscribe<Event.Transaction.TxFauxMinedUnconfirmed>(this) { onTxFauxMinedUnconfirmed(it.tx) }
         EventBus.subscribe<Event.Transaction.TxFauxConfirmed>(this) { onFauxTxMined(it.tx) }
-        EventBus.subscribe<Event.Transaction.TxCancelled>(this) {
-            onTxCancelled(it.tx)
-        }
-
+        EventBus.subscribe<Event.Transaction.TxCancelled>(this) { onTxCancelled(it.tx) }
         EventBus.subscribe<Event.Transaction.TxSendSuccessful>(this) { onTxSendSuccessful(it.txId) }
     }
 

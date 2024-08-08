@@ -1,11 +1,13 @@
-package com.tari.android.wallet.ui.fragment.home.homeTransactionHistory
+package com.tari.android.wallet.ui.fragment.tx.history
 
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import com.tari.android.wallet.extension.collectFlow
+import com.tari.android.wallet.model.Tx
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.common.recyclerView.CommonViewHolderItem
 import com.tari.android.wallet.ui.fragment.contactBook.data.ContactsRepository
+import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
 import com.tari.android.wallet.ui.fragment.tx.TransactionRepository
 import com.tari.android.wallet.ui.fragment.tx.adapter.TransactionItem
 import javax.inject.Inject
@@ -57,5 +59,13 @@ class HomeTransactionHistoryViewModel : CommonViewModel() {
 
     fun doSearch(text: String) {
         searchText.postValue(text)
+    }
+
+    fun onTransactionClick(tx: Tx) {
+        tariNavigator.navigate(Navigation.TxListNavigation.ToTxDetails(tx))
+    }
+
+    fun onRequestTariClick() {
+        tariNavigator.navigate(Navigation.AllSettingsNavigation.ToRequestTari)
     }
 }

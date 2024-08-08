@@ -52,10 +52,10 @@ import com.tari.android.wallet.ui.fragment.contactBook.link.ContactLinkViewModel
 import com.tari.android.wallet.ui.fragment.contactBook.root.ContactBookViewModel
 import com.tari.android.wallet.ui.fragment.contactBook.root.ShareViewModel
 import com.tari.android.wallet.ui.fragment.contactBook.root.actionMenu.ContactBookActionMenuViewModel
-import com.tari.android.wallet.ui.fragment.contactBook.transactionHistory.TransactionHistoryViewModel
+import com.tari.android.wallet.ui.fragment.tx.history.TransactionHistoryViewModel
 import com.tari.android.wallet.ui.fragment.home.HomeActivity
 import com.tari.android.wallet.ui.fragment.home.HomeViewModel
-import com.tari.android.wallet.ui.fragment.home.homeTransactionHistory.HomeTransactionHistoryViewModel
+import com.tari.android.wallet.ui.fragment.tx.history.HomeTransactionHistoryViewModel
 import com.tari.android.wallet.ui.fragment.onboarding.activity.OnboardingFlowActivity
 import com.tari.android.wallet.ui.fragment.onboarding.createWallet.CreateWalletFragment
 import com.tari.android.wallet.ui.fragment.onboarding.createWallet.CreateWalletViewModel
