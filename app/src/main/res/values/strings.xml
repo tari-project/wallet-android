@@ -233,7 +233,7 @@
     <string name="bluetooth_connect">Bluetooth Connect 🤘</string>
     <string name="bluetooth_connect_description">Connect and send Tari to someone nearby</string>
     <string name="tx_list_you_paid_with_alias">You paid %s</string>
-    <string name="tx_list_paid_you">paid you</string>
+    <string name="tx_list_paid_you">sent a payment</string>
     <string name="tx_list_seconds_ago">%ds ago</string>
     <string name="tx_list_minutes_ago">%dm ago</string>
     <string name="tx_list_hours_ago">%dh ago</string>

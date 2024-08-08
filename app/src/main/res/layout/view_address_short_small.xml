@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:gravity="center_vertical"
+    android:orientation="horizontal">
+
+    <com.tari.android.wallet.ui.component.tari.TariTextView
+        android:id="@+id/text_view_emoji_prefix"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:letterSpacing="0.01"
+        android:lineSpacingExtra="8dp"
+        android:textColor="?attr/palette_text_body"
+        android:textSize="12sp"
+        app:customFont="medium"
+        tools:text="🐢💤" />
+
+    <View
+        android:layout_width="1dp"
+        android:layout_height="12dp"
+        android:layout_marginStart="5dp"
+        android:background="?attr/palette_text_light" />
+
+    <com.tari.android.wallet.ui.component.tari.TariTextView
+        android:id="@+id/text_view_emoji_first_part"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="5dp"
+        android:letterSpacing="0.01"
+        android:lineSpacingExtra="8dp"
+        android:textColor="?attr/palette_text_body"
+        android:textSize="12sp"
+        app:customFont="medium"
+        tools:text="🐉🔋😎" />
+
+    <TextView
+        android:id="@+id/emoji_id_summary_txt_emoji_separator"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="5dp"
+        android:text="@string/emoji_id_bullet_separator"
+        android:textColor="?attr/palette_text_light"
+        android:textSize="12sp"
+        android:typeface="monospace" />
+
+    <com.tari.android.wallet.ui.component.tari.TariTextView
+        android:id="@+id/text_view_emoji_last_part"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="5dp"
+        android:letterSpacing="0.01"
+        android:lineSpacingExtra="8dp"
+        android:textColor="?attr/palette_text_body"
+        android:textSize="12sp"
+        app:customFont="medium"
+        tools:text="🍭🎤💍" />
+</LinearLayout>

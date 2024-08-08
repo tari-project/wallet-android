@@ -33,7 +33,7 @@
 package com.tari.android.wallet.di
 
 import com.tari.android.wallet.BuildConfig
-import com.tari.android.wallet.ui.common.gyphy.repository.GIFRepository
+import com.tari.android.wallet.ui.common.gyphy.repository.GifRepository
 import com.tari.android.wallet.ui.common.gyphy.repository.GiphyRESTRetrofitRepository
 import dagger.Module
 import dagger.Provides
@@ -85,7 +85,7 @@ class PresentationModule {
 
     @Provides
     @Singleton
-    fun provideGIFsRepository(@Named(GIPHY_RETROFIT) retrofit: Retrofit): GIFRepository =
+    fun provideGifRepository(@Named(GIPHY_RETROFIT) retrofit: Retrofit): GifRepository =
         GiphyRESTRetrofitRepository(retrofit.create())
 
 }

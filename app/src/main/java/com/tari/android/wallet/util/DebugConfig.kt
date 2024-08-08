@@ -44,8 +44,8 @@ import com.tari.android.wallet.model.TariUtxo
 import com.tari.android.wallet.model.TariWalletAddress
 import com.tari.android.wallet.model.Tx
 import com.tari.android.wallet.model.TxStatus
-import com.tari.android.wallet.ui.common.gyphy.presentation.GIFViewModel
-import com.tari.android.wallet.ui.common.gyphy.repository.GIFRepository
+import com.tari.android.wallet.ui.common.gyphy.presentation.GifViewModel
+import com.tari.android.wallet.ui.common.gyphy.repository.GifRepository
 import com.tari.android.wallet.ui.common.recyclerView.items.TitleViewHolderItem
 import com.tari.android.wallet.ui.fragment.chat.data.ChatItemDto
 import com.tari.android.wallet.ui.fragment.chat.data.ChatMessageItemDto
@@ -151,7 +151,7 @@ object MockDataStub {
     )
 
     fun createTxList(
-        gifRepository: GIFRepository,
+        gifRepository: GifRepository,
         confirmationCount: Long,
         title: String = "Mocked Transactions"
     ) = listOf(
@@ -180,7 +180,7 @@ object MockDataStub {
     )
 
     fun createTx(
-        gifRepository: GIFRepository,
+        gifRepository: GifRepository,
         confirmationCount: Long,
         amount: Long = 100000,
         contactAlias: String = "Test",
@@ -198,7 +198,7 @@ object MockDataStub {
         ),
         contact = createContact(alias = contactAlias),
         position = 0,
-        viewModel = GIFViewModel(gifRepository),
+        gifViewModel = GifViewModel(gifRepository),
         requiredConfirmationCount = confirmationCount,
     )
 

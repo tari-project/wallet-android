@@ -22,14 +22,16 @@ class TransactionHistoryViewModel(savedState: SavedStateHandle) : CommonViewMode
     @Inject
     lateinit var contactsRepository: ContactsRepository
 
+    init {
+        component.inject(this)
+    }
+
     // Actualize the contact with the latest data from the repository
     val selectedContact = contactsRepository.getByUuid(savedState.get<ContactDto>(TariNavigator.PARAMETER_CONTACT)!!.uuid)
 
     var list = MediatorLiveData<List<CommonViewHolderItem>>()
 
     init {
-        component.inject(this)
-
         collectFlow(contactsRepository.contactList) {
             updateList()
         }

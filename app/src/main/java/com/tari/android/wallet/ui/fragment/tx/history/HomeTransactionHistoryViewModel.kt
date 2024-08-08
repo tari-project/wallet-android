@@ -41,11 +41,10 @@ class HomeTransactionHistoryViewModel : CommonViewModel() {
     }
 
     private fun updateList() {
-        val filtered = transactionRepository.list.value
         val searchText = searchText.value.orEmpty()
-        val newList = (filtered.orEmpty().filter {
+        val newList = transactionRepository.list.value.orEmpty().filter {
             searchText.isEmpty() || searchText.isNotEmpty() && (it is TransactionItem) && it.isContains(searchText)
-        }.toMutableList())
+        }
         list.postValue(newList)
 
         val listIsEmpty = newList.isEmpty()

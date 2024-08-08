@@ -104,8 +104,8 @@ import com.tari.android.wallet.ui.extension.string
 import com.tari.android.wallet.ui.extension.temporarilyDisableClick
 import com.tari.android.wallet.ui.extension.visible
 import com.tari.android.wallet.ui.fragment.contactBook.data.contacts.ContactDto
-import com.tari.android.wallet.ui.fragment.tx.details.gif.GIFView
-import com.tari.android.wallet.ui.fragment.tx.details.gif.GIFViewModel
+import com.tari.android.wallet.ui.fragment.tx.details.gif.GifView
+import com.tari.android.wallet.ui.fragment.tx.details.gif.GifViewModel
 import com.tari.android.wallet.ui.fragment.tx.details.gif.TxState
 import com.tari.android.wallet.util.WalletUtil
 import java.util.Date
@@ -182,9 +182,9 @@ class TxDetailsFragment : CommonFragment<FragmentTxDetailsBinding, TxDetailsView
 
     private fun fetchGIFIfAttached(tx: Tx) {
         val gifId = TxNote.fromNote(tx.message).gifId ?: return
-        val gifViewModel: GIFViewModel by viewModels()
+        val gifViewModel: GifViewModel by viewModels()
         gifViewModel.onGIFFetchRequested(gifId)
-        GIFView(ui.gifContainer, Glide.with(this), gifViewModel, this).displayGIF()
+        GifView(ui.gifContainer, Glide.with(this), gifViewModel, this).displayGif()
     }
 
     private fun setupUI() {

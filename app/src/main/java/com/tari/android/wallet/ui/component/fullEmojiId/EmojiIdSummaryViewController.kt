@@ -42,12 +42,13 @@ import com.tari.android.wallet.ui.extension.setVisible
  *
  * @author The Tari Development Team
  */
+
+// Todo check it and remove
 class EmojiIdSummaryViewController(private val ui: ViewEmojiIdSummaryBinding) {
 
     constructor(view: View) : this(ViewEmojiIdSummaryBinding.bind(view))
 
     fun display(emojiId: String, showEmojisFromEachEnd: Int = 3) {
-
         val emojis = ArrayList<String>()
         val it: BreakIterator = BreakIterator.getCharacterInstance()
         it.setText(emojiId)

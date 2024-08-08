@@ -11,20 +11,20 @@ import com.bumptech.glide.request.RequestOptions
 import com.bumptech.glide.request.target.Target
 import com.tari.android.wallet.R
 import com.tari.android.wallet.databinding.ViewTxDetailsGifContainerBinding
-import com.tari.android.wallet.ui.common.gyphy.repository.GIFItem
+import com.tari.android.wallet.ui.common.gyphy.repository.GifItem
 import com.tari.android.wallet.ui.extension.dimenPx
 import com.tari.android.wallet.ui.extension.gone
 import com.tari.android.wallet.ui.extension.setTopMargin
 import com.tari.android.wallet.ui.extension.visible
 
-class GIFView(
+class GifView(
     private val ui: ViewTxDetailsGifContainerBinding,
     private val glide: RequestManager,
-    private val viewModel: GIFViewModel,
+    private val viewModel: GifViewModel,
     private val owner: LifecycleOwner
 ) {
 
-    fun displayGIF() {
+    fun displayGif() {
         viewModel.gif.observe(owner) {
             when {
                 it.isError -> onFailure()
@@ -71,7 +71,7 @@ class GIFView(
         ui.loadingGifProgressBar.gone()
     }
 
-    private fun downloadMedia(gifItem: GIFItem) {
+    private fun downloadMedia(gifItem: GifItem) {
         glide.asGif()
             .load(gifItem.uri)
             .apply(RequestOptions().transform(RoundedCorners(10)))

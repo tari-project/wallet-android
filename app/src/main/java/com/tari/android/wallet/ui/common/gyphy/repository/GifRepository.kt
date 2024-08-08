@@ -32,9 +32,9 @@
  */
 package com.tari.android.wallet.ui.common.gyphy.repository
 
-interface GIFRepository {
-    fun getAll(query: String, limit: Int): List<GIFItem>
+interface GifRepository {
+    fun getAll(query: String, limit: Int): List<GifItem>
 
-    fun getById(id: String): GIFItem
+    fun getById(id: String): GifItem
 }
 

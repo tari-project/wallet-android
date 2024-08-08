@@ -73,7 +73,7 @@ import com.tari.android.wallet.ui.fragment.restore.walletRestoringFromSeedWords.
 import com.tari.android.wallet.ui.fragment.send.addAmount.AddAmountViewModel
 import com.tari.android.wallet.ui.fragment.send.addNote.AddNoteViewModel
 import com.tari.android.wallet.ui.fragment.send.addNote.gif.ChooseGIFDialogFragment
-import com.tari.android.wallet.ui.fragment.send.addNote.gif.ThumbnailGIFsViewModel
+import com.tari.android.wallet.ui.fragment.send.addNote.gif.ThumbnailGifViewModel
 import com.tari.android.wallet.ui.fragment.send.finalize.FinalizeSendTxViewModel
 import com.tari.android.wallet.ui.fragment.send.requestTari.RequestTariViewModel
 import com.tari.android.wallet.ui.fragment.settings.allSettings.AllSettingsViewModel
@@ -104,7 +104,7 @@ import com.tari.android.wallet.ui.fragment.splash.SplashActivity
 import com.tari.android.wallet.ui.fragment.tx.HomeFragmentViewModel
 import com.tari.android.wallet.ui.fragment.tx.TransactionRepository
 import com.tari.android.wallet.ui.fragment.tx.details.TxDetailsViewModel
-import com.tari.android.wallet.ui.fragment.tx.details.gif.GIFViewModel
+import com.tari.android.wallet.ui.fragment.tx.details.gif.GifViewModel
 import com.tari.android.wallet.ui.fragment.utxos.list.UtxosListViewModel
 import dagger.Component
 import javax.inject.Singleton
@@ -142,8 +142,8 @@ interface ApplicationComponent {
     fun inject(fragment: CreateWalletFragment)
 
     fun inject(commonViewModel: CommonViewModel)
-    fun inject(viewModel: ThumbnailGIFsViewModel)
-    fun inject(viewModel: GIFViewModel)
+    fun inject(viewModel: ThumbnailGifViewModel)
+    fun inject(viewModel: GifViewModel)
     fun inject(viewModel: BackgroundServiceSettingsViewModel)
     fun inject(viewModel: ScreenRecordingSettingsViewModel)
     fun inject(viewModel: ConnectionIndicatorViewModel)

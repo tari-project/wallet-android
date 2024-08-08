@@ -21,8 +21,8 @@ import com.tari.android.wallet.model.TxId
 import com.tari.android.wallet.model.TxStatus
 import com.tari.android.wallet.model.WalletError
 import com.tari.android.wallet.ui.common.CommonViewModel
-import com.tari.android.wallet.ui.common.gyphy.presentation.GIFViewModel
-import com.tari.android.wallet.ui.common.gyphy.repository.GIFRepository
+import com.tari.android.wallet.ui.common.gyphy.presentation.GifViewModel
+import com.tari.android.wallet.ui.common.gyphy.repository.GifRepository
 import com.tari.android.wallet.ui.common.recyclerView.CommonViewHolderItem
 import com.tari.android.wallet.ui.common.recyclerView.items.TitleViewHolderItem
 import com.tari.android.wallet.ui.fragment.contactBook.data.ContactsRepository
@@ -42,7 +42,7 @@ class TransactionRepository @Inject constructor() : CommonViewModel() {
     lateinit var contactsRepository: ContactsRepository
 
     @Inject
-    lateinit var gifRepository: GIFRepository
+    lateinit var gifRepository: GifRepository
 
     // TODO Repository should not return ViewHolders!!!
     private val _list = MutableLiveData<List<CommonViewHolderItem>>(emptyList())
@@ -143,7 +143,7 @@ class TransactionRepository @Inject constructor() : CommonViewModel() {
                         tx = tx,
                         contact = contactsRepository.getContactForTx(tx),
                         position = index,
-                        viewModel = GIFViewModel(gifRepository),
+                        gifViewModel = GifViewModel(gifRepository),
                         requiredConfirmationCount = confirmationCount,
                     )
                 })
@@ -153,13 +153,13 @@ class TransactionRepository @Inject constructor() : CommonViewModel() {
             val nonPendingTxs = (cancelledTxs + nonMinedUnconfirmedCompletedTxs).toMutableList()
             nonPendingTxs.sortWith(compareByDescending(Tx::timestamp).thenByDescending { it.id })
             if (nonPendingTxs.isNotEmpty()) {
-                items.add(TitleViewHolderItem(title = resourceManager.getString(R.string.home_completed_transactions_title), isFirst = false))
+                items.add(TitleViewHolderItem(title = resourceManager.getString(R.string.home_completed_transactions_title), isFirst = pendingTxs.isEmpty()))
                 items.addAll(nonPendingTxs.mapIndexed { index, tx ->
                     TransactionItem(
                         tx = tx,
                         contact = contactsRepository.getContactForTx(tx),
                         position = index + pendingTxs.size,
-                        viewModel = GIFViewModel(gifRepository),
+                        gifViewModel = GifViewModel(gifRepository),
                         requiredConfirmationCount = confirmationCount,
                     )
                 })
