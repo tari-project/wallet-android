@@ -190,7 +190,7 @@ class ContactsRepository @Inject constructor(
     }
 
     // TODO save yats to shared prefs
-    suspend fun updateYatInfo(contactDto: ContactDto, connectedWallets: Map<String, PaymentAddressResponseResult>) {
+    suspend fun updateYatInfo(contactDto: ContactDto, connectedWallets: Map<String, PaymentAddressResponseResult>): ContactDto {
         updateContactList { currentList ->
             currentList
                 .replaceItem(
@@ -198,6 +198,7 @@ class ContactsRepository @Inject constructor(
                     replace = { contact -> contact.copy(yatDto = contact.yatDto.withConnectedWallets(connectedWallets)) }
                 )
         }
+        return getByUuid(contactDto.uuid)
     }
 
     fun isContactOnline(contact: TariWalletAddress): Boolean {

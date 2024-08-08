@@ -82,7 +82,7 @@ data class TariWalletAddress(
     val uniqueIdentifier: String
         get() = "$networkEmoji$spendKeyEmojis"
 
-    val avatarEmoji: String
+    val avatarEmoji: String // TODO remove this and check places is used. We don't avatar emoji anymore
         get() = fullEmojiId.extractEmojis().first()
 
     fun isUnknownUser(): Boolean = unknownAddress

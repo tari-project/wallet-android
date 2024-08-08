@@ -84,7 +84,7 @@ import com.tari.android.wallet.ui.fragment.settings.allSettings.PresentationBack
 import com.tari.android.wallet.ui.fragment.settings.allSettings.backupOptions.SettingsBackupOptionViewHolderItem
 import com.tari.android.wallet.ui.fragment.settings.allSettings.myProfile.MyProfileViewHolderItem
 import com.tari.android.wallet.ui.fragment.settings.allSettings.row.SettingsRowStyle
-import com.tari.android.wallet.ui.fragment.settings.allSettings.row.SettingsRowViewDto
+import com.tari.android.wallet.ui.fragment.settings.allSettings.row.SettingsRowViewHolderItem
 import com.tari.android.wallet.ui.fragment.settings.allSettings.title.SettingsTitleViewHolderItem
 import com.tari.android.wallet.ui.fragment.settings.allSettings.version.SettingsVersionViewHolderItem
 import com.tari.android.wallet.ui.fragment.settings.userAutorization.BiometricAuthenticationViewModel
@@ -142,81 +142,81 @@ class AllSettingsViewModel : CommonViewModel() {
                 navigation.postValue(AllSettingsNavigation.ToMyProfile)
             },
             DividerViewHolderItem(),
-            SettingsRowViewDto(resourceManager.getString(all_settings_connect_yats), vector_all_settings_yat_icon) {
+            SettingsRowViewHolderItem(resourceManager.getString(all_settings_connect_yats), vector_all_settings_yat_icon) {
                 _openYatOnboarding.postValue(Unit)
             },
             SettingsTitleViewHolderItem(resourceManager.getString(all_settings_security_label)),
             backupOption,
             DividerViewHolderItem(),
-            SettingsRowViewDto(resourceManager.getString(all_settings_data_collection), vector_all_settings_data_collection) {
+            SettingsRowViewHolderItem(resourceManager.getString(all_settings_data_collection), vector_all_settings_data_collection) {
                 navigation.postValue(AllSettingsNavigation.ToDataCollection)
             },
             DividerViewHolderItem(),
             if (pinCode != null) {
-                SettingsRowViewDto(resourceManager.getString(all_settings_pin_code), vector_all_settings_passcode) {
+                SettingsRowViewHolderItem(resourceManager.getString(all_settings_pin_code), vector_all_settings_passcode) {
                     runWithAuthorization {
                         navigation.postValue(Navigation.EnterPinCodeNavigation(PinCodeScreenBehavior.ChangeNew))
                     }
                 }
             } else {
-                SettingsRowViewDto(resourceManager.getString(all_settings_create_pin_code), vector_all_settings_passcode) {
+                SettingsRowViewHolderItem(resourceManager.getString(all_settings_create_pin_code), vector_all_settings_passcode) {
                     runWithAuthorization {
                         navigation.postValue(Navigation.EnterPinCodeNavigation(PinCodeScreenBehavior.Create))
                     }
                 }
             },
             DividerViewHolderItem(),
-            SettingsRowViewDto(resourceManager.getString(all_settings_biometrics), vector_fingerprint) {
+            SettingsRowViewHolderItem(resourceManager.getString(all_settings_biometrics), vector_fingerprint) {
                 runWithAuthorization {
                     navigation.postValue(Navigation.ChangeBiometrics)
                 }
             },
             SettingsTitleViewHolderItem(resourceManager.getString(all_settings_secondary_settings_label)),
-            SettingsRowViewDto(resourceManager.getString(all_settings_store), vector_all_settings_cart) {
+            SettingsRowViewHolderItem(resourceManager.getString(all_settings_store), vector_all_settings_cart) {
                 _openLink.postValue(resourceManager.getString(ttl_store_url))
             },
             DividerViewHolderItem(),
-            SettingsRowViewDto(resourceManager.getString(tari_about_title), vector_all_settings_about_icon) {
+            SettingsRowViewHolderItem(resourceManager.getString(tari_about_title), vector_all_settings_about_icon) {
                 navigation.postValue(AllSettingsNavigation.ToAbout)
             },
             DividerViewHolderItem(),
-            SettingsRowViewDto(resourceManager.getString(all_settings_report_a_bug), vector_all_settings_report_bug_icon) {
+            SettingsRowViewHolderItem(resourceManager.getString(all_settings_report_a_bug), vector_all_settings_report_bug_icon) {
                 navigation.postValue(AllSettingsNavigation.ToBugReporting)
             },
             DividerViewHolderItem(),
-            SettingsRowViewDto(resourceManager.getString(all_settings_visit_site), vector_all_settings_visit_tari_icon) {
+            SettingsRowViewHolderItem(resourceManager.getString(all_settings_visit_site), vector_all_settings_visit_tari_icon) {
                 _openLink.postValue(resourceManager.getString(tari_url))
             },
             DividerViewHolderItem(),
-            SettingsRowViewDto(resourceManager.getString(all_settings_contribute), vector_all_settings_contribute_to_tari_icon) {
+            SettingsRowViewHolderItem(resourceManager.getString(all_settings_contribute), vector_all_settings_contribute_to_tari_icon) {
                 _openLink.postValue(resourceManager.getString(github_repo_url))
             },
             DividerViewHolderItem(),
-            SettingsRowViewDto(resourceManager.getString(all_settings_user_agreement), vector_all_settings_user_agreement_icon) {
+            SettingsRowViewHolderItem(resourceManager.getString(all_settings_user_agreement), vector_all_settings_user_agreement_icon) {
                 _openLink.postValue(resourceManager.getString(user_agreement_url))
             },
             DividerViewHolderItem(),
-            SettingsRowViewDto(resourceManager.getString(all_settings_privacy_policy), vector_all_settings_privacy_policy_icon) {
+            SettingsRowViewHolderItem(resourceManager.getString(all_settings_privacy_policy), vector_all_settings_privacy_policy_icon) {
                 _openLink.postValue(resourceManager.getString(privacy_policy_url))
             },
             DividerViewHolderItem(),
-            SettingsRowViewDto(resourceManager.getString(all_settings_disclaimer), vector_all_settings_disclaimer_icon) {
+            SettingsRowViewHolderItem(resourceManager.getString(all_settings_disclaimer), vector_all_settings_disclaimer_icon) {
                 _openLink.postValue(resourceManager.getString(disclaimer_url))
             },
             DividerViewHolderItem(),
-            SettingsRowViewDto(resourceManager.getString(all_settings_explorer), vector_all_settings_block_explorer_icon) {
+            SettingsRowViewHolderItem(resourceManager.getString(all_settings_explorer), vector_all_settings_block_explorer_icon) {
                 _openLink.postValue(networkRepository.currentNetwork.blockExplorerUrl.orEmpty())
             }.takeIf { networkRepository.currentNetwork.isBlockExplorerAvailable },
             SettingsTitleViewHolderItem(resourceManager.getString(all_settings_advanced_settings_label)),
-            SettingsRowViewDto(resourceManager.getString(all_settings_select_theme), vector_all_settings_select_theme_icon) {
+            SettingsRowViewHolderItem(resourceManager.getString(all_settings_select_theme), vector_all_settings_select_theme_icon) {
                 navigation.postValue(AllSettingsNavigation.ToThemeSelection)
             },
             DividerViewHolderItem(),
-            SettingsRowViewDto(resourceManager.getString(all_settings_background_service), vector_all_settings_background_service_icon) {
+            SettingsRowViewHolderItem(resourceManager.getString(all_settings_background_service), vector_all_settings_background_service_icon) {
                 navigation.postValue(AllSettingsNavigation.ToBackgroundService)
             },
             DividerViewHolderItem(),
-            SettingsRowViewDto(
+            SettingsRowViewHolderItem(
                 title = resourceManager.getString(all_settings_screen_recording),
                 leftIconId = vector_all_settings_screen_recording_icon,
                 warning = tariSettingsSharedRepository.screenRecordingTurnedOn,
@@ -224,23 +224,23 @@ class AllSettingsViewModel : CommonViewModel() {
                 navigation.postValue(AllSettingsNavigation.ToScreenRecording)
             },
             DividerViewHolderItem(),
-            SettingsRowViewDto(resourceManager.getString(all_settings_bluetooth_settings), vector_all_settings_bluetooth) {
+            SettingsRowViewHolderItem(resourceManager.getString(all_settings_bluetooth_settings), vector_all_settings_bluetooth) {
                 navigation.postValue(AllSettingsNavigation.ToBluetoothSettings)
             },
             DividerViewHolderItem(),
-            SettingsRowViewDto(resourceManager.getString(all_settings_bridge_configuration), vector_all_settings_bridge_configuration_icon) {
+            SettingsRowViewHolderItem(resourceManager.getString(all_settings_bridge_configuration), vector_all_settings_bridge_configuration_icon) {
                 navigation.postValue(AllSettingsNavigation.ToTorBridges)
             },
             DividerViewHolderItem(),
-            SettingsRowViewDto(resourceManager.getString(all_settings_select_network), vector_all_settings_select_network_icon) {
+            SettingsRowViewHolderItem(resourceManager.getString(all_settings_select_network), vector_all_settings_select_network_icon) {
                 navigation.postValue(AllSettingsNavigation.ToNetworkSelection)
             },
             DividerViewHolderItem(),
-            SettingsRowViewDto(resourceManager.getString(all_settings_select_base_node), vector_all_settings_select_base_node_icon) {
+            SettingsRowViewHolderItem(resourceManager.getString(all_settings_select_base_node), vector_all_settings_select_base_node_icon) {
                 navigation.postValue(AllSettingsNavigation.ToBaseNodeSelection)
             },
             DividerViewHolderItem(),
-            SettingsRowViewDto(
+            SettingsRowViewHolderItem(
                 title = resourceManager.getString(all_settings_delete_wallet),
                 leftIconId = vector_all_settings_delete_button_icon,
                 iconId = null,

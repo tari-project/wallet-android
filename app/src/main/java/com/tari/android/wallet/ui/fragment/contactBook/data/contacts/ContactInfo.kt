@@ -110,7 +110,7 @@ data class MergedContactInfo(
 
     override fun extractWalletAddress(): TariWalletAddress = ffiContactInfo.walletAddress
 
-    override fun getAlias(): String = phoneContactInfo.firstName
+    override fun getAlias(): String = phoneContactInfo.getAlias()
 }
 
 fun splitAlias(alias: String): ParsedAlias = alias.split(" ", limit = 2)
