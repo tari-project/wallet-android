@@ -12,12 +12,16 @@ import com.tari.android.wallet.extension.observe
 import com.tari.android.wallet.ui.common.CommonFragment
 import com.tari.android.wallet.ui.common.recyclerView.CommonAdapter
 import com.tari.android.wallet.ui.common.recyclerView.CommonViewHolderItem
+import com.tari.android.wallet.ui.extension.gone
 import com.tari.android.wallet.ui.extension.setVisible
+import com.tari.android.wallet.ui.extension.visible
 import com.tari.android.wallet.ui.fragment.contactBook.data.contacts.ContactDto
 import com.tari.android.wallet.ui.fragment.home.navigation.TariNavigator
 import com.tari.android.wallet.ui.fragment.tx.adapter.TransactionItem
 import com.tari.android.wallet.ui.fragment.tx.adapter.TxListAdapter
-import com.tari.android.wallet.util.extractEmojis
+import com.tari.android.wallet.util.addressFirstEmojis
+import com.tari.android.wallet.util.addressLastEmojis
+import com.tari.android.wallet.util.addressPrefixEmojis
 import yat.android.ui.extension.HtmlHelper
 
 class TransactionHistoryFragment : CommonFragment<FragmentContactTransactionHistoryBinding, TransactionHistoryViewModel>() {
@@ -43,7 +47,7 @@ class TransactionHistoryFragment : CommonFragment<FragmentContactTransactionHist
 
     private fun updateList(items: List<CommonViewHolderItem>) {
         ui.list.setVisible(items.isNotEmpty())
-        ui.descriptionView.setVisible(items.isNotEmpty())
+        ui.descriptionViewContainer.setVisible(items.isNotEmpty())
         ui.emptyState.setVisible(items.isEmpty())
 
         adapter.update(items)
@@ -68,15 +72,18 @@ class TransactionHistoryFragment : CommonFragment<FragmentContactTransactionHist
     }
 
     private fun setContactText(contactDto: ContactDto) {
-        val name = contactDto.contactInfo.getAlias().ifBlank {
-            contactDto.contactInfo.extractWalletAddress()?.let {
-                val emojiId = it.fullEmojiId.extractEmojis()
-                val shortEmojiId = emojiId.take(3) + getString(R.string.emoji_id_bullet_separator) + emojiId.takeLast(3) // TODO put alias methods to a helper class
-                shortEmojiId.joinToString("")
-            }
+        val name = contactDto.contactInfo.getAlias()
+        val address = contactDto.walletAddress
+
+        ui.descriptionView.text = getString(R.string.contact_details_transaction_history_description, name)
+        if (name.isBlank() && address != null) {
+            ui.emojiIdViewContainer.root.visible()
+            ui.emojiIdViewContainer.textViewEmojiPrefix.text = address.addressPrefixEmojis()
+            ui.emojiIdViewContainer.textViewEmojiFirstPart.text = address.addressFirstEmojis()
+            ui.emojiIdViewContainer.textViewEmojiLastPart.text = address.addressLastEmojis()
+        } else {
+            ui.emojiIdViewContainer.root.gone()
         }
-        val text = getString(R.string.contact_details_transaction_history_description, name)
-        ui.descriptionView.text = text
 
         val emptyStateText = getString(R.string.contact_details_transaction_history_empty_state_description, name)
         ui.emptyStateDescription.text = HtmlHelper.getSpannedText(emptyStateText)

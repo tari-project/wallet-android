@@ -167,7 +167,7 @@ class TxListHomeViewHolder(view: ItemHomeTxListBinding) : CommonViewHolder<Trans
             }
 
             txDate.isEqual(yesterdayDate) -> string(R.string.home_tx_list_header_yesterday)
-            else -> txDate.toString(dateFormat, Locale.ENGLISH)
+            else -> txDate.toString(DATE_FORMAT, Locale.ENGLISH)
         }
     }
 
@@ -176,6 +176,6 @@ class TxListHomeViewHolder(view: ItemHomeTxListBinding) : CommonViewHolder<Trans
             ViewHolderBuilder(ItemHomeTxListBinding::inflate, TransactionItem::class.java) { TxListHomeViewHolder(it as ItemHomeTxListBinding) }
 
         // e.g. Wed, Jun 2
-        private const val dateFormat = "E, MMM d"
+        private const val DATE_FORMAT = "E, MMM d"
     }
 }
