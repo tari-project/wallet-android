@@ -39,7 +39,7 @@ class TxListHomeViewHolder(view: ItemHomeTxListBinding) : CommonViewHolder<Trans
             displayDate(this)
         }
 
-        item.viewModel.onNewTxNote(tx.message)
+        item.gifViewModel.onNewTxNote(tx.message)
     }
 
     private fun displayAliasOrEmojiId(tx: Tx, contact: ContactDto?) {
@@ -167,7 +167,7 @@ class TxListHomeViewHolder(view: ItemHomeTxListBinding) : CommonViewHolder<Trans
             }
 
             txDate.isEqual(yesterdayDate) -> string(R.string.home_tx_list_header_yesterday)
-            else -> txDate.toString(dateFormat, Locale.ENGLISH)
+            else -> txDate.toString(DATE_FORMAT, Locale.ENGLISH)
         }
     }
 
@@ -176,6 +176,6 @@ class TxListHomeViewHolder(view: ItemHomeTxListBinding) : CommonViewHolder<Trans
             ViewHolderBuilder(ItemHomeTxListBinding::inflate, TransactionItem::class.java) { TxListHomeViewHolder(it as ItemHomeTxListBinding) }
 
         // e.g. Wed, Jun 2
-        private const val dateFormat = "E, MMM d"
+        private const val DATE_FORMAT = "E, MMM d"
     }
 }

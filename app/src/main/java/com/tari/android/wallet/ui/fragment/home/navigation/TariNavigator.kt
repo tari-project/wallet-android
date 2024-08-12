@@ -39,9 +39,9 @@ import com.tari.android.wallet.ui.fragment.contactBook.data.contacts.YatDto
 import com.tari.android.wallet.ui.fragment.contactBook.details.ContactDetailsFragment
 import com.tari.android.wallet.ui.fragment.contactBook.link.ContactLinkFragment
 import com.tari.android.wallet.ui.fragment.contactBook.root.ContactBookFragment
-import com.tari.android.wallet.ui.fragment.contactBook.transactionHistory.TransactionHistoryFragment
+import com.tari.android.wallet.ui.fragment.tx.history.TransactionHistoryFragment
 import com.tari.android.wallet.ui.fragment.home.HomeActivity
-import com.tari.android.wallet.ui.fragment.home.homeTransactionHistory.HomeTransactionHistoryFragment
+import com.tari.android.wallet.ui.fragment.tx.history.HomeTransactionHistoryFragment
 import com.tari.android.wallet.ui.fragment.home.navigation.Navigation.AddAmountNavigation
 import com.tari.android.wallet.ui.fragment.home.navigation.Navigation.AllSettingsNavigation
 import com.tari.android.wallet.ui.fragment.home.navigation.Navigation.BackupSettingsNavigation

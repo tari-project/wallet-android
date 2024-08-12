@@ -70,7 +70,7 @@ import com.tari.android.wallet.model.TxNote
 import com.tari.android.wallet.network.NetworkConnectionState
 import com.tari.android.wallet.ui.common.CommonFragment
 import com.tari.android.wallet.ui.common.domain.PaletteManager
-import com.tari.android.wallet.ui.common.gyphy.repository.GIFItem
+import com.tari.android.wallet.ui.common.gyphy.repository.GifItem
 import com.tari.android.wallet.ui.component.fullEmojiId.EmojiIdSummaryViewController
 import com.tari.android.wallet.ui.component.fullEmojiId.FullEmojiIdViewController
 import com.tari.android.wallet.ui.extension.dimen
@@ -89,11 +89,11 @@ import com.tari.android.wallet.ui.fragment.contactBook.data.contacts.ContactDto
 import com.tari.android.wallet.ui.fragment.home.navigation.TariNavigator.Companion.PARAMETER_NOTE
 import com.tari.android.wallet.ui.fragment.home.navigation.TariNavigator.Companion.PARAMETER_TRANSACTION
 import com.tari.android.wallet.ui.fragment.send.addNote.gif.ChooseGIFDialogFragment
-import com.tari.android.wallet.ui.fragment.send.addNote.gif.GIFContainer
-import com.tari.android.wallet.ui.fragment.send.addNote.gif.GIFThumbnailAdapter
+import com.tari.android.wallet.ui.fragment.send.addNote.gif.GifContainer
+import com.tari.android.wallet.ui.fragment.send.addNote.gif.GifThumbnailAdapter
 import com.tari.android.wallet.ui.fragment.send.addNote.gif.HorizontalInnerMarginDecoration
-import com.tari.android.wallet.ui.fragment.send.addNote.gif.ThumbnailGIFsViewModel
-import com.tari.android.wallet.ui.fragment.send.addNote.gif.ThumbnailGIFsViewModel.Companion.REQUEST_CODE_GIF
+import com.tari.android.wallet.ui.fragment.send.addNote.gif.ThumbnailGifViewModel
+import com.tari.android.wallet.ui.fragment.send.addNote.gif.ThumbnailGifViewModel.Companion.REQUEST_CODE_GIF
 import com.tari.android.wallet.ui.fragment.send.common.TransactionData
 import com.tari.android.wallet.util.Constants
 
@@ -116,9 +116,9 @@ class AddNoteFragment : CommonFragment<FragmentAddNoteBinding, AddNoteViewModel>
     private lateinit var amount: MicroTari
     private var isOneSidePayment: Boolean = false
 
-    private lateinit var gifViewModel: ThumbnailGIFsViewModel
-    private lateinit var gifContainer: GIFContainer
-    private lateinit var adapter: GIFThumbnailAdapter
+    private lateinit var gifViewModel: ThumbnailGifViewModel
+    private lateinit var gifContainer: GifContainer
+    private lateinit var adapter: GifThumbnailAdapter
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?) =
         FragmentAddNoteBinding.inflate(inflater, container, false).also { ui = it }.root
@@ -137,7 +137,7 @@ class AddNoteFragment : CommonFragment<FragmentAddNoteBinding, AddNoteViewModel>
     }
 
     private fun initializeGIFsViewModel() {
-        gifViewModel = ViewModelProvider(this)[ThumbnailGIFsViewModel::class.java]
+        gifViewModel = ViewModelProvider(this)[ThumbnailGifViewModel::class.java]
         observe(gifViewModel.state) {
             if (it.isSuccessful) {
                 adapter.repopulate(it.gifItems!!)
@@ -152,7 +152,7 @@ class AddNoteFragment : CommonFragment<FragmentAddNoteBinding, AddNoteViewModel>
             changeScrollViewBottomConstraint(R.id.slide_button_container_view)
             val media = data?.parcelable<Media>(ChooseGIFDialogFragment.MEDIA_DELIVERY_KEY) ?: return
             gifContainer.gifItem = media.let {
-                GIFItem(it.id, Uri.parse(it.embedUrl), Uri.parse(it.images.original!!.gifUrl))
+                GifItem(it.id, Uri.parse(it.embedUrl), Uri.parse(it.images.original!!.gifUrl))
             }
             updateSliderState()
         }
@@ -170,9 +170,9 @@ class AddNoteFragment : CommonFragment<FragmentAddNoteBinding, AddNoteViewModel>
 
     @SuppressLint("ClickableViewAccessibility")
     private fun setupUI(state: Bundle?) {
-        gifContainer = GIFContainer(Glide.with(this), ui.gifContainerView, ui.gifImageView, ui.searchGiphyContainerView, state)
+        gifContainer = GifContainer(Glide.with(this), ui.gifContainerView, ui.gifImageView, ui.searchGiphyContainerView, state)
         if (gifContainer.gifItem != null) changeScrollViewBottomConstraint(R.id.slide_button_container_view)
-        adapter = GIFThumbnailAdapter(Glide.with(this), ::handleViewMoreGIFsIntent) {
+        adapter = GifThumbnailAdapter(Glide.with(this), ::handleViewMoreGIFsIntent) {
             if (gifContainer.isShown) {
                 changeScrollViewBottomConstraint(R.id.slide_button_container_view)
                 gifContainer.gifItem = it

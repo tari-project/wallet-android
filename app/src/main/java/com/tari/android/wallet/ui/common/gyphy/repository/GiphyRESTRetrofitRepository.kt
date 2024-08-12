@@ -8,16 +8,16 @@ import com.tari.android.wallet.ui.common.gyphy.api.dto.SearchGIFResponse
 import com.tari.android.wallet.ui.common.gyphy.api.dto.SearchGIFsResponse
 import retrofit2.Response
 
-class GiphyRESTRetrofitRepository(private val gateway: GiphyRESTGateway) : GIFRepository {
+class GiphyRESTRetrofitRepository(private val gateway: GiphyRESTGateway) : GifRepository {
 
     private val logger
         get() = Logger.t(GiphyRESTRetrofitRepository::class.simpleName)
 
-    override fun getAll(query: String, limit: Int): List<GIFItem> {
+    override fun getAll(query: String, limit: Int): List<GifItem> {
         val response: Response<SearchGIFsResponse> = gateway.searchGIFs(query, limit).execute()
         val body = response.body()
         return if (response.isSuccessful && body != null && body.meta.status in 200..299)
-            body.data.map { GIFItem(it.id, Uri.parse(it.embedUrl), Uri.parse(it.images.fixedWidth.url)) }
+            body.data.map { GifItem(it.id, Uri.parse(it.embedUrl), Uri.parse(it.images.fixedWidth.url)) }
         else {
             val exception = GIFSearchException(body?.meta?.message ?: response.message() ?: response.errorBody()?.string())
             logger.i(exception.toString() + "Get all was failed")
@@ -25,12 +25,12 @@ class GiphyRESTRetrofitRepository(private val gateway: GiphyRESTGateway) : GIFRe
         }
     }
 
-    override fun getById(id: String): GIFItem {
+    override fun getById(id: String): GifItem {
         val request = gateway.getGIFByID(id)
         val response: Response<SearchGIFResponse> = request.execute()
         val body = response.body()
         return if (response.isSuccessful && body != null && body.meta.status in 200..299)
-            body.data.let { GIFItem(it.id, Uri.parse(it.embedUrl), Uri.parse(it.images.fixedWidth.url)) }
+            body.data.let { GifItem(it.id, Uri.parse(it.embedUrl), Uri.parse(it.images.fixedWidth.url)) }
         else {
             val exception = GIFSearchException(body?.meta?.message ?: response.message() ?: response.errorBody()?.string())
             logger.i(exception.message.orEmpty())

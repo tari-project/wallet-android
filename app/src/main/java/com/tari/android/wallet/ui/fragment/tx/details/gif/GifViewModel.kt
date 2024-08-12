@@ -3,27 +3,26 @@ package com.tari.android.wallet.ui.fragment.tx.details.gif
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import com.orhanobut.logger.Logger
 import com.tari.android.wallet.ui.common.CommonViewModel
-import com.tari.android.wallet.ui.common.gyphy.repository.GIFRepository
+import com.tari.android.wallet.ui.common.gyphy.repository.GifRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
-class GIFViewModel : CommonViewModel() {
+class GifViewModel : CommonViewModel() {
 
     init {
         component.inject(this)
     }
 
     @Inject
-    lateinit var repository: GIFRepository
+    lateinit var repository: GifRepository
 
     private var gifId: String = ""
 
-    private val _gif = MutableLiveData<GIFState>()
-    val gif: LiveData<GIFState> get() = _gif
+    private val _gif = MutableLiveData<GifState>()
+    val gif: LiveData<GifState> get() = _gif
 
     val currentState get() = _gif.value!!
 
@@ -38,11 +37,11 @@ class GIFViewModel : CommonViewModel() {
 
     fun onGIFFetchRequested() {
         viewModelScope.launch(Dispatchers.IO) {
-            withContext(Dispatchers.Main) { _gif.value = GIFState() }
+            withContext(Dispatchers.Main) { _gif.value = GifState() }
             try {
-                _gif.postValue(GIFState(repository.getById(gifId)))
+                _gif.postValue(GifState(repository.getById(gifId)))
             } catch (e: Exception) {
-                _gif.postValue(GIFState(e))
+                _gif.postValue(GifState(e))
             }
         }
     }
