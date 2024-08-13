@@ -11,6 +11,7 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
 
 inline fun LifecycleOwner.launchAndRepeatOnLifecycle(
@@ -34,10 +35,26 @@ fun <T> Fragment.collectFlow(stateFlow: Flow<T>, action: (T) -> Unit): Job {
     }
 }
 
+fun <T> Fragment.collectNonNullFlow(stateFlow: Flow<T?>, action: (T) -> Unit): Job {
+    return viewLifecycleOwner.launchAndRepeatOnLifecycle(Lifecycle.State.STARTED) {
+        stateFlow.filter { it != null }.collect { state ->
+            action(state!!)
+        }
+    }
+}
+
 fun <T> ViewModel.collectFlow(stateFlow: Flow<T>, action: (T) -> Unit): Job {
     return viewModelScope.launch {
         stateFlow.collect { state ->
             action(state)
+        }
+    }
+}
+
+fun <T> ViewModel.collectNonNullFlow(stateFlow: Flow<T?>, action: (T) -> Unit): Job {
+    return viewModelScope.launch {
+        stateFlow.filter { it != null }.collect { state ->
+            action(state!!)
         }
     }
 }

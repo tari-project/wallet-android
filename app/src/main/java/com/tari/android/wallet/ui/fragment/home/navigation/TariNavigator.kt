@@ -39,9 +39,7 @@ import com.tari.android.wallet.ui.fragment.contactBook.data.contacts.YatDto
 import com.tari.android.wallet.ui.fragment.contactBook.details.ContactDetailsFragment
 import com.tari.android.wallet.ui.fragment.contactBook.link.ContactLinkFragment
 import com.tari.android.wallet.ui.fragment.contactBook.root.ContactBookFragment
-import com.tari.android.wallet.ui.fragment.tx.history.TransactionHistoryFragment
 import com.tari.android.wallet.ui.fragment.home.HomeActivity
-import com.tari.android.wallet.ui.fragment.tx.history.HomeTransactionHistoryFragment
 import com.tari.android.wallet.ui.fragment.home.navigation.Navigation.AddAmountNavigation
 import com.tari.android.wallet.ui.fragment.home.navigation.Navigation.AllSettingsNavigation
 import com.tari.android.wallet.ui.fragment.home.navigation.Navigation.BackupSettingsNavigation
@@ -91,6 +89,8 @@ import com.tari.android.wallet.ui.fragment.settings.torBridges.TorBridgesSelecti
 import com.tari.android.wallet.ui.fragment.settings.torBridges.customBridges.CustomTorBridgesFragment
 import com.tari.android.wallet.ui.fragment.tx.HomeFragment
 import com.tari.android.wallet.ui.fragment.tx.details.TxDetailsFragment
+import com.tari.android.wallet.ui.fragment.tx.history.HomeTransactionHistoryFragment
+import com.tari.android.wallet.ui.fragment.tx.history.TransactionHistoryFragment
 import com.tari.android.wallet.ui.fragment.utxos.list.UtxosListFragment
 import java.math.BigInteger
 import javax.inject.Inject
@@ -147,7 +147,7 @@ class TariNavigator @Inject constructor(val prefs: CorePrefRepository, val tariS
             is AddAmountNavigation.ContinueToAddNote -> continueToAddNote(navigation.transactionData)
             is AddAmountNavigation.ContinueToFinalizing -> continueToFinalizeSendTx(navigation.transactionData)
             is TxListNavigation.ToChat -> toChat()
-            is TxListNavigation.ToTxDetails -> toTxDetails(navigation.tx, null)
+            is TxListNavigation.ToTxDetails -> toTxDetails(tx = navigation.tx)
             is TxListNavigation.ToSendTariToUser -> toSendTari(navigation.contact, navigation.amount)
             is TxListNavigation.ToSendWithDeeplink -> toSendWithDeeplink(navigation.sendDeeplink)
             is TxListNavigation.ToUtxos -> toUtxos()
@@ -203,7 +203,7 @@ class TariNavigator @Inject constructor(val prefs: CorePrefRepository, val tariS
 
     fun onBackPressed() = activity.onBackPressed()
 
-    fun toTxDetails(tx: Tx?, txId: TxId?) = activity.addFragment(TxDetailsFragment().apply {
+    fun toTxDetails(tx: Tx? = null, txId: TxId? = null) = activity.addFragment(TxDetailsFragment().apply {
         arguments = Bundle().apply {
             putParcelable(TxDetailsFragment.TX_EXTRA_KEY, tx)
             putParcelable(TxDetailsFragment.TX_ID_EXTRA_KEY, txId)
