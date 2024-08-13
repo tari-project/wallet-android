@@ -42,6 +42,7 @@ import com.tari.android.wallet.ui.fragment.send.finalize.TxFailureReason
 import com.tari.android.wallet.ui.fragment.settings.backup.backupOnboarding.item.BackupOnboardingArgs
 import com.tari.android.wallet.ui.fragment.settings.backup.backupOnboarding.module.BackupOnboardingFlowItemModule
 import com.tari.android.wallet.ui.fragment.tx.adapter.TransactionItem
+import com.tari.android.wallet.util.EmojiId
 import com.tari.android.wallet.util.extractEmojis
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -52,7 +53,7 @@ import javax.inject.Inject
 class HomeFragmentViewModel : CommonViewModel() {
 
     @Inject
-    lateinit var sharedPrefsWrapper: CorePrefRepository
+    lateinit var corePrefRepository: CorePrefRepository
 
     @Inject
     lateinit var contactsRepository: ContactsRepository
@@ -74,9 +75,9 @@ class HomeFragmentViewModel : CommonViewModel() {
 
     val txList = MediatorLiveData<List<CommonViewHolderItem>>()
 
-    val emoji = MutableLiveData<String>()
+    val avatarEmoji = MutableLiveData<EmojiId>()
 
-    val emojiMedium = MutableLiveData<String>()
+    val emojiMedium = MutableLiveData<EmojiId>()
 
     init {
         component.inject(this)
@@ -87,9 +88,9 @@ class HomeFragmentViewModel : CommonViewModel() {
 
         doOnWalletRunning { doOnWalletServiceConnected { runCatching { onServiceConnected() } } }
 
-        val emojies = sharedPrefsWrapper.emojiId.orEmpty().extractEmojis()
+        val emojies = corePrefRepository.walletAddress.spendKeyEmojis.extractEmojis()
         emojiMedium.postValue(emojies.take(3).joinToString(""))
-        emoji.postValue(emojies.take(1).joinToString(""))
+        avatarEmoji.postValue(emojies.take(1).joinToString(""))
 
         checkForDataConsent()
     }

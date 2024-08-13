@@ -99,7 +99,7 @@ class HomeFragment : CommonFragment<FragmentHomeBinding, HomeFragmentViewModel>(
 
         observe(refreshBalanceInfo) { updateBalanceInfoUI(it) }
 
-        observe(emoji) { ui.avatar.text = it }
+        observe(avatarEmoji) { ui.avatar.text = it }
 
         observe(emojiMedium) { ui.emptyStateTextView.text = getString(R.string.home_empty_state, it) }
 

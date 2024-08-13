@@ -18,7 +18,9 @@ import com.tari.android.wallet.ui.extension.string
 import com.tari.android.wallet.ui.extension.visible
 import com.tari.android.wallet.ui.fragment.contactBook.data.contacts.ContactDto
 import com.tari.android.wallet.util.WalletUtil
-import com.tari.android.wallet.util.extractEmojis
+import com.tari.android.wallet.util.addressFirstEmojis
+import com.tari.android.wallet.util.addressLastEmojis
+import com.tari.android.wallet.util.addressPrefixEmojis
 import org.joda.time.DateTime
 import org.joda.time.Hours
 import org.joda.time.LocalDate
@@ -47,18 +49,18 @@ class TxListHomeViewHolder(view: ItemHomeTxListBinding) : CommonViewHolder<Trans
         // display contact name or emoji id
         when {
             tx.isCoinbase -> {
-                ui.participantTextView1.visible()
+                ui.participantTextView1.gone()
                 ui.participantTextView2.gone()
-                ui.participantEmojiIdView.gone()
                 ui.participantTextView1.text = string(R.string.tx_details_coinbase_placeholder)
+                ui.emojiIdViewContainer.root.gone()
             }
 
             tx.isOneSided -> {
                 val title = string(R.string.tx_list_someone) + " " + string(R.string.tx_list_paid_you)
                 ui.participantTextView1.visible()
                 ui.participantTextView2.gone()
-                ui.participantEmojiIdView.gone()
                 ui.participantTextView1.text = title
+                ui.emojiIdViewContainer.root.gone()
             }
 
             contact != null && contact.contactInfo.getAlias().isNotEmpty() || txUser.walletAddress.isUnknownUser() -> {
@@ -74,14 +76,16 @@ class TxListHomeViewHolder(view: ItemHomeTxListBinding) : CommonViewHolder<Trans
                     listOf(alias),
                     TariFont.AVENIR_LT_STD_HEAVY
                 )
-                ui.participantEmojiIdView.gone()
                 ui.participantTextView2.gone()
+                ui.emojiIdViewContainer.root.gone()
             }
 
             else -> { // display emoji id
-                ui.participantEmojiIdView.visible()
-                // TODO put alias methods to a helper class
-                ui.participantEmojiIdView.text = txUser.walletAddress.fullEmojiId.extractEmojis().take(3).joinToString("")
+                ui.emojiIdViewContainer.root.visible()
+                ui.emojiIdViewContainer.textViewEmojiPrefix.text = txUser.walletAddress.addressPrefixEmojis()
+                ui.emojiIdViewContainer.textViewEmojiFirstPart.text = txUser.walletAddress.addressFirstEmojis()
+                ui.emojiIdViewContainer.textViewEmojiLastPart.text = txUser.walletAddress.addressLastEmojis()
+
                 when (tx.direction) {
                     Tx.Direction.INBOUND -> {
                         ui.participantTextView1.gone()
