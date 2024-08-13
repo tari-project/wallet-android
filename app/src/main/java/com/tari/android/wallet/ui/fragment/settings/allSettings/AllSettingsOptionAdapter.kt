@@ -11,7 +11,7 @@ import com.tari.android.wallet.ui.fragment.settings.allSettings.title.SettingsTi
 import com.tari.android.wallet.ui.fragment.settings.allSettings.version.SettingsVersionViewHolder
 
 class AllSettingsOptionAdapter: CommonAdapter<CommonViewHolderItem>() {
-    override var viewHolderBuilders: List<ViewHolderBuilder> = mutableListOf(
+    override var viewHolderBuilders: List<ViewHolderBuilder> = listOf(
         SettingsRowViewHolder.getBuilder(),
         SettingsTitleViewHolder.getBuilder(),
         SettingsDividerViewHolder.getBuilder(),
