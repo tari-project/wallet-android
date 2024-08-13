@@ -289,7 +289,7 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>() {
         if (screen.orEmpty().isNotEmpty()) {
             when (HomeDeeplinkScreens.parse(screen)) {
                 HomeDeeplinkScreens.TxDetails -> {
-                    (intent.parcelable<TxId>(HomeDeeplinkScreens.KeyTxDetailsArgs))?.let { viewModel.tariNavigator.toTxDetails(null, it) }
+                    (intent.parcelable<TxId>(HomeDeeplinkScreens.KeyTxDetailsArgs))?.let { viewModel.tariNavigator.toTxDetails(txId = it) }
                 }
 
                 else -> {}

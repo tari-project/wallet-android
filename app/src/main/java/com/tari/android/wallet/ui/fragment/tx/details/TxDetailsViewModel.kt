@@ -1,10 +1,13 @@
 package com.tari.android.wallet.ui.fragment.tx.details
 
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.toLiveData
+import androidx.lifecycle.SavedStateHandle
 import com.tari.android.wallet.R
+import com.tari.android.wallet.R.string.common_are_you_sure
+import com.tari.android.wallet.R.string.tx_details_cancel_dialog_cancel
+import com.tari.android.wallet.R.string.tx_details_cancel_dialog_description
+import com.tari.android.wallet.R.string.tx_details_cancel_dialog_not_cancel
 import com.tari.android.wallet.event.Event
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.extension.collectFlow
@@ -13,34 +16,46 @@ import com.tari.android.wallet.extension.launchOnMain
 import com.tari.android.wallet.ffi.FFITxCancellationReason
 import com.tari.android.wallet.model.CancelledTx
 import com.tari.android.wallet.model.CompletedTx
+import com.tari.android.wallet.model.PendingOutboundTx
 import com.tari.android.wallet.model.Tx
+import com.tari.android.wallet.model.Tx.Direction.OUTBOUND
 import com.tari.android.wallet.model.TxId
+import com.tari.android.wallet.model.TxStatus.PENDING
 import com.tari.android.wallet.model.WalletError
 import com.tari.android.wallet.service.TariWalletService
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.dialog.modular.DialogArgs
 import com.tari.android.wallet.ui.dialog.modular.ModularDialogArgs
-import com.tari.android.wallet.ui.dialog.modular.SimpleDialogArgs
+import com.tari.android.wallet.ui.dialog.modular.modules.addressDetails.AddressDetailsModule
+import com.tari.android.wallet.ui.dialog.modular.modules.body.BodyModule
+import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonModule
+import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonStyle
 import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
 import com.tari.android.wallet.ui.dialog.modular.modules.input.InputModule
 import com.tari.android.wallet.ui.fragment.contactBook.data.ContactsRepository
 import com.tari.android.wallet.ui.fragment.contactBook.data.contacts.ContactDto
 import com.tari.android.wallet.ui.fragment.contactBook.data.contacts.splitAlias
-import io.reactivex.BackpressureStrategy
-import io.reactivex.subjects.BehaviorSubject
+import com.tari.android.wallet.ui.fragment.tx.details.TxDetailsFragment.Companion.TX_EXTRA_KEY
+import com.tari.android.wallet.ui.fragment.tx.details.TxDetailsFragment.Companion.TX_ID_EXTRA_KEY
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 
-class TxDetailsViewModel : CommonViewModel() {
+class TxDetailsViewModel(savedState: SavedStateHandle) : CommonViewModel() {
+
+    @Inject
+    lateinit var contactsRepository: ContactsRepository
 
     var requiredConfirmationCount: Long = 0
         private set
 
-    private var txId: TxId? = null
+    private var txId: TxId? = savedState.get<TxId>(TX_ID_EXTRA_KEY)
 
-    private val _txObject = BehaviorSubject.create<Tx>()
-    val tx: LiveData<Tx> = _txObject.toFlowable(BackpressureStrategy.LATEST).toLiveData()
-    val txValue: Tx
-        get() = _txObject.value ?: error("Tx object is not initialized")
+    private val _tx = MutableStateFlow(savedState.get<Tx>(TX_EXTRA_KEY))
+    val tx = _tx.asStateFlow()
+    private val txValue: Tx
+        get() = _tx.value ?: error("Tx object is not initialized")
 
     private val _cancellationReason = MutableLiveData<String>()
     val cancellationReason: LiveData<String> = _cancellationReason
@@ -48,10 +63,8 @@ class TxDetailsViewModel : CommonViewModel() {
     private val _explorerLink = MutableLiveData("")
     val explorerLink: LiveData<String> = _explorerLink
 
-    val contact = MediatorLiveData<ContactDto>()
-
-    @Inject
-    lateinit var contactsRepository: ContactsRepository
+    private val _contact = MutableStateFlow<ContactDto?>(null)
+    val contact = _contact.asStateFlow()
 
     init {
         component.inject(this)
@@ -59,37 +72,11 @@ class TxDetailsViewModel : CommonViewModel() {
         doOnWalletServiceConnected {
             fetchRequiredConfirmationCount()
             findTxAndUpdateUI()
-            _txObject.value?.let { _txObject.onNext(it) } // TODO why invoke the same value??
         }
 
         observeTxUpdates()
 
         collectFlow(contactsRepository.contactList) { updateContact() }
-
-        contact.addSource(tx) { updateContact() }
-    }
-
-    fun setTxArg(tx: Tx) {
-        _txObject.onNext(tx)
-        _cancellationReason.postValue(getCancellationReason(tx))
-        generateExplorerLink(tx)
-    }
-
-    fun loadTxById(txId: TxId) {
-        this.txId = txId
-        findTxAndUpdateUI()
-    }
-
-    fun cancelTransaction() {
-        val isCancelled = walletService.getWithError { error, wallet -> wallet.cancelPendingTx(TxId(this.txValue.id), error) }
-        if (!isCancelled) {
-            showModularDialog(
-                SimpleDialogArgs(
-                    title = resourceManager.getString(R.string.tx_detail_cancellation_error_title),
-                    description = resourceManager.getString(R.string.tx_detail_cancellation_error_description),
-                ).getModular(resourceManager)
-            )
-        }
     }
 
     fun addOrEditContact() = showEditNameInputs()
@@ -98,10 +85,73 @@ class TxDetailsViewModel : CommonViewModel() {
         _openLink.postValue(_explorerLink.value.orEmpty())
     }
 
+    fun onTransactionCancel() {
+        val tx = txValue
+        if (tx is PendingOutboundTx && tx.direction == OUTBOUND && tx.status == PENDING) {
+            showTxCancelDialog()
+        }
+    }
+
+    fun onAddressDetailsClicked() {
+        val walletAddress = contact.value?.walletAddress ?: return
+
+        showModularDialog(
+            HeadModule(
+                title = resourceManager.getString(R.string.wallet_info_address_details_title),
+                rightButtonIcon = R.drawable.vector_common_close,
+                rightButtonAction = { hideDialog() },
+            ),
+            AddressDetailsModule(
+                tariWalletAddress = walletAddress,
+                copyBase58 = {
+                    copyToClipboard(
+                        clipLabel = resourceManager.getString(R.string.wallet_info_address_copy_address_to_clipboard_label),
+                        clipText = walletAddress.fullBase58,
+                    )
+                },
+                copyEmojis = {
+                    copyToClipboard(
+                        clipLabel = resourceManager.getString(R.string.wallet_info_address_copy_address_to_clipboard_label),
+                        clipText = walletAddress.fullEmojiId,
+                    )
+                },
+            )
+        )
+    }
+
+    private fun setTxArg(tx: Tx) {
+        _tx.update { tx }
+        _cancellationReason.postValue(getCancellationReason(tx))
+        generateExplorerLink(tx)
+        updateContact()
+    }
+
+    private fun cancelTransaction() {
+        val isCancelled = walletService.getWithError { error, wallet -> wallet.cancelPendingTx(TxId(this.txValue.id), error) }
+        if (!isCancelled) {
+            showSimpleDialog(
+                title = resourceManager.getString(R.string.tx_detail_cancellation_error_title),
+                description = resourceManager.getString(R.string.tx_detail_cancellation_error_description),
+            )
+        }
+    }
+
+    private fun showTxCancelDialog() {
+        showModularDialog(
+            HeadModule(resourceManager.getString(common_are_you_sure)),
+            BodyModule(resourceManager.getString(tx_details_cancel_dialog_description)),
+            ButtonModule(resourceManager.getString(tx_details_cancel_dialog_cancel), ButtonStyle.Normal) {
+                cancelTransaction()
+                hideDialog()
+            },
+            ButtonModule(resourceManager.getString(tx_details_cancel_dialog_not_cancel), ButtonStyle.Close),
+        )
+    }
+
     private fun updateContact() {
         this.tx.value?.let { tx ->
             val contact = contactsRepository.getContactForTx(tx)
-            this.contact.postValue(contact)
+            _contact.update { contact }
         }
     }
 
@@ -143,16 +193,13 @@ class TxDetailsViewModel : CommonViewModel() {
         val foundTx = findTxById(txId!!, walletService)
 
         if (foundTx == null) {
-            showModularDialog(
-                SimpleDialogArgs(
-                    title = resourceManager.getString(R.string.tx_details_error_tx_not_found_title),
-                    description = resourceManager.getString(R.string.tx_details_error_tx_not_found_desc),
-                    onClose = { backPressed.call() },
-                ).getModular(resourceManager)
+            showSimpleDialog(
+                title = resourceManager.getString(R.string.tx_details_error_tx_not_found_title),
+                description = resourceManager.getString(R.string.tx_details_error_tx_not_found_desc),
+                onClose = { backPressed.call() },
             )
         } else {
-            _txObject.onNext(foundTx)
-            generateExplorerLink(foundTx)
+            setTxArg(foundTx)
         }
     }
 
@@ -215,7 +262,7 @@ class TxDetailsViewModel : CommonViewModel() {
             val firstName = splitAlias(newName).firstName
             val lastName = splitAlias(newName).lastName
             val contactDto = contact.value!!
-            contact.value = contactsRepository.updateContactInfo(contactDto, firstName, lastName, contactDto.yatDto?.yat.orEmpty())
+            _contact.update { contactsRepository.updateContactInfo(contactDto, firstName, lastName, contactDto.yatDto?.yat.orEmpty()) }
             hideDialog()
         }
     }

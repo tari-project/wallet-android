@@ -32,9 +32,8 @@
  */
 package com.tari.android.wallet.model
 
-import android.os.Parcel
 import android.os.Parcelable
-import com.tari.android.wallet.ui.extension.readS
+import kotlinx.parcelize.Parcelize
 import java.math.BigInteger
 
 /**
@@ -42,54 +41,8 @@ import java.math.BigInteger
  *
  * @author The Tari Development Team
  */
-class TxId() : Parcelable {
 
-    var value = BigInteger("0")
-
-    constructor(
-        value: BigInteger
-    ) : this() {
-        this.value = value
-    }
-
-    // region Parcelable
-
-    constructor(parcel: Parcel) : this() {
-        readFromParcel(parcel)
-    }
-
-    companion object CREATOR : Parcelable.Creator<TxId> {
-
-        override fun createFromParcel(parcel: Parcel): TxId {
-            return TxId(parcel)
-        }
-
-        override fun newArray(size: Int): Array<TxId> {
-            return Array(size) { TxId() }
-        }
-
-    }
-
-    override fun writeToParcel(parcel: Parcel, flags: Int) {
-        parcel.writeSerializable(value)
-    }
-
-    private fun readFromParcel(inParcel: Parcel) {
-        value = inParcel.readS(BigInteger::class.java)
-    }
-
-    override fun describeContents(): Int {
-        return 0
-    }
-
-    override fun equals(other: Any?): Boolean {
-        return value == (other as? TxId)?.value
-    }
-
-    override fun hashCode(): Int {
-        return value.hashCode()
-    }
-
-    // endregion
-
-}
+@Parcelize
+data class TxId(
+    val value: BigInteger = 0.toBigInteger(),
+) : Parcelable
