@@ -1,16 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-
-<com.tari.android.wallet.ui.component.tari.background.obsolete.TariPrimaryBackgroundConstraint xmlns:android="http://schemas.android.com/apk/res/android"
+<com.tari.android.wallet.ui.component.tari.background.TariPrimaryBackground xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/root"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:clickable="true"
-    android:focusable="true"
-    android:orientation="vertical">
+    android:focusable="true">
 
-    <androidx.appcompat.widget.LinearLayoutCompat
+    <LinearLayout
         android:id="@+id/back_up_wallet_cta_view"
         android:layout_width="match_parent"
         android:layout_height="@dimen/menu_item_height"
@@ -28,7 +26,7 @@
 
         <com.tari.android.wallet.ui.component.tari.TariTextView
             android:id="@+id/back_up_wallet_label_view"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="@string/all_settings_back_up_wallet_settings_entry"
@@ -41,7 +39,6 @@
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
             android:layout_gravity="center_vertical"
             android:orientation="horizontal">
 
@@ -97,7 +94,6 @@
                     app:layout_constraintStart_toStartOf="@id/cloud_backup_status_success_view"
                     app:layout_constraintTop_toTopOf="@id/cloud_backup_status_success_view"
                     tools:visibility="visible" />
-
             </androidx.constraintlayout.widget.ConstraintLayout>
 
             <com.tari.android.wallet.ui.component.tari.TariIconView
@@ -109,7 +105,5 @@
                 android:src="@drawable/vector_back_button" />
 
         </LinearLayout>
-
-    </androidx.appcompat.widget.LinearLayoutCompat>
-
-</com.tari.android.wallet.ui.component.tari.background.obsolete.TariPrimaryBackgroundConstraint>
+    </LinearLayout>
+</com.tari.android.wallet.ui.component.tari.background.TariPrimaryBackground>

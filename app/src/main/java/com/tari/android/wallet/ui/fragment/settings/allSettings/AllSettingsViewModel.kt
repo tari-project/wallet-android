@@ -138,7 +138,7 @@ class AllSettingsViewModel : CommonViewModel() {
         val pinCode = securityPrefRepository.pinCode
 
         _allSettingsOptions.postValue(listOfNotNull(
-            MyProfileViewHolderItem(settingsRepository.emojiId.orEmpty(), yatSharedPrefsRepository.connectedYat.orEmpty(), alias) {
+            MyProfileViewHolderItem(settingsRepository.walletAddress, yatSharedPrefsRepository.connectedYat.orEmpty(), alias) {
                 navigation.postValue(AllSettingsNavigation.ToMyProfile)
             },
             DividerViewHolderItem(),
