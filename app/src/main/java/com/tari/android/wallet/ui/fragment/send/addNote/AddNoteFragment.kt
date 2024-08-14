@@ -66,13 +66,12 @@ import com.tari.android.wallet.databinding.FragmentAddNoteBinding
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.extension.observe
 import com.tari.android.wallet.model.MicroTari
+import com.tari.android.wallet.model.TariWalletAddress
 import com.tari.android.wallet.model.TxNote
 import com.tari.android.wallet.network.NetworkConnectionState
 import com.tari.android.wallet.ui.common.CommonFragment
 import com.tari.android.wallet.ui.common.domain.PaletteManager
 import com.tari.android.wallet.ui.common.gyphy.repository.GifItem
-import com.tari.android.wallet.ui.component.fullEmojiId.EmojiIdSummaryViewController
-import com.tari.android.wallet.ui.component.fullEmojiId.FullEmojiIdViewController
 import com.tari.android.wallet.ui.extension.dimen
 import com.tari.android.wallet.ui.extension.dimenPx
 import com.tari.android.wallet.ui.extension.getStartMargin
@@ -96,6 +95,9 @@ import com.tari.android.wallet.ui.fragment.send.addNote.gif.ThumbnailGifViewMode
 import com.tari.android.wallet.ui.fragment.send.addNote.gif.ThumbnailGifViewModel.Companion.REQUEST_CODE_GIF
 import com.tari.android.wallet.ui.fragment.send.common.TransactionData
 import com.tari.android.wallet.util.Constants
+import com.tari.android.wallet.util.addressFirstEmojis
+import com.tari.android.wallet.util.addressLastEmojis
+import com.tari.android.wallet.util.addressPrefixEmojis
 
 class AddNoteFragment : CommonFragment<FragmentAddNoteBinding, AddNoteViewModel>(), View.OnTouchListener {
 
@@ -103,12 +105,6 @@ class AddNoteFragment : CommonFragment<FragmentAddNoteBinding, AddNoteViewModel>
     private var slideButtonXDelta = 0
     private var slideButtonLastMarginStart = 0
     private var slideButtonContainerWidth = 0
-
-    // Formats the summarized emoji id.
-    private lateinit var emojiIdSummaryController: EmojiIdSummaryViewController
-
-    // Control full emoji popups
-    private lateinit var fullEmojiIdViewController: FullEmojiIdViewController
 
     // Tx properties.
     private lateinit var transactionData: TransactionData
@@ -179,27 +175,6 @@ class AddNoteFragment : CommonFragment<FragmentAddNoteBinding, AddNoteViewModel>
                 updateSliderState()
             }
         }
-        emojiIdSummaryController = EmojiIdSummaryViewController(ui.emojiIdSummaryView)
-
-        val fullEmojiIdListener = object : FullEmojiIdViewController.Listener {
-            override fun animationHide(value: Float) {
-                ui.backCtaView.alpha = 1 - value
-            }
-
-            override fun animationShow(value: Float) {
-                ui.backCtaView.alpha = 1 - value
-            }
-        }
-
-        fullEmojiIdViewController = FullEmojiIdViewController(
-            ui.emojiIdOuterContainer,
-            ui.emojiIdSummaryView,
-            requireContext(),
-            fullEmojiIdListener
-        )
-        val walletAddress = recipientUser.contactInfo.requireWalletAddress()
-        fullEmojiIdViewController.fullEmojiId = walletAddress.fullEmojiId
-        fullEmojiIdViewController.base58 = walletAddress.fullBase58
 
         displayAliasOrEmojiId()
         ui.progressBar.setWhite()
@@ -241,7 +216,7 @@ class AddNoteFragment : CommonFragment<FragmentAddNoteBinding, AddNoteViewModel>
 
     private fun setupCTAs() {
         ui.backCtaView.backPressedAction = { onBackButtonClicked() }
-        ui.emojiIdSummaryContainerView.setOnClickListener { emojiIdClicked() }
+        ui.emojiIdSummaryContainerView.setOnClickListener { viewModel.emojiIdClicked(recipientUser.contactInfo.requireWalletAddress()) }
         ui.removeGifCtaView.setOnClickListener {
             changeScrollViewBottomConstraint(R.id.search_giphy_container_view)
             gifContainer.gifItem = null
@@ -268,7 +243,7 @@ class AddNoteFragment : CommonFragment<FragmentAddNoteBinding, AddNoteViewModel>
 
     private fun displayAliasOrEmojiId() {
         val alias = recipientUser.contactInfo.getAlias()
-        if (alias.isEmpty()) displayEmojiId(recipientUser.contactInfo.requireWalletAddress().fullEmojiId) else displayAlias(alias)
+        if (alias.isEmpty()) displayEmojiId(recipientUser.contactInfo.requireWalletAddress()) else displayAlias(alias)
     }
 
     private fun displayAlias(alias: String) {
@@ -277,9 +252,11 @@ class AddNoteFragment : CommonFragment<FragmentAddNoteBinding, AddNoteViewModel>
         ui.titleTextView.text = alias
     }
 
-    private fun displayEmojiId(emojiId: String) {
+    private fun displayEmojiId(address: TariWalletAddress) {
         ui.emojiIdSummaryContainerView.visible()
-        emojiIdSummaryController.display(emojiId)
+        ui.emojiIdViewContainer.textViewEmojiPrefix.text = address.addressPrefixEmojis()
+        ui.emojiIdViewContainer.textViewEmojiFirstPart.text = address.addressFirstEmojis()
+        ui.emojiIdViewContainer.textViewEmojiLastPart.text = address.addressLastEmojis()
         ui.titleTextView.gone()
     }
 
@@ -291,13 +268,6 @@ class AddNoteFragment : CommonFragment<FragmentAddNoteBinding, AddNoteViewModel>
             it.hideKeyboard()
             ui.rootView.postDelayed(Constants.UI.shortDurationMs, it.onBackPressedDispatcher::onBackPressed)
         }
-    }
-
-    /**
-     * Display full emoji id and dim out all other views.
-     */
-    private fun emojiIdClicked() {
-        fullEmojiIdViewController.showFullEmojiId()
     }
 
     private fun focusEditTextAndShowKeyboard() {
