@@ -4,14 +4,11 @@ import com.bumptech.glide.Glide
 import com.tari.android.wallet.databinding.ItemChatItemBinding
 import com.tari.android.wallet.ui.common.recyclerView.CommonViewHolder
 import com.tari.android.wallet.ui.common.recyclerView.ViewHolderBuilder
-import com.tari.android.wallet.ui.component.fullEmojiId.EmojiIdSummaryViewController
 import com.tari.android.wallet.ui.extension.gone
 import com.tari.android.wallet.ui.extension.setVisible
 import com.tari.android.wallet.ui.extension.visible
 
 class ChatItemViewHolder(view: ItemChatItemBinding) : CommonViewHolder<ChatItemViewHolderItem, ItemChatItemBinding>(view) {
-
-    private val emojiIdSummaryController = EmojiIdSummaryViewController(ui.participantEmojiIdView)
 
     override fun bind(item: ChatItemViewHolderItem) {
         super.bind(item)
@@ -35,11 +32,10 @@ class ChatItemViewHolder(view: ItemChatItemBinding) : CommonViewHolder<ChatItemV
             }
 
             if (item.alias.isEmpty()) {
-                participantEmojiIdView.root.visible()
+                emojiIdViewContainer.root.visible()
                 alias.gone()
-                emojiIdSummaryController.display(item.emojiId)
             } else {
-                participantEmojiIdView.root.gone()
+                emojiIdViewContainer.root.gone()
                 alias.text = item.alias
                 alias.visible()
             }

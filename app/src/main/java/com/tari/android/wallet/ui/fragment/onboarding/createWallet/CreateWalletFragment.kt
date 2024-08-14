@@ -60,7 +60,6 @@ import com.tari.android.wallet.di.DiContainer
 import com.tari.android.wallet.extension.applyFontStyle
 import com.tari.android.wallet.extension.collectFlow
 import com.tari.android.wallet.ui.common.domain.PaletteManager
-import com.tari.android.wallet.ui.component.fullEmojiId.EmojiIdSummaryViewController
 import com.tari.android.wallet.ui.component.tari.TariFont
 import com.tari.android.wallet.ui.extension.animateClick
 import com.tari.android.wallet.ui.extension.dimen
@@ -80,6 +79,9 @@ import com.tari.android.wallet.ui.fragment.onboarding.createWallet.CreateWalletM
 import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.Constants.UI.CreateEmojiId
 import com.tari.android.wallet.util.EmojiUtil
+import com.tari.android.wallet.util.addressFirstEmojis
+import com.tari.android.wallet.util.addressLastEmojis
+import com.tari.android.wallet.util.addressPrefixEmojis
 import me.everything.android.ui.overscroll.OverScrollDecoratorHelper
 import javax.inject.Inject
 
@@ -92,8 +94,6 @@ class CreateWalletFragment : OnboardingFlowFragment<FragmentCreateWalletBinding,
 
     @Inject
     lateinit var walletStateHandler: WalletStateHandler
-
-    private lateinit var emojiIdSummaryController: EmojiIdSummaryViewController
 
     private val uiHandler = Handler(Looper.getMainLooper())
 
@@ -129,7 +129,6 @@ class CreateWalletFragment : OnboardingFlowFragment<FragmentCreateWalletBinding,
 
     private fun setupUi() {
         OverScrollDecoratorHelper.setUpOverScroll(ui.emojiIdScrollView)
-        emojiIdSummaryController = EmojiIdSummaryViewController(ui.emojiIdSummaryView.root)
         ui.apply {
             yourEmojiIdTitleTextView.text = string(create_wallet_your_emoji_id_text_label).applyFontStyle(
                 context = requireActivity(),
@@ -158,10 +157,8 @@ class CreateWalletFragment : OnboardingFlowFragment<FragmentCreateWalletBinding,
             continueButton.setOnClickListener { onContinueButtonClick() }
             createEmojiIdButton.setOnClickListener { onCreateEmojiIdButtonClick() }
             emojiIdTextView.setOnClickListener { fullEmojiIdTextViewClicked(it) }
-            arrayOf(
-                seeFullEmojiIdButton,
-                emojiIdSummaryContainerView
-            ).forEach { it.setOnClickListener(this@CreateWalletFragment::onSeeFullEmojiIdButtonClicked) }
+            seeFullEmojiIdButton.setOnClickListener { onSeeFullEmojiIdButtonClicked(it) }
+            emojiIdSummaryContainerView.setOnClickListener { onSeeFullEmojiIdButtonClicked(it) }
         }
     }
 
@@ -253,21 +250,22 @@ class CreateWalletFragment : OnboardingFlowFragment<FragmentCreateWalletBinding,
             addListener(object : AnimatorListenerAdapter() {
                 override fun onAnimationEnd(animation: Animator) {
                     super.onAnimationEnd(animation)
-                    viewModel.corePrefRepository.emojiId?.let { emojiId ->
-                        ui.emojiIdTextView.text = EmojiUtil.getFullEmojiIdSpannable(
-                            emojiId = emojiId,
-                            separator = string(emoji_id_chunk_separator),
-                            darkColor = PaletteManager.getBlack(requireContext()),
-                            lightColor = PaletteManager.getLightGray(requireContext()),
-                        )
-                        emojiIdSummaryController.display(emojiId)
+                    val walletAddress = viewModel.corePrefRepository.walletAddress
+                    val emojiId = walletAddress.fullEmojiId
 
-                        ui.checkmarkLottieAnimationView.visible()
-                        ui.checkmarkLottieAnimationView.playAnimation()
-                    } ?: run {
-                        viewModel.logger.i("Emoji id is null during checkmark animation in the onboarding flow.")
-                        onboardingListener.resetFlow()
-                    }
+                    ui.emojiIdTextView.text = EmojiUtil.getFullEmojiIdSpannable(
+                        emojiId = emojiId,
+                        separator = string(emoji_id_chunk_separator),
+                        darkColor = PaletteManager.getBlack(requireContext()),
+                        lightColor = PaletteManager.getLightGray(requireContext()),
+                    )
+                    ui.emojiIdViewContainer.textViewEmojiPrefix.text = walletAddress.addressPrefixEmojis()
+                    ui.emojiIdViewContainer.textViewEmojiFirstPart.text = walletAddress.addressFirstEmojis()
+                    ui.emojiIdViewContainer.textViewEmojiLastPart.text = walletAddress.addressLastEmojis()
+
+
+                    ui.checkmarkLottieAnimationView.visible()
+                    ui.checkmarkLottieAnimationView.playAnimation()
                 }
             })
             start()

@@ -68,7 +68,8 @@ import me.everything.android.ui.overscroll.OverScrollDecoratorHelper
  *
  * @author The Tari Development Team
  */
-// TODO check we don't use it anymore and delete
+
+// Todo check it and remove
 class FullEmojiIdViewController(
     private val ui: ViewFullEmojiIdBinding,
     summary: ViewEmojiIdSummaryBinding,
