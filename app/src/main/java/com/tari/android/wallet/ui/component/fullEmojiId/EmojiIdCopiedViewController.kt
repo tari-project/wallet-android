@@ -47,6 +47,8 @@ import com.tari.android.wallet.util.Constants
  *
  * @author The Tari Development Team
  */
+
+// Todo check it and remove
 class EmojiIdCopiedViewController(private val ui: ViewEmojiIdCopiedAnimBinding) {
 
     init {

@@ -70,12 +70,12 @@
                     android:id="@+id/online_status"
                     android:layout_width="18dp"
                     android:layout_height="18dp"
+                    android:layout_gravity="top|end"
                     android:layout_marginStart="-12dp"
                     android:layout_marginBottom="-2dp"
                     android:elevation="2dp"
                     app:backgroundColor="?attr/palette_system_green"
-                    app:cornerRadius="9dp"
-                    android:layout_gravity="top|end">
+                    app:cornerRadius="9dp">
 
                     <com.tari.android.wallet.ui.component.tari.background.TariAlphaBackground
                         android:layout_width="16dp"
@@ -93,7 +93,6 @@
         </com.tari.android.wallet.ui.component.tari.background.TariSwitchedBackground>
 
         <LinearLayout
-            android:id="@+id/emoji_id_participant_container"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginVertical="10dp"
@@ -112,8 +111,8 @@
                 tools:text="Mr. Robot" />
 
             <include
-                android:id="@+id/participant_emoji_id_view"
-                layout="@layout/view_emoji_id_summary"
+                android:id="@+id/emoji_id_view_container"
+                layout="@layout/view_address_short_small"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
 
