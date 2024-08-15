@@ -81,6 +81,7 @@ object DebugConfig {
 
     const val isChatEnabled = false
 
+    const val isYatEnabled = false
     private val _useYatSandbox = valueIfDebug(false)
     val yatEnvironment = if (_useYatSandbox) YatEnvironment.SANDBOX else YatEnvironment.PRODUCTION
 

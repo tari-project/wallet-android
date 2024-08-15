@@ -88,6 +88,7 @@ import com.tari.android.wallet.ui.fragment.settings.allSettings.row.SettingsRowV
 import com.tari.android.wallet.ui.fragment.settings.allSettings.title.SettingsTitleViewHolderItem
 import com.tari.android.wallet.ui.fragment.settings.allSettings.version.SettingsVersionViewHolderItem
 import com.tari.android.wallet.ui.fragment.settings.userAutorization.BiometricAuthenticationViewModel
+import com.tari.android.wallet.util.DebugConfig
 import javax.inject.Inject
 
 class AllSettingsViewModel : CommonViewModel() {
@@ -144,7 +145,7 @@ class AllSettingsViewModel : CommonViewModel() {
             DividerViewHolderItem(),
             SettingsRowViewHolderItem(resourceManager.getString(all_settings_connect_yats), vector_all_settings_yat_icon) {
                 _openYatOnboarding.postValue(Unit)
-            },
+            }.takeIf { DebugConfig.isYatEnabled },
             SettingsTitleViewHolderItem(resourceManager.getString(all_settings_security_label)),
             backupOption,
             DividerViewHolderItem(),
