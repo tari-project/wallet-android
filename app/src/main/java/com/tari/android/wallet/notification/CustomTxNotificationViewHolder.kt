@@ -34,14 +34,16 @@ package com.tari.android.wallet.notification
 
 import android.app.KeyguardManager
 import android.content.Context
-import android.icu.text.BreakIterator
 import android.view.View
 import android.widget.RemoteViews
 import com.tari.android.wallet.R
-import com.tari.android.wallet.model.TariContact
 import com.tari.android.wallet.model.MicroTari
+import com.tari.android.wallet.model.TariContact
 import com.tari.android.wallet.model.Tx
 import com.tari.android.wallet.util.WalletUtil
+import com.tari.android.wallet.util.addressFirstEmojis
+import com.tari.android.wallet.util.addressLastEmojis
+import com.tari.android.wallet.util.addressPrefixEmojis
 
 /**
  * Displays custom transaction notification.
@@ -71,31 +73,15 @@ class CustomTxNotificationViewHolder(val context: Context, tx: Tx) : RemoteViews
 
     private fun displayTxContactAlias(tariContact: TariContact) {
         setTextViewText(R.id.notification_tx_received_txt_contact_alias, tariContact.alias)
-        setViewVisibility(R.id.notification_tx_received_vw_emoji_summary, View.INVISIBLE)
+        setViewVisibility(R.id.emoji_id_view_container, View.INVISIBLE)
     }
 
     private fun displayTxUserEmojiId(tariContact: TariContact) {
         setTextViewText(R.id.notification_tx_received_txt_contact_alias, "")
         setViewVisibility(R.id.notification_tx_received_txt_contact_alias, View.INVISIBLE)
-        val emojis = ArrayList<String>()
-        val it: BreakIterator = BreakIterator.getCharacterInstance()
-        it.setText(tariContact.walletAddress.fullEmojiId)
-        // TODO move it to EmojiUtil
-        var previous = 0
-        while (it.next() != BreakIterator.DONE) {
-            val builder = StringBuilder()
-            for (i in previous until it.current()) {
-                builder.append(tariContact.walletAddress.fullEmojiId[i])
-            }
-            emojis.add(builder.toString())
-            previous = it.current()
-        }
-        setTextViewText(R.id.emoji_id_summary_emoji_1_text_view, emojis[0])
-        setTextViewText(R.id.emoji_id_summary_emoji_2_text_view, emojis[1])
-        setTextViewText(R.id.emoji_id_summary_emoji_3_text_view, emojis[2])
-        setTextViewText(R.id.emoji_id_summary_emoji_4_text_view, emojis.takeLast(3)[0])
-        setTextViewText(R.id.emoji_id_summary_emoji_5_text_view, emojis.takeLast(2)[0])
-        setTextViewText(R.id.emoji_id_summary_emoji_6_text_view, emojis.takeLast(1)[0])
+        setTextViewText(R.id.text_view_emoji_prefix, tariContact.walletAddress.addressPrefixEmojis())
+        setTextViewText(R.id.text_view_emoji_first_part, tariContact.walletAddress.addressFirstEmojis())
+        setTextViewText(R.id.text_view_emoji_last_part, tariContact.walletAddress.addressLastEmojis())
     }
 
     private fun displayTxMessage(message: String) {
