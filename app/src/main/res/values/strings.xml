@@ -830,7 +830,7 @@
     <string name="contact_book_contacts_book_link_message_secondLine"><![CDATA[to <b>%s</b>]]></string>
     <string name="contact_book_contacts_book_link_success_message_firstLine"><![CDATA[You have successfully linked]]></string>
     <string name="contact_book_contacts_book_link_success_message_secondLine"><![CDATA[to <b>%s</b>]]></string>
-    <string name="contact_book_contacts_book_link_message">You can quickly associate an Emoji ID or Yat with a contact already present in your phone. Simply click on a name below and it will be linked to %s</string>
+    <string name="contact_book_contacts_book_link_message">You can quickly associate an Emoji ID or Yat with a contact already present in your phone. Simply click on a name below and it will be linked to:</string>
     <string name="contact_book_contacts_book_unlink_title">Unlink Contact</string>
     <string name="contact_book_contacts_book_unlink_message_firstLine"><![CDATA[Click "confirm" to unlink]]></string>
     <string name="contact_book_contacts_book_unlink_message_secondLine"><![CDATA[from <b>%s</b>]]></string>
