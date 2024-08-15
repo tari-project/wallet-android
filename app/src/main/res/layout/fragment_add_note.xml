@@ -34,14 +34,15 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@id/back_cta_view" />
 
-    <com.tari.android.wallet.ui.component.tari.background.obsolete.TariPrimaryBackgroundConstraint
+    <com.tari.android.wallet.ui.component.tari.background.TariPrimaryBackground
         android:id="@+id/emoji_id_summary_container_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
         android:clickable="true"
-        android:elevation="@dimen/common_view_elevation"
+        android:elevation="5dp"
         android:focusable="true"
+        android:foreground="?attr/selectableItemBackground"
         android:paddingStart="@dimen/emoji_id_container_horizontal_padding"
         android:paddingTop="@dimen/emoji_id_container_vertical_padding"
         android:paddingEnd="@dimen/emoji_id_container_horizontal_padding"
@@ -54,13 +55,12 @@
         app:layout_constraintTop_toTopOf="@id/back_cta_view">
 
         <include
-            android:id="@+id/emoji_id_summary_view"
-            layout="@layout/view_emoji_id_summary"
+            android:id="@+id/emoji_id_view_container"
+            layout="@layout/view_address_short_small"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:visibility="visible" />
-
-    </com.tari.android.wallet.ui.component.tari.background.obsolete.TariPrimaryBackgroundConstraint>
+    </com.tari.android.wallet.ui.component.tari.background.TariPrimaryBackground>
 
     <androidx.constraintlayout.widget.Barrier
         android:id="@+id/add_note_header_barrier"
@@ -290,20 +290,6 @@
                 android:rotation="180"
                 android:src="@drawable/vector_back_button"
                 android:tint="?attr/palette_brand_purple" />
-
         </RelativeLayout>
-
     </RelativeLayout>
-
-    <!-- full emoji id outer container -->
-    <include
-        android:id="@+id/emoji_id_outer_container"
-        layout="@layout/view_full_emoji_id"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
 </com.tari.android.wallet.ui.component.tari.background.obsolete.TariPrimaryBackgroundConstraint>

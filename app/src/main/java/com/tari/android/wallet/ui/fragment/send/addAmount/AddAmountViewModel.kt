@@ -7,6 +7,7 @@ import com.tari.android.wallet.R
 import com.tari.android.wallet.extension.getWithError
 import com.tari.android.wallet.ffi.FFIWallet
 import com.tari.android.wallet.model.MicroTari
+import com.tari.android.wallet.model.TariWalletAddress
 import com.tari.android.wallet.model.WalletError
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.dialog.modular.modules.body.BodyModule
@@ -107,6 +108,10 @@ class AddAmountViewModel : CommonViewModel() {
             },
             ButtonModule(resourceManager.getString(R.string.common_cancel), ButtonStyle.Close)
         )
+    }
+
+    fun emojiIdClicked(walletAddress: TariWalletAddress) {
+        showAddressDetailsDialog(walletAddress)
     }
 
     fun calculateFee(amount: MicroTari, walletError: WalletError) {

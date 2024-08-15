@@ -15,7 +15,6 @@ import com.tari.android.wallet.extension.launchOnIo
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.dialog.modular.DialogArgs
 import com.tari.android.wallet.ui.dialog.modular.ModularDialogArgs
-import com.tari.android.wallet.ui.dialog.modular.modules.addressDetails.AddressDetailsModule
 import com.tari.android.wallet.ui.dialog.modular.modules.body.BodyModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonStyle
@@ -162,29 +161,7 @@ class WalletInfoViewModel : CommonViewModel() {
     }
 
     fun onAddressDetailsClicked() {
-        val walletAddress = corePrefRepository.walletAddress
-        showModularDialog(
-            HeadModule(
-                title = resourceManager.getString(R.string.wallet_info_address_details_title),
-                rightButtonIcon = R.drawable.vector_common_close,
-                rightButtonAction = { hideDialog() },
-            ),
-            AddressDetailsModule(
-                tariWalletAddress = walletAddress,
-                copyBase58 = {
-                    copyToClipboard(
-                        clipLabel = resourceManager.getString(R.string.wallet_info_address_copy_address_to_clipboard_label),
-                        clipText = walletAddress.fullBase58,
-                    )
-                },
-                copyEmojis = {
-                    copyToClipboard(
-                        clipLabel = resourceManager.getString(R.string.wallet_info_address_copy_address_to_clipboard_label),
-                        clipText = walletAddress.fullEmojiId,
-                    )
-                },
-            )
-        )
+        showAddressDetailsDialog(corePrefRepository.walletAddress)
     }
 
     fun onShareAddressClicked() {

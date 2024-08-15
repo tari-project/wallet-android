@@ -18,6 +18,7 @@ import com.tari.android.wallet.extension.addTo
 import com.tari.android.wallet.ffi.FFIWallet
 import com.tari.android.wallet.infrastructure.logging.LoggerTags
 import com.tari.android.wallet.model.CoreError
+import com.tari.android.wallet.model.TariWalletAddress
 import com.tari.android.wallet.service.TariWalletService
 import com.tari.android.wallet.service.connection.TariWalletServiceConnection
 import com.tari.android.wallet.ui.common.domain.ResourceManager
@@ -28,6 +29,7 @@ import com.tari.android.wallet.ui.dialog.error.WalletErrorArgs
 import com.tari.android.wallet.ui.dialog.modular.IDialogModule
 import com.tari.android.wallet.ui.dialog.modular.ModularDialogArgs
 import com.tari.android.wallet.ui.dialog.modular.SimpleDialogArgs
+import com.tari.android.wallet.ui.dialog.modular.modules.addressDetails.AddressDetailsModule
 import com.tari.android.wallet.ui.dialog.modular.modules.body.BodyModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonStyle
@@ -218,6 +220,31 @@ open class CommonViewModel : ViewModel() {
         showModularDialog(
             SimpleDialogArgs(iconRes, title, description, cancelable, canceledOnTouchOutside, closeButtonTextRes, onClose)
                 .getModular(resourceManager)
+        )
+    }
+
+    protected fun showAddressDetailsDialog(walletAddress: TariWalletAddress) {
+        showModularDialog(
+            HeadModule(
+                title = resourceManager.getString(R.string.wallet_info_address_details_title),
+                rightButtonIcon = R.drawable.vector_common_close,
+                rightButtonAction = { hideDialog() },
+            ),
+            AddressDetailsModule(
+                tariWalletAddress = walletAddress,
+                copyBase58 = {
+                    copyToClipboard(
+                        clipLabel = resourceManager.getString(R.string.wallet_info_address_copy_address_to_clipboard_label),
+                        clipText = walletAddress.fullBase58,
+                    )
+                },
+                copyEmojis = {
+                    copyToClipboard(
+                        clipLabel = resourceManager.getString(R.string.wallet_info_address_copy_address_to_clipboard_label),
+                        clipText = walletAddress.fullEmojiId,
+                    )
+                },
+            )
         )
     }
 

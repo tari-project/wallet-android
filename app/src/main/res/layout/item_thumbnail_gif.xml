@@ -4,4 +4,4 @@
     android:id="@+id/image_view"
     android:layout_width="@dimen/add_note_gif_thumbnail_size"
     android:layout_height="@dimen/add_note_gif_thumbnail_size"
-     />
+    tools:background="@mipmap/ic_launcher" />
