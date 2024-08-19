@@ -1,9 +1,7 @@
 package com.tari.android.wallet.ui.component.networkStateIndicator
 
-import androidx.lifecycle.MediatorLiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.map
 import com.tari.android.wallet.R
+import com.tari.android.wallet.application.baseNodes.BaseNodesManager
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.extension.collectFlow
 import com.tari.android.wallet.network.NetworkConnectionState
@@ -17,6 +15,9 @@ import com.tari.android.wallet.ui.dialog.modular.ModularDialogArgs
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonStyle
 import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 
 class ConnectionIndicatorViewModel : CommonViewModel() {
@@ -24,38 +25,33 @@ class ConnectionIndicatorViewModel : CommonViewModel() {
     @Inject
     lateinit var torProxyStateHandler: TorProxyStateHandler
 
-    private val _networkState = MutableLiveData<NetworkConnectionState>()
-    private val _torProxyState = MutableLiveData<TorProxyState>()
-    private val _baseNodeState = MutableLiveData<BaseNodeState>()
-    private val _syncState = MutableLiveData<BaseNodeSyncState>()
+    @Inject
+    lateinit var baseNodesManager: BaseNodesManager
 
-    private val _state = MediatorLiveData<ConnectionIndicatorState>()
-    val state = _state.map { it }
+    private val _state = MutableStateFlow(UiState())
+    val state = _state.asStateFlow()
 
     init {
         component.inject(this)
-
-        _state.addSource(_torProxyState) { updateConnectionState() }
-        _state.addSource(_networkState) { updateConnectionState() }
-        _state.addSource(_baseNodeState) { updateConnectionState() }
-        _state.addSource(_syncState) { updateConnectionState() }
 
         subscribeOnEventBus()
     }
 
     fun showStatesDialog(isRefreshing: Boolean = false) {
-        _networkState.value ?: return
-        _torProxyState.value ?: return
-        _baseNodeState.value ?: return
-        _syncState.value ?: return
-
         if (!isRefreshing || dialogManager.isDialogShowing(ModularDialogArgs.DialogId.CONNECTION_STATUS)) {
             showModularDialog(
                 ModularDialogArgs(
                     dialogId = ModularDialogArgs.DialogId.CONNECTION_STATUS,
                     modules = listOf(
                         HeadModule(resourceManager.getString(R.string.connection_status_dialog_title)),
-                        ConnectionStatusesModule(_networkState.value!!, _torProxyState.value!!, _baseNodeState.value!!, _syncState.value!!),
+                        ConnectionStatusesModule(
+                            networkState = state.value.networkState,
+                            torState = state.value.torProxyState,
+                            baseNodeState = state.value.baseNodeState,
+                            baseNodeSyncState = state.value.baseNodeSyncState,
+                            walletScannedHeight = state.value.walletScannedHeight,
+                            chainTip = state.value.chainTip,
+                        ),
                         ButtonModule(resourceManager.getString(R.string.common_close), ButtonStyle.Close),
                     ),
                 )
@@ -64,47 +60,72 @@ class ConnectionIndicatorViewModel : CommonViewModel() {
     }
 
     private fun subscribeOnEventBus() {
-        EventBus.networkConnectionState.subscribe(this) { _networkState.postValue(it) }
-        EventBus.baseNodeState.subscribe(this) { _baseNodeState.postValue(it) }
-        EventBus.baseNodeSyncState.subscribe(this) { _syncState.postValue(it) }
-
-        collectFlow(torProxyStateHandler.torProxyState) { _torProxyState.postValue(it) }
-    }
-
-    private fun updateConnectionState() {
-        _state.value = when (_networkState.value) {
-            NetworkConnectionState.UNKNOWN,
-            NetworkConnectionState.DISCONNECTED -> ConnectionIndicatorState.Disconnected
-
-            NetworkConnectionState.CONNECTED -> {
-                when (_torProxyState.value) {
-                    is TorProxyState.Failed,
-                    is TorProxyState.Initializing,
-                    is TorProxyState.NotReady -> ConnectionIndicatorState.Disconnected
-
-                    is TorProxyState.Running -> {
-                        when (_baseNodeState.value) {
-                            BaseNodeState.Online,
-                            BaseNodeState.Syncing -> {
-                                when (_syncState.value) {
-                                    BaseNodeSyncState.Online,
-                                    BaseNodeSyncState.Syncing -> ConnectionIndicatorState.Connected
-
-                                    else -> ConnectionIndicatorState.ConnectedWithIssues
-                                }
-                            }
-
-                            else -> ConnectionIndicatorState.Disconnected
-                        }
-                    }
-
-                    else -> ConnectionIndicatorState.Disconnected
-                }
-            }
-
-            else -> ConnectionIndicatorState.Disconnected
+        EventBus.networkConnectionState.subscribe(this) { networkState ->
+            _state.update { it.copy(networkState = networkState) }
+            showStatesDialog(true)
+        }
+        EventBus.baseNodeState.subscribe(this) { baseNodeState ->
+            _state.update { it.copy(baseNodeState = baseNodeState) }
+            showStatesDialog(true)
+        }
+        EventBus.baseNodeSyncState.subscribe(this) { syncState ->
+            _state.update { it.copy(baseNodeSyncState = syncState) }
+            showStatesDialog(true)
         }
 
-        showStatesDialog(true)
+        collectFlow(torProxyStateHandler.torProxyState) { torProxyState ->
+            _state.update { it.copy(torProxyState = torProxyState) }
+            showStatesDialog(true)
+        }
+        collectFlow(baseNodesManager.walletScannedHeight) { height ->
+            _state.update {
+                it.copy(
+                    walletScannedHeight = height,
+                    chainTip = baseNodesManager.networkBlockHeight.toInt(),
+                )
+            }
+            showStatesDialog(true)
+        }
+    }
+
+    data class UiState(
+        val networkState: NetworkConnectionState = NetworkConnectionState.UNKNOWN,
+        val torProxyState: TorProxyState = TorProxyState.NotReady,
+        val baseNodeState: BaseNodeState = BaseNodeState.Offline,
+        val baseNodeSyncState: BaseNodeSyncState = BaseNodeSyncState.NotStarted,
+        val walletScannedHeight: Int = 0,
+        val chainTip: Int = 0,
+    ) {
+        val indicatorState: ConnectionIndicatorState
+            get() = when (networkState) {
+                NetworkConnectionState.UNKNOWN,
+                NetworkConnectionState.DISCONNECTED -> ConnectionIndicatorState.Disconnected
+
+                NetworkConnectionState.CONNECTED -> {
+                    when (torProxyState) {
+                        is TorProxyState.Failed,
+                        is TorProxyState.Initializing,
+                        is TorProxyState.NotReady -> ConnectionIndicatorState.Disconnected
+
+                        is TorProxyState.Running -> {
+                            when (baseNodeState) {
+                                BaseNodeState.Online,
+                                BaseNodeState.Syncing -> {
+                                    when (baseNodeSyncState) {
+                                        BaseNodeSyncState.Online,
+                                        BaseNodeSyncState.Syncing -> ConnectionIndicatorState.Connected
+
+                                        else -> ConnectionIndicatorState.ConnectedWithIssues
+                                    }
+                                }
+
+                                else -> ConnectionIndicatorState.Disconnected
+                            }
+                        }
+
+                        else -> ConnectionIndicatorState.Disconnected
+                    }
+                }
+            }
     }
 }

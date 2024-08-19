@@ -11,7 +11,9 @@ class ConnectionStatusesModule(
     networkState: NetworkConnectionState,
     torState: TorProxyState,
     baseNodeState: BaseNodeState,
-    baseNodeSyncState: BaseNodeSyncState
+    baseNodeSyncState: BaseNodeSyncState,
+    val walletScannedHeight: Int,
+    val chainTip: Int,
 ) : IDialogModule() {
 
     val networkText = when (networkState) {
@@ -67,4 +69,6 @@ class ConnectionStatusesModule(
         BaseNodeSyncState.Online -> R.drawable.vector_network_status_dot_green
         BaseNodeSyncState.Failed -> R.drawable.vector_network_status_dot_red
     }
+
+    val showChainTipConnecting: Boolean = baseNodeState != BaseNodeState.Online || walletScannedHeight == 0 || chainTip == 0
 }

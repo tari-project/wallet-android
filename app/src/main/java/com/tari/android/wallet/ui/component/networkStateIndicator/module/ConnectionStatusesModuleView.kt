@@ -4,12 +4,15 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import com.tari.android.wallet.R
 import com.tari.android.wallet.databinding.DialogModuleConnectionStatusesBinding
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.component.common.CommonView
+import com.tari.android.wallet.ui.extension.setVisible
+import com.tari.android.wallet.ui.extension.string
 
 @SuppressLint("ViewConstructor")
-class ConnectionStatusesModuleView(context: Context, buttonModule: ConnectionStatusesModule) :
+class ConnectionStatusesModuleView(context: Context, module: ConnectionStatusesModule) :
     CommonView<CommonViewModel, DialogModuleConnectionStatusesBinding>(context) {
 
     override fun bindingInflate(layoutInflater: LayoutInflater, parent: ViewGroup?, attachToRoot: Boolean): DialogModuleConnectionStatusesBinding =
@@ -18,14 +21,18 @@ class ConnectionStatusesModuleView(context: Context, buttonModule: ConnectionSta
     override fun setup() = Unit
 
     init {
-        ui.wifiStatusText.setText(buttonModule.networkText)
-        ui.torText.setText(buttonModule.torText)
-        ui.baseNodeStatusText.setText(buttonModule.baseNodeStateText)
-        ui.syncingStateText.setText(buttonModule.baseNodeSyncText)
+        ui.wifiStatusText.setText(module.networkText)
+        ui.torText.setText(module.torText)
+        ui.baseNodeStatusText.setText(module.baseNodeStateText)
+        ui.syncingStateText.setText(module.baseNodeSyncText)
 
-        ui.networkIcon.setBackgroundResource(buttonModule.networkIcon)
-        ui.torIcon.setBackgroundResource(buttonModule.torIcon)
-        ui.baseNodeIcon.setBackgroundResource(buttonModule.baseNodeStateIcon)
-        ui.syncIcon.setBackgroundResource(buttonModule.baseNodeSyncIcon)
+        ui.networkIcon.setBackgroundResource(module.networkIcon)
+        ui.torIcon.setBackgroundResource(module.torIcon)
+        ui.baseNodeIcon.setBackgroundResource(module.baseNodeStateIcon)
+        ui.syncIcon.setBackgroundResource(module.baseNodeSyncIcon)
+
+        ui.textChainTipWaiting.setVisible(module.showChainTipConnecting)
+        ui.textChainTipValue.setVisible(!module.showChainTipConnecting)
+        ui.textChainTipValue.text = context.string(R.string.connection_status_dialog_chain_tip_value, module.walletScannedHeight, module.chainTip)
     }
 }

@@ -641,6 +641,9 @@
     <string name="connection_status_dialog_base_node_sync_pending">Syncing with Base Node</string>
     <string name="connection_status_dialog_base_node_sync_success">Synced with Base Node</string>
     <string name="connection_status_dialog_base_node_sync_failure">Failed sync with Base Node</string>
+    <string name="connection_status_dialog_chain_tip">Chain Tip: </string>
+    <string name="connection_status_dialog_chain_tip_value">#%s (%s)</string>
+    <string name="connection_status_dialog_chain_tip_waiting">Waiting for connection…</string>
 
     <string name="tor_bridges_title">Bridges Configuration</string>
     <string name="tor_bridges_connect">Connect</string>
