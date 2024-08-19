@@ -155,10 +155,4 @@
         android:id="@+id/nav_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
-
-    <com.tari.android.wallet.ui.fragment.contactBook.root.actionMenu.ActionMenuView
-        android:id="@+id/action_menu_view"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
-
 </FrameLayout>
