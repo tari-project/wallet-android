@@ -44,6 +44,7 @@ import com.tari.android.wallet.ui.fragment.settings.backup.backupOnboarding.modu
 import com.tari.android.wallet.ui.fragment.tx.adapter.TransactionItem
 import com.tari.android.wallet.util.EmojiId
 import com.tari.android.wallet.util.extractEmojis
+import com.tari.android.wallet.util.shortString
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import yat.android.ui.extension.HtmlHelper
@@ -88,9 +89,9 @@ class HomeFragmentViewModel : CommonViewModel() {
 
         doOnWalletRunning { doOnWalletServiceConnected { runCatching { onServiceConnected() } } }
 
-        val emojies = corePrefRepository.walletAddress.spendKeyEmojis.extractEmojis()
-        emojiMedium.postValue(emojies.take(3).joinToString(""))
-        avatarEmoji.postValue(emojies.take(1).joinToString(""))
+        val address = corePrefRepository.walletAddress
+        emojiMedium.postValue(address.shortString())
+        avatarEmoji.postValue(address.spendKeyEmojis.extractEmojis().take(1).joinToString(""))
 
         checkForDataConsent()
     }

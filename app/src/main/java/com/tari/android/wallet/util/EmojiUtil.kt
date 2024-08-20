@@ -311,3 +311,8 @@ fun TariWalletAddress.addressFirstEmojis(): EmojiId {
 fun TariWalletAddress.addressLastEmojis(): EmojiId {
     return this.spendKeyEmojis.extractEmojis().takeLast(3).joinToString("")
 }
+
+/**
+ * Returns a string with the address in the format "prefix|address1•••address2". E.g. "🐢💤|🐉🔋😎•••🍭🎤💍".
+ */
+fun TariWalletAddress.shortString(): String = this.addressPrefixEmojis() + "|" + this.addressFirstEmojis() + "..." + this.addressLastEmojis()

@@ -40,7 +40,6 @@ import com.tari.android.wallet.ffi.FFIException
 import com.tari.android.wallet.ffi.FFITariWalletAddress
 import com.tari.android.wallet.ffi.runWithDestroy
 import com.tari.android.wallet.util.EmojiId
-import com.tari.android.wallet.util.extractEmojis
 import com.tari.android.wallet.util.tariEmoji
 import kotlinx.parcelize.Parcelize
 
@@ -81,9 +80,6 @@ data class TariWalletAddress(
 
     val uniqueIdentifier: String
         get() = "$networkEmoji$spendKeyEmojis"
-
-    val avatarEmoji: String // TODO remove this and check places is used. We don't avatar emoji anymore
-        get() = fullEmojiId.extractEmojis().first()
 
     fun isUnknownUser(): Boolean = unknownAddress
 

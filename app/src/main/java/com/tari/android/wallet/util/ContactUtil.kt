@@ -16,5 +16,5 @@ class ContactUtil @Inject constructor(
     }
 
     private fun getDefaultAlias(walletAddress: TariWalletAddress): String =
-        resourceManager.getString(R.string.contact_book_default_alias, walletAddress.fullEmojiId.extractEmojis().take(3).joinToString(""))
+        resourceManager.getString(R.string.contact_book_default_alias, walletAddress.spendKeyEmojis.extractEmojis().take(3).joinToString(""))
 }

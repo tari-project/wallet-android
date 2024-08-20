@@ -1,6 +1,5 @@
 package com.tari.android.wallet.ui.fragment.chat.chatList.adapter
 
-import com.bumptech.glide.Glide
 import com.tari.android.wallet.databinding.ItemChatItemBinding
 import com.tari.android.wallet.ui.common.recyclerView.CommonViewHolder
 import com.tari.android.wallet.ui.common.recyclerView.ViewHolderBuilder
@@ -14,22 +13,11 @@ class ChatItemViewHolder(view: ItemChatItemBinding) : CommonViewHolder<ChatItemV
         super.bind(item)
 
         with(ui) {
-            onlineStatus.setVisible(item.isOnline)
             unreadCountContainer.setVisible(item.unreadCount > 0)
             unreadCount.text = item.unreadCount.toString()
             date.text = item.dateMessage
             message.text = item.subtitle
             alias.text = item.alias
-
-            if (item.avatar.isNotEmpty()) {
-                firstEmojiTextView.gone()
-                avatar.visible()
-                Glide.with(avatar).load(item.avatar).into(avatar)
-            } else {
-                firstEmojiTextView.visible()
-                avatar.gone()
-                firstEmojiTextView.text = item.firstEmoji
-            }
 
             if (item.alias.isEmpty()) {
                 emojiIdViewContainer.root.visible()
