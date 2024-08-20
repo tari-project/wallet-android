@@ -211,6 +211,26 @@ open class CommonViewModel : ViewModel() {
     }
 
     fun showSimpleDialog(
+        iconRes: Int? = null,
+        @StringRes title: Int,
+        @StringRes description: Int,
+        cancelable: Boolean = true,
+        canceledOnTouchOutside: Boolean = true,
+        closeButtonTextRes: Int = R.string.common_close,
+        onClose: () -> Unit = {},
+    ) {
+        showSimpleDialog(
+            iconRes = iconRes,
+            title = resourceManager.getString(title),
+            description = resourceManager.getString(description),
+            cancelable = cancelable,
+            canceledOnTouchOutside = canceledOnTouchOutside,
+            closeButtonTextRes = closeButtonTextRes,
+            onClose = onClose,
+        )
+    }
+
+    fun showSimpleDialog(
         @DrawableRes iconRes: Int? = null,
         @StringRes titleRes: Int,
         @StringRes descriptionRes: Int,
