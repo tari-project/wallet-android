@@ -51,11 +51,8 @@ import com.tari.android.wallet.ui.fragment.contactBook.details.ContactDetailsVie
 import com.tari.android.wallet.ui.fragment.contactBook.link.ContactLinkViewModel
 import com.tari.android.wallet.ui.fragment.contactBook.root.ContactBookViewModel
 import com.tari.android.wallet.ui.fragment.contactBook.root.ShareViewModel
-import com.tari.android.wallet.ui.fragment.contactBook.root.actionMenu.ContactBookActionMenuViewModel
-import com.tari.android.wallet.ui.fragment.tx.history.TransactionHistoryViewModel
 import com.tari.android.wallet.ui.fragment.home.HomeActivity
 import com.tari.android.wallet.ui.fragment.home.HomeViewModel
-import com.tari.android.wallet.ui.fragment.tx.history.HomeTransactionHistoryViewModel
 import com.tari.android.wallet.ui.fragment.onboarding.activity.OnboardingFlowActivity
 import com.tari.android.wallet.ui.fragment.onboarding.createWallet.CreateWalletFragment
 import com.tari.android.wallet.ui.fragment.onboarding.createWallet.CreateWalletViewModel
@@ -105,6 +102,8 @@ import com.tari.android.wallet.ui.fragment.tx.HomeFragmentViewModel
 import com.tari.android.wallet.ui.fragment.tx.TransactionRepository
 import com.tari.android.wallet.ui.fragment.tx.details.TxDetailsViewModel
 import com.tari.android.wallet.ui.fragment.tx.details.gif.GifViewModel
+import com.tari.android.wallet.ui.fragment.tx.history.HomeTransactionHistoryViewModel
+import com.tari.android.wallet.ui.fragment.tx.history.TransactionHistoryViewModel
 import com.tari.android.wallet.ui.fragment.utxos.list.UtxosListViewModel
 import dagger.Component
 import javax.inject.Singleton
@@ -198,7 +197,6 @@ interface ApplicationComponent {
     fun inject(viewModel: BluetoothSettingsViewModel)
     fun inject(viewModel: WalletAddressViewModel)
     fun inject(viewModel: QRScannerViewModel)
-    fun inject(viewModel: ContactBookActionMenuViewModel)
     fun inject(viewModel: ChatListViewModel)
     fun inject(viewModel: ChatDetailsViewModel)
     fun inject(viewModel: DataCollectionViewModel)
