@@ -1,5 +1,6 @@
 package com.tari.android.wallet.ui.common
 
+import androidx.annotation.StringRes
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -205,6 +206,26 @@ open class CommonViewModel : ViewModel() {
             iconRes = R.drawable.tari_construction,
             title = resourceManager.getString(R.string.common_not_ready_yet_dialog_title),
             description = resourceManager.getString(R.string.common_not_ready_yet_dialog_description),
+        )
+    }
+
+    fun showSimpleDialog(
+        iconRes: Int? = null,
+        @StringRes title: Int,
+        @StringRes description: Int,
+        cancelable: Boolean = true,
+        canceledOnTouchOutside: Boolean = true,
+        closeButtonTextRes: Int = R.string.common_close,
+        onClose: () -> Unit = {},
+    ) {
+        showSimpleDialog(
+            iconRes = iconRes,
+            title = resourceManager.getString(title),
+            description = resourceManager.getString(description),
+            cancelable = cancelable,
+            canceledOnTouchOutside = canceledOnTouchOutside,
+            closeButtonTextRes = closeButtonTextRes,
+            onClose = onClose,
         )
     }
 

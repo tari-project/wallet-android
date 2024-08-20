@@ -840,6 +840,8 @@
     <string name="contact_book_contacts_book_unlink_success_title">Success!</string>
     <string name="contact_book_contacts_book_unlink_success_message_firstLine"><![CDATA[You have successfully unlinked]]></string>
     <string name="contact_book_contacts_book_unlink_success_message_secondLine"><![CDATA[from <b>%s</b>]]></string>
+    <string name="contact_book_add">Add</string>
+    <string name="contact_book_add_title">Add Contact</string>
     <string name="contact_book_contacts_title">Contacts</string>
     <string name="contact_book_favorites_title">Favorites</string>
     <string name="contact_book_add_contact_title">Add Contact</string>
@@ -886,6 +888,8 @@
     <string name="tx_details_contact_name">Contact name here</string>
     <string name="share_via_qr_code_title">Share QR Code</string>
     <string name="contact_book_default_alias">Aurora user %s</string>
+    <string name="contact_details_empty_name_title">Name is empty</string>
+    <string name="contact_details_empty_name_description">Name can\’t be empty. Please enter a name for this contact</string>
 
     <string name="share_via_bluetooth_title">Share via BLE</string>
     <string name="share_via_bluetooth_message">Bring the smartphone close to a BLE enabled device</string>
