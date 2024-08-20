@@ -36,8 +36,10 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.appcompat.app.AppCompatActivity
 import com.tari.android.wallet.databinding.ViewConnectionIndicatorBinding
-import com.tari.android.wallet.extension.observe
+import com.tari.android.wallet.extension.castTo
+import com.tari.android.wallet.extension.collectFlow
 import com.tari.android.wallet.ui.component.common.CommonView
 
 
@@ -61,10 +63,8 @@ class ConnectionIndicatorView : CommonView<ConnectionIndicatorViewModel, ViewCon
     override fun bindViewModel(viewModel: ConnectionIndicatorViewModel) {
         super.bindViewModel(viewModel)
 
-        with(viewModel) {
-            observe(state) {
-                ui.image.setImageResource(it.resId)
-            }
+        context.castTo<AppCompatActivity>().collectFlow(viewModel.state) { state ->
+            ui.image.setImageResource(state.indicatorState.resId)
         }
     }
 }

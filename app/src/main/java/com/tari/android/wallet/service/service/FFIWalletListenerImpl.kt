@@ -329,6 +329,10 @@ class FFIWalletListenerImpl(
         baseNodesManager.saveBaseNodeState(baseNodeState)
     }
 
+    override fun onWalletScannedHeight(height: Int) {
+       baseNodesManager.saveWalletScannedHeight(height)
+    }
+
     enum class ConnectivityStatus(val value: Int) {
         CONNECTING(0),
         ONLINE(1),

@@ -98,6 +98,7 @@ jmethodID txoValidationCompleteCallbackMethodId;
 jmethodID transactionValidationCompleteCallbackMethodId;
 jmethodID recoveringProcessCompleteCallbackMethodId;
 jmethodID balanceUpdatedCallbackMethodId;
+jmethodID walletScannedHeightCallbackMethodId;
 jmethodID baseNodeStatusCallbackMethodId;
 
 void txBroadcastCallback(TariCompletedTransaction *pCompletedTransaction) {
@@ -246,6 +247,16 @@ void connectivityStatusCallback(uint64_t status) {
     g_vm->DetachCurrentThread();
 }
 
+void walletScannedHeightCallback(uint64_t height) {
+    auto *jniEnv = getJNIEnv();
+    if (jniEnv == nullptr || callbackHandler == nullptr) {
+        return;
+    }
+    jbyteArray bytes = getBytesFromUnsignedLongLong(jniEnv, height);
+    jniEnv->CallVoidMethod(callbackHandler, walletScannedHeightCallbackMethodId, bytes);
+    g_vm->DetachCurrentThread();
+}
+
 void balanceUpdatedCallback(TariBalance *pBalance) {
     auto *jniEnv = getJNIEnv();
     if (jniEnv == nullptr || callbackHandler == nullptr) {
@@ -269,7 +280,6 @@ void baseNodeStatusCallback(TariBaseNodeState *pBaseNodeState) {
     jniEnv->CallVoidMethod(callbackHandler, baseNodeStatusCallbackMethodId, jpBaseNodeState);
     g_vm->DetachCurrentThread();
 }
-
 
 void recoveringProcessCompleteCallback(uint8_t first, uint64_t second, uint64_t third) {
     auto *jniEnv = getJNIEnv();
@@ -337,6 +347,8 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniCreate(
         jstring callback_transaction_validation_complete_sig,
         jstring callback_connectivity_status,
         jstring callback_connectivity_status_sig,
+        jstring callback_wallet_scanned_height,
+        jstring callback_wallet_scanned_height_sig,
         jstring callback_base_node_status,
         jstring callback_base_node_status_sig,
         jobject error) {
@@ -427,6 +439,11 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniCreate(
         SetNullPointerField(jEnv, jThis);
     }
 
+    walletScannedHeightCallbackMethodId = getMethodId(jEnv, jThis, callback_wallet_scanned_height, callback_wallet_scanned_height_sig);
+    if (walletScannedHeightCallbackMethodId == nullptr) {
+        SetNullPointerField(jEnv, jThis);
+    }
+
     baseNodeStatusCallbackMethodId = getMethodId(jEnv, jThis, callback_base_node_status, callback_base_node_status_sig);
     if (baseNodeStatusCallbackMethodId == nullptr) {
         SetNullPointerField(jEnv, jThis);
@@ -489,6 +506,7 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniCreate(
             transactionValidationCompleteCallback,
             storeAndForwardMessagesReceivedCallback,
             connectivityStatusCallback,
+            walletScannedHeightCallback,
             baseNodeStatusCallback,
             pRecovery,
             &errorCode);

@@ -127,6 +127,8 @@ class FFIWallet(
         callbackTransactionValidationCompleteSig: String,
         callbackConnectivityStatus: String,
         callbackConnectivityStatusSig: String,
+        callbackWalletScannedHeight: String,
+        callbackWalletScannedHeightSig: String,
         callbackBaseNodeStatusStatus: String,
         callbackBaseNodeStatusSig: String,
         libError: FFIError
@@ -285,6 +287,7 @@ class FFIWallet(
                 this::onBalanceUpdated.name, "(J)V",
                 this::onTxValidationComplete.name, "([B[B)V",
                 this::onConnectivityStatus.name, "([B)V",
+                this::onWalletScannedHeight.name, "([B)V",
                 this::onBaseNodeStatus.name, "(J)V",
                 libError = error,
             )
@@ -426,6 +429,12 @@ class FFIWallet(
         val connectivityStatus = BigInteger(1, bytes)
         localScope.launch { listener?.onConnectivityStatus(connectivityStatus.toInt()) }
         logger.i("ConnectivityStatus is [$connectivityStatus]")
+    }
+
+    fun onWalletScannedHeight(bytes: ByteArray) {
+        val height = BigInteger(1, bytes)
+        localScope.launch { listener?.onWalletScannedHeight(height.toInt()) }
+        logger.i("Wallet scanned height is [$height]")
     }
 
     fun onBalanceUpdated(ptr: FFIPointer) {
