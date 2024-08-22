@@ -12,7 +12,7 @@ import com.tari.android.wallet.model.TariWalletAddress
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.common.SingleLiveEvent
 import com.tari.android.wallet.ui.fragment.home.HomeActivity
-import com.tari.android.wallet.util.extractEmojis
+import com.tari.android.wallet.util.shortString
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -136,8 +136,7 @@ class QRScannerViewModel : CommonViewModel() {
             val text = when (deepLink) {
                 is DeepLink.Send -> {
                     val walletAddress = TariWalletAddress.fromBase58OrNull(deepLink.walletAddress) ?: return@launchOnIo
-                    val emojiId = walletAddress.fullEmojiId.extractEmojis().take(3).joinToString("") // TODO put alias methods to a helper class
-                    resourceManager.getString(R.string.qr_code_scanner_labels_actions_transaction_send, emojiId)
+                    resourceManager.getString(R.string.qr_code_scanner_labels_actions_transaction_send, walletAddress.shortString())
                 }
 
                 is DeepLink.UserProfile -> resourceManager.getString(R.string.qr_code_scanner_labels_actions_profile)

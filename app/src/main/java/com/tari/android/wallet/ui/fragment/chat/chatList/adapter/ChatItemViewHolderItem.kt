@@ -11,7 +11,6 @@ import com.tari.android.wallet.util.EmojiId
 data class ChatItemViewHolderItem(
     val walletAddress: TariWalletAddress,
     val uuid: String,
-    val firstEmoji: EmojiId,
     val avatar: String,
     val alias: String,
     val emojiId: EmojiId,
@@ -30,7 +29,6 @@ data class ChatItemViewHolderItem(
     ) : this(
         walletAddress = dto.walletAddress,
         uuid = dto.uuid,
-        firstEmoji = dto.walletAddress.avatarEmoji,
         avatar = contact.getPhoneContactInfo()?.avatar.orEmpty(),
         alias = contact.contactInfo.getAlias(),
         emojiId = dto.walletAddress.fullEmojiId,

@@ -53,6 +53,7 @@ import com.tari.android.wallet.ui.fragment.home.navigation.TariNavigator.Compani
 import com.tari.android.wallet.ui.fragment.settings.allSettings.row.SettingsRowStyle
 import com.tari.android.wallet.ui.fragment.settings.allSettings.row.SettingsRowViewHolderItem
 import com.tari.android.wallet.ui.fragment.settings.allSettings.title.SettingsTitleViewHolderItem
+import com.tari.android.wallet.util.DebugConfig
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -213,22 +214,23 @@ class ContactDetailsViewModel(savedState: SavedStateHandle) : CommonViewModel() 
             hint = resourceManager.getString(contact_book_add_contact_first_name_hint),
             isFirst = true,
             isEnd = true,
-        ) { saveAction.invoke() }
+            onDoneAction = { saveAction.invoke() },
+        )
 
-        val yatModule = phoneDto?.let {
-            YatInputModule(
-                search = this::yatSearchAction,
-                value = yatDto?.yat.orEmpty(),
-                hint = resourceManager.getString(contact_book_add_contact_yat_hint),
-                isFirst = false,
-                isEnd = true,
-            ) { saveAction.invoke() }
-        }
+        val yatModule = YatInputModule(
+            search = this::yatSearchAction,
+            value = yatDto?.yat.orEmpty(),
+            hint = resourceManager.getString(contact_book_add_contact_yat_hint),
+            isFirst = false,
+            isEnd = true,
+            onDoneAction = { saveAction.invoke() },
+        ).takeIf { DebugConfig.isYatEnabled && phoneDto != null }
 
         val headModule = HeadModule(
             title = resourceManager.getString(contact_book_details_edit_title),
-            rightButtonTitle = resourceManager.getString(contact_book_add_contact_done_button)
-        ) { saveAction.invoke() }
+            rightButtonTitle = resourceManager.getString(contact_book_add_contact_done_button),
+            rightButtonAction = { saveAction.invoke() },
+        )
 
         saveAction = {
             saveDetails(contact, nameModule.value, yatModule?.value ?: "")
