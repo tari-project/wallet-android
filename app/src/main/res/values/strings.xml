@@ -333,6 +333,9 @@
     <string name="wallet_info_share_profile">Share my address</string>
     <string name="wallet_info_share_address_title">Share Address</string>
     <string name="wallet_info_share_address_description">Easily receive tXTR from others by sharing your profile via one of the following methods:</string>
+    <string name="wallet_info_empty_name_dialog_title">Name can\’t be empty</string>
+    <string name="wallet_info_empty_name_dialog_message">You can\’t delete your name. Give it a quick update instead!</string>
+    <string name="wallet_info_empty_name_dialog_button">Okay, got it!</string>
 
     <!-- tx failed dialog -->
     <string name="tx_failed_title">Sorry, you can\'t send tXTR to offline users</string>
@@ -888,8 +891,9 @@
     <string name="tx_details_contact_name">Contact name here</string>
     <string name="share_via_qr_code_title">Share QR Code</string>
     <string name="contact_book_default_alias">Aurora user %s</string>
-    <string name="contact_details_empty_name_title">Name is empty</string>
-    <string name="contact_details_empty_name_description">Name can\’t be empty. Please enter a name for this contact</string>
+    <string name="contact_details_empty_name_dialog_title">Name can\’t be empty</string>
+    <string name="contact_details_empty_name_dialog_message">A contact without a name? That won\’t work. Please add one to keep things running smoothly.</string>
+    <string name="contact_details_empty_name_dialog_button">Will do!</string>
 
     <string name="share_via_bluetooth_title">Share via BLE</string>
     <string name="share_via_bluetooth_message">Bring the smartphone close to a BLE enabled device</string>

@@ -268,8 +268,9 @@ class ContactDetailsViewModel(savedState: SavedStateHandle) : CommonViewModel() 
     private fun saveDetails(contact: ContactDto, newName: String, yat: String = "") {
         if (newName.isBlank()) {
             showSimpleDialog(
-                title = R.string.contact_details_empty_name_title,
-                description = R.string.contact_details_empty_name_description,
+                titleRes = R.string.contact_details_empty_name_dialog_title,
+                descriptionRes = R.string.contact_details_empty_name_dialog_message,
+                closeButtonTextRes = R.string.contact_details_empty_name_dialog_button,
             )
         } else {
             updatingJob?.cancel()
