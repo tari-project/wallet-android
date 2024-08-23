@@ -48,6 +48,7 @@ import com.tari.android.wallet.ui.extension.setOnThrottledClickListener
 import com.tari.android.wallet.ui.extension.setVisible
 import com.tari.android.wallet.ui.extension.string
 import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
+import com.tari.android.wallet.util.DebugConfig
 import com.tari.android.wallet.util.addressFirstEmojis
 import com.tari.android.wallet.util.addressLastEmojis
 import com.tari.android.wallet.util.addressPrefixEmojis
@@ -97,11 +98,13 @@ class WalletInfoFragment : CommonFragment<FragmentWalletInfoBinding, WalletInfoV
                 viewModel.navigation.postValue(Navigation.TxListNavigation.ToUtxos)
             })
         })
-        ui.auroraContainer.addView(RoundButtonWithIconView(requireContext()).apply {
-            setArgs(getString(R.string.wallet_info_connect_yat_button), R.drawable.vector_wallet_yat, {
-                viewModel.yatAdapter.openOnboarding(requireContext())
+        if (DebugConfig.isYatEnabled) {
+            ui.auroraContainer.addView(RoundButtonWithIconView(requireContext()).apply {
+                setArgs(getString(R.string.wallet_info_connect_yat_button), R.drawable.vector_wallet_yat, {
+                    viewModel.yatAdapter.openOnboarding(requireContext())
+                })
             })
-        })
+        }
 
         ui.toolbar.setRightArgs(TariToolbarActionArg(title = string(R.string.tx_detail_edit)) { viewModel.showEditAliasDialog() })
 
