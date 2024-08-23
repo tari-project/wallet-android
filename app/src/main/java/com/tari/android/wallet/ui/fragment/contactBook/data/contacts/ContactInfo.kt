@@ -25,10 +25,11 @@ sealed class ContactInfo(
         ContactAction.Link.takeIf { this is FFIContactInfo },
         ContactAction.Unlink.takeIf { this is MergedContactInfo },
         ContactAction.OpenProfile,
-        ContactAction.EditName,
+        ContactAction.EditName.takeIf { getAlias().isNotBlank() },
+        ContactAction.AddContact.takeIf { getAlias().isBlank() },
         ContactAction.ToUnFavorite.takeIf { (this is FFIContactInfo || this is MergedContactInfo) && this.isFavorite },
         ContactAction.ToFavorite.takeIf { (this is FFIContactInfo || this is MergedContactInfo) && !this.isFavorite },
-        ContactAction.Delete,
+        ContactAction.Delete.takeIf { getAlias().isNotBlank() }, // the delete option is available only for added contacts (with alias)
     )
 
     fun getTypeName(): Int = when (this) {

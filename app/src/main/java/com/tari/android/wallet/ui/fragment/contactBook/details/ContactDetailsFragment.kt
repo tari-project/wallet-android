@@ -42,9 +42,9 @@ class ContactDetailsFragment : CommonFragment<FragmentContactsDetailsBinding, Co
 
     private fun applyContact(contact: ContactDto) {
         if (contact.getContactActions().contains(ContactAction.EditName)) {
-            ui.toolbar.setRightArgs(TariToolbarActionArg(title = getString(R.string.contact_book_details_edit)) {
-                viewModel.onEditClick()
-            })
+            ui.toolbar.setRightArgs(TariToolbarActionArg(title = getString(R.string.contact_book_details_edit)) { viewModel.onEditClick() })
+        } else if (contact.getContactActions().contains(ContactAction.AddContact)) {
+            ui.toolbar.setRightArgs(TariToolbarActionArg(title = getString(R.string.contact_book_add)) { viewModel.onEditClick() })
         } else {
             ui.toolbar.hideRightActions()
         }

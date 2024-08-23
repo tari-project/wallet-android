@@ -154,10 +154,18 @@ class WalletInfoViewModel : CommonViewModel() {
     }
 
     private fun saveDetails(name: String) {
-        corePrefRepository.firstName = splitAlias(name).firstName
-        corePrefRepository.lastName = splitAlias(name).lastName
-        _uiState.update { it.copy(alias = name) }
-        hideDialog()
+        if (name.isBlank()) {
+            showSimpleDialog(
+                titleRes = R.string.wallet_info_empty_name_dialog_title,
+                descriptionRes = R.string.wallet_info_empty_name_dialog_message,
+                closeButtonTextRes = R.string.wallet_info_empty_name_dialog_button,
+            )
+        } else {
+            corePrefRepository.firstName = splitAlias(name).firstName
+            corePrefRepository.lastName = splitAlias(name).lastName
+            _uiState.update { it.copy(alias = name) }
+            hideDialog()
+        }
     }
 
     fun onAddressDetailsClicked() {

@@ -266,16 +266,24 @@ class ContactDetailsViewModel(savedState: SavedStateHandle) : CommonViewModel() 
     }
 
     private fun saveDetails(contact: ContactDto, newName: String, yat: String = "") {
-        updatingJob?.cancel()
-        launchOnIo {
-            val firstName = splitAlias(newName).firstName
-            val lastName = splitAlias(newName).lastName
+        if (newName.isBlank()) {
+            showSimpleDialog(
+                titleRes = R.string.contact_details_empty_name_dialog_title,
+                descriptionRes = R.string.contact_details_empty_name_dialog_message,
+                closeButtonTextRes = R.string.contact_details_empty_name_dialog_button,
+            )
+        } else {
+            updatingJob?.cancel()
+            launchOnIo {
+                val firstName = splitAlias(newName).firstName
+                val lastName = splitAlias(newName).lastName
 
-            val newContact = contactsRepository.updateContactInfo(contact, firstName, lastName, yat)
+                val newContact = contactsRepository.updateContactInfo(contact, firstName, lastName, yat)
 
-            launchOnMain {
-                _uiState.update { it.copy(contact = newContact, list = updateList(newContact)) }
-                hideDialog()
+                launchOnMain {
+                    _uiState.update { it.copy(contact = newContact, list = updateList(newContact)) }
+                    hideDialog()
+                }
             }
         }
     }
