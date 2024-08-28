@@ -116,12 +116,16 @@ class FFIContactsRepositoryBridge(
                     .filter { !it.tariContact.walletAddress.isUnknownUser() }
                     .sortedByDescending { it.timestamp }
                     .map { tx ->
-                        FFIContactInfo(
-                            walletAddress = tx.tariContact.walletAddress,
-                            alias = tx.tariContact.alias,
-                            isFavorite = tx.tariContact.isFavorite,
-                            lastUsedTimeMillis = tx.timestamp.toLong() * 1000L,
-                        )
+                        // if there is a wallet contact with the same address, use data from it instead of the tx contact
+                        val walletContact = walletContacts.firstOrNull { it.walletAddress == tx.tariContact.walletAddress }
+
+                        walletContact?.copy(lastUsedTimeMillis = tx.timestamp.toLong() * 1000L)
+                            ?: FFIContactInfo(
+                                walletAddress = tx.tariContact.walletAddress,
+                                alias = tx.tariContact.alias,
+                                isFavorite = tx.tariContact.isFavorite,
+                                lastUsedTimeMillis = tx.timestamp.toLong() * 1000L,
+                            )
                     }.toList()
             }
         } catch (e: Throwable) {
@@ -132,7 +136,7 @@ class FFIContactsRepositoryBridge(
 
         return txContacts // tx ones should be first because of lastUsedTimeMillis
             .plus(walletContacts)
-            .distinctBy { it.walletAddress }
+            .distinctBy { it.walletAddress.uniqueIdentifier }
     }
 
     suspend fun deleteContact(contact: FFIContactInfo) {
