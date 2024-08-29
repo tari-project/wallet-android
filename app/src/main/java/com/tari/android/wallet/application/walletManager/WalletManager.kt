@@ -51,6 +51,7 @@ import com.tari.android.wallet.ffi.FFITariTransportConfig
 import com.tari.android.wallet.ffi.FFIWallet
 import com.tari.android.wallet.ffi.LogFileObserver
 import com.tari.android.wallet.ffi.NetAddressString
+import com.tari.android.wallet.model.fullBase58
 import com.tari.android.wallet.service.seedPhrase.SeedPhraseRepository
 import com.tari.android.wallet.service.service.WalletService
 import com.tari.android.wallet.tor.TorConfig
@@ -131,8 +132,8 @@ class WalletManager @Inject constructor(
         transport = getTorTransport(),
         databaseName = walletConfig.walletDBName,
         datastorePath = walletConfig.getWalletFilesDirPath(),
-        discoveryTimeoutSec = Constants.Wallet.discoveryTimeoutSec,
-        safMessageDurationSec = Constants.Wallet.storeAndForwardMessageDurationSec,
+        discoveryTimeoutSec = Constants.Wallet.DISCOVERY_TIMEOUT_SEC,
+        safMessageDurationSec = Constants.Wallet.STORE_AND_FORWARD_MESSAGE_DURATION_SEC,
     )
 
     private fun startWallet() {
@@ -188,13 +189,13 @@ class WalletManager @Inject constructor(
     }
 
     /**
-     * Stores wallet's public key hex and emoji id's into the shared prefs
+     * Stores wallet's Base58 address and emoji id into the shared prefs
      * for future convenience.
      */
-    private fun saveWalletPublicKeyHexToSharedPrefs() {
+    private fun saveWalletAddressToSharedPrefs() {
         // set shared preferences values after instantiation
         FFIWallet.instance?.getWalletAddress()?.let { ffiTariWalletAddress ->
-            corePrefRepository.publicKeyHexString = ffiTariWalletAddress.toString()
+            corePrefRepository.walletAddressBase58 = ffiTariWalletAddress.fullBase58()
             corePrefRepository.emojiId = ffiTariWalletAddress.getEmojiId()
             ffiTariWalletAddress.destroy()
         }
@@ -238,7 +239,7 @@ class WalletManager @Inject constructor(
                 baseNodesManager.setNextBaseNode()
                 baseNodesManager.startSync()
             }
-            saveWalletPublicKeyHexToSharedPrefs()
+            saveWalletAddressToSharedPrefs()
         }
     }
 }

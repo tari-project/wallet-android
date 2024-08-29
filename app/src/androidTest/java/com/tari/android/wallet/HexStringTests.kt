@@ -10,7 +10,7 @@ class HexStringTests {
     fun toString_assertThatGivenConstructorArgumentWasReturned() {
         assertEquals(
             FFITestUtil.WALLET_ADDRESS_HEX_STRING,
-            HexString(FFITestUtil.WALLET_ADDRESS_HEX_STRING).toString()
+            HexString(FFITestUtil.WALLET_ADDRESS_HEX_STRING).hex
         )
     }
 }

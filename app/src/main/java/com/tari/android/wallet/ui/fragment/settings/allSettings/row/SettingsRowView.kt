@@ -24,7 +24,7 @@ class SettingsRowView : CommonView<CommonViewModel, ViewSettingsRowBinding> {
 
     override fun setup() = Unit
 
-    fun initDto(dto: SettingsRowViewDto) {
+    fun initDto(dto: SettingsRowViewHolderItem) {
         ui.leftIcon.setVisible(dto.leftIconId != null)
         dto.leftIconId?.let { ui.leftIcon.setImageResource(it) }
         ui.title.text = dto.title

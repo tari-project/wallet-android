@@ -49,6 +49,7 @@ class FFIBalance() : FFIBase() {
     private external fun jniDestroy()
 
     constructor(pointer: FFIPointer) : this() {
+        if (pointer.isNull()) error("Pointer must not be null")
         this.pointer = pointer
     }
 

@@ -32,7 +32,7 @@
             android:background="@drawable/vector_view_elevation_bottom_gradient"
             app:layout_constraintBottom_toTopOf="@id/bottom_navigation_view" />
 
-        <com.tari.android.wallet.ui.component.tari.background.obsolete.TariPrimaryBackgroundConstraint
+        <com.tari.android.wallet.ui.component.tari.background.TariPrimaryBackground
             android:id="@+id/bottom_navigation_view"
             android:layout_width="0dp"
             android:layout_height="64dp"
@@ -110,9 +110,9 @@
 
             </LinearLayout>
 
-        </com.tari.android.wallet.ui.component.tari.background.obsolete.TariPrimaryBackgroundConstraint>
+        </com.tari.android.wallet.ui.component.tari.background.TariPrimaryBackground>
 
-        <com.tari.android.wallet.ui.component.tari.background.obsolete.TariAlphaBackgroundConstraint
+        <com.tari.android.wallet.ui.component.tari.background.TariAlphaBackground
             android:id="@+id/send_button_container"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -129,11 +129,7 @@
                 android:id="@+id/send_button_external_container"
                 android:layout_width="78dp"
                 android:layout_height="78dp"
-                android:background="@drawable/vector_disable_able_gradient_button_bg_external"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent">
+                android:background="@drawable/vector_disable_able_gradient_button_bg_external">
 
                 <androidx.appcompat.widget.AppCompatImageView
                     android:id="@+id/send_tari_button"
@@ -151,7 +147,7 @@
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
-        </com.tari.android.wallet.ui.component.tari.background.obsolete.TariAlphaBackgroundConstraint>
+        </com.tari.android.wallet.ui.component.tari.background.TariAlphaBackground>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -159,10 +155,4 @@
         android:id="@+id/nav_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
-
-    <com.tari.android.wallet.ui.fragment.contactBook.root.action_menu.ActionMenuView
-        android:id="@+id/action_menu_view"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
-
 </FrameLayout>

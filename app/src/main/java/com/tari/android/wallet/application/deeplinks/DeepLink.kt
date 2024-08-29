@@ -32,9 +32,10 @@
  */
 package com.tari.android.wallet.application.deeplinks
 
-import com.tari.android.wallet.data.repository.TariAddressRepository
 import com.tari.android.wallet.data.sharedPrefs.tor.TorBridgeConfiguration
+import com.tari.android.wallet.ffi.Base58
 import com.tari.android.wallet.model.MicroTari
+import com.tari.android.wallet.model.TariWalletAddress
 import com.tari.android.wallet.util.parseToBigInteger
 
 /**
@@ -47,7 +48,7 @@ sealed class DeepLink {
     open fun getParams(): Map<String, String> = emptyMap()
     open fun getCommand(): String = ""
 
-    // tari://esmeralda/contacts?list[0][alias]=Name&list[0][hex]=hex&list[1][alias]=Name&list[1][hex]=hex
+    // tari://esmeralda/contacts?list[0][alias]=Name&list[0][tariAddress]=tariAddress&list[1][alias]=Name&list[1][tariAddress]=tariAddress
     data class Contacts(val contacts: List<DeeplinkContact>) : DeepLink() {
 
         constructor(params: Map<String, String>) : this(
@@ -55,17 +56,18 @@ sealed class DeepLink {
                 .map { FormatExtractor(it.key, it.value) }
                 .groupBy { it.index }
                 .map { param ->
-                    val alias = param.value.firstOrNull { it.name == KEY_ALIAS }?.value.orEmpty()
-                    val hex = param.value.firstOrNull { it.name == KEY_HEX }?.value.orEmpty()
-                    DeeplinkContact(alias, hex)
+                    DeeplinkContact(
+                        alias = param.value.firstOrNull { it.name == KEY_ALIAS }?.value.orEmpty(),
+                        tariAddress = param.value.firstOrNull { it.name == KEY_TARI_ADDRESS }?.value.orEmpty()
+                    )
                 }
-                .filter { TariAddressRepository.validateHex(it.hex) },
+                .filter { TariWalletAddress.validateBase58(it.tariAddress) },
         )
 
         override fun getParams(): Map<String, String> = hashMapOf<String, String>().apply {
             contacts.forEachIndexed { index, contact ->
                 put("list[$index][$KEY_ALIAS]", contact.alias)
-                put("list[$index][$KEY_HEX]", contact.hex)
+                put("list[$index][$KEY_TARI_ADDRESS]", contact.tariAddress)
             }
         }
 
@@ -74,10 +76,10 @@ sealed class DeepLink {
         companion object {
             const val COMMAND_CONTACTS = "contacts"
             const val KEY_ALIAS = "alias"
-            const val KEY_HEX = "hex"
+            const val KEY_TARI_ADDRESS = "tariAddress"
         }
 
-        data class DeeplinkContact(val alias: String, val hex: String)
+        data class DeeplinkContact(val alias: String, val tariAddress: Base58)
 
         class FormatExtractor(val key: String, val value: String = "") {
             val index: Int
@@ -95,7 +97,7 @@ sealed class DeepLink {
         }
     }
 
-    data class Send(val walletAddressHex: String = "", val amount: MicroTari? = null, val note: String = "") : DeepLink() {
+    data class Send(val walletAddress: Base58 = "", val amount: MicroTari? = null, val note: String = "") : DeepLink() {
 
         constructor(params: Map<String, String>) : this(
             params[KEY_TARI_ADDRESS].orEmpty(),
@@ -104,7 +106,7 @@ sealed class DeepLink {
         )
 
         override fun getParams(): Map<String, String> = hashMapOf<String, String>().apply {
-            put(KEY_TARI_ADDRESS, walletAddressHex)
+            put(KEY_TARI_ADDRESS, walletAddress)
             put(KEY_AMOUNT, amount?.formattedValue.orEmpty())
             put(KEY_NOTE, note)
         }
@@ -119,8 +121,7 @@ sealed class DeepLink {
         }
     }
 
-
-    data class UserProfile(val tariAddressHex: String = "", val alias: String = "") : DeepLink() {
+    data class UserProfile(val tariAddress: Base58 = "", val alias: String = "") : DeepLink() {
 
         constructor(params: Map<String, String>) : this(
             params[KEY_WALLET_ADDRESS].orEmpty(),
@@ -128,7 +129,7 @@ sealed class DeepLink {
         )
 
         override fun getParams(): Map<String, String> = hashMapOf<String, String>().apply {
-            put(KEY_WALLET_ADDRESS, tariAddressHex)
+            put(KEY_WALLET_ADDRESS, tariAddress)
             put(KEY_ALIAS, alias)
         }
 

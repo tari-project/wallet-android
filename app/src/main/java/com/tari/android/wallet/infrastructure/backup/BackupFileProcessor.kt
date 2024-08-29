@@ -35,14 +35,14 @@ package com.tari.android.wallet.infrastructure.backup
 import com.google.gson.Gson
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.data.WalletConfig
+import com.tari.android.wallet.data.sharedPrefs.backup.BackupPrefRepository
 import com.tari.android.wallet.data.sharedPrefs.security.SecurityPrefRepository
 import com.tari.android.wallet.extension.encrypt
 import com.tari.android.wallet.ffi.FFIError
 import com.tari.android.wallet.ffi.FFIWallet
-import com.tari.android.wallet.ffi.HexString
 import com.tari.android.wallet.infrastructure.backup.compress.CompressionMethod
 import com.tari.android.wallet.infrastructure.security.encryption.SymmetricEncryptionAlgorithm
-import com.tari.android.wallet.data.sharedPrefs.backup.BackupPrefRepository
+import com.tari.android.wallet.model.fullBase58
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -78,10 +78,13 @@ class BackupFileProcessor @Inject constructor(
             val mimeType = "application/json"
 
             val ffiWallet = FFIWallet.instance!!
-            val outputs = ffiWallet.getUnbindedOutputs(FFIError())
-            val hexString = HexString(ffiWallet.getWalletAddress().getBytes())
-            val jsonObject = BackupUtxos(outputs.map { it.json }, hexString.hex)
-            val json = Gson().toJson(jsonObject)
+
+            val json = Gson().toJson(
+                BackupUtxos(
+                    utxos = ffiWallet.getUnbindedOutputs(FFIError()).map { it.json },
+                    sourceBase58 = ffiWallet.getWalletAddress().fullBase58(),
+                )
+            )
 
             outputFile.bufferedWriter().use { it.append(json) }
 

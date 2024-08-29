@@ -32,7 +32,6 @@ import io.reactivex.Observable
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import java.math.BigInteger
-import java.util.Locale
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.ConcurrentMap
 import java.util.concurrent.CopyOnWriteArrayList
@@ -68,10 +67,7 @@ class FFIWalletListenerImpl(
 
     private var txBroadcastRestarted = false
 
-    /**
-     * Pairs of <tx id, recipient public key hex>.
-     */
-    val outboundTxIdsToBePushNotified = CopyOnWriteArraySet<Pair<BigInteger, String>>()
+    val outboundTxIdsToBePushNotified = CopyOnWriteArraySet<OutboundTxNotification>()
 
     override fun onTxReceived(pendingInboundTx: PendingInboundTx) {
         val newTx = pendingInboundTx.copy(tariContact = getUserByWalletAddress(pendingInboundTx.tariContact.walletAddress))
@@ -167,9 +163,9 @@ class FFIWalletListenerImpl(
     override fun onDirectSendResult(txId: BigInteger, status: TransactionSendStatus) {
         // post event to bus
         EventBus.post(Event.Transaction.DirectSendResult(TxId(txId), status))
-        outboundTxIdsToBePushNotified.firstOrNull { it.first == txId }?.let {
+        outboundTxIdsToBePushNotified.firstOrNull { it.txId == txId }?.let {
             outboundTxIdsToBePushNotified.remove(it)
-            sendPushNotificationToTxRecipient(it.second)
+            sendPushNotificationToTxRecipient(it.recipientPublicKeyHex)
         }
         // schedule a backup
         backupManager.backupNow()
@@ -241,10 +237,9 @@ class FFIWalletListenerImpl(
         val contactsFFI = wallet.getContacts()
         for (i in 0 until contactsFFI.getLength()) {
             val contactFFI = contactsFFI.getAt(i)
-            val publicKeyFFI = contactFFI.getWalletAddress()
-            val hex = publicKeyFFI.toString()
-            val tariContact = if (hex == address.hexString) TariContact(address, contactFFI.getAlias(), contactFFI.getIsFavorite()) else null
-            publicKeyFFI.destroy()
+            val walletAddressFFI = contactFFI.getWalletAddress()
+            val tariContact = if (TariWalletAddress(walletAddressFFI) == address) TariContact(contactFFI) else null
+            walletAddressFFI.destroy()
             contactFFI.destroy()
             if (tariContact != null) {
                 contactsFFI.destroy()
@@ -276,10 +271,9 @@ class FFIWalletListenerImpl(
                 }
     }
 
-    private fun sendPushNotificationToTxRecipient(recipientPublicKeyHex: String) {
-        // the push notification server accepts lower-case hex strings as of now
-        val fromPublicKeyHex = wallet.getWalletAddress().toString().lowercase(Locale.ENGLISH)
-        notificationService.notifyRecipient(recipientPublicKeyHex, fromPublicKeyHex, wallet::signMessage)
+    private fun sendPushNotificationToTxRecipient(recipientHex: String) {
+        val senderHex = wallet.getWalletAddress().notificationHex()
+        notificationService.notifyRecipient(recipientHex, senderHex, wallet::signMessage)
     }
 
     private fun checkBaseNodeSyncCompletion() {
@@ -335,9 +329,15 @@ class FFIWalletListenerImpl(
         baseNodesManager.saveBaseNodeState(baseNodeState)
     }
 
+    override fun onWalletScannedHeight(height: Int) {
+       baseNodesManager.saveWalletScannedHeight(height)
+    }
+
     enum class ConnectivityStatus(val value: Int) {
         CONNECTING(0),
         ONLINE(1),
         OFFLINE(2),
     }
+
+    data class OutboundTxNotification(val txId: BigInteger, val recipientPublicKeyHex: String)
 }

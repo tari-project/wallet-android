@@ -1,7 +1,6 @@
 package com.tari.android.wallet.application.deeplinks
 
 import android.net.Uri
-import com.tari.android.wallet.data.repository.TariAddressRepository
 import com.tari.android.wallet.data.sharedPrefs.network.NetworkPrefRepository
 import com.tari.android.wallet.data.sharedPrefs.tor.TorBridgeConfiguration
 import com.tari.android.wallet.model.TariWalletAddress
@@ -33,16 +32,13 @@ class DeeplinkFormatter @Inject constructor(private val networkRepository: Netwo
             paramentrs = values.toMutableMap()
         }
 
-        val parsedDeeplink = DeepLink.getByCommand(command, paramentrs)
-
-        if (parsedDeeplink is DeepLink.Send) {
-            if (!TariAddressRepository.validateHex(parsedDeeplink.walletAddressHex)) return null
+        return DeepLink.getByCommand(command, paramentrs)?.takeIf {
+            when (it) {
+                is DeepLink.Send -> TariWalletAddress.validateBase58(it.walletAddress)
+                is DeepLink.UserProfile -> TariWalletAddress.validateBase58(it.tariAddress)
+                else -> true // Handle other DeepLink types or consider returning null if they shouldn't be valid
+            }
         }
-        if (parsedDeeplink is DeepLink.UserProfile) {
-            if (!TariAddressRepository.validateHex(parsedDeeplink.tariAddressHex)) return null
-        }
-
-        return parsedDeeplink
     }
 
     fun toDeeplink(deepLink: DeepLink): String {

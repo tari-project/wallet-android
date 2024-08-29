@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-
-<com.tari.android.wallet.ui.component.tari.background.obsolete.TariSecondaryBackgroundConstraint xmlns:android="http://schemas.android.com/apk/res/android"
+<com.tari.android.wallet.ui.component.tari.background.TariSecondaryBackground xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/root_view"
@@ -30,7 +29,7 @@
                 android:layout_height="wrap_content"
                 android:layout_alignTop="@id/emoji_id_summary_container_view"
                 android:layout_centerHorizontal="true"
-                android:layout_marginTop="0dp"
+                android:layout_marginTop="-45dp"
                 android:elevation="4dp">
 
                 <com.tari.android.wallet.ui.component.tari.TariTextView
@@ -64,7 +63,7 @@
                     android:src="@drawable/tari_speech_notch_down" />
             </RelativeLayout>
 
-            <RelativeLayout
+            <FrameLayout
                 android:id="@+id/emoji_id_summary_container_view"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -76,16 +75,18 @@
                 android:background="@drawable/vector_emoji_id_bg"
                 android:clickable="true"
                 android:focusable="true"
+                android:foreground="?attr/selectableItemBackground"
                 android:paddingHorizontal="@dimen/onboarding_emoji_id_container_horizontal_padding"
-                android:paddingVertical="@dimen/onboarding_emoji_id_container_vertical_padding">
+                android:paddingVertical="@dimen/onboarding_emoji_id_container_vertical_padding"
+                tools:alpha="1">
 
                 <include
-                    android:id="@+id/emoji_id_summary_view"
-                    layout="@layout/view_onboarding_emoji_id_summary"
+                    android:id="@+id/emoji_id_view_container"
+                    layout="@layout/view_address_short"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:visibility="visible" />
-            </RelativeLayout>
+            </FrameLayout>
 
             <RelativeLayout
                 android:id="@+id/emoji_id_container_view"
@@ -413,5 +414,4 @@
             app:lottie_renderMode="automatic" />
 
     </RelativeLayout>
-
-</com.tari.android.wallet.ui.component.tari.background.obsolete.TariSecondaryBackgroundConstraint>
+</com.tari.android.wallet.ui.component.tari.background.TariSecondaryBackground>

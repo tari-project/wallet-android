@@ -7,7 +7,6 @@ import com.tari.android.wallet.data.sharedPrefs.tor.TorBridgeConfiguration
 import com.tari.android.wallet.data.sharedPrefs.tor.TorPrefRepository
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.common.SingleLiveEvent
-import com.tari.android.wallet.ui.dialog.modular.SimpleDialogArgs
 import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
 import javax.inject.Inject
 
@@ -75,11 +74,9 @@ class CustomTorBridgesViewModel : CommonViewModel() {
     }
 
     private fun incorrectFormat() {
-        showModularDialog(
-            SimpleDialogArgs(
-                resourceManager.getString(R.string.common_error_title),
-                resourceManager.getString(R.string.tor_bridges_incorrect_format)
-            ).getModular(resourceManager)
+        showSimpleDialog(
+            title = resourceManager.getString(R.string.common_error_title),
+            description = resourceManager.getString(R.string.tor_bridges_incorrect_format),
         )
     }
 }

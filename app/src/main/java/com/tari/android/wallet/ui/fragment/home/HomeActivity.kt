@@ -47,7 +47,6 @@ import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.deeplinks.DeeplinkHandler
 import com.tari.android.wallet.application.deeplinks.DeeplinkViewModel
-import com.tari.android.wallet.data.sharedPrefs.CorePrefRepository
 import com.tari.android.wallet.data.sharedPrefs.network.NetworkPrefRepository
 import com.tari.android.wallet.data.sharedPrefs.security.SecurityPrefRepository
 import com.tari.android.wallet.data.sharedPrefs.tariSettings.TariSettingsPrefRepository
@@ -64,7 +63,6 @@ import com.tari.android.wallet.ui.extension.setVisible
 import com.tari.android.wallet.ui.fragment.auth.AuthActivity
 import com.tari.android.wallet.ui.fragment.chat.chatList.ChatListFragment
 import com.tari.android.wallet.ui.fragment.contactBook.root.ContactBookFragment
-import com.tari.android.wallet.ui.fragment.contactBook.root.action_menu.ContactBookActionMenuViewModel
 import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
 import com.tari.android.wallet.ui.fragment.home.navigation.TariNavigator.Companion.INDEX_CHAT
 import com.tari.android.wallet.ui.fragment.home.navigation.TariNavigator.Companion.INDEX_CONTACT_BOOK
@@ -82,9 +80,6 @@ import java.lang.ref.WeakReference
 import javax.inject.Inject
 
 class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>() {
-
-    @Inject
-    lateinit var sharedPrefsRepository: CorePrefRepository
 
     @Inject
     lateinit var securityPrefRepository: SecurityPrefRepository
@@ -106,16 +101,11 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>() {
 
     val deeplinkViewModel: DeeplinkViewModel by viewModels()
 
-    val actionMenuViewModel = ContactBookActionMenuViewModel()
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         appComponent.inject(this)
 
         onBackPressedDispatcher.addCallback {
-            if (ui.actionMenuView.onBackPressed()) {
-                return@addCallback
-            }
             if (supportFragmentManager.backStackEntryCount > 0) {
                 supportFragmentManager.popBackStack()
             } else {
@@ -138,7 +128,6 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>() {
         subscribeToCommon(viewModel.shareViewModel.tariBluetoothServer)
         subscribeToCommon(viewModel.shareViewModel.tariBluetoothClient)
         subscribeToCommon(viewModel.shareViewModel.deeplinkViewModel)
-        subscribeToCommon(actionMenuViewModel)
 
         viewModel.shareViewModel.tariBluetoothServer.init(this)
         viewModel.shareViewModel.tariBluetoothClient.init(this)
@@ -199,11 +188,6 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>() {
 
     private fun subscribeUI() = with(viewModel) {
         observe(shareViewModel.shareText) { shareViaText(it) }
-
-        ui.actionMenuView.init(sharedPrefsRepository)
-        observe(actionMenuViewModel.showWithContact) {
-            ui.actionMenuView.showContact(it)
-        }
     }
 
     @Deprecated("Deprecated in Java")
@@ -289,7 +273,7 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>() {
         if (screen.orEmpty().isNotEmpty()) {
             when (HomeDeeplinkScreens.parse(screen)) {
                 HomeDeeplinkScreens.TxDetails -> {
-                    (intent.parcelable<TxId>(HomeDeeplinkScreens.KeyTxDetailsArgs))?.let { viewModel.tariNavigator.toTxDetails(null, it) }
+                    (intent.parcelable<TxId>(HomeDeeplinkScreens.KeyTxDetailsArgs))?.let { viewModel.tariNavigator.toTxDetails(txId = it) }
                 }
 
                 else -> {}

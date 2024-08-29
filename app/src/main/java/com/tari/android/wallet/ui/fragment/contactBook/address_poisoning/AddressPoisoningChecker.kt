@@ -15,7 +15,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 private const val MIN_SAME_CHARS = 3
-private const val USED_PREFIX_SUFFIX_CHARS = Constants.Wallet.emojiFormatterChunkSize
+private const val USED_PREFIX_SUFFIX_CHARS = Constants.Wallet.EMOJI_FORMATTER_CHUNK_SIZE
 
 
 @Singleton
@@ -37,17 +37,17 @@ class AddressPoisoningChecker @Inject constructor(
 
     fun markAsTrusted(walletAddress: TariWalletAddress, markAsTrusted: Boolean) {
         if (markAsTrusted) {
-            addressPoisoningSharedRepository.addTrustedContactHex(walletAddress.hexString)
+            addressPoisoningSharedRepository.addTrustedContact(walletAddress)
         } else {
-            addressPoisoningSharedRepository.removeTrustedContactHex(walletAddress.hexString)
+            addressPoisoningSharedRepository.removeTrustedContact(walletAddress)
         }
     }
 
     private fun TariWalletAddress.isPoisoned(similarContactList: List<SimilarAddressDto>): Boolean {
         return if (DebugConfig.mockEveryAddressPoisoned) {
-            this.hexString !in addressPoisoningSharedRepository.getTrustedContactHexList()
+            this !in addressPoisoningSharedRepository.getTrustedContactList()
         } else {
-            this.hexString !in addressPoisoningSharedRepository.getTrustedContactHexList()
+            this !in addressPoisoningSharedRepository.getTrustedContactList()
                     && similarContactList.size > 1 // because the current wallet address is always similar to itself
         }
     }
@@ -72,10 +72,10 @@ class AddressPoisoningChecker @Inject constructor(
                 .map { contactDto ->
                     SimilarAddressDto(
                         contactDto = contactDto,
-                        numberOfTransaction = allTxs.filterByWalletAddress(contactDto.walletAddress).size,
-                        lastTransactionTimestampMillis = allTxs.filterByWalletAddress(contactDto.walletAddress).maxOfOrNull { it.timestamp }
+                        numberOfTransaction = allTxs.filterByWalletAddress(contactDto.contactInfo.requireWalletAddress()).size,
+                        lastTransactionTimestampMillis = allTxs.filterByWalletAddress(contactDto.contactInfo.requireWalletAddress()).maxOfOrNull { it.timestamp }
                             ?.let { it.toLong() * 1000L },
-                        trusted = addressPoisoningSharedRepository.getTrustedContactHexList().contains(contactDto.walletAddress.hexString),
+                        trusted = addressPoisoningSharedRepository.getTrustedContactList().contains(contactDto.contactInfo.requireWalletAddress()),
                     )
                 }.let { similarContacts ->
                     // put the current wallet address to the first place
@@ -90,18 +90,19 @@ class AddressPoisoningChecker @Inject constructor(
     }
 }
 
-private fun TariWalletAddress.isSimilarTo(walletAddress: TariWalletAddress): Boolean {
-    return this.emojiId.extractEmojis().isSimilarEmojiId(walletAddress.emojiId.extractEmojis())
-}
-
 @VisibleForTesting
-fun List<String>.isSimilarEmojiId(other: List<String>): Boolean {
-    if (size != other.size || size < (USED_PREFIX_SUFFIX_CHARS * 2)) {
+fun TariWalletAddress?.isSimilarTo(other: TariWalletAddress): Boolean {
+    if (this == null) return false
+
+    val thisEmojis = this.spendKeyEmojis.extractEmojis()
+    val otherEmojis = other.spendKeyEmojis.extractEmojis()
+
+    if (thisEmojis.size != otherEmojis.size || thisEmojis.size < (USED_PREFIX_SUFFIX_CHARS * 2)) {
         return false
     }
 
-    val lShortText = take(USED_PREFIX_SUFFIX_CHARS) + takeLast(USED_PREFIX_SUFFIX_CHARS)
-    val rShortText = other.take(USED_PREFIX_SUFFIX_CHARS) + other.takeLast(USED_PREFIX_SUFFIX_CHARS)
+    val lShortText = thisEmojis.take(USED_PREFIX_SUFFIX_CHARS) + thisEmojis.takeLast(USED_PREFIX_SUFFIX_CHARS)
+    val rShortText = otherEmojis.take(USED_PREFIX_SUFFIX_CHARS) + otherEmojis.takeLast(USED_PREFIX_SUFFIX_CHARS)
 
     var result = 0
     lShortText.zip(rShortText) { l, r ->

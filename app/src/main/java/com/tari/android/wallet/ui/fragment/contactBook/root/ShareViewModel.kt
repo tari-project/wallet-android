@@ -5,8 +5,6 @@ import com.tari.android.wallet.R
 import com.tari.android.wallet.application.deeplinks.DeepLink
 import com.tari.android.wallet.application.deeplinks.DeeplinkHandler
 import com.tari.android.wallet.application.deeplinks.DeeplinkViewModel
-import com.tari.android.wallet.ffi.FFITariWalletAddress
-import com.tari.android.wallet.ffi.HexString
 import com.tari.android.wallet.infrastructure.bluetooth.TariBluetoothClient
 import com.tari.android.wallet.infrastructure.bluetooth.TariBluetoothServer
 import com.tari.android.wallet.model.TariWalletAddress
@@ -25,9 +23,10 @@ import com.tari.android.wallet.ui.fragment.contactBook.data.contacts.FFIContactI
 import com.tari.android.wallet.ui.fragment.contactBook.root.share.ShareType
 import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
 import com.tari.android.wallet.ui.fragment.send.shareQr.ShareQrCodeModule
-import com.tari.android.wallet.util.extractEmojis
+import com.tari.android.wallet.util.ContactUtil
 import javax.inject.Inject
 
+// TODO make it not VM, but a singleton service
 class ShareViewModel : CommonViewModel() {
 
     @Inject
@@ -41,6 +40,9 @@ class ShareViewModel : CommonViewModel() {
 
     @Inject
     lateinit var contactsRepository: ContactsRepository
+
+    @Inject
+    lateinit var contactUtil: ContactUtil
 
     val deeplinkViewModel = DeeplinkViewModel()
 
@@ -99,14 +101,10 @@ class ShareViewModel : CommonViewModel() {
 
     private fun successfulDeviceFoundSharing(userProfile: DeepLink.UserProfile) {
         val contactDto = runCatching {
-            val ffiWalletAddress = FFITariWalletAddress(HexString(userProfile.tariAddressHex))
-            val tariWalletAddress = TariWalletAddress(ffiWalletAddress)
-            ContactDto(FFIContactInfo(walletAddress = tariWalletAddress, alias = userProfile.alias))
+            ContactDto(FFIContactInfo(walletAddress = TariWalletAddress.fromBase58(userProfile.tariAddress), alias = userProfile.alias))
         }.getOrNull() ?: return
 
-        val name = userProfile.alias.ifEmpty {
-            contactDto.contactInfo.extractWalletAddress().emojiId.extractEmojis().take(3).joinToString("")
-        }
+        val name = contactUtil.normalizeAlias(userProfile.alias, contactDto.contactInfo.requireWalletAddress())
 
         showModularDialog(
             IconModule(R.drawable.vector_sharing_via_ble),

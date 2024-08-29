@@ -1,34 +1,40 @@
 package com.tari.android.wallet.ui.fragment.profile
 
 import android.content.Context
+import android.graphics.Bitmap
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.viewModelScope
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.YatAdapter
 import com.tari.android.wallet.application.deeplinks.DeepLink
 import com.tari.android.wallet.application.deeplinks.DeeplinkHandler
 import com.tari.android.wallet.data.sharedPrefs.CorePrefRepository
 import com.tari.android.wallet.data.sharedPrefs.yat.YatPrefRepository
-import com.tari.android.wallet.model.TariWalletAddress
+import com.tari.android.wallet.extension.launchOnIo
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.dialog.modular.DialogArgs
 import com.tari.android.wallet.ui.dialog.modular.ModularDialogArgs
+import com.tari.android.wallet.ui.dialog.modular.modules.body.BodyModule
+import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonModule
+import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonStyle
 import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
 import com.tari.android.wallet.ui.dialog.modular.modules.input.InputModule
+import com.tari.android.wallet.ui.dialog.modular.modules.shareOptions.ShareOptionsModule
+import com.tari.android.wallet.ui.fragment.contactBook.data.contacts.splitAlias
 import com.tari.android.wallet.ui.fragment.contactBook.root.ShareViewModel
 import com.tari.android.wallet.ui.fragment.contactBook.root.share.ShareType
-import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
 import com.tari.android.wallet.util.ContactUtil
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import com.tari.android.wallet.util.QrUtil
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 
 class WalletInfoViewModel : CommonViewModel() {
 
     @Inject
-    lateinit var sharedPrefsWrapper: CorePrefRepository
+    lateinit var corePrefRepository: CorePrefRepository
 
     @Inject
     lateinit var yatSharedPrefsRepository: YatPrefRepository
@@ -42,18 +48,7 @@ class WalletInfoViewModel : CommonViewModel() {
     @Inject
     lateinit var contactUtil: ContactUtil
 
-    private val _emojiId: MutableLiveData<String> = MutableLiveData()
-    val emojiId: LiveData<String> = _emojiId
-
-    private val _publicKeyHex: MutableLiveData<String> = MutableLiveData()
-    val publicKeyHex: LiveData<String> = _publicKeyHex
-
-    private val _yat: MutableLiveData<String> = MutableLiveData()
-    val yat: LiveData<String> = _yat
-
-    val alias: MutableLiveData<String> = MutableLiveData("")
-
-    private val _yatDisconnected: MutableLiveData<Boolean> = MutableLiveData(false)
+    private val _yatDisconnected: MutableLiveData<Boolean> = MutableLiveData(false) // todo move to UiState
     val yatDisconnected: LiveData<Boolean> = _yatDisconnected
 
     private val _reconnectVisibility: MediatorLiveData<Boolean> = MediatorLiveData()
@@ -61,18 +56,39 @@ class WalletInfoViewModel : CommonViewModel() {
 
     init {
         component.inject(this)
+    }
 
+    private val _uiState = MutableStateFlow(
+        WalletInfoModel.UiState(
+            walletAddress = corePrefRepository.walletAddress,
+            yat = yatSharedPrefsRepository.connectedYat.orEmpty(),
+            alias = corePrefRepository.firstName.orEmpty() + " " + corePrefRepository.lastName.orEmpty(),
+        )
+    )
+    val uiState = _uiState.asStateFlow()
+
+    private val shareProfileDeeplink = deeplinkHandler.getDeeplink(
+        DeepLink.UserProfile(
+            tariAddress = corePrefRepository.walletAddressBase58.orEmpty(),
+            alias = contactUtil.normalizeAlias(uiState.value.alias, corePrefRepository.walletAddress),
+        )
+    )
+
+    init {
         _reconnectVisibility.addSource(_yatDisconnected) { updateReconnectVisibility() }
 
         refreshData()
     }
 
     fun refreshData() {
-        _emojiId.postValue(sharedPrefsWrapper.emojiId)
-        _publicKeyHex.postValue(sharedPrefsWrapper.publicKeyHexString)
-        _yat.postValue(yatSharedPrefsRepository.connectedYat.orEmpty())
+        _uiState.update {
+            it.copy(
+                walletAddress = corePrefRepository.walletAddress,
+                yat = yatSharedPrefsRepository.connectedYat.orEmpty(),
+                alias = corePrefRepository.firstName.orEmpty() + " " + corePrefRepository.lastName.orEmpty(),
+            )
+        }
         _yatDisconnected.postValue(yatSharedPrefsRepository.yatWasDisconnected)
-        alias.postValue(sharedPrefsWrapper.name.orEmpty() + " " + sharedPrefsWrapper.surname.orEmpty())
 
         checkEmojiIdConnection()
     }
@@ -84,11 +100,11 @@ class WalletInfoViewModel : CommonViewModel() {
     private fun checkEmojiIdConnection() {
         val connectedYat = yatSharedPrefsRepository.connectedYat.orEmpty()
         if (connectedYat.isNotEmpty()) {
-            viewModelScope.launch(Dispatchers.IO) {
+            launchOnIo {
                 yatAdapter.searchTariYats(connectedYat).let {
                     if (it?.status == true) {
                         it.result?.entries?.firstOrNull()?.let { response ->
-                            val wasDisconnected = response.value.address.lowercase() != sharedPrefsWrapper.publicKeyHexString.orEmpty().lowercase()
+                            val wasDisconnected = response.value.address.lowercase() != corePrefRepository.walletAddressBase58.orEmpty().lowercase()
                             yatSharedPrefsRepository.yatWasDisconnected = wasDisconnected
                             _yatDisconnected.postValue(wasDisconnected)
                         }
@@ -105,21 +121,12 @@ class WalletInfoViewModel : CommonViewModel() {
         _reconnectVisibility.postValue(_yatDisconnected.value!!)
     }
 
-    fun shareData(type: ShareType) {
-        val walletAddress = TariWalletAddress(
-            hexString = sharedPrefsWrapper.publicKeyHexString.orEmpty(),
-            emojiId = sharedPrefsWrapper.emojiId.orEmpty(),
-        )
-
-        val name = contactUtil.normalizeAlias(alias.value.orEmpty(), walletAddress)
-        val hex = sharedPrefsWrapper.publicKeyHexString.orEmpty()
-
-        val deeplink = deeplinkHandler.getDeeplink(DeepLink.UserProfile(hex, name))
-        ShareViewModel.currentInstant?.share(type, deeplink)
+    private fun shareData(type: ShareType) {
+        ShareViewModel.currentInstant?.share(type, shareProfileDeeplink)
     }
 
     fun showEditAliasDialog() {
-        val name = (sharedPrefsWrapper.name.orEmpty() + " " + sharedPrefsWrapper.surname.orEmpty()).trim()
+        val name = (corePrefRepository.firstName.orEmpty() + " " + corePrefRepository.lastName.orEmpty()).trim()
 
         var saveAction: () -> Boolean = { false }
 
@@ -146,15 +153,40 @@ class WalletInfoViewModel : CommonViewModel() {
         showInputModalDialog(ModularDialogArgs(DialogArgs(), moduleList))
     }
 
-    fun openRequestTari() {
-        navigation.postValue(Navigation.AllSettingsNavigation.ToRequestTari)
+    private fun saveDetails(name: String) {
+        if (name.isBlank()) {
+            showSimpleDialog(
+                titleRes = R.string.wallet_info_empty_name_dialog_title,
+                descriptionRes = R.string.wallet_info_empty_name_dialog_message,
+                closeButtonTextRes = R.string.wallet_info_empty_name_dialog_button,
+            )
+        } else {
+            corePrefRepository.firstName = splitAlias(name).firstName
+            corePrefRepository.lastName = splitAlias(name).lastName
+            _uiState.update { it.copy(alias = name) }
+            hideDialog()
+        }
     }
 
-    private fun saveDetails(name: String) {
-        val split = name.split(" ")
-        sharedPrefsWrapper.name = split.getOrNull(0).orEmpty().trim()
-        sharedPrefsWrapper.surname = split.getOrNull(1).orEmpty().trim()
-        alias.postValue(name)
-        hideDialog()
+    fun onAddressDetailsClicked() {
+        showAddressDetailsDialog(corePrefRepository.walletAddress)
     }
+
+    fun onShareAddressClicked() {
+        showModularDialog(
+            HeadModule(resourceManager.getString(R.string.wallet_info_share_address_title)),
+            BodyModule(resourceManager.getString(R.string.wallet_info_share_address_description)),
+            ShareOptionsModule(
+                shareQr = { shareData(ShareType.QR_CODE) },
+                shareDeeplink = { shareData(ShareType.LINK) },
+                shareBle = { shareData(ShareType.BLE) },
+            ),
+            ButtonModule(resourceManager.getString(R.string.common_close), ButtonStyle.Close) { hideDialog() }
+        )
+    }
+
+    fun getQrCodeBitmap(): Bitmap? = QrUtil.getQrEncodedBitmapOrNull(
+        content = shareProfileDeeplink,
+        size = resourceManager.getDimenInPx(R.dimen.wallet_info_img_qr_code_size),
+    )
 }

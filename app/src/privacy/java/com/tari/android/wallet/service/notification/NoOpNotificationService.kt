@@ -34,8 +34,8 @@ package com.tari.android.wallet.service.notification
 
 class NoOpNotificationService : NotificationService {
     override fun notifyRecipient(
-        recipientPublicKeyHex: String,
-        senderPublicKeyHex: String,
+        recipientHex: String,
+        senderHex: String,
         signer: (String) -> String,
         onSuccess: () -> Unit,
         onFailure: (Throwable) -> Unit

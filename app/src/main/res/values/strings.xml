@@ -105,6 +105,9 @@
     <string name="common_no_2">Nah, not now</string>
     <string name="common_are_you_sure">Are you sure?</string>
     <string name="common_next">Next</string>
+    <string name="common_not_ready_yet_dialog_title">Hang tight, coming soon!</string>
+    <string name="common_not_ready_yet_dialog_description">This feature is currently under construction. We\'re working hard to bring it to you soon. Stay tuned!</string>
+    <string name="common_copied_to_clipboard">Copied to clipboard</string>
 
     <!-- emoji id copied view -->
     <string name="emoji_id_copied">COPIED</string>
@@ -230,7 +233,7 @@
     <string name="bluetooth_connect">Bluetooth Connect 🤘</string>
     <string name="bluetooth_connect_description">Connect and send Tari to someone nearby</string>
     <string name="tx_list_you_paid_with_alias">You paid %s</string>
-    <string name="tx_list_paid_you">paid you</string>
+    <string name="tx_list_paid_you">sent a payment</string>
     <string name="tx_list_seconds_ago">%ds ago</string>
     <string name="tx_list_minutes_ago">%dm ago</string>
     <string name="tx_list_hours_ago">%dh ago</string>
@@ -267,11 +270,11 @@
     <string name="add_recipient_scan_qr_error">Invalid QR Code.\nYour request cannot be processed at this time.</string>
     <string name="add_recipient_failed_init_camera_message">Failed to initialize Camera</string>
     <string name="add_recipient_camera_permission_denied_message">Camera permission denied</string>
-    <string name="qr_code_scanner_labels_actions_transaction_send">This code contains a funds request.\nWould you like to send funds to %s?</string>
-    <string name="qr_code_scanner_labels_actions_base_node_add">This code contains base node information.\nWould you like to save it to the app?</string>
-    <string name="qr_code_scanner_labels_actions_contacts">This code contains contacts information. \nWould you like to add its to your contact book?</string>
-    <string name="qr_code_scanner_labels_actions_profile">This code contains contact information. \nWould you like to add it to your contact book?</string>
-    <string name="qr_code_scanner_labels_actions_tor_bridges">This code contains a custom bridge.\nWould you like to save it to the app?</string>
+    <string name="qr_code_scanner_labels_actions_transaction_send">This QR code contains a funds request.\nWould you like to send funds to \n%s?</string>
+    <string name="qr_code_scanner_labels_actions_base_node_add">This QR code contains base node information.\nWould you like to save it to the app?</string>
+    <string name="qr_code_scanner_labels_actions_contacts">This QR code contains contacts information. \nWould you like to add its to your contact book?</string>
+    <string name="qr_code_scanner_labels_actions_profile">This QR code contains contact information. \nWould you like to add it to your contact book?</string>
+    <string name="qr_code_scanner_labels_actions_tor_bridges">This QR code contains a custom bridge.\nWould you like to save it to the app?</string>
 
 
     <!-- send tari - amount -->
@@ -308,13 +311,31 @@
 
     <!-- wallet info -->
     <string name="wallet_info_my_profile">My Profile</string>
-    <string name="wallet_info_qr_code_desc">Easily receive tXTR from others by sharing your profile via one of the methods below:</string>
+    <string name="wallet_info_qr_code_desc">Transacting in person? Others can scan this QR code from the Tari Aurora App to send you tXTR.</string>
     <string name="wallet_info_yat_disconnected_description">You\'ve previously connected this Yat.\n Do you want to re-connect it to your wallet?</string>
     <string name="wallet_info_yat_disconnected_reconnect">Reconnect Yat</string>
     <string name="wallet_info_share_profile_title">Share Profile</string>
     <string name="wallet_info_my_aurora_title">My Aurora</string>
     <string name="wallet_info_wallet_button">Wallet</string>
     <string name="wallet_info_connect_yat_button">Connect Yats</string>
+    <string name="wallet_info_address_details_title">Address Details</string>
+    <string name="wallet_info_address_network">Network:</string>
+    <string name="wallet_info_address_features">Features:</string>
+    <string name="wallet_info_address_view_key">View Key:</string>
+    <string name="wallet_info_address_spend_key">Core Address:</string>
+    <string name="wallet_info_address_checksum">Checksum:</string>
+    <string name="wallet_info_address_copy_address">Copy Address:</string>
+    <string name="wallet_info_address_button_copy_base58">Copy Base58</string>
+    <string name="wallet_info_address_button_copy_emoji">Copy Emojis</string>
+    <string name="wallet_info_address_one_side_payment">One Sided Payments</string>
+    <string name="wallet_info_address_interactive_payment">Interactive Payments</string>
+    <string name="wallet_info_address_copy_address_to_clipboard_label">Tari Wallet Identity</string>
+    <string name="wallet_info_share_profile">Share my address</string>
+    <string name="wallet_info_share_address_title">Share Address</string>
+    <string name="wallet_info_share_address_description">Easily receive tXTR from others by sharing your profile via one of the following methods:</string>
+    <string name="wallet_info_empty_name_dialog_title">Name can\’t be empty</string>
+    <string name="wallet_info_empty_name_dialog_message">You can\’t delete your name. Give it a quick update instead!</string>
+    <string name="wallet_info_empty_name_dialog_button">Okay, got it!</string>
 
     <!-- tx failed dialog -->
     <string name="tx_failed_title">Sorry, you can\'t send tXTR to offline users</string>
@@ -623,6 +644,9 @@
     <string name="connection_status_dialog_base_node_sync_pending">Syncing with Base Node</string>
     <string name="connection_status_dialog_base_node_sync_success">Synced with Base Node</string>
     <string name="connection_status_dialog_base_node_sync_failure">Failed sync with Base Node</string>
+    <string name="connection_status_dialog_chain_tip">Chain Tip: </string>
+    <string name="connection_status_dialog_chain_tip_value">#%s (%s)</string>
+    <string name="connection_status_dialog_chain_tip_waiting">Waiting for connection…</string>
 
     <string name="tor_bridges_title">Bridges Configuration</string>
     <string name="tor_bridges_connect">Connect</string>
@@ -812,19 +836,23 @@
     <string name="contact_book_contacts_book_link_message_secondLine"><![CDATA[to <b>%s</b>]]></string>
     <string name="contact_book_contacts_book_link_success_message_firstLine"><![CDATA[You have successfully linked]]></string>
     <string name="contact_book_contacts_book_link_success_message_secondLine"><![CDATA[to <b>%s</b>]]></string>
-    <string name="contact_book_contacts_book_link_message">You can quickly associate an Emoji ID or Yat with a contact already present in your phone. Simply click on a name below and it will be linked to %s</string>
+    <string name="contact_book_contacts_book_link_message">You can quickly associate an Emoji ID or Yat with a contact already present in your phone. Simply click on a name below and it will be linked to:</string>
     <string name="contact_book_contacts_book_unlink_title">Unlink Contact</string>
     <string name="contact_book_contacts_book_unlink_message_firstLine"><![CDATA[Click "confirm" to unlink]]></string>
     <string name="contact_book_contacts_book_unlink_message_secondLine"><![CDATA[from <b>%s</b>]]></string>
     <string name="contact_book_contacts_book_unlink_success_title">Success!</string>
     <string name="contact_book_contacts_book_unlink_success_message_firstLine"><![CDATA[You have successfully unlinked]]></string>
     <string name="contact_book_contacts_book_unlink_success_message_secondLine"><![CDATA[from <b>%s</b>]]></string>
+    <string name="contact_book_add">Add</string>
+    <string name="contact_book_add_title">Add Contact</string>
     <string name="contact_book_contacts_title">Contacts</string>
     <string name="contact_book_favorites_title">Favorites</string>
     <string name="contact_book_add_contact_title">Add Contact</string>
     <string name="contact_book_add_contact_first_name_hint">Add Name</string>
     <string name="contact_book_add_contact_yat_hint">Yat</string>
     <string name="contact_book_add_contact_placeholder">Enter Emoji ID, Contact Name or Yat</string>
+    <string name="contact_book_add_contact_cant_add_yourself_title">Can’t add yourself</string>
+    <string name="contact_book_add_contact_cant_add_yourself_description">You can’t add your own Tari wallet address to your contact book</string>
     <string name="contact_book_search_hint">Find Contact</string>
     <string name="contact_book_details_send_tari">Send Tari</string>
     <string name="transaction_send_to">Send To</string>
@@ -863,6 +891,9 @@
     <string name="tx_details_contact_name">Contact name here</string>
     <string name="share_via_qr_code_title">Share QR Code</string>
     <string name="contact_book_default_alias">Aurora user %s</string>
+    <string name="contact_details_empty_name_dialog_title">Name can\’t be empty</string>
+    <string name="contact_details_empty_name_dialog_message">A contact without a name? That won\’t work. Please add one to keep things running smoothly.</string>
+    <string name="contact_details_empty_name_dialog_button">Will do!</string>
 
     <string name="share_via_bluetooth_title">Share via BLE</string>
     <string name="share_via_bluetooth_message">Bring the smartphone close to a BLE enabled device</string>

@@ -3,6 +3,7 @@ package com.tari.android.wallet.service.service
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodePrefRepository
 import com.tari.android.wallet.event.EventBus
+import com.tari.android.wallet.ffi.Base58String
 import com.tari.android.wallet.ffi.FFIContact
 import com.tari.android.wallet.ffi.FFIError
 import com.tari.android.wallet.ffi.FFIException
@@ -25,6 +26,7 @@ import com.tari.android.wallet.model.TariVector
 import com.tari.android.wallet.model.TariWalletAddress
 import com.tari.android.wallet.model.TxId
 import com.tari.android.wallet.model.WalletError
+import com.tari.android.wallet.model.fullBase58
 import com.tari.android.wallet.service.TariWalletService
 import com.tari.android.wallet.service.TariWalletServiceListener
 import com.tari.android.wallet.service.baseNode.BaseNodeSyncState
@@ -49,10 +51,8 @@ class TariWalletServiceStubImpl(
             val tariContacts = mutableListOf<TariContact>()
             for (i in 0 until contactsFFI.getLength()) {
                 val contactFFI = contactsFFI.getAt(i)
-                val ffiTariWalletAddress = contactFFI.getWalletAddress()
-                tariContacts.add(TariContact(TariWalletAddress(ffiTariWalletAddress), contactFFI.getAlias(), contactFFI.getIsFavorite()))
+                tariContacts.add(TariContact(contactFFI))
                 // destroy native objects
-                ffiTariWalletAddress.destroy()
                 contactFFI.destroy()
             }
             // destroy native collection
@@ -68,14 +68,14 @@ class TariWalletServiceStubImpl(
 
     override fun unregisterListener(listener: TariWalletServiceListener): Boolean = walletServiceListener.listeners.remove(listener)
 
-    override fun getWalletAddressHexString(error: WalletError): String? = runMapping(error) { wallet.getWalletAddress().toString() }
+    override fun getWalletAddressBase58(error: WalletError): String? = runMapping(error) { wallet.getWalletAddress().fullBase58() }
 
     override fun getBalanceInfo(error: WalletError): BalanceInfo? = runMapping(error) { wallet.getBalance() }
 
     override fun estimateTxFee(amount: MicroTari, error: WalletError, feePerGram: MicroTari?): MicroTari? = runMapping(error) {
         val defaultKernelCount = BigInteger("1")
         val defaultOutputCount = BigInteger("2")
-        val gram = feePerGram?.value ?: Constants.Wallet.defaultFeePerGram.value
+        val gram = feePerGram?.value ?: Constants.Wallet.DEFAULT_FEE_PER_GRAM.value
         MicroTari(wallet.estimateTxFee(amount.value, gram, defaultKernelCount, defaultOutputCount))
     }
 
@@ -149,8 +149,8 @@ class TariWalletServiceStubImpl(
     override fun cancelPendingTx(id: TxId, error: WalletError): Boolean = runMapping(error) { wallet.cancelPendingTx(id.value) } ?: false
 
     override fun addBaseNodePeer(baseNodePublicKey: String, baseNodeAddress: String, error: WalletError): Boolean = runMapping(error) {
-        Logger.t(this::class.simpleName).e("walletServiceStub:addBaseNodePeer:publicKeyHex: ${baseNodePublicKey}")
-        Logger.t(this::class.simpleName).e("walletServiceStub:addBaseNodePeer:address: ${baseNodeAddress}")
+        Logger.t(this::class.simpleName).e("walletServiceStub:addBaseNodePeer:publicKeyHex: $baseNodePublicKey")
+        Logger.t(this::class.simpleName).e("walletServiceStub:addBaseNodePeer:address: $baseNodeAddress")
         val result = FFIPublicKey(HexString(baseNodePublicKey)).runWithDestroy { wallet.addBaseNodePeer(it, baseNodeAddress) }
         if (result) {
             walletServiceListener.baseNodeValidationStatusMap.clear()
@@ -173,22 +173,34 @@ class TariWalletServiceStubImpl(
     } ?: false
 
     override fun sendTari(
-        tariContact: TariContact, amount: MicroTari, feePerGram: MicroTari, message: String, isOneSidePayment: Boolean, error: WalletError
+        tariContact: TariContact,
+        amount: MicroTari,
+        feePerGram: MicroTari,
+        message: String,
+        isOneSidePayment: Boolean,
+        paymentId: String,
+        error: WalletError,
     ): TxId? = runMapping(error) {
-        val recipientAddressHex = tariContact.walletAddress.hexString
-        val recipientAddress = FFITariWalletAddress(HexString(recipientAddressHex)).runWithDestroy {
-            wallet.sendTx(it, amount.value, feePerGram.value, message, isOneSidePayment)
-        }
-        walletServiceListener.outboundTxIdsToBePushNotified.add(Pair(recipientAddress, recipientAddressHex.lowercase(Locale.ENGLISH)))
-        TxId(recipientAddress)
+        val recipientAddress = FFITariWalletAddress(Base58String(tariContact.walletAddress.fullBase58))
+        val txId = wallet.sendTx(recipientAddress, amount.value, feePerGram.value, message, isOneSidePayment, paymentId)
+
+        walletServiceListener.outboundTxIdsToBePushNotified.add(
+            FFIWalletListenerImpl.OutboundTxNotification(
+                txId = txId,
+                recipientPublicKeyHex = recipientAddress.notificationHex().lowercase(Locale.ENGLISH),
+            )
+        )
+
+        recipientAddress.destroy()
+        TxId(txId)
     }
 
-    override fun removeContact(walletAddress: TariWalletAddress,  error: WalletError): Boolean = runMapping(error) {
+    override fun removeContact(walletAddress: TariWalletAddress, error: WalletError): Boolean = runMapping(error) {
         val contactsFFI = wallet.getContacts()
         for (i in 0 until contactsFFI.getLength()) {
             val contactFFI = contactsFFI.getAt(i)
             val ffiTariWalletAddress = contactFFI.getWalletAddress()
-            if (ffiTariWalletAddress.toString() == walletAddress.hexString) {
+            if (TariWalletAddress(ffiTariWalletAddress) == walletAddress) {
                 return@runMapping wallet.removeContact(contactFFI).also {
                     ffiTariWalletAddress.destroy()
                     contactFFI.destroy()
@@ -203,21 +215,22 @@ class TariWalletServiceStubImpl(
         false
     } ?: false
 
-    override fun updateContact(walletAddress: TariWalletAddress, alias: String, isFavorite: Boolean, error: WalletError): Boolean = runMapping(error) {
-        val ffiTariWalletAddress = FFITariWalletAddress(HexString(walletAddress.hexString))
-        val contact = FFIContact(alias, ffiTariWalletAddress, isFavorite)
-        wallet.addUpdateContact(contact).also {
-            ffiTariWalletAddress.destroy()
-            contact.destroy()
-            _cachedTariContacts = null
-        }
-    } ?: false
+    override fun updateContact(walletAddress: TariWalletAddress, alias: String, isFavorite: Boolean, error: WalletError): Boolean =
+        runMapping(error) {
+            val ffiTariWalletAddress = FFITariWalletAddress(Base58String(walletAddress.fullBase58))
+            val contact = FFIContact(alias, ffiTariWalletAddress, isFavorite)
+            wallet.addUpdateContact(contact).also {
+                ffiTariWalletAddress.destroy()
+                contact.destroy()
+                _cachedTariContacts = null
+            }
+        } ?: false
 
     override fun getWalletAddressFromEmojiId(emojiId: String?, error: WalletError): TariWalletAddress? =
-        runMapping(error) { FFITariWalletAddress(emojiId.orEmpty()).runWithDestroy { TariWalletAddress(it) } }
+        runMapping(error) { FFITariWalletAddress(emojiId = emojiId.orEmpty()).runWithDestroy { TariWalletAddress(it) } }
 
-    override fun getWalletAddressFromHexString(walletAddressHex: String?,error: WalletError): TariWalletAddress? =
-        runMapping(error) { FFITariWalletAddress(HexString(walletAddressHex ?: "")).runWithDestroy { TariWalletAddress(it) } }
+    override fun getWalletAddressFromBase58(walletAddressBase58: String?, error: WalletError): TariWalletAddress? =
+        runMapping(error) { FFITariWalletAddress(base58 = Base58String(walletAddressBase58 ?: "")).runWithDestroy { TariWalletAddress(it) } }
 
     override fun setKeyValue(key: String, value: String, error: WalletError): Boolean = runMapping(error) { wallet.setKeyValue(key, value) } ?: false
 
@@ -242,19 +255,19 @@ class TariWalletServiceStubImpl(
 
     override fun joinUtxos(utxos: List<TariUtxo>, walletError: WalletError) = runMapping(walletError) {
         val ffiError = FFIError()
-        wallet.joinUtxos(utxos.map { it.commitment }.toTypedArray(), Constants.Wallet.defaultFeePerGram.value, ffiError)
+        wallet.joinUtxos(utxos.map { it.commitment }.toTypedArray(), Constants.Wallet.DEFAULT_FEE_PER_GRAM.value, ffiError)
         walletError.code = ffiError.code
     } ?: Unit
 
     override fun splitUtxos(utxos: List<TariUtxo>, splitCount: Int, walletError: WalletError) = runMapping(walletError) {
         val ffiError = FFIError()
-        wallet.splitUtxos(utxos.map { it.commitment }.toTypedArray(), splitCount, Constants.Wallet.defaultFeePerGram.value, ffiError)
+        wallet.splitUtxos(utxos.map { it.commitment }.toTypedArray(), splitCount, Constants.Wallet.DEFAULT_FEE_PER_GRAM.value, ffiError)
         walletError.code = ffiError.code
     } ?: Unit
 
     override fun previewJoinUtxos(utxos: List<TariUtxo>, walletError: WalletError): TariCoinPreview? = runMapping(walletError) {
         val ffiError = FFIError()
-        val result = wallet.joinPreviewUtxos(utxos.map { it.commitment }.toTypedArray(), Constants.Wallet.defaultFeePerGram.value, ffiError)
+        val result = wallet.joinPreviewUtxos(utxos.map { it.commitment }.toTypedArray(), Constants.Wallet.DEFAULT_FEE_PER_GRAM.value, ffiError)
         walletError.code = ffiError.code
         result
     }
@@ -262,7 +275,7 @@ class TariWalletServiceStubImpl(
     override fun previewSplitUtxos(utxos: List<TariUtxo>, splitCount: Int, walletError: WalletError): TariCoinPreview? = runMapping(walletError) {
         val ffiError = FFIError()
         val result = wallet.splitPreviewUtxos(
-            utxos.map { it.commitment }.toTypedArray(), splitCount, Constants.Wallet.defaultFeePerGram.value, ffiError
+            utxos.map { it.commitment }.toTypedArray(), splitCount, Constants.Wallet.DEFAULT_FEE_PER_GRAM.value, ffiError
         )
         walletError.code = ffiError.code
         result

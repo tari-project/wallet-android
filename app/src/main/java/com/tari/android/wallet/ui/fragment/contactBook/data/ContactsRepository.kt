@@ -101,6 +101,9 @@ class ContactsRepository @Inject constructor(
         return getByUuid(contactDto.uuid)
     }
 
+    /**
+     * Update contact info or add a new contact if it does not exist
+     */
     suspend fun updateContactInfo(
         contactToUpdate: ContactDto,
         firstName: String,
@@ -163,7 +166,7 @@ class ContactsRepository @Inject constructor(
                     ContactDto(
                         MergedContactInfo(
                             ffiContactInfo = ffiContactInfo,
-                            phoneContactInfo = phoneContactInfo.copy(phoneEmojiId = ffiContactInfo.walletAddress.emojiId, shouldUpdate = true),
+                            phoneContactInfo = phoneContactInfo.copy(phoneEmojiId = ffiContactInfo.walletAddress.fullEmojiId, shouldUpdate = true),
                         )
                     )
                 )
@@ -187,7 +190,7 @@ class ContactsRepository @Inject constructor(
     }
 
     // TODO save yats to shared prefs
-    suspend fun updateYatInfo(contactDto: ContactDto, connectedWallets: Map<String, PaymentAddressResponseResult>) {
+    suspend fun updateYatInfo(contactDto: ContactDto, connectedWallets: Map<String, PaymentAddressResponseResult>): ContactDto {
         updateContactList { currentList ->
             currentList
                 .replaceItem(
@@ -195,6 +198,7 @@ class ContactsRepository @Inject constructor(
                     replace = { contact -> contact.copy(yatDto = contact.yatDto.withConnectedWallets(connectedWallets)) }
                 )
         }
+        return getByUuid(contactDto.uuid)
     }
 
     fun isContactOnline(contact: TariWalletAddress): Boolean {

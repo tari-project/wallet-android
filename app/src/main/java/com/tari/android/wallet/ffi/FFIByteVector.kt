@@ -32,8 +32,6 @@
  */
 package com.tari.android.wallet.ffi
 
-import java.math.BigInteger
-
 /**
  * Wrapper for native byte vector type.
  *
@@ -46,22 +44,9 @@ class FFIByteVector() : FFIBase() {
     private external fun jniDestroy()
     private external fun jniCreate(byteArray: ByteArray, error: FFIError)
 
-    val hexString: HexString
-        get() = HexString(this)
-
     constructor(pointer: FFIPointer) : this() {
+        if (pointer.isNull()) error("Pointer must not be null")
         this.pointer = pointer
-    }
-
-    constructor(hex: HexString) : this() {
-        val stringHex = hex.toString()
-        val hexInteger = BigInteger(stringHex, 16)
-        var byteArray = hexInteger.toByteArray()
-        // toByteArray for some reason added one leading zero. Probably gets it from protocol
-        if (byteArray.size == 33 && byteArray[0] == 0.toByte()) {
-            byteArray = byteArray.drop(1).toByteArray()
-        }
-        runWithError { jniCreate(byteArray, it) }
     }
 
     constructor(bytes: ByteArray) : this() {
@@ -72,7 +57,7 @@ class FFIByteVector() : FFIBase() {
 
     fun getLength(): Int = runWithError { jniGetLength(it) }
 
-    fun getBytes(): ByteArray {
+    fun byteArray(): ByteArray {
         val length = getLength()
         val byteArray = ByteArray(length)
         for (i in byteArray.indices) {
@@ -81,7 +66,11 @@ class FFIByteVector() : FFIBase() {
         return byteArray
     }
 
-    override fun toString(): String = HexString(this).toString()
+    fun base58(): Base58 = Base58String(this).base58
+
+    fun hex(): String = HexString(this).hex
+
+    override fun toString(): String = HexString(this).hex
 
     override fun destroy() = jniDestroy()
 }

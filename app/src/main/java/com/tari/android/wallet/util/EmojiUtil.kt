@@ -40,11 +40,14 @@ import com.tari.android.wallet.extension.applyColorStyle
 import com.tari.android.wallet.extension.applyLetterSpacingStyle
 import com.tari.android.wallet.extension.applyRelativeTextSizeStyle
 import com.tari.android.wallet.ffi.FFIEmojiSet
+import com.tari.android.wallet.model.TariWalletAddress
+
+typealias EmojiId = String
 
 /**
  * Number of emojis from the Tari emoji set in a string.
  */
-fun String.numberOfEmojis(emojiSet: Set<String> = EmojiUtil.emojiSet): Int {
+fun EmojiId.numberOfEmojis(emojiSet: Set<EmojiId> = EmojiUtil.FFI_EMOJI_SET): Int {
     val it: BreakIterator = BreakIterator.getCharacterInstance()
     it.setText(this)
     var emojiCount = 0
@@ -67,7 +70,7 @@ fun String.numberOfEmojis(emojiSet: Set<String> = EmojiUtil.emojiSet): Int {
 /**
  * @return true if there is at least 1 character that is not included in the Tari emoji set.
  */
-fun String.containsNonEmoji(emojiSet: Set<String> = EmojiUtil.emojiSet): Boolean {
+fun EmojiId.containsNonEmoji(emojiSet: Set<EmojiId> = EmojiUtil.FFI_EMOJI_SET): Boolean {
     // iterate through the string
     val it: BreakIterator = BreakIterator.getCharacterInstance()
     it.setText(this)
@@ -91,7 +94,7 @@ fun String.containsNonEmoji(emojiSet: Set<String> = EmojiUtil.emojiSet): Boolean
 /**
  * @return emojis in the string that are from the Tari emoji set
  */
-fun String.extractEmojis(emojiSet: Set<String> = EmojiUtil.emojiSet): List<String> {
+fun EmojiId.extractEmojis(emojiSet: Set<String> = EmojiUtil.FFI_EMOJI_SET): List<EmojiId> {
     // iterate through the codepoints
     val it: BreakIterator = BreakIterator.getCharacterInstance()
     it.setText(this)
@@ -116,7 +119,7 @@ fun String.extractEmojis(emojiSet: Set<String> = EmojiUtil.emojiSet): List<Strin
  * Checks whether a given number of first characters of the string are emojis from the Tari
  * emoji set.
  */
-fun String.firstNCharactersAreEmojis(n: Int, emojiSet: Set<String> = EmojiUtil.emojiSet): Boolean {
+fun String.firstNCharactersAreEmojis(n: Int, emojiSet: Set<String> = EmojiUtil.FFI_EMOJI_SET): Boolean {
     // iterate through the string
     val it: BreakIterator = BreakIterator.getCharacterInstance()
     it.setText(this)
@@ -142,6 +145,10 @@ fun String.firstNCharactersAreEmojis(n: Int, emojiSet: Set<String> = EmojiUtil.e
     return false
 }
 
+fun Int.tariEmoji(): EmojiId {
+    return EmojiUtil.FFI_EMOJI_SET.elementAt(this)
+}
+
 /**
  * Emoji utility functions.
  *
@@ -153,12 +160,12 @@ class EmojiUtil {
 
         const val SMALL_EMOJI_ID_SIZE = 6
 
-        val emojiSet by lazy {
-            val emojis = mutableSetOf<String>()
+        val FFI_EMOJI_SET: Set<EmojiId> by lazy {
+            val emojis = mutableSetOf<EmojiId>()
             val emojiSetFFI = FFIEmojiSet()
             for (i in 0 until emojiSetFFI.getLength()) {
                 val emojiFFI = emojiSetFFI.getAt(i)
-                val emojiBytes = emojiFFI.getBytes()
+                val emojiBytes = emojiFFI.byteArray()
                 val emoji = String(emojiBytes)
                 emojis.add(emoji)
                 emojiFFI.destroy()
@@ -218,7 +225,7 @@ class EmojiUtil {
                 }
                 noOfElements++
                 if (currentIndex < string.length
-                    && noOfElements % Constants.Wallet.emojiFormatterChunkSize == 0
+                    && noOfElements % Constants.Wallet.EMOJI_FORMATTER_CHUNK_SIZE == 0
                 ) {
                     newIndices.add(currentIndex)
                 }
@@ -240,7 +247,7 @@ class EmojiUtil {
             return -1
         }
 
-        private fun getChunkedEmojiId(emojiId: String, separator: String): String {
+        private fun getChunkedEmojiId(emojiId: EmojiId, separator: String): String {
             // make chunks
             val separatorIndices = getNewChunkSeparatorIndices(emojiId)
             val builder = java.lang.StringBuilder(emojiId)
@@ -253,24 +260,24 @@ class EmojiUtil {
         fun getChunkSeparatorSpannable(separator: String, color: Int): SpannableString {
             val spannable = SpannableString(separator)
             spannable.setSpan(ForegroundColorSpan(color), 0, separator.length, Spanned.SPAN_INTERMEDIATE)
-            spannable.applyRelativeTextSizeStyle(separator, Constants.UI.emojiIdChunkSeparatorRelativeScale)
-            spannable.applyLetterSpacingStyle(separator, Constants.UI.emojiIdChunkSeparatorLetterSpacing)
+            spannable.applyRelativeTextSizeStyle(separator, Constants.UI.EMOJI_ID_CHUNK_SEPARATOR_RELATIVE_SCALE)
+            spannable.applyLetterSpacingStyle(separator, Constants.UI.EMOJI_ID_CHUNK_SEPARATOR_LETTER_SPACING)
             return spannable
         }
 
-        fun getFullEmojiIdSpannable(emojiId: String, separator: String, darkColor: Int, lightColor: Int): SpannableString {
+        fun getFullEmojiIdSpannable(emojiId: EmojiId, separator: String, darkColor: Int, lightColor: Int): SpannableString {
             val spannable = getChunkedEmojiId(emojiId, separator).applyColorStyle(
                 defaultColor = darkColor,
                 search = listOf(separator),
                 styleColor = lightColor,
                 applyToOnlyFirstOccurrence = false,
             )
-            spannable.applyLetterSpacingStyle(separator, Constants.UI.emojiIdChunkSeparatorLetterSpacing)
-            spannable.applyRelativeTextSizeStyle(separator, Constants.UI.emojiIdChunkSeparatorRelativeScale, applyToOnlyFirstOccurrence = false)
+            spannable.applyLetterSpacingStyle(separator, Constants.UI.EMOJI_ID_CHUNK_SEPARATOR_LETTER_SPACING)
+            spannable.applyRelativeTextSizeStyle(separator, Constants.UI.EMOJI_ID_CHUNK_SEPARATOR_RELATIVE_SCALE, applyToOnlyFirstOccurrence = false)
             return spannable
         }
 
-        fun String.getGraphemeLength(): Int {
+        fun EmojiId.getGraphemeLength(): Int {
             val it: BreakIterator = BreakIterator.getCharacterInstance()
             it.setText(this)
             var count = 0
@@ -281,3 +288,31 @@ class EmojiUtil {
         }
     }
 }
+
+/* new address format */
+
+/**
+ * Returns the prefix of the address in the format "| prefix | address1 ••• address2". E.g. "| 🐢💤| 🐉🔋😎 ••• 🍭🎤💍".
+ */
+fun TariWalletAddress.addressPrefixEmojis(): EmojiId {
+    return this.networkEmoji + this.featuresEmoji
+}
+
+/**
+ * Returns the first 3 emojis of the address in the format "| prefix | address1 ••• address2". E.g. "| 🐢💤| 🐉🔋😎 ••• 🍭🎤💍".
+ */
+fun TariWalletAddress.addressFirstEmojis(): EmojiId {
+    return this.spendKeyEmojis.extractEmojis().take(3).joinToString("")
+}
+
+/**
+ * Returns the last 3 emojis of the address in the format "| prefix | address1 ••• address2". E.g. "| 🐢💤| 🐉🔋😎 ••• 🍭🎤💍".
+ */
+fun TariWalletAddress.addressLastEmojis(): EmojiId {
+    return this.spendKeyEmojis.extractEmojis().takeLast(3).joinToString("")
+}
+
+/**
+ * Returns a string with the address in the format "prefix|address1•••address2". E.g. "🐢💤|🐉🔋😎•••🍭🎤💍".
+ */
+fun TariWalletAddress.shortString(): String = this.addressPrefixEmojis() + "|" + this.addressFirstEmojis() + "..." + this.addressLastEmojis()

@@ -69,11 +69,23 @@ class DeepLinkTest {
 
     class NetworkRepositoryMock : NetworkPrefRepository {
         private val network: Network = Network.STAGENET
-        private val tariNetwork = TariNetwork(network, "seeds.stagenet.tari.com", "xtr", true)
+        private val tariNetwork = TariNetwork(
+            network = network,
+            dnsPeer = "seeds.stagenet.tari.com",
+            ticker = "xtr",
+            blockExplorerUrl = null,
+            recommended = true,
+        )
 
         override val defaultNetwork: TariNetwork = tariNetwork
         override var supportedNetworks: List<TariNetwork> = listOf(tariNetwork)
-        override var currentNetwork: TariNetwork = TariNetwork(network, "seeds.stagenet.tari.com", "", true)
+        override var currentNetwork: TariNetwork = TariNetwork(
+            network = network,
+            dnsPeer = "seeds.stagenet.tari.com",
+            ticker = "",
+            blockExplorerUrl = null,
+            recommended = true,
+        )
         override var ffiNetwork: Network? = network
     }
 }

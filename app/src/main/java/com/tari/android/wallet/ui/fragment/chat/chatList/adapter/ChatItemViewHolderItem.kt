@@ -6,15 +6,14 @@ import com.tari.android.wallet.ui.common.domain.ResourceManager
 import com.tari.android.wallet.ui.common.recyclerView.CommonViewHolderItem
 import com.tari.android.wallet.ui.fragment.chat.data.ChatItemDto
 import com.tari.android.wallet.ui.fragment.contactBook.data.contacts.ContactDto
-import com.tari.android.wallet.util.extractEmojis
+import com.tari.android.wallet.util.EmojiId
 
 data class ChatItemViewHolderItem(
     val walletAddress: TariWalletAddress,
     val uuid: String,
-    val firstEmoji: String,
     val avatar: String,
     val alias: String,
-    val emojiId: String,
+    val emojiId: EmojiId,
     val subtitle: String,
     val dateMessage: String,
     val unreadCount: Int,
@@ -30,10 +29,9 @@ data class ChatItemViewHolderItem(
     ) : this(
         walletAddress = dto.walletAddress,
         uuid = dto.uuid,
-        firstEmoji = dto.walletAddress.emojiId.extractEmojis().first(),
         avatar = contact.getPhoneContactInfo()?.avatar.orEmpty(),
         alias = contact.contactInfo.getAlias(),
-        emojiId = dto.walletAddress.emojiId,
+        emojiId = dto.walletAddress.fullEmojiId,
         subtitle = dto.lastMessage?.message.orEmpty(),
         dateMessage = dto.lastMessage?.date?.formatToRelativeTime(resourceManager).orEmpty(),
         unreadCount = dto.messages.count { it.isRead.not() },

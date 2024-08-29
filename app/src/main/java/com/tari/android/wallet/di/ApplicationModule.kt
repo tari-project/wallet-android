@@ -117,10 +117,6 @@ class ApplicationModule(private val app: TariWalletApplication) {
     @Singleton
     fun provideGiphyAdapter(context: Context): GiphyAdapter = GiphyAdapter(context, BuildConfig.GIPHY_KEY)
 
-    @Provides
-    @Singleton
-    fun provideContactUtil(resourceManager: ResourceManager): ContactUtil = ContactUtil(resourceManager)
-
     companion object {
         const val sharedPrefsFileName = "tari_wallet_shared_prefs"
     }

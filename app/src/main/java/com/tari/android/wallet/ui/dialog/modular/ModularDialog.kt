@@ -14,6 +14,8 @@ import androidx.core.animation.doOnEnd
 import com.tari.android.wallet.R
 import com.tari.android.wallet.ui.component.networkStateIndicator.module.ConnectionStatusesModule
 import com.tari.android.wallet.ui.component.networkStateIndicator.module.ConnectionStatusesModuleView
+import com.tari.android.wallet.ui.dialog.modular.modules.addressDetails.AddressDetailsModule
+import com.tari.android.wallet.ui.dialog.modular.modules.addressDetails.AddressDetailsModuleView
 import com.tari.android.wallet.ui.dialog.modular.modules.addressPoisoning.AddressPoisoningModule
 import com.tari.android.wallet.ui.dialog.modular.modules.addressPoisoning.AddressPoisoningModuleView
 import com.tari.android.wallet.ui.dialog.modular.modules.body.BodyModule
@@ -40,6 +42,8 @@ import com.tari.android.wallet.ui.dialog.modular.modules.option.OptionModule
 import com.tari.android.wallet.ui.dialog.modular.modules.option.OptionModuleView
 import com.tari.android.wallet.ui.dialog.modular.modules.securityStages.SecurityStageHeadModule
 import com.tari.android.wallet.ui.dialog.modular.modules.securityStages.SecurityStageHeadModuleView
+import com.tari.android.wallet.ui.dialog.modular.modules.shareOptions.ShareOptionsModule
+import com.tari.android.wallet.ui.dialog.modular.modules.shareOptions.ShareOptionsModuleView
 import com.tari.android.wallet.ui.dialog.modular.modules.shortEmoji.ShortEmojiIdModule
 import com.tari.android.wallet.ui.dialog.modular.modules.shortEmoji.ShortEmojiModuleView
 import com.tari.android.wallet.ui.dialog.modular.modules.space.SpaceModule
@@ -151,6 +155,8 @@ open class ModularDialog(val context: Context) {
                 is ShortEmojiIdModule -> ShortEmojiModuleView(context, module)
                 is IconModule -> IconModuleView(context, module)
                 is AddressPoisoningModule -> AddressPoisoningModuleView(context, module)
+                is AddressDetailsModule -> AddressDetailsModuleView(context, module)
+                is ShareOptionsModule -> ShareOptionsModuleView(context, module)
                 else -> View(context)
             }
             root.addView(view)

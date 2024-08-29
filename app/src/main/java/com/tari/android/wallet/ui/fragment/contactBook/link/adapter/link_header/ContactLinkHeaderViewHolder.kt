@@ -2,12 +2,13 @@ package com.tari.android.wallet.ui.fragment.contactBook.link.adapter.link_header
 
 import android.app.Activity
 import androidx.appcompat.widget.SearchView
-import com.tari.android.wallet.R
 import com.tari.android.wallet.databinding.ItemContactLinkHeaderBinding
 import com.tari.android.wallet.ui.common.recyclerView.CommonViewHolder
 import com.tari.android.wallet.ui.common.recyclerView.ViewHolderBuilder
 import com.tari.android.wallet.ui.extension.showKeyboard
-import com.tari.android.wallet.util.extractEmojis
+import com.tari.android.wallet.util.addressFirstEmojis
+import com.tari.android.wallet.util.addressLastEmojis
+import com.tari.android.wallet.util.addressPrefixEmojis
 
 class ContactLinkHeaderViewHolder(view: ItemContactLinkHeaderBinding) :
     CommonViewHolder<ContactLinkHeaderViewHolderItem, ItemContactLinkHeaderBinding>(view) {
@@ -29,10 +30,9 @@ class ContactLinkHeaderViewHolder(view: ItemContactLinkHeaderBinding) :
         ui.searchView.requestFocus()
         (ui.searchView.context as? Activity)?.showKeyboard(ui.searchView)
 
-        val emojiId = item.walletAddress.emojiId.extractEmojis()
-        val shortEmojiId = emojiId.take(3) + itemView.context.getString(R.string.emoji_id_bullet_separator) + emojiId.takeLast(3)
-        val shortString = shortEmojiId.joinToString("")
-        ui.linkContactMessage.text = itemView.context.getString(R.string.contact_book_contacts_book_link_message, shortString)
+        ui.emojiIdViewContainer.textViewEmojiPrefix.text = item.walletAddress.addressPrefixEmojis()
+        ui.emojiIdViewContainer.textViewEmojiFirstPart.text = item.walletAddress.addressFirstEmojis()
+        ui.emojiIdViewContainer.textViewEmojiLastPart.text = item.walletAddress.addressLastEmojis()
     }
 
     companion object {

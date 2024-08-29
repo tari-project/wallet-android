@@ -20,6 +20,9 @@ import com.tari.android.wallet.service.connection.TariWalletServiceConnection
 import com.tari.android.wallet.util.DebugConfig
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.apache.commons.io.IOUtils
 import java.math.BigInteger
@@ -53,6 +56,9 @@ class BaseNodesManager @Inject constructor(
         } else {
             baseNodeSharedRepository.ffiBaseNodes
         }
+
+    private val _walletScannedHeight = MutableStateFlow(0)
+    val walletScannedHeight = _walletScannedHeight.asStateFlow()
 
     val networkBlockHeight: BigInteger
         get() = baseNodeSharedRepository.baseNodeHeightOfLongestChain
@@ -95,6 +101,10 @@ class BaseNodesManager @Inject constructor(
 
     fun saveBaseNodeState(baseNodeState: FFITariBaseNodeState) {
         baseNodeSharedRepository.baseNodeHeightOfLongestChain = baseNodeState.getHeightOfLongestChain()
+    }
+
+    fun saveWalletScannedHeight(height: Int) {
+        _walletScannedHeight.update { height }
     }
 
     fun startSync() {
@@ -148,7 +158,7 @@ class BaseNodesManager @Inject constructor(
                 name = "${networkRepository.currentNetwork.network.displayName} ${index + 1}",
                 publicKeyHex = publicKey.hex,
             )
-        }?.toMutableList().orEmpty()
+        }.orEmpty()
         .let { BaseNodeList(it) }
         .also { list -> logger.i("baseNodeList from FFI: \n${list.joinToString(separator = "\n")}") }
 

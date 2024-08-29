@@ -32,8 +32,7 @@
  */
 package com.tari.android.wallet.util
 
-import com.tari.android.wallet.model.MicroTari
-import java.math.BigInteger
+import com.tari.android.wallet.extension.toMicroTari
 
 /**
  * Contains application-wide constant values.
@@ -57,8 +56,8 @@ object Constants {
 
         const val scrollDepthShadowViewMaxOpacity = 0.75f
 
-        const val emojiIdChunkSeparatorRelativeScale = 0.9f
-        const val emojiIdChunkSeparatorLetterSpacing = 1f
+        const val EMOJI_ID_CHUNK_SEPARATOR_RELATIVE_SCALE = 0.9f
+        const val EMOJI_ID_CHUNK_SEPARATOR_LETTER_SPACING = 1f
 
         object Button {
             const val clickScaleAnimFullScale = 1f
@@ -124,17 +123,16 @@ object Constants {
      * Wallet constants.
      */
     object Wallet {
-        const val maxNumberOfRollingLogFiles = 2
-        const val rollingLogFileMaxSizeBytes = 10 * 1024 * 1024
-        const val discoveryTimeoutSec = 20L
-        const val storeAndForwardMessageDurationSec = 10800L
-        const val emojiIdLength = 33
-        const val emojiFormatterChunkSize = 3
-        const val pushNotificationServerUrl = "https://push.tari.com"
-        const val pendingTxExpirationPeriodHours = 3 * 24
-        const val backupDelayMs = 60 * 1000L
-        const val backupRetryPeriodMs = 0L
-        val defaultFeePerGram = MicroTari(BigInteger.valueOf(10))
+        const val MAX_NUMBER_OF_ROLLING_LOG_FILES = 2
+        const val ROLLING_LOG_FILE_MAX_SIZE_BYTES = 10 * 1024 * 1024
+        const val DISCOVERY_TIMEOUT_SEC = 20L
+        const val STORE_AND_FORWARD_MESSAGE_DURATION_SEC = 10800L
+        const val EMOJI_FORMATTER_CHUNK_SIZE = 3
+        const val PUSH_NOTIFICATION_SERVER_URL = "https://push.tari.com"
+        const val PENDING_TX_EXPIRATION_PERIOD_HOURS = 3 * 24
+        const val BACKUP_DELAY_MS = 60 * 1000L
+        const val BACKUP_RETRY_PERIOD_MS = 0L
+        val DEFAULT_FEE_PER_GRAM = 10.toMicroTari()
     }
 
     object Contacts {

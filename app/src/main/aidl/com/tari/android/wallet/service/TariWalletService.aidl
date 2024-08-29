@@ -49,7 +49,7 @@ interface TariWalletService {
     */
     boolean unregisterListener(TariWalletServiceListener listener);
 
-    String getWalletAddressHexString(out WalletError error);
+    String getWalletAddressBase58(out WalletError error);
 
     BalanceInfo getBalanceInfo(out WalletError error);
 
@@ -88,6 +88,7 @@ interface TariWalletService {
         in MicroTari feePerGram,
         String message,
         boolean isOneSidePayment,
+        String paymentId,
         out WalletError error
     );
 
@@ -95,12 +96,8 @@ interface TariWalletService {
 
     boolean removeContact(in TariWalletAddress address, out WalletError error);
 
-    /**
-    * Two functions below to get the public key from emoji id and public key hex string
-    * do not accept out error parameters.
-    */
     TariWalletAddress getWalletAddressFromEmojiId(in String emojiId, out WalletError error);
-    TariWalletAddress getWalletAddressFromHexString(in String hex, out WalletError error);
+    TariWalletAddress getWalletAddressFromBase58(in String base58, out WalletError error);
 
     /**
     * Key-value storage functions.

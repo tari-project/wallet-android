@@ -58,12 +58,11 @@ import com.tari.android.wallet.extension.getWithError
 import com.tari.android.wallet.extension.observe
 import com.tari.android.wallet.model.BalanceInfo
 import com.tari.android.wallet.model.MicroTari
+import com.tari.android.wallet.model.TariWalletAddress
 import com.tari.android.wallet.model.WalletError
 import com.tari.android.wallet.ui.common.CommonFragment
-import com.tari.android.wallet.ui.component.fullEmojiId.EmojiIdSummaryViewController
-import com.tari.android.wallet.ui.component.fullEmojiId.FullEmojiIdViewController
-import com.tari.android.wallet.ui.dialog.modular.SimpleDialogArgs
 import com.tari.android.wallet.ui.dialog.modular.ModularDialog
+import com.tari.android.wallet.ui.dialog.modular.SimpleDialogArgs
 import com.tari.android.wallet.ui.dialog.tooltipDialog.TooltipDialogArgs
 import com.tari.android.wallet.ui.extension.gone
 import com.tari.android.wallet.ui.extension.invisible
@@ -83,6 +82,9 @@ import com.tari.android.wallet.ui.fragment.send.common.TransactionData
 import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.DebugConfig
 import com.tari.android.wallet.util.WalletUtil
+import com.tari.android.wallet.util.addressFirstEmojis
+import com.tari.android.wallet.util.addressLastEmojis
+import com.tari.android.wallet.util.addressPrefixEmojis
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -91,17 +93,7 @@ class AddAmountFragment : CommonFragment<FragmentAddAmountBinding, AddAmountView
     /**
      * Recipient is either an emoji id or a user from contacts or recent txs.
      */
-    private var contactDto: ContactDto? = null
-
-    /**
-     *     Control full emoji popups
-     */
-    private lateinit var fullEmojiIdViewController: FullEmojiIdViewController
-
-    /**
-     * Formats the summarized emoji id.
-     */
-    private lateinit var emojiIdSummaryController: EmojiIdSummaryViewController
+    private lateinit var contactDto: ContactDto
 
     private var keyboardController: KeyboardController = KeyboardController()
 
@@ -135,41 +127,21 @@ class AddAmountFragment : CommonFragment<FragmentAddAmountBinding, AddAmountView
     private fun setupUI() {
         val amount = arguments?.parcelable<MicroTari>(PARAMETER_AMOUNT)
         keyboardController.setup(requireContext(), AmountCheckRunnable(), ui.numpad, ui.amount, amount?.tariValue?.toDouble() ?: Double.MIN_VALUE)
-        contactDto = arguments?.parcelable<ContactDto>(PARAMETER_CONTACT)
+        contactDto = arguments?.parcelable<ContactDto>(PARAMETER_CONTACT)!!
         // hide tx fee
         ui.txFeeContainerView.invisible()
 
         // hide/disable continue button
         ui.continueButton.isEnabled = false
-        // add first digit to the element list
-        val fullEmojiIdListener = object : FullEmojiIdViewController.Listener {
-            override fun animationHide(value: Float) {
-                ui.backCtaView.alpha = 1 - value
-            }
-
-            override fun animationShow(value: Float) {
-                ui.backCtaView.alpha = 1 - value
-            }
-        }
-        emojiIdSummaryController = EmojiIdSummaryViewController(ui.emojiIdSummaryView)
-        fullEmojiIdViewController = FullEmojiIdViewController(
-            ui.emojiIdOuterContainer,
-            ui.emojiIdSummaryView,
-            requireContext(),
-            fullEmojiIdListener
-        )
-        val walletAddress = contactDto?.contactInfo?.extractWalletAddress()
-        fullEmojiIdViewController.fullEmojiId = walletAddress?.emojiId.orEmpty()
-        fullEmojiIdViewController.emojiIdHex = walletAddress?.hexString.orEmpty()
 
         displayAliasOrEmojiId()
         setActionBindings()
     }
 
     private fun displayAliasOrEmojiId() {
-        val alias = contactDto?.contactInfo?.getAlias().orEmpty()
+        val alias = contactDto.contactInfo.getAlias()
         if (alias.isEmpty()) {
-            displayEmojiId(contactDto?.contactInfo?.extractWalletAddress()?.emojiId.orEmpty())
+            displayEmojiId(contactDto.contactInfo.requireWalletAddress())
         } else {
             displayAlias(alias)
         }
@@ -177,7 +149,7 @@ class AddAmountFragment : CommonFragment<FragmentAddAmountBinding, AddAmountView
 
     private fun setActionBindings() {
         ui.backCtaView.setOnClickListener { onBackButtonClicked(it) }
-        ui.emojiIdSummaryContainerView.setOnClickListener { emojiIdClicked() }
+        ui.emojiIdSummaryContainerView.setOnClickListener { viewModel.emojiIdClicked(contactDto.contactInfo.requireWalletAddress()) }
         ui.txFeeDescTextView.setOnClickListener { showTxFeeToolTip() }
         ui.oneSidePaymentHelp.setOnClickListener { showOneSidePaymentTooltip() }
         ui.continueButton.setOnClickListener { continueButtonClicked() }
@@ -203,9 +175,11 @@ class AddAmountFragment : CommonFragment<FragmentAddAmountBinding, AddAmountView
         ui.titleTextView.text = alias
     }
 
-    private fun displayEmojiId(emojiId: String) {
+    private fun displayEmojiId(address: TariWalletAddress) {
         ui.emojiIdSummaryContainerView.visible()
-        emojiIdSummaryController.display(emojiId)
+        ui.emojiIdViewContainer.textViewEmojiPrefix.text = address.addressPrefixEmojis()
+        ui.emojiIdViewContainer.textViewEmojiFirstPart.text = address.addressFirstEmojis()
+        ui.emojiIdViewContainer.textViewEmojiLastPart.text = address.addressLastEmojis()
         ui.titleTextView.gone()
     }
 
@@ -213,13 +187,6 @@ class AddAmountFragment : CommonFragment<FragmentAddAmountBinding, AddAmountView
         view.temporarilyDisableClick()
         val mActivity = activity ?: return
         mActivity.onBackPressed()
-    }
-
-    /**
-     * Display full emoji id and dim out all other views.
-     */
-    private fun emojiIdClicked() {
-        fullEmojiIdViewController.showFullEmojiId()
     }
 
     private fun showTxFeeToolTip() {
@@ -294,11 +261,8 @@ class AddAmountFragment : CommonFragment<FragmentAddAmountBinding, AddAmountView
             feePerGram = viewModel.selectedFeeData!!.feePerGram,
             isOneSidePayment = isOneSidePayment,
         )
-        if (isOneSidePayment) {
-            viewModel.navigation.postValue(Navigation.AddAmountNavigation.ContinueToFinalizing(transactionData))
-        } else {
-            viewModel.navigation.postValue(Navigation.AddAmountNavigation.ContinueToAddNote(transactionData))
-        }
+
+        viewModel.navigation.postValue(Navigation.AddAmountNavigation.ContinueToAddNote(transactionData))
     }
 
     /**

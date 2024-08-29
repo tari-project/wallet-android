@@ -7,8 +7,6 @@ import androidx.lifecycle.viewModelScope
 import com.tari.android.wallet.R
 import com.tari.android.wallet.data.WalletConfig
 import com.tari.android.wallet.data.sharedPrefs.backup.BackupPrefRepository
-import com.tari.android.wallet.ffi.FFITariWalletAddress
-import com.tari.android.wallet.ffi.HexString
 import com.tari.android.wallet.infrastructure.backup.BackupFileIsEncryptedException
 import com.tari.android.wallet.infrastructure.backup.BackupManager
 import com.tari.android.wallet.infrastructure.backup.BackupStorageAuthRevokedException
@@ -60,8 +58,7 @@ class ChooseRestoreOptionViewModel : CommonViewModel() {
                     backupPrefRepository.restoredTxs?.let {
                         if (it.utxos.orEmpty().isEmpty()) return@let
 
-                        val sourceAddress = FFITariWalletAddress(HexString(it.source))
-                        val tariWalletAddress = TariWalletAddress(it.source, sourceAddress.getEmojiId())
+                        val tariWalletAddress = TariWalletAddress.fromBase58(it.sourceBase58)
                         val message = resourceManager.getString(R.string.backup_restored_tx)
                         val error = WalletError()
                         walletService.restoreWithUnbindedOutputs(it.utxos, tariWalletAddress, message, error)

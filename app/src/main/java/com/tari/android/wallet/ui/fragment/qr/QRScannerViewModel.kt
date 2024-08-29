@@ -6,13 +6,13 @@ import com.tari.android.wallet.R
 import com.tari.android.wallet.application.deeplinks.DeepLink
 import com.tari.android.wallet.application.deeplinks.DeeplinkHandler
 import com.tari.android.wallet.application.deeplinks.DeeplinkViewModel
-import com.tari.android.wallet.data.repository.TariAddressRepository
 import com.tari.android.wallet.extension.launchOnIo
 import com.tari.android.wallet.extension.launchOnMain
+import com.tari.android.wallet.model.TariWalletAddress
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.common.SingleLiveEvent
 import com.tari.android.wallet.ui.fragment.home.HomeActivity
-import com.tari.android.wallet.util.extractEmojis
+import com.tari.android.wallet.util.shortString
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -22,9 +22,6 @@ class QRScannerViewModel : CommonViewModel() {
 
     @Inject
     lateinit var deeplinkHandler: DeeplinkHandler
-
-    @Inject
-    lateinit var tariAddressRepository: TariAddressRepository
 
     init {
         component.inject(this)
@@ -138,9 +135,8 @@ class QRScannerViewModel : CommonViewModel() {
         launchOnIo {
             val text = when (deepLink) {
                 is DeepLink.Send -> {
-                    val walletAddress = tariAddressRepository.walletAddressFromHex(deepLink.walletAddressHex).getOrNull() ?: return@launchOnIo
-                    val emojiId = walletAddress.emojiId.extractEmojis().take(3).joinToString("")
-                    resourceManager.getString(R.string.qr_code_scanner_labels_actions_transaction_send, emojiId)
+                    val walletAddress = TariWalletAddress.fromBase58OrNull(deepLink.walletAddress) ?: return@launchOnIo
+                    resourceManager.getString(R.string.qr_code_scanner_labels_actions_transaction_send, walletAddress.shortString())
                 }
 
                 is DeepLink.UserProfile -> resourceManager.getString(R.string.qr_code_scanner_labels_actions_profile)

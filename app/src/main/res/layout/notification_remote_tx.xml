@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/notification_tx_received_vw_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -44,14 +44,13 @@
                 android:ellipsize="end"
                 android:gravity="center_vertical"
                 android:singleLine="true"
-                android:text="@string/dummy_contact_alias"
                 android:textColor="?attr/palette_brand_dark_blue"
-                android:textSize="13sp" />
+                android:textSize="13sp"
+                tools:text="@string/dummy_contact_alias" />
 
-            <!-- emoji id summary -->
             <include
-                android:id="@+id/notification_tx_received_vw_emoji_summary"
-                layout="@layout/view_emoji_id_summary"
+                android:id="@+id/emoji_id_view_container"
+                layout="@layout/view_address_short_small"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent" />
         </FrameLayout>

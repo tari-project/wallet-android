@@ -7,6 +7,7 @@ import com.tari.android.wallet.R
 import com.tari.android.wallet.extension.getWithError
 import com.tari.android.wallet.ffi.FFIWallet
 import com.tari.android.wallet.model.MicroTari
+import com.tari.android.wallet.model.TariWalletAddress
 import com.tari.android.wallet.model.WalletError
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.dialog.modular.modules.body.BodyModule
@@ -109,6 +110,10 @@ class AddAmountViewModel : CommonViewModel() {
         )
     }
 
+    fun emojiIdClicked(walletAddress: TariWalletAddress) {
+        showAddressDetailsDialog(walletAddress)
+    }
+
     fun calculateFee(amount: MicroTari, walletError: WalletError) {
         try {
             val grams = feePerGrams.value
@@ -136,9 +141,9 @@ class AddAmountViewModel : CommonViewModel() {
 
     private fun calculateDefaultFees(amount: MicroTari, walletError: WalletError) {
         val calculatedFee = walletService.getWithError(this::showFeeError) { _, wallet ->
-            wallet.estimateTxFee(amount, walletError, Constants.Wallet.defaultFeePerGram)
+            wallet.estimateTxFee(amount, walletError, Constants.Wallet.DEFAULT_FEE_PER_GRAM)
         } ?: return
-        selectedFeeData = FeeData(Constants.Wallet.defaultFeePerGram, calculatedFee)
+        selectedFeeData = FeeData(Constants.Wallet.DEFAULT_FEE_PER_GRAM, calculatedFee)
     }
 
     private fun showFeeError(walletError: WalletError) {

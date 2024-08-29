@@ -37,14 +37,15 @@ package com.tari.android.wallet.util
 import com.tari.android.wallet.BuildConfig
 import com.tari.android.wallet.extension.minusHours
 import com.tari.android.wallet.extension.toMicroTari
+import com.tari.android.wallet.ffi.Base58
 import com.tari.android.wallet.model.CompletedTx
 import com.tari.android.wallet.model.TariContact
 import com.tari.android.wallet.model.TariUtxo
 import com.tari.android.wallet.model.TariWalletAddress
 import com.tari.android.wallet.model.Tx
 import com.tari.android.wallet.model.TxStatus
-import com.tari.android.wallet.ui.common.gyphy.presentation.GIFViewModel
-import com.tari.android.wallet.ui.common.gyphy.repository.GIFRepository
+import com.tari.android.wallet.ui.common.gyphy.presentation.GifViewModel
+import com.tari.android.wallet.ui.common.gyphy.repository.GifRepository
 import com.tari.android.wallet.ui.common.recyclerView.items.TitleViewHolderItem
 import com.tari.android.wallet.ui.fragment.chat.data.ChatItemDto
 import com.tari.android.wallet.ui.fragment.chat.data.ChatMessageItemDto
@@ -80,6 +81,7 @@ object DebugConfig {
 
     const val isChatEnabled = false
 
+    const val isYatEnabled = false
     private val _useYatSandbox = valueIfDebug(false)
     val yatEnvironment = if (_useYatSandbox) YatEnvironment.SANDBOX else YatEnvironment.PRODUCTION
 
@@ -93,11 +95,23 @@ object DebugConfig {
 }
 
 object MockDataStub {
-    private const val EMOJI_ID =
+    private const val EMOJI_ID: EmojiId =
         "\uD83C\uDF34\uD83C\uDF0D\uD83C\uDFB5\uD83C\uDFBA\uD83D\uDDFD\uD83C\uDF37\uD83D\uDE91\uD83C\uDF45\uD83D\uDC60\uD83C\uDF1F\uD83D\uDC8C\uD83D\uDE97\uD83D\uDC40\uD83D\uDD29\uD83C\uDF08\uD83D\uDC1D\uD83C\uDF37\uD83C\uDF70\uD83C\uDF38\uD83C\uDF81\uD83C\uDF55\uD83D\uDEBF\uD83D\uDC34\uD83D\uDCA6\uD83D\uDE0E\uD83D\uDEAA\uD83C\uDFE0\uD83D\uDD29\uD83C\uDFE0\uD83D\uDE82\uD83C\uDFBA\uD83C\uDFC6\uD83C\uDFB3"
-    private const val HEX = "C05575BE00EF016A209B1F493D9027B0E330F3E25FE89BBE6FA66D966EE5B6356"
+    private const val BASE58: Base58 = "C05575BE00EF016A209B1F493D9027B0E330F3E25FE89BBE6FA66D966EE5B6356"
 
-    val WALLET_ADDRESS = TariWalletAddress(hexString = HEX, emojiId = EMOJI_ID)
+    // TODO make better mock stub
+    val WALLET_ADDRESS = TariWalletAddress(
+        network = TariWalletAddress.Network.NEXTNET,
+        features = listOf(TariWalletAddress.Feature.INTERACTIVE),
+        networkEmoji = EMOJI_ID,
+        featuresEmoji = EMOJI_ID,
+        viewKeyEmojis = EMOJI_ID,
+        spendKeyEmojis = EMOJI_ID,
+        checksumEmoji = EMOJI_ID,
+        fullBase58 = BASE58,
+        fullEmojiId = EMOJI_ID,
+        unknownAddress = false,
+    )
 
     private val RANDOM_MESSAGES = listOf(
         "Hello, how are you?",
@@ -138,7 +152,7 @@ object MockDataStub {
     )
 
     fun createTxList(
-        gifRepository: GIFRepository,
+        gifRepository: GifRepository,
         confirmationCount: Long,
         title: String = "Mocked Transactions"
     ) = listOf(
@@ -167,7 +181,7 @@ object MockDataStub {
     )
 
     fun createTx(
-        gifRepository: GIFRepository,
+        gifRepository: GifRepository,
         confirmationCount: Long,
         amount: Long = 100000,
         contactAlias: String = "Test",
@@ -185,7 +199,7 @@ object MockDataStub {
         ),
         contact = createContact(alias = contactAlias),
         position = 0,
-        viewModel = GIFViewModel(gifRepository),
+        gifViewModel = GifViewModel(gifRepository),
         requiredConfirmationCount = confirmationCount,
     )
 

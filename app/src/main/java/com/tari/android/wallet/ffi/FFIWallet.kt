@@ -127,6 +127,8 @@ class FFIWallet(
         callbackTransactionValidationCompleteSig: String,
         callbackConnectivityStatus: String,
         callbackConnectivityStatusSig: String,
+        callbackWalletScannedHeight: String,
+        callbackWalletScannedHeightSig: String,
         callbackBaseNodeStatusStatus: String,
         callbackBaseNodeStatusSig: String,
         libError: FFIError
@@ -168,6 +170,7 @@ class FFIWallet(
         feePerGram: String,
         message: String,
         oneSided: Boolean,
+        paymentId: String,
         libError: FFIError
     ): ByteArray
 
@@ -262,8 +265,8 @@ class FFIWallet(
                 commsConfig = commsConfig,
                 logPath = logPath,
                 logVerbosity = logVerbosity,
-                maxNumberOfRollingLogFiles = Constants.Wallet.maxNumberOfRollingLogFiles,
-                rollingLogFileMaxSizeBytes = Constants.Wallet.rollingLogFileMaxSizeBytes,
+                maxNumberOfRollingLogFiles = Constants.Wallet.MAX_NUMBER_OF_ROLLING_LOG_FILES,
+                rollingLogFileMaxSizeBytes = Constants.Wallet.ROLLING_LOG_FILE_MAX_SIZE_BYTES,
                 passphrase = passphrase,
                 network = networkRepository.currentNetwork.network.uriComponent,
                 seedWords = seedPhraseRepository.getPhrase()?.ffiSeedWords,
@@ -284,6 +287,7 @@ class FFIWallet(
                 this::onBalanceUpdated.name, "(J)V",
                 this::onTxValidationComplete.name, "([B[B)V",
                 this::onConnectivityStatus.name, "([B)V",
+                this::onWalletScannedHeight.name, "([B)V",
                 this::onBaseNodeStatus.name, "(J)V",
                 libError = error,
             )
@@ -427,6 +431,12 @@ class FFIWallet(
         logger.i("ConnectivityStatus is [$connectivityStatus]")
     }
 
+    fun onWalletScannedHeight(bytes: ByteArray) {
+        val height = BigInteger(1, bytes)
+        localScope.launch { listener?.onWalletScannedHeight(height.toInt()) }
+        logger.i("Wallet scanned height is [$height]")
+    }
+
     fun onBalanceUpdated(ptr: FFIPointer) {
         logger.i("Balance Updated")
         val balance = FFIBalance(ptr).runWithDestroy { BalanceInfo(it.getAvailable(), it.getIncoming(), it.getOutgoing(), it.getTimeLocked()) }
@@ -458,14 +468,21 @@ class FFIWallet(
         BigInteger(1, jniEstimateTxFee(amount.toString(), gramFee.toString(), kernelCount.toString(), outputCount.toString(), it))
     }
 
-    fun sendTx(destination: FFITariWalletAddress, amount: BigInteger, feePerGram: BigInteger, message: String, isOneSided: Boolean): BigInteger {
+    fun sendTx(
+        destination: FFITariWalletAddress,
+        amount: BigInteger,
+        feePerGram: BigInteger,
+        message: String,
+        isOneSided: Boolean,
+        paymentId: String,
+    ): BigInteger {
         if (amount < BigInteger.valueOf(0L)) {
             throw FFIException(message = "Amount is less than 0.")
         }
         if (destination == getWalletAddress()) {
             throw FFIException(message = "Tx source and destination are the same.")
         }
-        val bytes = runWithError { jniSendTx(destination, amount.toString(), feePerGram.toString(), message, isOneSided, it) }
+        val bytes = runWithError { jniSendTx(destination, amount.toString(), feePerGram.toString(), message, isOneSided, paymentId, it) }
         return BigInteger(1, bytes)
     }
 
@@ -538,7 +555,7 @@ class FFIWallet(
     fun restoreWithUnbindedOutputs(jsons: List<String>, address: TariWalletAddress, message: String, error: FFIError) {
         for (json in jsons) {
             val output = FFITariUnblindedOutput(json)
-            jniImportExternalUtxoAsNonRewindable(output, FFITariWalletAddress(address.emojiId), message, error)
+            jniImportExternalUtxoAsNonRewindable(output, FFITariWalletAddress(emojiId = address.fullEmojiId), message, error)
         }
     }
 

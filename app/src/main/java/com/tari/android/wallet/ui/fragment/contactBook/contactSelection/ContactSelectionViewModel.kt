@@ -8,10 +8,11 @@ import com.tari.android.wallet.application.YatAdapter
 import com.tari.android.wallet.application.deeplinks.DeepLink
 import com.tari.android.wallet.application.deeplinks.DeeplinkFormatter
 import com.tari.android.wallet.application.deeplinks.DeeplinkHandler
-import com.tari.android.wallet.data.repository.TariAddressRepository
+import com.tari.android.wallet.data.sharedPrefs.CorePrefRepository
 import com.tari.android.wallet.event.EffectChannelFlow
 import com.tari.android.wallet.extension.collectFlow
 import com.tari.android.wallet.extension.launchOnIo
+import com.tari.android.wallet.extension.launchOnMain
 import com.tari.android.wallet.model.MicroTari
 import com.tari.android.wallet.model.TariWalletAddress
 import com.tari.android.wallet.ui.common.CommonViewModel
@@ -33,9 +34,11 @@ import com.tari.android.wallet.ui.fragment.contactBook.data.ContactsRepository
 import com.tari.android.wallet.ui.fragment.contactBook.data.contacts.ContactDto
 import com.tari.android.wallet.ui.fragment.contactBook.data.contacts.FFIContactInfo
 import com.tari.android.wallet.ui.fragment.contactBook.data.contacts.YatDto
+import com.tari.android.wallet.ui.fragment.contactBook.data.contacts.splitAlias
 import com.tari.android.wallet.ui.fragment.contactBook.root.ShareViewModel
 import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
 import com.tari.android.wallet.util.Constants
+import com.tari.android.wallet.util.EmojiId
 import com.tari.android.wallet.util.EmojiUtil.Companion.getGraphemeLength
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -67,7 +70,7 @@ class ContactSelectionViewModel : CommonViewModel() {
     lateinit var addressPoisoningChecker: AddressPoisoningChecker
 
     @Inject
-    lateinit var tariAddressRepository: TariAddressRepository
+    lateinit var corePrefRepository: CorePrefRepository
 
     var additionalFilter: (ContactItem) -> Boolean = { true }
 
@@ -111,31 +114,29 @@ class ContactSelectionViewModel : CommonViewModel() {
     }
 
     fun handleDeeplink(deeplinkString: String) {
-        launchOnIo {
-            val deeplink = deeplinkFormatter.parse(deeplinkString)
-            val hex = when (deeplink) {
-                is DeepLink.Contacts -> deeplink.contacts.firstOrNull()?.hex
-                is DeepLink.Send -> deeplink.walletAddressHex
-                is DeepLink.UserProfile -> deeplink.tariAddressHex
-                else -> null
-            }
-
-            val name = when (deeplink) {
-                is DeepLink.Contacts -> deeplink.contacts.firstOrNull()?.alias
-                is DeepLink.UserProfile -> deeplink.alias
-                else -> null
-            }.orEmpty()
-
-            when (deeplink) {
-                is DeepLink.Send -> deeplink.amount?.let { amount.value = it }
-                else -> Unit
-            }
-
-            hex?.let { tariAddressRepository.walletAddressFromHex(it).getOrNull() }?.let { walletAddress ->
-                selectedContact.value = ContactDto(FFIContactInfo(walletAddress), uuid = name)
-                _yatState.update { it.copy(yatUser = null) }
-            } ?: run { logger.e("Wallet address not found for deeplink: $deeplinkString") }
+        val deeplink = deeplinkFormatter.parse(deeplinkString)
+        val deeplinkBase58 = when (deeplink) {
+            is DeepLink.Contacts -> deeplink.contacts.firstOrNull()?.tariAddress
+            is DeepLink.Send -> deeplink.walletAddress
+            is DeepLink.UserProfile -> deeplink.tariAddress
+            else -> null
         }
+
+        val name = when (deeplink) {
+            is DeepLink.Contacts -> deeplink.contacts.firstOrNull()?.alias
+            is DeepLink.UserProfile -> deeplink.alias
+            else -> null
+        }.orEmpty()
+
+        when (deeplink) {
+            is DeepLink.Send -> deeplink.amount?.let { amount.value = it }
+            else -> Unit
+        }
+
+        deeplinkBase58?.let { TariWalletAddress.fromBase58OrNull(it) }?.let { walletAddress ->
+            selectedContact.value = ContactDto(FFIContactInfo(walletAddress), uuid = name)
+            _yatState.update { it.copy(yatUser = null) }
+        } ?: run { logger.e("Wallet address not found for deeplink: $deeplinkString") }
     }
 
     fun onContactlessPaymentClick() {
@@ -155,11 +156,11 @@ class ContactSelectionViewModel : CommonViewModel() {
         _yatState.update { it.toggleEye() }
     }
 
-    fun addressEntered(addressText: String) {
+    fun addressEntered(addressText: EmojiId) {
         launchOnIo {
             val yatUser = tryToFindYatUser(addressText)
             _yatState.update { it.copy(yatUser = yatUser) }
-            val walletAddress = tariAddressRepository.walletAddressFromEmojiId(addressText).getOrNull()
+            val walletAddress = TariWalletAddress.fromEmojiIdOrNull(addressText)
             selectedTariWalletAddress.postValue(walletAddress)
 
             addressPoisoningChecker.doOnAddressPoisoned(walletAddress) { addresses ->
@@ -182,14 +183,17 @@ class ContactSelectionViewModel : CommonViewModel() {
             is ContinueButtonEffect.AddContact -> {
                 val user = getUserDto()
                 val fullName = effect.name
-                val split = fullName.split(" ")
-                val firstName = split.getOrNull(1).orEmpty().trim()
-                val surname = split.getOrNull(0).orEmpty().trim()
+                val firstName = splitAlias(fullName).firstName
+                val lastName = splitAlias(fullName).lastName
 
-                viewModelScope.launch(Dispatchers.IO) {
-                    contactsRepository.updateContactInfo(user, firstName, surname, "")
-                    viewModelScope.launch(Dispatchers.Main) {
-                        navigation.postValue(Navigation.ContactBookNavigation.BackToContactBook)
+                if (user.walletAddress == corePrefRepository.walletAddress) {
+                    showCantAddYourselfDialog()
+                } else {
+                    launchOnIo {
+                        contactsRepository.updateContactInfo(user, firstName, lastName, "")
+                        launchOnMain {
+                            navigation.postValue(Navigation.ContactBookNavigation.BackToContactBook)
+                        }
                     }
                 }
             }
@@ -207,6 +211,13 @@ class ContactSelectionViewModel : CommonViewModel() {
                 navigation.postValue(Navigation.ChatNavigation.ToChat(user.getFFIContactInfo()?.walletAddress!!, true))
             }
         }
+    }
+
+    private fun showCantAddYourselfDialog() {
+        showSimpleDialog(
+            title = resourceManager.getString(R.string.contact_book_add_contact_cant_add_yourself_title),
+            description = resourceManager.getString(R.string.contact_book_add_contact_cant_add_yourself_description),
+        )
     }
 
     private fun getUserDto(): ContactDto =
@@ -259,12 +270,13 @@ class ContactSelectionViewModel : CommonViewModel() {
         this.contactList.postValue(result)
     }
 
-    private suspend fun tryToFindYatUser(emojiId: String): YatState.YatUser? {
+    private fun tryToFindYatUser(emojiId: EmojiId): YatState.YatUser? {
         if (emojiId.isEmpty() || emojiId.getGraphemeLength() > YAT_MAX_LENGTH) return null
 
         val connectedWallets = yatAdapter.searchTariYats(emojiId)?.result?.entries
+        // TODO I think it won't work. Need to check it and probably change Yat lib to return base58 address
         val hexAddress = connectedWallets?.firstOrNull()?.value?.address
-        return hexAddress?.let { tariAddressRepository.walletAddressFromHex(it).getOrNull() }?.let { walletAddress ->
+        return hexAddress?.let { TariWalletAddress.fromBase58OrNull(hexAddress) }?.let { walletAddress ->
             YatState.YatUser(
                 yatName = emojiId,
                 hexAddress = hexAddress,
@@ -301,7 +313,7 @@ class ContactSelectionViewModel : CommonViewModel() {
     }
 
     private fun similarAddressDialogContinueClick(selectedAddressItem: SimilarAddressDto, markAsTrusted: Boolean) {
-        selectedAddressItem.contactDto.walletAddress.let { selectedAddress ->
+        selectedAddressItem.contactDto.contactInfo.requireWalletAddress().let { selectedAddress ->
             addressPoisoningChecker.markAsTrusted(selectedAddress, markAsTrusted)
             viewModelScope.launch(Dispatchers.Main) {
                 hideDialog()

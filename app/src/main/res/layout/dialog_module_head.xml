@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/root"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:paddingHorizontal="20dp"
     android:paddingBottom="22dp">
 
     <com.tari.android.wallet.ui.component.tari.TariTextView
@@ -13,20 +13,35 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
+        android:layout_marginHorizontal="20dp"
         android:gravity="center"
         android:lineSpacingExtra="8dp"
         android:textColor="?attr/palette_text_heading"
         android:textSize="18sp"
-        app:customFont="heavy" />
+        app:customFont="heavy"
+        tools:text="Sample text" />
 
     <com.tari.android.wallet.ui.component.tari.TariSecondaryButton
         android:id="@+id/button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="end|center_vertical"
+        android:layout_marginHorizontal="20dp"
         android:lineSpacingExtra="8dp"
         android:textSize="14sp"
         app:customFont="light"
         app:title="@string/contact_book_add_contact_done_button" />
 
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/button_icon"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_gravity="end|center_vertical"
+        android:layout_marginHorizontal="8dp"
+        android:foreground="?attr/selectableItemBackgroundBorderless"
+        android:padding="12dp"
+        android:tint="?attr/palette_text_heading"
+        android:visibility="gone"
+        tools:src="@drawable/vector_common_close"
+        tools:visibility="visible" />
 </FrameLayout>

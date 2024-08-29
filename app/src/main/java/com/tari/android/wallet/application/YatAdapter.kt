@@ -57,7 +57,7 @@ class YatAdapter @Inject constructor(
         kotlin.runCatching { YatLibApi.emojiIDApi.lookupEmojiIDPayment(emojiId, null) }.getOrNull()
 
     fun openOnboarding(context: Context) {
-        val address = commonRepository.publicKeyHexString.orEmpty()
+        val address = commonRepository.walletAddressBase58.orEmpty() // TODO use the correct value for Yat
         YatIntegration.showOnboarding(context, listOf(YatRecord(YatRecordType.XTR_ADDRESS, data = address)))
     }
 

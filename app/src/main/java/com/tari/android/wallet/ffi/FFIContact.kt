@@ -49,6 +49,7 @@ class FFIContact() : FFIBase() {
     private external fun jniCreate(alias: String, isFavorite: Boolean, publicKeyPtr: FFITariWalletAddress, libError: FFIError)
 
     constructor(pointer: FFIPointer) : this() {
+        if (pointer.isNull()) error("Pointer must not be null")
         this.pointer = pointer
     }
 
@@ -66,11 +67,7 @@ class FFIContact() : FFIBase() {
 
     fun getIsFavorite(): Boolean = runWithError { jniGetIsFavorite(it) }
 
-    override fun toString(): String = StringBuilder()
-        .append(getAlias())
-        .append("|")
-        .append(getWalletAddress().toString())
-        .toString()
+    override fun toString(): String = "${getAlias()}|${getWalletAddress()}"
 
     override fun destroy() = jniDestroy()
 }

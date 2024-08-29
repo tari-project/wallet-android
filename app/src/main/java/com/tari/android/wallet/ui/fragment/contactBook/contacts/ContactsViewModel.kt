@@ -6,7 +6,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.map
-import androidx.lifecycle.viewModelScope
 import com.tari.android.wallet.R
 import com.tari.android.wallet.R.string.contact_book_details_phone_contacts
 import com.tari.android.wallet.R.string.contact_book_empty_state_body
@@ -17,6 +16,8 @@ import com.tari.android.wallet.R.string.contact_book_empty_state_grant_access_bu
 import com.tari.android.wallet.R.string.contact_book_empty_state_title
 import com.tari.android.wallet.extension.collectFlow
 import com.tari.android.wallet.extension.debounce
+import com.tari.android.wallet.extension.launchOnIo
+import com.tari.android.wallet.extension.launchOnMain
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.common.SingleLiveEvent
 import com.tari.android.wallet.ui.common.recyclerView.CommonViewHolderItem
@@ -30,8 +31,6 @@ import com.tari.android.wallet.ui.fragment.contactBook.root.ContactSelectionRepo
 import com.tari.android.wallet.ui.fragment.contactBook.root.ShareViewModel
 import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
 import com.tari.android.wallet.ui.fragment.settings.allSettings.title.SettingsTitleViewHolderItem
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import yat.android.ui.extension.HtmlHelper
 import javax.inject.Inject
 
@@ -102,7 +101,7 @@ class ContactsViewModel : CommonViewModel() {
 
     fun grantPermission() {
         permissionManager.runWithPermission(listOf(android.Manifest.permission.READ_CONTACTS), silently = false) {
-            viewModelScope.launch(Dispatchers.IO) {
+            launchOnIo {
                 contactsRepository.grantContactPermissionAndRefresh()
             }
         }
@@ -130,7 +129,7 @@ class ContactsViewModel : CommonViewModel() {
                     badgeViewModel = badgeViewModel,
                 )
             }
-            viewModelScope.launch(Dispatchers.Main) {
+            launchOnMain {
                 sourceList.postValue(newItems)
             }
         }

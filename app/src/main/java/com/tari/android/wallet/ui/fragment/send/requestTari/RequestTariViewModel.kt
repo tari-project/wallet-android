@@ -19,5 +19,5 @@ class RequestTariViewModel : CommonViewModel() {
         component.inject(this)
     }
 
-    fun getDeepLink(amount: MicroTari): String = deeplinkHandler.getDeeplink(DeepLink.Send(sharedPrefsWrapper.publicKeyHexString!!, amount))
+    fun getDeepLink(amount: MicroTari): String = deeplinkHandler.getDeeplink(DeepLink.Send(sharedPrefsWrapper.walletAddressBase58!!, amount))
 }

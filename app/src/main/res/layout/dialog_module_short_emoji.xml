@@ -1,18 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/root"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical">
 
     <include
-        android:id="@+id/participant_emoji_id_view"
-        layout="@layout/view_emoji_id_summary"
+        android:id="@+id/emoji_id_view_container"
+        layout="@layout/view_address_short_small"
         android:layout_width="wrap_content"
         android:layout_height="0dp"
         android:layout_gravity="center"
         android:layout_marginBottom="10dp"
         android:layout_weight="1" />
-
 </LinearLayout>

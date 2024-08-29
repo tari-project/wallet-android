@@ -28,7 +28,6 @@ import com.tari.android.wallet.model.BalanceInfo
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.common.SingleLiveEvent
 import com.tari.android.wallet.ui.common.recyclerView.CommonViewHolderItem
-import com.tari.android.wallet.ui.dialog.modular.SimpleDialogArgs
 import com.tari.android.wallet.ui.dialog.modular.DialogArgs
 import com.tari.android.wallet.ui.dialog.modular.ModularDialogArgs
 import com.tari.android.wallet.ui.dialog.modular.modules.body.BodyModule
@@ -43,7 +42,9 @@ import com.tari.android.wallet.ui.fragment.send.finalize.TxFailureReason
 import com.tari.android.wallet.ui.fragment.settings.backup.backupOnboarding.item.BackupOnboardingArgs
 import com.tari.android.wallet.ui.fragment.settings.backup.backupOnboarding.module.BackupOnboardingFlowItemModule
 import com.tari.android.wallet.ui.fragment.tx.adapter.TransactionItem
+import com.tari.android.wallet.util.EmojiId
 import com.tari.android.wallet.util.extractEmojis
+import com.tari.android.wallet.util.shortString
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import yat.android.ui.extension.HtmlHelper
@@ -53,7 +54,7 @@ import javax.inject.Inject
 class HomeFragmentViewModel : CommonViewModel() {
 
     @Inject
-    lateinit var sharedPrefsWrapper: CorePrefRepository
+    lateinit var corePrefRepository: CorePrefRepository
 
     @Inject
     lateinit var contactsRepository: ContactsRepository
@@ -75,9 +76,9 @@ class HomeFragmentViewModel : CommonViewModel() {
 
     val txList = MediatorLiveData<List<CommonViewHolderItem>>()
 
-    val emoji = MutableLiveData<String>()
+    val avatarEmoji = MutableLiveData<EmojiId>()
 
-    val emojiMedium = MutableLiveData<String>()
+    val emojiMedium = MutableLiveData<EmojiId>()
 
     init {
         component.inject(this)
@@ -88,9 +89,9 @@ class HomeFragmentViewModel : CommonViewModel() {
 
         doOnWalletRunning { doOnWalletServiceConnected { runCatching { onServiceConnected() } } }
 
-        val emojies = sharedPrefsWrapper.emojiId.orEmpty().extractEmojis()
-        emojiMedium.postValue(emojies.take(3).joinToString(""))
-        emoji.postValue(emojies.take(1).joinToString(""))
+        val address = corePrefRepository.walletAddress
+        emojiMedium.postValue(address.shortString())
+        avatarEmoji.postValue(address.spendKeyEmojis.extractEmojis().take(1).joinToString(""))
 
         checkForDataConsent()
     }
@@ -211,20 +212,16 @@ class HomeFragmentViewModel : CommonViewModel() {
     }
 
     private fun displayNetworkConnectionErrorDialog() {
-        showModularDialog(
-            SimpleDialogArgs(
-                resourceManager.getString(error_no_connection_title),
-                resourceManager.getString(error_no_connection_description),
-            ).getModular(resourceManager)
+        showSimpleDialog(
+            title = resourceManager.getString(error_no_connection_title),
+            description = resourceManager.getString(error_no_connection_description),
         )
     }
 
     private fun displayBaseNodeConnectionErrorDialog() {
-        showModularDialog(
-            SimpleDialogArgs(
-                resourceManager.getString(error_node_unreachable_title),
-                resourceManager.getString(error_node_unreachable_description),
-            ).getModular(resourceManager)
+        showSimpleDialog(
+            title = resourceManager.getString(error_node_unreachable_title),
+            description = resourceManager.getString(error_node_unreachable_description),
         )
     }
 

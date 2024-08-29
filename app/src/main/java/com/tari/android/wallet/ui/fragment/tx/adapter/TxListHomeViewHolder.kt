@@ -18,7 +18,9 @@ import com.tari.android.wallet.ui.extension.string
 import com.tari.android.wallet.ui.extension.visible
 import com.tari.android.wallet.ui.fragment.contactBook.data.contacts.ContactDto
 import com.tari.android.wallet.util.WalletUtil
-import com.tari.android.wallet.util.extractEmojis
+import com.tari.android.wallet.util.addressFirstEmojis
+import com.tari.android.wallet.util.addressLastEmojis
+import com.tari.android.wallet.util.addressPrefixEmojis
 import org.joda.time.DateTime
 import org.joda.time.Hours
 import org.joda.time.LocalDate
@@ -39,7 +41,7 @@ class TxListHomeViewHolder(view: ItemHomeTxListBinding) : CommonViewHolder<Trans
             displayDate(this)
         }
 
-        item.viewModel.onNewTxNote(tx.message)
+        item.gifViewModel.onNewTxNote(tx.message)
     }
 
     private fun displayAliasOrEmojiId(tx: Tx, contact: ContactDto?) {
@@ -47,21 +49,21 @@ class TxListHomeViewHolder(view: ItemHomeTxListBinding) : CommonViewHolder<Trans
         // display contact name or emoji id
         when {
             tx.isCoinbase -> {
-                ui.participantTextView1.visible()
+                ui.participantTextView1.gone()
                 ui.participantTextView2.gone()
-                ui.participantEmojiIdView.gone()
                 ui.participantTextView1.text = string(R.string.tx_details_coinbase_placeholder)
+                ui.emojiIdViewContainer.root.gone()
             }
 
             tx.isOneSided -> {
                 val title = string(R.string.tx_list_someone) + " " + string(R.string.tx_list_paid_you)
                 ui.participantTextView1.visible()
                 ui.participantTextView2.gone()
-                ui.participantEmojiIdView.gone()
                 ui.participantTextView1.text = title
+                ui.emojiIdViewContainer.root.gone()
             }
 
-            contact != null && contact.contactInfo.getAlias().isNotEmpty() || txUser.walletAddress.isZeros() -> {
+            contact != null && contact.contactInfo.getAlias().isNotEmpty() || txUser.walletAddress.isUnknownUser() -> {
                 val alias = contact?.contactInfo?.getAlias().orEmpty().ifBlank { itemView.context.getString(R.string.unknown_source) }
                 val fullText = when (tx.direction) {
                     Tx.Direction.INBOUND -> string(R.string.tx_list_sent_a_payment, alias)
@@ -74,13 +76,16 @@ class TxListHomeViewHolder(view: ItemHomeTxListBinding) : CommonViewHolder<Trans
                     listOf(alias),
                     TariFont.AVENIR_LT_STD_HEAVY
                 )
-                ui.participantEmojiIdView.gone()
                 ui.participantTextView2.gone()
+                ui.emojiIdViewContainer.root.gone()
             }
 
             else -> { // display emoji id
-                ui.participantEmojiIdView.visible()
-                ui.participantEmojiIdView.text = txUser.walletAddress.emojiId.extractEmojis().take(3).joinToString("")
+                ui.emojiIdViewContainer.root.visible()
+                ui.emojiIdViewContainer.textViewEmojiPrefix.text = txUser.walletAddress.addressPrefixEmojis()
+                ui.emojiIdViewContainer.textViewEmojiFirstPart.text = txUser.walletAddress.addressFirstEmojis()
+                ui.emojiIdViewContainer.textViewEmojiLastPart.text = txUser.walletAddress.addressLastEmojis()
+
                 when (tx.direction) {
                     Tx.Direction.INBOUND -> {
                         ui.participantTextView1.gone()
@@ -166,7 +171,7 @@ class TxListHomeViewHolder(view: ItemHomeTxListBinding) : CommonViewHolder<Trans
             }
 
             txDate.isEqual(yesterdayDate) -> string(R.string.home_tx_list_header_yesterday)
-            else -> txDate.toString(dateFormat, Locale.ENGLISH)
+            else -> txDate.toString(DATE_FORMAT, Locale.ENGLISH)
         }
     }
 
@@ -175,6 +180,6 @@ class TxListHomeViewHolder(view: ItemHomeTxListBinding) : CommonViewHolder<Trans
             ViewHolderBuilder(ItemHomeTxListBinding::inflate, TransactionItem::class.java) { TxListHomeViewHolder(it as ItemHomeTxListBinding) }
 
         // e.g. Wed, Jun 2
-        private const val dateFormat = "E, MMM d"
+        private const val DATE_FORMAT = "E, MMM d"
     }
 }

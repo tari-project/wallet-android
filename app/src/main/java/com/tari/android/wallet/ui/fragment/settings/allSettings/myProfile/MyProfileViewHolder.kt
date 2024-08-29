@@ -3,24 +3,20 @@ package com.tari.android.wallet.ui.fragment.settings.allSettings.myProfile
 import com.tari.android.wallet.databinding.ItemMyProfileBinding
 import com.tari.android.wallet.ui.common.recyclerView.CommonViewHolder
 import com.tari.android.wallet.ui.common.recyclerView.ViewHolderBuilder
-import com.tari.android.wallet.ui.component.fullEmojiId.EmojiIdSummaryViewController
 import com.tari.android.wallet.ui.extension.setVisible
-import com.tari.android.wallet.util.extractEmojis
+import com.tari.android.wallet.util.addressFirstEmojis
+import com.tari.android.wallet.util.addressLastEmojis
+import com.tari.android.wallet.util.addressPrefixEmojis
 
-class MyProfileViewHolder(view: ItemMyProfileBinding) :
-    CommonViewHolder<MyProfileViewHolderItem, ItemMyProfileBinding>(view) {
-
-    private val emojiIdSummaryController = EmojiIdSummaryViewController(ui.participantEmojiIdView)
-    private val yatController = EmojiIdSummaryViewController(ui.participantYatIdView)
+class MyProfileViewHolder(view: ItemMyProfileBinding) : CommonViewHolder<MyProfileViewHolderItem, ItemMyProfileBinding>(view) {
 
     override fun bind(item: MyProfileViewHolderItem) {
         super.bind(item)
-        ui.firstEmojiTextView.text = item.emojiId.extractEmojis()[0]
         ui.alias.text = item.alias
         ui.alias.setVisible(item.alias.isNotBlank())
-        ui.participantYatIdView.root.setVisible(item.yat.isNotBlank())
-        yatController.display(item.yat)
-        emojiIdSummaryController.display(item.emojiId)
+        ui.emojiIdViewContainer.textViewEmojiPrefix.text = item.address.addressPrefixEmojis()
+        ui.emojiIdViewContainer.textViewEmojiFirstPart.text = item.address.addressFirstEmojis()
+        ui.emojiIdViewContainer.textViewEmojiLastPart.text = item.address.addressLastEmojis()
         ui.root.setOnClickListener { item.action.invoke() }
     }
 

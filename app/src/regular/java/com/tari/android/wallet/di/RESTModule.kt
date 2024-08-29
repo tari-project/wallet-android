@@ -76,7 +76,7 @@ class RESTModule {
     fun providePushNotificationRetrofit(
         @Named(FieldName.pushNotificationHttpClient) okHttpClient: OkHttpClient
     ): Retrofit = Retrofit.Builder()
-        .baseUrl(Constants.Wallet.pushNotificationServerUrl)
+        .baseUrl(Constants.Wallet.PUSH_NOTIFICATION_SERVER_URL)
         .client(okHttpClient)
         .addConverterFactory(GsonConverterFactory.create())
         .build()

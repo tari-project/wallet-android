@@ -1,5 +1,7 @@
 package com.tari.android.wallet.ui.common
 
+import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -18,6 +20,7 @@ import com.tari.android.wallet.extension.addTo
 import com.tari.android.wallet.ffi.FFIWallet
 import com.tari.android.wallet.infrastructure.logging.LoggerTags
 import com.tari.android.wallet.model.CoreError
+import com.tari.android.wallet.model.TariWalletAddress
 import com.tari.android.wallet.service.TariWalletService
 import com.tari.android.wallet.service.connection.TariWalletServiceConnection
 import com.tari.android.wallet.ui.common.domain.ResourceManager
@@ -27,6 +30,8 @@ import com.tari.android.wallet.ui.dialog.confirm.ConfirmDialogArgs
 import com.tari.android.wallet.ui.dialog.error.WalletErrorArgs
 import com.tari.android.wallet.ui.dialog.modular.IDialogModule
 import com.tari.android.wallet.ui.dialog.modular.ModularDialogArgs
+import com.tari.android.wallet.ui.dialog.modular.SimpleDialogArgs
+import com.tari.android.wallet.ui.dialog.modular.modules.addressDetails.AddressDetailsModule
 import com.tari.android.wallet.ui.dialog.modular.modules.body.BodyModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonStyle
@@ -96,7 +101,7 @@ open class CommonViewModel : ViewModel() {
     protected val _showToast = SingleLiveEvent<TariToastArgs>()
     val showToast: LiveData<TariToastArgs> = _showToast
 
-    protected val _copyToClipboard = SingleLiveEvent<ClipboardArgs>()
+    private val _copyToClipboard = SingleLiveEvent<ClipboardArgs>()
     val copyToClipboard: LiveData<ClipboardArgs> = _copyToClipboard
 
     private val _modularDialog = SingleLiveEvent<ModularDialogArgs>()
@@ -197,6 +202,74 @@ open class CommonViewModel : ViewModel() {
         showModularDialog(WalletErrorArgs(resourceManager, exception).getModular())
     }
 
+    fun showNotReadyYetDialog() {
+        showSimpleDialog(
+            iconRes = R.drawable.tari_construction,
+            title = resourceManager.getString(R.string.common_not_ready_yet_dialog_title),
+            description = resourceManager.getString(R.string.common_not_ready_yet_dialog_description),
+        )
+    }
+
+    fun showSimpleDialog(
+        @DrawableRes iconRes: Int? = null,
+        @StringRes titleRes: Int,
+        @StringRes descriptionRes: Int,
+        cancelable: Boolean = true,
+        canceledOnTouchOutside: Boolean = true,
+        @StringRes closeButtonTextRes: Int = R.string.common_close,
+        onClose: () -> Unit = {},
+    ) {
+        showSimpleDialog(
+            iconRes = iconRes,
+            title = resourceManager.getString(titleRes),
+            description = resourceManager.getString(descriptionRes),
+            cancelable = cancelable,
+            canceledOnTouchOutside = canceledOnTouchOutside,
+            closeButtonTextRes = closeButtonTextRes,
+            onClose = onClose,
+        )
+    }
+
+    fun showSimpleDialog(
+        @DrawableRes iconRes: Int? = null,
+        title: CharSequence,
+        description: CharSequence,
+        cancelable: Boolean = true,
+        canceledOnTouchOutside: Boolean = true,
+        @StringRes closeButtonTextRes: Int = R.string.common_close,
+        onClose: () -> Unit = {},
+    ) {
+        showModularDialog(
+            SimpleDialogArgs(iconRes, title, description, cancelable, canceledOnTouchOutside, closeButtonTextRes, onClose)
+                .getModular(resourceManager)
+        )
+    }
+
+    protected fun showAddressDetailsDialog(walletAddress: TariWalletAddress) {
+        showModularDialog(
+            HeadModule(
+                title = resourceManager.getString(R.string.wallet_info_address_details_title),
+                rightButtonIcon = R.drawable.vector_common_close,
+                rightButtonAction = { hideDialog() },
+            ),
+            AddressDetailsModule(
+                tariWalletAddress = walletAddress,
+                copyBase58 = {
+                    copyToClipboard(
+                        clipLabel = resourceManager.getString(R.string.wallet_info_address_copy_address_to_clipboard_label),
+                        clipText = walletAddress.fullBase58,
+                    )
+                },
+                copyEmojis = {
+                    copyToClipboard(
+                        clipLabel = resourceManager.getString(R.string.wallet_info_address_copy_address_to_clipboard_label),
+                        clipText = walletAddress.fullEmojiId,
+                    )
+                },
+            )
+        )
+    }
+
     fun hideDialog(dialogId: Int = ModularDialogArgs.DialogId.NO_ID) {
         viewModelScope.launch(Dispatchers.Main) {
             dialogManager.dismiss(dialogId)
@@ -218,5 +291,13 @@ open class CommonViewModel : ViewModel() {
                 ).getModular(resourceManager)
             )
         }
+    }
+
+    internal fun copyToClipboard(
+        clipLabel: String,
+        clipText: String,
+        toastMessage: String = resourceManager.getString(R.string.common_copied_to_clipboard)
+    ) {
+        _copyToClipboard.postValue(ClipboardArgs(clipLabel, clipText, toastMessage))
     }
 }

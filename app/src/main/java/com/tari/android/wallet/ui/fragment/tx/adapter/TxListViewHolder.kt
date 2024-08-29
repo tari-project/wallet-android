@@ -1,6 +1,5 @@
 package com.tari.android.wallet.ui.fragment.tx.adapter
 
-import android.net.Uri
 import androidx.annotation.StringRes
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
@@ -14,16 +13,16 @@ import com.tari.android.wallet.model.CancelledTx
 import com.tari.android.wallet.model.CompletedTx
 import com.tari.android.wallet.model.PendingInboundTx
 import com.tari.android.wallet.model.PendingOutboundTx
+import com.tari.android.wallet.model.TariWalletAddress
 import com.tari.android.wallet.model.Tx
 import com.tari.android.wallet.model.TxNote
 import com.tari.android.wallet.model.TxStatus
 import com.tari.android.wallet.ui.common.domain.PaletteManager
-import com.tari.android.wallet.ui.common.gyphy.presentation.GIFStateConsumer
-import com.tari.android.wallet.ui.common.gyphy.presentation.GlideGIFListener
-import com.tari.android.wallet.ui.common.gyphy.repository.GIFItem
+import com.tari.android.wallet.ui.common.gyphy.presentation.GifStateConsumer
+import com.tari.android.wallet.ui.common.gyphy.presentation.GlideGifListener
+import com.tari.android.wallet.ui.common.gyphy.repository.GifItem
 import com.tari.android.wallet.ui.common.recyclerView.CommonViewHolder
 import com.tari.android.wallet.ui.common.recyclerView.ViewHolderBuilder
-import com.tari.android.wallet.ui.component.fullEmojiId.EmojiIdSummaryViewController
 import com.tari.android.wallet.ui.component.tari.TariFont
 import com.tari.android.wallet.ui.extension.dimen
 import com.tari.android.wallet.ui.extension.gone
@@ -32,19 +31,19 @@ import com.tari.android.wallet.ui.extension.setVisible
 import com.tari.android.wallet.ui.extension.string
 import com.tari.android.wallet.ui.extension.visible
 import com.tari.android.wallet.ui.fragment.contactBook.data.contacts.ContactDto
-import com.tari.android.wallet.ui.fragment.contactBook.data.contacts.MergedContactInfo
 import com.tari.android.wallet.util.WalletUtil
-import com.tari.android.wallet.util.extractEmojis
+import com.tari.android.wallet.util.addressFirstEmojis
+import com.tari.android.wallet.util.addressLastEmojis
+import com.tari.android.wallet.util.addressPrefixEmojis
 import org.joda.time.DateTime
 import org.joda.time.Hours
 import org.joda.time.LocalDate
 import org.joda.time.Minutes
 import java.util.Locale
 
-class TxListViewHolder(view: ItemTxListBinding) : CommonViewHolder<TransactionItem, ItemTxListBinding>(view), GIFStateConsumer {
+class TxListViewHolder(view: ItemTxListBinding) : CommonViewHolder<TransactionItem, ItemTxListBinding>(view), GifStateConsumer {
 
     private val glide = Glide.with(itemView.context)
-    private val emojiIdSummaryController = EmojiIdSummaryViewController(ui.participantEmojiIdView)
     private lateinit var tx: Tx
 
     override fun bind(item: TransactionItem) {
@@ -52,7 +51,6 @@ class TxListViewHolder(view: ItemTxListBinding) : CommonViewHolder<TransactionIt
 
         with(item.tx) {
             this@TxListViewHolder.tx = this
-            displayFirstEmojiOrAvatar(this, item.contact)
             displayAliasOrEmojiId(this, item.contact)
             displayAmount(this)
             displayDate(this)
@@ -60,27 +58,9 @@ class TxListViewHolder(view: ItemTxListBinding) : CommonViewHolder<TransactionIt
             displayMessage(this)
         }
 
-        item.viewModel.onNewTxNote(tx.message)
-        ui.gifContainer.retryLoadingGifTextView.setOnClickListener { item.viewModel.retry() }
-        item.viewModel.gifState.observeForever { it.handle(this) }
-    }
-
-    private fun displayFirstEmojiOrAvatar(tx: Tx, contact: ContactDto?) {
-        val avatar = (contact?.contactInfo as? MergedContactInfo)?.phoneContactInfo?.avatar.orEmpty()
-        if (avatar.isEmpty()) {
-            // display first emoji of emoji id
-            val firstEmoji = when {
-                tx.isCoinbase -> string(R.string.tx_list_emoji_coinbase_payment_placeholder)
-                tx.isOneSided -> string(R.string.tx_list_emoji_one_side_payment_placeholder)
-                else -> tx.tariContact.walletAddress.emojiId.extractEmojis()[0]
-            }
-            ui.firstEmojiTextView.text = firstEmoji
-        } else {
-            // display avatar
-            ui.avatar.setImageURI(Uri.parse(avatar))
-        }
-        ui.avatar.setVisible(avatar.isNotEmpty())
-        ui.firstEmojiTextView.setVisible(avatar.isEmpty())
+        item.gifViewModel.onNewTxNote(tx.message)
+        ui.gifContainer.retryLoadingGifTextView.setOnClickListener { item.gifViewModel.retry() }
+        item.gifViewModel.gifState.observeForever { it.handle(this) }
     }
 
     private fun displayAliasOrEmojiId(tx: Tx, contact: ContactDto?) {
@@ -90,7 +70,7 @@ class TxListViewHolder(view: ItemTxListBinding) : CommonViewHolder<TransactionIt
             tx.isCoinbase -> {
                 ui.participantTextView1.visible()
                 ui.participantTextView2.gone()
-                ui.participantEmojiIdView.root.gone()
+                ui.emojiIdViewContainer.root.gone()
                 ui.participantTextView1.text = string(R.string.tx_details_coinbase_placeholder)
             }
 
@@ -98,11 +78,11 @@ class TxListViewHolder(view: ItemTxListBinding) : CommonViewHolder<TransactionIt
                 val title = string(R.string.tx_list_someone) + " " + string(R.string.tx_list_paid_you)
                 ui.participantTextView1.visible()
                 ui.participantTextView2.gone()
-                ui.participantEmojiIdView.root.gone()
+                ui.emojiIdViewContainer.root.gone()
                 ui.participantTextView1.text = title
             }
 
-            contact != null && contact.contactInfo.getAlias().isNotEmpty() || txUser.walletAddress.isZeros() -> {
+            contact != null && contact.contactInfo.getAlias().isNotEmpty() || txUser.walletAddress.isUnknownUser() -> {
                 val alias = contact?.contactInfo?.getAlias().orEmpty().ifBlank { itemView.context.getString(R.string.unknown_source) }
                 val fullText = when (tx.direction) {
                     Tx.Direction.INBOUND -> string(R.string.tx_list_sent_a_payment, alias)
@@ -115,19 +95,18 @@ class TxListViewHolder(view: ItemTxListBinding) : CommonViewHolder<TransactionIt
                     listOf(alias),
                     TariFont.AVENIR_LT_STD_HEAVY
                 )
-                ui.participantEmojiIdView.root.gone()
+                ui.emojiIdViewContainer.root.gone()
                 ui.participantTextView2.gone()
             }
 
             else -> { // display emoji id
-                ui.participantEmojiIdView.root.visible()
-                emojiIdSummaryController.display(txUser.walletAddress.emojiId, showEmojisFromEachEnd = 3)
+                displayEmojiId(txUser.walletAddress)
+
                 when (tx.direction) {
                     Tx.Direction.INBOUND -> {
                         ui.participantTextView1.gone()
                         ui.participantTextView2.visible()
                         ui.participantTextView2.text = string(R.string.tx_list_paid_you)
-                        // paid you
                     }
 
                     Tx.Direction.OUTBOUND -> {
@@ -207,7 +186,7 @@ class TxListViewHolder(view: ItemTxListBinding) : CommonViewHolder<TransactionIt
             }
 
             txDate.isEqual(yesterdayDate) -> string(R.string.home_tx_list_header_yesterday)
-            else -> txDate.toString(dateFormat, Locale.ENGLISH)
+            else -> txDate.toString(DATE_FORMAT, Locale.ENGLISH)
         }
     }
 
@@ -233,6 +212,13 @@ class TxListViewHolder(view: ItemTxListBinding) : CommonViewHolder<TransactionIt
         else -> ui.statusTextView.gone()
     }
 
+    private fun displayEmojiId(address: TariWalletAddress) {
+        ui.emojiIdViewContainer.root.visible()
+        ui.emojiIdViewContainer.textViewEmojiPrefix.text = address.addressPrefixEmojis()
+        ui.emojiIdViewContainer.textViewEmojiFirstPart.text = address.addressFirstEmojis()
+        ui.emojiIdViewContainer.textViewEmojiLastPart.text = address.addressLastEmojis()
+    }
+
     private fun showStatusTextViewFinalProcessing(step: Int = 0) = showStatusTextView(
         string(R.string.tx_detail_completing_final_processing, step + 1, item!!.requiredConfirmationCount + 1)
     )
@@ -246,16 +232,15 @@ class TxListViewHolder(view: ItemTxListBinding) : CommonViewHolder<TransactionIt
 
     private fun displayMessage(tx: Tx) {
         val note = TxNote.fromNote(tx.message)
-        if (note.message == null) {
+        if (note.message.isNullOrBlank()) {
             ui.messageTextView.gone()
-            ui.messageTextView.text = ""
         } else {
             ui.messageTextView.visible()
             ui.messageTextView.text = if (tx.isOneSided) string(R.string.tx_list_you_received_one_side_payment) else note.message
         }
     }
 
-    override fun onLoadingState() {
+    override fun onGifLoadingState() {
         glide.clear(ui.gifContainer.gifView)
         ui.gifContainer.gifStatusContainer.visible()
         ui.gifContainer.loadingGifTextView.visible()
@@ -265,31 +250,31 @@ class TxListViewHolder(view: ItemTxListBinding) : CommonViewHolder<TransactionIt
         ui.gifContainer.gifView.setTopMargin(0)
     }
 
-    override fun onErrorState() {
+    override fun onGifErrorState() {
         ui.gifContainer.gifStatusContainer.visible()
         ui.gifContainer.loadingGifProgressBar.gone()
         ui.gifContainer.loadingGifTextView.gone()
         ui.gifContainer.retryLoadingGifTextView.visible()
     }
 
-    override fun onSuccessState(gifItem: GIFItem) {
+    override fun onGifSuccessState(gifItem: GifItem) {
         glide
             .asGif()
             .override(ui.gifContainer.gifContainerRootView.width, Target.SIZE_ORIGINAL)
             .apply(RequestOptions().transform(RoundedCorners(10)))
             .load(gifItem.uri)
-            .listener(GlideGIFListener(this))
+            .listener(GlideGifListener(this))
             .transition(DrawableTransitionOptions.withCrossFade(250))
             .into(ui.gifContainer.gifView)
     }
 
-    override fun onResourceReady() {
+    override fun onGifResourceReady() {
         ui.gifContainer.gifStatusContainer.gone()
         ui.gifContainer.gifView.visible()
         ui.gifContainer.gifView.setTopMargin(dimen(R.dimen.tx_list_item_gif_container_top_margin))
     }
 
-    override fun noGIFState() {
+    override fun noGifState() {
         glide.clear(ui.gifContainer.gifView)
         ui.gifContainer.gifView.gone()
         ui.gifContainer.gifStatusContainer.gone()
@@ -300,6 +285,6 @@ class TxListViewHolder(view: ItemTxListBinding) : CommonViewHolder<TransactionIt
             ViewHolderBuilder(ItemTxListBinding::inflate, TransactionItem::class.java) { TxListViewHolder(it as ItemTxListBinding) }
 
         // e.g. Wed, Jun 2
-        private const val dateFormat = "E, MMM d"
+        private const val DATE_FORMAT = "E, MMM d"
     }
 }

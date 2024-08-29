@@ -122,7 +122,7 @@ class BackupSettingsViewModel : CommonViewModel() {
             exception?.message == null -> resourceManager.getString(R.string.back_up_wallet_backing_up_unknown_error)
             else -> resourceManager.getString(R.string.back_up_wallet_backing_up_error_desc, exception.message!!)
         }
-        showModularDialog(SimpleDialogArgs(errorTitle, errorDescription).getModular(resourceManager))
+        showSimpleDialog(title = errorTitle, description = errorDescription)
     }
 }
 

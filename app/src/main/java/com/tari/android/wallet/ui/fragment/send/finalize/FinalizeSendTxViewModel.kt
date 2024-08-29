@@ -1,7 +1,6 @@
 package com.tari.android.wallet.ui.fragment.send.finalize
 
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.viewModelScope
 import com.tari.android.wallet.R.string.finalize_send_tx_sending_step_1_desc_line_1
 import com.tari.android.wallet.R.string.finalize_send_tx_sending_step_1_desc_line_2
 import com.tari.android.wallet.R.string.finalize_send_tx_sending_step_2_desc_line_1
@@ -24,8 +23,6 @@ import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.common.domain.ResourceManager
 import com.tari.android.wallet.ui.fragment.send.common.TransactionData
 import com.tari.android.wallet.util.Constants
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import org.joda.time.DateTime
 import org.joda.time.Seconds
 import javax.inject.Inject
@@ -175,15 +172,16 @@ class FinalizeSendTxViewModel : CommonViewModel() {
         }
 
         override fun execute() {
-            viewModelScope.launch(Dispatchers.IO) {
+            launchOnIo {
                 val error = WalletError()
                 val txId = walletService.sendTari(
-                    TariContact(transactionData.recipientContact!!.contactInfo.extractWalletAddress()),
-                    transactionData.amount,
-                    transactionData.feePerGram ?: Constants.Wallet.defaultFeePerGram,
-                    transactionData.note.orEmpty(),
-                    transactionData.isOneSidePayment,
-                    error
+                    /* contact = */ TariContact(transactionData.recipientContact!!.contactInfo.requireWalletAddress()),
+                    /* amount = */ transactionData.amount,
+                    /* feePerGram = */ transactionData.feePerGram ?: Constants.Wallet.DEFAULT_FEE_PER_GRAM,
+                    /* message = */ transactionData.message,
+                    /* isOneSidePayment = */ transactionData.isOneSidePayment,
+                    /* paymentId = */ transactionData.paymentId,
+                    /* error = */ error,
                 )
                 // if success, just wait for the callback to happen
                 // if failed, just show the failed info & return
