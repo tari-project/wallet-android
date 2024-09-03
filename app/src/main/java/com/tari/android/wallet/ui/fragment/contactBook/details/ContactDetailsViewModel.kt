@@ -171,7 +171,7 @@ class ContactDetailsViewModel(savedState: SavedStateHandle) : CommonViewModel() 
             launchOnMain {
                 _uiState.update {
                     it.copy(
-                        contact = contactsRepository.toggleFavorite(contactDto),
+                        contact = newContact,
                         list = updateList(newContact),
                     )
                 }
