@@ -15,6 +15,7 @@ import com.tari.android.wallet.ui.fragment.contactBook.data.contacts.PhoneContac
 import com.tari.android.wallet.ui.fragment.contactBook.data.contacts.toYatDto
 import com.tari.android.wallet.ui.fragment.contactBook.data.contacts.withConnectedWallets
 import com.tari.android.wallet.util.ContactUtil
+import com.tari.android.wallet.util.EmojiId
 import com.tari.android.wallet.util.nextBoolean
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -108,7 +109,7 @@ class ContactsRepository @Inject constructor(
         contactToUpdate: ContactDto,
         firstName: String,
         lastName: String,
-        yat: String
+        yat: EmojiId,
     ): ContactDto {
         updateContactList { currentList ->
             currentList
@@ -190,12 +191,12 @@ class ContactsRepository @Inject constructor(
     }
 
     // TODO save yats to shared prefs
-    suspend fun updateYatInfo(contactDto: ContactDto, connectedWallets: Map<String, PaymentAddressResponseResult>): ContactDto {
+    suspend fun updateYatInfo(contactDto: ContactDto, connectedWalletsMap: Map<String, PaymentAddressResponseResult>): ContactDto {
         updateContactList { currentList ->
             currentList
                 .replaceItem(
                     condition = { it.uuid == contactDto.uuid },
-                    replace = { contact -> contact.copy(yatDto = contact.yatDto.withConnectedWallets(connectedWallets)) }
+                    replace = { contact -> contact.copy(yatDto = contact.yatDto.withConnectedWallets(connectedWalletsMap)) }
                 )
         }
         return getByUuid(contactDto.uuid)

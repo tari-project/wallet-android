@@ -2,7 +2,6 @@ package com.tari.android.wallet.ui.fragment.contactBook.details
 
 import android.text.SpannableString
 import androidx.lifecycle.SavedStateHandle
-import androidx.lifecycle.viewModelScope
 import com.tari.android.wallet.R
 import com.tari.android.wallet.R.string.common_cancel
 import com.tari.android.wallet.R.string.common_close
@@ -46,6 +45,7 @@ import com.tari.android.wallet.ui.fragment.contactBook.data.contacts.ContactDto
 import com.tari.android.wallet.ui.fragment.contactBook.data.contacts.MergedContactInfo
 import com.tari.android.wallet.ui.fragment.contactBook.data.contacts.YatDto
 import com.tari.android.wallet.ui.fragment.contactBook.data.contacts.splitAlias
+import com.tari.android.wallet.ui.fragment.contactBook.data.contacts.toConnectedWallets
 import com.tari.android.wallet.ui.fragment.contactBook.details.adapter.contactType.ContactTypeViewHolderItem
 import com.tari.android.wallet.ui.fragment.contactBook.details.adapter.profile.ContactProfileViewHolderItem
 import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
@@ -54,10 +54,6 @@ import com.tari.android.wallet.ui.fragment.settings.allSettings.row.SettingsRowS
 import com.tari.android.wallet.ui.fragment.settings.allSettings.row.SettingsRowViewHolderItem
 import com.tari.android.wallet.ui.fragment.settings.allSettings.title.SettingsTitleViewHolderItem
 import com.tari.android.wallet.util.DebugConfig
-import kotlinx.coroutines.Deferred
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -72,10 +68,6 @@ class ContactDetailsViewModel(savedState: SavedStateHandle) : CommonViewModel() 
     @Inject
     lateinit var yatAdapter: YatAdapter
 
-    // TODO don't understand the purpose of this. Need a refactor once Yat is implemented
-    private var searchingJob: Deferred<YatDto?>? = null
-    private var updatingJob: Job? = null
-
     private val _uiState = MutableStateFlow(ContactDetailsModel.UiState(contact = savedState.get<ContactDto>(PARAMETER_CONTACT)!!))
     val uiState = _uiState.asStateFlow()
 
@@ -83,11 +75,11 @@ class ContactDetailsViewModel(savedState: SavedStateHandle) : CommonViewModel() 
         component.inject(this)
 
         _uiState.update { it.copy(list = updateList(it.contact)) }
+
+        updateYatInfo(uiState.value.contact.yatDto)
     }
 
-
     private fun updateList(contact: ContactDto): List<CommonViewHolderItem> {
-        updateYatInfo(contact)
 
         val availableActions = contact.getContactActions()
         val connectedYatWallets = contact.yatDto?.connectedWallets?.filter { it.name != null }
@@ -179,22 +171,16 @@ class ContactDetailsViewModel(savedState: SavedStateHandle) : CommonViewModel() 
         }
     }
 
-    private fun updateYatInfo(contact: ContactDto) {
-        if (updatingJob != null) return
-
-        contact.yatDto?.takeUnless { it.yat.isEmpty() }?.let { yatDto ->
-            updatingJob = launchOnIo {
-                try {
-                    val entries = yatAdapter.searchAnyYats(yatDto.yat)?.result?.entries
-                    entries ?: return@launchOnIo
-                    val map = entries.associate { entry -> entry.key to entry.value }
-                    contactsRepository.updateYatInfo(contactDto = contact, connectedWallets = map)
-                    val newContact = contactsRepository.getByUuid(contact.uuid)
-                    launchOnMain {
-                        _uiState.update { it.copy(contact = newContact, list = updateList(newContact)) }
-                    }
-                } catch (e: Throwable) {
-                    e.printStackTrace()
+    /**
+     * Look up connected wallets for the given Yat
+     */
+    private fun updateYatInfo(yatDto: YatDto?) {
+        if (yatDto != null && yatDto.yat.isNotEmpty() && yatDto.connectedWallets.isEmpty()) {
+            launchOnIo {
+                val connectedWallets = yatAdapter.searchAllYats(yatDto.yat).toConnectedWallets()
+                val newContact = uiState.value.contact.copy(yatDto = yatDto.copy(connectedWallets = connectedWallets))
+                launchOnMain {
+                    _uiState.update { it.copy(contact = newContact, list = updateList(newContact)) }
                 }
             }
         }
@@ -218,7 +204,7 @@ class ContactDetailsViewModel(savedState: SavedStateHandle) : CommonViewModel() 
         )
 
         val yatModule = YatInputModule(
-            search = this::yatSearchAction,
+            search = this::searchYat,
             value = yatDto?.yat.orEmpty(),
             hint = resourceManager.getString(contact_book_add_contact_yat_hint),
             isFirst = false,
@@ -249,20 +235,12 @@ class ContactDetailsViewModel(savedState: SavedStateHandle) : CommonViewModel() 
         )
     }
 
-    private suspend fun yatSearchAction(yat: String): Boolean {
-        searchingJob?.cancel()
-
+    // TODO rewrite this function to validate Yat only when it's fully entered
+    private suspend fun searchYat(yat: String): Boolean {
         if (yat.isEmpty()) return false
 
-        searchingJob = viewModelScope.async(Dispatchers.IO) {
-            val entries = yatAdapter.searchTariYats(yat)?.result?.entries?.firstOrNull()
-            entries ?: return@async null
-            // TODO: Weird code. Returns nothing, don't understand the purpose of this. Also check if returns base58 or not
-            val pubkey = entries.value.address
-            val address = TariWalletAddress.fromBase58OrNull(pubkey) ?: return@async null
-            YatDto(yat)
-        }
-        return searchingJob?.await() != null
+        val searchResult = yatAdapter.searchTariYat(yat) ?: return false
+        return TariWalletAddress.validateBase58(searchResult.address)
     }
 
     private fun saveDetails(contact: ContactDto, newName: String, yat: String = "") {
@@ -273,7 +251,7 @@ class ContactDetailsViewModel(savedState: SavedStateHandle) : CommonViewModel() 
                 closeButtonTextRes = R.string.contact_details_empty_name_dialog_button,
             )
         } else {
-            updatingJob?.cancel()
+            // TODO validate yat using YanAdapter and show error if invalid
             launchOnIo {
                 val firstName = splitAlias(newName).firstName
                 val lastName = splitAlias(newName).lastName

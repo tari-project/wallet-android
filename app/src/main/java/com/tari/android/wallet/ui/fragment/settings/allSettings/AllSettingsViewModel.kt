@@ -111,9 +111,6 @@ class AllSettingsViewModel : CommonViewModel() {
     @Inject
     lateinit var settingsRepository: CorePrefRepository
 
-    @Inject
-    lateinit var yatSharedPrefsRepository: YatPrefRepository
-
     private val _openYatOnboarding = SingleLiveEvent<Unit>()
     val openYatOnboarding: LiveData<Unit> = _openYatOnboarding
 
@@ -139,7 +136,7 @@ class AllSettingsViewModel : CommonViewModel() {
         val pinCode = securityPrefRepository.pinCode
 
         _allSettingsOptions.postValue(listOfNotNull(
-            MyProfileViewHolderItem(settingsRepository.walletAddress, yatSharedPrefsRepository.connectedYat.orEmpty(), alias) {
+            MyProfileViewHolderItem(settingsRepository.walletAddress, yatAdapter.connectedYat.orEmpty(), alias) {
                 navigation.postValue(AllSettingsNavigation.ToMyProfile)
             },
             DividerViewHolderItem(),

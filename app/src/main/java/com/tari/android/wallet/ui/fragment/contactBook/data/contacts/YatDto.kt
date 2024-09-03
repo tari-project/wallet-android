@@ -4,6 +4,7 @@ import android.os.Parcelable
 import com.google.gson.annotations.SerializedName
 import com.tari.android.wallet.R
 import com.tari.android.wallet.ui.fragment.contactBook.data.contacts.YatDto.ConnectedWallet
+import com.tari.android.wallet.util.EmojiId
 import kotlinx.parcelize.Parcelize
 import yat.android.data.YatRecordType
 import yat.android.sdk.models.PaymentAddressResponseResult
@@ -11,11 +12,9 @@ import java.lang.reflect.Field
 
 @Parcelize
 data class YatDto(
-    val yat: String,
-    val connectedWallets: List<ConnectedWallet> = listOf(),
+    val yat: EmojiId,
+    val connectedWallets: List<ConnectedWallet> = listOf(), // TODO don't store connected wallets in this class. They should be loaded on the Contact Detail screen
 ) : Parcelable {
-
-    fun filtered(text: String): Boolean = yat.contains(text, true)
 
     @Parcelize
     data class ConnectedWallet(
@@ -64,5 +63,7 @@ data class YatDto(
     }
 }
 
-fun YatDto?.withConnectedWallets(connectedWallets: Map<String, PaymentAddressResponseResult>): YatDto? =
-    this?.copy(connectedWallets = connectedWallets.map { ConnectedWallet(it.key, it.value) })
+fun YatDto?.withConnectedWallets(connectedWalletsMap: Map<String, PaymentAddressResponseResult>): YatDto? =
+    this?.copy(connectedWallets = connectedWalletsMap.toConnectedWallets())
+
+fun Map<String, PaymentAddressResponseResult>.toConnectedWallets(): List<ConnectedWallet> = map { ConnectedWallet(it.key, it.value) }

@@ -14,14 +14,15 @@ import com.tari.android.wallet.ui.fragment.send.common.TransactionData
 import com.tari.android.wallet.ui.fragment.send.finalize.FinalizeSendTxViewModel
 import com.tari.android.wallet.ui.fragment.send.finalize.YatFinalizeSendTxActivity
 import com.tari.android.wallet.util.DebugConfig
+import com.tari.android.wallet.util.EmojiId
 import yat.android.data.YatRecord
 import yat.android.data.YatRecordType
 import yat.android.lib.YatConfiguration
 import yat.android.lib.YatIntegration
 import yat.android.lib.YatLibApi
-import yat.android.sdk.models.PaymentAddressResponse
+import yat.android.sdk.models.PaymentAddressResponseResult
+import yat.android.ui.transactions.outcoming.YatLibOutcomingTransactionActivity
 import yat.android.ui.transactions.outcoming.YatLibOutcomingTransactionData
-import java.io.Serializable
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -34,6 +35,12 @@ class YatAdapter @Inject constructor(
 
     private val logger
         get() = Logger.t(YatAdapter::class.simpleName)
+
+    val connectedYat: EmojiId?
+        get() = yatSharedRepository.connectedYat
+
+    val isYatDisconnected: Boolean // TODO make a check every time we show the Wallet Info screen
+        get() = yatSharedRepository.yatWasDisconnected
 
     fun initYat(application: Application) {
         val config = YatConfiguration(
@@ -50,15 +57,39 @@ class YatAdapter @Inject constructor(
         )
     }
 
-    fun searchTariYats(emojiId: String): PaymentAddressResponse? =
-        kotlin.runCatching { YatLibApi.emojiIDApi.lookupEmojiIDPayment(emojiId, TYPE_XTR) }.getOrNull()
+    /**
+     * Search for Tari address by Yat emojiId
+     */
+    suspend fun searchTariYat(yatEmojiId: EmojiId): PaymentAddressResponseResult? {
+        return try {
+            val tariTag = YatRecordType.XTM_ADDRESS.serializedName
+            // We take only the first result because we are looking for a Tari address only
+            val result = YatLibApi.emojiIDApi.lookupEmojiIDPayment(yatEmojiId, tariTag).result?.entries?.firstOrNull()?.value
+            if (result == null) logger.d("Can't find Tari address for $yatEmojiId")
+            result
+        } catch (e: Exception) {
+            logger.e("Error while searching for Tari address for $yatEmojiId:\n${e.message}")
+            null
+        }
+    }
 
-    fun searchAnyYats(emojiId: String): PaymentAddressResponse? =
-        kotlin.runCatching { YatLibApi.emojiIDApi.lookupEmojiIDPayment(emojiId, null) }.getOrNull()
+    /**
+     * Search for all payment addresses connected to the Yat emojiId
+     */
+    suspend fun searchAllYats(yatEmojiId: EmojiId): Map<String, PaymentAddressResponseResult> {
+        return try {
+            val result = YatLibApi.emojiIDApi.lookupEmojiIDPayment(yatEmojiId, null).result
+            if (result.isNullOrEmpty()) logger.d("Can't find any Yats for $yatEmojiId")
+            result.orEmpty()
+        } catch (e: Exception) {
+            logger.e("Error while searching for Yats for $yatEmojiId:\n${e.message}")
+            emptyMap()
+        }
+    }
 
     fun openOnboarding(context: Context) {
-        val address = commonRepository.walletAddressBase58.orEmpty() // TODO use the correct value for Yat
-        YatIntegration.showOnboarding(context, listOf(YatRecord(YatRecordType.XTR_ADDRESS, data = address)))
+        val address = commonRepository.walletAddressBase58.orEmpty()
+        YatIntegration.showOnboarding(context, listOf(YatRecord(YatRecordType.XTM_ADDRESS, data = address)))
     }
 
     fun showOutcomingFinalizeActivity(activity: Activity, transactionData: TransactionData) {
@@ -71,10 +102,14 @@ class YatAdapter @Inject constructor(
         )
 
         val intent = Intent(activity, YatFinalizeSendTxActivity::class.java)
-        intent.putExtra(KEY_YATLIB_DATA, data as Serializable)
+        intent.putExtra(YatLibOutcomingTransactionActivity.DATA_KEY, data)
         intent.putExtra(FinalizeSendTxViewModel.KEY_TRANSACTION_DATA, transactionData)
         intent.flags = Intent.FLAG_ACTIVITY_NO_ANIMATION
         activity.startActivity(intent, ActivityOptions.makeSceneTransitionAnimation(activity).toBundle())
+    }
+
+    fun disconnectYat(disconnected: Boolean = true) {
+        yatSharedRepository.yatWasDisconnected = disconnected
     }
 
     override fun onYatIntegrationComplete(yat: String) {
@@ -84,10 +119,5 @@ class YatAdapter @Inject constructor(
 
     override fun onYatIntegrationFailed(failureType: YatIntegration.FailureType) {
         logger.d("Yat integration failed $failureType")
-    }
-
-    companion object {
-        private const val KEY_YATLIB_DATA = "YatLibDataKey"
-        private const val TYPE_XTR = "0x0103"
     }
 }

@@ -225,7 +225,7 @@ class ContactSelectionViewModel : CommonViewModel() {
             ContactDto(
                 contactInfo = FFIContactInfo(it.walletAddress),
                 yatDto = YatDto(
-                    yat = it.yatName,
+                    yat = it.yat,
                     connectedWallets = it.connectedWallets,
                 ),
             )
@@ -265,18 +265,14 @@ class ContactSelectionViewModel : CommonViewModel() {
         )
     }
 
-    private fun tryToFindYatUser(emojiId: EmojiId): YatState.YatUser? {
-        if (emojiId.isEmpty() || emojiId.getGraphemeLength() > YAT_MAX_LENGTH) return null
+    private suspend fun tryToFindYatUser(yatEmojiId: EmojiId): YatState.YatUser? {
+        if (yatEmojiId.isEmpty() || yatEmojiId.getGraphemeLength() > YAT_MAX_LENGTH) return null
 
-        val connectedWallets = yatAdapter.searchTariYats(emojiId)?.result?.entries
-        // TODO I think it won't work. Need to check it and probably change Yat lib to return base58 address
-        val hexAddress = connectedWallets?.firstOrNull()?.value?.address
-        return hexAddress?.let { TariWalletAddress.fromBase58OrNull(hexAddress) }?.let { walletAddress ->
+        return yatAdapter.searchTariYat(yatEmojiId)?.let { yatResult ->
             YatState.YatUser(
-                yatName = emojiId,
-                hexAddress = hexAddress,
-                walletAddress = walletAddress,
-                connectedWallets = connectedWallets.map { YatDto.ConnectedWallet(it.key, it.value) },
+                yat = yatEmojiId,
+                walletAddress = TariWalletAddress.fromBase58(yatResult.address),
+                connectedWallets = yatAdapter.searchAllYats(yatEmojiId).map { YatDto.ConnectedWallet(it.key, it.value) },
             )
         }
     }
@@ -327,5 +323,3 @@ class ContactSelectionViewModel : CommonViewModel() {
         data object AddChat : ContinueButtonEffect()
     }
 }
-
-

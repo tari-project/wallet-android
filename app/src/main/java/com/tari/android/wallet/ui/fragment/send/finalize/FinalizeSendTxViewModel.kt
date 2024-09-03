@@ -1,5 +1,6 @@
 package com.tari.android.wallet.ui.fragment.send.finalize
 
+import androidx.annotation.StringRes
 import androidx.lifecycle.MutableLiveData
 import com.tari.android.wallet.R.string.finalize_send_tx_sending_step_1_desc_line_1
 import com.tari.android.wallet.R.string.finalize_send_tx_sending_step_1_desc_line_2
@@ -20,7 +21,7 @@ import com.tari.android.wallet.tor.TorBootstrapStatus
 import com.tari.android.wallet.tor.TorProxyState
 import com.tari.android.wallet.tor.TorProxyStateHandler
 import com.tari.android.wallet.ui.common.CommonViewModel
-import com.tari.android.wallet.ui.common.domain.ResourceManager
+import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
 import com.tari.android.wallet.ui.fragment.send.common.TransactionData
 import com.tari.android.wallet.util.Constants
 import org.joda.time.DateTime
@@ -34,7 +35,7 @@ class FinalizeSendTxViewModel : CommonViewModel() {
 
     lateinit var transactionData: TransactionData
 
-    val steps: MutableLiveData<MutableList<FinalizingStep>> = MutableLiveData<MutableList<FinalizingStep>>()
+    val steps: MutableLiveData<List<FinalizingStep>> = MutableLiveData<List<FinalizingStep>>()
     val sentTxId: MutableLiveData<TxId> = MutableLiveData()
     val txFailureReason: MutableLiveData<TxFailureReason> = MutableLiveData()
     val isSuccess = MutableLiveData<Boolean>()
@@ -45,13 +46,11 @@ class FinalizeSendTxViewModel : CommonViewModel() {
     }
 
     fun start() {
-        val stepList = mutableListOf<FinalizingStep>()
-        stepList.add(ConnectionCheckStep(resourceManager))
-        stepList.add(DiscoveryStep(resourceManager))
-        if (!transactionData.isOneSidePayment) {
-            stepList.add(SentStep(resourceManager))
-        }
-        steps.value = stepList
+        steps.value = listOfNotNull(
+            ConnectionCheckStep(),
+            DiscoveryStep(),
+            SentStep().takeIf { !transactionData.isOneSidePayment },
+        )
 
         checkStepStatus()
     }
@@ -72,13 +71,29 @@ class FinalizeSendTxViewModel : CommonViewModel() {
         }
     }
 
-    abstract inner class FinalizingStep(val resourceManager: ResourceManager, descLine1Res: Int, descLine2Res: Int) {
+    fun onYatSendTxStop() {
+        trySendTxSuccess(isYat = true)
+        trySendTxSuccess(isYat = true)
+    }
 
+    fun trySendTxSuccess(isYat: Boolean) {
+        sentTxId.value?.let {
+            tariNavigator.navigate(Navigation.SendTxNavigation.OnSendTxSuccess(isYat = isYat, txId = it))
+        }
+    }
+
+    fun trySendTxFailure(isYat: Boolean) {
+        txFailureReason.value?.let {
+            tariNavigator.navigate(Navigation.SendTxNavigation.OnSendTxFailure(isYat = isYat, txFailureReason = it))
+        }
+    }
+
+    sealed class FinalizingStep(
+        @StringRes val descLine1Res: Int,
+        @StringRes val descLine2Res: Int,
+    ) {
         var isStarted: Boolean = false
         var isCompleted: Boolean = false
-
-        var descriptionLine1 = resourceManager.getString(descLine1Res)
-        var descriptionLine2 = resourceManager.getString(descLine2Res)
 
         abstract fun execute()
 
@@ -90,8 +105,7 @@ class FinalizeSendTxViewModel : CommonViewModel() {
         }
     }
 
-    inner class ConnectionCheckStep(resourceManager: ResourceManager) : FinalizingStep(
-        resourceManager = resourceManager,
+    inner class ConnectionCheckStep : FinalizingStep(
         descLine1Res = finalize_send_tx_sending_step_1_desc_line_1,
         descLine2Res = finalize_send_tx_sending_step_1_desc_line_2,
     ) {
@@ -157,20 +171,10 @@ class FinalizeSendTxViewModel : CommonViewModel() {
         }
     }
 
-    open inner class DiscoveryStep(resourceManager: ResourceManager) :
-        FinalizingStep(
-            resourceManager = resourceManager,
-            descLine1Res = finalize_send_tx_sending_step_2_desc_line_1,
-            descLine2Res = finalize_send_tx_sending_step_2_desc_line_2,
-        ) {
-
-        init {
-            if (transactionData.isOneSidePayment) {
-                descriptionLine1 = resourceManager.getString(finalize_send_tx_sending_step_3_desc_line_1)
-                descriptionLine2 = resourceManager.getString(finalize_send_tx_sending_step_3_desc_line_2)
-            }
-        }
-
+    inner class DiscoveryStep : FinalizingStep(
+        descLine1Res = if (transactionData.isOneSidePayment) finalize_send_tx_sending_step_3_desc_line_1 else finalize_send_tx_sending_step_2_desc_line_1,
+        descLine2Res = if (transactionData.isOneSidePayment) finalize_send_tx_sending_step_3_desc_line_2 else finalize_send_tx_sending_step_2_desc_line_2,
+    ) {
         override fun execute() {
             launchOnIo {
                 val error = WalletError()
@@ -195,12 +199,10 @@ class FinalizeSendTxViewModel : CommonViewModel() {
         }
     }
 
-    inner class SentStep(resourceManager: ResourceManager) :
-        FinalizingStep(
-            resourceManager = resourceManager,
-            descLine1Res = finalize_send_tx_sending_step_3_desc_line_1,
-            descLine2Res = finalize_send_tx_sending_step_3_desc_line_2,
-        ) {
+    inner class SentStep : FinalizingStep(
+        descLine1Res = finalize_send_tx_sending_step_3_desc_line_1,
+        descLine2Res = finalize_send_tx_sending_step_3_desc_line_2,
+    ) {
 
         init {
             subscribeToEventBus()

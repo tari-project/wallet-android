@@ -53,13 +53,14 @@ import com.tari.android.wallet.ui.component.tari.TariTextView
 import com.tari.android.wallet.ui.extension.getResourceUri
 import com.tari.android.wallet.ui.extension.invisible
 import com.tari.android.wallet.ui.extension.parcelable
+import com.tari.android.wallet.ui.extension.string
 import com.tari.android.wallet.ui.extension.visible
 import com.tari.android.wallet.ui.fragment.send.common.TransactionData
 import com.tari.android.wallet.util.Constants
 
 class FinalizeSendTxFragment : CommonFragment<FragmentFinalizeSendTxBinding, FinalizeSendTxViewModel>() {
 
-    private var stepListView = mutableListOf<FinalizingStepView>()
+    private val stepListView = mutableListOf<FinalizingStepView>()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
         FragmentFinalizeSendTxBinding.inflate(inflater, container, false).also { ui = it }.root
@@ -124,7 +125,7 @@ class FinalizeSendTxFragment : CommonFragment<FragmentFinalizeSendTxBinding, Fin
     }
 
     private fun setupUi() = with(ui) {
-        lottieAnimationView.setMaxProgress(lottieAnimationPauseProgress)
+        lottieAnimationView.setMaxProgress(LOTTIE_ANIMATION_PAUSE_PROGRESS)
         infoLine1TextView.invisible()
         infoLine2TextView.invisible()
 
@@ -135,8 +136,15 @@ class FinalizeSendTxFragment : CommonFragment<FragmentFinalizeSendTxBinding, Fin
     }
 
     private fun playCurrentStepTextAppearAnimation(step: FinalizeSendTxViewModel.FinalizingStep) {
-        playStepAppearAnimation(step.descriptionLine1, ui.infoLine1TextView)
-        playStepAppearAnimation(step.descriptionLine2, ui.infoLine2TextView, Constants.UI.xShortDurationMs)
+        playStepAppearAnimation(
+            lineText = string(step.descLine1Res),
+            textView = ui.infoLine1TextView,
+        )
+        playStepAppearAnimation(
+            lineText = string(step.descLine2Res),
+            textView = ui.infoLine2TextView,
+            additionalDelay = Constants.UI.xShortDurationMs,
+        )
     }
 
     private fun playStepAppearAnimation(lineText: String, textView: TariTextView, additionalDelay: Long = 0) = with(textView) {
@@ -187,7 +195,7 @@ class FinalizeSendTxFragment : CommonFragment<FragmentFinalizeSendTxBinding, Fin
         stepListView.forEach { it.progressAnim?.removeAllUpdateListeners() }
         ui.lottieAnimationView.speed = -1f
         ui.lottieAnimationView.playAnimation()
-        ui.lottieAnimationView.progress = lottieAnimationPauseProgress
+        ui.lottieAnimationView.progress = LOTTIE_ANIMATION_PAUSE_PROGRESS
 
         // fade out text and progress
         ValueAnimator.ofFloat(1f, 0f).apply {
@@ -204,9 +212,7 @@ class FinalizeSendTxFragment : CommonFragment<FragmentFinalizeSendTxBinding, Fin
                     removeAllListeners()
                     ui.lottieAnimationView.alpha = 0f
 
-                    viewModel.txFailureReason.value?.let {
-                       viewModel.tariNavigator.onSendTxFailure(isYat = false, txFailureReason = it)
-                    }
+                    viewModel.trySendTxFailure(isYat = false)
                 }
             })
             start()
@@ -217,7 +223,7 @@ class FinalizeSendTxFragment : CommonFragment<FragmentFinalizeSendTxBinding, Fin
         stepListView.forEach { it.progressAnim?.removeAllUpdateListeners() }
         ui.lottieAnimationView.setMaxProgress(1.0f)
         ui.lottieAnimationView.playAnimation()
-        ui.lottieAnimationView.progress = lottieAnimationPauseProgress
+        ui.lottieAnimationView.progress = LOTTIE_ANIMATION_PAUSE_PROGRESS
 
         // fade out text and progress
         ValueAnimator.ofFloat(1f, 0f).apply {
@@ -234,9 +240,8 @@ class FinalizeSendTxFragment : CommonFragment<FragmentFinalizeSendTxBinding, Fin
                 runCatching {
                     removeAllListeners()
                     ui.lottieAnimationView.alpha = 0f
-                    viewModel.sentTxId.value?.let {
-                        viewModel.tariNavigator.onSendTxSuccessful(isYat = false, txId = it)
-                    }
+
+                    viewModel.trySendTxSuccess(isYat = false)
                 }
             })
             start()
@@ -244,9 +249,9 @@ class FinalizeSendTxFragment : CommonFragment<FragmentFinalizeSendTxBinding, Fin
     }
 
     companion object {
-        const val maxProgress = 100
-        const val progressBarFillDurationMs = 850L
-        const val lottieAnimationPauseProgress = 0.3f
+        const val MAX_PROGRESS = 100
+        const val PROGRESS_BAR_FILL_DURATION_MS = 850L
+        const val LOTTIE_ANIMATION_PAUSE_PROGRESS = 0.3f
 
         fun create(transactionData: TransactionData): FinalizeSendTxFragment {
             return FinalizeSendTxFragment().apply {
