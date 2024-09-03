@@ -4,6 +4,7 @@ import com.tari.android.wallet.R
 import com.tari.android.wallet.application.baseNodes.BaseNodesManager
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.extension.collectFlow
+import com.tari.android.wallet.extension.combineToPair
 import com.tari.android.wallet.network.NetworkConnectionState
 import com.tari.android.wallet.service.baseNode.BaseNodeState
 import com.tari.android.wallet.service.baseNode.BaseNodeSyncState
@@ -77,11 +78,12 @@ class ConnectionIndicatorViewModel : CommonViewModel() {
             _state.update { it.copy(torProxyState = torProxyState) }
             showStatesDialog(true)
         }
-        collectFlow(baseNodesManager.walletScannedHeight) { height ->
+
+        collectFlow(baseNodesManager.walletScannedHeight.combineToPair(baseNodesManager.networkBlockHeight)) { (height, tip) ->
             _state.update {
                 it.copy(
                     walletScannedHeight = height,
-                    chainTip = baseNodesManager.networkBlockHeight.toInt(),
+                    chainTip = tip.toInt(),
                 )
             }
             showStatesDialog(true)

@@ -59,7 +59,6 @@ class BaseNodePrefRepository @Inject constructor(
         const val BASE_NODE_STATE = "tari_wallet_user_base_node_state"
         const val BASE_NODE_LAST_SYNC_RESULT = "tari_wallet_base_node_last_sync_result"
         const val FFI_BASE_NODE_LIST = "FFI_BASE_NODE_LIST"
-        const val HEIGHT_OF_LONGEST_CHAIN = "HEIGHT_OF_LONGEST_CHAIN"
     }
 
     var currentBaseNode: BaseNodeDto? by SharedPrefGsonNullableDelegate(
@@ -102,13 +101,6 @@ class BaseNodePrefRepository @Inject constructor(
         set(value) {
             baseNodeStateOrdinal = value.ordinal
         }
-
-    var baseNodeHeightOfLongestChain: BigInteger by SharedPrefBigIntegerDelegate(
-        prefs = sharedPrefs,
-        commonRepository = this,
-        name = Key.HEIGHT_OF_LONGEST_CHAIN,
-        defValue = 0.toBigInteger(),
-    )
 
     init {
         EventBus.baseNodeState.post(baseNodeState)

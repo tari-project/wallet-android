@@ -60,8 +60,8 @@ class BaseNodesManager @Inject constructor(
     private val _walletScannedHeight = MutableStateFlow(0)
     val walletScannedHeight = _walletScannedHeight.asStateFlow()
 
-    val networkBlockHeight: BigInteger
-        get() = baseNodeSharedRepository.baseNodeHeightOfLongestChain
+    private val _networkBlockHeight = MutableStateFlow(BigInteger.ZERO)
+    val networkBlockHeight = _networkBlockHeight.asStateFlow()
 
     /**
      * Select a base node randomly from the list of base nodes in base_nodes.tx, and sets
@@ -100,7 +100,7 @@ class BaseNodesManager @Inject constructor(
     }
 
     fun saveBaseNodeState(baseNodeState: FFITariBaseNodeState) {
-        baseNodeSharedRepository.baseNodeHeightOfLongestChain = baseNodeState.getHeightOfLongestChain()
+        _networkBlockHeight.update { baseNodeState.getHeightOfLongestChain() }
     }
 
     fun saveWalletScannedHeight(height: Int) {

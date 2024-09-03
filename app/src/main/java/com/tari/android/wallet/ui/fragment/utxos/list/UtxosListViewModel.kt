@@ -164,7 +164,7 @@ class UtxosListViewModel : CommonViewModel() {
         } else {
             walletService.getWithError { error, wallet ->
                 wallet.getAllUtxos(error)
-            }.itemsList.map { UtxosViewHolderItem(it, baseNodesManager.networkBlockHeight.toLong()) }.filter { it.showStatus }
+            }.itemsList.map { UtxosViewHolderItem(it, baseNodesManager.networkBlockHeight.value.toLong()) }.filter { it.showStatus }
         }
 
         val state = if (allItems.isEmpty()) ScreenState.Empty else ScreenState.Data
