@@ -11,6 +11,7 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
 
@@ -57,4 +58,8 @@ fun <T> ViewModel.collectNonNullFlow(stateFlow: Flow<T?>, action: (T) -> Unit): 
             action(state!!)
         }
     }
+}
+
+fun <A, B> Flow<A>.combineToPair(other: Flow<B>): Flow<Pair<A, B>> {
+    return this.combine(other) { a, b -> a to b }
 }
