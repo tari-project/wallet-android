@@ -30,11 +30,7 @@ class FinalizingStepView : FrameLayout {
         init()
     }
 
-    constructor(context: Context, attrs: AttributeSet, defStyleAttr: Int) : super(
-        context,
-        attrs,
-        defStyleAttr
-    ) {
+    constructor(context: Context, attrs: AttributeSet, defStyleAttr: Int) : super(context, attrs, defStyleAttr) {
         init()
     }
 
@@ -46,7 +42,7 @@ class FinalizingStepView : FrameLayout {
         ui.stepProgressBar.apply {
             invisible()
             progress = 0
-            max = FinalizeSendTxFragment.maxProgress
+            max = FinalizeSendTxFragment.MAX_PROGRESS
         }
     }
 
@@ -58,11 +54,11 @@ class FinalizingStepView : FrameLayout {
     fun animateCurrentStepProgress(isReverse: Boolean) {
         // On config change the UI is already cleared out but this method can be invoked
         ui.stepProgressBar.visible()
-        val minValue = if (isReverse) FinalizeSendTxFragment.maxProgress else 0
-        val maxValue = if (isReverse) 0 else FinalizeSendTxFragment.maxProgress
+        val minValue = if (isReverse) FinalizeSendTxFragment.MAX_PROGRESS else 0
+        val maxValue = if (isReverse) 0 else FinalizeSendTxFragment.MAX_PROGRESS
         progressAnim = ValueAnimator.ofInt(minValue, maxValue).apply {
             addUpdateListener { valueAnimator: ValueAnimator -> ui.stepProgressBar.progress = valueAnimator.animatedValue as Int }
-            duration = FinalizeSendTxFragment.progressBarFillDurationMs
+            duration = FinalizeSendTxFragment.PROGRESS_BAR_FILL_DURATION_MS
             interpolator = EasingInterpolator(Ease.QUART_IN_OUT)
             startDelay = Constants.UI.xShortDurationMs
             addListener(onEnd = {

@@ -214,10 +214,10 @@ open class ContactSelectionFragment : CommonFragment<FragmentContactsSelectionBi
             if (yatState.eyeOpened) {
                 ui.searchEditText.removeTextChangedListener(this)
                 ui.yatEyeButton.setImageDrawable(ContextCompat.getDrawable(requireContext(), R.drawable.vector_closed_eye))
-                ui.searchEditText.setText(yatState.yatUser.hexAddress)
+                ui.searchEditText.setText(yatState.yatUser.walletAddress.fullBase58)
             } else {
                 ui.searchEditText.removeTextChangedListener(this)
-                ui.searchEditText.setText(yatState.yatUser.yatName)
+                ui.searchEditText.setText(yatState.yatUser.yat)
                 ui.searchEditText.setSelectionToEnd()
                 ui.searchEditText.addTextChangedListener(this)
                 ui.yatEyeButton.setImageDrawable(ContextCompat.getDrawable(requireContext(), R.drawable.vector_opened_eye))

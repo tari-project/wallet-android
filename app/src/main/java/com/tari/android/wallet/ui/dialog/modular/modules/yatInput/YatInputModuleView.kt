@@ -23,7 +23,7 @@ import kotlinx.coroutines.launch
 class YatInputModuleView(context: Context, private val inputModule: YatInputModule) :
     CommonView<CommonViewModel, DialogModuleInputYatBinding>(context) {
 
-    private val coroutineScope = CoroutineScope(Job())
+    private val coroutineScope = CoroutineScope(Job()) // TODo it's a pure memory leak
 
     override fun bindingInflate(layoutInflater: LayoutInflater, parent: ViewGroup?, attachToRoot: Boolean): DialogModuleInputYatBinding =
         DialogModuleInputYatBinding.inflate(layoutInflater, parent, attachToRoot)

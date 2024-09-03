@@ -3,6 +3,7 @@ package com.tari.android.wallet.ui.fragment.contactBook.data.contacts
 import android.os.Parcelable
 import com.tari.android.wallet.model.TariWalletAddress
 import com.tari.android.wallet.ui.fragment.contactBook.data.ContactAction
+import com.tari.android.wallet.util.EmojiId
 import kotlinx.parcelize.Parcelize
 import java.util.UUID
 
@@ -30,4 +31,4 @@ data class ContactDto(
     fun getPhoneContactInfo(): PhoneContactInfo? = (contactInfo as? PhoneContactInfo) ?: (contactInfo as? MergedContactInfo)?.phoneContactInfo
 }
 
-fun String.toYatDto(): YatDto? = this.takeIf { it.isNotEmpty() }?.let { YatDto(it) }
+fun EmojiId.toYatDto(): YatDto? = this.takeIf { it.isNotEmpty() }?.let { YatDto(it) }

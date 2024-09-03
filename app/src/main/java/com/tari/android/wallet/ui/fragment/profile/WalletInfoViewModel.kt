@@ -10,7 +10,6 @@ import com.tari.android.wallet.application.YatAdapter
 import com.tari.android.wallet.application.deeplinks.DeepLink
 import com.tari.android.wallet.application.deeplinks.DeeplinkHandler
 import com.tari.android.wallet.data.sharedPrefs.CorePrefRepository
-import com.tari.android.wallet.data.sharedPrefs.yat.YatPrefRepository
 import com.tari.android.wallet.extension.launchOnIo
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.dialog.modular.DialogArgs
@@ -37,9 +36,6 @@ class WalletInfoViewModel : CommonViewModel() {
     lateinit var corePrefRepository: CorePrefRepository
 
     @Inject
-    lateinit var yatSharedPrefsRepository: YatPrefRepository
-
-    @Inject
     lateinit var yatAdapter: YatAdapter
 
     @Inject
@@ -61,7 +57,7 @@ class WalletInfoViewModel : CommonViewModel() {
     private val _uiState = MutableStateFlow(
         WalletInfoModel.UiState(
             walletAddress = corePrefRepository.walletAddress,
-            yat = yatSharedPrefsRepository.connectedYat.orEmpty(),
+            yat = yatAdapter.connectedYat.orEmpty(),
             alias = corePrefRepository.firstName.orEmpty() + " " + corePrefRepository.lastName.orEmpty(),
         )
     )
@@ -84,34 +80,35 @@ class WalletInfoViewModel : CommonViewModel() {
         _uiState.update {
             it.copy(
                 walletAddress = corePrefRepository.walletAddress,
-                yat = yatSharedPrefsRepository.connectedYat.orEmpty(),
+                yat = yatAdapter.connectedYat.orEmpty(),
                 alias = corePrefRepository.firstName.orEmpty() + " " + corePrefRepository.lastName.orEmpty(),
             )
         }
-        _yatDisconnected.postValue(yatSharedPrefsRepository.yatWasDisconnected)
+        _yatDisconnected.postValue(yatAdapter.isYatDisconnected)
 
-        checkEmojiIdConnection()
+        checkYatConnection()
     }
 
     fun openYatOnboarding(context: Context) {
         yatAdapter.openOnboarding(context)
     }
 
-    private fun checkEmojiIdConnection() {
-        val connectedYat = yatSharedPrefsRepository.connectedYat.orEmpty()
+    private fun checkYatConnection() {
+        val connectedYat = yatAdapter.connectedYat.orEmpty()
         if (connectedYat.isNotEmpty()) {
             launchOnIo {
-                yatAdapter.searchTariYats(connectedYat).let {
-                    if (it?.status == true) {
-                        it.result?.entries?.firstOrNull()?.let { response ->
-                            val wasDisconnected = response.value.address.lowercase() != corePrefRepository.walletAddressBase58.orEmpty().lowercase()
-                            yatSharedPrefsRepository.yatWasDisconnected = wasDisconnected
-                            _yatDisconnected.postValue(wasDisconnected)
-                        }
-                    } else {
-                        yatSharedPrefsRepository.yatWasDisconnected = true
-                        _yatDisconnected.postValue(true)
-                    }
+                yatAdapter.searchTariYat(connectedYat).let {
+                     // TODO: check if Yat is connected to the wallet address and show status
+//                    if (it?.status == true) {
+//                        it.result?.entries?.firstOrNull()?.let { response ->
+//                            val wasDisconnected = response.value.address.lowercase() != corePrefRepository.walletAddressBase58.orEmpty().lowercase()
+//                            yatAdapter.disconnectYat(wasDisconnected)
+//                            _yatDisconnected.postValue(wasDisconnected)
+//                        }
+//                    } else {
+//                        yatAdapter.disconnectYat()
+//                        _yatDisconnected.postValue(true)
+//                    }
                 }
             }
         }

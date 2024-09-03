@@ -15,6 +15,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:animateLayoutChanges="true"
             android:orientation="vertical">
 
             <com.tari.android.wallet.ui.component.tari.toolbar.TariToolbar
@@ -34,10 +35,10 @@
                 android:layout_marginTop="50dp"
                 android:background="@android:color/transparent"
                 android:gravity="center_horizontal"
-                android:text="Alias Name"
                 android:textColor="?attr/palette_text_heading"
                 android:textSize="17sp"
-                app:customFont="heavy" />
+                app:customFont="heavy"
+                tools:text="Alias Name" />
 
             <RelativeLayout
                 android:layout_width="match_parent"
