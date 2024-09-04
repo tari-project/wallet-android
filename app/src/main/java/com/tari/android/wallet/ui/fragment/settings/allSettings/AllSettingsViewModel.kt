@@ -1,7 +1,6 @@
 package com.tari.android.wallet.ui.fragment.settings.allSettings
 
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import com.tari.android.wallet.R
 import com.tari.android.wallet.R.drawable.vector_all_settings_about_icon
 import com.tari.android.wallet.R.drawable.vector_all_settings_background_service_icon
@@ -65,7 +64,6 @@ import com.tari.android.wallet.R.string.user_agreement_url
 import com.tari.android.wallet.application.YatAdapter
 import com.tari.android.wallet.data.sharedPrefs.CorePrefRepository
 import com.tari.android.wallet.data.sharedPrefs.backup.BackupPrefRepository
-import com.tari.android.wallet.data.sharedPrefs.yat.YatPrefRepository
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.extension.addTo
 import com.tari.android.wallet.infrastructure.backup.BackupManager
@@ -89,6 +87,9 @@ import com.tari.android.wallet.ui.fragment.settings.allSettings.title.SettingsTi
 import com.tari.android.wallet.ui.fragment.settings.allSettings.version.SettingsVersionViewHolderItem
 import com.tari.android.wallet.ui.fragment.settings.userAutorization.BiometricAuthenticationViewModel
 import com.tari.android.wallet.util.DebugConfig
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 
 class AllSettingsViewModel : CommonViewModel() {
@@ -111,34 +112,39 @@ class AllSettingsViewModel : CommonViewModel() {
     @Inject
     lateinit var settingsRepository: CorePrefRepository
 
+    init {
+        component.inject(this)
+    }
+
     private val _openYatOnboarding = SingleLiveEvent<Unit>()
     val openYatOnboarding: LiveData<Unit> = _openYatOnboarding
 
-    private val _allSettingsOptions = MutableLiveData<List<CommonViewHolderItem>>()
-    val allSettingsOptions: LiveData<List<CommonViewHolderItem>> = _allSettingsOptions
+    private val _allSettingsOptions = MutableStateFlow(generateOptions())
+    val allSettingsOptions = _allSettingsOptions.asStateFlow()
 
     init {
-        component.inject(this)
-        initOptions()
         EventBus.backupState.subscribe(this) { backupState -> onBackupStateChanged(backupState) }
 
-        settingsRepository.updateNotifier.subscribe { initOptions() }.addTo(compositeDisposable)
+        settingsRepository.updateNotifier.subscribe { generateOptions() }.addTo(compositeDisposable)
     }
 
     fun updateOptions() {
-        initOptions()
+        _allSettingsOptions.update { generateOptions() }
     }
 
-    private fun initOptions() {
+    private fun generateOptions(): List<CommonViewHolderItem> {
         val versionText = TariVersionModel(networkRepository).versionInfo
 
         val alias = settingsRepository.firstName.orEmpty() + " " + settingsRepository.lastName.orEmpty()
         val pinCode = securityPrefRepository.pinCode
 
-        _allSettingsOptions.postValue(listOfNotNull(
-            MyProfileViewHolderItem(settingsRepository.walletAddress, yatAdapter.connectedYat.orEmpty(), alias) {
-                navigation.postValue(AllSettingsNavigation.ToMyProfile)
-            },
+        return listOfNotNull(
+            MyProfileViewHolderItem(
+                address = settingsRepository.walletAddress,
+                yat = yatAdapter.connectedYat.orEmpty(),
+                alias = alias,
+                action = { tariNavigator.navigate(AllSettingsNavigation.ToMyProfile) },
+            ),
             DividerViewHolderItem(),
             SettingsRowViewHolderItem(resourceManager.getString(all_settings_connect_yats), vector_all_settings_yat_icon) {
                 _openYatOnboarding.postValue(Unit)
@@ -252,7 +258,6 @@ class AllSettingsViewModel : CommonViewModel() {
                     toastMessage = resourceManager.getString(all_settings_version_text_copy_toast_message),
                 )
             })
-        )
     }
 
     private fun onBackupStateChanged(backupState: BackupsState?) {
@@ -275,7 +280,7 @@ class AllSettingsViewModel : CommonViewModel() {
             }
             backupOption.backupState = presentationBackupState
         }
-        _allSettingsOptions.postValue(_allSettingsOptions.value)
+        _allSettingsOptions.update { generateOptions() }
     }
 
     private fun showBackupStorageCheckFailedDialog(message: String) {
@@ -285,4 +290,3 @@ class AllSettingsViewModel : CommonViewModel() {
         )
     }
 }
-
