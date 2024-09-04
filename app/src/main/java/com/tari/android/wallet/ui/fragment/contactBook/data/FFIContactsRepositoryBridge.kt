@@ -114,6 +114,7 @@ class FFIContactsRepositoryBridge(
                     walletService.getPendingOutboundTxs(WalletError()),
                 ).asSequence().flatten()
                     .filter { !it.tariContact.walletAddress.isUnknownUser() }
+                    .filter { !it.isCoinbase }
                     .sortedByDescending { it.timestamp }
                     .map { tx ->
                         // if there is a wallet contact with the same address, use data from it instead of the tx contact
