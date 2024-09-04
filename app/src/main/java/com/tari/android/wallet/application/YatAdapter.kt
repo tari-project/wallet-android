@@ -15,6 +15,8 @@ import com.tari.android.wallet.ui.fragment.send.finalize.FinalizeSendTxViewModel
 import com.tari.android.wallet.ui.fragment.send.finalize.YatFinalizeSendTxActivity
 import com.tari.android.wallet.util.DebugConfig
 import com.tari.android.wallet.util.EmojiId
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import yat.android.data.YatRecord
 import yat.android.data.YatRecordType
 import yat.android.lib.YatConfiguration
@@ -60,8 +62,8 @@ class YatAdapter @Inject constructor(
     /**
      * Search for Tari address by Yat emojiId
      */
-    suspend fun searchTariYat(yatEmojiId: EmojiId): PaymentAddressResponseResult? {
-        return try {
+    suspend fun searchTariYat(yatEmojiId: EmojiId): PaymentAddressResponseResult? = withContext(Dispatchers.IO) {
+        return@withContext try {
             val tariTag = YatRecordType.XTM_ADDRESS.serializedName
             // We take only the first result because we are looking for a Tari address only
             val result = YatLibApi.emojiIDApi.lookupEmojiIDPayment(yatEmojiId, tariTag).result?.entries?.firstOrNull()?.value
@@ -76,8 +78,8 @@ class YatAdapter @Inject constructor(
     /**
      * Search for all payment addresses connected to the Yat emojiId
      */
-    suspend fun searchAllYats(yatEmojiId: EmojiId): Map<String, PaymentAddressResponseResult> {
-        return try {
+    suspend fun searchAllYats(yatEmojiId: EmojiId): Map<String, PaymentAddressResponseResult> = withContext(Dispatchers.IO) {
+        return@withContext try {
             val result = YatLibApi.emojiIDApi.lookupEmojiIDPayment(yatEmojiId, null).result
             if (result.isNullOrEmpty()) logger.d("Can't find any Yats for $yatEmojiId")
             result.orEmpty()
