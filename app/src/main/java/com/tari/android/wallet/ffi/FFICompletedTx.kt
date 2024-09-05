@@ -45,6 +45,7 @@ class FFICompletedTx() : FFITxBase() {
     private external fun jniGetFee(libError: FFIError): ByteArray
     private external fun jniGetTimestamp(libError: FFIError): ByteArray
     private external fun jniGetMessage(libError: FFIError): String
+    private external fun jniGetPaymentId(libError: FFIError): String
     private external fun jniGetStatus(libError: FFIError): Int
     private external fun jniGetConfirmationCount(libError: FFIError): ByteArray
     private external fun jniIsOutbound(libError: FFIError): Boolean
@@ -71,6 +72,8 @@ class FFICompletedTx() : FFITxBase() {
     fun getTimestamp(): BigInteger = runWithError { BigInteger(1, jniGetTimestamp(it)) }
 
     fun getMessage(): String = runWithError { jniGetMessage(it) }
+
+    fun getPaymentId(): String = runWithError { jniGetPaymentId(it) }
 
     fun getStatus(): FFITxStatus = runWithError { FFITxStatus.map(jniGetStatus(it)) }
 

@@ -245,7 +245,6 @@
     <string name="tx_list_emoji_one_side_payment_placeholder">➡️</string>
     <string name="tx_list_emoji_coinbase_payment_placeholder">🪙</string>
     <string name="tx_list_someone">Someone</string>
-    <string name="tx_list_you_received_one_side_payment">You received a one side payment</string>
 
     <!-- send tari -->
     <string name="send_tari_title">Send To</string>

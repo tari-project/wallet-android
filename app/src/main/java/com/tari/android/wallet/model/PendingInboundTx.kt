@@ -51,9 +51,10 @@ data class PendingInboundTx(
     override val amount: MicroTari = 0.toMicroTari(),
     override val timestamp: BigInteger = 0.toBigInteger(),
     override val message: String = "",
+    override val paymentId: String = "",
     override val status: TxStatus = TxStatus.PENDING,
     override val tariContact: TariContact,
-) : Tx(id, direction, amount, timestamp, message, status, tariContact), Parcelable {
+) : Tx(id, direction, amount, timestamp, message, paymentId, status, tariContact), Parcelable {
 
     constructor(tx: FFICompletedTx) : this(
         id = tx.getId(),
@@ -62,6 +63,7 @@ data class PendingInboundTx(
         amount = tx.getAmount().toMicroTari(),
         timestamp = tx.getTimestamp(),
         message = tx.getMessage(),
+        paymentId = tx.getPaymentId(),
         status = TxStatus.map(tx.getStatus()),
     )
 

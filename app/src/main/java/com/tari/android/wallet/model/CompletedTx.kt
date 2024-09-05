@@ -51,12 +51,13 @@ data class CompletedTx(
     override val amount: MicroTari = 0.toMicroTari(),
     override val timestamp: BigInteger = 0.toBigInteger(),
     override val message: String = "",
+    override val paymentId: String = "",
     override val status: TxStatus = TxStatus.PENDING,
     override val tariContact: TariContact,
     val fee: MicroTari = 0.toMicroTari(),
     val confirmationCount: BigInteger = 0.toBigInteger(),
     val txKernel: CompletedTransactionKernel? = null,
-) : Tx(id, direction, amount, timestamp, message, status, tariContact), Parcelable {
+) : Tx(id, direction, amount, timestamp, message, paymentId, status, tariContact), Parcelable {
 
     constructor(tx: FFICompletedTx) : this(
         id = tx.getId(),
@@ -64,6 +65,7 @@ data class CompletedTx(
         amount = MicroTari(tx.getAmount()),
         timestamp = tx.getTimestamp(),
         message = tx.getMessage(),
+        paymentId = tx.getPaymentId(),
         status = TxStatus.map(tx.getStatus()),
         tariContact = tx.getContact(),
         fee = MicroTari(tx.getFee()),
