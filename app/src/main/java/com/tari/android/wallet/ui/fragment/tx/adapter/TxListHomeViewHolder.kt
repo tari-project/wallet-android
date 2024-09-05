@@ -49,7 +49,7 @@ class TxListHomeViewHolder(view: ItemHomeTxListBinding) : CommonViewHolder<Trans
         // display contact name or emoji id
         when {
             tx.isCoinbase -> {
-                ui.participantTextView1.gone()
+                ui.participantTextView1.visible()
                 ui.participantTextView2.gone()
                 ui.participantTextView1.text = string(R.string.tx_details_coinbase_placeholder)
                 ui.emojiIdViewContainer.root.gone()
