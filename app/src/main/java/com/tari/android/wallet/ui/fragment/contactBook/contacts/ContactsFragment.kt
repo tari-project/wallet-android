@@ -66,7 +66,7 @@ open class ContactsFragment : CommonFragment<FragmentContactsBinding, ContactsVi
     fun search(text: String) = viewModel.search(text)
 
     private fun observeUI() = with(viewModel) {
-        observe(list) {
+        observe(contactList) {
             ui.swipeRefreshLayout.isRefreshing = false
             recyclerViewAdapter.update(it)
         }

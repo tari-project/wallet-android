@@ -245,29 +245,24 @@ class ContactSelectionViewModel : CommonViewModel() {
             list = list.filter { it.filtered(searchText) }
         }
 
-        val result = mutableListOf<CommonViewHolderItem>()
-
-        if (isContactlessPayment.value == true) {
-            result.add(ContactlessPaymentItem())
-        }
-
         val resentUsed = list.filter { it.contact.getFFIContactInfo()?.lastUsedTimeMillis != null }
             .sortedBy { it.contact.getFFIContactInfo()?.lastUsedTimeMillis }
-            .take(Constants.Contacts.recentContactCount)
-
-        if (resentUsed.isNotEmpty()) {
-            result.add(TitleViewHolderItem(resourceManager.getString(R.string.add_recipient_recent_tx_contacts)))
-        }
-        result.addAll(resentUsed)
+            .take(Constants.Contacts.RECENT_CONTACTS_COUNT)
 
         val restOfContact = list.filter { !resentUsed.contains(it) }.sortedBy { it.contact.contactInfo.getAlias().lowercase() }
-        if (restOfContact.isNotEmpty() && resentUsed.isNotEmpty()) {
-            result.add(TitleViewHolderItem(resourceManager.getString(R.string.add_recipient_my_contacts)))
-        }
 
-        result.addAll(restOfContact)
+        contactList.postValue(
+            listOfNotNull(
+                ContactlessPaymentItem().takeIf { isContactlessPayment.value == true },
 
-        this.contactList.postValue(result)
+                TitleViewHolderItem(resourceManager.getString(R.string.add_recipient_recent_tx_contacts)).takeIf { resentUsed.isNotEmpty() },
+                *resentUsed.toTypedArray(),
+
+                TitleViewHolderItem(resourceManager.getString(R.string.add_recipient_my_contacts))
+                    .takeIf { restOfContact.isNotEmpty() && resentUsed.isNotEmpty() },
+                *restOfContact.toTypedArray(),
+            )
+        )
     }
 
     private fun tryToFindYatUser(emojiId: EmojiId): YatState.YatUser? {

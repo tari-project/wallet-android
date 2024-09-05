@@ -29,7 +29,7 @@ import com.tari.android.wallet.ui.extension.showKeyboard
 import com.tari.android.wallet.ui.extension.string
 import com.tari.android.wallet.ui.extension.temporarilyDisableClick
 import com.tari.android.wallet.ui.fragment.contactBook.contacts.ContactsFragment
-import com.tari.android.wallet.ui.fragment.contactBook.favorites.FavoritesFragment
+import com.tari.android.wallet.ui.fragment.contactBook.contacts.FavoritesFragment
 import com.tari.android.wallet.ui.fragment.contactBook.root.share.ShareOptionArgs
 import com.tari.android.wallet.ui.fragment.contactBook.root.share.ShareOptionView
 import com.tari.android.wallet.ui.fragment.home.HomeActivity
