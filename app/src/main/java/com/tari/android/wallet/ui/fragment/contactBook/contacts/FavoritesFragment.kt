@@ -30,22 +30,12 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.tari.android.wallet.ui.fragment.contactBook.favorites
+package com.tari.android.wallet.ui.fragment.contactBook.contacts
 
 import android.os.Bundle
 import android.view.View
-import com.tari.android.wallet.ui.fragment.contactBook.contacts.ContactsFragment
 
 class FavoritesFragment : ContactsFragment() {
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
-        viewModel.isFavorite = true
-        viewModel.addFilter { contactItem -> contactItem.contact.contactInfo.isFavorite }
-    }
-}
-
-class AddContactListFragment : ContactsFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 

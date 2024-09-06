@@ -48,7 +48,7 @@ class ContactsViewModel : CommonViewModel() {
 
     val selectionTrigger: LiveData<Unit>
 
-    val list = MediatorLiveData<List<CommonViewHolderItem>>()
+    val contactList = MediatorLiveData<List<CommonViewHolderItem>>()
 
     private val badgeViewModel = BadgeViewModel()
 
@@ -68,15 +68,15 @@ class ContactsViewModel : CommonViewModel() {
     init {
         component.inject(this)
 
-        list.addSource(searchText) { _listUpdateTrigger.postValue(Unit) }
+        contactList.addSource(searchText) { _listUpdateTrigger.postValue(Unit) }
 
-        list.addSource(sourceList) { _listUpdateTrigger.postValue(Unit) }
+        contactList.addSource(sourceList) { _listUpdateTrigger.postValue(Unit) }
 
-        list.addSource(filters) { _listUpdateTrigger.postValue(Unit) }
+        contactList.addSource(filters) { _listUpdateTrigger.postValue(Unit) }
 
         selectionTrigger = contactSelectionRepository.isSelectionState.map { it }
 
-        list.addSource(selectionTrigger) { _listUpdateTrigger.postValue(Unit) }
+        contactList.addSource(selectionTrigger) { _listUpdateTrigger.postValue(Unit) }
 
         collectFlow(contactsRepository.contactList) { updateContacts() }
     }
@@ -142,9 +142,6 @@ class ContactsViewModel : CommonViewModel() {
         val selectedItems = contactSelectionRepository.selectedContacts.map { it.contact.uuid }.toList()
         sourceList = sourceList.map { it.copy() }
 
-        val resultList = mutableListOf<CommonViewHolderItem>()
-        resultList.add(ContactlessPaymentItem())
-
         val filtered = sourceList.filter { contact -> contact.filtered(searchText) && filters.all { it.invoke(contact) } }
 
         for (item in filtered) {
@@ -153,23 +150,31 @@ class ContactsViewModel : CommonViewModel() {
         }
 
         if (contactsRepository.contactPermissionGranted.not() || filtered.isEmpty()) {
-            val emptyState = EmptyStateItem(getEmptyTitle(), getBody(), getEmptyImage(), getButtonTitle()) { grantPermission.postValue(Unit) }
-            resultList += emptyState
+            contactList.postValue(
+                listOf(
+                    EmptyStateItem(
+                        title = getEmptyTitle(),
+                        body = getEmptyBody(),
+                        image = getEmptyImage(),
+                        buttonTitle = getButtonTitle()
+                    ) { grantPermission.postValue(Unit) }
+                )
+            )
+        } else {
+            val sorted = filtered.sortedBy { it.contact.contactInfo.getAlias().lowercase() }
+            val (phoneContacts, notPhoneContacts) = sorted.partition { it.contact.contactInfo is PhoneContactInfo }
+
+            contactList.postValue(
+                listOfNotNull(
+                    *notPhoneContacts.toTypedArray(),
+
+                    SettingsTitleViewHolderItem(resourceManager.getString(contact_book_details_phone_contacts)).takeIf { phoneContacts.isNotEmpty() },
+                    *phoneContacts.toTypedArray(),
+
+                    SpaceVerticalViewHolderItem(60),
+                )
+            )
         }
-
-        val sorted = filtered.sortedBy { it.contact.contactInfo.getAlias().lowercase() }
-
-        val (phoneContacts, notPhoneContact) = sorted.partition { it.contact.contactInfo is PhoneContactInfo }
-
-        resultList.addAll(notPhoneContact)
-        if (phoneContacts.isNotEmpty()) {
-            resultList.add(SettingsTitleViewHolderItem(resourceManager.getString(contact_book_details_phone_contacts)))
-            resultList.addAll(phoneContacts)
-        }
-
-        resultList += SpaceVerticalViewHolderItem(60)
-
-        list.postValue(resultList)
     }
 
     private fun getEmptyTitle(): SpannedString {
@@ -177,7 +182,7 @@ class ContactsViewModel : CommonViewModel() {
         return SpannedString(HtmlHelper.getSpannedText(resourceManager.getString(resource)))
     }
 
-    private fun getBody(): SpannedString {
+    private fun getEmptyBody(): SpannedString {
         val resource = if (isFavorite) contact_book_empty_state_favorites_body else
             (if (contactsRepository.contactPermissionGranted) contact_book_empty_state_body else contact_book_empty_state_body_no_permissions)
         return SpannedString(HtmlHelper.getSpannedText(resourceManager.getString(resource)))

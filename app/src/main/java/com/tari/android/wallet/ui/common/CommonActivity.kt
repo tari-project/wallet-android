@@ -146,7 +146,7 @@ abstract class CommonActivity<Binding : ViewBinding, VM : CommonViewModel> : App
 
     override fun onStop() {
         shakeDetector.stop()
-        dialogManager.dismiss()
+        dialogManager.dismiss() // TODO don't dismiss dialogs onStop. Think about a better way to handle this.
         super.onStop()
         screenCaptureCallback?.let { unregisterScreenCaptureCallback(it) }
     }

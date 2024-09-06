@@ -136,7 +136,7 @@ object Constants {
     }
 
     object Contacts {
-        const val recentContactCount = 3
+        const val RECENT_CONTACTS_COUNT = 3
     }
 
     object Build {
