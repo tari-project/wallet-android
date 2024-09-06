@@ -41,7 +41,7 @@ class TxListHomeViewHolder(view: ItemHomeTxListBinding) : CommonViewHolder<Trans
             displayDate(this)
         }
 
-        item.gifViewModel.onNewTxNote(tx.message)
+        item.gifViewModel.onNewTx(tx)
     }
 
     private fun displayAliasOrEmojiId(tx: Tx, contact: ContactDto?) {

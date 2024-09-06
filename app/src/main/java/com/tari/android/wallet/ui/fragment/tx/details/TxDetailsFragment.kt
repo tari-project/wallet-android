@@ -55,7 +55,6 @@ import com.tari.android.wallet.R.string.tx_detail_pending_payment_received
 import com.tari.android.wallet.R.string.tx_detail_waiting_for_recipient
 import com.tari.android.wallet.R.string.tx_detail_waiting_for_sender_to_complete
 import com.tari.android.wallet.R.string.tx_details_fee_value
-import com.tari.android.wallet.R.string.tx_list_you_received_one_side_payment
 import com.tari.android.wallet.databinding.FragmentTxDetailsBinding
 import com.tari.android.wallet.extension.collectNonNullFlow
 import com.tari.android.wallet.extension.observe
@@ -157,7 +156,7 @@ class TxDetailsFragment : CommonFragment<FragmentTxDetailsBinding, TxDetailsView
     }
 
     private fun fetchGIFIfAttached(tx: Tx) {
-        val gifId = TxNote.fromNote(tx.message).gifId ?: return
+        val gifId = TxNote.fromTx(tx).gifId ?: return
         val gifViewModel: GifViewModel by viewModels()
         gifViewModel.onGIFFetchRequested(gifId)
         GifView(ui.gifContainer, Glide.with(this), gifViewModel, this).displayGif()
@@ -224,11 +223,12 @@ class TxDetailsFragment : CommonFragment<FragmentTxDetailsBinding, TxDetailsView
 
     private fun setTxMetaData(tx: Tx) {
         ui.dateTextView.text = Date(tx.timestamp.toLong() * 1000).txFormattedDate()
-        val note = TxNote.fromNote(tx.message)
-        if (note.message == null) {
+        val note = TxNote.fromTx(tx)
+        if (note.message.isNullOrBlank()) {
             ui.txNoteTextView.gone()
         } else {
-            ui.txNoteTextView.text = if (tx.isOneSided) string(tx_list_you_received_one_side_payment) else note.message
+            ui.txNoteTextView.visible()
+            ui.txNoteTextView.text = note.message
         }
         ui.gifContainer.root.visible()
     }

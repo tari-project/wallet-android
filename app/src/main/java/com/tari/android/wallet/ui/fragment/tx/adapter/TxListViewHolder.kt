@@ -58,7 +58,7 @@ class TxListViewHolder(view: ItemTxListBinding) : CommonViewHolder<TransactionIt
             displayMessage(this)
         }
 
-        item.gifViewModel.onNewTxNote(tx.message)
+        item.gifViewModel.onNewTx(tx)
         ui.gifContainer.retryLoadingGifTextView.setOnClickListener { item.gifViewModel.retry() }
         item.gifViewModel.gifState.observeForever { it.handle(this) }
     }
@@ -231,12 +231,12 @@ class TxListViewHolder(view: ItemTxListBinding) : CommonViewHolder<TransactionIt
     }
 
     private fun displayMessage(tx: Tx) {
-        val note = TxNote.fromNote(tx.message)
+        val note = TxNote.fromTx(tx)
         if (note.message.isNullOrBlank()) {
             ui.messageTextView.gone()
         } else {
             ui.messageTextView.visible()
-            ui.messageTextView.text = if (tx.isOneSided) string(R.string.tx_list_you_received_one_side_payment) else note.message
+            ui.messageTextView.text = note.message
         }
     }
 

@@ -32,7 +32,10 @@
  */
 package com.tari.android.wallet.ui.presentation
 
+import com.tari.android.wallet.model.CompletedTx
+import com.tari.android.wallet.model.TariContact
 import com.tari.android.wallet.model.TxNote
+import com.tari.android.wallet.util.MockDataStub.WALLET_ADDRESS
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test
@@ -80,7 +83,7 @@ class TxNoteTest {
 
     @Test
     fun `fromNote, assert that empty note and no gif will be returnedif note is empty`() {
-        val note = TxNote.fromNote("")
+        val note = TxNote.fromTx(CompletedTx(message = "", tariContact = TariContact(WALLET_ADDRESS, "Test")))
         assertEquals("", note.message)
         assertNull(note.gifUrl)
     }
@@ -88,13 +91,17 @@ class TxNoteTest {
     @Test
     fun `fromNote, assert that only message was included if gif is null`() {
         val givenMessage = "alala"
-        assertEquals(TxNote(givenMessage, null), TxNote.fromNote(givenMessage))
+        assertEquals(
+            TxNote(givenMessage, null), TxNote.fromTx(CompletedTx(message = givenMessage, tariContact = TariContact(WALLET_ADDRESS, "Test")))
+        )
     }
 
     @Test
     fun `fromNote, assert that only url with a whitespace was included if message is null`() {
         val givenUrl = "https://giphy.com/embed/l2Sq9qGTQnL5NyI6Y"
-        assertEquals(TxNote(null, givenUrl), TxNote.fromNote(" $givenUrl"))
+        assertEquals(
+            TxNote(null, givenUrl), TxNote.fromTx(CompletedTx(message = " $givenUrl", tariContact = TariContact(WALLET_ADDRESS, "Test")))
+        )
     }
 
     @Test
@@ -103,7 +110,7 @@ class TxNoteTest {
         val givenUrl = "https://giphy.com/embed/l2Sq9qGTQnL5NyI6Y"
         assertEquals(
             TxNote(givenMessage, givenUrl),
-            TxNote.fromNote("$givenMessage $givenUrl")
+            TxNote.fromTx(CompletedTx(message = "$givenMessage $givenUrl", tariContact = TariContact(WALLET_ADDRESS, "Test")))
         )
     }
 
