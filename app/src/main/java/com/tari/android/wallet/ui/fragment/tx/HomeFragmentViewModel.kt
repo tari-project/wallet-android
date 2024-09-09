@@ -91,7 +91,7 @@ class HomeFragmentViewModel : CommonViewModel() {
 
         val address = corePrefRepository.walletAddress
         emojiMedium.postValue(address.shortString())
-        avatarEmoji.postValue(address.spendKeyEmojis.extractEmojis().take(1).joinToString(""))
+        avatarEmoji.postValue(address.coreKeyEmojis.extractEmojis().take(1).joinToString(""))
 
         checkForDataConsent()
     }

@@ -81,6 +81,9 @@ data class TariWalletAddress(
     val uniqueIdentifier: String
         get() = "$networkEmoji$spendKeyEmojis"
 
+    val coreKeyEmojis: EmojiId
+        get() = viewKeyEmojis + spendKeyEmojis + checksumEmoji
+
     fun isUnknownUser(): Boolean = unknownAddress
 
     override fun equals(other: Any?): Boolean = (other is TariWalletAddress) && uniqueIdentifier == other.uniqueIdentifier

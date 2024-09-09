@@ -302,14 +302,14 @@ fun TariWalletAddress.addressPrefixEmojis(): EmojiId {
  * Returns the first 3 emojis of the address in the format "| prefix | address1 ••• address2". E.g. "| 🐢💤| 🐉🔋😎 ••• 🍭🎤💍".
  */
 fun TariWalletAddress.addressFirstEmojis(): EmojiId {
-    return this.spendKeyEmojis.extractEmojis().take(3).joinToString("")
+    return this.coreKeyEmojis.extractEmojis().take(3).joinToString("")
 }
 
 /**
  * Returns the last 3 emojis of the address in the format "| prefix | address1 ••• address2". E.g. "| 🐢💤| 🐉🔋😎 ••• 🍭🎤💍".
  */
 fun TariWalletAddress.addressLastEmojis(): EmojiId {
-    return this.spendKeyEmojis.extractEmojis().takeLast(3).joinToString("")
+    return this.coreKeyEmojis.extractEmojis().takeLast(3).joinToString("")
 }
 
 /**

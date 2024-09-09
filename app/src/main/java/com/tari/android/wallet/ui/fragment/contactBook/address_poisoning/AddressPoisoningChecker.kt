@@ -94,8 +94,8 @@ class AddressPoisoningChecker @Inject constructor(
 fun TariWalletAddress?.isSimilarTo(other: TariWalletAddress): Boolean {
     if (this == null) return false
 
-    val thisEmojis = this.spendKeyEmojis.extractEmojis()
-    val otherEmojis = other.spendKeyEmojis.extractEmojis()
+    val thisEmojis = this.coreKeyEmojis.extractEmojis()
+    val otherEmojis = other.coreKeyEmojis.extractEmojis()
 
     if (thisEmojis.size != otherEmojis.size || thisEmojis.size < (USED_PREFIX_SUFFIX_CHARS * 2)) {
         return false
