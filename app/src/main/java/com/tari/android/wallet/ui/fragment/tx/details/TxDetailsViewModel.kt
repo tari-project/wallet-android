@@ -1,5 +1,6 @@
 package com.tari.android.wallet.ui.fragment.tx.details
 
+import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
@@ -18,9 +19,25 @@ import com.tari.android.wallet.model.CancelledTx
 import com.tari.android.wallet.model.CompletedTx
 import com.tari.android.wallet.model.PendingOutboundTx
 import com.tari.android.wallet.model.Tx
+import com.tari.android.wallet.model.Tx.Direction.INBOUND
 import com.tari.android.wallet.model.Tx.Direction.OUTBOUND
 import com.tari.android.wallet.model.TxId
+import com.tari.android.wallet.model.TxStatus.BROADCAST
+import com.tari.android.wallet.model.TxStatus.COINBASE
+import com.tari.android.wallet.model.TxStatus.COINBASE_CONFIRMED
+import com.tari.android.wallet.model.TxStatus.COINBASE_NOT_IN_BLOCKCHAIN
+import com.tari.android.wallet.model.TxStatus.COINBASE_UNCONFIRMED
+import com.tari.android.wallet.model.TxStatus.COMPLETED
+import com.tari.android.wallet.model.TxStatus.IMPORTED
+import com.tari.android.wallet.model.TxStatus.MINED_CONFIRMED
+import com.tari.android.wallet.model.TxStatus.MINED_UNCONFIRMED
+import com.tari.android.wallet.model.TxStatus.ONE_SIDED_CONFIRMED
+import com.tari.android.wallet.model.TxStatus.ONE_SIDED_UNCONFIRMED
 import com.tari.android.wallet.model.TxStatus.PENDING
+import com.tari.android.wallet.model.TxStatus.QUEUED
+import com.tari.android.wallet.model.TxStatus.REJECTED
+import com.tari.android.wallet.model.TxStatus.TX_NULL_ERROR
+import com.tari.android.wallet.model.TxStatus.UNKNOWN
 import com.tari.android.wallet.model.WalletError
 import com.tari.android.wallet.service.TariWalletService
 import com.tari.android.wallet.ui.common.CommonViewModel
@@ -31,11 +48,13 @@ import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonStyle
 import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
 import com.tari.android.wallet.ui.dialog.modular.modules.input.InputModule
+import com.tari.android.wallet.ui.extension.string
 import com.tari.android.wallet.ui.fragment.contactBook.data.ContactsRepository
 import com.tari.android.wallet.ui.fragment.contactBook.data.contacts.ContactDto
 import com.tari.android.wallet.ui.fragment.contactBook.data.contacts.splitAlias
 import com.tari.android.wallet.ui.fragment.tx.details.TxDetailsFragment.Companion.TX_EXTRA_KEY
 import com.tari.android.wallet.ui.fragment.tx.details.TxDetailsFragment.Companion.TX_ID_EXTRA_KEY
+import com.tari.android.wallet.ui.fragment.tx.details.gif.TxState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -46,7 +65,7 @@ class TxDetailsViewModel(savedState: SavedStateHandle) : CommonViewModel() {
     @Inject
     lateinit var contactsRepository: ContactsRepository
 
-    var requiredConfirmationCount: Long = 0
+    var requiredConfirmationCount: Long? = null
         private set
 
     private var txId: TxId? = savedState.get<TxId>(TX_ID_EXTRA_KEY)
@@ -243,5 +262,32 @@ class TxDetailsViewModel(savedState: SavedStateHandle) : CommonViewModel() {
             _contact.update { contactsRepository.updateContactInfo(contactDto, firstName, lastName, contactDto.yatDto?.yat.orEmpty()) }
             hideDialog()
         }
+    }
+}
+
+fun Tx.statusString(context: Context, requiredConfirmationCount: Long?): String {
+    val state = TxState.from(this)
+    val confirmationCount = if (this is CompletedTx) this.confirmationCount.toInt() else null
+
+    return if (this is CancelledTx) "" else when (state.status) {
+        PENDING -> when (state.direction) {
+            INBOUND -> context.string(R.string.tx_detail_waiting_for_sender_to_complete)
+            OUTBOUND -> context.string(R.string.tx_detail_waiting_for_recipient)
+        }
+
+        BROADCAST, COMPLETED -> if (requiredConfirmationCount != null) {
+            context.string(R.string.tx_detail_completing_final_processing_with_step, 1, requiredConfirmationCount + 1)
+        } else {
+            context.string(R.string.tx_detail_completing_final_processing)
+        }
+
+        MINED_UNCONFIRMED -> if (confirmationCount != null && requiredConfirmationCount != null) {
+            context.string(R.string.tx_detail_completing_final_processing_with_step, confirmationCount, requiredConfirmationCount + 1)
+        } else {
+            context.string(R.string.tx_detail_completing_final_processing)
+        }
+
+        TX_NULL_ERROR, IMPORTED, COINBASE, MINED_CONFIRMED, REJECTED, ONE_SIDED_UNCONFIRMED, ONE_SIDED_CONFIRMED, QUEUED, COINBASE_UNCONFIRMED,
+        COINBASE_CONFIRMED, COINBASE_NOT_IN_BLOCKCHAIN, UNKNOWN -> ""
     }
 }
