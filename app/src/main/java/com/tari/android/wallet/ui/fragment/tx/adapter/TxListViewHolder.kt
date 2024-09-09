@@ -1,6 +1,5 @@
 package com.tari.android.wallet.ui.fragment.tx.adapter
 
-import androidx.annotation.StringRes
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
@@ -31,6 +30,7 @@ import com.tari.android.wallet.ui.extension.setVisible
 import com.tari.android.wallet.ui.extension.string
 import com.tari.android.wallet.ui.extension.visible
 import com.tari.android.wallet.ui.fragment.contactBook.data.contacts.ContactDto
+import com.tari.android.wallet.ui.fragment.tx.details.statusString
 import com.tari.android.wallet.util.WalletUtil
 import com.tari.android.wallet.util.addressFirstEmojis
 import com.tari.android.wallet.util.addressLastEmojis
@@ -190,26 +190,10 @@ class TxListViewHolder(view: ItemTxListBinding) : CommonViewHolder<TransactionIt
         }
     }
 
-    private fun displayStatus(tx: Tx) = when (tx) {
-        is PendingInboundTx -> when (tx.status) {
-            TxStatus.PENDING -> showStatusTextView(R.string.tx_detail_waiting_for_sender_to_complete)
-            else -> showStatusTextViewFinalProcessing()
-        }
-
-        is PendingOutboundTx -> when (tx.status) {
-            TxStatus.PENDING -> showStatusTextView(R.string.tx_detail_waiting_for_recipient)
-            else -> showStatusTextViewFinalProcessing()
-        }
-
-        is CompletedTx -> {
-            when (tx.status) {
-                TxStatus.MINED_UNCONFIRMED -> showStatusTextViewFinalProcessing(tx.confirmationCount.toInt())
-                else -> ui.statusTextView.gone()
-            }
-        }
-
-        is CancelledTx -> showStatusTextView(R.string.tx_detail_payment_cancelled)
-        else -> ui.statusTextView.gone()
+    private fun displayStatus(tx: Tx) {
+        val status = tx.statusString(context = itemView.context, item!!.requiredConfirmationCount)
+        ui.statusTextView.setVisible(status.isNotEmpty())
+        ui.statusTextView.text = status
     }
 
     private fun displayEmojiId(address: TariWalletAddress) {
@@ -217,17 +201,6 @@ class TxListViewHolder(view: ItemTxListBinding) : CommonViewHolder<TransactionIt
         ui.emojiIdViewContainer.textViewEmojiPrefix.text = address.addressPrefixEmojis()
         ui.emojiIdViewContainer.textViewEmojiFirstPart.text = address.addressFirstEmojis()
         ui.emojiIdViewContainer.textViewEmojiLastPart.text = address.addressLastEmojis()
-    }
-
-    private fun showStatusTextViewFinalProcessing(step: Int = 0) = showStatusTextView(
-        string(R.string.tx_detail_completing_final_processing, step + 1, item!!.requiredConfirmationCount + 1)
-    )
-
-    private fun showStatusTextView(@StringRes messageId: Int) = showStatusTextView(string(messageId))
-
-    private fun showStatusTextView(status: String) {
-        ui.statusTextView.setVisible(status.isNotEmpty())
-        ui.statusTextView.text = status
     }
 
     private fun displayMessage(tx: Tx) {

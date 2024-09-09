@@ -39,22 +39,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import com.bumptech.glide.Glide
-import com.tari.android.wallet.R.dimen.add_amount_element_text_size
-import com.tari.android.wallet.R.dimen.add_amount_gem_size
-import com.tari.android.wallet.R.string.common_from
-import com.tari.android.wallet.R.string.common_to
-import com.tari.android.wallet.R.string.tx_detail_add_contact
-import com.tari.android.wallet.R.string.tx_detail_completing_final_processing
-import com.tari.android.wallet.R.string.tx_detail_edit
-import com.tari.android.wallet.R.string.tx_detail_fee_tooltip_desc
-import com.tari.android.wallet.R.string.tx_detail_fee_tooltip_transaction_fee
-import com.tari.android.wallet.R.string.tx_detail_payment_cancelled
-import com.tari.android.wallet.R.string.tx_detail_payment_received
-import com.tari.android.wallet.R.string.tx_detail_payment_sent
-import com.tari.android.wallet.R.string.tx_detail_pending_payment_received
-import com.tari.android.wallet.R.string.tx_detail_waiting_for_recipient
-import com.tari.android.wallet.R.string.tx_detail_waiting_for_sender_to_complete
-import com.tari.android.wallet.R.string.tx_details_fee_value
+import com.tari.android.wallet.R
 import com.tari.android.wallet.databinding.FragmentTxDetailsBinding
 import com.tari.android.wallet.extension.collectNonNullFlow
 import com.tari.android.wallet.extension.observe
@@ -67,11 +52,8 @@ import com.tari.android.wallet.model.Tx
 import com.tari.android.wallet.model.Tx.Direction.INBOUND
 import com.tari.android.wallet.model.Tx.Direction.OUTBOUND
 import com.tari.android.wallet.model.TxNote
-import com.tari.android.wallet.model.TxStatus.COINBASE
 import com.tari.android.wallet.model.TxStatus.IMPORTED
 import com.tari.android.wallet.model.TxStatus.MINED_CONFIRMED
-import com.tari.android.wallet.model.TxStatus.ONE_SIDED_CONFIRMED
-import com.tari.android.wallet.model.TxStatus.ONE_SIDED_UNCONFIRMED
 import com.tari.android.wallet.model.TxStatus.PENDING
 import com.tari.android.wallet.ui.common.CommonFragment
 import com.tari.android.wallet.ui.dialog.modular.ModularDialog
@@ -145,7 +127,7 @@ class TxDetailsFragment : CommonFragment<FragmentTxDetailsBinding, TxDetailsView
 
     private fun updateContactInfo(contact: ContactDto) {
         val alias = contact.contactInfo.getAlias()
-        val addEditText = if (alias.isEmpty()) tx_detail_add_contact else tx_detail_edit
+        val addEditText = if (alias.isEmpty()) R.string.tx_detail_add_contact else R.string.tx_detail_edit
         ui.editContactLabelTextView.text = getString(addEditText)
         ui.contactNameTextView.setText(contact.contactInfo.getAlias())
     }
@@ -169,8 +151,8 @@ class TxDetailsFragment : CommonFragment<FragmentTxDetailsBinding, TxDetailsView
 
     @SuppressLint("ClickableViewAccessibility")
     private fun bindViews() {
-        currentTextSize = dimen(add_amount_element_text_size)
-        currentAmountGemSize = dimen(add_amount_gem_size)
+        currentTextSize = dimen(R.dimen.add_amount_element_text_size)
+        currentAmountGemSize = dimen(R.dimen.add_amount_gem_size)
 
         ui.gifContainer.root.invisible()
     }
@@ -196,12 +178,12 @@ class TxDetailsFragment : CommonFragment<FragmentTxDetailsBinding, TxDetailsView
         val state = TxState.from(tx)
         ui.amountTextView.text = WalletUtil.amountFormatter.format(tx.amount.tariValue)
         ui.paymentStateTextView.text = when {
-            tx is CancelledTx -> string(tx_detail_payment_cancelled)
+            tx is CancelledTx -> string(R.string.tx_detail_payment_cancelled)
             state.status == MINED_CONFIRMED || state.status == IMPORTED ->
-                if (state.direction == INBOUND) string(tx_detail_payment_received)
-                else string(tx_detail_payment_sent)
+                if (state.direction == INBOUND) string(R.string.tx_detail_payment_received)
+                else string(R.string.tx_detail_payment_sent)
 
-            else -> string(tx_detail_pending_payment_received)
+            else -> string(R.string.tx_detail_pending_payment_received)
         }
         when {
             tx is CompletedTx && tx.direction == OUTBOUND -> setFeeData(tx.fee)
@@ -218,7 +200,7 @@ class TxDetailsFragment : CommonFragment<FragmentTxDetailsBinding, TxDetailsView
     private fun setFeeData(fee: MicroTari) {
         ui.txFeeTextView.visible()
         ui.feeLabelTextView.visible()
-        ui.txFeeTextView.text = string(tx_details_fee_value, WalletUtil.amountFormatter.format(fee.tariValue))
+        ui.txFeeTextView.text = string(R.string.tx_details_fee_value, WalletUtil.amountFormatter.format(fee.tariValue))
     }
 
     private fun setTxMetaData(tx: Tx) {
@@ -235,7 +217,7 @@ class TxDetailsFragment : CommonFragment<FragmentTxDetailsBinding, TxDetailsView
 
     private fun setTxAddressData(tx: Tx) {
         val state = TxState.from(tx)
-        ui.fromTextView.text = if (state.direction == INBOUND) string(common_from) else string(common_to)
+        ui.fromTextView.text = if (state.direction == INBOUND) string(R.string.common_from) else string(R.string.common_to)
         if (tx.tariContact.walletAddress.isUnknownUser()) {
             ui.emojiIdViewContainer.root.gone()
             ui.unknownSource.visible()
@@ -250,20 +232,7 @@ class TxDetailsFragment : CommonFragment<FragmentTxDetailsBinding, TxDetailsView
 
     private fun setTxStatusData(tx: Tx) {
         val state = TxState.from(tx)
-
-        val statusText = when {
-            tx is CancelledTx -> ""
-            state == TxState(INBOUND, PENDING) -> string(tx_detail_waiting_for_sender_to_complete)
-            state == TxState(OUTBOUND, PENDING) -> string(tx_detail_waiting_for_recipient)
-            state == TxState(INBOUND, ONE_SIDED_UNCONFIRMED) || state == TxState(INBOUND, ONE_SIDED_CONFIRMED) -> ""
-            state.status != MINED_CONFIRMED && state.status != COINBASE -> string(
-                tx_detail_completing_final_processing,
-                if (tx is CompletedTx) tx.confirmationCount.toInt() + 1 else 1,
-                viewModel.requiredConfirmationCount + 1
-            )
-
-            else -> ""
-        }
+        val statusText = tx.statusString(context = requireContext(), viewModel.requiredConfirmationCount)
         ui.statusTextView.text = statusText
         ui.statusContainerView.visibility = if (statusText.isEmpty()) View.GONE else View.VISIBLE
         if (tx !is CancelledTx && state.direction == OUTBOUND && state.status == PENDING) {
@@ -300,7 +269,7 @@ class TxDetailsFragment : CommonFragment<FragmentTxDetailsBinding, TxDetailsView
     }
 
     private fun showTxFeeToolTip() {
-        val args = TooltipDialogArgs(string(tx_detail_fee_tooltip_transaction_fee), string(tx_detail_fee_tooltip_desc))
+        val args = TooltipDialogArgs(string(R.string.tx_detail_fee_tooltip_transaction_fee), string(R.string.tx_detail_fee_tooltip_desc))
             .getModular(viewModel.resourceManager)
         ModularDialog(requireContext(), args).show()
     }
@@ -310,4 +279,3 @@ class TxDetailsFragment : CommonFragment<FragmentTxDetailsBinding, TxDetailsView
         const val TX_ID_EXTRA_KEY = "TX_DETAIL_EXTRA_KEY"
     }
 }
-
