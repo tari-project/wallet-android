@@ -84,6 +84,20 @@ class FFIWallet(
         var instance: FFIWallet?
             get() = atomicInstance.get()
             set(value) = atomicInstance.set(value)
+
+        fun <T> getOrNull(block: (FFIWallet) -> T): T? {
+            return instance.takeIf { it != null }?.let { wallet ->
+                try {
+                    block(wallet)
+                } catch (e: Exception) {
+                    logger.e("FFIWallet block failed with exception: $e")
+                    null
+                }
+            } ?: run {
+                logger.i("Trying to access FFIWallet instance before it is initialized.")
+                null
+            }
+        }
     }
 
     private external fun jniCreate(
