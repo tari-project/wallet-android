@@ -2,15 +2,13 @@ package com.tari.android.wallet.ui.fragment.profile
 
 import android.content.Context
 import android.graphics.Bitmap
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MediatorLiveData
-import androidx.lifecycle.MutableLiveData
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.YatAdapter
 import com.tari.android.wallet.application.deeplinks.DeepLink
 import com.tari.android.wallet.application.deeplinks.DeeplinkHandler
 import com.tari.android.wallet.data.sharedPrefs.CorePrefRepository
 import com.tari.android.wallet.extension.launchOnIo
+import com.tari.android.wallet.extension.launchOnMain
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.dialog.modular.DialogArgs
 import com.tari.android.wallet.ui.dialog.modular.ModularDialogArgs
@@ -23,6 +21,7 @@ import com.tari.android.wallet.ui.dialog.modular.modules.shareOptions.ShareOptio
 import com.tari.android.wallet.ui.fragment.contactBook.data.contacts.splitAlias
 import com.tari.android.wallet.ui.fragment.contactBook.root.ShareViewModel
 import com.tari.android.wallet.ui.fragment.contactBook.root.share.ShareType
+import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
 import com.tari.android.wallet.util.ContactUtil
 import com.tari.android.wallet.util.QrUtil
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -43,12 +42,6 @@ class WalletInfoViewModel : CommonViewModel() {
 
     @Inject
     lateinit var contactUtil: ContactUtil
-
-    private val _yatDisconnected: MutableLiveData<Boolean> = MutableLiveData(false) // todo move to UiState
-    val yatDisconnected: LiveData<Boolean> = _yatDisconnected
-
-    private val _reconnectVisibility: MediatorLiveData<Boolean> = MediatorLiveData()
-    val reconnectVisibility: LiveData<Boolean> = _reconnectVisibility
 
     init {
         component.inject(this)
@@ -71,8 +64,6 @@ class WalletInfoViewModel : CommonViewModel() {
     )
 
     init {
-        _reconnectVisibility.addSource(_yatDisconnected) { updateReconnectVisibility() }
-
         refreshData()
     }
 
@@ -80,42 +71,30 @@ class WalletInfoViewModel : CommonViewModel() {
         _uiState.update {
             it.copy(
                 walletAddress = corePrefRepository.walletAddress,
-                yat = yatAdapter.connectedYat.orEmpty(),
+                yat = yatAdapter.connectedYat,
                 alias = corePrefRepository.firstName.orEmpty() + " " + corePrefRepository.lastName.orEmpty(),
             )
         }
-        _yatDisconnected.postValue(yatAdapter.isYatDisconnected)
 
-        checkYatConnection()
+        checkYatDisconnected()
     }
 
     fun openYatOnboarding(context: Context) {
         yatAdapter.openOnboarding(context)
     }
 
-    private fun checkYatConnection() {
-        val connectedYat = yatAdapter.connectedYat.orEmpty()
-        if (connectedYat.isNotEmpty()) {
-            launchOnIo {
-                yatAdapter.searchTariYat(connectedYat).let {
-                     // TODO: check if Yat is connected to the wallet address and show status
-//                    if (it?.status == true) {
-//                        it.result?.entries?.firstOrNull()?.let { response ->
-//                            val wasDisconnected = response.value.address.lowercase() != corePrefRepository.walletAddressBase58.orEmpty().lowercase()
-//                            yatAdapter.disconnectYat(wasDisconnected)
-//                            _yatDisconnected.postValue(wasDisconnected)
-//                        }
-//                    } else {
-//                        yatAdapter.disconnectYat()
-//                        _yatDisconnected.postValue(true)
-//                    }
-                }
-            }
-        }
+    fun onYatButtonClicked() {
+        _uiState.update { it.copy(yatShowing = !it.yatShowing) }
     }
 
-    private fun updateReconnectVisibility() {
-        _reconnectVisibility.postValue(_yatDisconnected.value!!)
+    private fun checkYatDisconnected() {
+        launchOnIo {
+            val disconnected = yatAdapter.checkYatDisconnected()
+
+            launchOnMain {
+                _uiState.update { it.copy(yatDisconnected = disconnected) }
+            }
+        }
     }
 
     private fun shareData(type: ShareType) {
@@ -186,4 +165,8 @@ class WalletInfoViewModel : CommonViewModel() {
         content = shareProfileDeeplink,
         size = resourceManager.getDimenInPx(R.dimen.wallet_info_img_qr_code_size),
     )
+
+    fun onOpenWalletClicked() {
+        tariNavigator.navigate(Navigation.TxListNavigation.ToUtxos)
+    }
 }
