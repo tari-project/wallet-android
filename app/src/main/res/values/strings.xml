@@ -245,6 +245,8 @@
     <string name="tx_list_emoji_one_side_payment_placeholder">➡️</string>
     <string name="tx_list_emoji_coinbase_payment_placeholder">🪙</string>
     <string name="tx_list_someone">Someone</string>
+    <string name="tx_list_you">You</string>
+    <string name="tx_list_miner">Miner</string>
 
     <!-- send tari -->
     <string name="send_tari_title">Send To</string>
@@ -365,7 +367,8 @@
     <string name="tx_details_cancel_dialog_not_cancel">Not now</string>
     <string name="tx_details_error_tx_not_found_title">Requested transaction was not found</string>
     <string name="tx_details_error_tx_not_found_desc">Please try again later</string>
-    <string name="tx_details_coinbase_placeholder">🪙 Coinbase</string>
+    <string name="tx_details_coinbase_inbound">Mining Reward!</string>
+    <string name="tx_details_coinbase_outbound">You paid the Miner</string>
 
     <string name="tx_details_cancellation_reason_unknown">The transaction failed for an unknown reason.</string>
     <string name="tx_details_cancellation_reason_user_cancelled">The transaction was canceled by the sender.</string>

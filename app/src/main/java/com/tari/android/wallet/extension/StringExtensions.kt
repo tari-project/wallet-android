@@ -157,3 +157,14 @@ fun SpannableString.applyLetterSpacingStyle(search: String, letterSpacing: Float
 fun SpannableString.applyCenterAlignment() {
     setSpan(AlignmentSpan.Standard(Layout.Alignment.ALIGN_CENTER), 0, length, Spanned.SPAN_INTERMEDIATE)
 }
+
+/**
+ * Helper function to apply bold style to a spannable string.
+ * If no words are provided, the whole string will be made bold.
+ */
+fun String.makeTextBold(context: Context, vararg wordsToBeBold: String): SpannableString = this.applyFontStyle(
+    context = context,
+    defaultFont = TariFont.AVENIR_LT_STD_LIGHT,
+    search = if (wordsToBeBold.isEmpty()) listOf(this) else wordsToBeBold.toList(),
+    tariFont = TariFont.AVENIR_LT_STD_HEAVY,
+)
