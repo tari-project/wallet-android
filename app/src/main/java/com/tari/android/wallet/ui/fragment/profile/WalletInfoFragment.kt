@@ -40,14 +40,12 @@ import androidx.fragment.app.viewModels
 import com.tari.android.wallet.R
 import com.tari.android.wallet.databinding.FragmentWalletInfoBinding
 import com.tari.android.wallet.extension.collectFlow
-import com.tari.android.wallet.extension.observe
-import com.tari.android.wallet.extension.observeOnLoad
+import com.tari.android.wallet.extension.makeTextBold
 import com.tari.android.wallet.ui.common.CommonFragment
 import com.tari.android.wallet.ui.component.tari.toolbar.TariToolbarActionArg
-import com.tari.android.wallet.ui.extension.setOnThrottledClickListener
+import com.tari.android.wallet.ui.extension.drawable
 import com.tari.android.wallet.ui.extension.setVisible
 import com.tari.android.wallet.ui.extension.string
-import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
 import com.tari.android.wallet.util.DebugConfig
 import com.tari.android.wallet.util.addressFirstEmojis
 import com.tari.android.wallet.util.addressLastEmojis
@@ -73,54 +71,50 @@ class WalletInfoFragment : CommonFragment<FragmentWalletInfoBinding, WalletInfoV
     }
 
     private fun subscribeUI() = with(viewModel) {
-        observe(reconnectVisibility) {
-            val text = if (it) R.string.wallet_info_yat_disconnected_description else R.string.wallet_info_qr_code_desc
-            ui.descTextView.setText(text)
-            ui.reconnectButton.setVisible(it)
-        }
-
-        observeOnLoad(yatDisconnected)
-
         collectFlow(uiState) { uiState ->
             ui.emojiIdSummaryView.textViewEmojiPrefix.text = uiState.walletAddress.addressPrefixEmojis()
             ui.emojiIdSummaryView.textViewEmojiFirstPart.text = uiState.walletAddress.addressFirstEmojis()
             ui.emojiIdSummaryView.textViewEmojiLastPart.text = uiState.walletAddress.addressLastEmojis()
-            // TODO show yat
-            updateAlias(uiState.alias)
+
+            ui.alias.setVisible(uiState.alias.isNotBlank())
+            ui.alias.text = uiState.alias
+
+            ui.yatButton.setVisible(!uiState.yat.isNullOrBlank() && DebugConfig.isYatEnabled)
+            ui.yatButton.setOnClickListener { viewModel.onYatButtonClicked() }
+            ui.yatButton.setImageDrawable(drawable(if (uiState.yatShowing) R.drawable.vector_tari_yat_open else R.drawable.vector_tari_yat_close))
+            ui.yatDisconnectedDescTextView.setVisible(uiState.yatDisconnected && DebugConfig.isYatEnabled)
+            ui.yatDisconnectedDescTextView.text = string(R.string.wallet_info_yat_disconnected_description)
+                .makeTextBold(requireContext(), string(R.string.wallet_info_yat_disconnected_description_connect_yats))
+            ui.emojiIdAddressText.setVisible(!uiState.yatShowing && DebugConfig.isYatEnabled, View.INVISIBLE)
+            ui.yatAddressText.setVisible(uiState.yatShowing && DebugConfig.isYatEnabled)
+            ui.yatAddressText.text = uiState.yat.orEmpty()
         }
     }
 
     private fun setupUI() {
-        ui.emojiIdSummaryContainerView.setOnClickListener { onEmojiSummaryClicked() }
+        ui.emojiIdSummaryContainerView.setOnClickListener { viewModel.onAddressDetailsClicked() }
 
-        ui.auroraContainer.addView(RoundButtonWithIconView(requireContext()).apply {
-            setArgs(getString(R.string.wallet_info_wallet_button), R.drawable.vector_wallet_wallet, {
-                viewModel.navigation.postValue(Navigation.TxListNavigation.ToUtxos)
-            })
+        ui.roundButtonsContainer.addView(RoundButtonWithIconView(requireContext()).apply {
+            setArgs(
+                text = string(R.string.wallet_info_wallet_button),
+                icon = R.drawable.vector_wallet_wallet,
+                action = { viewModel.onOpenWalletClicked() },
+            )
         })
         if (DebugConfig.isYatEnabled) {
-            ui.auroraContainer.addView(RoundButtonWithIconView(requireContext()).apply {
-                setArgs(getString(R.string.wallet_info_connect_yat_button), R.drawable.vector_wallet_yat, {
-                    viewModel.yatAdapter.openOnboarding(requireContext())
-                })
+            ui.roundButtonsContainer.addView(RoundButtonWithIconView(requireContext()).apply {
+                setArgs(
+                    text = string(R.string.wallet_info_connect_yat_button),
+                    icon = R.drawable.vector_wallet_yat,
+                    action = { viewModel.openYatOnboarding(requireContext()) },
+                )
             })
         }
 
         ui.toolbar.setRightArgs(TariToolbarActionArg(title = string(R.string.tx_detail_edit)) { viewModel.showEditAliasDialog() })
 
-        ui.reconnectButton.setOnThrottledClickListener { viewModel.openYatOnboarding(requireContext()) }
         ui.buttonShareAddress.setOnClickListener { viewModel.onShareAddressClicked() }
 
         viewModel.getQrCodeBitmap()?.let { ui.qrImageView.setImageBitmap(it) }
     }
-
-    private fun onEmojiSummaryClicked() {
-        viewModel.onAddressDetailsClicked()
-    }
-
-    private fun updateAlias(alias: String?) {
-        ui.alias.setVisible(alias.orEmpty().isNotBlank())
-        ui.alias.text = alias.orEmpty()
-    }
 }
-

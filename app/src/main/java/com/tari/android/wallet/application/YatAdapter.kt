@@ -41,9 +41,6 @@ class YatAdapter @Inject constructor(
     val connectedYat: EmojiId?
         get() = yatSharedRepository.connectedYat
 
-    val isYatDisconnected: Boolean // TODO make a check every time we show the Wallet Info screen
-        get() = yatSharedRepository.yatWasDisconnected
-
     fun initYat(application: Application) {
         val config = YatConfiguration(
             appReturnLink = BuildConfig.YAT_ORGANIZATION_RETURN_URL,
@@ -89,6 +86,14 @@ class YatAdapter @Inject constructor(
         }
     }
 
+    /**
+     * Check if the stored Yat emojiId isn't empty, but it is disconnected with user's wallet
+     */
+    suspend fun checkYatDisconnected(): Boolean = connectedYat.takeIf { it.isNullOrBlank() }
+        ?.let { searchTariYat(it) }?.address
+        ?.let { address -> address.lowercase() != commonRepository.walletAddressBase58.orEmpty().lowercase() }
+        ?: false
+
     fun openOnboarding(context: Context) {
         val address = commonRepository.walletAddressBase58.orEmpty()
         YatIntegration.showOnboarding(context, listOf(YatRecord(YatRecordType.XTM_ADDRESS, data = address)))
@@ -108,10 +113,6 @@ class YatAdapter @Inject constructor(
         intent.putExtra(FinalizeSendTxViewModel.KEY_TRANSACTION_DATA, transactionData)
         intent.flags = Intent.FLAG_ACTIVITY_NO_ANIMATION
         activity.startActivity(intent, ActivityOptions.makeSceneTransitionAnimation(activity).toBundle())
-    }
-
-    fun disconnectYat(disconnected: Boolean = true) {
-        yatSharedRepository.yatWasDisconnected = disconnected
     }
 
     override fun onYatIntegrationComplete(yat: String) {
