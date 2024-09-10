@@ -15,6 +15,7 @@ import com.tari.android.wallet.extension.collectFlow
 import com.tari.android.wallet.extension.getWithError
 import com.tari.android.wallet.extension.launchOnMain
 import com.tari.android.wallet.ffi.FFITxCancellationReason
+import com.tari.android.wallet.ffi.FFIWallet
 import com.tari.android.wallet.model.CancelledTx
 import com.tari.android.wallet.model.CompletedTx
 import com.tari.android.wallet.model.PendingOutboundTx
@@ -65,8 +66,7 @@ class TxDetailsViewModel(savedState: SavedStateHandle) : CommonViewModel() {
     @Inject
     lateinit var contactsRepository: ContactsRepository
 
-    var requiredConfirmationCount: Long? = null
-        private set
+    val requiredConfirmationCount: Long? = FFIWallet.getOrNull { it.getRequiredConfirmationCount() }?.toLong()
 
     private var txId: TxId? = savedState.get<TxId>(TX_ID_EXTRA_KEY)
 
@@ -88,7 +88,6 @@ class TxDetailsViewModel(savedState: SavedStateHandle) : CommonViewModel() {
         component.inject(this)
 
         doOnWalletServiceConnected {
-            fetchRequiredConfirmationCount()
             findTxAndUpdateUI()
         }
 
@@ -218,11 +217,6 @@ class TxDetailsViewModel(savedState: SavedStateHandle) : CommonViewModel() {
             ?: runCatching { walletService.getPendingOutboundTxById(id, WalletError()) }.getOrNull()
             ?: runCatching { walletService.getCompletedTxById(id, WalletError()) }.getOrNull()
             ?: runCatching { walletService.getCancelledTxById(id, WalletError()) }.getOrNull()
-
-
-    private fun fetchRequiredConfirmationCount() {
-        requiredConfirmationCount = walletService.getWithError { error, wallet -> wallet.getRequiredConfirmationCount(error) }
-    }
 
     private fun showEditNameInputs() {
         val contact = contact.value!!
