@@ -36,7 +36,7 @@ class ContactDetailsFragment : CommonFragment<FragmentContactsDetailsBinding, Co
     private fun observeUI() = with(viewModel) {
         collectFlow(uiState) { uiState ->
             applyContact(uiState.contact)
-            adapter.update(uiState.list)
+            adapter.update(uiState.viewHolderItemList)
         }
     }
 

@@ -100,7 +100,13 @@ class ContactsViewModel : CommonViewModel() {
     }
 
     fun grantPermission() {
-        permissionManager.runWithPermission(listOf(android.Manifest.permission.READ_CONTACTS), silently = false) {
+        permissionManager.runWithPermission(
+            permissions = listOf(
+                android.Manifest.permission.READ_CONTACTS,
+                android.Manifest.permission.WRITE_CONTACTS,
+            ),
+            silently = false,
+        ) {
             launchOnIo {
                 contactsRepository.grantContactPermissionAndRefresh()
             }

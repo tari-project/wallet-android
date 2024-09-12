@@ -62,7 +62,7 @@ class ContactLinkViewModel : CommonViewModel() {
         list.addSource(contactListSource) { updateList() }
         list.addSource(searchText) { updateList() }
 
-        collectFlow(contactsRepository.contactListFiltered) {
+        collectFlow(contactsRepository.contactList) {
             contactListSource.value = it.map { contactDto -> ContactItem(contact = contactDto, isSimple = true) }
         }
     }
@@ -78,7 +78,13 @@ class ContactLinkViewModel : CommonViewModel() {
     }
 
     fun grantPermission() {
-        permissionManager.runWithPermission(listOf(android.Manifest.permission.READ_CONTACTS), silently = true) {
+        permissionManager.runWithPermission(
+            permissions = listOf(
+                android.Manifest.permission.READ_CONTACTS,
+                android.Manifest.permission.WRITE_CONTACTS,
+            ),
+            silently = true,
+        ) {
             viewModelScope.launch(Dispatchers.IO) {
                 contactsRepository.grantContactPermissionAndRefresh()
             }

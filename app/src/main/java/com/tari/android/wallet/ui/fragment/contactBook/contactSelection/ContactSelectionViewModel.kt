@@ -33,7 +33,6 @@ import com.tari.android.wallet.ui.fragment.contactBook.contacts.adapter.contact.
 import com.tari.android.wallet.ui.fragment.contactBook.data.ContactsRepository
 import com.tari.android.wallet.ui.fragment.contactBook.data.contacts.ContactDto
 import com.tari.android.wallet.ui.fragment.contactBook.data.contacts.FFIContactInfo
-import com.tari.android.wallet.ui.fragment.contactBook.data.contacts.YatDto
 import com.tari.android.wallet.ui.fragment.contactBook.data.contacts.splitAlias
 import com.tari.android.wallet.ui.fragment.contactBook.root.ShareViewModel
 import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
@@ -105,7 +104,7 @@ class ContactSelectionViewModel : CommonViewModel() {
             walletAddressViewModel.checkClipboardForValidEmojiId()
         }
 
-        collectFlow(contactsRepository.contactListFiltered) {
+        collectFlow(contactsRepository.contactList) {
             contactListSource.value = it.map { contactDto -> ContactItem(contact = contactDto, isSimple = true) }
         }
         contactList.addSource(contactListSource) { updateContactList() }
@@ -221,15 +220,7 @@ class ContactSelectionViewModel : CommonViewModel() {
     }
 
     private fun getUserDto(): ContactDto =
-        yatState.value.yatUser?.let {
-            ContactDto(
-                contactInfo = FFIContactInfo(it.walletAddress),
-                yatDto = YatDto(
-                    yat = it.yat,
-                    connectedWallets = it.connectedWallets,
-                ),
-            )
-        }
+        yatState.value.yatUser?.let { ContactDto(contactInfo = FFIContactInfo(it.walletAddress)) }
             ?: selectedContact.value
             ?: contactListSource.value.orEmpty()
                 .firstOrNull { it.contact.contactInfo.extractWalletAddress() == selectedTariWalletAddress.value }?.contact
@@ -272,7 +263,6 @@ class ContactSelectionViewModel : CommonViewModel() {
             YatState.YatUser(
                 yat = yatEmojiId,
                 walletAddress = TariWalletAddress.fromBase58(yatResult.address),
-                connectedWallets = yatAdapter.searchAllYats(yatEmojiId).map { YatDto.ConnectedWallet(it.key, it.value) },
             )
         }
     }

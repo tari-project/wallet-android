@@ -13,16 +13,11 @@ import com.tari.android.wallet.ui.fragment.contactBook.data.contacts.PhoneContac
 import com.tari.android.wallet.util.addressFirstEmojis
 import com.tari.android.wallet.util.addressLastEmojis
 import com.tari.android.wallet.util.addressPrefixEmojis
-import com.tari.android.wallet.util.containsNonEmoji
-import com.tari.android.wallet.util.extractEmojis
 
 class ContactItemViewHolder(view: ItemContactBinding) : CommonViewHolder<ContactItem, ItemContactBinding>(view) {
 
-//    private val badgesController: BadgesController by lazy { BadgesController(view) }
-
     override fun bind(item: ContactItem) {
         super.bind(item)
-//        badgesController.bind(item)
 
         when (val contactInfo = item.contact.contactInfo) {
             is FFIContactInfo -> {
@@ -35,12 +30,10 @@ class ContactItemViewHolder(view: ItemContactBinding) : CommonViewHolder<Contact
 
             is MergedContactInfo -> {
                 displayAlias(contactInfo.phoneContactInfo.getAlias())
-                displayYat(item.contact.yatDto?.yat.orEmpty())
             }
 
             is PhoneContactInfo -> {
                 displayAlias(contactInfo.getAlias())
-                displayYat(item.contact.yatDto?.yat.orEmpty())
             }
         }
 
@@ -48,13 +41,6 @@ class ContactItemViewHolder(view: ItemContactBinding) : CommonViewHolder<Contact
         ui.starred.setVisible(item.contact.contactInfo.isFavorite)
         ui.checkbox.setVisible(item.isSelectionState && item.contact.getFFIContactInfo() != null)
         ui.checkbox.isChecked = item.isSelected
-    }
-
-    private fun displayYat(yat: String) {
-        val extracted = yat.extractEmojis()
-        if (yat.isNotEmpty() && !yat.containsNonEmoji() && extracted.isNotEmpty()) {
-            // TODO show Yat? There were no code for showing Yat address
-        }
     }
 
     private fun displayAlias(alias: String) {

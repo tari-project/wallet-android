@@ -1,12 +1,12 @@
 package com.tari.android.wallet.ui.fragment.home.navigation
 
+import com.tari.android.wallet.application.YatAdapter.ConnectedWallet
 import com.tari.android.wallet.application.deeplinks.DeepLink
 import com.tari.android.wallet.model.MicroTari
 import com.tari.android.wallet.model.TariWalletAddress
 import com.tari.android.wallet.model.Tx
 import com.tari.android.wallet.model.TxId
 import com.tari.android.wallet.ui.fragment.contactBook.data.contacts.ContactDto
-import com.tari.android.wallet.ui.fragment.contactBook.data.contacts.YatDto
 import com.tari.android.wallet.ui.fragment.pinCode.PinCodeScreenBehavior
 import com.tari.android.wallet.ui.fragment.send.common.TransactionData
 import com.tari.android.wallet.ui.fragment.send.finalize.TxFailureReason
@@ -109,10 +109,9 @@ sealed class Navigation {
         class ToSendTari(val contact: ContactDto) : ContactBookNavigation()
         object ToSelectTariUser : ContactBookNavigation()
         class ToRequestTari(val contact: ContactDto) : ContactBookNavigation()
-        class ToExternalWallet(val connectedWallet: YatDto.ConnectedWallet) : ContactBookNavigation()
+        class ToExternalWallet(val connectedWallet: ConnectedWallet) : ContactBookNavigation()
         class ToLinkContact(val contact: ContactDto) : ContactBookNavigation()
         class ToContactTransactionHistory(val contact: ContactDto) : ContactBookNavigation()
         object BackToContactBook : ContactBookNavigation()
     }
 }
-

@@ -41,8 +41,6 @@ import com.tari.android.wallet.model.TxStatus.UNKNOWN
 import com.tari.android.wallet.model.WalletError
 import com.tari.android.wallet.service.TariWalletService
 import com.tari.android.wallet.ui.common.CommonViewModel
-import com.tari.android.wallet.ui.dialog.modular.DialogArgs
-import com.tari.android.wallet.ui.dialog.modular.ModularDialogArgs
 import com.tari.android.wallet.ui.dialog.modular.modules.body.BodyModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonStyle
@@ -231,27 +229,29 @@ class TxDetailsViewModel(savedState: SavedStateHandle) : CommonViewModel() {
 
         var saveAction: () -> Boolean = { false }
 
-        val nameModule =
-            InputModule(
-                value = name,
-                hint = resourceManager.getString(R.string.contact_book_add_contact_first_name_hint),
-                isFirst = true,
-                isEnd = false,
-            ) { saveAction.invoke() }
+        val nameModule = InputModule(
+            value = name,
+            hint = resourceManager.getString(R.string.contact_book_add_contact_first_name_hint),
+            isFirst = true,
+            isEnd = false,
+            onDoneAction = { saveAction.invoke() },
+        )
 
         val headModule = HeadModule(
             title = resourceManager.getString(R.string.contact_book_details_edit_title),
             rightButtonTitle = resourceManager.getString(R.string.contact_book_add_contact_done_button),
-        ) { saveAction.invoke() }
-
-        val moduleList = mutableListOf(headModule, nameModule)
+            rightButtonAction = { saveAction.invoke() },
+        )
 
         saveAction = {
             saveDetails(nameModule.value)
             true
         }
 
-        showInputModalDialog(ModularDialogArgs(DialogArgs(), moduleList))
+        showInputModalDialog(
+            headModule,
+            nameModule,
+        )
     }
 
     private fun saveDetails(newName: String) {
@@ -259,7 +259,7 @@ class TxDetailsViewModel(savedState: SavedStateHandle) : CommonViewModel() {
             val firstName = splitAlias(newName).firstName
             val lastName = splitAlias(newName).lastName
             val contactDto = contact.value!!
-            _contact.update { contactsRepository.updateContactInfo(contactDto, firstName, lastName, contactDto.yatDto?.yat.orEmpty()) }
+            _contact.update { contactsRepository.updateContactInfo(contactDto, firstName, lastName, contactDto.yat) }
             hideDialog()
         }
     }

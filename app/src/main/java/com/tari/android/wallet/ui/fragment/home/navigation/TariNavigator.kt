@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.provider.ContactsContract
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.YatAdapter
+import com.tari.android.wallet.application.YatAdapter.ConnectedWallet
 import com.tari.android.wallet.application.deeplinks.DeepLink
 import com.tari.android.wallet.data.sharedPrefs.CorePrefRepository
 import com.tari.android.wallet.data.sharedPrefs.tariSettings.TariSettingsPrefRepository
@@ -36,7 +37,6 @@ import com.tari.android.wallet.ui.fragment.chat.chatDetails.ChatDetailsFragment
 import com.tari.android.wallet.ui.fragment.contactBook.add.AddContactFragment
 import com.tari.android.wallet.ui.fragment.contactBook.add.SelectUserContactFragment
 import com.tari.android.wallet.ui.fragment.contactBook.data.contacts.ContactDto
-import com.tari.android.wallet.ui.fragment.contactBook.data.contacts.YatDto
 import com.tari.android.wallet.ui.fragment.contactBook.details.ContactDetailsFragment
 import com.tari.android.wallet.ui.fragment.contactBook.link.ContactLinkFragment
 import com.tari.android.wallet.ui.fragment.contactBook.root.ContactBookFragment
@@ -144,7 +144,7 @@ class TariNavigator @Inject constructor(
             is InputSeedWordsNavigation.ToRestoreFormSeedWordsInProgress -> toRestoreFromSeedWordsInProgress()
             is InputSeedWordsNavigation.ToBaseNodeSelection -> toBaseNodeSelection()
             is WalletRestoringFromSeedWordsNavigation.OnRestoreCompleted -> onRestoreCompleted()
-            is WalletRestoringFromSeedWordsNavigation.OnRestoreFailed -> { onBackPressed() }
+            is WalletRestoringFromSeedWordsNavigation.OnRestoreFailed -> onBackPressed()
             is AddAmountNavigation.OnAmountExceedsActualAvailableBalance -> onAmountExceedsActualAvailableBalance()
             is AddAmountNavigation.ContinueToAddNote -> continueToAddNote(navigation.transactionData)
             is AddAmountNavigation.ContinueToFinalizing -> continueToFinalizeSendTx(navigation.transactionData)
@@ -283,7 +283,7 @@ class TariNavigator @Inject constructor(
 
     private fun toContactTransactionHistory(contact: ContactDto) = addFragment(TransactionHistoryFragment.createFragment(contact))
 
-    private fun toExternalWallet(connectedWallet: YatDto.ConnectedWallet) {
+    private fun toExternalWallet(connectedWallet: ConnectedWallet) {
         try {
             val externalAddress = connectedWallet.getExternalLink()
             val intent = Intent(Intent.ACTION_VIEW, Uri.parse(externalAddress))
@@ -322,7 +322,7 @@ class TariNavigator @Inject constructor(
     }
 
     private fun continueToFinalizeSendTx(transactionData: TransactionData) {
-        if (transactionData.recipientContact?.yatDto != null) {
+        if (transactionData.recipientContact?.yat != null) {
             yatAdapter.showOutcomingFinalizeActivity(this.activity, transactionData)
         } else {
             addFragment(FinalizeSendTxFragment.create(transactionData))

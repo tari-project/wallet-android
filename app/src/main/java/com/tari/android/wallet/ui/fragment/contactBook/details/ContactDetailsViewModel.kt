@@ -43,9 +43,7 @@ import com.tari.android.wallet.ui.fragment.contactBook.data.ContactAction
 import com.tari.android.wallet.ui.fragment.contactBook.data.ContactsRepository
 import com.tari.android.wallet.ui.fragment.contactBook.data.contacts.ContactDto
 import com.tari.android.wallet.ui.fragment.contactBook.data.contacts.MergedContactInfo
-import com.tari.android.wallet.ui.fragment.contactBook.data.contacts.YatDto
 import com.tari.android.wallet.ui.fragment.contactBook.data.contacts.splitAlias
-import com.tari.android.wallet.ui.fragment.contactBook.data.contacts.toConnectedWallets
 import com.tari.android.wallet.ui.fragment.contactBook.details.adapter.contactType.ContactTypeViewHolderItem
 import com.tari.android.wallet.ui.fragment.contactBook.details.adapter.profile.ContactProfileViewHolderItem
 import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
@@ -54,6 +52,7 @@ import com.tari.android.wallet.ui.fragment.settings.allSettings.row.SettingsRowS
 import com.tari.android.wallet.ui.fragment.settings.allSettings.row.SettingsRowViewHolderItem
 import com.tari.android.wallet.ui.fragment.settings.allSettings.title.SettingsTitleViewHolderItem
 import com.tari.android.wallet.util.DebugConfig
+import com.tari.android.wallet.util.EmojiId
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -74,113 +73,102 @@ class ContactDetailsViewModel(savedState: SavedStateHandle) : CommonViewModel() 
     init {
         component.inject(this)
 
-        _uiState.update { it.copy(list = updateList(it.contact)) }
-
-        updateYatInfo(uiState.value.contact.yatDto)
+        updateYatInfo(uiState.value.contact.yat)
     }
 
-    private fun updateList(contact: ContactDto): List<CommonViewHolderItem> {
+    val ContactDetailsModel.UiState.viewHolderItemList: List<CommonViewHolderItem>
+        get() = run {
+            val availableActions = this.contact.getContactActions()
 
-        val availableActions = contact.getContactActions()
-        val connectedYatWallets = contact.yatDto?.connectedWallets?.filter { it.name != null }
+            listOfNotNull(
+                ContactProfileViewHolderItem(
+                    contactDto = contact,
+                    onAddressClick = { showAddressDetailsDialog(it) },
+                ),
 
-        return listOfNotNull(
-            ContactProfileViewHolderItem(
-                contactDto = contact,
-                onAddressClick = { showAddressDetailsDialog(it) },
-            ),
+                SettingsRowViewHolderItem(
+                    title = resourceManager.getString(ContactAction.Send.title),
+                    action = { tariNavigator.navigate(Navigation.ContactBookNavigation.ToSendTari(contact)) }
+                ).takeIf { availableActions.contains(ContactAction.Send) },
+                DividerViewHolderItem().takeIf { availableActions.contains(ContactAction.Send) },
 
-            SettingsRowViewHolderItem(
-                title = resourceManager.getString(ContactAction.Send.title),
-                action = { tariNavigator.navigate(Navigation.ContactBookNavigation.ToSendTari(contact)) }
-            ).takeIf { availableActions.contains(ContactAction.Send) },
-            DividerViewHolderItem().takeIf { availableActions.contains(ContactAction.Send) },
+                SettingsRowViewHolderItem(
+                    title = resourceManager.getString(ContactAction.Link.title),
+                    action = { tariNavigator.navigate(Navigation.ContactBookNavigation.ToLinkContact(contact)) }
+                ).takeIf { availableActions.contains(ContactAction.Link) },
+                DividerViewHolderItem().takeIf { availableActions.contains(ContactAction.Link) },
 
-            SettingsRowViewHolderItem(
-                title = resourceManager.getString(ContactAction.Link.title),
-                action = { tariNavigator.navigate(Navigation.ContactBookNavigation.ToLinkContact(contact)) }
-            ).takeIf { availableActions.contains(ContactAction.Link) },
-            DividerViewHolderItem().takeIf { availableActions.contains(ContactAction.Link) },
+                SettingsRowViewHolderItem(
+                    title = resourceManager.getString(R.string.contact_details_transaction_history),
+                    action = { tariNavigator.navigate(Navigation.ContactBookNavigation.ToContactTransactionHistory(contact)) }
+                ).takeIf { contact.getFFIContactInfo() != null },
+                DividerViewHolderItem().takeIf { contact.getFFIContactInfo() != null },
 
-            SettingsRowViewHolderItem(
-                title = resourceManager.getString(R.string.contact_details_transaction_history),
-                action = { tariNavigator.navigate(Navigation.ContactBookNavigation.ToContactTransactionHistory(contact)) }
-            ).takeIf { contact.getFFIContactInfo() != null },
-            DividerViewHolderItem().takeIf { contact.getFFIContactInfo() != null },
+                SettingsRowViewHolderItem(
+                    title = resourceManager.getString(ContactAction.ToFavorite.title),
+                    action = { toggleFavorite(contact) }
+                ).takeIf { availableActions.contains(ContactAction.ToFavorite) },
+                DividerViewHolderItem().takeIf { availableActions.contains(ContactAction.ToFavorite) },
 
-            SettingsRowViewHolderItem(
-                title = resourceManager.getString(ContactAction.ToFavorite.title),
-                action = { toggleFavorite(contact) }
-            ).takeIf { availableActions.contains(ContactAction.ToFavorite) },
-            DividerViewHolderItem().takeIf { availableActions.contains(ContactAction.ToFavorite) },
+                SettingsRowViewHolderItem(
+                    title = resourceManager.getString(ContactAction.ToUnFavorite.title),
+                    action = { toggleFavorite(contact) }
+                ).takeIf { availableActions.contains(ContactAction.ToUnFavorite) },
+                DividerViewHolderItem().takeIf { availableActions.contains(ContactAction.ToUnFavorite) },
 
-            SettingsRowViewHolderItem(
-                title = resourceManager.getString(ContactAction.ToUnFavorite.title),
-                action = { toggleFavorite(contact) }
-            ).takeIf { availableActions.contains(ContactAction.ToUnFavorite) },
-            DividerViewHolderItem().takeIf { availableActions.contains(ContactAction.ToUnFavorite) },
+                SettingsRowViewHolderItem(
+                    title = resourceManager.getString(ContactAction.Unlink.title),
+                    action = { showUnlinkDialog(contact) }
+                ).takeIf { availableActions.contains(ContactAction.Unlink) },
+                DividerViewHolderItem().takeIf { availableActions.contains(ContactAction.Unlink) },
 
-            SettingsRowViewHolderItem(
-                title = resourceManager.getString(ContactAction.Unlink.title),
-                action = { showUnlinkDialog(contact) }
-            ).takeIf { availableActions.contains(ContactAction.Unlink) },
-            DividerViewHolderItem().takeIf { availableActions.contains(ContactAction.Unlink) },
+                SettingsRowViewHolderItem(
+                    title = resourceManager.getString(ContactAction.Delete.title),
+                    style = SettingsRowStyle.Warning,
+                    iconId = R.drawable.tari_empty_drawable,
+                    action = { showDeleteContactDialog(contact) },
+                ).takeIf { availableActions.contains(ContactAction.Delete) },
+                DividerViewHolderItem().takeIf { availableActions.contains(ContactAction.Delete) },
 
-            SettingsRowViewHolderItem(
-                title = resourceManager.getString(ContactAction.Delete.title),
-                style = SettingsRowStyle.Warning,
-                iconId = R.drawable.tari_empty_drawable,
-                action = { showDeleteContactDialog(contact) },
-            ).takeIf { availableActions.contains(ContactAction.Delete) },
-            DividerViewHolderItem().takeIf { availableActions.contains(ContactAction.Delete) },
+                SettingsTitleViewHolderItem(
+                    title = resourceManager.getString(contact_book_details_connected_wallets),
+                ).takeIf { this.connectedYatWallets.isNotEmpty() },
+                *this.connectedYatWallets.map { connectedWallet ->
+                    listOf(
+                        SettingsRowViewHolderItem(
+                            title = resourceManager.getString(connectedWallet.name!!),
+                            action = { tariNavigator.navigate(Navigation.ContactBookNavigation.ToExternalWallet(connectedWallet)) },
+                        ),
+                        DividerViewHolderItem(),
+                    )
+                }.flatten().toTypedArray(),
 
-            SettingsTitleViewHolderItem(
-                title = resourceManager.getString(contact_book_details_connected_wallets),
-            ).takeIf { connectedYatWallets?.isNotEmpty() == true },
-            *connectedYatWallets?.map { connectedWallet ->
-                listOf(
-                    SettingsRowViewHolderItem(
-                        title = resourceManager.getString(connectedWallet.name!!),
-                        action = { tariNavigator.navigate(Navigation.ContactBookNavigation.ToExternalWallet(connectedWallet)) },
-                    ),
-                    DividerViewHolderItem(),
-                )
-            }.orEmpty().flatten().toTypedArray(),
+                ContactTypeViewHolderItem(
+                    type = resourceManager.getString(contact.getTypeName()),
+                    icon = contact.getTypeIcon(),
+                ),
 
-            ContactTypeViewHolderItem(
-                type = resourceManager.getString(contact.getTypeName()),
-                icon = contact.getTypeIcon(),
-            ),
-
-            SpaceVerticalViewHolderItem(20),
-        )
-    }
+                SpaceVerticalViewHolderItem(20),
+            )
+        }
 
     private fun toggleFavorite(contactDto: ContactDto) {
         launchOnIo {
             val newContact = contactsRepository.toggleFavorite(contactDto)
 
             launchOnMain {
-                _uiState.update {
-                    it.copy(
-                        contact = newContact,
-                        list = updateList(newContact),
-                    )
-                }
+                _uiState.update { it.copy(contact = newContact) }
             }
         }
     }
 
-    /**
-     * Look up connected wallets for the given Yat
-     */
-    private fun updateYatInfo(yatDto: YatDto?) {
-        if (yatDto != null && yatDto.yat.isNotEmpty() && yatDto.connectedWallets.isEmpty()) {
+    private fun updateYatInfo(yat: EmojiId?) {
+        if (!yat.isNullOrEmpty()) {
             launchOnIo {
-                val connectedWallets = yatAdapter.searchAllYats(yatDto.yat).toConnectedWallets()
-                val newContact = uiState.value.contact.copy(yatDto = yatDto.copy(connectedWallets = connectedWallets))
+                val connectedWallets = yatAdapter.loadConnectedWallets(yat)
+
                 launchOnMain {
-                    _uiState.update { it.copy(contact = newContact, list = updateList(newContact)) }
+                    _uiState.update { it.copy(connectedYatWallets = connectedWallets) }
                 }
             }
         }
@@ -191,7 +179,7 @@ class ContactDetailsViewModel(savedState: SavedStateHandle) : CommonViewModel() 
 
         val name = (contact.contactInfo.firstName + " " + contact.contactInfo.lastName).trim()
         val phoneDto = contact.getPhoneContactInfo()
-        val yatDto = contact.yatDto
+        val yat = contact.yat
 
         var saveAction: () -> Boolean = { false }
 
@@ -205,7 +193,7 @@ class ContactDetailsViewModel(savedState: SavedStateHandle) : CommonViewModel() 
 
         val yatModule = YatInputModule(
             search = this::searchYat,
-            value = yatDto?.yat.orEmpty(),
+            value = yat.orEmpty(),
             hint = resourceManager.getString(contact_book_add_contact_yat_hint),
             isFirst = false,
             isEnd = true,
@@ -225,8 +213,7 @@ class ContactDetailsViewModel(savedState: SavedStateHandle) : CommonViewModel() 
 
         showInputModalDialog(
             ModularDialogArgs(
-                DialogArgs(),
-                listOfNotNull(
+                modules = listOfNotNull(
                     headModule,
                     nameModule,
                     yatModule.takeIf { it != null },
@@ -252,6 +239,7 @@ class ContactDetailsViewModel(savedState: SavedStateHandle) : CommonViewModel() 
             )
         } else {
             // TODO validate yat using YanAdapter and show error if invalid
+            // TODO refresh Yat info if changed
             launchOnIo {
                 val firstName = splitAlias(newName).firstName
                 val lastName = splitAlias(newName).lastName
@@ -259,7 +247,7 @@ class ContactDetailsViewModel(savedState: SavedStateHandle) : CommonViewModel() 
                 val newContact = contactsRepository.updateContactInfo(contact, firstName, lastName, yat)
 
                 launchOnMain {
-                    _uiState.update { it.copy(contact = newContact, list = updateList(newContact)) }
+                    _uiState.update { it.copy(contact = newContact) }
                     hideDialog()
                 }
             }

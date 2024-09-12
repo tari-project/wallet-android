@@ -5,9 +5,10 @@ import com.orhanobut.logger.Logger
 import com.tari.android.wallet.ui.fragment.contactBook.data.contacts.ContactDto
 import com.tari.android.wallet.ui.fragment.contactBook.data.contacts.MergedContactInfo
 import com.tari.android.wallet.ui.fragment.contactBook.data.contacts.PhoneContactInfo
-import com.tari.android.wallet.ui.fragment.contactBook.data.contacts.toYatDto
+import com.tari.android.wallet.util.EmojiId
 import contacts.core.Contacts
 import contacts.core.Fields
+import contacts.core.entities.MutableContact
 import contacts.core.entities.NewNote
 import contacts.core.entities.NewOptions
 import contacts.core.entities.Note
@@ -22,7 +23,7 @@ import kotlinx.coroutines.withContext
 
 class PhoneBookRepositoryBridge(
     private val contactsRepository: ContactsRepository,
-    private val context: Context,
+    context: Context,
 ) {
     private val logger
         get() = Logger.t(this::class.simpleName)
@@ -41,19 +42,11 @@ class PhoneBookRepositoryBridge(
             .map { contact ->
                 phoneContacts.firstOrNull { it.id == contact.getPhoneContactInfo()?.id }?.let { phoneContact ->
                     when (contact.contactInfo) {
-                        is PhoneContactInfo -> contact.copy(
-                            contactInfo = phoneContact,
-                            yatDto = phoneContact.phoneYat.toYatDto(),
-                        )
-
-                        is MergedContactInfo -> contact.copy(
-                            contactInfo = contact.contactInfo.copy(phoneContactInfo = phoneContact),
-                            yatDto = phoneContact.phoneYat.toYatDto(),
-                        )
-
+                        is PhoneContactInfo -> contact.copy(contactInfo = phoneContact)
+                        is MergedContactInfo -> contact.copy(contactInfo = contact.contactInfo.copy(phoneContactInfo = phoneContact))
                         else -> contact
                     }
-                } ?: contact // do nothing if phone contact is not exist
+                } ?: contact // do nothing if phone contact does not exist
             }
             // add new contacts
             .plus(
@@ -71,11 +64,7 @@ class PhoneBookRepositoryBridge(
                 contact.getPhoneContactInfo()?.takeIf { it.shouldUpdate }?.let { phoneContact ->
                     saveNamesToPhoneBook(phoneContact)
                     saveStarredToPhoneBook(phoneContact)
-                    saveCustomFieldsToPhoneBook(
-                        contactId = phoneContact.id.toInt(),
-                        yat = phoneContact.phoneYat,
-                        emojiId = phoneContact.phoneEmojiId,
-                    )
+                    saveCustomFieldsToPhoneBook(phoneContact)
                 }
             }
         } catch (e: Throwable) {
@@ -97,11 +86,7 @@ class PhoneBookRepositoryBridge(
             setName(name)
         }
 
-        updatedContact?.let {
-            phoneContactsSource.update()
-                .contacts(it)
-                .commit()
-        }
+        updatePhoneContact(updatedContact)
     }
 
     private suspend fun saveStarredToPhoneBook(contact: PhoneContactInfo) = withContext(Dispatchers.IO) {
@@ -117,28 +102,35 @@ class PhoneBookRepositoryBridge(
             }
         }
 
-        updatedContact?.let {
-            phoneContactsSource.update()
-                .contacts(it)
-                .commit()
-        }
+        updatePhoneContact(updatedContact)
     }
 
-    private suspend fun saveCustomFieldsToPhoneBook(contactId: Int, yat: String, emojiId: String) = withContext(Dispatchers.IO) {
-        val phoneContact = phoneContactsSource.query().include(Fields.all()).where { Contact.Id equalTo contactId }.find().firstOrNull()
+    private suspend fun saveCustomFieldsToPhoneBook(contact: PhoneContactInfo) = withContext(Dispatchers.IO) {
+        val phoneContact = phoneContactsSource.query().include(Fields.all()).where { Contact.Id equalTo contact.id }.find().firstOrNull()
 
         val updatedContact = phoneContact?.mutableCopy {
-            setNote(generateCustomFields(yat, emojiId))
+            setNote(generateCustomFields(contact.phoneYat.orEmpty(), contact.phoneEmojiId.orEmpty()))
         }
 
-        updatedContact?.let {
+        updatePhoneContact(updatedContact)
+    }
+
+    private fun updatePhoneContact(updatedContact: MutableContact?) {
+        val result = updatedContact?.let {
             phoneContactsSource.update()
                 .contacts(it)
                 .commit()
         }
+
+        if (result?.isSuccessful == false) {
+            logger.i(
+                "Failed to save contact to phone book: $updatedContact with error: $result" +
+                        "\nProbably the android.Manifest.permission.WRITE_CONTACTS permission is not granted."
+            )
+        }
     }
 
-    private fun generateCustomFields(yat: String, emojiId: String): NewNote? {
+    private fun generateCustomFields(yat: String, emojiId: EmojiId): NewNote? {
         val formattedYat = if (yat.isNotEmpty()) "Yat: $yat" else ""
         val formattedEmojiId = if (emojiId.isNotEmpty()) "Tari address: $emojiId" else ""
 
@@ -151,7 +143,7 @@ class PhoneBookRepositoryBridge(
         return note?.note?.split("\n")
             ?.map { it.split(": ") }
             ?.associate { it.first() to it.last() }
-            ?.let { it["Yat"] to it["Tari address"] } ?: ("" to "")
+            ?.let { it["Yat"] to it["Tari address"] } ?: (null to null)
     }
 
     private suspend fun getPhoneContacts(): List<PhoneContactInfo> = withContext(Dispatchers.IO) {
@@ -165,12 +157,13 @@ class PhoneBookRepositoryBridge(
                     firstName = name?.givenName.orEmpty(),
                     lastName = name?.familyName.orEmpty(),
                     displayName = name?.displayName.orEmpty(),
-                    phoneEmojiId = emojiId.orEmpty(),
-                    phoneYat = yat.orEmpty(),
+                    phoneEmojiId = emojiId,
+                    phoneYat = yat,
                     avatar = contact.photoUri?.toString().orEmpty(),
                     isFavorite = contact.options?.starred ?: false,
                 )
             }
+            .filter { it.displayName.isNotEmpty() || it.firstName.isNotEmpty() || it.lastName.isNotEmpty() }
     }
 
     internal suspend fun deleteFromContactBook(contact: PhoneContactInfo) = withContext(Dispatchers.IO) {
