@@ -430,7 +430,8 @@ class AddNoteFragment : CommonFragment<FragmentAddNoteBinding, AddNoteViewModel>
         // notify listener (i.e. activity)
         val note = TxNote(ui.noteEditText.editableText.toString(), gifContainer.gifItem?.embedUri?.toString()).compose()
         val newData = transactionData.copy(note = note)
-        viewModel.tariNavigator.continueToFinalizeSendTx(newData)
+
+        viewModel.continueToFinalizeSendTx(newData)
     }
 
     private fun restoreSlider() {

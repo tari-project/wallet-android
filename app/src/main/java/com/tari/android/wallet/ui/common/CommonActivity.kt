@@ -140,8 +140,9 @@ abstract class CommonActivity<Binding : ViewBinding, VM : CommonViewModel> : App
 
         viewModel.tariNavigator.activity = this@CommonActivity
 
-        if (viewModel.tariSettingsSharedRepository.currentTheme != viewModel.currentTheme.value)
+        if (viewModel.tariSettingsSharedRepository.currentTheme != viewModel.currentTheme.value) {
             recreate()
+        }
     }
 
     override fun onStop() {
@@ -236,4 +237,3 @@ abstract class CommonActivity<Binding : ViewBinding, VM : CommonViewModel> : App
         DebugActivity.launch(this, navigation)
     }
 }
-

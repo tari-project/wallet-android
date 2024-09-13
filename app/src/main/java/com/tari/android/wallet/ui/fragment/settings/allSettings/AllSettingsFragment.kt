@@ -40,6 +40,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.tari.android.wallet.databinding.FragmentAllSettingsBinding
+import com.tari.android.wallet.extension.collectFlow
 import com.tari.android.wallet.extension.observe
 import com.tari.android.wallet.ui.common.CommonFragment
 import com.tari.android.wallet.ui.fragment.settings.userAutorization.BiometricAuthenticationViewModel
@@ -75,6 +76,12 @@ class AllSettingsFragment : CommonFragment<FragmentAllSettingsBinding, AllSettin
         onResume()
     }
 
+    override fun onResume() {
+        super.onResume()
+
+        viewModel.updateOptions()
+    }
+
     private fun setupUI() {
         ui.optionsList.layoutManager = LinearLayoutManager(requireContext())
         ui.optionsList.adapter = optionsAdapter
@@ -83,7 +90,7 @@ class AllSettingsFragment : CommonFragment<FragmentAllSettingsBinding, AllSettin
     private fun observeUI() = with(viewModel) {
         observe(openYatOnboarding) { yatAdapter.openOnboarding(requireActivity()) }
 
-        observe(allSettingsOptions) { optionsAdapter.update(it) }
+        collectFlow(allSettingsOptions) { optionsAdapter.update(it) }
     }
 
     companion object {

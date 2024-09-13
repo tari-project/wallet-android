@@ -23,6 +23,7 @@ import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.extension.addTo
 import com.tari.android.wallet.extension.collectFlow
 import com.tari.android.wallet.extension.getWithError
+import com.tari.android.wallet.extension.launchOnIo
 import com.tari.android.wallet.extension.safeCastTo
 import com.tari.android.wallet.model.BalanceInfo
 import com.tari.android.wallet.ui.common.CommonViewModel
@@ -113,8 +114,14 @@ class HomeFragmentViewModel : CommonViewModel() {
     }
 
     fun grantContactsPermission() {
-        permissionManager.runWithPermission(listOf(android.Manifest.permission.READ_CONTACTS), silently = true) {
-            viewModelScope.launch(Dispatchers.IO) {
+        permissionManager.runWithPermission(
+            permissions = listOf(
+                android.Manifest.permission.READ_CONTACTS,
+                android.Manifest.permission.WRITE_CONTACTS,
+            ),
+            silently = true,
+        ) {
+            launchOnIo {
                 contactsRepository.grantContactPermissionAndRefresh()
             }
         }

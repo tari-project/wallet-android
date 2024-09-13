@@ -39,7 +39,6 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ProcessLifecycleOwner
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.BuildConfig
-import com.tari.android.wallet.data.sharedPrefs.CorePrefRepository
 import com.tari.android.wallet.data.sharedPrefs.security.SecurityPrefRepository
 import com.tari.android.wallet.di.DiContainer
 import com.tari.android.wallet.event.Event
@@ -68,9 +67,6 @@ class TariWalletApplication : Application() {
 
     @Inject
     lateinit var connectionStateReceiver: NetworkConnectionStateReceiver
-
-    @Inject
-    lateinit var sharedPrefsRepository: CorePrefRepository
 
     @Inject
     lateinit var securityPrefRepository: SecurityPrefRepository
@@ -172,4 +168,3 @@ class TariWalletApplication : Application() {
         }
     }
 }
-

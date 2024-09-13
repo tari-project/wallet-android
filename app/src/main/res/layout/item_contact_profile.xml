@@ -22,10 +22,10 @@
             android:layout_gravity="center"
             android:background="@android:color/transparent"
             android:gravity="center_horizontal"
-            android:text="Alias Name"
             android:textColor="?attr/palette_text_heading"
             android:textSize="15sp"
-            app:customFont="heavy" />
+            app:customFont="heavy"
+            tools:text="Alias Name" />
 
         <RelativeLayout
             android:id="@+id/emoji_id_summary_container"
@@ -38,6 +38,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
+                android:animateLayoutChanges="true"
                 android:clickable="true"
                 android:elevation="0dp"
                 android:focusable="true"
@@ -47,6 +48,7 @@
                 app:cornerRadius="10dp">
 
                 <LinearLayout
+                    android:id="@+id/emoji_id_address_text"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center_vertical"
@@ -68,10 +70,21 @@
                     <ImageView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_centerVertical="true"
                         android:layout_marginStart="10dp"
                         android:src="@drawable/vector_info_circle" />
                 </LinearLayout>
+
+                <com.tari.android.wallet.ui.component.tari.TariTextView
+                    android:id="@+id/yat_address_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:letterSpacing="0.01"
+                    android:lineSpacingExtra="8dp"
+                    android:textColor="?attr/palette_text_body"
+                    android:textSize="17sp"
+                    app:customFont="medium"
+                    tools:text="🐢🐢🐢" />
             </com.tari.android.wallet.ui.component.tari.background.TariPrimaryBackground>
 
             <androidx.appcompat.widget.AppCompatImageButton
@@ -81,11 +94,10 @@
                 android:layout_centerVertical="true"
                 android:layout_marginStart="15dp"
                 android:layout_toEndOf="@+id/emoji_id_summary_container_view"
-                android:background="?attr/selectableItemBackground"
-                android:src="@drawable/vector_tari_yat_open"
+                android:background="?attr/selectableItemBackgroundBorderless"
                 android:visibility="invisible"
+                tools:src="@drawable/vector_tari_yat_open"
                 tools:visibility="visible" />
         </RelativeLayout>
     </LinearLayout>
-
 </com.tari.android.wallet.ui.component.tari.background.TariSecondaryBackground>

@@ -3,6 +3,7 @@ package com.tari.android.wallet.ui.fragment.contactBook.data.contacts
 import android.os.Parcelable
 import com.tari.android.wallet.model.TariWalletAddress
 import com.tari.android.wallet.ui.fragment.contactBook.data.ContactAction
+import com.tari.android.wallet.util.EmojiId
 import kotlinx.parcelize.Parcelize
 import java.util.UUID
 
@@ -10,12 +11,15 @@ import java.util.UUID
 data class ContactDto(
     val contactInfo: ContactInfo,
     val uuid: String = UUID.randomUUID().toString(),
-    val yatDto: YatDto? = null,
 ) : Parcelable {
-    constructor(contactInfo: PhoneContactInfo) : this(contactInfo, yatDto = contactInfo.phoneYat.toYatDto())
-
     val walletAddress: TariWalletAddress?
         get() = contactInfo.extractWalletAddress()
+
+    val yat: EmojiId?
+        get() = contactInfo.extractYat().takeIf { !it.isNullOrBlank() }
+
+    val alias: String
+        get() = contactInfo.getAlias()
 
     fun filtered(text: String): Boolean = contactInfo.filtered(text)
 
@@ -29,5 +33,3 @@ data class ContactDto(
 
     fun getPhoneContactInfo(): PhoneContactInfo? = (contactInfo as? PhoneContactInfo) ?: (contactInfo as? MergedContactInfo)?.phoneContactInfo
 }
-
-fun String.toYatDto(): YatDto? = this.takeIf { it.isNotEmpty() }?.let { YatDto(it) }

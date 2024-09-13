@@ -1,19 +1,19 @@
 package com.tari.android.wallet.ui.fragment.contactBook.root
 
 import androidx.lifecycle.MutableLiveData
-import com.tari.android.wallet.ui.fragment.contactBook.contacts.adapter.contact.ContactItem
+import com.tari.android.wallet.ui.fragment.contactBook.contacts.adapter.contact.ContactItemViewHolderItem
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class ContactSelectionRepository @Inject constructor() {
-    val selectedContacts = mutableListOf<ContactItem>()
+    val selectedContacts = mutableListOf<ContactItemViewHolderItem>()
 
     val isSelectionState = MutableLiveData(false)
 
     val isPossibleToShare = MutableLiveData(false)
 
-    fun toggle(item: ContactItem) {
+    fun toggle(item: ContactItemViewHolderItem) {
         if (item.contact.getFFIContactInfo() == null) return
 
         val contact = selectedContacts.firstOrNull { it.contact.uuid == item.contact.uuid }

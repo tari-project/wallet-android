@@ -65,7 +65,7 @@ class AddressPoisoningChecker @Inject constructor(
                 ).flatten()
             }
 
-            return (contactsRepository.currentContactList
+            return (contactsRepository.contactList.value
                     // add the current wallet address to the list because it may not exist if there were no interactions with it
                     + contactsRepository.getContactByAddress(this))
                 .filter { it.walletAddress.isSimilarTo(this) }

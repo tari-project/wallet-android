@@ -1,7 +1,7 @@
 package com.tari.android.wallet.ui.fragment.contactBook.contactSelection
 
 import com.tari.android.wallet.model.TariWalletAddress
-import com.tari.android.wallet.ui.fragment.contactBook.data.contacts.YatDto
+import com.tari.android.wallet.util.EmojiId
 
 object ContactSelectionModel {
 
@@ -15,10 +15,8 @@ object ContactSelectionModel {
         fun toggleEye() = this.copy(eyeOpened = !eyeOpened)
 
         data class YatUser(
-            val yatName: String,
-            val hexAddress: String,
+            val yat: EmojiId,
             val walletAddress: TariWalletAddress,
-            val connectedWallets: List<YatDto.ConnectedWallet>,
         )
     }
 

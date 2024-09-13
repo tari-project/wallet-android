@@ -5,6 +5,7 @@ import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.widget.FrameLayout
 import android.widget.LinearLayout
+import androidx.annotation.DrawableRes
 import androidx.core.view.updateLayoutParams
 import com.tari.android.wallet.R
 import com.tari.android.wallet.databinding.ViewShareOptionBinding
@@ -26,7 +27,7 @@ class RoundButtonWithIconView @JvmOverloads constructor(
         }
     }
 
-    fun setArgs(text: String, icon: Int, action: () -> Unit, size: Size = Size.Medium, isSelected: Boolean = false) {
+    fun setArgs(text: String, @DrawableRes icon: Int, action: () -> Unit, size: Size = Size.Medium, isSelected: Boolean = false) {
         this.setOnThrottledClickListener { action() }
         ui.icon.setImageResource(icon)
         val padding = context.resources.getDimensionPixelSize(size.padding)

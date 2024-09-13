@@ -12,17 +12,14 @@ import com.tari.android.wallet.ui.fragment.contactBook.data.contacts.ContactDto
 import com.tari.android.wallet.ui.fragment.contactBook.data.contacts.FFIContactInfo
 import com.tari.android.wallet.ui.fragment.contactBook.data.contacts.MergedContactInfo
 import com.tari.android.wallet.ui.fragment.contactBook.data.contacts.PhoneContactInfo
-import com.tari.android.wallet.ui.fragment.contactBook.data.contacts.toYatDto
-import com.tari.android.wallet.ui.fragment.contactBook.data.contacts.withConnectedWallets
 import com.tari.android.wallet.util.ContactUtil
+import com.tari.android.wallet.util.EmojiId
 import com.tari.android.wallet.util.nextBoolean
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import yat.android.sdk.models.PaymentAddressResponseResult
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.random.Random
@@ -53,22 +50,10 @@ class ContactsRepository @Inject constructor(
 
     private val _contactList: MutableStateFlow<List<ContactDto>> = MutableStateFlow(emptyList())
     val contactList = _contactList.asStateFlow()
-    val contactListFiltered = _contactList
-        .map {
-            it.filter { contact ->
-                contact.getPhoneContactInfo()?.let { phoneContact ->
-                    return@let phoneContact.extractDisplayName().isNotBlank()
-                            || phoneContact.firstName.isNotBlank()
-                            || phoneContact.lastName.isNotBlank()
-                } ?: true
-            }
-        }
-    val currentContactList: List<ContactDto>
-        get() = _contactList.value
 
-    private val contactPermission = MutableStateFlow(false)
+    private val _contactPermission = MutableStateFlow(false)
     val contactPermissionGranted: Boolean
-        get() = contactPermission.value
+        get() = _contactPermission.value
 
     init {
         applicationScope.launch {
@@ -108,7 +93,7 @@ class ContactsRepository @Inject constructor(
         contactToUpdate: ContactDto,
         firstName: String,
         lastName: String,
-        yat: String
+        yat: EmojiId?,
     ): ContactDto {
         updateContactList { currentList ->
             currentList
@@ -146,7 +131,6 @@ class ContactsRepository @Inject constructor(
                                         ),
                                     )
                             },
-                            yatDto = yat.toYatDto(),
                         )
                     }
                 )
@@ -186,19 +170,7 @@ class ContactsRepository @Inject constructor(
     suspend fun deleteContact(contactDto: ContactDto) {
         contactDto.getPhoneContactInfo()?.let { phoneBookBridge.deleteFromContactBook(it) }
         contactDto.getFFIContactInfo()?.let { ffiBridge.deleteContact(it) }
-        refreshContactList(currentContactList.filter { it.uuid != contactDto.uuid })
-    }
-
-    // TODO save yats to shared prefs
-    suspend fun updateYatInfo(contactDto: ContactDto, connectedWallets: Map<String, PaymentAddressResponseResult>): ContactDto {
-        updateContactList { currentList ->
-            currentList
-                .replaceItem(
-                    condition = { it.uuid == contactDto.uuid },
-                    replace = { contact -> contact.copy(yatDto = contact.yatDto.withConnectedWallets(connectedWallets)) }
-                )
-        }
-        return getByUuid(contactDto.uuid)
+        refreshContactList(contactList.value.filter { it.uuid != contactDto.uuid })
     }
 
     fun isContactOnline(contact: TariWalletAddress): Boolean {
@@ -218,7 +190,7 @@ class ContactsRepository @Inject constructor(
         logger.i("Contacts repository event: Updating contact list")
 
         // TODO filter only updated contacts
-        val updatedContactList = update(currentContactList)
+        val updatedContactList = update(contactList.value)
 
         phoneBookBridge.updateToPhoneBook(updatedContactList)
         ffiBridge.updateToFFI(updatedContactList)
@@ -227,8 +199,7 @@ class ContactsRepository @Inject constructor(
     }
 
     private suspend fun refreshContactList(
-        currentContactList: List<ContactDto> = this.currentContactList,
-        also: suspend (List<ContactDto>) -> List<ContactDto> = { it },
+        currentContactList: List<ContactDto> = this.contactList.value,
     ) {
         logger.i("Contacts repository event: Refreshing contact list")
 
@@ -237,8 +208,6 @@ class ContactsRepository @Inject constructor(
                 .let { ffiBridge.updateContactsWithFFIContacts(it) }
                 .let { phoneBookBridge.updateContactsWithPhoneBook(it) }
                 .let { mergedBridge.updateContactsWithMergedContacts(it) }
-                // TODO read yats from shared prefs (and store them before)
-                .let { also(it) }
         }
     }
 
@@ -246,16 +215,16 @@ class ContactsRepository @Inject constructor(
      * Grant contact permission and refresh contact list if it was not granted before
      */
     suspend fun grantContactPermissionAndRefresh() {
-        if (!contactPermission.value) {
-            contactPermission.value = true
+        if (!_contactPermission.value) {
+            _contactPermission.value = true
             refreshContactList()
         }
     }
 
-    private fun ContactDto.contactExists() = currentContactList.any { it.uuid == this.uuid }
+    private fun ContactDto.contactExists() = contactList.value.any { it.uuid == this.uuid }
 
     private fun ContactDto.contactExistsByWalletAddress() =
-        currentContactList.any { it.contactInfo.extractWalletAddress() == this.contactInfo.extractWalletAddress() }
+        contactList.value.any { it.contactInfo.extractWalletAddress() == this.contactInfo.extractWalletAddress() }
 
     private fun List<ContactDto>.withItemIfNotExists(
         contact: ContactDto,
@@ -265,8 +234,8 @@ class ContactsRepository @Inject constructor(
     fun getContactForTx(tx: Tx): ContactDto = getContactByAddress(tx.tariContact.walletAddress)
 
     fun getContactByAddress(address: TariWalletAddress): ContactDto =
-        currentContactList.firstOrNull { it.getFFIContactInfo()?.walletAddress == address }
+        contactList.value.firstOrNull { it.getFFIContactInfo()?.walletAddress == address }
             ?: ContactDto(FFIContactInfo(address))
 
-    fun getByUuid(uuid: String): ContactDto = currentContactList.first { it.uuid == uuid }
+    fun getByUuid(uuid: String): ContactDto = contactList.value.first { it.uuid == uuid }
 }

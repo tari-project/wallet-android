@@ -313,8 +313,8 @@
     <!-- wallet info -->
     <string name="wallet_info_my_profile">My Profile</string>
     <string name="wallet_info_qr_code_desc">Transacting in person? Others can scan this QR code from the Tari Aurora App to send you tXTR.</string>
-    <string name="wallet_info_yat_disconnected_description">You\'ve previously connected this Yat.\n Do you want to re-connect it to your wallet?</string>
-    <string name="wallet_info_yat_disconnected_reconnect">Reconnect Yat</string>
+    <string name="wallet_info_yat_disconnected_description">Your previously connected Yat has lost sync with the app. Click Connect Yats below if you\’d like to reconnect it.</string>
+    <string name="wallet_info_yat_disconnected_description_connect_yats">Connect Yats</string>
     <string name="wallet_info_share_profile_title">Share Profile</string>
     <string name="wallet_info_my_aurora_title">My Aurora</string>
     <string name="wallet_info_wallet_button">Wallet</string>
@@ -854,6 +854,7 @@
     <string name="contact_book_add_contact_first_name_hint">Add Name</string>
     <string name="contact_book_add_contact_yat_hint">Yat</string>
     <string name="contact_book_add_contact_placeholder">Enter Emoji ID, Contact Name or Yat</string>
+    <string name="contact_book_add_contact_placeholder_no_yat">Enter Emoji ID or Contact Name</string>
     <string name="contact_book_add_contact_cant_add_yourself_title">Can’t add yourself</string>
     <string name="contact_book_add_contact_cant_add_yourself_description">You can’t add your own Tari wallet address to your contact book</string>
     <string name="contact_book_search_hint">Find Contact</string>
@@ -884,8 +885,8 @@
     <string name="contact_book_type_ffi">Tari Contact</string>
     <string name="contact_book_type_contact_book">Phone Contact</string>
     <string name="contact_book_type_merged">Linked Contact</string>
-    <string name="remove_all">Remove all contacts</string>
-    <string name="add_1000_contacts">Add 1000 contacts</string>
+    <string name="contact_book_details_yat_not_found_dialog_title">Yat not found</string>
+    <string name="contact_book_details_yat_not_found_dialog_message">Aurora was unable to get data from the Yat service. Some contact details may be unavailable</string>
     <string name="share_contact_via_qr_code">QR Code</string>
     <string name="share_contact_via_qr_link">Link</string>
     <string name="share_contact_via_qr_nfc">NFC</string>

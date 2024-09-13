@@ -5,6 +5,8 @@ import android.net.Uri
 import android.os.Bundle
 import android.provider.ContactsContract
 import com.tari.android.wallet.R
+import com.tari.android.wallet.application.YatAdapter
+import com.tari.android.wallet.application.YatAdapter.ConnectedWallet
 import com.tari.android.wallet.application.deeplinks.DeepLink
 import com.tari.android.wallet.data.sharedPrefs.CorePrefRepository
 import com.tari.android.wallet.data.sharedPrefs.tariSettings.TariSettingsPrefRepository
@@ -35,7 +37,6 @@ import com.tari.android.wallet.ui.fragment.chat.chatDetails.ChatDetailsFragment
 import com.tari.android.wallet.ui.fragment.contactBook.add.AddContactFragment
 import com.tari.android.wallet.ui.fragment.contactBook.add.SelectUserContactFragment
 import com.tari.android.wallet.ui.fragment.contactBook.data.contacts.ContactDto
-import com.tari.android.wallet.ui.fragment.contactBook.data.contacts.YatDto
 import com.tari.android.wallet.ui.fragment.contactBook.details.ContactDetailsFragment
 import com.tari.android.wallet.ui.fragment.contactBook.link.ContactLinkFragment
 import com.tari.android.wallet.ui.fragment.contactBook.root.ContactBookFragment
@@ -49,6 +50,7 @@ import com.tari.android.wallet.ui.fragment.home.navigation.Navigation.ContactBoo
 import com.tari.android.wallet.ui.fragment.home.navigation.Navigation.CustomBridgeNavigation
 import com.tari.android.wallet.ui.fragment.home.navigation.Navigation.EnterRestorationPasswordNavigation
 import com.tari.android.wallet.ui.fragment.home.navigation.Navigation.InputSeedWordsNavigation
+import com.tari.android.wallet.ui.fragment.home.navigation.Navigation.SendTxNavigation
 import com.tari.android.wallet.ui.fragment.home.navigation.Navigation.TorBridgeNavigation
 import com.tari.android.wallet.ui.fragment.home.navigation.Navigation.TxListNavigation
 import com.tari.android.wallet.ui.fragment.home.navigation.Navigation.VerifySeedPhraseNavigation
@@ -98,7 +100,11 @@ import javax.inject.Singleton
 
 // TODO: move navigation logic to only the navigate() method and make all navigation methods private
 @Singleton
-class TariNavigator @Inject constructor(val prefs: CorePrefRepository, val tariSettingsSharedRepository: TariSettingsPrefRepository) {
+class TariNavigator @Inject constructor(
+    val prefs: CorePrefRepository,
+    val tariSettingsSharedRepository: TariSettingsPrefRepository,
+    private val yatAdapter: YatAdapter,
+) {
 
     lateinit var activity: CommonActivity<*, *>
 
@@ -138,11 +144,7 @@ class TariNavigator @Inject constructor(val prefs: CorePrefRepository, val tariS
             is InputSeedWordsNavigation.ToRestoreFormSeedWordsInProgress -> toRestoreFromSeedWordsInProgress()
             is InputSeedWordsNavigation.ToBaseNodeSelection -> toBaseNodeSelection()
             is WalletRestoringFromSeedWordsNavigation.OnRestoreCompleted -> onRestoreCompleted()
-            is WalletRestoringFromSeedWordsNavigation.OnRestoreFailed -> {
-//                changeOnBackPressed(false)
-                onBackPressed()
-            }
-
+            is WalletRestoringFromSeedWordsNavigation.OnRestoreFailed -> onBackPressed()
             is AddAmountNavigation.OnAmountExceedsActualAvailableBalance -> onAmountExceedsActualAvailableBalance()
             is AddAmountNavigation.ContinueToAddNote -> continueToAddNote(navigation.transactionData)
             is AddAmountNavigation.ContinueToFinalizing -> continueToFinalizeSendTx(navigation.transactionData)
@@ -155,6 +157,8 @@ class TariNavigator @Inject constructor(val prefs: CorePrefRepository, val tariS
             is TxListNavigation.ToSplashScreen -> toSplash()
             is TxListNavigation.ToTransfer -> addFragment(TransferFragment())
             is TxListNavigation.HomeTransactionHistory -> addFragment(HomeTransactionHistoryFragment())
+            is SendTxNavigation.OnSendTxFailure -> onSendTxFailure(navigation.isYat, navigation.txFailureReason)
+            is SendTxNavigation.OnSendTxSuccess -> onSendTxSuccessful(navigation.isYat, navigation.txId)
             is TorBridgeNavigation.ToCustomBridges -> toCustomTorBridges()
             is VerifySeedPhraseNavigation.ToSeedPhraseVerificationComplete -> onSeedPhraseVerificationComplete()
             is VerifySeedPhraseNavigation.ToSeedPhraseVerification -> toSeedPhraseVerification(navigation.seedWords)
@@ -279,7 +283,7 @@ class TariNavigator @Inject constructor(val prefs: CorePrefRepository, val tariS
 
     private fun toContactTransactionHistory(contact: ContactDto) = addFragment(TransactionHistoryFragment.createFragment(contact))
 
-    private fun toExternalWallet(connectedWallet: YatDto.ConnectedWallet) {
+    private fun toExternalWallet(connectedWallet: ConnectedWallet) {
         try {
             val externalAddress = connectedWallet.getExternalLink()
             val intent = Intent(Intent.ACTION_VIEW, Uri.parse(externalAddress))
@@ -317,20 +321,20 @@ class TariNavigator @Inject constructor(val prefs: CorePrefRepository, val tariS
         addFragment(AddNoteFragment(), bundle)
     }
 
-    fun continueToFinalizeSendTx(transactionData: TransactionData) {
-        if (transactionData.recipientContact?.yatDto != null) {
-            (activity as HomeActivity).viewModel.yatAdapter.showOutcomingFinalizeActivity(this.activity, transactionData)
+    private fun continueToFinalizeSendTx(transactionData: TransactionData) {
+        if (transactionData.recipientContact?.yat != null) {
+            yatAdapter.showOutcomingFinalizeActivity(this.activity, transactionData)
         } else {
             addFragment(FinalizeSendTxFragment.create(transactionData))
         }
     }
 
-    fun onSendTxFailure(isYat: Boolean, txFailureReason: TxFailureReason) {
+    private fun onSendTxFailure(isYat: Boolean, txFailureReason: TxFailureReason) {
         EventBus.post(Event.Transaction.TxSendFailed(txFailureReason))
         navigateBackFromTxSend(isYat)
     }
 
-    fun onSendTxSuccessful(isYat: Boolean, txId: TxId) {
+    private fun onSendTxSuccessful(isYat: Boolean, txId: TxId) {
         EventBus.post(Event.Transaction.TxSendSuccessful(txId))
         navigateBackFromTxSend(isYat)
     }
