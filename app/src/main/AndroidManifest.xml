@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:ignore="LockedOrientationActivity,IntentFilterUniqueDataAttributes">
+    tools:ignore="LockedOrientationActivity">
 
     <uses-feature
         android:name="android.hardware.camera"
@@ -95,8 +95,8 @@
             android:name=".ui.fragment.splash.SplashActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:exported="true"
-            android:screenOrientation="portrait"
             android:launchMode="singleInstance"
+            android:screenOrientation="portrait"
             android:theme="@style/AppTheme.Splash"
             android:windowSoftInputMode="stateAlwaysHidden">
             <intent-filter>
@@ -111,19 +111,19 @@
         <activity
             android:name=".ui.fragment.onboarding.activity.OnboardingFlowActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
+            android:exported="false"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.Light"
-            android:exported="false"
             android:windowSoftInputMode="stateAlwaysHidden" />
 
         <!-- local authentication -->
         <activity
             android:name=".ui.fragment.auth.AuthActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
+            android:exported="false"
             android:launchMode="singleInstance"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.Light"
-            android:exported="false"
             android:windowSoftInputMode="stateAlwaysHidden" />
 
         <!-- home (transaction list) -->
@@ -142,34 +142,14 @@
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
 
-                <data
-                    android:host="mainnet"
-                    android:scheme="tari" />
+                <data android:scheme="tari" />
 
-                <data
-                    android:host="nextnet"
-                    android:scheme="tari" />
-
-                <data
-                    android:host="stagenet"
-                    android:scheme="tari" />
-
-                <data
-                    android:host="esmeralda"
-                    android:scheme="tari" />
-
-                <data
-                    android:host="tari.esmeralda"
-                    android:scheme="https" />
-
-                <data
-                    android:host="y.at"
-                    android:scheme="tari" />
-
-                <data
-                    android:host="yat.fyi"
-                    android:scheme="tari" />
-
+                <data android:host="mainnet" />
+                <data android:host="nextnet" />
+                <data android:host="stagenet" />
+                <data android:host="esmeralda" />
+                <data android:host="y.at" />
+                <data android:host="yat.fyi" />
             </intent-filter>
 
             <intent-filter>
@@ -258,5 +238,4 @@
             </intent-filter>
         </receiver>
     </application>
-
 </manifest>
