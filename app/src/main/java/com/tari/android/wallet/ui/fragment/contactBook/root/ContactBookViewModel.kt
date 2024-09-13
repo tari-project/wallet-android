@@ -1,11 +1,11 @@
 package com.tari.android.wallet.ui.fragment.contactBook.root
 
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.viewModelScope
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.deeplinks.DeepLink
 import com.tari.android.wallet.application.deeplinks.DeeplinkFormatter
 import com.tari.android.wallet.application.deeplinks.DeeplinkHandler
+import com.tari.android.wallet.extension.launchOnIo
 import com.tari.android.wallet.model.TariWalletAddress
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.component.clipboardController.WalletAddressViewModel
@@ -15,8 +15,6 @@ import com.tari.android.wallet.ui.fragment.contactBook.root.share.ShareOptionArg
 import com.tari.android.wallet.ui.fragment.contactBook.root.share.ShareType
 import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
 import com.tari.android.wallet.util.ContactUtil
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 class ContactBookViewModel : CommonViewModel() {
@@ -95,8 +93,14 @@ class ContactBookViewModel : CommonViewModel() {
     }
 
     fun grantPermission() {
-        permissionManager.runWithPermission(listOf(android.Manifest.permission.READ_CONTACTS), silently = true) {
-            viewModelScope.launch(Dispatchers.IO) {
+        permissionManager.runWithPermission(
+            permissions = listOf(
+                android.Manifest.permission.READ_CONTACTS,
+                android.Manifest.permission.WRITE_CONTACTS,
+            ),
+            silently = true,
+        ) {
+            launchOnIo {
                 contactsRepository.grantContactPermissionAndRefresh()
             }
         }

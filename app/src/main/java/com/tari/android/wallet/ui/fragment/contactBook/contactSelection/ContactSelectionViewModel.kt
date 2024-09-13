@@ -28,12 +28,11 @@ import com.tari.android.wallet.ui.fragment.contactBook.address_poisoning.Address
 import com.tari.android.wallet.ui.fragment.contactBook.address_poisoning.SimilarAddressDto
 import com.tari.android.wallet.ui.fragment.contactBook.contactSelection.ContactSelectionModel.Effect
 import com.tari.android.wallet.ui.fragment.contactBook.contactSelection.ContactSelectionModel.YatState
-import com.tari.android.wallet.ui.fragment.contactBook.contacts.adapter.contact.ContactItem
+import com.tari.android.wallet.ui.fragment.contactBook.contacts.adapter.contact.ContactItemViewHolderItem
 import com.tari.android.wallet.ui.fragment.contactBook.contacts.adapter.contact.ContactlessPaymentItem
 import com.tari.android.wallet.ui.fragment.contactBook.data.ContactsRepository
 import com.tari.android.wallet.ui.fragment.contactBook.data.contacts.ContactDto
 import com.tari.android.wallet.ui.fragment.contactBook.data.contacts.FFIContactInfo
-import com.tari.android.wallet.ui.fragment.contactBook.data.contacts.YatDto
 import com.tari.android.wallet.ui.fragment.contactBook.data.contacts.splitAlias
 import com.tari.android.wallet.ui.fragment.contactBook.root.ShareViewModel
 import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
@@ -72,13 +71,13 @@ class ContactSelectionViewModel : CommonViewModel() {
     @Inject
     lateinit var corePrefRepository: CorePrefRepository
 
-    var additionalFilter: (ContactItem) -> Boolean = { true }
+    var additionalFilter: (ContactItemViewHolderItem) -> Boolean = { true }
 
     val selectedContact = MutableLiveData<ContactDto>()
 
     val selectedTariWalletAddress = MutableLiveData<TariWalletAddress?>()
 
-    private val contactListSource = MediatorLiveData<List<ContactItem>>()
+    private val contactListSource = MediatorLiveData<List<ContactItemViewHolderItem>>()
 
     private val searchText = MutableLiveData("")
 
@@ -105,8 +104,8 @@ class ContactSelectionViewModel : CommonViewModel() {
             walletAddressViewModel.checkClipboardForValidEmojiId()
         }
 
-        collectFlow(contactsRepository.contactListFiltered) {
-            contactListSource.value = it.map { contactDto -> ContactItem(contact = contactDto, isSimple = true) }
+        collectFlow(contactsRepository.contactList) {
+            contactListSource.value = it.map { contactDto -> ContactItemViewHolderItem(contact = contactDto, isSimple = true) }
         }
         contactList.addSource(contactListSource) { updateContactList() }
         contactList.addSource(searchText) { updateContactList() }
@@ -221,15 +220,7 @@ class ContactSelectionViewModel : CommonViewModel() {
     }
 
     private fun getUserDto(): ContactDto =
-        yatState.value.yatUser?.let {
-            ContactDto(
-                contactInfo = FFIContactInfo(it.walletAddress),
-                yatDto = YatDto(
-                    yat = it.yat,
-                    connectedWallets = it.connectedWallets,
-                ),
-            )
-        }
+        yatState.value.yatUser?.let { ContactDto(contactInfo = FFIContactInfo(it.walletAddress)) }
             ?: selectedContact.value
             ?: contactListSource.value.orEmpty()
                 .firstOrNull { it.contact.contactInfo.extractWalletAddress() == selectedTariWalletAddress.value }?.contact
@@ -272,7 +263,6 @@ class ContactSelectionViewModel : CommonViewModel() {
             YatState.YatUser(
                 yat = yatEmojiId,
                 walletAddress = TariWalletAddress.fromBase58(yatResult.address),
-                connectedWallets = yatAdapter.searchAllYats(yatEmojiId).map { YatDto.ConnectedWallet(it.key, it.value) },
             )
         }
     }

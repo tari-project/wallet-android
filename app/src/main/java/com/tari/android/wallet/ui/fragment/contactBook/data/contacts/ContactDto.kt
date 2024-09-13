@@ -11,12 +11,15 @@ import java.util.UUID
 data class ContactDto(
     val contactInfo: ContactInfo,
     val uuid: String = UUID.randomUUID().toString(),
-    val yatDto: YatDto? = null,
 ) : Parcelable {
-    constructor(contactInfo: PhoneContactInfo) : this(contactInfo, yatDto = contactInfo.phoneYat.toYatDto())
-
     val walletAddress: TariWalletAddress?
         get() = contactInfo.extractWalletAddress()
+
+    val yat: EmojiId?
+        get() = contactInfo.extractYat().takeIf { !it.isNullOrBlank() }
+
+    val alias: String
+        get() = contactInfo.getAlias()
 
     fun filtered(text: String): Boolean = contactInfo.filtered(text)
 
@@ -30,5 +33,3 @@ data class ContactDto(
 
     fun getPhoneContactInfo(): PhoneContactInfo? = (contactInfo as? PhoneContactInfo) ?: (contactInfo as? MergedContactInfo)?.phoneContactInfo
 }
-
-fun EmojiId.toYatDto(): YatDto? = this.takeIf { it.isNotEmpty() }?.let { YatDto(it) }

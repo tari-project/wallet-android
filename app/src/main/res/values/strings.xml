@@ -854,6 +854,7 @@
     <string name="contact_book_add_contact_first_name_hint">Add Name</string>
     <string name="contact_book_add_contact_yat_hint">Yat</string>
     <string name="contact_book_add_contact_placeholder">Enter Emoji ID, Contact Name or Yat</string>
+    <string name="contact_book_add_contact_placeholder_no_yat">Enter Emoji ID or Contact Name</string>
     <string name="contact_book_add_contact_cant_add_yourself_title">Can’t add yourself</string>
     <string name="contact_book_add_contact_cant_add_yourself_description">You can’t add your own Tari wallet address to your contact book</string>
     <string name="contact_book_search_hint">Find Contact</string>
@@ -884,8 +885,8 @@
     <string name="contact_book_type_ffi">Tari Contact</string>
     <string name="contact_book_type_contact_book">Phone Contact</string>
     <string name="contact_book_type_merged">Linked Contact</string>
-    <string name="remove_all">Remove all contacts</string>
-    <string name="add_1000_contacts">Add 1000 contacts</string>
+    <string name="contact_book_details_yat_not_found_dialog_title">Yat not found</string>
+    <string name="contact_book_details_yat_not_found_dialog_message">Aurora was unable to get data from the Yat service. Some contact details may be unavailable</string>
     <string name="share_contact_via_qr_code">QR Code</string>
     <string name="share_contact_via_qr_link">Link</string>
     <string name="share_contact_via_qr_nfc">NFC</string>

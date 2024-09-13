@@ -44,11 +44,12 @@ import com.tari.android.wallet.ui.extension.visible
 import com.tari.android.wallet.ui.fragment.contactBook.contactSelection.ContactSelectionModel.Effect
 import com.tari.android.wallet.ui.fragment.contactBook.contactSelection.ContactSelectionModel.YatState
 import com.tari.android.wallet.ui.fragment.contactBook.contacts.adapter.ContactListAdapter
-import com.tari.android.wallet.ui.fragment.contactBook.contacts.adapter.contact.ContactItem
+import com.tari.android.wallet.ui.fragment.contactBook.contacts.adapter.contact.ContactItemViewHolderItem
 import com.tari.android.wallet.ui.fragment.contactBook.contacts.adapter.contact.ContactlessPaymentItem
 import com.tari.android.wallet.ui.fragment.qr.QRScannerActivity
 import com.tari.android.wallet.ui.fragment.qr.QrScannerSource
 import com.tari.android.wallet.util.Constants
+import com.tari.android.wallet.util.DebugConfig
 import com.tari.android.wallet.util.EmojiUtil
 import com.tari.android.wallet.util.containsNonEmoji
 import com.tari.android.wallet.util.firstNCharactersAreEmojis
@@ -183,7 +184,7 @@ open class ContactSelectionFragment : CommonFragment<FragmentContactsSelectionBi
         ui.contactsListRecyclerView.layoutManager = LinearLayoutManager(requireContext())
         recyclerViewAdapter.setClickListener(CommonAdapter.ItemClickListener { holderItem ->
             when (holderItem) {
-                is ContactItem -> viewModel.onContactClick(holderItem.contact)
+                is ContactItemViewHolderItem -> viewModel.onContactClick(holderItem.contact)
                 is ContactlessPaymentItem -> viewModel.onContactlessPaymentClick()
             }
         })
@@ -209,6 +210,10 @@ open class ContactSelectionFragment : CommonFragment<FragmentContactsSelectionBi
     private fun handleYatState(yatState: YatState) {
         ui.yatEyeButton.setVisible(yatState.showYatIcons)
         ui.yatIcon.setVisible(yatState.showYatIcons)
+        ui.searchEditText.hint = string(
+            if (DebugConfig.isYatEnabled) R.string.contact_book_add_contact_placeholder
+            else R.string.contact_book_add_contact_placeholder_no_yat
+        )
 
         if (yatState.yatUser != null) {
             if (yatState.eyeOpened) {

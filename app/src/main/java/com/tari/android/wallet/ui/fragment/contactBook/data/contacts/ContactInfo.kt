@@ -5,6 +5,7 @@ import com.tari.android.wallet.R
 import com.tari.android.wallet.model.TariContact
 import com.tari.android.wallet.model.TariWalletAddress
 import com.tari.android.wallet.ui.fragment.contactBook.data.ContactAction
+import com.tari.android.wallet.util.EmojiId
 import kotlinx.parcelize.Parcelize
 
 sealed class ContactInfo(
@@ -14,6 +15,7 @@ sealed class ContactInfo(
 ) : Parcelable {
     abstract fun filtered(text: String): Boolean
     abstract fun extractWalletAddress(): TariWalletAddress?
+    abstract fun extractYat(): EmojiId?
 
     fun requireWalletAddress(): TariWalletAddress = extractWalletAddress()
         ?: error("Wallet address is required, but is null. Most probably this is a PhoneContactInfo which does not have a wallet address.")
@@ -73,6 +75,8 @@ data class FFIContactInfo(
 
     override fun extractWalletAddress(): TariWalletAddress = walletAddress
 
+    override fun extractYat(): EmojiId? = null
+
     override fun getAlias(): String = "$firstName $lastName".ifBlank { "" }
 }
 
@@ -80,8 +84,8 @@ data class FFIContactInfo(
 data class PhoneContactInfo(
     val id: String,
     val avatar: String,
-    val phoneEmojiId: String = "",
-    val phoneYat: String = "",
+    val phoneEmojiId: EmojiId?,
+    val phoneYat: EmojiId?,
     val shouldUpdate: Boolean = false,
     val displayName: String,
     override val firstName: String = "",
@@ -96,7 +100,7 @@ data class PhoneContactInfo(
 
     override fun extractWalletAddress(): TariWalletAddress? = null
 
-    fun extractDisplayName(): String = displayName.ifEmpty { "$firstName $lastName" }
+    override fun extractYat(): EmojiId? = phoneYat
 }
 
 @Parcelize
@@ -110,6 +114,8 @@ data class MergedContactInfo(
     override fun filtered(text: String): Boolean = ffiContactInfo.filtered(text) || phoneContactInfo.filtered(text)
 
     override fun extractWalletAddress(): TariWalletAddress = ffiContactInfo.walletAddress
+
+    override fun extractYat(): EmojiId? = phoneContactInfo.phoneYat
 
     override fun getAlias(): String = phoneContactInfo.getAlias()
 }
