@@ -49,6 +49,7 @@ import com.tari.android.wallet.ui.fragment.contactBook.contacts.adapter.contact.
 import com.tari.android.wallet.ui.fragment.qr.QRScannerActivity
 import com.tari.android.wallet.ui.fragment.qr.QrScannerSource
 import com.tari.android.wallet.util.Constants
+import com.tari.android.wallet.util.DebugConfig
 import com.tari.android.wallet.util.EmojiUtil
 import com.tari.android.wallet.util.containsNonEmoji
 import com.tari.android.wallet.util.firstNCharactersAreEmojis
@@ -209,6 +210,10 @@ open class ContactSelectionFragment : CommonFragment<FragmentContactsSelectionBi
     private fun handleYatState(yatState: YatState) {
         ui.yatEyeButton.setVisible(yatState.showYatIcons)
         ui.yatIcon.setVisible(yatState.showYatIcons)
+        ui.searchEditText.hint = string(
+            if (DebugConfig.isYatEnabled) R.string.contact_book_add_contact_placeholder
+            else R.string.contact_book_add_contact_placeholder_no_yat
+        )
 
         if (yatState.yatUser != null) {
             if (yatState.eyeOpened) {
