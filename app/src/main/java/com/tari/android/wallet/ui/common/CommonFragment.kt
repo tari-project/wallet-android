@@ -169,11 +169,6 @@ abstract class CommonFragment<Binding : ViewBinding, VM : CommonViewModel> : Fra
             action()
         }
     }
-
-    override fun onDestroy() {
-        dialogManager?.dismiss()
-        super.onDestroy()
-    }
 }
 
 /**

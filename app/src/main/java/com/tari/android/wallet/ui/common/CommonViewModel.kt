@@ -17,6 +17,7 @@ import com.tari.android.wallet.di.ApplicationComponent
 import com.tari.android.wallet.di.DiContainer
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.extension.addTo
+import com.tari.android.wallet.extension.launchOnMain
 import com.tari.android.wallet.ffi.FFIWallet
 import com.tari.android.wallet.infrastructure.logging.LoggerTags
 import com.tari.android.wallet.model.CoreError
@@ -42,7 +43,6 @@ import com.tari.android.wallet.ui.fragment.home.navigation.TariNavigator
 import com.tari.android.wallet.ui.fragment.settings.themeSelector.TariTheme
 import io.reactivex.disposables.CompositeDisposable
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -271,7 +271,7 @@ open class CommonViewModel : ViewModel() {
     }
 
     fun hideDialog(dialogId: Int = ModularDialogArgs.DialogId.NO_ID) {
-        viewModelScope.launch(Dispatchers.Main) {
+        launchOnMain {
             dialogManager.dismiss(dialogId)
         }
     }
