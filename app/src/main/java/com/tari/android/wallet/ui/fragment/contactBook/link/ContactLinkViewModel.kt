@@ -26,7 +26,7 @@ import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonStyle
 import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
 import com.tari.android.wallet.ui.dialog.modular.modules.shortEmoji.ShortEmojiIdModule
-import com.tari.android.wallet.ui.fragment.contactBook.contacts.adapter.contact.ContactItem
+import com.tari.android.wallet.ui.fragment.contactBook.contacts.adapter.contact.ContactItemViewHolderItem
 import com.tari.android.wallet.ui.fragment.contactBook.contacts.adapter.emptyState.EmptyStateItem
 import com.tari.android.wallet.ui.fragment.contactBook.data.ContactsRepository
 import com.tari.android.wallet.ui.fragment.contactBook.data.contacts.ContactDto
@@ -50,7 +50,7 @@ class ContactLinkViewModel : CommonViewModel() {
 
     private val ffiContact = MutableLiveData<ContactDto>()
 
-    private val contactListSource = MediatorLiveData<List<ContactItem>>()
+    private val contactListSource = MediatorLiveData<List<ContactItemViewHolderItem>>()
 
     private val searchText = MutableLiveData("")
 
@@ -63,7 +63,7 @@ class ContactLinkViewModel : CommonViewModel() {
         list.addSource(searchText) { updateList() }
 
         collectFlow(contactsRepository.contactList) {
-            contactListSource.value = it.map { contactDto -> ContactItem(contact = contactDto, isSimple = true) }
+            contactListSource.value = it.map { contactDto -> ContactItemViewHolderItem(contact = contactDto, isSimple = true) }
         }
     }
 
@@ -72,7 +72,7 @@ class ContactLinkViewModel : CommonViewModel() {
     }
 
     fun onContactClick(item: CommonViewHolderItem) {
-        (item as? ContactItem)?.let {
+        (item as? ContactItemViewHolderItem)?.let {
             showLinkDialog(it.contact)
         }
     }
@@ -125,7 +125,7 @@ class ContactLinkViewModel : CommonViewModel() {
     private fun getEmptyTitle(): SpannedString =
         SpannedString(HtmlHelper.getSpannedText(resourceManager.getString(R.string.contact_book_contacts_book_link_empty_state_title)))
 
-    private fun getBody(sourceList: List<ContactItem>): SpannedString {
+    private fun getBody(sourceList: List<ContactItemViewHolderItem>): SpannedString {
         val noContacts = sourceList.none { it.contact.contactInfo is PhoneContactInfo }
         val noMergedContacts = sourceList.none { it.contact.contactInfo is MergedContactInfo }
         val havePermission = contactsRepository.contactPermissionGranted

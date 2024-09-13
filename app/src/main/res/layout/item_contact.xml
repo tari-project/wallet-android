@@ -7,6 +7,7 @@
     android:animateLayoutChanges="true"
     android:clickable="true"
     android:focusable="true"
+    android:foreground="?attr/selectableItemBackground"
     android:minHeight="64dp">
 
     <LinearLayout
@@ -40,7 +41,6 @@
                 android:padding="3dp"
                 android:src="@drawable/vector_contact_type_link"
                 android:tint="?attr/palette_background_primary" />
-
         </com.tari.android.wallet.ui.component.tari.background.TariAlphaBackground>
 
         <View

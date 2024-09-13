@@ -28,7 +28,7 @@ import com.tari.android.wallet.ui.fragment.contactBook.address_poisoning.Address
 import com.tari.android.wallet.ui.fragment.contactBook.address_poisoning.SimilarAddressDto
 import com.tari.android.wallet.ui.fragment.contactBook.contactSelection.ContactSelectionModel.Effect
 import com.tari.android.wallet.ui.fragment.contactBook.contactSelection.ContactSelectionModel.YatState
-import com.tari.android.wallet.ui.fragment.contactBook.contacts.adapter.contact.ContactItem
+import com.tari.android.wallet.ui.fragment.contactBook.contacts.adapter.contact.ContactItemViewHolderItem
 import com.tari.android.wallet.ui.fragment.contactBook.contacts.adapter.contact.ContactlessPaymentItem
 import com.tari.android.wallet.ui.fragment.contactBook.data.ContactsRepository
 import com.tari.android.wallet.ui.fragment.contactBook.data.contacts.ContactDto
@@ -71,13 +71,13 @@ class ContactSelectionViewModel : CommonViewModel() {
     @Inject
     lateinit var corePrefRepository: CorePrefRepository
 
-    var additionalFilter: (ContactItem) -> Boolean = { true }
+    var additionalFilter: (ContactItemViewHolderItem) -> Boolean = { true }
 
     val selectedContact = MutableLiveData<ContactDto>()
 
     val selectedTariWalletAddress = MutableLiveData<TariWalletAddress?>()
 
-    private val contactListSource = MediatorLiveData<List<ContactItem>>()
+    private val contactListSource = MediatorLiveData<List<ContactItemViewHolderItem>>()
 
     private val searchText = MutableLiveData("")
 
@@ -105,7 +105,7 @@ class ContactSelectionViewModel : CommonViewModel() {
         }
 
         collectFlow(contactsRepository.contactList) {
-            contactListSource.value = it.map { contactDto -> ContactItem(contact = contactDto, isSimple = true) }
+            contactListSource.value = it.map { contactDto -> ContactItemViewHolderItem(contact = contactDto, isSimple = true) }
         }
         contactList.addSource(contactListSource) { updateContactList() }
         contactList.addSource(searchText) { updateContactList() }

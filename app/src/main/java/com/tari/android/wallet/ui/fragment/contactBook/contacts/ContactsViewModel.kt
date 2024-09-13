@@ -22,7 +22,7 @@ import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.common.SingleLiveEvent
 import com.tari.android.wallet.ui.common.recyclerView.CommonViewHolderItem
 import com.tari.android.wallet.ui.common.recyclerView.items.SpaceVerticalViewHolderItem
-import com.tari.android.wallet.ui.fragment.contactBook.contacts.adapter.contact.ContactItem
+import com.tari.android.wallet.ui.fragment.contactBook.contacts.adapter.contact.ContactItemViewHolderItem
 import com.tari.android.wallet.ui.fragment.contactBook.contacts.adapter.contact.ContactlessPaymentItem
 import com.tari.android.wallet.ui.fragment.contactBook.contacts.adapter.emptyState.EmptyStateItem
 import com.tari.android.wallet.ui.fragment.contactBook.data.ContactsRepository
@@ -50,11 +50,9 @@ class ContactsViewModel : CommonViewModel() {
 
     val contactList = MediatorLiveData<List<CommonViewHolderItem>>()
 
-    private val badgeViewModel = BadgeViewModel()
+    private val sourceList = MutableLiveData<List<ContactItemViewHolderItem>>(emptyList())
 
-    private val sourceList = MutableLiveData<List<ContactItem>>(emptyList())
-
-    private val filters = MutableLiveData<List<(ContactItem) -> Boolean>>(emptyList())
+    private val filters = MutableLiveData<List<(ContactItemViewHolderItem) -> Boolean>>(emptyList())
 
     private val searchText = MutableLiveData("")
 
@@ -84,7 +82,7 @@ class ContactsViewModel : CommonViewModel() {
     fun processItemClick(item: CommonViewHolderItem) {
         if (item is ContactlessPaymentItem) {
             ShareViewModel.currentInstant?.doContactlessPayment()
-        } else if (item is ContactItem) {
+        } else if (item is ContactItemViewHolderItem) {
             if (contactSelectionRepository.isSelectionState.value == true) {
                 contactSelectionRepository.toggle(item)
                 refresh()
@@ -117,22 +115,18 @@ class ContactsViewModel : CommonViewModel() {
         searchText.postValue(text)
     }
 
-    fun addFilter(filter: (ContactItem) -> Boolean) {
+    fun addFilter(filter: (ContactItemViewHolderItem) -> Boolean) {
         filters.value = filters.value!! + filter
     }
 
     private fun updateContacts() {
         collectFlow(contactsRepository.contactList) { contacts ->
             val newItems = contacts.map { contactDto ->
-                ContactItem(
+                ContactItemViewHolderItem(
                     contact = contactDto.copy(),
                     isSimple = false,
                     isSelectionState = false,
                     isSelected = false,
-                    contactAction = { _, _ ->
-                        //todo suppressed intentionally
-                    },
-                    badgeViewModel = badgeViewModel,
                 )
             }
             launchOnMain {

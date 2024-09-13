@@ -23,7 +23,6 @@ import com.tari.android.wallet.R.string.contact_book_details_edit_title
 import com.tari.android.wallet.application.YatAdapter
 import com.tari.android.wallet.extension.launchOnIo
 import com.tari.android.wallet.extension.launchOnMain
-import com.tari.android.wallet.model.TariWalletAddress
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.common.recyclerView.CommonViewHolderItem
 import com.tari.android.wallet.ui.common.recyclerView.items.DividerViewHolderItem
@@ -38,7 +37,6 @@ import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonStyle.Warn
 import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
 import com.tari.android.wallet.ui.dialog.modular.modules.input.InputModule
 import com.tari.android.wallet.ui.dialog.modular.modules.shortEmoji.ShortEmojiIdModule
-import com.tari.android.wallet.ui.dialog.modular.modules.yatInput.YatInputModule
 import com.tari.android.wallet.ui.fragment.contactBook.data.ContactAction
 import com.tari.android.wallet.ui.fragment.contactBook.data.ContactsRepository
 import com.tari.android.wallet.ui.fragment.contactBook.data.contacts.ContactDto
@@ -163,12 +161,19 @@ class ContactDetailsViewModel(savedState: SavedStateHandle) : CommonViewModel() 
     }
 
     private fun updateYatInfo(yat: EmojiId?) {
-        if (!yat.isNullOrEmpty()) {
+        if (DebugConfig.isYatEnabled && !yat.isNullOrEmpty()) {
             launchOnIo {
+                val yatExists = yatAdapter.searchTariYat(yat) != null
                 val connectedWallets = yatAdapter.loadConnectedWallets(yat)
 
                 launchOnMain {
                     _uiState.update { it.copy(connectedYatWallets = connectedWallets) }
+                    if (!yatExists) {
+                        showSimpleDialog(
+                            titleRes = R.string.contact_book_details_yat_not_found_dialog_title,
+                            descriptionRes = R.string.contact_book_details_yat_not_found_dialog_message,
+                        )
+                    }
                 }
             }
         }
@@ -177,28 +182,25 @@ class ContactDetailsViewModel(savedState: SavedStateHandle) : CommonViewModel() 
     fun onEditClick() {
         val contact = uiState.value.contact
 
-        val name = (contact.contactInfo.firstName + " " + contact.contactInfo.lastName).trim()
-        val phoneDto = contact.getPhoneContactInfo()
-        val yat = contact.yat
+        val showYatInput = DebugConfig.isYatEnabled && contact.getPhoneContactInfo() != null
 
         var saveAction: () -> Boolean = { false }
 
         val nameModule = InputModule(
-            value = name,
+            value = contact.alias,
             hint = resourceManager.getString(contact_book_add_contact_first_name_hint),
             isFirst = true,
-            isEnd = true,
+            isEnd = !showYatInput,
             onDoneAction = { saveAction.invoke() },
         )
 
-        val yatModule = YatInputModule(
-            search = this::searchYat,
-            value = yat.orEmpty(),
+        val yatModule = InputModule(
+            value = contact.yat.orEmpty(),
             hint = resourceManager.getString(contact_book_add_contact_yat_hint),
             isFirst = false,
             isEnd = true,
             onDoneAction = { saveAction.invoke() },
-        ).takeIf { DebugConfig.isYatEnabled && phoneDto != null }
+        ).takeIf { showYatInput }
 
         val headModule = HeadModule(
             title = resourceManager.getString(contact_book_details_edit_title),
@@ -207,7 +209,7 @@ class ContactDetailsViewModel(savedState: SavedStateHandle) : CommonViewModel() 
         )
 
         saveAction = {
-            saveDetails(contact, nameModule.value, yatModule?.value ?: "")
+            saveDetails(contact, nameModule.value, yatModule?.value.orEmpty())
             true
         }
 
@@ -222,14 +224,6 @@ class ContactDetailsViewModel(savedState: SavedStateHandle) : CommonViewModel() 
         )
     }
 
-    // TODO rewrite this function to validate Yat only when it's fully entered
-    private suspend fun searchYat(yat: String): Boolean {
-        if (yat.isEmpty()) return false
-
-        val searchResult = yatAdapter.searchTariYat(yat) ?: return false
-        return TariWalletAddress.validateBase58(searchResult.address)
-    }
-
     private fun saveDetails(contact: ContactDto, newName: String, yat: String = "") {
         if (newName.isBlank()) {
             showSimpleDialog(
@@ -238,8 +232,6 @@ class ContactDetailsViewModel(savedState: SavedStateHandle) : CommonViewModel() 
                 closeButtonTextRes = R.string.contact_details_empty_name_dialog_button,
             )
         } else {
-            // TODO validate yat using YanAdapter and show error if invalid
-            // TODO refresh Yat info if changed
             launchOnIo {
                 val firstName = splitAlias(newName).firstName
                 val lastName = splitAlias(newName).lastName
@@ -247,6 +239,9 @@ class ContactDetailsViewModel(savedState: SavedStateHandle) : CommonViewModel() 
                 val newContact = contactsRepository.updateContactInfo(contact, firstName, lastName, yat)
 
                 launchOnMain {
+                    if (newContact.yat != contact.yat) {
+                        updateYatInfo(newContact.yat)
+                    }
                     _uiState.update { it.copy(contact = newContact) }
                     hideDialog()
                 }

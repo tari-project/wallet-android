@@ -44,7 +44,7 @@ import com.tari.android.wallet.ui.extension.visible
 import com.tari.android.wallet.ui.fragment.contactBook.contactSelection.ContactSelectionModel.Effect
 import com.tari.android.wallet.ui.fragment.contactBook.contactSelection.ContactSelectionModel.YatState
 import com.tari.android.wallet.ui.fragment.contactBook.contacts.adapter.ContactListAdapter
-import com.tari.android.wallet.ui.fragment.contactBook.contacts.adapter.contact.ContactItem
+import com.tari.android.wallet.ui.fragment.contactBook.contacts.adapter.contact.ContactItemViewHolderItem
 import com.tari.android.wallet.ui.fragment.contactBook.contacts.adapter.contact.ContactlessPaymentItem
 import com.tari.android.wallet.ui.fragment.qr.QRScannerActivity
 import com.tari.android.wallet.ui.fragment.qr.QrScannerSource
@@ -184,7 +184,7 @@ open class ContactSelectionFragment : CommonFragment<FragmentContactsSelectionBi
         ui.contactsListRecyclerView.layoutManager = LinearLayoutManager(requireContext())
         recyclerViewAdapter.setClickListener(CommonAdapter.ItemClickListener { holderItem ->
             when (holderItem) {
-                is ContactItem -> viewModel.onContactClick(holderItem.contact)
+                is ContactItemViewHolderItem -> viewModel.onContactClick(holderItem.contact)
                 is ContactlessPaymentItem -> viewModel.onContactlessPaymentClick()
             }
         })

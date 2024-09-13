@@ -14,9 +14,9 @@ import com.tari.android.wallet.util.addressFirstEmojis
 import com.tari.android.wallet.util.addressLastEmojis
 import com.tari.android.wallet.util.addressPrefixEmojis
 
-class ContactItemViewHolder(view: ItemContactBinding) : CommonViewHolder<ContactItem, ItemContactBinding>(view) {
+class ContactItemViewHolder(view: ItemContactBinding) : CommonViewHolder<ContactItemViewHolderItem, ItemContactBinding>(view) {
 
-    override fun bind(item: ContactItem) {
+    override fun bind(item: ContactItemViewHolderItem) {
         super.bind(item)
 
         when (val contactInfo = item.contact.contactInfo) {
@@ -59,6 +59,6 @@ class ContactItemViewHolder(view: ItemContactBinding) : CommonViewHolder<Contact
 
     companion object {
         fun getBuilder(): ViewHolderBuilder =
-            ViewHolderBuilder(ItemContactBinding::inflate, ContactItem::class.java) { ContactItemViewHolder(it as ItemContactBinding) }
+            ViewHolderBuilder(ItemContactBinding::inflate, ContactItemViewHolderItem::class.java) { ContactItemViewHolder(it as ItemContactBinding) }
     }
 }
