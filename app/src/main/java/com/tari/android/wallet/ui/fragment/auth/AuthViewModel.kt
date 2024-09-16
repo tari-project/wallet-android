@@ -1,8 +1,9 @@
 package com.tari.android.wallet.ui.fragment.auth
 
-import androidx.lifecycle.viewModelScope
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.MigrationManager
+import com.tari.android.wallet.extension.launchOnIo
+import com.tari.android.wallet.extension.launchOnMain
 import com.tari.android.wallet.infrastructure.security.biometric.BiometricAuthenticationService
 import com.tari.android.wallet.service.service.WalletServiceLauncher
 import com.tari.android.wallet.ui.common.CommonViewModel
@@ -12,8 +13,6 @@ import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonStyle
 import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
 import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 class AuthViewModel : CommonViewModel() {
@@ -32,15 +31,15 @@ class AuthViewModel : CommonViewModel() {
     init {
         component.inject(this)
 
-        viewModelScope.launch(Dispatchers.IO) {
+        launchOnIo {
             migrationManager.validateVersion(
                 onValid = {
-                    viewModelScope.launch(Dispatchers.Main) {
+                    launchOnMain {
                         goAuth.postValue(Unit)
                     }
                 },
                 onError = {
-                    viewModelScope.launch(Dispatchers.Main) {
+                    launchOnMain {
                         showIncompatibleVersionDialog()
                     }
                 }
@@ -65,7 +64,7 @@ class AuthViewModel : CommonViewModel() {
 
     private fun deleteWallet() {
         // disable CTAs
-        viewModelScope.launch(Dispatchers.IO) {
+        launchOnIo {
             walletServiceLauncher.stopAndDelete()
             navigation.postValue(Navigation.TxListNavigation.ToSplashScreen)
         }
