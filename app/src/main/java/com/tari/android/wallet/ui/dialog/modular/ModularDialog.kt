@@ -48,8 +48,6 @@ import com.tari.android.wallet.ui.dialog.modular.modules.shortEmoji.ShortEmojiId
 import com.tari.android.wallet.ui.dialog.modular.modules.shortEmoji.ShortEmojiModuleView
 import com.tari.android.wallet.ui.dialog.modular.modules.space.SpaceModule
 import com.tari.android.wallet.ui.dialog.modular.modules.space.SpaceModuleView
-import com.tari.android.wallet.ui.dialog.modular.modules.yatInput.YatInputModule
-import com.tari.android.wallet.ui.dialog.modular.modules.yatInput.YatInputModuleView
 import com.tari.android.wallet.ui.fragment.send.addAmount.feeModule.FeeModule
 import com.tari.android.wallet.ui.fragment.send.addAmount.feeModule.FeeModuleView
 import com.tari.android.wallet.ui.fragment.send.shareQr.ShareQRCodeModuleView
@@ -150,7 +148,6 @@ open class ModularDialog(val context: Context) {
                 is ConnectionStatusesModule -> ConnectionStatusesModuleView(context, module)
                 is SecurityStageHeadModule -> SecurityStageHeadModuleView(context, module)
                 is BackupOnboardingFlowItemModule -> BackupOnboardingFlowItemModuleView(context, module)
-                is YatInputModule -> YatInputModuleView(context, module)
                 is InputModule -> InputModuleView(context, module)
                 is ShortEmojiIdModule -> ShortEmojiModuleView(context, module)
                 is IconModule -> IconModuleView(context, module)
