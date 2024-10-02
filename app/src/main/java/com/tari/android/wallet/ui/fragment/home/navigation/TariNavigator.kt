@@ -8,11 +8,11 @@ import com.tari.android.wallet.R
 import com.tari.android.wallet.application.YatAdapter
 import com.tari.android.wallet.application.YatAdapter.ConnectedWallet
 import com.tari.android.wallet.application.deeplinks.DeepLink
+import com.tari.android.wallet.application.walletManager.WalletManager
 import com.tari.android.wallet.data.sharedPrefs.CorePrefRepository
 import com.tari.android.wallet.data.sharedPrefs.tariSettings.TariSettingsPrefRepository
 import com.tari.android.wallet.event.Event
 import com.tari.android.wallet.event.EventBus
-import com.tari.android.wallet.ffi.FFIWallet
 import com.tari.android.wallet.model.MicroTari
 import com.tari.android.wallet.model.TariWalletAddress
 import com.tari.android.wallet.model.Tx
@@ -103,6 +103,7 @@ import javax.inject.Singleton
 class TariNavigator @Inject constructor(
     val prefs: CorePrefRepository,
     val tariSettingsSharedRepository: TariSettingsPrefRepository,
+    val walletManager: WalletManager,
     private val yatAdapter: YatAdapter,
 ) {
 
@@ -355,7 +356,7 @@ class TariNavigator @Inject constructor(
     }
 
     private fun sendToUserByDeeplink(deeplink: DeepLink.Send) {
-        FFIWallet.instance?.getWalletAddress()
+        walletManager.walletInstance?.getWalletAddress() // TODO move all the logic beside of navigation from here
         val address = TariWalletAddress.fromBase58(deeplink.walletAddress)
         val contact = (activity as HomeActivity).viewModel.contactsRepository.getContactByAddress(address)
         val bundle = Bundle().apply {

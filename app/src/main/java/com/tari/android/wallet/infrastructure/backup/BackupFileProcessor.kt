@@ -34,12 +34,12 @@ package com.tari.android.wallet.infrastructure.backup
 
 import com.google.gson.Gson
 import com.orhanobut.logger.Logger
+import com.tari.android.wallet.application.walletManager.WalletManager
 import com.tari.android.wallet.data.WalletConfig
 import com.tari.android.wallet.data.sharedPrefs.backup.BackupPrefRepository
 import com.tari.android.wallet.data.sharedPrefs.security.SecurityPrefRepository
 import com.tari.android.wallet.extension.encrypt
 import com.tari.android.wallet.ffi.FFIError
-import com.tari.android.wallet.ffi.FFIWallet
 import com.tari.android.wallet.infrastructure.backup.compress.CompressionMethod
 import com.tari.android.wallet.infrastructure.security.encryption.SymmetricEncryptionAlgorithm
 import com.tari.android.wallet.model.fullBase58
@@ -57,6 +57,7 @@ class BackupFileProcessor @Inject constructor(
     private val securityPrefRepository: SecurityPrefRepository,
     private val walletConfig: WalletConfig,
     private val namingPolicy: BackupNamingPolicy,
+    private val walletManager: WalletManager,
 ) {
     private val logger
         get() = Logger.t(BackupFileProcessor::class.simpleName)
@@ -77,7 +78,7 @@ class BackupFileProcessor @Inject constructor(
         if (backupPassword.isNullOrEmpty()) {
             val mimeType = "application/json"
 
-            val ffiWallet = FFIWallet.instance!!
+            val ffiWallet = walletManager.walletInstance ?: error("Wallet is not initialized during backup")
 
             val json = Gson().toJson(
                 BackupUtxos(
@@ -157,4 +158,3 @@ class BackupFileProcessor @Inject constructor(
         }
     }
 }
-

@@ -2,10 +2,9 @@ package com.tari.android.wallet.ui.fragment.send.addAmount
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.viewModelScope
 import com.tari.android.wallet.R
 import com.tari.android.wallet.extension.getWithError
-import com.tari.android.wallet.ffi.FFIWallet
+import com.tari.android.wallet.extension.launchOnIo
 import com.tari.android.wallet.model.MicroTari
 import com.tari.android.wallet.model.TariWalletAddress
 import com.tari.android.wallet.model.WalletError
@@ -17,8 +16,6 @@ import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
 import com.tari.android.wallet.ui.fragment.send.addAmount.feeModule.FeeModule
 import com.tari.android.wallet.ui.fragment.send.addAmount.feeModule.NetworkSpeed
 import com.tari.android.wallet.util.Constants
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import java.math.BigInteger
 import kotlin.math.min
 
@@ -48,9 +45,9 @@ class AddAmountViewModel : CommonViewModel() {
     }
 
     private fun loadFees() = doOnWalletServiceConnected {
-        viewModelScope.launch(Dispatchers.IO) {
+        launchOnIo {
             try {
-                val stats = FFIWallet.instance!!.getFeePerGramStats()
+                val stats = walletManager.walletInstance!!.getFeePerGramStats()
                 val elements = (0 until stats.getLength()).map { stats.getAt(it) }.toList()
 
                 val elementsCount = min(stats.getLength(), 3)
@@ -85,7 +82,7 @@ class AddAmountViewModel : CommonViewModel() {
                 }
                 _feePerGrams.postValue(FeePerGramOptions(networkSpeed, MicroTari(slowOption), MicroTari(mediumOption), MicroTari(fastOption)))
             } catch (e: Throwable) {
-                logger.i(e.message + "load fees")
+                logger.i("Error loading fees: ${e.message}")
             }
         }
     }

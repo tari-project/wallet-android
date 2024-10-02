@@ -158,7 +158,7 @@ class InputSeedWordsFragment : CommonFragment<FragmentWalletInputSeedWordsBindin
                 ui.text.setTextSilently(it)
             }
             this@InputSeedWordsFragment.observe(word.index) {
-                val ime = if (it == SeedPhrase.SeedPhraseLength - 1)
+                val ime = if (it == SeedPhrase.SEED_PHRASE_LENGTH - 1)
                     EditorInfo.IME_ACTION_DONE else EditorInfo.IME_ACTION_NEXT
                 ui.text.imeOptions = ime
             }

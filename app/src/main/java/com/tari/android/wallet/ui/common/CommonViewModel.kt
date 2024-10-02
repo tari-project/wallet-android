@@ -4,11 +4,12 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.orhanobut.logger.Logger
 import com.orhanobut.logger.Printer
 import com.tari.android.wallet.R
-import com.tari.android.wallet.application.walletManager.WalletStateHandler
+import com.tari.android.wallet.application.walletManager.WalletManager
+import com.tari.android.wallet.application.walletManager.doOnWalletFailed
+import com.tari.android.wallet.application.walletManager.doOnWalletRunning
 import com.tari.android.wallet.data.sharedPrefs.CorePrefRepository
 import com.tari.android.wallet.data.sharedPrefs.network.NetworkPrefRepository
 import com.tari.android.wallet.data.sharedPrefs.security.SecurityPrefRepository
@@ -17,6 +18,7 @@ import com.tari.android.wallet.di.ApplicationComponent
 import com.tari.android.wallet.di.DiContainer
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.extension.addTo
+import com.tari.android.wallet.extension.launchOnIo
 import com.tari.android.wallet.extension.launchOnMain
 import com.tari.android.wallet.ffi.FFIWallet
 import com.tari.android.wallet.infrastructure.logging.LoggerTags
@@ -42,9 +44,6 @@ import com.tari.android.wallet.ui.fragment.home.navigation.Navigation.AllSetting
 import com.tari.android.wallet.ui.fragment.home.navigation.TariNavigator
 import com.tari.android.wallet.ui.fragment.settings.themeSelector.TariTheme
 import io.reactivex.disposables.CompositeDisposable
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 open class CommonViewModel : ViewModel() {
@@ -81,7 +80,7 @@ open class CommonViewModel : ViewModel() {
         get() = serviceConnection.walletService
 
     @Inject
-    lateinit var walletStateHandler: WalletStateHandler
+    lateinit var walletManager: WalletManager
 
     @Inject
     lateinit var dialogManager: DialogManager
@@ -127,8 +126,8 @@ open class CommonViewModel : ViewModel() {
             checkAuthorization()
         }.addTo(compositeDisposable)
 
-        viewModelScope.launch {
-            walletStateHandler.doOnWalletFailed {
+        launchOnIo {
+            walletManager.doOnWalletFailed {
                 showErrorDialog(it)
             }
         }
@@ -143,14 +142,14 @@ open class CommonViewModel : ViewModel() {
     }
 
     fun doOnWalletServiceConnected(action: suspend (walletService: TariWalletService) -> Unit) {
-        viewModelScope.launch {
+        launchOnIo {
             serviceConnection.doOnWalletServiceConnected(action)
         }
     }
 
     fun doOnWalletRunning(action: suspend (walletService: FFIWallet) -> Unit) {
-        viewModelScope.launch {
-            walletStateHandler.doOnWalletRunning(action)
+        launchOnIo {
+            walletManager.doOnWalletRunning(action)
         }
     }
 
@@ -175,8 +174,6 @@ open class CommonViewModel : ViewModel() {
             authorizedAction = null
         }
     }
-
-    fun doOnBackground(action: suspend CoroutineScope.() -> Unit): Job = viewModelScope.launch { action() }
 
     fun showModularDialog(args: ModularDialogArgs) {
         _modularDialog.postValue(args)

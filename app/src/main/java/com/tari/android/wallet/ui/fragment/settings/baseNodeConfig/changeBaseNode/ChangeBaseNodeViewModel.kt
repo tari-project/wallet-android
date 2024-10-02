@@ -52,6 +52,7 @@ class ChangeBaseNodeViewModel : CommonViewModel() {
 
     fun selectBaseNode(baseNodeDto: BaseNodeDto) {
         baseNodesManager.setBaseNode(baseNodeDto)
+        walletManager.syncBaseNode()
         backPressed.postValue(Unit)
     }
 
@@ -136,6 +137,7 @@ class ChangeBaseNodeViewModel : CommonViewModel() {
 
             baseNodesManager.addUserBaseNode(baseNode)
             baseNodesManager.setBaseNode(baseNode)
+            walletManager.syncBaseNode()
             hideDialog()
             loadList()
         } else {

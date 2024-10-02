@@ -7,7 +7,6 @@ import android.text.Spanned
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.viewModelScope
 import com.tari.android.wallet.R
 import com.tari.android.wallet.R.string.error_no_connection_description
 import com.tari.android.wallet.R.string.error_no_connection_title
@@ -15,6 +14,7 @@ import com.tari.android.wallet.R.string.error_node_unreachable_description
 import com.tari.android.wallet.R.string.error_node_unreachable_title
 import com.tari.android.wallet.application.securityStage.StagedWalletSecurityManager
 import com.tari.android.wallet.application.securityStage.StagedWalletSecurityManager.StagedSecurityEffect
+import com.tari.android.wallet.application.walletManager.WalletManager.WalletEvent
 import com.tari.android.wallet.data.sharedPrefs.CorePrefRepository
 import com.tari.android.wallet.data.sharedPrefs.securityStages.WalletSecurityStage
 import com.tari.android.wallet.data.sharedPrefs.sentry.SentryPrefRepository
@@ -46,8 +46,6 @@ import com.tari.android.wallet.ui.fragment.tx.adapter.TransactionItem
 import com.tari.android.wallet.util.EmojiId
 import com.tari.android.wallet.util.extractEmojis
 import com.tari.android.wallet.util.shortString
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import yat.android.ui.extension.HtmlHelper
 import javax.inject.Inject
 
@@ -155,9 +153,24 @@ class HomeFragmentViewModel : CommonViewModel() {
     private fun onServiceConnected() {
         subscribeToEventBus()
 
-        viewModelScope.launch(Dispatchers.IO) {
-            refreshAllData(true)
+        collectFlow(walletManager.walletEvent) { event ->
+            when (event) {
+                is WalletEvent.Tx.TxReceived,
+                is WalletEvent.Tx.TxReplyReceived,
+                is WalletEvent.Tx.TxFinalized,
+                is WalletEvent.Tx.InboundTxBroadcast,
+                is WalletEvent.Tx.OutboundTxBroadcast,
+                is WalletEvent.Tx.TxMinedUnconfirmed,
+                is WalletEvent.Tx.TxMined,
+                is WalletEvent.Tx.TxFauxMinedUnconfirmed,
+                is WalletEvent.Tx.TxFauxConfirmed,
+                is WalletEvent.Tx.TxCancelled -> refreshBalance(false)
+
+                else -> Unit
+            }
         }
+
+        refreshAllData(true)
     }
 
     private fun fetchBalanceInfoData() {
@@ -178,14 +191,14 @@ class HomeFragmentViewModel : CommonViewModel() {
     }
 
     private fun refreshAllData(isRestarted: Boolean = false) {
-        viewModelScope.launch(Dispatchers.IO) {
+        launchOnIo {
             refreshBalance(isRestarted)
             transactionRepository.refreshAllData()
         }
     }
 
     private fun refreshBalance(isRestarted: Boolean = false) {
-        viewModelScope.launch(Dispatchers.IO) {
+        launchOnIo {
             fetchBalanceInfoData()
             _refreshBalanceInfo.postValue(isRestarted)
         }
@@ -193,16 +206,6 @@ class HomeFragmentViewModel : CommonViewModel() {
 
     private fun subscribeToEventBus() {
         EventBus.subscribe<Event.Transaction.Updated>(this) { refreshAllData() }
-        EventBus.subscribe<Event.Transaction.TxReceived>(this) { refreshBalance(false) }
-        EventBus.subscribe<Event.Transaction.TxReplyReceived>(this) { refreshBalance(false) }
-        EventBus.subscribe<Event.Transaction.TxFinalized>(this) { refreshBalance(false) }
-        EventBus.subscribe<Event.Transaction.InboundTxBroadcast>(this) { refreshBalance(false) }
-        EventBus.subscribe<Event.Transaction.OutboundTxBroadcast>(this) { refreshBalance(false) }
-        EventBus.subscribe<Event.Transaction.TxMinedUnconfirmed>(this) { refreshBalance(false) }
-        EventBus.subscribe<Event.Transaction.TxMined>(this) { refreshBalance(false) }
-        EventBus.subscribe<Event.Transaction.TxFauxMinedUnconfirmed>(this) { refreshBalance(false) }
-        EventBus.subscribe<Event.Transaction.TxFauxConfirmed>(this) { refreshBalance(false) }
-        EventBus.subscribe<Event.Transaction.TxCancelled>(this) { refreshBalance(false) }
 
         EventBus.subscribe<Event.Transaction.TxSendSuccessful>(this) { refreshBalance(false) }
         EventBus.subscribe<Event.Transaction.TxSendFailed>(this) { onTxSendFailed(it.failureReason) }

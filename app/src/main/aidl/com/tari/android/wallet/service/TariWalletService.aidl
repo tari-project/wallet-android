@@ -34,22 +34,8 @@ package com.tari.android.wallet.service;
 
 // import model classes
 import com.tari.android.wallet.model.Model;
-import com.tari.android.wallet.service.TariWalletServiceListener;
 
 interface TariWalletService {
-
-    /**
-    * Registers new wallet listener.
-    * Registered listener will be unregistered on death.
-    */
-    boolean registerListener(TariWalletServiceListener listener);
-
-    /**
-    * Unregisters wallet listener.
-    */
-    boolean unregisterListener(TariWalletServiceListener listener);
-
-    String getWalletAddressBase58(out WalletError error);
 
     BalanceInfo getBalanceInfo(out WalletError error);
 
@@ -71,17 +57,6 @@ interface TariWalletService {
 
     boolean cancelPendingTx(in TxId id, out WalletError error);
 
-    /**
-    * Sets the base node peer that the wallet syncs with.
-    */
-    boolean addBaseNodePeer(
-        in String baseNodePublicKey,
-        in String baseNodeAddress,
-        out WalletError error
-    );
-
-    boolean startBaseNodeSync(out WalletError error);
-
     TxId sendTari(
         in TariContact contact,
         in MicroTari amount,
@@ -95,9 +70,6 @@ interface TariWalletService {
     boolean updateContact(in TariWalletAddress address, in String alias, boolean isFavorite, out WalletError error);
 
     boolean removeContact(in TariWalletAddress address, out WalletError error);
-
-    TariWalletAddress getWalletAddressFromEmojiId(in String emojiId, out WalletError error);
-    TariWalletAddress getWalletAddressFromBase58(in String base58, out WalletError error);
 
     /**
     * Key-value storage functions.

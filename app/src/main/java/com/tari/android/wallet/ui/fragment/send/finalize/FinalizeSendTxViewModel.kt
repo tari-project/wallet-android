@@ -8,8 +8,9 @@ import com.tari.android.wallet.R.string.finalize_send_tx_sending_step_2_desc_lin
 import com.tari.android.wallet.R.string.finalize_send_tx_sending_step_2_desc_line_2
 import com.tari.android.wallet.R.string.finalize_send_tx_sending_step_3_desc_line_1
 import com.tari.android.wallet.R.string.finalize_send_tx_sending_step_3_desc_line_2
-import com.tari.android.wallet.event.Event
+import com.tari.android.wallet.application.walletManager.WalletManager
 import com.tari.android.wallet.event.EventBus
+import com.tari.android.wallet.extension.collectFlow
 import com.tari.android.wallet.extension.launchOnIo
 import com.tari.android.wallet.extension.launchOnMain
 import com.tari.android.wallet.model.TariContact
@@ -205,14 +206,15 @@ class FinalizeSendTxViewModel : CommonViewModel() {
     ) {
 
         init {
-            subscribeToEventBus()
+            collectFlow(walletManager.walletEvent) { event ->
+                when (event) {
+                    is WalletManager.WalletEvent.Tx.DirectSendResult -> onDirectSendResult(event.txId, event.status)
+                    else -> Unit
+                }
+            }
         }
 
         override fun execute() = Unit
-
-        private fun subscribeToEventBus() {
-            EventBus.subscribe<Event.Transaction.DirectSendResult>(this) { event -> onDirectSendResult(event.txId, event.status) }
-        }
 
         private fun onDirectSendResult(txId: TxId, status: TransactionSendStatus) {
             if (sentTxId.value != txId) {

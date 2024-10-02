@@ -9,10 +9,8 @@ import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodeDto
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.extension.addTo
 import com.tari.android.wallet.ffi.FFIPublicKey
-import com.tari.android.wallet.ffi.FFIWallet
 import com.tari.android.wallet.ffi.HexString
 import com.tari.android.wallet.model.recovery.WalletRestorationResult
-import com.tari.android.wallet.service.seedPhrase.SeedPhraseRepository
 import com.tari.android.wallet.service.service.WalletServiceLauncher
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.common.domain.ResourceManager
@@ -25,10 +23,6 @@ import java.text.DecimalFormat
 import javax.inject.Inject
 
 class WalletRestoringFromSeedWordsViewModel : CommonViewModel() {
-
-
-    @Inject
-    lateinit var seedPhraseRepository: SeedPhraseRepository
 
     @Inject
     lateinit var walletServiceLauncher: WalletServiceLauncher
@@ -62,7 +56,7 @@ class WalletRestoringFromSeedWordsViewModel : CommonViewModel() {
     private fun startRestoringOnNode(baseNode: BaseNodeDto) {
         try {
             val baseNodeFFI = FFIPublicKey(HexString(baseNode.publicKeyHex))
-            val result = FFIWallet.instance?.startRecovery(baseNodeFFI, resourceManager.getString(R.string.restore_wallet_output_message))
+            val result = walletManager.walletInstance?.startRecovery(baseNodeFFI, resourceManager.getString(R.string.restore_wallet_output_message))
             if (result == true) {
                 subscribeOnRestorationState()
                 return

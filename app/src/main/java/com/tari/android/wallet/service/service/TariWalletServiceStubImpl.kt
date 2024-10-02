@@ -1,16 +1,13 @@
 package com.tari.android.wallet.service.service
 
-import com.orhanobut.logger.Logger
-import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodePrefRepository
-import com.tari.android.wallet.event.EventBus
+import com.tari.android.wallet.application.walletManager.OutboundTxNotifier
+import com.tari.android.wallet.application.walletManager.WalletManager
 import com.tari.android.wallet.ffi.Base58String
 import com.tari.android.wallet.ffi.FFIContact
 import com.tari.android.wallet.ffi.FFIError
 import com.tari.android.wallet.ffi.FFIException
-import com.tari.android.wallet.ffi.FFIPublicKey
 import com.tari.android.wallet.ffi.FFITariWalletAddress
 import com.tari.android.wallet.ffi.FFIWallet
-import com.tari.android.wallet.ffi.HexString
 import com.tari.android.wallet.ffi.runWithDestroy
 import com.tari.android.wallet.model.BalanceInfo
 import com.tari.android.wallet.model.CancelledTx
@@ -26,22 +23,15 @@ import com.tari.android.wallet.model.TariVector
 import com.tari.android.wallet.model.TariWalletAddress
 import com.tari.android.wallet.model.TxId
 import com.tari.android.wallet.model.WalletError
-import com.tari.android.wallet.model.fullBase58
 import com.tari.android.wallet.service.TariWalletService
-import com.tari.android.wallet.service.TariWalletServiceListener
-import com.tari.android.wallet.service.baseNode.BaseNodeSyncState
 import com.tari.android.wallet.util.Constants
 import java.math.BigInteger
 import java.util.Locale
 
 class TariWalletServiceStubImpl(
     private val wallet: FFIWallet,
-    private val baseNodeSharedPrefsRepository: BaseNodePrefRepository,
-    private val walletServiceListener: FFIWalletListenerImpl
+    private val outboundTxNotifier: OutboundTxNotifier,
 ) : TariWalletService.Stub() {
-
-    private val logger
-        get() = Logger.t(WalletService::class.simpleName)
 
     private var _cachedTariContacts: List<TariContact>? = null
     private val cachedTariContacts: List<TariContact>
@@ -59,16 +49,6 @@ class TariWalletServiceStubImpl(
             contactsFFI.destroy()
             return tariContacts.sortedWith(compareBy { it.alias }).also { _cachedTariContacts = it }
         }
-
-    override fun registerListener(listener: TariWalletServiceListener): Boolean {
-        walletServiceListener.listeners.add(listener)
-        listener.asBinder().linkToDeath({ walletServiceListener.listeners.remove(listener) }, 0)
-        return true
-    }
-
-    override fun unregisterListener(listener: TariWalletServiceListener): Boolean = walletServiceListener.listeners.remove(listener)
-
-    override fun getWalletAddressBase58(error: WalletError): String? = runMapping(error) { wallet.getWalletAddress().fullBase58() }
 
     override fun getBalanceInfo(error: WalletError): BalanceInfo? = runMapping(error) { wallet.getBalance() }
 
@@ -148,30 +128,6 @@ class TariWalletServiceStubImpl(
 
     override fun cancelPendingTx(id: TxId, error: WalletError): Boolean = runMapping(error) { wallet.cancelPendingTx(id.value) } ?: false
 
-    override fun addBaseNodePeer(baseNodePublicKey: String, baseNodeAddress: String, error: WalletError): Boolean = runMapping(error) {
-        Logger.t(this::class.simpleName).e("walletServiceStub:addBaseNodePeer:publicKeyHex: $baseNodePublicKey")
-        Logger.t(this::class.simpleName).e("walletServiceStub:addBaseNodePeer:address: $baseNodeAddress")
-        val result = FFIPublicKey(HexString(baseNodePublicKey)).runWithDestroy { wallet.addBaseNodePeer(it, baseNodeAddress) }
-        if (result) {
-            walletServiceListener.baseNodeValidationStatusMap.clear()
-            EventBus.baseNodeSyncState.post(BaseNodeSyncState.NotStarted)
-        }
-        result
-    } ?: false
-
-    override fun startBaseNodeSync(error: WalletError): Boolean = runMapping(error, {
-        logger.i(it.toString() + "Base node sync failed")
-        baseNodeSharedPrefsRepository.baseNodeLastSyncResult = false
-        walletServiceListener.baseNodeValidationStatusMap.clear()
-        EventBus.baseNodeSyncState.post(BaseNodeSyncState.Failed)
-    }) {
-        walletServiceListener.baseNodeValidationStatusMap.clear()
-        walletServiceListener.baseNodeValidationStatusMap[BaseNodeValidationType.TXO] = Pair(wallet.startTXOValidation(), null)
-        walletServiceListener.baseNodeValidationStatusMap[BaseNodeValidationType.TX] = Pair(wallet.startTxValidation(), null)
-        baseNodeSharedPrefsRepository.baseNodeLastSyncResult = null
-        true
-    } ?: false
-
     override fun sendTari(
         tariContact: TariContact,
         amount: MicroTari,
@@ -184,8 +140,8 @@ class TariWalletServiceStubImpl(
         val recipientAddress = FFITariWalletAddress(Base58String(tariContact.walletAddress.fullBase58))
         val txId = wallet.sendTx(recipientAddress, amount.value, feePerGram.value, message, isOneSidePayment, paymentId)
 
-        walletServiceListener.outboundTxIdsToBePushNotified.add(
-            FFIWalletListenerImpl.OutboundTxNotification(
+        outboundTxNotifier.outboundTxIdsToBePushNotified.add(
+            WalletManager.OutboundTxNotification(
                 txId = txId,
                 recipientPublicKeyHex = recipientAddress.notificationHex().lowercase(Locale.ENGLISH),
             )
@@ -225,12 +181,6 @@ class TariWalletServiceStubImpl(
                 _cachedTariContacts = null
             }
         } ?: false
-
-    override fun getWalletAddressFromEmojiId(emojiId: String?, error: WalletError): TariWalletAddress? =
-        runMapping(error) { FFITariWalletAddress(emojiId = emojiId.orEmpty()).runWithDestroy { TariWalletAddress(it) } }
-
-    override fun getWalletAddressFromBase58(walletAddressBase58: String?, error: WalletError): TariWalletAddress? =
-        runMapping(error) { FFITariWalletAddress(base58 = Base58String(walletAddressBase58 ?: "")).runWithDestroy { TariWalletAddress(it) } }
 
     override fun setKeyValue(key: String, value: String, error: WalletError): Boolean = runMapping(error) { wallet.setKeyValue(key, value) } ?: false
 
