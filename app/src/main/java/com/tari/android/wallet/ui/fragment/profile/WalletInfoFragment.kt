@@ -85,7 +85,7 @@ class WalletInfoFragment : CommonFragment<FragmentWalletInfoBinding, WalletInfoV
             ui.yatDisconnectedDescTextView.setVisible(uiState.yatDisconnected && DebugConfig.isYatEnabled)
             ui.yatDisconnectedDescTextView.text = string(R.string.wallet_info_yat_disconnected_description)
                 .makeTextBold(requireContext(), string(R.string.wallet_info_yat_disconnected_description_connect_yats))
-            ui.emojiIdAddressText.setVisible(!uiState.yatShowing && DebugConfig.isYatEnabled, View.INVISIBLE)
+            ui.emojiIdAddressText.setVisible(!uiState.yatShowing || !DebugConfig.isYatEnabled, View.INVISIBLE)
             ui.yatAddressText.setVisible(uiState.yatShowing && DebugConfig.isYatEnabled)
             ui.yatAddressText.text = uiState.yat.orEmpty()
         }
