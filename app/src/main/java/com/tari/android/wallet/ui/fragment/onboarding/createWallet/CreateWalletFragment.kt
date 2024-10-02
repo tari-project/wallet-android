@@ -54,7 +54,6 @@ import com.tari.android.wallet.R.dimen.onboarding_see_full_emoji_id_button_visib
 import com.tari.android.wallet.R.string.create_wallet_your_emoji_id_text_label
 import com.tari.android.wallet.R.string.create_wallet_your_emoji_id_text_label_bold_part
 import com.tari.android.wallet.R.string.emoji_id_chunk_separator
-import com.tari.android.wallet.application.walletManager.WalletStateHandler
 import com.tari.android.wallet.databinding.FragmentCreateWalletBinding
 import com.tari.android.wallet.di.DiContainer
 import com.tari.android.wallet.extension.applyFontStyle
@@ -83,7 +82,6 @@ import com.tari.android.wallet.util.addressFirstEmojis
 import com.tari.android.wallet.util.addressLastEmojis
 import com.tari.android.wallet.util.addressPrefixEmojis
 import me.everything.android.ui.overscroll.OverScrollDecoratorHelper
-import javax.inject.Inject
 
 /**
  * onBoarding flow : wallet creation step.
@@ -91,9 +89,6 @@ import javax.inject.Inject
  * @author The Tari Development Team
  */
 class CreateWalletFragment : OnboardingFlowFragment<FragmentCreateWalletBinding, CreateWalletViewModel>() {
-
-    @Inject
-    lateinit var walletStateHandler: WalletStateHandler
 
     private val uiHandler = Handler(Looper.getMainLooper())
 

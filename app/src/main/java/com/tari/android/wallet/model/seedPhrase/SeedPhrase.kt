@@ -19,6 +19,7 @@ class SeedPhrase {
                         this.ffiSeedWords = ffiSeedWords
                         SeedPhraseCreationResult.Success
                     }
+
                     SeedWordsWordPushResult.InvalidSeedPhrase -> SeedPhraseCreationResult.InvalidSeedPhrase
                 }
             }
@@ -31,14 +32,14 @@ class SeedPhrase {
 
 
     sealed class SeedPhraseCreationResult {
-        object Success : SeedPhraseCreationResult()
-        class Failed(val exception: Throwable) : SeedPhraseCreationResult()
-        object InvalidSeedPhrase : SeedPhraseCreationResult()
-        object SeedPhraseNotCompleted : SeedPhraseCreationResult()
-        object InvalidSeedWord : SeedPhraseCreationResult()
+        data object Success : SeedPhraseCreationResult()
+        data class Failed(val exception: Throwable) : SeedPhraseCreationResult()
+        data object InvalidSeedPhrase : SeedPhraseCreationResult()
+        data object SeedPhraseNotCompleted : SeedPhraseCreationResult()
+        data object InvalidSeedWord : SeedPhraseCreationResult()
     }
 
     companion object {
-        const val SeedPhraseLength: Int = 24
+        const val SEED_PHRASE_LENGTH: Int = 24
     }
 }

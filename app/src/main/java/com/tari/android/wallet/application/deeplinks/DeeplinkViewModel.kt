@@ -142,5 +142,6 @@ class DeeplinkViewModel : CommonViewModel() {
     private fun addBaseNodeAction(baseNodeDto: BaseNodeDto, isQrData: Boolean) {
         baseNodesManager.addUserBaseNode(baseNodeDto)
         baseNodesManager.setBaseNode(baseNodeDto)
+        walletManager.syncBaseNode()
     }
 }

@@ -2,7 +2,7 @@ package com.tari.android.wallet.ui.fragment.contactBook.data
 
 import android.content.Context
 import com.orhanobut.logger.Logger
-import com.tari.android.wallet.application.walletManager.WalletStateHandler
+import com.tari.android.wallet.application.walletManager.WalletManager
 import com.tari.android.wallet.di.ApplicationScope
 import com.tari.android.wallet.extension.replaceItem
 import com.tari.android.wallet.model.TariWalletAddress
@@ -29,7 +29,7 @@ class ContactsRepository @Inject constructor(
     context: Context,
     contactUtil: ContactUtil,
     tariWalletServiceConnection: TariWalletServiceConnection,
-    walletStateHandler: WalletStateHandler,
+    walletManager: WalletManager,
     @ApplicationScope private val applicationScope: CoroutineScope,
 ) {
     private val logger
@@ -38,7 +38,7 @@ class ContactsRepository @Inject constructor(
     private val ffiBridge = FFIContactsRepositoryBridge(
         contactsRepository = this,
         tariWalletServiceConnection = tariWalletServiceConnection,
-        walletStateHandler = walletStateHandler,
+        walletManager = walletManager,
         contactUtil = contactUtil,
         externalScope = applicationScope,
     )

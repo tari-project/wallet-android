@@ -48,15 +48,11 @@ data class TariContact(
     val isFavorite: Boolean = false,
 ) : Parcelable {
 
-    // TODO create a constructor that takes an wallet address only and use normalized alias
-
     constructor(ffiContact: FFIContact) : this(
         walletAddress = TariWalletAddress(ffiContact.getWalletAddress()),
         alias = ffiContact.getAlias(),
         isFavorite = ffiContact.getIsFavorite()
     )
-
-    fun filtered(text: String): Boolean = walletAddress.fullEmojiId.contains(text, ignoreCase = true) || alias.contains(text, ignoreCase = true)
 
     override fun toString() = "Contact(alias='$alias') ${super.toString()}"
 }

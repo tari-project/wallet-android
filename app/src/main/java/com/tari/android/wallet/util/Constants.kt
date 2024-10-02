@@ -123,8 +123,6 @@ object Constants {
      * Wallet constants.
      */
     object Wallet {
-        const val MAX_NUMBER_OF_ROLLING_LOG_FILES = 2
-        const val ROLLING_LOG_FILE_MAX_SIZE_BYTES = 10 * 1024 * 1024
         const val DISCOVERY_TIMEOUT_SEC = 20L
         const val STORE_AND_FORWARD_MESSAGE_DURATION_SEC = 10800L
         const val EMOJI_FORMATTER_CHUNK_SIZE = 3

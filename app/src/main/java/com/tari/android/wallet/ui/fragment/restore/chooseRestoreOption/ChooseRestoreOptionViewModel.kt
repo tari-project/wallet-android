@@ -5,8 +5,11 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.tari.android.wallet.R
+import com.tari.android.wallet.application.walletManager.doOnWalletFailed
+import com.tari.android.wallet.application.walletManager.doOnWalletRunning
 import com.tari.android.wallet.data.WalletConfig
 import com.tari.android.wallet.data.sharedPrefs.backup.BackupPrefRepository
+import com.tari.android.wallet.extension.launchOnIo
 import com.tari.android.wallet.infrastructure.backup.BackupFileIsEncryptedException
 import com.tari.android.wallet.infrastructure.backup.BackupManager
 import com.tari.android.wallet.infrastructure.backup.BackupStorageAuthRevokedException
@@ -52,11 +55,11 @@ class ChooseRestoreOptionViewModel : CommonViewModel() {
 
         options.postValue(backupPrefRepository.getOptionList)
 
-        viewModelScope.launch(Dispatchers.IO) {
-            walletStateHandler.doOnWalletRunning {
+        launchOnIo {
+            walletManager.doOnWalletRunning {
                 if (WalletUtil.walletExists(walletConfig) && state.value != null) {
                     backupPrefRepository.restoredTxs?.let {
-                        if (it.utxos.orEmpty().isEmpty()) return@let
+                        if (it.utxos.isEmpty()) return@let
 
                         val tariWalletAddress = TariWalletAddress.fromBase58(it.sourceBase58)
                         val message = resourceManager.getString(R.string.backup_restored_tx)
@@ -74,8 +77,8 @@ class ChooseRestoreOptionViewModel : CommonViewModel() {
             }
         }
 
-        viewModelScope.launch(Dispatchers.IO) {
-            walletStateHandler.doOnWalletFailed {
+        launchOnIo {
+            walletManager.doOnWalletFailed {
                 handleException(WalletStartFailedException(it))
             }
         }
@@ -86,7 +89,7 @@ class ChooseRestoreOptionViewModel : CommonViewModel() {
     }
 
     fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        viewModelScope.launch(Dispatchers.IO) {
+        launchOnIo {
             try {
                 if (backupManager.onSetupActivityResult(requestCode, resultCode, data)) {
                     restoreFromBackup()

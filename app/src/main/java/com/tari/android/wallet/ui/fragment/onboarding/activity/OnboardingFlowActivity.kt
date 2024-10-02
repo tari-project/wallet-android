@@ -40,7 +40,8 @@ import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
 import androidx.lifecycle.lifecycleScope
 import com.tari.android.wallet.R
-import com.tari.android.wallet.application.walletManager.WalletStateHandler
+import com.tari.android.wallet.application.walletManager.WalletManager
+import com.tari.android.wallet.application.walletManager.doOnWalletFailed
 import com.tari.android.wallet.data.WalletConfig
 import com.tari.android.wallet.data.sharedPrefs.CorePrefRepository
 import com.tari.android.wallet.databinding.ActivityOnboardingFlowBinding
@@ -82,7 +83,7 @@ class OnboardingFlowActivity : CommonActivity<ActivityOnboardingFlowBinding, Com
     lateinit var walletServiceLauncher: WalletServiceLauncher
 
     @Inject
-    lateinit var walletStateHandler: WalletStateHandler
+    lateinit var walletManager: WalletManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         appComponent.inject(this)
@@ -120,7 +121,7 @@ class OnboardingFlowActivity : CommonActivity<ActivityOnboardingFlowBinding, Com
         }
 
         lifecycleScope.launch {
-            walletStateHandler.doOnWalletFailed {
+            walletManager.doOnWalletFailed {
                 resetFlow()
             }
         }

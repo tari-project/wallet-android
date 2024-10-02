@@ -56,7 +56,7 @@ interface FFIWalletListener {
     fun onTxValidationComplete(responseId: BigInteger, status: TransactionValidationStatus)
     fun onBalanceUpdated(balanceInfo: BalanceInfo)
     fun onConnectivityStatus(status: Int)
-    fun onWalletScannedHeight(height: Int)
     fun onWalletRestoration(result: WalletRestorationResult)
+    fun onWalletScannedHeight(height: Int)
     fun onBaseNodeStateChanged(baseNodeState: FFITariBaseNodeState)
 }
