@@ -1,9 +1,10 @@
 package com.tari.android.wallet.ui.fragment.contactBook.data
 
 import com.orhanobut.logger.Logger
-import com.tari.android.wallet.application.walletManager.WalletStateHandler
-import com.tari.android.wallet.event.Event
-import com.tari.android.wallet.event.EventBus
+import com.tari.android.wallet.application.walletManager.WalletManager
+import com.tari.android.wallet.application.walletManager.WalletManager.WalletEvent
+import com.tari.android.wallet.application.walletManager.doOnWalletRunning
+import com.tari.android.wallet.application.walletManager.doOnWalletRunningWithValue
 import com.tari.android.wallet.model.TariWalletAddress
 import com.tari.android.wallet.model.WalletError
 import com.tari.android.wallet.service.connection.TariWalletServiceConnection
@@ -17,7 +18,7 @@ import kotlinx.coroutines.launch
 class FFIContactsRepositoryBridge(
     private val contactsRepository: ContactsRepository,
     private val tariWalletServiceConnection: TariWalletServiceConnection,
-    private val walletStateHandler: WalletStateHandler,
+    private val walletManager: WalletManager,
     private val contactUtil: ContactUtil,
     private val externalScope: CoroutineScope,
 ) {
@@ -26,19 +27,22 @@ class FFIContactsRepositoryBridge(
 
     init {
         externalScope.launch {
-            walletStateHandler.doOnWalletRunning {
-                tariWalletServiceConnection.doOnWalletServiceConnected {
-                    EventBus.subscribe<Event.Transaction.TxReceived>(this) { contactsRepository.onNewTxReceived() }
-                    EventBus.subscribe<Event.Transaction.TxReplyReceived>(this) { contactsRepository.onNewTxReceived() }
-                    EventBus.subscribe<Event.Transaction.TxFinalized>(this) { contactsRepository.onNewTxReceived() }
-                    EventBus.subscribe<Event.Transaction.InboundTxBroadcast>(this) { contactsRepository.onNewTxReceived() }
-                    EventBus.subscribe<Event.Transaction.OutboundTxBroadcast>(this) { contactsRepository.onNewTxReceived() }
-                    EventBus.subscribe<Event.Transaction.TxMinedUnconfirmed>(this) { contactsRepository.onNewTxReceived() }
-                    EventBus.subscribe<Event.Transaction.TxMined>(this) { contactsRepository.onNewTxReceived() }
-                    EventBus.subscribe<Event.Transaction.TxFauxMinedUnconfirmed>(this) { contactsRepository.onNewTxReceived() }
-                    EventBus.subscribe<Event.Transaction.TxFauxConfirmed>(this) { contactsRepository.onNewTxReceived() }
-                    EventBus.subscribe<Event.Transaction.TxCancelled>(this) { contactsRepository.onNewTxReceived() }
+            walletManager.walletEvent.collect { event ->
+                when (event) {
+                    is WalletEvent.Tx.TxReceived,
+                    is WalletEvent.Tx.TxReplyReceived,
+                    is WalletEvent.Tx.TxFinalized,
+                    is WalletEvent.Tx.InboundTxBroadcast,
+                    is WalletEvent.Tx.OutboundTxBroadcast,
+                    is WalletEvent.Tx.TxMinedUnconfirmed,
+                    is WalletEvent.Tx.TxMined,
+                    is WalletEvent.Tx.TxFauxMinedUnconfirmed,
+                    is WalletEvent.Tx.TxFauxConfirmed,
+                    is WalletEvent.Tx.TxCancelled -> contactsRepository.onNewTxReceived()
+
+                    else -> Unit
                 }
+
             }
         }
     }
@@ -46,7 +50,7 @@ class FFIContactsRepositoryBridge(
     suspend fun updateToFFI(contacts: List<ContactDto>) {
         logger.i("Contacts repository event: Saving updates to FFI")
 
-        walletStateHandler.doOnWalletRunning {
+        walletManager.doOnWalletRunning {
             tariWalletServiceConnection.doOnWalletServiceConnected { service ->
                 contacts.mapNotNull { it.getFFIContactInfo() }.forEach { ffiContactInfo ->
                     val error = WalletError()
@@ -89,7 +93,7 @@ class FFIContactsRepositoryBridge(
 
     private suspend fun loadFFIContacts(): List<FFIContactInfo> {
         val walletContacts: List<FFIContactInfo> = try {
-            walletStateHandler.doOnWalletRunningWithValue { walletService ->
+            walletManager.doOnWalletRunningWithValue { walletService ->
                 walletService.getContacts().items()
                     .map { ffiContact ->
                         FFIContactInfo(
@@ -142,7 +146,7 @@ class FFIContactsRepositoryBridge(
 
     suspend fun deleteContact(contact: FFIContactInfo) {
         logger.i("Contacts repository event: Deleting contact from FFI")
-        walletStateHandler.doOnWalletRunning {
+        walletManager.doOnWalletRunning {
             tariWalletServiceConnection.doOnWalletServiceConnected { service ->
                 val error = WalletError()
                 service.removeContact(contact.walletAddress, error)

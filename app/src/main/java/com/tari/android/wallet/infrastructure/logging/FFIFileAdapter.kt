@@ -7,7 +7,7 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
 
-class FFIFileAdapter : LogAdapter {
+class FFIFileAdapter(private val wallet: FFIWallet?) : LogAdapter {
 
     override fun isLoggable(priority: Int, tag: String?): Boolean = true
 
@@ -25,7 +25,7 @@ class FFIFileAdapter : LogAdapter {
             }
             val dateTimeNow = dateTimeFormatter.format(LocalDateTime.now())
             val debugLine = "$dateTimeNow [${tag ?: ""}] $priorityName ${message.replace("\n", " ")}"
-            FFIWallet.instance?.logMessage(debugLine)
+            wallet?.logMessage(debugLine)
         }
     }
 }

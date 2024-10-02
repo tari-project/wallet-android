@@ -9,13 +9,11 @@ import com.tari.android.wallet.R.string.common_are_you_sure
 import com.tari.android.wallet.R.string.tx_details_cancel_dialog_cancel
 import com.tari.android.wallet.R.string.tx_details_cancel_dialog_description
 import com.tari.android.wallet.R.string.tx_details_cancel_dialog_not_cancel
-import com.tari.android.wallet.event.Event
-import com.tari.android.wallet.event.EventBus
+import com.tari.android.wallet.application.walletManager.WalletManager.WalletEvent
 import com.tari.android.wallet.extension.collectFlow
 import com.tari.android.wallet.extension.getWithError
 import com.tari.android.wallet.extension.launchOnMain
 import com.tari.android.wallet.ffi.FFITxCancellationReason
-import com.tari.android.wallet.ffi.FFIWallet
 import com.tari.android.wallet.model.CancelledTx
 import com.tari.android.wallet.model.CompletedTx
 import com.tari.android.wallet.model.PendingOutboundTx
@@ -64,7 +62,7 @@ class TxDetailsViewModel(savedState: SavedStateHandle) : CommonViewModel() {
     @Inject
     lateinit var contactsRepository: ContactsRepository
 
-    val requiredConfirmationCount: Long? = FFIWallet.getOrNull { it.getRequiredConfirmationCount() }?.toLong()
+    val requiredConfirmationCount: Long? = walletManager.walletInstance?.getRequiredConfirmationCount()?.toLong()
 
     private var txId: TxId? = savedState.get<TxId>(TX_ID_EXTRA_KEY)
 
@@ -89,9 +87,20 @@ class TxDetailsViewModel(savedState: SavedStateHandle) : CommonViewModel() {
             findTxAndUpdateUI()
         }
 
-        observeTxUpdates()
-
         collectFlow(contactsRepository.contactList) { updateContact() }
+
+        collectFlow(walletManager.walletEvent) { event ->
+            when (event) {
+                is WalletEvent.Tx.InboundTxBroadcast -> updateTxData(event.tx)
+                is WalletEvent.Tx.OutboundTxBroadcast -> updateTxData(event.tx)
+                is WalletEvent.Tx.TxFinalized -> updateTxData(event.tx)
+                is WalletEvent.Tx.TxMined -> updateTxData(event.tx)
+                is WalletEvent.Tx.TxMinedUnconfirmed -> updateTxData(event.tx)
+                is WalletEvent.Tx.TxReplyReceived -> updateTxData(event.tx)
+                is WalletEvent.Tx.TxCancelled -> updateTxData(event.tx)
+                else -> Unit
+            }
+        }
     }
 
     fun addOrEditContact() = showEditNameInputs()
@@ -163,16 +172,6 @@ class TxDetailsViewModel(savedState: SavedStateHandle) : CommonViewModel() {
         }
 
         return reason?.let { resourceManager.getString(it) } ?: ""
-    }
-
-    private fun observeTxUpdates() {
-        EventBus.subscribe<Event.Transaction.InboundTxBroadcast>(this) { updateTxData(it.tx) }
-        EventBus.subscribe<Event.Transaction.OutboundTxBroadcast>(this) { updateTxData(it.tx) }
-        EventBus.subscribe<Event.Transaction.TxFinalized>(this) { updateTxData(it.tx) }
-        EventBus.subscribe<Event.Transaction.TxMined>(this) { updateTxData(it.tx) }
-        EventBus.subscribe<Event.Transaction.TxMinedUnconfirmed>(this) { updateTxData(it.tx) }
-        EventBus.subscribe<Event.Transaction.TxReplyReceived>(this) { updateTxData(it.tx) }
-        EventBus.subscribe<Event.Transaction.TxCancelled>(this) { updateTxData(it.tx) }
     }
 
     private fun updateTxData(tx: Tx) {

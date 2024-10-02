@@ -32,11 +32,6 @@
  */
 package com.tari.android.wallet.event
 
-import com.tari.android.wallet.model.CancelledTx
-import com.tari.android.wallet.model.CompletedTx
-import com.tari.android.wallet.model.PendingInboundTx
-import com.tari.android.wallet.model.PendingOutboundTx
-import com.tari.android.wallet.model.TransactionSendStatus
 import com.tari.android.wallet.model.TxId
 import com.tari.android.wallet.ui.fragment.send.finalize.TxFailureReason
 
@@ -44,6 +39,8 @@ import com.tari.android.wallet.ui.fragment.send.finalize.TxFailureReason
  * App-wide events.
  */
 object Event {
+
+    // TODO use WalletManager.WalletEvent instead of these EventBus events
 
     object App {
         class AppBackgrounded
@@ -55,17 +52,7 @@ object Event {
      */
     object Transaction {
         object Updated
-        data class TxReceived(val tx: PendingInboundTx)
-        data class TxReplyReceived(val tx: PendingOutboundTx)
-        data class TxFinalized(val tx: PendingInboundTx)
-        data class InboundTxBroadcast(val tx: PendingInboundTx)
-        data class OutboundTxBroadcast(val tx: PendingOutboundTx)
-        data class TxMined(val tx: CompletedTx)
-        data class TxMinedUnconfirmed(val tx: CompletedTx)
-        data class TxFauxConfirmed(val tx: CompletedTx)
-        data class TxFauxMinedUnconfirmed(val tx: CompletedTx)
-        data class TxCancelled(val tx: CancelledTx)
-        data class DirectSendResult(val txId: TxId, val status: TransactionSendStatus)
+
         data class TxSendSuccessful(val txId: TxId)
         data class TxSendFailed(val failureReason: TxFailureReason)
     }

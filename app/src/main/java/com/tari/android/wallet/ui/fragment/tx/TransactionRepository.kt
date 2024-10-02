@@ -6,6 +6,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
 import com.tari.android.wallet.R
+import com.tari.android.wallet.application.walletManager.WalletManager.WalletEvent
 import com.tari.android.wallet.event.Event
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.extension.collectFlow
@@ -80,6 +81,22 @@ class TransactionRepository @Inject constructor() : CommonViewModel() {
 
         collectFlow(contactsRepository.contactList) { _listUpdateTrigger.postValue(Unit) }
 
+        collectFlow(walletManager.walletEvent) { event ->
+            when (event) {
+                is WalletEvent.Tx.TxReceived -> onTxReceived(event.tx)
+                is WalletEvent.Tx.TxReplyReceived -> onTxReplyReceived(event.tx)
+                is WalletEvent.Tx.TxFinalized -> onTxFinalized(event.tx)
+                is WalletEvent.Tx.InboundTxBroadcast -> onInboundTxBroadcast(event.tx)
+                is WalletEvent.Tx.OutboundTxBroadcast -> onOutboundTxBroadcast(event.tx)
+                is WalletEvent.Tx.TxMinedUnconfirmed -> onTxMinedUnconfirmed(event.tx)
+                is WalletEvent.Tx.TxMined -> onTxMined(event.tx)
+                is WalletEvent.Tx.TxFauxMinedUnconfirmed -> onTxFauxMinedUnconfirmed(event.tx)
+                is WalletEvent.Tx.TxFauxConfirmed -> onFauxTxMined(event.tx)
+                is WalletEvent.Tx.TxCancelled -> onTxCancelled(event.tx)
+                else -> Unit
+            }
+        }
+
         viewModelScope.launch(Dispatchers.IO) {
             updateTxListData()
             fetchRequiredConfirmationCount()
@@ -93,16 +110,6 @@ class TransactionRepository @Inject constructor() : CommonViewModel() {
 
     private fun subscribeToEventBus() {
         EventBus.subscribe<Event.Transaction.Updated>(this) { refreshAllData() }
-        EventBus.subscribe<Event.Transaction.TxReceived>(this) { onTxReceived(it.tx) }
-        EventBus.subscribe<Event.Transaction.TxReplyReceived>(this) { onTxReplyReceived(it.tx) }
-        EventBus.subscribe<Event.Transaction.TxFinalized>(this) { onTxFinalized(it.tx) }
-        EventBus.subscribe<Event.Transaction.InboundTxBroadcast>(this) { onInboundTxBroadcast(it.tx) }
-        EventBus.subscribe<Event.Transaction.OutboundTxBroadcast>(this) { onOutboundTxBroadcast(it.tx) }
-        EventBus.subscribe<Event.Transaction.TxMinedUnconfirmed>(this) { onTxMinedUnconfirmed(it.tx) }
-        EventBus.subscribe<Event.Transaction.TxMined>(this) { onTxMined(it.tx) }
-        EventBus.subscribe<Event.Transaction.TxFauxMinedUnconfirmed>(this) { onTxFauxMinedUnconfirmed(it.tx) }
-        EventBus.subscribe<Event.Transaction.TxFauxConfirmed>(this) { onFauxTxMined(it.tx) }
-        EventBus.subscribe<Event.Transaction.TxCancelled>(this) { onTxCancelled(it.tx) }
         EventBus.subscribe<Event.Transaction.TxSendSuccessful>(this) { onTxSendSuccessful(it.txId) }
     }
 
@@ -153,7 +160,12 @@ class TransactionRepository @Inject constructor() : CommonViewModel() {
             val nonPendingTxs = (cancelledTxs + nonMinedUnconfirmedCompletedTxs).toMutableList()
             nonPendingTxs.sortWith(compareByDescending(Tx::timestamp).thenByDescending { it.id })
             if (nonPendingTxs.isNotEmpty()) {
-                items.add(TitleViewHolderItem(title = resourceManager.getString(R.string.home_completed_transactions_title), isFirst = pendingTxs.isEmpty()))
+                items.add(
+                    TitleViewHolderItem(
+                        title = resourceManager.getString(R.string.home_completed_transactions_title),
+                        isFirst = pendingTxs.isEmpty(),
+                    )
+                )
                 items.addAll(nonPendingTxs.mapIndexed { index, tx ->
                     TransactionItem(
                         tx = tx,
