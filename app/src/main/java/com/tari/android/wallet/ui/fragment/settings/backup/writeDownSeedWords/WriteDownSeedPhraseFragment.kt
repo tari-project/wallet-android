@@ -53,6 +53,7 @@ import com.tari.android.wallet.ui.extension.setVisible
 import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
 import com.tari.android.wallet.ui.fragment.settings.backup.writeDownSeedWords.adapter.PhraseWordsAdapter
 import com.tari.android.wallet.util.Constants
+import com.tari.android.wallet.util.DebugConfig
 
 
 class WriteDownSeedPhraseFragment : CommonFragment<FragmentWriteDownSeedPhraseBinding, WriteDownSeedPhraseViewModel>() {
@@ -91,6 +92,8 @@ class WriteDownSeedPhraseFragment : CommonFragment<FragmentWriteDownSeedPhraseBi
             adapter.seedWords.addAll(it)
             adapter.notifyDataSetChanged()
             checkScreensFit()
+            ui.copyToClipboardCtaView.setVisible(DebugConfig.showCopySeedsButton)
+            ui.copyToClipboardCtaView.setOnClickListener { viewModel.copySeedsToClipboard() }
         }
     }
 
