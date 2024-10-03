@@ -35,4 +35,11 @@ class WriteDownSeedPhraseViewModel : CommonViewModel() {
             ).getModular(resourceManager)
         )
     }
+
+    fun copySeedsToClipboard() {
+        copyToClipboard(
+            clipLabel = resourceManager.getString(R.string.wallet_info_address_copy_address_to_clipboard_label),
+            clipText = seedWords.value!!.joinToString(" "),
+        )
+    }
 }

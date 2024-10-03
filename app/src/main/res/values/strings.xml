@@ -551,6 +551,7 @@
     <string name="back_up_seed_phrase_verify_cta">Verify Seed Phrase</string>
     <string name="back_up_seep_phrase_losing_warning_label">I understand that if I lose my recovery seed phrase I will not be able to restore my wallet.</string>
     <string name="back_up_seed_phrase_error">Error while getting the wallet seed phrase. Please try again later.</string>
+    <string name="back_up_seed_phrase_copy_to_clipboard">Copy seed phrase</string>
 
     <!-- Verify seed phrase -->
     <string name="verify_seed_phrase_page_title">Verify Seed Phrase</string>
