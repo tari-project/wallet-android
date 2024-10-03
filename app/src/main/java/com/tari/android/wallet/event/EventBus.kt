@@ -35,8 +35,6 @@ package com.tari.android.wallet.event
 import com.tari.android.wallet.infrastructure.backup.BackupsState
 import com.tari.android.wallet.model.BalanceInfo
 import com.tari.android.wallet.model.recovery.WalletRestorationResult
-import com.tari.android.wallet.service.baseNode.BaseNodeState
-import com.tari.android.wallet.service.baseNode.BaseNodeSyncState
 
 /**
  * Event bus for the pub/sub model.
@@ -53,29 +51,17 @@ object EventBus : GeneralEventBus() {
 
     val backupState = BehaviorEventBus<BackupsState>()
 
-    val baseNodeState = BehaviorEventBus<BaseNodeState>()
-
-    val baseNodeSyncState = BehaviorEventBus<BaseNodeSyncState>()
-
     val walletRestorationState = BehaviorEventBus<WalletRestorationResult>()
-
-    init {
-        baseNodeSyncState.post(BaseNodeSyncState.Syncing)
-    }
 
     fun unsubscribeAll(subscriber: Any) {
         EventBus.unsubscribe(subscriber)
         backupState.unsubscribe(subscriber)
-        baseNodeState.unsubscribe(subscriber)
-        baseNodeSyncState.unsubscribe(subscriber)
         walletRestorationState.unsubscribe(subscriber)
     }
 
     override fun clear() {
         super.clear()
         backupState.clear()
-        baseNodeState.clear()
-        baseNodeSyncState.clear()
         walletRestorationState.clear()
     }
 }

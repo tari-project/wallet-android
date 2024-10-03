@@ -36,11 +36,8 @@ import android.content.SharedPreferences
 import com.tari.android.wallet.data.sharedPrefs.CommonPrefRepository
 import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefGsonDelegate
 import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefGsonNullableDelegate
-import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefIntDelegate
 import com.tari.android.wallet.data.sharedPrefs.network.NetworkPrefRepository
 import com.tari.android.wallet.data.sharedPrefs.network.formatKey
-import com.tari.android.wallet.event.EventBus
-import com.tari.android.wallet.service.baseNode.BaseNodeState
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -53,7 +50,6 @@ class BaseNodePrefRepository @Inject constructor(
     private object Key {
         const val CURRENT_BASE_NODE = "tari_wallet_current_base_node"
         const val USER_BASE_NODE_LIST = "tari_wallet_user_base_nodes"
-        const val BASE_NODE_STATE = "tari_wallet_user_base_node_state"
         const val FFI_BASE_NODE_LIST = "FFI_BASE_NODE_LIST"
     }
 
@@ -78,23 +74,6 @@ class BaseNodePrefRepository @Inject constructor(
         type = BaseNodeList::class.java,
         defValue = BaseNodeList(),
     )
-
-    // ordinal value of BaseNodeState enum class
-    private var baseNodeStateOrdinal: Int by SharedPrefIntDelegate(
-        prefs = sharedPrefs,
-        commonRepository = this,
-        name = Key.BASE_NODE_STATE,
-        defValue = BaseNodeState.Syncing.ordinal,
-    )
-    var baseNodeState: BaseNodeState
-        get() = BaseNodeState.get(baseNodeStateOrdinal)
-        set(value) {
-            baseNodeStateOrdinal = value.ordinal
-        }
-
-    init {
-        EventBus.baseNodeState.post(baseNodeState)
-    }
 
     fun clear() {
         currentBaseNode = null
