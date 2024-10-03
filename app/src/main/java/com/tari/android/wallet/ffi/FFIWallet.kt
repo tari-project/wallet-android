@@ -41,7 +41,6 @@ import com.tari.android.wallet.model.PendingInboundTx
 import com.tari.android.wallet.model.PendingOutboundTx
 import com.tari.android.wallet.model.PublicKey
 import com.tari.android.wallet.model.TariCoinPreview
-import com.tari.android.wallet.model.TariContact
 import com.tari.android.wallet.model.TariUnblindedOutput
 import com.tari.android.wallet.model.TariVector
 import com.tari.android.wallet.model.TariWalletAddress
@@ -379,21 +378,21 @@ class FFIWallet(
     private fun onTxReceived(pendingInboundTxPtr: FFIPointer) {
         val tx = FFIPendingInboundTx(pendingInboundTxPtr)
         logger.i("Tx received ${tx.getId()}")
-        val pendingTx = PendingInboundTx(tx).let { it.copy(tariContact = getUserByWalletAddress(it.tariContact.walletAddress)) }
+        val pendingTx = PendingInboundTx(tx)
         listener.onTxReceived(pendingTx)
     }
 
     private fun onTxReplyReceived(txPointer: FFIPointer) {
         val tx = FFICompletedTx(txPointer)
         logger.i("Tx reply received ${tx.getId()}")
-        val pendingOutboundTx = PendingOutboundTx(tx).let { it.copy(tariContact = getUserByWalletAddress(it.tariContact.walletAddress)) }
+        val pendingOutboundTx = PendingOutboundTx(tx)
         listener.onTxReplyReceived(pendingOutboundTx)
     }
 
     private fun onTxFinalized(completedTx: FFIPointer) {
         val tx = FFICompletedTx(completedTx)
         logger.i("Tx finalized ${tx.getId()}")
-        val pendingInboundTx = PendingInboundTx(tx).let { it.copy(tariContact = getUserByWalletAddress(it.tariContact.walletAddress)) }
+        val pendingInboundTx = PendingInboundTx(tx)
         listener.onTxFinalized(pendingInboundTx)
     }
 
@@ -402,39 +401,39 @@ class FFIWallet(
         logger.i("Tx broadcast ${tx.getId()}")
         when (tx.getDirection()) {
             Tx.Direction.INBOUND -> {
-                val pendingInboundTx = PendingInboundTx(tx).let { it.copy(tariContact = getUserByWalletAddress(it.tariContact.walletAddress)) }
+                val pendingInboundTx = PendingInboundTx(tx)
                 listener.onInboundTxBroadcast(pendingInboundTx)
             }
 
             Tx.Direction.OUTBOUND -> {
-                val pendingOutboundTx = PendingOutboundTx(tx).let { it.copy(tariContact = getUserByWalletAddress(it.tariContact.walletAddress)) }
+                val pendingOutboundTx = PendingOutboundTx(tx)
                 listener.onOutboundTxBroadcast(pendingOutboundTx)
             }
         }
     }
 
     private fun onTxMined(completedTxPtr: FFIPointer) {
-        val completed = CompletedTx(completedTxPtr).let { it.copy(tariContact = getUserByWalletAddress(it.tariContact.walletAddress)) }
+        val completed = CompletedTx(completedTxPtr)
         logger.i("Tx mined & confirmed ${completed.id}")
         listener.onTxMined(completed)
     }
 
     private fun onTxMinedUnconfirmed(completedTxPtr: FFIPointer, confirmationCountBytes: ByteArray) {
         val confirmationCount = BigInteger(1, confirmationCountBytes).toInt()
-        val completed = CompletedTx(completedTxPtr).let { it.copy(tariContact = getUserByWalletAddress(it.tariContact.walletAddress)) }
+        val completed = CompletedTx(completedTxPtr)
         logger.i("Tx mined & unconfirmed ${completed.id} $confirmationCount")
         listener.onTxMinedUnconfirmed(completed, confirmationCount)
     }
 
     private fun onTxFauxConfirmed(completedTxPtr: FFIPointer) {
-        val completed = CompletedTx(completedTxPtr).let { it.copy(tariContact = getUserByWalletAddress(it.tariContact.walletAddress)) }
+        val completed = CompletedTx(completedTxPtr)
         logger.i("Tx faux confirmed ${completed.id}")
         listener.onTxMined(completed)
     }
 
     private fun onTxFauxUnconfirmed(completedTxPtr: FFIPointer, confirmationCountBytes: ByteArray) {
         val confirmationCount = BigInteger(1, confirmationCountBytes).toInt()
-        val completed = CompletedTx(completedTxPtr).let { it.copy(tariContact = getUserByWalletAddress(it.tariContact.walletAddress)) }
+        val completed = CompletedTx(completedTxPtr)
         logger.i("Tx faux unconfirmed ${completed.id}")
         listener.onTxMinedUnconfirmed(completed, confirmationCount)
     }
@@ -449,7 +448,7 @@ class FFIWallet(
         val rejectionReasonInt = BigInteger(1, rejectionReason).toInt()
         val tx = FFICompletedTx(completedTx)
         logger.i("Tx cancelled ${tx.getId()}")
-        val cancelledTx = CancelledTx(tx).let { it.copy(tariContact = getUserByWalletAddress(it.tariContact.walletAddress)) }
+        val cancelledTx = CancelledTx(tx)
         if (tx.getDirection() == Tx.Direction.OUTBOUND) {
             listener.onTxCancelled(cancelledTx, rejectionReasonInt)
         }
@@ -497,23 +496,5 @@ class FFIWallet(
 
     private fun onContactLivenessDataUpdated(livenessUpdate: FFIPointer) {
         logger.i("OnContactLivenessDataUpdated")
-    }
-
-    private fun getUserByWalletAddress(address: TariWalletAddress): TariContact {
-        val contactsFFI = getContacts()
-        for (i in 0 until contactsFFI.getLength()) {
-            val contactFFI = contactsFFI.getAt(i)
-            val walletAddressFFI = contactFFI.getWalletAddress()
-            val tariContact = if (TariWalletAddress(walletAddressFFI) == address) TariContact(contactFFI) else null
-            walletAddressFFI.destroy()
-            contactFFI.destroy()
-            if (tariContact != null) {
-                contactsFFI.destroy()
-                return tariContact
-            }
-        }
-        // destroy native collection
-        contactsFFI.destroy()
-        return TariContact(address)
     }
 }

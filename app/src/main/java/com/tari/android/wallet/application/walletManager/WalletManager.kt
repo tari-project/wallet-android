@@ -65,6 +65,8 @@ import com.tari.android.wallet.model.CancelledTx
 import com.tari.android.wallet.model.CompletedTx
 import com.tari.android.wallet.model.PendingInboundTx
 import com.tari.android.wallet.model.PendingOutboundTx
+import com.tari.android.wallet.model.TariContact
+import com.tari.android.wallet.model.TariWalletAddress
 import com.tari.android.wallet.model.TransactionSendStatus
 import com.tari.android.wallet.model.Tx
 import com.tari.android.wallet.model.TxId
@@ -325,40 +327,78 @@ class WalletManager @Inject constructor(
                      * The app will crash if we try to update the UI from the FFI thread.
                      */
                     override fun onTxReceived(pendingInboundTx: PendingInboundTx) = runOnMain {
-                        _walletEvent.send(WalletEvent.Tx.TxReceived(pendingInboundTx))
+                        _walletEvent.send(
+                            WalletEvent.Tx.TxReceived(
+                                tx = pendingInboundTx.copy(tariContact = getUserByWalletAddress(pendingInboundTx.tariContact.walletAddress)),
+                            )
+                        )
                         postTxNotification(pendingInboundTx)
                     }
 
                     override fun onTxReplyReceived(pendingOutboundTx: PendingOutboundTx) = runOnMain {
-                        _walletEvent.send(WalletEvent.Tx.TxReplyReceived(pendingOutboundTx))
+                        _walletEvent.send(
+                            WalletEvent.Tx.TxReplyReceived(
+                                tx = pendingOutboundTx.copy(tariContact = getUserByWalletAddress(pendingOutboundTx.tariContact.walletAddress)),
+                            )
+                        )
                     }
 
                     override fun onTxFinalized(pendingInboundTx: PendingInboundTx) = runOnMain {
-                        _walletEvent.send(WalletEvent.Tx.TxFinalized(pendingInboundTx))
+                        _walletEvent.send(
+                            WalletEvent.Tx.TxFinalized(
+                                tx = pendingInboundTx.copy(tariContact = getUserByWalletAddress(pendingInboundTx.tariContact.walletAddress)),
+                            )
+                        )
                     }
 
                     override fun onInboundTxBroadcast(pendingInboundTx: PendingInboundTx) = runOnMain {
-                        _walletEvent.send(WalletEvent.Tx.InboundTxBroadcast(pendingInboundTx))
+                        _walletEvent.send(
+                            WalletEvent.Tx.InboundTxBroadcast(
+                                tx = pendingInboundTx.copy(tariContact = getUserByWalletAddress(pendingInboundTx.tariContact.walletAddress)),
+                            )
+                        )
                     }
 
                     override fun onOutboundTxBroadcast(pendingOutboundTx: PendingOutboundTx) = runOnMain {
-                        _walletEvent.send(WalletEvent.Tx.OutboundTxBroadcast(pendingOutboundTx))
+                        _walletEvent.send(
+                            WalletEvent.Tx.OutboundTxBroadcast(
+                                tx = pendingOutboundTx.copy(tariContact = getUserByWalletAddress(pendingOutboundTx.tariContact.walletAddress)),
+                            )
+                        )
                     }
 
                     override fun onTxMined(completedTx: CompletedTx) = runOnMain {
-                        _walletEvent.send(WalletEvent.Tx.TxMined(completedTx))
+                        _walletEvent.send(
+                            WalletEvent.Tx.TxMined(
+                                tx = completedTx.copy(tariContact = getUserByWalletAddress(completedTx.tariContact.walletAddress)),
+                            )
+                        )
                     }
 
                     override fun onTxMinedUnconfirmed(completedTx: CompletedTx, confirmationCount: Int) = runOnMain {
-                        _walletEvent.send(WalletEvent.Tx.TxMinedUnconfirmed(completedTx, confirmationCount))
+                        _walletEvent.send(
+                            WalletEvent.Tx.TxMinedUnconfirmed(
+                                tx = completedTx.copy(tariContact = getUserByWalletAddress(completedTx.tariContact.walletAddress)),
+                                confirmationCount = confirmationCount,
+                            )
+                        )
                     }
 
                     override fun onTxFauxConfirmed(completedTx: CompletedTx) = runOnMain {
-                        _walletEvent.send(WalletEvent.Tx.TxFauxConfirmed(completedTx))
+                        _walletEvent.send(
+                            WalletEvent.Tx.TxFauxConfirmed(
+                                tx = completedTx.copy(tariContact = getUserByWalletAddress(completedTx.tariContact.walletAddress)),
+                            )
+                        )
                     }
 
                     override fun onTxFauxUnconfirmed(completedTx: CompletedTx, confirmationCount: Int) = runOnMain {
-                        _walletEvent.send(WalletEvent.Tx.TxFauxMinedUnconfirmed(completedTx, confirmationCount))
+                        _walletEvent.send(
+                            WalletEvent.Tx.TxFauxMinedUnconfirmed(
+                                tx = completedTx.copy(tariContact = getUserByWalletAddress(completedTx.tariContact.walletAddress)),
+                                confirmationCount = confirmationCount,
+                            )
+                        )
                     }
 
                     override fun onDirectSendResult(txId: BigInteger, status: TransactionSendStatus) = runOnMain {
@@ -370,7 +410,11 @@ class WalletManager @Inject constructor(
                     }
 
                     override fun onTxCancelled(cancelledTx: CancelledTx, rejectionReason: Int) = runOnMain {
-                        _walletEvent.send(WalletEvent.Tx.TxCancelled(cancelledTx))
+                        _walletEvent.send(
+                            WalletEvent.Tx.TxCancelled(
+                                tx = cancelledTx.copy(tariContact = getUserByWalletAddress(cancelledTx.tariContact.walletAddress)),
+                            )
+                        )
 
                         // TODO don't use android components in this class
                         val currentActivity = app.currentActivity
@@ -537,6 +581,24 @@ class WalletManager @Inject constructor(
             EventBus.baseNodeSyncState.post(BaseNodeSyncState.Online) // TODO replace with flow!!!
         }
         // shouldn't ever reach here - no-op
+    }
+
+    private fun getUserByWalletAddress(address: TariWalletAddress): TariContact {
+        val contactsFFI = requireWalletInstance.getContacts()
+        for (i in 0 until contactsFFI.getLength()) {
+            val contactFFI = contactsFFI.getAt(i)
+            val walletAddressFFI = contactFFI.getWalletAddress()
+            val tariContact = if (TariWalletAddress(walletAddressFFI) == address) TariContact(contactFFI) else null
+            walletAddressFFI.destroy()
+            contactFFI.destroy()
+            if (tariContact != null) {
+                contactsFFI.destroy()
+                return tariContact
+            }
+        }
+        // destroy native collection
+        contactsFFI.destroy()
+        return TariContact(address)
     }
 
     enum class ConnectivityStatus(val value: Int) {
