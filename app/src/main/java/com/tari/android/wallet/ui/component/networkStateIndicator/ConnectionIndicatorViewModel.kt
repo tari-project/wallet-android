@@ -6,6 +6,7 @@ import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.extension.collectFlow
 import com.tari.android.wallet.extension.combineToPair
 import com.tari.android.wallet.network.NetworkConnectionState
+import com.tari.android.wallet.network.NetworkConnectionStateHandler
 import com.tari.android.wallet.service.baseNode.BaseNodeState
 import com.tari.android.wallet.service.baseNode.BaseNodeSyncState
 import com.tari.android.wallet.tor.TorProxyState
@@ -28,6 +29,9 @@ class ConnectionIndicatorViewModel : CommonViewModel() {
 
     @Inject
     lateinit var baseNodesManager: BaseNodesManager
+
+    @Inject
+    lateinit var networkConnectionStateHandler: NetworkConnectionStateHandler
 
     private val _state = MutableStateFlow(UiState())
     val state = _state.asStateFlow()
@@ -61,7 +65,7 @@ class ConnectionIndicatorViewModel : CommonViewModel() {
     }
 
     private fun subscribeOnEventBus() {
-        EventBus.networkConnectionState.subscribe(this) { networkState ->
+        collectFlow(networkConnectionStateHandler.networkConnectionState) { networkState ->
             _state.update { it.copy(networkState = networkState) }
             showStatesDialog(true)
         }

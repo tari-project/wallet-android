@@ -132,7 +132,6 @@ class HomeFragment : CommonFragment<FragmentHomeBinding, HomeFragmentViewModel>(
 
     override fun onDestroyView() {
         EventBus.unsubscribe(this)
-        EventBus.networkConnectionState.unsubscribe(this)
         super.onDestroyView()
     }
 

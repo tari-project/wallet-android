@@ -17,7 +17,7 @@ import com.tari.android.wallet.model.MicroTari
 import com.tari.android.wallet.model.TariWalletAddress
 import com.tari.android.wallet.model.Tx
 import com.tari.android.wallet.model.TxId
-import com.tari.android.wallet.network.NetworkConnectionState
+import com.tari.android.wallet.network.NetworkConnectionStateHandler
 import com.tari.android.wallet.ui.common.CommonActivity
 import com.tari.android.wallet.ui.common.CommonFragment
 import com.tari.android.wallet.ui.dialog.modular.DialogArgs
@@ -101,10 +101,11 @@ import javax.inject.Singleton
 // TODO: move navigation logic to only the navigate() method and make all navigation methods private
 @Singleton
 class TariNavigator @Inject constructor(
-    val prefs: CorePrefRepository,
-    val tariSettingsSharedRepository: TariSettingsPrefRepository,
-    val walletManager: WalletManager,
+    private val prefs: CorePrefRepository,
+    private val tariSettingsSharedRepository: TariSettingsPrefRepository,
+    private val walletManager: WalletManager,
     private val yatAdapter: YatAdapter,
+    private val networkConnection: NetworkConnectionStateHandler,
 ) {
 
     lateinit var activity: CommonActivity<*, *>
@@ -311,7 +312,7 @@ class TariNavigator @Inject constructor(
     }
 
     private fun continueToAddNote(transactionData: TransactionData) {
-        if (EventBus.networkConnectionState.publishSubject.value != NetworkConnectionState.CONNECTED) {
+        if (!networkConnection.isNetworkConnected()) {
             showInternetConnectionErrorDialog(this.activity)
             return
         }
