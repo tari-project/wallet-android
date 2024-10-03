@@ -63,12 +63,10 @@ import com.tari.android.wallet.R.dimen.add_note_gif_inner_margin
 import com.tari.android.wallet.R.dimen.add_note_slide_button_left_margin
 import com.tari.android.wallet.R.dimen.add_note_slide_button_width
 import com.tari.android.wallet.databinding.FragmentAddNoteBinding
-import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.extension.observe
 import com.tari.android.wallet.model.MicroTari
 import com.tari.android.wallet.model.TariWalletAddress
 import com.tari.android.wallet.model.TxNote
-import com.tari.android.wallet.network.NetworkConnectionState
 import com.tari.android.wallet.ui.common.CommonFragment
 import com.tari.android.wallet.ui.common.domain.PaletteManager
 import com.tari.android.wallet.ui.common.gyphy.repository.GifItem
@@ -407,7 +405,7 @@ class AddNoteFragment : CommonFragment<FragmentAddNoteBinding, AddNoteViewModel>
 
     private fun onSlideAnimationEnd() {
         hideKeyboard()
-        if (EventBus.networkConnectionState.publishSubject.value != NetworkConnectionState.CONNECTED) {
+        if (!viewModel.isNetworkConnectionAvailable()) {
             ui.rootView.postDelayed(Constants.UI.keyboardHideWaitMs) {
                 restoreSlider()
                 ui.noteEditText.isEnabled = true

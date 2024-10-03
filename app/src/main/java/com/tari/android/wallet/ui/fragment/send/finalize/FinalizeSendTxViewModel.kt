@@ -17,7 +17,7 @@ import com.tari.android.wallet.model.TariContact
 import com.tari.android.wallet.model.TransactionSendStatus
 import com.tari.android.wallet.model.TxId
 import com.tari.android.wallet.model.WalletError
-import com.tari.android.wallet.network.NetworkConnectionState
+import com.tari.android.wallet.network.NetworkConnectionStateHandler
 import com.tari.android.wallet.tor.TorBootstrapStatus
 import com.tari.android.wallet.tor.TorProxyState
 import com.tari.android.wallet.tor.TorProxyStateHandler
@@ -33,6 +33,9 @@ class FinalizeSendTxViewModel : CommonViewModel() {
 
     @Inject
     lateinit var torProxyStateHandler: TorProxyStateHandler
+
+    @Inject
+    lateinit var networkConnection: NetworkConnectionStateHandler
 
     lateinit var transactionData: TransactionData
 
@@ -119,8 +122,7 @@ class FinalizeSendTxViewModel : CommonViewModel() {
 
             val secondsElapsed = Seconds.secondsBetween(connectionCheckStartTime, DateTime.now()).seconds
             if (secondsElapsed >= CONNECTION_TIMEOUT_SEC) {
-                val networkConnectionState = EventBus.networkConnectionState.publishSubject.value
-                if (networkConnectionState != NetworkConnectionState.CONNECTED) {
+                if (!networkConnection.isNetworkConnected()) {
                     // internet connection problem
                     txFailureReason.value = TxFailureReason.NETWORK_CONNECTION_ERROR
                 } else {
@@ -141,10 +143,9 @@ class FinalizeSendTxViewModel : CommonViewModel() {
         }
 
         private fun checkConnectionStatus() {
-            val networkConnectionState = EventBus.networkConnectionState.publishSubject.value
             val torProxyState = torProxyStateHandler.torProxyState.value
             // check internet connection
-            if (networkConnectionState != NetworkConnectionState.CONNECTED) {
+            if (!networkConnection.isNetworkConnected()) {
                 // either not connected or Tor proxy is not running
                 txFailureReason.value = TxFailureReason.NETWORK_CONNECTION_ERROR
                 isCompleted = true

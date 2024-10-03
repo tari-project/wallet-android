@@ -10,7 +10,6 @@ import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodePrefRepository
 import com.tari.android.wallet.data.sharedPrefs.network.NetworkPrefRepository
 import com.tari.android.wallet.ffi.FFITariBaseNodeState
 import com.tari.android.wallet.ffi.FFIWallet
-import com.tari.android.wallet.service.baseNode.BaseNodeState
 import com.tari.android.wallet.util.DebugConfig
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -111,10 +110,6 @@ class BaseNodesManager @Inject constructor(
 
     fun refreshBaseNodeList(wallet: FFIWallet) {
         baseNodeSharedRepository.ffiBaseNodes = loadBaseNodesFromFFI(wallet)
-    }
-
-    fun setBaseNodeState(state: BaseNodeState) {
-        baseNodeSharedRepository.baseNodeState = state
     }
 
     private fun loadBaseNodesFromFFI(wallet: FFIWallet): BaseNodeList = wallet.getBaseNodePeers()
