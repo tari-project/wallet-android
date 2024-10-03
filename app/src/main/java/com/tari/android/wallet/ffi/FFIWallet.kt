@@ -33,9 +33,7 @@
 package com.tari.android.wallet.ffi
 
 import com.tari.android.wallet.BuildConfig
-import com.tari.android.wallet.data.sharedPrefs.CorePrefRepository
-import com.tari.android.wallet.data.sharedPrefs.network.NetworkPrefRepository
-import com.tari.android.wallet.data.sharedPrefs.security.SecurityPrefRepository
+import com.tari.android.wallet.data.sharedPrefs.network.TariNetwork
 import com.tari.android.wallet.model.BalanceInfo
 import com.tari.android.wallet.model.CancelledTx
 import com.tari.android.wallet.model.CompletedTx
@@ -49,7 +47,6 @@ import com.tari.android.wallet.model.TariVector
 import com.tari.android.wallet.model.TariWalletAddress
 import com.tari.android.wallet.model.Tx
 import com.tari.android.wallet.model.recovery.WalletRestorationResult
-import com.tari.android.wallet.service.seedPhrase.SeedPhraseRepository
 import java.math.BigInteger
 
 /**
@@ -59,13 +56,7 @@ import java.math.BigInteger
  */
 
 class FFIWallet(
-    private val sharedPrefsRepository: CorePrefRepository,
-    private val securityPrefRepository: SecurityPrefRepository,
-    private val seedPhraseRepository: SeedPhraseRepository,
-    private val networkRepository: NetworkPrefRepository,
-    private val commsConfig: FFICommsConfig,
-    private val logPath: String,
-    private val listener: FFIWalletListener
+    private val listener: FFIWalletListener,
 ) : FFIBase() {
 
     companion object {
@@ -190,23 +181,16 @@ class FFIWallet(
 
     private external fun jniDestroy()
 
-    // this acts as a constructor would for a normal class since constructors are not allowed for
-    // singletons
-    init {
-        if (pointer == nullptr) { // so it can only be assigned once for the singleton
-            init()
-        }
-    }
-
-    private fun init() {
+    constructor(
+        tariNetwork: TariNetwork,
+        commsConfig: FFICommsConfig,
+        logPath: String,
+        passphrase: String,
+        seedWords: FFISeedWords?,
+        listener: FFIWalletListener,
+    ) : this(listener) {
         val error = FFIError()
         logger.i("Pre jniCreate")
-
-        var passphrase = securityPrefRepository.databasePassphrase
-        if (passphrase.isNullOrEmpty()) {
-            passphrase = sharedPrefsRepository.generateDatabasePassphrase()
-            securityPrefRepository.databasePassphrase = passphrase
-        }
 
         try {
             jniCreate(
@@ -216,9 +200,9 @@ class FFIWallet(
                 maxNumberOfRollingLogFiles = MAX_NUMBER_OF_ROLLING_LOG_FILES,
                 rollingLogFileMaxSizeBytes = ROLLING_LOG_FILE_MAX_SIZE_BYTES,
                 passphrase = passphrase,
-                network = networkRepository.currentNetwork.network.uriComponent,
-                seedWords = seedPhraseRepository.getPhrase()?.ffiSeedWords,
-                dnsPeer = networkRepository.currentNetwork.dnsPeer,
+                network = tariNetwork.network.uriComponent,
+                seedWords = seedWords,
+                dnsPeer = tariNetwork.dnsPeer,
                 isDnsSecureOn = IS_DNS_SECURE_ON,
                 this::onTxReceived.name, "(J)V",
                 this::onTxReplyReceived.name, "(J)V",
@@ -244,7 +228,7 @@ class FFIWallet(
             throw e
         }
 
-        logger.i("Post jniCreate with code: %d.", error.code)
+        logger.i("Post jniCreate with code: ${error.code}.")
         throwIf(error)
     }
 

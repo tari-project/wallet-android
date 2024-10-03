@@ -309,13 +309,16 @@ class WalletManager @Inject constructor(
         if (walletInstance == null) {
             // store network info in shared preferences if it's a new wallet
             val isNewInstallation = !WalletUtil.walletExists(walletConfig)
+
+            val passphrase = securityPrefRepository.databasePassphrase.takeIf { !it.isNullOrEmpty() }
+                ?: corePrefRepository.generateDatabasePassphrase().also { securityPrefRepository.databasePassphrase = it }
+
             walletInstance = FFIWallet(
-                sharedPrefsRepository = corePrefRepository,
-                securityPrefRepository = securityPrefRepository,
-                seedPhraseRepository = seedPhraseRepository,
-                networkRepository = networkPrefRepository,
+                tariNetwork = networkPrefRepository.currentNetwork,
                 commsConfig = getCommsConfig(),
                 logPath = walletConfig.getWalletLogFilePath(),
+                passphrase = passphrase,
+                seedWords = seedPhraseRepository.getPhrase()?.ffiSeedWords,
                 listener = object : FFIWalletListener {
                     /**
                      * All the callbacks are called on the FFI thread, so we need to switch to the main thread.
@@ -502,12 +505,12 @@ class WalletManager @Inject constructor(
             logger.i("startSync:wallet validation:validation result: $type: $isSuccess")
             checkBaseNodeSyncCompletion()
         } catch (e: Throwable) {
-            logger.i(e.toString())
+            logger.i("startSync:wallet validation $type:error: ${e.message}")
         }
     }
 
     private fun checkBaseNodeSyncCompletion() {
-        // make a copy of the status map for concurrency protection
+        // make a copy of the status map for concurrency protection§
         val statusMapCopy = walletValidationStatusMap.toMap()
         // if base node not in sync, then switch to the next base node
         // check if any has failed
