@@ -284,7 +284,9 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>() {
     fun willNotifyAboutNewTx(): Boolean = ui.viewPager.currentItem == INDEX_HOME
 
     private fun processIntentDeepLink(intent: Intent) {
-        deeplinkViewModel.tryToHandle(intent.data?.toString().orEmpty(), false)
+        intent.data?.toString()?.takeIf { it.isNotEmpty() }?.let { deeplinkString ->
+            deeplinkViewModel.tryToHandle(deeplinkString, isQrData = false)
+        }
     }
 
     override fun onDestroy() {

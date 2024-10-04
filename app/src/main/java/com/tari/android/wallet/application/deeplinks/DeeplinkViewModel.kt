@@ -39,7 +39,7 @@ class DeeplinkViewModel : CommonViewModel() {
     }
 
     fun tryToHandle(qrData: String, isQrData: Boolean = true) {
-        deeplinkHandler.handle(qrData)?.let { execute(it, isQrData) }
+        deeplinkHandler.parseDeepLink(qrData)?.let { execute(it, isQrData) }
     }
 
     fun execute(deeplink: DeepLink, isQrData: Boolean = true) {
@@ -49,6 +49,18 @@ class DeeplinkViewModel : CommonViewModel() {
             is DeepLink.Send -> sendAction(deeplink, isQrData)
             is DeepLink.UserProfile -> addUserProfile(deeplink, isQrData)
             is DeepLink.TorBridges -> addTorBridges(deeplink, isQrData)
+            is DeepLink.PaperWallet -> showPaperWalletDialog(deeplink, isQrData)
+        }
+    }
+
+    fun executeRawDeeplink(deeplink: DeepLink, isQrData: Boolean = true) {
+        when (deeplink) {
+            is DeepLink.AddBaseNode -> addBaseNode(deeplink)
+            is DeepLink.Contacts -> addContactsAction(getData(deeplink), isQrData)
+            is DeepLink.Send -> sendAction(deeplink, isQrData)
+            is DeepLink.UserProfile -> addContactsAction(getData(deeplink)?.let { listOf(it) } ?: listOf(), isQrData)
+            is DeepLink.TorBridges -> addTorBridges(deeplink, isQrData)
+            is DeepLink.PaperWallet -> showPaperWalletDialog(deeplink, isQrData)
         }
     }
 
@@ -79,7 +91,7 @@ class DeeplinkViewModel : CommonViewModel() {
         addContacts(contact, isQrData)
     }
 
-    fun addContacts(contacts: DeepLink.Contacts, isQrData: Boolean = true) {
+    private fun addContacts(contacts: DeepLink.Contacts, isQrData: Boolean = true) {
         val contactDtos = getData(contacts)
         if (contactDtos.isEmpty()) return
         val names = contactDtos.joinToString(", ") { it.contactInfo.getAlias().trim() }
@@ -94,20 +106,14 @@ class DeeplinkViewModel : CommonViewModel() {
         )
     }
 
-    fun addTorBridges(deeplink: DeepLink.TorBridges, isQrData: Boolean) {
+    private fun addTorBridges(deeplink: DeepLink.TorBridges, isQrData: Boolean) {
         deeplink.torConfigurations.forEach {
             torSharedRepository.addTorBridgeConfiguration(it)
         }
     }
 
-    fun executeRawDeeplink(deeplink: DeepLink, isQrData: Boolean = true) {
-        when (deeplink) {
-            is DeepLink.AddBaseNode -> addBaseNode(deeplink)
-            is DeepLink.Contacts -> addContactsAction(getData(deeplink), isQrData)
-            is DeepLink.Send -> sendAction(deeplink, isQrData)
-            is DeepLink.UserProfile -> addContactsAction(getData(deeplink)?.let { listOf(it) } ?: listOf(), isQrData)
-            is DeepLink.TorBridges -> addTorBridges(deeplink, isQrData)
-        }
+    private fun showPaperWalletDialog(deeplink: DeepLink.PaperWallet, isQrSata: Boolean = true) {
+        showNotReadyYetDialog()
     }
 
     private fun getData(deeplink: DeepLink.AddBaseNode): BaseNodeDto = BaseNodeDto.fromDeeplink(deeplink)

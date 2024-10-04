@@ -57,7 +57,7 @@ class ChangeBaseNodeViewModel : CommonViewModel() {
     }
 
     fun showQrCode(baseNodeDto: BaseNodeDto) {
-        val data = deeplinkHandler.getDeeplink(baseNodeDto.toDeeplink())
+        val data = deeplinkHandler.getDeeplinkString(baseNodeDto.toDeeplink())
         showModularDialog(
             ModularDialogArgs(
                 DialogArgs(true, canceledOnTouchOutside = true), listOf(

@@ -6,7 +6,6 @@ import androidx.lifecycle.viewModelScope
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.YatAdapter
 import com.tari.android.wallet.application.deeplinks.DeepLink
-import com.tari.android.wallet.application.deeplinks.DeeplinkFormatter
 import com.tari.android.wallet.application.deeplinks.DeeplinkHandler
 import com.tari.android.wallet.data.sharedPrefs.CorePrefRepository
 import com.tari.android.wallet.event.EffectChannelFlow
@@ -60,9 +59,6 @@ class ContactSelectionViewModel : CommonViewModel() {
     lateinit var deeplinkHandler: DeeplinkHandler
 
     @Inject
-    lateinit var deeplinkFormatter: DeeplinkFormatter
-
-    @Inject
     lateinit var chatsRepository: ChatsRepository
 
     @Inject
@@ -112,8 +108,7 @@ class ContactSelectionViewModel : CommonViewModel() {
         contactList.addSource(isContactlessPayment) { updateContactList() }
     }
 
-    fun handleDeeplink(deeplinkString: String) {
-        val deeplink = deeplinkFormatter.parse(deeplinkString)
+    fun handleDeeplink(deeplink: DeepLink) {
         val deeplinkBase58 = when (deeplink) {
             is DeepLink.Contacts -> deeplink.contacts.firstOrNull()?.tariAddress
             is DeepLink.Send -> deeplink.walletAddress
@@ -135,7 +130,7 @@ class ContactSelectionViewModel : CommonViewModel() {
         deeplinkBase58?.let { TariWalletAddress.fromBase58OrNull(it) }?.let { walletAddress ->
             selectedContact.value = ContactDto(FFIContactInfo(walletAddress), uuid = name)
             _yatState.update { it.copy(yatUser = null) }
-        } ?: run { logger.e("Wallet address not found for deeplink: $deeplinkString") }
+        } ?: run { logger.e("Wallet address not found for deeplink: $deeplink") }
     }
 
     fun onContactlessPaymentClick() {

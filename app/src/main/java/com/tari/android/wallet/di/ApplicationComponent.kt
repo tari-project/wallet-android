@@ -60,8 +60,8 @@ import com.tari.android.wallet.ui.fragment.onboarding.inroduction.IntroductionVi
 import com.tari.android.wallet.ui.fragment.onboarding.localAuth.LocalAuthViewModel
 import com.tari.android.wallet.ui.fragment.pinCode.EnterPinCodeViewModel
 import com.tari.android.wallet.ui.fragment.profile.WalletInfoViewModel
-import com.tari.android.wallet.ui.fragment.qr.QRScannerActivity
-import com.tari.android.wallet.ui.fragment.qr.QRScannerViewModel
+import com.tari.android.wallet.ui.fragment.qr.QrScannerActivity
+import com.tari.android.wallet.ui.fragment.qr.QrScannerViewModel
 import com.tari.android.wallet.ui.fragment.restore.activity.WalletRestoreActivity
 import com.tari.android.wallet.ui.fragment.restore.chooseRestoreOption.ChooseRestoreOptionViewModel
 import com.tari.android.wallet.ui.fragment.restore.enterRestorationPassword.EnterRestorationPasswordViewModel
@@ -134,7 +134,7 @@ interface ApplicationComponent {
     fun inject(activity: OnboardingFlowActivity)
     fun inject(activity: AuthActivity)
     fun inject(activity: HomeActivity)
-    fun inject(activity: QRScannerActivity)
+    fun inject(activity: QrScannerActivity)
     fun inject(activity: WalletRestoreActivity)
 
     fun inject(fragment: ChooseGIFDialogFragment)
@@ -196,7 +196,7 @@ interface ApplicationComponent {
     fun inject(viewModel: TransactionHistoryViewModel)
     fun inject(viewModel: BluetoothSettingsViewModel)
     fun inject(viewModel: WalletAddressViewModel)
-    fun inject(viewModel: QRScannerViewModel)
+    fun inject(viewModel: QrScannerViewModel)
     fun inject(viewModel: ChatListViewModel)
     fun inject(viewModel: ChatDetailsViewModel)
     fun inject(viewModel: DataCollectionViewModel)

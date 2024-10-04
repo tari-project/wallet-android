@@ -98,7 +98,7 @@ class TorBridgesSelectionViewModel : CommonViewModel() {
 
     fun showBridgeQrCode(torBridgeItem: TorBridgeViewHolderItem) {
         if (torBridgeItem !is TorBridgeViewHolderItem.Bridge) return
-        val data = deeplinkHandler.getDeeplink(DeepLink.TorBridges(listOf(torBridgeItem.bridgeConfiguration)))
+        val data = deeplinkHandler.getDeeplinkString(DeepLink.TorBridges(listOf(torBridgeItem.bridgeConfiguration)))
         showModularDialog(
             ModularDialogArgs(
                 DialogArgs(true, canceledOnTouchOutside = true), listOf(

@@ -53,7 +53,7 @@ class WalletAddressViewModel : CommonViewModel() {
     }
 
     private fun findValidEmojiId(query: String): TariWalletAddress? {
-        return when (val deepLink = deeplinkHandler.handle(query)) {
+        return when (val deepLink = deeplinkHandler.parseDeepLink(query)) {
             is DeepLink.Send -> deepLink.walletAddress
             is DeepLink.UserProfile -> deepLink.tariAddress
             is DeepLink.Contacts -> deepLink.contacts.firstOrNull()?.tariAddress

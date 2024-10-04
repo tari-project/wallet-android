@@ -120,7 +120,7 @@ class TariBluetoothServer @Inject constructor(
             private fun doHandling(string: String): GattStatus {
                 logger.i("share: handle: url: $string")
 
-                val handled = runCatching { deeplinkHandler.handle(string) }.getOrNull()
+                val handled = runCatching { deeplinkHandler.parseDeepLink(string) }.getOrNull()
 
                 logger.i("share: handle: handled: $handled")
 
@@ -141,7 +141,7 @@ class TariBluetoothServer @Inject constructor(
             fun initiateReading() {
                 if (shareChunkedData.isNotEmpty()) return
                 val myWalletAddress = sharedPrefsRepository.walletAddress
-                val data = deeplinkHandler.getDeeplink(
+                val data = deeplinkHandler.getDeeplinkString(
                     DeepLink.UserProfile(
                         tariAddress = sharedPrefsRepository.walletAddressBase58.orEmpty(),
                         alias = contactUtil.normalizeAlias(

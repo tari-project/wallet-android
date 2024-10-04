@@ -3,7 +3,6 @@ package com.tari.android.wallet.ui.fragment.contactBook.root
 import androidx.lifecycle.MutableLiveData
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.deeplinks.DeepLink
-import com.tari.android.wallet.application.deeplinks.DeeplinkFormatter
 import com.tari.android.wallet.application.deeplinks.DeeplinkHandler
 import com.tari.android.wallet.extension.launchOnIo
 import com.tari.android.wallet.model.TariWalletAddress
@@ -27,9 +26,6 @@ class ContactBookViewModel : CommonViewModel() {
 
     @Inject
     lateinit var contactSelectionRepository: ContactSelectionRepository
-
-    @Inject
-    lateinit var deeplinkFormatter: DeeplinkFormatter
 
     @Inject
     lateinit var contactUtil: ContactUtil
@@ -70,8 +66,8 @@ class ContactBookViewModel : CommonViewModel() {
         shareList.postValue(list)
     }
 
-    fun handleDeeplink(deeplinkString: String) {
-        when (val deeplink = deeplinkFormatter.parse(deeplinkString)) {
+    fun handleDeeplink(deeplink: DeepLink) {
+        when (deeplink) {
             is DeepLink.Contacts -> deeplink.contacts.firstOrNull()?.tariAddress
             is DeepLink.Send -> deeplink.walletAddress
             is DeepLink.UserProfile -> deeplink.tariAddress
@@ -127,7 +123,7 @@ class ContactBookViewModel : CommonViewModel() {
                 tariAddress = it.contactInfo.requireWalletAddress().fullBase58,
             )
         }
-        return deeplinkHandler.getDeeplink(DeepLink.Contacts(contacts))
+        return deeplinkHandler.getDeeplinkString(DeepLink.Contacts(contacts))
     }
 
     private fun setSelectedToShareType(shareType: ShareType) {

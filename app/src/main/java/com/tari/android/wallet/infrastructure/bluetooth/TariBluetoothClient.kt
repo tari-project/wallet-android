@@ -137,7 +137,7 @@ class TariBluetoothClient @Inject constructor(val deeplinkHandler: DeeplinkHandl
             private fun doHandling(string: String): GattStatus {
                 logger.i("contactlessPayment: handle: url: $string")
 
-                val handled = runCatching { deeplinkHandler.handle(string) }.getOrNull()
+                val handled = runCatching { deeplinkHandler.parseDeepLink(string) }.getOrNull()
 
                 logger.i("contactlessPayment: handle: handled: $handled")
 

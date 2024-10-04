@@ -65,10 +65,9 @@ class CustomTorBridgesViewModel : CommonViewModel() {
         backPressed.postValue(Unit)
     }
 
-    fun handleQrCode(input: String) {
-        val deeplink = deeplinkHandler.handle(input)
+    fun handleQrCode(deeplink: DeepLink) {
         if (deeplink is DeepLink.TorBridges) {
-            val text = deeplinkHandler.getDeeplink(deeplink)
+            val text = deeplinkHandler.getDeeplinkString(deeplink)
             this.text.postValue(text)
         }
     }

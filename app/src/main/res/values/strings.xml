@@ -276,6 +276,7 @@
     <string name="qr_code_scanner_labels_actions_contacts">This QR code contains contacts information. \nWould you like to add its to your contact book?</string>
     <string name="qr_code_scanner_labels_actions_profile">This QR code contains contact information. \nWould you like to add it to your contact book?</string>
     <string name="qr_code_scanner_labels_actions_tor_bridges">This QR code contains a custom bridge.\nWould you like to save it to the app?</string>
+    <string name="qr_code_scanner_labels_actions_paper_wallet">This QR code contains a paper wallet.\nWould you like to save it to the app?</string>
 
 
     <!-- send tari - amount -->
