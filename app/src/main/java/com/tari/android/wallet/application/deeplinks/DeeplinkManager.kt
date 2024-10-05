@@ -37,8 +37,13 @@ class DeeplinkManager @Inject constructor(
     private val dialogManager: DialogManager,
     private val walletManager: WalletManager,
     private val navigator: TariNavigator,
+    private val deeplinkParser: DeeplinkParser,
     @ApplicationScope private val applicationScope: CoroutineScope,
 ) {
+
+    fun parseDeepLink(deepLink: String): DeepLink? = deeplinkParser.parse(deepLink)
+
+    fun getDeeplinkString(deeplink: DeepLink): String = deeplinkParser.toDeeplink(deeplink)
 
     /**
      * Executes the given deeplink, but first shows a confirmation dialog.

@@ -45,7 +45,6 @@ import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.Lifecycle
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.tari.android.wallet.R
-import com.tari.android.wallet.application.deeplinks.DeeplinkHandler
 import com.tari.android.wallet.application.deeplinks.DeeplinkManager
 import com.tari.android.wallet.data.sharedPrefs.network.NetworkPrefRepository
 import com.tari.android.wallet.data.sharedPrefs.security.SecurityPrefRepository
@@ -89,9 +88,6 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>() {
 
     @Inject
     lateinit var networkRepository: NetworkPrefRepository
-
-    @Inject
-    lateinit var deeplinkHandler: DeeplinkHandler
 
     @Inject
     lateinit var deeplinkManager: DeeplinkManager
@@ -284,7 +280,7 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>() {
 
     private fun processIntentDeepLink(intent: Intent) {
         intent.data?.toString()?.takeIf { it.isNotEmpty() }
-            ?.let { deeplinkString -> deeplinkHandler.parseDeepLink(deeplinkString) }
+            ?.let { deeplinkString -> deeplinkManager.parseDeepLink(deeplinkString) }
             ?.let { deeplink ->
                 deeplinkManager.execute(context = this, deeplink = deeplink, isQrData = false)
             }

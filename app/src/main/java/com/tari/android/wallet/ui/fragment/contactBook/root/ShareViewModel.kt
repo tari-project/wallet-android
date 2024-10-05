@@ -3,7 +3,6 @@ package com.tari.android.wallet.ui.fragment.contactBook.root
 import androidx.lifecycle.MutableLiveData
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.deeplinks.DeepLink
-import com.tari.android.wallet.application.deeplinks.DeeplinkHandler
 import com.tari.android.wallet.application.deeplinks.DeeplinkManager
 import com.tari.android.wallet.infrastructure.bluetooth.TariBluetoothClient
 import com.tari.android.wallet.infrastructure.bluetooth.TariBluetoothServer
@@ -35,9 +34,6 @@ class ShareViewModel : CommonViewModel() {
 
     @Inject
     lateinit var tariBluetoothServer: TariBluetoothServer
-
-    @Inject
-    lateinit var deeplinkHandler: DeeplinkHandler
 
     @Inject
     lateinit var contactsRepository: ContactsRepository

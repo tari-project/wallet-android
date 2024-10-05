@@ -2,7 +2,7 @@ package com.tari.android.wallet.ui.fragment.settings.torBridges.customBridges
 
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.deeplinks.DeepLink
-import com.tari.android.wallet.application.deeplinks.DeeplinkHandler
+import com.tari.android.wallet.application.deeplinks.DeeplinkManager
 import com.tari.android.wallet.data.sharedPrefs.tor.TorBridgeConfiguration
 import com.tari.android.wallet.data.sharedPrefs.tor.TorPrefRepository
 import com.tari.android.wallet.ui.common.CommonViewModel
@@ -16,7 +16,7 @@ class CustomTorBridgesViewModel : CommonViewModel() {
     lateinit var torSharedRepository: TorPrefRepository
 
     @Inject
-    lateinit var deeplinkHandler: DeeplinkHandler
+    lateinit var deeplinkManager: DeeplinkManager
 
     var text = SingleLiveEvent<String>()
 
@@ -67,7 +67,7 @@ class CustomTorBridgesViewModel : CommonViewModel() {
 
     fun handleQrCode(deeplink: DeepLink) {
         if (deeplink is DeepLink.TorBridges) {
-            val text = deeplinkHandler.getDeeplinkString(deeplink)
+            val text = deeplinkManager.getDeeplinkString(deeplink)
             this.text.postValue(text)
         }
     }

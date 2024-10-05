@@ -4,7 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.deeplinks.DeepLink
-import com.tari.android.wallet.application.deeplinks.DeeplinkHandler
+import com.tari.android.wallet.application.deeplinks.DeeplinkManager
 import com.tari.android.wallet.data.sharedPrefs.tor.TorBridgeConfigurationList
 import com.tari.android.wallet.data.sharedPrefs.tor.TorPrefRepository
 import com.tari.android.wallet.extension.collectFlow
@@ -38,7 +38,7 @@ class TorBridgesSelectionViewModel : CommonViewModel() {
     lateinit var torProxyManager: TorProxyManager
 
     @Inject
-    lateinit var deeplinkHandler: DeeplinkHandler
+    lateinit var deeplinkManager: DeeplinkManager
 
     @Inject
     lateinit var torProxyStateHandler: TorProxyStateHandler
@@ -98,7 +98,7 @@ class TorBridgesSelectionViewModel : CommonViewModel() {
 
     fun showBridgeQrCode(torBridgeItem: TorBridgeViewHolderItem) {
         if (torBridgeItem !is TorBridgeViewHolderItem.Bridge) return
-        val data = deeplinkHandler.getDeeplinkString(DeepLink.TorBridges(listOf(torBridgeItem.bridgeConfiguration)))
+        val data = deeplinkManager.getDeeplinkString(DeepLink.TorBridges(listOf(torBridgeItem.bridgeConfiguration)))
         showModularDialog(
             ModularDialogArgs(
                 DialogArgs(true, canceledOnTouchOutside = true), listOf(

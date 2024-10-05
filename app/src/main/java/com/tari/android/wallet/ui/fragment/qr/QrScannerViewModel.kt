@@ -4,7 +4,6 @@ import android.content.Context
 import androidx.lifecycle.SavedStateHandle
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.deeplinks.DeepLink
-import com.tari.android.wallet.application.deeplinks.DeeplinkHandler
 import com.tari.android.wallet.application.deeplinks.DeeplinkManager
 import com.tari.android.wallet.event.EffectChannelFlow
 import com.tari.android.wallet.extension.launchOnIo
@@ -22,9 +21,6 @@ import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 
 class QrScannerViewModel(savedState: SavedStateHandle) : CommonViewModel() {
-
-    @Inject
-    lateinit var deeplinkHandler: DeeplinkHandler
 
     @Inject
     lateinit var deeplinkManager: DeeplinkManager
@@ -59,7 +55,7 @@ class QrScannerViewModel(savedState: SavedStateHandle) : CommonViewModel() {
     }
 
     fun onScanResult(text: String?) {
-        val deeplink = deeplinkHandler.parseDeepLink(text.orEmpty())
+        val deeplink = deeplinkManager.parseDeepLink(text.orEmpty())
         if (deeplink == null) {
             _uiState.update { it.copy(scanError = true) }
         } else {

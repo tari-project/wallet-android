@@ -9,16 +9,10 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 
-// TODO DeepLinkParser??
-// TODO move to deeplinkManager ??
 @Singleton
-class DeeplinkHandler @Inject constructor(private val networkRepository: NetworkPrefRepository) {
+class DeeplinkParser @Inject constructor(private val networkRepository: NetworkPrefRepository) {
 
-    fun parseDeepLink(deepLink: String): DeepLink? = parse(deepLink)
-
-    fun getDeeplinkString(deeplink: DeepLink): String = toDeeplink(deeplink)
-
-    private fun parse(deepLink: String): DeepLink? {
+    fun parse(deepLink: String): DeepLink? {
         val torBridges = getTorDeeplink(deepLink)
         if (torBridges.isNotEmpty()) {
             return DeepLink.TorBridges(torBridges)
@@ -49,7 +43,7 @@ class DeeplinkHandler @Inject constructor(private val networkRepository: Network
         }
     }
 
-    private fun toDeeplink(deepLink: DeepLink): String {
+    fun toDeeplink(deepLink: DeepLink): String {
         if (deepLink is DeepLink.TorBridges) {
             return deepLink.torConfigurations.joinToString("\n") {
                 "${it.ip}:${it.port} ${it.fingerprint}"

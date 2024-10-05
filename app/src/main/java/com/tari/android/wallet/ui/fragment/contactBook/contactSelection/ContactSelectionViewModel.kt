@@ -7,7 +7,6 @@ import androidx.lifecycle.viewModelScope
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.YatAdapter
 import com.tari.android.wallet.application.deeplinks.DeepLink
-import com.tari.android.wallet.application.deeplinks.DeeplinkHandler
 import com.tari.android.wallet.application.deeplinks.DeeplinkManager
 import com.tari.android.wallet.data.sharedPrefs.CorePrefRepository
 import com.tari.android.wallet.event.EffectChannelFlow
@@ -56,9 +55,6 @@ class ContactSelectionViewModel : CommonViewModel() {
 
     @Inject
     lateinit var contactsRepository: ContactsRepository
-
-    @Inject
-    lateinit var deeplinkHandler: DeeplinkHandler
 
     @Inject
     lateinit var chatsRepository: ChatsRepository
@@ -213,7 +209,7 @@ class ContactSelectionViewModel : CommonViewModel() {
     }
 
     fun parseDeeplink(context: Context, deeplinkString: String) {
-        val deeplink = deeplinkHandler.parseDeepLink(deeplinkString)!!
+        val deeplink = deeplinkManager.parseDeepLink(deeplinkString)!!
         deeplinkManager.execute(context, deeplink)
         deselectTariWalletAddress()
     }

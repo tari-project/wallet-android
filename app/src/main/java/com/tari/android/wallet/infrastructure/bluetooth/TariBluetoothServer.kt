@@ -8,9 +8,9 @@ import android.bluetooth.le.AdvertiseData
 import android.bluetooth.le.AdvertiseSettings
 import android.os.ParcelUuid
 import com.tari.android.wallet.application.deeplinks.DeepLink
-import com.tari.android.wallet.application.deeplinks.DeeplinkHandler
-import com.tari.android.wallet.data.sharedPrefs.bluetooth.BluetoothServerState
+import com.tari.android.wallet.application.deeplinks.DeeplinkManager
 import com.tari.android.wallet.data.sharedPrefs.bluetooth.BluetoothPrefRepository
+import com.tari.android.wallet.data.sharedPrefs.bluetooth.BluetoothServerState
 import com.tari.android.wallet.extension.addTo
 import com.tari.android.wallet.util.ContactUtil
 import com.welie.blessed.BluetoothCentral
@@ -29,7 +29,7 @@ import javax.inject.Singleton
 @Singleton
 class TariBluetoothServer @Inject constructor(
     private val shareSettingsRepository: BluetoothPrefRepository,
-    private val deeplinkHandler: DeeplinkHandler,
+    private val deeplinkManager: DeeplinkManager,
     private val contactUtil: ContactUtil,
 ) : TariBluetoothAdapter() {
 
@@ -120,7 +120,7 @@ class TariBluetoothServer @Inject constructor(
             private fun doHandling(string: String): GattStatus {
                 logger.i("share: handle: url: $string")
 
-                val handled = runCatching { deeplinkHandler.parseDeepLink(string) }.getOrNull()
+                val handled = runCatching { deeplinkManager.parseDeepLink(string) }.getOrNull()
 
                 logger.i("share: handle: handled: $handled")
 
@@ -141,7 +141,7 @@ class TariBluetoothServer @Inject constructor(
             fun initiateReading() {
                 if (shareChunkedData.isNotEmpty()) return
                 val myWalletAddress = sharedPrefsRepository.walletAddress
-                val data = deeplinkHandler.getDeeplinkString(
+                val data = deeplinkManager.getDeeplinkString(
                     DeepLink.UserProfile(
                         tariAddress = sharedPrefsRepository.walletAddressBase58.orEmpty(),
                         alias = contactUtil.normalizeAlias(

@@ -5,7 +5,7 @@ import android.graphics.Bitmap
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.YatAdapter
 import com.tari.android.wallet.application.deeplinks.DeepLink
-import com.tari.android.wallet.application.deeplinks.DeeplinkHandler
+import com.tari.android.wallet.application.deeplinks.DeeplinkManager
 import com.tari.android.wallet.data.sharedPrefs.CorePrefRepository
 import com.tari.android.wallet.extension.launchOnIo
 import com.tari.android.wallet.extension.launchOnMain
@@ -38,7 +38,7 @@ class WalletInfoViewModel : CommonViewModel() {
     lateinit var yatAdapter: YatAdapter
 
     @Inject
-    lateinit var deeplinkHandler: DeeplinkHandler
+    lateinit var deeplinkManager: DeeplinkManager
 
     @Inject
     lateinit var contactUtil: ContactUtil
@@ -56,7 +56,7 @@ class WalletInfoViewModel : CommonViewModel() {
     )
     val uiState = _uiState.asStateFlow()
 
-    private val shareProfileDeeplink = deeplinkHandler.getDeeplinkString(
+    private val shareProfileDeeplink = deeplinkManager.getDeeplinkString(
         DeepLink.UserProfile(
             tariAddress = corePrefRepository.walletAddressBase58.orEmpty(),
             alias = contactUtil.normalizeAlias(uiState.value.alias, corePrefRepository.walletAddress),
