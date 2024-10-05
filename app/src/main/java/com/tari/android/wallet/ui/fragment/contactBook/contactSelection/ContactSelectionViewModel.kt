@@ -1,5 +1,6 @@
 package com.tari.android.wallet.ui.fragment.contactBook.contactSelection
 
+import android.content.Context
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
@@ -7,6 +8,7 @@ import com.tari.android.wallet.R
 import com.tari.android.wallet.application.YatAdapter
 import com.tari.android.wallet.application.deeplinks.DeepLink
 import com.tari.android.wallet.application.deeplinks.DeeplinkHandler
+import com.tari.android.wallet.application.deeplinks.DeeplinkManager
 import com.tari.android.wallet.data.sharedPrefs.CorePrefRepository
 import com.tari.android.wallet.event.EffectChannelFlow
 import com.tari.android.wallet.extension.collectFlow
@@ -66,6 +68,9 @@ class ContactSelectionViewModel : CommonViewModel() {
 
     @Inject
     lateinit var corePrefRepository: CorePrefRepository
+
+    @Inject
+    lateinit var deeplinkManager: DeeplinkManager
 
     var additionalFilter: (ContactItemViewHolderItem) -> Boolean = { true }
 
@@ -205,6 +210,12 @@ class ContactSelectionViewModel : CommonViewModel() {
                 navigation.postValue(Navigation.ChatNavigation.ToChat(user.getFFIContactInfo()?.walletAddress!!, true))
             }
         }
+    }
+
+    fun parseDeeplink(context: Context, deeplinkString: String) {
+        val deeplink = deeplinkHandler.parseDeepLink(deeplinkString)!!
+        deeplinkManager.execute(context, deeplink)
+        deselectTariWalletAddress()
     }
 
     private fun showCantAddYourselfDialog() {

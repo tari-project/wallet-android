@@ -23,7 +23,6 @@ import com.daasuu.ei.Ease
 import com.daasuu.ei.EasingInterpolator
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.deeplinks.DeepLink
-import com.tari.android.wallet.application.deeplinks.DeeplinkViewModel
 import com.tari.android.wallet.databinding.FragmentContactsSelectionBinding
 import com.tari.android.wallet.extension.launchAndRepeatOnLifecycle
 import com.tari.android.wallet.extension.observe
@@ -62,8 +61,6 @@ open class ContactSelectionFragment : CommonFragment<FragmentContactsSelectionBi
 
     private lateinit var clipboardController: ClipboardController
 
-    private val deeplinkViewModel: DeeplinkViewModel by viewModels()
-
     private var recyclerViewAdapter = ContactListAdapter()
 
     /**
@@ -93,7 +90,6 @@ open class ContactSelectionFragment : CommonFragment<FragmentContactsSelectionBi
 
         val viewModel: ContactSelectionViewModel by viewModels()
         bindViewModel(viewModel)
-        subscribeVM(deeplinkViewModel)
 
         clipboardController = ClipboardController(listOf(ui.dimmerView), ui.clipboard, viewModel.walletAddressViewModel)
 
@@ -343,9 +339,7 @@ open class ContactSelectionFragment : CommonFragment<FragmentContactsSelectionBi
                 viewModel.addressEntered(textWithoutSeparators)
             }
         } else if (viewModel.deeplinkHandler.parseDeepLink(text) != null) {
-            val deeplink = viewModel.deeplinkHandler.parseDeepLink(text)!!
-            deeplinkViewModel.execute(deeplink)
-            viewModel.deselectTariWalletAddress()
+            viewModel.parseDeeplink(requireContext(), text)
         } else {
             val walletAddress = TariWalletAddress.fromBase58OrNull(text)
             if (walletAddress != null) {

@@ -8,6 +8,9 @@ import java.net.URLDecoder
 import javax.inject.Inject
 import javax.inject.Singleton
 
+
+// TODO DeepLinkParser??
+// TODO move to deeplinkManager ??
 @Singleton
 class DeeplinkHandler @Inject constructor(private val networkRepository: NetworkPrefRepository) {
 

@@ -45,7 +45,6 @@ import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.deeplinks.DeepLink
-import com.tari.android.wallet.application.deeplinks.DeeplinkViewModel
 import com.tari.android.wallet.databinding.FragmentHomeBinding
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.extension.observe
@@ -78,8 +77,6 @@ class HomeFragment : CommonFragment<FragmentHomeBinding, HomeFragmentViewModel>(
     // This listener is used only to animate the visibility of the scroll depth gradient view.
     private lateinit var balanceViewController: BalanceViewController
 
-    private val deeplinkViewModel: DeeplinkViewModel by viewModels()
-
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
         FragmentHomeBinding.inflate(inflater, container, false).also { ui = it }.root
 
@@ -88,8 +85,6 @@ class HomeFragment : CommonFragment<FragmentHomeBinding, HomeFragmentViewModel>(
 
         val viewModel: HomeFragmentViewModel by viewModels()
         bindViewModel(viewModel)
-
-        subscribeVM(deeplinkViewModel)
 
         viewModel.checkPermission()
         setupUI()
@@ -159,7 +154,7 @@ class HomeFragment : CommonFragment<FragmentHomeBinding, HomeFragmentViewModel>(
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == QrScannerActivity.REQUEST_QR_SCANNER && resultCode == Activity.RESULT_OK && data != null) {
             val qrDeepLink = data.parcelable<DeepLink>(QrScannerActivity.EXTRA_DEEPLINK) ?: return
-            deeplinkViewModel.execute(qrDeepLink)
+            viewModel.handleDeeplink(requireContext(), qrDeepLink)
         }
     }
 

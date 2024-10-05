@@ -1,6 +1,8 @@
 package com.tari.android.wallet.ui.common
 
+import android.content.Context
 import com.tari.android.wallet.ui.dialog.modular.ModularDialog
+import com.tari.android.wallet.ui.dialog.modular.ModularDialogArgs
 import com.tari.android.wallet.ui.dialog.modular.ModularDialogArgs.DialogId
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -18,6 +20,10 @@ class DialogManager @Inject constructor() {
             dialogQueue.add(newDialog)
             newDialog.show()
         }
+    }
+
+    fun replace(context: Context, args: ModularDialogArgs) {
+        replace(ModularDialog(context, args))
     }
 
     /**

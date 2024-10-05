@@ -97,7 +97,6 @@ class QrScannerActivity : CommonActivity<ActivityQrScannerBinding, QrScannerView
 
         val viewModel: QrScannerViewModel by viewModels()
         bindViewModel(viewModel)
-        subscribeToCommon(viewModel.deeplinkViewModel)
 
         subscribeUI()
         setupUi()
@@ -129,7 +128,7 @@ class QrScannerActivity : CommonActivity<ActivityQrScannerBinding, QrScannerView
             finish()
         }
 
-        alternativeApply.setOnClickListener { viewModel.onAlternativeApply() }
+        alternativeApply.setOnClickListener { viewModel.onAlternativeApply(this@QrScannerActivity) }
         alternativeDeny.setOnClickListener { viewModel.onAlternativeDeny() }
         retryButton.setOnClickListener { viewModel.onRetry() }
     }

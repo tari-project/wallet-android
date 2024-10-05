@@ -34,7 +34,6 @@ package com.tari.android.wallet.di
 
 import android.content.ClipboardManager
 import com.tari.android.wallet.application.TariWalletApplication
-import com.tari.android.wallet.application.deeplinks.DeeplinkViewModel
 import com.tari.android.wallet.application.securityStage.StagedWalletSecurityManager
 import com.tari.android.wallet.service.service.WalletService
 import com.tari.android.wallet.ui.common.CommonViewModel
@@ -162,7 +161,6 @@ interface ApplicationComponent {
     fun inject(viewModel: AddAmountViewModel)
     fun inject(viewModel: TorBridgesSelectionViewModel)
     fun inject(viewModel: CustomTorBridgesViewModel)
-    fun inject(viewModel: DeeplinkViewModel)
     fun inject(viewModel: LocalAuthViewModel)
     fun inject(viewModel: CreateWalletViewModel)
     fun inject(viewModel: IntroductionViewModel)

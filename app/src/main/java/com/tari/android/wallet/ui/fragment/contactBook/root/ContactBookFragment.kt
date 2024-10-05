@@ -16,7 +16,6 @@ import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.google.android.material.tabs.TabLayoutMediator
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.deeplinks.DeepLink
-import com.tari.android.wallet.application.deeplinks.DeeplinkViewModel
 import com.tari.android.wallet.databinding.FragmentContactBookRootBinding
 import com.tari.android.wallet.extension.observe
 import com.tari.android.wallet.model.TariWalletAddress
@@ -48,14 +47,11 @@ class ContactBookFragment : CommonFragment<FragmentContactBookRootBinding, Conta
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?) =
         FragmentContactBookRootBinding.inflate(inflater, container, false).also { ui = it }.root
 
-    private val deeplinkViewModel: DeeplinkViewModel by viewModels()
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         val viewModel: ContactBookViewModel by viewModels()
         bindViewModel(viewModel)
-        subscribeVM(deeplinkViewModel)
 
         clipboardController = ClipboardController(listOf(ui.dimmerView), ui.clipboardWallet, viewModel.walletAddressViewModel)
 

@@ -1,27 +1,24 @@
 package com.tari.android.wallet.ui.fragment.qr
 
+import android.content.Context
 import androidx.lifecycle.SavedStateHandle
-import androidx.lifecycle.viewModelScope
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.deeplinks.DeepLink
 import com.tari.android.wallet.application.deeplinks.DeeplinkHandler
-import com.tari.android.wallet.application.deeplinks.DeeplinkViewModel
+import com.tari.android.wallet.application.deeplinks.DeeplinkManager
 import com.tari.android.wallet.event.EffectChannelFlow
+import com.tari.android.wallet.extension.launchOnIo
 import com.tari.android.wallet.extension.launchOnMain
 import com.tari.android.wallet.model.TariWalletAddress
 import com.tari.android.wallet.ui.common.CommonViewModel
-import com.tari.android.wallet.ui.fragment.home.HomeActivity
 import com.tari.android.wallet.ui.fragment.qr.QrScannerActivity.Companion.EXTRA_QR_DATA_SOURCE
 import com.tari.android.wallet.util.shortString
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 class QrScannerViewModel(savedState: SavedStateHandle) : CommonViewModel() {
@@ -29,12 +26,12 @@ class QrScannerViewModel(savedState: SavedStateHandle) : CommonViewModel() {
     @Inject
     lateinit var deeplinkHandler: DeeplinkHandler
 
+    @Inject
+    lateinit var deeplinkManager: DeeplinkManager
+
     init {
         component.inject(this)
     }
-
-    val deeplinkViewModel: DeeplinkViewModel
-        get() = HomeActivity.instance.get()?.deeplinkViewModel!!
 
     private val _uiState = MutableStateFlow(QrScannerModel.UiState())
     val uiState: StateFlow<QrScannerModel.UiState> = _uiState.asStateFlow()
@@ -44,18 +41,12 @@ class QrScannerViewModel(savedState: SavedStateHandle) : CommonViewModel() {
 
     private val qrScannerSource: QrScannerSource = savedState.get<QrScannerSource>(EXTRA_QR_DATA_SOURCE) ?: QrScannerSource.None
 
-    fun onAlternativeApply() {
+    fun onAlternativeApply(context: Context) {
         backPressed.postValue(Unit)
-        executeWithDelay(deeplinkViewModel.viewModelScope) {
-            deeplinkViewModel.executeRawDeeplink(uiState.value.scannedDeeplink!!)
-        }
-    }
-
-    private fun executeWithDelay(scope: CoroutineScope, action: () -> Unit) {
-        scope.launch(Dispatchers.IO) {
+        launchOnIo {
             delay(500)
-            scope.launch(Dispatchers.Main) {
-                action()
+            launchOnMain {
+                deeplinkManager.executeRawDeeplink(context, uiState.value.scannedDeeplink!!)
             }
         }
     }
