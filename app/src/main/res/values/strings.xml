@@ -545,6 +545,7 @@
     <string name="back_up_wallet_restore_with_google_drive">Restore with Google Drive</string>
     <string name="back_up_wallet_restore_with_local_files">Restore with Local files</string>
     <string name="back_up_wallet_restore_with_dropbox">Restore with Dropbox</string>
+    <string name="back_up_wallet_restore_with_paper_wallet">Restore from paper wallet</string>
 
     <!-- Wallet back up with seed phrase -->
     <string name="back_up_seed_phrase_page_title">Back Up With Seed Phrase</string>
@@ -571,6 +572,12 @@
     <string name="restore_wallet_restore_cta">Restore Wallet</string>
     <string name="restore_wallet_password_match_error">@string/enter_backup_password_password_match_error</string>
     <string name="restore_wallet_output_message">You recovered some funds</string>
+    <string name="restore_wallet_invalid_qr_code">Invalid QR Code</string>
+    <string name="restore_wallet_invalid_qr_code_description">The QR code you scanned does not contain valid paper wallet seeds</string>
+    <string name="restore_wallet_paper_wallet_title">Paper Wallet Detected</string>
+    <string name="restore_wallet_paper_wallet_body">You’ve scanned a paper wallet!\nWhat would you like to do?</string>
+    <string name="restore_wallet_paper_wallet_restore_button">Restore the wallet</string>
+    <string name="restore_wallet_paper_wallet_do_not_restore_button">Don\'t restore right now</string>
 
     <!-- Wallet recovery with seed phrase -->
     <string name="restore_from_seed_words_title">Restore With Seed Phrase</string>
