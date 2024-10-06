@@ -16,33 +16,36 @@ import java.nio.ByteBuffer
 //       attempt will be made
 //     - If a unrecoverable error occurs the `RecoveryFailed` event will be returned and the client will need to start
 //       a new process.
+// TODO needs a refactor
 sealed class WalletRestorationResult {
-    class ConnectingToBaseNode : WalletRestorationResult()
-    class ConnectedToBaseNode : WalletRestorationResult()
-    class ConnectionToBaseNodeFailed(val retryCount: Long, val retryLimit: Long) : WalletRestorationResult() {
+    data object ConnectingToBaseNode : WalletRestorationResult()
+    data object ConnectedToBaseNode : WalletRestorationResult()
+    data class ConnectionToBaseNodeFailed(val retryCount: Long, val retryLimit: Long) : WalletRestorationResult() {
         override fun toString(): String = "${this.javaClass.simpleName} $retryCount / $retryLimit"
     }
-    class Progress(val currentBlock: Long, val numberOfBlocks: Long) : WalletRestorationResult()
-    class Completed(val numberOfUTXO: Long, val microTari: ByteArray) : WalletRestorationResult()
-    class ScanningRoundFailed(val retryCount: Long, val retryLimit: Long) : WalletRestorationResult() {
+
+    data class Progress(val currentBlock: Long, val numberOfBlocks: Long) : WalletRestorationResult()
+    data class Completed(val numberOfUTXO: Long, val microTari: ByteArray) : WalletRestorationResult()
+    data class ScanningRoundFailed(val retryCount: Long, val retryLimit: Long) : WalletRestorationResult() {
         override fun toString(): String = "${this.javaClass.simpleName} $retryCount / $retryLimit"
     }
-    class RecoveryFailed : WalletRestorationResult()
+
+    data object RecoveryFailed : WalletRestorationResult()
 
     companion object {
-        fun create(event: Int, firstArg: ByteArray, secondArgs: ByteArray) : WalletRestorationResult {
+        fun create(event: Int, firstArg: ByteArray, secondArgs: ByteArray): WalletRestorationResult {
             val first = bytesToLong(firstArg)
             val second = bytesToLong(secondArgs)
             Logger.t("WalletRestorationResult $event $first $second")
-            return when(event) {
-                0 -> ConnectingToBaseNode()
-                1 -> ConnectedToBaseNode()
+            return when (event) {
+                0 -> ConnectingToBaseNode
+                1 -> ConnectedToBaseNode
                 2 -> ConnectionToBaseNodeFailed(first, second)
                 3 -> Progress(first, second)
                 4 -> Completed(first, secondArgs)
                 5 -> ScanningRoundFailed(first, second)
-                6 -> RecoveryFailed()
-                else -> TODO()
+                6 -> RecoveryFailed
+                else -> TODO() // WHY??
             }
         }
 

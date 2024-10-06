@@ -23,7 +23,13 @@ import com.tari.android.wallet.model.throwIf
 import com.tari.android.wallet.service.service.WalletServiceLauncher
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.common.SingleLiveEvent
+import com.tari.android.wallet.ui.dialog.modular.modules.body.BodyModule
+import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonModule
+import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonStyle
+import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
 import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
+import com.tari.android.wallet.ui.fragment.qr.QrScannerActivity
+import com.tari.android.wallet.ui.fragment.qr.QrScannerSource
 import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupOptionDto
 import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupOptions
 import com.tari.android.wallet.util.WalletUtil
@@ -89,12 +95,11 @@ class ChooseRestoreOptionViewModel : CommonViewModel() {
     }
 
     fun onRecoveryPhraseClicked() {
-        tariNavigator.navigate(Navigation.ChooseRestoreOptionNavigation.ToRestoreWithRecoveryPhrase)
+        tariNavigator.navigate(Navigation.ChooseRestoreOptionNavigation.ToRestoreWithRecoveryPhrase(seedWords = null))
     }
 
     fun onPaperWalletClicked(fragment: Fragment) {
-        showNotReadyYetDialog()
-//        QrScannerActivity.startScanner(fragment, QrScannerSource.PaperWallet)
+        QrScannerActivity.startScanner(fragment, QrScannerSource.PaperWallet)
     }
 
     fun handleDeeplink(qrDeepLink: DeepLink) {
@@ -182,7 +187,15 @@ class ChooseRestoreOptionViewModel : CommonViewModel() {
     }
 
     private fun showPaperWalletDialog(seedWords: List<String>) {
-        // TODO
+        showModularDialog(
+            HeadModule(resourceManager.getString(R.string.restore_wallet_paper_wallet_title)),
+            BodyModule(resourceManager.getString(R.string.restore_wallet_paper_wallet_body)),
+            ButtonModule(resourceManager.getString(R.string.restore_wallet_paper_wallet_restore_button), ButtonStyle.Normal) {
+                hideDialog()
+                tariNavigator.navigate(Navigation.ChooseRestoreOptionNavigation.ToRestoreWithRecoveryPhrase(seedWords))
+            },
+            ButtonModule(resourceManager.getString(R.string.restore_wallet_paper_wallet_do_not_restore_button), ButtonStyle.Close),
+        )
     }
 
     private fun showBackupFileNotFoundDialog() {

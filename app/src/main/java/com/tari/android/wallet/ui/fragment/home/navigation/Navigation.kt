@@ -98,7 +98,7 @@ sealed class Navigation {
 
     sealed class ChooseRestoreOptionNavigation : Navigation() {
         object ToEnterRestorePassword : ChooseRestoreOptionNavigation()
-        object ToRestoreWithRecoveryPhrase : ChooseRestoreOptionNavigation()
+        data class ToRestoreWithRecoveryPhrase(val seedWords: List<String>?) : ChooseRestoreOptionNavigation()
         object OnRestoreCompleted : ChooseRestoreOptionNavigation()
     }
 

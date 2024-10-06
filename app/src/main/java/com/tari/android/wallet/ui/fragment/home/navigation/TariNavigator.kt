@@ -127,7 +127,7 @@ class TariNavigator @Inject constructor(
             is ContactBookNavigation.ToSelectTariUser -> addFragment(SelectUserContactFragment.newInstance())
             is ChooseRestoreOptionNavigation.ToEnterRestorePassword -> toEnterRestorePassword()
             is ChooseRestoreOptionNavigation.OnRestoreCompleted -> onRestoreCompleted()
-            is ChooseRestoreOptionNavigation.ToRestoreWithRecoveryPhrase -> toRestoreWithRecoveryPhrase()
+            is ChooseRestoreOptionNavigation.ToRestoreWithRecoveryPhrase -> toRestoreWithRecoveryPhrase(navigation.seedWords)
             is AllSettingsNavigation.ToBugReporting -> DebugActivity.launch(activity, DebugNavigation.BugReport)
             is AllSettingsNavigation.ToMyProfile -> toMyProfile()
             is AllSettingsNavigation.ToAbout -> toAbout()
@@ -188,7 +188,7 @@ class TariNavigator @Inject constructor(
 
     private fun toEnterRestorePassword() = addFragment(EnterRestorationPasswordFragment.newInstance())
 
-    private fun toRestoreWithRecoveryPhrase() = addFragment(InputSeedWordsFragment.newInstance())
+    private fun toRestoreWithRecoveryPhrase(seedWords: List<String>?) = addFragment(InputSeedWordsFragment.createFragment(seedWords))
 
     private fun toRestoreFromSeedWordsInProgress() = addFragment(WalletRestoringFromSeedWordsFragment.newInstance())
 
