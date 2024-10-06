@@ -35,6 +35,7 @@ package com.tari.android.wallet.di
 import android.content.ClipboardManager
 import com.tari.android.wallet.application.TariWalletApplication
 import com.tari.android.wallet.application.securityStage.StagedWalletSecurityManager
+import com.tari.android.wallet.notification.NotificationBroadcastReceiver
 import com.tari.android.wallet.service.service.WalletService
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.component.clipboardController.WalletAddressViewModel
@@ -200,6 +201,8 @@ interface ApplicationComponent {
     fun inject(viewModel: DataCollectionViewModel)
     fun inject(viewModel: EnterPinCodeViewModel)
     fun inject(viewModel: ChangeBiometricsViewModel)
+
+    fun inject(notificationBroadcastReceiver: NotificationBroadcastReceiver)
 
     fun getClipboardManager(): ClipboardManager
 }

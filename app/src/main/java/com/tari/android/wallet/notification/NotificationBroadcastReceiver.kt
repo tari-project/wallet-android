@@ -36,21 +36,30 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import com.orhanobut.logger.Logger
-import com.tari.android.wallet.event.EventBus
-import com.tari.android.wallet.model.recovery.WalletRestorationResult
-import com.tari.android.wallet.ui.fragment.splash.SplashActivity
+import com.tari.android.wallet.di.DiContainer
+import com.tari.android.wallet.recovery.WalletRestorationState
+import com.tari.android.wallet.recovery.WalletRestorationStateHandler
 import com.tari.android.wallet.ui.fragment.home.HomeActivity
 import com.tari.android.wallet.ui.fragment.restore.activity.WalletRestoreActivity
+import com.tari.android.wallet.ui.fragment.splash.SplashActivity
+import javax.inject.Inject
 
 class NotificationBroadcastReceiver : BroadcastReceiver() {
+
+    @Inject
+    lateinit var walletRestorationStateHandler: WalletRestorationStateHandler
 
     private val logger
         get() = Logger.t(NotificationBroadcastReceiver::class.simpleName)
 
+    init {
+        DiContainer.appComponent.inject(this)
+    }
+
     override fun onReceive(context: Context, intent: Intent) {
         logger.d("NotificationBroadcastReceiver received")
-        val restorationState = EventBus.walletRestorationState.publishSubject.value
-        val newIntent: Intent = if (restorationState != null && restorationState !is WalletRestorationResult.Completed) {
+        val restorationState = walletRestorationStateHandler.walletRestorationState.value
+        val newIntent: Intent = if (restorationState !is WalletRestorationState.Completed) {
             Intent(context, WalletRestoreActivity::class.java)
         } else {
             if (HomeActivity.instance.get() != null) {

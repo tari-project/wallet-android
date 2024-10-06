@@ -32,6 +32,7 @@
  */
 package com.tari.android.wallet.ffi
 
+import com.orhanobut.logger.Logger
 import java.io.File
 
 /**
@@ -40,6 +41,9 @@ import java.io.File
  * @author The Tari Development Team
  */
 class FFICommsConfig() : FFIBase() {
+
+    private val logger
+        get() = Logger.t(FFICommsConfig::class.simpleName)
 
     private external fun jniCreate(
         publicAddress: String,

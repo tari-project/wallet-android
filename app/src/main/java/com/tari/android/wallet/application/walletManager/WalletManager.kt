@@ -71,8 +71,9 @@ import com.tari.android.wallet.model.TransactionSendStatus
 import com.tari.android.wallet.model.Tx
 import com.tari.android.wallet.model.TxId
 import com.tari.android.wallet.model.fullBase58
-import com.tari.android.wallet.model.recovery.WalletRestorationResult
 import com.tari.android.wallet.notification.NotificationHelper
+import com.tari.android.wallet.recovery.WalletRestorationState
+import com.tari.android.wallet.recovery.WalletRestorationStateHandler
 import com.tari.android.wallet.service.baseNode.BaseNodeState
 import com.tari.android.wallet.service.baseNode.BaseNodeStateHandler
 import com.tari.android.wallet.service.baseNode.BaseNodeSyncState
@@ -127,6 +128,7 @@ class WalletManager @Inject constructor(
     private val app: TariWalletApplication,
     private val notificationHelper: NotificationHelper,
     private val notificationService: NotificationService,
+    private val walletRestorationStateHandler: WalletRestorationStateHandler,
     @ApplicationScope private val applicationScope: CoroutineScope,
 ) : OutboundTxNotifier {
 
@@ -243,6 +245,15 @@ class WalletManager @Inject constructor(
                 }
             }
         }
+    }
+
+    /**
+     * Starts the wallet recovery process. Returns true if the recovery process was started successfully.
+     * The recovery process events will be handled in the onWalletRestoration() callback.
+     */
+    fun startRecovery(baseNode: BaseNodeDto, recoveryOutputMessage: String): Boolean {
+        val baseNodeFFI = FFIPublicKey(HexString(baseNode.publicKeyHex))
+        return walletInstance?.startRecovery(baseNodeFFI, recoveryOutputMessage) ?: false
     }
 
     private fun startWallet() {
@@ -481,8 +492,8 @@ class WalletManager @Inject constructor(
                         }
                     }
 
-                    override fun onWalletRestoration(result: WalletRestorationResult) = runOnMain {
-                        EventBus.walletRestorationState.post(result) // TODO replace with flow!!!
+                    override fun onWalletRestoration(state: WalletRestorationState) = runOnMain {
+                        walletRestorationStateHandler.updateState(state)
                     }
 
                     override fun onWalletScannedHeight(height: Int) = runOnMain {

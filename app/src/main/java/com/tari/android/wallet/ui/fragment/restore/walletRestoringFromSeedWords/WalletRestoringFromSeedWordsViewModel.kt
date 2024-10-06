@@ -2,23 +2,19 @@ package com.tari.android.wallet.ui.fragment.restore.walletRestoringFromSeedWords
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.viewModelScope
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.baseNodes.BaseNodesManager
 import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodeDto
-import com.tari.android.wallet.event.EventBus
-import com.tari.android.wallet.extension.addTo
-import com.tari.android.wallet.ffi.FFIPublicKey
-import com.tari.android.wallet.ffi.HexString
-import com.tari.android.wallet.model.recovery.WalletRestorationResult
+import com.tari.android.wallet.extension.collectFlow
+import com.tari.android.wallet.extension.launchOnIo
+import com.tari.android.wallet.recovery.WalletRestorationState
+import com.tari.android.wallet.recovery.WalletRestorationStateHandler
 import com.tari.android.wallet.service.service.WalletServiceLauncher
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.common.domain.ResourceManager
 import com.tari.android.wallet.ui.dialog.modular.SimpleDialogArgs
 import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
 import io.reactivex.disposables.CompositeDisposable
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import java.text.DecimalFormat
 import javax.inject.Inject
 
@@ -30,6 +26,9 @@ class WalletRestoringFromSeedWordsViewModel : CommonViewModel() {
     @Inject
     lateinit var baseNodesManager: BaseNodesManager
 
+    @Inject
+    lateinit var walletRestorationStateHandler: WalletRestorationStateHandler
+
     private lateinit var baseNodeIterator: Iterator<BaseNodeDto>
 
     private val _recoveryState = MutableLiveData<RecoveryState>(RecoveryState.ConnectingToBaseNode(resourceManager))
@@ -39,12 +38,12 @@ class WalletRestoringFromSeedWordsViewModel : CommonViewModel() {
         component.inject(this)
     }
 
-    fun startRestoring() = viewModelScope.launch(Dispatchers.IO) {
+    fun startRestoring() = launchOnIo {
         baseNodeIterator = baseNodesManager.baseNodeList.iterator()
         tryNextBaseNode()
     }
 
-    private fun tryNextBaseNode() = viewModelScope.launch(Dispatchers.IO) {
+    private fun tryNextBaseNode() = launchOnIo {
         logger.i("set next base node ${baseNodeIterator.hasNext()}")
         if (baseNodeIterator.hasNext()) {
             startRestoringOnNode(baseNodeIterator.next())
@@ -55,9 +54,8 @@ class WalletRestoringFromSeedWordsViewModel : CommonViewModel() {
 
     private fun startRestoringOnNode(baseNode: BaseNodeDto) {
         try {
-            val baseNodeFFI = FFIPublicKey(HexString(baseNode.publicKeyHex))
-            val result = walletManager.walletInstance?.startRecovery(baseNodeFFI, resourceManager.getString(R.string.restore_wallet_output_message))
-            if (result == true) {
+            val result = walletManager.startRecovery(baseNode, resourceManager.getString(R.string.restore_wallet_output_message))
+            if (result) {
                 subscribeOnRestorationState()
                 return
             } else {
@@ -70,25 +68,22 @@ class WalletRestoringFromSeedWordsViewModel : CommonViewModel() {
     }
 
     private fun subscribeOnRestorationState() {
-        EventBus.walletRestorationState.publishSubject.subscribe {
-            logger.i(it.toString())
-            when (it) {
-                is WalletRestorationResult.ConnectingToBaseNode -> onProgress(RecoveryState.ConnectingToBaseNode(resourceManager))
-                is WalletRestorationResult.ConnectedToBaseNode -> onProgress(RecoveryState.ConnectedToBaseNode(resourceManager))
-                is WalletRestorationResult.ScanningRoundFailed -> onConnectionFailed(it.retryCount, it.retryLimit)
-                is WalletRestorationResult.ConnectionToBaseNodeFailed -> onConnectionFailed(it.retryCount, it.retryLimit)
-                is WalletRestorationResult.Progress -> onProgress(RecoveryState.Recovery(resourceManager, it.currentBlock, it.numberOfBlocks))
-                is WalletRestorationResult.RecoveryFailed -> {
-                    logger.i("recovery failed ${baseNodeIterator.hasNext()}")
-                    if (!baseNodeIterator.hasNext()) {
-                        onError(RestorationError.RecoveryInternalError(resourceManager, this@WalletRestoringFromSeedWordsViewModel::onErrorClosed))
-                    }
-                }
+        collectFlow(walletRestorationStateHandler.walletRestorationState) { state ->
+            when (state) {
+                is WalletRestorationState.ConnectingToBaseNode -> onProgress(RecoveryState.ConnectingToBaseNode(resourceManager))
+                is WalletRestorationState.ConnectedToBaseNode -> onProgress(RecoveryState.ConnectedToBaseNode(resourceManager))
+                is WalletRestorationState.ScanningRoundFailed -> onConnectionFailed(state.retryCount, state.retryLimit)
+                is WalletRestorationState.ConnectionToBaseNodeFailed -> onConnectionFailed(state.retryCount, state.retryLimit)
+                is WalletRestorationState.Progress -> onProgress(RecoveryState.Recovery(resourceManager, state.currentBlock, state.numberOfBlocks))
+                is WalletRestorationState.RecoveryFailed -> onError(
+                    RestorationError.RecoveryInternalError(resourceManager, this@WalletRestoringFromSeedWordsViewModel::onErrorClosed)
+                )
 
-                is WalletRestorationResult.Completed -> onSuccessRestoration()
+                is WalletRestorationState.Completed -> onSuccessRestoration()
             }
-        }.addTo(compositeDisposable)
+        }
     }
+
 
     private fun onConnectionFailed(retryCount: Long, retryLimit: Long) {
         if (retryCount == retryLimit) {
@@ -101,8 +96,10 @@ class WalletRestoringFromSeedWordsViewModel : CommonViewModel() {
     }
 
     private fun onError(restorationError: RestorationError) {
-        walletServiceLauncher.stopAndDelete()
-        showModularDialog(restorationError.args.getModular(resourceManager))
+        if (!baseNodeIterator.hasNext()) {
+            walletServiceLauncher.stopAndDelete()
+            showModularDialog(restorationError.args.getModular(resourceManager))
+        }
     }
 
     private fun onSuccessRestoration() {
