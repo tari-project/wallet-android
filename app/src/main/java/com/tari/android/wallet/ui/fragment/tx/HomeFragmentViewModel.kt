@@ -1,6 +1,7 @@
 package com.tari.android.wallet.ui.fragment.tx
 
 
+import android.content.Context
 import android.os.Build
 import android.text.SpannableString
 import android.text.Spanned
@@ -12,6 +13,8 @@ import com.tari.android.wallet.R.string.error_no_connection_description
 import com.tari.android.wallet.R.string.error_no_connection_title
 import com.tari.android.wallet.R.string.error_node_unreachable_description
 import com.tari.android.wallet.R.string.error_node_unreachable_title
+import com.tari.android.wallet.application.deeplinks.DeepLink
+import com.tari.android.wallet.application.deeplinks.DeeplinkManager
 import com.tari.android.wallet.application.securityStage.StagedWalletSecurityManager
 import com.tari.android.wallet.application.securityStage.StagedWalletSecurityManager.StagedSecurityEffect
 import com.tari.android.wallet.application.walletManager.WalletManager.WalletEvent
@@ -66,6 +69,9 @@ class HomeFragmentViewModel : CommonViewModel() {
 
     @Inject
     lateinit var stagedWalletSecurityManager: StagedWalletSecurityManager
+
+    @Inject
+    lateinit var deeplinkManager: DeeplinkManager
 
     private val _balanceInfo = MutableLiveData<BalanceInfo>()
     val balanceInfo: LiveData<BalanceInfo> = _balanceInfo
@@ -123,6 +129,10 @@ class HomeFragmentViewModel : CommonViewModel() {
                 contactsRepository.grantContactPermissionAndRefresh()
             }
         }
+    }
+
+    fun handleDeeplink(context: Context, deepLink: DeepLink) {
+        deeplinkManager.execute(context, deepLink)
     }
 
     private fun updateList() {

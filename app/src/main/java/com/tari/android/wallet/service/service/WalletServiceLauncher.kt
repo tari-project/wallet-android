@@ -45,18 +45,18 @@ class WalletServiceLauncher(
         }
     }
 
-    private fun getStartIntent(context: Context) = Intent(context, WalletService::class.java).also { it.action = startAction }
+    private fun getStartIntent(context: Context) = Intent(context, WalletService::class.java).also { it.action = START_ACTION }
 
-    private fun getStopIntent(context: Context) = Intent(context, WalletService::class.java).also { it.action = stopAction }
+    private fun getStopIntent(context: Context) = Intent(context, WalletService::class.java).also { it.action = STOP_ACTION }
 
-    private fun getStopAndDeleteIntent(context: Context) = Intent(context, WalletService::class.java).also { it.action = stopAndDeleteAction }
+    private fun getStopAndDeleteIntent(context: Context) = Intent(context, WalletService::class.java).also { it.action = STOP_AND_DELETE_ACTION }
 
 
     companion object {
         // intent actions
-        const val startAction = "START_SERVICE"
-        const val stopAction = "STOP_SERVICE"
-        const val stopAndDeleteAction = "STOP_SERVICE_AND_DELETE_WALLET"
+        const val START_ACTION = "START_SERVICE"
+        const val STOP_ACTION = "STOP_SERVICE"
+        const val STOP_AND_DELETE_ACTION = "STOP_SERVICE_AND_DELETE_WALLET"
     }
 
 }

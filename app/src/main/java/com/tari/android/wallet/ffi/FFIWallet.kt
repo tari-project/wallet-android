@@ -32,6 +32,7 @@
  */
 package com.tari.android.wallet.ffi
 
+import com.orhanobut.logger.Logger
 import com.tari.android.wallet.BuildConfig
 import com.tari.android.wallet.data.sharedPrefs.network.TariNetwork
 import com.tari.android.wallet.model.BalanceInfo
@@ -45,7 +46,7 @@ import com.tari.android.wallet.model.TariUnblindedOutput
 import com.tari.android.wallet.model.TariVector
 import com.tari.android.wallet.model.TariWalletAddress
 import com.tari.android.wallet.model.Tx
-import com.tari.android.wallet.model.recovery.WalletRestorationResult
+import com.tari.android.wallet.recovery.WalletRestorationState
 import java.math.BigInteger
 
 /**
@@ -57,6 +58,9 @@ import java.math.BigInteger
 class FFIWallet(
     private val listener: FFIWalletListener,
 ) : FFIBase() {
+
+    private val logger
+        get() = Logger.t(FFIWallet::class.simpleName)
 
     companion object {
         // values for the wallet initialization
@@ -364,9 +368,21 @@ class FFIWallet(
     }
 
     private fun onWalletRecovery(event: Int, firstArg: ByteArray, secondArg: ByteArray) {
-        val result = WalletRestorationResult.create(event, firstArg, secondArg)
-        logger.i("Wallet restored with $result")
-        listener.onWalletRestoration(result)
+        val state = WalletRestorationState.create(event, firstArg, secondArg)
+        logger.i(
+            "Wallet restoration: ${
+                when (state) {
+                    is WalletRestorationState.ConnectingToBaseNode -> "Connecting to base node"
+                    is WalletRestorationState.ConnectedToBaseNode -> "Connected to base node"
+                    is WalletRestorationState.ConnectionToBaseNodeFailed -> "Connection to base node failed: ${state.retryCount}/${state.retryLimit}"
+                    is WalletRestorationState.Progress -> "Progress: ${state.currentBlock}/${state.numberOfBlocks}"
+                    is WalletRestorationState.Completed -> "Completed: ${state.numberOfUTXO} UTXOs, ${state.microTari.size} MicroTari"
+                    is WalletRestorationState.ScanningRoundFailed -> "Scanning round failed: ${state.retryCount}/${state.retryLimit}"
+                    is WalletRestorationState.RecoveryFailed -> "Recovery failed"
+                }
+            }"
+        )
+        listener.onWalletRestoration(state)
     }
 
     override fun destroy() {

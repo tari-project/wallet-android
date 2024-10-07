@@ -45,8 +45,7 @@ import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.Lifecycle
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.tari.android.wallet.R
-import com.tari.android.wallet.application.deeplinks.DeeplinkHandler
-import com.tari.android.wallet.application.deeplinks.DeeplinkViewModel
+import com.tari.android.wallet.application.deeplinks.DeeplinkManager
 import com.tari.android.wallet.data.sharedPrefs.network.NetworkPrefRepository
 import com.tari.android.wallet.data.sharedPrefs.security.SecurityPrefRepository
 import com.tari.android.wallet.data.sharedPrefs.tariSettings.TariSettingsPrefRepository
@@ -91,15 +90,13 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>() {
     lateinit var networkRepository: NetworkPrefRepository
 
     @Inject
-    lateinit var deeplinkHandler: DeeplinkHandler
+    lateinit var deeplinkManager: DeeplinkManager
 
     @Inject
     lateinit var resourceManager: ResourceManager
 
     @Inject
     lateinit var tariSettingsRepository: TariSettingsPrefRepository
-
-    val deeplinkViewModel: DeeplinkViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -122,12 +119,10 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>() {
 
         val viewModel: HomeViewModel by viewModels()
         bindViewModel(viewModel)
-        subscribeToCommon(deeplinkViewModel)
 
         subscribeToCommon(viewModel.shareViewModel)
         subscribeToCommon(viewModel.shareViewModel.tariBluetoothServer)
         subscribeToCommon(viewModel.shareViewModel.tariBluetoothClient)
-        subscribeToCommon(viewModel.shareViewModel.deeplinkViewModel)
 
         viewModel.shareViewModel.tariBluetoothServer.init(this)
         viewModel.shareViewModel.tariBluetoothClient.init(this)
@@ -284,7 +279,11 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>() {
     fun willNotifyAboutNewTx(): Boolean = ui.viewPager.currentItem == INDEX_HOME
 
     private fun processIntentDeepLink(intent: Intent) {
-        deeplinkViewModel.tryToHandle(intent.data?.toString().orEmpty(), false)
+        intent.data?.toString()?.takeIf { it.isNotEmpty() }
+            ?.let { deeplinkString -> deeplinkManager.parseDeepLink(deeplinkString) }
+            ?.let { deeplink ->
+                deeplinkManager.execute(context = this, deeplink = deeplink, isQrData = false)
+            }
     }
 
     override fun onDestroy() {
@@ -331,7 +330,7 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>() {
         private const val KEY_PAGE = "key_page"
 
         @Volatile
-        var instance: WeakReference<HomeActivity> = WeakReference(null)
+        var instance: WeakReference<HomeActivity> = WeakReference(null) // TODO I don't like this. Better not to share context globally
             private set
     }
 }

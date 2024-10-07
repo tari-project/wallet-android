@@ -8,7 +8,7 @@ import com.tari.android.wallet.ui.extension.setVisible
 import com.tari.android.wallet.ui.extension.string
 import com.tari.android.wallet.ui.fragment.contactBook.contactSelection.ContactSelectionFragment
 import com.tari.android.wallet.ui.fragment.contactBook.contactSelection.ContactSelectionViewModel.ContinueButtonEffect
-import com.tari.android.wallet.ui.fragment.qr.QRScannerActivity
+import com.tari.android.wallet.ui.fragment.qr.QrScannerActivity
 import com.tari.android.wallet.ui.fragment.qr.QrScannerSource
 
 class SelectUserContactFragment : ContactSelectionFragment() {
@@ -33,7 +33,7 @@ class SelectUserContactFragment : ContactSelectionFragment() {
     }
 
     override fun startQRCodeActivity() {
-        QRScannerActivity.startScanner(this, QrScannerSource.TransactionSend)
+        QrScannerActivity.startScanner(this, QrScannerSource.TransactionSend)
     }
 
     override fun goToNext() {

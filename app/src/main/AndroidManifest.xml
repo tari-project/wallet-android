@@ -192,7 +192,7 @@
         </activity>
 
         <activity
-            android:name=".ui.fragment.qr.QRScannerActivity"
+            android:name=".ui.fragment.qr.QrScannerActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:exported="false"
             android:theme="@style/AppTheme.Light"

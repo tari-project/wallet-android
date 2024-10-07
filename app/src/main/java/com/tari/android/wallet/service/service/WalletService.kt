@@ -49,9 +49,9 @@ import com.tari.android.wallet.ffi.FFIWallet
 import com.tari.android.wallet.infrastructure.backup.BackupManager
 import com.tari.android.wallet.notification.NotificationHelper
 import com.tari.android.wallet.service.ServiceRestartBroadcastReceiver
-import com.tari.android.wallet.service.service.WalletServiceLauncher.Companion.startAction
-import com.tari.android.wallet.service.service.WalletServiceLauncher.Companion.stopAction
-import com.tari.android.wallet.service.service.WalletServiceLauncher.Companion.stopAndDeleteAction
+import com.tari.android.wallet.service.service.WalletServiceLauncher.Companion.START_ACTION
+import com.tari.android.wallet.service.service.WalletServiceLauncher.Companion.STOP_ACTION
+import com.tari.android.wallet.service.service.WalletServiceLauncher.Companion.STOP_AND_DELETE_ACTION
 import com.tari.android.wallet.ui.common.domain.ResourceManager
 import com.tari.android.wallet.ui.fragment.settings.logs.LogFilesManager
 import com.tari.android.wallet.util.Constants
@@ -131,9 +131,9 @@ class WalletService : Service() {
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
         startForeground()
         when (intent.action) {
-            startAction -> startService()
-            stopAction -> stopService(startId)
-            stopAndDeleteAction -> {
+            START_ACTION -> startService()
+            STOP_ACTION -> stopService(startId)
+            STOP_AND_DELETE_ACTION -> {
                 //todo total crutch. Service is auto-creating during the bind func. Need to refactor this first
                 DiContainer.appComponent.inject(this)
                 stopService(startId)

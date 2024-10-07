@@ -4,7 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.baseNodes.BaseNodesManager
-import com.tari.android.wallet.application.deeplinks.DeeplinkHandler
+import com.tari.android.wallet.application.deeplinks.DeeplinkManager
 import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodeDto
 import com.tari.android.wallet.extension.collectFlow
 import com.tari.android.wallet.service.baseNode.BaseNodeStateHandler
@@ -34,7 +34,7 @@ class ChangeBaseNodeViewModel : CommonViewModel() {
     lateinit var baseNodeStateHandler: BaseNodeStateHandler
 
     @Inject
-    lateinit var deeplinkHandler: DeeplinkHandler
+    lateinit var deeplinkManager: DeeplinkManager
 
     private val _baseNodeList = MutableLiveData<MutableList<CommonViewHolderItem>>()
     val baseNodeList: LiveData<MutableList<CommonViewHolderItem>> = _baseNodeList
@@ -57,7 +57,7 @@ class ChangeBaseNodeViewModel : CommonViewModel() {
     }
 
     fun showQrCode(baseNodeDto: BaseNodeDto) {
-        val data = deeplinkHandler.getDeeplink(baseNodeDto.toDeeplink())
+        val data = deeplinkManager.getDeeplinkString(baseNodeDto.toDeeplink())
         showModularDialog(
             ModularDialogArgs(
                 DialogArgs(true, canceledOnTouchOutside = true), listOf(

@@ -2,7 +2,7 @@ package com.tari.android.wallet.ui.component.clipboardController
 
 import android.content.ClipboardManager
 import com.tari.android.wallet.application.deeplinks.DeepLink
-import com.tari.android.wallet.application.deeplinks.DeeplinkHandler
+import com.tari.android.wallet.application.deeplinks.DeeplinkManager
 import com.tari.android.wallet.extension.launchOnIo
 import com.tari.android.wallet.extension.launchOnMain
 import com.tari.android.wallet.model.TariWalletAddress
@@ -16,7 +16,7 @@ class WalletAddressViewModel : CommonViewModel() {
     lateinit var clipboardManager: ClipboardManager
 
     @Inject
-    lateinit var deeplinkHandler: DeeplinkHandler
+    lateinit var deeplinkManager: DeeplinkManager
 
     val discoveredWalletAddressFromClipboard = SingleLiveEvent<TariWalletAddress>()
 
@@ -53,7 +53,7 @@ class WalletAddressViewModel : CommonViewModel() {
     }
 
     private fun findValidEmojiId(query: String): TariWalletAddress? {
-        return when (val deepLink = deeplinkHandler.handle(query)) {
+        return when (val deepLink = deeplinkManager.parseDeepLink(query)) {
             is DeepLink.Send -> deepLink.walletAddress
             is DeepLink.UserProfile -> deepLink.tariAddress
             is DeepLink.Contacts -> deepLink.contacts.firstOrNull()?.tariAddress

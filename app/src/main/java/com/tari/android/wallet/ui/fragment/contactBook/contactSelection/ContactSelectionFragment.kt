@@ -22,7 +22,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.daasuu.ei.Ease
 import com.daasuu.ei.EasingInterpolator
 import com.tari.android.wallet.R
-import com.tari.android.wallet.application.deeplinks.DeeplinkViewModel
+import com.tari.android.wallet.application.deeplinks.DeepLink
 import com.tari.android.wallet.databinding.FragmentContactsSelectionBinding
 import com.tari.android.wallet.extension.launchAndRepeatOnLifecycle
 import com.tari.android.wallet.extension.observe
@@ -35,6 +35,7 @@ import com.tari.android.wallet.ui.component.clipboardController.ClipboardControl
 import com.tari.android.wallet.ui.component.tari.toolbar.TariToolbarActionArg
 import com.tari.android.wallet.ui.extension.gone
 import com.tari.android.wallet.ui.extension.hideKeyboard
+import com.tari.android.wallet.ui.extension.parcelable
 import com.tari.android.wallet.ui.extension.postDelayed
 import com.tari.android.wallet.ui.extension.setSelectionToEnd
 import com.tari.android.wallet.ui.extension.setVisible
@@ -46,7 +47,7 @@ import com.tari.android.wallet.ui.fragment.contactBook.contactSelection.ContactS
 import com.tari.android.wallet.ui.fragment.contactBook.contacts.adapter.ContactListAdapter
 import com.tari.android.wallet.ui.fragment.contactBook.contacts.adapter.contact.ContactItemViewHolderItem
 import com.tari.android.wallet.ui.fragment.contactBook.contacts.adapter.contact.ContactlessPaymentItem
-import com.tari.android.wallet.ui.fragment.qr.QRScannerActivity
+import com.tari.android.wallet.ui.fragment.qr.QrScannerActivity
 import com.tari.android.wallet.ui.fragment.qr.QrScannerSource
 import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.DebugConfig
@@ -59,8 +60,6 @@ import me.everything.android.ui.overscroll.OverScrollDecoratorHelper
 open class ContactSelectionFragment : CommonFragment<FragmentContactsSelectionBinding, ContactSelectionViewModel>(), TextWatcher {
 
     private lateinit var clipboardController: ClipboardController
-
-    private val deeplinkViewModel: DeeplinkViewModel by viewModels()
 
     private var recyclerViewAdapter = ContactListAdapter()
 
@@ -91,7 +90,6 @@ open class ContactSelectionFragment : CommonFragment<FragmentContactsSelectionBi
 
         val viewModel: ContactSelectionViewModel by viewModels()
         bindViewModel(viewModel)
-        subscribeVM(deeplinkViewModel)
 
         clipboardController = ClipboardController(listOf(ui.dimmerView), ui.clipboard, viewModel.walletAddressViewModel)
 
@@ -231,7 +229,7 @@ open class ContactSelectionFragment : CommonFragment<FragmentContactsSelectionBi
     }
 
     open fun startQRCodeActivity() {
-        QRScannerActivity.startScanner(this, QrScannerSource.AddContact)
+        QrScannerActivity.startScanner(this, QrScannerSource.AddContact)
     }
 
     private fun focusEditTextAndShowKeyboard() {
@@ -254,9 +252,9 @@ open class ContactSelectionFragment : CommonFragment<FragmentContactsSelectionBi
 
     @Deprecated("Deprecated in Java")
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        if (requestCode == QRScannerActivity.REQUEST_QR_SCANNER && resultCode == Activity.RESULT_OK && data != null) {
-            val qrData = data.getStringExtra(QRScannerActivity.EXTRA_QR_DATA) ?: return
-            viewModel.handleDeeplink(qrData)
+        if (requestCode == QrScannerActivity.REQUEST_QR_SCANNER && resultCode == Activity.RESULT_OK && data != null) {
+            val qrDeepLink = data.parcelable<DeepLink>(QrScannerActivity.EXTRA_DEEPLINK) ?: return
+            viewModel.handleDeeplink(qrDeepLink)
         }
     }
 
@@ -340,10 +338,8 @@ open class ContactSelectionFragment : CommonFragment<FragmentContactsSelectionBi
             } else {
                 viewModel.addressEntered(textWithoutSeparators)
             }
-        } else if (viewModel.deeplinkHandler.handle(text) != null) {
-            val deeplink = viewModel.deeplinkHandler.handle(text)!!
-            deeplinkViewModel.execute(deeplink)
-            viewModel.deselectTariWalletAddress()
+        } else if (viewModel.deeplinkManager.parseDeepLink(text) != null) {
+            viewModel.parseDeeplink(requireContext(), text)
         } else {
             val walletAddress = TariWalletAddress.fromBase58OrNull(text)
             if (walletAddress != null) {

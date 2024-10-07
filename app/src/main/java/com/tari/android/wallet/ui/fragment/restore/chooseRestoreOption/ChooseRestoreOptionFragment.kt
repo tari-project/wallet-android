@@ -32,6 +32,7 @@
  */
 package com.tari.android.wallet.ui.fragment.restore.chooseRestoreOption
 
+import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -39,10 +40,12 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.children
 import androidx.fragment.app.viewModels
+import com.tari.android.wallet.application.deeplinks.DeepLink
 import com.tari.android.wallet.databinding.FragmentChooseRestoreOptionBinding
 import com.tari.android.wallet.extension.observe
 import com.tari.android.wallet.ui.common.CommonFragment
-import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
+import com.tari.android.wallet.ui.extension.parcelable
+import com.tari.android.wallet.ui.fragment.qr.QrScannerActivity
 import com.tari.android.wallet.ui.fragment.restore.chooseRestoreOption.option.RecoveryOptionView
 import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupOptionDto
 import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupOptions
@@ -71,16 +74,17 @@ class ChooseRestoreOptionFragment : CommonFragment<FragmentChooseRestoreOptionBi
     @Deprecated("Deprecated in Java")
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        viewModel.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == QrScannerActivity.REQUEST_QR_SCANNER && resultCode == Activity.RESULT_OK && data != null) {
+            val qrDeepLink = data.parcelable<DeepLink>(QrScannerActivity.EXTRA_DEEPLINK) ?: return
+            viewModel.handleDeeplink(qrDeepLink)
+        } else {
+            viewModel.onActivityResult(requestCode, resultCode, data)
+        }
     }
 
     private fun setupUI() = with(ui) {
-        restoreWithRecoveryPhraseCtaView.setOnClickListener { viewModel.navigation.postValue(Navigation.ChooseRestoreOptionNavigation.ToRestoreWithRecoveryPhrase) }
-    }
-
-    private fun startRecovery(options: BackupOptions) {
-        viewModel.startRestore(options)
-        viewModel.backupManager.setupStorage(options, this)
+        restoreWithRecoveryPhraseCtaView.setOnClickListener { viewModel.onRecoveryPhraseClicked() }
+        restoreWithPaperWalletCtaView.setOnClickListener { viewModel.onPaperWalletClicked(this@ChooseRestoreOptionFragment) }
     }
 
     private fun observeUI() = with(viewModel) {
@@ -93,7 +97,12 @@ class ChooseRestoreOptionFragment : CommonFragment<FragmentChooseRestoreOptionBi
         for (option in options) {
             val view = RecoveryOptionView(requireContext()).apply {
                 viewLifecycle = viewLifecycleOwner
-                ui.restoreWalletCtaView.setOnClickListener { startRecovery(option.type) }
+                ui.restoreWalletCtaView.setOnClickListener {
+                    this@ChooseRestoreOptionFragment.viewModel.startRecovery(
+                        options = option.type,
+                        hostFragment = this@ChooseRestoreOptionFragment,
+                    )
+                }
                 init(option.type)
             }
             ui.optionsContainer.addView(view)
@@ -106,7 +115,6 @@ class ChooseRestoreOptionFragment : CommonFragment<FragmentChooseRestoreOptionBi
             is ChooseRestoreOptionState.EndProgress -> updateProgress(state.backupOptions, false)
         }
     }
-
 
     private fun updateProgress(backupOptions: BackupOptions, isStarted: Boolean) {
         blockingBackPressDispatcher.isEnabled = isStarted
