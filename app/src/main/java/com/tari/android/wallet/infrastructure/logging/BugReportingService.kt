@@ -34,7 +34,7 @@ package com.tari.android.wallet.infrastructure.logging
 
 import com.tari.android.wallet.data.WalletConfig
 import com.tari.android.wallet.data.sharedPrefs.CorePrefRepository
-import com.tari.android.wallet.util.WalletUtil
+import com.tari.android.wallet.application.walletManager.WalletFileUtil
 import io.sentry.Attachment
 import io.sentry.Sentry
 import io.sentry.UserFeedback
@@ -72,7 +72,7 @@ class BugReportingService @Inject constructor(private val sharedPrefsWrapper: Co
             }
             val fileOutStream = FileOutputStream(zipFile)
             // zip!
-            val allLogFiles = WalletUtil.getLogFilesFromDirectory(logFilesDirPath)
+            val allLogFiles = WalletFileUtil.getLogFilesFromDirectory(logFilesDirPath)
             ZipOutputStream(BufferedOutputStream(fileOutStream)).use { out ->
                 for (file in allLogFiles) {
                     FileInputStream(file).use { inputStream ->

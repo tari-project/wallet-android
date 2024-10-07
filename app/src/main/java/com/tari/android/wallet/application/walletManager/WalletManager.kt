@@ -85,7 +85,6 @@ import com.tari.android.wallet.tor.TorProxyManager
 import com.tari.android.wallet.tor.TorProxyStateHandler
 import com.tari.android.wallet.ui.fragment.home.HomeActivity
 import com.tari.android.wallet.util.Constants
-import com.tari.android.wallet.util.WalletUtil
 import io.reactivex.Observable
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
@@ -256,6 +255,10 @@ class WalletManager @Inject constructor(
         return walletInstance?.startRecovery(baseNodeFFI, recoveryOutputMessage) ?: false
     }
 
+    fun clearWalletFiles() {
+        WalletFileUtil.clearWalletFiles(walletConfig.getWalletFilesDirPath())
+    }
+
     private fun startWallet() {
         if (walletState.value is WalletState.NotReady || walletState.value is WalletState.Failed) {
             logger.i("Initialize wallet started")
@@ -324,7 +327,7 @@ class WalletManager @Inject constructor(
     private fun initWallet() {
         if (walletInstance == null) {
             // store network info in shared preferences if it's a new wallet
-            val isNewInstallation = !WalletUtil.walletExists(walletConfig)
+            val isNewInstallation = !WalletFileUtil.walletExists(walletConfig)
 
             val passphrase = securityPrefRepository.databasePassphrase.takeIf { !it.isNullOrEmpty() }
                 ?: corePrefRepository.generateDatabasePassphrase().also { securityPrefRepository.databasePassphrase = it }

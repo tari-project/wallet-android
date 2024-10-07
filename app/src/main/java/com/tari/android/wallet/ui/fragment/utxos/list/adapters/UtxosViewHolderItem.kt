@@ -3,14 +3,14 @@ package com.tari.android.wallet.ui.fragment.utxos.list.adapters
 import com.tari.android.wallet.model.TariUtxo
 import com.tari.android.wallet.ui.common.recyclerView.CommonViewHolderItem
 import com.tari.android.wallet.ui.dialog.ChangedPropertyDelegate
-import com.tari.android.wallet.util.WalletUtil
+import com.tari.android.wallet.application.walletManager.WalletFileUtil
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
 class UtxosViewHolderItem(val source: TariUtxo, networkBlockHeight: Long) : CommonViewHolderItem() {
 
-    val amount = WalletUtil.amountFormatter.format(source.value.tariValue)!!
+    val amount = WalletFileUtil.amountFormatter.format(source.value.tariValue)!!
     val formattedDate: String = SimpleDateFormat("d MMM, y", Locale.getDefault()).format(Date(source.timestamp))
     val formattedTime: String = SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date(source.timestamp))
     val status: UtxosStatus? = when (source.status) {

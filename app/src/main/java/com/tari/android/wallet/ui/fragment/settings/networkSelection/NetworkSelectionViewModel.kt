@@ -15,7 +15,7 @@ import com.tari.android.wallet.ui.common.SingleLiveEvent
 import com.tari.android.wallet.ui.common.recyclerView.CommonViewHolderItem
 import com.tari.android.wallet.ui.dialog.confirm.ConfirmDialogArgs
 import com.tari.android.wallet.ui.fragment.settings.networkSelection.networkItem.NetworkViewHolderItem
-import com.tari.android.wallet.util.WalletUtil
+import com.tari.android.wallet.application.walletManager.WalletFileUtil
 import javax.inject.Inject
 
 class NetworkSelectionViewModel : CommonViewModel() {
@@ -49,7 +49,7 @@ class NetworkSelectionViewModel : CommonViewModel() {
             return
         }
 
-        if (WalletUtil.walletExists(walletConfig)) {
+        if (WalletFileUtil.walletExists(walletConfig)) {
             showModularDialog(
                 ConfirmDialogArgs(
                     title = resourceManager.getString(R.string.all_settings_select_network_confirm_title),

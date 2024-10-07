@@ -73,7 +73,7 @@ import com.tari.android.wallet.ui.fragment.contactBook.data.contacts.ContactDto
 import com.tari.android.wallet.ui.fragment.tx.details.gif.GifView
 import com.tari.android.wallet.ui.fragment.tx.details.gif.GifViewModel
 import com.tari.android.wallet.ui.fragment.tx.details.gif.TxState
-import com.tari.android.wallet.util.WalletUtil
+import com.tari.android.wallet.application.walletManager.WalletFileUtil
 import com.tari.android.wallet.util.addressFirstEmojis
 import com.tari.android.wallet.util.addressLastEmojis
 import com.tari.android.wallet.util.addressPrefixEmojis
@@ -176,7 +176,7 @@ class TxDetailsFragment : CommonFragment<FragmentTxDetailsBinding, TxDetailsView
 
     private fun setTxPaymentData(tx: Tx) {
         val state = TxState.from(tx)
-        ui.amountTextView.text = WalletUtil.amountFormatter.format(tx.amount.tariValue)
+        ui.amountTextView.text = WalletFileUtil.amountFormatter.format(tx.amount.tariValue)
         ui.paymentStateTextView.text = when {
             tx is CancelledTx -> string(R.string.tx_detail_payment_cancelled)
             state.status == MINED_CONFIRMED || state.status == IMPORTED ->
@@ -200,7 +200,7 @@ class TxDetailsFragment : CommonFragment<FragmentTxDetailsBinding, TxDetailsView
     private fun setFeeData(fee: MicroTari) {
         ui.txFeeTextView.visible()
         ui.feeLabelTextView.visible()
-        ui.txFeeTextView.text = string(R.string.tx_details_fee_value, WalletUtil.amountFormatter.format(fee.tariValue))
+        ui.txFeeTextView.text = string(R.string.tx_details_fee_value, WalletFileUtil.amountFormatter.format(fee.tariValue))
     }
 
     private fun setTxMetaData(tx: Tx) {

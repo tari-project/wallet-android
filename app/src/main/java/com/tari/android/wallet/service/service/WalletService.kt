@@ -42,7 +42,6 @@ import com.orhanobut.logger.Logger
 import com.tari.android.wallet.application.TariWalletApplication
 import com.tari.android.wallet.application.walletManager.WalletManager
 import com.tari.android.wallet.application.walletManager.doOnWalletStarted
-import com.tari.android.wallet.data.WalletConfig
 import com.tari.android.wallet.data.sharedPrefs.CorePrefRepository
 import com.tari.android.wallet.di.DiContainer
 import com.tari.android.wallet.ffi.FFIWallet
@@ -55,7 +54,6 @@ import com.tari.android.wallet.service.service.WalletServiceLauncher.Companion.S
 import com.tari.android.wallet.ui.common.domain.ResourceManager
 import com.tari.android.wallet.ui.fragment.settings.logs.LogFilesManager
 import com.tari.android.wallet.util.Constants
-import com.tari.android.wallet.util.WalletUtil
 import io.reactivex.Observable
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
@@ -75,9 +73,6 @@ import javax.inject.Inject
  * @author The Tari Development Team
  */
 class WalletService : Service() {
-
-    @Inject
-    lateinit var walletConfig: WalletConfig
 
     @Inject
     lateinit var app: TariWalletApplication
@@ -173,7 +168,7 @@ class WalletService : Service() {
     }
 
     private fun deleteWallet() {
-        WalletUtil.clearWalletFiles(walletConfig.getWalletFilesDirPath())
+        walletManager.clearWalletFiles()
         sharedPrefsWrapper.clear()
         backupManager.turnOffAll()
     }

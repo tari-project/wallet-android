@@ -81,7 +81,7 @@ import com.tari.android.wallet.ui.fragment.send.amountView.AmountStyle
 import com.tari.android.wallet.ui.fragment.send.common.TransactionData
 import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.DebugConfig
-import com.tari.android.wallet.util.WalletUtil
+import com.tari.android.wallet.application.walletManager.WalletFileUtil
 import com.tari.android.wallet.util.addressFirstEmojis
 import com.tari.android.wallet.util.addressLastEmojis
 import com.tari.android.wallet.util.addressPrefixEmojis
@@ -294,7 +294,7 @@ class AddAmountFragment : CommonFragment<FragmentAddAmountBinding, AddAmountView
             notEnoughBalanceDescriptionTextView.text = string(add_amount_wallet_balance)
             availableBalanceContainerView.visible()
 
-            txFeeTextView.text = "+${WalletUtil.amountFormatter.format(fee.tariValue)}"
+            txFeeTextView.text = "+${WalletFileUtil.amountFormatter.format(fee.tariValue)}"
             val showsTxFee: Boolean = if (keyboardController.currentAmount.value.toInt() == 0) {
                 hideContinueButton()
                 false

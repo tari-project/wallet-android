@@ -19,7 +19,7 @@ import com.tari.android.wallet.ui.extension.gone
 import com.tari.android.wallet.ui.extension.string
 import com.tari.android.wallet.ui.extension.visible
 import com.tari.android.wallet.ui.fragment.contactBook.data.contacts.ContactDto
-import com.tari.android.wallet.util.WalletUtil
+import com.tari.android.wallet.application.walletManager.WalletFileUtil
 import com.tari.android.wallet.util.addressFirstEmojis
 import com.tari.android.wallet.util.addressLastEmojis
 import com.tari.android.wallet.util.addressPrefixEmojis
@@ -97,7 +97,7 @@ abstract class CommonTxListViewHolder<T : CommonViewHolderItem, VB : ViewBinding
     }
 
     protected fun displayAmount(tx: Tx, amountTextView: TariTextView, amountTextViewRound: TariRoundBackground) {
-        val amount = WalletUtil.amountFormatter.format(tx.amount.tariValue)
+        val amount = WalletFileUtil.amountFormatter.format(tx.amount.tariValue)
         val context = itemView.context
         val (amountText, textColor, backgroundColor) = when {
             tx is CancelledTx -> Triple(
