@@ -177,7 +177,7 @@ class InputSeedWordsViewModel(savedState: SavedStateHandle) : CommonViewModel() 
     private fun onError(restorationError: RestorationError) = showModularDialog(restorationError.args.getModular(resourceManager))
 
     private fun clear() {
-        walletServiceLauncher.stopAndDelete()
+        walletManager.deleteWallet()
         compositeDisposable.dispose()
         compositeDisposable = CompositeDisposable()
     }

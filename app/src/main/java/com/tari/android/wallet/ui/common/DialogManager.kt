@@ -43,6 +43,11 @@ class DialogManager @Inject constructor() {
         dialogQueue.remove(dialogToDismiss)
     }
 
+    fun dismissAll() {
+        dialogQueue.forEach { it.dismiss() }
+        dialogQueue.clear()
+    }
+
     fun isDialogShowing(dialogId: Int) = dialogId != DialogId.NO_ID && dialogQueue.any { it.args.dialogId == dialogId }
 
     fun showNotReadyYetDialog(context: Context) {

@@ -6,6 +6,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.deeplinks.DeepLink
+import com.tari.android.wallet.application.walletManager.WalletFileUtil
 import com.tari.android.wallet.application.walletManager.doOnWalletFailed
 import com.tari.android.wallet.application.walletManager.doOnWalletRunning
 import com.tari.android.wallet.data.WalletConfig
@@ -32,7 +33,6 @@ import com.tari.android.wallet.ui.fragment.qr.QrScannerActivity
 import com.tari.android.wallet.ui.fragment.qr.QrScannerSource
 import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupOptionDto
 import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupOptions
-import com.tari.android.wallet.application.walletManager.WalletFileUtil
 import java.io.IOException
 import javax.inject.Inject
 
@@ -158,7 +158,7 @@ class ChooseRestoreOptionViewModel : CommonViewModel() {
             is WalletStartFailedException -> {
                 logger.i("Restore failed: wallet start failed")
                 launchOnMain {
-                    walletServiceLauncher.stopAndDelete()
+                    walletManager.deleteWallet()
                 }
                 val cause = WalletError(exception.cause)
                 if (cause == WalletError.DatabaseDataError) {

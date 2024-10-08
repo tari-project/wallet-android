@@ -68,7 +68,17 @@ class QrScannerViewModel(savedState: SavedStateHandle) : CommonViewModel() {
 
         when (qrScannerSource) {
             QrScannerSource.None,
-            QrScannerSource.Home -> setAlternativeText(deepLink)
+            QrScannerSource.Home -> {
+                when (deepLink) {
+                    is DeepLink.Send,
+                    is DeepLink.UserProfile,
+                    is DeepLink.Contacts,
+                    is DeepLink.TorBridges,
+                    is DeepLink.AddBaseNode -> setAlternativeText(deepLink)
+
+                    is DeepLink.PaperWallet -> returnResult(deepLink)
+                }
+            }
 
             QrScannerSource.TransactionSend -> {
                 when (deepLink) {

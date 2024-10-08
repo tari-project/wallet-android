@@ -16,6 +16,7 @@ sealed class Navigation {
     class EnterPinCodeNavigation(val behavior: PinCodeScreenBehavior, val stashedPin: String? = null) : Navigation()
     object ChangeBiometrics : Navigation()
     object FeatureAuth : Navigation()
+    data class SplashScreen(val seedWords: List<String>? = null) : TxListNavigation()
 
     sealed class CustomBridgeNavigation : Navigation() {
         object UploadQrCode : CustomBridgeNavigation()
@@ -38,7 +39,6 @@ sealed class Navigation {
     }
 
     sealed class TxListNavigation : Navigation() {
-        object ToSplashScreen : TxListNavigation()
         class ToTxDetails(val tx: Tx) : TxListNavigation()
         object ToChat : TxListNavigation()
         object ToAllSettings : TxListNavigation()

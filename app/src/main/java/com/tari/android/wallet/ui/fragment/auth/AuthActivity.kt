@@ -76,10 +76,6 @@ class AuthActivity : CommonActivity<ActivityAuthBinding, AuthViewModel>() {
 
         setupUi()
 
-        observe(viewModel.goAuth) {
-            viewModel.walletServiceLauncher.start()
-        }
-
         doAuth()
     }
 

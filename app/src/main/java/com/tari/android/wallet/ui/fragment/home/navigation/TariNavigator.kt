@@ -156,7 +156,7 @@ class TariNavigator @Inject constructor(
             is TxListNavigation.ToSendWithDeeplink -> toSendWithDeeplink(navigation.sendDeeplink)
             is TxListNavigation.ToUtxos -> toUtxos()
             is TxListNavigation.ToAllSettings -> toAllSettings()
-            is TxListNavigation.ToSplashScreen -> toSplash()
+            is Navigation.SplashScreen -> toSplash(navigation.seedWords)
             is TxListNavigation.ToTransfer -> addFragment(TransferFragment())
             is TxListNavigation.HomeTransactionHistory -> addFragment(HomeTransactionHistoryFragment())
             is SendTxNavigation.OnSendTxFailure -> onSendTxFailure(navigation.isYat, navigation.txFailureReason)
@@ -174,10 +174,11 @@ class TariNavigator @Inject constructor(
         }
     }
 
-    private fun toSplash() {
-        val intent = Intent(activity, OnboardingFlowActivity::class.java)
-        intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
-        activity.startActivity(intent)
+    private fun toSplash(seedWords: List<String>?) {
+        activity.startActivity(Intent(activity, OnboardingFlowActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
+            putExtra(OnboardingFlowActivity.ARG_SEED_WORDS, seedWords?.toTypedArray())
+        })
         activity.finishAffinity()
     }
 
@@ -220,7 +221,7 @@ class TariNavigator @Inject constructor(
 
     fun toAllSettings() = (activity as HomeActivity).ui.viewPager.setCurrentItem(INDEX_SETTINGS, NO_SMOOTH_SCROLL)
 
-    fun toBackupSettings(withAnimation: Boolean) = addFragment(BackupSettingsFragment(), withAnimation = withAnimation)
+    fun toBackupSettings(withAnimation: Boolean) = addFragment(BackupSettingsFragment.newInstance(), withAnimation = withAnimation)
 
     private fun toDeleteWallet() = addFragment(DeleteWalletFragment())
 

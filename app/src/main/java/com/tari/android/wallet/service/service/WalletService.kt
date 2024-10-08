@@ -50,7 +50,6 @@ import com.tari.android.wallet.notification.NotificationHelper
 import com.tari.android.wallet.service.ServiceRestartBroadcastReceiver
 import com.tari.android.wallet.service.service.WalletServiceLauncher.Companion.START_ACTION
 import com.tari.android.wallet.service.service.WalletServiceLauncher.Companion.STOP_ACTION
-import com.tari.android.wallet.service.service.WalletServiceLauncher.Companion.STOP_AND_DELETE_ACTION
 import com.tari.android.wallet.ui.common.domain.ResourceManager
 import com.tari.android.wallet.ui.fragment.settings.logs.LogFilesManager
 import com.tari.android.wallet.util.Constants
@@ -128,13 +127,6 @@ class WalletService : Service() {
         when (intent.action) {
             START_ACTION -> startService()
             STOP_ACTION -> stopService(startId)
-            STOP_AND_DELETE_ACTION -> {
-                //todo total crutch. Service is auto-creating during the bind func. Need to refactor this first
-                DiContainer.appComponent.inject(this)
-                stopService(startId)
-                deleteWallet()
-            }
-
             else -> throw RuntimeException("Unexpected intent action: ${intent.action}")
         }
         return START_NOT_STICKY
@@ -165,12 +157,6 @@ class WalletService : Service() {
         stopSelfResult(startId)
         // stop wallet manager on a separate thread & unsubscribe from events
         lifecycleObserver?.let { ProcessLifecycleOwner.get().lifecycle.removeObserver(it) }
-    }
-
-    private fun deleteWallet() {
-        walletManager.clearWalletFiles()
-        sharedPrefsWrapper.clear()
-        backupManager.turnOffAll()
     }
 
     private fun onWalletStarted(ffiWallet: FFIWallet) {

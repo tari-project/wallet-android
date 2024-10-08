@@ -80,9 +80,11 @@ import com.tari.android.wallet.service.baseNode.BaseNodeSyncState
 import com.tari.android.wallet.service.notification.NotificationService
 import com.tari.android.wallet.service.seedPhrase.SeedPhraseRepository
 import com.tari.android.wallet.service.service.WalletService
+import com.tari.android.wallet.service.service.WalletServiceLauncher
 import com.tari.android.wallet.tor.TorConfig
 import com.tari.android.wallet.tor.TorProxyManager
 import com.tari.android.wallet.tor.TorProxyStateHandler
+import com.tari.android.wallet.ui.common.DialogManager
 import com.tari.android.wallet.ui.fragment.home.HomeActivity
 import com.tari.android.wallet.util.Constants
 import io.reactivex.Observable
@@ -128,6 +130,8 @@ class WalletManager @Inject constructor(
     private val notificationHelper: NotificationHelper,
     private val notificationService: NotificationService,
     private val walletRestorationStateHandler: WalletRestorationStateHandler,
+    private val walletServiceLauncher: WalletServiceLauncher,
+    private val dialogManager: DialogManager,
     @ApplicationScope private val applicationScope: CoroutineScope,
 ) : OutboundTxNotifier {
 
@@ -253,6 +257,18 @@ class WalletManager @Inject constructor(
     fun startRecovery(baseNode: BaseNodeDto, recoveryOutputMessage: String): Boolean {
         val baseNodeFFI = FFIPublicKey(HexString(baseNode.publicKeyHex))
         return walletInstance?.startRecovery(baseNodeFFI, recoveryOutputMessage) ?: false
+    }
+
+    fun deleteWallet() {
+        walletInstance?.destroy()
+        walletInstance = null
+        _walletState.update { WalletState.NotReady }
+        runOnMain { _walletEvent.send(WalletEvent.OnWalletRemove) }
+        clearWalletFiles()
+        corePrefRepository.clear()
+        dialogManager.dismissAll()
+        walletServiceLauncher.stop()
+
     }
 
     fun clearWalletFiles() {
@@ -649,6 +665,8 @@ class WalletManager @Inject constructor(
             data class TxCancelled(val tx: CancelledTx) : WalletEvent()
             data class DirectSendResult(val txId: TxId, val status: TransactionSendStatus) : WalletEvent()
         }
+
+        data object OnWalletRemove : WalletEvent()
     }
 }
 

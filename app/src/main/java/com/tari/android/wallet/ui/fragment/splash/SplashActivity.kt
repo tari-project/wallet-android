@@ -86,7 +86,7 @@ class SplashActivity : AppCompatActivity() {
         onBackPressedDispatcher.addCallback { }
 
         if (sharedPrefsRepository.checkIfIsDataCleared()) {
-            walletServiceLauncher.stopAndDelete()
+            walletManager.deleteWallet()
         }
 
         if (!networkRepository.isCurrentNetworkSupported()) {
@@ -96,14 +96,17 @@ class SplashActivity : AppCompatActivity() {
         val exists = WalletFileUtil.walletExists(walletConfig) && sharedPrefsRepository.onboardingAuthSetupCompleted
         if (WalletFileUtil.walletExists(walletConfig) && !sharedPrefsRepository.onboardingAuthSetupCompleted) {
             // in cases interrupted restoration
-            walletManager.clearWalletFiles()
+            walletManager.deleteWallet()
             sharedPrefsRepository.clear()
         }
-        if (securityPrefRepository.pinCode == null) {
-            launchActivity(OnboardingFlowActivity::class.java)
-            return
-        }
-        launchActivity(if (exists) AuthActivity::class.java else OnboardingFlowActivity::class.java)
+
+        launchActivity(
+            if (securityPrefRepository.pinCode == null || !exists) {
+                OnboardingFlowActivity::class.java
+            } else {
+                AuthActivity::class.java
+            }
+        )
     }
 
     private fun changeNetwork() {

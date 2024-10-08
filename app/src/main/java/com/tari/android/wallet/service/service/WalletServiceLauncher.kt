@@ -31,8 +31,6 @@ class WalletServiceLauncher(
 
     fun stop() = ContextCompat.startForegroundService(context, getStopIntent(context))
 
-    fun stopAndDelete() = ContextCompat.startForegroundService(context, getStopAndDeleteIntent(context))
-
     fun startOnAppForegrounded() {
         if (!tariSettingsSharedRepository.backgroundServiceTurnedOn) {
             start()
@@ -49,14 +47,10 @@ class WalletServiceLauncher(
 
     private fun getStopIntent(context: Context) = Intent(context, WalletService::class.java).also { it.action = STOP_ACTION }
 
-    private fun getStopAndDeleteIntent(context: Context) = Intent(context, WalletService::class.java).also { it.action = STOP_AND_DELETE_ACTION }
-
-
     companion object {
         // intent actions
         const val START_ACTION = "START_SERVICE"
         const val STOP_ACTION = "STOP_SERVICE"
-        const val STOP_AND_DELETE_ACTION = "STOP_SERVICE_AND_DELETE_WALLET"
     }
 
 }

@@ -100,7 +100,7 @@ class OnboardingFlowActivity : CommonActivity<ActivityOnboardingFlowBinding, Com
                 // start wallet service
                 walletServiceLauncher.start()
                 // clean existing files & restart onboarding
-                walletManager.clearWalletFiles()
+                walletManager.deleteWallet()
                 loadFragment(CreateWalletFragment())
             }
 
@@ -164,9 +164,8 @@ class OnboardingFlowActivity : CommonActivity<ActivityOnboardingFlowBinding, Com
     }
 
     override fun resetFlow() {
-        walletServiceLauncher.stopAndDelete()
+        walletManager.deleteWallet()
         clearBackStack()
-        walletManager.clearWalletFiles()
         loadFragment(IntroductionFragment())
     }
 
@@ -193,5 +192,9 @@ class OnboardingFlowActivity : CommonActivity<ActivityOnboardingFlowBinding, Com
         if (supportFragmentManager.backStackEntryCount > 0) {
             supportFragmentManager.popBackStack(supportFragmentManager.getBackStackEntryAt(0).id, FragmentManager.POP_BACK_STACK_INCLUSIVE)
         }
+    }
+
+    companion object {
+        const val ARG_SEED_WORDS = "ARG_SEED_WORDS"
     }
 }

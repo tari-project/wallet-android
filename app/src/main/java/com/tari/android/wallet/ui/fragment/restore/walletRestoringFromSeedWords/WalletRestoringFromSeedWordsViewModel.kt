@@ -9,7 +9,6 @@ import com.tari.android.wallet.extension.collectFlow
 import com.tari.android.wallet.extension.launchOnIo
 import com.tari.android.wallet.recovery.WalletRestorationState
 import com.tari.android.wallet.recovery.WalletRestorationStateHandler
-import com.tari.android.wallet.service.service.WalletServiceLauncher
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.common.domain.ResourceManager
 import com.tari.android.wallet.ui.dialog.modular.SimpleDialogArgs
@@ -19,9 +18,6 @@ import java.text.DecimalFormat
 import javax.inject.Inject
 
 class WalletRestoringFromSeedWordsViewModel : CommonViewModel() {
-
-    @Inject
-    lateinit var walletServiceLauncher: WalletServiceLauncher
 
     @Inject
     lateinit var baseNodesManager: BaseNodesManager
@@ -97,7 +93,7 @@ class WalletRestoringFromSeedWordsViewModel : CommonViewModel() {
 
     private fun onError(restorationError: RestorationError) {
         if (!baseNodeIterator.hasNext()) {
-            walletServiceLauncher.stopAndDelete()
+            walletManager.deleteWallet()
             showModularDialog(restorationError.args.getModular(resourceManager))
         }
     }

@@ -55,7 +55,7 @@ class DeeplinkManager @Inject constructor(
             is DeepLink.Send -> sendAction(deeplink, isQrData)
             is DeepLink.UserProfile -> addUserProfile(context, deeplink, isQrData)
             is DeepLink.TorBridges -> addTorBridges(deeplink, isQrData)
-            is DeepLink.PaperWallet -> showPaperWalletDialog(deeplink, isQrData)
+            is DeepLink.PaperWallet -> showPaperWalletDialog(context, deeplink, isQrData)
         }
     }
 
@@ -69,7 +69,7 @@ class DeeplinkManager @Inject constructor(
             is DeepLink.Send -> sendAction(deeplink, isQrData)
             is DeepLink.UserProfile -> addContactsAction(deeplink.data()?.let { listOf(it) } ?: emptyList(), isQrData)
             is DeepLink.TorBridges -> addTorBridges(deeplink, isQrData)
-            is DeepLink.PaperWallet -> showPaperWalletDialog(deeplink, isQrData)
+            is DeepLink.PaperWallet -> showPaperWalletDialog(context, deeplink, isQrData)
         }
     }
 
@@ -130,8 +130,48 @@ class DeeplinkManager @Inject constructor(
         }
     }
 
-    private fun showPaperWalletDialog(deeplink: DeepLink.PaperWallet, isQrSata: Boolean = true) {
-        // TODO
+    private fun showPaperWalletDialog(context: Context, deeplink: DeepLink.PaperWallet, isQrSata: Boolean = true) {
+        dialogManager.replace(
+            context = context,
+            args = ModularDialogArgs(
+                dialogId = DialogId.DEEPLINK_PAPER_WALLET,
+                modules = listOf(
+                    HeadModule(resourceManager.getString(R.string.restore_wallet_paper_wallet_title)),
+                    BodyModule(resourceManager.getString(R.string.restore_wallet_paper_wallet_body)),
+                    ButtonModule(resourceManager.getString(R.string.restore_wallet_paper_wallet_sweep_funds_button), ButtonStyle.Normal) {
+                        dialogManager.dismiss(DialogId.DEEPLINK_PAPER_WALLET)
+                        dialogManager.showNotReadyYetDialog(context)
+                    },
+                    ButtonModule(resourceManager.getString(R.string.restore_wallet_paper_wallet_replace_wallet_button), ButtonStyle.Normal) {
+                        dialogManager.dismiss(DialogId.DEEPLINK_PAPER_WALLET)
+                        showRememberToBackupDialog(context, deeplink)
+                    },
+                    ButtonModule(resourceManager.getString(R.string.common_cancel), ButtonStyle.Close),
+                ),
+            )
+        )
+    }
+
+    private fun showRememberToBackupDialog(context: Context, deeplink: DeepLink.PaperWallet) {
+        dialogManager.replace(
+            context = context,
+            args = ModularDialogArgs(
+                dialogId = DialogId.DEEPLINK_PAPER_WALLET_REMEMBER_TO_BACKUP,
+                modules = listOf(
+                    HeadModule(resourceManager.getString(R.string.restore_wallet_paper_wallet_remember_backup_title)),
+                    BodyModule(resourceManager.getString(R.string.restore_wallet_paper_wallet_remember_backup_body)),
+                    ButtonModule(resourceManager.getString(R.string.restore_wallet_paper_wallet_remember_backup_yes_button), ButtonStyle.Normal) {
+                        dialogManager.dismiss(DialogId.DEEPLINK_PAPER_WALLET_REMEMBER_TO_BACKUP)
+                        goToBackupAction()
+                    },
+                    ButtonModule(resourceManager.getString(R.string.restore_wallet_paper_wallet_remember_backup_no_button), ButtonStyle.Normal) {
+                        dialogManager.dismiss(DialogId.DEEPLINK_PAPER_WALLET_REMEMBER_TO_BACKUP)
+                        replaceWalletAction(deeplink)
+                    },
+                    ButtonModule(resourceManager.getString(R.string.common_cancel), ButtonStyle.Close),
+                ),
+            )
+        )
     }
 
     private fun DeepLink.AddBaseNode.data(): BaseNodeDto = BaseNodeDto.fromDeeplink(this)
@@ -167,5 +207,17 @@ class DeeplinkManager @Inject constructor(
         baseNodesManager.addUserBaseNode(baseNodeDto)
         baseNodesManager.setBaseNode(baseNodeDto)
         walletManager.syncBaseNode()
+    }
+
+    private fun goToBackupAction() {
+        navigator.let {
+            it.toAllSettings()
+            it.toBackupSettings(true)
+        }
+    }
+
+    private fun replaceWalletAction(deeplink: DeepLink.PaperWallet) {
+        walletManager.deleteWallet()
+        navigator.navigate(Navigation.SplashScreen(deeplink.seedWords))
     }
 }
