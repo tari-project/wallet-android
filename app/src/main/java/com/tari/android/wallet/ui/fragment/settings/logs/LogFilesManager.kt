@@ -5,7 +5,7 @@ import com.tari.android.wallet.data.WalletConfig
 import com.tari.android.wallet.event.Event
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.ui.common.CommonViewModel
-import com.tari.android.wallet.util.WalletUtil
+import com.tari.android.wallet.application.walletManager.WalletFileUtil
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -22,7 +22,7 @@ class LogFilesManager : CommonViewModel() {
     }
 
     private fun manage() = viewModelScope.launch {
-        val files = WalletUtil.getLogFilesFromDirectory(walletConfig.getWalletLogFilesDirPath()).toMutableList()
+        val files = WalletFileUtil.getLogFilesFromDirectory(walletConfig.getWalletLogFilesDirPath()).toMutableList()
         if (files.size > MAX_FILES) {
             files.sortedByDescending { it.lastModified() }.drop(10).forEach { fileToDelete ->
                 runCatching { fileToDelete.delete() }

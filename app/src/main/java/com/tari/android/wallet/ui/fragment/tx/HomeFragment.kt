@@ -63,7 +63,7 @@ import com.tari.android.wallet.ui.fragment.qr.QrScannerSource
 import com.tari.android.wallet.ui.fragment.tx.adapter.TxListHomeViewHolder
 import com.tari.android.wallet.ui.fragment.tx.questionMark.QuestionMarkViewModel
 import com.tari.android.wallet.ui.fragment.tx.ui.balanceController.BalanceViewController
-import com.tari.android.wallet.util.WalletUtil
+import com.tari.android.wallet.application.walletManager.WalletFileUtil
 
 class HomeFragment : CommonFragment<FragmentHomeBinding, HomeFragmentViewModel>() {
 
@@ -161,7 +161,7 @@ class HomeFragment : CommonFragment<FragmentHomeBinding, HomeFragmentViewModel>(
     private fun updateBalanceInfoUI(restart: Boolean) {
         val balanceInfo = viewModel.balanceInfo.value!!
 
-        val availableBalance = WalletUtil.balanceFormatter.format(balanceInfo.availableBalance.tariValue)
+        val availableBalance = WalletFileUtil.balanceFormatter.format(balanceInfo.availableBalance.tariValue)
         ui.availableBalance.text = availableBalance
 
         if (restart) {

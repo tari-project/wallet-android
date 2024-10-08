@@ -32,7 +32,7 @@ import com.tari.android.wallet.ui.fragment.qr.QrScannerActivity
 import com.tari.android.wallet.ui.fragment.qr.QrScannerSource
 import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupOptionDto
 import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupOptions
-import com.tari.android.wallet.util.WalletUtil
+import com.tari.android.wallet.application.walletManager.WalletFileUtil
 import java.io.IOException
 import javax.inject.Inject
 
@@ -62,7 +62,7 @@ class ChooseRestoreOptionViewModel : CommonViewModel() {
 
         launchOnIo {
             walletManager.doOnWalletRunning {
-                if (WalletUtil.walletExists(walletConfig) && state.value != null) {
+                if (WalletFileUtil.walletExists(walletConfig) && state.value != null) {
                     backupPrefRepository.restoredTxs?.let {
                         if (it.utxos.isEmpty()) return@let
 

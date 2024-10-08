@@ -42,7 +42,6 @@ import androidx.lifecycle.lifecycleScope
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.walletManager.WalletManager
 import com.tari.android.wallet.application.walletManager.doOnWalletFailed
-import com.tari.android.wallet.data.WalletConfig
 import com.tari.android.wallet.data.sharedPrefs.CorePrefRepository
 import com.tari.android.wallet.databinding.ActivityOnboardingFlowBinding
 import com.tari.android.wallet.di.DiContainer.appComponent
@@ -57,7 +56,6 @@ import com.tari.android.wallet.ui.fragment.onboarding.createWallet.CreateWalletF
 import com.tari.android.wallet.ui.fragment.onboarding.inroduction.IntroductionFragment
 import com.tari.android.wallet.ui.fragment.onboarding.localAuth.LocalAuthFragment
 import com.tari.android.wallet.ui.fragment.settings.networkSelection.NetworkSelectionFragment
-import com.tari.android.wallet.util.WalletUtil
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -72,9 +70,6 @@ import javax.inject.Inject
  * @author The Tari Development Team
  */
 class OnboardingFlowActivity : CommonActivity<ActivityOnboardingFlowBinding, CommonViewModel>(), OnboardingFlowListener {
-
-    @Inject
-    lateinit var walletConfig: WalletConfig
 
     @Inject
     lateinit var corePrefRepository: CorePrefRepository
@@ -105,7 +100,7 @@ class OnboardingFlowActivity : CommonActivity<ActivityOnboardingFlowBinding, Com
                 // start wallet service
                 walletServiceLauncher.start()
                 // clean existing files & restart onboarding
-                WalletUtil.clearWalletFiles(walletConfig.getWalletFilesDirPath())
+                walletManager.clearWalletFiles()
                 loadFragment(CreateWalletFragment())
             }
 
@@ -171,7 +166,7 @@ class OnboardingFlowActivity : CommonActivity<ActivityOnboardingFlowBinding, Com
     override fun resetFlow() {
         walletServiceLauncher.stopAndDelete()
         clearBackStack()
-        WalletUtil.clearWalletFiles(walletConfig.getWalletFilesDirPath())
+        walletManager.clearWalletFiles()
         loadFragment(IntroductionFragment())
     }
 

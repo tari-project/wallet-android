@@ -133,6 +133,8 @@ class AllSettingsViewModel : CommonViewModel() {
     }
 
     private fun generateOptions(): List<CommonViewHolderItem> {
+        if (!settingsRepository.walletAddressExists()) return emptyList() // Return empty list if this method called after wallet is deleted
+
         val versionText = TariVersionModel(networkRepository).versionInfo
 
         val alias = settingsRepository.firstName.orEmpty() + " " + settingsRepository.lastName.orEmpty()

@@ -50,7 +50,7 @@ import com.tari.android.wallet.model.CancelledTx
 import com.tari.android.wallet.model.Tx
 import com.tari.android.wallet.model.TxId
 import com.tari.android.wallet.ui.fragment.home.HomeDeeplinkScreens
-import com.tari.android.wallet.util.WalletUtil
+import com.tari.android.wallet.application.walletManager.WalletFileUtil
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -132,7 +132,7 @@ class NotificationHelper @Inject constructor(private val context: Context) {
         val notificationTitle = context.getString(R.string.notification_tx_received_title)
         // format spannable string
         val formattedAmount = if (tx.amount.tariValue.toDouble() % 1 == 0.toDouble()) tx.amount.tariValue.toBigInteger().toString()
-        else WalletUtil.amountFormatter.format(tx.amount.tariValue)
+        else WalletFileUtil.amountFormatter.format(tx.amount.tariValue)
         val notificationBody = context.getString(R.string.notification_tx_received_description_format, formattedAmount)
         val layout = CustomTxNotificationViewHolder(context, tx)
         val intent = Intent(context, NotificationBroadcastReceiver::class.java).apply {

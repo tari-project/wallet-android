@@ -30,7 +30,7 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.tari.android.wallet.util
+package com.tari.android.wallet.application.walletManager
 
 import com.tari.android.wallet.data.WalletConfig
 import java.io.File
@@ -38,12 +38,7 @@ import java.math.RoundingMode
 import java.text.DecimalFormat
 import java.util.*
 
-/**
- * Wallet utility functions.
- *
- * @author The Tari Development Team
- */
-object WalletUtil {
+object WalletFileUtil {
 
     val balanceFormatter = DecimalFormat("#,##0.00").apply {
         roundingMode = RoundingMode.FLOOR

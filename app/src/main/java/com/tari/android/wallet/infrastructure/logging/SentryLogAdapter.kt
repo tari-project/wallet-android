@@ -4,7 +4,7 @@ import com.orhanobut.logger.LogAdapter
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.data.WalletConfig
 import com.tari.android.wallet.data.sharedPrefs.sentry.SentryPrefRepository
-import com.tari.android.wallet.util.WalletUtil
+import com.tari.android.wallet.application.walletManager.WalletFileUtil
 import com.welie.blessed.BluetoothPeripheralManager
 import io.sentry.Attachment
 import io.sentry.Breadcrumb
@@ -30,7 +30,7 @@ class SentryLogAdapter(val walletConfig: WalletConfig,
         if (priority == Logger.ERROR) {
             localScope.launch(Dispatchers.IO) {
                 try {
-                    val files = WalletUtil.getLogFilesFromDirectory(walletConfig.getWalletLogFilesDirPath()).toMutableList()
+                    val files = WalletFileUtil.getLogFilesFromDirectory(walletConfig.getWalletLogFilesDirPath()).toMutableList()
                     val lines = files.firstOrNull()?.inputStream()?.bufferedReader()?.readLines()?.takeLast(100)?.joinToString("\n")
 
                     val breadcrumb = Breadcrumb(message).apply {

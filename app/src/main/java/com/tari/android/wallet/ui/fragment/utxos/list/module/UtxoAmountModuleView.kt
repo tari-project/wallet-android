@@ -7,7 +7,7 @@ import android.view.ViewGroup
 import com.tari.android.wallet.databinding.DialogModuleUtxoAmountBinding
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.component.common.CommonView
-import com.tari.android.wallet.util.WalletUtil
+import com.tari.android.wallet.application.walletManager.WalletFileUtil
 
 @SuppressLint("ViewConstructor")
 class UtxoAmountModuleView(context: Context, buttonModule: UtxoAmountModule) :
@@ -19,6 +19,6 @@ class UtxoAmountModuleView(context: Context, buttonModule: UtxoAmountModule) :
     override fun setup() = Unit
 
     init {
-        ui.amount.text = WalletUtil.amountFormatter.format(buttonModule.amount.tariValue)!!
+        ui.amount.text = WalletFileUtil.amountFormatter.format(buttonModule.amount.tariValue)!!
     }
 }

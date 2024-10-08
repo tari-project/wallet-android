@@ -12,7 +12,7 @@ import com.tari.android.wallet.ui.common.recyclerView.CommonViewHolder
 import com.tari.android.wallet.ui.common.recyclerView.ViewHolderBuilder
 import com.tari.android.wallet.ui.extension.dpToPx
 import com.tari.android.wallet.ui.extension.setVisible
-import com.tari.android.wallet.util.WalletUtil
+import com.tari.android.wallet.application.walletManager.WalletFileUtil
 import kotlin.random.Random
 
 class UtxosTileListViewHolder(view: ItemUtxosTileBinding) : CommonViewHolder<UtxosViewHolderItem, ItemUtxosTileBinding>(view) {
@@ -20,7 +20,7 @@ class UtxosTileListViewHolder(view: ItemUtxosTileBinding) : CommonViewHolder<Utx
     override fun bind(item: UtxosViewHolderItem) {
         super.bind(item)
 
-        val wholeBalance = WalletUtil.amountFormatter.format(item.source.value.tariValue)
+        val wholeBalance = WalletFileUtil.amountFormatter.format(item.source.value.tariValue)
         val indexOfSeparator = wholeBalance.indexOfAny(charArrayOf(',', '.'))
         val amount = wholeBalance.take(indexOfSeparator)
         val decimal = wholeBalance.drop(indexOfSeparator)

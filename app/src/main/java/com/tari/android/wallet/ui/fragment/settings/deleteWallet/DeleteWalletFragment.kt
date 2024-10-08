@@ -38,16 +38,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.lifecycleScope
 import com.tari.android.wallet.databinding.FragmentDeleteWalletBinding
 import com.tari.android.wallet.extension.observe
 import com.tari.android.wallet.ui.common.CommonFragment
 import com.tari.android.wallet.ui.extension.ThrottleClick
 import com.tari.android.wallet.ui.extension.visible
 import com.tari.android.wallet.ui.fragment.onboarding.activity.OnboardingFlowActivity
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 class DeleteWalletFragment : CommonFragment<FragmentDeleteWalletBinding, DeleteWalletViewModel>() {
 
@@ -71,21 +67,13 @@ class DeleteWalletFragment : CommonFragment<FragmentDeleteWalletBinding, DeleteW
     }
 
     private fun observeUI() = with(viewModel) {
-        observe(deleteWallet) { deleteWallet() }
+        observe(showProgress) { showProgress() }
+        observe(goToSplash) { goToSplashScreen() }
     }
 
-    private fun deleteWallet() {
-        // disable CTAs
+    private fun showProgress() {
         ui.deleteWalletCtaView.isEnabled = false
         ui.deleteWalletProgress.visible()
-        // delete wallet
-        lifecycleScope.launch(Dispatchers.IO) {
-            viewModel.walletService
-            viewModel.walletServiceLauncher.stopAndDelete()
-            withContext(Dispatchers.Main) {
-                goToSplashScreen()
-            }
-        }
     }
 
     private fun goToSplashScreen() {
