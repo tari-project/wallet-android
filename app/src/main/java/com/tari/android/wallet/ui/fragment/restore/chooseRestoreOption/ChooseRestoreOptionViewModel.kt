@@ -77,7 +77,8 @@ class ChooseRestoreOptionViewModel : CommonViewModel() {
                     backupPrefRepository.updateOption(dto)
                     backupManager.backupNow()
 
-                    navigation.postValue(Navigation.ChooseRestoreOptionNavigation.OnRestoreCompleted)
+                    walletManager.onWalletRestored()
+                    tariNavigator.navigate(Navigation.SplashScreen(clearTop = false))
                 }
             }
         }

@@ -16,7 +16,7 @@ sealed class Navigation {
     class EnterPinCodeNavigation(val behavior: PinCodeScreenBehavior, val stashedPin: String? = null) : Navigation()
     object ChangeBiometrics : Navigation()
     object FeatureAuth : Navigation()
-    data class SplashScreen(val seedWords: List<String>? = null) : TxListNavigation()
+    data class SplashScreen(val seedWords: List<String>? = null, val clearTop: Boolean = true) : Navigation()
 
     sealed class CustomBridgeNavigation : Navigation() {
         object UploadQrCode : CustomBridgeNavigation()
@@ -65,11 +65,6 @@ sealed class Navigation {
         data class OnSendTxSuccess(val isYat: Boolean, val txId: TxId) : SendTxNavigation()
     }
 
-    sealed class WalletRestoringFromSeedWordsNavigation : Navigation() {
-        object OnRestoreCompleted : WalletRestoringFromSeedWordsNavigation()
-        object OnRestoreFailed : WalletRestoringFromSeedWordsNavigation()
-    }
-
     sealed class AllSettingsNavigation : Navigation() {
         object ToMyProfile : AllSettingsNavigation()
         object ToBugReporting : AllSettingsNavigation()
@@ -88,18 +83,13 @@ sealed class Navigation {
     }
 
     sealed class InputSeedWordsNavigation : Navigation() {
-        object ToRestoreFormSeedWordsInProgress : InputSeedWordsNavigation()
+        object ToRestoreFromSeeds : InputSeedWordsNavigation()
         object ToBaseNodeSelection : InputSeedWordsNavigation()
-    }
-
-    sealed class EnterRestorationPasswordNavigation : Navigation() {
-        object OnRestore : EnterRestorationPasswordNavigation()
     }
 
     sealed class ChooseRestoreOptionNavigation : Navigation() {
         object ToEnterRestorePassword : ChooseRestoreOptionNavigation()
         data class ToRestoreWithRecoveryPhrase(val seedWords: List<String>?) : ChooseRestoreOptionNavigation()
-        object OnRestoreCompleted : ChooseRestoreOptionNavigation()
     }
 
     sealed class ContactBookNavigation : Navigation() {

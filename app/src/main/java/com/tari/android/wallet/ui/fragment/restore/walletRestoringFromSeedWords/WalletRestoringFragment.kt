@@ -37,21 +37,21 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
-import com.tari.android.wallet.databinding.FragmentWalletRestoringFromSeedWordsBinding
-import com.tari.android.wallet.extension.observe
+import com.tari.android.wallet.databinding.FragmentWalletRestoringBinding
+import com.tari.android.wallet.extension.collectFlow
 import com.tari.android.wallet.ui.common.CommonFragment
 
-class WalletRestoringFromSeedWordsFragment :
-    CommonFragment<FragmentWalletRestoringFromSeedWordsBinding, WalletRestoringFromSeedWordsViewModel>() {
+class WalletRestoringFragment :
+    CommonFragment<FragmentWalletRestoringBinding, WalletRestoringViewModel>() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
-        FragmentWalletRestoringFromSeedWordsBinding.inflate(inflater, container, false).also { ui = it }.root
+        FragmentWalletRestoringBinding.inflate(inflater, container, false).also { ui = it }.root
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         changeOnBackPressed(true)
 
-        val viewModel: WalletRestoringFromSeedWordsViewModel by viewModels()
+        val viewModel: WalletRestoringViewModel by viewModels()
         bindViewModel(viewModel)
 
         subscribeUI()
@@ -60,15 +60,15 @@ class WalletRestoringFromSeedWordsFragment :
     }
 
     private fun subscribeUI() = with(viewModel) {
-        observe(recoveryState) { processRecoveryState(it) }
+        collectFlow(recoveryState) { processRecoveryState(it) }
     }
 
-    private fun processRecoveryState(state: WalletRestoringFromSeedWordsViewModel.RecoveryState) {
+    private fun processRecoveryState(state: WalletRestoringViewModel.RestorationState) {
         ui.statusLabel.text = state.status
         ui.progressLabel.text = state.progress
     }
 
     companion object {
-        fun newInstance() = WalletRestoringFromSeedWordsFragment()
+        fun newInstance() = WalletRestoringFragment()
     }
 }

@@ -52,6 +52,7 @@ import com.tari.android.wallet.ffi.FFIByteVector
 import com.tari.android.wallet.ffi.FFICommsConfig
 import com.tari.android.wallet.ffi.FFIException
 import com.tari.android.wallet.ffi.FFIPublicKey
+import com.tari.android.wallet.ffi.FFISeedWords
 import com.tari.android.wallet.ffi.FFITariBaseNodeState
 import com.tari.android.wallet.ffi.FFITariTransportConfig
 import com.tari.android.wallet.ffi.FFIWallet
@@ -71,6 +72,7 @@ import com.tari.android.wallet.model.TransactionSendStatus
 import com.tari.android.wallet.model.Tx
 import com.tari.android.wallet.model.TxId
 import com.tari.android.wallet.model.fullBase58
+import com.tari.android.wallet.model.seedPhrase.SeedPhrase
 import com.tari.android.wallet.notification.NotificationHelper
 import com.tari.android.wallet.recovery.WalletRestorationState
 import com.tari.android.wallet.recovery.WalletRestorationStateHandler
@@ -78,7 +80,6 @@ import com.tari.android.wallet.service.baseNode.BaseNodeState
 import com.tari.android.wallet.service.baseNode.BaseNodeStateHandler
 import com.tari.android.wallet.service.baseNode.BaseNodeSyncState
 import com.tari.android.wallet.service.notification.NotificationService
-import com.tari.android.wallet.service.seedPhrase.SeedPhraseRepository
 import com.tari.android.wallet.service.service.WalletService
 import com.tari.android.wallet.service.service.WalletServiceLauncher
 import com.tari.android.wallet.tor.TorConfig
@@ -118,7 +119,6 @@ class WalletManager @Inject constructor(
     private val walletConfig: WalletConfig,
     private val torManager: TorProxyManager,
     private val corePrefRepository: CorePrefRepository,
-    private val seedPhraseRepository: SeedPhraseRepository,
     private val networkPrefRepository: NetworkPrefRepository,
     private val tariSettingsPrefRepository: TariSettingsPrefRepository,
     private val securityPrefRepository: SecurityPrefRepository,
@@ -171,12 +171,14 @@ class WalletManager @Inject constructor(
     private var txBroadcastRestarted = false
 
     @Synchronized
-    fun start() {
+    fun start(seedWords: List<String>?) {
         torManager.run()
+
+        val ffiSeedWords = SeedPhrase.createOrNull(seedWords)
 
         applicationScope.launch {
             torProxyStateHandler.doOnTorReadyForWallet {
-                startWallet()
+                startWallet(ffiSeedWords)
             }
         }
     }
@@ -259,29 +261,34 @@ class WalletManager @Inject constructor(
         return walletInstance?.startRecovery(baseNodeFFI, recoveryOutputMessage) ?: false
     }
 
+    fun onWalletRestored() {
+        corePrefRepository.onboardingCompleted = true
+        corePrefRepository.onboardingStarted = true
+        corePrefRepository.onboardingAuthSetupStarted = true
+        corePrefRepository.onboardingAuthSetupCompleted = false
+        corePrefRepository.onboardingDisplayedAtHome = true
+        tariSettingsPrefRepository.isRestoredWallet = true
+    }
+
     fun deleteWallet() {
         walletInstance?.destroy()
         walletInstance = null
         _walletState.update { WalletState.NotReady }
         runOnMain { _walletEvent.send(WalletEvent.OnWalletRemove) }
-        clearWalletFiles()
+        WalletFileUtil.clearWalletFiles(walletConfig.getWalletFilesDirPath())
         corePrefRepository.clear()
         dialogManager.dismissAll()
         walletServiceLauncher.stop()
 
     }
 
-    fun clearWalletFiles() {
-        WalletFileUtil.clearWalletFiles(walletConfig.getWalletFilesDirPath())
-    }
-
-    private fun startWallet() {
+    private fun startWallet(ffiSeedWords: FFISeedWords?) {
         if (walletState.value is WalletState.NotReady || walletState.value is WalletState.Failed) {
             logger.i("Initialize wallet started")
             _walletState.update { WalletState.Initializing }
             applicationScope.launch {
                 try {
-                    initWallet()
+                    initWallet(ffiSeedWords)
                     _walletState.update { WalletState.Started }
                     logger.i("Wallet was started")
                 } catch (e: Exception) {
@@ -340,7 +347,7 @@ class WalletManager @Inject constructor(
     /**
      * Initializes the wallet and sets the singleton instance in the wallet companion object.
      */
-    private fun initWallet() {
+    private fun initWallet(ffiSeedWords: FFISeedWords?) {
         if (walletInstance == null) {
             // store network info in shared preferences if it's a new wallet
             val isNewInstallation = !WalletFileUtil.walletExists(walletConfig)
@@ -353,7 +360,7 @@ class WalletManager @Inject constructor(
                 commsConfig = getCommsConfig(),
                 logPath = walletConfig.getWalletLogFilePath(),
                 passphrase = passphrase,
-                seedWords = seedPhraseRepository.getPhrase()?.ffiSeedWords,
+                seedWords = ffiSeedWords,
                 listener = object : FFIWalletListener {
                     /**
                      * All the callbacks are called on the FFI thread, so we need to switch to the main thread.

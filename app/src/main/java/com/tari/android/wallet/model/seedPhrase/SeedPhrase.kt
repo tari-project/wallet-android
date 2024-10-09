@@ -1,38 +1,12 @@
 package com.tari.android.wallet.model.seedPhrase
 
+import com.orhanobut.logger.Logger
 import com.tari.android.wallet.ffi.FFISeedWords
 
 class SeedPhrase {
 
-    var ffiSeedWords: FFISeedWords? = null
-        private set
-
-    fun init(words: List<String>): SeedPhraseCreationResult {
-        val ffiSeedWords = FFISeedWords()
-
-        try {
-            for (seedWord in words) {
-                return when (ffiSeedWords.pushWord(seedWord)) {
-                    SeedWordsWordPushResult.InvalidSeedWord -> SeedPhraseCreationResult.InvalidSeedWord
-                    SeedWordsWordPushResult.SuccessfulPush -> continue
-                    SeedWordsWordPushResult.SeedPhraseComplete -> {
-                        this.ffiSeedWords = ffiSeedWords
-                        SeedPhraseCreationResult.Success
-                    }
-
-                    SeedWordsWordPushResult.InvalidSeedPhrase -> SeedPhraseCreationResult.InvalidSeedPhrase
-                }
-            }
-        } catch (e: Throwable) {
-            return SeedPhraseCreationResult.Failed(e)
-        }
-
-        return SeedPhraseCreationResult.SeedPhraseNotCompleted
-    }
-
-
     sealed class SeedPhraseCreationResult {
-        data object Success : SeedPhraseCreationResult()
+        data class Success(val ffiSeedWords: FFISeedWords) : SeedPhraseCreationResult()
         data class Failed(val exception: Throwable) : SeedPhraseCreationResult()
         data object InvalidSeedPhrase : SeedPhraseCreationResult()
         data object SeedPhraseNotCompleted : SeedPhraseCreationResult()
@@ -40,6 +14,40 @@ class SeedPhrase {
     }
 
     companion object {
+        private val logger
+            get() = Logger.t(SeedPhrase::class.simpleName)
+
         const val SEED_PHRASE_LENGTH: Int = 24
+
+        fun create(words: List<String>): SeedPhraseCreationResult {
+            val ffiSeedWords = FFISeedWords()
+
+            try {
+                for (seedWord in words) {
+                    return when (ffiSeedWords.pushWord(seedWord)) {
+                        SeedWordsWordPushResult.InvalidSeedWord -> SeedPhraseCreationResult.InvalidSeedWord
+                        SeedWordsWordPushResult.SuccessfulPush -> continue
+                        SeedWordsWordPushResult.SeedPhraseComplete -> SeedPhraseCreationResult.Success(ffiSeedWords)
+                        SeedWordsWordPushResult.InvalidSeedPhrase -> SeedPhraseCreationResult.InvalidSeedPhrase
+                    }
+                }
+            } catch (e: Throwable) {
+                return SeedPhraseCreationResult.Failed(e)
+            }
+
+            return SeedPhraseCreationResult.SeedPhraseNotCompleted
+        }
+
+        fun createOrNull(words: List<String>?): FFISeedWords? {
+            return words?.let {
+                when (val result = create(words)) {
+                    is SeedPhraseCreationResult.Success -> result.ffiSeedWords
+                    else -> {
+                        logger.i("Seed phrase creation failed: $result")
+                        null
+                    }
+                }
+            }
+        }
     }
 }
