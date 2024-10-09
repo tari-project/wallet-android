@@ -11,6 +11,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
@@ -141,10 +142,12 @@ abstract class CommonFragment<Binding : ViewBinding, VM : CommonViewModel> : Fra
         }
     }
 
-    protected fun changeOnBackPressed(isBlocked: Boolean) {
-        blockingBackPressDispatcher.isEnabled = false
-        blockingBackPressDispatcher = MutedBackPressedCallback(isBlocked)
-        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, blockingBackPressDispatcher)
+    protected fun doOnBackPressed(onBackPressedAction: () -> Unit) {
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                onBackPressedAction()
+            }
+        })
     }
 
     private fun copy(clipboardArgs: ClipboardArgs) {

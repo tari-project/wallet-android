@@ -41,15 +41,13 @@ import com.tari.android.wallet.databinding.FragmentWalletRestoringBinding
 import com.tari.android.wallet.extension.collectFlow
 import com.tari.android.wallet.ui.common.CommonFragment
 
-class WalletRestoringFragment :
-    CommonFragment<FragmentWalletRestoringBinding, WalletRestoringViewModel>() {
+class WalletRestoringFragment : CommonFragment<FragmentWalletRestoringBinding, WalletRestoringViewModel>() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
         FragmentWalletRestoringBinding.inflate(inflater, container, false).also { ui = it }.root
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        changeOnBackPressed(true)
 
         val viewModel: WalletRestoringViewModel by viewModels()
         bindViewModel(viewModel)
@@ -57,6 +55,8 @@ class WalletRestoringFragment :
         subscribeUI()
 
         viewModel.startRestoring()
+
+        doOnBackPressed { viewModel.showResetFlowDialog() }
     }
 
     private fun subscribeUI() = with(viewModel) {

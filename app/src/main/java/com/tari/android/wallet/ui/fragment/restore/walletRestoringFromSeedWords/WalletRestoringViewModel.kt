@@ -1,5 +1,6 @@
 package com.tari.android.wallet.ui.fragment.restore.walletRestoringFromSeedWords
 
+import androidx.lifecycle.viewModelScope
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.baseNodes.BaseNodesManager
 import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodeDto
@@ -10,11 +11,16 @@ import com.tari.android.wallet.recovery.WalletRestorationStateHandler
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.common.domain.ResourceManager
 import com.tari.android.wallet.ui.dialog.modular.SimpleDialogArgs
+import com.tari.android.wallet.ui.dialog.modular.modules.body.BodyModule
+import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonModule
+import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonStyle
+import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
 import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.text.DecimalFormat
 import javax.inject.Inject
@@ -41,6 +47,22 @@ class WalletRestoringViewModel : CommonViewModel() {
         connectToNextBaseNode()
     }
 
+    fun showResetFlowDialog() {
+        showModularDialog(
+            HeadModule(resourceManager.getString(R.string.restore_from_seed_words_cancel_dialog_title)),
+            BodyModule(resourceManager.getString(R.string.restore_from_seed_words_cancel_dialog_description)),
+            ButtonModule(resourceManager.getString(R.string.common_confirm), ButtonStyle.Warning) {
+                viewModelScope.launch(Dispatchers.Main) {
+                    cancelRecovery()
+                    hideDialog()
+                }
+            },
+            ButtonModule(resourceManager.getString(R.string.common_cancel), ButtonStyle.Close) {
+                hideDialog()
+            },
+        )
+    }
+
     private suspend fun connectToNextBaseNode() = withContext(Dispatchers.IO) {
         if (baseNodeIterator.hasNext()) {
             val nextBaseNode = baseNodeIterator.next()
@@ -48,7 +70,7 @@ class WalletRestoringViewModel : CommonViewModel() {
             startRestoringOnNode(nextBaseNode)
         } else {
             logger.i("No more base nodes to try")
-            onError(RestorationError.ConnectionFailed(resourceManager, this@WalletRestoringViewModel::onErrorClosed))
+            onError(RestorationError.ConnectionFailed(resourceManager, this@WalletRestoringViewModel::cancelRecovery))
         }
     }
 
@@ -61,9 +83,9 @@ class WalletRestoringViewModel : CommonViewModel() {
             } else {
                 connectToNextBaseNode()
             }
-            onError(RestorationError.ConnectionFailed(resourceManager, this@WalletRestoringViewModel::onErrorClosed))
+            onError(RestorationError.ConnectionFailed(resourceManager, this@WalletRestoringViewModel::cancelRecovery))
         } catch (e: Throwable) {
-            onError(RestorationError.RecoveryInternalError(resourceManager, this@WalletRestoringViewModel::onErrorClosed))
+            onError(RestorationError.RecoveryInternalError(resourceManager, this@WalletRestoringViewModel::cancelRecovery))
         }
     }
 
@@ -79,7 +101,7 @@ class WalletRestoringViewModel : CommonViewModel() {
                 )
 
                 is WalletRestorationState.RecoveryFailed -> onError(
-                    RestorationError.RecoveryInternalError(resourceManager, this@WalletRestoringViewModel::onErrorClosed)
+                    RestorationError.RecoveryInternalError(resourceManager, this@WalletRestoringViewModel::cancelRecovery)
                 )
 
                 is WalletRestorationState.Completed -> onSuccessRestoration()
@@ -111,7 +133,10 @@ class WalletRestoringViewModel : CommonViewModel() {
 
     private fun updateState(recoveryState: RestorationState) = _recoveryState.update { recoveryState }
 
-    private fun onErrorClosed() = tariNavigator.onBackPressed()
+    private fun cancelRecovery() {
+        walletManager.deleteWallet()
+        tariNavigator.navigate(Navigation.SplashScreen())
+    }
 
     sealed class RestorationError(title: String, message: String, dismissAction: () -> Unit) {
 
