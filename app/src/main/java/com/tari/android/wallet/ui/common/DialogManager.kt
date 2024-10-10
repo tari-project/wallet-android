@@ -1,6 +1,6 @@
 package com.tari.android.wallet.ui.common
 
-import android.content.Context
+import android.app.Activity
 import com.tari.android.wallet.R
 import com.tari.android.wallet.ui.dialog.modular.ModularDialog
 import com.tari.android.wallet.ui.dialog.modular.ModularDialogArgs
@@ -26,7 +26,7 @@ class DialogManager @Inject constructor() {
         }
     }
 
-    fun replace(context: Context, args: ModularDialogArgs) {
+    fun replace(context: Activity, args: ModularDialogArgs) {
         replace(ModularDialog(context, args))
     }
 
@@ -50,7 +50,7 @@ class DialogManager @Inject constructor() {
 
     fun isDialogShowing(dialogId: Int) = dialogId != DialogId.NO_ID && dialogQueue.any { it.args.dialogId == dialogId }
 
-    fun showNotReadyYetDialog(context: Context) {
+    fun showNotReadyYetDialog(context: Activity) {
         replace(
             context, ModularDialogArgs(
                 modules = listOf(

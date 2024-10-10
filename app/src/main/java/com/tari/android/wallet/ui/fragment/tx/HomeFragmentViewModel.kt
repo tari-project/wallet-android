@@ -1,7 +1,7 @@
 package com.tari.android.wallet.ui.fragment.tx
 
 
-import android.content.Context
+import android.app.Activity
 import android.os.Build
 import android.text.SpannableString
 import android.text.Spanned
@@ -131,7 +131,7 @@ class HomeFragmentViewModel : CommonViewModel() {
         }
     }
 
-    fun handleDeeplink(context: Context, deepLink: DeepLink) {
+    fun handleDeeplink(context: Activity, deepLink: DeepLink) {
         deeplinkManager.execute(context, deepLink)
     }
 

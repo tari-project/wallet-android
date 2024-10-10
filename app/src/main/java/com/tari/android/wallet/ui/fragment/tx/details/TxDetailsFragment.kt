@@ -40,6 +40,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import com.bumptech.glide.Glide
 import com.tari.android.wallet.R
+import com.tari.android.wallet.application.walletManager.WalletFileUtil
 import com.tari.android.wallet.databinding.FragmentTxDetailsBinding
 import com.tari.android.wallet.extension.collectNonNullFlow
 import com.tari.android.wallet.extension.observe
@@ -73,7 +74,6 @@ import com.tari.android.wallet.ui.fragment.contactBook.data.contacts.ContactDto
 import com.tari.android.wallet.ui.fragment.tx.details.gif.GifView
 import com.tari.android.wallet.ui.fragment.tx.details.gif.GifViewModel
 import com.tari.android.wallet.ui.fragment.tx.details.gif.TxState
-import com.tari.android.wallet.application.walletManager.WalletFileUtil
 import com.tari.android.wallet.util.addressFirstEmojis
 import com.tari.android.wallet.util.addressLastEmojis
 import com.tari.android.wallet.util.addressPrefixEmojis
@@ -271,7 +271,7 @@ class TxDetailsFragment : CommonFragment<FragmentTxDetailsBinding, TxDetailsView
     private fun showTxFeeToolTip() {
         val args = TooltipDialogArgs(string(R.string.tx_detail_fee_tooltip_transaction_fee), string(R.string.tx_detail_fee_tooltip_desc))
             .getModular(viewModel.resourceManager)
-        ModularDialog(requireContext(), args).show()
+        ModularDialog(requireActivity(), args).show()
     }
 
     companion object {

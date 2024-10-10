@@ -32,6 +32,7 @@
  */
 package com.tari.android.wallet.ui.extension
 
+import android.app.Activity
 import android.content.ContentResolver
 import android.content.Context
 import android.graphics.drawable.Drawable
@@ -67,3 +68,5 @@ fun Context.getResourceUri(resourceId: Int): Uri = Uri.Builder()
     .authority(packageName)
     .path(resourceId.toString())
     .build()
+
+fun Context.isStillAlive(): Boolean = this is Activity && !this.isFinishing && !this.isDestroyed

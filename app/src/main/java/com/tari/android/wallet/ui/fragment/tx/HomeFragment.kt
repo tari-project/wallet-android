@@ -154,7 +154,7 @@ class HomeFragment : CommonFragment<FragmentHomeBinding, HomeFragmentViewModel>(
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == QrScannerActivity.REQUEST_QR_SCANNER && resultCode == Activity.RESULT_OK && data != null) {
             val qrDeepLink = data.parcelable<DeepLink>(QrScannerActivity.EXTRA_DEEPLINK) ?: return
-            viewModel.handleDeeplink(requireContext(), qrDeepLink)
+            viewModel.handleDeeplink(requireActivity(), qrDeepLink)
         }
     }
 

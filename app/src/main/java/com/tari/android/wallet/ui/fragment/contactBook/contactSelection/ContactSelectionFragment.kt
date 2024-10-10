@@ -339,7 +339,7 @@ open class ContactSelectionFragment : CommonFragment<FragmentContactsSelectionBi
                 viewModel.addressEntered(textWithoutSeparators)
             }
         } else if (viewModel.deeplinkManager.parseDeepLink(text) != null) {
-            viewModel.parseDeeplink(requireContext(), text)
+            viewModel.parseDeeplink(requireActivity(), text)
         } else {
             val walletAddress = TariWalletAddress.fromBase58OrNull(text)
             if (walletAddress != null) {

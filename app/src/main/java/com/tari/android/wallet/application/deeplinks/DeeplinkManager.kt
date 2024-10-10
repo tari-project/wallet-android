@@ -1,6 +1,6 @@
 package com.tari.android.wallet.application.deeplinks
 
-import android.content.Context
+import android.app.Activity
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.baseNodes.BaseNodesManager
 import com.tari.android.wallet.application.walletManager.WalletManager
@@ -48,7 +48,7 @@ class DeeplinkManager @Inject constructor(
     /**
      * Executes the given deeplink, but first shows a confirmation dialog.
      */
-    fun execute(context: Context, deeplink: DeepLink, isQrData: Boolean = true) {
+    fun execute(context: Activity, deeplink: DeepLink, isQrData: Boolean = true) {
         when (deeplink) {
             is DeepLink.AddBaseNode -> showAddBaseNodeDialog(context, deeplink, isQrData)
             is DeepLink.Contacts -> showAddContactsDialog(context, deeplink, isQrData)
@@ -62,7 +62,7 @@ class DeeplinkManager @Inject constructor(
     /**
      * Executes the given deeplink without showing a confirmation dialog.
      */
-    fun executeRawDeeplink(context: Context, deeplink: DeepLink, isQrData: Boolean = true) {
+    fun executeRawDeeplink(context: Activity, deeplink: DeepLink, isQrData: Boolean = true) {
         when (deeplink) {
             is DeepLink.AddBaseNode -> showAddBaseNodeDialog(context, deeplink)
             is DeepLink.Contacts -> addContactsAction(deeplink.data(), isQrData)
@@ -73,7 +73,7 @@ class DeeplinkManager @Inject constructor(
         }
     }
 
-    private fun showAddBaseNodeDialog(context: Context, deeplink: DeepLink.AddBaseNode, isQrData: Boolean = true) {
+    private fun showAddBaseNodeDialog(context: Activity, deeplink: DeepLink.AddBaseNode, isQrData: Boolean = true) {
         val baseNode = deeplink.data()
         dialogManager.replace(
             context = context,
@@ -91,7 +91,7 @@ class DeeplinkManager @Inject constructor(
         )
     }
 
-    private fun addUserProfile(context: Context, deeplink: DeepLink.UserProfile, isQrData: Boolean) {
+    private fun addUserProfile(context: Activity, deeplink: DeepLink.UserProfile, isQrData: Boolean) {
         val contact = DeepLink.Contacts(
             listOf(
                 DeepLink.Contacts.DeeplinkContact(
@@ -103,7 +103,7 @@ class DeeplinkManager @Inject constructor(
         showAddContactsDialog(context, contact, isQrData)
     }
 
-    private fun showAddContactsDialog(context: Context, deeplink: DeepLink.Contacts, isQrData: Boolean = true) {
+    private fun showAddContactsDialog(context: Activity, deeplink: DeepLink.Contacts, isQrData: Boolean = true) {
         val contactDtos = deeplink.data()
         if (contactDtos.isEmpty()) return
         val names = contactDtos.joinToString(", ") { it.contactInfo.getAlias().trim() }
@@ -130,7 +130,7 @@ class DeeplinkManager @Inject constructor(
         }
     }
 
-    private fun showPaperWalletDialog(context: Context, deeplink: DeepLink.PaperWallet, isQrSata: Boolean = true) {
+    private fun showPaperWalletDialog(context: Activity, deeplink: DeepLink.PaperWallet, isQrSata: Boolean = true) {
         dialogManager.replace(
             context = context,
             args = ModularDialogArgs(
@@ -152,7 +152,7 @@ class DeeplinkManager @Inject constructor(
         )
     }
 
-    private fun showRememberToBackupDialog(context: Context, deeplink: DeepLink.PaperWallet) {
+    private fun showRememberToBackupDialog(context: Activity, deeplink: DeepLink.PaperWallet) {
         dialogManager.replace(
             context = context,
             args = ModularDialogArgs(
