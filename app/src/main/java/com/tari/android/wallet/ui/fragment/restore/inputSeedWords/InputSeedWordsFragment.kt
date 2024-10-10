@@ -212,10 +212,6 @@ class InputSeedWordsFragment : CommonFragment<FragmentWalletInputSeedWordsBindin
     }
 
     companion object {
-        const val PARAMETER_SEED_WORDS = "PARAMETER_SEED_WORDS"
-
-        fun createFragment(seedWords: List<String>?): InputSeedWordsFragment = InputSeedWordsFragment().apply {
-            arguments = Bundle().apply { putStringArray(PARAMETER_SEED_WORDS, seedWords?.toTypedArray()) }
-        }
+        fun createFragment(): InputSeedWordsFragment = InputSeedWordsFragment()
     }
 }

@@ -6,6 +6,7 @@ import com.tari.android.wallet.application.baseNodes.BaseNodesManager
 import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodeDto
 import com.tari.android.wallet.extension.collectFlow
 import com.tari.android.wallet.extension.launchOnIo
+import com.tari.android.wallet.extension.launchOnMain
 import com.tari.android.wallet.recovery.WalletRestorationState
 import com.tari.android.wallet.recovery.WalletRestorationStateHandler
 import com.tari.android.wallet.ui.common.CommonViewModel
@@ -91,24 +92,25 @@ class WalletRestoringViewModel : CommonViewModel() {
 
     private fun subscribeOnRestorationState() {
         collectFlow(walletRestorationStateHandler.walletRestorationState) { state ->
-            when (state) {
-                is WalletRestorationState.ConnectingToBaseNode -> updateState(RestorationState.ConnectingToBaseNode(resourceManager))
-                is WalletRestorationState.ConnectedToBaseNode -> updateState(RestorationState.ConnectedToBaseNode(resourceManager))
-                is WalletRestorationState.ScanningRoundFailed -> onConnectionFailed(state.retryCount, state.retryLimit)
-                is WalletRestorationState.ConnectionToBaseNodeFailed -> onConnectionFailed(state.retryCount, state.retryLimit)
-                is WalletRestorationState.Progress -> updateState(
-                    RestorationState.Recovery(resourceManager, state.currentBlock, state.numberOfBlocks)
-                )
+            launchOnMain {
+                when (state) {
+                    is WalletRestorationState.ConnectingToBaseNode -> updateState(RestorationState.ConnectingToBaseNode(resourceManager))
+                    is WalletRestorationState.ConnectedToBaseNode -> updateState(RestorationState.ConnectedToBaseNode(resourceManager))
+                    is WalletRestorationState.ScanningRoundFailed -> onConnectionFailed(state.retryCount, state.retryLimit)
+                    is WalletRestorationState.ConnectionToBaseNodeFailed -> onConnectionFailed(state.retryCount, state.retryLimit)
+                    is WalletRestorationState.Progress -> updateState(
+                        RestorationState.Recovery(resourceManager, state.currentBlock, state.numberOfBlocks)
+                    )
 
-                is WalletRestorationState.RecoveryFailed -> onError(
-                    RestorationError.RecoveryInternalError(resourceManager, this@WalletRestoringViewModel::cancelRecovery)
-                )
+                    is WalletRestorationState.RecoveryFailed -> onError(
+                        RestorationError.RecoveryInternalError(resourceManager, this@WalletRestoringViewModel::cancelRecovery)
+                    )
 
-                is WalletRestorationState.Completed -> onSuccessRestoration()
+                    is WalletRestorationState.Completed -> onSuccessRestoration()
+                }
             }
         }
     }
-
 
     private fun onConnectionFailed(retryCount: Long, retryLimit: Long) {
         if (retryCount == retryLimit) {

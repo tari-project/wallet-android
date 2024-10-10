@@ -121,7 +121,7 @@ class TariNavigator @Inject constructor(
             is ContactBookNavigation.ToAddPhoneContact -> toAddPhoneContact()
             is ContactBookNavigation.ToSelectTariUser -> addFragment(SelectUserContactFragment.newInstance())
             is ChooseRestoreOptionNavigation.ToEnterRestorePassword -> toEnterRestorePassword()
-            is ChooseRestoreOptionNavigation.ToRestoreWithRecoveryPhrase -> toRestoreWithRecoveryPhrase(navigation.seedWords)
+            is ChooseRestoreOptionNavigation.ToRestoreWithRecoveryPhrase -> addFragment(InputSeedWordsFragment.createFragment())
             is AllSettingsNavigation.ToBugReporting -> DebugActivity.launch(activity, DebugNavigation.BugReport)
             is AllSettingsNavigation.ToMyProfile -> toMyProfile()
             is AllSettingsNavigation.ToAbout -> toAbout()
@@ -179,8 +179,6 @@ class TariNavigator @Inject constructor(
     }
 
     private fun toEnterRestorePassword() = addFragment(EnterRestorationPasswordFragment.newInstance())
-
-    private fun toRestoreWithRecoveryPhrase(seedWords: List<String>?) = addFragment(InputSeedWordsFragment.createFragment(seedWords))
 
     fun onBackPressed() = activity.onBackPressed()
 

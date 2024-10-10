@@ -3,7 +3,6 @@ package com.tari.android.wallet.ui.fragment.restore.inputSeedWords
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.map
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.baseNodes.BaseNodesManager
@@ -25,7 +24,6 @@ import com.tari.android.wallet.ui.dialog.modular.SimpleDialogArgs
 import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
 import com.tari.android.wallet.ui.dialog.modular.modules.input.InputModule
 import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
-import com.tari.android.wallet.ui.fragment.restore.inputSeedWords.InputSeedWordsFragment.Companion.PARAMETER_SEED_WORDS
 import com.tari.android.wallet.ui.fragment.restore.inputSeedWords.suggestions.SuggestionState
 import com.tari.android.wallet.ui.fragment.restore.inputSeedWords.suggestions.SuggestionViewHolderItem
 import io.reactivex.disposables.CompositeDisposable
@@ -35,7 +33,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 
-class InputSeedWordsViewModel(savedState: SavedStateHandle) : CommonViewModel() {
+class InputSeedWordsViewModel() : CommonViewModel() {
 
     private var mnemonicList = mutableListOf<String>()
 
@@ -92,16 +90,6 @@ class InputSeedWordsViewModel(savedState: SavedStateHandle) : CommonViewModel() 
 
         _suggestions.addSource(focusedIndex) { processSuggestions() }
         _suggestions.addSource(_words) { processSuggestions() }
-
-        // Check if there are seed words for paper wallet restoration
-        val seedWords = savedState.get<Array<String>>(PARAMETER_SEED_WORDS)
-        if (seedWords != null) {
-            for (index in seedWords.indices) {
-                addWord(index, seedWords[index])
-            }
-            finishEntering()
-            startRestoringWallet()
-        }
     }
 
     fun startRestoringWallet() {

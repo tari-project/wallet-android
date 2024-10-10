@@ -2,8 +2,6 @@ package com.tari.android.wallet.ui.fragment.restore.chooseRestoreOption
 
 import android.content.Intent
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.deeplinks.DeepLink
 import com.tari.android.wallet.application.walletManager.WalletFileUtil
@@ -23,7 +21,6 @@ import com.tari.android.wallet.model.WalletError
 import com.tari.android.wallet.model.throwIf
 import com.tari.android.wallet.service.service.WalletServiceLauncher
 import com.tari.android.wallet.ui.common.CommonViewModel
-import com.tari.android.wallet.ui.common.SingleLiveEvent
 import com.tari.android.wallet.ui.dialog.modular.modules.body.BodyModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonStyle
@@ -31,8 +28,10 @@ import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
 import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
 import com.tari.android.wallet.ui.fragment.qr.QrScannerActivity
 import com.tari.android.wallet.ui.fragment.qr.QrScannerSource
-import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupOptionDto
-import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupOptions
+import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupOption
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import java.io.IOException
 import javax.inject.Inject
 
@@ -50,35 +49,33 @@ class ChooseRestoreOptionViewModel : CommonViewModel() {
     @Inject
     lateinit var walletConfig: WalletConfig
 
-    private val _state = SingleLiveEvent<ChooseRestoreOptionState>()
-    val state: LiveData<ChooseRestoreOptionState> = _state
-
-    val options = MutableLiveData<List<BackupOptionDto>>()
-
     init {
         component.inject(this)
+    }
 
-        options.postValue(backupPrefRepository.getOptionList)
+    private val _uiState = MutableStateFlow(ChooseRestoreOptionModel.UiState(backupOptions = backupPrefRepository.getOptionList))
+    val uiState = _uiState.asStateFlow()
 
+    init {
         launchOnIo {
             walletManager.doOnWalletRunning {
-                if (WalletFileUtil.walletExists(walletConfig) && state.value != null) {
-                    backupPrefRepository.restoredTxs?.let {
-                        if (it.utxos.isEmpty()) return@let
+                uiState.value.selectedOption?.let { selectedOption ->
+                    if (WalletFileUtil.walletExists(walletConfig)) {
+                        backupPrefRepository.restoredTxs?.takeIf { it.utxos.isNotEmpty() }?.let { restoredTxs ->
+                            val tariWalletAddress = TariWalletAddress.fromBase58(restoredTxs.sourceBase58)
+                            val message = resourceManager.getString(R.string.backup_restored_tx)
+                            val error = WalletError()
+                            walletService.restoreWithUnbindedOutputs(restoredTxs.utxos, tariWalletAddress, message, error)
+                            throwIf(error)
+                        }
 
-                        val tariWalletAddress = TariWalletAddress.fromBase58(it.sourceBase58)
-                        val message = resourceManager.getString(R.string.backup_restored_tx)
-                        val error = WalletError()
-                        walletService.restoreWithUnbindedOutputs(it.utxos, tariWalletAddress, message, error)
-                        throwIf(error)
+                        val dto = backupPrefRepository.getOptionDto(selectedOption).copy(isEnable = true)
+                        backupPrefRepository.updateOption(dto)
+                        backupManager.backupNow()
+
+                        walletManager.onWalletRestored()
+                        tariNavigator.navigate(Navigation.SplashScreen(clearTop = false))
                     }
-
-                    val dto = backupPrefRepository.getOptionDto(state.value!!.backupOptions)!!.copy(isEnable = true)
-                    backupPrefRepository.updateOption(dto)
-                    backupManager.backupNow()
-
-                    walletManager.onWalletRestored()
-                    tariNavigator.navigate(Navigation.SplashScreen(clearTop = false))
                 }
             }
         }
@@ -90,13 +87,13 @@ class ChooseRestoreOptionViewModel : CommonViewModel() {
         }
     }
 
-    fun startRecovery(options: BackupOptions, hostFragment: Fragment) {
-        _state.postValue(ChooseRestoreOptionState.BeginProgress(options))
-        backupManager.setupStorage(options, hostFragment)
+    fun startRecovery(selectedOption: BackupOption, hostFragment: Fragment) {
+        _uiState.update { it.copy(isStarted = true) }
+        backupManager.setupStorage(selectedOption, hostFragment)
     }
 
     fun onRecoveryPhraseClicked() {
-        tariNavigator.navigate(Navigation.ChooseRestoreOptionNavigation.ToRestoreWithRecoveryPhrase(seedWords = null))
+        tariNavigator.navigate(Navigation.ChooseRestoreOptionNavigation.ToRestoreWithRecoveryPhrase)
     }
 
     fun onPaperWalletClicked(fragment: Fragment) {
@@ -120,7 +117,7 @@ class ChooseRestoreOptionViewModel : CommonViewModel() {
             } catch (exception: Exception) {
                 logger.i(exception.message + "Backup storage setup failed")
                 backupManager.signOut()
-                _state.postValue(ChooseRestoreOptionState.EndProgress(backupManager.currentOption!!))
+                _uiState.update { it.copy(isStarted = false) }
                 showAuthFailedDialog()
             }
         }
@@ -135,6 +132,17 @@ class ChooseRestoreOptionViewModel : CommonViewModel() {
             }
         } catch (exception: Throwable) {
             handleException(exception)
+        }
+    }
+
+    private fun restoreFromPaperWallet(seedWords: List<String>) {
+        _uiState.update { it.copy(paperWalletProgress = true) }
+        walletServiceLauncher.start(seedWords)
+        launchOnIo {
+            walletManager.doOnWalletRunning {
+                _uiState.update { it.copy(paperWalletProgress = false) }
+                tariNavigator.navigate(Navigation.InputSeedWordsNavigation.ToRestoreFromSeeds)
+            }
         }
     }
 
@@ -184,7 +192,7 @@ class ChooseRestoreOptionViewModel : CommonViewModel() {
             }
         }
 
-        _state.postValue(ChooseRestoreOptionState.EndProgress(backupManager.currentOption!!))
+        _uiState.update { it.copy(isStarted = false) }
     }
 
     private fun showPaperWalletDialog(seedWords: List<String>) {
@@ -193,7 +201,7 @@ class ChooseRestoreOptionViewModel : CommonViewModel() {
             BodyModule(resourceManager.getString(R.string.restore_wallet_paper_wallet_body)),
             ButtonModule(resourceManager.getString(R.string.restore_wallet_paper_wallet_restore_button), ButtonStyle.Normal) {
                 hideDialog()
-                tariNavigator.navigate(Navigation.ChooseRestoreOptionNavigation.ToRestoreWithRecoveryPhrase(seedWords))
+                restoreFromPaperWallet(seedWords)
             },
             ButtonModule(resourceManager.getString(R.string.restore_wallet_paper_wallet_do_not_restore_button), ButtonStyle.Close),
         )

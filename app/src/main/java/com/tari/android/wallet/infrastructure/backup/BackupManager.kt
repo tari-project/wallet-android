@@ -49,7 +49,7 @@ import com.tari.android.wallet.infrastructure.backup.googleDrive.GoogleDriveBack
 import com.tari.android.wallet.infrastructure.backup.local.LocalBackupStorage
 import com.tari.android.wallet.notification.NotificationHelper
 import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupOptionDto
-import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupOptions
+import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupOption
 import io.reactivex.subjects.BehaviorSubject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -76,7 +76,7 @@ class BackupManager @Inject constructor(
     private val logger
         get() = Logger.t(BackupManager::class.simpleName)
 
-    var currentOption: BackupOptions? = BackupOptions.Dropbox
+    var currentOption: BackupOption? = BackupOption.Dropbox
 
     private val backupMutex = Mutex()
 
@@ -113,7 +113,7 @@ class BackupManager @Inject constructor(
         }
     }
 
-    fun setupStorage(option: BackupOptions, hostFragment: Fragment) {
+    fun setupStorage(option: BackupOption, hostFragment: Fragment) {
         currentOption = option
         getStorageByOption(option).setup(hostFragment)
     }
@@ -125,7 +125,7 @@ class BackupManager @Inject constructor(
 
     private suspend fun backupAll() = backupSettingsRepository.getOptionList.forEach { backup(it.type) }
 
-    private suspend fun backup(optionType: BackupOptions) = backupMutex.withLock {
+    private suspend fun backup(optionType: BackupOption) = backupMutex.withLock {
         val currentDto = backupSettingsRepository.getOptionList.firstOrNull { it.type == optionType } ?: return
         if (!currentDto.isEnable) {
             logger.d("Backup is disabled. Exit.")
@@ -173,7 +173,7 @@ class BackupManager @Inject constructor(
         backupSettingsRepository.getOptionList.forEach { turnOff(it.type) }
     }
 
-    fun turnOff(optionType: BackupOptions) = with(backupMutex) {
+    fun turnOff(optionType: BackupOption) = with(backupMutex) {
         val backupsState = EventBus.backupState.publishSubject.value!!.copy()
         backupSettingsRepository.updateOption(BackupOptionDto(optionType))
         backupSettingsRepository.backupPassword = null
@@ -198,10 +198,10 @@ class BackupManager @Inject constructor(
         else -> BackupState.BackupUpToDate
     }
 
-    private fun getStorageByOption(optionType: BackupOptions): BackupStorage = when (optionType) {
-        BackupOptions.Google -> googleDriveBackupStorage
-        BackupOptions.Local -> localFileBackupStorage
-        BackupOptions.Dropbox -> dropboxBackupStorage
+    private fun getStorageByOption(optionType: BackupOption): BackupStorage = when (optionType) {
+        BackupOption.Google -> googleDriveBackupStorage
+        BackupOption.Local -> localFileBackupStorage
+        BackupOption.Dropbox -> dropboxBackupStorage
     }
 
     private fun postBackupFailedNotification(exception: Exception) {
