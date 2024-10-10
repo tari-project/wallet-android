@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <com.tari.android.wallet.ui.component.tari.background.obsolete.TariPrimaryBackgroundConstraint xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -16,7 +17,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.4"  />
+        app:layout_constraintVertical_bias="0.4" />
 
     <com.tari.android.wallet.ui.component.tari.TariTextView
         android:id="@+id/label_view"
@@ -54,12 +55,12 @@
         android:layout_marginTop="12dp"
         android:gravity="center"
         android:lineSpacingMultiplier="1.5"
-        android:text="@string/restore_from_seed_words_overlay_description"
         android:textColor="?attr/palette_text_body"
         app:customFont="medium"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/description_view" />
+        app:layout_constraintTop_toBottomOf="@id/description_view"
+        tools:text="Waiting for connection" />
 
     <com.tari.android.wallet.ui.component.tari.TariTextView
         android:id="@+id/progress_label"
@@ -68,13 +69,13 @@
         android:layout_marginHorizontal="20dp"
         android:layout_marginTop="5dp"
         android:gravity="center"
-        android:text="@string/back_up_wallet_restoring_wallet_label_description"
         android:textColor="?attr/palette_text_body"
         android:textSize="18sp"
         app:customFont="light"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/status_label" />
+        app:layout_constraintTop_toBottomOf="@id/status_label"
+        tools:text="Attempts 5 out of 10" />
 
     <com.airbnb.lottie.LottieAnimationView
         android:id="@+id/progress_bar"

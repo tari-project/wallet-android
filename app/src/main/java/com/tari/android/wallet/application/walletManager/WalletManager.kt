@@ -271,6 +271,7 @@ class WalletManager @Inject constructor(
     }
 
     fun deleteWallet() {
+        logger.i("Deleting wallet: ${walletInstance?.getWalletAddress()?.fullBase58() ?: "wallet is already null!"}")
         walletInstance?.destroy()
         walletInstance = null
         _walletState.update { WalletState.NotReady }

@@ -7,6 +7,8 @@ import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodeDto
 import com.tari.android.wallet.extension.collectFlow
 import com.tari.android.wallet.extension.launchOnIo
 import com.tari.android.wallet.extension.launchOnMain
+import com.tari.android.wallet.extension.switchToIo
+import com.tari.android.wallet.extension.switchToMain
 import com.tari.android.wallet.recovery.WalletRestorationState
 import com.tari.android.wallet.recovery.WalletRestorationStateHandler
 import com.tari.android.wallet.ui.common.CommonViewModel
@@ -45,6 +47,7 @@ class WalletRestoringViewModel : CommonViewModel() {
 
     fun startRestoring() = launchOnIo {
         baseNodeIterator = baseNodesManager.baseNodeList.iterator()
+        subscribeOnRestorationState()
         connectToNextBaseNode()
     }
 
@@ -78,13 +81,10 @@ class WalletRestoringViewModel : CommonViewModel() {
     private suspend fun startRestoringOnNode(baseNode: BaseNodeDto) {
         try {
             val startedSuccessfully = walletManager.startRecovery(baseNode, resourceManager.getString(R.string.restore_wallet_output_message))
-            if (startedSuccessfully) {
-                subscribeOnRestorationState()
-                return
-            } else {
+            if (!startedSuccessfully) {
                 connectToNextBaseNode()
+                onError(RestorationError.ConnectionFailed(resourceManager, this@WalletRestoringViewModel::cancelRecovery))
             }
-            onError(RestorationError.ConnectionFailed(resourceManager, this@WalletRestoringViewModel::cancelRecovery))
         } catch (e: Throwable) {
             onError(RestorationError.RecoveryInternalError(resourceManager, this@WalletRestoringViewModel::cancelRecovery))
         }
@@ -112,9 +112,9 @@ class WalletRestoringViewModel : CommonViewModel() {
         }
     }
 
-    private fun onConnectionFailed(retryCount: Long, retryLimit: Long) {
+    private suspend fun onConnectionFailed(retryCount: Long, retryLimit: Long) = switchToMain {
         if (retryCount == retryLimit) {
-            launchOnIo { connectToNextBaseNode() }
+            switchToIo { connectToNextBaseNode() }
         } else {
             updateState(RestorationState.ConnectionFailed(resourceManager, retryCount, retryLimit))
         }
