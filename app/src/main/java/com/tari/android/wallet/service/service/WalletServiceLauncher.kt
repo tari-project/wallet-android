@@ -4,34 +4,40 @@ import android.content.Context
 import android.content.Intent
 import androidx.core.content.ContextCompat
 import com.tari.android.wallet.application.TariWalletApplication
+import com.tari.android.wallet.application.walletManager.WalletFileUtil
 import com.tari.android.wallet.data.WalletConfig
 import com.tari.android.wallet.data.sharedPrefs.tariSettings.TariSettingsPrefRepository
-import com.tari.android.wallet.application.walletManager.WalletFileUtil
 
+/**
+ * Wallet service launcher. Starts the wallet service that starts the wallet.
+ */
 class WalletServiceLauncher(
     private val context: Context,
     val walletConfig: WalletConfig,
     val tariSettingsSharedRepository: TariSettingsPrefRepository
 ) {
-    fun startIfExist() {
+    fun startIfWalletExists(seedWords: List<String>? = null) {
         if (WalletFileUtil.walletExists(walletConfig)) {
-            startService()
+            startService(seedWords)
         }
     }
 
-    fun start() {
-        if (tariSettingsSharedRepository.backgroundServiceTurnedOn ||
-            !tariSettingsSharedRepository.backgroundServiceTurnedOn && TariWalletApplication.INSTANCE.get()?.isInForeground == true
-        ) {
-            startService()
+    // We can't pass a FFISeedWords object to the service, so we pass the seed words as a list of strings
+    fun start(seedWords: List<String>? = null) {
+        val backgroundServiceTurnedOn = tariSettingsSharedRepository.backgroundServiceTurnedOn
+        val appInForeground = TariWalletApplication.INSTANCE.get()?.isInForeground == true
+        if (backgroundServiceTurnedOn || appInForeground) {
+            startService(seedWords)
         }
     }
 
-    private fun startService() = ContextCompat.startForegroundService(context, getStartIntent(context))
+    private fun startService(seedWords: List<String>?) =
+        ContextCompat.startForegroundService(context, Intent(context, WalletService::class.java).also {
+            it.action = START_ACTION
+            it.putExtra(ARG_SEED_WORDS, seedWords?.toTypedArray())
+        })
 
-    fun stop() = ContextCompat.startForegroundService(context, getStopIntent(context))
-
-    fun stopAndDelete() = ContextCompat.startForegroundService(context, getStopAndDeleteIntent(context))
+    fun stop() = ContextCompat.startForegroundService(context, Intent(context, WalletService::class.java).also { it.action = STOP_ACTION })
 
     fun startOnAppForegrounded() {
         if (!tariSettingsSharedRepository.backgroundServiceTurnedOn) {
@@ -45,18 +51,9 @@ class WalletServiceLauncher(
         }
     }
 
-    private fun getStartIntent(context: Context) = Intent(context, WalletService::class.java).also { it.action = START_ACTION }
-
-    private fun getStopIntent(context: Context) = Intent(context, WalletService::class.java).also { it.action = STOP_ACTION }
-
-    private fun getStopAndDeleteIntent(context: Context) = Intent(context, WalletService::class.java).also { it.action = STOP_AND_DELETE_ACTION }
-
-
     companion object {
-        // intent actions
         const val START_ACTION = "START_SERVICE"
         const val STOP_ACTION = "STOP_SERVICE"
-        const val STOP_AND_DELETE_ACTION = "STOP_SERVICE_AND_DELETE_WALLET"
+        const val ARG_SEED_WORDS = "ARG_SEED_WORDS"
     }
-
 }

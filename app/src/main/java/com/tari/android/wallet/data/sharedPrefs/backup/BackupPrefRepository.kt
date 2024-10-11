@@ -12,8 +12,8 @@ import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefStringSecure
 import com.tari.android.wallet.data.sharedPrefs.network.NetworkPrefRepository
 import com.tari.android.wallet.data.sharedPrefs.network.formatKey
 import com.tari.android.wallet.infrastructure.backup.BackupUtxos
+import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupOption
 import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupOptionDto
-import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupOptions
 import com.tari.android.wallet.util.Constants
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -30,7 +30,7 @@ class BackupPrefRepository @Inject constructor(
         commonRepository = this,
         name = formatKey(Keys.LOCAL_FILE_OPTIONS_KEY),
         type = BackupOptionDto::class.java,
-        defValue = BackupOptionDto(BackupOptions.Local),
+        defValue = BackupOptionDto(BackupOption.Local),
     )
 
     private var googleDriveOption: BackupOptionDto by SharedPrefGsonDelegate(
@@ -38,14 +38,15 @@ class BackupPrefRepository @Inject constructor(
         commonRepository = this,
         name = formatKey(Keys.GOOGLE_DRIVE_OPTION_KEY),
         type = BackupOptionDto::class.java,
-        defValue = BackupOptionDto(BackupOptions.Google),
+        defValue = BackupOptionDto(BackupOption.Google),
     )
 
-    var dropboxOption: BackupOptionDto? by SharedPrefGsonNullableDelegate(
+    var dropboxOption: BackupOptionDto by SharedPrefGsonDelegate(
         prefs = sharedPrefs,
         commonRepository = this,
         name = formatKey(Keys.DROPBOX_OPTIONS_KEY),
         type = BackupOptionDto::class.java,
+        defValue = BackupOptionDto(BackupOption.Dropbox),
     )
 
     var dropboxCredential: DbxCredential? by SharedPrefGsonNullableDelegate(
@@ -86,23 +87,23 @@ class BackupPrefRepository @Inject constructor(
     fun clear() {
         backupPassword = null
         localBackupFolderURI = null
-        localFileOption = BackupOptionDto(BackupOptions.Local)
-        googleDriveOption = BackupOptionDto(BackupOptions.Google)
-        dropboxOption = BackupOptionDto(BackupOptions.Dropbox)
+        localFileOption = BackupOptionDto(BackupOption.Local)
+        googleDriveOption = BackupOptionDto(BackupOption.Google)
+        dropboxOption = BackupOptionDto(BackupOption.Dropbox)
     }
 
     fun updateOption(option: BackupOptionDto) {
         when (option.type) {
-            BackupOptions.Google -> googleDriveOption = option
-            BackupOptions.Local -> localFileOption = option
-            BackupOptions.Dropbox -> dropboxOption = option
+            BackupOption.Google -> googleDriveOption = option
+            BackupOption.Local -> localFileOption = option
+            BackupOption.Dropbox -> dropboxOption = option
         }
     }
 
-    fun getOptionDto(type: BackupOptions): BackupOptionDto? = when (type) {
-        BackupOptions.Google -> googleDriveOption
-        BackupOptions.Local -> localFileOption
-        BackupOptions.Dropbox -> dropboxOption
+    fun getOptionDto(type: BackupOption): BackupOptionDto = when (type) {
+        BackupOption.Google -> googleDriveOption
+        BackupOption.Local -> localFileOption
+        BackupOption.Dropbox -> dropboxOption
     }
 
     companion object {

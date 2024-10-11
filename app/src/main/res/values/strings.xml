@@ -578,6 +578,12 @@
     <string name="restore_wallet_paper_wallet_body">You’ve scanned a paper wallet!\nWhat would you like to do?</string>
     <string name="restore_wallet_paper_wallet_restore_button">Restore the wallet</string>
     <string name="restore_wallet_paper_wallet_do_not_restore_button">Don\'t restore right now</string>
+    <string name="restore_wallet_paper_wallet_sweep_funds_button">Sweep the funds</string>
+    <string name="restore_wallet_paper_wallet_replace_wallet_button">Replace current wallet</string>
+    <string name="restore_wallet_paper_wallet_remember_backup_title">Remember to back up first!</string>
+    <string name="restore_wallet_paper_wallet_remember_backup_body">Do you want to back up your current wallet before replacing it? If you don\’t back it up first, you will lose all the funds in your current wallet!</string>
+    <string name="restore_wallet_paper_wallet_remember_backup_yes_button">Yes, back it up</string>
+    <string name="restore_wallet_paper_wallet_remember_backup_no_button">No, just replace it</string>
 
     <!-- Wallet recovery with seed phrase -->
     <string name="restore_from_seed_words_title">Restore With Seed Phrase</string>
@@ -588,24 +594,21 @@
     <string name="restore_from_seed_words_button_select_base_node_select">Select Custom Base Node</string>
     <string name="restore_from_seed_words_button_select_base_node_edit">Edit Base Node</string>
     <string name="restore_from_seed_words_form_error_message">Oops, looks like the address you entered isn\'t good. We had to revert your change.</string>
-
     <string name="restore_from_seed_words_error_invalid_seed_word">At least one of the entered seed words is invalid. Please review them and try again</string>
     <string name="restore_from_seed_words_error_phrase_too_short">You entered not enough seed words. Please add some more and try again</string>
     <string name="restore_from_seed_words_error_unknown">Unable to generate key from seed words. Please check your seed words and try again</string>
-
     <string name="restore_from_seed_words_overlay_description">This could take between 1 to 3 minutes.\nPlease keep the app open</string>
-
     <string name="restore_from_seed_words_overlay_status_connecting">Waiting for connection</string>
     <string name="restore_from_seed_words_overlay_status_connected">Connection established. The process will start soon</string>
     <string name="restore_from_seed_words_overlay_status_progress">Restoring in progress:</string>
     <string name="restore_from_seed_words_overlay_status_connection_failed">Attempt %s out of %s</string>
-
     <string name="restore_from_seed_words_overlay_error_title">Recovery Failed</string>
     <string name="restore_from_seed_words_overlay_error_description_connection_failed">Unable to connect with base node. Please try again later</string>
     <string name="restore_from_seed_words_overlay_error_description_internal_error">Unable to recover your wallet due to the error</string>
-
     <string name="restore_from_seed_words_autocompletion_start_typing">Start typing to see suggestions</string>
     <string name="restore_from_seed_words_autocompletion_no_suggestions">here are no suggestions for the phrase</string>
+    <string name="restore_from_seed_words_cancel_dialog_title">Are you sure you want to cancel?</string>
+    <string name="restore_from_seed_words_cancel_dialog_description">You will lose your progress, but don\'t worry, you can always start over.</string>
 
     <!--Restore -->
     <string name="restore_with_cloud_page_title">Enter your backup password</string>

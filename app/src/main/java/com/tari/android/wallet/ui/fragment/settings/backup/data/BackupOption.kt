@@ -1,6 +1,6 @@
 package com.tari.android.wallet.ui.fragment.settings.backup.data
 
-enum class BackupOptions {
+enum class BackupOption {
     Google,
     Dropbox,
     Local

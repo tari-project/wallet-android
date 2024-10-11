@@ -45,6 +45,7 @@ import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.deeplinks.DeepLink
+import com.tari.android.wallet.application.walletManager.WalletFileUtil
 import com.tari.android.wallet.databinding.FragmentHomeBinding
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.extension.observe
@@ -63,7 +64,6 @@ import com.tari.android.wallet.ui.fragment.qr.QrScannerSource
 import com.tari.android.wallet.ui.fragment.tx.adapter.TxListHomeViewHolder
 import com.tari.android.wallet.ui.fragment.tx.questionMark.QuestionMarkViewModel
 import com.tari.android.wallet.ui.fragment.tx.ui.balanceController.BalanceViewController
-import com.tari.android.wallet.application.walletManager.WalletFileUtil
 
 class HomeFragment : CommonFragment<FragmentHomeBinding, HomeFragmentViewModel>() {
 
@@ -135,7 +135,7 @@ class HomeFragment : CommonFragment<FragmentHomeBinding, HomeFragmentViewModel>(
     @SuppressLint("ClickableViewAccessibility")
     private fun setupUI() = with(ui) {
         viewAllTxsButton.setOnClickListener { viewModel.navigation.postValue(Navigation.TxListNavigation.HomeTransactionHistory) }
-        qrCodeButton.setOnClickListener { QrScannerActivity.startScanner(requireActivity(), QrScannerSource.Home) }
+        qrCodeButton.setOnClickListener { QrScannerActivity.startScanner(this@HomeFragment, QrScannerSource.Home) }
         transactionsRecyclerView.adapter = adapter
         adapter.setClickListener(CommonAdapter.ItemClickListener { viewModel.processItemClick(it) })
         transactionsRecyclerView.layoutManager = LinearLayoutManager(requireContext())
@@ -154,7 +154,7 @@ class HomeFragment : CommonFragment<FragmentHomeBinding, HomeFragmentViewModel>(
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == QrScannerActivity.REQUEST_QR_SCANNER && resultCode == Activity.RESULT_OK && data != null) {
             val qrDeepLink = data.parcelable<DeepLink>(QrScannerActivity.EXTRA_DEEPLINK) ?: return
-            viewModel.handleDeeplink(requireContext(), qrDeepLink)
+            viewModel.handleDeeplink(requireActivity(), qrDeepLink)
         }
     }
 

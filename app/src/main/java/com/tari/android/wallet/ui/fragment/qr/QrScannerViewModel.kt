@@ -1,6 +1,6 @@
 package com.tari.android.wallet.ui.fragment.qr
 
-import android.content.Context
+import android.app.Activity
 import androidx.lifecycle.SavedStateHandle
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.deeplinks.DeepLink
@@ -37,7 +37,7 @@ class QrScannerViewModel(savedState: SavedStateHandle) : CommonViewModel() {
 
     private val qrScannerSource: QrScannerSource = savedState.get<QrScannerSource>(EXTRA_QR_DATA_SOURCE) ?: QrScannerSource.None
 
-    fun onAlternativeApply(context: Context) {
+    fun onAlternativeApply(context: Activity) {
         backPressed.postValue(Unit)
         launchOnIo {
             delay(500)
@@ -68,7 +68,17 @@ class QrScannerViewModel(savedState: SavedStateHandle) : CommonViewModel() {
 
         when (qrScannerSource) {
             QrScannerSource.None,
-            QrScannerSource.Home -> setAlternativeText(deepLink)
+            QrScannerSource.Home -> {
+                when (deepLink) {
+                    is DeepLink.Send,
+                    is DeepLink.UserProfile,
+                    is DeepLink.Contacts,
+                    is DeepLink.TorBridges,
+                    is DeepLink.AddBaseNode -> setAlternativeText(deepLink)
+
+                    is DeepLink.PaperWallet -> returnResult(deepLink)
+                }
+            }
 
             QrScannerSource.TransactionSend -> {
                 when (deepLink) {

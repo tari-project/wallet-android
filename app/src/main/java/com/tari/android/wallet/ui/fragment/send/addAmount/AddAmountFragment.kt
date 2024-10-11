@@ -192,7 +192,7 @@ class AddAmountFragment : CommonFragment<FragmentAddAmountBinding, AddAmountView
     private fun showTxFeeToolTip() {
         val args = TooltipDialogArgs(string(tx_detail_fee_tooltip_transaction_fee), string(tx_detail_fee_tooltip_desc))
             .getModular(viewModel.resourceManager)
-        ModularDialog(requireContext(), args).show()
+        ModularDialog(requireActivity(), args).show()
     }
 
     private fun showOneSidePaymentTooltip() {
@@ -200,7 +200,7 @@ class AddAmountFragment : CommonFragment<FragmentAddAmountBinding, AddAmountView
             string(add_amount_one_side_payment_switcher),
             string(add_amount_one_side_payment_question_mark)
         ).getModular(viewModel.resourceManager)
-        ModularDialog(requireContext(), args).show()
+        ModularDialog(requireActivity(), args).show()
     }
 
     private fun continueButtonClicked() {
@@ -226,7 +226,7 @@ class AddAmountFragment : CommonFragment<FragmentAddAmountBinding, AddAmountView
                             title = string(error_fee_more_than_amount_title),
                             description = string(error_fee_more_than_amount_description),
                         )
-                        ModularDialog(requireContext(), args.getModular(viewModel.resourceManager)).show()
+                        ModularDialog(requireActivity(), args.getModular(viewModel.resourceManager)).show()
                         ui.continueButton.isClickable = true
                     } else {
                         continueToNote()

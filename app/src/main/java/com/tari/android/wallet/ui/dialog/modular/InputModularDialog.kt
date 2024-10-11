@@ -1,6 +1,6 @@
 package com.tari.android.wallet.ui.dialog.modular
 
-import android.content.Context
+import android.app.Activity
 import android.view.ViewGroup
 import android.view.WindowManager
 import android.view.WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE
@@ -10,9 +10,9 @@ import com.tari.android.wallet.R
 import com.tari.android.wallet.ui.component.tari.background.obsolete.TariPrimaryBackgroundConstraint
 
 
-class InputModularDialog(context: Context) : ModularDialog(context) {
+class InputModularDialog(context: Activity) : ModularDialog(context) {
 
-    constructor(context: Context, args: ModularDialogArgs) : this(context) {
+    constructor(context: Activity, args: ModularDialogArgs) : this(context) {
         applyArgs(args)
         modifyDialog()
     }

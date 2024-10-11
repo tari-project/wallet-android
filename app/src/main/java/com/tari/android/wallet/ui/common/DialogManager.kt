@@ -1,9 +1,13 @@
 package com.tari.android.wallet.ui.common
 
-import android.content.Context
+import android.app.Activity
+import com.tari.android.wallet.R
 import com.tari.android.wallet.ui.dialog.modular.ModularDialog
 import com.tari.android.wallet.ui.dialog.modular.ModularDialogArgs
 import com.tari.android.wallet.ui.dialog.modular.ModularDialogArgs.DialogId
+import com.tari.android.wallet.ui.dialog.modular.modules.body.BodyModule
+import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
+import com.tari.android.wallet.ui.dialog.modular.modules.imageModule.ImageModule
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -22,7 +26,7 @@ class DialogManager @Inject constructor() {
         }
     }
 
-    fun replace(context: Context, args: ModularDialogArgs) {
+    fun replace(context: Activity, args: ModularDialogArgs) {
         replace(ModularDialog(context, args))
     }
 
@@ -39,7 +43,24 @@ class DialogManager @Inject constructor() {
         dialogQueue.remove(dialogToDismiss)
     }
 
+    fun dismissAll() {
+        dialogQueue.forEach { it.dismiss() }
+        dialogQueue.clear()
+    }
+
     fun isDialogShowing(dialogId: Int) = dialogId != DialogId.NO_ID && dialogQueue.any { it.args.dialogId == dialogId }
+
+    fun showNotReadyYetDialog(context: Activity) {
+        replace(
+            context, ModularDialogArgs(
+                modules = listOf(
+                    ImageModule(R.drawable.tari_construction),
+                    HeadModule(context.getString(R.string.common_not_ready_yet_dialog_title)),
+                    BodyModule(context.getString(R.string.common_not_ready_yet_dialog_description)),
+                )
+            )
+        )
+    }
 
     private fun getDialog(dialogId: Int): ModularDialog? =
         if (dialogId != DialogId.NO_ID) dialogQueue.firstOrNull { it.args.dialogId == dialogId } else null

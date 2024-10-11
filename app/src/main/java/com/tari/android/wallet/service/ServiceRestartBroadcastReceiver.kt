@@ -58,6 +58,6 @@ class ServiceRestartBroadcastReceiver : BroadcastReceiver() {
         val sharedPreferences = context.getSharedPreferences(ApplicationModule.sharedPrefsFileName, Context.MODE_PRIVATE)
         val networkRepository = NetworkPrefRepositoryImpl(sharedPreferences)
         val tariSettingsSharedRepository = TariSettingsPrefRepository(sharedPreferences, networkRepository)
-        WalletServiceLauncher(context, WalletConfig(context, networkRepository), tariSettingsSharedRepository).startIfExist()
+        WalletServiceLauncher(context, WalletConfig(context, networkRepository), tariSettingsSharedRepository).startIfWalletExists()
     }
 }

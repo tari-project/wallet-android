@@ -42,7 +42,6 @@ import com.orhanobut.logger.Logger
 import com.tari.android.wallet.application.TariWalletApplication
 import com.tari.android.wallet.application.walletManager.WalletManager
 import com.tari.android.wallet.application.walletManager.doOnWalletStarted
-import com.tari.android.wallet.data.sharedPrefs.CorePrefRepository
 import com.tari.android.wallet.di.DiContainer
 import com.tari.android.wallet.ffi.FFIWallet
 import com.tari.android.wallet.infrastructure.backup.BackupManager
@@ -50,7 +49,6 @@ import com.tari.android.wallet.notification.NotificationHelper
 import com.tari.android.wallet.service.ServiceRestartBroadcastReceiver
 import com.tari.android.wallet.service.service.WalletServiceLauncher.Companion.START_ACTION
 import com.tari.android.wallet.service.service.WalletServiceLauncher.Companion.STOP_ACTION
-import com.tari.android.wallet.service.service.WalletServiceLauncher.Companion.STOP_AND_DELETE_ACTION
 import com.tari.android.wallet.ui.common.domain.ResourceManager
 import com.tari.android.wallet.ui.fragment.settings.logs.LogFilesManager
 import com.tari.android.wallet.util.Constants
@@ -82,9 +80,6 @@ class WalletService : Service() {
 
     @Inject
     lateinit var notificationHelper: NotificationHelper
-
-    @Inject
-    lateinit var sharedPrefsWrapper: CorePrefRepository
 
     @Inject
     lateinit var walletManager: WalletManager
@@ -126,21 +121,14 @@ class WalletService : Service() {
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
         startForeground()
         when (intent.action) {
-            START_ACTION -> startService()
+            START_ACTION -> startService(intent.getStringArrayExtra(WalletServiceLauncher.ARG_SEED_WORDS)?.toList())
             STOP_ACTION -> stopService(startId)
-            STOP_AND_DELETE_ACTION -> {
-                //todo total crutch. Service is auto-creating during the bind func. Need to refactor this first
-                DiContainer.appComponent.inject(this)
-                stopService(startId)
-                deleteWallet()
-            }
-
             else -> throw RuntimeException("Unexpected intent action: ${intent.action}")
         }
         return START_NOT_STICKY
     }
 
-    private fun startService() {
+    private fun startService(seedWords: List<String>?) {
         //todo total crutch. Service is auto-creating during the bind func. Need to refactor this first
         DiContainer.appComponent.inject(this)
 
@@ -149,7 +137,7 @@ class WalletService : Service() {
                 onWalletStarted(it)
             }
         }
-        walletManager.start()
+        walletManager.start(seedWords)
         logger.i("Wallet service started")
     }
 
@@ -165,12 +153,6 @@ class WalletService : Service() {
         stopSelfResult(startId)
         // stop wallet manager on a separate thread & unsubscribe from events
         lifecycleObserver?.let { ProcessLifecycleOwner.get().lifecycle.removeObserver(it) }
-    }
-
-    private fun deleteWallet() {
-        walletManager.clearWalletFiles()
-        sharedPrefsWrapper.clear()
-        backupManager.turnOffAll()
     }
 
     private fun onWalletStarted(ffiWallet: FFIWallet) {

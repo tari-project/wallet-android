@@ -81,7 +81,7 @@ class RequestTariFragment : CommonFragment<FragmentRequestTariBinding, RequestTa
             )
         )
 
-        ModularDialog(requireContext(), args).show()
+        ModularDialog(requireActivity(), args).show()
     }
 
     private inner class AmountCheckRunnable : Runnable {

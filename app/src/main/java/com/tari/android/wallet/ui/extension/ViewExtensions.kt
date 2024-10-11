@@ -34,6 +34,7 @@ package com.tari.android.wallet.ui.extension
 
 import android.animation.AnimatorSet
 import android.animation.ValueAnimator
+import android.app.Activity
 import android.content.Context
 import android.content.res.TypedArray
 import android.graphics.drawable.Drawable
@@ -89,7 +90,7 @@ fun View.setVisible(visible: Boolean, hideState: Int = View.GONE) {
 /**
  * Given the context, displays the standard "no internet connection" dialog.
  */
-fun showInternetConnectionErrorDialog(context: Context) {
+fun showInternetConnectionErrorDialog(context: Activity) {
     val args = ModularDialogArgs(
         DialogArgs(), listOf(
             HeadModule(context.string(R.string.internet_connection_error_dialog_title)),

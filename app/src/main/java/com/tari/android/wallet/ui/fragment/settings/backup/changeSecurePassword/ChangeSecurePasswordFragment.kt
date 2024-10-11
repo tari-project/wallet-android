@@ -302,7 +302,7 @@ class ChangeSecurePasswordFragment : CommonFragment<FragmentChangeSecurePassword
             canceledOnTouchOutside = false,
             onClose = onClose,
         )
-        ModularDialog(requireContext(), args.getModular(viewModel.resourceManager)).show()
+        ModularDialog(requireActivity(), args.getModular(viewModel.resourceManager)).show()
     }
 
     companion object {

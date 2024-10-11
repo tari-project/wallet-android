@@ -1,6 +1,6 @@
 package com.tari.android.wallet.ui.fragment.contactBook.contactSelection
 
-import android.content.Context
+import android.app.Activity
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
@@ -208,7 +208,7 @@ class ContactSelectionViewModel : CommonViewModel() {
         }
     }
 
-    fun parseDeeplink(context: Context, deeplinkString: String) {
+    fun parseDeeplink(context: Activity, deeplinkString: String) {
         val deeplink = deeplinkManager.parseDeepLink(deeplinkString)!!
         deeplinkManager.execute(context, deeplink)
         deselectTariWalletAddress()

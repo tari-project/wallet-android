@@ -71,16 +71,10 @@ class QrScannerActivity : CommonActivity<ActivityQrScannerBinding, QrScannerView
          */
         const val REQUEST_QR_SCANNER = 101
 
-        fun startScanner(activity: Activity, source: QrScannerSource) {
-            val intent = Intent(activity, QrScannerActivity::class.java)
+        fun startScanner(fragment: Fragment, source: QrScannerSource) {
+            val intent = Intent(fragment.requireActivity(), QrScannerActivity::class.java)
             intent.putExtra(EXTRA_QR_DATA_SOURCE, source)
-            activity.startActivityForResult(intent, REQUEST_QR_SCANNER)
-        }
-
-        fun startScanner(activity: Fragment, source: QrScannerSource) {
-            val intent = Intent(activity.requireActivity(), QrScannerActivity::class.java)
-            intent.putExtra(EXTRA_QR_DATA_SOURCE, source)
-            activity.startActivityForResult(intent, REQUEST_QR_SCANNER)
+            fragment.startActivityForResult(intent, REQUEST_QR_SCANNER)
         }
 
         private const val REQUEST_CAMERA_PERMISSION = 102

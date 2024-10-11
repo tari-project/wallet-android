@@ -42,6 +42,7 @@ import androidx.lifecycle.lifecycleScope
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.walletManager.WalletManager
 import com.tari.android.wallet.application.walletManager.doOnWalletFailed
+import com.tari.android.wallet.application.walletManager.doOnWalletRunning
 import com.tari.android.wallet.data.sharedPrefs.CorePrefRepository
 import com.tari.android.wallet.databinding.ActivityOnboardingFlowBinding
 import com.tari.android.wallet.di.DiContainer.appComponent
@@ -55,6 +56,7 @@ import com.tari.android.wallet.ui.fragment.onboarding.activity.OnboardingFlowMod
 import com.tari.android.wallet.ui.fragment.onboarding.createWallet.CreateWalletFragment
 import com.tari.android.wallet.ui.fragment.onboarding.inroduction.IntroductionFragment
 import com.tari.android.wallet.ui.fragment.onboarding.localAuth.LocalAuthFragment
+import com.tari.android.wallet.ui.fragment.restore.walletRestoringFromSeedWords.WalletRestoringFragment
 import com.tari.android.wallet.ui.fragment.settings.networkSelection.NetworkSelectionFragment
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -90,7 +92,19 @@ class OnboardingFlowActivity : CommonActivity<ActivityOnboardingFlowBinding, Com
 
         setContainerId(R.id.onboarding_fragment_container)
 
+        val paperWalletSeeds = intent.extras?.getStringArray(ARG_SEED_WORDS)?.toList()
+
         when {
+            paperWalletSeeds != null -> {
+                walletServiceLauncher.start(paperWalletSeeds)
+
+                lifecycleScope.launch {
+                    walletManager.doOnWalletRunning {
+                        loadFragment(WalletRestoringFragment())
+                    }
+                }
+            }
+
             corePrefRepository.onboardingAuthWasInterrupted -> {
                 walletServiceLauncher.start()
                 loadFragment(LocalAuthFragment())
@@ -100,7 +114,7 @@ class OnboardingFlowActivity : CommonActivity<ActivityOnboardingFlowBinding, Com
                 // start wallet service
                 walletServiceLauncher.start()
                 // clean existing files & restart onboarding
-                walletManager.clearWalletFiles()
+                walletManager.deleteWallet()
                 loadFragment(CreateWalletFragment())
             }
 
@@ -164,9 +178,8 @@ class OnboardingFlowActivity : CommonActivity<ActivityOnboardingFlowBinding, Com
     }
 
     override fun resetFlow() {
-        walletServiceLauncher.stopAndDelete()
+        walletManager.deleteWallet()
         clearBackStack()
-        walletManager.clearWalletFiles()
         loadFragment(IntroductionFragment())
     }
 
@@ -193,5 +206,9 @@ class OnboardingFlowActivity : CommonActivity<ActivityOnboardingFlowBinding, Com
         if (supportFragmentManager.backStackEntryCount > 0) {
             supportFragmentManager.popBackStack(supportFragmentManager.getBackStackEntryAt(0).id, FragmentManager.POP_BACK_STACK_INCLUSIVE)
         }
+    }
+
+    companion object {
+        const val ARG_SEED_WORDS = "ARG_SEED_WORDS"
     }
 }

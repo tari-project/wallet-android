@@ -43,7 +43,8 @@ class EnterRestorationPasswordViewModel : CommonViewModel() {
                     backupSettingsRepository.updateOption(dto)
                     backupManager.backupNow()
 
-                    navigation.postValue(Navigation.EnterRestorationPasswordNavigation.OnRestore)
+                    walletManager.onWalletRestored()
+                    tariNavigator.navigate(Navigation.SplashScreen(clearTop = false))
                 }
             }
         }

@@ -73,10 +73,6 @@ class FeatureAuthFragment : CommonFragment<FragmentFeatureAuthBinding, AuthViewM
 
         setupUi()
 
-        observe(viewModel.goAuth) {
-            viewModel.walletServiceLauncher.start()
-        }
-
         doAuth()
     }
 
