@@ -282,7 +282,7 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>() {
         intent.data?.toString()?.takeIf { it.isNotEmpty() }
             ?.let { deeplinkString -> deeplinkManager.parseDeepLink(deeplinkString) }
             ?.let { deeplink ->
-                deeplinkManager.execute(context = this, deeplink = deeplink, isQrData = false)
+                deeplinkManager.execute(context = this, deeplink = deeplink)
             }
     }
 

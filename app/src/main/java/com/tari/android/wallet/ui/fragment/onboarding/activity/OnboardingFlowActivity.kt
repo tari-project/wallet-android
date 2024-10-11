@@ -56,7 +56,7 @@ import com.tari.android.wallet.ui.fragment.onboarding.activity.OnboardingFlowMod
 import com.tari.android.wallet.ui.fragment.onboarding.createWallet.CreateWalletFragment
 import com.tari.android.wallet.ui.fragment.onboarding.inroduction.IntroductionFragment
 import com.tari.android.wallet.ui.fragment.onboarding.localAuth.LocalAuthFragment
-import com.tari.android.wallet.ui.fragment.restore.walletRestoringFromSeedWords.WalletRestoringFragment
+import com.tari.android.wallet.ui.fragment.restore.walletRestoring.WalletRestoringFragment
 import com.tari.android.wallet.ui.fragment.settings.networkSelection.NetworkSelectionFragment
 import kotlinx.coroutines.launch
 import javax.inject.Inject

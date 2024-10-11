@@ -159,7 +159,7 @@ class ShareViewModel : CommonViewModel() {
 
     private fun onReceived(data: List<DeepLink.Contacts.DeeplinkContact>) {
         HomeActivity.instance.get()?.let { context ->
-            deeplinkManager.execute(context, DeepLink.Contacts(data), false)
+            deeplinkManager.execute(context, DeepLink.Contacts(data))
         }
     }
 

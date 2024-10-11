@@ -609,6 +609,9 @@
     <string name="restore_from_seed_words_autocompletion_no_suggestions">here are no suggestions for the phrase</string>
     <string name="restore_from_seed_words_cancel_dialog_title">Are you sure you want to cancel?</string>
     <string name="restore_from_seed_words_cancel_dialog_description">You will lose your progress, but don\'t worry, you can always start over.</string>
+    <string name="recovery_success_dialog_title">You’re all set!</string>
+    <string name="recovery_success_dialog_description">Your funds have been imported and are being processed 😊</string>
+    <string name="recovery_success_dialog_close">Awesome, thanks!</string>
 
     <!--Restore -->
     <string name="restore_with_cloud_page_title">Enter your backup password</string>

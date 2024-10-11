@@ -49,32 +49,32 @@ class DeeplinkManager @Inject constructor(
     /**
      * Executes the given deeplink, but first shows a confirmation dialog.
      */
-    fun execute(context: Activity, deeplink: DeepLink, isQrData: Boolean = true) {
+    fun execute(context: Activity, deeplink: DeepLink) {
         when (deeplink) {
-            is DeepLink.AddBaseNode -> showAddBaseNodeDialog(context, deeplink, isQrData)
-            is DeepLink.Contacts -> showAddContactsDialog(context, deeplink, isQrData)
-            is DeepLink.Send -> sendAction(deeplink, isQrData)
-            is DeepLink.UserProfile -> addUserProfile(context, deeplink, isQrData)
-            is DeepLink.TorBridges -> addTorBridges(deeplink, isQrData)
-            is DeepLink.PaperWallet -> showPaperWalletDialog(context, deeplink, isQrData)
+            is DeepLink.AddBaseNode -> showAddBaseNodeDialog(context, deeplink)
+            is DeepLink.Contacts -> showAddContactsDialog(context, deeplink)
+            is DeepLink.Send -> sendAction(deeplink)
+            is DeepLink.UserProfile -> addUserProfile(context, deeplink)
+            is DeepLink.TorBridges -> addTorBridges(deeplink)
+            is DeepLink.PaperWallet -> showPaperWalletDialog(context, deeplink)
         }
     }
 
     /**
      * Executes the given deeplink without showing a confirmation dialog.
      */
-    fun executeRawDeeplink(context: Activity, deeplink: DeepLink, isQrData: Boolean = true) {
+    fun executeRawDeeplink(context: Activity, deeplink: DeepLink) {
         when (deeplink) {
             is DeepLink.AddBaseNode -> showAddBaseNodeDialog(context, deeplink)
-            is DeepLink.Contacts -> addContactsAction(deeplink.data(), isQrData)
-            is DeepLink.Send -> sendAction(deeplink, isQrData)
-            is DeepLink.UserProfile -> addContactsAction(deeplink.data()?.let { listOf(it) } ?: emptyList(), isQrData)
-            is DeepLink.TorBridges -> addTorBridges(deeplink, isQrData)
-            is DeepLink.PaperWallet -> showPaperWalletDialog(context, deeplink, isQrData)
+            is DeepLink.Contacts -> addContactsAction(deeplink.data())
+            is DeepLink.Send -> sendAction(deeplink)
+            is DeepLink.UserProfile -> addContactsAction(deeplink.data()?.let { listOf(it) } ?: emptyList())
+            is DeepLink.TorBridges -> addTorBridges(deeplink)
+            is DeepLink.PaperWallet -> showPaperWalletDialog(context, deeplink)
         }
     }
 
-    private fun showAddBaseNodeDialog(context: Activity, deeplink: DeepLink.AddBaseNode, isQrData: Boolean = true) {
+    private fun showAddBaseNodeDialog(context: Activity, deeplink: DeepLink.AddBaseNode) {
         val baseNode = deeplink.data()
         dialogManager.replace(
             context = context,
@@ -86,13 +86,13 @@ class DeeplinkManager @Inject constructor(
                 confirmButtonText = resourceManager.getString(R.string.common_lets_do_it),
                 onConfirm = {
                     dialogManager.dismiss(DialogId.DEEPLINK_ADD_BASE_NODE)
-                    addBaseNodeAction(baseNode, isQrData)
+                    addBaseNodeAction(baseNode)
                 },
             ).getModular(baseNode, resourceManager),
         )
     }
 
-    private fun addUserProfile(context: Activity, deeplink: DeepLink.UserProfile, isQrData: Boolean) {
+    private fun addUserProfile(context: Activity, deeplink: DeepLink.UserProfile) {
         val contact = DeepLink.Contacts(
             listOf(
                 DeepLink.Contacts.DeeplinkContact(
@@ -101,10 +101,10 @@ class DeeplinkManager @Inject constructor(
                 )
             )
         )
-        showAddContactsDialog(context, contact, isQrData)
+        showAddContactsDialog(context, contact)
     }
 
-    private fun showAddContactsDialog(context: Activity, deeplink: DeepLink.Contacts, isQrData: Boolean = true) {
+    private fun showAddContactsDialog(context: Activity, deeplink: DeepLink.Contacts) {
         val contactDtos = deeplink.data()
         if (contactDtos.isEmpty()) return
         val names = contactDtos.joinToString(", ") { it.contactInfo.getAlias().trim() }
@@ -116,7 +116,7 @@ class DeeplinkManager @Inject constructor(
                     HeadModule(resourceManager.getString(R.string.contact_deeplink_title)),
                     BodyModule(resourceManager.getString(R.string.contact_deeplink_message, contactDtos.size.toString()) + ". " + names),
                     ButtonModule(resourceManager.getString(R.string.common_confirm), ButtonStyle.Normal) {
-                        addContactsAction(contactDtos, isQrData)
+                        addContactsAction(contactDtos)
                         dialogManager.dismiss(DialogId.DEEPLINK_ADD_CONTACTS)
                     },
                     ButtonModule(resourceManager.getString(R.string.common_cancel), ButtonStyle.Close)
@@ -125,13 +125,13 @@ class DeeplinkManager @Inject constructor(
         )
     }
 
-    private fun addTorBridges(deeplink: DeepLink.TorBridges, isQrData: Boolean) {
+    private fun addTorBridges(deeplink: DeepLink.TorBridges) {
         deeplink.torConfigurations.forEach {
             torSharedRepository.addTorBridgeConfiguration(it)
         }
     }
 
-    private fun showPaperWalletDialog(context: Activity, deeplink: DeepLink.PaperWallet, isQrSata: Boolean = true) {
+    private fun showPaperWalletDialog(context: Activity, deeplink: DeepLink.PaperWallet) {
         dialogManager.replace(
             context = context,
             args = ModularDialogArgs(
@@ -194,17 +194,17 @@ class DeeplinkManager @Inject constructor(
         ContactDto(FFIContactInfo(walletAddress = tariWalletAddress, alias = this.alias))
     }.getOrNull()
 
-    private fun addContactsAction(contacts: List<ContactDto>, isQrData: Boolean) {
+    private fun addContactsAction(contacts: List<ContactDto>) {
         applicationScope.launch(Dispatchers.IO) {
             contactRepository.addContactList(contacts)
         }
     }
 
-    private fun sendAction(deeplink: DeepLink.Send, isQrData: Boolean) {
+    private fun sendAction(deeplink: DeepLink.Send) {
         navigator.navigate(Navigation.TxListNavigation.ToSendWithDeeplink(deeplink))
     }
 
-    private fun addBaseNodeAction(baseNodeDto: BaseNodeDto, isQrData: Boolean) {
+    private fun addBaseNodeAction(baseNodeDto: BaseNodeDto) {
         baseNodesManager.addUserBaseNode(baseNodeDto)
         baseNodesManager.setBaseNode(baseNodeDto)
         walletManager.syncBaseNode()

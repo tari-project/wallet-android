@@ -99,6 +99,8 @@ class HomeFragmentViewModel : CommonViewModel() {
         avatarEmoji.postValue(address.coreKeyEmojis.extractEmojis().take(1).joinToString(""))
 
         checkForDataConsent()
+
+        showRecoverySuccessIfNeeded()
     }
 
     fun processItemClick(item: CommonViewHolderItem) {
@@ -156,6 +158,17 @@ class HomeFragmentViewModel : CommonViewModel() {
                         hideDialog()
                     }
                 ))
+            )
+        }
+    }
+
+    private fun showRecoverySuccessIfNeeded() {
+        if (corePrefRepository.needToShowRecoverySuccessDialog) {
+            showSimpleDialog(
+                titleRes = R.string.recovery_success_dialog_title,
+                descriptionRes = R.string.recovery_success_dialog_description,
+                closeButtonTextRes = R.string.recovery_success_dialog_close,
+                onClose = { corePrefRepository.needToShowRecoverySuccessDialog = false },
             )
         }
     }

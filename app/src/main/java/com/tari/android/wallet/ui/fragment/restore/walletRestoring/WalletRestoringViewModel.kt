@@ -1,4 +1,4 @@
-package com.tari.android.wallet.ui.fragment.restore.walletRestoringFromSeedWords
+package com.tari.android.wallet.ui.fragment.restore.walletRestoring
 
 import androidx.lifecycle.viewModelScope
 import com.tari.android.wallet.R

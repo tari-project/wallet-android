@@ -267,6 +267,7 @@ class WalletManager @Inject constructor(
         corePrefRepository.onboardingAuthSetupStarted = true
         corePrefRepository.onboardingAuthSetupCompleted = false
         corePrefRepository.onboardingDisplayedAtHome = true
+        corePrefRepository.needToShowRecoverySuccessDialog = true
         tariSettingsPrefRepository.isRestoredWallet = true
     }
 
