@@ -72,7 +72,7 @@ Java_com_tari_android_wallet_ffi_FFISeedWords_jniPushWord(
     return ExecuteWithError<jint>(jEnv, error, [&](int *errorPointer) {
         auto pSeedWords = GetPointerField<TariSeedWords *>(jEnv, jThis);
         const char *pWord = jEnv->GetStringUTFChars(jWord, JNI_FALSE);
-        jint result = seed_words_push_word(pSeedWords, pWord, errorPointer);
+        jint result = seed_words_push_word(pSeedWords, pWord, nullptr, errorPointer);
         jEnv->ReleaseStringUTFChars(jWord, pWord);
         return result;
     });

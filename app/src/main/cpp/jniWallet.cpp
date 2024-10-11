@@ -101,7 +101,7 @@ jmethodID balanceUpdatedCallbackMethodId;
 jmethodID walletScannedHeightCallbackMethodId;
 jmethodID baseNodeStatusCallbackMethodId;
 
-void txBroadcastCallback(TariCompletedTransaction *pCompletedTransaction) {
+void txBroadcastCallback(void *context, TariCompletedTransaction *pCompletedTransaction) {
     auto *jniEnv = getJNIEnv();
     if (jniEnv == nullptr || callbackHandler == nullptr) {
         return;
@@ -111,7 +111,7 @@ void txBroadcastCallback(TariCompletedTransaction *pCompletedTransaction) {
     g_vm->DetachCurrentThread();
 }
 
-void txMinedCallback(TariCompletedTransaction *pCompletedTransaction) {
+void txMinedCallback(void *context, TariCompletedTransaction *pCompletedTransaction) {
     auto *jniEnv = getJNIEnv();
     if (jniEnv == nullptr || callbackHandler == nullptr) {
         return;
@@ -121,7 +121,7 @@ void txMinedCallback(TariCompletedTransaction *pCompletedTransaction) {
     g_vm->DetachCurrentThread();
 }
 
-void txMinedUnconfirmedCallback(TariCompletedTransaction *pCompletedTransaction, uint64_t confirmationCount) {
+void txMinedUnconfirmedCallback(void *context, TariCompletedTransaction *pCompletedTransaction, uint64_t confirmationCount) {
     auto *jniEnv = getJNIEnv();
     if (jniEnv == nullptr || callbackHandler == nullptr) {
         return;
@@ -132,7 +132,7 @@ void txMinedUnconfirmedCallback(TariCompletedTransaction *pCompletedTransaction,
     g_vm->DetachCurrentThread();
 }
 
-void txFauxConfirmedCallback(TariCompletedTransaction *pCompletedTransaction) {
+void txFauxConfirmedCallback(void *context, TariCompletedTransaction *pCompletedTransaction) {
     auto *jniEnv = getJNIEnv();
     if (jniEnv == nullptr || callbackHandler == nullptr) {
         return;
@@ -142,7 +142,7 @@ void txFauxConfirmedCallback(TariCompletedTransaction *pCompletedTransaction) {
     g_vm->DetachCurrentThread();
 }
 
-void txFauxUnconfirmedCallback(TariCompletedTransaction *pCompletedTransaction, uint64_t confirmationCount) {
+void txFauxUnconfirmedCallback(void *context, TariCompletedTransaction *pCompletedTransaction, uint64_t confirmationCount) {
     auto *jniEnv = getJNIEnv();
     if (jniEnv == nullptr || callbackHandler == nullptr) {
         return;
@@ -153,7 +153,7 @@ void txFauxUnconfirmedCallback(TariCompletedTransaction *pCompletedTransaction, 
     g_vm->DetachCurrentThread();
 }
 
-void txReceivedCallback(TariPendingInboundTransaction *pPendingInboundTransaction) {
+void txReceivedCallback(void *context, TariPendingInboundTransaction *pPendingInboundTransaction) {
     auto *jniEnv = getJNIEnv();
     if (jniEnv == nullptr || callbackHandler == nullptr) {
         return;
@@ -163,7 +163,7 @@ void txReceivedCallback(TariPendingInboundTransaction *pPendingInboundTransactio
     g_vm->DetachCurrentThread();
 }
 
-void txReplyReceivedCallback(TariCompletedTransaction *pCompletedTransaction) {
+void txReplyReceivedCallback(void *context, TariCompletedTransaction *pCompletedTransaction) {
     auto *jniEnv = getJNIEnv();
     if (jniEnv == nullptr || callbackHandler == nullptr) {
         return;
@@ -173,7 +173,7 @@ void txReplyReceivedCallback(TariCompletedTransaction *pCompletedTransaction) {
     g_vm->DetachCurrentThread();
 }
 
-void txFinalizedCallback(TariCompletedTransaction *pCompletedTransaction) {
+void txFinalizedCallback(void *context, TariCompletedTransaction *pCompletedTransaction) {
     auto *jniEnv = getJNIEnv();
     if (jniEnv == nullptr || callbackHandler == nullptr) {
         return;
@@ -183,7 +183,7 @@ void txFinalizedCallback(TariCompletedTransaction *pCompletedTransaction) {
     g_vm->DetachCurrentThread();
 }
 
-void txDirectSendResultCallback(unsigned long long txId, TariTransactionSendStatus *status) {
+void txDirectSendResultCallback(void *context, unsigned long long txId, TariTransactionSendStatus *status) {
     auto *jniEnv = getJNIEnv();
     if (jniEnv == nullptr || callbackHandler == nullptr) {
         return;
@@ -194,7 +194,7 @@ void txDirectSendResultCallback(unsigned long long txId, TariTransactionSendStat
 }
 
 void
-txCancellationCallback(TariCompletedTransaction *pCompletedTransaction, uint64_t rejectionReason) {
+txCancellationCallback(void *context, TariCompletedTransaction *pCompletedTransaction, uint64_t rejectionReason) {
     auto *jniEnv = getJNIEnv();
     if (jniEnv == nullptr || callbackHandler == nullptr) {
         return;
@@ -205,7 +205,7 @@ txCancellationCallback(TariCompletedTransaction *pCompletedTransaction, uint64_t
     g_vm->DetachCurrentThread();
 }
 
-void txoValidationCompleteCallback(uint64_t requestId, uint64_t status) {
+void txoValidationCompleteCallback(void *context, uint64_t requestId, uint64_t status) {
     auto *jniEnv = getJNIEnv();
     if (jniEnv == nullptr || callbackHandler == nullptr) {
         return;
@@ -216,7 +216,7 @@ void txoValidationCompleteCallback(uint64_t requestId, uint64_t status) {
     g_vm->DetachCurrentThread();
 }
 
-void contactsLivenessDataUpdatedCallback(TariContactsLivenessData *pTariContactsLivenessData) {
+void contactsLivenessDataUpdatedCallback(void *context, TariContactsLivenessData *pTariContactsLivenessData) {
     auto *jniEnv = getJNIEnv();
     if (jniEnv == nullptr || callbackHandler == nullptr) {
         return;
@@ -226,7 +226,7 @@ void contactsLivenessDataUpdatedCallback(TariContactsLivenessData *pTariContacts
     g_vm->DetachCurrentThread();
 }
 
-void transactionValidationCompleteCallback(uint64_t requestId, uint64_t status) {
+void transactionValidationCompleteCallback(void *context, uint64_t requestId, uint64_t status) {
     auto *jniEnv = getJNIEnv();
     if (jniEnv == nullptr || callbackHandler == nullptr) {
         return;
@@ -237,7 +237,7 @@ void transactionValidationCompleteCallback(uint64_t requestId, uint64_t status) 
     g_vm->DetachCurrentThread();
 }
 
-void connectivityStatusCallback(uint64_t status) {
+void connectivityStatusCallback(void *context, uint64_t status) {
     auto *jniEnv = getJNIEnv();
     if (jniEnv == nullptr || callbackHandler == nullptr) {
         return;
@@ -247,7 +247,7 @@ void connectivityStatusCallback(uint64_t status) {
     g_vm->DetachCurrentThread();
 }
 
-void walletScannedHeightCallback(uint64_t height) {
+void walletScannedHeightCallback(void *context, uint64_t height) {
     auto *jniEnv = getJNIEnv();
     if (jniEnv == nullptr || callbackHandler == nullptr) {
         return;
@@ -257,7 +257,7 @@ void walletScannedHeightCallback(uint64_t height) {
     g_vm->DetachCurrentThread();
 }
 
-void balanceUpdatedCallback(TariBalance *pBalance) {
+void balanceUpdatedCallback(void *context, TariBalance *pBalance) {
     auto *jniEnv = getJNIEnv();
     if (jniEnv == nullptr || callbackHandler == nullptr) {
         return;
@@ -267,11 +267,11 @@ void balanceUpdatedCallback(TariBalance *pBalance) {
     g_vm->DetachCurrentThread();
 }
 
-void storeAndForwardMessagesReceivedCallback() {
+void storeAndForwardMessagesReceivedCallback(void *context) {
     // no-op
 }
 
-void baseNodeStatusCallback(TariBaseNodeState *pBaseNodeState) {
+void baseNodeStatusCallback(void *context, TariBaseNodeState *pBaseNodeState) {
     auto *jniEnv = getJNIEnv();
     if (jniEnv == nullptr || callbackHandler == nullptr) {
         return;
@@ -281,7 +281,7 @@ void baseNodeStatusCallback(TariBaseNodeState *pBaseNodeState) {
     g_vm->DetachCurrentThread();
 }
 
-void recoveringProcessCompleteCallback(uint8_t first, uint64_t second, uint64_t third) {
+void recoveringProcessCompleteCallback(void *context, uint8_t first, uint64_t second, uint64_t third) {
     auto *jniEnv = getJNIEnv();
     if (jniEnv == nullptr || callbackHandler == nullptr) {
         return;
@@ -480,12 +480,14 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniCreate(
     }
 
     TariWallet *pWallet = wallet_create(
+            nullptr,
             pWalletConfig,
             pLogPath,
             logVerbosity,
             static_cast<unsigned int>(maxNumberOfRollingLogFiles),
             static_cast<unsigned int>(rollingLogFileMaxSizeBytes),
             pPassphrase,
+            nullptr,
             pSeedWords,
             pNetwork,
             pDnsPeer,
@@ -580,7 +582,7 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniGetWalletAddress(
         jobject error) {
     return ExecuteWithErrorAndCast<TariWalletAddress *>(jEnv, error, [&](int *errorPointer) {
         auto pWallet = GetPointerField<TariWallet *>(jEnv, jThis);
-        return wallet_get_tari_address(pWallet, errorPointer);
+        return wallet_get_tari_interactive_address(pWallet, errorPointer);
     });
 }
 
