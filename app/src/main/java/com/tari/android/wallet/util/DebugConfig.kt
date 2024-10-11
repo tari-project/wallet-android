@@ -91,6 +91,8 @@ object DebugConfig {
 
     val showCopySeedsButton = valueIfDebug(true)
 
+    val sweepFundsButtonEnabled = valueIfDebug(false)
+
     private fun isDebug() = BuildConfig.BUILD_TYPE == "debug"
 
     private fun valueIfDebug(value: Boolean) = isDebug() && value

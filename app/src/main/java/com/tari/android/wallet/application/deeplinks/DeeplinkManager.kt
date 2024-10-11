@@ -22,6 +22,7 @@ import com.tari.android.wallet.ui.fragment.contactBook.data.contacts.ContactDto
 import com.tari.android.wallet.ui.fragment.contactBook.data.contacts.FFIContactInfo
 import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
 import com.tari.android.wallet.ui.fragment.home.navigation.TariNavigator
+import com.tari.android.wallet.util.DebugConfig
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -135,13 +136,13 @@ class DeeplinkManager @Inject constructor(
             context = context,
             args = ModularDialogArgs(
                 dialogId = DialogId.DEEPLINK_PAPER_WALLET,
-                modules = listOf(
+                modules = listOfNotNull(
                     HeadModule(resourceManager.getString(R.string.restore_wallet_paper_wallet_title)),
                     BodyModule(resourceManager.getString(R.string.restore_wallet_paper_wallet_body)),
                     ButtonModule(resourceManager.getString(R.string.restore_wallet_paper_wallet_sweep_funds_button), ButtonStyle.Normal) {
                         dialogManager.dismiss(DialogId.DEEPLINK_PAPER_WALLET)
                         dialogManager.showNotReadyYetDialog(context)
-                    },
+                    }.takeIf { DebugConfig.sweepFundsButtonEnabled },
                     ButtonModule(resourceManager.getString(R.string.restore_wallet_paper_wallet_replace_wallet_button), ButtonStyle.Normal) {
                         dialogManager.dismiss(DialogId.DEEPLINK_PAPER_WALLET)
                         showRememberToBackupDialog(context, deeplink)
