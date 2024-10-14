@@ -17,5 +17,6 @@ data class ModularDialogArgs(
         const val DEEPLINK_ADD_CONTACTS = 605
         const val DEEPLINK_PAPER_WALLET = 606
         const val DEEPLINK_PAPER_WALLET_REMEMBER_TO_BACKUP = 606
+        const val DEEPLINK_PAPER_WALLET_ENTER_PASSPHRASE = 607
     }
 }

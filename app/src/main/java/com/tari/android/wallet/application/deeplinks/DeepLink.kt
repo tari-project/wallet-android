@@ -35,6 +35,8 @@ package com.tari.android.wallet.application.deeplinks
 import android.os.Parcelable
 import com.tari.android.wallet.data.sharedPrefs.tor.TorBridgeConfiguration
 import com.tari.android.wallet.ffi.Base58
+import com.tari.android.wallet.ffi.FFISeedWords
+import com.tari.android.wallet.ffi.runWithDestroy
 import com.tari.android.wallet.model.MicroTari
 import com.tari.android.wallet.model.TariWalletAddress
 import com.tari.android.wallet.util.parseToBigInteger
@@ -173,28 +175,27 @@ sealed class DeepLink : Parcelable {
     @Parcelize
     data class TorBridges(val torConfigurations: List<TorBridgeConfiguration>) : DeepLink()
 
-    // tari://esmeralda/paper_wallet?seed_words[0]=young&seed_words[1]=shrimp&seed_words[2]=day&seed_words[3]=mountain&seed_words[4]=mammal&seed_words[5]=pond&seed_words[6]=shrimp&seed_words[7]=mammal&seed_words[8]=loyal&seed_words[9]=young&seed_words[10]=whisper&seed_words[11]=glare&seed_words[12]=stuff&seed_words[13]=around&seed_words[14]=estate&seed_words[15]=fabric&seed_words[16]=faint&seed_words[17]=goddess&seed_words[18]=crew&seed_words[19]=custom&seed_words[20]=disagree&seed_words[21]=fox&seed_words[22]=fragile&seed_words[23]=impact
+    // tari://esmeralda/paper_wallet?private_key=1LTWgW1kzx1e1EoY9vU1FCSDweVKjnJuNA9LysUJnFuy3x
     @Parcelize
-    data class PaperWallet(val seedWords: List<String>) : DeepLink() {
+    data class PaperWallet(val privateKey: String) : DeepLink() {
+
+        fun seedWords(passphrase: String): List<String>? = runCatching {
+            FFISeedWords(this.privateKey, passphrase).runWithDestroy { seedWords -> (0 until seedWords.getLength()).map { seedWords.getAt(it) } }
+        }.getOrNull()
+
         constructor(params: Map<String, String>) : this(
-            params.filterKeys { it.startsWith("seed_words[") }
-                .toSortedMap(compareBy { it.substringAfter("[").substringBefore("]").toInt() })
-                .values
-                .toList()
+            params[KEY_PRIVATE_KEY].orEmpty()
         )
 
-        override fun getParams(): Map<String, String> {
-            val params = hashMapOf<String, String>()
-            seedWords.forEachIndexed { index, seedWord ->
-                params["seed_words[$index]"] = seedWord
-            }
-            return params
+        override fun getParams(): Map<String, String> = hashMapOf<String, String>().apply {
+            put(KEY_PRIVATE_KEY, privateKey)
         }
 
         override fun getCommand(): String = COMMAND_PAPER_WALLET
 
         companion object {
             const val COMMAND_PAPER_WALLET = "paper_wallet"
+            const val KEY_PRIVATE_KEY = "private_key"
         }
     }
 

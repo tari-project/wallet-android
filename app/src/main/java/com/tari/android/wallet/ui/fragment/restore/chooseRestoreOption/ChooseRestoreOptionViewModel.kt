@@ -21,10 +21,12 @@ import com.tari.android.wallet.model.WalletError
 import com.tari.android.wallet.model.throwIf
 import com.tari.android.wallet.service.service.WalletServiceLauncher
 import com.tari.android.wallet.ui.common.CommonViewModel
+import com.tari.android.wallet.ui.dialog.modular.ModularDialogArgs
 import com.tari.android.wallet.ui.dialog.modular.modules.body.BodyModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonStyle
 import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
+import com.tari.android.wallet.ui.dialog.modular.modules.input.InputModule
 import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
 import com.tari.android.wallet.ui.fragment.qr.QrScannerActivity
 import com.tari.android.wallet.ui.fragment.qr.QrScannerSource
@@ -102,7 +104,7 @@ class ChooseRestoreOptionViewModel : CommonViewModel() {
 
     fun handleDeeplink(qrDeepLink: DeepLink) {
         if (qrDeepLink is DeepLink.PaperWallet) {
-            showPaperWalletDialog(qrDeepLink.seedWords)
+            showPaperWalletDialog(qrDeepLink)
         } else {
             showInvalidQrDialog()
         }
@@ -195,15 +197,63 @@ class ChooseRestoreOptionViewModel : CommonViewModel() {
         _uiState.update { it.copy(isStarted = false) }
     }
 
-    private fun showPaperWalletDialog(seedWords: List<String>) {
+    private fun showPaperWalletDialog(deepLink: DeepLink.PaperWallet) {
         showModularDialog(
             HeadModule(resourceManager.getString(R.string.restore_wallet_paper_wallet_title)),
             BodyModule(resourceManager.getString(R.string.restore_wallet_paper_wallet_body)),
             ButtonModule(resourceManager.getString(R.string.restore_wallet_paper_wallet_restore_button), ButtonStyle.Normal) {
                 hideDialog()
-                restoreFromPaperWallet(seedWords)
+                showEnterPassphraseDialog(deepLink)
             },
             ButtonModule(resourceManager.getString(R.string.restore_wallet_paper_wallet_do_not_restore_button), ButtonStyle.Close),
+        )
+    }
+
+    private fun showEnterPassphraseDialog(deeplink: DeepLink.PaperWallet) {
+        var saveAction: () -> Boolean = { false }
+
+        val headModule = HeadModule(
+            title = resourceManager.getString(R.string.restore_wallet_paper_wallet_enter_passphrase_title),
+            rightButtonTitle = resourceManager.getString(R.string.common_done),
+            rightButtonAction = { saveAction() },
+        )
+
+        val bodyModule = BodyModule(resourceManager.getString(R.string.restore_wallet_paper_wallet_enter_passphrase_body))
+
+        val passphraseModule = InputModule(
+            value = "",
+            hint = resourceManager.getString(R.string.restore_wallet_paper_wallet_enter_passphrase_hint),
+            isFirst = true,
+            isEnd = true,
+            onDoneAction = { saveAction() },
+        )
+
+        saveAction = {
+            val seeds = deeplink.seedWords(passphraseModule.value.trim())
+            if (seeds != null) {
+                hideDialog()
+                restoreFromPaperWallet(seeds)
+            } else {
+                showPaperWalletErrorDialog()
+            }
+            true
+        }
+
+        showInputModalDialog(
+            ModularDialogArgs(
+                modules = listOf(
+                    headModule,
+                    bodyModule,
+                    passphraseModule,
+                ),
+            )
+        )
+    }
+
+    private fun showPaperWalletErrorDialog() {
+        showSimpleDialog(
+            title = resourceManager.getString(R.string.restore_wallet_paper_wallet_error_title),
+            description = resourceManager.getString(R.string.restore_wallet_paper_wallet_error_body),
         )
     }
 

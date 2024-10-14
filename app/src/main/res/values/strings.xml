@@ -584,6 +584,11 @@
     <string name="restore_wallet_paper_wallet_remember_backup_body">Do you want to back up your current wallet before replacing it? If you don\’t back it up first, you will lose all the funds in your current wallet!</string>
     <string name="restore_wallet_paper_wallet_remember_backup_yes_button">Yes, back it up</string>
     <string name="restore_wallet_paper_wallet_remember_backup_no_button">No, just replace it</string>
+    <string name="restore_wallet_paper_wallet_enter_passphrase_title">Password</string>
+    <string name="restore_wallet_paper_wallet_enter_passphrase_body">Enter the paper wallet password</string>
+    <string name="restore_wallet_paper_wallet_enter_passphrase_hint">Password</string>
+    <string name="restore_wallet_paper_wallet_error_title">Incorrect password</string>
+    <string name="restore_wallet_paper_wallet_error_body">The password you entered is incorrect. Please try again.</string>
 
     <!-- Wallet recovery with seed phrase -->
     <string name="restore_from_seed_words_title">Restore With Seed Phrase</string>

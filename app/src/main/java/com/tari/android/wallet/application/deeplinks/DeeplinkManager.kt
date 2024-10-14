@@ -11,12 +11,14 @@ import com.tari.android.wallet.model.TariWalletAddress
 import com.tari.android.wallet.ui.common.DialogManager
 import com.tari.android.wallet.ui.common.domain.ResourceManager
 import com.tari.android.wallet.ui.dialog.confirm.ConfirmDialogArgs
+import com.tari.android.wallet.ui.dialog.modular.InputModularDialog
 import com.tari.android.wallet.ui.dialog.modular.ModularDialogArgs
 import com.tari.android.wallet.ui.dialog.modular.ModularDialogArgs.DialogId
 import com.tari.android.wallet.ui.dialog.modular.modules.body.BodyModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonStyle
 import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
+import com.tari.android.wallet.ui.dialog.modular.modules.input.InputModule
 import com.tari.android.wallet.ui.fragment.contactBook.data.ContactsRepository
 import com.tari.android.wallet.ui.fragment.contactBook.data.contacts.ContactDto
 import com.tari.android.wallet.ui.fragment.contactBook.data.contacts.FFIContactInfo
@@ -167,9 +169,67 @@ class DeeplinkManager @Inject constructor(
                     },
                     ButtonModule(resourceManager.getString(R.string.restore_wallet_paper_wallet_remember_backup_no_button), ButtonStyle.Normal) {
                         dialogManager.dismiss(DialogId.DEEPLINK_PAPER_WALLET_REMEMBER_TO_BACKUP)
-                        replaceWalletAction(deeplink)
+                        showEnterPassphraseDialog(context, deeplink)
                     },
                     ButtonModule(resourceManager.getString(R.string.common_cancel), ButtonStyle.Close),
+                ),
+            )
+        )
+    }
+
+    private fun showEnterPassphraseDialog(context: Activity, deeplink: DeepLink.PaperWallet) {
+        var saveAction: () -> Boolean = { false }
+
+        val headModule = HeadModule(
+            title = resourceManager.getString(R.string.restore_wallet_paper_wallet_enter_passphrase_title),
+            rightButtonTitle = resourceManager.getString(R.string.common_done),
+            rightButtonAction = { saveAction() },
+        )
+
+        val bodyModule = BodyModule(resourceManager.getString(R.string.restore_wallet_paper_wallet_enter_passphrase_body))
+
+        val passphraseModule = InputModule(
+            value = "",
+            hint = resourceManager.getString(R.string.restore_wallet_paper_wallet_enter_passphrase_hint),
+            isFirst = true,
+            isEnd = true,
+            onDoneAction = { saveAction() },
+        )
+
+        saveAction = {
+            val seeds = deeplink.seedWords(passphraseModule.value.trim())
+            if (seeds != null) {
+                dialogManager.dismiss(DialogId.DEEPLINK_PAPER_WALLET_ENTER_PASSPHRASE)
+                replaceWalletAction(seeds)
+            } else {
+                showPaperWalletErrorDialog(context)
+            }
+            true
+        }
+
+        dialogManager.replace(
+            InputModularDialog(
+                context = context,
+                args = ModularDialogArgs(
+                    dialogId = DialogId.DEEPLINK_PAPER_WALLET_ENTER_PASSPHRASE,
+                    modules = listOf(
+                        headModule,
+                        bodyModule,
+                        passphraseModule,
+                    ),
+                )
+            )
+        )
+    }
+
+    private fun showPaperWalletErrorDialog(context: Activity) {
+        dialogManager.replace(
+            context = context,
+            args = ModularDialogArgs(
+                modules = listOf(
+                    HeadModule(resourceManager.getString(R.string.restore_wallet_paper_wallet_error_title)),
+                    BodyModule(resourceManager.getString(R.string.restore_wallet_paper_wallet_error_body)),
+                    ButtonModule(resourceManager.getString(R.string.common_close), ButtonStyle.Close),
                 ),
             )
         )
@@ -221,8 +281,8 @@ class DeeplinkManager @Inject constructor(
         }
     }
 
-    private fun replaceWalletAction(deeplink: DeepLink.PaperWallet) {
+    private fun replaceWalletAction(seedWords: List<String>) {
         walletManager.deleteWallet()
-        navigator.navigate(Navigation.SplashScreen(deeplink.seedWords))
+        navigator.navigate(Navigation.SplashScreen(seedWords))
     }
 }

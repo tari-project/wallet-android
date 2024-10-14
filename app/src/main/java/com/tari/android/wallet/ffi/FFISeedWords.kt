@@ -42,6 +42,7 @@ import com.tari.android.wallet.model.seedPhrase.SeedWordsWordPushResult
 class FFISeedWords() : FFIBase() {
 
     private external fun jniCreate()
+    private external fun jniFromBase58(cypher: String, passphrase: String, libError: FFIError)
     private external fun jniPushWord(word: String, libError: FFIError): Int
     private external fun jniGetLength(libError: FFIError): Int
     private external fun jniGetAt(index: Int, libError: FFIError): String
@@ -51,6 +52,10 @@ class FFISeedWords() : FFIBase() {
 
     init {
         jniCreate()
+    }
+
+    constructor(base58: Base58, passphrase: String) : this() {
+        runWithError { jniFromBase58(base58, passphrase, it) }
     }
 
     constructor(pointer: FFIPointer) : this() {
