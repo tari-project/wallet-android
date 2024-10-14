@@ -86,7 +86,7 @@ class DeeplinkManager @Inject constructor(
                 confirmButtonText = resourceManager.getString(R.string.common_lets_do_it),
                 onConfirm = {
                     dialogManager.dismiss(DialogId.DEEPLINK_ADD_BASE_NODE)
-                    addBaseNodeAction(baseNode)
+                    addBaseNodeAction(context, baseNode)
                 },
             ).getModular(baseNode, resourceManager),
         )
@@ -204,10 +204,14 @@ class DeeplinkManager @Inject constructor(
         navigator.navigate(Navigation.TxListNavigation.ToSendWithDeeplink(deeplink))
     }
 
-    private fun addBaseNodeAction(baseNodeDto: BaseNodeDto) {
-        baseNodesManager.addUserBaseNode(baseNodeDto)
-        baseNodesManager.setBaseNode(baseNodeDto)
-        walletManager.syncBaseNode()
+    private fun addBaseNodeAction(context: Activity, baseNodeDto: BaseNodeDto) {
+        if (DebugConfig.selectBaseNodeEnabled) {
+            baseNodesManager.addUserBaseNode(baseNodeDto)
+            baseNodesManager.setBaseNode(baseNodeDto)
+            walletManager.syncBaseNode()
+        } else {
+            dialogManager.showNotReadyYetDialog(context)
+        }
     }
 
     private fun goToBackupAction() {

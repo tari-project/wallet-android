@@ -88,6 +88,7 @@ import com.tari.android.wallet.tor.TorProxyStateHandler
 import com.tari.android.wallet.ui.common.DialogManager
 import com.tari.android.wallet.ui.fragment.home.HomeActivity
 import com.tari.android.wallet.util.Constants
+import com.tari.android.wallet.util.DebugConfig
 import io.reactivex.Observable
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
@@ -210,6 +211,9 @@ class WalletManager @Inject constructor(
      * Syncs the wallet with the base node and validates the wallet
      */
     fun syncBaseNode() {
+        if (!DebugConfig.selectBaseNodeEnabled) {
+            Logger.e("baseNodeSync: Base node selection is disabled, but syncBaseNode() is called")
+        }
         var currentBaseNode: BaseNodeDto? = baseNodesManager.currentBaseNode ?: return
 
         applicationScope.launch(Dispatchers.IO) {
@@ -510,7 +514,7 @@ class WalletManager @Inject constructor(
 
                             ConnectivityStatus.OFFLINE -> {
                                 val currentBaseNode = baseNodesManager.currentBaseNode
-                                if (currentBaseNode == null || !currentBaseNode.isCustom) {
+                                if (DebugConfig.selectBaseNodeEnabled && (currentBaseNode == null || !currentBaseNode.isCustom)) {
                                     baseNodesManager.setNextBaseNode()
                                     syncBaseNode()
                                 }
@@ -548,11 +552,24 @@ class WalletManager @Inject constructor(
             }
             startLogFileObserver()
 
-            walletInstance?.let { baseNodesManager.refreshBaseNodeList(it) }
-                ?: error("Wallet instance is null when trying to refresh base node list")
-            if (baseNodesManager.currentBaseNode == null) {
-                baseNodesManager.setNextBaseNode()
+            baseNodesManager.loadBaseNodesFromFFI(requireWalletInstance)
+                .let {
+                    logger.i(
+                        "baseNodeSync: baseNodeList from FFI: ${
+                            if (it.isEmpty()) "No base nodes available!!"
+                            else "\n${it.joinToString(separator = "\n")}"
+                        }"
+                    )
+                }
+
+            if (DebugConfig.selectBaseNodeEnabled) {
+                walletInstance?.let { baseNodesManager.refreshBaseNodeList(it) }
+                    ?: error("Wallet instance is null when trying to refresh base node list")
+                if (baseNodesManager.currentBaseNode == null) {
+                    baseNodesManager.setNextBaseNode()
+                }
             }
+
             saveWalletAddressToSharedPrefs()
         }
     }
@@ -605,7 +622,7 @@ class WalletManager @Inject constructor(
         if (failed) {
             walletValidationStatusMap.clear()
             val currentBaseNode = baseNodesManager.currentBaseNode
-            if (currentBaseNode == null || !currentBaseNode.isCustom) {
+            if (DebugConfig.selectBaseNodeEnabled && (currentBaseNode == null || !currentBaseNode.isCustom)) {
                 baseNodesManager.setNextBaseNode()
                 syncBaseNode()
             }

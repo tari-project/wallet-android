@@ -26,6 +26,7 @@ import com.tari.android.wallet.ui.dialog.modular.modules.input.InputModule
 import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
 import com.tari.android.wallet.ui.fragment.restore.inputSeedWords.suggestions.SuggestionState
 import com.tari.android.wallet.ui.fragment.restore.inputSeedWords.suggestions.SuggestionViewHolderItem
+import com.tari.android.wallet.util.DebugConfig
 import io.reactivex.disposables.CompositeDisposable
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -136,11 +137,14 @@ class InputSeedWordsViewModel() : CommonViewModel() {
             }
         }
 
-        customBaseNodeState.value.customBaseNode?.let {
-            baseNodesManager.addUserBaseNode(it)
-            baseNodesManager.setBaseNode(it)
-            walletManager.syncBaseNode()
+        if (DebugConfig.selectBaseNodeEnabled) {
+            customBaseNodeState.value.customBaseNode?.let {
+                baseNodesManager.addUserBaseNode(it)
+                baseNodesManager.setBaseNode(it)
+                walletManager.syncBaseNode()
+            }
         }
+
         walletServiceLauncher.start(seedWords)
     }
 

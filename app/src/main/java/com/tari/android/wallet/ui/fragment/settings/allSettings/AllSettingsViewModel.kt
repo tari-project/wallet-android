@@ -241,10 +241,10 @@ class AllSettingsViewModel : CommonViewModel() {
             SettingsRowViewHolderItem(resourceManager.getString(all_settings_select_network), vector_all_settings_select_network_icon) {
                 navigation.postValue(AllSettingsNavigation.ToNetworkSelection)
             },
-            DividerViewHolderItem(),
+            DividerViewHolderItem().takeIf { DebugConfig.selectBaseNodeEnabled },
             SettingsRowViewHolderItem(resourceManager.getString(all_settings_select_base_node), vector_all_settings_select_base_node_icon) {
                 navigation.postValue(AllSettingsNavigation.ToBaseNodeSelection)
-            },
+            }.takeIf { DebugConfig.selectBaseNodeEnabled },
             DividerViewHolderItem(),
             SettingsRowViewHolderItem(
                 title = resourceManager.getString(all_settings_delete_wallet),
