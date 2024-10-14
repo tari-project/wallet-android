@@ -24,6 +24,7 @@ import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
 import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
 import com.tari.android.wallet.ui.fragment.send.shareQr.ShareQrCodeModule
 import com.tari.android.wallet.ui.fragment.settings.torBridges.torItem.TorBridgeViewHolderItem
+import com.tari.android.wallet.util.DebugConfig
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
@@ -135,7 +136,9 @@ class TorBridgesSelectionViewModel : CommonViewModel() {
         torProxyManager.shutdown()
         subscribeToTorState()
         torProxyManager.run()
-        walletManager.syncBaseNode()
+        if (DebugConfig.selectBaseNodeEnabled) {
+            walletManager.syncBaseNode()
+        }
     }
 
     private fun subscribeToTorState() {
