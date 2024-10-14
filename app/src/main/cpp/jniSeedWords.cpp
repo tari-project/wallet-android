@@ -50,6 +50,24 @@ Java_com_tari_android_wallet_ffi_FFISeedWords_jniCreate(
 
 extern "C"
 JNIEXPORT void JNICALL
+Java_com_tari_android_wallet_ffi_FFISeedWords_jniFromBase58(
+        JNIEnv *jEnv,
+        jobject jThis,
+        jstring jCypher,
+        jstring jPassphrase,
+        jobject error) {
+    ExecuteWithError(jEnv, error, [&](int *errorPointer) {
+        const char *pCypher = jEnv->GetStringUTFChars(jCypher, JNI_FALSE);
+        const char *pPassphrase = jEnv->GetStringUTFChars(jPassphrase, JNI_FALSE);
+        TariSeedWords *pSeedWords = seed_words_create_from_cipher(pCypher, pPassphrase, errorPointer);
+        jEnv->ReleaseStringUTFChars(jCypher, pCypher);
+        jEnv->ReleaseStringUTFChars(jPassphrase, pPassphrase);
+        SetPointerField(jEnv, jThis, reinterpret_cast<jlong>(pSeedWords));
+    });
+}
+
+extern "C"
+JNIEXPORT void JNICALL
 Java_com_tari_android_wallet_ffi_FFISeedWords_jniGetMnemonicWordListForLanguage(
         JNIEnv *jEnv,
         jobject jThis,

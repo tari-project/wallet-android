@@ -25,7 +25,7 @@ class DeeplinkParser @Inject constructor(private val networkRepository: NetworkP
         }
 
         val command = uri.path.orEmpty().trimStart('/')
-        val parameters = if (command == DeepLink.Contacts.COMMAND_CONTACTS || command == DeepLink.PaperWallet.COMMAND_PAPER_WALLET) { // list params
+        val parameters = if (command == DeepLink.Contacts.COMMAND_CONTACTS) { // list params
             uri.query.orEmpty().split("&").associate {
                 val (key, value) = it.split("=")
                 key to value
