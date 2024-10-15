@@ -227,20 +227,7 @@ class WalletManager @Inject constructor(
                             baseNodeKeyFFI.destroy()
                             logger.i("baseNodeSync:addBaseNodePeer ${if (addBaseNodeResult) "success" else "failed"}")
 
-                            try {
-                                logger.i("baseNodeSync:wallet validation:start Tx and TXO validation")
-                                walletValidationStatusMap.clear()
-                                walletValidationStatusMap[WalletValidationType.TXO] = WalletValidationResult(wallet.startTXOValidation(), null)
-                                walletValidationStatusMap[WalletValidationType.TX] = WalletValidationResult(wallet.startTxValidation(), null)
-                                logger.i(
-                                    "baseNodeSync:wallet validation:started Tx and TXO validation with " +
-                                            "request keys: ${Gson().toJson(walletValidationStatusMap.map { it.value.requestKey })}"
-                                )
-                            } catch (e: Throwable) {
-                                logger.i("baseNodeSync:wallet validation:error: ${e.message}")
-                                walletValidationStatusMap.clear()
-                                baseNodeStateHandler.updateSyncState(BaseNodeSyncState.Failed)
-                            }
+                            validateWallet()
                         }
                         break
                     } catch (e: Throwable) {
@@ -570,7 +557,30 @@ class WalletManager @Inject constructor(
                 }
             }
 
+            validateWallet()
+
             saveWalletAddressToSharedPrefs()
+        }
+    }
+
+    private fun validateWallet() {
+        applicationScope.launch(Dispatchers.IO) {
+            doOnWalletRunning { wallet ->
+                try {
+                    logger.i("baseNodeSync:wallet validation:start Tx and TXO validation")
+                    walletValidationStatusMap.clear()
+                    walletValidationStatusMap[WalletValidationType.TXO] = WalletValidationResult(wallet.startTXOValidation(), null)
+                    walletValidationStatusMap[WalletValidationType.TX] = WalletValidationResult(wallet.startTxValidation(), null)
+                    logger.i(
+                        "baseNodeSync:wallet validation:started Tx and TXO validation with " +
+                                "request keys: ${Gson().toJson(walletValidationStatusMap.map { it.value.requestKey })}"
+                    )
+                } catch (e: Throwable) {
+                    logger.i("baseNodeSync:wallet validation:error: ${e.message}")
+                    walletValidationStatusMap.clear()
+                    baseNodeStateHandler.updateSyncState(BaseNodeSyncState.Failed)
+                }
+            }
         }
     }
 
