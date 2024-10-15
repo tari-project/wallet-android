@@ -491,6 +491,7 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniCreate(
             pSeedWords,
             pNetwork,
             pDnsPeer,
+            nullptr,
             isDnsSecureOn,
             txReceivedCallback,
             txReplyReceivedCallback,
