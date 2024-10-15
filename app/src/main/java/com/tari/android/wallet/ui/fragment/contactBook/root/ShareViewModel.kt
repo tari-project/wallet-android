@@ -3,8 +3,7 @@ package com.tari.android.wallet.ui.fragment.contactBook.root
 import androidx.lifecycle.MutableLiveData
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.deeplinks.DeepLink
-import com.tari.android.wallet.application.deeplinks.DeeplinkHandler
-import com.tari.android.wallet.application.deeplinks.DeeplinkViewModel
+import com.tari.android.wallet.application.deeplinks.DeeplinkManager
 import com.tari.android.wallet.infrastructure.bluetooth.TariBluetoothClient
 import com.tari.android.wallet.infrastructure.bluetooth.TariBluetoothServer
 import com.tari.android.wallet.model.TariWalletAddress
@@ -21,6 +20,7 @@ import com.tari.android.wallet.ui.fragment.contactBook.data.ContactsRepository
 import com.tari.android.wallet.ui.fragment.contactBook.data.contacts.ContactDto
 import com.tari.android.wallet.ui.fragment.contactBook.data.contacts.FFIContactInfo
 import com.tari.android.wallet.ui.fragment.contactBook.root.share.ShareType
+import com.tari.android.wallet.ui.fragment.home.HomeActivity
 import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
 import com.tari.android.wallet.ui.fragment.send.shareQr.ShareQrCodeModule
 import com.tari.android.wallet.util.ContactUtil
@@ -36,15 +36,13 @@ class ShareViewModel : CommonViewModel() {
     lateinit var tariBluetoothServer: TariBluetoothServer
 
     @Inject
-    lateinit var deeplinkHandler: DeeplinkHandler
-
-    @Inject
     lateinit var contactsRepository: ContactsRepository
 
     @Inject
     lateinit var contactUtil: ContactUtil
 
-    val deeplinkViewModel = DeeplinkViewModel()
+    @Inject
+    lateinit var deeplinkManager: DeeplinkManager
 
     val shareText = SingleLiveEvent<String>()
 
@@ -160,7 +158,9 @@ class ShareViewModel : CommonViewModel() {
     }
 
     private fun onReceived(data: List<DeepLink.Contacts.DeeplinkContact>) {
-        deeplinkViewModel.addContacts(DeepLink.Contacts(data))
+        HomeActivity.instance.get()?.let { context ->
+            deeplinkManager.execute(context, DeepLink.Contacts(data))
+        }
     }
 
     companion object {

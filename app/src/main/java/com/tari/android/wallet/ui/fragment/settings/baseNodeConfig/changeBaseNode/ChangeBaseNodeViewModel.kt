@@ -4,15 +4,15 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.baseNodes.BaseNodesManager
-import com.tari.android.wallet.application.deeplinks.DeeplinkHandler
+import com.tari.android.wallet.application.deeplinks.DeeplinkManager
 import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodeDto
-import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodePrefRepository
-import com.tari.android.wallet.event.EventBus
+import com.tari.android.wallet.extension.collectFlow
+import com.tari.android.wallet.service.baseNode.BaseNodeStateHandler
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.common.recyclerView.CommonViewHolderItem
-import com.tari.android.wallet.ui.dialog.modular.SimpleDialogArgs
 import com.tari.android.wallet.ui.dialog.modular.DialogArgs
 import com.tari.android.wallet.ui.dialog.modular.ModularDialogArgs
+import com.tari.android.wallet.ui.dialog.modular.SimpleDialogArgs
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonStyle
 import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
@@ -28,13 +28,13 @@ import javax.inject.Inject
 class ChangeBaseNodeViewModel : CommonViewModel() {
 
     @Inject
-    lateinit var baseNodeSharedRepository: BaseNodePrefRepository
-
-    @Inject
     lateinit var baseNodesManager: BaseNodesManager
 
     @Inject
-    lateinit var deeplinkHandler: DeeplinkHandler
+    lateinit var baseNodeStateHandler: BaseNodeStateHandler
+
+    @Inject
+    lateinit var deeplinkManager: DeeplinkManager
 
     private val _baseNodeList = MutableLiveData<MutableList<CommonViewHolderItem>>()
     val baseNodeList: LiveData<MutableList<CommonViewHolderItem>> = _baseNodeList
@@ -45,18 +45,19 @@ class ChangeBaseNodeViewModel : CommonViewModel() {
     init {
         component.inject(this)
 
-        EventBus.baseNodeState.subscribe(this) { loadList() }
+        collectFlow(baseNodeStateHandler.baseNodeState) { loadList() }
 
         loadList()
     }
 
     fun selectBaseNode(baseNodeDto: BaseNodeDto) {
         baseNodesManager.setBaseNode(baseNodeDto)
+        walletManager.syncBaseNode()
         backPressed.postValue(Unit)
     }
 
     fun showQrCode(baseNodeDto: BaseNodeDto) {
-        val data = deeplinkHandler.getDeeplink(baseNodeDto.toDeeplink())
+        val data = deeplinkManager.getDeeplinkString(baseNodeDto.toDeeplink())
         showModularDialog(
             ModularDialogArgs(
                 DialogArgs(true, canceledOnTouchOutside = true), listOf(
@@ -76,9 +77,9 @@ class ChangeBaseNodeViewModel : CommonViewModel() {
     }
 
     private fun loadList() {
-        val currentBaseNode = baseNodeSharedRepository.currentBaseNode
+        val currentBaseNode = baseNodesManager.currentBaseNode
         val items = mutableListOf<CommonViewHolderItem>()
-        items.addAll(baseNodeSharedRepository.userBaseNodes.map { BaseNodeViewHolderItem(it, currentBaseNode, this::deleteBaseNode) })
+        items.addAll(baseNodesManager.userBaseNodes.map { BaseNodeViewHolderItem(it, currentBaseNode, this::deleteBaseNode) })
         items.addAll(baseNodesManager.baseNodeList.map { BaseNodeViewHolderItem(it, currentBaseNode, this::deleteBaseNode) })
         _baseNodeList.postValue(items)
     }
@@ -136,6 +137,7 @@ class ChangeBaseNodeViewModel : CommonViewModel() {
 
             baseNodesManager.addUserBaseNode(baseNode)
             baseNodesManager.setBaseNode(baseNode)
+            walletManager.syncBaseNode()
             hideDialog()
             loadList()
         } else {
@@ -148,5 +150,4 @@ class ChangeBaseNodeViewModel : CommonViewModel() {
             )
         }
     }
-
 }

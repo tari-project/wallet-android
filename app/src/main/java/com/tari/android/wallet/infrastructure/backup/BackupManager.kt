@@ -37,7 +37,11 @@ import android.content.Intent
 import androidx.fragment.app.Fragment
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.R
+import com.tari.android.wallet.application.walletManager.WalletManager
+import com.tari.android.wallet.application.walletManager.WalletManager.WalletEvent
+import com.tari.android.wallet.data.sharedPrefs.backup.BackupPrefRepository
 import com.tari.android.wallet.data.sharedPrefs.delegates.SerializableTime
+import com.tari.android.wallet.di.ApplicationScope
 import com.tari.android.wallet.event.Event
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.infrastructure.backup.dropbox.DropboxBackupStorage
@@ -45,11 +49,9 @@ import com.tari.android.wallet.infrastructure.backup.googleDrive.GoogleDriveBack
 import com.tari.android.wallet.infrastructure.backup.local.LocalBackupStorage
 import com.tari.android.wallet.notification.NotificationHelper
 import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupOptionDto
-import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupOptions
-import com.tari.android.wallet.data.sharedPrefs.backup.BackupPrefRepository
+import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupOption
 import io.reactivex.subjects.BehaviorSubject
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -66,22 +68,21 @@ class BackupManager @Inject constructor(
     private val localFileBackupStorage: LocalBackupStorage,
     private val googleDriveBackupStorage: GoogleDriveBackupStorage,
     private val dropboxBackupStorage: DropboxBackupStorage,
-    private val notificationHelper: NotificationHelper
+    private val notificationHelper: NotificationHelper,
+    private val walletManager: WalletManager,
+    @ApplicationScope private val applicationScope: CoroutineScope,
 ) {
 
     private val logger
         get() = Logger.t(BackupManager::class.simpleName)
 
-    var currentOption: BackupOptions? = BackupOptions.Dropbox
-
-    private val coroutineContext = Job()
-    private var localScope = CoroutineScope(coroutineContext)
+    var currentOption: BackupOption? = BackupOption.Dropbox
 
     private val backupMutex = Mutex()
 
     private val trigger = BehaviorSubject.create<Unit>()
-    private val debouncedJob = trigger.debounce(300L, TimeUnit.MILLISECONDS)
-        .doOnEach { localScope.launch { backupAll() } }
+    private val debouncedJob = trigger.debounce(300L, TimeUnit.MILLISECONDS) // TODO don't use rx for debounce
+        .doOnEach { applicationScope.launch { backupAll() } }
         .subscribe()
 
     init {
@@ -90,9 +91,29 @@ class BackupManager @Inject constructor(
 
         EventBus.subscribe<Event.App.AppBackgrounded>(this) { trigger.onNext(Unit) }
         EventBus.subscribe<Event.App.AppForegrounded>(this) { trigger.onNext(Unit) }
+
+        applicationScope.launch {
+            walletManager.walletEvent.collect { event ->
+                when (event) {
+                    is WalletEvent.Tx.TxReceived,
+                    is WalletEvent.Tx.TxReplyReceived,
+                    is WalletEvent.Tx.TxFinalized,
+                    is WalletEvent.Tx.InboundTxBroadcast,
+                    is WalletEvent.Tx.OutboundTxBroadcast,
+                    is WalletEvent.Tx.TxMined,
+                    is WalletEvent.Tx.TxMinedUnconfirmed,
+                    is WalletEvent.Tx.TxFauxConfirmed,
+                    is WalletEvent.Tx.TxFauxMinedUnconfirmed,
+                    is WalletEvent.Tx.DirectSendResult,
+                    is WalletEvent.Tx.TxCancelled -> trigger.onNext(Unit)
+
+                    is WalletEvent.OnWalletRemove -> turnOffAll()
+                }
+            }
+        }
     }
 
-    fun setupStorage(option: BackupOptions, hostFragment: Fragment) {
+    fun setupStorage(option: BackupOption, hostFragment: Fragment) {
         currentOption = option
         getStorageByOption(option).setup(hostFragment)
     }
@@ -104,7 +125,7 @@ class BackupManager @Inject constructor(
 
     private suspend fun backupAll() = backupSettingsRepository.getOptionList.forEach { backup(it.type) }
 
-    private suspend fun backup(optionType: BackupOptions) = backupMutex.withLock {
+    private suspend fun backup(optionType: BackupOption) = backupMutex.withLock {
         val currentDto = backupSettingsRepository.getOptionList.firstOrNull { it.type == optionType } ?: return
         if (!currentDto.isEnable) {
             logger.d("Backup is disabled. Exit.")
@@ -148,11 +169,11 @@ class BackupManager @Inject constructor(
         }
     }
 
-    fun turnOffAll() = localScope.launch {
+    fun turnOffAll() = applicationScope.launch {
         backupSettingsRepository.getOptionList.forEach { turnOff(it.type) }
     }
 
-    fun turnOff(optionType: BackupOptions) = with(backupMutex) {
+    fun turnOff(optionType: BackupOption) = with(backupMutex) {
         val backupsState = EventBus.backupState.publishSubject.value!!.copy()
         backupSettingsRepository.updateOption(BackupOptionDto(optionType))
         backupSettingsRepository.backupPassword = null
@@ -160,7 +181,7 @@ class BackupManager @Inject constructor(
             backupsState.copy(backupsStates = backupsState.backupsStates.toMutableMap().also { it[optionType] = BackupState.BackupDisabled })
         EventBus.backupState.post(newState)
         val backupStorage = getStorageByOption(optionType)
-        localScope.launch { backupStorage.signOut() }
+        applicationScope.launch { backupStorage.signOut() }
     }
 
     suspend fun signOut() {
@@ -177,10 +198,10 @@ class BackupManager @Inject constructor(
         else -> BackupState.BackupUpToDate
     }
 
-    private fun getStorageByOption(optionType: BackupOptions): BackupStorage = when (optionType) {
-        BackupOptions.Google -> googleDriveBackupStorage
-        BackupOptions.Local -> localFileBackupStorage
-        BackupOptions.Dropbox -> dropboxBackupStorage
+    private fun getStorageByOption(optionType: BackupOption): BackupStorage = when (optionType) {
+        BackupOption.Google -> googleDriveBackupStorage
+        BackupOption.Local -> localFileBackupStorage
+        BackupOption.Dropbox -> dropboxBackupStorage
     }
 
     private fun postBackupFailedNotification(exception: Exception) {

@@ -40,8 +40,9 @@ import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
 import androidx.lifecycle.lifecycleScope
 import com.tari.android.wallet.R
-import com.tari.android.wallet.application.walletManager.WalletStateHandler
-import com.tari.android.wallet.data.WalletConfig
+import com.tari.android.wallet.application.walletManager.WalletManager
+import com.tari.android.wallet.application.walletManager.doOnWalletFailed
+import com.tari.android.wallet.application.walletManager.doOnWalletRunning
 import com.tari.android.wallet.data.sharedPrefs.CorePrefRepository
 import com.tari.android.wallet.databinding.ActivityOnboardingFlowBinding
 import com.tari.android.wallet.di.DiContainer.appComponent
@@ -55,8 +56,8 @@ import com.tari.android.wallet.ui.fragment.onboarding.activity.OnboardingFlowMod
 import com.tari.android.wallet.ui.fragment.onboarding.createWallet.CreateWalletFragment
 import com.tari.android.wallet.ui.fragment.onboarding.inroduction.IntroductionFragment
 import com.tari.android.wallet.ui.fragment.onboarding.localAuth.LocalAuthFragment
+import com.tari.android.wallet.ui.fragment.restore.walletRestoring.WalletRestoringFragment
 import com.tari.android.wallet.ui.fragment.settings.networkSelection.NetworkSelectionFragment
-import com.tari.android.wallet.util.WalletUtil
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -73,16 +74,13 @@ import javax.inject.Inject
 class OnboardingFlowActivity : CommonActivity<ActivityOnboardingFlowBinding, CommonViewModel>(), OnboardingFlowListener {
 
     @Inject
-    lateinit var walletConfig: WalletConfig
-
-    @Inject
     lateinit var corePrefRepository: CorePrefRepository
 
     @Inject
     lateinit var walletServiceLauncher: WalletServiceLauncher
 
     @Inject
-    lateinit var walletStateHandler: WalletStateHandler
+    lateinit var walletManager: WalletManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         appComponent.inject(this)
@@ -94,7 +92,19 @@ class OnboardingFlowActivity : CommonActivity<ActivityOnboardingFlowBinding, Com
 
         setContainerId(R.id.onboarding_fragment_container)
 
+        val paperWalletSeeds = intent.extras?.getStringArray(ARG_SEED_WORDS)?.toList()
+
         when {
+            paperWalletSeeds != null -> {
+                walletServiceLauncher.start(paperWalletSeeds)
+
+                lifecycleScope.launch {
+                    walletManager.doOnWalletRunning {
+                        loadFragment(WalletRestoringFragment())
+                    }
+                }
+            }
+
             corePrefRepository.onboardingAuthWasInterrupted -> {
                 walletServiceLauncher.start()
                 loadFragment(LocalAuthFragment())
@@ -104,7 +114,7 @@ class OnboardingFlowActivity : CommonActivity<ActivityOnboardingFlowBinding, Com
                 // start wallet service
                 walletServiceLauncher.start()
                 // clean existing files & restart onboarding
-                WalletUtil.clearWalletFiles(walletConfig.getWalletFilesDirPath())
+                walletManager.deleteWallet()
                 loadFragment(CreateWalletFragment())
             }
 
@@ -120,7 +130,7 @@ class OnboardingFlowActivity : CommonActivity<ActivityOnboardingFlowBinding, Com
         }
 
         lifecycleScope.launch {
-            walletStateHandler.doOnWalletFailed {
+            walletManager.doOnWalletFailed {
                 resetFlow()
             }
         }
@@ -168,9 +178,8 @@ class OnboardingFlowActivity : CommonActivity<ActivityOnboardingFlowBinding, Com
     }
 
     override fun resetFlow() {
-        walletServiceLauncher.stopAndDelete()
+        walletManager.deleteWallet()
         clearBackStack()
-        WalletUtil.clearWalletFiles(walletConfig.getWalletFilesDirPath())
         loadFragment(IntroductionFragment())
     }
 
@@ -197,5 +206,9 @@ class OnboardingFlowActivity : CommonActivity<ActivityOnboardingFlowBinding, Com
         if (supportFragmentManager.backStackEntryCount > 0) {
             supportFragmentManager.popBackStack(supportFragmentManager.getBackStackEntryAt(0).id, FragmentManager.POP_BACK_STACK_INCLUSIVE)
         }
+    }
+
+    companion object {
+        const val ARG_SEED_WORDS = "ARG_SEED_WORDS"
     }
 }

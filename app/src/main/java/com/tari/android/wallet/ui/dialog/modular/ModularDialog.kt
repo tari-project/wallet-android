@@ -3,7 +3,6 @@ package com.tari.android.wallet.ui.dialog.modular
 import android.animation.ValueAnimator
 import android.app.Activity
 import android.app.Dialog
-import android.content.Context
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.view.Gravity
@@ -48,6 +47,7 @@ import com.tari.android.wallet.ui.dialog.modular.modules.shortEmoji.ShortEmojiId
 import com.tari.android.wallet.ui.dialog.modular.modules.shortEmoji.ShortEmojiModuleView
 import com.tari.android.wallet.ui.dialog.modular.modules.space.SpaceModule
 import com.tari.android.wallet.ui.dialog.modular.modules.space.SpaceModuleView
+import com.tari.android.wallet.ui.extension.isStillAlive
 import com.tari.android.wallet.ui.fragment.send.addAmount.feeModule.FeeModule
 import com.tari.android.wallet.ui.fragment.send.addAmount.feeModule.FeeModuleView
 import com.tari.android.wallet.ui.fragment.send.shareQr.ShareQRCodeModuleView
@@ -64,14 +64,16 @@ import com.tari.android.wallet.ui.fragment.utxos.list.module.UtxoAmountModule
 import com.tari.android.wallet.ui.fragment.utxos.list.module.UtxoAmountModuleView
 import com.tari.android.wallet.ui.fragment.utxos.list.module.UtxoSplitModule
 import com.tari.android.wallet.ui.fragment.utxos.list.module.UtxoSplitModuleView
+import java.lang.ref.WeakReference
 
-open class ModularDialog(val context: Context) {
+open class ModularDialog(context: Activity) {
+    private val weakContext = WeakReference(context)
 
     lateinit var args: ModularDialogArgs
 
     private val onDismissListeners = mutableListOf<() -> Unit>()
 
-    constructor(context: Context, args: ModularDialogArgs) : this(context) {
+    constructor(context: Activity, args: ModularDialogArgs) : this(context) {
         applyArgs(args)
     }
 
@@ -85,14 +87,16 @@ open class ModularDialog(val context: Context) {
     }
 
     fun show() {
-        dialog.show()
-        showAnimation(true)
+        withContext {
+            dialog.show()
+            showAnimation(true)
+        }
     }
 
     fun dismiss() {
-        showAnimation(false) {
-            runCatching {
-                if (context !is Activity || !context.isFinishing) {
+        withContext {
+            showAnimation(false) {
+                runCatching {
                     dialog.dismiss()
                 }
             }
@@ -104,24 +108,26 @@ open class ModularDialog(val context: Context) {
     }
 
     fun applyArgs(args: ModularDialogArgs) {
-        this.args = args
-        with(dialog) {
-            setCancelable(args.dialogArgs.cancelable)
-            setCanceledOnTouchOutside(args.dialogArgs.canceledOnTouchOutside)
-            setOnDismissListener {
-                onDismissListeners.forEach { runCatching { it() } }
-                args.dialogArgs.onDismiss()
-            }
-            if (args.dialogArgs.canceledOnTouchOutside) {
-                findViewById<View>(R.id.back).setOnClickListener {
-                    this@ModularDialog.dismiss()
+        withContext { context ->
+            this.args = args
+            with(dialog) {
+                setCancelable(args.dialogArgs.cancelable)
+                setCanceledOnTouchOutside(args.dialogArgs.canceledOnTouchOutside)
+                setOnDismissListener {
+                    onDismissListeners.forEach { runCatching { it() } }
+                    args.dialogArgs.onDismiss()
+                }
+                if (args.dialogArgs.canceledOnTouchOutside) {
+                    findViewById<View>(R.id.back).setOnClickListener {
+                        this@ModularDialog.dismiss()
+                    }
                 }
             }
+            updateModules(context, args.modules)
         }
-        updateModules(args.modules)
     }
 
-    private fun updateModules(modules: List<IDialogModule>) {
+    private fun updateModules(context: Activity, modules: List<IDialogModule>) {
         val root = dialog.findViewById<LinearLayoutCompat>(R.id.dialog_root_view)
         root.removeAllViews()
         for (module in modules) {
@@ -178,6 +184,12 @@ open class ModularDialog(val context: Context) {
             }
             doOnEnd { endAction() }
             start()
+        }
+    }
+
+    private fun withContext(block: (Activity) -> Unit) {
+        weakContext.get()?.takeIf { it.isStillAlive() }?.let {
+            block(it)
         }
     }
 }

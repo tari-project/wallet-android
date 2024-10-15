@@ -82,10 +82,10 @@ class CorePrefRepository @Inject constructor(
         const val SURNAME = "tari_wallet_surname_"
         const val ONBOARDING_STARTED = "tari_wallet_onboarding_started"
         const val ONBOARDING_AUTH_SETUP_COMPLETED = "tari_wallet_onboarding_auth_setup_completed"
-        const val ACTION_MENU_SIDE = "tari_wallet_action_menu_side"
         const val ONBOARDING_AUTH_SETUP_STARTED = "tari_wallet_onboarding_auth_setup_started"
         const val ONBOARDING_COMPLETED = "tari_wallet_onboarding_completed"
         const val ONBOARDING_DISPLAYED_AT_HOME = "tari_wallet_onboarding_displayed_at_home"
+        const val NEED_TO_SHOW_RECOVERY_SUCCESS_DIALOG = "NEED_TO_SHOW_RECOVERY_SUCCESS_DIALOG"
         const val IS_DATA_CLEARED = "tari_is_data_cleared"
     }
 
@@ -105,8 +105,6 @@ class CorePrefRepository @Inject constructor(
 
     var onboardingAuthSetupCompleted: Boolean by SharedPrefBooleanDelegate(sharedPrefs, this, formatKey(Key.ONBOARDING_AUTH_SETUP_COMPLETED))
 
-    var actionMenuSide: Boolean by SharedPrefBooleanDelegate(sharedPrefs, this, formatKey(Key.ACTION_MENU_SIDE))
-
     val onboardingAuthWasInterrupted: Boolean
         get() = onboardingAuthSetupStarted && (!onboardingAuthSetupCompleted || securityPrefRepository.pinCode == null)
 
@@ -115,10 +113,18 @@ class CorePrefRepository @Inject constructor(
 
     var onboardingDisplayedAtHome: Boolean by SharedPrefBooleanDelegate(sharedPrefs, this, formatKey(Key.ONBOARDING_DISPLAYED_AT_HOME))
 
+    var needToShowRecoverySuccessDialog: Boolean by SharedPrefBooleanDelegate(sharedPrefs, this, formatKey(Key.NEED_TO_SHOW_RECOVERY_SUCCESS_DIALOG), false)
+
     var isDataCleared: Boolean by SharedPrefBooleanDelegate(sharedPrefs, this, formatKey(Key.IS_DATA_CLEARED), true)
 
     val walletAddress: TariWalletAddress
-        get() = TariWalletAddress.fromBase58(walletAddressBase58!!)
+        get() = walletAddressBase58?.let { TariWalletAddress.fromBase58(it) } ?: error("Wallet address is not set to shared preferences")
+
+    /**
+     * Sometimes the wallet address is not set to the shared preferences (e.g. after a wallet removing).
+     * TODO: Investigate why the app accesses the wallet address when it is not set
+     */
+    fun walletAddressExists(): Boolean = walletAddressBase58 != null
 
     fun clear() {
         baseNodeSharedRepository.clear()

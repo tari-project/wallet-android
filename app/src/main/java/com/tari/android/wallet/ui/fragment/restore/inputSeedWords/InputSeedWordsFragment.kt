@@ -82,8 +82,8 @@ class InputSeedWordsFragment : CommonFragment<FragmentWalletInputSeedWordsBindin
             }
             true
         }
-        chooseBaseNodeButton.setVisible(DebugConfig.hardcodedBaseNodes)
-        chooseCustomBaseNodeButton.setVisible(!DebugConfig.hardcodedBaseNodes)
+        chooseBaseNodeButton.setVisible(DebugConfig.selectBaseNodeEnabled && DebugConfig.hardcodedBaseNodes)
+        chooseCustomBaseNodeButton.setVisible(DebugConfig.selectBaseNodeEnabled && !DebugConfig.hardcodedBaseNodes)
         chooseBaseNodeButton.setOnClickListener { viewModel.navigation.postValue(Navigation.InputSeedWordsNavigation.ToBaseNodeSelection) }
         chooseCustomBaseNodeButton.setOnClickListener { viewModel.chooseCustomBaseNodeClick() }
         suggestionsAdapter.setClickListener(CommonAdapter.ItemClickListener { viewModel.selectSuggestion(it) })
@@ -158,7 +158,7 @@ class InputSeedWordsFragment : CommonFragment<FragmentWalletInputSeedWordsBindin
                 ui.text.setTextSilently(it)
             }
             this@InputSeedWordsFragment.observe(word.index) {
-                val ime = if (it == SeedPhrase.SeedPhraseLength - 1)
+                val ime = if (it == SeedPhrase.SEED_PHRASE_LENGTH - 1)
                     EditorInfo.IME_ACTION_DONE else EditorInfo.IME_ACTION_NEXT
                 ui.text.imeOptions = ime
             }
@@ -212,6 +212,6 @@ class InputSeedWordsFragment : CommonFragment<FragmentWalletInputSeedWordsBindin
     }
 
     companion object {
-        fun newInstance() = InputSeedWordsFragment()
+        fun createFragment(): InputSeedWordsFragment = InputSeedWordsFragment()
     }
 }

@@ -3,9 +3,8 @@ package com.tari.android.wallet.ui.fragment.settings.torBridges
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.tari.android.wallet.R
-import com.tari.android.wallet.application.baseNodes.BaseNodesManager
 import com.tari.android.wallet.application.deeplinks.DeepLink
-import com.tari.android.wallet.application.deeplinks.DeeplinkHandler
+import com.tari.android.wallet.application.deeplinks.DeeplinkManager
 import com.tari.android.wallet.data.sharedPrefs.tor.TorBridgeConfigurationList
 import com.tari.android.wallet.data.sharedPrefs.tor.TorPrefRepository
 import com.tari.android.wallet.extension.collectFlow
@@ -15,9 +14,9 @@ import com.tari.android.wallet.tor.TorProxyManager
 import com.tari.android.wallet.tor.TorProxyState
 import com.tari.android.wallet.tor.TorProxyStateHandler
 import com.tari.android.wallet.ui.common.CommonViewModel
-import com.tari.android.wallet.ui.dialog.modular.SimpleDialogArgs
 import com.tari.android.wallet.ui.dialog.modular.DialogArgs
 import com.tari.android.wallet.ui.dialog.modular.ModularDialogArgs
+import com.tari.android.wallet.ui.dialog.modular.SimpleDialogArgs
 import com.tari.android.wallet.ui.dialog.modular.modules.body.BodyModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonStyle
@@ -25,6 +24,7 @@ import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
 import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
 import com.tari.android.wallet.ui.fragment.send.shareQr.ShareQrCodeModule
 import com.tari.android.wallet.ui.fragment.settings.torBridges.torItem.TorBridgeViewHolderItem
+import com.tari.android.wallet.util.DebugConfig
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
@@ -39,10 +39,7 @@ class TorBridgesSelectionViewModel : CommonViewModel() {
     lateinit var torProxyManager: TorProxyManager
 
     @Inject
-    lateinit var baseNodesManager: BaseNodesManager
-
-    @Inject
-    lateinit var deeplinkHandler: DeeplinkHandler
+    lateinit var deeplinkManager: DeeplinkManager
 
     @Inject
     lateinit var torProxyStateHandler: TorProxyStateHandler
@@ -102,7 +99,7 @@ class TorBridgesSelectionViewModel : CommonViewModel() {
 
     fun showBridgeQrCode(torBridgeItem: TorBridgeViewHolderItem) {
         if (torBridgeItem !is TorBridgeViewHolderItem.Bridge) return
-        val data = deeplinkHandler.getDeeplink(DeepLink.TorBridges(listOf(torBridgeItem.bridgeConfiguration)))
+        val data = deeplinkManager.getDeeplinkString(DeepLink.TorBridges(listOf(torBridgeItem.bridgeConfiguration)))
         showModularDialog(
             ModularDialogArgs(
                 DialogArgs(true, canceledOnTouchOutside = true), listOf(
@@ -139,7 +136,9 @@ class TorBridgesSelectionViewModel : CommonViewModel() {
         torProxyManager.shutdown()
         subscribeToTorState()
         torProxyManager.run()
-        baseNodesManager.startSync()
+        if (DebugConfig.selectBaseNodeEnabled) {
+            walletManager.syncBaseNode()
+        }
     }
 
     private fun subscribeToTorState() {

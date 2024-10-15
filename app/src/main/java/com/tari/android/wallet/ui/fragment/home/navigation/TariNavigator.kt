@@ -8,16 +8,14 @@ import com.tari.android.wallet.R
 import com.tari.android.wallet.application.YatAdapter
 import com.tari.android.wallet.application.YatAdapter.ConnectedWallet
 import com.tari.android.wallet.application.deeplinks.DeepLink
-import com.tari.android.wallet.data.sharedPrefs.CorePrefRepository
-import com.tari.android.wallet.data.sharedPrefs.tariSettings.TariSettingsPrefRepository
+import com.tari.android.wallet.application.walletManager.WalletManager
 import com.tari.android.wallet.event.Event
 import com.tari.android.wallet.event.EventBus
-import com.tari.android.wallet.ffi.FFIWallet
 import com.tari.android.wallet.model.MicroTari
 import com.tari.android.wallet.model.TariWalletAddress
 import com.tari.android.wallet.model.Tx
 import com.tari.android.wallet.model.TxId
-import com.tari.android.wallet.network.NetworkConnectionState
+import com.tari.android.wallet.network.NetworkConnectionStateHandler
 import com.tari.android.wallet.ui.common.CommonActivity
 import com.tari.android.wallet.ui.common.CommonFragment
 import com.tari.android.wallet.ui.dialog.modular.DialogArgs
@@ -48,20 +46,18 @@ import com.tari.android.wallet.ui.fragment.home.navigation.Navigation.ChatNaviga
 import com.tari.android.wallet.ui.fragment.home.navigation.Navigation.ChooseRestoreOptionNavigation
 import com.tari.android.wallet.ui.fragment.home.navigation.Navigation.ContactBookNavigation
 import com.tari.android.wallet.ui.fragment.home.navigation.Navigation.CustomBridgeNavigation
-import com.tari.android.wallet.ui.fragment.home.navigation.Navigation.EnterRestorationPasswordNavigation
 import com.tari.android.wallet.ui.fragment.home.navigation.Navigation.InputSeedWordsNavigation
 import com.tari.android.wallet.ui.fragment.home.navigation.Navigation.SendTxNavigation
 import com.tari.android.wallet.ui.fragment.home.navigation.Navigation.TorBridgeNavigation
 import com.tari.android.wallet.ui.fragment.home.navigation.Navigation.TxListNavigation
 import com.tari.android.wallet.ui.fragment.home.navigation.Navigation.VerifySeedPhraseNavigation
-import com.tari.android.wallet.ui.fragment.home.navigation.Navigation.WalletRestoringFromSeedWordsNavigation
 import com.tari.android.wallet.ui.fragment.onboarding.activity.OnboardingFlowActivity
 import com.tari.android.wallet.ui.fragment.onboarding.localAuth.LocalAuthFragment
 import com.tari.android.wallet.ui.fragment.pinCode.EnterPinCodeFragment
 import com.tari.android.wallet.ui.fragment.profile.WalletInfoFragment
 import com.tari.android.wallet.ui.fragment.restore.enterRestorationPassword.EnterRestorationPasswordFragment
 import com.tari.android.wallet.ui.fragment.restore.inputSeedWords.InputSeedWordsFragment
-import com.tari.android.wallet.ui.fragment.restore.walletRestoringFromSeedWords.WalletRestoringFromSeedWordsFragment
+import com.tari.android.wallet.ui.fragment.restore.walletRestoring.WalletRestoringFragment
 import com.tari.android.wallet.ui.fragment.send.addAmount.AddAmountFragment
 import com.tari.android.wallet.ui.fragment.send.addNote.AddNoteFragment
 import com.tari.android.wallet.ui.fragment.send.common.TransactionData
@@ -101,9 +97,9 @@ import javax.inject.Singleton
 // TODO: move navigation logic to only the navigate() method and make all navigation methods private
 @Singleton
 class TariNavigator @Inject constructor(
-    val prefs: CorePrefRepository,
-    val tariSettingsSharedRepository: TariSettingsPrefRepository,
+    private val walletManager: WalletManager,
     private val yatAdapter: YatAdapter,
+    private val networkConnection: NetworkConnectionStateHandler,
 ) {
 
     lateinit var activity: CommonActivity<*, *>
@@ -113,6 +109,7 @@ class TariNavigator @Inject constructor(
             is Navigation.EnterPinCodeNavigation -> addFragment(EnterPinCodeFragment.newInstance(navigation.behavior, navigation.stashedPin))
             is Navigation.ChangeBiometrics -> addFragment(ChangeBiometricsFragment())
             is Navigation.FeatureAuth -> addFragment(FeatureAuthFragment())
+            is Navigation.SplashScreen -> toSplash(navigation.seedWords, navigation.clearTop)
             is ContactBookNavigation.ToAddContact -> toAddContact()
             is ContactBookNavigation.ToContactDetails -> toContactDetails(navigation.contact)
             is ContactBookNavigation.ToRequestTari -> toRequestTariFromContact(navigation.contact)
@@ -124,8 +121,7 @@ class TariNavigator @Inject constructor(
             is ContactBookNavigation.ToAddPhoneContact -> toAddPhoneContact()
             is ContactBookNavigation.ToSelectTariUser -> addFragment(SelectUserContactFragment.newInstance())
             is ChooseRestoreOptionNavigation.ToEnterRestorePassword -> toEnterRestorePassword()
-            is ChooseRestoreOptionNavigation.OnRestoreCompleted -> onRestoreCompleted()
-            is ChooseRestoreOptionNavigation.ToRestoreWithRecoveryPhrase -> toRestoreWithRecoveryPhrase()
+            is ChooseRestoreOptionNavigation.ToRestoreWithRecoveryPhrase -> addFragment(InputSeedWordsFragment.createFragment())
             is AllSettingsNavigation.ToBugReporting -> DebugActivity.launch(activity, DebugNavigation.BugReport)
             is AllSettingsNavigation.ToMyProfile -> toMyProfile()
             is AllSettingsNavigation.ToAbout -> toAbout()
@@ -140,11 +136,8 @@ class TariNavigator @Inject constructor(
             is AllSettingsNavigation.ToDataCollection -> addFragment(DataCollectionFragment())
             is AllSettingsNavigation.ToThemeSelection -> toThemeSelection()
             is AllSettingsNavigation.ToRequestTari -> addFragment(RequestTariFragment.newInstance())
-            is EnterRestorationPasswordNavigation.OnRestore -> onRestoreCompleted()
-            is InputSeedWordsNavigation.ToRestoreFormSeedWordsInProgress -> toRestoreFromSeedWordsInProgress()
+            is InputSeedWordsNavigation.ToRestoreFromSeeds -> addFragment(WalletRestoringFragment.newInstance())
             is InputSeedWordsNavigation.ToBaseNodeSelection -> toBaseNodeSelection()
-            is WalletRestoringFromSeedWordsNavigation.OnRestoreCompleted -> onRestoreCompleted()
-            is WalletRestoringFromSeedWordsNavigation.OnRestoreFailed -> onBackPressed()
             is AddAmountNavigation.OnAmountExceedsActualAvailableBalance -> onAmountExceedsActualAvailableBalance()
             is AddAmountNavigation.ContinueToAddNote -> continueToAddNote(navigation.transactionData)
             is AddAmountNavigation.ContinueToFinalizing -> continueToFinalizeSendTx(navigation.transactionData)
@@ -154,7 +147,6 @@ class TariNavigator @Inject constructor(
             is TxListNavigation.ToSendWithDeeplink -> toSendWithDeeplink(navigation.sendDeeplink)
             is TxListNavigation.ToUtxos -> toUtxos()
             is TxListNavigation.ToAllSettings -> toAllSettings()
-            is TxListNavigation.ToSplashScreen -> toSplash()
             is TxListNavigation.ToTransfer -> addFragment(TransferFragment())
             is TxListNavigation.HomeTransactionHistory -> addFragment(HomeTransactionHistoryFragment())
             is SendTxNavigation.OnSendTxFailure -> onSendTxFailure(navigation.isYat, navigation.txFailureReason)
@@ -172,10 +164,12 @@ class TariNavigator @Inject constructor(
         }
     }
 
-    private fun toSplash() {
-        val intent = Intent(activity, OnboardingFlowActivity::class.java)
-        intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
-        activity.startActivity(intent)
+    private fun toSplash(seedWords: List<String>? = null, clearTop: Boolean = true) {
+        activity.startActivity(Intent(activity, OnboardingFlowActivity::class.java).apply {
+            flags = if (clearTop) Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
+            else Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            putExtra(OnboardingFlowActivity.ARG_SEED_WORDS, seedWords?.toTypedArray())
+        })
         activity.finishAffinity()
     }
 
@@ -185,25 +179,6 @@ class TariNavigator @Inject constructor(
     }
 
     private fun toEnterRestorePassword() = addFragment(EnterRestorationPasswordFragment.newInstance())
-
-    private fun toRestoreWithRecoveryPhrase() = addFragment(InputSeedWordsFragment.newInstance())
-
-    private fun toRestoreFromSeedWordsInProgress() = addFragment(WalletRestoringFromSeedWordsFragment.newInstance())
-
-    private fun onRestoreCompleted() {
-        // wallet restored, setup shared prefs accordingly
-        prefs.onboardingCompleted = true
-        prefs.onboardingStarted = true
-        prefs.onboardingAuthSetupStarted = true
-        prefs.onboardingAuthSetupCompleted = false
-        prefs.onboardingDisplayedAtHome = true
-        tariSettingsSharedRepository.isRestoredWallet = true
-
-        activity.finish()
-        activity.startActivity(Intent(this.activity, OnboardingFlowActivity::class.java).apply {
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-        })
-    }
 
     fun onBackPressed() = activity.onBackPressed()
 
@@ -218,7 +193,7 @@ class TariNavigator @Inject constructor(
 
     fun toAllSettings() = (activity as HomeActivity).ui.viewPager.setCurrentItem(INDEX_SETTINGS, NO_SMOOTH_SCROLL)
 
-    fun toBackupSettings(withAnimation: Boolean) = addFragment(BackupSettingsFragment(), withAnimation = withAnimation)
+    fun toBackupSettings(withAnimation: Boolean) = addFragment(BackupSettingsFragment.newInstance(), withAnimation = withAnimation)
 
     private fun toDeleteWallet() = addFragment(DeleteWalletFragment())
 
@@ -310,7 +285,7 @@ class TariNavigator @Inject constructor(
     }
 
     private fun continueToAddNote(transactionData: TransactionData) {
-        if (EventBus.networkConnectionState.publishSubject.value != NetworkConnectionState.CONNECTED) {
+        if (!networkConnection.isNetworkConnected()) {
             showInternetConnectionErrorDialog(this.activity)
             return
         }
@@ -355,7 +330,7 @@ class TariNavigator @Inject constructor(
     }
 
     private fun sendToUserByDeeplink(deeplink: DeepLink.Send) {
-        FFIWallet.instance?.getWalletAddress()
+        walletManager.walletInstance?.getWalletAddress() // TODO move all the logic beside of navigation from here
         val address = TariWalletAddress.fromBase58(deeplink.walletAddress)
         val contact = (activity as HomeActivity).viewModel.contactsRepository.getContactByAddress(address)
         val bundle = Bundle().apply {

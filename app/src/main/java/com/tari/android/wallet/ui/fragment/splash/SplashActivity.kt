@@ -38,7 +38,9 @@ import android.os.Bundle
 import androidx.activity.addCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.coroutineScope
-import com.tari.android.wallet.application.walletManager.WalletStateHandler
+import com.tari.android.wallet.application.walletManager.WalletFileUtil
+import com.tari.android.wallet.application.walletManager.WalletManager
+import com.tari.android.wallet.application.walletManager.doOnWalletNotReady
 import com.tari.android.wallet.data.WalletConfig
 import com.tari.android.wallet.data.sharedPrefs.CorePrefRepository
 import com.tari.android.wallet.data.sharedPrefs.network.NetworkPrefRepository
@@ -49,7 +51,6 @@ import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.service.service.WalletServiceLauncher
 import com.tari.android.wallet.ui.fragment.auth.AuthActivity
 import com.tari.android.wallet.ui.fragment.onboarding.activity.OnboardingFlowActivity
-import com.tari.android.wallet.util.WalletUtil
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -76,7 +77,7 @@ class SplashActivity : AppCompatActivity() {
     lateinit var walletServiceLauncher: WalletServiceLauncher
 
     @Inject
-    lateinit var walletStateHandler: WalletStateHandler
+    lateinit var walletManager: WalletManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         appComponent.inject(this)
@@ -85,31 +86,34 @@ class SplashActivity : AppCompatActivity() {
         onBackPressedDispatcher.addCallback { }
 
         if (sharedPrefsRepository.checkIfIsDataCleared()) {
-            walletServiceLauncher.stopAndDelete()
+            walletManager.deleteWallet()
         }
 
         if (!networkRepository.isCurrentNetworkSupported()) {
             changeNetwork()
         }
 
-        val exists = WalletUtil.walletExists(walletConfig) && sharedPrefsRepository.onboardingAuthSetupCompleted
-        if (WalletUtil.walletExists(walletConfig) && !sharedPrefsRepository.onboardingAuthSetupCompleted) {
+        val exists = WalletFileUtil.walletExists(walletConfig) && sharedPrefsRepository.onboardingAuthSetupCompleted
+        if (WalletFileUtil.walletExists(walletConfig) && !sharedPrefsRepository.onboardingAuthSetupCompleted) {
             // in cases interrupted restoration
-            WalletUtil.clearWalletFiles(walletConfig.getWalletFilesDirPath())
+            walletManager.deleteWallet()
             sharedPrefsRepository.clear()
         }
-        if (securityPrefRepository.pinCode == null) {
-            launchActivity(OnboardingFlowActivity::class.java)
-            return
-        }
-        launchActivity(if (exists) AuthActivity::class.java else OnboardingFlowActivity::class.java)
+
+        launchActivity(
+            if (securityPrefRepository.pinCode == null || !exists) {
+                OnboardingFlowActivity::class.java
+            } else {
+                AuthActivity::class.java
+            }
+        )
     }
 
     private fun changeNetwork() {
         networkRepository.setDefaultNetworkAsCurrent()
 
         lifecycle.coroutineScope.launch {
-            walletStateHandler.doOnWalletNotReady {
+            walletManager.doOnWalletNotReady {
                 EventBus.clear()
                 DiContainer.reInitContainer()
             }

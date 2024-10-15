@@ -1,12 +1,16 @@
 package com.tari.android.wallet.ui.fragment.restore.chooseRestoreOption
 
 import android.content.Intent
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.viewModelScope
+import androidx.fragment.app.Fragment
 import com.tari.android.wallet.R
+import com.tari.android.wallet.application.deeplinks.DeepLink
+import com.tari.android.wallet.application.walletManager.WalletFileUtil
+import com.tari.android.wallet.application.walletManager.doOnWalletFailed
+import com.tari.android.wallet.application.walletManager.doOnWalletRunning
 import com.tari.android.wallet.data.WalletConfig
 import com.tari.android.wallet.data.sharedPrefs.backup.BackupPrefRepository
+import com.tari.android.wallet.extension.launchOnIo
+import com.tari.android.wallet.extension.launchOnMain
 import com.tari.android.wallet.infrastructure.backup.BackupFileIsEncryptedException
 import com.tari.android.wallet.infrastructure.backup.BackupManager
 import com.tari.android.wallet.infrastructure.backup.BackupStorageAuthRevokedException
@@ -17,14 +21,19 @@ import com.tari.android.wallet.model.WalletError
 import com.tari.android.wallet.model.throwIf
 import com.tari.android.wallet.service.service.WalletServiceLauncher
 import com.tari.android.wallet.ui.common.CommonViewModel
-import com.tari.android.wallet.ui.common.SingleLiveEvent
-import com.tari.android.wallet.ui.dialog.modular.SimpleDialogArgs
+import com.tari.android.wallet.ui.dialog.modular.ModularDialogArgs
+import com.tari.android.wallet.ui.dialog.modular.modules.body.BodyModule
+import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonModule
+import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonStyle
+import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
+import com.tari.android.wallet.ui.dialog.modular.modules.input.InputModule
 import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
-import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupOptionDto
-import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupOptions
-import com.tari.android.wallet.util.WalletUtil
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import com.tari.android.wallet.ui.fragment.qr.QrScannerActivity
+import com.tari.android.wallet.ui.fragment.qr.QrScannerSource
+import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupOption
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import java.io.IOException
 import javax.inject.Inject
 
@@ -42,51 +51,67 @@ class ChooseRestoreOptionViewModel : CommonViewModel() {
     @Inject
     lateinit var walletConfig: WalletConfig
 
-    private val _state = SingleLiveEvent<ChooseRestoreOptionState>()
-    val state: LiveData<ChooseRestoreOptionState> = _state
-
-    val options = MutableLiveData<List<BackupOptionDto>>()
-
     init {
         component.inject(this)
+    }
 
-        options.postValue(backupPrefRepository.getOptionList)
+    private val _uiState = MutableStateFlow(ChooseRestoreOptionModel.UiState(backupOptions = backupPrefRepository.getOptionList))
+    val uiState = _uiState.asStateFlow()
 
-        viewModelScope.launch(Dispatchers.IO) {
-            walletStateHandler.doOnWalletRunning {
-                if (WalletUtil.walletExists(walletConfig) && state.value != null) {
-                    backupPrefRepository.restoredTxs?.let {
-                        if (it.utxos.orEmpty().isEmpty()) return@let
+    init {
+        launchOnIo {
+            walletManager.doOnWalletRunning {
+                uiState.value.selectedOption?.let { selectedOption ->
+                    if (WalletFileUtil.walletExists(walletConfig)) {
+                        backupPrefRepository.restoredTxs?.takeIf { it.utxos.isNotEmpty() }?.let { restoredTxs ->
+                            val tariWalletAddress = TariWalletAddress.fromBase58(restoredTxs.sourceBase58)
+                            val message = resourceManager.getString(R.string.backup_restored_tx)
+                            val error = WalletError()
+                            walletService.restoreWithUnbindedOutputs(restoredTxs.utxos, tariWalletAddress, message, error)
+                            throwIf(error)
+                        }
 
-                        val tariWalletAddress = TariWalletAddress.fromBase58(it.sourceBase58)
-                        val message = resourceManager.getString(R.string.backup_restored_tx)
-                        val error = WalletError()
-                        walletService.restoreWithUnbindedOutputs(it.utxos, tariWalletAddress, message, error)
-                        throwIf(error)
+                        val dto = backupPrefRepository.getOptionDto(selectedOption).copy(isEnable = true)
+                        backupPrefRepository.updateOption(dto)
+                        backupManager.backupNow()
+
+                        walletManager.onWalletRestored()
+                        tariNavigator.navigate(Navigation.SplashScreen(clearTop = false))
                     }
-
-                    val dto = backupPrefRepository.getOptionDto(state.value!!.backupOptions)!!.copy(isEnable = true)
-                    backupPrefRepository.updateOption(dto)
-                    backupManager.backupNow()
-
-                    navigation.postValue(Navigation.ChooseRestoreOptionNavigation.OnRestoreCompleted)
                 }
             }
         }
 
-        viewModelScope.launch(Dispatchers.IO) {
-            walletStateHandler.doOnWalletFailed {
+        launchOnIo {
+            walletManager.doOnWalletFailed {
                 handleException(WalletStartFailedException(it))
             }
         }
     }
 
-    fun startRestore(options: BackupOptions) {
-        _state.postValue(ChooseRestoreOptionState.BeginProgress(options))
+    fun startRecovery(selectedOption: BackupOption, hostFragment: Fragment) {
+        _uiState.update { it.copy(isStarted = true) }
+        backupManager.setupStorage(selectedOption, hostFragment)
+    }
+
+    fun onRecoveryPhraseClicked() {
+        tariNavigator.navigate(Navigation.ChooseRestoreOptionNavigation.ToRestoreWithRecoveryPhrase)
+    }
+
+    fun onPaperWalletClicked(fragment: Fragment) {
+        QrScannerActivity.startScanner(fragment, QrScannerSource.PaperWallet)
+    }
+
+    fun handleDeeplink(qrDeepLink: DeepLink) {
+        if (qrDeepLink is DeepLink.PaperWallet) {
+            showPaperWalletDialog(qrDeepLink)
+        } else {
+            showInvalidQrDialog()
+        }
     }
 
     fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        viewModelScope.launch(Dispatchers.IO) {
+        launchOnIo {
             try {
                 if (backupManager.onSetupActivityResult(requestCode, resultCode, data)) {
                     restoreFromBackup()
@@ -94,7 +119,7 @@ class ChooseRestoreOptionViewModel : CommonViewModel() {
             } catch (exception: Exception) {
                 logger.i(exception.message + "Backup storage setup failed")
                 backupManager.signOut()
-                _state.postValue(ChooseRestoreOptionState.EndProgress(backupManager.currentOption!!))
+                _uiState.update { it.copy(isStarted = false) }
                 showAuthFailedDialog()
             }
         }
@@ -104,11 +129,22 @@ class ChooseRestoreOptionViewModel : CommonViewModel() {
         try {
             // try to restore with no password
             backupManager.restoreLatestBackup()
-            viewModelScope.launch(Dispatchers.Main) {
+            launchOnMain {
                 walletServiceLauncher.start()
             }
         } catch (exception: Throwable) {
             handleException(exception)
+        }
+    }
+
+    private fun restoreFromPaperWallet(seedWords: List<String>) {
+        _uiState.update { it.copy(paperWalletProgress = true) }
+        walletServiceLauncher.start(seedWords)
+        launchOnIo {
+            walletManager.doOnWalletRunning {
+                _uiState.update { it.copy(paperWalletProgress = false) }
+                tariNavigator.navigate(Navigation.InputSeedWordsNavigation.ToRestoreFromSeeds)
+            }
         }
     }
 
@@ -132,8 +168,8 @@ class ChooseRestoreOptionViewModel : CommonViewModel() {
 
             is WalletStartFailedException -> {
                 logger.i("Restore failed: wallet start failed")
-                viewModelScope.launch(Dispatchers.Main) {
-                    walletServiceLauncher.stopAndDelete()
+                launchOnMain {
+                    walletManager.deleteWallet()
                 }
                 val cause = WalletError(exception.cause)
                 if (cause == WalletError.DatabaseDataError) {
@@ -158,34 +194,95 @@ class ChooseRestoreOptionViewModel : CommonViewModel() {
             }
         }
 
-        _state.postValue(ChooseRestoreOptionState.EndProgress(backupManager.currentOption!!))
+        _uiState.update { it.copy(isStarted = false) }
+    }
+
+    private fun showPaperWalletDialog(deepLink: DeepLink.PaperWallet) {
+        showModularDialog(
+            HeadModule(resourceManager.getString(R.string.restore_wallet_paper_wallet_title)),
+            BodyModule(resourceManager.getString(R.string.restore_wallet_paper_wallet_body)),
+            ButtonModule(resourceManager.getString(R.string.restore_wallet_paper_wallet_restore_button), ButtonStyle.Normal) {
+                hideDialog()
+                showEnterPassphraseDialog(deepLink)
+            },
+            ButtonModule(resourceManager.getString(R.string.restore_wallet_paper_wallet_do_not_restore_button), ButtonStyle.Close),
+        )
+    }
+
+    private fun showEnterPassphraseDialog(deeplink: DeepLink.PaperWallet) {
+        var saveAction: () -> Boolean = { false }
+
+        val headModule = HeadModule(
+            title = resourceManager.getString(R.string.restore_wallet_paper_wallet_enter_passphrase_title),
+            rightButtonTitle = resourceManager.getString(R.string.common_done),
+            rightButtonAction = { saveAction() },
+        )
+
+        val bodyModule = BodyModule(resourceManager.getString(R.string.restore_wallet_paper_wallet_enter_passphrase_body))
+
+        val passphraseModule = InputModule(
+            value = "",
+            hint = resourceManager.getString(R.string.restore_wallet_paper_wallet_enter_passphrase_hint),
+            isFirst = true,
+            isEnd = true,
+            onDoneAction = { saveAction() },
+        )
+
+        saveAction = {
+            val seeds = deeplink.seedWords(passphraseModule.value.trim())
+            if (seeds != null) {
+                hideDialog()
+                restoreFromPaperWallet(seeds)
+            } else {
+                showPaperWalletErrorDialog()
+            }
+            true
+        }
+
+        showInputModalDialog(
+            ModularDialogArgs(
+                modules = listOf(
+                    headModule,
+                    bodyModule,
+                    passphraseModule,
+                ),
+            )
+        )
+    }
+
+    private fun showPaperWalletErrorDialog() {
+        showSimpleDialog(
+            title = resourceManager.getString(R.string.restore_wallet_paper_wallet_error_title),
+            description = resourceManager.getString(R.string.restore_wallet_paper_wallet_error_body),
+        )
     }
 
     private fun showBackupFileNotFoundDialog() {
-        showModularDialog(
-            SimpleDialogArgs(
-                title = resourceManager.getString(R.string.restore_wallet_error_title),
-                description = resourceManager.getString(R.string.restore_wallet_error_file_not_found),
-                onClose = { backPressed.call() },
-            ).getModular(resourceManager)
+        showSimpleDialog(
+            title = resourceManager.getString(R.string.restore_wallet_error_title),
+            description = resourceManager.getString(R.string.restore_wallet_error_file_not_found),
+            onClose = { backPressed.call() },
         )
     }
 
     private fun showRestoreFailedDialog(message: String? = null) {
-        showModularDialog(
-            SimpleDialogArgs(
-                title = resourceManager.getString(R.string.restore_wallet_error_title),
-                description = resourceManager.getString(R.string.restore_wallet_error_desc, message.orEmpty())
-            ).getModular(resourceManager)
+        showSimpleDialog(
+            title = resourceManager.getString(R.string.restore_wallet_error_title),
+            description = resourceManager.getString(R.string.restore_wallet_error_desc, message.orEmpty()),
         )
     }
 
     private fun showAuthFailedDialog() {
-        showModularDialog(
-            SimpleDialogArgs(
-                title = resourceManager.getString(R.string.restore_wallet_error_title),
-                description = resourceManager.getString(R.string.back_up_wallet_storage_setup_error_desc),
-            ).getModular(resourceManager)
+        showSimpleDialog(
+            title = resourceManager.getString(R.string.restore_wallet_error_title),
+            description = resourceManager.getString(R.string.back_up_wallet_storage_setup_error_desc),
+        )
+    }
+
+    private fun showInvalidQrDialog() {
+        showSimpleDialog(
+            title = resourceManager.getString(R.string.restore_wallet_invalid_qr_code),
+            description = resourceManager.getString(R.string.restore_wallet_invalid_qr_code_description),
         )
     }
 }

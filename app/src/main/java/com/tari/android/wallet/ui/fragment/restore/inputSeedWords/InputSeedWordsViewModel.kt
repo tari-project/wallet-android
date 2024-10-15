@@ -4,14 +4,16 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.map
-import androidx.lifecycle.viewModelScope
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.baseNodes.BaseNodesManager
+import com.tari.android.wallet.application.walletManager.doOnWalletFailed
+import com.tari.android.wallet.application.walletManager.doOnWalletRunning
 import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodeDto
+import com.tari.android.wallet.extension.launchOnIo
+import com.tari.android.wallet.extension.launchOnMain
 import com.tari.android.wallet.ffi.FFISeedWords
 import com.tari.android.wallet.model.WalletError
 import com.tari.android.wallet.model.seedPhrase.SeedPhrase
-import com.tari.android.wallet.service.seedPhrase.SeedPhraseRepository
 import com.tari.android.wallet.service.service.WalletServiceLauncher
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.common.SingleLiveEvent
@@ -24,21 +26,17 @@ import com.tari.android.wallet.ui.dialog.modular.modules.input.InputModule
 import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
 import com.tari.android.wallet.ui.fragment.restore.inputSeedWords.suggestions.SuggestionState
 import com.tari.android.wallet.ui.fragment.restore.inputSeedWords.suggestions.SuggestionViewHolderItem
+import com.tari.android.wallet.util.DebugConfig
 import io.reactivex.disposables.CompositeDisposable
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-class InputSeedWordsViewModel : CommonViewModel() {
+class InputSeedWordsViewModel() : CommonViewModel() {
 
     private var mnemonicList = mutableListOf<String>()
-
-    @Inject
-    lateinit var seedPhraseRepository: SeedPhraseRepository
 
     @Inject
     lateinit var walletServiceLauncher: WalletServiceLauncher
@@ -68,7 +66,7 @@ class InputSeedWordsViewModel : CommonViewModel() {
     val isInProgress: LiveData<Boolean> = _inProgress
 
     val isAllEntered: LiveData<Boolean> = _words.map { words ->
-        words.all { it.text.value!!.isNotEmpty() } && words.size == SeedPhrase.SeedPhraseLength
+        words.all { it.text.value!!.isNotEmpty() } && words.size == SeedPhrase.SEED_PHRASE_LENGTH
     }
 
     private val _continueButtonState = MediatorLiveData<LoadingButtonState>()
@@ -97,19 +95,18 @@ class InputSeedWordsViewModel : CommonViewModel() {
 
     fun startRestoringWallet() {
         val words = _words.value!!.map { it.text.value!! }
-        val seedPhrase = SeedPhrase()
-        val result = seedPhrase.init(words)
+        when (SeedPhrase.create(words)) {
+            is SeedPhrase.SeedPhraseCreationResult.Success -> startRestoring(words)
 
-        if (result == SeedPhrase.SeedPhraseCreationResult.Success) {
-            seedPhraseRepository.save(seedPhrase)
-            startRestoring()
-        } else {
-            handleSeedPhraseResult(result)
+            is SeedPhrase.SeedPhraseCreationResult.SeedPhraseNotCompleted -> onError(RestorationError.SeedPhraseTooShort(resourceManager))
+            is SeedPhrase.SeedPhraseCreationResult.Failed -> onError(RestorationError.Unknown(resourceManager))
+            is SeedPhrase.SeedPhraseCreationResult.InvalidSeedPhrase,
+            is SeedPhrase.SeedPhraseCreationResult.InvalidSeedWord -> onError(RestorationError.Invalid(resourceManager))
         }
     }
 
     private fun loadSuggestions() {
-        viewModelScope.launch(Dispatchers.IO) {
+        launchOnIo {
             val mnemonic = FFISeedWords.getMnemomicWordList(FFISeedWords.Language.English)
             val size = mnemonic.getLength()
             for (i in 0 until size) {
@@ -118,11 +115,11 @@ class InputSeedWordsViewModel : CommonViewModel() {
         }
     }
 
-    private fun startRestoring() {
+    private fun startRestoring(seedWords: List<String>) {
         _inProgress.postValue(true)
 
-        viewModelScope.launch(Dispatchers.IO) {
-            walletStateHandler.doOnWalletFailed { exception ->
+        launchOnIo {
+            walletManager.doOnWalletFailed { exception ->
                 if (WalletError(exception) == WalletError.NoError) {
                     onError(RestorationError.Unknown(resourceManager))
                 } else {
@@ -133,36 +130,28 @@ class InputSeedWordsViewModel : CommonViewModel() {
             }
         }
 
-        viewModelScope.launch(Dispatchers.IO) {
-            walletStateHandler.doOnWalletRunning {
-                navigation.postValue(Navigation.InputSeedWordsNavigation.ToRestoreFormSeedWordsInProgress)
+        launchOnIo {
+            walletManager.doOnWalletRunning {
+                tariNavigator.navigate(Navigation.InputSeedWordsNavigation.ToRestoreFromSeeds)
                 _inProgress.postValue(false)
             }
         }
 
-        customBaseNodeState.value.customBaseNode?.let {
-            baseNodesManager.addUserBaseNode(it)
-            baseNodesManager.setBaseNode(it)
+        if (DebugConfig.selectBaseNodeEnabled) {
+            customBaseNodeState.value.customBaseNode?.let {
+                baseNodesManager.addUserBaseNode(it)
+                baseNodesManager.setBaseNode(it)
+                walletManager.syncBaseNode()
+            }
         }
-        walletServiceLauncher.start()
-    }
 
-    private fun handleSeedPhraseResult(result: SeedPhrase.SeedPhraseCreationResult) {
-        val errorDialogArgs = when (result) {
-            is SeedPhrase.SeedPhraseCreationResult.Failed -> RestorationError.Unknown(resourceManager)
-            SeedPhrase.SeedPhraseCreationResult.InvalidSeedPhrase,
-            SeedPhrase.SeedPhraseCreationResult.InvalidSeedWord -> RestorationError.Invalid(resourceManager)
-
-            SeedPhrase.SeedPhraseCreationResult.SeedPhraseNotCompleted -> RestorationError.SeedPhraseTooShort(resourceManager)
-            else -> RestorationError.Unknown(resourceManager)
-        }
-        onError(errorDialogArgs)
+        walletServiceLauncher.start(seedWords)
     }
 
     private fun onError(restorationError: RestorationError) = showModularDialog(restorationError.args.getModular(resourceManager))
 
     private fun clear() {
-        walletServiceLauncher.stopAndDelete()
+        walletManager.deleteWallet()
         compositeDisposable.dispose()
         compositeDisposable = CompositeDisposable()
     }
@@ -208,7 +197,7 @@ class InputSeedWordsViewModel : CommonViewModel() {
             list[index].text.value = formattedText[0]
             for ((formattedIndex, item) in formattedText.drop(1).withIndex()) {
                 val nextIndex = index + formattedIndex + 1
-                if (list.size < SeedPhrase.SeedPhraseLength) {
+                if (list.size < SeedPhrase.SEED_PHRASE_LENGTH) {
                     addWord(nextIndex, item)
                 }
             }
@@ -225,7 +214,7 @@ class InputSeedWordsViewModel : CommonViewModel() {
 
     fun getFocusToNextElement(currentIndex: Int) {
         val list = _words.value!!
-        if (list.isEmpty() || list.last().text.value!!.isNotEmpty() && list.size < SeedPhrase.SeedPhraseLength) {
+        if (list.isEmpty() || list.last().text.value!!.isNotEmpty() && list.size < SeedPhrase.SEED_PHRASE_LENGTH) {
             WordItemViewModel.create("", mnemonicList).apply {
                 list.add(this)
                 reindex()
@@ -250,7 +239,7 @@ class InputSeedWordsViewModel : CommonViewModel() {
 
     fun finishEntering(index: Int, text: String) {
         val list = _words.value!!
-        if (text.isNotEmpty() && list.size < SeedPhrase.SeedPhraseLength) {
+        if (text.isNotEmpty() && list.size < SeedPhrase.SEED_PHRASE_LENGTH) {
             addWord(index + 1)
         }
         _words.value = _words.value
@@ -275,10 +264,10 @@ class InputSeedWordsViewModel : CommonViewModel() {
 
     fun selectSuggestion(suggestionViewHolderItem: SuggestionViewHolderItem) {
         onCurrentWordChanges(_focusedIndex.value!!, suggestionViewHolderItem.suggestion + " ")
-        if (_words.value.orEmpty().size == SeedPhrase.SeedPhraseLength) {
-            viewModelScope.launch(Dispatchers.IO) {
+        if (_words.value.orEmpty().size == SeedPhrase.SEED_PHRASE_LENGTH) {
+            launchOnIo {
                 delay(100)
-                viewModelScope.launch(Dispatchers.Main) {
+                launchOnMain {
                     finishEntering()
                 }
             }

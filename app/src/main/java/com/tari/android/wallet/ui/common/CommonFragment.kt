@@ -11,6 +11,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
@@ -112,9 +113,9 @@ abstract class CommonFragment<Binding : ViewBinding, VM : CommonViewModel> : Fra
 
         observe(copyToClipboard) { copy(it) }
 
-        observe(modularDialog) { dialogManager.replace(ModularDialog(requireContext(), it)) }
+        observe(modularDialog) { dialogManager.replace(ModularDialog(requireActivity(), it)) }
 
-        observe(inputDialog) { dialogManager.replace(InputModularDialog(requireContext(), it)) }
+        observe(inputDialog) { dialogManager.replace(InputModularDialog(requireActivity(), it)) }
 
         observe(showToast) { TariToast(requireContext(), it) }
 
@@ -130,7 +131,7 @@ abstract class CommonFragment<Binding : ViewBinding, VM : CommonViewModel> : Fra
 
         observe(permissionManager.openSettings) { openSettings() }
 
-        observe(permissionManager.dialog) { dialogManager.replace(ModularDialog(requireContext(), it)) }
+        observe(permissionManager.dialog) { dialogManager.replace(ModularDialog(requireActivity(), it)) }
     }
 
     private fun openSettings() {
@@ -141,10 +142,12 @@ abstract class CommonFragment<Binding : ViewBinding, VM : CommonViewModel> : Fra
         }
     }
 
-    protected fun changeOnBackPressed(isBlocked: Boolean) {
-        blockingBackPressDispatcher.isEnabled = false
-        blockingBackPressDispatcher = MutedBackPressedCallback(isBlocked)
-        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, blockingBackPressDispatcher)
+    protected fun doOnBackPressed(onBackPressedAction: () -> Unit) {
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                onBackPressedAction()
+            }
+        })
     }
 
     private fun copy(clipboardArgs: ClipboardArgs) {

@@ -21,7 +21,7 @@ import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonStyle
 import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
 import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupOptionDto
-import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupOptions
+import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupOption
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.joda.time.DateTime
@@ -57,12 +57,12 @@ class BackupOptionViewModel : CommonViewModel() {
 
     val title: Int
         get() = when (option.value!!.type) {
-            BackupOptions.Google -> R.string.back_up_wallet_google_title
-            BackupOptions.Local -> R.string.back_up_wallet_local_file_title
-            BackupOptions.Dropbox -> R.string.back_up_wallet_dropbox_backup_title
+            BackupOption.Google -> R.string.back_up_wallet_google_title
+            BackupOption.Local -> R.string.back_up_wallet_local_file_title
+            BackupOption.Dropbox -> R.string.back_up_wallet_dropbox_backup_title
         }
 
-    fun setup(option: BackupOptions) {
+    fun setup(option: BackupOption) {
         _option.value = backupSettingsRepository.getOptionList.first { it.type == option }
         _switchChecked.value = _option.value!!.isEnable
         onBackupStateChanged(EventBus.backupState.publishSubject.value?.backupsStates?.get(option))
@@ -73,7 +73,7 @@ class BackupOptionViewModel : CommonViewModel() {
             val currentOption = _option.value!!.type
             try {
                 if (backupManager.onSetupActivityResult(requestCode, resultCode, data)) {
-                    backupSettingsRepository.getOptionDto(currentOption)?.copy(isEnable = true)?.let { backupSettingsRepository.updateOption(it) }
+                    backupSettingsRepository.getOptionDto(currentOption).copy(isEnable = true).let { backupSettingsRepository.updateOption(it) }
                     EventBus.backupState.publishSubject
                         .filter {
                             it.backupsStates[currentOption] is BackupState.BackupUpToDate || it.backupsStates[currentOption] is BackupState.BackupFailed
@@ -89,7 +89,7 @@ class BackupOptionViewModel : CommonViewModel() {
         }
     }
 
-    private fun turnOff(backupOption: BackupOptions, throwable: Throwable?) {
+    private fun turnOff(backupOption: BackupOption, throwable: Throwable?) {
         logger.i("Backup storage setup failed: $throwable")
         backupManager.turnOff(backupOption)
         _inProgress.postValue(false)
@@ -187,7 +187,7 @@ class BackupOptionViewModel : CommonViewModel() {
         val currentState = backupSettingsRepository.getOptionDto(_option.value!!.type)
         _inProgress.postValue(false)
         _switchChecked.postValue(true)
-        updateLastSuccessfulBackupDate(currentState?.lastSuccessDate?.date)
+        updateLastSuccessfulBackupDate(currentState.lastSuccessDate?.date)
     }
 
     private fun handleInProgressState() {

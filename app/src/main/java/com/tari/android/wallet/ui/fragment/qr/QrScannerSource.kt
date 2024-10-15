@@ -7,4 +7,5 @@ enum class QrScannerSource {
     ContactBook,
     TransactionSend,
     TorBridges,
+    PaperWallet,
 }

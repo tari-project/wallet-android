@@ -15,7 +15,6 @@ import com.tari.android.wallet.model.TariWalletAddress
 import com.tari.android.wallet.model.TxId
 import com.tari.android.wallet.model.WalletError
 import com.tari.android.wallet.service.TariWalletService
-import com.tari.android.wallet.service.TariWalletServiceListener
 
 class TariWalletServiceStubProxy : TariWalletService.Stub() {
 
@@ -26,12 +25,6 @@ class TariWalletServiceStubProxy : TariWalletService.Stub() {
         set(newStub) {
             _stub = newStub
         }
-
-    override fun registerListener(listener: TariWalletServiceListener): Boolean = stub?.registerListener(listener) ?: false
-
-    override fun unregisterListener(listener: TariWalletServiceListener): Boolean = stub?.unregisterListener(listener) ?: false
-
-    override fun getWalletAddressBase58(error: WalletError): String? = stub?.getWalletAddressBase58(error)
 
     override fun getBalanceInfo(error: WalletError): BalanceInfo? = stub?.getBalanceInfo(error)
 
@@ -58,11 +51,6 @@ class TariWalletServiceStubProxy : TariWalletService.Stub() {
 
     override fun cancelPendingTx(id: TxId, error: WalletError): Boolean = stub?.cancelPendingTx(id, error) ?: false
 
-    override fun addBaseNodePeer(baseNodePublicKey: String, baseNodeAddress: String, error: WalletError): Boolean =
-        stub?.addBaseNodePeer(baseNodePublicKey, baseNodeAddress, error) ?: false
-
-    override fun startBaseNodeSync(error: WalletError): Boolean = stub?.startBaseNodeSync(error) ?: false
-
     override fun sendTari(
         contact: TariContact,
         amount: MicroTari,
@@ -78,11 +66,6 @@ class TariWalletServiceStubProxy : TariWalletService.Stub() {
 
     override fun removeContact(contactPublicKey: TariWalletAddress, error: WalletError): Boolean =
         stub?.removeContact(contactPublicKey, error) ?: false
-
-    override fun getWalletAddressFromBase58(base58: String, error: WalletError): TariWalletAddress? = stub?.getWalletAddressFromBase58(base58, error)
-
-    override fun getWalletAddressFromEmojiId(emojiId: String, error: WalletError): TariWalletAddress? =
-        stub?.getWalletAddressFromEmojiId(emojiId, error)
 
     override fun setKeyValue(key: String, value: String, error: WalletError): Boolean = stub?.setKeyValue(key, value, error) ?: false
 

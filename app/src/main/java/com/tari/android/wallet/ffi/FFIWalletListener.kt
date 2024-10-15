@@ -33,7 +33,7 @@
 package com.tari.android.wallet.ffi
 
 import com.tari.android.wallet.model.*
-import com.tari.android.wallet.model.recovery.WalletRestorationResult
+import com.tari.android.wallet.recovery.WalletRestorationState
 import java.math.BigInteger
 
 /**
@@ -56,7 +56,7 @@ interface FFIWalletListener {
     fun onTxValidationComplete(responseId: BigInteger, status: TransactionValidationStatus)
     fun onBalanceUpdated(balanceInfo: BalanceInfo)
     fun onConnectivityStatus(status: Int)
+    fun onWalletRestoration(state: WalletRestorationState)
     fun onWalletScannedHeight(height: Int)
-    fun onWalletRestoration(result: WalletRestorationResult)
     fun onBaseNodeStateChanged(baseNodeState: FFITariBaseNodeState)
 }

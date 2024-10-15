@@ -34,8 +34,8 @@ package com.tari.android.wallet.di
 
 import android.content.ClipboardManager
 import com.tari.android.wallet.application.TariWalletApplication
-import com.tari.android.wallet.application.deeplinks.DeeplinkViewModel
 import com.tari.android.wallet.application.securityStage.StagedWalletSecurityManager
+import com.tari.android.wallet.notification.NotificationBroadcastReceiver
 import com.tari.android.wallet.service.service.WalletService
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.component.clipboardController.WalletAddressViewModel
@@ -60,13 +60,13 @@ import com.tari.android.wallet.ui.fragment.onboarding.inroduction.IntroductionVi
 import com.tari.android.wallet.ui.fragment.onboarding.localAuth.LocalAuthViewModel
 import com.tari.android.wallet.ui.fragment.pinCode.EnterPinCodeViewModel
 import com.tari.android.wallet.ui.fragment.profile.WalletInfoViewModel
-import com.tari.android.wallet.ui.fragment.qr.QRScannerActivity
-import com.tari.android.wallet.ui.fragment.qr.QRScannerViewModel
+import com.tari.android.wallet.ui.fragment.qr.QrScannerActivity
+import com.tari.android.wallet.ui.fragment.qr.QrScannerViewModel
 import com.tari.android.wallet.ui.fragment.restore.activity.WalletRestoreActivity
 import com.tari.android.wallet.ui.fragment.restore.chooseRestoreOption.ChooseRestoreOptionViewModel
 import com.tari.android.wallet.ui.fragment.restore.enterRestorationPassword.EnterRestorationPasswordViewModel
 import com.tari.android.wallet.ui.fragment.restore.inputSeedWords.InputSeedWordsViewModel
-import com.tari.android.wallet.ui.fragment.restore.walletRestoringFromSeedWords.WalletRestoringFromSeedWordsViewModel
+import com.tari.android.wallet.ui.fragment.restore.walletRestoring.WalletRestoringViewModel
 import com.tari.android.wallet.ui.fragment.send.addAmount.AddAmountViewModel
 import com.tari.android.wallet.ui.fragment.send.addNote.AddNoteViewModel
 import com.tari.android.wallet.ui.fragment.send.addNote.gif.ChooseGIFDialogFragment
@@ -134,7 +134,7 @@ interface ApplicationComponent {
     fun inject(activity: OnboardingFlowActivity)
     fun inject(activity: AuthActivity)
     fun inject(activity: HomeActivity)
-    fun inject(activity: QRScannerActivity)
+    fun inject(activity: QrScannerActivity)
     fun inject(activity: WalletRestoreActivity)
 
     fun inject(fragment: ChooseGIFDialogFragment)
@@ -148,7 +148,7 @@ interface ApplicationComponent {
     fun inject(viewModel: ConnectionIndicatorViewModel)
     fun inject(viewModel: ChooseRestoreOptionViewModel)
     fun inject(viewModel: EnterRestorationPasswordViewModel)
-    fun inject(viewModel: WalletRestoringFromSeedWordsViewModel)
+    fun inject(viewModel: WalletRestoringViewModel)
     fun inject(viewModel: InputSeedWordsViewModel)
     fun inject(viewModel: VerifySeedPhraseViewModel)
     fun inject(viewModel: BackupSettingsViewModel)
@@ -162,7 +162,6 @@ interface ApplicationComponent {
     fun inject(viewModel: AddAmountViewModel)
     fun inject(viewModel: TorBridgesSelectionViewModel)
     fun inject(viewModel: CustomTorBridgesViewModel)
-    fun inject(viewModel: DeeplinkViewModel)
     fun inject(viewModel: LocalAuthViewModel)
     fun inject(viewModel: CreateWalletViewModel)
     fun inject(viewModel: IntroductionViewModel)
@@ -196,12 +195,14 @@ interface ApplicationComponent {
     fun inject(viewModel: TransactionHistoryViewModel)
     fun inject(viewModel: BluetoothSettingsViewModel)
     fun inject(viewModel: WalletAddressViewModel)
-    fun inject(viewModel: QRScannerViewModel)
+    fun inject(viewModel: QrScannerViewModel)
     fun inject(viewModel: ChatListViewModel)
     fun inject(viewModel: ChatDetailsViewModel)
     fun inject(viewModel: DataCollectionViewModel)
     fun inject(viewModel: EnterPinCodeViewModel)
     fun inject(viewModel: ChangeBiometricsViewModel)
+
+    fun inject(notificationBroadcastReceiver: NotificationBroadcastReceiver)
 
     fun getClipboardManager(): ClipboardManager
 }

@@ -1,8 +1,10 @@
 package com.tari.android.wallet.ui.fragment.onboarding.localAuth
 
 import androidx.lifecycle.viewModelScope
+import com.tari.android.wallet.application.walletManager.doOnWalletRunning
 import com.tari.android.wallet.event.EffectChannelFlow
 import com.tari.android.wallet.extension.addTo
+import com.tari.android.wallet.extension.launchOnMain
 import com.tari.android.wallet.infrastructure.backup.BackupManager
 import com.tari.android.wallet.infrastructure.security.biometric.BiometricAuthenticationService
 import com.tari.android.wallet.ui.common.CommonViewModel
@@ -10,7 +12,6 @@ import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
 import com.tari.android.wallet.ui.fragment.onboarding.localAuth.LocalAuthModel.Effect
 import com.tari.android.wallet.ui.fragment.onboarding.localAuth.LocalAuthModel.SecureState
 import com.tari.android.wallet.ui.fragment.pinCode.PinCodeScreenBehavior
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -49,12 +50,12 @@ class LocalAuthViewModel : CommonViewModel() {
 
     fun proceedToMain() {
         viewModelScope.launch {
-            walletStateHandler.doOnWalletRunning {
+            walletManager.doOnWalletRunning {
                 securityPrefRepository.isAuthenticated = true
                 sharedPrefsRepository.onboardingAuthSetupCompleted = true
                 backupManager.backupNow()
-                navigation.postValue(Navigation.EnterPinCodeNavigation(PinCodeScreenBehavior.CreateConfirm))
-                viewModelScope.launch(Dispatchers.Main) {
+                tariNavigator.navigate(Navigation.EnterPinCodeNavigation(PinCodeScreenBehavior.CreateConfirm))
+                launchOnMain {
                     _effect.send(Effect.OnAuthSuccess)
                 }
             }
@@ -62,7 +63,7 @@ class LocalAuthViewModel : CommonViewModel() {
     }
 
     fun goToEnterPinCode() {
-        navigation.postValue(Navigation.EnterPinCodeNavigation(PinCodeScreenBehavior.Create))
+        tariNavigator.navigate(Navigation.EnterPinCodeNavigation(PinCodeScreenBehavior.Create))
     }
 
     private fun updateState() {

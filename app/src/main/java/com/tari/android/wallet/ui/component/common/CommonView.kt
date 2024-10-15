@@ -13,6 +13,7 @@ import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.common.DialogManager
 import com.tari.android.wallet.ui.component.tari.toast.TariToast
 import com.tari.android.wallet.ui.dialog.modular.ModularDialog
+import contacts.ui.view.activity
 
 abstract class CommonView<VM : CommonViewModel, VB : ViewBinding> : LinearLayout {
 
@@ -58,7 +59,7 @@ abstract class CommonView<VM : CommonViewModel, VB : ViewBinding> : LinearLayout
 
         openLink.observe(viewLifecycle) { context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(it))) }
 
-        modularDialog.observe(viewLifecycle) { dialogManager.replace(ModularDialog(context, it)) }
+        modularDialog.observe(viewLifecycle) { args -> activity?.let { activity -> dialogManager.replace(ModularDialog(activity, args)) } }
 
         showToast.observe(viewLifecycle) { TariToast(context, it) }
 

@@ -2,20 +2,20 @@ package com.tari.android.wallet.ui.fragment.settings.networkSelection
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.viewModelScope
 import com.tari.android.wallet.R
+import com.tari.android.wallet.application.walletManager.doOnWalletNotReady
 import com.tari.android.wallet.data.WalletConfig
 import com.tari.android.wallet.data.sharedPrefs.network.TariNetwork
 import com.tari.android.wallet.di.DiContainer
 import com.tari.android.wallet.event.EventBus
+import com.tari.android.wallet.extension.launchOnIo
 import com.tari.android.wallet.service.service.WalletServiceLauncher
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.common.SingleLiveEvent
 import com.tari.android.wallet.ui.common.recyclerView.CommonViewHolderItem
 import com.tari.android.wallet.ui.dialog.confirm.ConfirmDialogArgs
 import com.tari.android.wallet.ui.fragment.settings.networkSelection.networkItem.NetworkViewHolderItem
-import com.tari.android.wallet.util.WalletUtil
-import kotlinx.coroutines.launch
+import com.tari.android.wallet.application.walletManager.WalletFileUtil
 import javax.inject.Inject
 
 class NetworkSelectionViewModel : CommonViewModel() {
@@ -49,7 +49,7 @@ class NetworkSelectionViewModel : CommonViewModel() {
             return
         }
 
-        if (WalletUtil.walletExists(walletConfig)) {
+        if (WalletFileUtil.walletExists(walletConfig)) {
             showModularDialog(
                 ConfirmDialogArgs(
                     title = resourceManager.getString(R.string.all_settings_select_network_confirm_title),
@@ -66,8 +66,8 @@ class NetworkSelectionViewModel : CommonViewModel() {
         networkRepository.currentNetwork = newNetwork
         loadData()
 
-        viewModelScope.launch {
-            walletStateHandler.doOnWalletNotReady {
+        launchOnIo {
+            walletManager.doOnWalletNotReady {
                 EventBus.clear()
                 DiContainer.reInitContainer()
                 _recreate.postValue(Unit)

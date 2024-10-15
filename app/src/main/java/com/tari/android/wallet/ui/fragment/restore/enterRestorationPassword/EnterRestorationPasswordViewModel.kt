@@ -1,10 +1,13 @@
 package com.tari.android.wallet.ui.fragment.restore.enterRestorationPassword
 
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.viewModelScope
 import com.tari.android.wallet.R
+import com.tari.android.wallet.application.walletManager.doOnWalletFailed
+import com.tari.android.wallet.application.walletManager.doOnWalletRunning
 import com.tari.android.wallet.data.WalletConfig
 import com.tari.android.wallet.data.sharedPrefs.backup.BackupPrefRepository
+import com.tari.android.wallet.extension.launchOnIo
+import com.tari.android.wallet.extension.launchOnMain
 import com.tari.android.wallet.infrastructure.backup.BackupManager
 import com.tari.android.wallet.infrastructure.backup.WalletStartFailedException
 import com.tari.android.wallet.service.service.WalletServiceLauncher
@@ -12,9 +15,7 @@ import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.common.SingleLiveEvent
 import com.tari.android.wallet.ui.dialog.modular.SimpleDialogArgs
 import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
-import com.tari.android.wallet.util.WalletUtil
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import com.tari.android.wallet.application.walletManager.WalletFileUtil
 import java.security.GeneralSecurityException
 import javax.inject.Inject
 
@@ -35,20 +36,21 @@ class EnterRestorationPasswordViewModel : CommonViewModel() {
     init {
         component.inject(this)
 
-        viewModelScope.launch {
-            walletStateHandler.doOnWalletRunning {
-                if (WalletUtil.walletExists(walletConfig)) {
+        launchOnIo {
+            walletManager.doOnWalletRunning {
+                if (WalletFileUtil.walletExists(walletConfig)) {
                     val dto = backupSettingsRepository.getOptionDto(backupManager.currentOption!!)!!.copy(isEnable = true)
                     backupSettingsRepository.updateOption(dto)
                     backupManager.backupNow()
 
-                    navigation.postValue(Navigation.EnterRestorationPasswordNavigation.OnRestore)
+                    walletManager.onWalletRestored()
+                    tariNavigator.navigate(Navigation.SplashScreen(clearTop = false))
                 }
             }
         }
 
-        viewModelScope.launch {
-            walletStateHandler.doOnWalletFailed {
+        launchOnIo {
+            walletManager.doOnWalletFailed {
                 handleRestorationFailure(WalletStartFailedException(it))
             }
         }
@@ -59,7 +61,7 @@ class EnterRestorationPasswordViewModel : CommonViewModel() {
 
     fun onBack() {
         backPressed.postValue(Unit)
-        viewModelScope.launch(Dispatchers.IO) {
+        launchOnIo {
             backupManager.signOut()
         }
     }
@@ -70,11 +72,11 @@ class EnterRestorationPasswordViewModel : CommonViewModel() {
     }
 
     private fun performRestoration(password: String) {
-        viewModelScope.launch(Dispatchers.IO) {
+        launchOnIo {
             try {
                 backupManager.restoreLatestBackup(password)
                 backupSettingsRepository.backupPassword = password
-                viewModelScope.launch(Dispatchers.Main) {
+                launchOnMain {
                     walletServiceLauncher.start()
                 }
             } catch (exception: Throwable) {

@@ -1,29 +1,19 @@
 package com.tari.android.wallet.application.baseNodes
 
 import android.content.Context
-import com.google.gson.Gson
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.Network
-import com.tari.android.wallet.application.walletManager.WalletStateHandler
 import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodeDto
 import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodeList
 import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodePrefRepository
 import com.tari.android.wallet.data.sharedPrefs.network.NetworkPrefRepository
-import com.tari.android.wallet.di.ApplicationScope
-import com.tari.android.wallet.extension.getWithError
-import com.tari.android.wallet.ffi.FFIPublicKey
 import com.tari.android.wallet.ffi.FFITariBaseNodeState
 import com.tari.android.wallet.ffi.FFIWallet
-import com.tari.android.wallet.ffi.HexString
-import com.tari.android.wallet.service.connection.TariWalletServiceConnection
 import com.tari.android.wallet.util.DebugConfig
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
 import org.apache.commons.io.IOUtils
 import java.math.BigInteger
 import javax.inject.Inject
@@ -39,9 +29,6 @@ class BaseNodesManager @Inject constructor(
     private val context: Context,
     private val baseNodeSharedRepository: BaseNodePrefRepository,
     private val networkRepository: NetworkPrefRepository,
-    private val serviceConnection: TariWalletServiceConnection,
-    private val walletStateHandler: WalletStateHandler,
-    @ApplicationScope private val applicationScope: CoroutineScope,
 ) {
     private val logger
         get() = Logger.t(this::class.simpleName)
@@ -63,6 +50,12 @@ class BaseNodesManager @Inject constructor(
     private val _networkBlockHeight = MutableStateFlow(BigInteger.ZERO)
     val networkBlockHeight = _networkBlockHeight.asStateFlow()
 
+    val currentBaseNode: BaseNodeDto?
+        get() = baseNodeSharedRepository.currentBaseNode
+
+    val userBaseNodes: List<BaseNodeDto>
+        get() = baseNodeSharedRepository.userBaseNodes
+
     /**
      * Select a base node randomly from the list of base nodes in base_nodes.tx, and sets
      * the wallet and stored the values in shared prefs.
@@ -73,16 +66,17 @@ class BaseNodesManager @Inject constructor(
         val currentBaseNode = baseNodeSharedRepository.currentBaseNode ?: baseNodeList.firstOrNull()
         val nextBaseNode = baseNodeList.getOrNull(baseNodeList.indexOf(currentBaseNode) + 1)
 
-        baseNodeSharedRepository.baseNodeLastSyncResult = null
         baseNodeSharedRepository.currentBaseNode = nextBaseNode
 
         return nextBaseNode
     }
 
+    /**
+     * Sets the base node to the given base node.
+     * Need to call WalletManager.syncBaseNode() after this method.
+     */
     fun setBaseNode(baseNode: BaseNodeDto) {
-        baseNodeSharedRepository.baseNodeLastSyncResult = null
         baseNodeSharedRepository.currentBaseNode = baseNode
-        startSync()
     }
 
     fun addUserBaseNode(baseNode: BaseNodeDto) {
@@ -107,40 +101,6 @@ class BaseNodesManager @Inject constructor(
         _walletScannedHeight.update { height }
     }
 
-    fun startSync() {
-        //essential for wallet creation flow
-        var currentBaseNode: BaseNodeDto? = baseNodeSharedRepository.currentBaseNode ?: return
-
-        applicationScope.launch(Dispatchers.IO) {
-            serviceConnection.doOnWalletServiceConnected { walletService ->
-                walletStateHandler.doOnWalletRunning { ffiWallet ->
-                    while (currentBaseNode != null) {
-                        try {
-                            currentBaseNode?.let {
-                                logger.i("startSync")
-                                logger.i("startSync:publicKeyHex: ${it.publicKeyHex}")
-                                logger.i("startSync:address: ${it.address}")
-                                logger.i("startSync:userBaseNodes: ${Gson().toJson(baseNodeSharedRepository.userBaseNodes)}")
-                                val baseNodeKeyFFI = FFIPublicKey(HexString(it.publicKeyHex))
-                                ffiWallet.addBaseNodePeer(baseNodeKeyFFI, it.address)
-                                baseNodeKeyFFI.destroy()
-                                walletService.getWithError { error, wallet -> wallet.startBaseNodeSync(error) }
-                            }
-                            break
-                        } catch (e: Throwable) {
-                            logger.i("startSync:error connecting to base node $currentBaseNode with an error: ${e.message}")
-                            currentBaseNode = setNextBaseNode()
-                        }
-                    }
-
-                    if (currentBaseNode == null) {
-                        logger.e("startSync: cannot connect to any base node")
-                    }
-                }
-            }
-        }
-    }
-
     /**
      * address should be in the format of hex::/onion3/{public_key} or hex::/ip4/{ip}/tcp/{port}
      */
@@ -148,17 +108,17 @@ class BaseNodesManager @Inject constructor(
         return Regex(REGEX_ONION).matches(address) || Regex(REGEX_IPV4).matches(address)
     }
 
-    fun refreshBaseNodeList() {
-        baseNodeSharedRepository.ffiBaseNodes = loadBaseNodesFromFFI()
+    fun refreshBaseNodeList(wallet: FFIWallet) {
+        baseNodeSharedRepository.ffiBaseNodes = loadBaseNodesFromFFI(wallet)
     }
 
-    private fun loadBaseNodesFromFFI(): BaseNodeList = FFIWallet.instance?.getBaseNodePeers()
-        ?.mapIndexed { index, publicKey ->
+    fun loadBaseNodesFromFFI(wallet: FFIWallet): BaseNodeList = wallet.getBaseNodePeers()
+        .mapIndexed { index, publicKey ->
             BaseNodeDto(
                 name = "${networkRepository.currentNetwork.network.displayName} ${index + 1}",
                 publicKeyHex = publicKey.hex,
             )
-        }.orEmpty()
+        }
         .let { BaseNodeList(it) }
         .also { list -> logger.i("baseNodeList from FFI: \n${list.joinToString(separator = "\n")}") }
 

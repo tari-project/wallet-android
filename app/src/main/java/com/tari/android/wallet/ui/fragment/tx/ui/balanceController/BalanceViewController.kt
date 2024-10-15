@@ -38,7 +38,7 @@ import android.content.Context
 import android.view.ViewGroup
 import com.tari.android.wallet.model.BalanceInfo
 import com.tari.android.wallet.util.Constants
-import com.tari.android.wallet.util.WalletUtil
+import com.tari.android.wallet.application.walletManager.WalletFileUtil
 import java.lang.ref.WeakReference
 
 /**
@@ -60,7 +60,7 @@ class BalanceViewController(
 
     init {
         val balance = _balanceInfo.totalBalance
-        formattedBalance = WalletUtil.balanceFormatter.format(balance.tariValue)
+        formattedBalance = WalletFileUtil.balanceFormatter.format(balance.tariValue)
         // decimal tens
         viewHolders.add(DecimalDigitViewHolder(context, formattedBalance[formattedBalance.length - 1].toString().toInt()))
         decimalDigitContainerView.addView(viewHolders[0].view, 0)
@@ -95,7 +95,7 @@ class BalanceViewController(
             /* execute setter logic */
             _balanceInfo = value
             val balance = _balanceInfo.totalBalance
-            formattedBalance = WalletUtil.balanceFormatter.format(balance.tariValue)
+            formattedBalance = WalletFileUtil.balanceFormatter.format(balance.tariValue)
             val sizeDiff = formattedBalance.length - viewHolders.size
             if (sizeDiff <= 0) {
                 // delete items

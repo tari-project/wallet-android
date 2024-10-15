@@ -40,25 +40,18 @@ import android.os.Looper
 import androidx.lifecycle.ProcessLifecycleOwner
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.application.TariWalletApplication
-import com.tari.android.wallet.application.baseNodes.BaseNodesManager
 import com.tari.android.wallet.application.walletManager.WalletManager
-import com.tari.android.wallet.application.walletManager.WalletStateHandler
-import com.tari.android.wallet.data.WalletConfig
-import com.tari.android.wallet.data.sharedPrefs.CorePrefRepository
-import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodePrefRepository
+import com.tari.android.wallet.application.walletManager.doOnWalletStarted
 import com.tari.android.wallet.di.DiContainer
 import com.tari.android.wallet.ffi.FFIWallet
 import com.tari.android.wallet.infrastructure.backup.BackupManager
 import com.tari.android.wallet.notification.NotificationHelper
 import com.tari.android.wallet.service.ServiceRestartBroadcastReceiver
-import com.tari.android.wallet.service.notification.NotificationService
-import com.tari.android.wallet.service.service.WalletServiceLauncher.Companion.startAction
-import com.tari.android.wallet.service.service.WalletServiceLauncher.Companion.stopAction
-import com.tari.android.wallet.service.service.WalletServiceLauncher.Companion.stopAndDeleteAction
+import com.tari.android.wallet.service.service.WalletServiceLauncher.Companion.START_ACTION
+import com.tari.android.wallet.service.service.WalletServiceLauncher.Companion.STOP_ACTION
 import com.tari.android.wallet.ui.common.domain.ResourceManager
 import com.tari.android.wallet.ui.fragment.settings.logs.LogFilesManager
 import com.tari.android.wallet.util.Constants
-import com.tari.android.wallet.util.WalletUtil
 import io.reactivex.Observable
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
@@ -80,37 +73,19 @@ import javax.inject.Inject
 class WalletService : Service() {
 
     @Inject
-    lateinit var walletConfig: WalletConfig
-
-    @Inject
     lateinit var app: TariWalletApplication
 
     @Inject
     lateinit var resourceManager: ResourceManager
 
     @Inject
-    lateinit var notificationService: NotificationService
-
-    @Inject
     lateinit var notificationHelper: NotificationHelper
-
-    @Inject
-    lateinit var sharedPrefsWrapper: CorePrefRepository
-
-    @Inject
-    lateinit var baseNodeSharedPrefsRepository: BaseNodePrefRepository
 
     @Inject
     lateinit var walletManager: WalletManager
 
     @Inject
     lateinit var backupManager: BackupManager
-
-    @Inject
-    lateinit var baseNodesManager: BaseNodesManager
-
-    @Inject
-    lateinit var walletStateHandler: WalletStateHandler
 
     private var lifecycleObserver: ServiceLifecycleCallbacks? = null
     private val stubProxy = TariWalletServiceStubProxy()
@@ -120,7 +95,7 @@ class WalletService : Service() {
     private lateinit var wallet: FFIWallet
 
     private val job = SupervisorJob()
-    private val scope = CoroutineScope(Dispatchers.IO + job)
+    private val serviceScope = CoroutineScope(Dispatchers.IO + job)
 
     private val logger
         get() = Logger.t(WalletService::class.simpleName)
@@ -146,30 +121,23 @@ class WalletService : Service() {
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
         startForeground()
         when (intent.action) {
-            startAction -> startService()
-            stopAction -> stopService(startId)
-            stopAndDeleteAction -> {
-                //todo total crutch. Service is auto-creating during the bind func. Need to refactor this first
-                DiContainer.appComponent.inject(this)
-                stopService(startId)
-                deleteWallet()
-            }
-
+            START_ACTION -> startService(intent.getStringArrayExtra(WalletServiceLauncher.ARG_SEED_WORDS)?.toList())
+            STOP_ACTION -> stopService(startId)
             else -> throw RuntimeException("Unexpected intent action: ${intent.action}")
         }
         return START_NOT_STICKY
     }
 
-    private fun startService() {
+    private fun startService(seedWords: List<String>?) {
         //todo total crutch. Service is auto-creating during the bind func. Need to refactor this first
         DiContainer.appComponent.inject(this)
 
-        scope.launch {
-            walletStateHandler.doOnWalletStarted {
+        serviceScope.launch {
+            walletManager.doOnWalletStarted {
                 onWalletStarted(it)
             }
         }
-        walletManager.start()
+        walletManager.start(seedWords)
         logger.i("Wallet service started")
     }
 
@@ -187,26 +155,13 @@ class WalletService : Service() {
         lifecycleObserver?.let { ProcessLifecycleOwner.get().lifecycle.removeObserver(it) }
     }
 
-    private fun deleteWallet() {
-        WalletUtil.clearWalletFiles(walletConfig.getWalletFilesDirPath())
-        sharedPrefsWrapper.clear()
-        backupManager.turnOffAll()
-    }
-
     private fun onWalletStarted(ffiWallet: FFIWallet) {
         wallet = ffiWallet
         lifecycleObserver = ServiceLifecycleCallbacks(wallet)
-        val impl = FFIWalletListenerImpl(
+        stubProxy.stub = TariWalletServiceStubImpl(
             wallet = wallet,
-            backupManager = backupManager,
-            notificationHelper = notificationHelper,
-            notificationService = notificationService,
-            app = app,
-            baseNodeSharedPrefsRepository = baseNodeSharedPrefsRepository,
-            baseNodesManager = baseNodesManager,
+            outboundTxNotifier = walletManager,
         )
-        stubProxy.stub = TariWalletServiceStubImpl(wallet, baseNodeSharedPrefsRepository, impl)
-        wallet.listener = impl
         scheduleExpirationCheck()
         Handler(Looper.getMainLooper()).post { ProcessLifecycleOwner.get().lifecycle.addObserver(lifecycleObserver!!) }
         walletManager.onWalletStarted()
@@ -298,7 +253,7 @@ class WalletService : Service() {
 
         object KeyValueStorageKeys {
             const val NETWORK = "SU7FM2O6Q3BU4XVN7HDD"
-            const val version = "version"
+            const val VERSION = "version"
         }
     }
 }

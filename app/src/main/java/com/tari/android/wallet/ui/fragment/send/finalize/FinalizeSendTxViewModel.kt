@@ -8,15 +8,16 @@ import com.tari.android.wallet.R.string.finalize_send_tx_sending_step_2_desc_lin
 import com.tari.android.wallet.R.string.finalize_send_tx_sending_step_2_desc_line_2
 import com.tari.android.wallet.R.string.finalize_send_tx_sending_step_3_desc_line_1
 import com.tari.android.wallet.R.string.finalize_send_tx_sending_step_3_desc_line_2
-import com.tari.android.wallet.event.Event
+import com.tari.android.wallet.application.walletManager.WalletManager
 import com.tari.android.wallet.event.EventBus
+import com.tari.android.wallet.extension.collectFlow
 import com.tari.android.wallet.extension.launchOnIo
 import com.tari.android.wallet.extension.launchOnMain
 import com.tari.android.wallet.model.TariContact
 import com.tari.android.wallet.model.TransactionSendStatus
 import com.tari.android.wallet.model.TxId
 import com.tari.android.wallet.model.WalletError
-import com.tari.android.wallet.network.NetworkConnectionState
+import com.tari.android.wallet.network.NetworkConnectionStateHandler
 import com.tari.android.wallet.tor.TorBootstrapStatus
 import com.tari.android.wallet.tor.TorProxyState
 import com.tari.android.wallet.tor.TorProxyStateHandler
@@ -32,6 +33,9 @@ class FinalizeSendTxViewModel : CommonViewModel() {
 
     @Inject
     lateinit var torProxyStateHandler: TorProxyStateHandler
+
+    @Inject
+    lateinit var networkConnection: NetworkConnectionStateHandler
 
     lateinit var transactionData: TransactionData
 
@@ -118,8 +122,7 @@ class FinalizeSendTxViewModel : CommonViewModel() {
 
             val secondsElapsed = Seconds.secondsBetween(connectionCheckStartTime, DateTime.now()).seconds
             if (secondsElapsed >= CONNECTION_TIMEOUT_SEC) {
-                val networkConnectionState = EventBus.networkConnectionState.publishSubject.value
-                if (networkConnectionState != NetworkConnectionState.CONNECTED) {
+                if (!networkConnection.isNetworkConnected()) {
                     // internet connection problem
                     txFailureReason.value = TxFailureReason.NETWORK_CONNECTION_ERROR
                 } else {
@@ -140,10 +143,9 @@ class FinalizeSendTxViewModel : CommonViewModel() {
         }
 
         private fun checkConnectionStatus() {
-            val networkConnectionState = EventBus.networkConnectionState.publishSubject.value
             val torProxyState = torProxyStateHandler.torProxyState.value
             // check internet connection
-            if (networkConnectionState != NetworkConnectionState.CONNECTED) {
+            if (!networkConnection.isNetworkConnected()) {
                 // either not connected or Tor proxy is not running
                 txFailureReason.value = TxFailureReason.NETWORK_CONNECTION_ERROR
                 isCompleted = true
@@ -205,14 +207,15 @@ class FinalizeSendTxViewModel : CommonViewModel() {
     ) {
 
         init {
-            subscribeToEventBus()
+            collectFlow(walletManager.walletEvent) { event ->
+                when (event) {
+                    is WalletManager.WalletEvent.Tx.DirectSendResult -> onDirectSendResult(event.txId, event.status)
+                    else -> Unit
+                }
+            }
         }
 
         override fun execute() = Unit
-
-        private fun subscribeToEventBus() {
-            EventBus.subscribe<Event.Transaction.DirectSendResult>(this) { event -> onDirectSendResult(event.txId, event.status) }
-        }
 
         private fun onDirectSendResult(txId: TxId, status: TransactionSendStatus) {
             if (sentTxId.value != txId) {

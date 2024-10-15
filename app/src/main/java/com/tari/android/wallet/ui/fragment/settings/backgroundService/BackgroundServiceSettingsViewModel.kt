@@ -44,6 +44,6 @@ class BackgroundServiceSettingsViewModel : CommonViewModel() {
         tariSettingsSharedRepository.backgroundServiceTurnedOn = isTurnedOn
         _switchState.value = TariLoadingSwitchState(isTurnedOn, false)
         hideDialog()
-        serviceLauncher.startIfExist()
+        serviceLauncher.startIfWalletExists()
     }
 }

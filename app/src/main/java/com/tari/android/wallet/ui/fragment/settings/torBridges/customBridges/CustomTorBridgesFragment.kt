@@ -8,12 +8,14 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import com.tari.android.wallet.R
+import com.tari.android.wallet.application.deeplinks.DeepLink
 import com.tari.android.wallet.databinding.FragmentCustomTorBridgesBinding
 import com.tari.android.wallet.extension.observe
 import com.tari.android.wallet.ui.common.CommonFragment
 import com.tari.android.wallet.ui.component.tari.toolbar.TariToolbarActionArg
+import com.tari.android.wallet.ui.extension.parcelable
 import com.tari.android.wallet.ui.extension.setOnThrottledClickListener
-import com.tari.android.wallet.ui.fragment.qr.QRScannerActivity
+import com.tari.android.wallet.ui.fragment.qr.QrScannerActivity
 import com.tari.android.wallet.ui.fragment.qr.QrScannerSource
 
 class CustomTorBridgesFragment : CommonFragment<FragmentCustomTorBridgesBinding, CustomTorBridgesViewModel>() {
@@ -33,7 +35,7 @@ class CustomTorBridgesFragment : CommonFragment<FragmentCustomTorBridgesBinding,
     private fun setupViews() = with(ui) {
         requestBridgesCta.setOnThrottledClickListener { viewModel.openRequestPage() }
         scanQrCta.setOnThrottledClickListener {
-            QRScannerActivity.startScanner(this@CustomTorBridgesFragment, QrScannerSource.TorBridges)
+            QrScannerActivity.startScanner(this@CustomTorBridgesFragment, QrScannerSource.TorBridges)
         }
         uploadQrCta.setOnThrottledClickListener { viewModel.navigateToUploadQr() }
         val actionArgs = TariToolbarActionArg(title = requireContext().getString(R.string.tor_bridges_connect)) {
@@ -46,9 +48,9 @@ class CustomTorBridgesFragment : CommonFragment<FragmentCustomTorBridgesBinding,
 
     @Deprecated("Deprecated in Java")
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        if (requestCode == QRScannerActivity.REQUEST_QR_SCANNER && resultCode == Activity.RESULT_OK && data != null) {
-            val qrData = data.getStringExtra(QRScannerActivity.EXTRA_QR_DATA) ?: return
-            viewModel.handleQrCode(qrData)
+        if (requestCode == QrScannerActivity.REQUEST_QR_SCANNER && resultCode == Activity.RESULT_OK && data != null) {
+            val qrDeepLink = data.parcelable<DeepLink>(QrScannerActivity.EXTRA_DEEPLINK) ?: return
+            viewModel.handleQrCode(qrDeepLink)
         }
     }
 }

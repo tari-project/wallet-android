@@ -7,7 +7,6 @@ import com.tari.android.wallet.extension.launchOnMain
 import com.tari.android.wallet.infrastructure.security.biometric.BiometricAuthenticationService
 import com.tari.android.wallet.service.service.WalletServiceLauncher
 import com.tari.android.wallet.ui.common.CommonViewModel
-import com.tari.android.wallet.ui.common.SingleLiveEvent
 import com.tari.android.wallet.ui.dialog.modular.modules.body.BodyModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonStyle
@@ -26,8 +25,6 @@ class AuthViewModel : CommonViewModel() {
     @Inject
     lateinit var migrationManager: MigrationManager
 
-    val goAuth = SingleLiveEvent<Unit>()
-
     init {
         component.inject(this)
 
@@ -35,7 +32,7 @@ class AuthViewModel : CommonViewModel() {
             migrationManager.validateVersion(
                 onValid = {
                     launchOnMain {
-                        goAuth.postValue(Unit)
+                        walletServiceLauncher.start()
                     }
                 },
                 onError = {
@@ -56,17 +53,16 @@ class AuthViewModel : CommonViewModel() {
                 deleteWallet()
             },
             ButtonModule(resourceManager.getString(R.string.ffi_validation_error_cancel), ButtonStyle.Close) {
-                goAuth.postValue(Unit)
+                walletServiceLauncher.start()
                 hideDialog()
             }
         )
     }
 
     private fun deleteWallet() {
-        // disable CTAs
         launchOnIo {
-            walletServiceLauncher.stopAndDelete()
-            navigation.postValue(Navigation.TxListNavigation.ToSplashScreen)
+            walletManager.deleteWallet()
+            tariNavigator.navigate(Navigation.SplashScreen())
         }
     }
 }

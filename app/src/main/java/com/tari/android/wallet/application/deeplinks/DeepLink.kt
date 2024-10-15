@@ -32,23 +32,28 @@
  */
 package com.tari.android.wallet.application.deeplinks
 
+import android.os.Parcelable
 import com.tari.android.wallet.data.sharedPrefs.tor.TorBridgeConfiguration
 import com.tari.android.wallet.ffi.Base58
+import com.tari.android.wallet.ffi.FFISeedWords
+import com.tari.android.wallet.ffi.runWithDestroy
 import com.tari.android.wallet.model.MicroTari
 import com.tari.android.wallet.model.TariWalletAddress
 import com.tari.android.wallet.util.parseToBigInteger
+import kotlinx.parcelize.Parcelize
 
 /**
  * Parses a deep link and contains the structured deep link details.
  *
  * @author The Tari Development Team
  */
-sealed class DeepLink {
+sealed class DeepLink : Parcelable {
 
     open fun getParams(): Map<String, String> = emptyMap()
     open fun getCommand(): String = ""
 
     // tari://esmeralda/contacts?list[0][alias]=Name&list[0][tariAddress]=tariAddress&list[1][alias]=Name&list[1][tariAddress]=tariAddress
+    @Parcelize
     data class Contacts(val contacts: List<DeeplinkContact>) : DeepLink() {
 
         constructor(params: Map<String, String>) : this(
@@ -79,7 +84,8 @@ sealed class DeepLink {
             const val KEY_TARI_ADDRESS = "tariAddress"
         }
 
-        data class DeeplinkContact(val alias: String, val tariAddress: Base58)
+        @Parcelize
+        data class DeeplinkContact(val alias: String, val tariAddress: Base58) : Parcelable
 
         class FormatExtractor(val key: String, val value: String = "") {
             val index: Int
@@ -97,6 +103,7 @@ sealed class DeepLink {
         }
     }
 
+    @Parcelize
     data class Send(val walletAddress: Base58 = "", val amount: MicroTari? = null, val note: String = "") : DeepLink() {
 
         constructor(params: Map<String, String>) : this(
@@ -121,6 +128,7 @@ sealed class DeepLink {
         }
     }
 
+    @Parcelize
     data class UserProfile(val tariAddress: Base58 = "", val alias: String = "") : DeepLink() {
 
         constructor(params: Map<String, String>) : this(
@@ -142,6 +150,7 @@ sealed class DeepLink {
         }
     }
 
+    @Parcelize
     data class AddBaseNode(val name: String = "", val peer: String = "") : DeepLink() {
 
         constructor(params: Map<String, String>) : this(
@@ -163,7 +172,32 @@ sealed class DeepLink {
         }
     }
 
+    @Parcelize
     data class TorBridges(val torConfigurations: List<TorBridgeConfiguration>) : DeepLink()
+
+    // tari://esmeralda/paper_wallet?private_key=1LTWgW1kzx1e1EoY9vU1FCSDweVKjnJuNA9LysUJnFuy3x
+    @Parcelize
+    data class PaperWallet(val privateKey: String) : DeepLink() {
+
+        fun seedWords(passphrase: String): List<String>? = runCatching {
+            FFISeedWords(this.privateKey, passphrase).runWithDestroy { seedWords -> (0 until seedWords.getLength()).map { seedWords.getAt(it) } }
+        }.getOrNull()
+
+        constructor(params: Map<String, String>) : this(
+            params[KEY_PRIVATE_KEY].orEmpty()
+        )
+
+        override fun getParams(): Map<String, String> = hashMapOf<String, String>().apply {
+            put(KEY_PRIVATE_KEY, privateKey)
+        }
+
+        override fun getCommand(): String = COMMAND_PAPER_WALLET
+
+        companion object {
+            const val COMMAND_PAPER_WALLET = "paper_wallet"
+            const val KEY_PRIVATE_KEY = "private_key"
+        }
+    }
 
     companion object {
 
@@ -172,6 +206,7 @@ sealed class DeepLink {
             Send.COMMAND_SEND -> Send(params)
             AddBaseNode.COMMAND_ADD_NODE -> AddBaseNode(params)
             UserProfile.COMMAND_PROFILE -> UserProfile(params)
+            PaperWallet.COMMAND_PAPER_WALLET -> PaperWallet(params)
             else -> null
         }
     }

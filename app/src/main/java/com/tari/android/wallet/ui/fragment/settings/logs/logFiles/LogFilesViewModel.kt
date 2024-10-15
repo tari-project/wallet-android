@@ -7,7 +7,7 @@ import com.tari.android.wallet.ui.common.SingleLiveEvent
 import com.tari.android.wallet.ui.common.recyclerView.CommonViewHolderItem
 import com.tari.android.wallet.ui.common.recyclerView.items.DividerViewHolderItem
 import com.tari.android.wallet.ui.fragment.settings.logs.logFiles.adapter.LogFileViewHolderItem
-import com.tari.android.wallet.util.WalletUtil
+import com.tari.android.wallet.application.walletManager.WalletFileUtil
 import java.io.File
 import java.text.DecimalFormat
 import javax.inject.Inject
@@ -26,7 +26,7 @@ class LogFilesViewModel : CommonViewModel() {
     init {
         component.inject(this)
 
-        val files = WalletUtil.getLogFilesFromDirectory(walletConfig.getWalletLogFilesDirPath()).toMutableList()
+        val files = WalletFileUtil.getLogFilesFromDirectory(walletConfig.getWalletLogFilesDirPath()).toMutableList()
         val wholeList = files.map { listOf(LogFileViewHolderItem(getFileName(it), it) { goNext.postValue(it.file) }, DividerViewHolderItem()) }
             .flatten()
             .toMutableList()
@@ -35,7 +35,7 @@ class LogFilesViewModel : CommonViewModel() {
 
     private fun getFileName(file: File): String = file.name + " - " + getReadableFileSize(file.length())
 
-    private fun getReadableFileSize(size: Long): String? {
+    private fun getReadableFileSize(size: Long): String {
         if (size <= 0) return "0"
         val units = arrayOf("B", "KB", "MB", "GB", "TB")
         val digitGroups = (log10(size.toDouble()) / log10(bytesInKilo)).toInt()

@@ -2,11 +2,12 @@ package com.tari.android.wallet.ui.component.networkStateIndicator
 
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.baseNodes.BaseNodesManager
-import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.extension.collectFlow
 import com.tari.android.wallet.extension.combineToPair
 import com.tari.android.wallet.network.NetworkConnectionState
+import com.tari.android.wallet.network.NetworkConnectionStateHandler
 import com.tari.android.wallet.service.baseNode.BaseNodeState
+import com.tari.android.wallet.service.baseNode.BaseNodeStateHandler
 import com.tari.android.wallet.service.baseNode.BaseNodeSyncState
 import com.tari.android.wallet.tor.TorProxyState
 import com.tari.android.wallet.tor.TorProxyStateHandler
@@ -28,6 +29,12 @@ class ConnectionIndicatorViewModel : CommonViewModel() {
 
     @Inject
     lateinit var baseNodesManager: BaseNodesManager
+
+    @Inject
+    lateinit var networkConnectionStateHandler: NetworkConnectionStateHandler
+
+    @Inject
+    lateinit var baseNodeStateHandler: BaseNodeStateHandler
 
     private val _state = MutableStateFlow(UiState())
     val state = _state.asStateFlow()
@@ -61,19 +68,18 @@ class ConnectionIndicatorViewModel : CommonViewModel() {
     }
 
     private fun subscribeOnEventBus() {
-        EventBus.networkConnectionState.subscribe(this) { networkState ->
+        collectFlow(networkConnectionStateHandler.networkConnectionState) { networkState ->
             _state.update { it.copy(networkState = networkState) }
             showStatesDialog(true)
         }
-        EventBus.baseNodeState.subscribe(this) { baseNodeState ->
+        collectFlow(baseNodeStateHandler.baseNodeState) { baseNodeState ->
             _state.update { it.copy(baseNodeState = baseNodeState) }
             showStatesDialog(true)
         }
-        EventBus.baseNodeSyncState.subscribe(this) { syncState ->
+        collectFlow(baseNodeStateHandler.baseNodeSyncState) { syncState ->
             _state.update { it.copy(baseNodeSyncState = syncState) }
             showStatesDialog(true)
         }
-
         collectFlow(torProxyStateHandler.torProxyState) { torProxyState ->
             _state.update { it.copy(torProxyState = torProxyState) }
             showStatesDialog(true)

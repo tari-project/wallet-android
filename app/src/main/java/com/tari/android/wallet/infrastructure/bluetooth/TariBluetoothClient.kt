@@ -9,7 +9,7 @@ import android.os.Looper
 import android.os.ParcelUuid
 import androidx.lifecycle.viewModelScope
 import com.tari.android.wallet.application.deeplinks.DeepLink
-import com.tari.android.wallet.application.deeplinks.DeeplinkHandler
+import com.tari.android.wallet.application.deeplinks.DeeplinkManager
 import com.welie.blessed.BluetoothCentralManager
 import com.welie.blessed.BluetoothCentralManagerCallback
 import com.welie.blessed.BluetoothPeripheral
@@ -24,7 +24,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class TariBluetoothClient @Inject constructor(val deeplinkHandler: DeeplinkHandler) : TariBluetoothAdapter() {
+class TariBluetoothClient @Inject constructor(val deeplinkManager: DeeplinkManager) : TariBluetoothAdapter() {
 
     var onSuccessSharing: () -> Unit = {}
     var onFailedSharing: (String) -> Unit = {}
@@ -34,9 +34,11 @@ class TariBluetoothClient @Inject constructor(val deeplinkHandler: DeeplinkHandl
     var foundDevice: BluetoothPeripheral? = null
     var myGatt: BluetoothGatt? = null
 
-    val manager: BluetoothCentralManager by lazy { BluetoothCentralManager(fragappCompatActivity!!, callback, Handler(Looper.getMainLooper())).apply {
-        disableLogging()
-    } }
+    val manager: BluetoothCentralManager by lazy {
+        BluetoothCentralManager(fragappCompatActivity!!, callback, Handler(Looper.getMainLooper())).apply {
+            disableLogging()
+        }
+    }
 
 
     val callback = object : BluetoothCentralManagerCallback() {
@@ -137,7 +139,7 @@ class TariBluetoothClient @Inject constructor(val deeplinkHandler: DeeplinkHandl
             private fun doHandling(string: String): GattStatus {
                 logger.i("contactlessPayment: handle: url: $string")
 
-                val handled = runCatching { deeplinkHandler.handle(string) }.getOrNull()
+                val handled = runCatching { deeplinkManager.parseDeepLink(string) }.getOrNull()
 
                 logger.i("contactlessPayment: handle: handled: $handled")
 

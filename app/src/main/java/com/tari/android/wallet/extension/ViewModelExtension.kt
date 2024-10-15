@@ -56,10 +56,6 @@ fun <T> CommonView<*, *>.observe(liveData: LiveData<T>, action: (data: T) -> Uni
     }
 }
 
-fun <T> CommonView<*, *>.observeOnLoad(liveData: LiveData<T>) {
-    observe(liveData) { }
-}
-
 fun <T> LiveData<T>.debounce(duration: Long = 1000L) = MediatorLiveData<T>().also { mld ->
     val source = this
     val handler = Handler(Looper.getMainLooper())
@@ -75,17 +71,17 @@ fun <T> LiveData<T>.debounce(duration: Long = 1000L) = MediatorLiveData<T>().als
 }
 
 fun ViewModel.launchOnIo(action: suspend () -> Unit): Job {
-    return viewModelScope.launch {
-        withContext(Dispatchers.IO) {
-            action()
-        }
+    return viewModelScope.launch(Dispatchers.IO) {
+        action()
     }
 }
 
 fun ViewModel.launchOnMain(action: suspend () -> Unit): Job {
-    return viewModelScope.launch {
-        withContext(Dispatchers.Main) {
-            action()
-        }
+    return viewModelScope.launch(Dispatchers.Main) {
+        action()
     }
 }
+
+suspend fun switchToIo(action: suspend () -> Unit) = withContext(Dispatchers.IO) { action() }
+
+suspend fun switchToMain(action: suspend () -> Unit) = withContext(Dispatchers.Main) { action() }

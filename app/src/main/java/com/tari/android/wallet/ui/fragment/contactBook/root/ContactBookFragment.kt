@@ -15,7 +15,7 @@ import androidx.fragment.app.viewModels
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.google.android.material.tabs.TabLayoutMediator
 import com.tari.android.wallet.R
-import com.tari.android.wallet.application.deeplinks.DeeplinkViewModel
+import com.tari.android.wallet.application.deeplinks.DeepLink
 import com.tari.android.wallet.databinding.FragmentContactBookRootBinding
 import com.tari.android.wallet.extension.observe
 import com.tari.android.wallet.model.TariWalletAddress
@@ -23,6 +23,7 @@ import com.tari.android.wallet.ui.common.CommonFragment
 import com.tari.android.wallet.ui.component.clipboardController.ClipboardController
 import com.tari.android.wallet.ui.component.tari.toolbar.TariToolbarActionArg
 import com.tari.android.wallet.ui.extension.hideKeyboard
+import com.tari.android.wallet.ui.extension.parcelable
 import com.tari.android.wallet.ui.extension.postDelayed
 import com.tari.android.wallet.ui.extension.setVisible
 import com.tari.android.wallet.ui.extension.showKeyboard
@@ -34,7 +35,7 @@ import com.tari.android.wallet.ui.fragment.contactBook.root.share.ShareOptionArg
 import com.tari.android.wallet.ui.fragment.contactBook.root.share.ShareOptionView
 import com.tari.android.wallet.ui.fragment.home.HomeActivity
 import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
-import com.tari.android.wallet.ui.fragment.qr.QRScannerActivity
+import com.tari.android.wallet.ui.fragment.qr.QrScannerActivity
 import com.tari.android.wallet.ui.fragment.qr.QrScannerSource
 import com.tari.android.wallet.util.Constants
 import java.lang.ref.WeakReference
@@ -46,14 +47,11 @@ class ContactBookFragment : CommonFragment<FragmentContactBookRootBinding, Conta
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?) =
         FragmentContactBookRootBinding.inflate(inflater, container, false).also { ui = it }.root
 
-    private val deeplinkViewModel: DeeplinkViewModel by viewModels()
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         val viewModel: ContactBookViewModel by viewModels()
         bindViewModel(viewModel)
-        subscribeVM(deeplinkViewModel)
 
         clipboardController = ClipboardController(listOf(ui.dimmerView), ui.clipboardWallet, viewModel.walletAddressViewModel)
 
@@ -71,9 +69,9 @@ class ContactBookFragment : CommonFragment<FragmentContactBookRootBinding, Conta
 
     @Deprecated("Deprecated in Java")
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        if (requestCode == QRScannerActivity.REQUEST_QR_SCANNER && resultCode == Activity.RESULT_OK && data != null) {
-            val qrData = data.getStringExtra(QRScannerActivity.EXTRA_QR_DATA) ?: return
-            viewModel.handleDeeplink(qrData)
+        if (requestCode == QrScannerActivity.REQUEST_QR_SCANNER && resultCode == Activity.RESULT_OK && data != null) {
+            val qrDeeplink = data.parcelable<DeepLink>(QrScannerActivity.EXTRA_DEEPLINK) ?: return
+            viewModel.handleDeeplink(qrDeeplink)
         }
     }
 
@@ -153,7 +151,7 @@ class ContactBookFragment : CommonFragment<FragmentContactBookRootBinding, Conta
     }
 
     private fun startQRCodeActivity() {
-        QRScannerActivity.startScanner(this, QrScannerSource.ContactBook)
+        QrScannerActivity.startScanner(this, QrScannerSource.ContactBook)
     }
 
     private fun focusEditTextAndShowKeyboard() {

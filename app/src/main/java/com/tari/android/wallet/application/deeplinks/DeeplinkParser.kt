@@ -8,8 +8,10 @@ import java.net.URLDecoder
 import javax.inject.Inject
 import javax.inject.Singleton
 
+
 @Singleton
-class DeeplinkFormatter @Inject constructor(private val networkRepository: NetworkPrefRepository) {
+class DeeplinkParser @Inject constructor(private val networkRepository: NetworkPrefRepository) {
+
     fun parse(deepLink: String): DeepLink? {
         val torBridges = getTorDeeplink(deepLink)
         if (torBridges.isNotEmpty()) {
@@ -22,17 +24,17 @@ class DeeplinkFormatter @Inject constructor(private val networkRepository: Netwo
             return null
         }
 
-        var paramentrs = uri.queryParameterNames.associateWith { uri.getQueryParameter(it).orEmpty() }.toMutableMap()
         val command = uri.path.orEmpty().trimStart('/')
-        if (command == DeepLink.Contacts.COMMAND_CONTACTS) {
-            val values = uri.query.orEmpty().split("&").map {
+        val parameters = if (command == DeepLink.Contacts.COMMAND_CONTACTS) { // list params
+            uri.query.orEmpty().split("&").associate {
                 val (key, value) = it.split("=")
                 key to value
-            }.toMap()
-            paramentrs = values.toMutableMap()
+            }
+        } else {
+            uri.queryParameterNames.associateWith { uri.getQueryParameter(it).orEmpty() }
         }
 
-        return DeepLink.getByCommand(command, paramentrs)?.takeIf {
+        return DeepLink.getByCommand(command, parameters)?.takeIf {
             when (it) {
                 is DeepLink.Send -> TariWalletAddress.validateBase58(it.walletAddress)
                 is DeepLink.UserProfile -> TariWalletAddress.validateBase58(it.tariAddress)
@@ -49,7 +51,7 @@ class DeeplinkFormatter @Inject constructor(private val networkRepository: Netwo
         }
 
         val fullPart = Uri.Builder()
-            .scheme(scheme)
+            .scheme(SCHEME)
             .authority(networkRepository.currentNetwork.network.uriComponent)
             .appendPath(deepLink.getCommand())
 
@@ -61,7 +63,7 @@ class DeeplinkFormatter @Inject constructor(private val networkRepository: Netwo
     }
 
     private fun getTorDeeplink(input: String): List<TorBridgeConfiguration> {
-        return regex.findAll(input).mapNotNull { match ->
+        return REGEX.findAll(input).mapNotNull { match ->
             try {
                 val ipAddressAndPort = match.groupValues[1].split(":")
                 val sha1Hash = match.groupValues[2]
@@ -73,8 +75,7 @@ class DeeplinkFormatter @Inject constructor(private val networkRepository: Netwo
     }
 
     companion object {
-        const val scheme = "tari"
-
-        val regex = Regex("""(\d+\.\d+\.\d+\.\d+:\d+) ([0-9A-Fa-f]+)""")
+        const val SCHEME = "tari"
+        val REGEX = Regex("""(\d+\.\d+\.\d+\.\d+:\d+) ([0-9A-Fa-f]+)""")
     }
 }

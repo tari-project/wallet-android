@@ -49,13 +49,13 @@ import com.budiyev.android.codescanner.ErrorCallback
 import com.budiyev.android.codescanner.ScanMode
 import com.google.zxing.BarcodeFormat
 import com.tari.android.wallet.R
+import com.tari.android.wallet.application.deeplinks.DeepLink
 import com.tari.android.wallet.databinding.ActivityQrScannerBinding
 import com.tari.android.wallet.di.DiContainer.appComponent
-import com.tari.android.wallet.extension.observe
+import com.tari.android.wallet.extension.collectFlow
 import com.tari.android.wallet.ui.common.CommonActivity
 import com.tari.android.wallet.ui.component.tari.toast.TariToast
 import com.tari.android.wallet.ui.component.tari.toast.TariToastArgs
-import com.tari.android.wallet.ui.extension.serializable
 import com.tari.android.wallet.ui.extension.setVisible
 
 /**
@@ -63,7 +63,7 @@ import com.tari.android.wallet.ui.extension.setVisible
  *
  * @author The Tari Development Team
  */
-class QRScannerActivity : CommonActivity<ActivityQrScannerBinding, QRScannerViewModel>() {
+class QrScannerActivity : CommonActivity<ActivityQrScannerBinding, QrScannerViewModel>() {
 
     companion object {
         /**
@@ -71,21 +71,15 @@ class QRScannerActivity : CommonActivity<ActivityQrScannerBinding, QRScannerView
          */
         const val REQUEST_QR_SCANNER = 101
 
-        fun startScanner(activity: Activity, source: QrScannerSource) {
-            val intent = Intent(activity, QRScannerActivity::class.java)
-            intent.putExtra(QR_DATA_SOURCE, source)
-            activity.startActivityForResult(intent, REQUEST_QR_SCANNER)
-        }
-
-        fun startScanner(activity: Fragment, source: QrScannerSource) {
-            val intent = Intent(activity.requireActivity(), QRScannerActivity::class.java)
-            intent.putExtra(QR_DATA_SOURCE, source)
-            activity.startActivityForResult(intent, REQUEST_QR_SCANNER)
+        fun startScanner(fragment: Fragment, source: QrScannerSource) {
+            val intent = Intent(fragment.requireActivity(), QrScannerActivity::class.java)
+            intent.putExtra(EXTRA_QR_DATA_SOURCE, source)
+            fragment.startActivityForResult(intent, REQUEST_QR_SCANNER)
         }
 
         private const val REQUEST_CAMERA_PERMISSION = 102
-        const val EXTRA_QR_DATA = "extra_qr_text"
-        const val QR_DATA_SOURCE = "qr_data_source"
+        const val EXTRA_DEEPLINK = "EXTRA_DEEPLINK"
+        const val EXTRA_QR_DATA_SOURCE = "EXTRA_QR_DATA_SOURCE"
     }
 
     private lateinit var codeScanner: CodeScanner
@@ -95,12 +89,8 @@ class QRScannerActivity : CommonActivity<ActivityQrScannerBinding, QRScannerView
         super.onCreate(savedInstanceState)
         ui = ActivityQrScannerBinding.inflate(layoutInflater).apply { setContentView(root) }
 
-        val viewModel: QRScannerViewModel by viewModels()
+        val viewModel: QrScannerViewModel by viewModels()
         bindViewModel(viewModel)
-        subscribeToCommon(viewModel.deeplinkViewModel)
-
-        val data = intent?.serializable<QrScannerSource>(QR_DATA_SOURCE)
-        viewModel.init(data ?: QrScannerSource.None)
 
         subscribeUI()
         setupUi()
@@ -113,16 +103,18 @@ class QRScannerActivity : CommonActivity<ActivityQrScannerBinding, QRScannerView
     }
 
     private fun subscribeUI() = with(viewModel) {
-        observe(scanError) { ui.errorContainer.setVisible(it) }
-
-        observe(alternativeText) {
-            ui.alternativeText.text = it
-            ui.alternativeContainer.setVisible(it.isNotEmpty())
+        collectFlow(uiState) { uiState ->
+            ui.errorContainer.setVisible(uiState.scanError)
+            ui.alternativeText.text = uiState.alternativeText
+            ui.alternativeContainer.setVisible(uiState.alternativeText.isNotEmpty())
         }
 
-        observe(navigationBackWithData) { doNavigationBack(it) }
-
-        observe(proceedScan) { codeScanner.startPreview() }
+        collectFlow(effect) { effect ->
+            when (effect) {
+                is QrScannerModel.Effect.FinishWithResult -> finishWithResult(effect.deepLink)
+                is QrScannerModel.Effect.ProceedScan -> codeScanner.startPreview()
+            }
+        }
     }
 
     private fun setupUi() = with(ui) {
@@ -130,7 +122,7 @@ class QRScannerActivity : CommonActivity<ActivityQrScannerBinding, QRScannerView
             finish()
         }
 
-        alternativeApply.setOnClickListener { viewModel.onAlternativeApply() }
+        alternativeApply.setOnClickListener { viewModel.onAlternativeApply(this@QrScannerActivity) }
         alternativeDeny.setOnClickListener { viewModel.onAlternativeDeny() }
         retryButton.setOnClickListener { viewModel.onRetry() }
     }
@@ -154,9 +146,9 @@ class QRScannerActivity : CommonActivity<ActivityQrScannerBinding, QRScannerView
         ui.scannerView.setOnClickListener { codeScanner.startPreview() }
     }
 
-    private fun doNavigationBack(text: String) {
+    private fun finishWithResult(deepLink: DeepLink) {
         val intent = Intent()
-        intent.putExtra(EXTRA_QR_DATA, text)
+        intent.putExtra(EXTRA_DEEPLINK, deepLink)
         setResult(Activity.RESULT_OK, intent)
         finish()
     }
