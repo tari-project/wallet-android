@@ -539,15 +539,7 @@ class WalletManager @Inject constructor(
             }
             startLogFileObserver()
 
-            baseNodesManager.loadBaseNodesFromFFI(requireWalletInstance)
-                .let {
-                    logger.i(
-                        "baseNodeSync: baseNodeList from FFI: ${
-                            if (it.isEmpty()) "No base nodes available!!"
-                            else "\n${it.joinToString(separator = "\n")}"
-                        }"
-                    )
-                }
+            baseNodesManager.refreshBaseNodeList(requireWalletInstance)
 
             if (DebugConfig.selectBaseNodeEnabled) {
                 walletInstance?.let { baseNodesManager.refreshBaseNodeList(it) }
