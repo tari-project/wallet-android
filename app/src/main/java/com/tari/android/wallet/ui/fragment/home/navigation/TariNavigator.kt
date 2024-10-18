@@ -289,11 +289,7 @@ class TariNavigator @Inject constructor(
             showInternetConnectionErrorDialog(this.activity)
             return
         }
-        val bundle = Bundle().apply {
-            putParcelable(PARAMETER_TRANSACTION, transactionData)
-            activity.intent.getStringExtra(PARAMETER_NOTE)?.let { putString(PARAMETER_NOTE, it) }
-        }
-        addFragment(AddNoteFragment(), bundle)
+        addFragment(AddNoteFragment.newInstance(transactionData))
     }
 
     private fun continueToFinalizeSendTx(transactionData: TransactionData) {
@@ -333,24 +329,16 @@ class TariNavigator @Inject constructor(
         walletManager.walletInstance?.getWalletAddress() // TODO move all the logic beside of navigation from here
         val address = TariWalletAddress.fromBase58(deeplink.walletAddress)
         val contact = (activity as HomeActivity).viewModel.contactsRepository.getContactByAddress(address)
-        val bundle = Bundle().apply {
-            putParcelable(PARAMETER_CONTACT, contact)
-            putParcelable(PARAMETER_AMOUNT, deeplink.amount)
-        }
 
-        addFragment(AddAmountFragment(), bundle)
+        addFragment(AddAmountFragment.newInstance(contact, deeplink.amount, deeplink.note))
     }
 
     private fun sendToUser(recipientUser: ContactDto, amount: MicroTari? = null) {
-        val bundle = Bundle().apply {
-            putParcelable(PARAMETER_CONTACT, recipientUser)
-            val innerAmount = (activity.intent.getDoubleExtra(PARAMETER_AMOUNT, Double.MIN_VALUE))
-            val tariAmount = amount ?: if (innerAmount != Double.MIN_VALUE) MicroTari(BigInteger.valueOf(innerAmount.toLong())) else null
-            tariAmount?.let { putParcelable(PARAMETER_AMOUNT, it) }
-            activity.intent.parcelable<ContactDto>(PARAMETER_CONTACT)?.let { putParcelable(PARAMETER_CONTACT, it) }
-        }
+        val contact = activity.intent.parcelable<ContactDto>(PARAMETER_CONTACT) ?: recipientUser
+        val innerAmount = activity.intent.getDoubleExtra(PARAMETER_AMOUNT, Double.MIN_VALUE)
+        val tariAmount = amount ?: MicroTari(BigInteger.valueOf(innerAmount.toLong())).takeIf { innerAmount != Double.MIN_VALUE }
 
-        addFragment(AddAmountFragment(), bundle)
+        addFragment(AddAmountFragment.newInstance(contact, tariAmount))
     }
 
     private fun toChatDetail(walletAddress: TariWalletAddress, isNew: Boolean) {
