@@ -53,6 +53,7 @@ import com.tari.android.wallet.R.string.error_fee_more_than_amount_description
 import com.tari.android.wallet.R.string.error_fee_more_than_amount_title
 import com.tari.android.wallet.R.string.tx_detail_fee_tooltip_desc
 import com.tari.android.wallet.R.string.tx_detail_fee_tooltip_transaction_fee
+import com.tari.android.wallet.application.walletManager.WalletFileUtil
 import com.tari.android.wallet.databinding.FragmentAddAmountBinding
 import com.tari.android.wallet.extension.getWithError
 import com.tari.android.wallet.extension.observe
@@ -75,13 +76,13 @@ import com.tari.android.wallet.ui.fragment.contactBook.data.contacts.ContactDto
 import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
 import com.tari.android.wallet.ui.fragment.home.navigation.TariNavigator.Companion.PARAMETER_AMOUNT
 import com.tari.android.wallet.ui.fragment.home.navigation.TariNavigator.Companion.PARAMETER_CONTACT
+import com.tari.android.wallet.ui.fragment.home.navigation.TariNavigator.Companion.PARAMETER_NOTE
 import com.tari.android.wallet.ui.fragment.send.addAmount.feeModule.NetworkSpeed
 import com.tari.android.wallet.ui.fragment.send.addAmount.keyboard.KeyboardController
 import com.tari.android.wallet.ui.fragment.send.amountView.AmountStyle
 import com.tari.android.wallet.ui.fragment.send.common.TransactionData
 import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.DebugConfig
-import com.tari.android.wallet.application.walletManager.WalletFileUtil
 import com.tari.android.wallet.util.addressFirstEmojis
 import com.tari.android.wallet.util.addressLastEmojis
 import com.tari.android.wallet.util.addressPrefixEmojis
@@ -94,6 +95,7 @@ class AddAmountFragment : CommonFragment<FragmentAddAmountBinding, AddAmountView
      * Recipient is either an emoji id or a user from contacts or recent txs.
      */
     private lateinit var contactDto: ContactDto
+    private lateinit var note: String
 
     private var keyboardController: KeyboardController = KeyboardController()
 
@@ -128,6 +130,7 @@ class AddAmountFragment : CommonFragment<FragmentAddAmountBinding, AddAmountView
         val amount = arguments?.parcelable<MicroTari>(PARAMETER_AMOUNT)
         keyboardController.setup(requireContext(), AmountCheckRunnable(), ui.numpad, ui.amount, amount?.tariValue?.toDouble() ?: Double.MIN_VALUE)
         contactDto = arguments?.parcelable<ContactDto>(PARAMETER_CONTACT)!!
+        note = arguments?.getString(PARAMETER_NOTE).orEmpty()
         // hide tx fee
         ui.txFeeContainerView.invisible()
 
@@ -257,7 +260,7 @@ class AddAmountFragment : CommonFragment<FragmentAddAmountBinding, AddAmountView
         val transactionData = TransactionData(
             recipientContact = contactDto,
             amount = keyboardController.currentAmount,
-            note = null,
+            note = note,
             feePerGram = viewModel.selectedFeeData!!.feePerGram,
             isOneSidePayment = isOneSidePayment,
         )
@@ -376,6 +379,16 @@ class AddAmountFragment : CommonFragment<FragmentAddAmountBinding, AddAmountView
 
         private fun hideContinueButton() = with(ui) {
             continueButton.isEnabled = false
+        }
+    }
+
+    companion object {
+        fun newInstance(contact: ContactDto, amount: MicroTari?, note: String = "") = AddAmountFragment().apply {
+            arguments = Bundle().apply {
+                putParcelable(PARAMETER_CONTACT, contact)
+                putParcelable(PARAMETER_AMOUNT, amount)
+                putString(PARAMETER_NOTE, note)
+            }
         }
     }
 }

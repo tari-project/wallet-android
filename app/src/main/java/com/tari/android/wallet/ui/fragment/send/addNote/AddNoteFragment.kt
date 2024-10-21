@@ -83,7 +83,6 @@ import com.tari.android.wallet.ui.extension.showInternetConnectionErrorDialog
 import com.tari.android.wallet.ui.extension.temporarilyDisableClick
 import com.tari.android.wallet.ui.extension.visible
 import com.tari.android.wallet.ui.fragment.contactBook.data.contacts.ContactDto
-import com.tari.android.wallet.ui.fragment.home.navigation.TariNavigator.Companion.PARAMETER_NOTE
 import com.tari.android.wallet.ui.fragment.home.navigation.TariNavigator.Companion.PARAMETER_TRANSACTION
 import com.tari.android.wallet.ui.fragment.send.addNote.gif.ChooseGIFDialogFragment
 import com.tari.android.wallet.ui.fragment.send.addNote.gif.GifContainer
@@ -207,8 +206,7 @@ class AddNoteFragment : CommonFragment<FragmentAddNoteBinding, AddNoteViewModel>
         amount = transactionData.amount!!
         isOneSidePayment = transactionData.isOneSidePayment
         if (savedInstanceState == null) {
-            requireArguments().getString(PARAMETER_NOTE)
-                ?.let { ui.noteEditText.setText(it) }
+            ui.noteEditText.setText(transactionData.note.orEmpty())
         }
     }
 
@@ -448,6 +446,12 @@ class AddNoteFragment : CommonFragment<FragmentAddNoteBinding, AddNoteViewModel>
             start()
         }
     }
+
+    companion object {
+        fun newInstance(transactionData: TransactionData) = AddNoteFragment().apply {
+            arguments = Bundle().apply {
+                putParcelable(PARAMETER_TRANSACTION, transactionData)
+            }
+        }
+    }
 }
-
-

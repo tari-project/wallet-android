@@ -13,12 +13,12 @@ import javax.inject.Singleton
 class DeeplinkParser @Inject constructor(private val networkRepository: NetworkPrefRepository) {
 
     fun parse(deepLink: String): DeepLink? {
-        val torBridges = getTorDeeplink(deepLink)
+        val torBridges = getTorDeeplink(deepLink.trim())
         if (torBridges.isNotEmpty()) {
             return DeepLink.TorBridges(torBridges)
         }
 
-        val uri = runCatching { Uri.parse(URLDecoder.decode(deepLink, "UTF-8")) }.getOrNull() ?: return null
+        val uri = runCatching { Uri.parse(URLDecoder.decode(deepLink.trim(), "UTF-8")) }.getOrNull() ?: return null
 
         if (!uri.authority.equals(networkRepository.currentNetwork.network.uriComponent)) {
             return null
