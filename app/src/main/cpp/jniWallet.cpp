@@ -1136,14 +1136,12 @@ JNIEXPORT jboolean JNICALL
 Java_com_tari_android_wallet_ffi_FFIWallet_jniStartRecovery(
         JNIEnv *jEnv,
         jobject jThis,
-        jobject base_node_public_key,
         jstring callback,
         jstring callback_sig,
         jstring recovery_output_message,
         jobject error) {
     return ExecuteWithError<jboolean>(jEnv, error, [&](int *errorPointer) {
         auto pWallet = GetPointerField<TariWallet *>(jEnv, jThis);
-        auto pTariPublicKey = GetPointerField<TariPublicKey *>(jEnv, base_node_public_key);
         recoveringProcessCompleteCallbackMethodId = getMethodId(jEnv, jThis, callback, callback_sig);
         if (recoveringProcessCompleteCallbackMethodId == nullptr) {
             SetNullPointerField(jEnv, jThis);
@@ -1151,10 +1149,9 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniStartRecovery(
 
         const char *pRecoveryOutputMessage = jEnv->GetStringUTFChars(recovery_output_message, JNI_FALSE);
 
-        return wallet_start_recovery(pWallet, pTariPublicKey, recoveringProcessCompleteCallback, pRecoveryOutputMessage, errorPointer);
+        return wallet_start_recovery(pWallet, nullptr, recoveringProcessCompleteCallback, pRecoveryOutputMessage, errorPointer);
     });
 }
-
 
 extern "C"
 JNIEXPORT jstring JNICALL
