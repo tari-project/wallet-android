@@ -19,6 +19,7 @@ import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonStyle
 import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
 import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
+import com.tari.android.wallet.util.DebugConfig
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -48,7 +49,11 @@ class WalletRestoringViewModel : CommonViewModel() {
     fun startRestoring() = launchOnIo {
         baseNodeIterator = baseNodesManager.baseNodeList.iterator()
         subscribeOnRestorationState()
-        connectToNextBaseNode()
+        if (DebugConfig.selectBaseNodeEnabled) {
+            connectToNextBaseNode()
+        } else {
+            startRecoveryWithoutNode()
+        }
     }
 
     fun showResetFlowDialog() {
@@ -80,9 +85,26 @@ class WalletRestoringViewModel : CommonViewModel() {
 
     private suspend fun startRestoringOnNode(baseNode: BaseNodeDto) {
         try {
-            val startedSuccessfully = walletManager.startRecovery(baseNode, resourceManager.getString(R.string.restore_wallet_output_message))
+            val startedSuccessfully = walletManager.startRecovery(
+                baseNode = baseNode,
+                recoveryOutputMessage = resourceManager.getString(R.string.restore_wallet_output_message),
+            )
             if (!startedSuccessfully) {
                 connectToNextBaseNode()
+                onError(RestorationError.ConnectionFailed(resourceManager, this@WalletRestoringViewModel::cancelRecovery))
+            }
+        } catch (e: Throwable) {
+            onError(RestorationError.RecoveryInternalError(resourceManager, this@WalletRestoringViewModel::cancelRecovery))
+        }
+    }
+
+    private fun startRecoveryWithoutNode() {
+        try {
+            val startedSuccessfully = walletManager.startRecovery(
+                baseNode = null,
+                recoveryOutputMessage = resourceManager.getString(R.string.restore_wallet_output_message),
+            )
+            if (!startedSuccessfully) {
                 onError(RestorationError.ConnectionFailed(resourceManager, this@WalletRestoringViewModel::cancelRecovery))
             }
         } catch (e: Throwable) {

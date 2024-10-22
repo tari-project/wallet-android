@@ -160,7 +160,6 @@ class FFIWallet(
     private external fun jniSetConfirmations(number: String, libError: FFIError)
     private external fun jniEstimateTxFee(amount: String, gramFee: String, kernelCount: String, outputCount: String, libError: FFIError): ByteArray
     private external fun jniStartRecovery(
-        baseNodePublicKey: FFIPublicKey,
         callback: String,
         callbackSig: String,
         recoveryOutputMessage: String,
@@ -346,8 +345,8 @@ class FFIWallet(
 
     fun setRequiredConfirmationCount(number: BigInteger) = runWithError { jniSetConfirmations(number.toString(), it) }
 
-    fun startRecovery(baseNodePublicKey: FFIPublicKey, recoveryOutputMessage: String): Boolean =
-        runWithError { jniStartRecovery(baseNodePublicKey, this::onWalletRecovery.name, "(I[B[B)V", recoveryOutputMessage, it) }
+    fun startRecovery(recoveryOutputMessage: String): Boolean =
+        runWithError { jniStartRecovery(this::onWalletRecovery.name, "(I[B[B)V", recoveryOutputMessage, it) }
 
     fun getFeePerGramStats(): FFIFeePerGramStats = runWithError { FFIFeePerGramStats(jniWalletGetFeePerGramStats(3, it)) }
 

@@ -247,9 +247,15 @@ class WalletManager @Inject constructor(
      * Starts the wallet recovery process. Returns true if the recovery process was started successfully.
      * The recovery process events will be handled in the onWalletRestoration() callback.
      */
-    fun startRecovery(baseNode: BaseNodeDto, recoveryOutputMessage: String): Boolean {
-        val baseNodeFFI = FFIPublicKey(HexString(baseNode.publicKeyHex))
-        return walletInstance?.startRecovery(baseNodeFFI, recoveryOutputMessage) ?: false
+    fun startRecovery(baseNode: BaseNodeDto?, recoveryOutputMessage: String): Boolean {
+        if (DebugConfig.selectBaseNodeEnabled) {
+            // TODO we don't support selecting base node for recovery yet
+            //  val baseNodeFFI = baseNode?.let { FFIPublicKey(HexString(it.publicKeyHex)) }
+            //  return walletInstance?.startRecovery(baseNodeFFI, recoveryOutputMessage) ?: false
+            return false
+        } else {
+            return walletInstance?.startRecovery(recoveryOutputMessage) ?: false
+        }
     }
 
     fun onWalletRestored() {
