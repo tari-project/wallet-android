@@ -45,7 +45,7 @@ import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.deeplinks.DeepLink
-import com.tari.android.wallet.application.walletManager.WalletFileUtil
+import com.tari.android.wallet.application.walletManager.WalletConfig
 import com.tari.android.wallet.databinding.FragmentHomeBinding
 import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.extension.observe
@@ -161,7 +161,7 @@ class HomeFragment : CommonFragment<FragmentHomeBinding, HomeFragmentViewModel>(
     private fun updateBalanceInfoUI(restart: Boolean) {
         val balanceInfo = viewModel.balanceInfo.value!!
 
-        val availableBalance = WalletFileUtil.balanceFormatter.format(balanceInfo.availableBalance.tariValue)
+        val availableBalance = WalletConfig.balanceFormatter.format(balanceInfo.availableBalance.tariValue)
         ui.availableBalance.text = availableBalance
 
         if (restart) {

@@ -2,6 +2,7 @@ package com.tari.android.wallet.ui.fragment.tx.adapter
 
 import androidx.viewbinding.ViewBinding
 import com.tari.android.wallet.R
+import com.tari.android.wallet.application.walletManager.WalletConfig
 import com.tari.android.wallet.databinding.ViewAddressShortSmallBinding
 import com.tari.android.wallet.extension.makeTextBold
 import com.tari.android.wallet.model.CancelledTx
@@ -19,7 +20,6 @@ import com.tari.android.wallet.ui.extension.gone
 import com.tari.android.wallet.ui.extension.string
 import com.tari.android.wallet.ui.extension.visible
 import com.tari.android.wallet.ui.fragment.contactBook.data.contacts.ContactDto
-import com.tari.android.wallet.application.walletManager.WalletFileUtil
 import com.tari.android.wallet.util.addressFirstEmojis
 import com.tari.android.wallet.util.addressLastEmojis
 import com.tari.android.wallet.util.addressPrefixEmojis
@@ -97,7 +97,7 @@ abstract class CommonTxListViewHolder<T : CommonViewHolderItem, VB : ViewBinding
     }
 
     protected fun displayAmount(tx: Tx, amountTextView: TariTextView, amountTextViewRound: TariRoundBackground) {
-        val amount = WalletFileUtil.amountFormatter.format(tx.amount.tariValue)
+        val amount = WalletConfig.amountFormatter.format(tx.amount.tariValue)
         val context = itemView.context
         val (amountText, textColor, backgroundColor) = when {
             tx is CancelledTx -> Triple(

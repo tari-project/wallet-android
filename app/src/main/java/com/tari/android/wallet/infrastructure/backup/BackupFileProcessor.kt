@@ -35,7 +35,7 @@ package com.tari.android.wallet.infrastructure.backup
 import com.google.gson.Gson
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.application.walletManager.WalletManager
-import com.tari.android.wallet.data.WalletConfig
+import com.tari.android.wallet.application.walletManager.WalletConfig
 import com.tari.android.wallet.data.sharedPrefs.backup.BackupPrefRepository
 import com.tari.android.wallet.data.sharedPrefs.security.SecurityPrefRepository
 import com.tari.android.wallet.extension.encrypt
@@ -69,7 +69,7 @@ class BackupFileProcessor @Inject constructor(
 
         delay(1000)
 
-        val databaseFile = File(walletConfig.walletDatabaseFilePath)
+        val databaseFile = File(walletConfig.getWalletDatabaseFilePath())
         val backupPassword = backupSettingsRepository.backupPassword
         val backupFileName = namingPolicy.getBackupFileName(backupPassword.isNullOrEmpty())
         val outputFile = File(walletConfig.getWalletTempDirPath(), backupFileName)
@@ -141,7 +141,7 @@ class BackupFileProcessor @Inject constructor(
 
             unencryptedCompressedFile.delete()
 
-            if (!File(walletConfig.walletDatabaseFilePath).exists()) {
+            if (!File(walletConfig.getWalletDatabaseFilePath()).exists()) {
                 // delete uncompressed files
                 walletFilesDir.deleteRecursively()
                 throw BackupStorageTamperedException("Invalid encrypted backup.")

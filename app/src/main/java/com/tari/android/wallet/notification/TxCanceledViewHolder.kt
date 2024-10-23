@@ -36,8 +36,8 @@ import android.app.KeyguardManager
 import android.content.Context
 import android.widget.RemoteViews
 import com.tari.android.wallet.R
+import com.tari.android.wallet.application.walletManager.WalletConfig
 import com.tari.android.wallet.model.CancelledTx
-import com.tari.android.wallet.application.walletManager.WalletFileUtil
 
 class TxCanceledViewHolder(context: Context, tx: CancelledTx) :
     RemoteViews(context.packageName, R.layout.notification_remote_tx_canceled) {
@@ -48,7 +48,7 @@ class TxCanceledViewHolder(context: Context, tx: CancelledTx) :
         val deviceIsLocked = keyguardManager?.isDeviceLocked ?: true
         val amount =
             if (deviceIsLocked) context.getString(R.string.common_new_uppercase)
-            else WalletFileUtil.amountFormatter.format(tx.amount.tariValue)
+            else WalletConfig.amountFormatter.format(tx.amount.tariValue)
         setTextViewText(R.id.notification_tx_canceled_amount_text_view, amount)
     }
 

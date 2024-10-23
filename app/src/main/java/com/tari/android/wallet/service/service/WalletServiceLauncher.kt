@@ -4,8 +4,7 @@ import android.content.Context
 import android.content.Intent
 import androidx.core.content.ContextCompat
 import com.tari.android.wallet.application.TariWalletApplication
-import com.tari.android.wallet.application.walletManager.WalletFileUtil
-import com.tari.android.wallet.data.WalletConfig
+import com.tari.android.wallet.application.walletManager.WalletConfig
 import com.tari.android.wallet.data.sharedPrefs.tariSettings.TariSettingsPrefRepository
 
 /**
@@ -17,7 +16,7 @@ class WalletServiceLauncher(
     val tariSettingsSharedRepository: TariSettingsPrefRepository
 ) {
     fun startIfWalletExists(seedWords: List<String>? = null) {
-        if (WalletFileUtil.walletExists(walletConfig)) {
+        if (walletConfig.walletExists()) {
             startService(seedWords)
         }
     }

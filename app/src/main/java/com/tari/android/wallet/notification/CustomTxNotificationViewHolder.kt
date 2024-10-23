@@ -37,10 +37,10 @@ import android.content.Context
 import android.view.View
 import android.widget.RemoteViews
 import com.tari.android.wallet.R
+import com.tari.android.wallet.application.walletManager.WalletConfig
 import com.tari.android.wallet.model.MicroTari
 import com.tari.android.wallet.model.TariContact
 import com.tari.android.wallet.model.Tx
-import com.tari.android.wallet.application.walletManager.WalletFileUtil
 import com.tari.android.wallet.util.addressFirstEmojis
 import com.tari.android.wallet.util.addressLastEmojis
 import com.tari.android.wallet.util.addressPrefixEmojis
@@ -92,7 +92,7 @@ class CustomTxNotificationViewHolder(val context: Context, tx: Tx) : RemoteViews
         if (deviceIsLocked) {
             setTextViewText(R.id.notification_tx_received_txt_positive_amount, context.getString(R.string.common_new_uppercase))
         } else {
-            val formattedValue = "+" + WalletFileUtil.amountFormatter.format(amount.tariValue)
+            val formattedValue = "+" + WalletConfig.amountFormatter.format(amount.tariValue)
             setTextViewText(R.id.notification_tx_received_txt_positive_amount, formattedValue)
         }
         setViewVisibility(R.id.notification_tx_received_txt_positive_amount, View.VISIBLE)
@@ -103,7 +103,7 @@ class CustomTxNotificationViewHolder(val context: Context, tx: Tx) : RemoteViews
         if (deviceIsLocked) {
             setTextViewText(R.id.notification_tx_received_txt_negative_amount, context.getString(R.string.common_new_uppercase))
         } else {
-            val formattedValue = "-" + WalletFileUtil.amountFormatter.format(amount.tariValue)
+            val formattedValue = "-" + WalletConfig.amountFormatter.format(amount.tariValue)
             setTextViewText(R.id.notification_tx_received_txt_negative_amount, formattedValue)
         }
         setViewVisibility(R.id.notification_tx_received_txt_negative_amount, View.VISIBLE)

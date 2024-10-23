@@ -38,7 +38,6 @@ import com.tari.android.wallet.BuildConfig
 import com.tari.android.wallet.application.Network
 import com.tari.android.wallet.application.TariWalletApplication
 import com.tari.android.wallet.application.baseNodes.BaseNodesManager
-import com.tari.android.wallet.data.WalletConfig
 import com.tari.android.wallet.data.sharedPrefs.CorePrefRepository
 import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodeDto
 import com.tari.android.wallet.data.sharedPrefs.network.NetworkPrefRepository
@@ -201,7 +200,7 @@ class WalletManager @Inject constructor(
     fun getCommsConfig(): FFICommsConfig = FFICommsConfig(
         publicAddress = NetAddressString(address = "127.0.0.1", port = 39069).toString(),
         transport = getTorTransport(),
-        databaseName = walletConfig.walletDBName,
+        databaseName = WalletConfig.WALLET_DB_NAME,
         datastorePath = walletConfig.getWalletFilesDirPath(),
         discoveryTimeoutSec = Constants.Wallet.DISCOVERY_TIMEOUT_SEC,
         safMessageDurationSec = Constants.Wallet.STORE_AND_FORWARD_MESSAGE_DURATION_SEC,
@@ -274,7 +273,7 @@ class WalletManager @Inject constructor(
         walletInstance = null
         _walletState.update { WalletState.NotReady }
         runOnMain { _walletEvent.send(WalletEvent.OnWalletRemove) }
-        WalletFileUtil.clearWalletFiles(walletConfig.getWalletFilesDirPath())
+        walletConfig.clearWalletFiles()
         corePrefRepository.clear()
         dialogManager.dismissAll()
         walletServiceLauncher.stop()
@@ -349,7 +348,7 @@ class WalletManager @Inject constructor(
     private fun initWallet(ffiSeedWords: FFISeedWords?) {
         if (walletInstance == null) {
             // store network info in shared preferences if it's a new wallet
-            val isNewInstallation = !WalletFileUtil.walletExists(walletConfig)
+            val isNewInstallation = !walletConfig.walletExists()
 
             val passphrase = securityPrefRepository.databasePassphrase.takeIf { !it.isNullOrEmpty() }
                 ?: corePrefRepository.generateDatabasePassphrase().also { securityPrefRepository.databasePassphrase = it }

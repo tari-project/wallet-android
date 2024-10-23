@@ -11,6 +11,7 @@ import android.widget.TextView
 import com.daasuu.ei.Ease
 import com.daasuu.ei.EasingInterpolator
 import com.tari.android.wallet.R
+import com.tari.android.wallet.application.walletManager.WalletConfig
 import com.tari.android.wallet.databinding.ViewInputAmountBinding
 import com.tari.android.wallet.databinding.ViewNumpadBinding
 import com.tari.android.wallet.model.MicroTari
@@ -25,7 +26,6 @@ import com.tari.android.wallet.ui.extension.setTextSizePx
 import com.tari.android.wallet.ui.extension.setTopMargin
 import com.tari.android.wallet.ui.extension.setWidthAndHeightToMeasured
 import com.tari.android.wallet.util.Constants
-import com.tari.android.wallet.application.walletManager.WalletFileUtil
 import java.math.BigInteger
 import kotlin.math.min
 
@@ -60,8 +60,8 @@ class KeyboardController {
      */
     private val actionWaitLengthMs = 500L
 
-    private val decimalSeparator = WalletFileUtil.amountFormatter.decimalFormatSymbols.decimalSeparator.toString()
-    private val thousandsSeparator = WalletFileUtil.amountFormatter.decimalFormatSymbols.groupingSeparator.toString()
+    private val decimalSeparator = WalletConfig.amountFormatter.decimalFormatSymbols.decimalSeparator.toString()
+    private val thousandsSeparator = WalletConfig.amountFormatter.decimalFormatSymbols.groupingSeparator.toString()
 
     /**
      * Below two are related to amount check and validation.
