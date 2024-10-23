@@ -11,7 +11,7 @@ buildscript {
 
     // JNI libs
     ext.libwalletHostURL = "https://github.com/tari-project/tari/releases/download/"
-    ext.libwalletVersion = "v1.7.0-pre.3"
+    ext.libwalletVersion = "v1.7.0-rc.3"
     ext.libwalletMinValidVersion = "v1.4.1-rc.0"
     ext.libwalletx64A = "libminotari_wallet_ffi.android_x86_64.a"
     ext.libwalletArmA = "libminotari_wallet_ffi.android_aarch64.a"
