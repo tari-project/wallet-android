@@ -34,20 +34,15 @@ package com.tari.android.wallet.ffi
 
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.BuildConfig
+import com.tari.android.wallet.application.walletManager.WalletCallbackListener
 import com.tari.android.wallet.data.sharedPrefs.network.TariNetwork
 import com.tari.android.wallet.model.BalanceInfo
-import com.tari.android.wallet.model.CancelledTx
-import com.tari.android.wallet.model.CompletedTx
 import com.tari.android.wallet.model.MicroTari
-import com.tari.android.wallet.model.PendingInboundTx
-import com.tari.android.wallet.model.PendingOutboundTx
 import com.tari.android.wallet.model.PublicKey
 import com.tari.android.wallet.model.TariCoinPreview
 import com.tari.android.wallet.model.TariUnblindedOutput
 import com.tari.android.wallet.model.TariVector
 import com.tari.android.wallet.model.TariWalletAddress
-import com.tari.android.wallet.model.Tx
-import com.tari.android.wallet.recovery.WalletRestorationState
 import com.tari.android.wallet.util.Constants
 import java.math.BigInteger
 
@@ -56,9 +51,8 @@ import java.math.BigInteger
  *
  * @author The Tari Development Team
  */
-
 class FFIWallet(
-    private val listener: FFIWalletListener,
+    private val walletCallbackListener: WalletCallbackListener,
 ) : FFIBase() {
 
     private val logger
@@ -73,6 +67,7 @@ class FFIWallet(
     }
 
     private external fun jniCreate(
+        walletContextId: Int,
         commsConfig: FFICommsConfig,
         logPath: String,
         logVerbosity: Int,
@@ -83,6 +78,7 @@ class FFIWallet(
         seedWords: FFISeedWords?,
         dnsPeer: String,
         isDnsSecureOn: Boolean,
+        walletCallbackListener: WalletCallbackListener,
         callbackReceivedTx: String,
         callbackReceivedTxSig: String,
         callbackReceivedTxReply: String,
@@ -162,6 +158,7 @@ class FFIWallet(
     private external fun jniSetConfirmations(number: String, libError: FFIError)
     private external fun jniEstimateTxFee(amount: String, gramFee: String, kernelCount: String, outputCount: String, libError: FFIError): ByteArray
     private external fun jniStartRecovery(
+        walletCallbackListener: WalletCallbackListener,
         callback: String,
         callbackSig: String,
         recoveryOutputMessage: String,
@@ -186,18 +183,20 @@ class FFIWallet(
     private external fun jniDestroy()
 
     constructor(
+        walletContextId: Int,
         tariNetwork: TariNetwork,
         commsConfig: FFICommsConfig,
         logPath: String,
         passphrase: String,
         seedWords: FFISeedWords?,
-        listener: FFIWalletListener,
-    ) : this(listener) {
+        walletCallbackListener: WalletCallbackListener,
+    ) : this(walletCallbackListener) {
         val error = FFIError()
         logger.i("Pre jniCreate")
 
         try {
             jniCreate(
+                walletContextId = walletContextId,
                 commsConfig = commsConfig,
                 logPath = logPath,
                 logVerbosity = LOG_VERBOSITY,
@@ -208,23 +207,24 @@ class FFIWallet(
                 seedWords = seedWords,
                 dnsPeer = tariNetwork.dnsPeer,
                 isDnsSecureOn = IS_DNS_SECURE_ON,
-                this::onTxReceived.name, "(J)V",
-                this::onTxReplyReceived.name, "(J)V",
-                this::onTxFinalized.name, "(J)V",
-                this::onTxBroadcast.name, "(J)V",
-                this::onTxMined.name, "(J)V",
-                this::onTxMinedUnconfirmed.name, "(J[B)V",
-                this::onTxFauxConfirmed.name, "(J)V",
-                this::onTxFauxUnconfirmed.name, "(J[B)V",
-                this::onDirectSendResult.name, "([BJ)V",
-                this::onTxCancelled.name, "(J[B)V",
-                this::onTXOValidationComplete.name, "([B[B)V",
-                this::onContactLivenessDataUpdated.name, "(J)V",
-                this::onBalanceUpdated.name, "(J)V",
-                this::onTxValidationComplete.name, "([B[B)V",
-                this::onConnectivityStatus.name, "([B)V",
-                this::onWalletScannedHeight.name, "([B)V",
-                this::onBaseNodeStatus.name, "(J)V",
+                walletCallbackListener = walletCallbackListener,
+                WalletCallbackListener::onTxReceived.name, "([BJ)V",
+                WalletCallbackListener::onTxReplyReceived.name, "([BJ)V",
+                WalletCallbackListener::onTxFinalized.name, "([BJ)V",
+                WalletCallbackListener::onTxBroadcast.name, "([BJ)V",
+                WalletCallbackListener::onTxMined.name, "([BJ)V",
+                WalletCallbackListener::onTxMinedUnconfirmed.name, "([BJ[B)V",
+                WalletCallbackListener::onTxFauxConfirmed.name, "([BJ)V",
+                WalletCallbackListener::onTxFauxUnconfirmed.name, "([BJ[B)V",
+                WalletCallbackListener::onDirectSendResult.name, "([B[BJ)V",
+                WalletCallbackListener::onTxCancelled.name, "([BJ[B)V",
+                WalletCallbackListener::onTXOValidationComplete.name, "([B[B[B)V",
+                WalletCallbackListener::onContactLivenessDataUpdated.name, "([BJ)V",
+                WalletCallbackListener::onBalanceUpdated.name, "([BJ)V",
+                WalletCallbackListener::onTxValidationComplete.name, "([B[B[B)V",
+                WalletCallbackListener::onConnectivityStatus.name, "([B[B)V",
+                WalletCallbackListener::onWalletScannedHeight.name, "([B[B)V",
+                WalletCallbackListener::onBaseNodeStatus.name, "([BJ)V",
                 libError = error,
             )
         } catch (e: Throwable) {
@@ -361,7 +361,15 @@ class FFIWallet(
     fun setRequiredConfirmationCount(number: BigInteger) = runWithError { jniSetConfirmations(number.toString(), it) }
 
     fun startRecovery(recoveryOutputMessage: String): Boolean =
-        runWithError { jniStartRecovery(this::onWalletRecovery.name, "(I[B[B)V", recoveryOutputMessage, it) }
+        runWithError {
+            jniStartRecovery(
+                walletCallbackListener = walletCallbackListener,
+                callback = walletCallbackListener::onWalletRecovery.name,
+                callbackSig = "([BI[B[B)V",
+                recoveryOutputMessage = recoveryOutputMessage,
+                libError = it,
+            )
+        }
 
     fun getFeePerGramStats(): FFIFeePerGramStats = runWithError { FFIFeePerGramStats(jniWalletGetFeePerGramStats(3, it)) }
 
@@ -381,150 +389,7 @@ class FFIWallet(
         }
     }
 
-    private fun onWalletRecovery(event: Int, firstArg: ByteArray, secondArg: ByteArray) {
-        val state = WalletRestorationState.create(event, firstArg, secondArg)
-        logger.i(
-            "Wallet restoration: ${
-                when (state) {
-                    is WalletRestorationState.ConnectingToBaseNode -> "Connecting to base node"
-                    is WalletRestorationState.ConnectedToBaseNode -> "Connected to base node"
-                    is WalletRestorationState.ConnectionToBaseNodeFailed -> "Connection to base node failed: ${state.retryCount}/${state.retryLimit}"
-                    is WalletRestorationState.Progress -> "Progress: ${state.currentBlock}/${state.numberOfBlocks}"
-                    is WalletRestorationState.Completed -> "Completed: ${state.numberOfUTXO} UTXOs, ${state.microTari.size} MicroTari"
-                    is WalletRestorationState.ScanningRoundFailed -> "Scanning round failed: ${state.retryCount}/${state.retryLimit}"
-                    is WalletRestorationState.RecoveryFailed -> "Recovery failed"
-                }
-            }"
-        )
-        listener.onWalletRestoration(state)
-    }
-
     override fun destroy() {
         jniDestroy()
-    }
-
-    /* FFI wallet callbacks */
-
-    private fun onTxReceived(pendingInboundTxPtr: FFIPointer) {
-        val tx = FFIPendingInboundTx(pendingInboundTxPtr)
-        logger.i("Tx received ${tx.getId()}")
-        val pendingTx = PendingInboundTx(tx)
-        listener.onTxReceived(pendingTx)
-    }
-
-    private fun onTxReplyReceived(txPointer: FFIPointer) {
-        val tx = FFICompletedTx(txPointer)
-        logger.i("Tx reply received ${tx.getId()}")
-        val pendingOutboundTx = PendingOutboundTx(tx)
-        listener.onTxReplyReceived(pendingOutboundTx)
-    }
-
-    private fun onTxFinalized(completedTx: FFIPointer) {
-        val tx = FFICompletedTx(completedTx)
-        logger.i("Tx finalized ${tx.getId()}")
-        val pendingInboundTx = PendingInboundTx(tx)
-        listener.onTxFinalized(pendingInboundTx)
-    }
-
-    private fun onTxBroadcast(completedTxPtr: FFIPointer) {
-        val tx = FFICompletedTx(completedTxPtr)
-        logger.i("Tx broadcast ${tx.getId()}")
-        when (tx.getDirection()) {
-            Tx.Direction.INBOUND -> {
-                val pendingInboundTx = PendingInboundTx(tx)
-                listener.onInboundTxBroadcast(pendingInboundTx)
-            }
-
-            Tx.Direction.OUTBOUND -> {
-                val pendingOutboundTx = PendingOutboundTx(tx)
-                listener.onOutboundTxBroadcast(pendingOutboundTx)
-            }
-        }
-    }
-
-    private fun onTxMined(completedTxPtr: FFIPointer) {
-        val completed = CompletedTx(completedTxPtr)
-        logger.i("Tx mined & confirmed ${completed.id}")
-        listener.onTxMined(completed)
-    }
-
-    private fun onTxMinedUnconfirmed(completedTxPtr: FFIPointer, confirmationCountBytes: ByteArray) {
-        val confirmationCount = BigInteger(1, confirmationCountBytes).toInt()
-        val completed = CompletedTx(completedTxPtr)
-        logger.i("Tx mined & unconfirmed ${completed.id} $confirmationCount")
-        listener.onTxMinedUnconfirmed(completed, confirmationCount)
-    }
-
-    private fun onTxFauxConfirmed(completedTxPtr: FFIPointer) {
-        val completed = CompletedTx(completedTxPtr)
-        logger.i("Tx faux confirmed ${completed.id}")
-        listener.onTxMined(completed)
-    }
-
-    private fun onTxFauxUnconfirmed(completedTxPtr: FFIPointer, confirmationCountBytes: ByteArray) {
-        val confirmationCount = BigInteger(1, confirmationCountBytes).toInt()
-        val completed = CompletedTx(completedTxPtr)
-        logger.i("Tx faux unconfirmed ${completed.id}")
-        listener.onTxMinedUnconfirmed(completed, confirmationCount)
-    }
-
-    private fun onDirectSendResult(bytes: ByteArray, pointer: FFIPointer) {
-        val txId = BigInteger(1, bytes)
-        logger.i("Tx direct send result $txId")
-        listener.onDirectSendResult(txId, FFITransactionSendStatus(pointer).getStatus())
-    }
-
-    private fun onTxCancelled(completedTx: FFIPointer, rejectionReason: ByteArray) {
-        val rejectionReasonInt = BigInteger(1, rejectionReason).toInt()
-        val tx = FFICompletedTx(completedTx)
-        logger.i("Tx cancelled ${tx.getId()}")
-        val cancelledTx = CancelledTx(tx)
-        if (tx.getDirection() == Tx.Direction.OUTBOUND) {
-            listener.onTxCancelled(cancelledTx, rejectionReasonInt)
-        }
-    }
-
-    private fun onBaseNodeStatus(baseNodeStatePointer: FFIPointer) {
-        val baseNodeState = FFITariBaseNodeState(baseNodeStatePointer)
-        logger.i("Base node state updated (height of the longest chain is ${baseNodeState.getHeightOfLongestChain()})")
-        listener.onBaseNodeStateChanged(baseNodeState)
-    }
-
-    private fun onConnectivityStatus(bytes: ByteArray) {
-        val connectivityStatus = BigInteger(1, bytes)
-        logger.i("ConnectivityStatus is [$connectivityStatus]")
-        listener.onConnectivityStatus(connectivityStatus.toInt())
-    }
-
-    private fun onWalletScannedHeight(bytes: ByteArray) {
-        val height = BigInteger(1, bytes)
-        logger.i("Wallet scanned height is [$height]")
-        listener.onWalletScannedHeight(height.toInt())
-    }
-
-    private fun onBalanceUpdated(ptr: FFIPointer) {
-        logger.i("Balance Updated")
-        val balance = FFIBalance(ptr).runWithDestroy { BalanceInfo(it.getAvailable(), it.getIncoming(), it.getOutgoing(), it.getTimeLocked()) }
-        listener.onBalanceUpdated(balance)
-    }
-
-    private fun onTXOValidationComplete(bytes: ByteArray, statusBytes: ByteArray) {
-        val requestId = BigInteger(1, bytes)
-        val statusInteger = BigInteger(1, statusBytes).toInt()
-        val status = TransactionValidationStatus.entries.firstOrNull { it.value == statusInteger } ?: return
-        logger.i("TXO validation [$requestId] complete. Result: $status")
-        listener.onTXOValidationComplete(requestId, status)
-    }
-
-    private fun onTxValidationComplete(requestIdBytes: ByteArray, statusBytes: ByteArray) {
-        val requestId = BigInteger(1, requestIdBytes)
-        val statusInteger = BigInteger(1, statusBytes).toInt()
-        val status = TransactionValidationStatus.entries.firstOrNull { it.value == statusInteger } ?: return
-        logger.i("Tx validation [$requestId] complete. Result: $status")
-        listener.onTxValidationComplete(requestId, status)
-    }
-
-    private fun onContactLivenessDataUpdated(livenessUpdate: FFIPointer) {
-        logger.i("OnContactLivenessDataUpdated")
     }
 }

@@ -38,6 +38,7 @@ import com.tari.android.wallet.BuildConfig
 import com.tari.android.wallet.application.Network
 import com.tari.android.wallet.application.TariWalletApplication
 import com.tari.android.wallet.application.baseNodes.BaseNodesManager
+import com.tari.android.wallet.application.walletManager.WalletCallbackListener.Companion.MAIN_WALLET_CONTEXT_ID
 import com.tari.android.wallet.data.sharedPrefs.CorePrefRepository
 import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodeDto
 import com.tari.android.wallet.data.sharedPrefs.network.NetworkPrefRepository
@@ -55,7 +56,6 @@ import com.tari.android.wallet.ffi.FFISeedWords
 import com.tari.android.wallet.ffi.FFITariBaseNodeState
 import com.tari.android.wallet.ffi.FFITariTransportConfig
 import com.tari.android.wallet.ffi.FFIWallet
-import com.tari.android.wallet.ffi.FFIWalletListener
 import com.tari.android.wallet.ffi.HexString
 import com.tari.android.wallet.ffi.LogFileObserver
 import com.tari.android.wallet.ffi.NetAddressString
@@ -132,6 +132,7 @@ class WalletManager @Inject constructor(
     private val walletRestorationStateHandler: WalletRestorationStateHandler,
     private val walletServiceLauncher: WalletServiceLauncher,
     private val dialogManager: DialogManager,
+    private val walletCallbackListener: WalletCallbackListener,
     @ApplicationScope private val applicationScope: CoroutineScope,
 ) : OutboundTxNotifier {
 
@@ -181,6 +182,179 @@ class WalletManager @Inject constructor(
                 startWallet(ffiSeedWords)
             }
         }
+
+        walletCallbackListener.addListener(
+            walletContextId = MAIN_WALLET_CONTEXT_ID,
+            listener = object : FFIWalletListener {
+                /**
+                 * All the callbacks are called on the FFI thread, so we need to switch to the main thread.
+                 * The app will crash if we try to update the UI from the FFI thread.
+                 */
+                override fun onTxReceived(pendingInboundTx: PendingInboundTx) = runOnMain {
+                    _walletEvent.send(
+                        WalletEvent.Tx.TxReceived(
+                            tx = pendingInboundTx.copy(tariContact = getUserByWalletAddress(pendingInboundTx.tariContact.walletAddress)),
+                        )
+                    )
+                    postTxNotification(pendingInboundTx)
+                }
+
+                override fun onTxReplyReceived(pendingOutboundTx: PendingOutboundTx) = runOnMain {
+                    _walletEvent.send(
+                        WalletEvent.Tx.TxReplyReceived(
+                            tx = pendingOutboundTx.copy(tariContact = getUserByWalletAddress(pendingOutboundTx.tariContact.walletAddress)),
+                        )
+                    )
+                }
+
+                override fun onTxFinalized(pendingInboundTx: PendingInboundTx) = runOnMain {
+                    _walletEvent.send(
+                        WalletEvent.Tx.TxFinalized(
+                            tx = pendingInboundTx.copy(tariContact = getUserByWalletAddress(pendingInboundTx.tariContact.walletAddress)),
+                        )
+                    )
+                }
+
+                override fun onInboundTxBroadcast(pendingInboundTx: PendingInboundTx) = runOnMain {
+                    _walletEvent.send(
+                        WalletEvent.Tx.InboundTxBroadcast(
+                            tx = pendingInboundTx.copy(tariContact = getUserByWalletAddress(pendingInboundTx.tariContact.walletAddress)),
+                        )
+                    )
+                }
+
+                override fun onOutboundTxBroadcast(pendingOutboundTx: PendingOutboundTx) = runOnMain {
+                    _walletEvent.send(
+                        WalletEvent.Tx.OutboundTxBroadcast(
+                            tx = pendingOutboundTx.copy(tariContact = getUserByWalletAddress(pendingOutboundTx.tariContact.walletAddress)),
+                        )
+                    )
+                }
+
+                override fun onTxMined(completedTx: CompletedTx) = runOnMain {
+                    _walletEvent.send(
+                        WalletEvent.Tx.TxMined(
+                            tx = completedTx.copy(tariContact = getUserByWalletAddress(completedTx.tariContact.walletAddress)),
+                        )
+                    )
+                }
+
+                override fun onTxMinedUnconfirmed(completedTx: CompletedTx, confirmationCount: Int) = runOnMain {
+                    _walletEvent.send(
+                        WalletEvent.Tx.TxMinedUnconfirmed(
+                            tx = completedTx.copy(tariContact = getUserByWalletAddress(completedTx.tariContact.walletAddress)),
+                            confirmationCount = confirmationCount,
+                        )
+                    )
+                }
+
+                override fun onTxFauxConfirmed(completedTx: CompletedTx) = runOnMain {
+                    _walletEvent.send(
+                        WalletEvent.Tx.TxFauxConfirmed(
+                            tx = completedTx.copy(tariContact = getUserByWalletAddress(completedTx.tariContact.walletAddress)),
+                        )
+                    )
+                }
+
+                override fun onTxFauxUnconfirmed(completedTx: CompletedTx, confirmationCount: Int) = runOnMain {
+                    _walletEvent.send(
+                        WalletEvent.Tx.TxFauxMinedUnconfirmed(
+                            tx = completedTx.copy(tariContact = getUserByWalletAddress(completedTx.tariContact.walletAddress)),
+                            confirmationCount = confirmationCount,
+                        )
+                    )
+                }
+
+                override fun onDirectSendResult(txId: BigInteger, status: TransactionSendStatus) = runOnMain {
+                    _walletEvent.send(WalletEvent.Tx.DirectSendResult(TxId(txId), status))
+                    outboundTxIdsToBePushNotified.firstOrNull { it.txId == txId }?.let {
+                        outboundTxIdsToBePushNotified.remove(it)
+                        sendPushNotificationToTxRecipient(it.recipientPublicKeyHex)
+                    }
+                }
+
+                override fun onTxCancelled(cancelledTx: CancelledTx, rejectionReason: Int) = runOnMain {
+                    _walletEvent.send(
+                        WalletEvent.Tx.TxCancelled(
+                            tx = cancelledTx.copy(tariContact = getUserByWalletAddress(cancelledTx.tariContact.walletAddress)),
+                        )
+                    )
+
+                    // TODO don't use android components in this class
+                    val currentActivity = app.currentActivity
+                    if (cancelledTx.direction == Tx.Direction.INBOUND
+                        && !(app.isInForeground && currentActivity is HomeActivity && currentActivity.willNotifyAboutNewTx())
+                    ) {
+                        notificationHelper.postTxCanceledNotification(cancelledTx)
+                    }
+                }
+
+                override fun onTXOValidationComplete(responseId: BigInteger, status: TransactionValidationStatus) = runOnMain {
+                    checkValidationResult(
+                        type = WalletValidationType.TXO,
+                        responseId = responseId,
+                        isSuccess = status == TransactionValidationStatus.Success,
+                    )
+                }
+
+                override fun onTxValidationComplete(responseId: BigInteger, status: TransactionValidationStatus) = runOnMain {
+                    checkValidationResult(
+                        type = WalletValidationType.TX,
+                        responseId = responseId,
+                        isSuccess = status == TransactionValidationStatus.Success,
+                    )
+                    walletInstance?.let {
+                        if (!txBroadcastRestarted && status == TransactionValidationStatus.Success) {
+                            it.restartTxBroadcast()
+                            txBroadcastRestarted = true
+                            logger.i("baseNodeSync:wallet validation: Transaction broadcast restarted (requestId: $responseId)")
+                        }
+                    }
+                        ?: logger.i("baseNodeSync:wallet validation:error: Transaction broadcast restart failed because wallet instance is null (requestId: $responseId)\"")
+                }
+
+                override fun onBalanceUpdated(balanceInfo: BalanceInfo) = runOnMain {
+                    EventBus.balanceState.post(balanceInfo) // TODO replace with flow!!!
+                }
+
+                override fun onConnectivityStatus(status: Int) = runOnMain {
+                    when (ConnectivityStatus.entries[status]) {
+                        ConnectivityStatus.CONNECTING -> {
+                            baseNodeStateHandler.updateState(BaseNodeState.Syncing)
+                            logger.i("baseNodeSync:base nodes state: connecting to ${baseNodesManager.currentBaseNode?.publicKeyHex}")
+                        }
+
+                        ConnectivityStatus.ONLINE -> {
+                            baseNodesManager.refreshBaseNodeList(requireWalletInstance)
+                            baseNodeStateHandler.updateState(BaseNodeState.Online)
+                            logger.i("baseNodeSync:base nodes state: connected to ${baseNodesManager.currentBaseNode?.publicKeyHex} ONLINE")
+                        }
+
+                        ConnectivityStatus.OFFLINE -> {
+                            val currentBaseNode = baseNodesManager.currentBaseNode
+                            if (DebugConfig.selectBaseNodeEnabled && (currentBaseNode == null || !currentBaseNode.isCustom)) {
+                                baseNodesManager.setNextBaseNode()
+                                syncBaseNode()
+                            }
+                            baseNodeStateHandler.updateState(BaseNodeState.Offline)
+                            logger.i("baseNodeSync:base nodes state: disconnected from ${baseNodesManager.currentBaseNode?.publicKeyHex} OFFLINE")
+                        }
+                    }
+                }
+
+                override fun onWalletRestoration(state: WalletRestorationState) = runOnMain {
+                    walletRestorationStateHandler.updateState(state)
+                }
+
+                override fun onWalletScannedHeight(height: Int) = runOnMain {
+                    baseNodesManager.saveWalletScannedHeight(height)
+                }
+
+                override fun onBaseNodeStateChanged(baseNodeState: FFITariBaseNodeState) = runOnMain {
+                    baseNodesManager.saveBaseNodeState(baseNodeState)
+                }
+            },
+        )
     }
 
     @Synchronized
@@ -191,6 +365,7 @@ class WalletManager @Inject constructor(
         _walletState.update { WalletState.NotReady }
         // stop tor proxy
         torManager.shutdown()
+        walletCallbackListener.removeListener(MAIN_WALLET_CONTEXT_ID)
     }
 
     fun onWalletStarted() {
@@ -277,7 +452,7 @@ class WalletManager @Inject constructor(
         corePrefRepository.clear()
         dialogManager.dismissAll()
         walletServiceLauncher.stop()
-
+        walletCallbackListener.removeAllListeners()
     }
 
     private fun startWallet(ffiSeedWords: FFISeedWords?) {
@@ -354,180 +529,13 @@ class WalletManager @Inject constructor(
                 ?: corePrefRepository.generateDatabasePassphrase().also { securityPrefRepository.databasePassphrase = it }
 
             walletInstance = FFIWallet(
+                walletContextId = MAIN_WALLET_CONTEXT_ID,
                 tariNetwork = networkPrefRepository.currentNetwork,
                 commsConfig = getCommsConfig(),
                 logPath = walletConfig.getWalletLogFilePath(),
                 passphrase = passphrase,
                 seedWords = ffiSeedWords,
-                listener = object : FFIWalletListener {
-                    /**
-                     * All the callbacks are called on the FFI thread, so we need to switch to the main thread.
-                     * The app will crash if we try to update the UI from the FFI thread.
-                     */
-                    override fun onTxReceived(pendingInboundTx: PendingInboundTx) = runOnMain {
-                        _walletEvent.send(
-                            WalletEvent.Tx.TxReceived(
-                                tx = pendingInboundTx.copy(tariContact = getUserByWalletAddress(pendingInboundTx.tariContact.walletAddress)),
-                            )
-                        )
-                        postTxNotification(pendingInboundTx)
-                    }
-
-                    override fun onTxReplyReceived(pendingOutboundTx: PendingOutboundTx) = runOnMain {
-                        _walletEvent.send(
-                            WalletEvent.Tx.TxReplyReceived(
-                                tx = pendingOutboundTx.copy(tariContact = getUserByWalletAddress(pendingOutboundTx.tariContact.walletAddress)),
-                            )
-                        )
-                    }
-
-                    override fun onTxFinalized(pendingInboundTx: PendingInboundTx) = runOnMain {
-                        _walletEvent.send(
-                            WalletEvent.Tx.TxFinalized(
-                                tx = pendingInboundTx.copy(tariContact = getUserByWalletAddress(pendingInboundTx.tariContact.walletAddress)),
-                            )
-                        )
-                    }
-
-                    override fun onInboundTxBroadcast(pendingInboundTx: PendingInboundTx) = runOnMain {
-                        _walletEvent.send(
-                            WalletEvent.Tx.InboundTxBroadcast(
-                                tx = pendingInboundTx.copy(tariContact = getUserByWalletAddress(pendingInboundTx.tariContact.walletAddress)),
-                            )
-                        )
-                    }
-
-                    override fun onOutboundTxBroadcast(pendingOutboundTx: PendingOutboundTx) = runOnMain {
-                        _walletEvent.send(
-                            WalletEvent.Tx.OutboundTxBroadcast(
-                                tx = pendingOutboundTx.copy(tariContact = getUserByWalletAddress(pendingOutboundTx.tariContact.walletAddress)),
-                            )
-                        )
-                    }
-
-                    override fun onTxMined(completedTx: CompletedTx) = runOnMain {
-                        _walletEvent.send(
-                            WalletEvent.Tx.TxMined(
-                                tx = completedTx.copy(tariContact = getUserByWalletAddress(completedTx.tariContact.walletAddress)),
-                            )
-                        )
-                    }
-
-                    override fun onTxMinedUnconfirmed(completedTx: CompletedTx, confirmationCount: Int) = runOnMain {
-                        _walletEvent.send(
-                            WalletEvent.Tx.TxMinedUnconfirmed(
-                                tx = completedTx.copy(tariContact = getUserByWalletAddress(completedTx.tariContact.walletAddress)),
-                                confirmationCount = confirmationCount,
-                            )
-                        )
-                    }
-
-                    override fun onTxFauxConfirmed(completedTx: CompletedTx) = runOnMain {
-                        _walletEvent.send(
-                            WalletEvent.Tx.TxFauxConfirmed(
-                                tx = completedTx.copy(tariContact = getUserByWalletAddress(completedTx.tariContact.walletAddress)),
-                            )
-                        )
-                    }
-
-                    override fun onTxFauxUnconfirmed(completedTx: CompletedTx, confirmationCount: Int) = runOnMain {
-                        _walletEvent.send(
-                            WalletEvent.Tx.TxFauxMinedUnconfirmed(
-                                tx = completedTx.copy(tariContact = getUserByWalletAddress(completedTx.tariContact.walletAddress)),
-                                confirmationCount = confirmationCount,
-                            )
-                        )
-                    }
-
-                    override fun onDirectSendResult(txId: BigInteger, status: TransactionSendStatus) = runOnMain {
-                        _walletEvent.send(WalletEvent.Tx.DirectSendResult(TxId(txId), status))
-                        outboundTxIdsToBePushNotified.firstOrNull { it.txId == txId }?.let {
-                            outboundTxIdsToBePushNotified.remove(it)
-                            sendPushNotificationToTxRecipient(it.recipientPublicKeyHex)
-                        }
-                    }
-
-                    override fun onTxCancelled(cancelledTx: CancelledTx, rejectionReason: Int) = runOnMain {
-                        _walletEvent.send(
-                            WalletEvent.Tx.TxCancelled(
-                                tx = cancelledTx.copy(tariContact = getUserByWalletAddress(cancelledTx.tariContact.walletAddress)),
-                            )
-                        )
-
-                        // TODO don't use android components in this class
-                        val currentActivity = app.currentActivity
-                        if (cancelledTx.direction == Tx.Direction.INBOUND
-                            && !(app.isInForeground && currentActivity is HomeActivity && currentActivity.willNotifyAboutNewTx())
-                        ) {
-                            notificationHelper.postTxCanceledNotification(cancelledTx)
-                        }
-                    }
-
-                    override fun onTXOValidationComplete(responseId: BigInteger, status: TransactionValidationStatus) = runOnMain {
-                        checkValidationResult(
-                            type = WalletValidationType.TXO,
-                            responseId = responseId,
-                            isSuccess = status == TransactionValidationStatus.Success,
-                        )
-                    }
-
-                    override fun onTxValidationComplete(responseId: BigInteger, status: TransactionValidationStatus) = runOnMain {
-                        checkValidationResult(
-                            type = WalletValidationType.TX,
-                            responseId = responseId,
-                            isSuccess = status == TransactionValidationStatus.Success,
-                        )
-                        walletInstance?.let {
-                            if (!txBroadcastRestarted && status == TransactionValidationStatus.Success) {
-                                it.restartTxBroadcast()
-                                txBroadcastRestarted = true
-                                logger.i("baseNodeSync:wallet validation: Transaction broadcast restarted (requestId: $responseId)")
-                            }
-                        }
-                            ?: logger.i("baseNodeSync:wallet validation:error: Transaction broadcast restart failed because wallet instance is null (requestId: $responseId)\"")
-                    }
-
-                    override fun onBalanceUpdated(balanceInfo: BalanceInfo) = runOnMain {
-                        EventBus.balanceState.post(balanceInfo) // TODO replace with flow!!!
-                    }
-
-                    override fun onConnectivityStatus(status: Int) = runOnMain {
-                        when (ConnectivityStatus.entries[status]) {
-                            ConnectivityStatus.CONNECTING -> {
-                                baseNodeStateHandler.updateState(BaseNodeState.Syncing)
-                                logger.i("baseNodeSync:base nodes state: connecting to ${baseNodesManager.currentBaseNode?.publicKeyHex}")
-                            }
-
-                            ConnectivityStatus.ONLINE -> {
-                                baseNodesManager.refreshBaseNodeList(requireWalletInstance)
-                                baseNodeStateHandler.updateState(BaseNodeState.Online)
-                                logger.i("baseNodeSync:base nodes state: connected to ${baseNodesManager.currentBaseNode?.publicKeyHex} ONLINE")
-                            }
-
-                            ConnectivityStatus.OFFLINE -> {
-                                val currentBaseNode = baseNodesManager.currentBaseNode
-                                if (DebugConfig.selectBaseNodeEnabled && (currentBaseNode == null || !currentBaseNode.isCustom)) {
-                                    baseNodesManager.setNextBaseNode()
-                                    syncBaseNode()
-                                }
-                                baseNodeStateHandler.updateState(BaseNodeState.Offline)
-                                logger.i("baseNodeSync:base nodes state: disconnected from ${baseNodesManager.currentBaseNode?.publicKeyHex} OFFLINE")
-                            }
-                        }
-                    }
-
-                    override fun onWalletRestoration(state: WalletRestorationState) = runOnMain {
-                        walletRestorationStateHandler.updateState(state)
-                    }
-
-                    override fun onWalletScannedHeight(height: Int) = runOnMain {
-                        baseNodesManager.saveWalletScannedHeight(height)
-                    }
-
-                    override fun onBaseNodeStateChanged(baseNodeState: FFITariBaseNodeState) = runOnMain {
-                        baseNodesManager.saveBaseNodeState(baseNodeState)
-                    }
-                }
+                walletCallbackListener = walletCallbackListener,
             )
 
             if (isNewInstallation) {

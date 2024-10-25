@@ -60,7 +60,7 @@ import com.tari.android.wallet.ffi.FFIException
 import com.tari.android.wallet.ffi.FFITariBaseNodeState
 import com.tari.android.wallet.ffi.FFITariTransportConfig
 import com.tari.android.wallet.ffi.FFIWallet
-import com.tari.android.wallet.ffi.FFIWalletListener
+import com.tari.android.wallet.application.walletManager.FFIWalletListener
 import com.tari.android.wallet.ffi.TransactionValidationStatus
 import com.tari.android.wallet.ffi.nullptr
 import com.tari.android.wallet.model.BalanceInfo
