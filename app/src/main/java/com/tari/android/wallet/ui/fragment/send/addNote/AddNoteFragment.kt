@@ -107,6 +107,7 @@ class AddNoteFragment : CommonFragment<FragmentAddNoteBinding, AddNoteViewModel>
     private lateinit var transactionData: TransactionData
     private lateinit var recipientUser: ContactDto
     private lateinit var amount: MicroTari
+    private lateinit var note: String
     private var isOneSidePayment: Boolean = false
 
     private lateinit var gifViewModel: ThumbnailGifViewModel
@@ -124,7 +125,7 @@ class AddNoteFragment : CommonFragment<FragmentAddNoteBinding, AddNoteViewModel>
         bindViewModel(viewModel)
 
         initializeGIFsViewModel()
-        retrievePageArguments(savedInstanceState)
+        retrievePageArguments()
         setupUI(savedInstanceState)
         setupCTAs()
     }
@@ -188,6 +189,8 @@ class AddNoteFragment : CommonFragment<FragmentAddNoteBinding, AddNoteViewModel>
             it.layoutManager = LinearLayoutManager(requireContext(), RecyclerView.HORIZONTAL, false)
             it.adapter = adapter
         }
+        ui.noteEditText.setText(transactionData.note.orEmpty())
+        updateSliderState()
     }
 
     private fun updateSliderState() {
@@ -200,14 +203,12 @@ class AddNoteFragment : CommonFragment<FragmentAddNoteBinding, AddNoteViewModel>
         }
     }
 
-    private fun retrievePageArguments(savedInstanceState: Bundle?) {
+    private fun retrievePageArguments() {
         transactionData = requireArguments().parcelable(PARAMETER_TRANSACTION)!!
         recipientUser = transactionData.recipientContact!!
         amount = transactionData.amount!!
         isOneSidePayment = transactionData.isOneSidePayment
-        if (savedInstanceState == null) {
-            ui.noteEditText.setText(transactionData.note.orEmpty())
-        }
+        note = transactionData.note.orEmpty()
     }
 
     private fun setupCTAs() {
