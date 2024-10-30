@@ -1,7 +1,6 @@
 package com.tari.android.wallet.ui.fragment.send.addAmount
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.SavedStateHandle
 import com.tari.android.wallet.R
 import com.tari.android.wallet.extension.getWithError
 import com.tari.android.wallet.extension.launchOnIo
@@ -13,22 +12,20 @@ import com.tari.android.wallet.ui.dialog.modular.modules.body.BodyModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonStyle
 import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
+import com.tari.android.wallet.ui.fragment.contactBook.data.contacts.ContactDto
+import com.tari.android.wallet.ui.fragment.home.navigation.TariNavigator.Companion.PARAMETER_AMOUNT
+import com.tari.android.wallet.ui.fragment.home.navigation.TariNavigator.Companion.PARAMETER_CONTACT
+import com.tari.android.wallet.ui.fragment.home.navigation.TariNavigator.Companion.PARAMETER_NOTE
 import com.tari.android.wallet.ui.fragment.send.addAmount.feeModule.FeeModule
 import com.tari.android.wallet.ui.fragment.send.addAmount.feeModule.NetworkSpeed
 import com.tari.android.wallet.util.Constants
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import java.math.BigInteger
 import kotlin.math.min
 
-class AddAmountViewModel : CommonViewModel() {
-
-    private val _isOneSidePaymentEnabled: MutableLiveData<Boolean> = MutableLiveData()
-    val isOneSidePaymentEnabled: LiveData<Boolean> = _isOneSidePaymentEnabled
-
-    private val _feePerGrams = MutableLiveData<FeePerGramOptions>()
-    val feePerGrams: LiveData<FeePerGramOptions> = _feePerGrams
-
-    private val _serviceConnected: MutableLiveData<Unit> = MutableLiveData()
-    val serviceConnected: LiveData<Unit> = _serviceConnected
+class AddAmountViewModel(savedState: SavedStateHandle) : CommonViewModel() {
 
     var selectedFeeData: FeeData? = null
     private var selectedSpeed: NetworkSpeed = NetworkSpeed.Medium
@@ -37,11 +34,25 @@ class AddAmountViewModel : CommonViewModel() {
 
     init {
         component.inject(this)
+    }
 
-        doOnWalletServiceConnected { _serviceConnected.postValue(Unit) }
+    private val _uiState = MutableStateFlow(
+        savedState.get<ContactDto>(PARAMETER_CONTACT)?.let { contact ->
+            AddAmountModel.UiState(
+                isOneSidedPaymentEnabled = tariSettingsSharedRepository.isOneSidePaymentEnabled,
+                isOneSidedPaymentForced = contact.contactInfo.requireWalletAddress().oneSided && !contact.contactInfo.requireWalletAddress().interactive,
+                amount = savedState.get<MicroTari>(PARAMETER_AMOUNT)?.tariValue?.toDouble() ?: Double.MIN_VALUE,
+                contactDto = contact,
+                note = savedState.get<String>(PARAMETER_NOTE).orEmpty(),
+            )
+        } ?: error("Contact is required, but not provided")
+    )
+    val uiState = _uiState.asStateFlow()
+
+    init {
+        doOnWalletServiceConnected { _uiState.update { it.copy(serviceConnected = true) } }
 
         loadFees()
-        _isOneSidePaymentEnabled.postValue(tariSettingsSharedRepository.isOneSidePaymentEnabled)
     }
 
     private fun loadFees() = doOnWalletServiceConnected {
@@ -80,7 +91,16 @@ class AddAmountViewModel : CommonViewModel() {
 
                     else -> throw Exception("Unexpected block count")
                 }
-                _feePerGrams.postValue(FeePerGramOptions(networkSpeed, MicroTari(slowOption), MicroTari(mediumOption), MicroTari(fastOption)))
+                _uiState.update {
+                    it.copy(
+                        feePerGrams = FeePerGramOptions(
+                            networkSpeed = networkSpeed,
+                            slow = MicroTari(slowOption),
+                            medium = MicroTari(mediumOption),
+                            fast = MicroTari(fastOption),
+                        )
+                    )
+                }
             } catch (e: Throwable) {
                 logger.i("Error loading fees: ${e.message}")
             }
@@ -113,7 +133,7 @@ class AddAmountViewModel : CommonViewModel() {
 
     fun calculateFee(amount: MicroTari, walletError: WalletError) {
         try {
-            val grams = feePerGrams.value
+            val grams = uiState.value.feePerGrams
             if (grams == null) {
                 calculateDefaultFees(amount, walletError)
                 return

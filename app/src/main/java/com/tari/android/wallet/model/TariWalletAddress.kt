@@ -84,6 +84,12 @@ data class TariWalletAddress(
     val coreKeyEmojis: EmojiId
         get() = viewKeyEmojis + spendKeyEmojis + checksumEmoji
 
+    val oneSided: Boolean
+        get() = features.contains(Feature.ONE_SIDED)
+
+    val interactive: Boolean
+        get() = features.contains(Feature.INTERACTIVE)
+
     fun isUnknownUser(): Boolean = unknownAddress
 
     override fun equals(other: Any?): Boolean = (other is TariWalletAddress) && uniqueIdentifier == other.uniqueIdentifier

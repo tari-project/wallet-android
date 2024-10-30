@@ -282,6 +282,7 @@
                 android:layout_height="24dp"
                 android:layout_gravity="center_vertical"
                 android:layout_marginStart="16dp"
+                android:foreground="?attr/selectableItemBackgroundBorderless"
                 android:src="@drawable/vector_help_icon_24dp" />
         </LinearLayout>
 
