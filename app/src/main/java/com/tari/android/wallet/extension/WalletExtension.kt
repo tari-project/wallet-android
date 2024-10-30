@@ -1,9 +1,8 @@
 package com.tari.android.wallet.extension
 
-import com.orhanobut.logger.Logger
+import com.tari.android.wallet.ffi.FFIException
+import com.tari.android.wallet.ffi.FFIWallet
 import com.tari.android.wallet.model.WalletError
-import com.tari.android.wallet.model.WalletError.Companion.NoError
-import com.tari.android.wallet.model.WalletException
 import com.tari.android.wallet.model.throwIf
 import com.tari.android.wallet.service.TariWalletService
 
@@ -26,15 +25,28 @@ fun <T> TariWalletService.getWithError(
     return result
 }
 
-fun <T> TariWalletService.getResultWithError(
-    action: (error: WalletError, service: TariWalletService) -> T,
-): Result<T> {
-    val walletError = WalletError()
-    val result = action(walletError, this)
+fun <T> FFIWallet.getWithError(
+    onError: (error: WalletError) -> Unit = { throwIf(it) },
+    action: (wallet: FFIWallet) -> T,
+): T? = try {
+    action(this)
+} catch (throwable: Throwable) {
+    onError(throwable.mapIntoError())
+    null
+}
 
-    if (walletError.code != NoError.code) {
-        Logger.t("WalletService").i("Error while wallet operation: ${walletError.signature}")
-        return Result.failure(WalletException(walletError))
+fun <T> FFIWallet.getOrNull(
+    action: (wallet: FFIWallet) -> T,
+): T? = try {
+    action(this)
+} catch (throwable: Throwable) {
+    null
+}
+
+private fun Throwable.mapIntoError(): WalletError {
+    return if (this is FFIException && this.error != null) {
+        WalletError(this.error.code)
+    } else {
+        WalletError(WalletError.UnknownError.code)
     }
-    return Result.success(result)
 }

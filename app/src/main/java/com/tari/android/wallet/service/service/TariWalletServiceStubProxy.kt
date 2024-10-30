@@ -28,9 +28,6 @@ class TariWalletServiceStubProxy : TariWalletService.Stub() {
 
     override fun getBalanceInfo(error: WalletError): BalanceInfo? = stub?.getBalanceInfo(error)
 
-    override fun estimateTxFee(amount: MicroTari, error: WalletError, feePerGram: MicroTari?): MicroTari? =
-        stub?.estimateTxFee(amount, error, feePerGram)
-
     override fun getContacts(error: WalletError): List<TariContact>? = stub?.getContacts(error)
 
     override fun getCompletedTxs(error: WalletError): List<CompletedTx>? = stub?.getCompletedTxs(error)

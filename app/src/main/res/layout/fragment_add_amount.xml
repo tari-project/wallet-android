@@ -132,14 +132,16 @@
                 android:id="@+id/amount"
                 layout="@layout/view_input_amount" />
 
-            <androidx.appcompat.widget.LinearLayoutCompat
+            <LinearLayout
                 android:id="@+id/fee_calculating"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentBottom="true"
                 android:layout_centerHorizontal="true"
                 android:layout_marginBottom="12dp"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:visibility="gone"
+                tools:visibility="visible">
 
                 <com.tari.android.wallet.ui.component.tari.TariProgressBar
                     android:layout_width="24dp"
@@ -155,8 +157,7 @@
                     android:textColor="#A9AFC4"
                     android:textSize="@dimen/add_amount_tx_fee_text_size"
                     app:customFont="heavy" />
-
-            </androidx.appcompat.widget.LinearLayoutCompat>
+            </LinearLayout>
 
             <RelativeLayout
                 android:id="@+id/tx_fee_container_view"
@@ -175,7 +176,9 @@
                     android:layout_height="22dp"
                     android:layout_above="@+id/fee_container"
                     android:layout_centerHorizontal="true"
-                    android:orientation="horizontal">
+                    android:orientation="horizontal"
+                    android:visibility="gone"
+                    tools:visibility="visible">
 
                     <androidx.appcompat.widget.AppCompatImageView
                         android:id="@+id/network_traffic_icon"
@@ -282,6 +285,7 @@
                 android:layout_height="24dp"
                 android:layout_gravity="center_vertical"
                 android:layout_marginStart="16dp"
+                android:foreground="?attr/selectableItemBackgroundBorderless"
                 android:src="@drawable/vector_help_icon_24dp" />
         </LinearLayout>
 

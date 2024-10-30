@@ -39,8 +39,6 @@ interface TariWalletService {
 
     BalanceInfo getBalanceInfo(out WalletError error);
 
-    MicroTari estimateTxFee(in MicroTari amount, out WalletError error, in MicroTari feePerGram);
-
     List<TariContact> getContacts(out WalletError error);
 
     List<CompletedTx> getCompletedTxs(out WalletError error);

@@ -98,6 +98,7 @@ class KeyboardController {
         // setup amount validation
         amountCheckRunnable.run()
         // add first digit to the element list
+        elements.clear()
         elements.add(Pair("0", amountInputBinding.amountElement0TextView))
 
         // input start amount

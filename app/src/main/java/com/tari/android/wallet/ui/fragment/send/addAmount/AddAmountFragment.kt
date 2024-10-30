@@ -55,8 +55,8 @@ import com.tari.android.wallet.R.string.tx_detail_fee_tooltip_desc
 import com.tari.android.wallet.R.string.tx_detail_fee_tooltip_transaction_fee
 import com.tari.android.wallet.application.walletManager.WalletFileUtil
 import com.tari.android.wallet.databinding.FragmentAddAmountBinding
+import com.tari.android.wallet.extension.collectFlow
 import com.tari.android.wallet.extension.getWithError
-import com.tari.android.wallet.extension.observe
 import com.tari.android.wallet.model.BalanceInfo
 import com.tari.android.wallet.model.MicroTari
 import com.tari.android.wallet.model.TariWalletAddress
@@ -67,7 +67,6 @@ import com.tari.android.wallet.ui.dialog.modular.SimpleDialogArgs
 import com.tari.android.wallet.ui.dialog.tooltipDialog.TooltipDialogArgs
 import com.tari.android.wallet.ui.extension.gone
 import com.tari.android.wallet.ui.extension.invisible
-import com.tari.android.wallet.ui.extension.parcelable
 import com.tari.android.wallet.ui.extension.setVisible
 import com.tari.android.wallet.ui.extension.string
 import com.tari.android.wallet.ui.extension.temporarilyDisableClick
@@ -119,18 +118,25 @@ class AddAmountFragment : CommonFragment<FragmentAddAmountBinding, AddAmountView
     }
 
     private fun subscribeVM() = with(viewModel) {
-        observe(isOneSidePaymentEnabled) { ui.oneSidePaymentSwitchView.isChecked = it }
+        collectFlow(uiState) { uiState ->
+            ui.oneSidePaymentSwitchView.isChecked = uiState.isOneSidedPaymentEnabled || uiState.isOneSidedPaymentForced
+            ui.oneSidePaymentSwitchView.isEnabled = !uiState.isOneSidedPaymentForced
+            showOrHideCustomFeeDialog(uiState.feePerGrams)
+        }
 
-        observe(serviceConnected) { setupUI() }
-
-        observe(feePerGrams) { showOrHideCustomFeeDialog(it) }
+        collectFlow(effect) { effect ->
+            when (effect) {
+                is AddAmountModel.Effect.OnServiceConnected -> {
+                    setupUI(effect.uiState)
+                }
+            }
+        }
     }
 
-    private fun setupUI() {
-        val amount = arguments?.parcelable<MicroTari>(PARAMETER_AMOUNT)
-        keyboardController.setup(requireContext(), AmountCheckRunnable(), ui.numpad, ui.amount, amount?.tariValue?.toDouble() ?: Double.MIN_VALUE)
-        contactDto = arguments?.parcelable<ContactDto>(PARAMETER_CONTACT)!!
-        note = arguments?.getString(PARAMETER_NOTE).orEmpty()
+    private fun setupUI(uiState: AddAmountModel.UiState) {
+        keyboardController.setup(requireContext(), AmountCheckRunnable(), ui.numpad, ui.amount, uiState.amount)
+        contactDto = uiState.contactDto
+        note = uiState.note
         // hide tx fee
         ui.txFeeContainerView.invisible()
 
@@ -160,16 +166,22 @@ class AddAmountFragment : CommonFragment<FragmentAddAmountBinding, AddAmountView
         ui.oneSidePaymentSwitchView.setOnClickListener { viewModel.toggleOneSidePayment() }
     }
 
-    private fun showOrHideCustomFeeDialog(feePerGram: FeePerGramOptions) {
-        ui.feeCalculating.setVisible(false)
-        ui.networkTrafficText.setVisible(true)
-        ui.modifyButton.setVisible(feePerGram.networkSpeed != NetworkSpeed.Slow, View.INVISIBLE)
-        val iconId = when (feePerGram.networkSpeed) {
-            NetworkSpeed.Slow -> R.drawable.vector_network_slow
-            NetworkSpeed.Medium -> R.drawable.vector_network_medium
-            NetworkSpeed.Fast -> R.drawable.vector_network_fast
+    private fun showOrHideCustomFeeDialog(feePerGram: FeePerGramOptions?) {
+        if (feePerGram == null) {
+            ui.feeCalculating.visible()
+            ui.networkTrafficText.gone()
+            ui.modifyButton.gone()
+        } else {
+            ui.feeCalculating.gone()
+            ui.networkTrafficText.visible()
+            ui.modifyButton.setVisible(feePerGram.networkSpeed != NetworkSpeed.Slow, View.INVISIBLE)
+            val iconId = when (feePerGram.networkSpeed) {
+                NetworkSpeed.Slow -> R.drawable.vector_network_slow
+                NetworkSpeed.Medium -> R.drawable.vector_network_medium
+                NetworkSpeed.Fast -> R.drawable.vector_network_fast
+            }
+            ui.networkTrafficIcon.setImageDrawable(ContextCompat.getDrawable(requireContext(), iconId))
         }
-        ui.networkTrafficIcon.setImageDrawable(ContextCompat.getDrawable(requireContext(), iconId))
     }
 
     private fun displayAlias(alias: String) {
@@ -274,8 +286,9 @@ class AddAmountFragment : CommonFragment<FragmentAddAmountBinding, AddAmountView
     private inner class AmountCheckRunnable : Runnable {
 
         override fun run() {
+            // TODO error handling should be in the view model
             val error = WalletError()
-            viewModel.calculateFee(keyboardController.currentAmount, error)
+            viewModel.calculateFee(keyboardController.currentAmount)
             if (error != WalletError.NoError) {
                 showErrorState(error)
                 return
