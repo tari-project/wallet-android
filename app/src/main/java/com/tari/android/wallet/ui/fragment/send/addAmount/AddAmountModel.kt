@@ -7,10 +7,13 @@ object AddAmountModel {
         val isOneSidedPaymentEnabled: Boolean,
         val isOneSidedPaymentForced: Boolean = false,
         val feePerGrams: FeePerGramOptions? = null,
-        val serviceConnected: Boolean = false,
 
         val amount: Double,
         val contactDto: ContactDto,
         val note: String,
     )
+
+    sealed class Effect {
+        data class OnServiceConnected(val uiState: UiState) : Effect()
+    }
 }

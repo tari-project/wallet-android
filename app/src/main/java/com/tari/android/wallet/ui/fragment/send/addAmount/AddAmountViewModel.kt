@@ -2,8 +2,11 @@ package com.tari.android.wallet.ui.fragment.send.addAmount
 
 import androidx.lifecycle.SavedStateHandle
 import com.tari.android.wallet.R
+import com.tari.android.wallet.event.EffectChannelFlow
+import com.tari.android.wallet.extension.getOrNull
 import com.tari.android.wallet.extension.getWithError
 import com.tari.android.wallet.extension.launchOnIo
+import com.tari.android.wallet.ffi.runWithDestroy
 import com.tari.android.wallet.model.MicroTari
 import com.tari.android.wallet.model.TariWalletAddress
 import com.tari.android.wallet.model.WalletError
@@ -22,8 +25,6 @@ import com.tari.android.wallet.util.Constants
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
-import java.math.BigInteger
-import kotlin.math.min
 
 class AddAmountViewModel(savedState: SavedStateHandle) : CommonViewModel() {
 
@@ -49,8 +50,11 @@ class AddAmountViewModel(savedState: SavedStateHandle) : CommonViewModel() {
     )
     val uiState = _uiState.asStateFlow()
 
+    private val _effect = EffectChannelFlow<AddAmountModel.Effect>()
+    val effect = _effect.flow
+
     init {
-        doOnWalletServiceConnected { _uiState.update { it.copy(serviceConnected = true) } }
+        doOnWalletServiceConnected { _effect.send(AddAmountModel.Effect.OnServiceConnected(uiState.value)) }
 
         loadFees()
     }
@@ -58,47 +62,10 @@ class AddAmountViewModel(savedState: SavedStateHandle) : CommonViewModel() {
     private fun loadFees() = doOnWalletServiceConnected {
         launchOnIo {
             try {
-                val stats = walletManager.walletInstance!!.getFeePerGramStats()
-                val elements = (0 until stats.getLength()).map { stats.getAt(it) }.toList()
-
-                val elementsCount = min(stats.getLength(), 3)
-                val slowOption: BigInteger
-                val mediumOption: BigInteger
-                val fastOption: BigInteger
-                val networkSpeed: NetworkSpeed
-
-                when (elementsCount) {
-                    1 -> {
-                        networkSpeed = NetworkSpeed.Slow
-                        slowOption = elements[0].getMin()
-                        mediumOption = elements[0].getAverage()
-                        fastOption = elements[0].getMax()
-                    }
-
-                    2 -> {
-                        networkSpeed = NetworkSpeed.Medium
-                        slowOption = elements[1].getAverage()
-                        mediumOption = elements[0].getMin()
-                        fastOption = elements[0].getMax()
-                    }
-
-                    3 -> {
-                        networkSpeed = NetworkSpeed.Fast
-                        slowOption = elements[2].getAverage()
-                        mediumOption = elements[1].getAverage()
-                        fastOption = elements[0].getMax()
-                    }
-
-                    else -> throw Exception("Unexpected block count")
-                }
                 _uiState.update {
                     it.copy(
-                        feePerGrams = FeePerGramOptions(
-                            networkSpeed = networkSpeed,
-                            slow = MicroTari(slowOption),
-                            medium = MicroTari(mediumOption),
-                            fast = MicroTari(fastOption),
-                        )
+                        feePerGrams = walletManager.requireWalletInstance.getFeePerGramStats()
+                            .runWithDestroy { ffiGrams -> FeePerGramOptions(ffiGrams) },
                     )
                 }
             } catch (e: Throwable) {
@@ -131,21 +98,22 @@ class AddAmountViewModel(savedState: SavedStateHandle) : CommonViewModel() {
         showAddressDetailsDialog(walletAddress)
     }
 
-    fun calculateFee(amount: MicroTari, walletError: WalletError) {
+    fun calculateFee(amount: MicroTari) {
         try {
             val grams = uiState.value.feePerGrams
             if (grams == null) {
-                calculateDefaultFees(amount, walletError)
+                calculateDefaultFees(amount)
                 return
             }
 
-            val slowFee = walletService.getWithError(this::showFeeError) { _, wallet -> wallet.estimateTxFee(amount, walletError, grams.slow) }
-            val mediumFee =
-                walletService.getWithError(this::showFeeError) { _, wallet -> wallet.estimateTxFee(amount, walletError, grams.medium) }
-            val fastFee = walletService.getWithError(this::showFeeError) { _, wallet -> wallet.estimateTxFee(amount, walletError, grams.fast) }
+            val wallet = walletManager.requireWalletInstance
+
+            val slowFee = wallet.getWithError(this::showFeeError) { it.estimateTxFee(amount, grams.slow) }
+            val mediumFee = wallet.getWithError(this::showFeeError) { it.estimateTxFee(amount, grams.medium) }
+            val fastFee = wallet.getWithError(this::showFeeError) { it.estimateTxFee(amount, grams.fast) }
 
             if (slowFee == null || mediumFee == null || fastFee == null) {
-                calculateDefaultFees(amount, walletError)
+                calculateDefaultFees(amount)
                 return
             }
 
@@ -156,9 +124,9 @@ class AddAmountViewModel(savedState: SavedStateHandle) : CommonViewModel() {
         }
     }
 
-    private fun calculateDefaultFees(amount: MicroTari, walletError: WalletError) {
-        val calculatedFee = walletService.getWithError(this::showFeeError) { _, wallet ->
-            wallet.estimateTxFee(amount, walletError, Constants.Wallet.DEFAULT_FEE_PER_GRAM)
+    private fun calculateDefaultFees(amount: MicroTari) {
+        val calculatedFee = walletManager.requireWalletInstance.getOrNull { wallet ->
+            wallet.estimateTxFee(amount, Constants.Wallet.DEFAULT_FEE_PER_GRAM)
         } ?: return
         selectedFeeData = FeeData(Constants.Wallet.DEFAULT_FEE_PER_GRAM, calculatedFee)
     }

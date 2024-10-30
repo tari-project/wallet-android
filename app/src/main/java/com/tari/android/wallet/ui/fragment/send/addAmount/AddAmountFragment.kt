@@ -122,8 +122,13 @@ class AddAmountFragment : CommonFragment<FragmentAddAmountBinding, AddAmountView
             ui.oneSidePaymentSwitchView.isChecked = uiState.isOneSidedPaymentEnabled || uiState.isOneSidedPaymentForced
             ui.oneSidePaymentSwitchView.isEnabled = !uiState.isOneSidedPaymentForced
             showOrHideCustomFeeDialog(uiState.feePerGrams)
-            if (uiState.serviceConnected) {
-                setupUI(uiState)
+        }
+
+        collectFlow(effect) { effect ->
+            when (effect) {
+                is AddAmountModel.Effect.OnServiceConnected -> {
+                    setupUI(effect.uiState)
+                }
             }
         }
     }
@@ -281,8 +286,9 @@ class AddAmountFragment : CommonFragment<FragmentAddAmountBinding, AddAmountView
     private inner class AmountCheckRunnable : Runnable {
 
         override fun run() {
+            // TODO error handling should be in the view model
             val error = WalletError()
-            viewModel.calculateFee(keyboardController.currentAmount, error)
+            viewModel.calculateFee(keyboardController.currentAmount)
             if (error != WalletError.NoError) {
                 showErrorState(error)
                 return

@@ -52,13 +52,6 @@ class TariWalletServiceStubImpl(
 
     override fun getBalanceInfo(error: WalletError): BalanceInfo? = runMapping(error) { wallet.getBalance() }
 
-    override fun estimateTxFee(amount: MicroTari, error: WalletError, feePerGram: MicroTari?): MicroTari? = runMapping(error) {
-        val defaultKernelCount = BigInteger("1")
-        val defaultOutputCount = BigInteger("2")
-        val gram = feePerGram?.value ?: Constants.Wallet.DEFAULT_FEE_PER_GRAM.value
-        MicroTari(wallet.estimateTxFee(amount.value, gram, defaultKernelCount, defaultOutputCount))
-    }
-
     /**
      * Get all contacts.
      */

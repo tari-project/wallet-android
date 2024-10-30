@@ -38,6 +38,7 @@ import com.tari.android.wallet.data.sharedPrefs.network.TariNetwork
 import com.tari.android.wallet.model.BalanceInfo
 import com.tari.android.wallet.model.CancelledTx
 import com.tari.android.wallet.model.CompletedTx
+import com.tari.android.wallet.model.MicroTari
 import com.tari.android.wallet.model.PendingInboundTx
 import com.tari.android.wallet.model.PendingOutboundTx
 import com.tari.android.wallet.model.PublicKey
@@ -47,6 +48,7 @@ import com.tari.android.wallet.model.TariVector
 import com.tari.android.wallet.model.TariWalletAddress
 import com.tari.android.wallet.model.Tx
 import com.tari.android.wallet.recovery.WalletRestorationState
+import com.tari.android.wallet.util.Constants
 import java.math.BigInteger
 
 /**
@@ -271,8 +273,21 @@ class FFIWallet(
 
     fun cancelPendingTx(id: BigInteger): Boolean = runWithError { jniCancelPendingTx(id.toString(), it) }
 
-    fun estimateTxFee(amount: BigInteger, gramFee: BigInteger, kernelCount: BigInteger, outputCount: BigInteger): BigInteger = runWithError {
-        BigInteger(1, jniEstimateTxFee(amount.toString(), gramFee.toString(), kernelCount.toString(), outputCount.toString(), it))
+    fun estimateTxFee(amount: MicroTari, feePerGram: MicroTari?): MicroTari = runWithError { error ->
+        val defaultKernelCount = BigInteger("1")
+        val defaultOutputCount = BigInteger("2")
+        val gram = feePerGram?.value ?: Constants.Wallet.DEFAULT_FEE_PER_GRAM.value
+        MicroTari(
+            BigInteger(
+                1, jniEstimateTxFee(
+                    amount = amount.value.toString(),
+                    gramFee = gram.toString(),
+                    kernelCount = defaultKernelCount.toString(),
+                    outputCount = defaultOutputCount.toString(),
+                    libError = error,
+                )
+            )
+        )
     }
 
     fun sendTx(
