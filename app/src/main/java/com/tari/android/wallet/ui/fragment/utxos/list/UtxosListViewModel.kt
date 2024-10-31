@@ -4,8 +4,7 @@ import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.baseNodes.BaseNodesManager
-import com.tari.android.wallet.event.Event
-import com.tari.android.wallet.event.EventBus
+import com.tari.android.wallet.application.walletManager.WalletManager
 import com.tari.android.wallet.extension.getWithError
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.dialog.modular.DialogArgs
@@ -124,7 +123,7 @@ class UtxosListViewModel : CommonViewModel() {
                 wallet.joinUtxos(selectedUtxos, error)
                 hideDialog()
                 loadUtxosFromFFI()
-                EventBus.post(Event.Transaction.Updated)
+                walletManager.sendWalletEvent(WalletManager.WalletEvent.Updated)
                 showSuccessJoinDialog()
             }
         }
@@ -149,7 +148,7 @@ class UtxosListViewModel : CommonViewModel() {
                         wallet.splitUtxos(selectedUtxos, splitModule.count, error)
                         hideDialog()
                         loadUtxosFromFFI()
-                        EventBus.post(Event.Transaction.Updated)
+                        walletManager.sendWalletEvent(WalletManager.WalletEvent.Updated)
                         showSuccessSplitDialog()
                     }
                 }

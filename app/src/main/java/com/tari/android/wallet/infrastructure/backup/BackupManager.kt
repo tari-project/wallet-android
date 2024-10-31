@@ -37,19 +37,18 @@ import android.content.Intent
 import androidx.fragment.app.Fragment
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.R
+import com.tari.android.wallet.application.AppStateHandler
 import com.tari.android.wallet.application.walletManager.WalletManager
 import com.tari.android.wallet.application.walletManager.WalletManager.WalletEvent
 import com.tari.android.wallet.data.sharedPrefs.backup.BackupPrefRepository
 import com.tari.android.wallet.data.sharedPrefs.delegates.SerializableTime
 import com.tari.android.wallet.di.ApplicationScope
-import com.tari.android.wallet.event.Event
-import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.infrastructure.backup.dropbox.DropboxBackupStorage
 import com.tari.android.wallet.infrastructure.backup.googleDrive.GoogleDriveBackupStorage
 import com.tari.android.wallet.infrastructure.backup.local.LocalBackupStorage
 import com.tari.android.wallet.notification.NotificationHelper
-import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupOptionDto
 import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupOption
+import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupOptionDto
 import io.reactivex.subjects.BehaviorSubject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -70,6 +69,8 @@ class BackupManager @Inject constructor(
     private val dropboxBackupStorage: DropboxBackupStorage,
     private val notificationHelper: NotificationHelper,
     private val walletManager: WalletManager,
+    private val appStateHandler: AppStateHandler,
+    private val backupStateHandler: BackupStateHandler,
     @ApplicationScope private val applicationScope: CoroutineScope,
 ) {
 
@@ -86,11 +87,8 @@ class BackupManager @Inject constructor(
         .subscribe()
 
     init {
-        val backupsState = BackupsState(backupSettingsRepository.getOptionList.associate { Pair(it.type, getBackupStateByOption(it)) })
-        EventBus.backupState.post(backupsState)
-
-        EventBus.subscribe<Event.App.AppBackgrounded>(this) { trigger.onNext(Unit) }
-        EventBus.subscribe<Event.App.AppForegrounded>(this) { trigger.onNext(Unit) }
+        val backupsState = BackupMapState(backupSettingsRepository.getOptionList.associate { Pair(it.type, getBackupStateByOption(it)) })
+        backupStateHandler.updateBackupState(backupsState)
 
         applicationScope.launch {
             walletManager.walletEvent.collect { event ->
@@ -108,6 +106,17 @@ class BackupManager @Inject constructor(
                     is WalletEvent.Tx.TxCancelled -> trigger.onNext(Unit)
 
                     is WalletEvent.OnWalletRemove -> turnOffAll()
+
+                    else -> Unit
+                }
+            }
+        }
+
+        applicationScope.launch {
+            appStateHandler.appEvent.collect { event ->
+                when (event) {
+                    is AppStateHandler.AppEvent.AppBackgrounded,
+                    is AppStateHandler.AppEvent.AppForegrounded -> trigger.onNext(Unit)
                 }
             }
         }
@@ -132,15 +141,14 @@ class BackupManager @Inject constructor(
             return
         }
 
-        val backupsState = EventBus.backupState.publishSubject.value!!.copy()
-        if (backupsState.backupsStates[optionType] is BackupState.BackupInProgress) {
+        val backupsState = backupStateHandler.backupState.value.copy()
+        if (backupsState.states[optionType] is BackupState.BackupInProgress) {
             logger.d("Backup is in progress. Exit.")
             return
         }
 
         fun updateState(state: BackupState) {
-            val newState = backupsState.copy(backupsStates = backupsState.backupsStates.toMutableMap().also { it[optionType] = state })
-            EventBus.backupState.post(newState)
+            backupStateHandler.updateBackupState(backupsState.copy(states = backupsState.states.toMutableMap().also { it[optionType] = state }))
         }
 
         logger.i("Backup started")
@@ -174,12 +182,11 @@ class BackupManager @Inject constructor(
     }
 
     fun turnOff(optionType: BackupOption) = with(backupMutex) {
-        val backupsState = EventBus.backupState.publishSubject.value!!.copy()
+        val backupsState = backupStateHandler.backupState.value.copy()
         backupSettingsRepository.updateOption(BackupOptionDto(optionType))
         backupSettingsRepository.backupPassword = null
-        val newState =
-            backupsState.copy(backupsStates = backupsState.backupsStates.toMutableMap().also { it[optionType] = BackupState.BackupDisabled })
-        EventBus.backupState.post(newState)
+        val newState = backupsState.copy(states = backupsState.states.toMutableMap().also { it[optionType] = BackupState.BackupDisabled })
+        backupStateHandler.updateBackupState(newState)
         val backupStorage = getStorageByOption(optionType)
         applicationScope.launch { backupStorage.signOut() }
     }

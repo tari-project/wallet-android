@@ -85,7 +85,7 @@ object DebugConfig {
     private val _useYatSandbox = valueIfDebug(false)
     val yatEnvironment = if (_useYatSandbox) YatEnvironment.SANDBOX else YatEnvironment.PRODUCTION
 
-    val mockNetwork = valueIfDebug(true)
+    val mockNetwork = valueIfDebug(false)
 
     val hardcodedBaseNodes = valueIfDebug(false)
 

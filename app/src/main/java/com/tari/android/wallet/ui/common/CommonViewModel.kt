@@ -16,7 +16,6 @@ import com.tari.android.wallet.data.sharedPrefs.security.SecurityPrefRepository
 import com.tari.android.wallet.data.sharedPrefs.tariSettings.TariSettingsPrefRepository
 import com.tari.android.wallet.di.ApplicationComponent
 import com.tari.android.wallet.di.DiContainer
-import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.extension.addTo
 import com.tari.android.wallet.extension.launchOnIo
 import com.tari.android.wallet.extension.launchOnMain
@@ -137,8 +136,6 @@ open class CommonViewModel : ViewModel() {
         super.onCleared()
 
         compositeDisposable.clear()
-
-        EventBus.unsubscribeAll(this)
     }
 
     fun doOnWalletServiceConnected(action: suspend (walletService: TariWalletService) -> Unit) {

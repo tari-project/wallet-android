@@ -32,8 +32,6 @@
  */
 package com.tari.android.wallet.event
 
-import com.tari.android.wallet.infrastructure.backup.BackupsState
-import com.tari.android.wallet.model.BalanceInfo
 
 /**
  * Event bus for the pub/sub model.
@@ -46,17 +44,11 @@ import com.tari.android.wallet.model.BalanceInfo
  */
 object EventBus : GeneralEventBus() {
 
-    val balanceState = BehaviorEventBus<BalanceInfo>()
-
-    val backupState = BehaviorEventBus<BackupsState>()
-
     fun unsubscribeAll(subscriber: Any) {
         EventBus.unsubscribe(subscriber)
-        backupState.unsubscribe(subscriber)
     }
 
     override fun clear() {
         super.clear()
-        backupState.clear()
     }
 }
