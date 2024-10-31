@@ -40,7 +40,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import com.bumptech.glide.Glide
 import com.tari.android.wallet.R
-import com.tari.android.wallet.application.walletManager.WalletFileUtil
+import com.tari.android.wallet.application.walletManager.WalletConfig
 import com.tari.android.wallet.databinding.FragmentTxDetailsBinding
 import com.tari.android.wallet.extension.collectNonNullFlow
 import com.tari.android.wallet.extension.observe
@@ -176,7 +176,7 @@ class TxDetailsFragment : CommonFragment<FragmentTxDetailsBinding, TxDetailsView
 
     private fun setTxPaymentData(tx: Tx) {
         val state = TxState.from(tx)
-        ui.amountTextView.text = WalletFileUtil.amountFormatter.format(tx.amount.tariValue)
+        ui.amountTextView.text = WalletConfig.amountFormatter.format(tx.amount.tariValue)
         ui.paymentStateTextView.text = when {
             tx is CancelledTx -> string(R.string.tx_detail_payment_cancelled)
             state.status == MINED_CONFIRMED || state.status == IMPORTED ->
@@ -200,7 +200,7 @@ class TxDetailsFragment : CommonFragment<FragmentTxDetailsBinding, TxDetailsView
     private fun setFeeData(fee: MicroTari) {
         ui.txFeeTextView.visible()
         ui.feeLabelTextView.visible()
-        ui.txFeeTextView.text = string(R.string.tx_details_fee_value, WalletFileUtil.amountFormatter.format(fee.tariValue))
+        ui.txFeeTextView.text = string(R.string.tx_details_fee_value, WalletConfig.amountFormatter.format(fee.tariValue))
     }
 
     private fun setTxMetaData(tx: Tx) {

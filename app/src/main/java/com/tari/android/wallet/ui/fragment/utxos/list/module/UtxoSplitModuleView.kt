@@ -6,11 +6,11 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.SeekBar
 import com.tari.android.wallet.R
+import com.tari.android.wallet.application.walletManager.WalletConfig
 import com.tari.android.wallet.databinding.DialogModuleUtxoSplitBinding
 import com.tari.android.wallet.model.MicroTari
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.component.common.CommonView
-import com.tari.android.wallet.application.walletManager.WalletFileUtil
 import java.math.BigInteger
 
 @SuppressLint("ViewConstructor")
@@ -40,11 +40,12 @@ class UtxoSplitModuleView(context: Context, val buttonModule: UtxoSplitModule) :
         buttonModule.count = newValue
         val previewValues = buttonModule.previewMaker(newValue, buttonModule.items)
         val fullAmountBigInteger = buttonModule.items.map { it.value.tariValue }.sumOf { it }
-        val amountText = WalletFileUtil.amountFormatter.format(fullAmountBigInteger)!!
+        val amountText = WalletConfig.amountFormatter.format(fullAmountBigInteger)!!
         val intoAmount = context.getString(R.string.utxos_split_preview_into) + " " + newValue + " x"
-        val feeAmount = WalletFileUtil.amountFormatter.format(previewValues.feeValue.tariValue)!!
+        val feeAmount = WalletConfig.amountFormatter.format(previewValues.feeValue.tariValue)!!
         val mostBestAmount = MicroTari(BigInteger.valueOf(previewValues.vector.longs[0]))
-        val coinsValues = WalletFileUtil.amountFormatter.format(mostBestAmount.tariValue)!! + " " + context.getString(R.string.utxos_split_preview_coins)
+        val coinsValues =
+            WalletConfig.amountFormatter.format(mostBestAmount.tariValue)!! + " " + context.getString(R.string.utxos_split_preview_coins)
         ui.fullAmount.text = amountText
         ui.intoAmount.text = intoAmount
         ui.feeAmount.text = feeAmount

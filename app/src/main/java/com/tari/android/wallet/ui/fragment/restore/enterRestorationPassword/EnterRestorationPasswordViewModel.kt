@@ -2,9 +2,9 @@ package com.tari.android.wallet.ui.fragment.restore.enterRestorationPassword
 
 import androidx.lifecycle.LiveData
 import com.tari.android.wallet.R
+import com.tari.android.wallet.application.walletManager.WalletConfig
 import com.tari.android.wallet.application.walletManager.doOnWalletFailed
 import com.tari.android.wallet.application.walletManager.doOnWalletRunning
-import com.tari.android.wallet.data.WalletConfig
 import com.tari.android.wallet.data.sharedPrefs.backup.BackupPrefRepository
 import com.tari.android.wallet.extension.launchOnIo
 import com.tari.android.wallet.extension.launchOnMain
@@ -15,7 +15,6 @@ import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.common.SingleLiveEvent
 import com.tari.android.wallet.ui.dialog.modular.SimpleDialogArgs
 import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
-import com.tari.android.wallet.application.walletManager.WalletFileUtil
 import java.security.GeneralSecurityException
 import javax.inject.Inject
 
@@ -38,7 +37,7 @@ class EnterRestorationPasswordViewModel : CommonViewModel() {
 
         launchOnIo {
             walletManager.doOnWalletRunning {
-                if (WalletFileUtil.walletExists(walletConfig)) {
+                if (walletConfig.walletExists()) {
                     val dto = backupSettingsRepository.getOptionDto(backupManager.currentOption!!)!!.copy(isEnable = true)
                     backupSettingsRepository.updateOption(dto)
                     backupManager.backupNow()

@@ -20,7 +20,7 @@ inline fun LifecycleOwner.launchAndRepeatOnLifecycle(
     crossinline block: suspend CoroutineScope.() -> Unit,
 ) = lifecycleScope.launch { repeatOnLifecycle(state) { block() } }
 
-fun <T> AppCompatActivity.collectFlow(stateFlow: Flow<T>, action: (T) -> Unit): Job {
+fun <T> AppCompatActivity.collectFlow(stateFlow: Flow<T>, action: suspend (T) -> Unit): Job {
     return launchAndRepeatOnLifecycle(Lifecycle.State.STARTED) {
         stateFlow.collect { state ->
             action(state)
@@ -28,7 +28,7 @@ fun <T> AppCompatActivity.collectFlow(stateFlow: Flow<T>, action: (T) -> Unit): 
     }
 }
 
-fun <T> Fragment.collectFlow(stateFlow: Flow<T>, action: (T) -> Unit): Job {
+fun <T> Fragment.collectFlow(stateFlow: Flow<T>, action: suspend (T) -> Unit): Job {
     return viewLifecycleOwner.launchAndRepeatOnLifecycle(Lifecycle.State.STARTED) {
         stateFlow.collect { state ->
             action(state)
@@ -36,7 +36,7 @@ fun <T> Fragment.collectFlow(stateFlow: Flow<T>, action: (T) -> Unit): Job {
     }
 }
 
-fun <T> Fragment.collectNonNullFlow(stateFlow: Flow<T?>, action: (T) -> Unit): Job {
+fun <T> Fragment.collectNonNullFlow(stateFlow: Flow<T?>, action: suspend (T) -> Unit): Job {
     return viewLifecycleOwner.launchAndRepeatOnLifecycle(Lifecycle.State.STARTED) {
         stateFlow.filter { it != null }.collect { state ->
             action(state!!)
@@ -44,7 +44,7 @@ fun <T> Fragment.collectNonNullFlow(stateFlow: Flow<T?>, action: (T) -> Unit): J
     }
 }
 
-fun <T> ViewModel.collectFlow(stateFlow: Flow<T>, action: (T) -> Unit): Job {
+fun <T> ViewModel.collectFlow(stateFlow: Flow<T>, action: suspend (T) -> Unit): Job {
     return viewModelScope.launch {
         stateFlow.collect { state ->
             action(state)
@@ -52,7 +52,7 @@ fun <T> ViewModel.collectFlow(stateFlow: Flow<T>, action: (T) -> Unit): Job {
     }
 }
 
-fun <T> ViewModel.collectNonNullFlow(stateFlow: Flow<T?>, action: (T) -> Unit): Job {
+fun <T> ViewModel.collectNonNullFlow(stateFlow: Flow<T?>, action: suspend (T) -> Unit): Job {
     return viewModelScope.launch {
         stateFlow.filter { it != null }.collect { state ->
             action(state!!)

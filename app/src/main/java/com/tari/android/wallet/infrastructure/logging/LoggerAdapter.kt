@@ -6,7 +6,7 @@ import com.orhanobut.logger.Logger
 import com.orhanobut.logger.PrettyFormatStrategy
 import com.tari.android.wallet.BuildConfig
 import com.tari.android.wallet.application.walletManager.WalletManager
-import com.tari.android.wallet.data.WalletConfig
+import com.tari.android.wallet.application.walletManager.WalletConfig
 import com.tari.android.wallet.data.sharedPrefs.sentry.SentryPrefRepository
 import javax.inject.Inject
 import javax.inject.Singleton

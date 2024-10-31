@@ -1,13 +1,12 @@
 package com.tari.android.wallet.ui.fragment.settings.logs.logFiles
 
 import androidx.lifecycle.MutableLiveData
-import com.tari.android.wallet.data.WalletConfig
+import com.tari.android.wallet.application.walletManager.WalletConfig
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.common.SingleLiveEvent
 import com.tari.android.wallet.ui.common.recyclerView.CommonViewHolderItem
 import com.tari.android.wallet.ui.common.recyclerView.items.DividerViewHolderItem
 import com.tari.android.wallet.ui.fragment.settings.logs.logFiles.adapter.LogFileViewHolderItem
-import com.tari.android.wallet.application.walletManager.WalletFileUtil
 import java.io.File
 import java.text.DecimalFormat
 import javax.inject.Inject
@@ -26,7 +25,7 @@ class LogFilesViewModel : CommonViewModel() {
     init {
         component.inject(this)
 
-        val files = WalletFileUtil.getLogFilesFromDirectory(walletConfig.getWalletLogFilesDirPath()).toMutableList()
+        val files = walletConfig.getLogFiles()
         val wholeList = files.map { listOf(LogFileViewHolderItem(getFileName(it), it) { goNext.postValue(it.file) }, DividerViewHolderItem()) }
             .flatten()
             .toMutableList()

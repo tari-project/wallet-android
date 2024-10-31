@@ -46,7 +46,7 @@ import com.google.api.client.googleapis.extensions.android.gms.auth.UserRecovera
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.BuildConfig
 import com.tari.android.wallet.R
-import com.tari.android.wallet.data.WalletConfig
+import com.tari.android.wallet.application.walletManager.WalletConfig
 import com.tari.android.wallet.data.sharedPrefs.delegates.SerializableTime
 import com.tari.android.wallet.infrastructure.backup.BackupException
 import com.tari.android.wallet.infrastructure.backup.BackupFileProcessor

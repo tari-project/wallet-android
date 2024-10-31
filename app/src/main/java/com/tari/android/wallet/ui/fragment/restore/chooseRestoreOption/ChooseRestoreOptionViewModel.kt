@@ -4,10 +4,9 @@ import android.content.Intent
 import androidx.fragment.app.Fragment
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.deeplinks.DeepLink
-import com.tari.android.wallet.application.walletManager.WalletFileUtil
+import com.tari.android.wallet.application.walletManager.WalletConfig
 import com.tari.android.wallet.application.walletManager.doOnWalletFailed
 import com.tari.android.wallet.application.walletManager.doOnWalletRunning
-import com.tari.android.wallet.data.WalletConfig
 import com.tari.android.wallet.data.sharedPrefs.backup.BackupPrefRepository
 import com.tari.android.wallet.extension.launchOnIo
 import com.tari.android.wallet.extension.launchOnMain
@@ -62,7 +61,7 @@ class ChooseRestoreOptionViewModel : CommonViewModel() {
         launchOnIo {
             walletManager.doOnWalletRunning {
                 uiState.value.selectedOption?.let { selectedOption ->
-                    if (WalletFileUtil.walletExists(walletConfig)) {
+                    if (walletConfig.walletExists()) {
                         backupPrefRepository.restoredTxs?.takeIf { it.utxos.isNotEmpty() }?.let { restoredTxs ->
                             val tariWalletAddress = TariWalletAddress.fromBase58(restoredTxs.sourceBase58)
                             val message = resourceManager.getString(R.string.backup_restored_tx)

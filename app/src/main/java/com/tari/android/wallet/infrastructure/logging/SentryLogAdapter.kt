@@ -2,9 +2,8 @@ package com.tari.android.wallet.infrastructure.logging
 
 import com.orhanobut.logger.LogAdapter
 import com.orhanobut.logger.Logger
-import com.tari.android.wallet.data.WalletConfig
+import com.tari.android.wallet.application.walletManager.WalletConfig
 import com.tari.android.wallet.data.sharedPrefs.sentry.SentryPrefRepository
-import com.tari.android.wallet.application.walletManager.WalletFileUtil
 import com.welie.blessed.BluetoothPeripheralManager
 import io.sentry.Attachment
 import io.sentry.Breadcrumb
@@ -17,8 +16,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 
-class SentryLogAdapter(val walletConfig: WalletConfig,
-                       private val sentryPrefRepository: SentryPrefRepository) : LogAdapter {
+class SentryLogAdapter(
+    val walletConfig: WalletConfig,
+    private val sentryPrefRepository: SentryPrefRepository,
+) : LogAdapter {
 
     private var localScope = CoroutineScope(Job())
 
@@ -30,7 +31,7 @@ class SentryLogAdapter(val walletConfig: WalletConfig,
         if (priority == Logger.ERROR) {
             localScope.launch(Dispatchers.IO) {
                 try {
-                    val files = WalletFileUtil.getLogFilesFromDirectory(walletConfig.getWalletLogFilesDirPath()).toMutableList()
+                    val files = walletConfig.getLogFiles()
                     val lines = files.firstOrNull()?.inputStream()?.bufferedReader()?.readLines()?.takeLast(100)?.joinToString("\n")
 
                     val breadcrumb = Breadcrumb(message).apply {

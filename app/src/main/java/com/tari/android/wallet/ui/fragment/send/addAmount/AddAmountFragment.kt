@@ -53,7 +53,7 @@ import com.tari.android.wallet.R.string.error_fee_more_than_amount_description
 import com.tari.android.wallet.R.string.error_fee_more_than_amount_title
 import com.tari.android.wallet.R.string.tx_detail_fee_tooltip_desc
 import com.tari.android.wallet.R.string.tx_detail_fee_tooltip_transaction_fee
-import com.tari.android.wallet.application.walletManager.WalletFileUtil
+import com.tari.android.wallet.application.walletManager.WalletConfig
 import com.tari.android.wallet.databinding.FragmentAddAmountBinding
 import com.tari.android.wallet.extension.collectFlow
 import com.tari.android.wallet.extension.getWithError
@@ -310,7 +310,7 @@ class AddAmountFragment : CommonFragment<FragmentAddAmountBinding, AddAmountView
             notEnoughBalanceDescriptionTextView.text = string(add_amount_wallet_balance)
             availableBalanceContainerView.visible()
 
-            txFeeTextView.text = "+${WalletFileUtil.amountFormatter.format(fee.tariValue)}"
+            txFeeTextView.text = "+${WalletConfig.amountFormatter.format(fee.tariValue)}"
             val showsTxFee: Boolean = if (keyboardController.currentAmount.value.toInt() == 0) {
                 hideContinueButton()
                 false
