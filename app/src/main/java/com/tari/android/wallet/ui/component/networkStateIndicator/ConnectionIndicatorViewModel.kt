@@ -42,7 +42,7 @@ class ConnectionIndicatorViewModel : CommonViewModel() {
     init {
         component.inject(this)
 
-        subscribeOnEventBus()
+        subscribeOnStates()
     }
 
     fun showStatesDialog(isRefreshing: Boolean = false) {
@@ -67,7 +67,7 @@ class ConnectionIndicatorViewModel : CommonViewModel() {
         }
     }
 
-    private fun subscribeOnEventBus() {
+    private fun subscribeOnStates() {
         collectFlow(networkConnectionStateHandler.networkConnectionState) { networkState ->
             _state.update { it.copy(networkState = networkState) }
             showStatesDialog(true)

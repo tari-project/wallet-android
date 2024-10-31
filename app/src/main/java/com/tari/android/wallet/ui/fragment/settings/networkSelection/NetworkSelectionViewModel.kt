@@ -7,7 +7,6 @@ import com.tari.android.wallet.application.walletManager.WalletConfig
 import com.tari.android.wallet.application.walletManager.doOnWalletNotReady
 import com.tari.android.wallet.data.sharedPrefs.network.TariNetwork
 import com.tari.android.wallet.di.DiContainer
-import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.extension.launchOnIo
 import com.tari.android.wallet.service.service.WalletServiceLauncher
 import com.tari.android.wallet.ui.common.CommonViewModel
@@ -67,7 +66,6 @@ class NetworkSelectionViewModel : CommonViewModel() {
 
         launchOnIo {
             walletManager.doOnWalletNotReady {
-                EventBus.clear()
                 DiContainer.reInitContainer()
                 _recreate.postValue(Unit)
             }
