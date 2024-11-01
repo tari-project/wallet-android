@@ -64,11 +64,12 @@ import com.tari.android.wallet.R.string.user_agreement_url
 import com.tari.android.wallet.application.YatAdapter
 import com.tari.android.wallet.data.sharedPrefs.CorePrefRepository
 import com.tari.android.wallet.data.sharedPrefs.backup.BackupPrefRepository
-import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.extension.addTo
+import com.tari.android.wallet.extension.collectFlow
 import com.tari.android.wallet.infrastructure.backup.BackupManager
+import com.tari.android.wallet.infrastructure.backup.BackupMapState
 import com.tari.android.wallet.infrastructure.backup.BackupState
-import com.tari.android.wallet.infrastructure.backup.BackupsState
+import com.tari.android.wallet.infrastructure.backup.BackupStateHandler
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.common.SingleLiveEvent
 import com.tari.android.wallet.ui.common.recyclerView.CommonViewHolderItem
@@ -110,6 +111,9 @@ class AllSettingsViewModel : CommonViewModel() {
     lateinit var backupManager: BackupManager
 
     @Inject
+    lateinit var backupStateHandler: BackupStateHandler
+
+    @Inject
     lateinit var settingsRepository: CorePrefRepository
 
     init {
@@ -123,7 +127,7 @@ class AllSettingsViewModel : CommonViewModel() {
     val allSettingsOptions = _allSettingsOptions.asStateFlow()
 
     init {
-        EventBus.backupState.subscribe(this) { backupState -> onBackupStateChanged(backupState) }
+        collectFlow(backupStateHandler.backupState) { onBackupStateChanged(it) }
 
         settingsRepository.updateNotifier.subscribe { generateOptions() }.addTo(compositeDisposable)
     }
@@ -262,7 +266,7 @@ class AllSettingsViewModel : CommonViewModel() {
             })
     }
 
-    private fun onBackupStateChanged(backupState: BackupsState?) {
+    private fun onBackupStateChanged(backupState: BackupMapState?) {
         if (backupState == null) {
             backupOption.backupState = PresentationBackupState(Warning)
         } else {

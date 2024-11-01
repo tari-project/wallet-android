@@ -7,8 +7,6 @@ import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.walletManager.WalletManager.WalletEvent
-import com.tari.android.wallet.event.Event
-import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.extension.collectFlow
 import com.tari.android.wallet.extension.debounce
 import com.tari.android.wallet.extension.getWithError
@@ -77,8 +75,6 @@ class TransactionRepository @Inject constructor() : CommonViewModel() {
     }
 
     private fun onServiceConnected() {
-        subscribeToEventBus()
-
         collectFlow(contactsRepository.contactList) { _listUpdateTrigger.postValue(Unit) }
 
         collectFlow(walletManager.walletEvent) { event ->
@@ -93,6 +89,11 @@ class TransactionRepository @Inject constructor() : CommonViewModel() {
                 is WalletEvent.Tx.TxFauxMinedUnconfirmed -> onTxFauxMinedUnconfirmed(event.tx)
                 is WalletEvent.Tx.TxFauxConfirmed -> onFauxTxMined(event.tx)
                 is WalletEvent.Tx.TxCancelled -> onTxCancelled(event.tx)
+
+                is WalletEvent.Updated -> refreshAllData()
+
+                is WalletEvent.TxSend.TxSendSuccessful -> onTxSendSuccessful(event.txId)
+
                 else -> Unit
             }
         }
@@ -106,11 +107,6 @@ class TransactionRepository @Inject constructor() : CommonViewModel() {
 
     private fun fetchRequiredConfirmationCount() {
         _requiredConfirmationCount.postValue(walletService.getWithError { error, service -> service.getRequiredConfirmationCount(error) })
-    }
-
-    private fun subscribeToEventBus() {
-        EventBus.subscribe<Event.Transaction.Updated>(this) { refreshAllData() }
-        EventBus.subscribe<Event.Transaction.TxSendSuccessful>(this) { onTxSendSuccessful(it.txId) }
     }
 
     fun refreshAllData() {

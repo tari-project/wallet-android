@@ -39,7 +39,9 @@ import android.os.IBinder
 import android.os.Looper
 import androidx.lifecycle.ProcessLifecycleOwner
 import com.orhanobut.logger.Logger
+import com.tari.android.wallet.application.AppStateHandler
 import com.tari.android.wallet.application.TariWalletApplication
+import com.tari.android.wallet.application.walletManager.WalletConfig
 import com.tari.android.wallet.application.walletManager.WalletManager
 import com.tari.android.wallet.application.walletManager.doOnWalletStarted
 import com.tari.android.wallet.di.DiContainer
@@ -85,13 +87,17 @@ class WalletService : Service() {
     lateinit var walletManager: WalletManager
 
     @Inject
+    lateinit var walletConfig: WalletConfig
+
+    @Inject
     lateinit var backupManager: BackupManager
+
+    @Inject
+    lateinit var appStateHandler: AppStateHandler
 
     private var lifecycleObserver: ServiceLifecycleCallbacks? = null
     private val stubProxy = TariWalletServiceStubProxy()
 
-    @Suppress("unused")
-    private val logFilesManager = LogFilesManager()
     private lateinit var wallet: FFIWallet
 
     private val job = SupervisorJob()
@@ -113,6 +119,15 @@ class WalletService : Service() {
     override fun onCreate() {
         super.onCreate()
         DiContainer.appComponent.inject(this)
+
+        serviceScope.launch {
+            appStateHandler.appEvent.collect { event ->
+                when (event) {
+                    is AppStateHandler.AppEvent.AppBackgrounded,
+                    is AppStateHandler.AppEvent.AppForegrounded -> LogFilesManager(walletConfig).manage()
+                }
+            }
+        }
     }
 
     /**

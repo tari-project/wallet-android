@@ -48,7 +48,6 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.TextView
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.lifecycleScope
 import com.tari.android.wallet.R.string.back_up_wallet_backing_up_error_desc
 import com.tari.android.wallet.R.string.back_up_wallet_backing_up_error_title
 import com.tari.android.wallet.R.string.back_up_wallet_backing_up_unknown_error
@@ -57,14 +56,14 @@ import com.tari.android.wallet.R.string.change_password_page_description_general
 import com.tari.android.wallet.R.string.change_password_page_description_highlight_part
 import com.tari.android.wallet.R.string.error_no_connection_title
 import com.tari.android.wallet.databinding.FragmentChangeSecurePasswordBinding
-import com.tari.android.wallet.event.EventBus
+import com.tari.android.wallet.extension.collectFlow
 import com.tari.android.wallet.infrastructure.backup.BackupState
 import com.tari.android.wallet.infrastructure.backup.BackupState.BackupFailed
 import com.tari.android.wallet.infrastructure.backup.BackupState.BackupUpToDate
 import com.tari.android.wallet.ui.common.CommonFragment
 import com.tari.android.wallet.ui.common.domain.PaletteManager
-import com.tari.android.wallet.ui.dialog.modular.SimpleDialogArgs
 import com.tari.android.wallet.ui.dialog.modular.ModularDialog
+import com.tari.android.wallet.ui.dialog.modular.SimpleDialogArgs
 import com.tari.android.wallet.ui.extension.animateClick
 import com.tari.android.wallet.ui.extension.gone
 import com.tari.android.wallet.ui.extension.hideKeyboard
@@ -74,8 +73,7 @@ import com.tari.android.wallet.ui.extension.scrollToTop
 import com.tari.android.wallet.ui.extension.showKeyboard
 import com.tari.android.wallet.ui.extension.string
 import com.tari.android.wallet.ui.extension.visible
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.Job
 import java.net.UnknownHostException
 
 
@@ -88,6 +86,8 @@ class ChangeSecurePasswordFragment : CommonFragment<FragmentChangeSecurePassword
 
     private val confirmInput
         get() = ui.confirmPasswordEditText.ui.editText
+
+    private var collectStateJob: Job? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
         FragmentChangeSecurePasswordBinding.inflate(inflater, container, false).also { ui = it }.root
@@ -104,7 +104,7 @@ class ChangeSecurePasswordFragment : CommonFragment<FragmentChangeSecurePassword
     }
 
     override fun onDestroyView() {
-        EventBus.backupState.unsubscribe(this)
+        collectStateJob?.cancel()
         super.onDestroyView()
     }
 
@@ -259,17 +259,9 @@ class ChangeSecurePasswordFragment : CommonFragment<FragmentChangeSecurePassword
 
     private fun performBackupAndUpdatePassword() {
         // start listening to wallet events
-        subscribeToBackupState()
+        collectStateJob = collectFlow(viewModel.backupState) { onBackupStateChanged(it.backupsState) }
         viewModel.backupSharedPrefsRepository.backupPassword = passwordInput.text!!.toString()
         viewModel.backupManager.backupNow()
-    }
-
-    private fun subscribeToBackupState() {
-        EventBus.backupState.subscribe(this) { backupState ->
-            lifecycleScope.launch(Dispatchers.Main) {
-                onBackupStateChanged(backupState.backupsState)
-            }
-        }
     }
 
     private fun onBackupStateChanged(backupState: BackupState?) {
@@ -278,12 +270,14 @@ class ChangeSecurePasswordFragment : CommonFragment<FragmentChangeSecurePassword
                 allowExitAndPasswordEditing()
                 viewModel.tariNavigator.onPasswordChanged()
             }
+
             is BackupFailed -> { // backup failed
                 showBackupErrorDialog(deductBackupErrorMessage(backupState.backupException)) {
                     allowExitAndPasswordEditing()
                     setSecurePasswordCtaIdleState()
                 }
             }
+
             else -> Unit
         }
     }

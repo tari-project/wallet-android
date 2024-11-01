@@ -9,7 +9,6 @@ import com.tari.android.wallet.R.string.finalize_send_tx_sending_step_2_desc_lin
 import com.tari.android.wallet.R.string.finalize_send_tx_sending_step_3_desc_line_1
 import com.tari.android.wallet.R.string.finalize_send_tx_sending_step_3_desc_line_2
 import com.tari.android.wallet.application.walletManager.WalletManager
-import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.extension.collectFlow
 import com.tari.android.wallet.extension.launchOnIo
 import com.tari.android.wallet.extension.launchOnMain
@@ -81,14 +80,16 @@ class FinalizeSendTxViewModel : CommonViewModel() {
     }
 
     fun trySendTxSuccess(isYat: Boolean) {
-        sentTxId.value?.let {
-            tariNavigator.navigate(Navigation.SendTxNavigation.OnSendTxSuccess(isYat = isYat, txId = it))
+        sentTxId.value?.let { txId ->
+            walletManager.sendWalletEvent(WalletManager.WalletEvent.TxSend.TxSendSuccessful(txId))
+            tariNavigator.navigate(Navigation.SendTxNavigation.OnSendTxSuccess(isYat))
         }
     }
 
     fun trySendTxFailure(isYat: Boolean) {
-        txFailureReason.value?.let {
-            tariNavigator.navigate(Navigation.SendTxNavigation.OnSendTxFailure(isYat = isYat, txFailureReason = it))
+        txFailureReason.value?.let { txFailureReason ->
+            walletManager.sendWalletEvent(WalletManager.WalletEvent.TxSend.TxSendFailed(txFailureReason))
+            tariNavigator.navigate(Navigation.SendTxNavigation.OnSendTxFailure(isYat))
         }
     }
 
@@ -228,7 +229,6 @@ class FinalizeSendTxViewModel : CommonViewModel() {
         }
 
         private fun finishSendingTx() {
-            EventBus.unsubscribe(this)
             isCompleted = true
         }
     }

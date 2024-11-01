@@ -47,7 +47,6 @@ import com.tari.android.wallet.R
 import com.tari.android.wallet.application.deeplinks.DeepLink
 import com.tari.android.wallet.application.walletManager.WalletConfig
 import com.tari.android.wallet.databinding.FragmentHomeBinding
-import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.extension.observe
 import com.tari.android.wallet.extension.observeOnLoad
 import com.tari.android.wallet.model.BalanceInfo
@@ -125,11 +124,6 @@ class HomeFragment : CommonFragment<FragmentHomeBinding, HomeFragmentViewModel>(
     override fun onResume() {
         super.onResume()
         viewModel.grantContactsPermission()
-    }
-
-    override fun onDestroyView() {
-        EventBus.unsubscribe(this)
-        super.onDestroyView()
     }
 
     @SuppressLint("ClickableViewAccessibility")

@@ -9,8 +9,6 @@ import com.tari.android.wallet.application.YatAdapter
 import com.tari.android.wallet.application.YatAdapter.ConnectedWallet
 import com.tari.android.wallet.application.deeplinks.DeepLink
 import com.tari.android.wallet.application.walletManager.WalletManager
-import com.tari.android.wallet.event.Event
-import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.model.MicroTari
 import com.tari.android.wallet.model.TariWalletAddress
 import com.tari.android.wallet.model.Tx
@@ -62,7 +60,6 @@ import com.tari.android.wallet.ui.fragment.send.addAmount.AddAmountFragment
 import com.tari.android.wallet.ui.fragment.send.addNote.AddNoteFragment
 import com.tari.android.wallet.ui.fragment.send.common.TransactionData
 import com.tari.android.wallet.ui.fragment.send.finalize.FinalizeSendTxFragment
-import com.tari.android.wallet.ui.fragment.send.finalize.TxFailureReason
 import com.tari.android.wallet.ui.fragment.send.requestTari.RequestTariFragment
 import com.tari.android.wallet.ui.fragment.send.transfer.TransferFragment
 import com.tari.android.wallet.ui.fragment.settings.allSettings.AllSettingsFragment
@@ -149,8 +146,8 @@ class TariNavigator @Inject constructor(
             is TxListNavigation.ToAllSettings -> toAllSettings()
             is TxListNavigation.ToTransfer -> addFragment(TransferFragment())
             is TxListNavigation.HomeTransactionHistory -> addFragment(HomeTransactionHistoryFragment())
-            is SendTxNavigation.OnSendTxFailure -> onSendTxFailure(navigation.isYat, navigation.txFailureReason)
-            is SendTxNavigation.OnSendTxSuccess -> onSendTxSuccessful(navigation.isYat, navigation.txId)
+            is SendTxNavigation.OnSendTxFailure -> navigateBackFromTxSend(navigation.isYat)
+            is SendTxNavigation.OnSendTxSuccess -> navigateBackFromTxSend(navigation.isYat)
             is TorBridgeNavigation.ToCustomBridges -> toCustomTorBridges()
             is VerifySeedPhraseNavigation.ToSeedPhraseVerificationComplete -> onSeedPhraseVerificationComplete()
             is VerifySeedPhraseNavigation.ToSeedPhraseVerification -> toSeedPhraseVerification(navigation.seedWords)
@@ -298,16 +295,6 @@ class TariNavigator @Inject constructor(
         } else {
             addFragment(FinalizeSendTxFragment.create(transactionData))
         }
-    }
-
-    private fun onSendTxFailure(isYat: Boolean, txFailureReason: TxFailureReason) {
-        EventBus.post(Event.Transaction.TxSendFailed(txFailureReason))
-        navigateBackFromTxSend(isYat)
-    }
-
-    private fun onSendTxSuccessful(isYat: Boolean, txId: TxId) {
-        EventBus.post(Event.Transaction.TxSendSuccessful(txId))
-        navigateBackFromTxSend(isYat)
     }
 
     private fun navigateBackFromTxSend(isYat: Boolean) {

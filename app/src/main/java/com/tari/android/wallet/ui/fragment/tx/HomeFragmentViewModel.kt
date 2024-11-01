@@ -18,12 +18,10 @@ import com.tari.android.wallet.application.deeplinks.DeeplinkManager
 import com.tari.android.wallet.application.securityStage.StagedWalletSecurityManager
 import com.tari.android.wallet.application.securityStage.StagedWalletSecurityManager.StagedSecurityEffect
 import com.tari.android.wallet.application.walletManager.WalletManager.WalletEvent
+import com.tari.android.wallet.data.BalanceStateHandler
 import com.tari.android.wallet.data.sharedPrefs.CorePrefRepository
 import com.tari.android.wallet.data.sharedPrefs.securityStages.WalletSecurityStage
 import com.tari.android.wallet.data.sharedPrefs.sentry.SentryPrefRepository
-import com.tari.android.wallet.event.Event
-import com.tari.android.wallet.event.EventBus
-import com.tari.android.wallet.extension.addTo
 import com.tari.android.wallet.extension.collectFlow
 import com.tari.android.wallet.extension.getWithError
 import com.tari.android.wallet.extension.launchOnIo
@@ -72,6 +70,9 @@ class HomeFragmentViewModel : CommonViewModel() {
 
     @Inject
     lateinit var deeplinkManager: DeeplinkManager
+
+    @Inject
+    lateinit var balanceStateHandler: BalanceStateHandler
 
     private val _balanceInfo = MutableLiveData<BalanceInfo>()
     val balanceInfo: LiveData<BalanceInfo> = _balanceInfo
@@ -174,8 +175,6 @@ class HomeFragmentViewModel : CommonViewModel() {
     }
 
     private fun onServiceConnected() {
-        subscribeToEventBus()
-
         collectFlow(walletManager.walletEvent) { event ->
             when (event) {
                 is WalletEvent.Tx.TxReceived,
@@ -189,9 +188,16 @@ class HomeFragmentViewModel : CommonViewModel() {
                 is WalletEvent.Tx.TxFauxConfirmed,
                 is WalletEvent.Tx.TxCancelled -> refreshBalance(false)
 
+                is WalletEvent.Updated -> refreshAllData()
+
+                is WalletEvent.TxSend.TxSendSuccessful -> refreshBalance(false)
+                is WalletEvent.TxSend.TxSendFailed -> onTxSendFailed(event.failureReason)
+
                 else -> Unit
             }
         }
+
+        collectFlow(balanceStateHandler.balanceState) { _balanceInfo.postValue(it) }
 
         refreshAllData(true)
     }
@@ -225,15 +231,6 @@ class HomeFragmentViewModel : CommonViewModel() {
             fetchBalanceInfoData()
             _refreshBalanceInfo.postValue(isRestarted)
         }
-    }
-
-    private fun subscribeToEventBus() {
-        EventBus.subscribe<Event.Transaction.Updated>(this) { refreshAllData() }
-
-        EventBus.subscribe<Event.Transaction.TxSendSuccessful>(this) { refreshBalance(false) }
-        EventBus.subscribe<Event.Transaction.TxSendFailed>(this) { onTxSendFailed(it.failureReason) }
-
-        EventBus.balanceState.publishSubject.subscribe { _balanceInfo.postValue(it) }.addTo(compositeDisposable)
     }
 
     /**

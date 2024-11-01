@@ -39,6 +39,7 @@ import com.tari.android.wallet.application.Network
 import com.tari.android.wallet.application.TariWalletApplication
 import com.tari.android.wallet.application.baseNodes.BaseNodesManager
 import com.tari.android.wallet.application.walletManager.WalletCallbackListener.Companion.MAIN_WALLET_CONTEXT_ID
+import com.tari.android.wallet.data.BalanceStateHandler
 import com.tari.android.wallet.data.sharedPrefs.CorePrefRepository
 import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodeDto
 import com.tari.android.wallet.data.sharedPrefs.network.NetworkPrefRepository
@@ -46,7 +47,6 @@ import com.tari.android.wallet.data.sharedPrefs.security.SecurityPrefRepository
 import com.tari.android.wallet.data.sharedPrefs.tariSettings.TariSettingsPrefRepository
 import com.tari.android.wallet.di.ApplicationScope
 import com.tari.android.wallet.event.EffectChannelFlow
-import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.extension.safeCastTo
 import com.tari.android.wallet.ffi.FFIByteVector
 import com.tari.android.wallet.ffi.FFICommsConfig
@@ -86,6 +86,7 @@ import com.tari.android.wallet.tor.TorProxyManager
 import com.tari.android.wallet.tor.TorProxyStateHandler
 import com.tari.android.wallet.ui.common.DialogManager
 import com.tari.android.wallet.ui.fragment.home.HomeActivity
+import com.tari.android.wallet.ui.fragment.send.finalize.TxFailureReason
 import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.DebugConfig
 import io.reactivex.Observable
@@ -132,6 +133,7 @@ class WalletManager @Inject constructor(
     private val walletRestorationStateHandler: WalletRestorationStateHandler,
     private val walletServiceLauncher: WalletServiceLauncher,
     private val dialogManager: DialogManager,
+    private val balanceStateHandler: BalanceStateHandler,
     private val walletCallbackListener: WalletCallbackListener,
     @ApplicationScope private val applicationScope: CoroutineScope,
 ) : OutboundTxNotifier {
@@ -314,7 +316,7 @@ class WalletManager @Inject constructor(
                 }
 
                 override fun onBalanceUpdated(balanceInfo: BalanceInfo) = runOnMain {
-                    EventBus.balanceState.post(balanceInfo) // TODO replace with flow!!!
+                    balanceStateHandler.updateBalanceState(balanceInfo)
                 }
 
                 override fun onConnectivityStatus(status: Int) = runOnMain {
@@ -325,7 +327,7 @@ class WalletManager @Inject constructor(
                         }
 
                         ConnectivityStatus.ONLINE -> {
-                            baseNodesManager.refreshBaseNodeList(requireWalletInstance)
+                            if (DebugConfig.selectBaseNodeEnabled) baseNodesManager.refreshBaseNodeList(requireWalletInstance)
                             baseNodeStateHandler.updateState(BaseNodeState.Online)
                             logger.i("baseNodeSync:base nodes state: connected to ${baseNodesManager.currentBaseNode?.publicKeyHex} ONLINE")
                         }
@@ -453,6 +455,12 @@ class WalletManager @Inject constructor(
         dialogManager.dismissAll()
         walletServiceLauncher.stop()
         walletCallbackListener.removeAllListeners()
+    }
+
+    fun sendWalletEvent(event: WalletEvent) {
+        applicationScope.launch {
+            _walletEvent.send(event)
+        }
     }
 
     private fun startWallet(ffiSeedWords: FFISeedWords?) {
@@ -707,7 +715,14 @@ class WalletManager @Inject constructor(
             data class DirectSendResult(val txId: TxId, val status: TransactionSendStatus) : WalletEvent()
         }
 
+        object TxSend {
+            data class TxSendSuccessful(val txId: TxId) : WalletEvent()
+            data class TxSendFailed(val failureReason: TxFailureReason) : WalletEvent()
+        }
+
         data object OnWalletRemove : WalletEvent()
+
+        data object Updated : WalletEvent()
     }
 }
 
