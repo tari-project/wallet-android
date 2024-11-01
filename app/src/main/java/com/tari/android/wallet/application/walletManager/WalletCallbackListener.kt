@@ -24,6 +24,8 @@ import javax.inject.Singleton
 /**
  * Wallet callback listener. It's needed because of FFI specific callback handling.
  * We support multiple wallet instances, but from the FFI side, we can only have one static callback listener.
+ *
+ * !! Should be added to proguard rules since method names are used in FFI callbacks. !!
  */
 @Singleton
 class WalletCallbackListener @Inject constructor() {
