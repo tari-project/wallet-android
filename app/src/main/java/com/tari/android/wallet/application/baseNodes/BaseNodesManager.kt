@@ -112,7 +112,7 @@ class BaseNodesManager @Inject constructor(
         baseNodeSharedRepository.ffiBaseNodes = loadBaseNodesFromFFI(wallet)
     }
 
-    fun loadBaseNodesFromFFI(wallet: FFIWallet): BaseNodeList = wallet.getBaseNodePeers()
+    private fun loadBaseNodesFromFFI(wallet: FFIWallet): BaseNodeList = wallet.getBaseNodePeers()
         .mapIndexed { index, publicKey ->
             BaseNodeDto(
                 name = "${networkRepository.currentNetwork.network.displayName} ${index + 1}",

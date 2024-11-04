@@ -70,13 +70,6 @@ interface TariWalletService {
     boolean removeContact(in TariWalletAddress address, out WalletError error);
 
     /**
-    * Key-value storage functions.
-    */
-    boolean setKeyValue(in String key, in String value, out WalletError error);
-    String getKeyValue(in String key, out WalletError error);
-    boolean removeKeyValue(in String key, out WalletError error);
-
-    /**
     * Required confirmation count functions.
     */
     long getRequiredConfirmationCount(out WalletError error);

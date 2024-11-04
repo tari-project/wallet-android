@@ -64,12 +64,6 @@ class TariWalletServiceStubProxy : TariWalletService.Stub() {
     override fun removeContact(contactPublicKey: TariWalletAddress, error: WalletError): Boolean =
         stub?.removeContact(contactPublicKey, error) ?: false
 
-    override fun setKeyValue(key: String, value: String, error: WalletError): Boolean = stub?.setKeyValue(key, value, error) ?: false
-
-    override fun getKeyValue(key: String, error: WalletError): String? = stub?.getKeyValue(key, error)
-
-    override fun removeKeyValue(key: String, error: WalletError): Boolean = stub?.removeKeyValue(key, error) ?: false
-
     override fun getRequiredConfirmationCount(error: WalletError): Long = stub?.getRequiredConfirmationCount(error) ?: 3
 
     override fun setRequiredConfirmationCount(number: Long, error: WalletError) = stub?.setRequiredConfirmationCount(number, error) ?: Unit
