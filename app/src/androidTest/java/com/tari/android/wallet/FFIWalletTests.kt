@@ -45,7 +45,6 @@ import com.tari.android.wallet.data.sharedPrefs.addressPoisoning.AddressPoisonin
 import com.tari.android.wallet.data.sharedPrefs.backup.BackupPrefRepository
 import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodePrefRepository
 import com.tari.android.wallet.data.sharedPrefs.chat.ChatsPrefRepository
-import com.tari.android.wallet.data.sharedPrefs.network.NetworkPrefRepositoryImpl
 import com.tari.android.wallet.data.sharedPrefs.security.SecurityPrefRepository
 import com.tari.android.wallet.data.sharedPrefs.securityStages.SecurityStagesPrefRepository
 import com.tari.android.wallet.data.sharedPrefs.sentry.SentryPrefRepository
@@ -61,6 +60,7 @@ import com.tari.android.wallet.ffi.FFITariBaseNodeState
 import com.tari.android.wallet.ffi.FFITariTransportConfig
 import com.tari.android.wallet.ffi.FFIWallet
 import com.tari.android.wallet.application.walletManager.FFIWalletListener
+import com.tari.android.wallet.data.sharedPrefs.network.NetworkPrefRepository
 import com.tari.android.wallet.ffi.TransactionValidationStatus
 import com.tari.android.wallet.ffi.nullptr
 import com.tari.android.wallet.model.BalanceInfo
@@ -89,7 +89,7 @@ class FFIWalletTests {
     private lateinit var listener: TestAddRecipientAddNodeListener
     private val context = getApplicationContext<Context>()
     private val prefs = context.getSharedPreferences(ApplicationModule.sharedPrefsFileName, Context.MODE_PRIVATE)
-    private val networkRepository = NetworkPrefRepositoryImpl(prefs)
+    private val networkRepository = NetworkPrefRepository(prefs)
     private val baseNodeSharedPrefsRepository = BaseNodePrefRepository(prefs, networkRepository)
     private val backupSettingsRepository = BackupPrefRepository(context, prefs, networkRepository)
     private val yatSharedPrefsRepository = YatPrefRepository(prefs, networkRepository)

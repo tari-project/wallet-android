@@ -1,7 +1,6 @@
 package com.tari.android.wallet.service.service
 
-import com.tari.android.wallet.application.walletManager.OutboundTxNotifier
-import com.tari.android.wallet.application.walletManager.WalletManager
+import com.tari.android.wallet.application.walletManager.WalletNotificationManager
 import com.tari.android.wallet.ffi.Base58String
 import com.tari.android.wallet.ffi.FFIContact
 import com.tari.android.wallet.ffi.FFIError
@@ -26,11 +25,10 @@ import com.tari.android.wallet.model.WalletError
 import com.tari.android.wallet.service.TariWalletService
 import com.tari.android.wallet.util.Constants
 import java.math.BigInteger
-import java.util.Locale
 
 class TariWalletServiceStubImpl(
     private val wallet: FFIWallet,
-    private val outboundTxNotifier: OutboundTxNotifier,
+    private val walletNotificationManager: WalletNotificationManager,
 ) : TariWalletService.Stub() {
 
     private var _cachedTariContacts: List<TariContact>? = null
@@ -133,12 +131,7 @@ class TariWalletServiceStubImpl(
         val recipientAddress = FFITariWalletAddress(Base58String(tariContact.walletAddress.fullBase58))
         val txId = wallet.sendTx(recipientAddress, amount.value, feePerGram.value, message, isOneSidePayment, paymentId)
 
-        outboundTxNotifier.outboundTxIdsToBePushNotified.add(
-            WalletManager.OutboundTxNotification(
-                txId = txId,
-                recipientPublicKeyHex = recipientAddress.notificationHex().lowercase(Locale.ENGLISH),
-            )
-        )
+        walletNotificationManager.addOutboundTxNotification(txId, recipientAddress)
 
         recipientAddress.destroy()
         TxId(txId)
@@ -174,12 +167,6 @@ class TariWalletServiceStubImpl(
                 _cachedTariContacts = null
             }
         } ?: false
-
-    override fun setKeyValue(key: String, value: String, error: WalletError): Boolean = runMapping(error) { wallet.setKeyValue(key, value) } ?: false
-
-    override fun getKeyValue(key: String, error: WalletError): String? = runMapping(error) { wallet.getKeyValue(key) }
-
-    override fun removeKeyValue(key: String, error: WalletError): Boolean = runMapping(error) { wallet.removeKeyValue(key) } ?: false
 
     override fun getRequiredConfirmationCount(error: WalletError): Long = runMapping(error) { wallet.getRequiredConfirmationCount().toLong() } ?: 0
 

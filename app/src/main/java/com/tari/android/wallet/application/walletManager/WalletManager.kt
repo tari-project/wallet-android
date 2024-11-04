@@ -35,7 +35,6 @@ package com.tari.android.wallet.application.walletManager
 import com.google.gson.Gson
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.BuildConfig
-import com.tari.android.wallet.application.Network
 import com.tari.android.wallet.application.TariWalletApplication
 import com.tari.android.wallet.application.baseNodes.BaseNodesManager
 import com.tari.android.wallet.application.walletManager.WalletCallbackListener.Companion.MAIN_WALLET_CONTEXT_ID
@@ -60,6 +59,7 @@ import com.tari.android.wallet.ffi.HexString
 import com.tari.android.wallet.ffi.LogFileObserver
 import com.tari.android.wallet.ffi.NetAddressString
 import com.tari.android.wallet.ffi.TransactionValidationStatus
+import com.tari.android.wallet.ffi.runWithDestroy
 import com.tari.android.wallet.model.BalanceInfo
 import com.tari.android.wallet.model.CancelledTx
 import com.tari.android.wallet.model.CompletedTx
@@ -78,8 +78,6 @@ import com.tari.android.wallet.recovery.WalletRestorationStateHandler
 import com.tari.android.wallet.service.baseNode.BaseNodeState
 import com.tari.android.wallet.service.baseNode.BaseNodeStateHandler
 import com.tari.android.wallet.service.baseNode.BaseNodeSyncState
-import com.tari.android.wallet.service.notification.NotificationService
-import com.tari.android.wallet.service.service.WalletService
 import com.tari.android.wallet.service.service.WalletServiceLauncher
 import com.tari.android.wallet.tor.TorConfig
 import com.tari.android.wallet.tor.TorProxyManager
@@ -89,9 +87,6 @@ import com.tari.android.wallet.ui.fragment.home.HomeActivity
 import com.tari.android.wallet.ui.fragment.send.finalize.TxFailureReason
 import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.DebugConfig
-import io.reactivex.Observable
-import io.reactivex.disposables.Disposable
-import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -103,8 +98,6 @@ import java.io.File
 import java.math.BigInteger
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.ConcurrentMap
-import java.util.concurrent.CopyOnWriteArraySet
-import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicReference
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -129,14 +122,14 @@ class WalletManager @Inject constructor(
     private val baseNodeStateHandler: BaseNodeStateHandler,
     private val app: TariWalletApplication,
     private val notificationHelper: NotificationHelper,
-    private val notificationService: NotificationService,
     private val walletRestorationStateHandler: WalletRestorationStateHandler,
     private val walletServiceLauncher: WalletServiceLauncher,
     private val dialogManager: DialogManager,
     private val balanceStateHandler: BalanceStateHandler,
     private val walletCallbackListener: WalletCallbackListener,
+    private val walletNotificationManager: WalletNotificationManager,
     @ApplicationScope private val applicationScope: CoroutineScope,
-) : OutboundTxNotifier {
+) {
 
     private var atomicInstance = AtomicReference<FFIWallet>()
     var walletInstance: FFIWallet?
@@ -161,15 +154,6 @@ class WalletManager @Inject constructor(
      * Validation results will all be null, and will be set as the result callbacks get called.
      */
     private val walletValidationStatusMap: ConcurrentMap<WalletValidationType, WalletValidationResult> = ConcurrentHashMap()
-
-    override val outboundTxIdsToBePushNotified = CopyOnWriteArraySet<OutboundTxNotification>()
-
-    /**
-     * Debounce for inbound transaction notification.
-     * TODO don't use rx. Replace with coroutines.
-     */
-    private var txReceivedNotificationDelayedAction: Disposable? = null
-    private var inboundTxEventNotificationTxs = mutableListOf<Tx>()
 
     private var txBroadcastRestarted = false
 
@@ -198,7 +182,7 @@ class WalletManager @Inject constructor(
                             tx = pendingInboundTx.copy(tariContact = getUserByWalletAddress(pendingInboundTx.tariContact.walletAddress)),
                         )
                     )
-                    postTxNotification(pendingInboundTx)
+                    walletNotificationManager.postTxNotification(pendingInboundTx)
                 }
 
                 override fun onTxReplyReceived(pendingOutboundTx: PendingOutboundTx) = runOnMain {
@@ -269,10 +253,7 @@ class WalletManager @Inject constructor(
 
                 override fun onDirectSendResult(txId: BigInteger, status: TransactionSendStatus) = runOnMain {
                     _walletEvent.send(WalletEvent.Tx.DirectSendResult(TxId(txId), status))
-                    outboundTxIdsToBePushNotified.firstOrNull { it.txId == txId }?.let {
-                        outboundTxIdsToBePushNotified.remove(it)
-                        sendPushNotificationToTxRecipient(it.recipientPublicKeyHex)
-                    }
+                    walletNotificationManager.sendOutboundTxNotification(requireWalletInstance, txId, status)
                 }
 
                 override fun onTxCancelled(cancelledTx: CancelledTx, rejectionReason: Int) = runOnMain {
@@ -309,10 +290,10 @@ class WalletManager @Inject constructor(
                         if (!txBroadcastRestarted && status == TransactionValidationStatus.Success) {
                             it.restartTxBroadcast()
                             txBroadcastRestarted = true
-                            logger.i("baseNodeSync:wallet validation: Transaction broadcast restarted (requestId: $responseId)")
+                            logger.i("Wallet validation: Transaction broadcast restarted (requestId: $responseId)")
                         }
                     }
-                        ?: logger.i("baseNodeSync:wallet validation:error: Transaction broadcast restart failed because wallet instance is null (requestId: $responseId)\"")
+                        ?: logger.i("Wallet validation: error: Transaction broadcast restart failed because wallet instance is null (requestId: $responseId)\"")
                 }
 
                 override fun onBalanceUpdated(balanceInfo: BalanceInfo) = runOnMain {
@@ -322,14 +303,14 @@ class WalletManager @Inject constructor(
                 override fun onConnectivityStatus(status: Int) = runOnMain {
                     when (ConnectivityStatus.entries[status]) {
                         ConnectivityStatus.CONNECTING -> {
-                            baseNodeStateHandler.updateState(BaseNodeState.Syncing)
-                            logger.i("baseNodeSync:base nodes state: connecting to ${baseNodesManager.currentBaseNode?.publicKeyHex}")
+                            logger.i("Base Node connection: connecting...")
                         }
 
                         ConnectivityStatus.ONLINE -> {
                             if (DebugConfig.selectBaseNodeEnabled) baseNodesManager.refreshBaseNodeList(requireWalletInstance)
-                            baseNodeStateHandler.updateState(BaseNodeState.Online)
-                            logger.i("baseNodeSync:base nodes state: connected to ${baseNodesManager.currentBaseNode?.publicKeyHex} ONLINE")
+                            if (baseNodeStateHandler.updateState(BaseNodeState.Online)) {
+                                logger.i("Base Node connection: connected [ONLINE]")
+                            }
                         }
 
                         ConnectivityStatus.OFFLINE -> {
@@ -338,8 +319,9 @@ class WalletManager @Inject constructor(
                                 baseNodesManager.setNextBaseNode()
                                 syncBaseNode()
                             }
-                            baseNodeStateHandler.updateState(BaseNodeState.Offline)
-                            logger.i("baseNodeSync:base nodes state: disconnected from ${baseNodesManager.currentBaseNode?.publicKeyHex} OFFLINE")
+                            if (baseNodeStateHandler.updateState(BaseNodeState.Offline)) {
+                                logger.i("Base Node connection: disconnected [OFFLINE]")
+                            }
                         }
                     }
                 }
@@ -388,7 +370,7 @@ class WalletManager @Inject constructor(
      */
     fun syncBaseNode() {
         if (!DebugConfig.selectBaseNodeEnabled) {
-            Logger.e("baseNodeSync: Base node selection is disabled, but syncBaseNode() is called")
+            Logger.e("Base Node connection: Base node selection is disabled, but syncBaseNode() is called!!")
         }
         var currentBaseNode: BaseNodeDto? = baseNodesManager.currentBaseNode ?: return
 
@@ -397,23 +379,23 @@ class WalletManager @Inject constructor(
                 while (currentBaseNode != null) {
                     try {
                         currentBaseNode?.let { it ->
-                            logger.i("baseNodeSync: sync with base node ${it.publicKeyHex}::${it.address} started")
+                            logger.i("Base Node connection: sync with base node ${it.publicKeyHex}::${it.address} started")
                             val baseNodeKeyFFI = FFIPublicKey(HexString(it.publicKeyHex))
                             val addBaseNodeResult = wallet.addBaseNodePeer(baseNodeKeyFFI, it.address)
                             baseNodeKeyFFI.destroy()
-                            logger.i("baseNodeSync:addBaseNodePeer ${if (addBaseNodeResult) "success" else "failed"}")
+                            logger.i("Base Node connection: addBaseNodePeer ${if (addBaseNodeResult) "success" else "failed"}")
 
                             validateWallet()
                         }
                         break
                     } catch (e: Throwable) {
-                        logger.i("baseNodeSync:error connecting to base node $currentBaseNode with an error: ${e.message}")
+                        logger.i("Base Node connection: error connecting to base node $currentBaseNode with an error: ${e.message}")
                         currentBaseNode = baseNodesManager.setNextBaseNode()
                     }
                 }
 
                 if (currentBaseNode == null) {
-                    logger.e("baseNodeSync: cannot connect to any base node")
+                    logger.e("Base Node connection: error: cannot connect to any base node")
                 }
             }
         }
@@ -465,23 +447,23 @@ class WalletManager @Inject constructor(
 
     private fun startWallet(ffiSeedWords: FFISeedWords?) {
         if (walletState.value is WalletState.NotReady || walletState.value is WalletState.Failed) {
-            logger.i("Initialize wallet started")
+            logger.i("Start wallet: Initializing wallet...")
             _walletState.update { WalletState.Initializing }
             applicationScope.launch {
                 try {
                     initWallet(ffiSeedWords)
                     _walletState.update { WalletState.Started }
-                    logger.i("Wallet was started")
+                    logger.i("Start wallet: Wallet was started")
                 } catch (e: Exception) {
                     val oldCode = walletState.value.errorCode
                     val newCode = e.safeCastTo<FFIException>()?.error?.code
 
                     if (oldCode == null || oldCode != newCode) {
-                        logger.e(e, "Wallet was failed")
+                        logger.e(e, "Start wallet: Wallet was failed")
                     }
                     _walletState.update { WalletState.Failed(e) }
                 }
-            }.start()
+            }
         }
     }
 
@@ -516,12 +498,10 @@ class WalletManager @Inject constructor(
      * Stores wallet's Base58 address and emoji id into the shared prefs
      * for future convenience.
      */
-    private fun saveWalletAddressToSharedPrefs() {
-        // set shared preferences values after instantiation
-        walletInstance?.getWalletAddress()?.let { ffiTariWalletAddress ->
+    private fun saveWalletAddressToSharedPrefs(wallet: FFIWallet) {
+        wallet.getWalletAddress().runWithDestroy { ffiTariWalletAddress ->
             corePrefRepository.walletAddressBase58 = ffiTariWalletAddress.fullBase58()
             corePrefRepository.emojiId = ffiTariWalletAddress.getEmojiId()
-            ffiTariWalletAddress.destroy()
         }
     }
 
@@ -530,9 +510,6 @@ class WalletManager @Inject constructor(
      */
     private fun initWallet(ffiSeedWords: FFISeedWords?) {
         if (walletInstance == null) {
-            // store network info in shared preferences if it's a new wallet
-            val isNewInstallation = !walletConfig.walletExists()
-
             val passphrase = securityPrefRepository.databasePassphrase.takeIf { !it.isNullOrEmpty() }
                 ?: corePrefRepository.generateDatabasePassphrase().also { securityPrefRepository.databasePassphrase = it }
 
@@ -546,82 +523,42 @@ class WalletManager @Inject constructor(
                 walletCallbackListener = walletCallbackListener,
             )
 
-            if (isNewInstallation) {
-                walletInstance?.setKeyValue(
-                    key = WalletService.Companion.KeyValueStorageKeys.NETWORK,
-                    value = networkPrefRepository.currentNetwork.network.uriComponent,
-                )
-            } else if (tariSettingsPrefRepository.isRestoredWallet && networkPrefRepository.ffiNetwork == null) {
-                networkPrefRepository.ffiNetwork = try {
-                    Network.from(walletInstance?.getKeyValue(WalletService.Companion.KeyValueStorageKeys.NETWORK) ?: "")
-                } catch (exception: Exception) {
-                    null
-                }
-            }
             startLogFileObserver()
 
-            baseNodesManager.refreshBaseNodeList(requireWalletInstance)
-
             if (DebugConfig.selectBaseNodeEnabled) {
-                walletInstance?.let { baseNodesManager.refreshBaseNodeList(it) }
-                    ?: error("Wallet instance is null when trying to refresh base node list")
+                baseNodesManager.refreshBaseNodeList(requireWalletInstance)
                 if (baseNodesManager.currentBaseNode == null) {
                     baseNodesManager.setNextBaseNode()
                 }
             }
 
-            validateWallet()
-
-            saveWalletAddressToSharedPrefs()
-        }
-    }
-
-    private fun validateWallet() {
-        applicationScope.launch(Dispatchers.IO) {
-            doOnWalletRunning { wallet ->
-                try {
-                    logger.i("baseNodeSync:wallet validation:start Tx and TXO validation")
-                    walletValidationStatusMap.clear()
-                    walletValidationStatusMap[WalletValidationType.TXO] = WalletValidationResult(wallet.startTXOValidation(), null)
-                    walletValidationStatusMap[WalletValidationType.TX] = WalletValidationResult(wallet.startTxValidation(), null)
-                    logger.i(
-                        "baseNodeSync:wallet validation:started Tx and TXO validation with " +
-                                "request keys: ${Gson().toJson(walletValidationStatusMap.map { it.value.requestKey })}"
-                    )
-                } catch (e: Throwable) {
-                    logger.i("baseNodeSync:wallet validation:error: ${e.message}")
-                    walletValidationStatusMap.clear()
-                    baseNodeStateHandler.updateSyncState(BaseNodeSyncState.Failed)
+            applicationScope.launch(Dispatchers.IO) {
+                baseNodeStateHandler.doOnBaseNodeOnline {
+                    validateWallet()
                 }
             }
+
+            saveWalletAddressToSharedPrefs(requireWalletInstance)
         }
     }
 
-    private fun postTxNotification(tx: Tx) {
-        txReceivedNotificationDelayedAction?.dispose()
-        inboundTxEventNotificationTxs.add(tx)
-        txReceivedNotificationDelayedAction =
-            Observable.timer(500, TimeUnit.MILLISECONDS)
-                .subscribeOn(Schedulers.io())
-                .observeOn(Schedulers.io())
-                .subscribe {
-                    // if app is backgrounded, display heads-up notification
-                    val currentActivity = app.currentActivity
-                    if (!app.isInForeground
-                        || currentActivity !is HomeActivity
-                        || !currentActivity.willNotifyAboutNewTx()
-                    ) {
-                        notificationHelper.postCustomLayoutTxNotification(inboundTxEventNotificationTxs.last())
-                    }
-                    inboundTxEventNotificationTxs.clear()
-                }
-    }
-
-    private fun sendPushNotificationToTxRecipient(recipientHex: String) {
-        walletInstance?.let { wallet ->
-            val senderHex = wallet.getWalletAddress().notificationHex()
-            notificationService.notifyRecipient(recipientHex, senderHex, wallet::signMessage)
-        } ?: logger.i("Wallet instance is null when trying to send push notification to recipient")
+    private suspend fun validateWallet() {
+        doOnWalletRunning { wallet ->
+            try {
+                logger.i("Wallet validation: Starting Tx and TXO validation...")
+                walletValidationStatusMap.clear()
+                walletValidationStatusMap[WalletValidationType.TXO] = WalletValidationResult(wallet.startTXOValidation(), null)
+                walletValidationStatusMap[WalletValidationType.TX] = WalletValidationResult(wallet.startTxValidation(), null)
+                logger.i(
+                    "Wallet validation: Started Tx and TXO validation with " +
+                            "request keys: ${Gson().toJson(walletValidationStatusMap.map { it.value.requestKey })}"
+                )
+            } catch (e: Throwable) {
+                logger.i("Wallet validation: Error: ${e.message}")
+                walletValidationStatusMap.clear()
+                baseNodeStateHandler.updateSyncState(BaseNodeSyncState.Failed)
+            }
+        }
     }
 
     private fun checkValidationResult(type: WalletValidationType, responseId: BigInteger, isSuccess: Boolean) {
@@ -629,42 +566,41 @@ class WalletManager @Inject constructor(
             val currentStatus = walletValidationStatusMap[type] ?: return
             if (currentStatus.requestKey != responseId) return
             walletValidationStatusMap[type] = WalletValidationResult(currentStatus.requestKey, isSuccess)
-            logger.i("baseNodeSync:wallet validation:validation result for request $responseId: $type: $isSuccess")
+            logger.i("Wallet validation: Validation result for request $responseId: $type: ${if (isSuccess) "Success" else "Failed!"}")
             checkBaseNodeSyncCompletion()
         } catch (e: Throwable) {
-            logger.i("baseNodeSync:wallet validation $type for request $responseId failed with an error: ${e.message}")
+            logger.i("Wallet validation: $type validation for request $responseId failed with an error: ${e.message}")
         }
     }
 
     private fun checkBaseNodeSyncCompletion() {
-        // make a copy of the status map for concurrency protection§
+        // make a copy of the status map for concurrency protection
         val statusMapCopy = walletValidationStatusMap.toMap()
-        // if base node not in sync, then switch to the next base node
-        // check if any has failed
+
         val failed = statusMapCopy.any { it.value.isSuccess == false }
-        if (failed) {
-            walletValidationStatusMap.clear()
-            val currentBaseNode = baseNodesManager.currentBaseNode
-            if (DebugConfig.selectBaseNodeEnabled && (currentBaseNode == null || !currentBaseNode.isCustom)) {
-                baseNodesManager.setNextBaseNode()
-                syncBaseNode()
-            }
-            baseNodeStateHandler.updateSyncState(BaseNodeSyncState.Failed)
-            return
-        }
-        // if any of the results is null, we're still waiting for all callbacks to happen
         val inProgress = statusMapCopy.any { it.value.isSuccess == null }
-        if (inProgress) {
-            baseNodeStateHandler.updateSyncState(BaseNodeSyncState.Syncing)
-            return
-        }
-        // check if it's successful
         val successful = statusMapCopy.all { it.value.isSuccess == true }
-        if (successful) {
-            walletValidationStatusMap.clear()
-            baseNodeStateHandler.updateSyncState(BaseNodeSyncState.Online)
+
+        when {
+            failed -> {
+                walletValidationStatusMap.clear()
+                val currentBaseNode = baseNodesManager.currentBaseNode
+                if (DebugConfig.selectBaseNodeEnabled && (currentBaseNode == null || !currentBaseNode.isCustom)) {
+                    baseNodesManager.setNextBaseNode()
+                    syncBaseNode()
+                }
+                baseNodeStateHandler.updateSyncState(BaseNodeSyncState.Failed)
+            }
+
+            inProgress -> {
+                baseNodeStateHandler.updateSyncState(BaseNodeSyncState.Syncing)
+            }
+
+            successful -> {
+                walletValidationStatusMap.clear()
+                baseNodeStateHandler.updateSyncState(BaseNodeSyncState.Online)
+            }
         }
-        // shouldn't ever reach here - no-op
     }
 
     private fun getUserByWalletAddress(address: TariWalletAddress): TariContact {
@@ -690,8 +626,6 @@ class WalletManager @Inject constructor(
         ONLINE(1),
         OFFLINE(2),
     }
-
-    data class OutboundTxNotification(val txId: BigInteger, val recipientPublicKeyHex: String)
 
     enum class WalletValidationType { TXO, TX }
     data class WalletValidationResult(val requestKey: BigInteger, val isSuccess: Boolean?)
@@ -724,8 +658,4 @@ class WalletManager @Inject constructor(
 
         data object Updated : WalletEvent()
     }
-}
-
-interface OutboundTxNotifier {
-    val outboundTxIdsToBePushNotified: CopyOnWriteArraySet<WalletManager.OutboundTxNotification>
 }

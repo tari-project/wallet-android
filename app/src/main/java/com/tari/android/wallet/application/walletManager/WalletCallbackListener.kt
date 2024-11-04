@@ -171,10 +171,10 @@ class WalletCallbackListener @Inject constructor() {
         val balance = FFIBalance(ptr).runWithDestroy { BalanceInfo(it.getAvailable(), it.getIncoming(), it.getOutgoing(), it.getTimeLocked()) }
         log(
             walletContextId = walletContextId,
-            message = "Balance Updated:\n" +
-                    "${balance.availableBalance.formattedTariValue} available\n" +
-                    "${balance.pendingIncomingBalance.formattedTariValue} pending incoming\n" +
-                    "${balance.pendingOutgoingBalance.formattedTariValue} pending outgoing\n" +
+            message = "Balance Updated: " +
+                    "${balance.availableBalance.formattedTariValue} available, " +
+                    "${balance.pendingIncomingBalance.formattedTariValue} pending incoming, " +
+                    "${balance.pendingOutgoingBalance.formattedTariValue} pending outgoing, " +
                     "${balance.timeLockedBalance.formattedTariValue} time locked",
         )
         listeners[walletContextId]?.onBalanceUpdated(balance)

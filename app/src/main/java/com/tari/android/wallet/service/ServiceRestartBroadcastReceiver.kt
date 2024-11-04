@@ -37,7 +37,7 @@ import android.content.Context
 import android.content.Intent
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.application.walletManager.WalletConfig
-import com.tari.android.wallet.data.sharedPrefs.network.NetworkPrefRepositoryImpl
+import com.tari.android.wallet.data.sharedPrefs.network.NetworkPrefRepository
 import com.tari.android.wallet.data.sharedPrefs.tariSettings.TariSettingsPrefRepository
 import com.tari.android.wallet.di.ApplicationModule
 import com.tari.android.wallet.service.service.WalletServiceLauncher
@@ -56,7 +56,7 @@ class ServiceRestartBroadcastReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
         logger.i("Service restart broadcast received")
         val sharedPreferences = context.getSharedPreferences(ApplicationModule.sharedPrefsFileName, Context.MODE_PRIVATE)
-        val networkRepository = NetworkPrefRepositoryImpl(sharedPreferences)
+        val networkRepository = NetworkPrefRepository(sharedPreferences)
         val tariSettingsSharedRepository = TariSettingsPrefRepository(sharedPreferences, networkRepository)
         WalletServiceLauncher(context, WalletConfig(context, networkRepository), tariSettingsSharedRepository).startIfWalletExists()
     }

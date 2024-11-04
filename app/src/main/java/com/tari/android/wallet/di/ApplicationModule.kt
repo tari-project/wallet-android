@@ -42,8 +42,6 @@ import androidx.core.content.ContextCompat
 import com.tari.android.wallet.BuildConfig
 import com.tari.android.wallet.application.TariWalletApplication
 import com.tari.android.wallet.application.walletManager.WalletConfig
-import com.tari.android.wallet.data.sharedPrefs.network.NetworkPrefRepository
-import com.tari.android.wallet.data.sharedPrefs.network.NetworkPrefRepositoryImpl
 import com.tari.android.wallet.data.sharedPrefs.tariSettings.TariSettingsPrefRepository
 import com.tari.android.wallet.infrastructure.security.biometric.BiometricAuthenticationService
 import com.tari.android.wallet.notification.NotificationHelper
@@ -78,10 +76,6 @@ class ApplicationModule(private val app: TariWalletApplication) {
     @Provides
     @Singleton
     fun provideSharedPrefs(): SharedPreferences = app.getSharedPreferences(sharedPrefsFileName, MODE_PRIVATE)
-
-    @Provides
-    @Singleton
-    fun provideNetworkRepository(prefs: SharedPreferences): NetworkPrefRepository = NetworkPrefRepositoryImpl(prefs)
 
     @Provides
     @Singleton

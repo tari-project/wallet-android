@@ -43,6 +43,7 @@ import com.tari.android.wallet.application.AppStateHandler
 import com.tari.android.wallet.application.TariWalletApplication
 import com.tari.android.wallet.application.walletManager.WalletConfig
 import com.tari.android.wallet.application.walletManager.WalletManager
+import com.tari.android.wallet.application.walletManager.WalletNotificationManager
 import com.tari.android.wallet.application.walletManager.doOnWalletStarted
 import com.tari.android.wallet.di.DiContainer
 import com.tari.android.wallet.ffi.FFIWallet
@@ -94,6 +95,9 @@ class WalletService : Service() {
 
     @Inject
     lateinit var appStateHandler: AppStateHandler
+
+    @Inject
+    lateinit var walletNotificationManager: WalletNotificationManager
 
     private var lifecycleObserver: ServiceLifecycleCallbacks? = null
     private val stubProxy = TariWalletServiceStubProxy()
@@ -175,7 +179,7 @@ class WalletService : Service() {
         lifecycleObserver = ServiceLifecycleCallbacks(wallet)
         stubProxy.stub = TariWalletServiceStubImpl(
             wallet = wallet,
-            outboundTxNotifier = walletManager,
+            walletNotificationManager = walletNotificationManager,
         )
         scheduleExpirationCheck()
         Handler(Looper.getMainLooper()).post { ProcessLifecycleOwner.get().lifecycle.addObserver(lifecycleObserver!!) }
@@ -265,10 +269,5 @@ class WalletService : Service() {
 
     companion object {
         private const val NOTIFICATION_ID = 1
-
-        object KeyValueStorageKeys {
-            const val NETWORK = "SU7FM2O6Q3BU4XVN7HDD"
-            const val VERSION = "version"
-        }
     }
 }
