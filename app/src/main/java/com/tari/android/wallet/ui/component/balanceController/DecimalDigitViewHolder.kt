@@ -1,4 +1,4 @@
-package com.tari.android.wallet.ui.fragment.tx.ui.balanceController
+package com.tari.android.wallet.ui.component.balanceController
 
 import android.animation.ValueAnimator
 import android.content.Context

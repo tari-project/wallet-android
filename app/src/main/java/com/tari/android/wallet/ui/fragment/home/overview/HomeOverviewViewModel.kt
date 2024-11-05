@@ -1,4 +1,4 @@
-package com.tari.android.wallet.ui.fragment.tx
+package com.tari.android.wallet.ui.fragment.home.overview
 
 
 import android.app.Activity
@@ -27,6 +27,7 @@ import com.tari.android.wallet.extension.getWithError
 import com.tari.android.wallet.extension.launchOnIo
 import com.tari.android.wallet.extension.safeCastTo
 import com.tari.android.wallet.model.BalanceInfo
+import com.tari.android.wallet.navigation.Navigation
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.common.SingleLiveEvent
 import com.tari.android.wallet.ui.common.recyclerView.CommonViewHolderItem
@@ -39,10 +40,10 @@ import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
 import com.tari.android.wallet.ui.dialog.modular.modules.securityStages.SecurityStageHeadModule
 import com.tari.android.wallet.ui.dialog.modular.modules.space.SpaceModule
 import com.tari.android.wallet.ui.fragment.contactBook.data.ContactsRepository
-import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
 import com.tari.android.wallet.ui.fragment.send.finalize.TxFailureReason
 import com.tari.android.wallet.ui.fragment.settings.backup.backupOnboarding.item.BackupOnboardingArgs
 import com.tari.android.wallet.ui.fragment.settings.backup.backupOnboarding.module.BackupOnboardingFlowItemModule
+import com.tari.android.wallet.data.TransactionRepository
 import com.tari.android.wallet.ui.fragment.tx.adapter.TransactionItem
 import com.tari.android.wallet.util.EmojiId
 import com.tari.android.wallet.util.extractEmojis
@@ -51,7 +52,7 @@ import yat.android.ui.extension.HtmlHelper
 import javax.inject.Inject
 
 
-class HomeFragmentViewModel : CommonViewModel() {
+class HomeOverviewViewModel : CommonViewModel() {
 
     @Inject
     lateinit var corePrefRepository: CorePrefRepository

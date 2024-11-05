@@ -21,7 +21,7 @@ import com.tari.android.wallet.ui.dialog.modular.modules.shareOptions.ShareOptio
 import com.tari.android.wallet.ui.fragment.contactBook.data.contacts.splitAlias
 import com.tari.android.wallet.ui.fragment.contactBook.root.ShareViewModel
 import com.tari.android.wallet.ui.fragment.contactBook.root.share.ShareType
-import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
+import com.tari.android.wallet.navigation.Navigation
 import com.tari.android.wallet.util.ContactUtil
 import com.tari.android.wallet.util.QrUtil
 import kotlinx.coroutines.flow.MutableStateFlow

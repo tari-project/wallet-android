@@ -26,7 +26,7 @@ import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonStyle
 import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
 import com.tari.android.wallet.ui.dialog.modular.modules.input.InputModule
-import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
+import com.tari.android.wallet.navigation.Navigation
 import com.tari.android.wallet.ui.fragment.qr.QrScannerActivity
 import com.tari.android.wallet.ui.fragment.qr.QrScannerSource
 import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupOption

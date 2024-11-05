@@ -21,7 +21,7 @@ import com.tari.android.wallet.ui.dialog.modular.modules.body.BodyModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonStyle
 import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
-import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
+import com.tari.android.wallet.navigation.Navigation
 import com.tari.android.wallet.ui.fragment.send.shareQr.ShareQrCodeModule
 import com.tari.android.wallet.ui.fragment.settings.torBridges.torItem.TorBridgeViewHolderItem
 import com.tari.android.wallet.util.DebugConfig

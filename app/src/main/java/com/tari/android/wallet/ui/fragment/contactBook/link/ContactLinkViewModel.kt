@@ -33,7 +33,7 @@ import com.tari.android.wallet.ui.fragment.contactBook.data.contacts.ContactDto
 import com.tari.android.wallet.ui.fragment.contactBook.data.contacts.MergedContactInfo
 import com.tari.android.wallet.ui.fragment.contactBook.data.contacts.PhoneContactInfo
 import com.tari.android.wallet.ui.fragment.contactBook.link.adapter.link_header.ContactLinkHeaderViewHolderItem
-import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
+import com.tari.android.wallet.navigation.Navigation
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import yat.android.ui.extension.HtmlHelper

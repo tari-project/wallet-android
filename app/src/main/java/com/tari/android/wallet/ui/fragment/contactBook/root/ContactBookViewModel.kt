@@ -12,7 +12,7 @@ import com.tari.android.wallet.ui.fragment.contactBook.data.ContactsRepository
 import com.tari.android.wallet.ui.fragment.contactBook.data.contacts.ContactDto
 import com.tari.android.wallet.ui.fragment.contactBook.root.share.ShareOptionArgs
 import com.tari.android.wallet.ui.fragment.contactBook.root.share.ShareType
-import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
+import com.tari.android.wallet.navigation.Navigation
 import com.tari.android.wallet.util.ContactUtil
 import javax.inject.Inject
 

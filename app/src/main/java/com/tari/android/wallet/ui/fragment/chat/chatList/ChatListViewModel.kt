@@ -6,7 +6,7 @@ import com.tari.android.wallet.ui.fragment.chat.chatList.adapter.ChatItemViewHol
 import com.tari.android.wallet.ui.fragment.chat.data.ChatItemDto
 import com.tari.android.wallet.ui.fragment.chat.data.ChatsRepository
 import com.tari.android.wallet.ui.fragment.contactBook.data.ContactsRepository
-import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
+import com.tari.android.wallet.navigation.Navigation
 import com.tari.android.wallet.util.DebugConfig
 import com.tari.android.wallet.util.MockDataStub
 import kotlinx.coroutines.flow.MutableStateFlow

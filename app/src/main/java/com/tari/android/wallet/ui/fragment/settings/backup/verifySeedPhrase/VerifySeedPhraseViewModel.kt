@@ -3,7 +3,7 @@ package com.tari.android.wallet.ui.fragment.settings.backup.verifySeedPhrase
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.tari.android.wallet.ui.common.CommonViewModel
-import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
+import com.tari.android.wallet.navigation.Navigation
 
 class VerifySeedPhraseViewModel : CommonViewModel() {
 

@@ -98,8 +98,8 @@ import com.tari.android.wallet.ui.fragment.settings.torBridges.TorBridgesSelecti
 import com.tari.android.wallet.ui.fragment.settings.torBridges.customBridges.CustomTorBridgesViewModel
 import com.tari.android.wallet.ui.fragment.settings.userAutorization.BiometricAuthenticationViewModel
 import com.tari.android.wallet.ui.fragment.splash.SplashActivity
-import com.tari.android.wallet.ui.fragment.tx.HomeFragmentViewModel
-import com.tari.android.wallet.ui.fragment.tx.TransactionRepository
+import com.tari.android.wallet.ui.fragment.home.overview.HomeOverviewViewModel
+import com.tari.android.wallet.data.TransactionRepository
 import com.tari.android.wallet.ui.fragment.tx.details.TxDetailsViewModel
 import com.tari.android.wallet.ui.fragment.tx.details.gif.GifViewModel
 import com.tari.android.wallet.ui.fragment.tx.history.HomeTransactionHistoryViewModel
@@ -176,7 +176,7 @@ interface ApplicationComponent {
     fun inject(viewModel: ThemeSelectorViewModel)
     fun inject(viewModel: DeleteWalletViewModel)
     fun inject(viewModel: HomeViewModel)
-    fun inject(viewModel: HomeFragmentViewModel)
+    fun inject(viewModel: HomeOverviewViewModel)
     fun inject(viewModel: HomeTransactionHistoryViewModel)
     fun inject(viewModel: EnterCurrentPasswordViewModel)
     fun inject(viewModel: ChangeSecurePasswordViewModel)

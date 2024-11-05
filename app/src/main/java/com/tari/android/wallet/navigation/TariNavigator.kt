@@ -1,4 +1,4 @@
-package com.tari.android.wallet.ui.fragment.home.navigation
+package com.tari.android.wallet.navigation
 
 import android.content.Intent
 import android.net.Uri
@@ -37,18 +37,18 @@ import com.tari.android.wallet.ui.fragment.contactBook.details.ContactDetailsFra
 import com.tari.android.wallet.ui.fragment.contactBook.link.ContactLinkFragment
 import com.tari.android.wallet.ui.fragment.contactBook.root.ContactBookFragment
 import com.tari.android.wallet.ui.fragment.home.HomeActivity
-import com.tari.android.wallet.ui.fragment.home.navigation.Navigation.AddAmountNavigation
-import com.tari.android.wallet.ui.fragment.home.navigation.Navigation.AllSettingsNavigation
-import com.tari.android.wallet.ui.fragment.home.navigation.Navigation.BackupSettingsNavigation
-import com.tari.android.wallet.ui.fragment.home.navigation.Navigation.ChatNavigation
-import com.tari.android.wallet.ui.fragment.home.navigation.Navigation.ChooseRestoreOptionNavigation
-import com.tari.android.wallet.ui.fragment.home.navigation.Navigation.ContactBookNavigation
-import com.tari.android.wallet.ui.fragment.home.navigation.Navigation.CustomBridgeNavigation
-import com.tari.android.wallet.ui.fragment.home.navigation.Navigation.InputSeedWordsNavigation
-import com.tari.android.wallet.ui.fragment.home.navigation.Navigation.SendTxNavigation
-import com.tari.android.wallet.ui.fragment.home.navigation.Navigation.TorBridgeNavigation
-import com.tari.android.wallet.ui.fragment.home.navigation.Navigation.TxListNavigation
-import com.tari.android.wallet.ui.fragment.home.navigation.Navigation.VerifySeedPhraseNavigation
+import com.tari.android.wallet.navigation.Navigation.AddAmountNavigation
+import com.tari.android.wallet.navigation.Navigation.AllSettingsNavigation
+import com.tari.android.wallet.navigation.Navigation.BackupSettingsNavigation
+import com.tari.android.wallet.navigation.Navigation.ChatNavigation
+import com.tari.android.wallet.navigation.Navigation.ChooseRestoreOptionNavigation
+import com.tari.android.wallet.navigation.Navigation.ContactBookNavigation
+import com.tari.android.wallet.navigation.Navigation.CustomBridgeNavigation
+import com.tari.android.wallet.navigation.Navigation.InputSeedWordsNavigation
+import com.tari.android.wallet.navigation.Navigation.SendTxNavigation
+import com.tari.android.wallet.navigation.Navigation.TorBridgeNavigation
+import com.tari.android.wallet.navigation.Navigation.TxListNavigation
+import com.tari.android.wallet.navigation.Navigation.VerifySeedPhraseNavigation
 import com.tari.android.wallet.ui.fragment.onboarding.activity.OnboardingFlowActivity
 import com.tari.android.wallet.ui.fragment.onboarding.localAuth.LocalAuthFragment
 import com.tari.android.wallet.ui.fragment.pinCode.EnterPinCodeFragment
@@ -82,7 +82,7 @@ import com.tari.android.wallet.ui.fragment.settings.screenRecording.ScreenRecord
 import com.tari.android.wallet.ui.fragment.settings.themeSelector.ThemeSelectorFragment
 import com.tari.android.wallet.ui.fragment.settings.torBridges.TorBridgesSelectionFragment
 import com.tari.android.wallet.ui.fragment.settings.torBridges.customBridges.CustomTorBridgesFragment
-import com.tari.android.wallet.ui.fragment.tx.HomeFragment
+import com.tari.android.wallet.ui.fragment.home.overview.HomeOverviewFragment
 import com.tari.android.wallet.ui.fragment.tx.details.TxDetailsFragment
 import com.tari.android.wallet.ui.fragment.tx.history.HomeTransactionHistoryFragment
 import com.tari.android.wallet.ui.fragment.tx.history.TransactionHistoryFragment
@@ -227,7 +227,7 @@ class TariNavigator @Inject constructor(
     private fun toSendTari(user: ContactDto, amount: MicroTari?) = sendToUser(user, amount)
 
     private fun toSendWithDeeplink(deeplink: DeepLink.Send) {
-        popUpTo(HomeFragment::class.java.simpleName)
+        popUpTo(HomeOverviewFragment::class.java.simpleName)
         sendToUserByDeeplink(deeplink)
     }
 

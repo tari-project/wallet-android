@@ -14,7 +14,7 @@
         android:alpha="1"
         android:background="@drawable/vector_home_gradient_bg" />
 
-    <com.tari.android.wallet.ui.fragment.tx.WaveView
+    <com.tari.android.wallet.ui.component.WaveView
         android:id="@+id/second_gradient_view"
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -234,12 +234,12 @@
                 android:layout_gravity="center_vertical"
                 android:layout_marginEnd="6dp"
                 android:letterSpacing="-0.018"
-                android:text="⏳⌛️"
                 android:textColor="?attr/palette_button_primary_text"
                 android:textSize="12sp"
-                app:customFont="heavy" />
+                app:customFont="heavy"
+                tools:text="⏳⌛️" />
 
-            <com.tari.android.wallet.ui.fragment.tx.questionMark.QuestionMarkView
+            <com.tari.android.wallet.ui.component.questionMark.QuestionMarkView
                 android:id="@+id/balance_question_mark"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

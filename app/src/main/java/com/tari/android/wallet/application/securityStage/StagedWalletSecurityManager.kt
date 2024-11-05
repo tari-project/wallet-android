@@ -90,6 +90,6 @@ class StagedWalletSecurityManager @Inject constructor(
 
     sealed class StagedSecurityEffect {
         data class ShowStagedSecurityPopUp(val stage: WalletSecurityStage) : StagedSecurityEffect()
-        object NoStagedSecurityPopUp : StagedSecurityEffect()
+        data object NoStagedSecurityPopUp : StagedSecurityEffect()
     }
 }

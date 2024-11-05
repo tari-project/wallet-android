@@ -34,7 +34,7 @@ import com.tari.android.wallet.ui.fragment.contactBook.contacts.FavoritesFragmen
 import com.tari.android.wallet.ui.fragment.contactBook.root.share.ShareOptionArgs
 import com.tari.android.wallet.ui.fragment.contactBook.root.share.ShareOptionView
 import com.tari.android.wallet.ui.fragment.home.HomeActivity
-import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
+import com.tari.android.wallet.navigation.Navigation
 import com.tari.android.wallet.ui.fragment.qr.QrScannerActivity
 import com.tari.android.wallet.ui.fragment.qr.QrScannerSource
 import com.tari.android.wallet.util.Constants

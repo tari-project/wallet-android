@@ -16,9 +16,9 @@ import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonStyle
 import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
 import com.tari.android.wallet.ui.fragment.contactBook.data.contacts.ContactDto
-import com.tari.android.wallet.ui.fragment.home.navigation.TariNavigator.Companion.PARAMETER_AMOUNT
-import com.tari.android.wallet.ui.fragment.home.navigation.TariNavigator.Companion.PARAMETER_CONTACT
-import com.tari.android.wallet.ui.fragment.home.navigation.TariNavigator.Companion.PARAMETER_NOTE
+import com.tari.android.wallet.navigation.TariNavigator.Companion.PARAMETER_AMOUNT
+import com.tari.android.wallet.navigation.TariNavigator.Companion.PARAMETER_CONTACT
+import com.tari.android.wallet.navigation.TariNavigator.Companion.PARAMETER_NOTE
 import com.tari.android.wallet.ui.fragment.send.addAmount.feeModule.FeeModule
 import com.tari.android.wallet.ui.fragment.send.addAmount.feeModule.NetworkSpeed
 import com.tari.android.wallet.util.Constants

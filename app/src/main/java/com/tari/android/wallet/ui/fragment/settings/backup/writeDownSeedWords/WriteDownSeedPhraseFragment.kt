@@ -50,7 +50,7 @@ import com.tari.android.wallet.ui.extension.ThrottleClick
 import com.tari.android.wallet.ui.extension.animateClick
 import com.tari.android.wallet.ui.extension.dimenPx
 import com.tari.android.wallet.ui.extension.setVisible
-import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
+import com.tari.android.wallet.navigation.Navigation
 import com.tari.android.wallet.ui.fragment.settings.backup.writeDownSeedWords.adapter.PhraseWordsAdapter
 import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.DebugConfig

@@ -62,17 +62,17 @@ import com.tari.android.wallet.ui.extension.setVisible
 import com.tari.android.wallet.ui.fragment.auth.AuthActivity
 import com.tari.android.wallet.ui.fragment.chat.chatList.ChatListFragment
 import com.tari.android.wallet.ui.fragment.contactBook.root.ContactBookFragment
-import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
-import com.tari.android.wallet.ui.fragment.home.navigation.TariNavigator.Companion.INDEX_CHAT
-import com.tari.android.wallet.ui.fragment.home.navigation.TariNavigator.Companion.INDEX_CONTACT_BOOK
-import com.tari.android.wallet.ui.fragment.home.navigation.TariNavigator.Companion.INDEX_HOME
-import com.tari.android.wallet.ui.fragment.home.navigation.TariNavigator.Companion.INDEX_SETTINGS
-import com.tari.android.wallet.ui.fragment.home.navigation.TariNavigator.Companion.NO_SMOOTH_SCROLL
+import com.tari.android.wallet.navigation.Navigation
+import com.tari.android.wallet.navigation.TariNavigator.Companion.INDEX_CHAT
+import com.tari.android.wallet.navigation.TariNavigator.Companion.INDEX_CONTACT_BOOK
+import com.tari.android.wallet.navigation.TariNavigator.Companion.INDEX_HOME
+import com.tari.android.wallet.navigation.TariNavigator.Companion.INDEX_SETTINGS
+import com.tari.android.wallet.navigation.TariNavigator.Companion.NO_SMOOTH_SCROLL
 import com.tari.android.wallet.ui.fragment.settings.allSettings.AllSettingsFragment
 import com.tari.android.wallet.ui.fragment.settings.themeSelector.TariTheme
 import com.tari.android.wallet.ui.fragment.splash.SplashActivity
 import com.tari.android.wallet.ui.fragment.store.StoreFragment
-import com.tari.android.wallet.ui.fragment.tx.HomeFragment
+import com.tari.android.wallet.ui.fragment.home.overview.HomeOverviewFragment
 import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.DebugConfig
 import java.lang.ref.WeakReference
@@ -264,11 +264,11 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>() {
     }
 
     private fun checkScreensDeeplink(intent: Intent) {
-        val screen = intent.getStringExtra(HomeDeeplinkScreens.Key)
+        val screen = intent.getStringExtra(HomeDeeplinkScreens.KEY)
         if (screen.orEmpty().isNotEmpty()) {
             when (HomeDeeplinkScreens.parse(screen)) {
                 HomeDeeplinkScreens.TxDetails -> {
-                    (intent.parcelable<TxId>(HomeDeeplinkScreens.KeyTxDetailsArgs))?.let { viewModel.tariNavigator.toTxDetails(txId = it) }
+                    (intent.parcelable<TxId>(HomeDeeplinkScreens.KEY_TX_DETAIL_ARGS))?.let { viewModel.tariNavigator.toTxDetails(txId = it) }
                 }
 
                 else -> {}
@@ -302,7 +302,7 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>() {
     private class HomeStoreAdapter(fm: FragmentManager, lifecycle: Lifecycle) : FragmentStateAdapter(fm, lifecycle) {
 
         override fun createFragment(position: Int): Fragment = when (position) {
-            INDEX_HOME -> HomeFragment()
+            INDEX_HOME -> HomeOverviewFragment()
             INDEX_CONTACT_BOOK -> StoreFragment.newInstance()
             INDEX_CHAT -> ContactBookFragment()
             INDEX_SETTINGS -> AllSettingsFragment.newInstance()
@@ -315,7 +315,7 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>() {
     private class HomeChatAdapter(fm: FragmentManager, lifecycle: Lifecycle) : FragmentStateAdapter(fm, lifecycle) {
 
         override fun createFragment(position: Int): Fragment = when (position) {
-            INDEX_HOME -> HomeFragment()
+            INDEX_HOME -> HomeOverviewFragment()
             INDEX_CONTACT_BOOK -> ContactBookFragment()
             INDEX_CHAT -> ChatListFragment()
             INDEX_SETTINGS -> AllSettingsFragment.newInstance()

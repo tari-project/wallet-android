@@ -1,4 +1,4 @@
-package com.tari.android.wallet.ui.fragment.home.navigation
+package com.tari.android.wallet.navigation
 
 import com.tari.android.wallet.application.YatAdapter.ConnectedWallet
 import com.tari.android.wallet.application.deeplinks.DeepLink

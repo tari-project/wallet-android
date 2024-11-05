@@ -22,8 +22,8 @@ import com.tari.android.wallet.ui.dialog.modular.modules.input.InputModule
 import com.tari.android.wallet.ui.fragment.contactBook.data.ContactsRepository
 import com.tari.android.wallet.ui.fragment.contactBook.data.contacts.ContactDto
 import com.tari.android.wallet.ui.fragment.contactBook.data.contacts.FFIContactInfo
-import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
-import com.tari.android.wallet.ui.fragment.home.navigation.TariNavigator
+import com.tari.android.wallet.navigation.Navigation
+import com.tari.android.wallet.navigation.TariNavigator
 import com.tari.android.wallet.util.DebugConfig
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

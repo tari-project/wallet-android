@@ -72,10 +72,10 @@ import com.tari.android.wallet.ui.extension.string
 import com.tari.android.wallet.ui.extension.temporarilyDisableClick
 import com.tari.android.wallet.ui.extension.visible
 import com.tari.android.wallet.ui.fragment.contactBook.data.contacts.ContactDto
-import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
-import com.tari.android.wallet.ui.fragment.home.navigation.TariNavigator.Companion.PARAMETER_AMOUNT
-import com.tari.android.wallet.ui.fragment.home.navigation.TariNavigator.Companion.PARAMETER_CONTACT
-import com.tari.android.wallet.ui.fragment.home.navigation.TariNavigator.Companion.PARAMETER_NOTE
+import com.tari.android.wallet.navigation.Navigation
+import com.tari.android.wallet.navigation.TariNavigator.Companion.PARAMETER_AMOUNT
+import com.tari.android.wallet.navigation.TariNavigator.Companion.PARAMETER_CONTACT
+import com.tari.android.wallet.navigation.TariNavigator.Companion.PARAMETER_NOTE
 import com.tari.android.wallet.ui.fragment.send.addAmount.feeModule.NetworkSpeed
 import com.tari.android.wallet.ui.fragment.send.addAmount.keyboard.KeyboardController
 import com.tari.android.wallet.ui.fragment.send.amountView.AmountStyle

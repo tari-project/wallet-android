@@ -1,4 +1,4 @@
-package com.tari.android.wallet.ui.fragment.tx
+package com.tari.android.wallet.ui.component
 
 import android.animation.ValueAnimator
 import android.content.Context

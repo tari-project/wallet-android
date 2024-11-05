@@ -83,7 +83,7 @@ import com.tari.android.wallet.ui.extension.showInternetConnectionErrorDialog
 import com.tari.android.wallet.ui.extension.temporarilyDisableClick
 import com.tari.android.wallet.ui.extension.visible
 import com.tari.android.wallet.ui.fragment.contactBook.data.contacts.ContactDto
-import com.tari.android.wallet.ui.fragment.home.navigation.TariNavigator.Companion.PARAMETER_TRANSACTION
+import com.tari.android.wallet.navigation.TariNavigator.Companion.PARAMETER_TRANSACTION
 import com.tari.android.wallet.ui.fragment.send.addNote.gif.ChooseGIFDialogFragment
 import com.tari.android.wallet.ui.fragment.send.addNote.gif.GifContainer
 import com.tari.android.wallet.ui.fragment.send.addNote.gif.GifThumbnailAdapter
