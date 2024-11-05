@@ -8,7 +8,6 @@ import com.tari.android.wallet.ffi.FFIException
 import com.tari.android.wallet.ffi.FFITariWalletAddress
 import com.tari.android.wallet.ffi.FFIWallet
 import com.tari.android.wallet.ffi.runWithDestroy
-import com.tari.android.wallet.model.BalanceInfo
 import com.tari.android.wallet.model.CancelledTx
 import com.tari.android.wallet.model.CompletedTx
 import com.tari.android.wallet.model.MicroTari
@@ -47,8 +46,6 @@ class TariWalletServiceStubImpl(
             contactsFFI.destroy()
             return tariContacts.sortedWith(compareBy { it.alias }).also { _cachedTariContacts = it }
         }
-
-    override fun getBalanceInfo(error: WalletError): BalanceInfo? = runMapping(error) { wallet.getBalance() }
 
     /**
      * Get all contacts.

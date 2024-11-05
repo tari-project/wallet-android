@@ -1,6 +1,5 @@
 package com.tari.android.wallet.service.service
 
-import com.tari.android.wallet.model.BalanceInfo
 import com.tari.android.wallet.model.CancelledTx
 import com.tari.android.wallet.model.CompletedTx
 import com.tari.android.wallet.model.MicroTari
@@ -25,8 +24,6 @@ class TariWalletServiceStubProxy : TariWalletService.Stub() {
         set(newStub) {
             _stub = newStub
         }
-
-    override fun getBalanceInfo(error: WalletError): BalanceInfo? = stub?.getBalanceInfo(error)
 
     override fun getContacts(error: WalletError): List<TariContact>? = stub?.getContacts(error)
 

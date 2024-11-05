@@ -7,6 +7,7 @@ import com.tari.android.wallet.extension.getOrNull
 import com.tari.android.wallet.extension.getWithError
 import com.tari.android.wallet.extension.launchOnIo
 import com.tari.android.wallet.ffi.runWithDestroy
+import com.tari.android.wallet.model.BalanceInfo
 import com.tari.android.wallet.model.MicroTari
 import com.tari.android.wallet.model.TariWalletAddress
 import com.tari.android.wallet.model.WalletError
@@ -52,6 +53,9 @@ class AddAmountViewModel(savedState: SavedStateHandle) : CommonViewModel() {
 
     private val _effect = EffectChannelFlow<AddAmountModel.Effect>()
     val effect = _effect.flow
+
+    val walletBalance: BalanceInfo
+        get() = walletManager.requireWalletInstance.getBalance()
 
     init {
         doOnWalletServiceConnected { _effect.send(AddAmountModel.Effect.OnServiceConnected(uiState.value)) }

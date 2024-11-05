@@ -79,7 +79,7 @@ open class CommonViewModel : ViewModel() {
         get() = serviceConnection.walletService
 
     @Inject
-    lateinit var walletManager: WalletManager
+    protected lateinit var walletManager: WalletManager
 
     @Inject
     lateinit var dialogManager: DialogManager
