@@ -93,11 +93,6 @@ class HomeOverviewFragment : CommonFragment<FragmentHomeOverviewBinding, HomeOve
     }
 
     private fun observeUI() = with(viewModel) {
-
-        observe(avatarEmoji) { ui.avatar.text = it }
-
-        observe(emojiMedium) { ui.emptyStateTextView.text = getString(R.string.home_empty_state, it) }
-
         observe(txList) {
             ui.transactionsRecyclerView.setVisible(it.isNotEmpty())
             ui.viewAllTxsButton.setVisible(it.isNotEmpty())
@@ -114,6 +109,8 @@ class HomeOverviewFragment : CommonFragment<FragmentHomeOverviewBinding, HomeOve
 
         collectFlow(uiState) { uiState ->
             updateBalanceInfoUI(uiState.balance)
+            ui.avatar.text = uiState.avatarEmoji
+            ui.emptyStateTextView.text = getString(R.string.home_empty_state, uiState.emojiMedium)
         }
     }
 

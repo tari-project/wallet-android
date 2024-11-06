@@ -6,7 +6,6 @@ import android.os.Build
 import android.text.SpannableString
 import android.text.Spanned
 import androidx.lifecycle.MediatorLiveData
-import androidx.lifecycle.MutableLiveData
 import com.tari.android.wallet.R
 import com.tari.android.wallet.R.string.error_no_connection_description
 import com.tari.android.wallet.R.string.error_no_connection_title
@@ -43,7 +42,6 @@ import com.tari.android.wallet.ui.fragment.send.finalize.TxFailureReason
 import com.tari.android.wallet.ui.fragment.settings.backup.backupOnboarding.item.BackupOnboardingArgs
 import com.tari.android.wallet.ui.fragment.settings.backup.backupOnboarding.module.BackupOnboardingFlowItemModule
 import com.tari.android.wallet.ui.fragment.tx.adapter.TransactionItem
-import com.tari.android.wallet.util.EmojiId
 import com.tari.android.wallet.util.extractEmojis
 import com.tari.android.wallet.util.shortString
 import kotlinx.coroutines.Dispatchers
@@ -80,11 +78,16 @@ class HomeOverviewViewModel : CommonViewModel() {
 
     val txList = MediatorLiveData<List<CommonViewHolderItem>>()
 
-    val avatarEmoji = MutableLiveData<EmojiId>()
+    init {
+        component.inject(this)
+    }
 
-    val emojiMedium = MutableLiveData<EmojiId>()
-
-    private val _uiState = MutableStateFlow(HomeOverviewModel.UiState())
+    private val _uiState = MutableStateFlow(
+        HomeOverviewModel.UiState(
+            avatarEmoji = corePrefRepository.walletAddress.coreKeyEmojis.extractEmojis().take(1).joinToString(""),
+            emojiMedium = corePrefRepository.walletAddress.shortString(),
+        )
+    )
     val uiState = _uiState.asStateFlow()
 
     init {
@@ -115,10 +118,6 @@ class HomeOverviewViewModel : CommonViewModel() {
                 runCatching { refreshAllData() }
             }
         }
-
-        val address = corePrefRepository.walletAddress
-        emojiMedium.postValue(address.shortString())
-        avatarEmoji.postValue(address.coreKeyEmojis.extractEmojis().take(1).joinToString(""))
 
         checkForDataConsent()
 
