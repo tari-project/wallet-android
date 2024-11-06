@@ -1,4 +1,4 @@
-package com.tari.android.wallet.ui.fragment.tx.questionMark
+package com.tari.android.wallet.ui.component.questionMark
 
 import com.tari.android.wallet.R
 import com.tari.android.wallet.ui.common.CommonViewModel

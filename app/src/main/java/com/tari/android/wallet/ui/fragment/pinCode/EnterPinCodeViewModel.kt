@@ -7,7 +7,7 @@ import com.tari.android.wallet.data.sharedPrefs.security.LoginAttemptDto
 import com.tari.android.wallet.extension.addTo
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.common.SingleLiveEvent
-import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
+import com.tari.android.wallet.navigation.Navigation
 import java.time.LocalDateTime
 import java.time.OffsetDateTime
 
@@ -66,7 +66,7 @@ class EnterPinCodeViewModel : CommonViewModel() {
     }
 
     private fun doFraudLogic() {
-        val attempts = securityPrefRepository.attempts.orEmpty()
+        val attempts = securityPrefRepository.attempts
         val lastTimeInMills = attempts.lastOrNull()?.timeInMills
         val localDateTime = LocalDateTime.ofEpochSecond((lastTimeInMills ?: 0) / 1000, 0, OffsetDateTime.now().offset)
         val nextDateTime = when (attempts.size) {

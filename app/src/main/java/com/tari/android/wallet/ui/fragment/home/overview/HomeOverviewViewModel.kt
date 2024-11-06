@@ -1,11 +1,10 @@
-package com.tari.android.wallet.ui.fragment.tx
+package com.tari.android.wallet.ui.fragment.home.overview
 
 
 import android.app.Activity
 import android.os.Build
 import android.text.SpannableString
 import android.text.Spanned
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import com.tari.android.wallet.R
@@ -19,16 +18,17 @@ import com.tari.android.wallet.application.securityStage.StagedWalletSecurityMan
 import com.tari.android.wallet.application.securityStage.StagedWalletSecurityManager.StagedSecurityEffect
 import com.tari.android.wallet.application.walletManager.WalletManager.WalletEvent
 import com.tari.android.wallet.data.BalanceStateHandler
+import com.tari.android.wallet.data.TransactionRepository
 import com.tari.android.wallet.data.sharedPrefs.CorePrefRepository
 import com.tari.android.wallet.data.sharedPrefs.securityStages.WalletSecurityStage
 import com.tari.android.wallet.data.sharedPrefs.sentry.SentryPrefRepository
 import com.tari.android.wallet.extension.collectFlow
-import com.tari.android.wallet.extension.getWithError
 import com.tari.android.wallet.extension.launchOnIo
-import com.tari.android.wallet.extension.safeCastTo
+import com.tari.android.wallet.extension.takeIfIs
 import com.tari.android.wallet.model.BalanceInfo
+import com.tari.android.wallet.model.Tx
+import com.tari.android.wallet.navigation.Navigation
 import com.tari.android.wallet.ui.common.CommonViewModel
-import com.tari.android.wallet.ui.common.SingleLiveEvent
 import com.tari.android.wallet.ui.common.recyclerView.CommonViewHolderItem
 import com.tari.android.wallet.ui.dialog.modular.DialogArgs
 import com.tari.android.wallet.ui.dialog.modular.ModularDialogArgs
@@ -39,7 +39,6 @@ import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
 import com.tari.android.wallet.ui.dialog.modular.modules.securityStages.SecurityStageHeadModule
 import com.tari.android.wallet.ui.dialog.modular.modules.space.SpaceModule
 import com.tari.android.wallet.ui.fragment.contactBook.data.ContactsRepository
-import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
 import com.tari.android.wallet.ui.fragment.send.finalize.TxFailureReason
 import com.tari.android.wallet.ui.fragment.settings.backup.backupOnboarding.item.BackupOnboardingArgs
 import com.tari.android.wallet.ui.fragment.settings.backup.backupOnboarding.module.BackupOnboardingFlowItemModule
@@ -47,11 +46,16 @@ import com.tari.android.wallet.ui.fragment.tx.adapter.TransactionItem
 import com.tari.android.wallet.util.EmojiId
 import com.tari.android.wallet.util.extractEmojis
 import com.tari.android.wallet.util.shortString
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.withContext
 import yat.android.ui.extension.HtmlHelper
 import javax.inject.Inject
 
 
-class HomeFragmentViewModel : CommonViewModel() {
+class HomeOverviewViewModel : CommonViewModel() {
 
     @Inject
     lateinit var corePrefRepository: CorePrefRepository
@@ -74,17 +78,14 @@ class HomeFragmentViewModel : CommonViewModel() {
     @Inject
     lateinit var balanceStateHandler: BalanceStateHandler
 
-    private val _balanceInfo = MutableLiveData<BalanceInfo>()
-    val balanceInfo: LiveData<BalanceInfo> = _balanceInfo
-
-    private val _refreshBalanceInfo = SingleLiveEvent<Boolean>()
-    val refreshBalanceInfo: SingleLiveEvent<Boolean> = _refreshBalanceInfo
-
     val txList = MediatorLiveData<List<CommonViewHolderItem>>()
 
     val avatarEmoji = MutableLiveData<EmojiId>()
 
     val emojiMedium = MutableLiveData<EmojiId>()
+
+    private val _uiState = MutableStateFlow(HomeOverviewModel.UiState())
+    val uiState = _uiState.asStateFlow()
 
     init {
         component.inject(this)
@@ -93,7 +94,27 @@ class HomeFragmentViewModel : CommonViewModel() {
 
         collectFlow(contactsRepository.contactList) { updateList() }
 
-        doOnWalletRunning { doOnWalletServiceConnected { runCatching { onServiceConnected() } } }
+        collectFlow(walletManager.walletEvent) { event ->
+            when (event) {
+                is WalletEvent.Updated -> refreshAllData()
+                is WalletEvent.TxSend.TxSendFailed -> onTxSendFailed(event.failureReason)
+
+                else -> Unit
+            }
+        }
+
+        collectFlow(balanceStateHandler.balanceState) { balanceInfo ->
+            _uiState.update { it.copy(balance = balanceInfo) }
+
+            handleStagedSecurity(balanceInfo)
+        }
+
+        doOnWalletRunning {
+            doOnWalletServiceConnected {
+                _uiState.update { it.copy(balance = walletManager.requireWalletInstance.getBalance()) }
+                runCatching { refreshAllData() }
+            }
+        }
 
         val address = corePrefRepository.walletAddress
         emojiMedium.postValue(address.shortString())
@@ -104,10 +125,8 @@ class HomeFragmentViewModel : CommonViewModel() {
         showRecoverySuccessIfNeeded()
     }
 
-    fun processItemClick(item: CommonViewHolderItem) {
-        if (item is TransactionItem) {
-            navigation.postValue(Navigation.TxListNavigation.ToTxDetails(item.tx))
-        }
+    fun navigateToTxList(tx: Tx) {
+        tariNavigator.navigate(Navigation.TxListNavigation.ToTxDetails(tx))
     }
 
     fun checkPermission() {
@@ -174,63 +193,8 @@ class HomeFragmentViewModel : CommonViewModel() {
         }
     }
 
-    private fun onServiceConnected() {
-        collectFlow(walletManager.walletEvent) { event ->
-            when (event) {
-                is WalletEvent.Tx.TxReceived,
-                is WalletEvent.Tx.TxReplyReceived,
-                is WalletEvent.Tx.TxFinalized,
-                is WalletEvent.Tx.InboundTxBroadcast,
-                is WalletEvent.Tx.OutboundTxBroadcast,
-                is WalletEvent.Tx.TxMinedUnconfirmed,
-                is WalletEvent.Tx.TxMined,
-                is WalletEvent.Tx.TxFauxMinedUnconfirmed,
-                is WalletEvent.Tx.TxFauxConfirmed,
-                is WalletEvent.Tx.TxCancelled -> refreshBalance(false)
-
-                is WalletEvent.Updated -> refreshAllData()
-
-                is WalletEvent.TxSend.TxSendSuccessful -> refreshBalance(false)
-                is WalletEvent.TxSend.TxSendFailed -> onTxSendFailed(event.failureReason)
-
-                else -> Unit
-            }
-        }
-
-        collectFlow(balanceStateHandler.balanceState) { _balanceInfo.postValue(it) }
-
-        refreshAllData(true)
-    }
-
-    private fun fetchBalanceInfoData() {
-        walletService.getWithError { error, service -> service.getBalanceInfo(error) }?.let { balanceInfo ->
-            _balanceInfo.postValue(balanceInfo)
-
-            stagedWalletSecurityManager.handleBalanceChange(balanceInfo)
-                .safeCastTo<StagedSecurityEffect.ShowStagedSecurityPopUp>()
-                ?.let { effect ->
-                    when (effect.stage) {
-                        WalletSecurityStage.Stage1A -> showStagePopUp1A()
-                        WalletSecurityStage.Stage1B -> showStagePopUp1B()
-                        WalletSecurityStage.Stage2 -> showStagePopUp2()
-                        WalletSecurityStage.Stage3 -> showStagePopUp3()
-                    }
-                }
-        }
-    }
-
-    private fun refreshAllData(isRestarted: Boolean = false) {
-        launchOnIo {
-            refreshBalance(isRestarted)
-            transactionRepository.refreshAllData()
-        }
-    }
-
-    private fun refreshBalance(isRestarted: Boolean = false) {
-        launchOnIo {
-            fetchBalanceInfoData()
-            _refreshBalanceInfo.postValue(isRestarted)
-        }
+    private suspend fun refreshAllData() = withContext(Dispatchers.IO) {
+        transactionRepository.refreshAllData()
     }
 
     /**
@@ -258,6 +222,19 @@ class HomeFragmentViewModel : CommonViewModel() {
     /**
      * Show staged security popups
      */
+
+    private fun handleStagedSecurity(balanceInfo: BalanceInfo) {
+        stagedWalletSecurityManager.handleBalanceChange(balanceInfo)
+            .takeIfIs<StagedSecurityEffect.ShowStagedSecurityPopUp>()
+            ?.let { effect ->
+                when (effect.stage) {
+                    WalletSecurityStage.Stage1A -> showStagePopUp1A()
+                    WalletSecurityStage.Stage1B -> showStagePopUp1B()
+                    WalletSecurityStage.Stage2 -> showStagePopUp2()
+                    WalletSecurityStage.Stage3 -> showStagePopUp3()
+                }
+            }
+    }
 
     private fun showStagePopUp1A() {
         showPopup(

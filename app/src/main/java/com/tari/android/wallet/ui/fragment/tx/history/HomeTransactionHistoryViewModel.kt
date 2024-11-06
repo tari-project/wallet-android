@@ -7,8 +7,8 @@ import com.tari.android.wallet.model.Tx
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.common.recyclerView.CommonViewHolderItem
 import com.tari.android.wallet.ui.fragment.contactBook.data.ContactsRepository
-import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
-import com.tari.android.wallet.ui.fragment.tx.TransactionRepository
+import com.tari.android.wallet.navigation.Navigation
+import com.tari.android.wallet.data.TransactionRepository
 import com.tari.android.wallet.ui.fragment.tx.adapter.TransactionItem
 import javax.inject.Inject
 

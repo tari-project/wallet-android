@@ -24,7 +24,7 @@ import com.tari.android.wallet.ui.extension.setSelectionToEnd
 import com.tari.android.wallet.ui.extension.setTextSilently
 import com.tari.android.wallet.ui.extension.setVisible
 import com.tari.android.wallet.ui.extension.showKeyboard
-import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
+import com.tari.android.wallet.navigation.Navigation
 import com.tari.android.wallet.ui.fragment.restore.inputSeedWords.suggestions.SuggestionState
 import com.tari.android.wallet.ui.fragment.restore.inputSeedWords.suggestions.SuggestionViewHolderItem
 import com.tari.android.wallet.ui.fragment.restore.inputSeedWords.suggestions.SuggestionsAdapter

@@ -30,7 +30,7 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.tari.android.wallet.ui.fragment.tx
+package com.tari.android.wallet.ui.fragment.home.overview
 
 import android.annotation.SuppressLint
 import android.app.Activity
@@ -46,25 +46,27 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.deeplinks.DeepLink
 import com.tari.android.wallet.application.walletManager.WalletConfig
-import com.tari.android.wallet.databinding.FragmentHomeBinding
+import com.tari.android.wallet.databinding.FragmentHomeOverviewBinding
+import com.tari.android.wallet.extension.collectFlow
 import com.tari.android.wallet.extension.observe
 import com.tari.android.wallet.extension.observeOnLoad
+import com.tari.android.wallet.extension.takeIfIs
 import com.tari.android.wallet.model.BalanceInfo
+import com.tari.android.wallet.navigation.Navigation
 import com.tari.android.wallet.ui.common.CommonFragment
 import com.tari.android.wallet.ui.common.recyclerView.AdapterFactory
-import com.tari.android.wallet.ui.common.recyclerView.CommonAdapter
 import com.tari.android.wallet.ui.common.recyclerView.CommonViewHolderItem
+import com.tari.android.wallet.ui.component.balanceController.BalanceViewController
 import com.tari.android.wallet.ui.component.networkStateIndicator.ConnectionIndicatorViewModel
+import com.tari.android.wallet.ui.component.questionMark.QuestionMarkViewModel
 import com.tari.android.wallet.ui.extension.parcelable
 import com.tari.android.wallet.ui.extension.setVisible
-import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
 import com.tari.android.wallet.ui.fragment.qr.QrScannerActivity
 import com.tari.android.wallet.ui.fragment.qr.QrScannerSource
+import com.tari.android.wallet.ui.fragment.tx.adapter.TransactionItem
 import com.tari.android.wallet.ui.fragment.tx.adapter.TxListHomeViewHolder
-import com.tari.android.wallet.ui.fragment.tx.questionMark.QuestionMarkViewModel
-import com.tari.android.wallet.ui.fragment.tx.ui.balanceController.BalanceViewController
 
-class HomeFragment : CommonFragment<FragmentHomeBinding, HomeFragmentViewModel>() {
+class HomeOverviewFragment : CommonFragment<FragmentHomeOverviewBinding, HomeOverviewViewModel>() {
 
     private val networkIndicatorViewModel: ConnectionIndicatorViewModel by viewModels()
     private val questionMarkViewModel: QuestionMarkViewModel by viewModels()
@@ -73,16 +75,15 @@ class HomeFragment : CommonFragment<FragmentHomeBinding, HomeFragmentViewModel>(
 
     private val adapter = AdapterFactory.generate<CommonViewHolderItem>(TxListHomeViewHolder.getBuilder())
 
-    // This listener is used only to animate the visibility of the scroll depth gradient view.
-    private lateinit var balanceViewController: BalanceViewController
+    private var balanceViewController: BalanceViewController? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
-        FragmentHomeBinding.inflate(inflater, container, false).also { ui = it }.root
+        FragmentHomeOverviewBinding.inflate(inflater, container, false).also { ui = it }.root
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val viewModel: HomeFragmentViewModel by viewModels()
+        val viewModel: HomeOverviewViewModel by viewModels()
         bindViewModel(viewModel)
 
         viewModel.checkPermission()
@@ -92,8 +93,6 @@ class HomeFragment : CommonFragment<FragmentHomeBinding, HomeFragmentViewModel>(
     }
 
     private fun observeUI() = with(viewModel) {
-
-        observe(refreshBalanceInfo) { updateBalanceInfoUI(it) }
 
         observe(avatarEmoji) { ui.avatar.text = it }
 
@@ -107,12 +106,14 @@ class HomeFragment : CommonFragment<FragmentHomeBinding, HomeFragmentViewModel>(
             adapter.notifyDataSetChanged()
         }
 
-        observeOnLoad(balanceInfo)
-
         with(transactionRepository) {
             observeOnLoad(requiredConfirmationCount)
             observeOnLoad(listUpdateTrigger)
             observeOnLoad(debouncedList)
+        }
+
+        collectFlow(uiState) { uiState ->
+            updateBalanceInfoUI(uiState.balance)
         }
     }
 
@@ -129,9 +130,9 @@ class HomeFragment : CommonFragment<FragmentHomeBinding, HomeFragmentViewModel>(
     @SuppressLint("ClickableViewAccessibility")
     private fun setupUI() = with(ui) {
         viewAllTxsButton.setOnClickListener { viewModel.navigation.postValue(Navigation.TxListNavigation.HomeTransactionHistory) }
-        qrCodeButton.setOnClickListener { QrScannerActivity.startScanner(this@HomeFragment, QrScannerSource.Home) }
+        qrCodeButton.setOnClickListener { QrScannerActivity.startScanner(this@HomeOverviewFragment, QrScannerSource.Home) }
         transactionsRecyclerView.adapter = adapter
-        adapter.setClickListener(CommonAdapter.ItemClickListener { viewModel.processItemClick(it) })
+        adapter.setClickListener { item -> item.takeIfIs<TransactionItem>()?.let { viewModel.navigateToTxList(it.tx) } }
         transactionsRecyclerView.layoutManager = LinearLayoutManager(requireContext())
         fullAvatarContainer.setOnClickListener { viewModel.navigation.postValue(Navigation.AllSettingsNavigation.ToMyProfile) }
     }
@@ -152,28 +153,23 @@ class HomeFragment : CommonFragment<FragmentHomeBinding, HomeFragmentViewModel>(
         }
     }
 
-    private fun updateBalanceInfoUI(restart: Boolean) {
-        val balanceInfo = viewModel.balanceInfo.value!!
-
+    private fun updateBalanceInfoUI(balanceInfo: BalanceInfo) {
         val availableBalance = WalletConfig.balanceFormatter.format(balanceInfo.availableBalance.tariValue)
         ui.availableBalance.text = availableBalance
 
-        if (restart) {
+        balanceViewController?.let {
+            it.balanceInfo = balanceInfo
+        } ?: run {
             ui.balanceDigitContainerView.removeAllViews()
             ui.balanceDecimalsDigitContainerView.removeAllViews()
-            createBalanceInfoController(balanceInfo)
-            // show digits
-            balanceViewController.runStartupAnimation()
-        } else {
-            if (::balanceViewController.isInitialized) {
-                balanceViewController.balanceInfo = balanceInfo
-            } else {
-                createBalanceInfoController(balanceInfo)
+            createBalanceInfoController(balanceInfo).also { controller ->
+                balanceViewController = controller
+                controller.runStartupAnimation()
             }
         }
     }
 
-    private fun createBalanceInfoController(info: BalanceInfo) {
-        balanceViewController = BalanceViewController(requireContext(), ui.balanceDigitContainerView, ui.balanceDecimalsDigitContainerView, info)
+    private fun createBalanceInfoController(info: BalanceInfo): BalanceViewController {
+        return BalanceViewController(requireContext(), ui.balanceDigitContainerView, ui.balanceDecimalsDigitContainerView, info)
     }
 }

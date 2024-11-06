@@ -38,9 +38,9 @@ import com.tari.android.wallet.ui.dialog.modular.modules.body.BodyModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonStyle
 import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
-import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
-import com.tari.android.wallet.ui.fragment.home.navigation.Navigation.AllSettingsNavigation
-import com.tari.android.wallet.ui.fragment.home.navigation.TariNavigator
+import com.tari.android.wallet.navigation.Navigation
+import com.tari.android.wallet.navigation.Navigation.AllSettingsNavigation
+import com.tari.android.wallet.navigation.TariNavigator
 import com.tari.android.wallet.ui.fragment.settings.themeSelector.TariTheme
 import io.reactivex.disposables.CompositeDisposable
 import javax.inject.Inject
@@ -79,7 +79,7 @@ open class CommonViewModel : ViewModel() {
         get() = serviceConnection.walletService
 
     @Inject
-    lateinit var walletManager: WalletManager
+    protected lateinit var walletManager: WalletManager
 
     @Inject
     lateinit var dialogManager: DialogManager

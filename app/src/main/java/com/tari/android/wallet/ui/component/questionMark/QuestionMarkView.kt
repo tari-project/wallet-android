@@ -1,4 +1,4 @@
-package com.tari.android.wallet.ui.fragment.tx.questionMark
+package com.tari.android.wallet.ui.component.questionMark
 
 import android.content.Context
 import android.util.AttributeSet

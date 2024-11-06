@@ -37,8 +37,6 @@ import com.tari.android.wallet.model.Model;
 
 interface TariWalletService {
 
-    BalanceInfo getBalanceInfo(out WalletError error);
-
     List<TariContact> getContacts(out WalletError error);
 
     List<CompletedTx> getCompletedTxs(out WalletError error);

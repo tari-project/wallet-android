@@ -137,8 +137,8 @@ class NotificationHelper @Inject constructor(private val context: Context) {
         val layout = CustomTxNotificationViewHolder(context, tx)
         val intent = Intent(context, NotificationBroadcastReceiver::class.java).apply {
             flags = FLAG_ACTIVITY_CLEAR_TOP
-            putExtra(HomeDeeplinkScreens.Key, HomeDeeplinkScreens.TxDetails.name)
-            putExtra(HomeDeeplinkScreens.KeyTxDetailsArgs, TxId(tx.id))
+            putExtra(HomeDeeplinkScreens.KEY, HomeDeeplinkScreens.TxDetails.name)
+            putExtra(HomeDeeplinkScreens.KEY_TX_DETAIL_ARGS, TxId(tx.id))
         }
         val pendingIntent = PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_IMMUTABLE)
 
@@ -175,8 +175,8 @@ class NotificationHelper @Inject constructor(private val context: Context) {
         val layout = TxCanceledViewHolder(context, tx)
         val intent = Intent(context, NotificationBroadcastReceiver::class.java).apply {
             flags = FLAG_ACTIVITY_CLEAR_TOP
-            putExtra(HomeDeeplinkScreens.Key, HomeDeeplinkScreens.TxDetails.name)
-            putExtra(HomeDeeplinkScreens.KeyTxDetailsArgs, TxId(tx.id))
+            putExtra(HomeDeeplinkScreens.KEY, HomeDeeplinkScreens.TxDetails.name)
+            putExtra(HomeDeeplinkScreens.KEY_TX_DETAIL_ARGS, TxId(tx.id))
         }
 
         val pendingIntent = PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_IMMUTABLE)

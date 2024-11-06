@@ -19,6 +19,10 @@ abstract class CommonAdapter<T : CommonViewHolderItem> : ListAdapter<T, CommonVi
         this.onClickListener = onClickListener ?: ItemClickListener()
     }
 
+    fun setClickListener(onClickListener: (T) -> Unit) {
+        this.onClickListener = ItemClickListener(onClickListener)
+    }
+
     fun setLongClickListener(onLongClickListener: ItemLongClickListener<T>?) {
         this.onLongClickListener = onLongClickListener ?: ItemLongClickListener()
     }

@@ -56,11 +56,14 @@ import com.tari.android.wallet.R.string.tx_detail_fee_tooltip_transaction_fee
 import com.tari.android.wallet.application.walletManager.WalletConfig
 import com.tari.android.wallet.databinding.FragmentAddAmountBinding
 import com.tari.android.wallet.extension.collectFlow
-import com.tari.android.wallet.extension.getWithError
 import com.tari.android.wallet.model.BalanceInfo
 import com.tari.android.wallet.model.MicroTari
 import com.tari.android.wallet.model.TariWalletAddress
 import com.tari.android.wallet.model.WalletError
+import com.tari.android.wallet.navigation.Navigation
+import com.tari.android.wallet.navigation.TariNavigator.Companion.PARAMETER_AMOUNT
+import com.tari.android.wallet.navigation.TariNavigator.Companion.PARAMETER_CONTACT
+import com.tari.android.wallet.navigation.TariNavigator.Companion.PARAMETER_NOTE
 import com.tari.android.wallet.ui.common.CommonFragment
 import com.tari.android.wallet.ui.dialog.modular.ModularDialog
 import com.tari.android.wallet.ui.dialog.modular.SimpleDialogArgs
@@ -72,10 +75,6 @@ import com.tari.android.wallet.ui.extension.string
 import com.tari.android.wallet.ui.extension.temporarilyDisableClick
 import com.tari.android.wallet.ui.extension.visible
 import com.tari.android.wallet.ui.fragment.contactBook.data.contacts.ContactDto
-import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
-import com.tari.android.wallet.ui.fragment.home.navigation.TariNavigator.Companion.PARAMETER_AMOUNT
-import com.tari.android.wallet.ui.fragment.home.navigation.TariNavigator.Companion.PARAMETER_CONTACT
-import com.tari.android.wallet.ui.fragment.home.navigation.TariNavigator.Companion.PARAMETER_NOTE
 import com.tari.android.wallet.ui.fragment.send.addAmount.feeModule.NetworkSpeed
 import com.tari.android.wallet.ui.fragment.send.addAmount.keyboard.KeyboardController
 import com.tari.android.wallet.ui.fragment.send.amountView.AmountStyle
@@ -225,7 +224,7 @@ class AddAmountFragment : CommonFragment<FragmentAddAmountBinding, AddAmountView
 
     private fun checkAmountAndFee() {
         val error = WalletError()
-        val balanceInfo = viewModel.walletService.getBalanceInfo(error)
+        val balanceInfo = viewModel.walletBalance
         val fee = viewModel.selectedFeeData?.calculatedFee
 
         val amount = keyboardController.currentAmount
@@ -257,7 +256,7 @@ class AddAmountFragment : CommonFragment<FragmentAddAmountBinding, AddAmountView
     }
 
     private fun updateBalanceInfo() {
-        balanceInfo = viewModel.walletService.getWithError { error, wallet -> wallet.getBalanceInfo(error) }
+        balanceInfo = viewModel.walletBalance
         availableBalance = balanceInfo.availableBalance
         ui.availableBalanceContainerView.setupArgs(availableBalance)
     }

@@ -7,6 +7,7 @@ import com.tari.android.wallet.extension.getOrNull
 import com.tari.android.wallet.extension.getWithError
 import com.tari.android.wallet.extension.launchOnIo
 import com.tari.android.wallet.ffi.runWithDestroy
+import com.tari.android.wallet.model.BalanceInfo
 import com.tari.android.wallet.model.MicroTari
 import com.tari.android.wallet.model.TariWalletAddress
 import com.tari.android.wallet.model.WalletError
@@ -16,9 +17,9 @@ import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonStyle
 import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
 import com.tari.android.wallet.ui.fragment.contactBook.data.contacts.ContactDto
-import com.tari.android.wallet.ui.fragment.home.navigation.TariNavigator.Companion.PARAMETER_AMOUNT
-import com.tari.android.wallet.ui.fragment.home.navigation.TariNavigator.Companion.PARAMETER_CONTACT
-import com.tari.android.wallet.ui.fragment.home.navigation.TariNavigator.Companion.PARAMETER_NOTE
+import com.tari.android.wallet.navigation.TariNavigator.Companion.PARAMETER_AMOUNT
+import com.tari.android.wallet.navigation.TariNavigator.Companion.PARAMETER_CONTACT
+import com.tari.android.wallet.navigation.TariNavigator.Companion.PARAMETER_NOTE
 import com.tari.android.wallet.ui.fragment.send.addAmount.feeModule.FeeModule
 import com.tari.android.wallet.ui.fragment.send.addAmount.feeModule.NetworkSpeed
 import com.tari.android.wallet.util.Constants
@@ -52,6 +53,9 @@ class AddAmountViewModel(savedState: SavedStateHandle) : CommonViewModel() {
 
     private val _effect = EffectChannelFlow<AddAmountModel.Effect>()
     val effect = _effect.flow
+
+    val walletBalance: BalanceInfo
+        get() = walletManager.requireWalletInstance.getBalance()
 
     init {
         doOnWalletServiceConnected { _effect.send(AddAmountModel.Effect.OnServiceConnected(uiState.value)) }

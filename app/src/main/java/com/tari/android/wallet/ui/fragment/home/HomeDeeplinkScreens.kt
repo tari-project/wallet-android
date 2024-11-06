@@ -4,11 +4,11 @@ enum class HomeDeeplinkScreens {
     TxDetails;
 
     companion object {
-        const val Key = "HomeDeeplinkScreen"
-        const val KeyTxDetailsArgs = "HomeDeeplinkScreen_tx_id"
+        const val KEY = "HomeDeeplinkScreen"
+        const val KEY_TX_DETAIL_ARGS = "HomeDeeplinkScreen_tx_id"
 
-        fun parse(string: String?) : HomeDeeplinkScreens? {
-            return values().firstOrNull { it.name == string }
+        fun parse(string: String?): HomeDeeplinkScreens? {
+            return entries.firstOrNull { it.name == string }
         }
     }
 }

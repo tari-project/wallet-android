@@ -12,7 +12,7 @@ import com.tari.android.wallet.ui.extension.gone
 import com.tari.android.wallet.ui.extension.postDelayed
 import com.tari.android.wallet.ui.extension.showKeyboard
 import com.tari.android.wallet.ui.extension.visible
-import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
+import com.tari.android.wallet.navigation.Navigation
 
 class EnterCurrentPasswordFragment : CommonFragment<FragmentEnterCurrentPasswordBinding, EnterCurrentPasswordViewModel>() {
 

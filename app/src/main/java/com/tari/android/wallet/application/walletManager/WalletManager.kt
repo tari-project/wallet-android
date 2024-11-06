@@ -599,6 +599,7 @@ class WalletManager @Inject constructor(
             successful -> {
                 walletValidationStatusMap.clear()
                 baseNodeStateHandler.updateSyncState(BaseNodeSyncState.Online)
+                logger.i("Wallet validation: Validation completed successfully")
             }
         }
     }

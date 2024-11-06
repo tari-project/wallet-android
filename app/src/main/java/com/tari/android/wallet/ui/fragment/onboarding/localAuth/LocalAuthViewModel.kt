@@ -8,7 +8,7 @@ import com.tari.android.wallet.extension.launchOnMain
 import com.tari.android.wallet.infrastructure.backup.BackupManager
 import com.tari.android.wallet.infrastructure.security.biometric.BiometricAuthenticationService
 import com.tari.android.wallet.ui.common.CommonViewModel
-import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
+import com.tari.android.wallet.navigation.Navigation
 import com.tari.android.wallet.ui.fragment.onboarding.localAuth.LocalAuthModel.Effect
 import com.tari.android.wallet.ui.fragment.onboarding.localAuth.LocalAuthModel.SecureState
 import com.tari.android.wallet.ui.fragment.pinCode.PinCodeScreenBehavior

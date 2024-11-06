@@ -12,7 +12,7 @@ import com.tari.android.wallet.ui.fragment.chat.chatDetails.adapter.ChatMessageV
 import com.tari.android.wallet.ui.fragment.chat.data.ChatMessageItemDto
 import com.tari.android.wallet.ui.fragment.chat.data.ChatsRepository
 import com.tari.android.wallet.ui.fragment.contactBook.data.ContactsRepository
-import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
+import com.tari.android.wallet.navigation.Navigation
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow

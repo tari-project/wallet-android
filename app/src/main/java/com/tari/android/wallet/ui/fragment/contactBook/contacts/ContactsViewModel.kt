@@ -29,7 +29,7 @@ import com.tari.android.wallet.ui.fragment.contactBook.data.ContactsRepository
 import com.tari.android.wallet.ui.fragment.contactBook.data.contacts.PhoneContactInfo
 import com.tari.android.wallet.ui.fragment.contactBook.root.ContactSelectionRepository
 import com.tari.android.wallet.ui.fragment.contactBook.root.ShareViewModel
-import com.tari.android.wallet.ui.fragment.home.navigation.Navigation
+import com.tari.android.wallet.navigation.Navigation
 import com.tari.android.wallet.ui.fragment.settings.allSettings.title.SettingsTitleViewHolderItem
 import yat.android.ui.extension.HtmlHelper
 import javax.inject.Inject
