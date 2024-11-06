@@ -47,8 +47,8 @@ abstract class CommonActivity<Binding : ViewBinding, VM : CommonViewModel> : App
 
     lateinit var viewModel: VM
 
-    private val dialogManager: DialogManager
-        get() = viewModel.dialogManager
+    private val dialogHandler: DialogHandler
+        get() = viewModel
 
     private val shakeDetector by lazy { ShakeDetector(this) }
 
@@ -202,22 +202,23 @@ abstract class CommonActivity<Binding : ViewBinding, VM : CommonViewModel> : App
     private fun showDebugDialog() {
         val versionInfo = TariVersionModel(viewModel.networkRepository).versionInfo
 
-        val modularDialogArgs = ModularDialogArgs(
-            dialogId = ModularDialogArgs.DialogId.DEBUG_MENU,
-            modules = listOf(
-                HeadModule(getString(R.string.debug_dialog_title)),
-                SpaceModule(8),
-                OptionModule(getString(R.string.debug_dialog_logs)) { openActivity(DebugNavigation.Logs) },
-                OptionModule(getString(R.string.debug_dialog_report)) { openActivity(DebugNavigation.BugReport) },
-                OptionModule(getString(R.string.debug_dialog_connection_status)) {
-                    dialogManager.dismiss()
-                    connectionStateViewModel.showStatesDialog()
-                },
-                BodyModule(versionInfo),
-                ButtonModule(getString(R.string.common_close), ButtonStyle.Close),
-            ),
+        dialogHandler.showModularDialog(
+            ModularDialogArgs(
+                dialogId = ModularDialogArgs.DialogId.DEBUG_MENU,
+                modules = listOf(
+                    HeadModule(getString(R.string.debug_dialog_title)),
+                    SpaceModule(8),
+                    OptionModule(getString(R.string.debug_dialog_logs)) { openActivity(DebugNavigation.Logs) },
+                    OptionModule(getString(R.string.debug_dialog_report)) { openActivity(DebugNavigation.BugReport) },
+                    OptionModule(getString(R.string.debug_dialog_connection_status)) {
+                        dialogHandler.hideDialog(ModularDialogArgs.DialogId.DEBUG_MENU)
+                        connectionStateViewModel.showStatesDialog()
+                    },
+                    BodyModule(versionInfo),
+                    ButtonModule(getString(R.string.common_close), ButtonStyle.Close),
+                ),
+            )
         )
-        dialogManager.replace(ModularDialog(this, modularDialogArgs))
     }
 
     protected fun shareViaText(text: String) {
@@ -233,7 +234,7 @@ abstract class CommonActivity<Binding : ViewBinding, VM : CommonViewModel> : App
     }
 
     private fun openActivity(navigation: DebugNavigation) {
-        dialogManager.dismiss()
+        dialogHandler.hideDialog()
         DebugActivity.launch(this, navigation)
     }
 }

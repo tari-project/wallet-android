@@ -23,6 +23,9 @@ import com.tari.android.wallet.ffi.FFIWallet
 import com.tari.android.wallet.infrastructure.logging.LoggerTags
 import com.tari.android.wallet.model.CoreError
 import com.tari.android.wallet.model.TariWalletAddress
+import com.tari.android.wallet.navigation.Navigation
+import com.tari.android.wallet.navigation.Navigation.AllSettingsNavigation
+import com.tari.android.wallet.navigation.TariNavigator
 import com.tari.android.wallet.service.TariWalletService
 import com.tari.android.wallet.service.connection.TariWalletServiceConnection
 import com.tari.android.wallet.ui.common.domain.ResourceManager
@@ -38,14 +41,11 @@ import com.tari.android.wallet.ui.dialog.modular.modules.body.BodyModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonStyle
 import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
-import com.tari.android.wallet.navigation.Navigation
-import com.tari.android.wallet.navigation.Navigation.AllSettingsNavigation
-import com.tari.android.wallet.navigation.TariNavigator
 import com.tari.android.wallet.ui.fragment.settings.themeSelector.TariTheme
 import io.reactivex.disposables.CompositeDisposable
 import javax.inject.Inject
 
-open class CommonViewModel : ViewModel() {
+open class CommonViewModel : ViewModel(), DialogHandler {
 
     var compositeDisposable: CompositeDisposable = CompositeDisposable()
 
@@ -163,7 +163,7 @@ open class CommonViewModel : ViewModel() {
         navigation.postValue(Navigation.FeatureAuth)
     }
 
-    fun checkAuthorization() {
+    private fun checkAuthorization() {
         if (authorizedAction != null && securityPrefRepository.isFeatureAuthenticated) {
             securityPrefRepository.isFeatureAuthenticated = false
             backPressed.value = Unit
@@ -172,31 +172,31 @@ open class CommonViewModel : ViewModel() {
         }
     }
 
-    fun showModularDialog(args: ModularDialogArgs) {
+    override fun showModularDialog(args: ModularDialogArgs) {
         _modularDialog.postValue(args)
     }
 
-    fun showModularDialog(vararg modules: IDialogModule) {
+    override fun showModularDialog(vararg modules: IDialogModule) {
         _modularDialog.postValue(ModularDialogArgs(modules = modules.toList()))
     }
 
-    fun showInputModalDialog(inputArgs: ModularDialogArgs) {
+    override fun showInputModalDialog(inputArgs: ModularDialogArgs) {
         _inputDialog.postValue(inputArgs)
     }
 
-    fun showInputModalDialog(vararg modules: IDialogModule) {
+    override fun showInputModalDialog(vararg modules: IDialogModule) {
         _inputDialog.postValue(ModularDialogArgs(modules = modules.toList()))
     }
 
-    fun showErrorDialog(error: CoreError) {
+    override fun showErrorDialog(error: CoreError) {
         showModularDialog(WalletErrorArgs(resourceManager, error).getModular())
     }
 
-    fun showErrorDialog(exception: Throwable) {
+    override fun showErrorDialog(exception: Throwable) {
         showModularDialog(WalletErrorArgs(resourceManager, exception).getModular())
     }
 
-    fun showNotReadyYetDialog() {
+    override fun showNotReadyYetDialog() {
         showSimpleDialog(
             iconRes = R.drawable.tari_construction,
             title = resourceManager.getString(R.string.common_not_ready_yet_dialog_title),
@@ -204,14 +204,14 @@ open class CommonViewModel : ViewModel() {
         )
     }
 
-    fun showSimpleDialog(
-        @DrawableRes iconRes: Int? = null,
+    override fun showSimpleDialog(
+        @DrawableRes iconRes: Int?,
         @StringRes titleRes: Int,
         @StringRes descriptionRes: Int,
-        cancelable: Boolean = true,
-        canceledOnTouchOutside: Boolean = true,
-        @StringRes closeButtonTextRes: Int = R.string.common_close,
-        onClose: () -> Unit = {},
+        cancelable: Boolean,
+        canceledOnTouchOutside: Boolean,
+        @StringRes closeButtonTextRes: Int,
+        onClose: () -> Unit,
     ) {
         showSimpleDialog(
             iconRes = iconRes,
@@ -224,14 +224,14 @@ open class CommonViewModel : ViewModel() {
         )
     }
 
-    fun showSimpleDialog(
-        @DrawableRes iconRes: Int? = null,
+    override fun showSimpleDialog(
+        @DrawableRes iconRes: Int?,
         title: CharSequence,
         description: CharSequence,
-        cancelable: Boolean = true,
-        canceledOnTouchOutside: Boolean = true,
-        @StringRes closeButtonTextRes: Int = R.string.common_close,
-        onClose: () -> Unit = {},
+        cancelable: Boolean,
+        canceledOnTouchOutside: Boolean,
+        @StringRes closeButtonTextRes: Int,
+        onClose: () -> Unit,
     ) {
         showModularDialog(
             SimpleDialogArgs(iconRes, title, description, cancelable, canceledOnTouchOutside, closeButtonTextRes, onClose)
@@ -239,7 +239,7 @@ open class CommonViewModel : ViewModel() {
         )
     }
 
-    protected fun showAddressDetailsDialog(walletAddress: TariWalletAddress) {
+    override fun showAddressDetailsDialog(walletAddress: TariWalletAddress) {
         showModularDialog(
             HeadModule(
                 title = resourceManager.getString(R.string.wallet_info_address_details_title),
@@ -264,7 +264,7 @@ open class CommonViewModel : ViewModel() {
         )
     }
 
-    fun hideDialog(dialogId: Int = ModularDialogArgs.DialogId.NO_ID) {
+    override fun hideDialog(dialogId: Int) {
         launchOnMain {
             dialogManager.dismiss(dialogId)
         }
@@ -294,4 +294,37 @@ open class CommonViewModel : ViewModel() {
     ) {
         _copyToClipboard.postValue(ClipboardArgs(clipLabel, clipText, toastMessage))
     }
+}
+
+interface DialogHandler {
+    fun showModularDialog(vararg modules: IDialogModule)
+    fun showModularDialog(args: ModularDialogArgs)
+    fun showSimpleDialog(
+        iconRes: Int? = null,
+        title: CharSequence,
+        description: CharSequence,
+        cancelable: Boolean = true,
+        canceledOnTouchOutside: Boolean = true,
+        closeButtonTextRes: Int = R.string.common_close,
+        onClose: () -> Unit = {}
+    )
+
+    fun showSimpleDialog(
+        iconRes: Int? = null,
+        titleRes: Int,
+        descriptionRes: Int,
+        cancelable: Boolean = true,
+        canceledOnTouchOutside: Boolean = true,
+        closeButtonTextRes: Int = R.string.common_close,
+        onClose: () -> Unit = {}
+    )
+
+    fun showErrorDialog(exception: Throwable)
+    fun showErrorDialog(error: CoreError)
+    fun showInputModalDialog(vararg modules: IDialogModule)
+    fun showInputModalDialog(inputArgs: ModularDialogArgs)
+    fun hideDialog(dialogId: Int = ModularDialogArgs.DialogId.NO_ID)
+
+    fun showNotReadyYetDialog()
+    fun showAddressDetailsDialog(walletAddress: TariWalletAddress)
 }
