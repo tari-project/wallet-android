@@ -1,10 +1,6 @@
 package com.tari.android.wallet.service.service
 
-import com.tari.android.wallet.model.CancelledTx
-import com.tari.android.wallet.model.CompletedTx
 import com.tari.android.wallet.model.MicroTari
-import com.tari.android.wallet.model.PendingInboundTx
-import com.tari.android.wallet.model.PendingOutboundTx
 import com.tari.android.wallet.model.TariCoinPreview
 import com.tari.android.wallet.model.TariContact
 import com.tari.android.wallet.model.TariUnblindedOutput
@@ -25,26 +21,6 @@ class TariWalletServiceStubProxy : TariWalletService.Stub() {
             _stub = newStub
         }
 
-    override fun getContacts(error: WalletError): List<TariContact>? = stub?.getContacts(error)
-
-    override fun getCompletedTxs(error: WalletError): List<CompletedTx>? = stub?.getCompletedTxs(error)
-
-    override fun getCompletedTxById(id: TxId, error: WalletError): CompletedTx? = stub?.getCompletedTxById(id, error)
-
-    override fun getPendingInboundTxs(error: WalletError): List<PendingInboundTx>? = stub?.getPendingInboundTxs(error)
-
-    override fun getPendingInboundTxById(id: TxId, error: WalletError): PendingInboundTx? = stub?.getPendingInboundTxById(id, error)
-
-    override fun getPendingOutboundTxs(error: WalletError): List<PendingOutboundTx>? = stub?.getPendingOutboundTxs(error)
-
-    override fun getPendingOutboundTxById(id: TxId, error: WalletError): PendingOutboundTx? = stub?.getPendingOutboundTxById(id, error)
-
-    override fun getCancelledTxs(error: WalletError): List<CancelledTx>? = stub?.getCancelledTxs(error)
-
-    override fun getCancelledTxById(id: TxId, error: WalletError): CancelledTx? = stub?.getCancelledTxById(id, error)
-
-    override fun cancelPendingTx(id: TxId, error: WalletError): Boolean = stub?.cancelPendingTx(id, error) ?: false
-
     override fun sendTari(
         contact: TariContact,
         amount: MicroTari,
@@ -60,10 +36,6 @@ class TariWalletServiceStubProxy : TariWalletService.Stub() {
 
     override fun removeContact(contactPublicKey: TariWalletAddress, error: WalletError): Boolean =
         stub?.removeContact(contactPublicKey, error) ?: false
-
-    override fun getRequiredConfirmationCount(error: WalletError): Long = stub?.getRequiredConfirmationCount(error) ?: 3
-
-    override fun setRequiredConfirmationCount(number: Long, error: WalletError) = stub?.setRequiredConfirmationCount(number, error) ?: Unit
 
     override fun getSeedWords(error: WalletError): List<String>? = stub?.getSeedWords(error)
 

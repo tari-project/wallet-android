@@ -38,7 +38,7 @@ package com.tari.android.wallet.ffi
  * @author The Tari Development Team
  */
 
-class FFIContacts() : FFIBase() {
+class FFIContacts() : FFIIterableBase<FFIContact>() {
 
     private external fun jniGetLength(libError: FFIError): Int
     private external fun jniGetAt(index: Int, libError: FFIError): FFIContactPtr
@@ -49,12 +49,9 @@ class FFIContacts() : FFIBase() {
         this.pointer = pointer
     }
 
-    fun getLength(): Int = runWithError { jniGetLength(it) }
+    override fun getLength(): Int = runWithError { jniGetLength(it) }
 
-    fun getAt(index: Int): FFIContact = runWithError { FFIContact(jniGetAt(index, it)) }
-
-    // TODO maybe need to remove this method because we need to destroy objects after using
-    fun items(): List<FFIContact> = (0 until getLength()).map { getAt(it) }
+    override fun getAt(index: Int): FFIContact = runWithError { FFIContact(jniGetAt(index, it)) }
 
     override fun destroy() = jniDestroy()
 }

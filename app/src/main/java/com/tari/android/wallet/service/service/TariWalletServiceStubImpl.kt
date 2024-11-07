@@ -8,11 +8,7 @@ import com.tari.android.wallet.ffi.FFIException
 import com.tari.android.wallet.ffi.FFITariWalletAddress
 import com.tari.android.wallet.ffi.FFIWallet
 import com.tari.android.wallet.ffi.runWithDestroy
-import com.tari.android.wallet.model.CancelledTx
-import com.tari.android.wallet.model.CompletedTx
 import com.tari.android.wallet.model.MicroTari
-import com.tari.android.wallet.model.PendingInboundTx
-import com.tari.android.wallet.model.PendingOutboundTx
 import com.tari.android.wallet.model.TariCoinPreview
 import com.tari.android.wallet.model.TariContact
 import com.tari.android.wallet.model.TariUnblindedOutput
@@ -23,98 +19,11 @@ import com.tari.android.wallet.model.TxId
 import com.tari.android.wallet.model.WalletError
 import com.tari.android.wallet.service.TariWalletService
 import com.tari.android.wallet.util.Constants
-import java.math.BigInteger
 
 class TariWalletServiceStubImpl(
     private val wallet: FFIWallet,
     private val walletNotificationManager: WalletNotificationManager,
 ) : TariWalletService.Stub() {
-
-    private var _cachedTariContacts: List<TariContact>? = null
-    private val cachedTariContacts: List<TariContact>
-        @Synchronized get() {
-            _cachedTariContacts?.let { return it }
-            val contactsFFI = wallet.getContacts()
-            val tariContacts = mutableListOf<TariContact>()
-            for (i in 0 until contactsFFI.getLength()) {
-                val contactFFI = contactsFFI.getAt(i)
-                tariContacts.add(TariContact(contactFFI))
-                // destroy native objects
-                contactFFI.destroy()
-            }
-            // destroy native collection
-            contactsFFI.destroy()
-            return tariContacts.sortedWith(compareBy { it.alias }).also { _cachedTariContacts = it }
-        }
-
-    /**
-     * Get all contacts.
-     */
-    override fun getContacts(error: WalletError): List<TariContact>? = runMapping(error) { cachedTariContacts }
-
-    /**
-     * Get all completed transactions.
-     * Client-facing function.
-     */
-    override fun getCompletedTxs(error: WalletError): List<CompletedTx>? = runMapping(error) {
-        wallet.getCompletedTxs().runWithDestroy { txs -> (0 until txs.getLength()).map { CompletedTx(txs.getAt(it)) } }
-    }
-
-    /**
-     * Get all cancelledTxs transactions.
-     * Client-facing function.
-     */
-    override fun getCancelledTxs(error: WalletError): List<CancelledTx>? = runMapping(error) {
-        wallet.getCancelledTxs().runWithDestroy { txs -> (0 until txs.getLength()).map { CancelledTx(txs.getAt(it)) } }
-    }
-
-    /**
-     * Get completed transaction by id.
-     * Client-facing function.
-     */
-    override fun getCancelledTxById(id: TxId, error: WalletError): CancelledTx? =
-        runMapping(error) { CancelledTx(wallet.getCancelledTxById(id.value)) }
-
-    /**
-     * Get completed transaction by id.
-     * Client-facing function.
-     */
-    override fun getCompletedTxById(id: TxId, error: WalletError): CompletedTx? =
-        runMapping(error) { CompletedTx(wallet.getCompletedTxById(id.value)) }
-
-    /**
-     * Get all pending inbound transactions.
-     * Client-facing function.
-     */
-    override fun getPendingInboundTxs(error: WalletError): List<PendingInboundTx>? = runMapping(error) {
-        wallet.getPendingInboundTxs().runWithDestroy { txs -> (0 until txs.getLength()).map { PendingInboundTx(txs.getAt(it)) } }
-    }
-
-    /**
-     * Get pending inbound transaction by id.
-     * Client-facing function.
-     */
-    override fun getPendingInboundTxById(id: TxId, error: WalletError): PendingInboundTx? = runMapping(error) {
-        PendingInboundTx(wallet.getPendingInboundTxById(id.value))
-    }
-
-    /**
-     * Get all pending outbound transactions.
-     * Client-facing function.
-     */
-    override fun getPendingOutboundTxs(error: WalletError): List<PendingOutboundTx>? = runMapping(error) {
-        wallet.getPendingOutboundTxs().runWithDestroy { txs -> (0 until txs.getLength()).map { PendingOutboundTx(txs.getAt(it)) } }
-    }
-
-    /**
-     * Get pending outbound transaction by id.
-     * Client-facing function.
-     */
-    override fun getPendingOutboundTxById(id: TxId, error: WalletError): PendingOutboundTx? = runMapping(error) {
-        PendingOutboundTx(wallet.getPendingOutboundTxById(id.value))
-    }
-
-    override fun cancelPendingTx(id: TxId, error: WalletError): Boolean = runMapping(error) { wallet.cancelPendingTx(id.value) } ?: false
 
     override fun sendTari(
         tariContact: TariContact,
@@ -135,41 +44,17 @@ class TariWalletServiceStubImpl(
     }
 
     override fun removeContact(walletAddress: TariWalletAddress, error: WalletError): Boolean = runMapping(error) {
-        val contactsFFI = wallet.getContacts()
-        for (i in 0 until contactsFFI.getLength()) {
-            val contactFFI = contactsFFI.getAt(i)
-            val ffiTariWalletAddress = contactFFI.getWalletAddress()
-            if (TariWalletAddress(ffiTariWalletAddress) == walletAddress) {
-                return@runMapping wallet.removeContact(contactFFI).also {
-                    ffiTariWalletAddress.destroy()
-                    contactFFI.destroy()
-                    contactsFFI.destroy()
-                    _cachedTariContacts = null
-                }
-            }
-            ffiTariWalletAddress.destroy()
-            contactFFI.destroy()
-        }
-        contactsFFI.destroy()
-        false
+        wallet.findContactByWalletAddress(walletAddress)?.runWithDestroy { wallet.removeContact(it) } ?: false
     } ?: false
 
     override fun updateContact(walletAddress: TariWalletAddress, alias: String, isFavorite: Boolean, error: WalletError): Boolean =
         runMapping(error) {
-            val ffiTariWalletAddress = FFITariWalletAddress(Base58String(walletAddress.fullBase58))
-            val contact = FFIContact(alias, ffiTariWalletAddress, isFavorite)
-            wallet.addUpdateContact(contact).also {
-                ffiTariWalletAddress.destroy()
-                contact.destroy()
-                _cachedTariContacts = null
+            FFITariWalletAddress(Base58String(walletAddress.fullBase58)).runWithDestroy { ffiTariWalletAddress ->
+                FFIContact(alias, ffiTariWalletAddress, isFavorite).runWithDestroy { contactToUpdate ->
+                    wallet.addUpdateContact(contactToUpdate)
+                }
             }
         } ?: false
-
-    override fun getRequiredConfirmationCount(error: WalletError): Long = runMapping(error) { wallet.getRequiredConfirmationCount().toLong() } ?: 0
-
-    override fun setRequiredConfirmationCount(number: Long, error: WalletError) {
-        runMapping(error) { wallet.setRequiredConfirmationCount(BigInteger.valueOf(number)) }
-    }
 
     override fun getSeedWords(error: WalletError): List<String>? = runMapping(error) {
         wallet.getSeedWords().runWithDestroy { seedWords -> (0 until seedWords.getLength()).map { seedWords.getAt(it) } }

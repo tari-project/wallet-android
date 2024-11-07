@@ -102,7 +102,6 @@ class HomeOverviewFragment : CommonFragment<FragmentHomeOverviewBinding, HomeOve
         }
 
         with(transactionRepository) {
-            observeOnLoad(requiredConfirmationCount)
             observeOnLoad(listUpdateTrigger)
             observeOnLoad(debouncedList)
         }

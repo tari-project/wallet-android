@@ -37,12 +37,17 @@ import com.tari.android.wallet.BuildConfig
 import com.tari.android.wallet.application.walletManager.WalletCallbackListener
 import com.tari.android.wallet.data.sharedPrefs.network.TariNetwork
 import com.tari.android.wallet.model.BalanceInfo
+import com.tari.android.wallet.model.CancelledTx
+import com.tari.android.wallet.model.CompletedTx
 import com.tari.android.wallet.model.MicroTari
+import com.tari.android.wallet.model.PendingInboundTx
+import com.tari.android.wallet.model.PendingOutboundTx
 import com.tari.android.wallet.model.PublicKey
 import com.tari.android.wallet.model.TariCoinPreview
 import com.tari.android.wallet.model.TariUnblindedOutput
 import com.tari.android.wallet.model.TariVector
 import com.tari.android.wallet.model.TariWalletAddress
+import com.tari.android.wallet.model.TxId
 import com.tari.android.wallet.util.Constants
 import java.math.BigInteger
 
@@ -249,27 +254,41 @@ class FFIWallet(
 
     fun getContacts(): FFIContacts = runWithError { FFIContacts(jniGetContacts(it)) }
 
+    fun findContactByWalletAddress(walletAddress: TariWalletAddress): FFIContact? = runWithError {
+        getContacts().find { ffiContact -> ffiContact.getWalletAddress().runWithDestroy { TariWalletAddress(it) } == walletAddress }
+    }
+
     fun addUpdateContact(contact: FFIContact): Boolean = runWithError { jniAddUpdateContact(contact, it) }
 
     fun removeContact(contact: FFIContact): Boolean = runWithError { jniRemoveContact(contact, it) }
 
-    fun getCompletedTxs(): FFICompletedTxs = runWithError { FFICompletedTxs(jniGetCompletedTxs(it)) }
+    fun getCompletedTxs(): List<CompletedTx> = runWithError { FFICompletedTxs(jniGetCompletedTxs(it)).iterateWithDestroy { tx -> CompletedTx(tx) } }
 
-    fun getCancelledTxs(): FFICompletedTxs = runWithError { FFICompletedTxs(jniGetCancelledTxs(it)) }
+    fun getCancelledTxs(): List<CancelledTx> = runWithError { FFICompletedTxs(jniGetCancelledTxs(it)).iterateWithDestroy { tx -> CancelledTx(tx) } }
 
-    fun getCompletedTxById(id: BigInteger): FFICompletedTx = runWithError { FFICompletedTx(jniGetCompletedTxById(id.toString(), it)) }
+    fun getPendingOutboundTxs(): List<PendingOutboundTx> = runWithError {
+        FFIPendingOutboundTxs(jniGetPendingOutboundTxs(it)).iterateWithDestroy { tx -> PendingOutboundTx(tx) }
+    }
 
-    fun getCancelledTxById(id: BigInteger): FFICompletedTx = runWithError { FFICompletedTx(jniGetCancelledTxById(id.toString(), it)) }
+    fun getPendingInboundTxs(): List<PendingInboundTx> = runWithError {
+        FFIPendingInboundTxs(jniGetPendingInboundTxs(it)).iterateWithDestroy { tx -> PendingInboundTx(tx) }
+    }
 
-    fun getPendingOutboundTxs(): FFIPendingOutboundTxs = runWithError { FFIPendingOutboundTxs(jniGetPendingOutboundTxs(it)) }
+    fun getCompletedTxById(id: TxId): CompletedTx = runWithError {
+        FFICompletedTx(jniGetCompletedTxById(id.value.toString(), it)).runWithDestroy { tx -> CompletedTx(tx) }
+    }
 
-    fun getPendingOutboundTxById(id: BigInteger): FFIPendingOutboundTx =
-        runWithError { FFIPendingOutboundTx(jniGetPendingOutboundTxById(id.toString(), it)) }
+    fun getCancelledTxById(id: TxId): CompletedTx = runWithError {
+        FFICompletedTx(jniGetCancelledTxById(id.value.toString(), it)).runWithDestroy { tx -> CompletedTx(tx) }
+    }
 
-    fun getPendingInboundTxs(): FFIPendingInboundTxs = runWithError { FFIPendingInboundTxs(jniGetPendingInboundTxs(it)) }
+    fun getPendingOutboundTxById(id: TxId): PendingOutboundTx = runWithError {
+        FFIPendingOutboundTx(jniGetPendingOutboundTxById(id.value.toString(), it)).runWithDestroy { tx -> PendingOutboundTx(tx) }
+    }
 
-    fun getPendingInboundTxById(id: BigInteger): FFIPendingInboundTx =
-        runWithError { FFIPendingInboundTx(jniGetPendingInboundTxById(id.toString(), it)) }
+    fun getPendingInboundTxById(id: TxId): PendingInboundTx = runWithError {
+        FFIPendingInboundTx(jniGetPendingInboundTxById(id.value.toString(), it)).runWithDestroy { tx -> PendingInboundTx(tx) }
+    }
 
     fun cancelPendingTx(id: BigInteger): Boolean = runWithError { jniCancelPendingTx(id.toString(), it) }
 
@@ -356,7 +375,7 @@ class FFIWallet(
 
     fun logMessage(message: String) = runWithError { jniLogMessage(message, it) }
 
-    fun getRequiredConfirmationCount(): BigInteger = runWithError { BigInteger(1, jniGetConfirmations(it)) }
+    fun getRequiredConfirmationCount(): Long = runWithError { BigInteger(1, jniGetConfirmations(it)).toLong() }
 
     fun setRequiredConfirmationCount(number: BigInteger) = runWithError { jniSetConfirmations(number.toString(), it) }
 

@@ -37,7 +37,7 @@ package com.tari.android.wallet.ffi
  *
  * @author The Tari Development Team
  */
-class FFICompletedTxs() : FFIBase() {
+class FFICompletedTxs() : FFIIterableBase<FFICompletedTx>() {
 
     private external fun jniGetLength(libError: FFIError): Int
     private external fun jniGetAt(index: Int, libError: FFIError): FFIPointer
@@ -48,9 +48,9 @@ class FFICompletedTxs() : FFIBase() {
         this.pointer = pointer
     }
 
-    fun getLength(): Int = runWithError { jniGetLength(it) }
+    override fun getLength(): Int = runWithError { jniGetLength(it) }
 
-    fun getAt(index: Int): FFICompletedTx = runWithError { FFICompletedTx(jniGetAt(index, it)) }
+    override fun getAt(index: Int): FFICompletedTx = runWithError { FFICompletedTx(jniGetAt(index, it)) }
 
     override fun destroy() = jniDestroy()
 }

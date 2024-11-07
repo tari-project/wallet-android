@@ -7,9 +7,9 @@ import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.walletManager.WalletManager.WalletEvent
+import com.tari.android.wallet.application.walletManager.doOnWalletRunning
 import com.tari.android.wallet.extension.collectFlow
 import com.tari.android.wallet.extension.debounce
-import com.tari.android.wallet.extension.getWithError
 import com.tari.android.wallet.extension.repopulate
 import com.tari.android.wallet.model.CancelledTx
 import com.tari.android.wallet.model.CompletedTx
@@ -18,7 +18,6 @@ import com.tari.android.wallet.model.PendingOutboundTx
 import com.tari.android.wallet.model.Tx
 import com.tari.android.wallet.model.TxId
 import com.tari.android.wallet.model.TxStatus
-import com.tari.android.wallet.model.WalletError
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.common.gyphy.presentation.GifViewModel
 import com.tari.android.wallet.ui.common.gyphy.repository.GifRepository
@@ -30,6 +29,7 @@ import com.tari.android.wallet.util.DebugConfig
 import com.tari.android.wallet.util.MockDataStub
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.util.concurrent.CopyOnWriteArrayList
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -50,9 +50,6 @@ class TransactionRepository @Inject constructor() : CommonViewModel() {
     private val _listUpdateTrigger = MediatorLiveData<Unit>()
     val listUpdateTrigger: LiveData<Unit> = _listUpdateTrigger
 
-    private val _requiredConfirmationCount = MutableLiveData<Long>(3)
-    val requiredConfirmationCount: LiveData<Long> = _requiredConfirmationCount
-
     val debouncedList = listUpdateTrigger.debounce(LIST_UPDATE_DEBOUNCE).map {
         updateList()
     }
@@ -61,12 +58,6 @@ class TransactionRepository @Inject constructor() : CommonViewModel() {
     private val completedTxs = CopyOnWriteArrayList<CompletedTx>()
     private val pendingInboundTxs = CopyOnWriteArrayList<PendingInboundTx>()
     private val pendingOutboundTxs = CopyOnWriteArrayList<PendingOutboundTx>()
-
-    val txListIsEmpty: Boolean
-        get() = cancelledTxs.isEmpty()
-                && completedTxs.isEmpty()
-                && pendingInboundTxs.isEmpty()
-                && pendingOutboundTxs.isEmpty()
 
     init {
         component.inject(this)
@@ -100,13 +91,8 @@ class TransactionRepository @Inject constructor() : CommonViewModel() {
 
         viewModelScope.launch(Dispatchers.IO) {
             updateTxListData()
-            fetchRequiredConfirmationCount()
             updateList()
         }
-    }
-
-    private fun fetchRequiredConfirmationCount() {
-        _requiredConfirmationCount.postValue(walletService.getWithError { error, service -> service.getRequiredConfirmationCount(error) })
     }
 
     fun refreshAllData() {
@@ -116,17 +102,17 @@ class TransactionRepository @Inject constructor() : CommonViewModel() {
         }
     }
 
-    private fun updateTxListData() {
-        doOnWalletServiceConnected {
-            cancelledTxs.repopulate(it.getWithError { error, service -> service.getCancelledTxs(error) }.orEmpty())
-            completedTxs.repopulate(it.getWithError { error, service -> service.getCompletedTxs(error) }.orEmpty())
-            pendingInboundTxs.repopulate(it.getWithError { error, service -> service.getPendingInboundTxs(error) }.orEmpty())
-            pendingOutboundTxs.repopulate(it.getWithError { error, service -> service.getPendingOutboundTxs(error) }.orEmpty())
+    private suspend fun updateTxListData() = withContext(Dispatchers.IO) {
+        walletManager.doOnWalletRunning { wallet ->
+            cancelledTxs.repopulate(wallet.getCancelledTxs())
+            completedTxs.repopulate(wallet.getCompletedTxs())
+            pendingInboundTxs.repopulate(wallet.getPendingInboundTxs())
+            pendingOutboundTxs.repopulate(wallet.getPendingOutboundTxs())
         }
     }
 
     private fun updateList() = viewModelScope.launch(Dispatchers.Main) {
-        val confirmationCount = requiredConfirmationCount.value!!
+        val confirmationCount = walletManager.walletInstance?.getRequiredConfirmationCount() ?: DEFAULT_CONFIRMATION_COUNT
 
         val items = mutableListOf<CommonViewHolderItem>()
 
@@ -286,12 +272,12 @@ class TransactionRepository @Inject constructor() : CommonViewModel() {
 
     private fun onTxSendSuccessful(txId: TxId) {
         viewModelScope.launch(Dispatchers.IO) {
-            val error = WalletError()
-            val tx = walletService.getPendingOutboundTxById(txId, error)
-            if (error == WalletError.NoError) {
+            try {
+                val tx = walletManager.requireWalletInstance.getPendingOutboundTxById(txId)
                 pendingOutboundTxs.add(tx)
                 _listUpdateTrigger.postValue(Unit)
-            } else {
+            } catch (e: Exception) {
+                logger.i("onTxSendSuccessful: error getting tx by id")
                 refreshAllData()
             }
         }
@@ -299,5 +285,7 @@ class TransactionRepository @Inject constructor() : CommonViewModel() {
 
     companion object {
         private const val LIST_UPDATE_DEBOUNCE = 500L
+
+        private const val DEFAULT_CONFIRMATION_COUNT = 3L
     }
 }

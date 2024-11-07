@@ -3,6 +3,7 @@ package com.tari.android.wallet.ui.fragment.contactBook.data
 import android.content.Context
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.application.walletManager.WalletManager
+import com.tari.android.wallet.application.walletManager.WalletManager.WalletEvent
 import com.tari.android.wallet.di.ApplicationScope
 import com.tari.android.wallet.extension.replaceItem
 import com.tari.android.wallet.model.TariWalletAddress
@@ -36,11 +37,9 @@ class ContactsRepository @Inject constructor(
         get() = Logger.t(ContactsRepository::class.simpleName)
 
     private val ffiBridge = FFIContactsRepositoryBridge(
-        contactsRepository = this,
         tariWalletServiceConnection = tariWalletServiceConnection,
         walletManager = walletManager,
         contactUtil = contactUtil,
-        externalScope = applicationScope,
     )
     private val phoneBookBridge = PhoneBookRepositoryBridge(
         contactsRepository = this,
@@ -58,6 +57,25 @@ class ContactsRepository @Inject constructor(
     init {
         applicationScope.launch {
             refreshContactList()
+        }
+
+        applicationScope.launch {
+            walletManager.walletEvent.collect { event ->
+                when (event) {
+                    is WalletEvent.Tx.TxReceived,
+                    is WalletEvent.Tx.TxReplyReceived,
+                    is WalletEvent.Tx.TxFinalized,
+                    is WalletEvent.Tx.InboundTxBroadcast,
+                    is WalletEvent.Tx.OutboundTxBroadcast,
+                    is WalletEvent.Tx.TxMinedUnconfirmed,
+                    is WalletEvent.Tx.TxMined,
+                    is WalletEvent.Tx.TxFauxMinedUnconfirmed,
+                    is WalletEvent.Tx.TxFauxConfirmed,
+                    is WalletEvent.Tx.TxCancelled -> refreshContactList()
+
+                    else -> Unit
+                }
+            }
         }
     }
 
@@ -176,14 +194,6 @@ class ContactsRepository @Inject constructor(
     fun isContactOnline(contact: TariWalletAddress): Boolean {
         // TODO not implemented
         return Random.nextBoolean(0.2)
-    }
-
-    fun onNewTxReceived() {
-        applicationScope.launch {
-            logger.i("Contacts repository event: Updating contact changes to phone and FFI")
-
-            refreshContactList()
-        }
     }
 
     private suspend fun updateContactList(update: suspend (List<ContactDto>) -> List<ContactDto>) {
