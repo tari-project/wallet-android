@@ -13,6 +13,18 @@ import com.tari.android.wallet.model.MicroTari
 import com.tari.android.wallet.model.TariWalletAddress
 import com.tari.android.wallet.model.Tx
 import com.tari.android.wallet.model.TxId
+import com.tari.android.wallet.navigation.Navigation.AddAmountNavigation
+import com.tari.android.wallet.navigation.Navigation.AllSettingsNavigation
+import com.tari.android.wallet.navigation.Navigation.BackupSettingsNavigation
+import com.tari.android.wallet.navigation.Navigation.ChatNavigation
+import com.tari.android.wallet.navigation.Navigation.ChooseRestoreOptionNavigation
+import com.tari.android.wallet.navigation.Navigation.ContactBookNavigation
+import com.tari.android.wallet.navigation.Navigation.CustomBridgeNavigation
+import com.tari.android.wallet.navigation.Navigation.InputSeedWordsNavigation
+import com.tari.android.wallet.navigation.Navigation.SendTxNavigation
+import com.tari.android.wallet.navigation.Navigation.TorBridgeNavigation
+import com.tari.android.wallet.navigation.Navigation.TxListNavigation
+import com.tari.android.wallet.navigation.Navigation.VerifySeedPhraseNavigation
 import com.tari.android.wallet.network.NetworkConnectionStateHandler
 import com.tari.android.wallet.ui.common.CommonActivity
 import com.tari.android.wallet.ui.common.CommonFragment
@@ -37,18 +49,7 @@ import com.tari.android.wallet.ui.fragment.contactBook.details.ContactDetailsFra
 import com.tari.android.wallet.ui.fragment.contactBook.link.ContactLinkFragment
 import com.tari.android.wallet.ui.fragment.contactBook.root.ContactBookFragment
 import com.tari.android.wallet.ui.fragment.home.HomeActivity
-import com.tari.android.wallet.navigation.Navigation.AddAmountNavigation
-import com.tari.android.wallet.navigation.Navigation.AllSettingsNavigation
-import com.tari.android.wallet.navigation.Navigation.BackupSettingsNavigation
-import com.tari.android.wallet.navigation.Navigation.ChatNavigation
-import com.tari.android.wallet.navigation.Navigation.ChooseRestoreOptionNavigation
-import com.tari.android.wallet.navigation.Navigation.ContactBookNavigation
-import com.tari.android.wallet.navigation.Navigation.CustomBridgeNavigation
-import com.tari.android.wallet.navigation.Navigation.InputSeedWordsNavigation
-import com.tari.android.wallet.navigation.Navigation.SendTxNavigation
-import com.tari.android.wallet.navigation.Navigation.TorBridgeNavigation
-import com.tari.android.wallet.navigation.Navigation.TxListNavigation
-import com.tari.android.wallet.navigation.Navigation.VerifySeedPhraseNavigation
+import com.tari.android.wallet.ui.fragment.home.overview.HomeOverviewFragment
 import com.tari.android.wallet.ui.fragment.onboarding.activity.OnboardingFlowActivity
 import com.tari.android.wallet.ui.fragment.onboarding.localAuth.LocalAuthFragment
 import com.tari.android.wallet.ui.fragment.pinCode.EnterPinCodeFragment
@@ -82,10 +83,9 @@ import com.tari.android.wallet.ui.fragment.settings.screenRecording.ScreenRecord
 import com.tari.android.wallet.ui.fragment.settings.themeSelector.ThemeSelectorFragment
 import com.tari.android.wallet.ui.fragment.settings.torBridges.TorBridgesSelectionFragment
 import com.tari.android.wallet.ui.fragment.settings.torBridges.customBridges.CustomTorBridgesFragment
-import com.tari.android.wallet.ui.fragment.home.overview.HomeOverviewFragment
 import com.tari.android.wallet.ui.fragment.tx.details.TxDetailsFragment
-import com.tari.android.wallet.ui.fragment.tx.history.HomeTransactionHistoryFragment
-import com.tari.android.wallet.ui.fragment.tx.history.TransactionHistoryFragment
+import com.tari.android.wallet.ui.fragment.tx.history.all.AllTxHistoryFragment
+import com.tari.android.wallet.ui.fragment.tx.history.contact.ContactTxHistoryFragment
 import com.tari.android.wallet.ui.fragment.utxos.list.UtxosListFragment
 import java.math.BigInteger
 import javax.inject.Inject
@@ -114,7 +114,7 @@ class TariNavigator @Inject constructor(
             is ContactBookNavigation.ToLinkContact -> toLinkContact(navigation.contact)
             is ContactBookNavigation.BackToContactBook -> backToContactBook()
             is ContactBookNavigation.ToExternalWallet -> toExternalWallet(navigation.connectedWallet)
-            is ContactBookNavigation.ToContactTransactionHistory -> toContactTransactionHistory(navigation.contact)
+            is ContactBookNavigation.ToContactTransactionHistory -> addFragment(ContactTxHistoryFragment.createFragment(navigation.contact))
             is ContactBookNavigation.ToAddPhoneContact -> toAddPhoneContact()
             is ContactBookNavigation.ToSelectTariUser -> addFragment(SelectUserContactFragment.newInstance())
             is ChooseRestoreOptionNavigation.ToEnterRestorePassword -> toEnterRestorePassword()
@@ -145,7 +145,7 @@ class TariNavigator @Inject constructor(
             is TxListNavigation.ToUtxos -> toUtxos()
             is TxListNavigation.ToAllSettings -> toAllSettings()
             is TxListNavigation.ToTransfer -> addFragment(TransferFragment())
-            is TxListNavigation.HomeTransactionHistory -> addFragment(HomeTransactionHistoryFragment())
+            is TxListNavigation.HomeTransactionHistory -> addFragment(AllTxHistoryFragment())
             is SendTxNavigation.OnSendTxFailure -> navigateBackFromTxSend(navigation.isYat)
             is SendTxNavigation.OnSendTxSuccess -> navigateBackFromTxSend(navigation.isYat)
             is TorBridgeNavigation.ToCustomBridges -> toCustomTorBridges()
@@ -252,8 +252,6 @@ class TariNavigator @Inject constructor(
     }
 
     private fun toLinkContact(contact: ContactDto) = addFragment(ContactLinkFragment.createFragment(contact))
-
-    private fun toContactTransactionHistory(contact: ContactDto) = addFragment(TransactionHistoryFragment.createFragment(contact))
 
     private fun toExternalWallet(connectedWallet: ConnectedWallet) {
         try {

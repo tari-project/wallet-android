@@ -20,17 +20,17 @@ import com.tari.android.wallet.ui.extension.setVisible
 import com.tari.android.wallet.ui.extension.visible
 import com.tari.android.wallet.ui.fragment.tx.details.statusString
 
-class TxListViewHolder(view: ItemTxListBinding) : CommonTxListViewHolder<TransactionItem, ItemTxListBinding>(view), GifStateConsumer {
+class TxListViewHolder(view: ItemTxListBinding) : CommonTxListViewHolder<TxViewHolderItem, ItemTxListBinding>(view), GifStateConsumer {
 
     private val glide = Glide.with(itemView.context)
     private lateinit var tx: Tx
 
-    override fun bind(item: TransactionItem) {
+    override fun bind(item: TxViewHolderItem) {
         super.bind(item)
 
-        with(item.tx) {
+        with(item.txDto.tx) {
             this@TxListViewHolder.tx = this
-            displayAliasOrEmojiId(this, item.contact, ui.participantTextView1, ui.participantTextView2, ui.emojiIdViewContainer)
+            displayAliasOrEmojiId(this, item.txDto.contact, ui.participantTextView1, ui.participantTextView2, ui.emojiIdViewContainer)
             displayAmount(this, ui.amountTextView, ui.amountTextViewRound)
             displayDate(this, ui.dateTextView)
             displayStatus(this)
@@ -43,7 +43,7 @@ class TxListViewHolder(view: ItemTxListBinding) : CommonTxListViewHolder<Transac
     }
 
     private fun displayStatus(tx: Tx) {
-        val status = tx.statusString(context = itemView.context, item!!.requiredConfirmationCount)
+        val status = tx.statusString(context = itemView.context, item!!.txDto.requiredConfirmationCount)
         ui.statusTextView.setVisible(status.isNotEmpty())
         ui.statusTextView.text = status
     }
@@ -100,6 +100,6 @@ class TxListViewHolder(view: ItemTxListBinding) : CommonTxListViewHolder<Transac
 
     companion object {
         fun getBuilder(): ViewHolderBuilder =
-            ViewHolderBuilder(ItemTxListBinding::inflate, TransactionItem::class.java) { TxListViewHolder(it as ItemTxListBinding) }
+            ViewHolderBuilder(ItemTxListBinding::inflate, TxViewHolderItem::class.java) { TxListViewHolder(it as ItemTxListBinding) }
     }
 }

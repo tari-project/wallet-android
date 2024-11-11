@@ -532,6 +532,10 @@ class WalletManager @Inject constructor(
                 }
             }
 
+            // Need to update the balance state after the wallet is initialized,
+            // because the first balance callback is called after the wallet is connected to the base node and validated
+            balanceStateHandler.updateBalanceState(requireWalletInstance.getBalance())
+
             applicationScope.launch(Dispatchers.IO) {
                 baseNodeStateHandler.doOnBaseNodeOnline {
                     validateWallet()
@@ -642,6 +646,6 @@ class WalletManager @Inject constructor(
 
         data object OnWalletRemove : WalletEvent()
 
-        data object Updated : WalletEvent()
+        data object UtxosSplit : WalletEvent()
     }
 }

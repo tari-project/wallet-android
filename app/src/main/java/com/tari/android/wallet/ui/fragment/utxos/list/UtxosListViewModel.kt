@@ -123,7 +123,7 @@ class UtxosListViewModel : CommonViewModel() {
                 wallet.joinUtxos(selectedUtxos, error)
                 hideDialog()
                 loadUtxosFromFFI()
-                walletManager.sendWalletEvent(WalletManager.WalletEvent.Updated)
+                walletManager.sendWalletEvent(WalletManager.WalletEvent.UtxosSplit)
                 showSuccessJoinDialog()
             }
         }
@@ -148,7 +148,7 @@ class UtxosListViewModel : CommonViewModel() {
                         wallet.splitUtxos(selectedUtxos, splitModule.count, error)
                         hideDialog()
                         loadUtxosFromFFI()
-                        walletManager.sendWalletEvent(WalletManager.WalletEvent.Updated)
+                        walletManager.sendWalletEvent(WalletManager.WalletEvent.UtxosSplit)
                         showSuccessSplitDialog()
                     }
                 }

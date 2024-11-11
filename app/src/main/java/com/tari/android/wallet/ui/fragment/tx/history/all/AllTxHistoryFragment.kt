@@ -1,4 +1,4 @@
-package com.tari.android.wallet.ui.fragment.tx.history
+package com.tari.android.wallet.ui.fragment.tx.history.all
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -7,25 +7,25 @@ import android.view.ViewGroup
 import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.tari.android.wallet.databinding.FragmentHomeContactTransactionHistoryBinding
-import com.tari.android.wallet.extension.observe
+import com.tari.android.wallet.databinding.FragmentAllTransactionHistoryBinding
+import com.tari.android.wallet.extension.collectFlow
 import com.tari.android.wallet.ui.common.CommonFragment
 import com.tari.android.wallet.ui.common.recyclerView.CommonAdapter
 import com.tari.android.wallet.ui.extension.setVisible
-import com.tari.android.wallet.ui.fragment.tx.adapter.TransactionItem
 import com.tari.android.wallet.ui.fragment.tx.adapter.TxListAdapter
+import com.tari.android.wallet.ui.fragment.tx.adapter.TxViewHolderItem
 
-class HomeTransactionHistoryFragment : CommonFragment<FragmentHomeContactTransactionHistoryBinding, HomeTransactionHistoryViewModel>() {
+class AllTxHistoryFragment : CommonFragment<FragmentAllTransactionHistoryBinding, AllTxHistoryViewModel>() {
 
     private var adapter = TxListAdapter()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
-        FragmentHomeContactTransactionHistoryBinding.inflate(inflater, container, false).apply { ui = this }.root
+        FragmentAllTransactionHistoryBinding.inflate(inflater, container, false).apply { ui = this }.root
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val viewModel: HomeTransactionHistoryViewModel by viewModels()
+        val viewModel: AllTxHistoryViewModel by viewModels()
         bindViewModel(viewModel)
 
         initUI()
@@ -33,18 +33,14 @@ class HomeTransactionHistoryFragment : CommonFragment<FragmentHomeContactTransac
     }
 
     private fun observeUI() = with(viewModel) {
-        observe(list) {
-            adapter.update(it)
+        collectFlow(uiState) { state ->
+            ui.searchFullContainer.setVisible(state.searchBarVisible)
+            ui.emptyState.setVisible(state.txEmptyStateVisible)
+            ui.list.setVisible(state.txListVisible)
+            adapter.update(state.sortedTxList)
             adapter.notifyDataSetChanged()
+            ui.list.smoothScrollToPosition(0)
         }
-
-        observe(searchBarVisible) { ui.searchFullContainer.setVisible(it) }
-
-//        observe(searchEmptyStateVisible) { ui.emptyState.setVisible(it) }
-
-        observe(txEmptyStateVisible) { ui.emptyState.setVisible(it) }
-
-        observe(txListVisible) { ui.list.setVisible(it) }
     }
 
     private fun initUI() = with(ui) {
@@ -53,8 +49,8 @@ class HomeTransactionHistoryFragment : CommonFragment<FragmentHomeContactTransac
         requestTariButton.setOnClickListener { viewModel.onRequestTariClick() }
 
         adapter.setClickListener(CommonAdapter.ItemClickListener { item ->
-            if (item is TransactionItem) {
-                viewModel.onTransactionClick(item.tx)
+            if (item is TxViewHolderItem) {
+                viewModel.onTransactionClick(item.txDto.tx)
             }
         })
 

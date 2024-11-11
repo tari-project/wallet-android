@@ -254,8 +254,8 @@ class FFIWallet(
 
     fun getContacts(): FFIContacts = runWithError { FFIContacts(jniGetContacts(it)) }
 
-    fun findContactByWalletAddress(walletAddress: TariWalletAddress): FFIContact? = runWithError {
-        getContacts().find { ffiContact -> ffiContact.getWalletAddress().runWithDestroy { TariWalletAddress(it) } == walletAddress }
+    fun findContactByWalletAddress(walletAddress: TariWalletAddress): FFIContact? = getContacts().find { ffiContact ->
+        ffiContact.getWalletAddress().runWithDestroy { TariWalletAddress(it) } == walletAddress
     }
 
     fun addUpdateContact(contact: FFIContact): Boolean = runWithError { jniAddUpdateContact(contact, it) }

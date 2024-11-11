@@ -18,6 +18,7 @@ import com.tari.android.wallet.extension.collectFlow
 import com.tari.android.wallet.extension.debounce
 import com.tari.android.wallet.extension.launchOnIo
 import com.tari.android.wallet.extension.launchOnMain
+import com.tari.android.wallet.navigation.Navigation
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.common.SingleLiveEvent
 import com.tari.android.wallet.ui.common.recyclerView.CommonViewHolderItem
@@ -26,10 +27,10 @@ import com.tari.android.wallet.ui.fragment.contactBook.contacts.adapter.contact.
 import com.tari.android.wallet.ui.fragment.contactBook.contacts.adapter.contact.ContactlessPaymentItem
 import com.tari.android.wallet.ui.fragment.contactBook.contacts.adapter.emptyState.EmptyStateItem
 import com.tari.android.wallet.ui.fragment.contactBook.data.ContactsRepository
+import com.tari.android.wallet.ui.fragment.contactBook.data.contacts.ContactDto
 import com.tari.android.wallet.ui.fragment.contactBook.data.contacts.PhoneContactInfo
 import com.tari.android.wallet.ui.fragment.contactBook.root.ContactSelectionRepository
 import com.tari.android.wallet.ui.fragment.contactBook.root.ShareViewModel
-import com.tari.android.wallet.navigation.Navigation
 import com.tari.android.wallet.ui.fragment.settings.allSettings.title.SettingsTitleViewHolderItem
 import yat.android.ui.extension.HtmlHelper
 import javax.inject.Inject
@@ -76,7 +77,7 @@ class ContactsViewModel : CommonViewModel() {
 
         contactList.addSource(selectionTrigger) { _listUpdateTrigger.postValue(Unit) }
 
-        collectFlow(contactsRepository.contactList) { updateContacts() }
+        collectFlow(contactsRepository.contactList) { updateContacts(it) }
     }
 
     fun processItemClick(item: CommonViewHolderItem) {
@@ -93,7 +94,7 @@ class ContactsViewModel : CommonViewModel() {
     }
 
     fun refresh() {
-        updateContacts()
+        updateContacts(contactsRepository.contactList.value)
         _listUpdateTrigger.postValue(Unit)
     }
 
@@ -119,19 +120,17 @@ class ContactsViewModel : CommonViewModel() {
         filters.value = filters.value!! + filter
     }
 
-    private fun updateContacts() {
-        collectFlow(contactsRepository.contactList) { contacts ->
-            val newItems = contacts.map { contactDto ->
-                ContactItemViewHolderItem(
-                    contact = contactDto.copy(),
-                    isSimple = false,
-                    isSelectionState = false,
-                    isSelected = false,
-                )
-            }
-            launchOnMain {
-                sourceList.postValue(newItems)
-            }
+    private fun updateContacts(contacts: List<ContactDto>) {
+        val newItems = contacts.map { contactDto ->
+            ContactItemViewHolderItem(
+                contact = contactDto.copy(),
+                isSimple = false,
+                isSelectionState = false,
+                isSelected = false,
+            )
+        }
+        launchOnMain {
+            sourceList.postValue(newItems)
         }
     }
 
@@ -161,8 +160,7 @@ class ContactsViewModel : CommonViewModel() {
                 )
             )
         } else {
-            val sorted = filtered.sortedBy { it.contact.contactInfo.getAlias().lowercase() }
-            val (phoneContacts, notPhoneContacts) = sorted.partition { it.contact.contactInfo is PhoneContactInfo }
+            val (phoneContacts, notPhoneContacts) = filtered.partition { it.contact.contactInfo is PhoneContactInfo }
 
             contactList.postValue(
                 listOfNotNull(

@@ -48,8 +48,6 @@ import com.tari.android.wallet.application.deeplinks.DeepLink
 import com.tari.android.wallet.application.walletManager.WalletConfig
 import com.tari.android.wallet.databinding.FragmentHomeOverviewBinding
 import com.tari.android.wallet.extension.collectFlow
-import com.tari.android.wallet.extension.observe
-import com.tari.android.wallet.extension.observeOnLoad
 import com.tari.android.wallet.extension.takeIfIs
 import com.tari.android.wallet.model.BalanceInfo
 import com.tari.android.wallet.navigation.Navigation
@@ -63,7 +61,7 @@ import com.tari.android.wallet.ui.extension.parcelable
 import com.tari.android.wallet.ui.extension.setVisible
 import com.tari.android.wallet.ui.fragment.qr.QrScannerActivity
 import com.tari.android.wallet.ui.fragment.qr.QrScannerSource
-import com.tari.android.wallet.ui.fragment.tx.adapter.TransactionItem
+import com.tari.android.wallet.ui.fragment.tx.adapter.TxViewHolderItem
 import com.tari.android.wallet.ui.fragment.tx.adapter.TxListHomeViewHolder
 
 class HomeOverviewFragment : CommonFragment<FragmentHomeOverviewBinding, HomeOverviewViewModel>() {
@@ -93,23 +91,17 @@ class HomeOverviewFragment : CommonFragment<FragmentHomeOverviewBinding, HomeOve
     }
 
     private fun observeUI() = with(viewModel) {
-        observe(txList) {
-            ui.transactionsRecyclerView.setVisible(it.isNotEmpty())
-            ui.viewAllTxsButton.setVisible(it.isNotEmpty())
-            ui.emptyState.setVisible(it.isEmpty())
-            adapter.update(it)
-            adapter.notifyDataSetChanged()
-        }
-
-        with(transactionRepository) {
-            observeOnLoad(listUpdateTrigger)
-            observeOnLoad(debouncedList)
-        }
-
         collectFlow(uiState) { uiState ->
             updateBalanceInfoUI(uiState.balance)
+
             ui.avatar.text = uiState.avatarEmoji
             ui.emptyStateTextView.text = getString(R.string.home_empty_state, uiState.emojiMedium)
+
+            ui.transactionsRecyclerView.setVisible(uiState.txList.isNotEmpty())
+            ui.viewAllTxsButton.setVisible(uiState.txList.isNotEmpty())
+            ui.emptyState.setVisible(uiState.txList.isEmpty())
+            adapter.update(uiState.txList)
+            adapter.notifyDataSetChanged()
         }
     }
 
@@ -128,7 +120,7 @@ class HomeOverviewFragment : CommonFragment<FragmentHomeOverviewBinding, HomeOve
         viewAllTxsButton.setOnClickListener { viewModel.navigation.postValue(Navigation.TxListNavigation.HomeTransactionHistory) }
         qrCodeButton.setOnClickListener { QrScannerActivity.startScanner(this@HomeOverviewFragment, QrScannerSource.Home) }
         transactionsRecyclerView.adapter = adapter
-        adapter.setClickListener { item -> item.takeIfIs<TransactionItem>()?.let { viewModel.navigateToTxList(it.tx) } }
+        adapter.setClickListener { item -> item.takeIfIs<TxViewHolderItem>()?.let { viewModel.navigateToTxList(it.txDto.tx) } }
         transactionsRecyclerView.layoutManager = LinearLayoutManager(requireContext())
         fullAvatarContainer.setOnClickListener { viewModel.navigation.postValue(Navigation.AllSettingsNavigation.ToMyProfile) }
     }
