@@ -1,4 +1,4 @@
-package com.tari.android.wallet.ui.fragment.tx.history
+package com.tari.android.wallet.ui.fragment.tx.history.contact
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -8,23 +8,22 @@ import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.tari.android.wallet.R
 import com.tari.android.wallet.databinding.FragmentContactTransactionHistoryBinding
-import com.tari.android.wallet.extension.observe
+import com.tari.android.wallet.extension.collectFlow
+import com.tari.android.wallet.navigation.TariNavigator
 import com.tari.android.wallet.ui.common.CommonFragment
 import com.tari.android.wallet.ui.common.recyclerView.CommonAdapter
-import com.tari.android.wallet.ui.common.recyclerView.CommonViewHolderItem
 import com.tari.android.wallet.ui.extension.gone
 import com.tari.android.wallet.ui.extension.setVisible
 import com.tari.android.wallet.ui.extension.visible
 import com.tari.android.wallet.ui.fragment.contactBook.data.contacts.ContactDto
-import com.tari.android.wallet.navigation.TariNavigator
-import com.tari.android.wallet.ui.fragment.tx.adapter.TransactionItem
 import com.tari.android.wallet.ui.fragment.tx.adapter.TxListAdapter
+import com.tari.android.wallet.ui.fragment.tx.adapter.TxViewHolderItem
 import com.tari.android.wallet.util.addressFirstEmojis
 import com.tari.android.wallet.util.addressLastEmojis
 import com.tari.android.wallet.util.addressPrefixEmojis
 import yat.android.ui.extension.HtmlHelper
 
-class TransactionHistoryFragment : CommonFragment<FragmentContactTransactionHistoryBinding, TransactionHistoryViewModel>() {
+class ContactTxHistoryFragment : CommonFragment<FragmentContactTransactionHistoryBinding, ContactTxHistoryViewModel>() {
 
     private var adapter = TxListAdapter()
 
@@ -34,7 +33,7 @@ class TransactionHistoryFragment : CommonFragment<FragmentContactTransactionHist
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val viewModel: TransactionHistoryViewModel by viewModels()
+        val viewModel: ContactTxHistoryViewModel by viewModels()
         bindViewModel(viewModel)
 
         initUI()
@@ -42,16 +41,14 @@ class TransactionHistoryFragment : CommonFragment<FragmentContactTransactionHist
     }
 
     private fun observeUI() = with(viewModel) {
-        observe(list) { updateList(it) }
-    }
+        collectFlow(uiState) { uiState ->
+            ui.list.setVisible(uiState.txList.isNotEmpty())
+            ui.descriptionViewContainer.setVisible(uiState.txList.isNotEmpty())
+            ui.emptyState.setVisible(uiState.txList.isEmpty())
 
-    private fun updateList(items: List<CommonViewHolderItem>) {
-        ui.list.setVisible(items.isNotEmpty())
-        ui.descriptionViewContainer.setVisible(items.isNotEmpty())
-        ui.emptyState.setVisible(items.isEmpty())
-
-        adapter.update(items)
-        adapter.notifyDataSetChanged()
+            adapter.update(uiState.txList)
+            adapter.notifyDataSetChanged()
+        }
     }
 
     private fun initUI() = with(ui) {
@@ -59,8 +56,8 @@ class TransactionHistoryFragment : CommonFragment<FragmentContactTransactionHist
         list.layoutManager = LinearLayoutManager(context)
 
         adapter.setClickListener(CommonAdapter.ItemClickListener { item ->
-            if (item is TransactionItem) {
-                viewModel.onTransactionClick(item.tx)
+            if (item is TxViewHolderItem) {
+                viewModel.onTransactionClick(item.txDto.tx)
             }
         })
 
@@ -68,7 +65,7 @@ class TransactionHistoryFragment : CommonFragment<FragmentContactTransactionHist
             viewModel.onSendTariClick()
         }
 
-        setContactText(viewModel.selectedContact)
+        setContactText(viewModel.uiState.value.selectedContact)
     }
 
     private fun setContactText(contactDto: ContactDto) {
@@ -90,7 +87,7 @@ class TransactionHistoryFragment : CommonFragment<FragmentContactTransactionHist
     }
 
     companion object {
-        fun createFragment(args: ContactDto): TransactionHistoryFragment = TransactionHistoryFragment().apply {
+        fun createFragment(args: ContactDto): ContactTxHistoryFragment = ContactTxHistoryFragment().apply {
             arguments = Bundle().apply { putParcelable(TariNavigator.PARAMETER_CONTACT, args) }
         }
     }

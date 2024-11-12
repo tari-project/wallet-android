@@ -239,7 +239,7 @@ class ContactSelectionViewModel : CommonViewModel() {
         }
 
         val resentUsed = list.filter { it.contact.getFFIContactInfo()?.lastUsedTimeMillis != null }
-            .sortedBy { it.contact.getFFIContactInfo()?.lastUsedTimeMillis }
+            .sortedByDescending { it.contact.getFFIContactInfo()?.lastUsedTimeMillis }
             .take(Constants.Contacts.RECENT_CONTACTS_COUNT)
 
         val restOfContact = list.filter { !resentUsed.contains(it) }.sortedBy { it.contact.contactInfo.getAlias().lowercase() }

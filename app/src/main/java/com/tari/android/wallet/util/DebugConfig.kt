@@ -35,6 +35,7 @@
 package com.tari.android.wallet.util
 
 import com.tari.android.wallet.BuildConfig
+import com.tari.android.wallet.data.tx.TxDto
 import com.tari.android.wallet.extension.minusHours
 import com.tari.android.wallet.extension.toMicroTari
 import com.tari.android.wallet.ffi.Base58
@@ -52,7 +53,7 @@ import com.tari.android.wallet.ui.fragment.chat.data.ChatMessageItemDto
 import com.tari.android.wallet.ui.fragment.contactBook.address_poisoning.SimilarAddressDto
 import com.tari.android.wallet.ui.fragment.contactBook.data.contacts.ContactDto
 import com.tari.android.wallet.ui.fragment.contactBook.data.contacts.FFIContactInfo
-import com.tari.android.wallet.ui.fragment.tx.adapter.TransactionItem
+import com.tari.android.wallet.ui.fragment.tx.adapter.TxViewHolderItem
 import com.tari.android.wallet.ui.fragment.utxos.list.adapters.UtxosViewHolderItem
 import org.joda.time.DateTime
 import yat.android.lib.YatIntegration
@@ -163,22 +164,22 @@ object MockDataStub {
         title: String = "Mocked Transactions"
     ) = listOf(
         TitleViewHolderItem(title = title, isFirst = true),
-        createTx(
+        createTxViewHolder(
             gifRepository, confirmationCount,
             amount = 1100000,
             contactAlias = "Alice",
         ),
-        createTx(
+        createTxViewHolder(
             gifRepository, confirmationCount,
             amount = 1200000,
             contactAlias = "Bob",
         ),
-        createTx(
+        createTxViewHolder(
             gifRepository, confirmationCount,
             amount = 1300000,
             contactAlias = "Charlie",
         ),
-        createTx(
+        createTxViewHolder(
             gifRepository, confirmationCount,
             amount = 1400000,
             contactAlias = "David",
@@ -186,27 +187,28 @@ object MockDataStub {
         ),
     )
 
-    fun createTx(
+    fun createTxViewHolder(
         gifRepository: GifRepository,
         confirmationCount: Long,
         amount: Long = 100000,
         contactAlias: String = "Test",
         status: TxStatus = TxStatus.MINED_CONFIRMED,
-    ) = TransactionItem(
-        tx = CompletedTx(
-            direction = Tx.Direction.INBOUND,
-            status = status,
-            amount = amount.toMicroTari(),
-            fee = 1000.toMicroTari(),
-            message = "https://giphy.com/embed/5885nYOgBHdCw",
-            timestamp = BigInteger.valueOf(System.currentTimeMillis()),
-            id = 1.toBigInteger(),
-            tariContact = TariContact(WALLET_ADDRESS, contactAlias),
+    ) = TxViewHolderItem(
+        txDto = TxDto(
+            tx = CompletedTx(
+                direction = Tx.Direction.INBOUND,
+                status = status,
+                amount = amount.toMicroTari(),
+                fee = 1000.toMicroTari(),
+                message = "https://giphy.com/embed/5885nYOgBHdCw",
+                timestamp = BigInteger.valueOf(System.currentTimeMillis()),
+                id = 1.toBigInteger(),
+                tariContact = TariContact(WALLET_ADDRESS, contactAlias),
+            ),
+            contact = createContact(alias = contactAlias),
+            requiredConfirmationCount = confirmationCount,
         ),
-        contact = createContact(alias = contactAlias),
-        position = 0,
         gifViewModel = GifViewModel(gifRepository),
-        requiredConfirmationCount = confirmationCount,
     )
 
     fun createSimilarAddressList() = listOf(

@@ -34,7 +34,6 @@ package com.tari.android.wallet.di
 
 import android.content.ClipboardManager
 import com.tari.android.wallet.application.TariWalletApplication
-import com.tari.android.wallet.application.securityStage.StagedWalletSecurityManager
 import com.tari.android.wallet.notification.NotificationBroadcastReceiver
 import com.tari.android.wallet.service.service.WalletService
 import com.tari.android.wallet.ui.common.CommonViewModel
@@ -53,6 +52,7 @@ import com.tari.android.wallet.ui.fragment.contactBook.root.ContactBookViewModel
 import com.tari.android.wallet.ui.fragment.contactBook.root.ShareViewModel
 import com.tari.android.wallet.ui.fragment.home.HomeActivity
 import com.tari.android.wallet.ui.fragment.home.HomeViewModel
+import com.tari.android.wallet.ui.fragment.home.overview.HomeOverviewViewModel
 import com.tari.android.wallet.ui.fragment.onboarding.activity.OnboardingFlowActivity
 import com.tari.android.wallet.ui.fragment.onboarding.createWallet.CreateWalletFragment
 import com.tari.android.wallet.ui.fragment.onboarding.createWallet.CreateWalletViewModel
@@ -98,12 +98,10 @@ import com.tari.android.wallet.ui.fragment.settings.torBridges.TorBridgesSelecti
 import com.tari.android.wallet.ui.fragment.settings.torBridges.customBridges.CustomTorBridgesViewModel
 import com.tari.android.wallet.ui.fragment.settings.userAutorization.BiometricAuthenticationViewModel
 import com.tari.android.wallet.ui.fragment.splash.SplashActivity
-import com.tari.android.wallet.ui.fragment.home.overview.HomeOverviewViewModel
-import com.tari.android.wallet.data.TransactionRepository
 import com.tari.android.wallet.ui.fragment.tx.details.TxDetailsViewModel
 import com.tari.android.wallet.ui.fragment.tx.details.gif.GifViewModel
-import com.tari.android.wallet.ui.fragment.tx.history.HomeTransactionHistoryViewModel
-import com.tari.android.wallet.ui.fragment.tx.history.TransactionHistoryViewModel
+import com.tari.android.wallet.ui.fragment.tx.history.all.AllTxHistoryViewModel
+import com.tari.android.wallet.ui.fragment.tx.history.contact.ContactTxHistoryViewModel
 import com.tari.android.wallet.ui.fragment.utxos.list.UtxosListViewModel
 import dagger.Component
 import javax.inject.Singleton
@@ -177,11 +175,10 @@ interface ApplicationComponent {
     fun inject(viewModel: DeleteWalletViewModel)
     fun inject(viewModel: HomeViewModel)
     fun inject(viewModel: HomeOverviewViewModel)
-    fun inject(viewModel: HomeTransactionHistoryViewModel)
+    fun inject(viewModel: AllTxHistoryViewModel)
     fun inject(viewModel: EnterCurrentPasswordViewModel)
     fun inject(viewModel: ChangeSecurePasswordViewModel)
     fun inject(viewModel: AddNoteViewModel)
-    fun inject(viewModel: StagedWalletSecurityManager)
     fun inject(viewModel: BackupOnboardingFlowViewModel)
     fun inject(viewModel: BackupOnboardingFlowItemViewModel)
     fun inject(viewModel: ContactBookViewModel)
@@ -191,8 +188,7 @@ interface ApplicationComponent {
     fun inject(viewModel: ContactSelectionViewModel)
     fun inject(viewModel: TxDetailsViewModel)
     fun inject(viewModel: ShareViewModel)
-    fun inject(viewModel: TransactionRepository)
-    fun inject(viewModel: TransactionHistoryViewModel)
+    fun inject(viewModel: ContactTxHistoryViewModel)
     fun inject(viewModel: BluetoothSettingsViewModel)
     fun inject(viewModel: WalletAddressViewModel)
     fun inject(viewModel: QrScannerViewModel)

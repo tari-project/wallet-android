@@ -231,19 +231,14 @@ class WalletService : Service() {
      * Expiration period is defined by Constants.Wallet.pendingTxExpirationPeriodHours
      */
     private fun cancelExpiredPendingInboundTxs() {
-        val pendingInboundTxs = wallet.getPendingInboundTxs()
-        val pendingInboundTxsLength = pendingInboundTxs.getLength()
         val now = DateTime.now().toLocalDateTime()
-        for (i in 0 until pendingInboundTxsLength) {
-            val tx = pendingInboundTxs.getAt(i)
-            val txDate = DateTime(tx.getTimestamp().toLong() * 1000L).toLocalDateTime()
+        wallet.getPendingInboundTxs().forEach { tx ->
+            val txDate = DateTime(tx.timestamp.toLong() * 1000L).toLocalDateTime()
             val hoursPassed = Hours.hoursBetween(txDate, now).hours
             if (hoursPassed >= Constants.Wallet.PENDING_TX_EXPIRATION_PERIOD_HOURS) {
-                wallet.cancelPendingTx(tx.getId())
+                wallet.cancelPendingTx(tx.id)
             }
-            tx.destroy()
         }
-        pendingInboundTxs.destroy()
     }
 
     /**
@@ -251,20 +246,14 @@ class WalletService : Service() {
      * Expiration period is defined by Constants.Wallet.pendingTxExpirationPeriodHours
      */
     private fun cancelExpiredPendingOutboundTxs() {
-        val pendingOutboundTxs = wallet.getPendingOutboundTxs()
-        val pendingOutboundTxsLength = wallet.getPendingOutboundTxs().getLength()
         val now = DateTime.now().toLocalDateTime()
-        for (i in 0 until pendingOutboundTxsLength) {
-            val tx = pendingOutboundTxs.getAt(i)
-            val txDate = DateTime(tx.getTimestamp().toLong() * 1000L).toLocalDateTime()
+        wallet.getPendingOutboundTxs().forEach { tx ->
+            val txDate = DateTime(tx.timestamp.toLong() * 1000L).toLocalDateTime()
             val hoursPassed = Hours.hoursBetween(txDate, now).hours
             if (hoursPassed >= Constants.Wallet.PENDING_TX_EXPIRATION_PERIOD_HOURS) {
-                wallet.cancelPendingTx(tx.getId())
+                wallet.cancelPendingTx(tx.id)
             }
-            tx.destroy()
         }
-
-        pendingOutboundTxs.destroy()
     }
 
     companion object {

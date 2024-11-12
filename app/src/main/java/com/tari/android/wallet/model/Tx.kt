@@ -62,5 +62,17 @@ abstract class Tx(
     val isCoinbase
         get() = status.isCoinbase()
 
-    override fun toString() = "Tx(id=$id, direction=$direction, amount=$amount, timestamp=$timestamp, message='$message', paymentId='$paymentId', status=$status, tariContact=$tariContact)"
+    val isInbound: Boolean
+        get() = direction == Direction.INBOUND
+    val isOutbound: Boolean
+        get() = direction == Direction.OUTBOUND
+
+    override fun toString() = "Tx(id=$id, " +
+            "direction=$direction, " +
+            "amount=$amount, " +
+            "timestamp=$timestamp, " +
+            "message='$message', " +
+            "paymentId='$paymentId', " +
+            "status=$status, " +
+            "tariContact=$tariContact)"
 }

@@ -1,11 +1,11 @@
 package com.tari.android.wallet.ui.fragment.contactBook.address_poisoning
 
 import androidx.annotation.VisibleForTesting
+import com.tari.android.wallet.application.walletManager.WalletManager
+import com.tari.android.wallet.application.walletManager.doOnWalletRunningWithValue
 import com.tari.android.wallet.data.sharedPrefs.addressPoisoning.AddressPoisoningPrefRepository
 import com.tari.android.wallet.model.TariWalletAddress
 import com.tari.android.wallet.model.Tx
-import com.tari.android.wallet.model.WalletError
-import com.tari.android.wallet.service.connection.TariWalletServiceConnection
 import com.tari.android.wallet.ui.fragment.contactBook.data.ContactsRepository
 import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.DebugConfig
@@ -17,12 +17,11 @@ import javax.inject.Singleton
 private const val MIN_SAME_CHARS = 3
 private const val USED_PREFIX_SUFFIX_CHARS = Constants.Wallet.EMOJI_FORMATTER_CHUNK_SIZE
 
-
 @Singleton
 class AddressPoisoningChecker @Inject constructor(
     private val addressPoisoningSharedRepository: AddressPoisoningPrefRepository,
     private val contactsRepository: ContactsRepository,
-    private val tariWalletServiceConnection: TariWalletServiceConnection,
+    private val walletManager: WalletManager,
 ) {
 
     suspend fun doOnAddressPoisoned(walletAddress: TariWalletAddress?, action: (similarContactList: List<SimilarAddressDto>) -> Unit) {
@@ -56,12 +55,12 @@ class AddressPoisoningChecker @Inject constructor(
         return if (DebugConfig.mockPoisonedAddresses) {
             MockDataStub.createSimilarAddressList()
         } else {
-            val allTxs = tariWalletServiceConnection.doOnWalletServiceConnectedWithValue { walletService ->
+            val allTxs = walletManager.doOnWalletRunningWithValue { wallet ->
                 listOf(
-                    walletService.getCompletedTxs(WalletError()),
-                    walletService.getCancelledTxs(WalletError()),
-                    walletService.getPendingInboundTxs(WalletError()),
-                    walletService.getPendingOutboundTxs(WalletError()),
+                    wallet.getCompletedTxs(),
+                    wallet.getCancelledTxs(),
+                    wallet.getPendingInboundTxs(),
+                    wallet.getPendingOutboundTxs(),
                 ).flatten()
             }
 
@@ -73,7 +72,8 @@ class AddressPoisoningChecker @Inject constructor(
                     SimilarAddressDto(
                         contactDto = contactDto,
                         numberOfTransaction = allTxs.filterByWalletAddress(contactDto.contactInfo.requireWalletAddress()).size,
-                        lastTransactionTimestampMillis = allTxs.filterByWalletAddress(contactDto.contactInfo.requireWalletAddress()).maxOfOrNull { it.timestamp }
+                        lastTransactionTimestampMillis = allTxs.filterByWalletAddress(contactDto.contactInfo.requireWalletAddress())
+                            .maxOfOrNull { it.timestamp }
                             ?.let { it.toLong() * 1000L },
                         trusted = addressPoisoningSharedRepository.getTrustedContactList().contains(contactDto.contactInfo.requireWalletAddress()),
                     )

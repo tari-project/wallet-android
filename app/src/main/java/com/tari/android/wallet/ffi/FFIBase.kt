@@ -57,3 +57,11 @@ abstract class FFIBase {
 }
 
 fun FFIPointer.isNull(): Boolean = this == nullptr
+
+/**
+ * Base class for FFI iterable entities. Used for proper memory management.
+ */
+abstract class FFIIterableBase<T> : FFIBase() {
+    abstract fun getLength(): Int
+    abstract fun getAt(index: Int): T
+}

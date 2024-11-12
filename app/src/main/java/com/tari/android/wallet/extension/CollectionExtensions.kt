@@ -40,3 +40,19 @@ fun <T> MutableList<T>.repopulate(replacement: Iterable<T>) {
 fun <T> List<T>.replaceItem(condition: (T) -> Boolean, replace: (T) -> T): List<T> {
     return map { if (condition(it)) replace(it) else it }
 }
+
+fun <T> List<T>.replaceOrAddItem(condition: (T) -> Boolean, item: T): List<T> {
+    return if (any(condition)) {
+        replaceItem(condition) { item }
+    } else {
+        plus(item)
+    }
+}
+
+fun <T> List<T>.withItem(item: T): List<T> {
+    return plus(item)
+}
+
+fun <T> List<T>.withoutItem(condition: (T) -> Boolean): List<T> {
+    return filterNot(condition)
+}

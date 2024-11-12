@@ -532,6 +532,10 @@ class WalletManager @Inject constructor(
                 }
             }
 
+            // Need to update the balance state after the wallet is initialized,
+            // because the first balance callback is called after the wallet is connected to the base node and validated
+            balanceStateHandler.updateBalanceState(requireWalletInstance.getBalance())
+
             applicationScope.launch(Dispatchers.IO) {
                 baseNodeStateHandler.doOnBaseNodeOnline {
                     validateWallet()
@@ -604,23 +608,8 @@ class WalletManager @Inject constructor(
         }
     }
 
-    private fun getUserByWalletAddress(address: TariWalletAddress): TariContact {
-        val contactsFFI = requireWalletInstance.getContacts()
-        for (i in 0 until contactsFFI.getLength()) {
-            val contactFFI = contactsFFI.getAt(i)
-            val walletAddressFFI = contactFFI.getWalletAddress()
-            val tariContact = if (TariWalletAddress(walletAddressFFI) == address) TariContact(contactFFI) else null
-            walletAddressFFI.destroy()
-            contactFFI.destroy()
-            if (tariContact != null) {
-                contactsFFI.destroy()
-                return tariContact
-            }
-        }
-        // destroy native collection
-        contactsFFI.destroy()
-        return TariContact(address)
-    }
+    private fun getUserByWalletAddress(address: TariWalletAddress): TariContact =
+        requireWalletInstance.findContactByWalletAddress(address)?.runWithDestroy { TariContact(it) } ?: TariContact(address)
 
     enum class ConnectivityStatus(val value: Int) {
         CONNECTING(0),
@@ -657,6 +646,6 @@ class WalletManager @Inject constructor(
 
         data object OnWalletRemove : WalletEvent()
 
-        data object Updated : WalletEvent()
+        data object UtxosSplit : WalletEvent()
     }
 }

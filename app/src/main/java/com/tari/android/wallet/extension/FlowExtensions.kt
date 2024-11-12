@@ -13,6 +13,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.zip
 import kotlinx.coroutines.launch
 
 inline fun LifecycleOwner.launchAndRepeatOnLifecycle(
@@ -62,4 +63,8 @@ fun <T> ViewModel.collectNonNullFlow(stateFlow: Flow<T?>, action: suspend (T) ->
 
 fun <A, B> Flow<A>.combineToPair(other: Flow<B>): Flow<Pair<A, B>> {
     return this.combine(other) { a, b -> a to b }
+}
+
+fun <A, B> Flow<A>.zipToPair(other: Flow<B>): Flow<Pair<A, B>> {
+    return this.zip(other) { a, b -> a to b }
 }

@@ -37,22 +37,6 @@ import com.tari.android.wallet.model.Model;
 
 interface TariWalletService {
 
-    List<TariContact> getContacts(out WalletError error);
-
-    List<CompletedTx> getCompletedTxs(out WalletError error);
-    CompletedTx getCompletedTxById(in TxId id, out WalletError error);
-
-    List<PendingInboundTx> getPendingInboundTxs(out WalletError error);
-    PendingInboundTx getPendingInboundTxById(in TxId id, out WalletError error);
-
-    List<PendingOutboundTx> getPendingOutboundTxs(out WalletError error);
-    PendingOutboundTx getPendingOutboundTxById(in TxId id, out WalletError error);
-
-    List<CancelledTx> getCancelledTxs(out WalletError error);
-    CancelledTx getCancelledTxById(in TxId id, out WalletError error);
-
-    boolean cancelPendingTx(in TxId id, out WalletError error);
-
     TxId sendTari(
         in TariContact contact,
         in MicroTari amount,
@@ -66,12 +50,6 @@ interface TariWalletService {
     boolean updateContact(in TariWalletAddress address, in String alias, boolean isFavorite, out WalletError error);
 
     boolean removeContact(in TariWalletAddress address, out WalletError error);
-
-    /**
-    * Required confirmation count functions.
-    */
-    long getRequiredConfirmationCount(out WalletError error);
-    void setRequiredConfirmationCount(long number, out WalletError error);
 
     /**
     * Seed words.

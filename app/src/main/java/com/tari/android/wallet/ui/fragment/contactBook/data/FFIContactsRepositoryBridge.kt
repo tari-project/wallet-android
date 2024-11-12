@@ -2,50 +2,23 @@ package com.tari.android.wallet.ui.fragment.contactBook.data
 
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.application.walletManager.WalletManager
-import com.tari.android.wallet.application.walletManager.WalletManager.WalletEvent
 import com.tari.android.wallet.application.walletManager.doOnWalletRunning
 import com.tari.android.wallet.application.walletManager.doOnWalletRunningWithValue
-import com.tari.android.wallet.model.TariWalletAddress
+import com.tari.android.wallet.ffi.iterateWithDestroy
 import com.tari.android.wallet.model.WalletError
 import com.tari.android.wallet.service.connection.TariWalletServiceConnection
 import com.tari.android.wallet.ui.fragment.contactBook.data.contacts.ContactDto
 import com.tari.android.wallet.ui.fragment.contactBook.data.contacts.FFIContactInfo
 import com.tari.android.wallet.ui.fragment.contactBook.data.contacts.MergedContactInfo
 import com.tari.android.wallet.util.ContactUtil
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
 
 class FFIContactsRepositoryBridge(
-    private val contactsRepository: ContactsRepository,
     private val tariWalletServiceConnection: TariWalletServiceConnection,
     private val walletManager: WalletManager,
     private val contactUtil: ContactUtil,
-    private val externalScope: CoroutineScope,
 ) {
     private val logger
         get() = Logger.t(this::class.simpleName)
-
-    init {
-        externalScope.launch {
-            walletManager.walletEvent.collect { event ->
-                when (event) {
-                    is WalletEvent.Tx.TxReceived,
-                    is WalletEvent.Tx.TxReplyReceived,
-                    is WalletEvent.Tx.TxFinalized,
-                    is WalletEvent.Tx.InboundTxBroadcast,
-                    is WalletEvent.Tx.OutboundTxBroadcast,
-                    is WalletEvent.Tx.TxMinedUnconfirmed,
-                    is WalletEvent.Tx.TxMined,
-                    is WalletEvent.Tx.TxFauxMinedUnconfirmed,
-                    is WalletEvent.Tx.TxFauxConfirmed,
-                    is WalletEvent.Tx.TxCancelled -> contactsRepository.onNewTxReceived()
-
-                    else -> Unit
-                }
-
-            }
-        }
-    }
 
     suspend fun updateToFFI(contacts: List<ContactDto>) {
         logger.i("Contacts repository event: Saving updates to FFI")
@@ -93,15 +66,8 @@ class FFIContactsRepositoryBridge(
 
     private suspend fun loadFFIContacts(): List<FFIContactInfo> {
         val walletContacts: List<FFIContactInfo> = try {
-            walletManager.doOnWalletRunningWithValue { walletService ->
-                walletService.getContacts().items()
-                    .map { ffiContact ->
-                        FFIContactInfo(
-                            walletAddress = TariWalletAddress(ffiContact.getWalletAddress()),
-                            alias = ffiContact.getAlias(),
-                            isFavorite = ffiContact.getIsFavorite(),
-                        )
-                    }
+            walletManager.doOnWalletRunningWithValue { wallet ->
+                wallet.getContacts().iterateWithDestroy { ffiContact -> FFIContactInfo(ffiContact) }
             }
         } catch (e: Throwable) {
             logger.e("Contacts repository event: Error getting contacts from FFI: ${e.message}")
@@ -110,12 +76,13 @@ class FFIContactsRepositoryBridge(
         }
 
         val txContacts: List<FFIContactInfo> = try {
-            tariWalletServiceConnection.doOnWalletServiceConnectedWithValue { walletService ->
+            walletManager.doOnWalletRunningWithValue { wallet ->
                 listOf(
-                    walletService.getCompletedTxs(WalletError()),
-                    walletService.getCancelledTxs(WalletError()),
-                    walletService.getPendingInboundTxs(WalletError()),
-                    walletService.getPendingOutboundTxs(WalletError()),
+                    // TODO use tx repository
+                    wallet.getCompletedTxs(),
+                    wallet.getCancelledTxs(),
+                    wallet.getPendingInboundTxs(),
+                    wallet.getPendingOutboundTxs(),
                 ).asSequence().flatten()
                     .filter { !it.tariContact.walletAddress.isUnknownUser() }
                     .filter { !it.isCoinbase }

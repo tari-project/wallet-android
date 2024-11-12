@@ -2,6 +2,8 @@ package com.tari.android.wallet.ui.fragment.contactBook.data.contacts
 
 import android.os.Parcelable
 import com.tari.android.wallet.R
+import com.tari.android.wallet.ffi.FFIContact
+import com.tari.android.wallet.ffi.runWithDestroy
 import com.tari.android.wallet.model.TariContact
 import com.tari.android.wallet.model.TariWalletAddress
 import com.tari.android.wallet.ui.fragment.contactBook.data.ContactAction
@@ -69,6 +71,12 @@ data class FFIContactInfo(
         firstName = splitAlias(tariContact.alias).firstName,
         lastName = splitAlias(tariContact.alias).lastName,
         isFavorite = tariContact.isFavorite,
+    )
+
+    constructor(ffiContact: FFIContact) : this(
+        walletAddress = ffiContact.getWalletAddress().runWithDestroy { TariWalletAddress(it) },
+        alias = ffiContact.getAlias(),
+        isFavorite = ffiContact.getIsFavorite(),
     )
 
     override fun filtered(text: String): Boolean = walletAddress.fullEmojiId.contains(text, true) || getAlias().contains(text, true)
