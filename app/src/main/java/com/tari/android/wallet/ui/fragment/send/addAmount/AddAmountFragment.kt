@@ -324,6 +324,8 @@ class AddAmountFragment : CommonFragment<FragmentAddAmountBinding, AddAmountView
         }
 
         private fun showOrHideFeeViewAnimated(showsTxFee: Boolean) = with(ui) {
+            if (showsTxFee) feeCalculating.gone()
+
             if ((showsTxFee && txFeeContainerView.visibility == View.VISIBLE) ||
                 (!showsTxFee && txFeeContainerView.visibility == View.INVISIBLE)
             ) {
