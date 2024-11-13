@@ -1,9 +1,8 @@
 package com.tari.android.wallet.ui.fragment.contactBook.address_poisoning
 
 import androidx.annotation.VisibleForTesting
-import com.tari.android.wallet.application.walletManager.WalletManager
-import com.tari.android.wallet.application.walletManager.doOnWalletRunningWithValue
 import com.tari.android.wallet.data.sharedPrefs.addressPoisoning.AddressPoisoningPrefRepository
+import com.tari.android.wallet.data.tx.TxRepository
 import com.tari.android.wallet.model.TariWalletAddress
 import com.tari.android.wallet.model.Tx
 import com.tari.android.wallet.ui.fragment.contactBook.data.ContactsRepository
@@ -17,14 +16,15 @@ import javax.inject.Singleton
 private const val MIN_SAME_CHARS = 3
 private const val USED_PREFIX_SUFFIX_CHARS = Constants.Wallet.EMOJI_FORMATTER_CHUNK_SIZE
 
+// TODO probably we need to completely test the address poisoning feature
 @Singleton
 class AddressPoisoningChecker @Inject constructor(
     private val addressPoisoningSharedRepository: AddressPoisoningPrefRepository,
     private val contactsRepository: ContactsRepository,
-    private val walletManager: WalletManager,
+    private val txRepository: TxRepository,
 ) {
 
-    suspend fun doOnAddressPoisoned(walletAddress: TariWalletAddress?, action: (similarContactList: List<SimilarAddressDto>) -> Unit) {
+    fun doOnAddressPoisoned(walletAddress: TariWalletAddress?, action: (similarContactList: List<SimilarAddressDto>) -> Unit) {
         if (walletAddress == null) return
 
         val similarContactList = walletAddress.findSimilarContacts()
@@ -51,18 +51,11 @@ class AddressPoisoningChecker @Inject constructor(
         }
     }
 
-    private suspend fun TariWalletAddress.findSimilarContacts(): List<SimilarAddressDto> {
+    private fun TariWalletAddress.findSimilarContacts(): List<SimilarAddressDto> {
         return if (DebugConfig.mockPoisonedAddresses) {
             MockDataStub.createSimilarAddressList()
         } else {
-            val allTxs = walletManager.doOnWalletRunningWithValue { wallet ->
-                listOf(
-                    wallet.getCompletedTxs(),
-                    wallet.getCancelledTxs(),
-                    wallet.getPendingInboundTxs(),
-                    wallet.getPendingOutboundTxs(),
-                ).flatten()
-            }
+            val allTxs = txRepository.txs.value.allTxs
 
             return (contactsRepository.contactList.value
                     // add the current wallet address to the list because it may not exist if there were no interactions with it

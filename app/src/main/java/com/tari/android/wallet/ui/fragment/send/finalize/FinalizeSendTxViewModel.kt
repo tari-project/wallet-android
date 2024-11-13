@@ -76,7 +76,7 @@ class FinalizeSendTxViewModel : CommonViewModel() {
 
     fun onYatSendTxStop() {
         trySendTxSuccess(isYat = true)
-        trySendTxSuccess(isYat = true)
+        trySendTxFailure(isYat = true)
     }
 
     fun trySendTxSuccess(isYat: Boolean) {

@@ -4,6 +4,7 @@ import com.tari.android.wallet.model.CancelledTx
 import com.tari.android.wallet.model.CompletedTx
 import com.tari.android.wallet.model.PendingInboundTx
 import com.tari.android.wallet.model.PendingOutboundTx
+import com.tari.android.wallet.model.Tx
 import com.tari.android.wallet.model.TxStatus
 
 data class TxListData(
@@ -17,4 +18,6 @@ data class TxListData(
         get() = completedTxs.filter { it.status == TxStatus.MINED_UNCONFIRMED }
     val nonMinedUnconfirmedCompletedTxs: List<CompletedTx>
         get() = completedTxs.filter { it.status != TxStatus.MINED_UNCONFIRMED }
+    val allTxs: List<Tx>
+        get() = cancelledTxs + completedTxs + pendingInboundTxs + pendingOutboundTxs
 }
