@@ -6,8 +6,8 @@ buildscript {
     ext.coroutines_version = '1.8.0'
 
     // build & version
-    ext.buildNumber = 315
-    ext.versionNumber = "0.28.1"
+    ext.buildNumber = 316
+    ext.versionNumber = "0.29.0"
 
     // JNI libs
     ext.libwalletHostURL = "https://github.com/tari-project/tari/releases/download/"
