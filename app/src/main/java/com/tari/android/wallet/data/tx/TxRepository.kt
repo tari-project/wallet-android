@@ -26,11 +26,7 @@ class TxRepository @Inject constructor(
     private val logger
         get() = Logger.t(TxRepository::class.java.simpleName)
 
-    private val _txs = MutableStateFlow(
-        TxListData(
-            confirmationCount = DEFAULT_CONFIRMATION_COUNT,
-        )
-    )
+    private val _txs = MutableStateFlow(TxListData(confirmationCount = DEFAULT_CONFIRMATION_COUNT))
     val txs = _txs.asStateFlow()
     val pendingTxs = txs.map { txs ->
         (txs.pendingInboundTxs + txs.pendingOutboundTxs + txs.minedUnconfirmedTxs)
