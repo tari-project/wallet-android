@@ -5,24 +5,13 @@ import com.tari.android.wallet.application.walletManager.WalletManager
 import com.tari.android.wallet.application.walletManager.WalletManager.WalletEvent
 import com.tari.android.wallet.application.walletManager.doOnWalletRunning
 import com.tari.android.wallet.di.ApplicationScope
-import com.tari.android.wallet.extension.replaceItem
-import com.tari.android.wallet.extension.replaceOrAddItem
-import com.tari.android.wallet.extension.withItem
-import com.tari.android.wallet.extension.withoutItem
-import com.tari.android.wallet.model.CancelledTx
-import com.tari.android.wallet.model.CompletedTx
-import com.tari.android.wallet.model.PendingInboundTx
-import com.tari.android.wallet.model.PendingOutboundTx
 import com.tari.android.wallet.model.Tx
-import com.tari.android.wallet.model.TxId
-import com.tari.android.wallet.model.TxStatus
 import com.tari.android.wallet.ui.fragment.contactBook.data.ContactsRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.flow.zip
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -66,20 +55,18 @@ class TxRepository @Inject constructor(
         applicationScope.launch(Dispatchers.IO) {
             walletManager.walletEvent.collect { event ->
                 when (event) {
-                    is WalletEvent.Tx.TxReceived -> onTxReceived(event.tx)
-                    is WalletEvent.Tx.TxReplyReceived -> onTxReplyReceived(event.tx)
-                    is WalletEvent.Tx.TxFinalized -> onTxFinalized(event.tx)
-                    is WalletEvent.Tx.InboundTxBroadcast -> onInboundTxBroadcast(event.tx)
-                    is WalletEvent.Tx.OutboundTxBroadcast -> onOutboundTxBroadcast(event.tx)
-                    is WalletEvent.Tx.TxMinedUnconfirmed -> onTxMinedUnconfirmed(event.tx)
-                    is WalletEvent.Tx.TxMined -> onTxMined(event.tx)
-                    is WalletEvent.Tx.TxFauxMinedUnconfirmed -> onTxFauxMinedUnconfirmed(event.tx)
-                    is WalletEvent.Tx.TxFauxConfirmed -> onFauxTxMined(event.tx)
-                    is WalletEvent.Tx.TxCancelled -> onTxCancelled(event.tx)
-
+                    is WalletEvent.Tx.TxReceived,
+                    is WalletEvent.Tx.TxReplyReceived,
+                    is WalletEvent.Tx.TxFinalized,
+                    is WalletEvent.Tx.InboundTxBroadcast,
+                    is WalletEvent.Tx.OutboundTxBroadcast,
+                    is WalletEvent.Tx.TxMinedUnconfirmed,
+                    is WalletEvent.Tx.TxMined,
+                    is WalletEvent.Tx.TxFauxMinedUnconfirmed,
+                    is WalletEvent.Tx.TxFauxConfirmed,
+                    is WalletEvent.Tx.TxCancelled,
+                    is WalletEvent.TxSend.TxSendSuccessful,
                     is WalletEvent.UtxosSplit -> refreshTxList()
-
-                    is WalletEvent.TxSend.TxSendSuccessful -> onTxSendSuccessful(event.txId)
 
                     else -> Unit
                 }
@@ -110,94 +97,6 @@ class TxRepository @Inject constructor(
                             "${_txs.value.confirmationCount})"
                 )
             }
-        }
-    }
-
-    private fun onTxReceived(tx: PendingInboundTx) {
-        _txs.update { it.copy(pendingInboundTxs = it.pendingInboundTxs.withItem(tx)) }
-    }
-
-    private fun onTxReplyReceived(tx: PendingOutboundTx) {
-        _txs.update { txs ->
-            txs.copy(pendingOutboundTxs = txs.pendingOutboundTxs.replaceItem({ it.id == tx.id }, { it.copy(status = tx.status) }))
-        }
-    }
-
-    private fun onTxFinalized(tx: PendingInboundTx) {
-        _txs.update { txs ->
-            txs.copy(pendingInboundTxs = txs.pendingInboundTxs.replaceItem({ it.id == tx.id }, { it.copy(status = tx.status) }))
-        }
-    }
-
-    private fun onInboundTxBroadcast(tx: PendingInboundTx) {
-        _txs.update { txs ->
-            txs.copy(pendingInboundTxs = txs.pendingInboundTxs.replaceItem({ it.id == tx.id }, { it.copy(status = TxStatus.BROADCAST) }))
-        }
-    }
-
-    private fun onOutboundTxBroadcast(tx: PendingOutboundTx) {
-        _txs.update { txs ->
-            txs.copy(pendingOutboundTxs = txs.pendingOutboundTxs.replaceItem({ it.id == tx.id }, { it.copy(status = TxStatus.BROADCAST) }))
-        }
-    }
-
-    private fun onTxMinedUnconfirmed(tx: CompletedTx) {
-        _txs.update { txs ->
-            txs.copy(
-                completedTxs = txs.completedTxs.replaceOrAddItem({ it.id == tx.id }, tx),
-                pendingInboundTxs = if (tx.isInbound) txs.pendingInboundTxs.withoutItem { it.id == tx.id } else txs.pendingInboundTxs,
-                pendingOutboundTxs = if (tx.isOutbound) txs.pendingOutboundTxs.withoutItem { it.id == tx.id } else txs.pendingOutboundTxs,
-            )
-        }
-    }
-
-    private fun onTxMined(tx: CompletedTx) {
-        _txs.update { txs ->
-            txs.copy(
-                completedTxs = txs.completedTxs.replaceOrAddItem({ it.id == tx.id }, tx),
-                pendingInboundTxs = txs.pendingInboundTxs.withoutItem { it.id == tx.id },
-                pendingOutboundTxs = txs.pendingOutboundTxs.withoutItem { it.id == tx.id },
-            )
-        }
-    }
-
-    private fun onTxFauxMinedUnconfirmed(tx: CompletedTx) {
-        _txs.update { txs ->
-            txs.copy(
-                completedTxs = txs.completedTxs.replaceOrAddItem({ it.id == tx.id }, tx),
-                pendingInboundTxs = if (tx.isInbound) txs.pendingInboundTxs.withoutItem { it.id == tx.id } else txs.pendingInboundTxs,
-                pendingOutboundTxs = if (tx.isOutbound) txs.pendingOutboundTxs.withoutItem { it.id == tx.id } else txs.pendingOutboundTxs,
-            )
-        }
-    }
-
-    private fun onFauxTxMined(tx: CompletedTx) {
-        _txs.update { txs ->
-            txs.copy(
-                completedTxs = txs.completedTxs.replaceOrAddItem({ it.id == tx.id }, tx),
-                pendingInboundTxs = txs.pendingInboundTxs.withoutItem { it.id == tx.id },
-                pendingOutboundTxs = txs.pendingOutboundTxs.withoutItem { it.id == tx.id },
-            )
-        }
-    }
-
-    private fun onTxCancelled(tx: CancelledTx) {
-        _txs.update { txs ->
-            txs.copy(
-                cancelledTxs = txs.cancelledTxs.withItem(tx),
-                pendingInboundTxs = if (tx.isInbound) txs.pendingInboundTxs.withoutItem { it.id == tx.id } else txs.pendingInboundTxs,
-                pendingOutboundTxs = if (tx.isOutbound) txs.pendingOutboundTxs.withoutItem { it.id == tx.id } else txs.pendingOutboundTxs,
-            )
-        }
-    }
-
-    private fun onTxSendSuccessful(txId: TxId) {
-        try {
-            val tx = walletManager.requireWalletInstance.getPendingOutboundTxById(txId)
-            _txs.update { it.copy(pendingOutboundTxs = it.pendingOutboundTxs.withItem(tx)) }
-        } catch (e: Exception) {
-            logger.i("onTxSendSuccessful: error getting tx by id")
-            refreshTxList()
         }
     }
 
