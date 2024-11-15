@@ -1,11 +1,8 @@
 package com.tari.android.wallet.ui.fragment.contactBook.address_poisoning
 
 import com.tari.android.wallet.model.TariWalletAddress
-import com.tari.android.wallet.util.EmojiId
+import com.tari.android.wallet.model.EmojiId
 import com.tari.android.wallet.util.MockDataStub
-import org.junit.Assert.assertFalse
-import org.junit.Assert.assertTrue
-import org.junit.Test
 
 class AddressPoisoningCheckerTest {
 

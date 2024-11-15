@@ -1,7 +1,7 @@
 package com.tari.android.wallet.ui.fragment.contactBook.contactSelection
 
 import com.tari.android.wallet.model.TariWalletAddress
-import com.tari.android.wallet.util.EmojiId
+import com.tari.android.wallet.model.EmojiId
 
 object ContactSelectionModel {
 

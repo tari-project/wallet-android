@@ -14,7 +14,7 @@ import com.tari.android.wallet.ui.fragment.contactBook.data.contacts.FFIContactI
 import com.tari.android.wallet.ui.fragment.contactBook.data.contacts.MergedContactInfo
 import com.tari.android.wallet.ui.fragment.contactBook.data.contacts.PhoneContactInfo
 import com.tari.android.wallet.util.ContactUtil
-import com.tari.android.wallet.util.EmojiId
+import com.tari.android.wallet.model.EmojiId
 import com.tari.android.wallet.util.nextBoolean
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow

@@ -32,8 +32,6 @@
  */
 package com.tari.android.wallet.ffi
 
-typealias FFIContactPtr = Long
-
 /**
  * Tari contact wrapper.
  *

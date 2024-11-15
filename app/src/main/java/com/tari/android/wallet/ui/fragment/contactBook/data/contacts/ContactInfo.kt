@@ -7,7 +7,7 @@ import com.tari.android.wallet.ffi.runWithDestroy
 import com.tari.android.wallet.model.TariContact
 import com.tari.android.wallet.model.TariWalletAddress
 import com.tari.android.wallet.ui.fragment.contactBook.data.ContactAction
-import com.tari.android.wallet.util.EmojiId
+import com.tari.android.wallet.model.EmojiId
 import kotlinx.parcelize.Parcelize
 
 sealed class ContactInfo(

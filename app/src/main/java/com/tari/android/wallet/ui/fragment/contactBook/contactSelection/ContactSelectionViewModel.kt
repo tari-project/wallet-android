@@ -37,7 +37,7 @@ import com.tari.android.wallet.ui.fragment.contactBook.data.contacts.splitAlias
 import com.tari.android.wallet.ui.fragment.contactBook.root.ShareViewModel
 import com.tari.android.wallet.navigation.Navigation
 import com.tari.android.wallet.util.Constants
-import com.tari.android.wallet.util.EmojiId
+import com.tari.android.wallet.model.EmojiId
 import com.tari.android.wallet.util.EmojiUtil.Companion.getGraphemeLength
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow

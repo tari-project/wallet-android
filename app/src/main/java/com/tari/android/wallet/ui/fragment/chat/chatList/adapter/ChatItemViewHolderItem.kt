@@ -6,7 +6,7 @@ import com.tari.android.wallet.ui.common.domain.ResourceManager
 import com.tari.android.wallet.ui.common.recyclerView.CommonViewHolderItem
 import com.tari.android.wallet.ui.fragment.chat.data.ChatItemDto
 import com.tari.android.wallet.ui.fragment.contactBook.data.contacts.ContactDto
-import com.tari.android.wallet.util.EmojiId
+import com.tari.android.wallet.model.EmojiId
 
 data class ChatItemViewHolderItem(
     val walletAddress: TariWalletAddress,

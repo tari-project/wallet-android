@@ -41,7 +41,7 @@ package com.tari.android.wallet.ffi
 class FFIContacts() : FFIIterableBase<FFIContact>() {
 
     private external fun jniGetLength(libError: FFIError): Int
-    private external fun jniGetAt(index: Int, libError: FFIError): FFIContactPtr
+    private external fun jniGetAt(index: Int, libError: FFIError): FFIPointer
     private external fun jniDestroy()
 
     constructor(pointer: FFIPointer) : this() {

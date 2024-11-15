@@ -1,5 +1,7 @@
 package com.tari.android.wallet.ffi
 
+import com.tari.android.wallet.model.Base58
+
 /**
  * @author The Tari Development Team
  *
@@ -15,8 +17,6 @@ package com.tari.android.wallet.ffi
  * in bitcoinj (https://bitcoinj.github.io) - thanks to  Google Inc. and Andreas Schildbach
  *
  */
-
-typealias Base58 = String
 
 private const val ENCODED_ZERO = '1'
 

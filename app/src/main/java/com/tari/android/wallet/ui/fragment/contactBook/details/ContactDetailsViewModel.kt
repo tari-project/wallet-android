@@ -50,7 +50,7 @@ import com.tari.android.wallet.ui.fragment.settings.allSettings.row.SettingsRowS
 import com.tari.android.wallet.ui.fragment.settings.allSettings.row.SettingsRowViewHolderItem
 import com.tari.android.wallet.ui.fragment.settings.allSettings.title.SettingsTitleViewHolderItem
 import com.tari.android.wallet.util.DebugConfig
-import com.tari.android.wallet.util.EmojiId
+import com.tari.android.wallet.model.EmojiId
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update

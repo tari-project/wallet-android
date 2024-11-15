@@ -5,7 +5,7 @@ import com.tari.android.wallet.data.sharedPrefs.CommonPrefRepository
 import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefStringDelegate
 import com.tari.android.wallet.data.sharedPrefs.network.NetworkPrefRepository
 import com.tari.android.wallet.data.sharedPrefs.network.formatKey
-import com.tari.android.wallet.util.EmojiId
+import com.tari.android.wallet.model.EmojiId
 import javax.inject.Inject
 import javax.inject.Singleton
 

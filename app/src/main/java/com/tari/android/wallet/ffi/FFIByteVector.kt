@@ -32,6 +32,8 @@
  */
 package com.tari.android.wallet.ffi
 
+import com.tari.android.wallet.model.Base58
+
 /**
  * Wrapper for native byte vector type.
  *
