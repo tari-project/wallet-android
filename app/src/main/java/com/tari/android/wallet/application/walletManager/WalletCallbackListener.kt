@@ -74,15 +74,16 @@ class WalletCallbackListener @Inject constructor() {
     fun onTxBroadcast(contextPtr: ByteArray, completedTxPtr: FFIPointer) {
         val walletContextId = BigInteger(1, contextPtr).toInt()
         val tx = FFICompletedTx(completedTxPtr)
-        log(walletContextId, "Tx broadcast ${tx.getId()}")
         when (tx.getDirection()) {
             Tx.Direction.INBOUND -> {
                 val pendingInboundTx = PendingInboundTx(tx)
+                log(walletContextId, "Tx inbound broadcast ${tx.getId()}")
                 listeners[walletContextId]?.onInboundTxBroadcast(pendingInboundTx)
             }
 
             Tx.Direction.OUTBOUND -> {
                 val pendingOutboundTx = PendingOutboundTx(tx)
+                log(walletContextId, "Tx outbound broadcast ${tx.getId()}")
                 listeners[walletContextId]?.onOutboundTxBroadcast(pendingOutboundTx)
             }
         }
@@ -99,7 +100,7 @@ class WalletCallbackListener @Inject constructor() {
         val walletContextId = BigInteger(1, contextPtr).toInt()
         val confirmationCount = BigInteger(1, confirmationCountBytes).toInt()
         val completed = CompletedTx(completedTxPtr)
-        log(walletContextId, "Tx mined & unconfirmed ${completed.id} $confirmationCount")
+        log(walletContextId, "Tx mined & unconfirmed ${completed.id} ($confirmationCount confirmations)")
         listeners[walletContextId]?.onTxMinedUnconfirmed(completed, confirmationCount)
     }
 
@@ -114,7 +115,7 @@ class WalletCallbackListener @Inject constructor() {
         val walletContextId = BigInteger(1, contextPtr).toInt()
         val confirmationCount = BigInteger(1, confirmationCountBytes).toInt()
         val completed = CompletedTx(completedTxPtr)
-        log(walletContextId, "Tx faux unconfirmed ${completed.id}")
+        log(walletContextId, "Tx faux unconfirmed ${completed.id} ($confirmationCount confirmations)")
         listeners[walletContextId]?.onTxMinedUnconfirmed(completed, confirmationCount)
     }
 
