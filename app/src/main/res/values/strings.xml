@@ -310,6 +310,8 @@
     <string name="finalize_send_tx_sending_step_2_desc_line_2" tools:ignore="TypographyEllipsis">recipient on the Tari Network...</string>
     <string name="finalize_send_tx_sending_step_3_desc_line_1">Good to go!</string>
     <string name="finalize_send_tx_sending_step_3_desc_line_2" tools:ignore="TypographyEllipsis">Your transaction is on its way...</string>
+    <string name="finalize_send_tx_sending_cancel_dialog_title">Cancel Sending</string>
+    <string name="finalize_send_tx_sending_cancel_dialog_description">Are you sure you want to leave this screen? Your transaction may be cancelled.</string>
 
     <!-- wallet info -->
     <string name="wallet_info_my_profile">My Profile</string>

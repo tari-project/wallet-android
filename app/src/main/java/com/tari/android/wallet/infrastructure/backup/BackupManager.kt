@@ -102,7 +102,6 @@ class BackupManager @Inject constructor(
                     is WalletEvent.Tx.TxMinedUnconfirmed,
                     is WalletEvent.Tx.TxFauxConfirmed,
                     is WalletEvent.Tx.TxFauxMinedUnconfirmed,
-                    is WalletEvent.Tx.DirectSendResult,
                     is WalletEvent.Tx.TxCancelled -> trigger.onNext(Unit)
 
                     is WalletEvent.OnWalletRemove -> turnOffAll()

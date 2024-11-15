@@ -1,5 +1,6 @@
 package com.tari.android.wallet.navigation
 
+import android.net.Uri
 import com.tari.android.wallet.application.YatAdapter.ConnectedWallet
 import com.tari.android.wallet.application.deeplinks.DeepLink
 import com.tari.android.wallet.model.MicroTari
@@ -15,6 +16,8 @@ sealed class Navigation {
     object ChangeBiometrics : Navigation()
     object FeatureAuth : Navigation()
     data class SplashScreen(val seedWords: List<String>? = null, val clearTop: Boolean = true) : Navigation()
+    data class Home(val uri: Uri? = null) : Navigation()
+    data object BackToHome : Navigation()
 
     sealed class CustomBridgeNavigation : Navigation() {
         object UploadQrCode : CustomBridgeNavigation()
@@ -56,11 +59,6 @@ sealed class Navigation {
         object OnAmountExceedsActualAvailableBalance : AddAmountNavigation()
         class ContinueToAddNote(val transactionData: TransactionData) : AddAmountNavigation()
         class ContinueToFinalizing(val transactionData: TransactionData) : AddAmountNavigation()
-    }
-
-    sealed class SendTxNavigation : Navigation() {
-        data class OnSendTxFailure(val isYat: Boolean) : SendTxNavigation()
-        data class OnSendTxSuccess(val isYat: Boolean) : SendTxNavigation()
     }
 
     sealed class AllSettingsNavigation : Navigation() {

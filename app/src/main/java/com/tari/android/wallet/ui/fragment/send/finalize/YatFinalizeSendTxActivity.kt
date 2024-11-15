@@ -2,15 +2,10 @@ package com.tari.android.wallet.ui.fragment.send.finalize
 
 import android.os.Bundle
 import androidx.activity.viewModels
-import androidx.lifecycle.lifecycleScope
 import com.orhanobut.logger.Logger
-import com.tari.android.wallet.extension.observe
-import com.tari.android.wallet.extension.observeOnLoad
+import com.tari.android.wallet.extension.collectFlow
 import com.tari.android.wallet.ui.extension.parcelable
 import com.tari.android.wallet.ui.fragment.send.common.TransactionData
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import yat.android.ui.transactions.outcoming.TransactionState
 import yat.android.ui.transactions.outcoming.YatLibOutcomingTransactionActivity
 
@@ -24,11 +19,8 @@ class YatFinalizeSendTxActivity : YatLibOutcomingTransactionActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        intent.parcelable<TransactionData>(FinalizeSendTxViewModel.KEY_TRANSACTION_DATA)?.let { transactionData ->
-            viewModel.transactionData = transactionData
-
+        intent.parcelable<TransactionData>(FinalizeSendTxViewModel.KEY_TRANSACTION_DATA)?.let {
             subscribeOnUI()
-            launchObserver()
         } ?: run {
             logger.e("Transaction data is null. Finishing activity.")
             finish()
@@ -36,24 +28,12 @@ class YatFinalizeSendTxActivity : YatLibOutcomingTransactionActivity() {
         }
     }
 
-
     private fun subscribeOnUI() = with(viewModel) {
-        observe(txFailureReason) { setTransactionState(TransactionState.Failed) }
-
-        observe(isSuccess) { setTransactionState(TransactionState.Complete) }
-
-        observeOnLoad(sentTxId)
-        observeOnLoad(steps)
-        observeOnLoad(nextStep)
-    }
-
-    private fun launchObserver() {
-        viewModel.start()
-
-        lifecycleScope.launch(Dispatchers.IO) {
-            while (viewModel.txFailureReason.value == null && viewModel.isSuccess.value == null) {
-                delay(200)
-                viewModel.checkStepStatus()
+        collectFlow(effect) {
+            when (it) {
+                is FinalizeSendTxModel.Effect.SendTxSuccess -> setTransactionState(TransactionState.Complete)
+                is FinalizeSendTxModel.Effect.ShowError -> setTransactionState(TransactionState.Failed)
+                else -> Unit
             }
         }
     }

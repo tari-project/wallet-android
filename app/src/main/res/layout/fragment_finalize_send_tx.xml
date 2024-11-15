@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/root_view"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -44,10 +45,10 @@
                 android:id="@+id/info_line_1_text_view"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/finalize_send_tx_sending_step_1_desc_line_1"
                 android:textColor="?attr/palette_text_heading"
                 android:textSize="18sp"
-                app:customFont="light" />
+                app:customFont="light"
+                tools:text="@string/finalize_send_tx_sending_step_1_desc_line_1" />
         </LinearLayout>
 
         <LinearLayout
@@ -61,19 +62,18 @@
                 android:id="@+id/info_line_2_text_view"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/finalize_send_tx_sending_step_1_desc_line_2"
                 android:textColor="?attr/palette_text_heading"
                 android:textSize="18sp"
-                app:customFont="black" />
+                app:customFont="black"
+                tools:text="@string/finalize_send_tx_sending_step_1_desc_line_2" />
         </LinearLayout>
 
         <LinearLayout
             android:id="@+id/steps_container"
             android:layout_width="wrap_content"
             android:layout_height="4dp"
+            android:layout_gravity="center_horizontal"
             android:layout_marginTop="40dp"
             android:orientation="horizontal" />
-
     </LinearLayout>
-
 </RelativeLayout>

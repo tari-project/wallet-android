@@ -84,7 +84,7 @@ import com.tari.android.wallet.tor.TorProxyManager
 import com.tari.android.wallet.tor.TorProxyStateHandler
 import com.tari.android.wallet.ui.common.DialogManager
 import com.tari.android.wallet.ui.fragment.home.HomeActivity
-import com.tari.android.wallet.ui.fragment.send.finalize.TxFailureReason
+import com.tari.android.wallet.ui.fragment.send.finalize.FinalizeSendTxModel
 import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.DebugConfig
 import kotlinx.coroutines.CoroutineScope
@@ -143,6 +143,9 @@ class WalletManager @Inject constructor(
 
     private val _walletEvent = EffectChannelFlow<WalletEvent>()
     val walletEvent: Flow<WalletEvent> = _walletEvent.flow
+
+    private val _txSentConfirmations = MutableStateFlow(emptyList<TxSendResult>())
+    val txSentConfirmations = _txSentConfirmations.asStateFlow()
 
     private var logFileObserver: LogFileObserver? = null
     private val logger
@@ -252,7 +255,7 @@ class WalletManager @Inject constructor(
                 }
 
                 override fun onDirectSendResult(txId: BigInteger, status: TransactionSendStatus) = runOnMain {
-                    _walletEvent.send(WalletEvent.Tx.DirectSendResult(TxId(txId), status))
+                    _txSentConfirmations.update { it + TxSendResult(TxId(txId), status) }
                     walletNotificationManager.sendOutboundTxNotification(requireWalletInstance, txId, status)
                 }
 
@@ -636,16 +639,17 @@ class WalletManager @Inject constructor(
             data class TxFauxConfirmed(val tx: CompletedTx) : WalletEvent()
             data class TxFauxMinedUnconfirmed(val tx: CompletedTx, val confirmationCount: Int) : WalletEvent()
             data class TxCancelled(val tx: CancelledTx) : WalletEvent()
-            data class DirectSendResult(val txId: TxId, val status: TransactionSendStatus) : WalletEvent()
         }
 
         object TxSend {
             data class TxSendSuccessful(val txId: TxId) : WalletEvent()
-            data class TxSendFailed(val failureReason: TxFailureReason) : WalletEvent()
+            data class TxSendFailed(val failureReason: FinalizeSendTxModel.TxFailureReason) : WalletEvent()
         }
 
         data object OnWalletRemove : WalletEvent()
 
         data object UtxosSplit : WalletEvent()
     }
+
+    data class TxSendResult(val txId: TxId, val status: TransactionSendStatus)
 }
