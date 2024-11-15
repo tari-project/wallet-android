@@ -6,6 +6,7 @@ import com.tari.android.wallet.application.deeplinks.DeepLink
 import com.tari.android.wallet.model.MicroTari
 import com.tari.android.wallet.model.TariWalletAddress
 import com.tari.android.wallet.model.Tx
+import com.tari.android.wallet.model.TxId
 import com.tari.android.wallet.ui.fragment.contactBook.data.contacts.ContactDto
 import com.tari.android.wallet.ui.fragment.pinCode.PinCodeScreenBehavior
 import com.tari.android.wallet.ui.fragment.send.common.TransactionData
@@ -40,7 +41,7 @@ sealed class Navigation {
     }
 
     sealed class TxListNavigation : Navigation() {
-        class ToTxDetails(val tx: Tx) : TxListNavigation()
+        class ToTxDetails(val tx: Tx? = null, val txId: TxId? = null) : TxListNavigation()
         object ToChat : TxListNavigation()
         object ToAllSettings : TxListNavigation()
         object ToUtxos : TxListNavigation()

@@ -46,7 +46,7 @@ import java.math.BigInteger
  */
 @Parcelize
 data class CompletedTx(
-    override val id: BigInteger = 0.toBigInteger(), // TODO do we use those default values??
+    override val id: TxId = 0.toBigInteger(), // TODO do we use those default values??
     override val direction: Direction = Direction.INBOUND,
     override val amount: MicroTari = 0.toMicroTari(),
     override val timestamp: BigInteger = 0.toBigInteger(),

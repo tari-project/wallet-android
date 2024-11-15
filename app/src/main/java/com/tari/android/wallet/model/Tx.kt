@@ -41,7 +41,7 @@ import java.math.BigInteger
  * @author The Tari Development Team
  */
 abstract class Tx(
-    open val id: BigInteger,
+    open val id: TxId,
     open val direction: Direction,
     open val amount: MicroTari,
     open val timestamp: BigInteger, // Seconds

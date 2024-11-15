@@ -15,7 +15,6 @@ import com.tari.android.wallet.extension.collectFlow
 import com.tari.android.wallet.extension.launchOnIo
 import com.tari.android.wallet.extension.launchOnMain
 import com.tari.android.wallet.model.TariContact
-import com.tari.android.wallet.model.WalletError
 import com.tari.android.wallet.navigation.Navigation
 import com.tari.android.wallet.network.NetworkConnectionStateHandler
 import com.tari.android.wallet.tor.TorBootstrapStatus
@@ -218,26 +217,22 @@ class FinalizeSendTxViewModel(savedState: SavedStateHandle) : CommonViewModel() 
     ) {
         override fun execute() {
             launchOnIo {
-                val error = WalletError()
-                val txId = walletService.sendTari(
-                    // TODO call the wallet
-                    /* contact = */ TariContact(transactionData.recipientContact!!.contactInfo.requireWalletAddress()),
-                    /* amount = */ transactionData.amount,
-                    /* feePerGram = */ transactionData.feePerGram ?: Constants.Wallet.DEFAULT_FEE_PER_GRAM,
-                    /* message = */ transactionData.message,
-                    /* isOneSidePayment = */ transactionData.isOneSidePayment,
-                    /* paymentId = */ transactionData.paymentId,
-                    /* error = */ error,
-                )
-                // if success, just wait for the callback to happen
-                // if failed, just show the failed info & return
-                isCompleted = true
-                if (txId == null || error != WalletError.NoError) {
-                    setFailureReason(TxFailureReason.SEND_ERROR)
-                } else {
+                try {
+                    val txId = walletManager.sendTari(
+                        tariContact = TariContact(transactionData.recipientContact!!.contactInfo.requireWalletAddress()),
+                        amount = transactionData.amount!!,
+                        feePerGram = transactionData.feePerGram ?: Constants.Wallet.DEFAULT_FEE_PER_GRAM,
+                        message = transactionData.message,
+                        isOneSidePayment = transactionData.isOneSidePayment,
+                        paymentId = transactionData.paymentId,
+                    )
+
                     logger.i("Tx sent: $txId")
                     _uiState.update { it.copy(sentTxId = txId) }
+                } catch (e: Exception) {
+                    setFailureReason(TxFailureReason.SEND_ERROR)
                 }
+                isCompleted = true
             }
         }
     }

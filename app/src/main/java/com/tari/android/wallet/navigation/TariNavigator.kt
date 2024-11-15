@@ -11,8 +11,6 @@ import com.tari.android.wallet.application.deeplinks.DeepLink
 import com.tari.android.wallet.application.walletManager.WalletManager
 import com.tari.android.wallet.model.MicroTari
 import com.tari.android.wallet.model.TariWalletAddress
-import com.tari.android.wallet.model.Tx
-import com.tari.android.wallet.model.TxId
 import com.tari.android.wallet.navigation.Navigation.AddAmountNavigation
 import com.tari.android.wallet.navigation.Navigation.AllSettingsNavigation
 import com.tari.android.wallet.navigation.Navigation.BackupSettingsNavigation
@@ -140,7 +138,7 @@ class TariNavigator @Inject constructor(
             is AddAmountNavigation.ContinueToAddNote -> continueToAddNote(navigation.transactionData)
             is AddAmountNavigation.ContinueToFinalizing -> continueToFinalizeSendTx(navigation.transactionData)
             is TxListNavigation.ToChat -> toChat()
-            is TxListNavigation.ToTxDetails -> toTxDetails(tx = navigation.tx)
+            is TxListNavigation.ToTxDetails -> addFragment(TxDetailsFragment.newInstance(navigation.tx, navigation.txId))
             is TxListNavigation.ToSendTariToUser -> toSendTari(navigation.contact, navigation.amount)
             is TxListNavigation.ToSendWithDeeplink -> toSendWithDeeplink(navigation.sendDeeplink)
             is TxListNavigation.ToUtxos -> toUtxos()
@@ -184,13 +182,6 @@ class TariNavigator @Inject constructor(
     private fun toEnterRestorePassword() = addFragment(EnterRestorationPasswordFragment.newInstance())
 
     fun onBackPressed() = activity.onBackPressed()
-
-    fun toTxDetails(tx: Tx? = null, txId: TxId? = null) = activity.addFragment(TxDetailsFragment().apply {
-        arguments = Bundle().apply {
-            putParcelable(TxDetailsFragment.TX_EXTRA_KEY, tx)
-            putParcelable(TxDetailsFragment.TX_ID_EXTRA_KEY, txId)
-        }
-    })
 
     private fun toChat() = (activity as HomeActivity).ui.viewPager.setCurrentItem(INDEX_CHAT, NO_SMOOTH_SCROLL)
 

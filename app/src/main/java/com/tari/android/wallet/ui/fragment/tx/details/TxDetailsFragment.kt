@@ -52,6 +52,7 @@ import com.tari.android.wallet.model.PendingOutboundTx
 import com.tari.android.wallet.model.Tx
 import com.tari.android.wallet.model.Tx.Direction.INBOUND
 import com.tari.android.wallet.model.Tx.Direction.OUTBOUND
+import com.tari.android.wallet.model.TxId
 import com.tari.android.wallet.model.TxNote
 import com.tari.android.wallet.model.TxStatus.IMPORTED
 import com.tari.android.wallet.model.TxStatus.MINED_CONFIRMED
@@ -277,5 +278,12 @@ class TxDetailsFragment : CommonFragment<FragmentTxDetailsBinding, TxDetailsView
     companion object {
         const val TX_EXTRA_KEY = "TX_EXTRA_KEY"
         const val TX_ID_EXTRA_KEY = "TX_DETAIL_EXTRA_KEY"
+
+        fun newInstance(tx: Tx? = null, txId: TxId? = null) = TxDetailsFragment().apply {
+            arguments = Bundle().apply {
+                putParcelable(TX_EXTRA_KEY, tx)
+                putSerializable(TX_ID_EXTRA_KEY, txId)
+            }
+        }
     }
 }

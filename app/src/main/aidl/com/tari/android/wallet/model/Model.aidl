@@ -36,18 +36,17 @@ package com.tari.android.wallet.model;
  * Declare model classes in this file.
  */
 parcelable WalletError;
-parcelable TxId;
-parcelable RequestId;
+parcelable RequestId; // TODO remove
 parcelable MicroTari;
-parcelable BalanceInfo;
-parcelable TariContact;
-parcelable CompletedTx;
-parcelable CancelledTx;
-parcelable PendingInboundTx;
-parcelable PendingOutboundTx;
-parcelable PublicKey;
-parcelable ValidationResult;
-parcelable TransactionSendStatus;
+parcelable BalanceInfo; // TODO remove
+parcelable TariContact; // TODO remove
+parcelable CompletedTx; // TODO remove
+parcelable CancelledTx; // TODO remove
+parcelable PendingInboundTx; // TODO remove
+parcelable PendingOutboundTx; // TODO remove
+parcelable PublicKey; // TODO remove
+parcelable ValidationResult; // TODO remove
+parcelable TransactionSendStatus; // TODO remove
 parcelable TariVector;
 parcelable TariUtxo;
 parcelable TariCoinPreview;
