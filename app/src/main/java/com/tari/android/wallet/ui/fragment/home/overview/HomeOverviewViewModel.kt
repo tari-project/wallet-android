@@ -30,7 +30,7 @@ import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonStyle
 import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
 import com.tari.android.wallet.ui.fragment.contactBook.data.ContactsRepository
-import com.tari.android.wallet.ui.fragment.send.finalize.TxFailureReason
+import com.tari.android.wallet.ui.fragment.send.finalize.FinalizeSendTxModel.TxFailureReason
 import com.tari.android.wallet.ui.fragment.tx.adapter.TxViewHolderItem
 import com.tari.android.wallet.util.extractEmojis
 import com.tari.android.wallet.util.shortString

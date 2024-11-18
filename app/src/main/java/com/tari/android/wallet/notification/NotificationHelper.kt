@@ -49,7 +49,6 @@ import com.tari.android.wallet.R
 import com.tari.android.wallet.application.walletManager.WalletConfig
 import com.tari.android.wallet.model.CancelledTx
 import com.tari.android.wallet.model.Tx
-import com.tari.android.wallet.model.TxId
 import com.tari.android.wallet.ui.fragment.home.HomeDeeplinkScreens
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -126,7 +125,11 @@ class NotificationHelper @Inject constructor(private val context: Context) {
      * Posts custom-layout heads-up transaction notification.
      */
     fun postCustomLayoutTxNotification(tx: Tx) {
-        if (ContextCompat.checkSelfPermission(context, android.Manifest.permission.POST_NOTIFICATIONS) != android.content.pm.PackageManager.PERMISSION_GRANTED) return
+        if (ContextCompat.checkSelfPermission(
+                context,
+                android.Manifest.permission.POST_NOTIFICATIONS
+            ) != android.content.pm.PackageManager.PERMISSION_GRANTED
+        ) return
 
         logger.i("postCustomLayoutTxNotification: ${tx.id}")
         val notificationTitle = context.getString(R.string.notification_tx_received_title)
@@ -138,7 +141,7 @@ class NotificationHelper @Inject constructor(private val context: Context) {
         val intent = Intent(context, NotificationBroadcastReceiver::class.java).apply {
             flags = FLAG_ACTIVITY_CLEAR_TOP
             putExtra(HomeDeeplinkScreens.KEY, HomeDeeplinkScreens.TxDetails.name)
-            putExtra(HomeDeeplinkScreens.KEY_TX_DETAIL_ARGS, TxId(tx.id))
+            putExtra(HomeDeeplinkScreens.KEY_TX_DETAIL_ARGS, tx.id)
         }
         val pendingIntent = PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_IMMUTABLE)
 
@@ -169,14 +172,18 @@ class NotificationHelper @Inject constructor(private val context: Context) {
     }
 
     fun postTxCanceledNotification(tx: CancelledTx) {
-        if (ContextCompat.checkSelfPermission(context, android.Manifest.permission.POST_NOTIFICATIONS) != android.content.pm.PackageManager.PERMISSION_GRANTED) return
+        if (ContextCompat.checkSelfPermission(
+                context,
+                android.Manifest.permission.POST_NOTIFICATIONS
+            ) != android.content.pm.PackageManager.PERMISSION_GRANTED
+        ) return
 
         logger.i("postTxCanceledNotification: ${tx.id}")
         val layout = TxCanceledViewHolder(context, tx)
         val intent = Intent(context, NotificationBroadcastReceiver::class.java).apply {
             flags = FLAG_ACTIVITY_CLEAR_TOP
             putExtra(HomeDeeplinkScreens.KEY, HomeDeeplinkScreens.TxDetails.name)
-            putExtra(HomeDeeplinkScreens.KEY_TX_DETAIL_ARGS, TxId(tx.id))
+            putExtra(HomeDeeplinkScreens.KEY_TX_DETAIL_ARGS, tx.id)
         }
 
         val pendingIntent = PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_IMMUTABLE)
@@ -206,7 +213,11 @@ class NotificationHelper @Inject constructor(private val context: Context) {
      * Posts standard Android heads-up notification.
      */
     fun postNotification(title: String, body: String) {
-        if (ContextCompat.checkSelfPermission(context, android.Manifest.permission.POST_NOTIFICATIONS) != android.content.pm.PackageManager.PERMISSION_GRANTED) return
+        if (ContextCompat.checkSelfPermission(
+                context,
+                android.Manifest.permission.POST_NOTIFICATIONS
+            ) != android.content.pm.PackageManager.PERMISSION_GRANTED
+        ) return
 
         // prepare notification
         val notification = NotificationCompat.Builder(context, APP_NOTIFICATION_CHANNEL_ID).run {

@@ -275,19 +275,19 @@ class FFIWallet(
     }
 
     fun getCompletedTxById(id: TxId): CompletedTx = runWithError {
-        FFICompletedTx(jniGetCompletedTxById(id.value.toString(), it)).runWithDestroy { tx -> CompletedTx(tx) }
+        FFICompletedTx(jniGetCompletedTxById(id.toString(), it)).runWithDestroy { tx -> CompletedTx(tx) }
     }
 
     fun getCancelledTxById(id: TxId): CompletedTx = runWithError {
-        FFICompletedTx(jniGetCancelledTxById(id.value.toString(), it)).runWithDestroy { tx -> CompletedTx(tx) }
+        FFICompletedTx(jniGetCancelledTxById(id.toString(), it)).runWithDestroy { tx -> CompletedTx(tx) }
     }
 
     fun getPendingOutboundTxById(id: TxId): PendingOutboundTx = runWithError {
-        FFIPendingOutboundTx(jniGetPendingOutboundTxById(id.value.toString(), it)).runWithDestroy { tx -> PendingOutboundTx(tx) }
+        FFIPendingOutboundTx(jniGetPendingOutboundTxById(id.toString(), it)).runWithDestroy { tx -> PendingOutboundTx(tx) }
     }
 
     fun getPendingInboundTxById(id: TxId): PendingInboundTx = runWithError {
-        FFIPendingInboundTx(jniGetPendingInboundTxById(id.value.toString(), it)).runWithDestroy { tx -> PendingInboundTx(tx) }
+        FFIPendingInboundTx(jniGetPendingInboundTxById(id.toString(), it)).runWithDestroy { tx -> PendingInboundTx(tx) }
     }
 
     fun cancelPendingTx(id: BigInteger): Boolean = runWithError { jniCancelPendingTx(id.toString(), it) }
@@ -316,15 +316,15 @@ class FFIWallet(
         message: String,
         isOneSided: Boolean,
         paymentId: String,
-    ): BigInteger {
+    ): TxId {
         if (amount < BigInteger.valueOf(0L)) {
             throw FFIException(message = "Amount is less than 0.")
         }
         if (destination == getWalletAddress()) {
             throw FFIException(message = "Tx source and destination are the same.")
         }
-        val bytes = runWithError { jniSendTx(destination, amount.toString(), feePerGram.toString(), message, isOneSided, paymentId, it) }
-        return BigInteger(1, bytes)
+        val txIdBytes = runWithError { jniSendTx(destination, amount.toString(), feePerGram.toString(), message, isOneSided, paymentId, it) }
+        return BigInteger(1, txIdBytes)
     }
 
     fun joinUtxos(commitments: Array<String>, feePerGram: BigInteger, error: FFIError) {

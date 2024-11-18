@@ -16,6 +16,7 @@ import com.tari.android.wallet.model.PendingInboundTx
 import com.tari.android.wallet.model.PendingOutboundTx
 import com.tari.android.wallet.model.TransactionSendStatus
 import com.tari.android.wallet.model.Tx
+import com.tari.android.wallet.model.TxId
 import com.tari.android.wallet.recovery.WalletRestorationState
 import java.math.BigInteger
 import javax.inject.Inject
@@ -244,7 +245,7 @@ interface FFIWalletListener {
     fun onTxMinedUnconfirmed(completedTx: CompletedTx, confirmationCount: Int) = Unit
     fun onTxFauxConfirmed(completedTx: CompletedTx) = Unit
     fun onTxFauxUnconfirmed(completedTx: CompletedTx, confirmationCount: Int) = Unit
-    fun onDirectSendResult(txId: BigInteger, status: TransactionSendStatus) = Unit
+    fun onDirectSendResult(txId: TxId, status: TransactionSendStatus) = Unit
     fun onTxCancelled(cancelledTx: CancelledTx, rejectionReason: Int) = Unit
     fun onTXOValidationComplete(responseId: BigInteger, status: TransactionValidationStatus) = Unit
     fun onTxValidationComplete(responseId: BigInteger, status: TransactionValidationStatus) = Unit

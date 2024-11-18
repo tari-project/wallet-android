@@ -180,6 +180,10 @@ open class CommonViewModel : ViewModel(), DialogHandler {
         _modularDialog.postValue(ModularDialogArgs(modules = modules.toList()))
     }
 
+    override fun showModularDialog(dialogId: Int, vararg modules: IDialogModule) {
+        _modularDialog.postValue(ModularDialogArgs(dialogId = dialogId, modules = modules.toList()))
+    }
+
     override fun showInputModalDialog(inputArgs: ModularDialogArgs) {
         _inputDialog.postValue(inputArgs)
     }
@@ -270,6 +274,10 @@ open class CommonViewModel : ViewModel(), DialogHandler {
         }
     }
 
+    override fun hideDialogImmediately(dialogId: Int) {
+        dialogManager.dismiss(dialogId, true)
+    }
+
     internal fun onScreenCaptured() {
         if (!tariSettingsSharedRepository.screenRecordingTurnedOn) {
             showModularDialog(
@@ -298,6 +306,7 @@ open class CommonViewModel : ViewModel(), DialogHandler {
 
 interface DialogHandler {
     fun showModularDialog(vararg modules: IDialogModule)
+    fun showModularDialog(dialogId: Int = ModularDialogArgs.DialogId.NO_ID, vararg modules: IDialogModule)
     fun showModularDialog(args: ModularDialogArgs)
     fun showSimpleDialog(
         iconRes: Int? = null,
@@ -324,6 +333,7 @@ interface DialogHandler {
     fun showInputModalDialog(vararg modules: IDialogModule)
     fun showInputModalDialog(inputArgs: ModularDialogArgs)
     fun hideDialog(dialogId: Int = ModularDialogArgs.DialogId.NO_ID)
+    fun hideDialogImmediately(dialogId: Int = ModularDialogArgs.DialogId.NO_ID)
 
     fun showNotReadyYetDialog()
     fun showAddressDetailsDialog(walletAddress: TariWalletAddress)

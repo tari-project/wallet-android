@@ -1,6 +1,5 @@
 package com.tari.android.wallet.service.service
 
-import com.tari.android.wallet.application.walletManager.WalletNotificationManager
 import com.tari.android.wallet.ffi.Base58String
 import com.tari.android.wallet.ffi.FFIContact
 import com.tari.android.wallet.ffi.FFIError
@@ -8,40 +7,18 @@ import com.tari.android.wallet.ffi.FFIException
 import com.tari.android.wallet.ffi.FFITariWalletAddress
 import com.tari.android.wallet.ffi.FFIWallet
 import com.tari.android.wallet.ffi.runWithDestroy
-import com.tari.android.wallet.model.MicroTari
 import com.tari.android.wallet.model.TariCoinPreview
-import com.tari.android.wallet.model.TariContact
 import com.tari.android.wallet.model.TariUnblindedOutput
 import com.tari.android.wallet.model.TariUtxo
 import com.tari.android.wallet.model.TariVector
 import com.tari.android.wallet.model.TariWalletAddress
-import com.tari.android.wallet.model.TxId
 import com.tari.android.wallet.model.WalletError
 import com.tari.android.wallet.service.TariWalletService
 import com.tari.android.wallet.util.Constants
 
 class TariWalletServiceStubImpl(
     private val wallet: FFIWallet,
-    private val walletNotificationManager: WalletNotificationManager,
 ) : TariWalletService.Stub() {
-
-    override fun sendTari(
-        tariContact: TariContact,
-        amount: MicroTari,
-        feePerGram: MicroTari,
-        message: String,
-        isOneSidePayment: Boolean,
-        paymentId: String,
-        error: WalletError,
-    ): TxId? = runMapping(error) {
-        val recipientAddress = FFITariWalletAddress(Base58String(tariContact.walletAddress.fullBase58))
-        val txId = wallet.sendTx(recipientAddress, amount.value, feePerGram.value, message, isOneSidePayment, paymentId)
-
-        walletNotificationManager.addOutboundTxNotification(txId, recipientAddress)
-
-        recipientAddress.destroy()
-        TxId(txId)
-    }
 
     override fun removeContact(walletAddress: TariWalletAddress, error: WalletError): Boolean = runMapping(error) {
         wallet.findContactByWalletAddress(walletAddress)?.runWithDestroy { wallet.removeContact(it) } ?: false

@@ -11,8 +11,6 @@ import com.tari.android.wallet.application.deeplinks.DeepLink
 import com.tari.android.wallet.application.walletManager.WalletManager
 import com.tari.android.wallet.model.MicroTari
 import com.tari.android.wallet.model.TariWalletAddress
-import com.tari.android.wallet.model.Tx
-import com.tari.android.wallet.model.TxId
 import com.tari.android.wallet.navigation.Navigation.AddAmountNavigation
 import com.tari.android.wallet.navigation.Navigation.AllSettingsNavigation
 import com.tari.android.wallet.navigation.Navigation.BackupSettingsNavigation
@@ -21,7 +19,6 @@ import com.tari.android.wallet.navigation.Navigation.ChooseRestoreOptionNavigati
 import com.tari.android.wallet.navigation.Navigation.ContactBookNavigation
 import com.tari.android.wallet.navigation.Navigation.CustomBridgeNavigation
 import com.tari.android.wallet.navigation.Navigation.InputSeedWordsNavigation
-import com.tari.android.wallet.navigation.Navigation.SendTxNavigation
 import com.tari.android.wallet.navigation.Navigation.TorBridgeNavigation
 import com.tari.android.wallet.navigation.Navigation.TxListNavigation
 import com.tari.android.wallet.navigation.Navigation.VerifySeedPhraseNavigation
@@ -107,6 +104,8 @@ class TariNavigator @Inject constructor(
             is Navigation.ChangeBiometrics -> addFragment(ChangeBiometricsFragment())
             is Navigation.FeatureAuth -> addFragment(FeatureAuthFragment())
             is Navigation.SplashScreen -> toSplash(navigation.seedWords, navigation.clearTop)
+            is Navigation.Home -> toHomeActivity(navigation.uri)
+            is Navigation.BackToHome -> popUpTo(HomeOverviewFragment::class.java.simpleName)
             is ContactBookNavigation.ToAddContact -> toAddContact()
             is ContactBookNavigation.ToContactDetails -> toContactDetails(navigation.contact)
             is ContactBookNavigation.ToRequestTari -> toRequestTariFromContact(navigation.contact)
@@ -139,15 +138,13 @@ class TariNavigator @Inject constructor(
             is AddAmountNavigation.ContinueToAddNote -> continueToAddNote(navigation.transactionData)
             is AddAmountNavigation.ContinueToFinalizing -> continueToFinalizeSendTx(navigation.transactionData)
             is TxListNavigation.ToChat -> toChat()
-            is TxListNavigation.ToTxDetails -> toTxDetails(tx = navigation.tx)
+            is TxListNavigation.ToTxDetails -> addFragment(TxDetailsFragment.newInstance(navigation.tx, navigation.txId))
             is TxListNavigation.ToSendTariToUser -> toSendTari(navigation.contact, navigation.amount)
             is TxListNavigation.ToSendWithDeeplink -> toSendWithDeeplink(navigation.sendDeeplink)
             is TxListNavigation.ToUtxos -> toUtxos()
             is TxListNavigation.ToAllSettings -> toAllSettings()
             is TxListNavigation.ToTransfer -> addFragment(TransferFragment())
             is TxListNavigation.HomeTransactionHistory -> addFragment(AllTxHistoryFragment())
-            is SendTxNavigation.OnSendTxFailure -> navigateBackFromTxSend(navigation.isYat)
-            is SendTxNavigation.OnSendTxSuccess -> navigateBackFromTxSend(navigation.isYat)
             is TorBridgeNavigation.ToCustomBridges -> toCustomTorBridges()
             is VerifySeedPhraseNavigation.ToSeedPhraseVerificationComplete -> onSeedPhraseVerificationComplete()
             is VerifySeedPhraseNavigation.ToSeedPhraseVerification -> toSeedPhraseVerification(navigation.seedWords)
@@ -159,6 +156,13 @@ class TariNavigator @Inject constructor(
             is ChatNavigation.ToChat -> toChatDetail(navigation.walletAddress, navigation.isNew)
             is ChatNavigation.ToAddChat -> addFragment(AddChatFragment())
         }
+    }
+
+    private fun toHomeActivity(uri: Uri? = null) {
+        activity.startActivity(Intent(activity, HomeActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
+            uri?.let { setData(it) }
+        })
     }
 
     private fun toSplash(seedWords: List<String>? = null, clearTop: Boolean = true) {
@@ -178,13 +182,6 @@ class TariNavigator @Inject constructor(
     private fun toEnterRestorePassword() = addFragment(EnterRestorationPasswordFragment.newInstance())
 
     fun onBackPressed() = activity.onBackPressed()
-
-    fun toTxDetails(tx: Tx? = null, txId: TxId? = null) = activity.addFragment(TxDetailsFragment().apply {
-        arguments = Bundle().apply {
-            putParcelable(TxDetailsFragment.TX_EXTRA_KEY, tx)
-            putParcelable(TxDetailsFragment.TX_ID_EXTRA_KEY, txId)
-        }
-    })
 
     private fun toChat() = (activity as HomeActivity).ui.viewPager.setCurrentItem(INDEX_CHAT, NO_SMOOTH_SCROLL)
 
@@ -292,13 +289,6 @@ class TariNavigator @Inject constructor(
             yatAdapter.showOutcomingFinalizeActivity(this.activity, transactionData)
         } else {
             addFragment(FinalizeSendTxFragment.create(transactionData))
-        }
-    }
-
-    private fun navigateBackFromTxSend(isYat: Boolean) {
-        val fragmentsCount = activity.supportFragmentManager.fragments.size - 5
-        for (i in 0 until fragmentsCount) {
-            activity.supportFragmentManager.popBackStackImmediate()
         }
     }
 

@@ -46,7 +46,7 @@ import java.math.BigInteger
  */
 @Parcelize
 data class PendingOutboundTx(
-    override val id: BigInteger = 0.toBigInteger(),
+    override val id: TxId = 0.toBigInteger(),
     override val direction: Direction = Direction.INBOUND,
     override val amount: MicroTari = 0.toMicroTari(),
     override val timestamp: BigInteger = 0.toBigInteger(),

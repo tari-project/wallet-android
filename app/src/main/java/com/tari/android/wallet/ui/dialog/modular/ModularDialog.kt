@@ -93,11 +93,18 @@ open class ModularDialog(context: Activity) {
         }
     }
 
-    fun dismiss() {
-        withContext {
-            showAnimation(false) {
-                runCatching {
-                    dialog.dismiss()
+    /**
+     * forceDismiss - dismiss dialog without animation
+     */
+    fun dismiss(forceDismiss: Boolean = false) {
+        if (forceDismiss) {
+            dialog.dismiss()
+        } else {
+            withContext {
+                showAnimation(false) {
+                    runCatching {
+                        dialog.dismiss()
+                    }
                 }
             }
         }

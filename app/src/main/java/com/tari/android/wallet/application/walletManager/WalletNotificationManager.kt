@@ -5,13 +5,13 @@ import com.tari.android.wallet.ffi.FFITariWalletAddress
 import com.tari.android.wallet.ffi.FFIWallet
 import com.tari.android.wallet.model.TransactionSendStatus
 import com.tari.android.wallet.model.Tx
+import com.tari.android.wallet.model.TxId
 import com.tari.android.wallet.notification.NotificationHelper
 import com.tari.android.wallet.service.notification.NotificationService
 import com.tari.android.wallet.ui.fragment.home.HomeActivity
 import io.reactivex.Observable
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
-import java.math.BigInteger
 import java.util.Locale
 import java.util.concurrent.CopyOnWriteArraySet
 import java.util.concurrent.TimeUnit
@@ -53,7 +53,7 @@ class WalletNotificationManager @Inject constructor(
                 }
     }
 
-    fun addOutboundTxNotification(txId: BigInteger, recipientAddress: FFITariWalletAddress) {
+    fun addOutboundTxNotification(txId: TxId, recipientAddress: FFITariWalletAddress) {
         outboundTxIdsToBePushNotified.add(
             OutboundTxNotification(
                 txId = txId,
@@ -62,7 +62,7 @@ class WalletNotificationManager @Inject constructor(
         )
     }
 
-    fun sendOutboundTxNotification(wallet: FFIWallet, txId: BigInteger, status: TransactionSendStatus) {
+    fun sendOutboundTxNotification(wallet: FFIWallet, txId: TxId, status: TransactionSendStatus) {
         outboundTxIdsToBePushNotified.firstOrNull { it.txId == txId }?.let {
             outboundTxIdsToBePushNotified.remove(it)
             val senderHex = wallet.getWalletAddress().notificationHex()
@@ -70,5 +70,5 @@ class WalletNotificationManager @Inject constructor(
         }
     }
 
-    private data class OutboundTxNotification(val txId: BigInteger, val recipientPublicKeyHex: String)
+    private data class OutboundTxNotification(val txId: TxId, val recipientPublicKeyHex: String)
 }

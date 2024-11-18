@@ -1,13 +1,10 @@
 package com.tari.android.wallet.service.service
 
-import com.tari.android.wallet.model.MicroTari
 import com.tari.android.wallet.model.TariCoinPreview
-import com.tari.android.wallet.model.TariContact
 import com.tari.android.wallet.model.TariUnblindedOutput
 import com.tari.android.wallet.model.TariUtxo
 import com.tari.android.wallet.model.TariVector
 import com.tari.android.wallet.model.TariWalletAddress
-import com.tari.android.wallet.model.TxId
 import com.tari.android.wallet.model.WalletError
 import com.tari.android.wallet.service.TariWalletService
 
@@ -20,16 +17,6 @@ class TariWalletServiceStubProxy : TariWalletService.Stub() {
         set(newStub) {
             _stub = newStub
         }
-
-    override fun sendTari(
-        contact: TariContact,
-        amount: MicroTari,
-        feePerGram: MicroTari,
-        message: String,
-        isOneSidePayment: Boolean,
-        paymentId: String,
-        error: WalletError,
-    ): TxId? = stub?.sendTari(contact, amount, feePerGram, message, isOneSidePayment, paymentId, error)
 
     override fun updateContact(contactPublicKey: TariWalletAddress, alias: String, isFavorite: Boolean, error: WalletError): Boolean =
         stub?.updateContact(contactPublicKey, alias, isFavorite, error) ?: false

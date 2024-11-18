@@ -53,26 +53,26 @@ import com.tari.android.wallet.databinding.ActivityHomeBinding
 import com.tari.android.wallet.di.DiContainer.appComponent
 import com.tari.android.wallet.extension.observe
 import com.tari.android.wallet.model.TxId
-import com.tari.android.wallet.service.service.WalletServiceLauncher
-import com.tari.android.wallet.ui.common.CommonActivity
-import com.tari.android.wallet.ui.common.domain.PaletteManager
-import com.tari.android.wallet.ui.common.domain.ResourceManager
-import com.tari.android.wallet.ui.extension.parcelable
-import com.tari.android.wallet.ui.extension.setVisible
-import com.tari.android.wallet.ui.fragment.auth.AuthActivity
-import com.tari.android.wallet.ui.fragment.chat.chatList.ChatListFragment
-import com.tari.android.wallet.ui.fragment.contactBook.root.ContactBookFragment
 import com.tari.android.wallet.navigation.Navigation
 import com.tari.android.wallet.navigation.TariNavigator.Companion.INDEX_CHAT
 import com.tari.android.wallet.navigation.TariNavigator.Companion.INDEX_CONTACT_BOOK
 import com.tari.android.wallet.navigation.TariNavigator.Companion.INDEX_HOME
 import com.tari.android.wallet.navigation.TariNavigator.Companion.INDEX_SETTINGS
 import com.tari.android.wallet.navigation.TariNavigator.Companion.NO_SMOOTH_SCROLL
+import com.tari.android.wallet.service.service.WalletServiceLauncher
+import com.tari.android.wallet.ui.common.CommonActivity
+import com.tari.android.wallet.ui.common.domain.PaletteManager
+import com.tari.android.wallet.ui.common.domain.ResourceManager
+import com.tari.android.wallet.ui.extension.serializable
+import com.tari.android.wallet.ui.extension.setVisible
+import com.tari.android.wallet.ui.fragment.auth.AuthActivity
+import com.tari.android.wallet.ui.fragment.chat.chatList.ChatListFragment
+import com.tari.android.wallet.ui.fragment.contactBook.root.ContactBookFragment
+import com.tari.android.wallet.ui.fragment.home.overview.HomeOverviewFragment
 import com.tari.android.wallet.ui.fragment.settings.allSettings.AllSettingsFragment
 import com.tari.android.wallet.ui.fragment.settings.themeSelector.TariTheme
 import com.tari.android.wallet.ui.fragment.splash.SplashActivity
 import com.tari.android.wallet.ui.fragment.store.StoreFragment
-import com.tari.android.wallet.ui.fragment.home.overview.HomeOverviewFragment
 import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.DebugConfig
 import java.lang.ref.WeakReference
@@ -268,7 +268,8 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>() {
         if (screen.orEmpty().isNotEmpty()) {
             when (HomeDeeplinkScreens.parse(screen)) {
                 HomeDeeplinkScreens.TxDetails -> {
-                    (intent.parcelable<TxId>(HomeDeeplinkScreens.KEY_TX_DETAIL_ARGS))?.let { viewModel.tariNavigator.toTxDetails(txId = it) }
+                    (intent.serializable<TxId>(HomeDeeplinkScreens.KEY_TX_DETAIL_ARGS))
+                        ?.let { viewModel.tariNavigator.navigate(Navigation.TxListNavigation.ToTxDetails(txId = it)) }
                 }
 
                 else -> {}

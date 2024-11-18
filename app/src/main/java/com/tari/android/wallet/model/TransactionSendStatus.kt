@@ -1,31 +1,26 @@
 package com.tari.android.wallet.model
 
-import android.os.Parcel
 import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
 
-class TransactionSendStatus() : Parcelable {
+@Parcelize
+class TransactionSendStatus(
+    val status: Status = Status.Invalid,
+) : Parcelable {
 
-    var status: Status = Status.Invalid
-
-    constructor(result: Int) : this() {
-        status = Status.findByInt(result)
-    }
-
-    constructor(parcel: Parcel) : this() {
-        status = Status.findByInt(parcel.readInt())
-    }
-
-    val isDirectSend: Boolean
-        get() = status in listOf(Status.DirectSend, Status.DirectSendSafSend)
-
-    val isSafSend: Boolean
-        get() = status in listOf(Status.DirectSendSafSend, Status.SafSend)
-
-    val isQueued: Boolean
-        get() = status == Status.Queued
+    constructor(result: Int) : this(Status.findByInt(result))
 
     val isSuccess: Boolean
         get() = isDirectSend || isSafSend || !isQueued
+
+    private val isDirectSend: Boolean
+        get() = status in listOf(Status.DirectSend, Status.DirectSendSafSend)
+
+    private val isSafSend: Boolean
+        get() = status in listOf(Status.DirectSendSafSend, Status.SafSend)
+
+    private val isQueued: Boolean
+        get() = status == Status.Queued
 
     enum class Status(val value: Int) {
         Queued(0),
@@ -35,21 +30,7 @@ class TransactionSendStatus() : Parcelable {
         Invalid(4);
 
         companion object {
-            fun findByInt(int: Int): Status = values().first { it.value == int }
+            fun findByInt(int: Int): Status = entries.first { it.value == int }
         }
-    }
-
-    override fun writeToParcel(parcel: Parcel, flags: Int) {
-        parcel.writeInt(status.value)
-    }
-
-    override fun describeContents(): Int {
-        return 0
-    }
-
-    companion object CREATOR : Parcelable.Creator<TransactionSendStatus> {
-        override fun createFromParcel(parcel: Parcel): TransactionSendStatus = TransactionSendStatus(parcel)
-
-        override fun newArray(size: Int): Array<TransactionSendStatus?> = arrayOfNulls(size)
     }
 }

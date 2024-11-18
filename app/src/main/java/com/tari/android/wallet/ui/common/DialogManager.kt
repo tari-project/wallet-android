@@ -32,14 +32,15 @@ class DialogManager @Inject constructor() {
 
     /**
      * Dismisses the dialog with the given dialogId. If dialogId is [DialogId.NO_ID], the last dialog in the queue will be dismissed.
+     * If forceDismiss is true, the dialog will be dismissed immediately without any animations.
      */
-    fun dismiss(dialogId: Int = DialogId.NO_ID) {
+    fun dismiss(dialogId: Int = DialogId.NO_ID, forceDismiss: Boolean = false) {
         val dialogToDismiss = if (isDialogShowing(dialogId)) {
             getDialog(dialogId)
         } else {
             dialogQueue.lastOrNull()
         }
-        dialogToDismiss?.dismiss()
+        dialogToDismiss?.dismiss(forceDismiss)
         dialogQueue.remove(dialogToDismiss)
     }
 
