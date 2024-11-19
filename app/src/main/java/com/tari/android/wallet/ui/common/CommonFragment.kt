@@ -37,7 +37,8 @@ abstract class CommonFragment<Binding : ViewBinding, VM : CommonViewModel> : Fra
 
     lateinit var viewModel: VM
 
-    private var dialogManager: DialogManager? = null
+    protected val dialogHandler: DialogHandler
+        get() = viewModel
 
     //TODO make viewModel not lateinit. Sometimes it's not initialized in time and causes crashes, so we need to check if it's initialized
     private val blockScreenRecording
@@ -122,8 +123,6 @@ abstract class CommonFragment<Binding : ViewBinding, VM : CommonViewModel> : Fra
         observe(blockedBackPressed) {
             blockingBackPressDispatcher.isEnabled = it
         }
-
-        observe(navigation) { viewModel.tariNavigator.navigate(it) }
 
         observe(permissionManager.checkForPermission) {
             launcher.launch(it.toTypedArray())

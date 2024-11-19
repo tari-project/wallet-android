@@ -86,19 +86,19 @@ class ContactDetailsViewModel(savedState: SavedStateHandle) : CommonViewModel() 
 
                 SettingsRowViewHolderItem(
                     title = resourceManager.getString(ContactAction.Send.title),
-                    action = { tariNavigator.navigate(Navigation.ContactBookNavigation.ToSendTari(contact)) }
+                    action = { tariNavigator.navigate(Navigation.ContactBook.ToSendTari(contact)) }
                 ).takeIf { availableActions.contains(ContactAction.Send) },
                 DividerViewHolderItem().takeIf { availableActions.contains(ContactAction.Send) },
 
                 SettingsRowViewHolderItem(
                     title = resourceManager.getString(ContactAction.Link.title),
-                    action = { tariNavigator.navigate(Navigation.ContactBookNavigation.ToLinkContact(contact)) }
+                    action = { tariNavigator.navigate(Navigation.ContactBook.ToLinkContact(contact)) }
                 ).takeIf { availableActions.contains(ContactAction.Link) },
                 DividerViewHolderItem().takeIf { availableActions.contains(ContactAction.Link) },
 
                 SettingsRowViewHolderItem(
                     title = resourceManager.getString(R.string.contact_details_transaction_history),
-                    action = { tariNavigator.navigate(Navigation.ContactBookNavigation.ToContactTransactionHistory(contact)) }
+                    action = { tariNavigator.navigate(Navigation.ContactBook.ToContactTransactionHistory(contact)) }
                 ).takeIf { contact.getFFIContactInfo() != null },
                 DividerViewHolderItem().takeIf { contact.getFFIContactInfo() != null },
 
@@ -135,7 +135,7 @@ class ContactDetailsViewModel(savedState: SavedStateHandle) : CommonViewModel() 
                     listOf(
                         SettingsRowViewHolderItem(
                             title = resourceManager.getString(connectedWallet.name!!),
-                            action = { tariNavigator.navigate(Navigation.ContactBookNavigation.ToExternalWallet(connectedWallet)) },
+                            action = { tariNavigator.navigate(Navigation.ContactBook.ToExternalWallet(connectedWallet)) },
                         ),
                         DividerViewHolderItem(),
                     )
@@ -292,7 +292,7 @@ class ContactDetailsViewModel(savedState: SavedStateHandle) : CommonViewModel() 
         showModularDialog(
             ModularDialogArgs(
                 dialogArgs = DialogArgs(
-                    onDismiss = { tariNavigator.navigate(Navigation.ContactBookNavigation.BackToContactBook) }
+                    onDismiss = { tariNavigator.navigate(Navigation.ContactBook.BackToContactBook) }
                 ),
                 modules = modules,
             )
@@ -308,7 +308,7 @@ class ContactDetailsViewModel(savedState: SavedStateHandle) : CommonViewModel() 
                     contactsRepository.deleteContact(contact)
                     launchOnMain {
                         hideDialog()
-                        tariNavigator.navigate(Navigation.ContactBookNavigation.BackToContactBook)
+                        tariNavigator.navigate(Navigation.ContactBook.BackToContactBook)
                     }
                 }
             },

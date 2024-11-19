@@ -122,7 +122,7 @@ class HomeOverviewViewModel : CommonViewModel() {
     }
 
     fun navigateToTxList(tx: Tx) {
-        tariNavigator.navigate(Navigation.TxListNavigation.ToTxDetails(tx))
+        tariNavigator.navigate(Navigation.TxList.ToTxDetails(tx))
     }
 
     fun checkPermission() {

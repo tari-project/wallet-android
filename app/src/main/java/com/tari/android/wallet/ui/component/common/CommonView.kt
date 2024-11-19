@@ -62,7 +62,5 @@ abstract class CommonView<VM : CommonViewModel, VB : ViewBinding> : LinearLayout
         modularDialog.observe(viewLifecycle) { args -> activity?.let { activity -> dialogManager.replace(ModularDialog(activity, args)) } }
 
         showToast.observe(viewLifecycle) { TariToast(context, it) }
-
-        navigation.observe(viewLifecycle) { viewModel.tariNavigator.navigate(it) }
     }
 }

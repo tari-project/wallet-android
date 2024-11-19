@@ -69,12 +69,12 @@ class ChatDetailsViewModel(savedState: SavedStateHandle) : CommonViewModel() {
 
     private fun onSendTariClicked() {
         hideDialog()
-        navigation.postValue(Navigation.ContactBookNavigation.ToSendTari(uiState.value.contact))
+        tariNavigator.navigate(Navigation.ContactBook.ToSendTari(uiState.value.contact))
     }
 
     private fun onRequestTariClicked() {
         hideDialog()
-        navigation.postValue(Navigation.AllSettingsNavigation.ToRequestTari)
+        tariNavigator.navigate(Navigation.AllSettings.ToRequestTari)
     }
 
 }

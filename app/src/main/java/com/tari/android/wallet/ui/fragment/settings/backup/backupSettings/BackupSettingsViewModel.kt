@@ -68,22 +68,22 @@ class BackupSettingsViewModel : CommonViewModel() {
 
     fun onBackupWithRecoveryPhrase() {
         biometricAuthenticationViewModel.requireAuthorization {
-            navigation.postValue(Navigation.BackupSettingsNavigation.ToWalletBackupWithRecoveryPhrase)
+            tariNavigator.navigate(Navigation.BackupSettings.ToWalletBackupWithRecoveryPhrase)
         }
     }
 
     fun onUpdatePassword() {
         biometricAuthenticationViewModel.requireAuthorization {
             if (backupSettingsRepository.backupPassword == null) {
-                navigation.postValue(Navigation.BackupSettingsNavigation.ToChangePassword)
+                tariNavigator.navigate(Navigation.BackupSettings.ToChangePassword)
             } else {
-                navigation.postValue(Navigation.BackupSettingsNavigation.ToConfirmPassword)
+                tariNavigator.navigate(Navigation.BackupSettings.ToConfirmPassword)
             }
         }
     }
 
     fun learnMore() {
-        navigation.postValue(Navigation.BackupSettingsNavigation.ToLearnMore)
+        tariNavigator.navigate(Navigation.BackupSettings.ToLearnMore)
     }
 
     fun onBackupToCloud() = backupManager.backupNow()

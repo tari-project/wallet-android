@@ -94,7 +94,7 @@ class ChooseRestoreOptionViewModel : CommonViewModel() {
     }
 
     fun onRecoveryPhraseClicked() {
-        tariNavigator.navigate(Navigation.ChooseRestoreOptionNavigation.ToRestoreWithRecoveryPhrase)
+        tariNavigator.navigate(Navigation.ChooseRestoreOption.ToRestoreWithRecoveryPhrase)
     }
 
     fun onPaperWalletClicked(fragment: Fragment) {
@@ -142,7 +142,7 @@ class ChooseRestoreOptionViewModel : CommonViewModel() {
         launchOnIo {
             walletManager.doOnWalletRunning {
                 _uiState.update { it.copy(paperWalletProgress = false) }
-                tariNavigator.navigate(Navigation.InputSeedWordsNavigation.ToRestoreFromSeeds)
+                tariNavigator.navigate(Navigation.InputSeedWords.ToRestoreFromSeeds)
             }
         }
     }
@@ -162,7 +162,7 @@ class ChooseRestoreOptionViewModel : CommonViewModel() {
             }
 
             is BackupFileIsEncryptedException -> {
-                navigation.postValue(Navigation.ChooseRestoreOptionNavigation.ToEnterRestorePassword)
+                tariNavigator.navigate(Navigation.ChooseRestoreOption.ToEnterRestorePassword)
             }
 
             is WalletStartFailedException -> {

@@ -37,7 +37,7 @@ class EnterCurrentPasswordFragment : CommonFragment<FragmentEnterCurrentPassword
             val input = (passwordInput.text?.toString() ?: "").toCharArray()
             val backupPassword = viewModel.backupSettingsRepository.backupPassword?.toCharArray() ?: charArrayOf()
             if (input.contentEquals(backupPassword)) {
-                viewModel.navigation.postValue(Navigation.BackupSettingsNavigation.ToChangePassword)
+                viewModel.tariNavigator.navigate(Navigation.BackupSettings.ToChangePassword)
             } else {
                 ui.changePasswordCtaTextView.isEnabled = false
                 canEnableChangePasswordCTA = false

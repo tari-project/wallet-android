@@ -181,7 +181,7 @@ class ContactBookFragment : CommonFragment<FragmentContactBookRootBinding, Conta
             ui.toolbar.setLeftArgs(cancelArgs)
         } else {
             val addContactArg = TariToolbarActionArg(icon = R.drawable.vector_add_contact) {
-                viewModel.navigation.postValue(Navigation.ContactBookNavigation.ToAddContact)
+                viewModel.tariNavigator.navigate(Navigation.ContactBook.ToAddContact)
             }
             val shareContactArg = TariToolbarActionArg(icon = R.drawable.vector_share_dots) {
                 viewModel.contactSelectionRepository.isSelectionState.postValue(true)

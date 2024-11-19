@@ -109,7 +109,7 @@ class ShareViewModel : CommonViewModel() {
             HeadModule(resourceManager.getString(R.string.contactless_payment_success_title)),
             BodyModule(resourceManager.getString(R.string.contactless_payment_success_description, name)),
             ButtonModule(resourceManager.getString(R.string.common_lets_do_it_2), ButtonStyle.Normal) {
-                navigation.postValue(Navigation.TxListNavigation.ToSendTariToUser(contactDto))
+                tariNavigator.navigate(Navigation.TxList.ToSendTariToUser(contactDto))
                 hideDialog()
             },
             ButtonModule(resourceManager.getString(R.string.common_no_2), ButtonStyle.Close),

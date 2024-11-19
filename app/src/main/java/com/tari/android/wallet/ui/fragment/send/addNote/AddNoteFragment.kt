@@ -67,6 +67,7 @@ import com.tari.android.wallet.extension.observe
 import com.tari.android.wallet.model.MicroTari
 import com.tari.android.wallet.model.TariWalletAddress
 import com.tari.android.wallet.model.TxNote
+import com.tari.android.wallet.navigation.TariNavigator.Companion.PARAMETER_TRANSACTION
 import com.tari.android.wallet.ui.common.CommonFragment
 import com.tari.android.wallet.ui.common.domain.PaletteManager
 import com.tari.android.wallet.ui.common.gyphy.repository.GifItem
@@ -79,11 +80,9 @@ import com.tari.android.wallet.ui.extension.invisible
 import com.tari.android.wallet.ui.extension.parcelable
 import com.tari.android.wallet.ui.extension.postDelayed
 import com.tari.android.wallet.ui.extension.setStartMargin
-import com.tari.android.wallet.ui.extension.showInternetConnectionErrorDialog
 import com.tari.android.wallet.ui.extension.temporarilyDisableClick
 import com.tari.android.wallet.ui.extension.visible
 import com.tari.android.wallet.ui.fragment.contactBook.data.contacts.ContactDto
-import com.tari.android.wallet.navigation.TariNavigator.Companion.PARAMETER_TRANSACTION
 import com.tari.android.wallet.ui.fragment.send.addNote.gif.ChooseGIFDialogFragment
 import com.tari.android.wallet.ui.fragment.send.addNote.gif.GifContainer
 import com.tari.android.wallet.ui.fragment.send.addNote.gif.GifThumbnailAdapter
@@ -408,7 +407,7 @@ class AddNoteFragment : CommonFragment<FragmentAddNoteBinding, AddNoteViewModel>
             ui.rootView.postDelayed(Constants.UI.keyboardHideWaitMs) {
                 restoreSlider()
                 ui.noteEditText.isEnabled = true
-                showInternetConnectionErrorDialog(requireActivity())
+                dialogHandler.showInternetConnectionErrorDialog()
             }
         } else {
             ui.removeGifCtaView.isEnabled = false

@@ -24,7 +24,7 @@ import com.tari.android.wallet.infrastructure.logging.LoggerTags
 import com.tari.android.wallet.model.CoreError
 import com.tari.android.wallet.model.TariWalletAddress
 import com.tari.android.wallet.navigation.Navigation
-import com.tari.android.wallet.navigation.Navigation.AllSettingsNavigation
+import com.tari.android.wallet.navigation.Navigation.AllSettings
 import com.tari.android.wallet.navigation.TariNavigator
 import com.tari.android.wallet.service.TariWalletService
 import com.tari.android.wallet.service.connection.TariWalletServiceConnection
@@ -111,11 +111,8 @@ open class CommonViewModel : ViewModel(), DialogHandler {
     protected val _blockedBackPressed = SingleLiveEvent<Boolean>()
     val blockedBackPressed: LiveData<Boolean> = _blockedBackPressed
 
-    // TODO don't use it. Use tariNavigator.navigate() instead
-    val navigation: SingleLiveEvent<Navigation> = SingleLiveEvent()
-
     init {
-        component.inject(this)
+        component.inject(this) // This injects the dependencies to the base class
 
         currentTheme.value = tariSettingsSharedRepository.currentTheme
 
@@ -150,17 +147,9 @@ open class CommonViewModel : ViewModel(), DialogHandler {
         }
     }
 
-    fun openWalletErrorDialog() {
-        showModularDialog(
-            HeadModule(resourceManager.getString(R.string.common_error_title)),
-            BodyModule(resourceManager.getString(R.string.contact_book_details_connected_wallets_no_application)),
-            ButtonModule(resourceManager.getString(R.string.common_close), ButtonStyle.Close),
-        )
-    }
-
     fun runWithAuthorization(action: () -> Unit) {
         authorizedAction = action
-        navigation.postValue(Navigation.FeatureAuth)
+        tariNavigator.navigate(Navigation.Auth.FeatureAuth)
     }
 
     private fun checkAuthorization() {
@@ -268,6 +257,21 @@ open class CommonViewModel : ViewModel(), DialogHandler {
         )
     }
 
+    override fun showInternetConnectionErrorDialog() {
+        showSimpleDialog(
+            title = resourceManager.getString(R.string.internet_connection_error_dialog_title),
+            description = resourceManager.getString(R.string.internet_connection_error_dialog_description),
+        )
+    }
+
+    override fun showWalletErrorDialog() {
+        showModularDialog(
+            HeadModule(resourceManager.getString(R.string.common_error_title)),
+            BodyModule(resourceManager.getString(R.string.contact_book_details_connected_wallets_no_application)),
+            ButtonModule(resourceManager.getString(R.string.common_close), ButtonStyle.Close),
+        )
+    }
+
     override fun hideDialog(dialogId: Int) {
         launchOnMain {
             dialogManager.dismiss(dialogId)
@@ -288,7 +292,7 @@ open class CommonViewModel : ViewModel(), DialogHandler {
                     confirmButtonText = resourceManager.getString(R.string.screen_recording_disabled_dialog_confirm_button),
                     cancelButtonText = resourceManager.getString(R.string.screen_recording_disabled_dialog_cancel_button),
                     onConfirm = { hideDialog(ModularDialogArgs.DialogId.SCREEN_RECORDING) },
-                    onCancel = { tariNavigator.navigate(AllSettingsNavigation.ToScreenRecording) },
+                    onCancel = { tariNavigator.navigate(AllSettings.ToScreenRecording) },
                     onDismiss = { },
                 ).getModular(resourceManager)
             )
@@ -337,4 +341,6 @@ interface DialogHandler {
 
     fun showNotReadyYetDialog()
     fun showAddressDetailsDialog(walletAddress: TariWalletAddress)
+    fun showInternetConnectionErrorDialog()
+    fun showWalletErrorDialog()
 }

@@ -54,10 +54,10 @@ class ChatListViewModel : CommonViewModel() {
     }
 
     fun onChatClicked(chat: ChatItemViewHolderItem) {
-        navigation.postValue(Navigation.ChatNavigation.ToChat(chat.walletAddress, false))
+        tariNavigator.navigate(Navigation.Chat.ToChat(chat.walletAddress, false))
     }
 
     fun onAddChatClicked() {
-        navigation.postValue(Navigation.ChatNavigation.ToAddChat)
+        tariNavigator.navigate(Navigation.Chat.ToAddChat)
     }
 }

@@ -32,7 +32,6 @@
  */
 package com.tari.android.wallet.ui.fragment.onboarding.activity
 
-import android.content.Intent
 import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.fragment.app.Fragment
@@ -50,8 +49,6 @@ import com.tari.android.wallet.extension.collectFlow
 import com.tari.android.wallet.extension.safeCastTo
 import com.tari.android.wallet.service.service.WalletServiceLauncher
 import com.tari.android.wallet.ui.common.CommonActivity
-import com.tari.android.wallet.ui.common.CommonViewModel
-import com.tari.android.wallet.ui.fragment.home.HomeActivity
 import com.tari.android.wallet.ui.fragment.onboarding.activity.OnboardingFlowModel.Effect
 import com.tari.android.wallet.ui.fragment.onboarding.createWallet.CreateWalletFragment
 import com.tari.android.wallet.ui.fragment.onboarding.inroduction.IntroductionFragment
@@ -71,7 +68,7 @@ import javax.inject.Inject
  *
  * @author The Tari Development Team
  */
-class OnboardingFlowActivity : CommonActivity<ActivityOnboardingFlowBinding, CommonViewModel>(), OnboardingFlowListener {
+class OnboardingFlowActivity : CommonActivity<ActivityOnboardingFlowBinding, OnboardingFlowViewModel>(), OnboardingFlowListener {
 
     @Inject
     lateinit var corePrefRepository: CorePrefRepository
@@ -162,9 +159,7 @@ class OnboardingFlowActivity : CommonActivity<ActivityOnboardingFlowBinding, Com
     }
 
     override fun onAuthSuccess() {
-        val intent = Intent(this, HomeActivity::class.java)
-        intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
-        startActivity(intent)
+        viewModel.navigateToHome()
         finish()
     }
 

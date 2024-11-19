@@ -5,9 +5,9 @@ import com.tari.android.wallet.application.deeplinks.DeepLink
 import com.tari.android.wallet.application.deeplinks.DeeplinkManager
 import com.tari.android.wallet.data.sharedPrefs.tor.TorBridgeConfiguration
 import com.tari.android.wallet.data.sharedPrefs.tor.TorPrefRepository
+import com.tari.android.wallet.navigation.Navigation
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.common.SingleLiveEvent
-import com.tari.android.wallet.navigation.Navigation
 import javax.inject.Inject
 
 class CustomTorBridgesViewModel : CommonViewModel() {
@@ -24,9 +24,13 @@ class CustomTorBridgesViewModel : CommonViewModel() {
         component.inject(this)
     }
 
-    fun openRequestPage() = _openLink.postValue(resourceManager.getString(R.string.tor_bridges_url))
+    fun openRequestPage() {
+        _openLink.postValue(resourceManager.getString(R.string.tor_bridges_url))
+    }
 
-    fun navigateToUploadQr() = navigation.postValue(Navigation.CustomBridgeNavigation.UploadQrCode)
+    fun navigateToUploadQr() {
+        tariNavigator.navigate(Navigation.CustomBridge.UploadQrCode)
+    }
 
     fun connect(inputStr: String) {
         val newBridges = mutableListOf<TorBridgeConfiguration>()

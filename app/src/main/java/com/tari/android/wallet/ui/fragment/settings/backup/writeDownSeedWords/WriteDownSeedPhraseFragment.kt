@@ -79,7 +79,7 @@ class WriteDownSeedPhraseFragment : CommonFragment<FragmentWriteDownSeedPhraseBi
     private fun setupUI() {
         ui.warningCheckBox.setOnCheckedChangeListener { _, isChecked -> updateContinueButtonState(isChecked) }
         ui.continueCtaView.setOnClickListener(ThrottleClick {
-            it.animateClick { viewModel.navigation.postValue(Navigation.VerifySeedPhraseNavigation.ToSeedPhraseVerification(viewModel.seedWords.value!!)) }
+            it.animateClick { viewModel.tariNavigator.navigate(Navigation.VerifySeedPhrase.ToSeedPhraseVerification(viewModel.seedWords.value!!)) }
         })
         ui.phraseWordsRecyclerView.layoutManager = GridLayoutManager(requireContext(), WORD_COLUMNS_COUNT)
         ui.phraseWordsRecyclerView.adapter = adapter

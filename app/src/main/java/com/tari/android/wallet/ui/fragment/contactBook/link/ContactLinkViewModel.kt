@@ -16,6 +16,7 @@ import com.tari.android.wallet.R.string.contact_book_contacts_book_link_success_
 import com.tari.android.wallet.R.string.contact_book_contacts_book_link_title
 import com.tari.android.wallet.R.string.contact_book_contacts_book_unlink_success_title
 import com.tari.android.wallet.extension.collectFlow
+import com.tari.android.wallet.navigation.Navigation
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.common.SingleLiveEvent
 import com.tari.android.wallet.ui.common.recyclerView.CommonViewHolderItem
@@ -33,7 +34,6 @@ import com.tari.android.wallet.ui.fragment.contactBook.data.contacts.ContactDto
 import com.tari.android.wallet.ui.fragment.contactBook.data.contacts.MergedContactInfo
 import com.tari.android.wallet.ui.fragment.contactBook.data.contacts.PhoneContactInfo
 import com.tari.android.wallet.ui.fragment.contactBook.link.adapter.link_header.ContactLinkHeaderViewHolderItem
-import com.tari.android.wallet.navigation.Navigation
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import yat.android.ui.extension.HtmlHelper
@@ -157,7 +157,7 @@ class ContactLinkViewModel : CommonViewModel() {
         if (!havePermission) {
             grantPermission.postValue(Unit)
         } else {
-            navigation.postValue(Navigation.ContactBookNavigation.ToAddPhoneContact)
+            tariNavigator.navigate(Navigation.ContactBook.ToAddPhoneContact)
         }
     }
 
@@ -199,7 +199,7 @@ class ContactLinkViewModel : CommonViewModel() {
             ButtonModule(resourceManager.getString(common_close), ButtonStyle.Close)
         )
         showModularDialog(ModularDialogArgs(DialogArgs {
-            navigation.value = Navigation.ContactBookNavigation.BackToContactBook
+            tariNavigator.navigate(Navigation.ContactBook.BackToContactBook)
         }, modules))
     }
 }

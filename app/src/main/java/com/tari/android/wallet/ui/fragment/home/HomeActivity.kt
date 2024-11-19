@@ -65,7 +65,6 @@ import com.tari.android.wallet.ui.common.domain.PaletteManager
 import com.tari.android.wallet.ui.common.domain.ResourceManager
 import com.tari.android.wallet.ui.extension.serializable
 import com.tari.android.wallet.ui.extension.setVisible
-import com.tari.android.wallet.ui.fragment.auth.AuthActivity
 import com.tari.android.wallet.ui.fragment.chat.chatList.ChatListFragment
 import com.tari.android.wallet.ui.fragment.contactBook.root.ContactBookFragment
 import com.tari.android.wallet.ui.fragment.home.overview.HomeOverviewFragment
@@ -177,7 +176,8 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>() {
         super.onResume()
 
         if (!viewModel.securityPrefRepository.isAuthenticated) {
-            launch(AuthActivity::class.java)
+            viewModel.navigateToAuth(this.intent.data)
+            finish()
         }
     }
 
@@ -218,7 +218,7 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>() {
     }
 
     private fun setupUi() {
-        ui.sendTariButton.setOnClickListener { viewModel.navigation.postValue(Navigation.TxListNavigation.ToTransfer) }
+        ui.sendTariButton.setOnClickListener { viewModel.tariNavigator.navigate(Navigation.TxList.ToTransfer) }
         setupBottomNavigation()
     }
 
@@ -269,7 +269,7 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>() {
             when (HomeDeeplinkScreens.parse(screen)) {
                 HomeDeeplinkScreens.TxDetails -> {
                     (intent.serializable<TxId>(HomeDeeplinkScreens.KEY_TX_DETAIL_ARGS))
-                        ?.let { viewModel.tariNavigator.navigate(Navigation.TxListNavigation.ToTxDetails(txId = it)) }
+                        ?.let { viewModel.tariNavigator.navigate(Navigation.TxList.ToTxDetails(txId = it)) }
                 }
 
                 else -> {}
