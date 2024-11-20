@@ -138,8 +138,10 @@ class AddAmountViewModel(savedState: SavedStateHandle) : CommonViewModel() {
     fun continueToAddNote(transactionData: TransactionData) {
         if (!networkConnection.isNetworkConnected()) {
             showInternetConnectionErrorDialog()
-        } else {
+        } else if (transactionData.note.isNullOrEmpty()) {
             tariNavigator.navigate(Navigation.AddAmount.ContinueToAddNote(transactionData))
+        } else {
+            tariNavigator.navigate(Navigation.AddAmount.ContinueToFinalizing(transactionData))
         }
     }
 

@@ -70,12 +70,13 @@ import com.tari.android.wallet.infrastructure.backup.BackupManager
 import com.tari.android.wallet.infrastructure.backup.BackupMapState
 import com.tari.android.wallet.infrastructure.backup.BackupState
 import com.tari.android.wallet.infrastructure.backup.BackupStateHandler
+import com.tari.android.wallet.navigation.Navigation
+import com.tari.android.wallet.navigation.Navigation.AllSettings
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.common.SingleLiveEvent
 import com.tari.android.wallet.ui.common.recyclerView.CommonViewHolderItem
 import com.tari.android.wallet.ui.common.recyclerView.items.DividerViewHolderItem
-import com.tari.android.wallet.navigation.Navigation
-import com.tari.android.wallet.navigation.Navigation.AllSettings
+import com.tari.android.wallet.ui.common.recyclerView.items.SpaceVerticalViewHolderItem
 import com.tari.android.wallet.ui.fragment.pinCode.PinCodeScreenBehavior
 import com.tari.android.wallet.ui.fragment.settings.allSettings.PresentationBackupState.BackupStateStatus.InProgress
 import com.tari.android.wallet.ui.fragment.settings.allSettings.PresentationBackupState.BackupStateStatus.Success
@@ -263,7 +264,9 @@ class AllSettingsViewModel : CommonViewModel() {
                     clipText = versionText,
                     toastMessage = resourceManager.getString(all_settings_version_text_copy_toast_message),
                 )
-            })
+            },
+            SpaceVerticalViewHolderItem(48),
+        )
     }
 
     private fun onBackupStateChanged(backupState: BackupMapState?) {

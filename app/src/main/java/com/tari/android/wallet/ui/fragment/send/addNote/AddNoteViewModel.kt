@@ -20,8 +20,8 @@ class AddNoteViewModel : CommonViewModel() {
         showAddressDetailsDialog(walletAddress)
     }
 
-    fun continueToFinalizeSendTx(newData: TransactionData) {
-        tariNavigator.navigate(Navigation.AddAmount.ContinueToFinalizing(newData))
+    fun continueToFinalizeSendTx(transactionData: TransactionData) {
+        tariNavigator.navigate(Navigation.AddAmount.ContinueToFinalizing(transactionData))
     }
 
     fun isNetworkConnectionAvailable(): Boolean = networkConnection.isNetworkConnected()
