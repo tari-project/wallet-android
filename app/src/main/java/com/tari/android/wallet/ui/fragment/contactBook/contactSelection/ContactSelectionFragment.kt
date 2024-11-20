@@ -59,7 +59,7 @@ import me.everything.android.ui.overscroll.OverScrollDecoratorHelper
 
 open class ContactSelectionFragment : CommonFragment<FragmentContactsSelectionBinding, ContactSelectionViewModel>(), TextWatcher {
 
-    private lateinit var clipboardController: ClipboardController
+    private var clipboardController: ClipboardController? = null
 
     private var recyclerViewAdapter = ContactListAdapter()
 
@@ -100,7 +100,7 @@ open class ContactSelectionFragment : CommonFragment<FragmentContactsSelectionBi
 
     override fun onDestroy() {
         super.onDestroy()
-        clipboardController.onDestroy()
+        clipboardController?.onDestroy()
     }
 
     open fun goToNext() {
@@ -111,7 +111,7 @@ open class ContactSelectionFragment : CommonFragment<FragmentContactsSelectionBi
     private fun subscribeViewModal() = with(viewModel) {
         observe(contactList) { recyclerViewAdapter.update(it) }
 
-        observe(walletAddressViewModel.discoveredWalletAddressFromClipboard) { clipboardController.showClipboardData(it) }
+        observe(walletAddressViewModel.discoveredWalletAddressFromClipboard) { clipboardController?.showClipboardData(it) }
 
         observe(selectedTariWalletAddress) { address -> address?.fullEmojiId?.let { putEmojiId(it) } }
 
@@ -160,7 +160,7 @@ open class ContactSelectionFragment : CommonFragment<FragmentContactsSelectionBi
         ui.searchEditText.setRawInputType(InputType.TYPE_CLASS_TEXT)
         ui.searchEditText.addTextChangedListener(this@ContactSelectionFragment)
 
-        clipboardController.listener = object : ClipboardController.ClipboardControllerListener {
+        clipboardController?.listener = object : ClipboardController.ClipboardControllerListener {
 
             override fun onPaste(walletAddress: TariWalletAddress) {
                 ui.searchEditText.scaleX = 0f
@@ -250,7 +250,7 @@ open class ContactSelectionFragment : CommonFragment<FragmentContactsSelectionBi
     private fun onQRButtonClick(view: View) {
         view.temporarilyDisableClick()
         requireActivity().hideKeyboard()
-        clipboardController.hidePasteEmojiIdViews(animate = true) {
+        clipboardController?.hidePasteEmojiIdViews(animate = true) {
             ui.rootView.postDelayed(Constants.UI.keyboardHideWaitMs) { startQRCodeActivity() }
         }
     }
@@ -265,7 +265,7 @@ open class ContactSelectionFragment : CommonFragment<FragmentContactsSelectionBi
 
     private fun animateEmojiIdPaste() {
         // animate text size
-       animations += ValueAnimator.ofFloat(0f, 1f).apply {
+        animations += ValueAnimator.ofFloat(0f, 1f).apply {
             addUpdateListener { valueAnimator: ValueAnimator ->
                 val value = valueAnimator.animatedValue as Float
                 ui.searchEditText.scaleX = value
@@ -289,9 +289,11 @@ open class ContactSelectionFragment : CommonFragment<FragmentContactsSelectionBi
     override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) = Unit
 
     override fun afterTextChanged(editable: Editable) {
-        if (clipboardController.hidePasteEmojiIdViewsOnTextChanged) {
-            clipboardController.hidePasteEmojiIdViews(animate = true)
-            clipboardController.hidePasteEmojiIdViewsOnTextChanged = false
+        clipboardController?.let { clipboardController ->
+            if (clipboardController.hidePasteEmojiIdViewsOnTextChanged) {
+                clipboardController.hidePasteEmojiIdViews(animate = true)
+                clipboardController.hidePasteEmojiIdViewsOnTextChanged = false
+            }
         }
         if (textWatcherIsRunning) {
             return

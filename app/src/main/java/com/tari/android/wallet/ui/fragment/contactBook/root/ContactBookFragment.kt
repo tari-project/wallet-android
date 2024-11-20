@@ -42,7 +42,7 @@ import java.lang.ref.WeakReference
 
 class ContactBookFragment : CommonFragment<FragmentContactBookRootBinding, ContactBookViewModel>() {
 
-    private lateinit var clipboardController: ClipboardController
+    private var clipboardController: ClipboardController? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?) =
         FragmentContactBookRootBinding.inflate(inflater, container, false).also { ui = it }.root
@@ -69,7 +69,7 @@ class ContactBookFragment : CommonFragment<FragmentContactBookRootBinding, Conta
 
     override fun onDestroy() {
         super.onDestroy()
-        clipboardController.onDestroy()
+        clipboardController?.onDestroy()
     }
 
     @Deprecated("Deprecated in Java")
@@ -83,7 +83,7 @@ class ContactBookFragment : CommonFragment<FragmentContactBookRootBinding, Conta
     private fun subscribeUI() = with(viewModel) {
         observe(contactSelectionRepository.isSelectionState) { updateSharedState() }
 
-        observe(walletAddressViewModel.discoveredWalletAddressFromClipboard) { clipboardController.showClipboardData(it) }
+        observe(walletAddressViewModel.discoveredWalletAddressFromClipboard) { clipboardController?.showClipboardData(it) }
 
         observe(walletAddressViewModel.discoveredWalletAddressFromQuery) { ui.sendButton.setVisible(it != null) }
 
@@ -130,7 +130,7 @@ class ContactBookFragment : CommonFragment<FragmentContactBookRootBinding, Conta
             viewModel.send()
         }
 
-        clipboardController.listener = object : ClipboardController.ClipboardControllerListener {
+        clipboardController?.listener = object : ClipboardController.ClipboardControllerListener {
 
             override fun onPaste(walletAddress: TariWalletAddress) {
                 ui.searchView.setQuery(viewModel.walletAddressViewModel.discoveredWalletAddressFromClipboard.value?.fullEmojiId, false)
@@ -150,7 +150,7 @@ class ContactBookFragment : CommonFragment<FragmentContactBookRootBinding, Conta
     private fun onQRButtonClick(view: View) {
         view.temporarilyDisableClick()
         requireActivity().hideKeyboard()
-        clipboardController.hidePasteEmojiIdViews(animate = true) {
+        clipboardController?.hidePasteEmojiIdViews(animate = true) {
             ui.rootView.postDelayed(Constants.UI.keyboardHideWaitMs) { startQRCodeActivity() }
         }
     }

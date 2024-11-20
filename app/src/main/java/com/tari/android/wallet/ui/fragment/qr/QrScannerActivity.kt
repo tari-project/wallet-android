@@ -82,7 +82,7 @@ class QrScannerActivity : CommonActivity<ActivityQrScannerBinding, QrScannerView
         const val EXTRA_QR_DATA_SOURCE = "EXTRA_QR_DATA_SOURCE"
     }
 
-    private lateinit var codeScanner: CodeScanner
+    private var codeScanner: CodeScanner? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         appComponent.inject(this)
@@ -112,7 +112,7 @@ class QrScannerActivity : CommonActivity<ActivityQrScannerBinding, QrScannerView
         collectFlow(effect) { effect ->
             when (effect) {
                 is QrScannerModel.Effect.FinishWithResult -> finishWithResult(effect.deepLink)
-                is QrScannerModel.Effect.ProceedScan -> codeScanner.startPreview()
+                is QrScannerModel.Effect.ProceedScan -> codeScanner?.startPreview()
             }
         }
     }
@@ -137,13 +137,13 @@ class QrScannerActivity : CommonActivity<ActivityQrScannerBinding, QrScannerView
             isFlashEnabled = false
         }
 
-        codeScanner.decodeCallback = DecodeCallback { viewModel.onScanResult(it.text) }
+        codeScanner?.decodeCallback = DecodeCallback { viewModel.onScanResult(it.text) }
 
-        codeScanner.errorCallback = ErrorCallback {
+        codeScanner?.errorCallback = ErrorCallback {
             runOnUiThread { TariToast(this, TariToastArgs(getString(R.string.add_recipient_failed_init_camera_message), Toast.LENGTH_LONG)) }
         }
 
-        ui.scannerView.setOnClickListener { codeScanner.startPreview() }
+        ui.scannerView.setOnClickListener { codeScanner?.startPreview() }
     }
 
     private fun finishWithResult(deepLink: DeepLink) {
@@ -166,15 +166,11 @@ class QrScannerActivity : CommonActivity<ActivityQrScannerBinding, QrScannerView
 
     override fun onResume() {
         super.onResume()
-        if (::codeScanner.isInitialized) {
-            codeScanner.startPreview()
-        }
+        codeScanner?.startPreview()
     }
 
     override fun onPause() {
-        if (::codeScanner.isInitialized) {
-            codeScanner.releaseResources()
-        }
+        codeScanner?.releaseResources()
         super.onPause()
     }
 }
