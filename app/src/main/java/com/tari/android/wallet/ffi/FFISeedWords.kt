@@ -32,6 +32,7 @@
  */
 package com.tari.android.wallet.ffi
 
+import com.tari.android.wallet.model.Base58
 import com.tari.android.wallet.model.seedPhrase.SeedWordsWordPushResult
 
 /**

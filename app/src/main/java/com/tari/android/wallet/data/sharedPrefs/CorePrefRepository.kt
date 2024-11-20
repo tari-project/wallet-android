@@ -47,7 +47,7 @@ import com.tari.android.wallet.data.sharedPrefs.sentry.SentryPrefRepository
 import com.tari.android.wallet.data.sharedPrefs.tariSettings.TariSettingsPrefRepository
 import com.tari.android.wallet.data.sharedPrefs.tor.TorPrefRepository
 import com.tari.android.wallet.data.sharedPrefs.yat.YatPrefRepository
-import com.tari.android.wallet.ffi.Base58
+import com.tari.android.wallet.model.Base58
 import com.tari.android.wallet.model.TariWalletAddress
 import javax.inject.Inject
 import javax.inject.Singleton

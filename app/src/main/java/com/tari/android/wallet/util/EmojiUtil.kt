@@ -40,9 +40,8 @@ import com.tari.android.wallet.extension.applyColorStyle
 import com.tari.android.wallet.extension.applyLetterSpacingStyle
 import com.tari.android.wallet.extension.applyRelativeTextSizeStyle
 import com.tari.android.wallet.ffi.FFIEmojiSet
+import com.tari.android.wallet.model.EmojiId
 import com.tari.android.wallet.model.TariWalletAddress
-
-typealias EmojiId = String
 
 /**
  * Number of emojis from the Tari emoji set in a string.

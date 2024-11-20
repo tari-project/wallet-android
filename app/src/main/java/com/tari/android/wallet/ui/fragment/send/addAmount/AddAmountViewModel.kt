@@ -11,23 +11,30 @@ import com.tari.android.wallet.model.BalanceInfo
 import com.tari.android.wallet.model.MicroTari
 import com.tari.android.wallet.model.TariWalletAddress
 import com.tari.android.wallet.model.WalletError
+import com.tari.android.wallet.navigation.Navigation
+import com.tari.android.wallet.navigation.TariNavigator.Companion.PARAMETER_AMOUNT
+import com.tari.android.wallet.navigation.TariNavigator.Companion.PARAMETER_CONTACT
+import com.tari.android.wallet.navigation.TariNavigator.Companion.PARAMETER_NOTE
+import com.tari.android.wallet.network.NetworkConnectionStateHandler
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.dialog.modular.modules.body.BodyModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonStyle
 import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
 import com.tari.android.wallet.ui.fragment.contactBook.data.contacts.ContactDto
-import com.tari.android.wallet.navigation.TariNavigator.Companion.PARAMETER_AMOUNT
-import com.tari.android.wallet.navigation.TariNavigator.Companion.PARAMETER_CONTACT
-import com.tari.android.wallet.navigation.TariNavigator.Companion.PARAMETER_NOTE
 import com.tari.android.wallet.ui.fragment.send.addAmount.feeModule.FeeModule
 import com.tari.android.wallet.ui.fragment.send.addAmount.feeModule.NetworkSpeed
+import com.tari.android.wallet.ui.fragment.send.common.TransactionData
 import com.tari.android.wallet.util.Constants
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import javax.inject.Inject
 
 class AddAmountViewModel(savedState: SavedStateHandle) : CommonViewModel() {
+
+    @Inject
+    lateinit var networkConnection: NetworkConnectionStateHandler
 
     var selectedFeeData: FeeData? = null
     private var selectedSpeed: NetworkSpeed = NetworkSpeed.Medium
@@ -126,6 +133,21 @@ class AddAmountViewModel(savedState: SavedStateHandle) : CommonViewModel() {
         } catch (e: Throwable) {
             logger.i(e.message + "calculate fees")
         }
+    }
+
+    fun continueToAddNote(transactionData: TransactionData) {
+        if (!networkConnection.isNetworkConnected()) {
+            showInternetConnectionErrorDialog()
+        } else {
+            tariNavigator.navigate(Navigation.AddAmount.ContinueToAddNote(transactionData))
+        }
+    }
+
+    fun showAmountExceededError() {
+        showSimpleDialog(
+            title = resourceManager.getString(R.string.error_balance_exceeded_title),
+            description = resourceManager.getString(R.string.error_balance_exceeded_description),
+        )
     }
 
     private fun calculateDefaultFees(amount: MicroTari) {

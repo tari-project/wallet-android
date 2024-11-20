@@ -268,7 +268,7 @@ class ChangeSecurePasswordFragment : CommonFragment<FragmentChangeSecurePassword
         when (backupState) {
             is BackupUpToDate -> {
                 allowExitAndPasswordEditing()
-                viewModel.tariNavigator.onPasswordChanged()
+                viewModel.backToBackupSettings()
             }
 
             is BackupFailed -> { // backup failed

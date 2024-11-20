@@ -75,7 +75,7 @@ import com.tari.android.wallet.ui.common.SingleLiveEvent
 import com.tari.android.wallet.ui.common.recyclerView.CommonViewHolderItem
 import com.tari.android.wallet.ui.common.recyclerView.items.DividerViewHolderItem
 import com.tari.android.wallet.navigation.Navigation
-import com.tari.android.wallet.navigation.Navigation.AllSettingsNavigation
+import com.tari.android.wallet.navigation.Navigation.AllSettings
 import com.tari.android.wallet.ui.fragment.pinCode.PinCodeScreenBehavior
 import com.tari.android.wallet.ui.fragment.settings.allSettings.PresentationBackupState.BackupStateStatus.InProgress
 import com.tari.android.wallet.ui.fragment.settings.allSettings.PresentationBackupState.BackupStateStatus.Success
@@ -98,7 +98,7 @@ class AllSettingsViewModel : CommonViewModel() {
     lateinit var authenticationViewModel: BiometricAuthenticationViewModel
 
     private val backupOption = SettingsBackupOptionViewHolderItem(leftIconId = vector_all_settings_backup_options_icon) {
-        runWithAuthorization { navigation.postValue(AllSettingsNavigation.ToBackupSettings) }
+        runWithAuthorization { tariNavigator.navigate(AllSettings.ToBackupSettings(true)) }
     }
 
     @Inject
@@ -149,7 +149,7 @@ class AllSettingsViewModel : CommonViewModel() {
                 address = settingsRepository.walletAddress,
                 yat = yatAdapter.connectedYat.orEmpty(),
                 alias = alias,
-                action = { tariNavigator.navigate(AllSettingsNavigation.ToMyProfile) },
+                action = { tariNavigator.navigate(AllSettings.ToMyProfile) },
             ),
             DividerViewHolderItem(),
             SettingsRowViewHolderItem(resourceManager.getString(all_settings_connect_yats), vector_all_settings_yat_icon) {
@@ -159,26 +159,26 @@ class AllSettingsViewModel : CommonViewModel() {
             backupOption,
             DividerViewHolderItem(),
             SettingsRowViewHolderItem(resourceManager.getString(all_settings_data_collection), vector_all_settings_data_collection) {
-                navigation.postValue(AllSettingsNavigation.ToDataCollection)
+                tariNavigator.navigate(AllSettings.ToDataCollection)
             },
             DividerViewHolderItem(),
             if (pinCode != null) {
                 SettingsRowViewHolderItem(resourceManager.getString(all_settings_pin_code), vector_all_settings_passcode) {
                     runWithAuthorization {
-                        navigation.postValue(Navigation.EnterPinCodeNavigation(PinCodeScreenBehavior.ChangeNew))
+                        tariNavigator.navigate(Navigation.EnterPinCode(PinCodeScreenBehavior.ChangeNew))
                     }
                 }
             } else {
                 SettingsRowViewHolderItem(resourceManager.getString(all_settings_create_pin_code), vector_all_settings_passcode) {
                     runWithAuthorization {
-                        navigation.postValue(Navigation.EnterPinCodeNavigation(PinCodeScreenBehavior.Create))
+                        tariNavigator.navigate(Navigation.EnterPinCode(PinCodeScreenBehavior.Create))
                     }
                 }
             },
             DividerViewHolderItem(),
             SettingsRowViewHolderItem(resourceManager.getString(all_settings_biometrics), vector_fingerprint) {
                 runWithAuthorization {
-                    navigation.postValue(Navigation.ChangeBiometrics)
+                    tariNavigator.navigate(Navigation.ChangeBiometrics)
                 }
             },
             SettingsTitleViewHolderItem(resourceManager.getString(all_settings_secondary_settings_label)),
@@ -187,11 +187,11 @@ class AllSettingsViewModel : CommonViewModel() {
             },
             DividerViewHolderItem(),
             SettingsRowViewHolderItem(resourceManager.getString(tari_about_title), vector_all_settings_about_icon) {
-                navigation.postValue(AllSettingsNavigation.ToAbout)
+                tariNavigator.navigate(AllSettings.ToAbout)
             },
             DividerViewHolderItem(),
             SettingsRowViewHolderItem(resourceManager.getString(all_settings_report_a_bug), vector_all_settings_report_bug_icon) {
-                navigation.postValue(AllSettingsNavigation.ToBugReporting)
+                tariNavigator.navigate(AllSettings.ToBugReporting)
             },
             DividerViewHolderItem(),
             SettingsRowViewHolderItem(resourceManager.getString(all_settings_visit_site), vector_all_settings_visit_tari_icon) {
@@ -219,11 +219,11 @@ class AllSettingsViewModel : CommonViewModel() {
             }.takeIf { networkRepository.currentNetwork.isBlockExplorerAvailable },
             SettingsTitleViewHolderItem(resourceManager.getString(all_settings_advanced_settings_label)),
             SettingsRowViewHolderItem(resourceManager.getString(all_settings_select_theme), vector_all_settings_select_theme_icon) {
-                navigation.postValue(AllSettingsNavigation.ToThemeSelection)
+                tariNavigator.navigate(AllSettings.ToThemeSelection)
             },
             DividerViewHolderItem(),
             SettingsRowViewHolderItem(resourceManager.getString(all_settings_background_service), vector_all_settings_background_service_icon) {
-                navigation.postValue(AllSettingsNavigation.ToBackgroundService)
+                tariNavigator.navigate(AllSettings.ToBackgroundService)
             },
             DividerViewHolderItem(),
             SettingsRowViewHolderItem(
@@ -231,23 +231,23 @@ class AllSettingsViewModel : CommonViewModel() {
                 leftIconId = vector_all_settings_screen_recording_icon,
                 warning = tariSettingsSharedRepository.screenRecordingTurnedOn,
             ) {
-                navigation.postValue(AllSettingsNavigation.ToScreenRecording)
+                tariNavigator.navigate(AllSettings.ToScreenRecording)
             },
             DividerViewHolderItem(),
             SettingsRowViewHolderItem(resourceManager.getString(all_settings_bluetooth_settings), vector_all_settings_bluetooth) {
-                navigation.postValue(AllSettingsNavigation.ToBluetoothSettings)
+                tariNavigator.navigate(AllSettings.ToBluetoothSettings)
             },
             DividerViewHolderItem(),
             SettingsRowViewHolderItem(resourceManager.getString(all_settings_bridge_configuration), vector_all_settings_bridge_configuration_icon) {
-                navigation.postValue(AllSettingsNavigation.ToTorBridges)
+                tariNavigator.navigate(AllSettings.ToTorBridges)
             },
             DividerViewHolderItem(),
             SettingsRowViewHolderItem(resourceManager.getString(all_settings_select_network), vector_all_settings_select_network_icon) {
-                navigation.postValue(AllSettingsNavigation.ToNetworkSelection)
+                tariNavigator.navigate(AllSettings.ToNetworkSelection)
             },
             DividerViewHolderItem().takeIf { DebugConfig.selectBaseNodeEnabled },
             SettingsRowViewHolderItem(resourceManager.getString(all_settings_select_base_node), vector_all_settings_select_base_node_icon) {
-                navigation.postValue(AllSettingsNavigation.ToBaseNodeSelection)
+                tariNavigator.navigate(AllSettings.ToBaseNodeSelection)
             }.takeIf { DebugConfig.selectBaseNodeEnabled },
             DividerViewHolderItem(),
             SettingsRowViewHolderItem(
@@ -255,7 +255,7 @@ class AllSettingsViewModel : CommonViewModel() {
                 leftIconId = vector_all_settings_delete_button_icon,
                 iconId = null,
                 style = SettingsRowStyle.Warning,
-            ) { navigation.postValue(AllSettingsNavigation.ToDeleteWallet) },
+            ) { tariNavigator.navigate(AllSettings.ToDeleteWallet) },
             DividerViewHolderItem(),
             SettingsVersionViewHolderItem(versionText) {
                 copyToClipboard(

@@ -21,7 +21,7 @@ class AddNoteViewModel : CommonViewModel() {
     }
 
     fun continueToFinalizeSendTx(newData: TransactionData) {
-        tariNavigator.navigate(Navigation.AddAmountNavigation.ContinueToFinalizing(newData))
+        tariNavigator.navigate(Navigation.AddAmount.ContinueToFinalizing(newData))
     }
 
     fun isNetworkConnectionAvailable(): Boolean = networkConnection.isNetworkConnected()

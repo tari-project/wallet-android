@@ -85,7 +85,7 @@ class ContactBookViewModel : CommonViewModel() {
     fun send() {
         val walletAddress = walletAddressViewModel.discoveredWalletAddressFromQuery.value!!
         val contact = contactsRepository.getContactByAddress(walletAddress)
-        navigation.postValue(Navigation.TxListNavigation.ToSendTariToUser(contact))
+        tariNavigator.navigate(Navigation.TxList.ToSendTariToUser(contact))
     }
 
     fun grantPermission() {

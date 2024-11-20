@@ -115,14 +115,19 @@ class HomeOverviewFragment : CommonFragment<FragmentHomeOverviewBinding, HomeOve
         viewModel.grantContactsPermission()
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        balanceViewController?.onDestroy()
+    }
+
     @SuppressLint("ClickableViewAccessibility")
     private fun setupUI() = with(ui) {
-        viewAllTxsButton.setOnClickListener { viewModel.navigation.postValue(Navigation.TxListNavigation.HomeTransactionHistory) }
+        viewAllTxsButton.setOnClickListener { viewModel.tariNavigator.navigate(Navigation.TxList.HomeTransactionHistory) }
         qrCodeButton.setOnClickListener { QrScannerActivity.startScanner(this@HomeOverviewFragment, QrScannerSource.Home) }
         transactionsRecyclerView.adapter = adapter
         adapter.setClickListener { item -> item.takeIfIs<TxViewHolderItem>()?.let { viewModel.navigateToTxList(it.txDto.tx) } }
         transactionsRecyclerView.layoutManager = LinearLayoutManager(requireContext())
-        fullAvatarContainer.setOnClickListener { viewModel.navigation.postValue(Navigation.AllSettingsNavigation.ToMyProfile) }
+        fullAvatarContainer.setOnClickListener { viewModel.tariNavigator.navigate(Navigation.AllSettings.ToMyProfile) }
     }
 
     private fun subscribeToViewModel() {

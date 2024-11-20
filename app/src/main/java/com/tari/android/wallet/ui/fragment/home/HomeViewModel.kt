@@ -1,5 +1,7 @@
 package com.tari.android.wallet.ui.fragment.home
 
+import android.net.Uri
+import com.tari.android.wallet.navigation.Navigation
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.fragment.contactBook.data.ContactsRepository
 import com.tari.android.wallet.ui.fragment.contactBook.root.ShareViewModel
@@ -22,5 +24,9 @@ class HomeViewModel : CommonViewModel() {
         shareViewModel.tariBluetoothClient.doOnRequiredPermissions = { permissions, action ->
             permissionManager.runWithPermission(permissions, false, action)
         }
+    }
+
+    fun navigateToAuth(uri: Uri?) {
+        tariNavigator.navigate(Navigation.Auth.AuthScreen(uri))
     }
 }

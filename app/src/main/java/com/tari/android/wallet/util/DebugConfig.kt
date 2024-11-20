@@ -38,8 +38,9 @@ import com.tari.android.wallet.BuildConfig
 import com.tari.android.wallet.data.tx.TxDto
 import com.tari.android.wallet.extension.minusHours
 import com.tari.android.wallet.extension.toMicroTari
-import com.tari.android.wallet.ffi.Base58
+import com.tari.android.wallet.model.Base58
 import com.tari.android.wallet.model.CompletedTx
+import com.tari.android.wallet.model.EmojiId
 import com.tari.android.wallet.model.TariContact
 import com.tari.android.wallet.model.TariUtxo
 import com.tari.android.wallet.model.TariWalletAddress

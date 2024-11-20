@@ -13,8 +13,7 @@ import com.tari.android.wallet.ui.extension.setTopMargin
 import com.tari.android.wallet.ui.extension.setWidthToMeasured
 import com.tari.android.wallet.util.Constants
 
-class DecimalDigitSeparatorViewHolder(context: Context, separator: String) :
-    BalanceDigitViewHolder() {
+class DecimalDigitSeparatorViewHolder(context: Context, separator: String) : BalanceDigitViewHolder() {
 
     private val ui = ViewHomeBalanceDecimalSeparatorBinding.inflate(LayoutInflater.from(context))
 
@@ -31,7 +30,7 @@ class DecimalDigitSeparatorViewHolder(context: Context, separator: String) :
     override fun reveal(delayMs: Long) {
         separatorTextView.setTopMargin(view.dimenPx(R.dimen.home_balance_digit_decimal_height))
         separatorTextView.setWidthToMeasured()
-        ValueAnimator.ofInt(view.dimenPx(R.dimen.home_balance_digit_decimal_height), 0).apply {
+        animations += ValueAnimator.ofInt(view.dimenPx(R.dimen.home_balance_digit_decimal_height), 0).apply {
             addUpdateListener { valueAnimator: ValueAnimator ->
                 val topMargin = valueAnimator.animatedValue as Int
                 separatorTextView.setTopMargin(topMargin)

@@ -2,6 +2,7 @@ package com.tari.android.wallet.ui.fragment.send.addNote.gif
 
 import android.animation.ValueAnimator
 import android.view.View
+import com.tari.android.wallet.ui.extension.removeListenersAndCancel
 
 class GIFsPanelAnimation(private val view: View) {
     private var state = GIFsPanelAnimationState(TranslationDirection.UP, null)
@@ -28,7 +29,7 @@ class GIFsPanelAnimation(private val view: View) {
         })
 
     fun dispose() {
-        this.state.animator?.cancel()
+        this.state.animator?.removeListenersAndCancel()
     }
 
     private companion object {

@@ -34,7 +34,7 @@ class BackupOnboardingFlowFragment : CommonFragment<FragmentBackupOnboardingFlow
 
     private fun setupUI() = with(ui) {
         closeButton.setOnClickListener { requireActivity().onBackPressed() }
-        nextButton.setOnClickListener { viewPager.currentItem = viewPager.currentItem + 1 }
+        nextButton.setOnClickListener { viewPager.currentItem += 1 }
 
         viewPager.adapter = BackupOnboardingFlowAdapter(requireActivity())
 
@@ -63,34 +63,30 @@ class BackupOnboardingFlowFragment : CommonFragment<FragmentBackupOnboardingFlow
         }
 
         private fun openStage1() {
-            viewModel.tariNavigator.let {
-                it.onBackPressed()
-                it.toWalletBackupWithRecoveryPhrase()
-            }
+            onBackPressed()
+            viewModel.navigateToWalletBackup()
         }
 
         private fun openStage1B() {
-            HomeActivity.instance.get()?.let {
-                it.onBackPressed()
-            }
+            onBackPressed()
         }
 
         private fun openStage2() {
-            viewModel.tariNavigator.let {
-                it.onBackPressed()
-                it.toChangePassword()
-            }
+            onBackPressed()
+            viewModel.navigateToChangePassword()
         }
 
         private fun openStage3() {
-            HomeActivity.instance.get()?.let {
-                it.onBackPressed()
-            }
+            onBackPressed()
         }
 
         override fun getItemCount(): Int = 4
 
         override fun createFragment(position: Int): Fragment = BackupOnboardingFlowItemFragment.createInstance(position)
+    }
+
+    private fun onBackPressed() {
+        HomeActivity.instance.get()?.onBackPressed()
     }
 }
 

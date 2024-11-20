@@ -8,6 +8,7 @@ import com.tari.android.wallet.application.securityStage.StagedWalletSecurityMan
 import com.tari.android.wallet.data.sharedPrefs.securityStages.WalletSecurityStage
 import com.tari.android.wallet.extension.takeIfIs
 import com.tari.android.wallet.model.BalanceInfo
+import com.tari.android.wallet.navigation.Navigation
 import com.tari.android.wallet.navigation.TariNavigator
 import com.tari.android.wallet.ui.common.DialogHandler
 import com.tari.android.wallet.ui.common.domain.ResourceManager
@@ -86,33 +87,33 @@ class StagedSecurityDelegate(
 
     private fun openStage1() {
         dialogHandler.hideDialog()
-        tariNavigator.let {
-            it.toAllSettings()
-            it.toBackupSettings(false)
-            it.toWalletBackupWithRecoveryPhrase()
-        }
+        tariNavigator.navigateSequence(
+            Navigation.TxList.ToAllSettings,
+            Navigation.AllSettings.ToBackupSettings(false),
+            Navigation.BackupSettings.ToWalletBackupWithRecoveryPhrase,
+        )
     }
 
     private fun openStage1B() {
         dialogHandler.hideDialog()
-        tariNavigator.let {
-            it.toAllSettings()
-            it.toBackupSettings(true)
-        }
+        tariNavigator.navigateSequence(
+            Navigation.TxList.ToAllSettings,
+            Navigation.AllSettings.ToBackupSettings(true),
+        )
     }
 
     private fun openStage2() {
         dialogHandler.hideDialog()
-        tariNavigator.let {
-            it.toAllSettings()
-            it.toBackupSettings(false)
-            it.toChangePassword()
-        }
+        tariNavigator.navigateSequence(
+            Navigation.TxList.ToAllSettings,
+            Navigation.AllSettings.ToBackupSettings(false),
+            Navigation.BackupSettings.ToChangePassword,
+        )
     }
 
     private fun openStage3() {
         dialogHandler.hideDialog()
-        //todo for future
+        // do nothing for now
     }
 
     private fun showPopup(

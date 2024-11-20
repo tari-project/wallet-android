@@ -5,7 +5,7 @@ import com.orhanobut.logger.Logger
 import com.tari.android.wallet.ui.fragment.contactBook.data.contacts.ContactDto
 import com.tari.android.wallet.ui.fragment.contactBook.data.contacts.MergedContactInfo
 import com.tari.android.wallet.ui.fragment.contactBook.data.contacts.PhoneContactInfo
-import com.tari.android.wallet.util.EmojiId
+import com.tari.android.wallet.model.EmojiId
 import contacts.core.Contacts
 import contacts.core.Fields
 import contacts.core.entities.MutableContact

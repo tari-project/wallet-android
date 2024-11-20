@@ -36,7 +36,7 @@ class DecimalDigitViewHolder(context: Context, private var value: Int) : Balance
 
     override fun reveal(delayMs: Long) {
         topDecimalDigitTextView.setTopMargin(view.dimenPx(R.dimen.home_balance_digit_decimal_height))
-        ValueAnimator.ofInt(view.dimenPx(R.dimen.home_balance_digit_decimal_height), 0).apply {
+        animations += ValueAnimator.ofInt(view.dimenPx(R.dimen.home_balance_digit_decimal_height), 0).apply {
             addUpdateListener { valueAnimator: ValueAnimator ->
                 val topMargin = valueAnimator.animatedValue as Int
                 topDecimalDigitTextView.setTopMargin(topMargin)
@@ -65,7 +65,7 @@ class DecimalDigitViewHolder(context: Context, private var value: Int) : Balance
         value = newValue
         bottomDecimalDigitTextView.text = value.toString()
         bottomDecimalDigitTextView.setWidthToMeasured()
-        ValueAnimator.ofInt(0, -view.dimenPx(R.dimen.home_balance_digit_decimal_height) - 1).apply {
+        animations += ValueAnimator.ofInt(0, -view.dimenPx(R.dimen.home_balance_digit_decimal_height) - 1).apply {
             addUpdateListener { valueAnimator: ValueAnimator ->
                 val topMargin = valueAnimator.animatedValue as Int
                 topDecimalDigitTextView.setTopMargin(topMargin)

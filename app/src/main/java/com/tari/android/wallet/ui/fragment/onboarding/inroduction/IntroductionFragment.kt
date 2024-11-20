@@ -204,7 +204,7 @@ class IntroductionFragment : OnboardingFlowFragment<FragmentIntroductionBinding,
         animateHeaderLineTextView(ui.headerLineTopTextView, Constants.UI.mediumDurationMs)
         animateHeaderLineTextView(ui.headerLineBottomTextView, Constants.UI.mediumDurationMs + Constants.UI.xShortDurationMs * 2)
 
-        ValueAnimator.ofFloat(0f, 1f).apply {
+        animations += ValueAnimator.ofFloat(0f, 1f).apply {
             addUpdateListener { valueAnimator: ValueAnimator ->
                 val value = valueAnimator.animatedValue as Float
                 ui.tariLogoLottieAnimationView.alpha = value
@@ -241,7 +241,7 @@ class IntroductionFragment : OnboardingFlowFragment<FragmentIntroductionBinding,
             interpolator = EasingInterpolator(Ease.CIRC_IN_OUT)
             duration = Constants.UI.CreateWallet.tariTextAnimViewDurationMs
             addListener(onEnd = { playTariWalletLottieAnimation() })
-        }
+        }.also { animations.add(it) }
 
         ui.tariLogoLottieAnimationView.addAnimatorListener(onEnd = { onboardingListener.continueToCreateWallet() })
 
@@ -252,7 +252,7 @@ class IntroductionFragment : OnboardingFlowFragment<FragmentIntroductionBinding,
                 ui.tariLogoLottieAnimationView.scaleY = scale
                 ui.tariLogoLottieAnimationView.scaleX = scale
             }
-        }
+        }.also { animations.add(it) }
 
         val fadeOutAnim = ValueAnimator.ofFloat(1f, 0f).apply {
             duration = Constants.UI.CreateWallet.viewContainerFadeOutDurationMs
@@ -274,9 +274,9 @@ class IntroductionFragment : OnboardingFlowFragment<FragmentIntroductionBinding,
                 ui.createWalletContainerView.invisible()
                 ui.userAgreementAndPrivacyPolicyTextView.invisible()
             })
-        }
+        }.also { animations.add(it) }
 
-        AnimatorSet().apply {
+        animations += AnimatorSet().apply {
             playTogether(tariViewTranslateAnim, tariViewScaleAnim, fadeOutAnim)
             start()
         }
@@ -284,7 +284,7 @@ class IntroductionFragment : OnboardingFlowFragment<FragmentIntroductionBinding,
 
     private fun playTariWalletLottieAnimation() {
         ui.tariLogoLottieAnimationView.playAnimation()
-        ValueAnimator.ofFloat(1f, 0f).apply {
+        animations += ValueAnimator.ofFloat(1f, 0f).apply {
             duration = Constants.UI.mediumDurationMs
             addUpdateListener { valueAnimator: ValueAnimator ->
                 val alpha = valueAnimator.animatedValue as Float
@@ -296,4 +296,3 @@ class IntroductionFragment : OnboardingFlowFragment<FragmentIntroductionBinding,
         }
     }
 }
-

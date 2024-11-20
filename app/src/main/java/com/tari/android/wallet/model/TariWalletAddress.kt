@@ -34,12 +34,10 @@ package com.tari.android.wallet.model
 
 import android.os.Parcelable
 import com.tari.android.wallet.extension.flag
-import com.tari.android.wallet.ffi.Base58
 import com.tari.android.wallet.ffi.Base58String
 import com.tari.android.wallet.ffi.FFIException
 import com.tari.android.wallet.ffi.FFITariWalletAddress
 import com.tari.android.wallet.ffi.runWithDestroy
-import com.tari.android.wallet.util.EmojiId
 import com.tari.android.wallet.util.tariEmoji
 import kotlinx.parcelize.Parcelize
 

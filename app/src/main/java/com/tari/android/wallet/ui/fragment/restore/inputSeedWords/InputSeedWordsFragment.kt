@@ -84,7 +84,7 @@ class InputSeedWordsFragment : CommonFragment<FragmentWalletInputSeedWordsBindin
         }
         chooseBaseNodeButton.setVisible(DebugConfig.selectBaseNodeEnabled && DebugConfig.hardcodedBaseNodes)
         chooseCustomBaseNodeButton.setVisible(DebugConfig.selectBaseNodeEnabled && !DebugConfig.hardcodedBaseNodes)
-        chooseBaseNodeButton.setOnClickListener { viewModel.navigation.postValue(Navigation.InputSeedWordsNavigation.ToBaseNodeSelection) }
+        chooseBaseNodeButton.setOnClickListener { viewModel.tariNavigator.navigate(Navigation.InputSeedWords.ToBaseNodeSelection) }
         chooseCustomBaseNodeButton.setOnClickListener { viewModel.chooseCustomBaseNodeClick() }
         suggestionsAdapter.setClickListener(CommonAdapter.ItemClickListener { viewModel.selectSuggestion(it) })
         suggestions.adapter = suggestionsAdapter

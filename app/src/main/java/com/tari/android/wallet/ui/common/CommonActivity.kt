@@ -1,6 +1,5 @@
 package com.tari.android.wallet.ui.common
 
-import android.app.Activity
 import android.app.Activity.ScreenCaptureCallback
 import android.content.Intent
 import android.content.res.Configuration.UI_MODE_NIGHT_MASK
@@ -85,8 +84,6 @@ abstract class CommonActivity<Binding : ViewBinding, VM : CommonViewModel> : App
 
         observe(showToast) { TariToast(this@CommonActivity, it) }
 
-        observe(navigation) { commonViewModel.tariNavigator.navigate(it) }
-
         observe(permissionManager.checkForPermission) {
             launcher.launch(it.toTypedArray())
         }
@@ -127,18 +124,10 @@ abstract class CommonActivity<Binding : ViewBinding, VM : CommonViewModel> : App
         screenCaptureCallback?.let { registerScreenCaptureCallback(mainExecutor, it) }
     }
 
-    fun <T : Activity> launch(destination: Class<T>) {
-        val intent = Intent(this, destination)
-        intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
-        this.intent.data?.let(intent::setData)
-        startActivity(intent)
-        finish()
-    }
-
     override fun onResume() {
         super.onResume()
 
-        viewModel.tariNavigator.activity = this@CommonActivity
+        viewModel.tariNavigator.currentActivity = this@CommonActivity
 
         if (viewModel.tariSettingsSharedRepository.currentTheme != viewModel.currentTheme.value) {
             recreate()

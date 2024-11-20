@@ -2,8 +2,8 @@ package com.tari.android.wallet.ui.fragment.settings.backup.verifySeedPhrase
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.navigation.Navigation
+import com.tari.android.wallet.ui.common.CommonViewModel
 
 class VerifySeedPhraseViewModel : CommonViewModel() {
 
@@ -50,6 +50,6 @@ class VerifySeedPhraseViewModel : CommonViewModel() {
 
     fun verify() {
         tariSettingsSharedRepository.hasVerifiedSeedWords = true
-        navigation.postValue(Navigation.VerifySeedPhraseNavigation.ToSeedPhraseVerificationComplete)
+        tariNavigator.navigate(Navigation.AllSettings.BackToBackupSettings)
     }
 }

@@ -1,7 +1,7 @@
 package com.tari.android.wallet.ui.fragment.profile
 
 import com.tari.android.wallet.model.TariWalletAddress
-import com.tari.android.wallet.util.EmojiId
+import com.tari.android.wallet.model.EmojiId
 
 object WalletInfoModel {
     data class UiState(

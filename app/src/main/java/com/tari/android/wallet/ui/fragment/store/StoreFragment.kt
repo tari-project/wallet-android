@@ -54,6 +54,7 @@ import com.tari.android.wallet.ui.component.tari.toast.TariToast
 import com.tari.android.wallet.ui.component.tari.toast.TariToastArgs
 import com.tari.android.wallet.ui.component.tari.toolbar.TariToolbarActionArg
 import com.tari.android.wallet.ui.extension.gone
+import com.tari.android.wallet.ui.extension.removeListenersAndCancel
 import com.tari.android.wallet.ui.extension.string
 import com.tari.android.wallet.ui.fragment.store.EventsPropagatingWebViewClient.ExternalSiteOverride
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -185,7 +186,7 @@ class StoreFragment : Fragment() {
                 })
 
         fun dispose() {
-            this.state.animator?.cancel()
+            this.state.animator?.removeListenersAndCancel()
         }
 
         private companion object {
@@ -201,8 +202,6 @@ class StoreFragment : Fragment() {
     private enum class TranslationDirection { UP, DOWN }
 
     companion object {
-        @Suppress("DEPRECATION")
         fun newInstance() = StoreFragment()
     }
-
 }

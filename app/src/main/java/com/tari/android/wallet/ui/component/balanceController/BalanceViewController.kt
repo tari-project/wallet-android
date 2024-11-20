@@ -161,4 +161,8 @@ class BalanceViewController(
                 }
             }
         }
+
+    fun onDestroy() {
+        viewHolders.forEach { it.onDestroy() }
+    }
 }

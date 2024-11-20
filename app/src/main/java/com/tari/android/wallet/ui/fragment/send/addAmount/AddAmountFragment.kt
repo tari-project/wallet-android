@@ -60,7 +60,6 @@ import com.tari.android.wallet.model.BalanceInfo
 import com.tari.android.wallet.model.MicroTari
 import com.tari.android.wallet.model.TariWalletAddress
 import com.tari.android.wallet.model.WalletError
-import com.tari.android.wallet.navigation.Navigation
 import com.tari.android.wallet.navigation.TariNavigator.Companion.PARAMETER_AMOUNT
 import com.tari.android.wallet.navigation.TariNavigator.Companion.PARAMETER_CONTACT
 import com.tari.android.wallet.navigation.TariNavigator.Companion.PARAMETER_NOTE
@@ -114,6 +113,11 @@ class AddAmountFragment : CommonFragment<FragmentAddAmountBinding, AddAmountView
 
         isFirstLaunch = savedInstanceState == null
         ui.modifyButton.setOnClickListener { viewModel.showFeeDialog() }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        keyboardController.onDestroy()
     }
 
     private fun subscribeVM() = with(viewModel) {
@@ -262,7 +266,7 @@ class AddAmountFragment : CommonFragment<FragmentAddAmountBinding, AddAmountView
     }
 
     private fun actualBalanceExceeded() {
-        viewModel.navigation.postValue(Navigation.AddAmountNavigation.OnAmountExceedsActualAvailableBalance)
+        viewModel.showAmountExceededError()
         ui.continueButton.isClickable = true
     }
 
@@ -276,7 +280,7 @@ class AddAmountFragment : CommonFragment<FragmentAddAmountBinding, AddAmountView
             isOneSidePayment = isOneSidePayment,
         )
 
-        viewModel.navigation.postValue(Navigation.AddAmountNavigation.ContinueToAddNote(transactionData))
+        viewModel.continueToAddNote(transactionData)
     }
 
     /**
@@ -337,7 +341,7 @@ class AddAmountFragment : CommonFragment<FragmentAddAmountBinding, AddAmountView
                 txFeeContainerView.visible()
             }
 
-            ValueAnimator.ofFloat(0f, 1f).apply {
+            animations += ValueAnimator.ofFloat(0f, 1f).apply {
                 addUpdateListener { valueAnimator: ValueAnimator ->
                     val value = valueAnimator.animatedValue as Float
 

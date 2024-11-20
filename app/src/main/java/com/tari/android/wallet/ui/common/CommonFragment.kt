@@ -1,5 +1,6 @@
 package com.tari.android.wallet.ui.common
 
+import android.animation.Animator
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Intent
@@ -25,6 +26,7 @@ import com.tari.android.wallet.ui.component.tari.toast.TariToast
 import com.tari.android.wallet.ui.component.tari.toast.TariToastArgs
 import com.tari.android.wallet.ui.dialog.modular.InputModularDialog
 import com.tari.android.wallet.ui.dialog.modular.ModularDialog
+import com.tari.android.wallet.ui.extension.removeListenersAndCancel
 import com.tari.android.wallet.ui.extension.string
 
 abstract class CommonFragment<Binding : ViewBinding, VM : CommonViewModel> : Fragment(), FragmentPoppedListener {
@@ -37,7 +39,10 @@ abstract class CommonFragment<Binding : ViewBinding, VM : CommonViewModel> : Fra
 
     lateinit var viewModel: VM
 
-    private var dialogManager: DialogManager? = null
+    protected val dialogHandler: DialogHandler
+        get() = viewModel
+
+    protected val animations = mutableListOf<Animator>()
 
     //TODO make viewModel not lateinit. Sometimes it's not initialized in time and causes crashes, so we need to check if it's initialized
     private val blockScreenRecording
@@ -91,6 +96,13 @@ abstract class CommonFragment<Binding : ViewBinding, VM : CommonViewModel> : Fra
         dialogManager = viewModel.dialogManager
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+
+        animations.forEach { it.removeListenersAndCancel() }
+        animations.clear()
+    }
+
     override fun onDetach() {
         super.onDetach()
 
@@ -122,8 +134,6 @@ abstract class CommonFragment<Binding : ViewBinding, VM : CommonViewModel> : Fra
         observe(blockedBackPressed) {
             blockingBackPressDispatcher.isEnabled = it
         }
-
-        observe(navigation) { viewModel.tariNavigator.navigate(it) }
 
         observe(permissionManager.checkForPermission) {
             launcher.launch(it.toTypedArray())

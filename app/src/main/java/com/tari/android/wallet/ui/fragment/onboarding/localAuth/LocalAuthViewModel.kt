@@ -54,7 +54,7 @@ class LocalAuthViewModel : CommonViewModel() {
                 securityPrefRepository.isAuthenticated = true
                 sharedPrefsRepository.onboardingAuthSetupCompleted = true
                 backupManager.backupNow()
-                tariNavigator.navigate(Navigation.EnterPinCodeNavigation(PinCodeScreenBehavior.CreateConfirm))
+                tariNavigator.navigate(Navigation.EnterPinCode(PinCodeScreenBehavior.CreateConfirm))
                 launchOnMain {
                     _effect.send(Effect.OnAuthSuccess)
                 }
@@ -63,7 +63,7 @@ class LocalAuthViewModel : CommonViewModel() {
     }
 
     fun goToEnterPinCode() {
-        tariNavigator.navigate(Navigation.EnterPinCodeNavigation(PinCodeScreenBehavior.Create))
+        tariNavigator.navigate(Navigation.EnterPinCode(PinCodeScreenBehavior.Create))
     }
 
     private fun updateState() {

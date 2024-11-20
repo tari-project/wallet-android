@@ -8,6 +8,8 @@ import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodeDto
 import com.tari.android.wallet.data.sharedPrefs.tor.TorPrefRepository
 import com.tari.android.wallet.di.ApplicationScope
 import com.tari.android.wallet.model.TariWalletAddress
+import com.tari.android.wallet.navigation.Navigation
+import com.tari.android.wallet.navigation.TariNavigator
 import com.tari.android.wallet.ui.common.DialogManager
 import com.tari.android.wallet.ui.common.domain.ResourceManager
 import com.tari.android.wallet.ui.dialog.confirm.ConfirmDialogArgs
@@ -22,8 +24,6 @@ import com.tari.android.wallet.ui.dialog.modular.modules.input.InputModule
 import com.tari.android.wallet.ui.fragment.contactBook.data.ContactsRepository
 import com.tari.android.wallet.ui.fragment.contactBook.data.contacts.ContactDto
 import com.tari.android.wallet.ui.fragment.contactBook.data.contacts.FFIContactInfo
-import com.tari.android.wallet.navigation.Navigation
-import com.tari.android.wallet.navigation.TariNavigator
 import com.tari.android.wallet.util.DebugConfig
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -261,7 +261,14 @@ class DeeplinkManager @Inject constructor(
     }
 
     private fun sendAction(deeplink: DeepLink.Send) {
-        navigator.navigate(Navigation.TxListNavigation.ToSendWithDeeplink(deeplink))
+        walletManager.walletInstance?.getWalletAddress()
+        val address = TariWalletAddress.fromBase58(deeplink.walletAddress)
+        val contact = contactRepository.getContactByAddress(address)
+
+        navigator.navigateSequence(
+            Navigation.BackToHome,
+            Navigation.TxList.ToSendTariToUser(contact, deeplink.amount, deeplink.note),
+        )
     }
 
     private fun addBaseNodeAction(context: Activity, baseNodeDto: BaseNodeDto) {
@@ -275,10 +282,10 @@ class DeeplinkManager @Inject constructor(
     }
 
     private fun goToBackupAction() {
-        navigator.let {
-            it.toAllSettings()
-            it.toBackupSettings(true)
-        }
+        navigator.navigateSequence(
+            Navigation.TxList.ToAllSettings,
+            Navigation.AllSettings.ToBackupSettings(true),
+        )
     }
 
     private fun replaceWalletAction(seedWords: List<String>) {

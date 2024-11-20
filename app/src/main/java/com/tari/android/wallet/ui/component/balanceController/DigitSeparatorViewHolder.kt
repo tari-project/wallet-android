@@ -32,7 +32,7 @@ class DigitSeparatorViewHolder(context: Context, separator: String) : BalanceDig
 
     override fun expand(delayMs: Long, animatorListener: Animator.AnimatorListener?) {
         val width = separatorTextView.measuredWidth
-        ValueAnimator.ofFloat(0f, 1f).apply {
+        animations += ValueAnimator.ofFloat(0f, 1f).apply {
             addUpdateListener { valueAnimator: ValueAnimator ->
                 val animValue = valueAnimator.animatedValue as Float
                 view.setLayoutWidth((width * animValue).toInt())
@@ -50,7 +50,7 @@ class DigitSeparatorViewHolder(context: Context, separator: String) : BalanceDig
     override fun reveal(delayMs: Long) {
         separatorTextView.setTopMargin(view.dimenPx(R.dimen.home_balance_digit_height))
         separatorTextView.setWidthToMeasured()
-        ValueAnimator.ofInt(view.dimenPx(R.dimen.home_balance_digit_height), 0).apply {
+        animations += ValueAnimator.ofInt(view.dimenPx(R.dimen.home_balance_digit_height), 0).apply {
             addUpdateListener { valueAnimator: ValueAnimator ->
                 val topMargin = valueAnimator.animatedValue as Int
                 separatorTextView.setTopMargin(topMargin)
@@ -64,7 +64,7 @@ class DigitSeparatorViewHolder(context: Context, separator: String) : BalanceDig
     }
 
     override fun remove(delayMs: Long, animatorListener: Animator.AnimatorListener?) {
-        ValueAnimator.ofFloat(1f, 0f).apply {
+        animations += ValueAnimator.ofFloat(1f, 0f).apply {
             addUpdateListener { valueAnimator: ValueAnimator ->
                 val animValue = valueAnimator.animatedValue as Float
                 separatorTextView.alpha = animValue

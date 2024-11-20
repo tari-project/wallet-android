@@ -34,7 +34,7 @@ package com.tari.android.wallet.application.deeplinks
 
 import android.os.Parcelable
 import com.tari.android.wallet.data.sharedPrefs.tor.TorBridgeConfiguration
-import com.tari.android.wallet.ffi.Base58
+import com.tari.android.wallet.model.Base58
 import com.tari.android.wallet.ffi.FFISeedWords
 import com.tari.android.wallet.ffi.runWithDestroy
 import com.tari.android.wallet.model.MicroTari

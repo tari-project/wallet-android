@@ -37,7 +37,7 @@ import com.tari.android.wallet.ui.fragment.contactBook.data.contacts.splitAlias
 import com.tari.android.wallet.ui.fragment.contactBook.root.ShareViewModel
 import com.tari.android.wallet.navigation.Navigation
 import com.tari.android.wallet.util.Constants
-import com.tari.android.wallet.util.EmojiId
+import com.tari.android.wallet.model.EmojiId
 import com.tari.android.wallet.util.EmojiUtil.Companion.getGraphemeLength
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -187,7 +187,7 @@ class ContactSelectionViewModel : CommonViewModel() {
                     launchOnIo {
                         contactsRepository.updateContactInfo(user, firstName, lastName, "")
                         launchOnMain {
-                            navigation.postValue(Navigation.ContactBookNavigation.BackToContactBook)
+                            tariNavigator.navigate(Navigation.ContactBook.BackToContactBook)
                         }
                     }
                 }
@@ -195,7 +195,7 @@ class ContactSelectionViewModel : CommonViewModel() {
 
             is ContinueButtonEffect.SelectUserContact -> {
                 val user = getUserDto()
-                navigation.postValue(Navigation.TxListNavigation.ToSendTariToUser(user, amount.value))
+                tariNavigator.navigate(Navigation.TxList.ToSendTariToUser(user, amount.value))
             }
 
             is ContinueButtonEffect.AddChat -> {
@@ -203,7 +203,7 @@ class ContactSelectionViewModel : CommonViewModel() {
                 val chatDto = ChatItemDto(UUID.randomUUID().toString(), listOf(), user.getFFIContactInfo()!!.walletAddress)
                 chatsRepository.addChat(chatDto)
 
-                navigation.postValue(Navigation.ChatNavigation.ToChat(user.getFFIContactInfo()?.walletAddress!!, true))
+                tariNavigator.navigate(Navigation.Chat.ToChat(user.getFFIContactInfo()?.walletAddress!!, true))
             }
         }
     }

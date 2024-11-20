@@ -82,7 +82,7 @@ class TorBridgesSelectionViewModel : CommonViewModel() {
     fun preselect(torBridgeItem: TorBridgeViewHolderItem) {
         val list = _torBridges.value.orEmpty()
         when (torBridgeItem) {
-            is TorBridgeViewHolderItem.CustomBridges -> navigation.postValue(Navigation.TorBridgeNavigation.ToCustomBridges)
+            is TorBridgeViewHolderItem.CustomBridges -> tariNavigator.navigate(Navigation.TorBridge.ToCustomBridges)
             is TorBridgeViewHolderItem.Empty -> {
                 list.forEach { it.isSelected = false }
                 torBridgeItem.isSelected = true

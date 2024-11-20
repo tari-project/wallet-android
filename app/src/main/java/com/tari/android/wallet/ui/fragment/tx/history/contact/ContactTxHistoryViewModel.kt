@@ -56,11 +56,11 @@ class ContactTxHistoryViewModel(savedState: SavedStateHandle) : CommonViewModel(
     }
 
     fun onSendTariClick() {
-        tariNavigator.navigate(Navigation.TxListNavigation.ToSendTariToUser(uiState.value.selectedContact))
+        tariNavigator.navigate(Navigation.TxList.ToSendTariToUser(uiState.value.selectedContact))
     }
 
     fun onTransactionClick(tx: Tx) {
-        tariNavigator.navigate(Navigation.TxListNavigation.ToTxDetails(tx))
+        tariNavigator.navigate(Navigation.TxList.ToTxDetails(tx))
     }
 }
 

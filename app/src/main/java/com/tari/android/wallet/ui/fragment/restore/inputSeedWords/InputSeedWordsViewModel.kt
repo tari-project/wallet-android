@@ -132,7 +132,7 @@ class InputSeedWordsViewModel() : CommonViewModel() {
 
         launchOnIo {
             walletManager.doOnWalletRunning {
-                tariNavigator.navigate(Navigation.InputSeedWordsNavigation.ToRestoreFromSeeds)
+                tariNavigator.navigate(Navigation.InputSeedWords.ToRestoreFromSeeds)
                 _inProgress.postValue(false)
             }
         }

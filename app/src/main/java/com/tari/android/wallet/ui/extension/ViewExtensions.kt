@@ -32,19 +32,26 @@
  */
 package com.tari.android.wallet.ui.extension
 
+import android.animation.Animator
 import android.animation.AnimatorSet
 import android.animation.ValueAnimator
-import android.app.Activity
 import android.content.Context
 import android.content.res.TypedArray
 import android.graphics.drawable.Drawable
 import android.util.AttributeSet
 import android.util.TypedValue
-import android.view.*
+import android.view.View
+import android.view.ViewGroup
+import android.view.ViewTreeObserver
 import android.view.animation.AccelerateInterpolator
 import android.view.animation.DecelerateInterpolator
-import android.widget.*
-import androidx.annotation.*
+import android.widget.ProgressBar
+import android.widget.ScrollView
+import android.widget.TextView
+import androidx.annotation.ColorRes
+import androidx.annotation.DimenRes
+import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
 import androidx.appcompat.widget.AppCompatEditText
 import androidx.core.animation.addListener
 import androidx.core.graphics.BlendModeColorFilterCompat
@@ -54,11 +61,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.airbnb.lottie.LottieAnimationView
 import com.tari.android.wallet.R
-import com.tari.android.wallet.ui.dialog.modular.*
-import com.tari.android.wallet.ui.dialog.modular.modules.body.BodyModule
-import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonModule
-import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonStyle
-import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
+import com.tari.android.wallet.extension.safeCastTo
 import com.tari.android.wallet.util.Constants
 import timber.log.Timber
 import java.lang.ref.WeakReference
@@ -85,20 +88,6 @@ fun View.gone() {
 
 fun View.setVisible(visible: Boolean, hideState: Int = View.GONE) {
     visibility = if (visible) View.VISIBLE else hideState
-}
-
-/**
- * Given the context, displays the standard "no internet connection" dialog.
- */
-fun showInternetConnectionErrorDialog(context: Activity) {
-    val args = ModularDialogArgs(
-        DialogArgs(), listOf(
-            HeadModule(context.string(R.string.internet_connection_error_dialog_title)),
-            BodyModule(context.string(R.string.internet_connection_error_dialog_description)),
-            ButtonModule(context.string(R.string.common_close), ButtonStyle.Close)
-        )
-    )
-    ModularDialog(context, args).show()
 }
 
 /**
@@ -313,7 +302,8 @@ private class ClickEnablingRunnable(view: View) : Runnable {
     }
 }
 
-fun View.animateClick(onEnd: (android.animation.Animator) -> Unit = {}) {
+// TODO we don't stop the animation when the view is detached from window. May cause memory leaks.
+fun View.animateClick(onEnd: (Animator) -> Unit = {}) {
     val scaleDownBtnAnim = ValueAnimator.ofFloat(
         Constants.UI.Button.clickScaleAnimFullScale,
         Constants.UI.Button.clickScaleAnimSmallScale
@@ -373,4 +363,10 @@ fun Context.colorFromAttribute(attribute: Int): Int {
     val dimension = attributes.getColor(0, 0)
     attributes.recycle()
     return dimension
+}
+
+fun Animator.removeListenersAndCancel() {
+    this.safeCastTo<ValueAnimator>()?.removeAllUpdateListeners()
+    removeAllListeners()
+    cancel()
 }

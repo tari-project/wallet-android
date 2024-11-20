@@ -2,7 +2,7 @@ package com.tari.android.wallet.ui.fragment.home.overview
 
 import com.tari.android.wallet.model.BalanceInfo
 import com.tari.android.wallet.ui.fragment.tx.adapter.TxViewHolderItem
-import com.tari.android.wallet.util.EmojiId
+import com.tari.android.wallet.model.EmojiId
 
 class HomeOverviewModel {
     data class UiState(

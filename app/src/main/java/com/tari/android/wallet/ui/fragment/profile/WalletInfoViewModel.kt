@@ -167,6 +167,6 @@ class WalletInfoViewModel : CommonViewModel() {
     )
 
     fun onOpenWalletClicked() {
-        tariNavigator.navigate(Navigation.TxListNavigation.ToUtxos)
+        tariNavigator.navigate(Navigation.TxList.ToUtxos)
     }
 }

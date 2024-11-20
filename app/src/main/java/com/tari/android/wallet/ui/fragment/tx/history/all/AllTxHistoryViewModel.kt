@@ -70,10 +70,10 @@ class AllTxHistoryViewModel : CommonViewModel() {
     }
 
     fun onTransactionClick(tx: Tx) {
-        tariNavigator.navigate(Navigation.TxListNavigation.ToTxDetails(tx))
+        tariNavigator.navigate(Navigation.TxList.ToTxDetails(tx))
     }
 
     fun onRequestTariClick() {
-        tariNavigator.navigate(Navigation.AllSettingsNavigation.ToRequestTari)
+        tariNavigator.navigate(Navigation.AllSettings.ToRequestTari)
     }
 }

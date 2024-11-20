@@ -5,9 +5,9 @@ import androidx.lifecycle.map
 import com.tari.android.wallet.R
 import com.tari.android.wallet.data.sharedPrefs.security.LoginAttemptDto
 import com.tari.android.wallet.extension.addTo
+import com.tari.android.wallet.navigation.Navigation
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.common.SingleLiveEvent
-import com.tari.android.wallet.navigation.Navigation
 import java.time.LocalDateTime
 import java.time.OffsetDateTime
 
@@ -115,7 +115,7 @@ class EnterPinCodeViewModel : CommonViewModel() {
     }
 
     private fun createPinCode() {
-        navigation.postValue(Navigation.EnterPinCodeNavigation(PinCodeScreenBehavior.CreateConfirm, currentNums.value))
+        tariNavigator.navigate(Navigation.EnterPinCode(PinCodeScreenBehavior.CreateConfirm, currentNums.value))
     }
 
     private fun createPinCodeConfirm() {
@@ -124,11 +124,11 @@ class EnterPinCodeViewModel : CommonViewModel() {
             return
         }
         securityPrefRepository.pinCode = currentNums.value.orEmpty()
-        tariNavigator.backAfterAuth()
+        tariNavigator.navigate(Navigation.Auth.BackAfterAuth)
     }
 
     private fun changeNewPinCode() {
-        navigation.postValue(Navigation.EnterPinCodeNavigation(PinCodeScreenBehavior.ChangeNewConfirm, currentNums.value))
+        tariNavigator.navigate(Navigation.EnterPinCode(PinCodeScreenBehavior.ChangeNewConfirm, currentNums.value))
     }
 
     private fun changeNewPinCodeConfirm() {
@@ -137,7 +137,7 @@ class EnterPinCodeViewModel : CommonViewModel() {
             return
         }
         securityPrefRepository.pinCode = currentNums.value.orEmpty()
-        tariNavigator.backAfterAuth()
+        tariNavigator.navigate(Navigation.Auth.BackAfterAuth)
     }
 
     private fun authPinCode() {
