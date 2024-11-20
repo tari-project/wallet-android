@@ -855,6 +855,7 @@
     <string name="contact_book_contacts_book_link_empty_state_no_contacts">Looks like you don’t have any contacts that we can link to yet. Once you’ve added a contact, you’ll be able to link to their profile.</string>
     <string name="contact_book_contacts_book_link_empty_state_empty_book">Looks like your phone’s contact book is empty. Once you’ve added a contact, you’ll be able to link to their profile.</string>
     <string name="contact_book_contacts_book_link_empty_state_no_access">Aurora doesn’t currently have permission to access your phone’s contacts. If you would like to link to an existing contact, please click below and grant permission to the app to read from your contact book.</string>
+    <string name="contact_book_contacts_book_link_empty_state_error">An error occurred while trying to access your phone’s contacts. Please try again later.</string>
     <string name="contact_book_contacts_book_link_empty_state_add_contact">Add a contact</string>
     <string name="contact_book_contacts_book_link_empty_state_go_to_permission_settings">Go to permission settings</string>
     <string name="contact_book_contacts_book_link_message_firstLine"><![CDATA[Click "confirm" below to link]]></string>
