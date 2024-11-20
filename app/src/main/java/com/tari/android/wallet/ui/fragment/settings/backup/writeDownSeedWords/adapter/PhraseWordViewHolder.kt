@@ -17,6 +17,7 @@ class PhraseWordViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
     private val indexTV: TextView = itemView.findViewById(R.id.word_position_text_view)
     private val contentTV: TextView = itemView.findViewById(R.id.word_content_text_view)
 
+    // TODO we don't store animation, so we can't cancel it. May cause memory leaks
     fun bind(index: Int, word: String, isExpanded: Boolean = true) {
         val text = (index + 1).toString()
         indexTV.text = text
@@ -24,7 +25,7 @@ class PhraseWordViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
         val d = if (isExpanded) R.dimen.write_down_seed_phrase_list_expanded_decoration else R.dimen.write_down_seed_phrase_list_collapsed_decoration
         val margin = itemView.context.dimen(d)
-        if(margin == itemView.marginTop.toFloat()) return
+        if (margin == itemView.marginTop.toFloat()) return
         ValueAnimator.ofFloat(itemView.marginTop.toFloat(), margin).apply {
             duration = Constants.UI.longDurationMs
             addUpdateListener {

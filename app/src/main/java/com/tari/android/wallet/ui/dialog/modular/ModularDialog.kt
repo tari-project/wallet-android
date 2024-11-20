@@ -71,6 +71,7 @@ open class ModularDialog(context: Activity) {
 
     lateinit var args: ModularDialogArgs
 
+    // TODO we never clear listeners nor stop animations. May cause memory leaks.
     private val onDismissListeners = mutableListOf<() -> Unit>()
 
     constructor(context: Activity, args: ModularDialogArgs) : this(context) {

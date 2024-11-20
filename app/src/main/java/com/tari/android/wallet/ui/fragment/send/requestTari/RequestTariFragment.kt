@@ -50,6 +50,11 @@ class RequestTariFragment : CommonFragment<FragmentRequestTariBinding, RequestTa
         requireActivity().hideKeyboard()
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        keyboardController.onDestroy()
+    }
+
     private fun subscribeUI() = Unit
 
     private fun setupUI() {

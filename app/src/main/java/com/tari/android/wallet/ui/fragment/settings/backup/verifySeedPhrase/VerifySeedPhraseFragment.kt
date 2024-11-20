@@ -94,13 +94,14 @@ class VerifySeedPhraseFragment : CommonFragment<FragmentVerifySeedPhraseBinding,
                 isEnabled = !selected
                 setOnClickListener { view ->
                     view.isEnabled = false
-                    ValueAnimator.ofFloat(1F, 0F).apply {
+                    animations += ValueAnimator.ofFloat(1F, 0F).apply {
                         addUpdateListener { view.alpha = it.animatedValue as Float }
                         addListener(onEnd = {
                             view.gone()
                             viewModel.selectWord(iv.index)
                         })
-                    }.start()
+                        start()
+                    }
                 }
                 this@VerifySeedPhraseFragment.ui.selectableWordsFlexboxLayout.addView(this)
             }
@@ -121,7 +122,7 @@ class VerifySeedPhraseFragment : CommonFragment<FragmentVerifySeedPhraseBinding,
                 view.isEnabled = false
                 val selectableWordView = this@VerifySeedPhraseFragment.ui.selectableWordsFlexboxLayout[index]
                 selectableWordView.visible()
-                ValueAnimator.ofFloat(1F, 0F).apply {
+                animations += ValueAnimator.ofFloat(1F, 0F).apply {
                     addUpdateListener {
                         val value = it.animatedValue as Float
                         view.alpha = value
@@ -139,7 +140,8 @@ class VerifySeedPhraseFragment : CommonFragment<FragmentVerifySeedPhraseBinding,
                             view.gone()
                             viewModel.unselectWord(index)
                         })
-                }.start()
+                    start()
+                }
             }
             this@VerifySeedPhraseFragment.ui.selectedWordsFlexboxLayout.addView(this)
         }

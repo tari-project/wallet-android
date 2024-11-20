@@ -32,6 +32,7 @@
  */
 package com.tari.android.wallet.ui.component.clipboardController
 
+import android.animation.Animator
 import android.animation.AnimatorSet
 import android.animation.LayoutTransition
 import android.animation.ValueAnimator
@@ -48,6 +49,7 @@ import com.tari.android.wallet.ui.common.domain.PaletteManager
 import com.tari.android.wallet.ui.extension.dimenPx
 import com.tari.android.wallet.ui.extension.gone
 import com.tari.android.wallet.ui.extension.hideKeyboard
+import com.tari.android.wallet.ui.extension.removeListenersAndCancel
 import com.tari.android.wallet.ui.extension.setBottomMargin
 import com.tari.android.wallet.ui.extension.setTopMargin
 import com.tari.android.wallet.ui.extension.string
@@ -73,6 +75,7 @@ class ClipboardController(
 
     var listener: ClipboardControllerListener? = null
 
+    private val animations = mutableListOf<Animator>()
 
     private val dimmerViews
         get() = arrayOf(ui.bottomDimmerView) + localDimmers
@@ -96,6 +99,11 @@ class ClipboardController(
             showPasteEmojiIdViews(data.fullEmojiId)
             listener?.focusOnEditText(true)
         }, 100)
+    }
+
+    fun onDestroy() {
+        animations.forEach { it.removeListenersAndCancel() }
+        animations.clear()
     }
 
     /**
@@ -124,7 +132,7 @@ class ClipboardController(
             }
             interpolator = EasingInterpolator(Ease.EASE_IN_OUT_EXPO)
             duration = Constants.UI.mediumDurationMs
-        }
+        }.also { animations.add(it) }
 
 
         // animate and show paste emoji id button
@@ -140,9 +148,9 @@ class ClipboardController(
             addListener(onStart = { ui.pasteEmojiIdContainerView.visible() })
             interpolator = EasingInterpolator(Ease.BACK_OUT)
             duration = Constants.UI.shortDurationMs
-        }
+        }.also { animations.add(it) }
 
-        AnimatorSet().apply {
+        animations += AnimatorSet().apply {
             playSequentially(emojiIdAppearAnim, pasteButtonAppearAnim)
             startDelay = Constants.UI.xShortDurationMs
             start()
@@ -185,7 +193,8 @@ class ClipboardController(
             }
             addListener(onEnd = { ui.pasteEmojiIdContainerView.gone() })
             duration = Constants.UI.shortDurationMs
-        }
+        }.also { animations.add(it) }
+
         // animate and hide emoji id & dimmers
         val emojiIdDisappearAnim = ValueAnimator.ofFloat(0f, 1f).apply {
             addUpdateListener { valueAnimator: ValueAnimator ->
@@ -198,7 +207,7 @@ class ClipboardController(
                 dimmerViews.forEach { it.gone() }
             })
             duration = Constants.UI.shortDurationMs
-        }
+        }.also { animations.add(it) }
 
         // chain anim.s and start
         val animSet = AnimatorSet()

@@ -115,6 +115,11 @@ class HomeOverviewFragment : CommonFragment<FragmentHomeOverviewBinding, HomeOve
         viewModel.grantContactsPermission()
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        balanceViewController?.onDestroy()
+    }
+
     @SuppressLint("ClickableViewAccessibility")
     private fun setupUI() = with(ui) {
         viewAllTxsButton.setOnClickListener { viewModel.tariNavigator.navigate(Navigation.TxList.HomeTransactionHistory) }

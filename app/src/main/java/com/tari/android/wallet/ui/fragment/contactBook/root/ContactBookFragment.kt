@@ -19,6 +19,7 @@ import com.tari.android.wallet.application.deeplinks.DeepLink
 import com.tari.android.wallet.databinding.FragmentContactBookRootBinding
 import com.tari.android.wallet.extension.observe
 import com.tari.android.wallet.model.TariWalletAddress
+import com.tari.android.wallet.navigation.Navigation
 import com.tari.android.wallet.ui.common.CommonFragment
 import com.tari.android.wallet.ui.component.clipboardController.ClipboardController
 import com.tari.android.wallet.ui.component.tari.toolbar.TariToolbarActionArg
@@ -34,7 +35,6 @@ import com.tari.android.wallet.ui.fragment.contactBook.contacts.FavoritesFragmen
 import com.tari.android.wallet.ui.fragment.contactBook.root.share.ShareOptionArgs
 import com.tari.android.wallet.ui.fragment.contactBook.root.share.ShareOptionView
 import com.tari.android.wallet.ui.fragment.home.HomeActivity
-import com.tari.android.wallet.navigation.Navigation
 import com.tari.android.wallet.ui.fragment.qr.QrScannerActivity
 import com.tari.android.wallet.ui.fragment.qr.QrScannerSource
 import com.tari.android.wallet.util.Constants
@@ -65,6 +65,11 @@ class ContactBookFragment : CommonFragment<FragmentContactBookRootBinding, Conta
     override fun onResume() {
         super.onResume()
         viewModel.walletAddressViewModel.tryToCheckClipboard()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        clipboardController.onDestroy()
     }
 
     @Deprecated("Deprecated in Java")

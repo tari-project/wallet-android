@@ -158,7 +158,7 @@ class CreateWalletFragment : OnboardingFlowFragment<FragmentCreateWalletBinding,
     }
 
     private fun playStartupWhiteBgAnimation() {
-        ObjectAnimator.ofFloat(ui.whiteBgView, View.TRANSLATION_Y, -ui.whiteBgView.height.toFloat(), 0f).apply {
+        animations += ObjectAnimator.ofFloat(ui.whiteBgView, View.TRANSLATION_Y, -ui.whiteBgView.height.toFloat(), 0f).apply {
             duration = CreateEmojiId.whiteBgAnimDurationMs
             interpolator = EasingInterpolator(Ease.CIRC_IN_OUT)
             addListener(object : AnimatorListenerAdapter() {
@@ -181,10 +181,12 @@ class CreateWalletFragment : OnboardingFlowFragment<FragmentCreateWalletBinding,
     }
 
     private fun showBottomSpinner() {
-        ObjectAnimator.ofFloat(ui.bottomSpinnerLottieAnimationView, "alpha", 0f, 1f).run {
-            duration = Constants.UI.longDurationMs
-            start()
-        }
+        ObjectAnimator.ofFloat(ui.bottomSpinnerLottieAnimationView, "alpha", 0f, 1f)
+            .also { animations.add(it) }
+            .run {
+                duration = Constants.UI.longDurationMs
+                start()
+            }
     }
 
     private fun showSecondViewByAnim() {
@@ -192,13 +194,13 @@ class CreateWalletFragment : OnboardingFlowFragment<FragmentCreateWalletBinding,
         val titleAnim = ObjectAnimator.ofFloat(ui.justSecTitleTextView, View.TRANSLATION_Y, 0f, offset).apply {
             interpolator = EasingInterpolator(Ease.QUINT_OUT)
             startDelay = CreateEmojiId.titleShortAnimDelayMs
-        }
+        }.also { animations.add(it) }
 
         val descAnim = ObjectAnimator.ofFloat(ui.justSecDescTextView, View.TRANSLATION_Y, 0f, offset).apply {
             interpolator = EasingInterpolator(Ease.QUINT_OUT)
-        }
+        }.also { animations.add(it) }
 
-        AnimatorSet().apply {
+        animations += AnimatorSet().apply {
             playTogether(titleAnim, descAnim)
             duration = CreateEmojiId.helloTextAnimDurationMs
             interpolator = EasingInterpolator(Ease.QUART_OUT)
@@ -229,12 +231,14 @@ class CreateWalletFragment : OnboardingFlowFragment<FragmentCreateWalletBinding,
             }
         })
 
-        ObjectAnimator.ofFloat(ui.bottomSpinnerLottieAnimationView, "alpha", 1f, 0f).run {
-            duration = CreateEmojiId.shortAlphaAnimDuration
-            start()
-        }
+        ObjectAnimator.ofFloat(ui.bottomSpinnerLottieAnimationView, "alpha", 1f, 0f)
+            .also { animations.add(it) }
+            .run {
+                duration = CreateEmojiId.shortAlphaAnimDuration
+                start()
+            }
 
-        ValueAnimator.ofFloat(1f, 0f).apply {
+        animations += ValueAnimator.ofFloat(1f, 0f).apply {
             duration = CreateEmojiId.shortAlphaAnimDuration
             addUpdateListener { valueAnimator: ValueAnimator ->
                 val alpha = valueAnimator.animatedValue as Float
@@ -281,19 +285,19 @@ class CreateWalletFragment : OnboardingFlowFragment<FragmentCreateWalletBinding,
                 ui.createEmojiIdButton.alpha = alpha
                 ui.nerdFaceEmojiLottieAnimationView.alpha = alpha
             }
-        }
+        }.also { animations.add(it) }
 
         val createNowAnim: ObjectAnimator = ObjectAnimator.ofFloat(
             ui.createYourEmojiIdLine2TextView, View.TRANSLATION_Y, 0f, -ui.createYourEmojiIdLine2TextView.height.toFloat()
         ).apply {
             duration = CreateEmojiId.awesomeTextAnimDurationMs
-        }
+        }.also { animations.add(it) }
 
         val awesomeAnim: ObjectAnimator = ObjectAnimator.ofFloat(
             ui.createYourEmojiIdLine1TextView, View.TRANSLATION_Y, 0f, -ui.createYourEmojiIdLine1TextView.height.toFloat()
         ).apply {
             duration = CreateEmojiId.awesomeTextAnimDurationMs
-        }
+        }.also { animations.add(it) }
 
         val buttonInitialBottomMargin = ui.createEmojiIdButton.getBottomMargin()
         val buttonBottomMarginDelta = dimenPx(create_wallet_button_bottom_margin) - buttonInitialBottomMargin
@@ -306,9 +310,9 @@ class CreateWalletFragment : OnboardingFlowFragment<FragmentCreateWalletBinding,
             }
             duration = CreateEmojiId.awesomeTextAnimDurationMs
             startDelay = CreateEmojiId.createEmojiButtonAnimDelayMs
-        }
+        }.also { animations.add(it) }
 
-        AnimatorSet().apply {
+        animations += AnimatorSet().apply {
             playTogether(fadeInAnim, createNowAnim, awesomeAnim, buttonTranslationAnim)
 
             startDelay = CreateEmojiId.viewOverlapDelayMs
@@ -337,7 +341,7 @@ class CreateWalletFragment : OnboardingFlowFragment<FragmentCreateWalletBinding,
     private fun showEmojiWheelAnimation() {
         ui.emojiWheelLottieAnimationView.playAnimation()
 
-        ValueAnimator.ofFloat(1f, 0f).apply {
+        animations += ValueAnimator.ofFloat(1f, 0f).apply {
             addUpdateListener { valueAnimator: ValueAnimator ->
                 val alpha = valueAnimator.animatedValue as Float
                 ui.nerdFaceEmojiLottieAnimationView.alpha = alpha
@@ -374,7 +378,7 @@ class CreateWalletFragment : OnboardingFlowFragment<FragmentCreateWalletBinding,
                 ui.continueButton.alpha = alpha
             }
             duration = CreateEmojiId.continueButtonAnimDurationMs
-        }
+        }.also { animations.add(it) }
 
         ui.emojiIdTextView.isEnabled = false
         ui.emojiIdScrollView.scrollTo(ui.emojiIdTextView.width - ui.emojiIdScrollView.width, 0)
@@ -386,7 +390,7 @@ class CreateWalletFragment : OnboardingFlowFragment<FragmentCreateWalletBinding,
                 ui.emojiIdContainerView.scaleY = scale
             }
             startDelay = CreateEmojiId.emojiIdImageViewAnimDelayMs
-        }
+        }.also { animations.add(it) }
 
         val titleOffset = -(ui.yourEmojiIdTitleContainerView.height).toFloat()
         val yourEmojiTitleAnim = ObjectAnimator.ofFloat(ui.yourEmojiIdTitleContainerView, View.TRANSLATION_Y, 0f, titleOffset).apply {
@@ -399,7 +403,7 @@ class CreateWalletFragment : OnboardingFlowFragment<FragmentCreateWalletBinding,
                     ui.yourEmojiIdTitleContainerView.visible()
                 }
             })
-        }
+        }.also { animations.add(it) }
 
         val fadeInAnim = ValueAnimator.ofFloat(0f, 1f).apply {
             addUpdateListener { valueAnimator: ValueAnimator ->
@@ -409,9 +413,9 @@ class CreateWalletFragment : OnboardingFlowFragment<FragmentCreateWalletBinding,
             }
             startDelay = CreateEmojiId.emojiIdImageViewAnimDelayMs
             duration = CreateEmojiId.continueButtonAnimDurationMs
-        }
+        }.also { animations.add(it) }
 
-        AnimatorSet().apply {
+        animations += AnimatorSet().apply {
             playTogether(
                 buttonFadeInAnim, emojiIdContainerViewScaleAnim, fadeInAnim, yourEmojiTitleAnim
             )
@@ -432,7 +436,7 @@ class CreateWalletFragment : OnboardingFlowFragment<FragmentCreateWalletBinding,
     }
 
     private fun elevateEmojiIdContainerView() {
-        ValueAnimator.ofFloat(0f, 1f).apply {
+        animations += ValueAnimator.ofFloat(0f, 1f).apply {
             addUpdateListener { valueAnimator: ValueAnimator ->
                 val value = valueAnimator.animatedValue as Float
                 ui.emojiIdContainerView.elevation = value * dimen(common_view_elevation)
@@ -454,7 +458,7 @@ class CreateWalletFragment : OnboardingFlowFragment<FragmentCreateWalletBinding,
     private fun showEmojiIdContinueButton() {
         val buttonInitialBottomMargin = ui.continueButton.getBottomMargin()
         val buttonBottomMarginDelta = dimenPx(create_wallet_button_bottom_margin) - buttonInitialBottomMargin
-        ValueAnimator.ofFloat(0f, 1f).apply {
+        animations += ValueAnimator.ofFloat(0f, 1f).apply {
             addUpdateListener { valueAnimator: ValueAnimator ->
                 val value = valueAnimator.animatedValue as Float
                 ui.continueButton.setBottomMargin((buttonInitialBottomMargin + buttonBottomMarginDelta * value).toInt())
@@ -487,7 +491,7 @@ class CreateWalletFragment : OnboardingFlowFragment<FragmentCreateWalletBinding,
         // scroll to end
         ui.emojiIdScrollView.post { ui.emojiIdScrollView.scrollTo(ui.emojiIdTextView.width - ui.emojiIdScrollView.width, 0) }
         // animate full emoji id view
-        ValueAnimator.ofFloat(0f, 1f).apply {
+        animations += ValueAnimator.ofFloat(0f, 1f).apply {
             addUpdateListener { valueAnimator: ValueAnimator ->
                 val value = valueAnimator.animatedValue as Float
                 // container alpha & scale
@@ -526,7 +530,7 @@ class CreateWalletFragment : OnboardingFlowFragment<FragmentCreateWalletBinding,
         val fullEmojiIdInitialWidth = ui.emojiIdContainerView.width
         val fullEmojiIdDeltaWidth = ui.emojiIdSummaryContainerView.width - fullEmojiIdInitialWidth
         // animate full emoji id view
-        ValueAnimator.ofFloat(0f, 1f).apply {
+        animations += ValueAnimator.ofFloat(0f, 1f).apply {
             addUpdateListener { valueAnimator: ValueAnimator ->
                 ensureIsAdded {
                     val value = valueAnimator.animatedValue as Float
@@ -570,7 +574,7 @@ class CreateWalletFragment : OnboardingFlowFragment<FragmentCreateWalletBinding,
             else -> ui.emojiIdSummaryContainerView
         }
 
-        ValueAnimator.ofFloat(1f, 0f).apply {
+        animations += ValueAnimator.ofFloat(1f, 0f).apply {
             addUpdateListener { valueAnimator: ValueAnimator ->
                 val alpha = valueAnimator.animatedValue as Float
                 ui.continueButton.alpha = alpha

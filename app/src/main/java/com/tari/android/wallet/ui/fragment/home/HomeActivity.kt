@@ -335,5 +335,3 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>() {
             private set
     }
 }
-
-

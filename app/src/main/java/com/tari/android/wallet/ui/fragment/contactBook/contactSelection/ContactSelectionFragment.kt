@@ -98,6 +98,11 @@ open class ContactSelectionFragment : CommonFragment<FragmentContactsSelectionBi
         subscribeViewModal()
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        clipboardController.onDestroy()
+    }
+
     open fun goToNext() {
         requireActivity().hideKeyboard(ui.searchEditText)
         ui.searchEditText.clearFocus()
@@ -260,7 +265,7 @@ open class ContactSelectionFragment : CommonFragment<FragmentContactsSelectionBi
 
     private fun animateEmojiIdPaste() {
         // animate text size
-        ValueAnimator.ofFloat(0f, 1f).apply {
+       animations += ValueAnimator.ofFloat(0f, 1f).apply {
             addUpdateListener { valueAnimator: ValueAnimator ->
                 val value = valueAnimator.animatedValue as Float
                 ui.searchEditText.scaleX = value

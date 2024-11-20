@@ -1,5 +1,6 @@
 package com.tari.android.wallet.ui.fragment.send.addAmount.keyboard
 
+import android.animation.Animator
 import android.animation.ValueAnimator
 import android.content.Context
 import android.os.Handler
@@ -19,6 +20,7 @@ import com.tari.android.wallet.ui.extension.dimen
 import com.tari.android.wallet.ui.extension.dimenPx
 import com.tari.android.wallet.ui.extension.getFirstChild
 import com.tari.android.wallet.ui.extension.getLastChild
+import com.tari.android.wallet.ui.extension.removeListenersAndCancel
 import com.tari.android.wallet.ui.extension.setLayoutSize
 import com.tari.android.wallet.ui.extension.setLayoutWidth
 import com.tari.android.wallet.ui.extension.setStartMargin
@@ -75,6 +77,8 @@ class KeyboardController {
 
     private var isFirstLaunch: Boolean = true
 
+    private val animations = mutableListOf<Animator>()
+
     fun setup(
         context: Context,
         amountRunnable: Runnable,
@@ -88,6 +92,11 @@ class KeyboardController {
         this.amountCheckRunnable = amountRunnable
         this.startAmount = startAmount ?: Double.MIN_VALUE
         setupUI()
+    }
+
+    fun onDestroy() {
+        animations.forEach { it.removeListenersAndCancel() }
+        animations.clear()
     }
 
     private fun setupUI() {
@@ -106,7 +115,7 @@ class KeyboardController {
             val handler = Handler(Looper.getMainLooper())
             isFirstLaunch = false
             handler.post {
-                startAmount.toString().withIndex().forEach { (index, char) ->
+                startAmount.toString().forEach { char ->
                     if (Character.isDigit(char)) {
                         onDigitOrSeparatorClicked(char.toString())
                     } else {
@@ -404,7 +413,7 @@ class KeyboardController {
         ghostTextView.alpha = 0f
         (amountInputBinding.root.parent as ViewGroup).addView(ghostTextView)
 
-        val anim = ValueAnimator.ofFloat(0f, 1f)
+        val anim = ValueAnimator.ofFloat(0f, 1f).also { animations.add(it) }
         anim.addUpdateListener { valueAnimator: ValueAnimator ->
             // update text view
             val value = min(1f, valueAnimator.animatedValue as Float)
@@ -455,7 +464,6 @@ class KeyboardController {
         anim.duration = Constants.UI.AddAmount.numPadDigitEnterAnimDurationMs
         anim.interpolator = EasingInterpolator(Ease.SINE_OUT)
         anim.start()
-
     }
 
     private fun deleteButtonClicked() {
@@ -554,7 +562,6 @@ class KeyboardController {
             duration = Constants.UI.shortDurationMs
             interpolator = EasingInterpolator(Ease.CIRC_OUT)
             start()
-        }
+        }.also { animations.add(it) }
     }
 }
-

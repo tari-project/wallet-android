@@ -7,8 +7,8 @@ import kotlinx.coroutines.*
 
 class BottomButtonsController(val ui: FragmentUtxosListBinding, private val fragmentScope: CoroutineScope) {
 
-    var counterToStartAnimation: Job? = null
-    var currentState: JoinSplitButtonsState = JoinSplitButtonsState.None
+    private var counterToStartAnimation: Job? = null
+    private var currentState: JoinSplitButtonsState = JoinSplitButtonsState.None
 
     fun setState(state: JoinSplitButtonsState) {
         if (currentState == state) return
@@ -41,7 +41,7 @@ class BottomButtonsController(val ui: FragmentUtxosListBinding, private val frag
         fragmentScope.launch {
             counterToStartAnimation?.cancelAndJoin()
             counterToStartAnimation = fragmentScope.launch(Dispatchers.IO) {
-                delay(animationDelay)
+                delay(ANIMATION_DELAY)
                 fragmentScope.launch(Dispatchers.Main) {
                     ui.combineButtonText.setVisible(false)
                     ui.combineAndBreakButtonText.setVisible(false)
@@ -51,6 +51,6 @@ class BottomButtonsController(val ui: FragmentUtxosListBinding, private val frag
     }
 
     companion object {
-        const val animationDelay = 3000L
+        const val ANIMATION_DELAY = 3000L
     }
 }

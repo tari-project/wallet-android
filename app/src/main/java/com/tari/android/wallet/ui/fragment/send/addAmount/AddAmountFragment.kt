@@ -115,6 +115,11 @@ class AddAmountFragment : CommonFragment<FragmentAddAmountBinding, AddAmountView
         ui.modifyButton.setOnClickListener { viewModel.showFeeDialog() }
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        keyboardController.onDestroy()
+    }
+
     private fun subscribeVM() = with(viewModel) {
         collectFlow(uiState) { uiState ->
             ui.oneSidePaymentSwitchView.isChecked = uiState.isOneSidedPaymentEnabled || uiState.isOneSidedPaymentForced
@@ -336,7 +341,7 @@ class AddAmountFragment : CommonFragment<FragmentAddAmountBinding, AddAmountView
                 txFeeContainerView.visible()
             }
 
-            ValueAnimator.ofFloat(0f, 1f).apply {
+            animations += ValueAnimator.ofFloat(0f, 1f).apply {
                 addUpdateListener { valueAnimator: ValueAnimator ->
                     val value = valueAnimator.animatedValue as Float
 

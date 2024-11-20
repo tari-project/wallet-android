@@ -10,12 +10,13 @@ import com.daasuu.ei.Ease
 import com.daasuu.ei.EasingInterpolator
 import com.tari.android.wallet.databinding.ViewFinalizingStepBinding
 import com.tari.android.wallet.ui.extension.invisible
+import com.tari.android.wallet.ui.extension.removeListenersAndCancel
 import com.tari.android.wallet.ui.extension.visible
 import com.tari.android.wallet.util.Constants
 
 class FinalizingStepView : FrameLayout {
 
-    var progressAnimationToggleCount = 0
+    private var progressAnimationToggleCount = 0
     var progressAnim: ValueAnimator? = null
 
     lateinit var ui: ViewFinalizingStepBinding
@@ -81,5 +82,10 @@ class FinalizingStepView : FrameLayout {
         } else {
             progressAnim?.removeAllListeners()
         }
+    }
+
+    override fun onDetachedFromWindow() {
+        super.onDetachedFromWindow()
+        progressAnim?.removeListenersAndCancel()
     }
 }

@@ -154,7 +154,7 @@ class FinalizeSendTxFragment : CommonFragment<FragmentFinalizeSendTxBinding, Fin
         alpha = 1f
         visible()
 
-        ObjectAnimator.ofFloat(this, View.TRANSLATION_Y, height.toFloat(), 0f).apply {
+        animations += ObjectAnimator.ofFloat(this, View.TRANSLATION_Y, height.toFloat(), 0f).apply {
             duration = Constants.UI.mediumDurationMs
             interpolator = EasingInterpolator(Ease.QUART_IN_OUT)
             startDelay = Constants.UI.FinalizeSendTx.textAppearAnimStartDelayMs + additionalDelay
@@ -197,7 +197,7 @@ class FinalizeSendTxFragment : CommonFragment<FragmentFinalizeSendTxBinding, Fin
         ui.lottieAnimationView.progress = LOTTIE_ANIMATION_PAUSE_PROGRESS
 
         // fade out text and progress
-        ValueAnimator.ofFloat(1f, 0f).apply {
+        animations += ValueAnimator.ofFloat(1f, 0f).apply {
             addUpdateListener { valueAnimator: ValueAnimator ->
                 val alpha = valueAnimator.animatedValue as Float
                 ui.infoLine1TextView.alpha = alpha
@@ -225,7 +225,7 @@ class FinalizeSendTxFragment : CommonFragment<FragmentFinalizeSendTxBinding, Fin
         ui.lottieAnimationView.progress = LOTTIE_ANIMATION_PAUSE_PROGRESS
 
         // fade out text and progress
-        ValueAnimator.ofFloat(1f, 0f).apply {
+        animations += ValueAnimator.ofFloat(1f, 0f).apply {
             addUpdateListener { valueAnimator: ValueAnimator ->
                 val alpha = valueAnimator.animatedValue as Float
                 ui.infoLine1TextView.alpha = alpha

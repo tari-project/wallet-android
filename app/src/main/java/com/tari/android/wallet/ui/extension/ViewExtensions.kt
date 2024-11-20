@@ -32,6 +32,7 @@
  */
 package com.tari.android.wallet.ui.extension
 
+import android.animation.Animator
 import android.animation.AnimatorSet
 import android.animation.ValueAnimator
 import android.content.Context
@@ -60,6 +61,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.airbnb.lottie.LottieAnimationView
 import com.tari.android.wallet.R
+import com.tari.android.wallet.extension.safeCastTo
 import com.tari.android.wallet.util.Constants
 import timber.log.Timber
 import java.lang.ref.WeakReference
@@ -300,7 +302,8 @@ private class ClickEnablingRunnable(view: View) : Runnable {
     }
 }
 
-fun View.animateClick(onEnd: (android.animation.Animator) -> Unit = {}) {
+// TODO we don't stop the animation when the view is detached from window. May cause memory leaks.
+fun View.animateClick(onEnd: (Animator) -> Unit = {}) {
     val scaleDownBtnAnim = ValueAnimator.ofFloat(
         Constants.UI.Button.clickScaleAnimFullScale,
         Constants.UI.Button.clickScaleAnimSmallScale
@@ -360,4 +363,10 @@ fun Context.colorFromAttribute(attribute: Int): Int {
     val dimension = attributes.getColor(0, 0)
     attributes.recycle()
     return dimension
+}
+
+fun Animator.removeListenersAndCancel() {
+    this.safeCastTo<ValueAnimator>()?.removeAllUpdateListeners()
+    removeAllListeners()
+    cancel()
 }

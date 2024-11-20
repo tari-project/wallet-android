@@ -289,9 +289,9 @@ class AddNoteFragment : CommonFragment<FragmentAddNoteBinding, AddNoteViewModel>
         ui.slideEnabledBgView.alpha = 0f
         ui.slideEnabledBgView.visible()
 
-        val textViewAnim = ObjectAnimator.ofFloat(ui.slideToSendEnabledTextView, "alpha", 0f, 1f)
-        val arrowAnim = ObjectAnimator.ofFloat(ui.slideToSendArrowEnabledImageView, "alpha", 0f, 1f)
-        val bgViewAnim = ObjectAnimator.ofFloat(ui.slideEnabledBgView, "alpha", 0f, 1f)
+        val textViewAnim = ObjectAnimator.ofFloat(ui.slideToSendEnabledTextView, "alpha", 0f, 1f).also { animations.add(it) }
+        val arrowAnim = ObjectAnimator.ofFloat(ui.slideToSendArrowEnabledImageView, "alpha", 0f, 1f).also { animations.add(it) }
+        val bgViewAnim = ObjectAnimator.ofFloat(ui.slideEnabledBgView, "alpha", 0f, 1f).also { animations.add(it) }
 
         // the animation set
         val animSet = AnimatorSet()
@@ -346,7 +346,7 @@ class AddNoteFragment : CommonFragment<FragmentAddNoteBinding, AddNoteViewModel>
             }
 
             MotionEvent.ACTION_UP -> if (slideButtonLastMarginStart < slideButtonContainerWidth / 2) {
-                ValueAnimator.ofInt(slideButtonLastMarginStart, dimenPx(add_note_slide_button_left_margin)).apply {
+                animations += ValueAnimator.ofInt(slideButtonLastMarginStart, dimenPx(add_note_slide_button_left_margin)).apply {
                     addUpdateListener { valueAnimator: ValueAnimator ->
                         val margin = valueAnimator.animatedValue as Int
                         ui.slideView.setStartMargin(margin)
@@ -362,7 +362,7 @@ class AddNoteFragment : CommonFragment<FragmentAddNoteBinding, AddNoteViewModel>
                 // disable input
                 ui.noteEditText.isEnabled = false
                 // complete slide animation
-                ValueAnimator.ofInt(
+                animations += ValueAnimator.ofInt(
                     slideButtonLastMarginStart, slideButtonContainerWidth - dimenPx(add_note_slide_button_left_margin)
                             - dimenPx(add_note_slide_button_width)
                 ).apply {
@@ -386,7 +386,7 @@ class AddNoteFragment : CommonFragment<FragmentAddNoteBinding, AddNoteViewModel>
 
     private fun slideAnimationCompleted() {
         // hide slide view
-        ValueAnimator.ofFloat(1F, 0F).apply {
+        animations += ValueAnimator.ofFloat(1F, 0F).apply {
             addUpdateListener { valueAnimator: ValueAnimator ->
                 ui.slideView.alpha = valueAnimator.animatedValue as Float
             }
@@ -434,7 +434,7 @@ class AddNoteFragment : CommonFragment<FragmentAddNoteBinding, AddNoteViewModel>
         // hide slide view
         val slideViewInitialMargin = ui.slideView.getStartMargin()
         val slideViewMarginDelta = dimenPx(add_note_slide_button_left_margin) - slideViewInitialMargin
-        ValueAnimator.ofFloat(1f, 0f).apply {
+        animations += ValueAnimator.ofFloat(1f, 0f).apply {
             addUpdateListener { valueAnimator: ValueAnimator ->
                 val value = valueAnimator.animatedValue as Float
                 ui.slideView.alpha = 1f - value

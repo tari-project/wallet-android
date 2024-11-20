@@ -31,7 +31,7 @@ class DigitViewHolder(context: Context, private var value: Int) : BalanceDigitVi
 
     override fun expand(delayMs: Long, animatorListener: Animator.AnimatorListener?) {
         val width = ui.balanceTopDigitTextView.measuredWidth
-        ValueAnimator.ofFloat(0f, 1f).apply {
+        animations += ValueAnimator.ofFloat(0f, 1f).apply {
             addUpdateListener { valueAnimator: ValueAnimator ->
                 val animValue = valueAnimator.animatedValue as Float
                 view.setLayoutWidth((width * animValue).toInt())
@@ -48,7 +48,7 @@ class DigitViewHolder(context: Context, private var value: Int) : BalanceDigitVi
 
     override fun reveal(delayMs: Long) {
         ui.balanceTopDigitTextView.setTopMargin(view.dimenPx(R.dimen.home_balance_digit_height))
-        ValueAnimator.ofInt(view.dimenPx(R.dimen.home_balance_digit_height), 0).apply {
+        animations += ValueAnimator.ofInt(view.dimenPx(R.dimen.home_balance_digit_height), 0).apply {
             addUpdateListener { valueAnimator: ValueAnimator ->
                 val topMargin = valueAnimator.animatedValue as Int
                 ui.balanceTopDigitTextView.setTopMargin(topMargin)
@@ -78,7 +78,7 @@ class DigitViewHolder(context: Context, private var value: Int) : BalanceDigitVi
         ui.balanceBottomDigitTextView.text = value.toString()
         ui.balanceBottomDigitTextView.setWidthToMeasured()
 
-        ValueAnimator.ofInt(0, -view.dimenPx(R.dimen.home_balance_digit_height) - 1).apply {
+        animations += ValueAnimator.ofInt(0, -view.dimenPx(R.dimen.home_balance_digit_height) - 1).apply {
             addUpdateListener { valueAnimator: ValueAnimator ->
                 val topMargin = valueAnimator.animatedValue as Int
                 ui.balanceTopDigitTextView.setTopMargin(topMargin)
@@ -105,7 +105,7 @@ class DigitViewHolder(context: Context, private var value: Int) : BalanceDigitVi
         }
         changed = true
 
-        ValueAnimator.ofFloat(1f, 0f).apply {
+        animations += ValueAnimator.ofFloat(1f, 0f).apply {
             addUpdateListener { valueAnimator: ValueAnimator ->
                 val animValue = valueAnimator.animatedValue as Float
                 ui.balanceTopDigitTextView.alpha = animValue

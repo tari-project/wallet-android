@@ -14,6 +14,7 @@ import android.view.View
 import androidx.core.graphics.blue
 import androidx.core.graphics.green
 import androidx.core.graphics.red
+import com.tari.android.wallet.ui.extension.removeListenersAndCancel
 import org.joda.time.DateTime
 import kotlin.math.sin
 
@@ -38,8 +39,10 @@ class WaveView : View {
     private var waveLength = 1500F
     private val pixelAccuracy = 5
 
+    private var animation: ValueAnimator? = null
+
     init {
-        ValueAnimator.ofInt(0, Int.MAX_VALUE).apply {
+        animation = ValueAnimator.ofInt(0, Int.MAX_VALUE).apply {
             repeatCount = ValueAnimator.INFINITE
             addUpdateListener {
                 currentSpeed = (baseTime - DateTime.now().millis) * waveSpeed / 1000
@@ -61,6 +64,13 @@ class WaveView : View {
 
         doWave()
         canvas.drawPath(path, paint)
+    }
+
+    override fun onDetachedFromWindow() {
+        super.onDetachedFromWindow()
+
+        animation?.removeListenersAndCancel()
+        animation = null
     }
 
     private fun doWave() {
