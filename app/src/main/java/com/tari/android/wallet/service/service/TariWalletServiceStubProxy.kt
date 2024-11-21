@@ -18,8 +18,6 @@ class TariWalletServiceStubProxy : TariWalletService.Stub() {
             _stub = newStub
         }
 
-    override fun getSeedWords(error: WalletError): List<String>? = stub?.getSeedWords(error)
-
     override fun getUtxos(page: Int, pageSize: Int, sorting: Int, error: WalletError): TariVector? = stub?.getUtxos(page, pageSize, sorting, error)
 
     override fun getAllUtxos(error: WalletError): TariVector? = stub?.getAllUtxos(error)

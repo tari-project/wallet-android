@@ -37,11 +37,6 @@ import com.tari.android.wallet.model.Model;
 
 interface TariWalletService {
 
-    /**
-    * Seed words.
-    */
-    List<String> getSeedWords(out WalletError error);
-
     TariVector getUtxos(int page, int pageSize, int sorting, out WalletError error);
 
     TariVector getAllUtxos(out WalletError error);

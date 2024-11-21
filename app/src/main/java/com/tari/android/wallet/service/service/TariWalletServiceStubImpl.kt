@@ -3,7 +3,6 @@ package com.tari.android.wallet.service.service
 import com.tari.android.wallet.ffi.FFIError
 import com.tari.android.wallet.ffi.FFIException
 import com.tari.android.wallet.ffi.FFIWallet
-import com.tari.android.wallet.ffi.runWithDestroy
 import com.tari.android.wallet.model.TariCoinPreview
 import com.tari.android.wallet.model.TariUnblindedOutput
 import com.tari.android.wallet.model.TariUtxo
@@ -16,10 +15,6 @@ import com.tari.android.wallet.util.Constants
 class TariWalletServiceStubImpl(
     private val wallet: FFIWallet,
 ) : TariWalletService.Stub() {
-
-    override fun getSeedWords(error: WalletError): List<String>? = runMapping(error) {
-        wallet.getSeedWords().runWithDestroy { seedWords -> (0 until seedWords.getLength()).map { seedWords.getAt(it) } }
-    }
 
     override fun getUtxos(page: Int, pageSize: Int, sorting: Int, error: WalletError): TariVector? =
         runMapping(error) { wallet.getUtxos(page, pageSize, sorting) }

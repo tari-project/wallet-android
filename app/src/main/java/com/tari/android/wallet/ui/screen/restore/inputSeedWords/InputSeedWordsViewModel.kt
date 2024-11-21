@@ -9,11 +9,10 @@ import com.tari.android.wallet.application.baseNodes.BaseNodesManager
 import com.tari.android.wallet.application.walletManager.doOnWalletFailed
 import com.tari.android.wallet.application.walletManager.doOnWalletRunning
 import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodeDto
-import com.tari.android.wallet.util.extension.launchOnIo
-import com.tari.android.wallet.util.extension.launchOnMain
 import com.tari.android.wallet.ffi.FFISeedWords
 import com.tari.android.wallet.model.WalletError
 import com.tari.android.wallet.model.seedPhrase.SeedPhrase
+import com.tari.android.wallet.navigation.Navigation
 import com.tari.android.wallet.service.service.WalletServiceLauncher
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.common.SingleLiveEvent
@@ -23,10 +22,11 @@ import com.tari.android.wallet.ui.component.loadingButton.LoadingButtonState
 import com.tari.android.wallet.ui.dialog.modular.SimpleDialogArgs
 import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
 import com.tari.android.wallet.ui.dialog.modular.modules.input.InputModule
-import com.tari.android.wallet.navigation.Navigation
 import com.tari.android.wallet.ui.screen.restore.inputSeedWords.suggestions.SuggestionState
 import com.tari.android.wallet.ui.screen.restore.inputSeedWords.suggestions.SuggestionViewHolderItem
 import com.tari.android.wallet.util.DebugConfig
+import com.tari.android.wallet.util.extension.launchOnIo
+import com.tari.android.wallet.util.extension.launchOnMain
 import io.reactivex.disposables.CompositeDisposable
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -34,7 +34,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 
-class InputSeedWordsViewModel() : CommonViewModel() {
+class InputSeedWordsViewModel : CommonViewModel() {
 
     private var mnemonicList = mutableListOf<String>()
 
@@ -107,7 +107,7 @@ class InputSeedWordsViewModel() : CommonViewModel() {
 
     private fun loadSuggestions() {
         launchOnIo {
-            val mnemonic = FFISeedWords.getMnemomicWordList(FFISeedWords.Language.English)
+            val mnemonic = FFISeedWords.getMnemonicWordList(FFISeedWords.Language.English)
             val size = mnemonic.getLength()
             for (i in 0 until size) {
                 mnemonicList.add(mnemonic.getAt(i))

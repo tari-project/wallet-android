@@ -37,17 +37,17 @@ import com.tari.android.wallet.BuildConfig
 import com.tari.android.wallet.application.walletManager.WalletCallbackListener
 import com.tari.android.wallet.data.sharedPrefs.network.TariNetwork
 import com.tari.android.wallet.model.BalanceInfo
-import com.tari.android.wallet.model.tx.CancelledTx
-import com.tari.android.wallet.model.tx.CompletedTx
 import com.tari.android.wallet.model.MicroTari
-import com.tari.android.wallet.model.tx.PendingInboundTx
-import com.tari.android.wallet.model.tx.PendingOutboundTx
 import com.tari.android.wallet.model.PublicKey
 import com.tari.android.wallet.model.TariCoinPreview
 import com.tari.android.wallet.model.TariUnblindedOutput
 import com.tari.android.wallet.model.TariVector
 import com.tari.android.wallet.model.TariWalletAddress
 import com.tari.android.wallet.model.TxId
+import com.tari.android.wallet.model.tx.CancelledTx
+import com.tari.android.wallet.model.tx.CompletedTx
+import com.tari.android.wallet.model.tx.PendingInboundTx
+import com.tari.android.wallet.model.tx.PendingOutboundTx
 import com.tari.android.wallet.util.Constants
 import java.math.BigInteger
 
@@ -366,7 +366,9 @@ class FFIWallet(
 
     fun setPowerModeLow() = runWithError { jniPowerModeLow(it) }
 
-    fun getSeedWords(): FFISeedWords = runWithError { FFISeedWords(jniGetSeedWords(it)) }
+    fun getSeedWords(): List<String> = runWithError { error ->
+        FFISeedWords(jniGetSeedWords(error)).runWithDestroy { seedWords -> (0 until seedWords.getLength()).map { seedWords.getAt(it) } }
+    }
 
     fun getBaseNodePeers(): List<PublicKey> = runWithError { error ->
         FFIPublicKeys(jniGetBaseNodePeers(error)).let { ffiPublicKeys ->
