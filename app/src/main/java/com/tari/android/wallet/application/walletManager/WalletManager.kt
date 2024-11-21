@@ -438,10 +438,12 @@ class WalletManager @Inject constructor(
         walletInstance?.destroy()
         walletInstance = null
         _walletState.update { WalletState.NotReady }
-        runOnMain { _walletEvent.send(WalletEvent.OnWalletRemove) }
+        runOnMain {
+            _walletEvent.send(WalletEvent.OnWalletRemove)
+            dialogManager.dismissAll()
+        }
         walletConfig.clearWalletFiles()
         corePrefRepository.clear()
-        dialogManager.dismissAll()
         walletServiceLauncher.stop()
         walletCallbackListener.removeAllListeners()
     }

@@ -97,7 +97,7 @@ object DebugConfig {
 
     val selectBaseNodeEnabled = valueIfDebug(false)
 
-    private fun isDebug() = BuildConfig.BUILD_TYPE == "debug"
+    fun isDebug() = BuildConfig.BUILD_TYPE == "debug"
 
     private fun valueIfDebug(value: Boolean) = isDebug() && value
 }

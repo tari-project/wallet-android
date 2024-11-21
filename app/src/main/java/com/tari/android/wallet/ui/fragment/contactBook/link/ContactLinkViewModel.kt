@@ -134,7 +134,7 @@ class ContactLinkViewModel : CommonViewModel() {
             !havePermission -> R.string.contact_book_contacts_book_link_empty_state_no_access
             noContacts && noMergedContacts -> R.string.contact_book_contacts_book_link_empty_state_empty_book
             noContacts -> R.string.contact_book_contacts_book_link_empty_state_no_contacts
-            else -> throw IllegalStateException("Unknown state")
+            else -> R.string.contact_book_contacts_book_link_empty_state_error
         }
 
         return SpannedString(HtmlHelper.getSpannedText(resourceManager.getString(resource)))
