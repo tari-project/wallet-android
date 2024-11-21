@@ -5,9 +5,9 @@ import com.tari.android.wallet.ui.common.recyclerView.CommonViewHolder
 import com.tari.android.wallet.ui.common.recyclerView.ViewHolderBuilder
 import com.tari.android.wallet.ui.extension.setVisible
 
-class EmptyStateViewHolder(view: ItemContactEmptyStateBinding) : CommonViewHolder<EmptyStateItem, ItemContactEmptyStateBinding>(view) {
+class EmptyStateViewHolder(view: ItemContactEmptyStateBinding) : CommonViewHolder<EmptyStateViewHolderItem, ItemContactEmptyStateBinding>(view) {
 
-    override fun bind(item: EmptyStateItem) {
+    override fun bind(item: EmptyStateViewHolderItem) {
         super.bind(item)
 
         ui.emptyStateTitleView.text = item.title
@@ -23,7 +23,7 @@ class EmptyStateViewHolder(view: ItemContactEmptyStateBinding) : CommonViewHolde
         fun getBuilder(): ViewHolderBuilder =
             ViewHolderBuilder(
                 ItemContactEmptyStateBinding::inflate,
-                EmptyStateItem::class.java
+                EmptyStateViewHolderItem::class.java
             ) { EmptyStateViewHolder(it as ItemContactEmptyStateBinding) }
     }
 }

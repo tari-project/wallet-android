@@ -25,7 +25,7 @@ import com.tari.android.wallet.ui.common.recyclerView.CommonViewHolderItem
 import com.tari.android.wallet.ui.common.recyclerView.items.SpaceVerticalViewHolderItem
 import com.tari.android.wallet.ui.fragment.contactBook.contacts.adapter.contact.ContactItemViewHolderItem
 import com.tari.android.wallet.ui.fragment.contactBook.contacts.adapter.contact.ContactlessPaymentItem
-import com.tari.android.wallet.ui.fragment.contactBook.contacts.adapter.emptyState.EmptyStateItem
+import com.tari.android.wallet.ui.fragment.contactBook.contacts.adapter.emptyState.EmptyStateViewHolderItem
 import com.tari.android.wallet.ui.fragment.contactBook.data.ContactsRepository
 import com.tari.android.wallet.ui.fragment.contactBook.data.contacts.ContactDto
 import com.tari.android.wallet.ui.fragment.contactBook.data.contacts.PhoneContactInfo
@@ -151,7 +151,7 @@ class ContactsViewModel : CommonViewModel() {
         if (contactsRepository.contactPermissionGranted.not() || filtered.isEmpty()) {
             contactList.postValue(
                 listOf(
-                    EmptyStateItem(
+                    EmptyStateViewHolderItem(
                         title = getEmptyTitle(),
                         body = getEmptyBody(),
                         image = getEmptyImage(),

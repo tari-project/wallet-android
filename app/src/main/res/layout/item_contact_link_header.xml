@@ -41,6 +41,7 @@
             android:layout_width="match_parent"
             android:layout_height="46dp"
             android:hint="@string/contact_book_search_hint"
+            android:theme="@style/TariSearchViewTheme"
             app:defaultQueryHint="@string/contact_book_search_hint"
             app:queryBackground="@null" />
     </com.tari.android.wallet.ui.component.tari.background.TariPrimaryBackground>
