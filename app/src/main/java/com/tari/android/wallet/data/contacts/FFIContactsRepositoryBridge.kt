@@ -4,16 +4,13 @@ import com.orhanobut.logger.Logger
 import com.tari.android.wallet.application.walletManager.WalletManager
 import com.tari.android.wallet.application.walletManager.doOnWalletRunning
 import com.tari.android.wallet.application.walletManager.doOnWalletRunningWithValue
-import com.tari.android.wallet.ffi.iterateWithDestroy
-import com.tari.android.wallet.model.WalletError
-import com.tari.android.wallet.data.connection.TariWalletServiceConnection
 import com.tari.android.wallet.data.contacts.model.ContactDto
 import com.tari.android.wallet.data.contacts.model.FFIContactInfo
 import com.tari.android.wallet.data.contacts.model.MergedContactInfo
+import com.tari.android.wallet.ffi.iterateWithDestroy
 import com.tari.android.wallet.util.ContactUtil
 
 class FFIContactsRepositoryBridge(
-    private val tariWalletServiceConnection: TariWalletServiceConnection,
     private val walletManager: WalletManager,
     private val contactUtil: ContactUtil,
 ) {
@@ -23,19 +20,16 @@ class FFIContactsRepositoryBridge(
     suspend fun updateToFFI(contacts: List<ContactDto>) {
         logger.i("Contacts repository event: Saving updates to FFI")
 
-        walletManager.doOnWalletRunning {
-            tariWalletServiceConnection.doOnWalletServiceConnected { service ->
-                contacts.mapNotNull { it.getFFIContactInfo() }.forEach { ffiContactInfo ->
-                    val error = WalletError()
-                    service.updateContact(
-                        ffiContactInfo.walletAddress,
-                        contactUtil.normalizeAlias(ffiContactInfo.getAlias(), ffiContactInfo.walletAddress),
-                        ffiContactInfo.isFavorite,
-                        error,
+        walletManager.doOnWalletRunning { wallet ->
+            contacts.mapNotNull { it.getFFIContactInfo() }.forEach { ffiContactInfo ->
+                try {
+                    wallet.addUpdateContact(
+                        walletAddress = ffiContactInfo.walletAddress,
+                        alias = contactUtil.normalizeAlias(ffiContactInfo.getAlias(), ffiContactInfo.walletAddress),
+                        isFavorite = ffiContactInfo.isFavorite,
                     )
-                    if (error.code != WalletError.NoError.code) {
-                        logger.e("Contacts repository event: Error updating contact to FFI: ${error.signature}")
-                    }
+                } catch (e: Throwable) {
+                    logger.e("Contacts repository event: Error updating contact to FFI: ${e.message}")
                 }
             }
         }
@@ -113,13 +107,11 @@ class FFIContactsRepositoryBridge(
 
     suspend fun deleteContact(contact: FFIContactInfo) {
         logger.i("Contacts repository event: Deleting contact from FFI")
-        walletManager.doOnWalletRunning {
-            tariWalletServiceConnection.doOnWalletServiceConnected { service ->
-                val error = WalletError()
-                service.removeContact(contact.walletAddress, error)
-                if (error.code != WalletError.NoError.code) {
-                    logger.e("Contacts repository event: Error deleting contact from FFI: ${error.signature}")
-                }
+        walletManager.doOnWalletRunning { wallet ->
+            try {
+                wallet.removeContact(contact.walletAddress)
+            } catch (e: Throwable) {
+                logger.e("Contacts repository event: Error deleting contact from FFI: ${e.message}")
             }
         }
     }

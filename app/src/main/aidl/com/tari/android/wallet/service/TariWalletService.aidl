@@ -37,10 +37,6 @@ import com.tari.android.wallet.model.Model;
 
 interface TariWalletService {
 
-    boolean updateContact(in TariWalletAddress address, in String alias, boolean isFavorite, out WalletError error);
-
-    boolean removeContact(in TariWalletAddress address, out WalletError error);
-
     /**
     * Seed words.
     */

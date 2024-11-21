@@ -4,17 +4,16 @@ import android.content.Context
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.application.walletManager.WalletManager
 import com.tari.android.wallet.application.walletManager.WalletManager.WalletEvent
-import com.tari.android.wallet.di.ApplicationScope
-import com.tari.android.wallet.util.extension.replaceItem
-import com.tari.android.wallet.model.TariWalletAddress
-import com.tari.android.wallet.model.Tx
-import com.tari.android.wallet.data.connection.TariWalletServiceConnection
 import com.tari.android.wallet.data.contacts.model.ContactDto
 import com.tari.android.wallet.data.contacts.model.FFIContactInfo
 import com.tari.android.wallet.data.contacts.model.MergedContactInfo
 import com.tari.android.wallet.data.contacts.model.PhoneContactInfo
-import com.tari.android.wallet.util.ContactUtil
+import com.tari.android.wallet.di.ApplicationScope
 import com.tari.android.wallet.model.EmojiId
+import com.tari.android.wallet.model.TariWalletAddress
+import com.tari.android.wallet.model.Tx
+import com.tari.android.wallet.util.ContactUtil
+import com.tari.android.wallet.util.extension.replaceItem
 import com.tari.android.wallet.util.nextBoolean
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -29,7 +28,6 @@ import kotlin.random.Random
 class ContactsRepository @Inject constructor(
     context: Context,
     contactUtil: ContactUtil,
-    tariWalletServiceConnection: TariWalletServiceConnection,
     walletManager: WalletManager,
     @ApplicationScope private val applicationScope: CoroutineScope,
 ) {
@@ -37,7 +35,6 @@ class ContactsRepository @Inject constructor(
         get() = Logger.t(ContactsRepository::class.simpleName)
 
     private val ffiBridge = FFIContactsRepositoryBridge(
-        tariWalletServiceConnection = tariWalletServiceConnection,
         walletManager = walletManager,
         contactUtil = contactUtil,
     )

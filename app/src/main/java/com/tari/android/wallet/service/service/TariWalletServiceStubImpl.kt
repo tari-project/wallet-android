@@ -1,10 +1,7 @@
 package com.tari.android.wallet.service.service
 
-import com.tari.android.wallet.ffi.Base58String
-import com.tari.android.wallet.ffi.FFIContact
 import com.tari.android.wallet.ffi.FFIError
 import com.tari.android.wallet.ffi.FFIException
-import com.tari.android.wallet.ffi.FFITariWalletAddress
 import com.tari.android.wallet.ffi.FFIWallet
 import com.tari.android.wallet.ffi.runWithDestroy
 import com.tari.android.wallet.model.TariCoinPreview
@@ -19,19 +16,6 @@ import com.tari.android.wallet.util.Constants
 class TariWalletServiceStubImpl(
     private val wallet: FFIWallet,
 ) : TariWalletService.Stub() {
-
-    override fun removeContact(walletAddress: TariWalletAddress, error: WalletError): Boolean = runMapping(error) {
-        wallet.findContactByWalletAddress(walletAddress)?.runWithDestroy { wallet.removeContact(it) } ?: false
-    } ?: false
-
-    override fun updateContact(walletAddress: TariWalletAddress, alias: String, isFavorite: Boolean, error: WalletError): Boolean =
-        runMapping(error) {
-            FFITariWalletAddress(Base58String(walletAddress.fullBase58)).runWithDestroy { ffiTariWalletAddress ->
-                FFIContact(alias, ffiTariWalletAddress, isFavorite).runWithDestroy { contactToUpdate ->
-                    wallet.addUpdateContact(contactToUpdate)
-                }
-            }
-        } ?: false
 
     override fun getSeedWords(error: WalletError): List<String>? = runMapping(error) {
         wallet.getSeedWords().runWithDestroy { seedWords -> (0 until seedWords.getLength()).map { seedWords.getAt(it) } }

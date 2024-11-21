@@ -258,9 +258,19 @@ class FFIWallet(
         ffiContact.getWalletAddress().runWithDestroy { TariWalletAddress(it) } == walletAddress
     }
 
-    fun addUpdateContact(contact: FFIContact): Boolean = runWithError { jniAddUpdateContact(contact, it) }
+    fun addUpdateContact(walletAddress: TariWalletAddress, alias: String, isFavorite: Boolean): Boolean = runWithError {
+        FFITariWalletAddress(Base58String(walletAddress.fullBase58)).runWithDestroy { ffiTariWalletAddress ->
+            FFIContact(alias, ffiTariWalletAddress, isFavorite).runWithDestroy { contactToUpdate ->
+                jniAddUpdateContact(contactToUpdate, it)
+            }
+        }
+    }
 
-    fun removeContact(contact: FFIContact): Boolean = runWithError { jniRemoveContact(contact, it) }
+    fun removeContact(walletAddress: TariWalletAddress): Boolean = runWithError {
+        findContactByWalletAddress(walletAddress)?.runWithDestroy { contact ->
+            jniRemoveContact(contact, it)
+        } ?: false
+    }
 
     fun getCompletedTxs(): List<CompletedTx> = runWithError { FFICompletedTxs(jniGetCompletedTxs(it)).iterateWithDestroy { tx -> CompletedTx(tx) } }
 

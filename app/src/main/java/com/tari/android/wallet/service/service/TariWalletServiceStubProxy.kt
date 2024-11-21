@@ -18,12 +18,6 @@ class TariWalletServiceStubProxy : TariWalletService.Stub() {
             _stub = newStub
         }
 
-    override fun updateContact(contactPublicKey: TariWalletAddress, alias: String, isFavorite: Boolean, error: WalletError): Boolean =
-        stub?.updateContact(contactPublicKey, alias, isFavorite, error) ?: false
-
-    override fun removeContact(contactPublicKey: TariWalletAddress, error: WalletError): Boolean =
-        stub?.removeContact(contactPublicKey, error) ?: false
-
     override fun getSeedWords(error: WalletError): List<String>? = stub?.getSeedWords(error)
 
     override fun getUtxos(page: Int, pageSize: Int, sorting: Int, error: WalletError): TariVector? = stub?.getUtxos(page, pageSize, sorting, error)
