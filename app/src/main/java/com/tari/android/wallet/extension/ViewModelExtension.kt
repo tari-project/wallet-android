@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.orhanobut.logger.Logger
@@ -40,10 +41,6 @@ fun <T> AppCompatActivity.observe(liveData: LiveData<T>, action: (data: T) -> Un
             logger.i(e.toString())
         }
     }
-}
-
-fun <T> AppCompatActivity.observeOnLoad(liveData: LiveData<T>) {
-    observe(liveData) { }
 }
 
 fun <T> CommonView<*, *>.observe(liveData: LiveData<T>, action: (data: T) -> Unit) {
@@ -85,3 +82,5 @@ fun ViewModel.launchOnMain(action: suspend () -> Unit): Job {
 suspend fun switchToIo(action: suspend () -> Unit) = withContext(Dispatchers.IO) { action() }
 
 suspend fun switchToMain(action: suspend () -> Unit) = withContext(Dispatchers.Main) { action() }
+
+fun <T> SavedStateHandle.getRequired(key: String): T = this.get<T>(key) ?: error("Required value for key $key is missing")
