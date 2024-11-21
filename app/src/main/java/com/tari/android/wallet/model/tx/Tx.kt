@@ -30,9 +30,13 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.tari.android.wallet.model
+package com.tari.android.wallet.model.tx
 
 import android.os.Parcelable
+import com.tari.android.wallet.model.MicroTari
+import com.tari.android.wallet.model.TariContact
+import com.tari.android.wallet.model.TxId
+import com.tari.android.wallet.model.TxStatus
 import java.math.BigInteger
 
 /**

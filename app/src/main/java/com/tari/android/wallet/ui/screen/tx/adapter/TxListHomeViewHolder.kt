@@ -1,7 +1,7 @@
 package com.tari.android.wallet.ui.screen.tx.adapter
 
 import com.tari.android.wallet.databinding.ItemHomeTxListBinding
-import com.tari.android.wallet.model.Tx
+import com.tari.android.wallet.model.tx.Tx
 import com.tari.android.wallet.ui.common.recyclerView.ViewHolderBuilder
 
 class TxListHomeViewHolder(view: ItemHomeTxListBinding) : CommonTxListViewHolder<TxViewHolderItem, ItemHomeTxListBinding>(view) {

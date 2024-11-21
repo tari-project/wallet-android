@@ -4,7 +4,7 @@ import com.tari.android.wallet.application.TariWalletApplication
 import com.tari.android.wallet.ffi.FFITariWalletAddress
 import com.tari.android.wallet.ffi.FFIWallet
 import com.tari.android.wallet.model.TransactionSendStatus
-import com.tari.android.wallet.model.Tx
+import com.tari.android.wallet.model.tx.Tx
 import com.tari.android.wallet.model.TxId
 import com.tari.android.wallet.notification.NotificationHelper
 import com.tari.android.wallet.service.notification.NotificationService

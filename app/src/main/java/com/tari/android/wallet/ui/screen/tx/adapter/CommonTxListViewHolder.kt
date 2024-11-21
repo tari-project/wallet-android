@@ -5,11 +5,11 @@ import com.tari.android.wallet.R
 import com.tari.android.wallet.application.walletManager.WalletConfig
 import com.tari.android.wallet.databinding.ViewAddressShortSmallBinding
 import com.tari.android.wallet.util.extension.makeTextBold
-import com.tari.android.wallet.model.CancelledTx
-import com.tari.android.wallet.model.CompletedTx
-import com.tari.android.wallet.model.PendingInboundTx
-import com.tari.android.wallet.model.PendingOutboundTx
-import com.tari.android.wallet.model.Tx
+import com.tari.android.wallet.model.tx.CancelledTx
+import com.tari.android.wallet.model.tx.CompletedTx
+import com.tari.android.wallet.model.tx.PendingInboundTx
+import com.tari.android.wallet.model.tx.PendingOutboundTx
+import com.tari.android.wallet.model.tx.Tx
 import com.tari.android.wallet.model.TxStatus
 import com.tari.android.wallet.ui.common.domain.PaletteManager
 import com.tari.android.wallet.ui.common.recyclerView.CommonViewHolder

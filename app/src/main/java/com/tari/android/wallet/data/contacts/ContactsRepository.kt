@@ -11,7 +11,7 @@ import com.tari.android.wallet.data.contacts.model.PhoneContactInfo
 import com.tari.android.wallet.di.ApplicationScope
 import com.tari.android.wallet.model.EmojiId
 import com.tari.android.wallet.model.TariWalletAddress
-import com.tari.android.wallet.model.Tx
+import com.tari.android.wallet.model.tx.Tx
 import com.tari.android.wallet.util.ContactUtil
 import com.tari.android.wallet.util.extension.replaceItem
 import com.tari.android.wallet.util.nextBoolean

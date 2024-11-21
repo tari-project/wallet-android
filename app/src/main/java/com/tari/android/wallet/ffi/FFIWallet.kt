@@ -37,11 +37,11 @@ import com.tari.android.wallet.BuildConfig
 import com.tari.android.wallet.application.walletManager.WalletCallbackListener
 import com.tari.android.wallet.data.sharedPrefs.network.TariNetwork
 import com.tari.android.wallet.model.BalanceInfo
-import com.tari.android.wallet.model.CancelledTx
-import com.tari.android.wallet.model.CompletedTx
+import com.tari.android.wallet.model.tx.CancelledTx
+import com.tari.android.wallet.model.tx.CompletedTx
 import com.tari.android.wallet.model.MicroTari
-import com.tari.android.wallet.model.PendingInboundTx
-import com.tari.android.wallet.model.PendingOutboundTx
+import com.tari.android.wallet.model.tx.PendingInboundTx
+import com.tari.android.wallet.model.tx.PendingOutboundTx
 import com.tari.android.wallet.model.PublicKey
 import com.tari.android.wallet.model.TariCoinPreview
 import com.tari.android.wallet.model.TariUnblindedOutput

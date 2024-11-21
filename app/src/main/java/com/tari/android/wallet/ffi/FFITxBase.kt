@@ -2,7 +2,7 @@ package com.tari.android.wallet.ffi
 
 import com.tari.android.wallet.model.TariContact
 import com.tari.android.wallet.model.TariWalletAddress
-import com.tari.android.wallet.model.Tx
+import com.tari.android.wallet.model.tx.Tx
 
 abstract class FFITxBase() : FFIBase() {
 

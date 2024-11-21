@@ -7,7 +7,7 @@ import com.bumptech.glide.request.RequestOptions
 import com.bumptech.glide.request.target.Target
 import com.tari.android.wallet.R
 import com.tari.android.wallet.databinding.ItemTxListBinding
-import com.tari.android.wallet.model.Tx
+import com.tari.android.wallet.model.tx.Tx
 import com.tari.android.wallet.model.TxNote
 import com.tari.android.wallet.ui.common.giphy.presentation.GifStateConsumer
 import com.tari.android.wallet.ui.common.giphy.presentation.GlideGifListener

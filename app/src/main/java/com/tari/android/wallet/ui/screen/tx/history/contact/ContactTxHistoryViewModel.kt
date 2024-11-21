@@ -3,7 +3,7 @@ package com.tari.android.wallet.ui.screen.tx.history.contact
 import androidx.lifecycle.SavedStateHandle
 import com.tari.android.wallet.data.tx.TxRepository
 import com.tari.android.wallet.util.extension.collectFlow
-import com.tari.android.wallet.model.Tx
+import com.tari.android.wallet.model.tx.Tx
 import com.tari.android.wallet.navigation.Navigation
 import com.tari.android.wallet.navigation.TariNavigator
 import com.tari.android.wallet.ui.common.CommonViewModel

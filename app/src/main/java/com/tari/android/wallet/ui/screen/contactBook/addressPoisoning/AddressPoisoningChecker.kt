@@ -4,7 +4,7 @@ import androidx.annotation.VisibleForTesting
 import com.tari.android.wallet.data.sharedPrefs.addressPoisoning.AddressPoisoningPrefRepository
 import com.tari.android.wallet.data.tx.TxRepository
 import com.tari.android.wallet.model.TariWalletAddress
-import com.tari.android.wallet.model.Tx
+import com.tari.android.wallet.model.tx.Tx
 import com.tari.android.wallet.data.contacts.ContactsRepository
 import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.DebugConfig

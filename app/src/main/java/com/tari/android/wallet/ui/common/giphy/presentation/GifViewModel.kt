@@ -3,7 +3,7 @@ package com.tari.android.wallet.ui.common.giphy.presentation
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.tari.android.wallet.util.extension.addTo
-import com.tari.android.wallet.model.Tx
+import com.tari.android.wallet.model.tx.Tx
 import com.tari.android.wallet.model.TxNote
 import com.tari.android.wallet.ui.common.giphy.presentation.GifState.ErrorState
 import com.tari.android.wallet.ui.common.giphy.presentation.GifState.LoadingState

@@ -30,56 +30,49 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.tari.android.wallet.model
+package com.tari.android.wallet.model.tx
 
-import android.os.Parcel
 import android.os.Parcelable
-import com.tari.android.wallet.util.extension.readS
+import com.tari.android.wallet.ffi.FFICompletedTx
+import com.tari.android.wallet.ffi.FFITxCancellationReason
+import com.tari.android.wallet.model.MicroTari
+import com.tari.android.wallet.model.TariContact
+import com.tari.android.wallet.model.TxId
+import com.tari.android.wallet.model.TxStatus
+import kotlinx.parcelize.Parcelize
 import java.math.BigInteger
 
 /**
- * This wrapper is needed for id parameters in AIDL methods.
+ * Canceled tx model class.
  *
  * @author The Tari Development Team
  */
-class RequestId() : Parcelable {
+@Parcelize
+data class CancelledTx(
+    override val id: TxId,
+    override val direction: Direction,
+    override val amount: MicroTari,
+    override val timestamp: BigInteger,
+    override val message: String,
+    override val paymentId: String,
+    override val status: TxStatus,
+    override val tariContact: TariContact,
+    val fee: MicroTari,
+    val cancellationReason: FFITxCancellationReason,
+) : Tx(id, direction, amount, timestamp, message, paymentId, status, tariContact), Parcelable {
 
-    var value = BigInteger("0")
+    constructor(tx: FFICompletedTx) : this(
+        id = tx.getId(),
+        direction = tx.getDirection(),
+        tariContact = tx.getContact(),
+        amount = MicroTari(tx.getAmount()),
+        timestamp = tx.getTimestamp(),
+        message = tx.getMessage(),
+        paymentId = tx.getPaymentId(),
+        status = TxStatus.map(tx.getStatus()),
+        fee = MicroTari(tx.getFee()),
+        cancellationReason = tx.getCancellationReason(),
+    )
 
-    constructor(value: BigInteger) : this() {
-        this.value = value
-    }
-
-    // region Parcelable
-
-    constructor(parcel: Parcel) : this() {
-        readFromParcel(parcel)
-    }
-
-    companion object CREATOR : Parcelable.Creator<RequestId> {
-
-        override fun createFromParcel(parcel: Parcel): RequestId {
-            return RequestId(parcel)
-        }
-
-        override fun newArray(size: Int): Array<RequestId> {
-            return Array(size) { RequestId() }
-        }
-
-    }
-
-    override fun writeToParcel(parcel: Parcel, flags: Int) {
-        parcel.writeSerializable(value)
-    }
-
-    private fun readFromParcel(inParcel: Parcel) {
-        value = inParcel.readS(BigInteger::class.java)
-    }
-
-    override fun describeContents(): Int {
-        return 0
-    }
-
-    // endregion
-
+    override fun toString() = "CanceledTx(fee=$fee, status=$status) ${super.toString()}"
 }

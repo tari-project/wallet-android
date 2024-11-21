@@ -30,12 +30,16 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.tari.android.wallet.model
+package com.tari.android.wallet.model.tx
 
 import android.os.Parcelable
 import com.tari.android.wallet.util.extension.toMicroTari
 import com.tari.android.wallet.ffi.FFICompletedTx
 import com.tari.android.wallet.ffi.FFIPendingOutboundTx
+import com.tari.android.wallet.model.MicroTari
+import com.tari.android.wallet.model.TariContact
+import com.tari.android.wallet.model.TxId
+import com.tari.android.wallet.model.TxStatus
 import kotlinx.parcelize.Parcelize
 import java.math.BigInteger
 
@@ -46,15 +50,15 @@ import java.math.BigInteger
  */
 @Parcelize
 data class PendingOutboundTx(
-    override val id: TxId = 0.toBigInteger(),
-    override val direction: Direction = Direction.INBOUND,
-    override val amount: MicroTari = 0.toMicroTari(),
-    override val timestamp: BigInteger = 0.toBigInteger(),
-    override val message: String = "",
-    override val paymentId: String = "",
-    override val status: TxStatus = TxStatus.PENDING,
+    override val id: TxId,
+    override val direction: Direction,
+    override val amount: MicroTari,
+    override val timestamp: BigInteger,
+    override val message: String,
+    override val paymentId: String,
+    override val status: TxStatus,
     override val tariContact: TariContact,
-    val fee: MicroTari = 0.toMicroTari(),
+    val fee: MicroTari,
 ) : Tx(id, direction, amount, timestamp, message, paymentId, status, tariContact), Parcelable {
 
     constructor(tx: FFICompletedTx) : this(
@@ -77,6 +81,7 @@ data class PendingOutboundTx(
         fee = MicroTari(tx.getFee()),
         timestamp = tx.getTimestamp(),
         message = tx.getMessage(),
+        paymentId = "", // can't get payment id from pending outbound tx
         status = TxStatus.map(tx.getStatus()),
     )
 

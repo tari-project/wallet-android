@@ -35,27 +35,27 @@
 package com.tari.android.wallet.util
 
 import com.tari.android.wallet.BuildConfig
+import com.tari.android.wallet.data.chat.ChatItemDto
+import com.tari.android.wallet.data.chat.ChatMessageItemDto
+import com.tari.android.wallet.data.contacts.model.ContactDto
+import com.tari.android.wallet.data.contacts.model.FFIContactInfo
 import com.tari.android.wallet.data.tx.TxDto
-import com.tari.android.wallet.util.extension.minusHours
-import com.tari.android.wallet.util.extension.toMicroTari
 import com.tari.android.wallet.model.Base58
-import com.tari.android.wallet.model.CompletedTx
+import com.tari.android.wallet.model.tx.CompletedTx
 import com.tari.android.wallet.model.EmojiId
 import com.tari.android.wallet.model.TariContact
 import com.tari.android.wallet.model.TariUtxo
 import com.tari.android.wallet.model.TariWalletAddress
-import com.tari.android.wallet.model.Tx
+import com.tari.android.wallet.model.tx.Tx
 import com.tari.android.wallet.model.TxStatus
 import com.tari.android.wallet.ui.common.giphy.presentation.GifViewModel
 import com.tari.android.wallet.ui.common.giphy.repository.GifRepository
 import com.tari.android.wallet.ui.common.recyclerView.items.TitleViewHolderItem
-import com.tari.android.wallet.data.chat.ChatItemDto
-import com.tari.android.wallet.data.chat.ChatMessageItemDto
 import com.tari.android.wallet.ui.screen.contactBook.addressPoisoning.SimilarAddressDto
-import com.tari.android.wallet.data.contacts.model.ContactDto
-import com.tari.android.wallet.data.contacts.model.FFIContactInfo
 import com.tari.android.wallet.ui.screen.tx.adapter.TxViewHolderItem
 import com.tari.android.wallet.ui.screen.utxos.list.adapters.UtxosViewHolderItem
+import com.tari.android.wallet.util.extension.minusHours
+import com.tari.android.wallet.util.extension.toMicroTari
 import org.joda.time.DateTime
 import yat.android.lib.YatIntegration
 import java.math.BigInteger
@@ -202,9 +202,12 @@ object MockDataStub {
                 amount = amount.toMicroTari(),
                 fee = 1000.toMicroTari(),
                 message = "https://giphy.com/embed/5885nYOgBHdCw",
+                paymentId = "1234567890",
                 timestamp = BigInteger.valueOf(System.currentTimeMillis()),
                 id = 1.toBigInteger(),
                 tariContact = TariContact(WALLET_ADDRESS, contactAlias),
+                confirmationCount = 0.toBigInteger(),
+                txKernel = null,
             ),
             contact = createContact(alias = contactAlias),
             requiredConfirmationCount = confirmationCount,

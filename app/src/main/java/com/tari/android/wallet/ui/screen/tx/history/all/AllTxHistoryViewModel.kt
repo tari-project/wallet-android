@@ -4,7 +4,7 @@ import com.tari.android.wallet.R
 import com.tari.android.wallet.data.tx.TxRepository
 import com.tari.android.wallet.util.extension.collectFlow
 import com.tari.android.wallet.util.extension.zipToPair
-import com.tari.android.wallet.model.Tx
+import com.tari.android.wallet.model.tx.Tx
 import com.tari.android.wallet.navigation.Navigation
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.common.giphy.presentation.GifViewModel
