@@ -32,7 +32,7 @@
  */
 package com.tari.android.wallet.util
 
-import com.tari.android.wallet.extension.toMicroTari
+import com.tari.android.wallet.util.extension.toMicroTari
 
 /**
  * Contains application-wide constant values.

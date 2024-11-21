@@ -38,7 +38,7 @@ import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefBooleanDeleg
 import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefGsonDelegate
 import com.tari.android.wallet.data.sharedPrefs.network.NetworkPrefRepository
 import com.tari.android.wallet.data.sharedPrefs.network.formatKey
-import com.tari.android.wallet.ui.fragment.settings.themeSelector.TariTheme
+import com.tari.android.wallet.ui.screen.settings.themeSelector.TariTheme
 import javax.inject.Inject
 import javax.inject.Singleton
 

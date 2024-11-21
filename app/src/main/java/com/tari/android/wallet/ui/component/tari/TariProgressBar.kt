@@ -4,7 +4,7 @@ import android.content.Context
 import android.util.AttributeSet
 import android.widget.ProgressBar
 import com.tari.android.wallet.ui.common.domain.PaletteManager
-import com.tari.android.wallet.ui.extension.setColor
+import com.tari.android.wallet.util.extension.setColor
 
 class TariProgressBar(context: Context, attrs: AttributeSet) : ProgressBar(context, attrs) {
 

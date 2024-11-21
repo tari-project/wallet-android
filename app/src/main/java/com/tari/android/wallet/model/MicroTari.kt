@@ -33,7 +33,7 @@
 package com.tari.android.wallet.model
 
 import android.os.Parcelable
-import com.tari.android.wallet.extension.toMicroTari
+import com.tari.android.wallet.util.extension.toMicroTari
 import kotlinx.parcelize.Parcelize
 import java.io.Serializable
 import java.math.BigDecimal

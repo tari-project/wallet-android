@@ -14,7 +14,7 @@ import android.view.View
 import androidx.core.graphics.blue
 import androidx.core.graphics.green
 import androidx.core.graphics.red
-import com.tari.android.wallet.ui.extension.removeListenersAndCancel
+import com.tari.android.wallet.util.extension.removeListenersAndCancel
 import org.joda.time.DateTime
 import kotlin.math.sin
 

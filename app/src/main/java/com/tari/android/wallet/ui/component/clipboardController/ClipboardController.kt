@@ -46,14 +46,14 @@ import com.tari.android.wallet.R
 import com.tari.android.wallet.databinding.ViewClipboardWalletBinding
 import com.tari.android.wallet.model.TariWalletAddress
 import com.tari.android.wallet.ui.common.domain.PaletteManager
-import com.tari.android.wallet.ui.extension.dimenPx
-import com.tari.android.wallet.ui.extension.gone
-import com.tari.android.wallet.ui.extension.hideKeyboard
-import com.tari.android.wallet.ui.extension.removeListenersAndCancel
-import com.tari.android.wallet.ui.extension.setBottomMargin
-import com.tari.android.wallet.ui.extension.setTopMargin
-import com.tari.android.wallet.ui.extension.string
-import com.tari.android.wallet.ui.extension.visible
+import com.tari.android.wallet.util.extension.dimenPx
+import com.tari.android.wallet.util.extension.gone
+import com.tari.android.wallet.util.extension.hideKeyboard
+import com.tari.android.wallet.util.extension.removeListenersAndCancel
+import com.tari.android.wallet.util.extension.setBottomMargin
+import com.tari.android.wallet.util.extension.setTopMargin
+import com.tari.android.wallet.util.extension.string
+import com.tari.android.wallet.util.extension.visible
 import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.EmojiUtil
 

@@ -6,9 +6,9 @@ import com.tari.android.wallet.model.MicroTari
 import com.tari.android.wallet.model.TariWalletAddress
 import com.tari.android.wallet.model.Tx
 import com.tari.android.wallet.model.TxId
-import com.tari.android.wallet.ui.fragment.contactBook.data.contacts.ContactDto
-import com.tari.android.wallet.ui.fragment.pinCode.PinCodeScreenBehavior
-import com.tari.android.wallet.ui.fragment.send.common.TransactionData
+import com.tari.android.wallet.data.contacts.model.ContactDto
+import com.tari.android.wallet.ui.screen.pinCode.PinCodeScreenBehavior
+import com.tari.android.wallet.ui.screen.send.common.TransactionData
 
 sealed class Navigation {
 

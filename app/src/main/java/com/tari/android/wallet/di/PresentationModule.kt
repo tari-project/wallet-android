@@ -33,8 +33,8 @@
 package com.tari.android.wallet.di
 
 import com.tari.android.wallet.BuildConfig
-import com.tari.android.wallet.ui.common.gyphy.repository.GifRepository
-import com.tari.android.wallet.ui.common.gyphy.repository.GiphyRESTRetrofitRepository
+import com.tari.android.wallet.ui.common.giphy.repository.GifRepository
+import com.tari.android.wallet.ui.common.giphy.repository.GiphyRESTRetrofitRepository
 import dagger.Module
 import dagger.Provides
 import okhttp3.Interceptor

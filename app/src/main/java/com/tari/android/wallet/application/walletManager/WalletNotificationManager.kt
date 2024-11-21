@@ -8,7 +8,7 @@ import com.tari.android.wallet.model.Tx
 import com.tari.android.wallet.model.TxId
 import com.tari.android.wallet.notification.NotificationHelper
 import com.tari.android.wallet.service.notification.NotificationService
-import com.tari.android.wallet.ui.fragment.home.HomeActivity
+import com.tari.android.wallet.ui.screen.home.HomeActivity
 import io.reactivex.Observable
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers

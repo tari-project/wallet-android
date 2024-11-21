@@ -8,7 +8,7 @@ import androidx.core.view.updateLayoutParams
 import com.tari.android.wallet.databinding.DialogModuleHeadBinding
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.component.common.CommonView
-import com.tari.android.wallet.ui.extension.setVisible
+import com.tari.android.wallet.util.extension.setVisible
 
 @SuppressLint("ViewConstructor")
 class HeadModuleView(context: Context, buttonModule: HeadModule) : CommonView<CommonViewModel, DialogModuleHeadBinding>(context) {

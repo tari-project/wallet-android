@@ -1,7 +1,7 @@
 package com.tari.android.wallet.tor
 
 import com.orhanobut.logger.Logger
-import com.tari.android.wallet.extension.safeCastTo
+import com.tari.android.wallet.util.extension.safeCastTo
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow

@@ -34,7 +34,7 @@ package com.tari.android.wallet.model
 
 import android.os.Parcel
 import android.os.Parcelable
-import com.tari.android.wallet.ui.extension.readS
+import com.tari.android.wallet.util.extension.readS
 import java.math.BigInteger
 
 /**

@@ -47,8 +47,8 @@ import com.tari.android.wallet.infrastructure.backup.dropbox.DropboxBackupStorag
 import com.tari.android.wallet.infrastructure.backup.googleDrive.GoogleDriveBackupStorage
 import com.tari.android.wallet.infrastructure.backup.local.LocalBackupStorage
 import com.tari.android.wallet.notification.NotificationHelper
-import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupOption
-import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupOptionDto
+import com.tari.android.wallet.ui.screen.settings.backup.data.BackupOption
+import com.tari.android.wallet.ui.screen.settings.backup.data.BackupOptionDto
 import io.reactivex.subjects.BehaviorSubject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch

@@ -36,8 +36,8 @@ package com.tari.android.wallet.util
 
 import com.tari.android.wallet.BuildConfig
 import com.tari.android.wallet.data.tx.TxDto
-import com.tari.android.wallet.extension.minusHours
-import com.tari.android.wallet.extension.toMicroTari
+import com.tari.android.wallet.util.extension.minusHours
+import com.tari.android.wallet.util.extension.toMicroTari
 import com.tari.android.wallet.model.Base58
 import com.tari.android.wallet.model.CompletedTx
 import com.tari.android.wallet.model.EmojiId
@@ -46,16 +46,16 @@ import com.tari.android.wallet.model.TariUtxo
 import com.tari.android.wallet.model.TariWalletAddress
 import com.tari.android.wallet.model.Tx
 import com.tari.android.wallet.model.TxStatus
-import com.tari.android.wallet.ui.common.gyphy.presentation.GifViewModel
-import com.tari.android.wallet.ui.common.gyphy.repository.GifRepository
+import com.tari.android.wallet.ui.common.giphy.presentation.GifViewModel
+import com.tari.android.wallet.ui.common.giphy.repository.GifRepository
 import com.tari.android.wallet.ui.common.recyclerView.items.TitleViewHolderItem
-import com.tari.android.wallet.ui.fragment.chat.data.ChatItemDto
-import com.tari.android.wallet.ui.fragment.chat.data.ChatMessageItemDto
-import com.tari.android.wallet.ui.fragment.contactBook.address_poisoning.SimilarAddressDto
-import com.tari.android.wallet.ui.fragment.contactBook.data.contacts.ContactDto
-import com.tari.android.wallet.ui.fragment.contactBook.data.contacts.FFIContactInfo
-import com.tari.android.wallet.ui.fragment.tx.adapter.TxViewHolderItem
-import com.tari.android.wallet.ui.fragment.utxos.list.adapters.UtxosViewHolderItem
+import com.tari.android.wallet.data.chat.ChatItemDto
+import com.tari.android.wallet.data.chat.ChatMessageItemDto
+import com.tari.android.wallet.ui.screen.contactBook.addressPoisoning.SimilarAddressDto
+import com.tari.android.wallet.data.contacts.model.ContactDto
+import com.tari.android.wallet.data.contacts.model.FFIContactInfo
+import com.tari.android.wallet.ui.screen.tx.adapter.TxViewHolderItem
+import com.tari.android.wallet.ui.screen.utxos.list.adapters.UtxosViewHolderItem
 import org.joda.time.DateTime
 import yat.android.lib.YatIntegration
 import java.math.BigInteger

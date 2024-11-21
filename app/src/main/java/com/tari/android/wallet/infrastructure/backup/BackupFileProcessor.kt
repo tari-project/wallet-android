@@ -38,7 +38,7 @@ import com.tari.android.wallet.application.walletManager.WalletManager
 import com.tari.android.wallet.application.walletManager.WalletConfig
 import com.tari.android.wallet.data.sharedPrefs.backup.BackupPrefRepository
 import com.tari.android.wallet.data.sharedPrefs.security.SecurityPrefRepository
-import com.tari.android.wallet.extension.encrypt
+import com.tari.android.wallet.util.extension.encrypt
 import com.tari.android.wallet.ffi.FFIError
 import com.tari.android.wallet.infrastructure.backup.compress.CompressionMethod
 import com.tari.android.wallet.infrastructure.security.encryption.SymmetricEncryptionAlgorithm

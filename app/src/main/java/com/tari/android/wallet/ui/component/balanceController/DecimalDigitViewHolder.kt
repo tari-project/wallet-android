@@ -9,9 +9,9 @@ import com.daasuu.ei.Ease
 import com.daasuu.ei.EasingInterpolator
 import com.tari.android.wallet.R
 import com.tari.android.wallet.databinding.ViewHomeBalanceDecimalDigitBinding
-import com.tari.android.wallet.ui.extension.dimenPx
-import com.tari.android.wallet.ui.extension.setTopMargin
-import com.tari.android.wallet.ui.extension.setWidthToMeasured
+import com.tari.android.wallet.util.extension.dimenPx
+import com.tari.android.wallet.util.extension.setTopMargin
+import com.tari.android.wallet.util.extension.setWidthToMeasured
 import com.tari.android.wallet.util.Constants
 
 class DecimalDigitViewHolder(context: Context, private var value: Int) : BalanceDigitViewHolder() {

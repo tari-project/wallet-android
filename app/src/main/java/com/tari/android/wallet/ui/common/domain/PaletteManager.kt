@@ -2,8 +2,8 @@ package com.tari.android.wallet.ui.common.domain
 
 import android.content.Context
 import com.tari.android.wallet.R
-import com.tari.android.wallet.ui.extension.color
-import com.tari.android.wallet.ui.extension.colorFromAttribute
+import com.tari.android.wallet.util.extension.color
+import com.tari.android.wallet.util.extension.colorFromAttribute
 
 object PaletteManager {
 

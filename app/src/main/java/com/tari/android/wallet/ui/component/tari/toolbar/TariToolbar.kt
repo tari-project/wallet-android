@@ -7,13 +7,13 @@ import android.widget.FrameLayout
 import com.giphy.sdk.ui.utils.px
 import com.tari.android.wallet.R
 import com.tari.android.wallet.databinding.TariToolbarBinding
-import com.tari.android.wallet.extension.repopulate
-import com.tari.android.wallet.ui.extension.gone
-import com.tari.android.wallet.ui.extension.obtain
-import com.tari.android.wallet.ui.extension.runRecycle
-import com.tari.android.wallet.ui.extension.setEndMargin
-import com.tari.android.wallet.ui.extension.setStartMargin
-import com.tari.android.wallet.ui.extension.visible
+import com.tari.android.wallet.util.extension.repopulate
+import com.tari.android.wallet.util.extension.gone
+import com.tari.android.wallet.util.extension.obtain
+import com.tari.android.wallet.util.extension.runRecycle
+import com.tari.android.wallet.util.extension.setEndMargin
+import com.tari.android.wallet.util.extension.setStartMargin
+import com.tari.android.wallet.util.extension.visible
 import kotlin.math.max
 
 class TariToolbar(context: Context, attrs: AttributeSet) : FrameLayout(context, attrs) {

@@ -37,11 +37,11 @@ import android.content.Context
 import android.content.Intent
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.di.DiContainer
-import com.tari.android.wallet.recovery.WalletRestorationState
-import com.tari.android.wallet.recovery.WalletRestorationStateHandler
-import com.tari.android.wallet.ui.fragment.home.HomeActivity
-import com.tari.android.wallet.ui.fragment.restore.activity.WalletRestoreActivity
-import com.tari.android.wallet.ui.fragment.splash.SplashActivity
+import com.tari.android.wallet.data.recovery.WalletRestorationState
+import com.tari.android.wallet.data.recovery.WalletRestorationStateHandler
+import com.tari.android.wallet.ui.screen.home.HomeActivity
+import com.tari.android.wallet.ui.screen.restore.activity.WalletRestoreActivity
+import com.tari.android.wallet.ui.screen.splash.SplashActivity
 import javax.inject.Inject
 
 class NotificationBroadcastReceiver : BroadcastReceiver() {

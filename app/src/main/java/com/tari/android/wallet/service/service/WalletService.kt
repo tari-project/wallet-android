@@ -52,7 +52,7 @@ import com.tari.android.wallet.service.ServiceRestartBroadcastReceiver
 import com.tari.android.wallet.service.service.WalletServiceLauncher.Companion.START_ACTION
 import com.tari.android.wallet.service.service.WalletServiceLauncher.Companion.STOP_ACTION
 import com.tari.android.wallet.ui.common.domain.ResourceManager
-import com.tari.android.wallet.ui.fragment.settings.logs.LogFilesManager
+import com.tari.android.wallet.ui.screen.settings.logs.LogFilesManager
 import com.tari.android.wallet.util.Constants
 import io.reactivex.Observable
 import io.reactivex.disposables.Disposable

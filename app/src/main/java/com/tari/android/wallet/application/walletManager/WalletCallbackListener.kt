@@ -17,7 +17,7 @@ import com.tari.android.wallet.model.PendingOutboundTx
 import com.tari.android.wallet.model.TransactionSendStatus
 import com.tari.android.wallet.model.Tx
 import com.tari.android.wallet.model.TxId
-import com.tari.android.wallet.recovery.WalletRestorationState
+import com.tari.android.wallet.data.recovery.WalletRestorationState
 import java.math.BigInteger
 import javax.inject.Inject
 import javax.inject.Singleton

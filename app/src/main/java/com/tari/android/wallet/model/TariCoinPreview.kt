@@ -4,7 +4,7 @@ import android.os.Parcel
 import android.os.Parcelable
 import com.tari.android.wallet.ffi.FFITariCoinPreview
 import com.tari.android.wallet.ffi.FFITariVector
-import com.tari.android.wallet.ui.extension.readP
+import com.tari.android.wallet.util.extension.readP
 import java.math.BigInteger
 
 class TariCoinPreview() : Parcelable {

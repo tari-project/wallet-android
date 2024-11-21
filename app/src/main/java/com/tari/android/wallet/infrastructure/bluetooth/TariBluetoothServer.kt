@@ -11,7 +11,7 @@ import com.tari.android.wallet.application.deeplinks.DeepLink
 import com.tari.android.wallet.application.deeplinks.DeeplinkManager
 import com.tari.android.wallet.data.sharedPrefs.bluetooth.BluetoothPrefRepository
 import com.tari.android.wallet.data.sharedPrefs.bluetooth.BluetoothServerState
-import com.tari.android.wallet.extension.addTo
+import com.tari.android.wallet.util.extension.addTo
 import com.tari.android.wallet.util.ContactUtil
 import com.welie.blessed.BluetoothCentral
 import com.welie.blessed.BluetoothPeripheralManager

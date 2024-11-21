@@ -33,7 +33,7 @@
 package com.tari.android.wallet.model
 
 import android.os.Parcelable
-import com.tari.android.wallet.extension.toMicroTari
+import com.tari.android.wallet.util.extension.toMicroTari
 import com.tari.android.wallet.ffi.FFICompletedTx
 import com.tari.android.wallet.ffi.FFIPointer
 import kotlinx.parcelize.Parcelize

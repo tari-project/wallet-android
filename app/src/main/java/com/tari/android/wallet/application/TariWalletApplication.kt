@@ -43,10 +43,10 @@ import com.tari.android.wallet.data.sharedPrefs.security.SecurityPrefRepository
 import com.tari.android.wallet.di.ApplicationScope
 import com.tari.android.wallet.di.DiContainer
 import com.tari.android.wallet.infrastructure.logging.LoggerAdapter
-import com.tari.android.wallet.network.NetworkConnectionStateReceiver
+import com.tari.android.wallet.data.network.NetworkConnectionStateReceiver
 import com.tari.android.wallet.notification.NotificationHelper
 import com.tari.android.wallet.service.service.WalletServiceLauncher
-import com.tari.android.wallet.ui.common.gyphy.GiphyAdapter
+import com.tari.android.wallet.ui.common.giphy.GiphyAdapter
 import io.sentry.android.core.SentryAndroid
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch

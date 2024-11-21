@@ -52,7 +52,7 @@ import com.google.api.services.drive.model.FileList
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.walletManager.WalletConfig
-import com.tari.android.wallet.extension.getLastPathComponent
+import com.tari.android.wallet.util.extension.getLastPathComponent
 import com.tari.android.wallet.infrastructure.backup.BackupFileProcessor
 import com.tari.android.wallet.infrastructure.backup.BackupNamingPolicy
 import com.tari.android.wallet.infrastructure.backup.BackupStorage

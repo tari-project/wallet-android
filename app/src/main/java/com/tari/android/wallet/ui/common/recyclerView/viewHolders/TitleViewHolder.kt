@@ -5,8 +5,8 @@ import com.tari.android.wallet.databinding.ItemTitleBinding
 import com.tari.android.wallet.ui.common.recyclerView.CommonViewHolder
 import com.tari.android.wallet.ui.common.recyclerView.ViewHolderBuilder
 import com.tari.android.wallet.ui.common.recyclerView.items.TitleViewHolderItem
-import com.tari.android.wallet.ui.extension.dimen
-import com.tari.android.wallet.ui.extension.setTopMargin
+import com.tari.android.wallet.util.extension.dimen
+import com.tari.android.wallet.util.extension.setTopMargin
 
 class TitleViewHolder(view: ItemTitleBinding) : CommonViewHolder<TitleViewHolderItem, ItemTitleBinding>(view) {
 

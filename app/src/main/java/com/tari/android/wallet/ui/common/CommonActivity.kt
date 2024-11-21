@@ -17,8 +17,8 @@ import androidx.fragment.app.Fragment
 import androidx.viewbinding.ViewBinding
 import com.squareup.seismic.ShakeDetector
 import com.tari.android.wallet.R
-import com.tari.android.wallet.extension.observe
-import com.tari.android.wallet.extension.safeCastTo
+import com.tari.android.wallet.util.extension.observe
+import com.tari.android.wallet.util.extension.safeCastTo
 import com.tari.android.wallet.ui.component.networkStateIndicator.ConnectionIndicatorViewModel
 import com.tari.android.wallet.ui.component.tari.toast.TariToast
 import com.tari.android.wallet.ui.component.tari.toast.TariToastArgs
@@ -30,12 +30,12 @@ import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonStyle
 import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
 import com.tari.android.wallet.ui.dialog.modular.modules.option.OptionModule
 import com.tari.android.wallet.ui.dialog.modular.modules.space.SpaceModule
-import com.tari.android.wallet.ui.extension.addEnterLeftAnimation
-import com.tari.android.wallet.ui.extension.string
-import com.tari.android.wallet.ui.fragment.settings.allSettings.TariVersionModel
-import com.tari.android.wallet.ui.fragment.settings.logs.activity.DebugActivity
-import com.tari.android.wallet.ui.fragment.settings.logs.activity.DebugNavigation
-import com.tari.android.wallet.ui.fragment.settings.themeSelector.TariTheme
+import com.tari.android.wallet.util.extension.addEnterLeftAnimation
+import com.tari.android.wallet.util.extension.string
+import com.tari.android.wallet.ui.screen.settings.allSettings.TariVersionModel
+import com.tari.android.wallet.ui.screen.settings.logs.activity.DebugActivity
+import com.tari.android.wallet.ui.screen.settings.logs.activity.DebugNavigation
+import com.tari.android.wallet.ui.screen.settings.themeSelector.TariTheme
 import yat.android.lib.YatIntegration
 
 abstract class CommonActivity<Binding : ViewBinding, VM : CommonViewModel> : AppCompatActivity(), ShakeDetector.Listener, FragmentPoppedListener {
