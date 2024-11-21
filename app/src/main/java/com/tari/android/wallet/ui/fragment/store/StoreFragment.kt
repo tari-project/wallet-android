@@ -42,6 +42,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.webkit.WebResourceError
+import android.webkit.WebView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.tari.android.wallet.R.drawable.vector_store_reload
@@ -57,6 +58,7 @@ import com.tari.android.wallet.ui.extension.gone
 import com.tari.android.wallet.ui.extension.removeListenersAndCancel
 import com.tari.android.wallet.ui.extension.string
 import com.tari.android.wallet.ui.fragment.store.EventsPropagatingWebViewClient.ExternalSiteOverride
+import com.tari.android.wallet.util.DebugConfig
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 
@@ -101,6 +103,9 @@ class StoreFragment : Fragment() {
             // Needed for product's photos selection
             settings.javaScriptEnabled = true
             settings.javaScriptCanOpenWindowsAutomatically = true
+            settings.databaseEnabled = true
+            settings.domStorageEnabled = true
+
             webViewClient = EventsPropagatingWebViewClient(
                 ExternalSiteOverride(string(ttl_store_url)) {
                     startActivity(Intent(ACTION_VIEW, it))
@@ -126,6 +131,7 @@ class StoreFragment : Fragment() {
             }
         }
         ui.webView.loadUrl(string(ttl_store_url))
+        if (DebugConfig.isDebug()) WebView.setWebContentsDebuggingEnabled(true)
     }
 
     private fun shareStoreLink() {
