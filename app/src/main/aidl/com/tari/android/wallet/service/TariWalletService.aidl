@@ -37,7 +37,4 @@ import com.tari.android.wallet.model.Model;
 
 interface TariWalletService {
 
-    List<TariUnblindedOutput> getUnbindedOutputs(out WalletError error);
-
-    void restoreWithUnbindedOutputs(in List<String> jsons, in TariWalletAddress address, in String message, out WalletError error);
 }

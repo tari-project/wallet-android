@@ -8,8 +8,6 @@ import com.tari.android.wallet.application.walletManager.WalletConfig
 import com.tari.android.wallet.application.walletManager.doOnWalletFailed
 import com.tari.android.wallet.application.walletManager.doOnWalletRunning
 import com.tari.android.wallet.data.sharedPrefs.backup.BackupPrefRepository
-import com.tari.android.wallet.util.extension.launchOnIo
-import com.tari.android.wallet.util.extension.launchOnMain
 import com.tari.android.wallet.infrastructure.backup.BackupFileIsEncryptedException
 import com.tari.android.wallet.infrastructure.backup.BackupManager
 import com.tari.android.wallet.infrastructure.backup.BackupStorageAuthRevokedException
@@ -17,7 +15,7 @@ import com.tari.android.wallet.infrastructure.backup.BackupStorageTamperedExcept
 import com.tari.android.wallet.infrastructure.backup.WalletStartFailedException
 import com.tari.android.wallet.model.TariWalletAddress
 import com.tari.android.wallet.model.WalletError
-import com.tari.android.wallet.model.throwIf
+import com.tari.android.wallet.navigation.Navigation
 import com.tari.android.wallet.service.service.WalletServiceLauncher
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.dialog.modular.ModularDialogArgs
@@ -26,10 +24,11 @@ import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonStyle
 import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
 import com.tari.android.wallet.ui.dialog.modular.modules.input.InputModule
-import com.tari.android.wallet.navigation.Navigation
 import com.tari.android.wallet.ui.screen.qr.QrScannerActivity
 import com.tari.android.wallet.ui.screen.qr.QrScannerSource
 import com.tari.android.wallet.ui.screen.settings.backup.data.BackupOption
+import com.tari.android.wallet.util.extension.launchOnIo
+import com.tari.android.wallet.util.extension.launchOnMain
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -59,15 +58,18 @@ class ChooseRestoreOptionViewModel : CommonViewModel() {
 
     init {
         launchOnIo {
-            walletManager.doOnWalletRunning {
+            walletManager.doOnWalletRunning { wallet ->
                 uiState.value.selectedOption?.let { selectedOption ->
                     if (walletConfig.walletExists()) {
                         backupPrefRepository.restoredTxs?.takeIf { it.utxos.isNotEmpty() }?.let { restoredTxs ->
                             val tariWalletAddress = TariWalletAddress.fromBase58(restoredTxs.sourceBase58)
                             val message = resourceManager.getString(R.string.backup_restored_tx)
-                            val error = WalletError()
-                            walletService.restoreWithUnbindedOutputs(restoredTxs.utxos, tariWalletAddress, message, error)
-                            throwIf(error)
+
+                            try {
+                                wallet.restoreWithUnbindedOutputs(restoredTxs.utxos, tariWalletAddress, message)
+                            } catch (exception: Exception) {
+                                handleException(exception)
+                            }
                         }
 
                         val dto = backupPrefRepository.getOptionDto(selectedOption).copy(isEnable = true)

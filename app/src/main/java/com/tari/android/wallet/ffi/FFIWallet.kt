@@ -430,19 +430,17 @@ class FFIWallet(
 
     fun getFeePerGramStats(): FFIFeePerGramStats = runWithError { FFIFeePerGramStats(jniWalletGetFeePerGramStats(3, it)) }
 
-    fun getUnbindedOutputs(error: FFIError): List<TariUnblindedOutput> {
-        val outputs = FFITariUnblindedOutputs(jniWalletGetUnspentOutputs(error))
-        val txs = mutableListOf<TariUnblindedOutput>()
-        for (i in 0 until outputs.getLength()) {
-            txs.add(TariUnblindedOutput(outputs.getAt(i)))
-        }
-        return txs
+    fun getUnbindedOutputs(): List<TariUnblindedOutput> = runWithError { error ->
+        FFITariUnblindedOutputs(jniWalletGetUnspentOutputs(error)).iterateWithDestroy { TariUnblindedOutput(it) }
     }
 
-    fun restoreWithUnbindedOutputs(jsons: List<String>, address: TariWalletAddress, message: String, error: FFIError) {
+    fun restoreWithUnbindedOutputs(jsons: List<String>, address: TariWalletAddress, message: String) = runWithError { error ->
         for (json in jsons) {
-            val output = FFITariUnblindedOutput(json)
-            jniImportExternalUtxoAsNonRewindable(output, FFITariWalletAddress(emojiId = address.fullEmojiId), message, error)
+            FFITariUnblindedOutput(json).runWithDestroy { output ->
+                FFITariWalletAddress(emojiId = address.fullEmojiId).runWithDestroy { sourceAddress ->
+                    jniImportExternalUtxoAsNonRewindable(output, sourceAddress, message, error)
+                }
+            }
         }
     }
 
