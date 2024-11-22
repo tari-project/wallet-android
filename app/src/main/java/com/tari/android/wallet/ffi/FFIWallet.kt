@@ -41,6 +41,7 @@ import com.tari.android.wallet.model.MicroTari
 import com.tari.android.wallet.model.PublicKey
 import com.tari.android.wallet.model.TariCoinPreview
 import com.tari.android.wallet.model.TariUnblindedOutput
+import com.tari.android.wallet.model.TariUtxo
 import com.tari.android.wallet.model.TariVector
 import com.tari.android.wallet.model.TariWalletAddress
 import com.tari.android.wallet.model.TxId
@@ -245,10 +246,11 @@ class FFIWallet(
         BalanceInfo(it.getAvailable(), it.getIncoming(), it.getOutgoing(), it.getTimeLocked())
     }
 
-    fun getUtxos(page: Int, pageSize: Int, sorting: Int): TariVector =
-        TariVector(FFITariVector(runWithError { jniGetUtxos(page, pageSize, sorting, 0, it) }))
+    fun getUtxos(page: Int, pageSize: Int, sorting: Int): TariVector = runWithError { error ->
+        TariVector(FFITariVector(jniGetUtxos(page, pageSize, sorting, 0, error)))
+    }
 
-    fun getAllUtxos(): TariVector = TariVector(FFITariVector(runWithError { jniGetAllUtxos(it) }))
+    fun getAllUtxos(): TariVector = runWithError { TariVector(FFITariVector(jniGetAllUtxos(it))) }
 
     fun getWalletAddress(): FFITariWalletAddress = runWithError { FFITariWalletAddress(jniGetWalletAddress(it)) }
 
@@ -337,19 +339,43 @@ class FFIWallet(
         return BigInteger(1, txIdBytes)
     }
 
-    fun joinUtxos(commitments: Array<String>, feePerGram: BigInteger, error: FFIError) {
-        jniJoinUtxos(commitments, feePerGram.toString(), error)
+    fun joinUtxos(utxos: List<TariUtxo>) = runWithError { error ->
+        jniJoinUtxos(
+            commitments = utxos.map { it.commitment }.toTypedArray(),
+            feePerGram = Constants.Wallet.DEFAULT_FEE_PER_GRAM.value.toString(),
+            libError = error,
+        )
     }
 
-    fun splitUtxos(commitments: Array<String>, count: Int, feePerGram: BigInteger, error: FFIError) {
-        jniSplitUtxos(commitments, count.toString(), feePerGram.toString(), error)
+    fun splitUtxos(utxos: List<TariUtxo>, splitCount: Int) = runWithError { error ->
+        jniSplitUtxos(
+            commitments = utxos.map { it.commitment }.toTypedArray(),
+            splitCount = splitCount.toString(),
+            feePerGram = Constants.Wallet.DEFAULT_FEE_PER_GRAM.value.toString(),
+            libError = error,
+        )
     }
 
-    fun joinPreviewUtxos(commitments: Array<String>, feePerGram: BigInteger, error: FFIError): TariCoinPreview =
-        TariCoinPreview(FFITariCoinPreview(jniPreviewJoinUtxos(commitments, feePerGram.toString(), error)))
+    fun joinPreviewUtxos(utxos: List<TariUtxo>): TariCoinPreview = runWithError { error ->
+        FFITariCoinPreview(
+            jniPreviewJoinUtxos(
+                commitments = utxos.map { it.commitment }.toTypedArray(),
+                feePerGram = Constants.Wallet.DEFAULT_FEE_PER_GRAM.value.toString(),
+                libError = error,
+            )
+        ).runWithDestroy { TariCoinPreview(it) }
+    }
 
-    fun splitPreviewUtxos(commitments: Array<String>, count: Int, feePerGram: BigInteger, error: FFIError): TariCoinPreview =
-        TariCoinPreview(FFITariCoinPreview(jniPreviewSplitUtxos(commitments, count.toString(), feePerGram.toString(), error)))
+    fun splitPreviewUtxos(utxos: List<TariUtxo>, splitCount: Int): TariCoinPreview = runWithError { error ->
+        FFITariCoinPreview(
+            jniPreviewSplitUtxos(
+                commitments = utxos.map { it.commitment }.toTypedArray(),
+                splitCount = splitCount.toString(),
+                feePerGram = Constants.Wallet.DEFAULT_FEE_PER_GRAM.value.toString(),
+                libError = error,
+            )
+        ).runWithDestroy { TariCoinPreview(it) }
+    }
 
     fun signMessage(message: String): String = runWithError { jniSignMessage(message, it) }
 

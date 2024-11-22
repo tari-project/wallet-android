@@ -5,7 +5,8 @@ import androidx.lifecycle.MutableLiveData
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.baseNodes.BaseNodesManager
 import com.tari.android.wallet.application.walletManager.WalletManager
-import com.tari.android.wallet.util.extension.getWithError
+import com.tari.android.wallet.model.TariCoinPreview
+import com.tari.android.wallet.model.TariUtxo
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.dialog.modular.DialogArgs
 import com.tari.android.wallet.ui.dialog.modular.IDialogModule
@@ -118,23 +119,14 @@ class UtxosListViewModel : CommonViewModel() {
 
     fun join() {
         showConfirmDialog(R.string.utxos_join_description) {
-            walletService.getWithError { error, wallet ->
-                val selectedUtxos = textList.value.orEmpty().filter { it.checked.value }.map { it.source }.toList()
-                wallet.joinUtxos(selectedUtxos, error)
-                hideDialog()
-                loadUtxosFromFFI()
-                walletManager.sendWalletEvent(WalletManager.WalletEvent.UtxosSplit)
-                showSuccessJoinDialog()
-            }
+            joinUtxos(textList.value.orEmpty().filter { it.checked.value }.map { it.source })
         }
     }
 
     fun split(currentItem: UtxosViewHolderItem? = null) {
         val selectedUtxos = textList.value.orEmpty().filter { it.checked.value }.map { it.source }.toMutableList()
         currentItem?.let { selectedUtxos.add(it.source) }
-        val splitModule = UtxoSplitModule(selectedUtxos) { count, items ->
-            walletService.getWithError { error, wallet -> wallet.previewSplitUtxos(items, count, error) }
-        }
+        val splitModule = UtxoSplitModule(selectedUtxos, ::previewSplitUtxos)
         val title = if (selectedUtxos.count() > 1) R.string.utxos_combine_and_break_title else R.string.utxos_break_title
         val buttonText = if (selectedUtxos.count() > 1) R.string.utxos_combine_and_break_button else R.string.utxos_break_button
         showModularDialog(
@@ -144,32 +136,62 @@ class UtxosListViewModel : CommonViewModel() {
             ButtonModule(resourceManager.getString(buttonText), ButtonStyle.Normal) {
                 hideDialog()
                 showConfirmDialog(R.string.utxos_break_description) {
-                    walletService.getWithError { error, wallet ->
-                        wallet.splitUtxos(selectedUtxos, splitModule.count, error)
-                        hideDialog()
-                        loadUtxosFromFFI()
-                        walletManager.sendWalletEvent(WalletManager.WalletEvent.UtxosSplit)
-                        showSuccessSplitDialog()
-                    }
+                    splitUtxos(selectedUtxos, splitModule.count)
                 }
             },
             ButtonModule(resourceManager.getString(R.string.common_cancel), ButtonStyle.Close),
         )
     }
 
-    private fun loadUtxosFromFFI() {
-        val allItems = if (DebugConfig.mockUtxos) {
-            MockDataStub.createUtxoList()
-        } else {
-            walletService.getWithError { error, wallet ->
-                wallet.getAllUtxos(error)
-            }.itemsList.map { UtxosViewHolderItem(it, baseNodesManager.networkBlockHeight.value.toLong()) }.filter { it.showStatus }
+    private fun joinUtxos(selectedUtxos: List<TariUtxo>) {
+        try {
+            walletManager.requireWalletInstance.joinUtxos(selectedUtxos)
+            hideDialog()
+            loadUtxosFromFFI()
+            walletManager.sendWalletEvent(WalletManager.WalletEvent.UtxosSplit)
+            showSuccessJoinDialog()
+        } catch (e: Exception) {
+            hideDialog()
+            logger.i("Error joining utxos: ${e.message}")
+            showErrorDialog(e)
         }
+    }
 
-        val state = if (allItems.isEmpty()) ScreenState.Empty else ScreenState.Data
-        screenState.postValue(state)
+    private fun previewSplitUtxos(count: Int, items: List<TariUtxo>): TariCoinPreview =
+        walletManager.requireWalletInstance.splitPreviewUtxos(items, count)
 
-        sourceList.postValue(allItems)
+    private fun splitUtxos(selectedUtxos: List<TariUtxo>, count: Int) {
+        try {
+            walletManager.requireWalletInstance.splitUtxos(selectedUtxos, count)
+            hideDialog()
+            loadUtxosFromFFI()
+            walletManager.sendWalletEvent(WalletManager.WalletEvent.UtxosSplit)
+            showSuccessSplitDialog()
+        } catch (e: Exception) {
+            hideDialog()
+            logger.i("Error splitting utxos: ${e.message}")
+            showErrorDialog(e)
+        }
+    }
+
+    private fun loadUtxosFromFFI() {
+        try {
+            val allItems = if (DebugConfig.mockUtxos) {
+                MockDataStub.createUtxoList()
+            } else {
+                walletManager.requireWalletInstance.getAllUtxos().itemsList
+                    .map { UtxosViewHolderItem(it, baseNodesManager.networkBlockHeight.value.toLong()) }
+                    .filter { it.showStatus }
+            }
+
+            val state = if (allItems.isEmpty()) ScreenState.Empty else ScreenState.Data
+
+            screenState.postValue(state)
+            sourceList.postValue(allItems)
+        } catch (e: Exception) {
+            logger.i("Error loading utxos: ${e.message}")
+            showErrorDialog(e)
+        }
     }
 
     private fun generateFromScratch() {
