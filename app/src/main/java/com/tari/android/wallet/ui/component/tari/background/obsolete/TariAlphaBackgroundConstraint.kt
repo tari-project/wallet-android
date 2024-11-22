@@ -36,8 +36,8 @@ import android.content.Context
 import android.util.AttributeSet
 import androidx.core.graphics.ColorUtils
 import com.tari.android.wallet.R
-import com.tari.android.wallet.ui.extension.obtain
-import com.tari.android.wallet.ui.extension.runRecycle
+import com.tari.android.wallet.util.extension.obtain
+import com.tari.android.wallet.util.extension.runRecycle
 
 @Deprecated("This is an obsolete class inheriting ConstraintLayout. Use TariAlphaBackground instead.")
 class TariAlphaBackgroundConstraint(context: Context, attrs: AttributeSet) : TariBackgroundConstraint(context, attrs) {

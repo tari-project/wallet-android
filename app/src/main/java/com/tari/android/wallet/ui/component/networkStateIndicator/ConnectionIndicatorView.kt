@@ -38,8 +38,8 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import com.tari.android.wallet.databinding.ViewConnectionIndicatorBinding
-import com.tari.android.wallet.extension.castTo
-import com.tari.android.wallet.extension.collectFlow
+import com.tari.android.wallet.util.extension.castTo
+import com.tari.android.wallet.util.extension.collectFlow
 import com.tari.android.wallet.ui.component.common.CommonView
 
 

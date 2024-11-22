@@ -7,10 +7,10 @@ import com.tari.android.wallet.R
 import com.tari.android.wallet.databinding.DialogModuleShareOptionsBinding
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.component.common.CommonView
-import com.tari.android.wallet.ui.extension.string
-import com.tari.android.wallet.ui.fragment.contactBook.root.share.ShareOptionArgs
-import com.tari.android.wallet.ui.fragment.contactBook.root.share.ShareOptionView
-import com.tari.android.wallet.ui.fragment.contactBook.root.share.ShareType
+import com.tari.android.wallet.util.extension.string
+import com.tari.android.wallet.ui.screen.contactBook.root.share.ShareOptionArgs
+import com.tari.android.wallet.ui.screen.contactBook.root.share.ShareOptionView
+import com.tari.android.wallet.infrastructure.ShareType
 
 class ShareOptionsModuleView(context: Context, shareOptionsModule: ShareOptionsModule) :
     CommonView<CommonViewModel, DialogModuleShareOptionsBinding>(context) {

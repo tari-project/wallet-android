@@ -10,7 +10,7 @@ import com.tari.android.wallet.databinding.DialogModuleButtonBinding
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.common.domain.PaletteManager
 import com.tari.android.wallet.ui.component.common.CommonView
-import com.tari.android.wallet.ui.extension.setOnThrottledClickListener
+import com.tari.android.wallet.util.extension.setOnThrottledClickListener
 
 class ButtonModuleView : CommonView<CommonViewModel, DialogModuleButtonBinding> {
 

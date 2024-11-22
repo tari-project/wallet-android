@@ -37,7 +37,7 @@ import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.widget.FrameLayout
 import com.tari.android.wallet.databinding.ViewProgressButtonBinding
-import com.tari.android.wallet.ui.extension.setVisible
+import com.tari.android.wallet.util.extension.setVisible
 
 class LoadingButtonView : FrameLayout {
 

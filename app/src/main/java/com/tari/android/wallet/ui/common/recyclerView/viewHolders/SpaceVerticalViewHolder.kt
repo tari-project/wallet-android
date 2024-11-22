@@ -4,7 +4,7 @@ import com.tari.android.wallet.databinding.ItemVerticalSpaceBinding
 import com.tari.android.wallet.ui.common.recyclerView.CommonViewHolder
 import com.tari.android.wallet.ui.common.recyclerView.ViewHolderBuilder
 import com.tari.android.wallet.ui.common.recyclerView.items.SpaceVerticalViewHolderItem
-import com.tari.android.wallet.ui.extension.dpToPx
+import com.tari.android.wallet.util.extension.dpToPx
 
 class SpaceVerticalViewHolder(view: ItemVerticalSpaceBinding) : CommonViewHolder<SpaceVerticalViewHolderItem, ItemVerticalSpaceBinding>(view) {
 

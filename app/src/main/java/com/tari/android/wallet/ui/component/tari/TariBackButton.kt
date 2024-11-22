@@ -6,7 +6,7 @@ import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.widget.FrameLayout
 import com.tari.android.wallet.databinding.TariBackButtonBinding
-import com.tari.android.wallet.ui.extension.setOnThrottledClickListener
+import com.tari.android.wallet.util.extension.setOnThrottledClickListener
 
 class TariBackButton(context: Context, attrs: AttributeSet) : FrameLayout(context, attrs) {
 

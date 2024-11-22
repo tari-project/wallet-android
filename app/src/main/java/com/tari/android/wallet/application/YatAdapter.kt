@@ -13,9 +13,9 @@ import com.tari.android.wallet.R
 import com.tari.android.wallet.data.sharedPrefs.CorePrefRepository
 import com.tari.android.wallet.data.sharedPrefs.network.NetworkPrefRepository
 import com.tari.android.wallet.data.sharedPrefs.yat.YatPrefRepository
-import com.tari.android.wallet.ui.fragment.send.common.TransactionData
-import com.tari.android.wallet.ui.fragment.send.finalize.FinalizeSendTxViewModel
-import com.tari.android.wallet.ui.fragment.send.finalize.YatFinalizeSendTxActivity
+import com.tari.android.wallet.ui.screen.send.common.TransactionData
+import com.tari.android.wallet.ui.screen.send.finalize.FinalizeSendTxViewModel
+import com.tari.android.wallet.ui.screen.send.finalize.YatFinalizeSendTxActivity
 import com.tari.android.wallet.util.DebugConfig
 import com.tari.android.wallet.model.EmojiId
 import kotlinx.coroutines.Dispatchers

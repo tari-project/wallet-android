@@ -40,7 +40,7 @@ import com.tari.android.wallet.R
 import com.tari.android.wallet.application.walletManager.WalletConfig
 import com.tari.android.wallet.model.MicroTari
 import com.tari.android.wallet.model.TariContact
-import com.tari.android.wallet.model.Tx
+import com.tari.android.wallet.model.tx.Tx
 import com.tari.android.wallet.util.addressFirstEmojis
 import com.tari.android.wallet.util.addressLastEmojis
 import com.tari.android.wallet.util.addressPrefixEmojis

@@ -32,6 +32,8 @@
  */
 package com.tari.android.wallet.model
 
+import com.tari.android.wallet.model.tx.Tx
+
 class TxNote(val message: String?, val gifUrl: String?) {
 
     init {

@@ -32,7 +32,7 @@
  */
 package com.tari.android.wallet.application.walletManager
 
-import com.tari.android.wallet.extension.safeCastTo
+import com.tari.android.wallet.util.extension.safeCastTo
 import com.tari.android.wallet.ffi.FFIException
 
 /**

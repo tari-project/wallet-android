@@ -73,7 +73,7 @@ class FFISeedWords() : FFIBase() {
     override fun destroy() = jniDestroy()
 
     companion object {
-        fun getMnemomicWordList(language: Language): FFISeedWords = FFISeedWords().apply {
+        fun getMnemonicWordList(language: Language): FFISeedWords = FFISeedWords().apply {
             jniGetMnemonicWordListForLanguage(language.name, FFIError())
         }
     }
@@ -83,4 +83,3 @@ class FFISeedWords() : FFIBase() {
         Spanish
     }
 }
-

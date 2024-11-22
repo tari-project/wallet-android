@@ -3,8 +3,8 @@ package com.tari.android.wallet.ui.component.clipboardController
 import android.content.ClipboardManager
 import com.tari.android.wallet.application.deeplinks.DeepLink
 import com.tari.android.wallet.application.deeplinks.DeeplinkManager
-import com.tari.android.wallet.extension.launchOnIo
-import com.tari.android.wallet.extension.launchOnMain
+import com.tari.android.wallet.util.extension.launchOnIo
+import com.tari.android.wallet.util.extension.launchOnMain
 import com.tari.android.wallet.model.TariWalletAddress
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.common.SingleLiveEvent

@@ -36,9 +36,9 @@ import android.icu.text.BreakIterator
 import android.text.SpannableString
 import android.text.Spanned
 import android.text.style.ForegroundColorSpan
-import com.tari.android.wallet.extension.applyColorStyle
-import com.tari.android.wallet.extension.applyLetterSpacingStyle
-import com.tari.android.wallet.extension.applyRelativeTextSizeStyle
+import com.tari.android.wallet.util.extension.applyColorStyle
+import com.tari.android.wallet.util.extension.applyLetterSpacingStyle
+import com.tari.android.wallet.util.extension.applyRelativeTextSizeStyle
 import com.tari.android.wallet.ffi.FFIEmojiSet
 import com.tari.android.wallet.model.EmojiId
 import com.tari.android.wallet.model.TariWalletAddress

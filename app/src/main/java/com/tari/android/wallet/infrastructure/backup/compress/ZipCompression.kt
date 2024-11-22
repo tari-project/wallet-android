@@ -1,6 +1,6 @@
 package com.tari.android.wallet.infrastructure.backup.compress
 
-import com.tari.android.wallet.extension.getLastPathComponent
+import com.tari.android.wallet.util.extension.getLastPathComponent
 import java.io.*
 import java.util.zip.ZipEntry
 import java.util.zip.ZipInputStream

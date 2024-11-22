@@ -64,10 +64,10 @@ import com.tari.android.wallet.data.sharedPrefs.network.NetworkPrefRepository
 import com.tari.android.wallet.ffi.TransactionValidationStatus
 import com.tari.android.wallet.ffi.nullptr
 import com.tari.android.wallet.model.BalanceInfo
-import com.tari.android.wallet.model.CancelledTx
-import com.tari.android.wallet.model.CompletedTx
-import com.tari.android.wallet.model.PendingInboundTx
-import com.tari.android.wallet.model.PendingOutboundTx
+import com.tari.android.wallet.model.tx.CancelledTx
+import com.tari.android.wallet.model.tx.CompletedTx
+import com.tari.android.wallet.model.tx.PendingInboundTx
+import com.tari.android.wallet.model.tx.PendingOutboundTx
 import com.tari.android.wallet.model.TransactionSendStatus
 import com.tari.android.wallet.model.recovery.WalletRestorationResult
 import com.tari.android.wallet.service.seedPhrase.SeedPhraseRepository

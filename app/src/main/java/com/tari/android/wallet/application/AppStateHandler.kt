@@ -1,6 +1,6 @@
 package com.tari.android.wallet.application
 
-import com.tari.android.wallet.event.EffectChannelFlow
+import com.tari.android.wallet.util.EffectChannelFlow
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext

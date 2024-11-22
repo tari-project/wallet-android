@@ -5,8 +5,8 @@ import com.tari.android.wallet.databinding.ItemSimilarAddressBinding
 import com.tari.android.wallet.ui.common.domain.PaletteManager
 import com.tari.android.wallet.ui.common.recyclerView.CommonViewHolder
 import com.tari.android.wallet.ui.common.recyclerView.ViewHolderBuilder
-import com.tari.android.wallet.ui.extension.setVisible
-import com.tari.android.wallet.ui.extension.string
+import com.tari.android.wallet.util.extension.setVisible
+import com.tari.android.wallet.util.extension.string
 import com.tari.android.wallet.util.EmojiUtil
 import java.text.SimpleDateFormat
 import java.util.Date

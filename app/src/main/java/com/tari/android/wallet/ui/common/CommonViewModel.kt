@@ -16,9 +16,9 @@ import com.tari.android.wallet.data.sharedPrefs.security.SecurityPrefRepository
 import com.tari.android.wallet.data.sharedPrefs.tariSettings.TariSettingsPrefRepository
 import com.tari.android.wallet.di.ApplicationComponent
 import com.tari.android.wallet.di.DiContainer
-import com.tari.android.wallet.extension.addTo
-import com.tari.android.wallet.extension.launchOnIo
-import com.tari.android.wallet.extension.launchOnMain
+import com.tari.android.wallet.util.extension.addTo
+import com.tari.android.wallet.util.extension.launchOnIo
+import com.tari.android.wallet.util.extension.launchOnMain
 import com.tari.android.wallet.ffi.FFIWallet
 import com.tari.android.wallet.infrastructure.logging.LoggerTags
 import com.tari.android.wallet.model.CoreError
@@ -27,9 +27,9 @@ import com.tari.android.wallet.navigation.Navigation
 import com.tari.android.wallet.navigation.Navigation.AllSettings
 import com.tari.android.wallet.navigation.TariNavigator
 import com.tari.android.wallet.service.TariWalletService
-import com.tari.android.wallet.service.connection.TariWalletServiceConnection
+import com.tari.android.wallet.data.connection.TariWalletServiceConnection
 import com.tari.android.wallet.ui.common.domain.ResourceManager
-import com.tari.android.wallet.ui.common.permission.PermissionManager
+import com.tari.android.wallet.infrastructure.permission.PermissionManager
 import com.tari.android.wallet.ui.component.tari.toast.TariToastArgs
 import com.tari.android.wallet.ui.dialog.confirm.ConfirmDialogArgs
 import com.tari.android.wallet.ui.dialog.error.WalletErrorArgs
@@ -41,7 +41,7 @@ import com.tari.android.wallet.ui.dialog.modular.modules.body.BodyModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonStyle
 import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
-import com.tari.android.wallet.ui.fragment.settings.themeSelector.TariTheme
+import com.tari.android.wallet.ui.screen.settings.themeSelector.TariTheme
 import io.reactivex.disposables.CompositeDisposable
 import javax.inject.Inject
 

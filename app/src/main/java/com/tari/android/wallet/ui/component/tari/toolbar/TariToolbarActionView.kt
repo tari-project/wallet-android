@@ -3,14 +3,12 @@ package com.tari.android.wallet.ui.component.tari.toolbar
 import android.content.Context
 import android.util.AttributeSet
 import android.view.LayoutInflater
-import android.view.View
 import android.widget.FrameLayout
-import com.tari.android.wallet.R
 import com.tari.android.wallet.databinding.ViewTariToolbarActionBinding
-import com.tari.android.wallet.ui.extension.setEndMargin
-import com.tari.android.wallet.ui.extension.setOnThrottledClickListener
-import com.tari.android.wallet.ui.extension.setStartMargin
-import com.tari.android.wallet.ui.extension.visible
+import com.tari.android.wallet.util.extension.setEndMargin
+import com.tari.android.wallet.util.extension.setOnThrottledClickListener
+import com.tari.android.wallet.util.extension.setStartMargin
+import com.tari.android.wallet.util.extension.visible
 
 class TariToolbarActionView @JvmOverloads constructor(
     context: Context,

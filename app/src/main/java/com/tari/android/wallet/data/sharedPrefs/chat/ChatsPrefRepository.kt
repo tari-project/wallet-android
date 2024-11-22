@@ -5,8 +5,8 @@ import com.tari.android.wallet.data.sharedPrefs.CommonPrefRepository
 import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefGsonDelegate
 import com.tari.android.wallet.data.sharedPrefs.network.NetworkPrefRepository
 import com.tari.android.wallet.data.sharedPrefs.network.formatKey
-import com.tari.android.wallet.ui.fragment.chat.data.ChatItemDto
-import com.tari.android.wallet.ui.fragment.chat.data.ChatMessageItemDto
+import com.tari.android.wallet.data.chat.ChatItemDto
+import com.tari.android.wallet.data.chat.ChatMessageItemDto
 import javax.inject.Inject
 import javax.inject.Singleton
 

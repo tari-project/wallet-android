@@ -37,17 +37,18 @@ import com.tari.android.wallet.BuildConfig
 import com.tari.android.wallet.application.walletManager.WalletCallbackListener
 import com.tari.android.wallet.data.sharedPrefs.network.TariNetwork
 import com.tari.android.wallet.model.BalanceInfo
-import com.tari.android.wallet.model.CancelledTx
-import com.tari.android.wallet.model.CompletedTx
 import com.tari.android.wallet.model.MicroTari
-import com.tari.android.wallet.model.PendingInboundTx
-import com.tari.android.wallet.model.PendingOutboundTx
 import com.tari.android.wallet.model.PublicKey
 import com.tari.android.wallet.model.TariCoinPreview
 import com.tari.android.wallet.model.TariUnblindedOutput
+import com.tari.android.wallet.model.TariUtxo
 import com.tari.android.wallet.model.TariVector
 import com.tari.android.wallet.model.TariWalletAddress
 import com.tari.android.wallet.model.TxId
+import com.tari.android.wallet.model.tx.CancelledTx
+import com.tari.android.wallet.model.tx.CompletedTx
+import com.tari.android.wallet.model.tx.PendingInboundTx
+import com.tari.android.wallet.model.tx.PendingOutboundTx
 import com.tari.android.wallet.util.Constants
 import java.math.BigInteger
 
@@ -245,10 +246,11 @@ class FFIWallet(
         BalanceInfo(it.getAvailable(), it.getIncoming(), it.getOutgoing(), it.getTimeLocked())
     }
 
-    fun getUtxos(page: Int, pageSize: Int, sorting: Int): TariVector =
-        TariVector(FFITariVector(runWithError { jniGetUtxos(page, pageSize, sorting, 0, it) }))
+    fun getUtxos(page: Int, pageSize: Int, sorting: Int): TariVector = runWithError { error ->
+        TariVector(FFITariVector(jniGetUtxos(page, pageSize, sorting, 0, error)))
+    }
 
-    fun getAllUtxos(): TariVector = TariVector(FFITariVector(runWithError { jniGetAllUtxos(it) }))
+    fun getAllUtxos(): TariVector = runWithError { TariVector(FFITariVector(jniGetAllUtxos(it))) }
 
     fun getWalletAddress(): FFITariWalletAddress = runWithError { FFITariWalletAddress(jniGetWalletAddress(it)) }
 
@@ -258,9 +260,19 @@ class FFIWallet(
         ffiContact.getWalletAddress().runWithDestroy { TariWalletAddress(it) } == walletAddress
     }
 
-    fun addUpdateContact(contact: FFIContact): Boolean = runWithError { jniAddUpdateContact(contact, it) }
+    fun addUpdateContact(walletAddress: TariWalletAddress, alias: String, isFavorite: Boolean): Boolean = runWithError {
+        FFITariWalletAddress(Base58String(walletAddress.fullBase58)).runWithDestroy { ffiTariWalletAddress ->
+            FFIContact(alias, ffiTariWalletAddress, isFavorite).runWithDestroy { contactToUpdate ->
+                jniAddUpdateContact(contactToUpdate, it)
+            }
+        }
+    }
 
-    fun removeContact(contact: FFIContact): Boolean = runWithError { jniRemoveContact(contact, it) }
+    fun removeContact(walletAddress: TariWalletAddress): Boolean = runWithError {
+        findContactByWalletAddress(walletAddress)?.runWithDestroy { contact ->
+            jniRemoveContact(contact, it)
+        } ?: false
+    }
 
     fun getCompletedTxs(): List<CompletedTx> = runWithError { FFICompletedTxs(jniGetCompletedTxs(it)).iterateWithDestroy { tx -> CompletedTx(tx) } }
 
@@ -327,19 +339,43 @@ class FFIWallet(
         return BigInteger(1, txIdBytes)
     }
 
-    fun joinUtxos(commitments: Array<String>, feePerGram: BigInteger, error: FFIError) {
-        jniJoinUtxos(commitments, feePerGram.toString(), error)
+    fun joinUtxos(utxos: List<TariUtxo>) = runWithError { error ->
+        jniJoinUtxos(
+            commitments = utxos.map { it.commitment }.toTypedArray(),
+            feePerGram = Constants.Wallet.DEFAULT_FEE_PER_GRAM.value.toString(),
+            libError = error,
+        )
     }
 
-    fun splitUtxos(commitments: Array<String>, count: Int, feePerGram: BigInteger, error: FFIError) {
-        jniSplitUtxos(commitments, count.toString(), feePerGram.toString(), error)
+    fun splitUtxos(utxos: List<TariUtxo>, splitCount: Int) = runWithError { error ->
+        jniSplitUtxos(
+            commitments = utxos.map { it.commitment }.toTypedArray(),
+            splitCount = splitCount.toString(),
+            feePerGram = Constants.Wallet.DEFAULT_FEE_PER_GRAM.value.toString(),
+            libError = error,
+        )
     }
 
-    fun joinPreviewUtxos(commitments: Array<String>, feePerGram: BigInteger, error: FFIError): TariCoinPreview =
-        TariCoinPreview(FFITariCoinPreview(jniPreviewJoinUtxos(commitments, feePerGram.toString(), error)))
+    fun joinPreviewUtxos(utxos: List<TariUtxo>): TariCoinPreview = runWithError { error ->
+        FFITariCoinPreview(
+            jniPreviewJoinUtxos(
+                commitments = utxos.map { it.commitment }.toTypedArray(),
+                feePerGram = Constants.Wallet.DEFAULT_FEE_PER_GRAM.value.toString(),
+                libError = error,
+            )
+        ).runWithDestroy { TariCoinPreview(it) }
+    }
 
-    fun splitPreviewUtxos(commitments: Array<String>, count: Int, feePerGram: BigInteger, error: FFIError): TariCoinPreview =
-        TariCoinPreview(FFITariCoinPreview(jniPreviewSplitUtxos(commitments, count.toString(), feePerGram.toString(), error)))
+    fun splitPreviewUtxos(utxos: List<TariUtxo>, splitCount: Int): TariCoinPreview = runWithError { error ->
+        FFITariCoinPreview(
+            jniPreviewSplitUtxos(
+                commitments = utxos.map { it.commitment }.toTypedArray(),
+                splitCount = splitCount.toString(),
+                feePerGram = Constants.Wallet.DEFAULT_FEE_PER_GRAM.value.toString(),
+                libError = error,
+            )
+        ).runWithDestroy { TariCoinPreview(it) }
+    }
 
     fun signMessage(message: String): String = runWithError { jniSignMessage(message, it) }
 
@@ -356,7 +392,9 @@ class FFIWallet(
 
     fun setPowerModeLow() = runWithError { jniPowerModeLow(it) }
 
-    fun getSeedWords(): FFISeedWords = runWithError { FFISeedWords(jniGetSeedWords(it)) }
+    fun getSeedWords(): List<String> = runWithError { error ->
+        FFISeedWords(jniGetSeedWords(error)).runWithDestroy { seedWords -> (0 until seedWords.getLength()).map { seedWords.getAt(it) } }
+    }
 
     fun getBaseNodePeers(): List<PublicKey> = runWithError { error ->
         FFIPublicKeys(jniGetBaseNodePeers(error)).let { ffiPublicKeys ->
@@ -392,19 +430,17 @@ class FFIWallet(
 
     fun getFeePerGramStats(): FFIFeePerGramStats = runWithError { FFIFeePerGramStats(jniWalletGetFeePerGramStats(3, it)) }
 
-    fun getUnbindedOutputs(error: FFIError): List<TariUnblindedOutput> {
-        val outputs = FFITariUnblindedOutputs(jniWalletGetUnspentOutputs(error))
-        val txs = mutableListOf<TariUnblindedOutput>()
-        for (i in 0 until outputs.getLength()) {
-            txs.add(TariUnblindedOutput(outputs.getAt(i)))
-        }
-        return txs
+    fun getUnbindedOutputs(): List<TariUnblindedOutput> = runWithError { error ->
+        FFITariUnblindedOutputs(jniWalletGetUnspentOutputs(error)).iterateWithDestroy { TariUnblindedOutput(it) }
     }
 
-    fun restoreWithUnbindedOutputs(jsons: List<String>, address: TariWalletAddress, message: String, error: FFIError) {
+    fun restoreWithUnbindedOutputs(jsons: List<String>, address: TariWalletAddress, message: String) = runWithError { error ->
         for (json in jsons) {
-            val output = FFITariUnblindedOutput(json)
-            jniImportExternalUtxoAsNonRewindable(output, FFITariWalletAddress(emojiId = address.fullEmojiId), message, error)
+            FFITariUnblindedOutput(json).runWithDestroy { output ->
+                FFITariWalletAddress(emojiId = address.fullEmojiId).runWithDestroy { sourceAddress ->
+                    jniImportExternalUtxoAsNonRewindable(output, sourceAddress, message, error)
+                }
+            }
         }
     }
 

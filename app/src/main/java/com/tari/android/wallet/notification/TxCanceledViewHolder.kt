@@ -37,7 +37,7 @@ import android.content.Context
 import android.widget.RemoteViews
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.walletManager.WalletConfig
-import com.tari.android.wallet.model.CancelledTx
+import com.tari.android.wallet.model.tx.CancelledTx
 
 class TxCanceledViewHolder(context: Context, tx: CancelledTx) :
     RemoteViews(context.packageName, R.layout.notification_remote_tx_canceled) {

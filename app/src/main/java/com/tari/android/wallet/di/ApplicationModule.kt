@@ -47,7 +47,7 @@ import com.tari.android.wallet.infrastructure.security.biometric.BiometricAuthen
 import com.tari.android.wallet.notification.NotificationHelper
 import com.tari.android.wallet.service.service.WalletServiceLauncher
 import com.tari.android.wallet.ui.common.domain.ResourceManager
-import com.tari.android.wallet.ui.common.gyphy.GiphyAdapter
+import com.tari.android.wallet.ui.common.giphy.GiphyAdapter
 import dagger.Module
 import dagger.Provides
 import java.io.File

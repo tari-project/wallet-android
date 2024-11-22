@@ -20,14 +20,14 @@ import androidx.viewbinding.ViewBinding
 import com.tari.android.wallet.BuildConfig
 import com.tari.android.wallet.R
 import com.tari.android.wallet.di.DiContainer
-import com.tari.android.wallet.extension.observe
+import com.tari.android.wallet.util.extension.observe
 import com.tari.android.wallet.ui.component.mainList.MutedBackPressedCallback
 import com.tari.android.wallet.ui.component.tari.toast.TariToast
 import com.tari.android.wallet.ui.component.tari.toast.TariToastArgs
 import com.tari.android.wallet.ui.dialog.modular.InputModularDialog
 import com.tari.android.wallet.ui.dialog.modular.ModularDialog
-import com.tari.android.wallet.ui.extension.removeListenersAndCancel
-import com.tari.android.wallet.ui.extension.string
+import com.tari.android.wallet.util.extension.removeListenersAndCancel
+import com.tari.android.wallet.util.extension.string
 
 abstract class CommonFragment<Binding : ViewBinding, VM : CommonViewModel> : Fragment(), FragmentPoppedListener {
 

@@ -4,8 +4,8 @@ import android.content.Context
 import android.util.AttributeSet
 import com.tari.android.wallet.R
 import com.tari.android.wallet.ui.common.domain.PaletteManager
-import com.tari.android.wallet.ui.extension.obtain
-import com.tari.android.wallet.ui.extension.runRecycle
+import com.tari.android.wallet.util.extension.obtain
+import com.tari.android.wallet.util.extension.runRecycle
 
 class TariQrBackground(context: Context, attrs: AttributeSet) : TariBackground(context, attrs) {
 

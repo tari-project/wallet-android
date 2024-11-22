@@ -5,8 +5,8 @@ import android.animation.ValueAnimator
 import android.view.View
 import com.daasuu.ei.Ease
 import com.daasuu.ei.EasingInterpolator
-import com.tari.android.wallet.ui.extension.removeListenersAndCancel
-import com.tari.android.wallet.ui.extension.setLayoutWidth
+import com.tari.android.wallet.util.extension.removeListenersAndCancel
+import com.tari.android.wallet.util.extension.setLayoutWidth
 import com.tari.android.wallet.util.Constants
 
 abstract class BalanceDigitViewHolder {

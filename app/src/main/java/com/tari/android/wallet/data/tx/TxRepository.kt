@@ -5,8 +5,8 @@ import com.tari.android.wallet.application.walletManager.WalletManager
 import com.tari.android.wallet.application.walletManager.WalletManager.WalletEvent
 import com.tari.android.wallet.application.walletManager.doOnWalletRunning
 import com.tari.android.wallet.di.ApplicationScope
-import com.tari.android.wallet.model.Tx
-import com.tari.android.wallet.ui.fragment.contactBook.data.ContactsRepository
+import com.tari.android.wallet.model.tx.Tx
+import com.tari.android.wallet.data.contacts.ContactsRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow

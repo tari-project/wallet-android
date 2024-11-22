@@ -6,7 +6,7 @@ import com.tari.android.wallet.data.sharedPrefs.securityStages.DisabledTimestamp
 import com.tari.android.wallet.data.sharedPrefs.securityStages.SecurityStagesPrefRepository
 import com.tari.android.wallet.data.sharedPrefs.securityStages.WalletSecurityStage
 import com.tari.android.wallet.data.sharedPrefs.tariSettings.TariSettingsPrefRepository
-import com.tari.android.wallet.extension.isAfterNow
+import com.tari.android.wallet.util.extension.isAfterNow
 import com.tari.android.wallet.model.BalanceInfo
 import com.tari.android.wallet.model.MicroTari
 import com.tari.android.wallet.data.sharedPrefs.backup.BackupPrefRepository

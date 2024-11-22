@@ -92,7 +92,7 @@
 
         <!-- splash -->
         <activity
-            android:name=".ui.fragment.splash.SplashActivity"
+            android:name=".ui.screen.splash.SplashActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:exported="true"
             android:launchMode="singleInstance"
@@ -109,7 +109,7 @@
 
         <!-- onboarding flow -->
         <activity
-            android:name=".ui.fragment.onboarding.activity.OnboardingFlowActivity"
+            android:name=".ui.screen.onboarding.activity.OnboardingFlowActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:exported="false"
             android:screenOrientation="portrait"
@@ -118,7 +118,7 @@
 
         <!-- local authentication -->
         <activity
-            android:name=".ui.fragment.auth.AuthActivity"
+            android:name=".ui.screen.auth.AuthActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:exported="false"
             android:launchMode="singleInstance"
@@ -128,7 +128,7 @@
 
         <!-- home (transaction list) -->
         <activity
-            android:name=".ui.fragment.home.HomeActivity"
+            android:name=".ui.screen.home.HomeActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:exported="true"
             android:launchMode="singleInstance"
@@ -192,7 +192,7 @@
         </activity>
 
         <activity
-            android:name=".ui.fragment.qr.QrScannerActivity"
+            android:name=".ui.screen.qr.QrScannerActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:exported="false"
             android:theme="@style/AppTheme.Light"
@@ -200,7 +200,7 @@
 
         <!-- send tari -->
         <activity
-            android:name=".ui.fragment.send.finalize.YatFinalizeSendTxActivity"
+            android:name=".ui.screen.send.finalize.YatFinalizeSendTxActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:exported="true"
             android:launchMode="singleInstance"
@@ -209,21 +209,21 @@
             android:windowSoftInputMode="stateAlwaysHidden" />
 
         <activity
-            android:name=".ui.fragment.settings.logs.activity.DebugActivity"
+            android:name=".ui.screen.settings.logs.activity.DebugActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:exported="false"
             android:launchMode="singleInstance"
-            android:parentActivityName=".ui.fragment.home.HomeActivity"
+            android:parentActivityName=".ui.screen.home.HomeActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.Light"
             android:windowSoftInputMode="adjustResize|stateAlwaysHidden" />
 
         <activity
-            android:name=".ui.fragment.restore.activity.WalletRestoreActivity"
+            android:name=".ui.screen.restore.activity.WalletRestoreActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:exported="false"
             android:launchMode="singleInstance"
-            android:parentActivityName=".ui.fragment.onboarding.activity.OnboardingFlowActivity"
+            android:parentActivityName=".ui.screen.onboarding.activity.OnboardingFlowActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.Light"
             android:windowSoftInputMode="adjustResize" />

@@ -2,13 +2,13 @@ package com.tari.android.wallet.ui.component.networkStateIndicator
 
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.baseNodes.BaseNodesManager
-import com.tari.android.wallet.extension.collectFlow
-import com.tari.android.wallet.extension.combineToPair
-import com.tari.android.wallet.network.NetworkConnectionState
-import com.tari.android.wallet.network.NetworkConnectionStateHandler
-import com.tari.android.wallet.service.baseNode.BaseNodeState
-import com.tari.android.wallet.service.baseNode.BaseNodeStateHandler
-import com.tari.android.wallet.service.baseNode.BaseNodeSyncState
+import com.tari.android.wallet.util.extension.collectFlow
+import com.tari.android.wallet.util.extension.combineToPair
+import com.tari.android.wallet.data.network.NetworkConnectionState
+import com.tari.android.wallet.data.network.NetworkConnectionStateHandler
+import com.tari.android.wallet.data.baseNode.BaseNodeState
+import com.tari.android.wallet.data.baseNode.BaseNodeStateHandler
+import com.tari.android.wallet.data.baseNode.BaseNodeSyncState
 import com.tari.android.wallet.tor.TorProxyState
 import com.tari.android.wallet.tor.TorProxyStateHandler
 import com.tari.android.wallet.ui.common.CommonViewModel

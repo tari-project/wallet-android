@@ -33,7 +33,7 @@
 package com.tari.android.wallet.model
 
 import android.os.Parcelable
-import com.tari.android.wallet.extension.flag
+import com.tari.android.wallet.util.extension.flag
 import com.tari.android.wallet.ffi.Base58String
 import com.tari.android.wallet.ffi.FFIException
 import com.tari.android.wallet.ffi.FFITariWalletAddress

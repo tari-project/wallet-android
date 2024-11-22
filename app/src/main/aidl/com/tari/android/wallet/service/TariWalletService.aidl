@@ -37,28 +37,4 @@ import com.tari.android.wallet.model.Model;
 
 interface TariWalletService {
 
-    boolean updateContact(in TariWalletAddress address, in String alias, boolean isFavorite, out WalletError error);
-
-    boolean removeContact(in TariWalletAddress address, out WalletError error);
-
-    /**
-    * Seed words.
-    */
-    List<String> getSeedWords(out WalletError error);
-
-    TariVector getUtxos(int page, int pageSize, int sorting, out WalletError error);
-
-    TariVector getAllUtxos(out WalletError error);
-
-    TariCoinPreview previewJoinUtxos(in List<TariUtxo> utxos, out WalletError error);
-
-    TariCoinPreview previewSplitUtxos(in List<TariUtxo> utxos, int splitCount, out WalletError error);
-
-    void joinUtxos(in List<TariUtxo> utxos, out WalletError error);
-
-    void splitUtxos(in List<TariUtxo> utxos, int splitCount, out WalletError error);
-
-    List<TariUnblindedOutput> getUnbindedOutputs(out WalletError error);
-
-    void restoreWithUnbindedOutputs(in List<String> jsons, in TariWalletAddress address, in String message, out WalletError error);
 }

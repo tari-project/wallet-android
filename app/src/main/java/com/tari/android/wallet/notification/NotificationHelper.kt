@@ -47,9 +47,9 @@ import androidx.core.content.ContextCompat
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.walletManager.WalletConfig
-import com.tari.android.wallet.model.CancelledTx
-import com.tari.android.wallet.model.Tx
-import com.tari.android.wallet.ui.fragment.home.HomeDeeplinkScreens
+import com.tari.android.wallet.model.tx.CancelledTx
+import com.tari.android.wallet.model.tx.Tx
+import com.tari.android.wallet.ui.screen.home.HomeDeeplinkScreens
 import javax.inject.Inject
 import javax.inject.Singleton
 

@@ -32,7 +32,7 @@
  */
 package com.tari.android.wallet.ui.presentation
 
-import com.tari.android.wallet.model.CompletedTx
+import com.tari.android.wallet.model.tx.CompletedTx
 import com.tari.android.wallet.model.TariContact
 import com.tari.android.wallet.model.TxNote
 import com.tari.android.wallet.util.MockDataStub.WALLET_ADDRESS

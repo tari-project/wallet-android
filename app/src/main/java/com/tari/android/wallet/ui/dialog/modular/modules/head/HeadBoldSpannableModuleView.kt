@@ -5,11 +5,11 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import com.tari.android.wallet.databinding.DialogModuleHeadBinding
-import com.tari.android.wallet.extension.applyFontStyle
+import com.tari.android.wallet.util.extension.applyFontStyle
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.component.tari.TariFont
 import com.tari.android.wallet.ui.component.common.CommonView
-import com.tari.android.wallet.ui.extension.string
+import com.tari.android.wallet.util.extension.string
 
 @SuppressLint("ViewConstructor")
 class HeadBoldSpannableModuleView(context: Context, buttonModule: HeadBoldSpannableModule) :
