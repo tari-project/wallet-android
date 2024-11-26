@@ -45,7 +45,6 @@
                 android:id="@+id/info_line_1_text_view"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="?attr/palette_text_heading"
                 android:textSize="18sp"
                 app:customFont="light"
                 tools:text="@string/finalize_send_tx_sending_step_1_desc_line_1" />
@@ -62,7 +61,6 @@
                 android:id="@+id/info_line_2_text_view"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="?attr/palette_text_heading"
                 android:textSize="18sp"
                 app:customFont="black"
                 tools:text="@string/finalize_send_tx_sending_step_1_desc_line_2" />
