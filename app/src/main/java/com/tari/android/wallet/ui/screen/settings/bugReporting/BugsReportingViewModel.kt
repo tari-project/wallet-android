@@ -1,14 +1,10 @@
 package com.tari.android.wallet.ui.screen.settings.bugReporting
 
-import androidx.lifecycle.viewModelScope
 import com.tari.android.wallet.R
 import com.tari.android.wallet.infrastructure.logging.BugReportingService
 import com.tari.android.wallet.ui.common.CommonViewModel
-import com.tari.android.wallet.ui.dialog.modular.modules.body.BodyModule
-import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonModule
-import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonStyle
-import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
-import kotlinx.coroutines.launch
+import com.tari.android.wallet.util.extension.launchOnIo
+import com.tari.android.wallet.util.extension.switchToMain
 import javax.inject.Inject
 
 class BugsReportingViewModel : CommonViewModel() {
@@ -20,17 +16,21 @@ class BugsReportingViewModel : CommonViewModel() {
         component.inject(this)
     }
 
-    fun send(name: String, email: String, bugDescription: String) = viewModelScope.launch {
+    fun send(name: String, email: String, bugDescription: String) = launchOnIo {
         try {
             bugReportingService.share(name, email, bugDescription)
             backPressed.postValue(Unit)
+            logger.i("Bug report sent: name=$name, email=$email, bugDescription=$bugDescription")
         } catch (e: Exception) {
-            showModularDialog(
-                HeadModule(resourceManager.getString(R.string.common_error_title)),
-                BodyModule(resourceManager.getString(R.string.common_unknown_error)),
-                ButtonModule(resourceManager.getString(R.string.common_ok), ButtonStyle.Close),
-            )
+            switchToMain {
+                showSimpleDialog(
+                    title = resourceManager.getString(R.string.common_error_title),
+                    description = e.message?.let { resourceManager.getString(R.string.bugs_reporting_send_logs_error, it) }
+                        ?: resourceManager.getString(R.string.common_unknown_error),
+                    closeButtonTextRes = R.string.common_ok,
+                )
+            }
+            logger.e("Error sending bug report: ${e.message}")
         }
     }
 }
-
