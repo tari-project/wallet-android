@@ -5,7 +5,7 @@ import kotlinx.parcelize.Parcelize
 
 @Parcelize
 class TransactionSendStatus(
-    val status: Status = Status.Invalid,
+    val status: Status,
 ) : Parcelable {
 
     constructor(result: Int) : this(Status.findByInt(result))

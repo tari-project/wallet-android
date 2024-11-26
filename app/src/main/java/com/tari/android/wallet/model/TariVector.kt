@@ -38,10 +38,10 @@ import kotlinx.parcelize.Parcelize
 
 @Parcelize
 data class TariVector(
-    val len: Long = -1,
-    val cap: Long = -1,
-    val itemsList: List<TariUtxo> = emptyList(),
-    val longs: List<Long> = emptyList(),
+    val len: Long,
+    val cap: Long,
+    val itemsList: List<TariUtxo>,
+    val longs: List<Long>,
 ) : Parcelable {
 
     constructor(ffiTariVector: FFITariVector) : this(

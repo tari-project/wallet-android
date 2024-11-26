@@ -51,7 +51,6 @@ import com.tari.android.wallet.data.sharedPrefs.security.SecurityPrefRepository
 import com.tari.android.wallet.data.sharedPrefs.tariSettings.TariSettingsPrefRepository
 import com.tari.android.wallet.databinding.ActivityHomeBinding
 import com.tari.android.wallet.di.DiContainer.appComponent
-import com.tari.android.wallet.util.extension.observe
 import com.tari.android.wallet.model.TxId
 import com.tari.android.wallet.navigation.Navigation
 import com.tari.android.wallet.navigation.TariNavigator.Companion.INDEX_CHAT
@@ -63,8 +62,6 @@ import com.tari.android.wallet.service.service.WalletServiceLauncher
 import com.tari.android.wallet.ui.common.CommonActivity
 import com.tari.android.wallet.ui.common.domain.PaletteManager
 import com.tari.android.wallet.ui.common.domain.ResourceManager
-import com.tari.android.wallet.util.extension.serializable
-import com.tari.android.wallet.util.extension.setVisible
 import com.tari.android.wallet.ui.screen.chat.chatList.ChatListFragment
 import com.tari.android.wallet.ui.screen.contactBook.root.ContactBookFragment
 import com.tari.android.wallet.ui.screen.home.overview.HomeOverviewFragment
@@ -74,6 +71,9 @@ import com.tari.android.wallet.ui.screen.splash.SplashActivity
 import com.tari.android.wallet.ui.screen.store.StoreFragment
 import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.DebugConfig
+import com.tari.android.wallet.util.extension.observe
+import com.tari.android.wallet.util.extension.serializable
+import com.tari.android.wallet.util.extension.setVisible
 import java.lang.ref.WeakReference
 import javax.inject.Inject
 
@@ -154,10 +154,8 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>() {
 
         if (savedInstanceState == null) {
             enableNavigationView(ui.homeImageView)
-            viewModel.doOnWalletServiceConnected {
-                ui.root.postDelayed({
-                    processIntentDeepLink(intent)
-                }, Constants.UI.mediumDurationMs)
+            viewModel.doOnWalletRunning {
+                ui.root.postDelayed({ processIntentDeepLink(intent) }, Constants.UI.mediumDurationMs)
             }
         } else {
             val index = savedInstanceState.getInt(KEY_PAGE)

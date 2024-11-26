@@ -48,6 +48,7 @@ import com.tari.android.wallet.model.tx.CancelledTx
 import com.tari.android.wallet.model.tx.CompletedTx
 import com.tari.android.wallet.model.tx.PendingInboundTx
 import com.tari.android.wallet.model.tx.PendingOutboundTx
+import com.tari.android.wallet.ui.screen.send.addAmount.FeePerGramOptions
 import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.DebugConfig
 import java.math.BigInteger
@@ -428,7 +429,9 @@ class FFIWallet(
             )
         }
 
-    fun getFeePerGramStats(): FFIFeePerGramStats = runWithError { FFIFeePerGramStats(jniWalletGetFeePerGramStats(3, it)) }
+    fun getFeePerGramStats(): FeePerGramOptions = runWithError { error ->
+        FFIFeePerGramStats(jniWalletGetFeePerGramStats(3, error)).runWithDestroy { FeePerGramOptions(it) }
+    }
 
     fun getUnbindedOutputs(): List<TariUnblindedOutput> = runWithError { error ->
         FFITariUnblindedOutputs(jniWalletGetUnspentOutputs(error)).iterateWithDestroy { TariUnblindedOutput(it) }

@@ -62,11 +62,7 @@
             android:description="@string/wallet_service_desc"
             android:enabled="true"
             android:exported="false"
-            android:foregroundServiceType="dataSync">
-            <intent-filter>
-                <action android:name="com.tari.android.wallet.service.TariWalletService" />
-            </intent-filter>
-        </service>
+            android:foregroundServiceType="dataSync" />
 
         <!-- file provider to share log files with other applications (i.e. email clients) -->
         <provider

@@ -41,11 +41,6 @@ import com.tari.android.wallet.ffi.runWithDestroy
 import com.tari.android.wallet.util.tariEmoji
 import kotlinx.parcelize.Parcelize
 
-/**
- * This wrapper is needed for id parameters in AIDL methods.
- *
- * @author The Tari Development Team
- */
 @Parcelize
 data class TariWalletAddress(
     val network: Network,

@@ -54,8 +54,8 @@ import com.tari.android.wallet.R.string.error_fee_more_than_amount_title
 import com.tari.android.wallet.R.string.tx_detail_fee_tooltip_desc
 import com.tari.android.wallet.R.string.tx_detail_fee_tooltip_transaction_fee
 import com.tari.android.wallet.application.walletManager.WalletConfig
+import com.tari.android.wallet.data.contacts.model.ContactDto
 import com.tari.android.wallet.databinding.FragmentAddAmountBinding
-import com.tari.android.wallet.util.extension.collectFlow
 import com.tari.android.wallet.model.BalanceInfo
 import com.tari.android.wallet.model.MicroTari
 import com.tari.android.wallet.model.TariWalletAddress
@@ -67,13 +67,6 @@ import com.tari.android.wallet.ui.common.CommonFragment
 import com.tari.android.wallet.ui.dialog.modular.ModularDialog
 import com.tari.android.wallet.ui.dialog.modular.SimpleDialogArgs
 import com.tari.android.wallet.ui.dialog.tooltipDialog.TooltipDialogArgs
-import com.tari.android.wallet.util.extension.gone
-import com.tari.android.wallet.util.extension.invisible
-import com.tari.android.wallet.util.extension.setVisible
-import com.tari.android.wallet.util.extension.string
-import com.tari.android.wallet.util.extension.temporarilyDisableClick
-import com.tari.android.wallet.util.extension.visible
-import com.tari.android.wallet.data.contacts.model.ContactDto
 import com.tari.android.wallet.ui.screen.send.addAmount.feeModule.NetworkSpeed
 import com.tari.android.wallet.ui.screen.send.addAmount.keyboard.KeyboardController
 import com.tari.android.wallet.ui.screen.send.amountView.AmountStyle
@@ -83,6 +76,13 @@ import com.tari.android.wallet.util.DebugConfig
 import com.tari.android.wallet.util.addressFirstEmojis
 import com.tari.android.wallet.util.addressLastEmojis
 import com.tari.android.wallet.util.addressPrefixEmojis
+import com.tari.android.wallet.util.extension.collectFlow
+import com.tari.android.wallet.util.extension.gone
+import com.tari.android.wallet.util.extension.invisible
+import com.tari.android.wallet.util.extension.setVisible
+import com.tari.android.wallet.util.extension.string
+import com.tari.android.wallet.util.extension.temporarilyDisableClick
+import com.tari.android.wallet.util.extension.visible
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -129,7 +129,7 @@ class AddAmountFragment : CommonFragment<FragmentAddAmountBinding, AddAmountView
 
         collectFlow(effect) { effect ->
             when (effect) {
-                is AddAmountModel.Effect.OnServiceConnected -> {
+                is AddAmountModel.Effect.SetupUi -> {
                     setupUI(effect.uiState)
                 }
             }
@@ -227,12 +227,11 @@ class AddAmountFragment : CommonFragment<FragmentAddAmountBinding, AddAmountView
     }
 
     private fun checkAmountAndFee() {
-        val error = WalletError()
         val balanceInfo = viewModel.walletBalance
         val fee = viewModel.selectedFeeData?.calculatedFee
 
         val amount = keyboardController.currentAmount
-        if (error == WalletError.NoError && fee != null) {
+        if (fee != null) {
             if (amount > balanceInfo.availableBalance && !DebugConfig.suppressAddAmountErrors) {
                 lifecycleScope.launch(Dispatchers.Main) {
                     actualBalanceExceeded()
@@ -290,10 +289,10 @@ class AddAmountFragment : CommonFragment<FragmentAddAmountBinding, AddAmountView
 
         override fun run() {
             // TODO error handling should be in the view model
-            val error = WalletError()
-            viewModel.calculateFee(keyboardController.currentAmount)
-            if (error != WalletError.NoError) {
-                showErrorState(error)
+            try {
+                viewModel.calculateFee(keyboardController.currentAmount)
+            } catch (error: Exception) {
+                showErrorState(WalletError(error))
                 return
             }
             viewModel.selectedFeeData ?: return

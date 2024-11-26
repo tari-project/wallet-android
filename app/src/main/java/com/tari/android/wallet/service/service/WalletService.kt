@@ -96,7 +96,6 @@ class WalletService : Service() {
     lateinit var appStateHandler: AppStateHandler
 
     private var lifecycleObserver: ServiceLifecycleCallbacks? = null
-    private val stubProxy = TariWalletServiceStubProxy()
 
     private lateinit var wallet: FFIWallet
 
@@ -173,7 +172,6 @@ class WalletService : Service() {
     private fun onWalletStarted(ffiWallet: FFIWallet) {
         wallet = ffiWallet
         lifecycleObserver = ServiceLifecycleCallbacks(wallet)
-        stubProxy.stub = TariWalletServiceStubImpl(wallet)
         scheduleExpirationCheck()
         Handler(Looper.getMainLooper()).post { ProcessLifecycleOwner.get().lifecycle.addObserver(lifecycleObserver!!) }
         walletManager.onWalletStarted()
@@ -198,14 +196,9 @@ class WalletService : Service() {
                 }
     }
 
-    override fun onBind(intent: Intent?): IBinder {
-        logger.i("Wallet service bound")
-        return stubProxy
-    }
-
-    override fun onUnbind(intent: Intent?): Boolean {
-        logger.i("Wallet service unbound")
-        return super.onUnbind(intent)
+    override fun onBind(intent: Intent?): IBinder? {
+        // Return null because this service is not meant to be bound to
+        return null
     }
 
     /**

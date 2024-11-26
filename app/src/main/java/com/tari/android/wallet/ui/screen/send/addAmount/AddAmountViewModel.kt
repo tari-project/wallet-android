@@ -2,11 +2,8 @@ package com.tari.android.wallet.ui.screen.send.addAmount
 
 import androidx.lifecycle.SavedStateHandle
 import com.tari.android.wallet.R
-import com.tari.android.wallet.util.EffectChannelFlow
-import com.tari.android.wallet.util.extension.getOrNull
-import com.tari.android.wallet.util.extension.getWithError
-import com.tari.android.wallet.util.extension.launchOnIo
-import com.tari.android.wallet.ffi.runWithDestroy
+import com.tari.android.wallet.data.contacts.model.ContactDto
+import com.tari.android.wallet.data.network.NetworkConnectionStateHandler
 import com.tari.android.wallet.model.BalanceInfo
 import com.tari.android.wallet.model.MicroTari
 import com.tari.android.wallet.model.TariWalletAddress
@@ -15,17 +12,20 @@ import com.tari.android.wallet.navigation.Navigation
 import com.tari.android.wallet.navigation.TariNavigator.Companion.PARAMETER_AMOUNT
 import com.tari.android.wallet.navigation.TariNavigator.Companion.PARAMETER_CONTACT
 import com.tari.android.wallet.navigation.TariNavigator.Companion.PARAMETER_NOTE
-import com.tari.android.wallet.data.network.NetworkConnectionStateHandler
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.dialog.modular.modules.body.BodyModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonStyle
 import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
-import com.tari.android.wallet.data.contacts.model.ContactDto
 import com.tari.android.wallet.ui.screen.send.addAmount.feeModule.FeeModule
 import com.tari.android.wallet.ui.screen.send.addAmount.feeModule.NetworkSpeed
 import com.tari.android.wallet.ui.screen.send.common.TransactionData
 import com.tari.android.wallet.util.Constants
+import com.tari.android.wallet.util.EffectChannelFlow
+import com.tari.android.wallet.util.extension.getOrNull
+import com.tari.android.wallet.util.extension.getWithError
+import com.tari.android.wallet.util.extension.launchOnIo
+import com.tari.android.wallet.util.extension.toMicroTari
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -65,19 +65,16 @@ class AddAmountViewModel(savedState: SavedStateHandle) : CommonViewModel() {
         get() = walletManager.requireWalletInstance.getBalance()
 
     init {
-        doOnWalletServiceConnected { _effect.send(AddAmountModel.Effect.OnServiceConnected(uiState.value)) }
+        doOnWalletRunning { _effect.send(AddAmountModel.Effect.SetupUi(uiState.value)) }
 
         loadFees()
     }
 
-    private fun loadFees() = doOnWalletServiceConnected {
+    private fun loadFees() = doOnWalletRunning { wallet ->
         launchOnIo {
             try {
                 _uiState.update {
-                    it.copy(
-                        feePerGrams = walletManager.requireWalletInstance.getFeePerGramStats()
-                            .runWithDestroy { ffiGrams -> FeePerGramOptions(ffiGrams) },
-                    )
+                    it.copy(feePerGrams = wallet.getFeePerGramStats())
                 }
             } catch (e: Throwable) {
                 logger.i("Error loading fees: ${e.message}")
@@ -91,7 +88,7 @@ class AddAmountViewModel(savedState: SavedStateHandle) : CommonViewModel() {
     }
 
     fun showFeeDialog() {
-        val feeModule = FeeModule(MicroTari(), feeData, selectedSpeed)
+        val feeModule = FeeModule(0.toMicroTari(), feeData, selectedSpeed)
         showModularDialog(
             HeadModule(resourceManager.getString(R.string.add_amount_modify_fee_title)),
             BodyModule(resourceManager.getString(R.string.add_amount_modify_fee_description)),
@@ -110,29 +107,25 @@ class AddAmountViewModel(savedState: SavedStateHandle) : CommonViewModel() {
     }
 
     fun calculateFee(amount: MicroTari) {
-        try {
-            val grams = uiState.value.feePerGrams
-            if (grams == null) {
-                calculateDefaultFees(amount)
-                return
-            }
-
-            val wallet = walletManager.requireWalletInstance
-
-            val slowFee = wallet.getWithError(this::showFeeError) { it.estimateTxFee(amount, grams.slow) }
-            val mediumFee = wallet.getWithError(this::showFeeError) { it.estimateTxFee(amount, grams.medium) }
-            val fastFee = wallet.getWithError(this::showFeeError) { it.estimateTxFee(amount, grams.fast) }
-
-            if (slowFee == null || mediumFee == null || fastFee == null) {
-                calculateDefaultFees(amount)
-                return
-            }
-
-            feeData = listOf(FeeData(grams.slow, slowFee), FeeData(grams.medium, mediumFee), FeeData(grams.fast, fastFee))
-            selectedFeeData = feeData[1]
-        } catch (e: Throwable) {
-            logger.i(e.message + "calculate fees")
+        val grams = uiState.value.feePerGrams
+        if (grams == null) {
+            calculateDefaultFees(amount)
+            return
         }
+
+        val wallet = walletManager.requireWalletInstance
+
+        val slowFee = wallet.getWithError(this::showFeeError) { it.estimateTxFee(amount, grams.slow) }
+        val mediumFee = wallet.getWithError(this::showFeeError) { it.estimateTxFee(amount, grams.medium) }
+        val fastFee = wallet.getWithError(this::showFeeError) { it.estimateTxFee(amount, grams.fast) }
+
+        if (slowFee == null || mediumFee == null || fastFee == null) {
+            calculateDefaultFees(amount)
+            return
+        }
+
+        feeData = listOf(FeeData(grams.slow, slowFee), FeeData(grams.medium, mediumFee), FeeData(grams.fast, fastFee))
+        selectedFeeData = feeData[1]
     }
 
     fun continueToAddNote(transactionData: TransactionData) {

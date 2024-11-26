@@ -7,12 +7,12 @@ import java.math.BigInteger
 
 @Parcelize
 data class TariUtxo(
-    val commitment: String = "",
-    val value: MicroTari = MicroTari(BigInteger.ZERO),
-    val minedHeight: Long = -1,
-    val timestamp: Long = -1,
-    val lockHeight: Long = -1,
-    val status: UtxoStatus = UtxoStatus.Spent,
+    val commitment: String,
+    val value: MicroTari,
+    val minedHeight: Long,
+    val timestamp: Long,
+    val lockHeight: Long,
+    val status: UtxoStatus,
 ) : Parcelable {
 
     constructor(ffiUtxo: FFITariUtxo) : this(

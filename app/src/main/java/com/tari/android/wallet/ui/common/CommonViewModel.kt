@@ -10,26 +10,22 @@ import com.tari.android.wallet.R
 import com.tari.android.wallet.application.walletManager.WalletManager
 import com.tari.android.wallet.application.walletManager.doOnWalletFailed
 import com.tari.android.wallet.application.walletManager.doOnWalletRunning
+import com.tari.android.wallet.data.connection.TariWalletServiceConnection
 import com.tari.android.wallet.data.sharedPrefs.CorePrefRepository
 import com.tari.android.wallet.data.sharedPrefs.network.NetworkPrefRepository
 import com.tari.android.wallet.data.sharedPrefs.security.SecurityPrefRepository
 import com.tari.android.wallet.data.sharedPrefs.tariSettings.TariSettingsPrefRepository
 import com.tari.android.wallet.di.ApplicationComponent
 import com.tari.android.wallet.di.DiContainer
-import com.tari.android.wallet.util.extension.addTo
-import com.tari.android.wallet.util.extension.launchOnIo
-import com.tari.android.wallet.util.extension.launchOnMain
 import com.tari.android.wallet.ffi.FFIWallet
 import com.tari.android.wallet.infrastructure.logging.LoggerTags
+import com.tari.android.wallet.infrastructure.permission.PermissionManager
 import com.tari.android.wallet.model.CoreError
 import com.tari.android.wallet.model.TariWalletAddress
 import com.tari.android.wallet.navigation.Navigation
 import com.tari.android.wallet.navigation.Navigation.AllSettings
 import com.tari.android.wallet.navigation.TariNavigator
-import com.tari.android.wallet.service.TariWalletService
-import com.tari.android.wallet.data.connection.TariWalletServiceConnection
 import com.tari.android.wallet.ui.common.domain.ResourceManager
-import com.tari.android.wallet.infrastructure.permission.PermissionManager
 import com.tari.android.wallet.ui.component.tari.toast.TariToastArgs
 import com.tari.android.wallet.ui.dialog.confirm.ConfirmDialogArgs
 import com.tari.android.wallet.ui.dialog.error.WalletErrorArgs
@@ -42,6 +38,9 @@ import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonStyle
 import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
 import com.tari.android.wallet.ui.screen.settings.themeSelector.TariTheme
+import com.tari.android.wallet.util.extension.addTo
+import com.tari.android.wallet.util.extension.launchOnIo
+import com.tari.android.wallet.util.extension.launchOnMain
 import io.reactivex.disposables.CompositeDisposable
 import javax.inject.Inject
 
@@ -75,8 +74,6 @@ open class CommonViewModel : ViewModel(), DialogHandler {
 
     @Inject
     lateinit var serviceConnection: TariWalletServiceConnection
-    val walletService: TariWalletService
-        get() = serviceConnection.walletService
 
     @Inject
     protected lateinit var walletManager: WalletManager
@@ -133,12 +130,6 @@ open class CommonViewModel : ViewModel(), DialogHandler {
         super.onCleared()
 
         compositeDisposable.clear()
-    }
-
-    fun doOnWalletServiceConnected(action: suspend (walletService: TariWalletService) -> Unit) {
-        launchOnIo {
-            serviceConnection.doOnWalletServiceConnected(action)
-        }
     }
 
     fun doOnWalletRunning(action: suspend (walletService: FFIWallet) -> Unit) {

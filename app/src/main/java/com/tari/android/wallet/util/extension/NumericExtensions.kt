@@ -35,15 +35,6 @@ package com.tari.android.wallet.util.extension
 import com.tari.android.wallet.model.MicroTari
 import java.math.BigInteger
 
-/**
- * Maps float from one range to another.
- *
- * @return mapped float
- */
-fun Float.remap(from1: Float, to1: Float, from2: Float, to2: Float): Float {
-    return (this - from1) / (to1 - from1) * (to2 - from2) + from2
-}
-
 fun Int.toMicroTari() = BigInteger.valueOf(this.toLong()).toMicroTari()
 
 fun Long.toMicroTari() = BigInteger.valueOf(this).toMicroTari()
