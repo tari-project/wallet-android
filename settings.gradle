@@ -1,5 +1,5 @@
-include ':app', ':yatlib'
-rootProject.name='Tari Wallet'
+include ":app", ":yatlib"
+rootProject.name="Tari Wallet"
 
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)

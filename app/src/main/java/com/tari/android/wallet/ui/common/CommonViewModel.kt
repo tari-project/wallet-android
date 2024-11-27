@@ -76,7 +76,7 @@ open class CommonViewModel : ViewModel(), DialogHandler {
     lateinit var serviceConnection: TariWalletServiceConnection
 
     @Inject
-    protected lateinit var walletManager: WalletManager
+    lateinit var walletManager: WalletManager
 
     @Inject
     lateinit var dialogManager: DialogManager

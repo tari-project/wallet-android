@@ -56,11 +56,19 @@ import com.tari.android.wallet.R.string.create_wallet_your_emoji_id_text_label_b
 import com.tari.android.wallet.R.string.emoji_id_chunk_separator
 import com.tari.android.wallet.databinding.FragmentCreateWalletBinding
 import com.tari.android.wallet.di.DiContainer
-import com.tari.android.wallet.util.extension.applyFontStyle
-import com.tari.android.wallet.util.extension.collectFlow
 import com.tari.android.wallet.ui.common.domain.PaletteManager
 import com.tari.android.wallet.ui.component.tari.TariFont
+import com.tari.android.wallet.ui.screen.onboarding.activity.OnboardingFlowFragment
+import com.tari.android.wallet.ui.screen.onboarding.createWallet.CreateWalletModel.Effect
+import com.tari.android.wallet.util.Constants
+import com.tari.android.wallet.util.Constants.UI.CreateEmojiId
+import com.tari.android.wallet.util.EmojiUtil
+import com.tari.android.wallet.util.addressFirstEmojis
+import com.tari.android.wallet.util.addressLastEmojis
+import com.tari.android.wallet.util.addressPrefixEmojis
 import com.tari.android.wallet.util.extension.animateClick
+import com.tari.android.wallet.util.extension.applyFontStyle
+import com.tari.android.wallet.util.extension.collectFlow
 import com.tari.android.wallet.util.extension.dimen
 import com.tari.android.wallet.util.extension.dimenPx
 import com.tari.android.wallet.util.extension.doOnGlobalLayout
@@ -73,15 +81,6 @@ import com.tari.android.wallet.util.extension.setTopMargin
 import com.tari.android.wallet.util.extension.string
 import com.tari.android.wallet.util.extension.temporarilyDisableClick
 import com.tari.android.wallet.util.extension.visible
-import com.tari.android.wallet.ui.screen.onboarding.activity.OnboardingFlowFragment
-import com.tari.android.wallet.ui.screen.onboarding.createWallet.CreateWalletModel.Effect
-import com.tari.android.wallet.util.Constants
-import com.tari.android.wallet.util.Constants.UI.CreateEmojiId
-import com.tari.android.wallet.util.EmojiUtil
-import com.tari.android.wallet.util.addressFirstEmojis
-import com.tari.android.wallet.util.addressLastEmojis
-import com.tari.android.wallet.util.addressPrefixEmojis
-import me.everything.android.ui.overscroll.OverScrollDecoratorHelper
 
 /**
  * onBoarding flow : wallet creation step.
@@ -123,7 +122,6 @@ class CreateWalletFragment : OnboardingFlowFragment<FragmentCreateWalletBinding,
     }
 
     private fun setupUi() {
-        OverScrollDecoratorHelper.setUpOverScroll(ui.emojiIdScrollView)
         ui.apply {
             yourEmojiIdTitleTextView.text = string(create_wallet_your_emoji_id_text_label).applyFontStyle(
                 context = requireActivity(),

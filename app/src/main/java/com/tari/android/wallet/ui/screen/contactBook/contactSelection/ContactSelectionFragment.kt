@@ -55,7 +55,6 @@ import com.tari.android.wallet.util.EmojiUtil
 import com.tari.android.wallet.util.containsNonEmoji
 import com.tari.android.wallet.util.firstNCharactersAreEmojis
 import kotlinx.coroutines.launch
-import me.everything.android.ui.overscroll.OverScrollDecoratorHelper
 
 open class ContactSelectionFragment : CommonFragment<FragmentContactsSelectionBinding, ContactSelectionViewModel>(), TextWatcher {
 
@@ -150,7 +149,6 @@ open class ContactSelectionFragment : CommonFragment<FragmentContactsSelectionBi
         setupRecyclerView()
         ui.toolbar.hideRightActions()
         ui.invalidEmojiIdTextView.gone()
-        OverScrollDecoratorHelper.setUpOverScroll(ui.searchEditTextScrollView)
         ui.searchEditText.inputType = InputType.TYPE_NULL
         ui.qrCodeButton.setOnClickListener { onQRButtonClick(it) }
         val args = TariToolbarActionArg(title = string(R.string.common_done)) { goToNext() }
@@ -241,7 +239,7 @@ open class ContactSelectionFragment : CommonFragment<FragmentContactsSelectionBi
         val mActivity = activity ?: return
         ui.searchEditText.requestFocus()
         val imm = mActivity.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-        imm.showSoftInput(ui.searchEditText, InputMethodManager.HIDE_IMPLICIT_ONLY)
+        imm.showSoftInput(ui.searchEditText, InputMethodManager.SHOW_IMPLICIT)
     }
 
     /**

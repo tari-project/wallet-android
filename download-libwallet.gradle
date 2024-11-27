@@ -1,7 +1,7 @@
 /**
  * Downloads JNI binaries as version specified in the project-level gradle file.
  */
-tasks.register('downloadLibwallet') {
+tasks.register("downloadLibwallet") {
     final def binariesDir = "${rootProject.projectDir}/libwallet/"
     final def armDir = "${rootProject.projectDir}/libwallet/arm64-v8a/"
     final def x64Dir = "${rootProject.projectDir}/libwallet/x86_64/"
@@ -26,21 +26,21 @@ tasks.register('downloadLibwallet') {
             dest binariesDir
         }
 
-        copyFile(binariesDir, binariesDir, libwalletHeader, 'wallet.h')
+        copyFile(binariesDir, binariesDir, libwalletHeader, "wallet.h")
 
 
         download {
             src(x64AFile)
             dest binariesDir
         }
-        copyFile(binariesDir, x64Dir, libwalletx64A, 'libminotari_wallet_ffi.a')
+        copyFile(binariesDir, x64Dir, libwalletx64A, "libminotari_wallet_ffi.a")
 
 
         download {
             src(armAFile)
             dest binariesDir
         }
-        copyFile(binariesDir, armDir, libwalletArmA, 'libminotari_wallet_ffi.a')
+        copyFile(binariesDir, armDir, libwalletArmA, "libminotari_wallet_ffi.a")
 
         delete {
             delete fileTree(binariesDir) {
@@ -52,7 +52,7 @@ tasks.register('downloadLibwallet') {
 
 WorkResult copyFile(String fromDir, String toDir, String oldFileName, String newFileName) {
     copy {
-        duplicatesStrategy = 'include'
+        duplicatesStrategy = "include"
         from fromDir + oldFileName
         rename { String currentFileName -> renameFile(currentFileName, oldFileName, newFileName) }
         into toDir
