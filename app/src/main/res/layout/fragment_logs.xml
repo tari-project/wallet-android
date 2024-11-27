@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-
-<com.tari.android.wallet.ui.component.tari.background.obsolete.TariPrimaryBackgroundConstraint xmlns:android="http://schemas.android.com/apk/res/android"
+<com.tari.android.wallet.ui.component.tari.background.TariPrimaryBackground xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <androidx.appcompat.widget.LinearLayoutCompat
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
@@ -16,7 +16,7 @@
             android:layout_height="wrap_content"
             app:text="@string/debug_logs_title" />
 
-        <com.tari.android.wallet.ui.component.tari.background.obsolete.TariSecondaryBackgroundConstraint
+        <com.tari.android.wallet.ui.component.tari.background.TariSecondaryBackground
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
@@ -32,7 +32,6 @@
                     android:layout_gravity="center"
                     android:indeterminate="true"
                     android:progressTint="?attr/palette_brand_purple" />
-
             </FrameLayout>
 
             <androidx.recyclerview.widget.RecyclerView
@@ -46,10 +45,8 @@
                 android:scrollbarAlwaysDrawVerticalTrack="true"
                 android:scrollbarSize="6dp"
                 android:scrollbarStyle="outsideInset"
-                android:scrollbars="vertical" />
-
-        </com.tari.android.wallet.ui.component.tari.background.obsolete.TariSecondaryBackgroundConstraint>
-
-    </androidx.appcompat.widget.LinearLayoutCompat>
-
-</com.tari.android.wallet.ui.component.tari.background.obsolete.TariPrimaryBackgroundConstraint>
+                android:scrollbars="vertical"
+                tools:listitem="@layout/item_log" />
+        </com.tari.android.wallet.ui.component.tari.background.TariSecondaryBackground>
+    </LinearLayout>
+</com.tari.android.wallet.ui.component.tari.background.TariPrimaryBackground>

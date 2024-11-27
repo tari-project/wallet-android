@@ -41,53 +41,81 @@ import java.io.BufferedInputStream
 import java.io.BufferedOutputStream
 import java.io.File
 import java.io.FileInputStream
+import java.io.FileNotFoundException
 import java.io.FileOutputStream
+import java.io.IOException
 import java.util.zip.ZipEntry
 import java.util.zip.ZipOutputStream
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class BugReportingService @Inject constructor(private val sharedPrefsWrapper: CorePrefRepository, private val walletConfig: WalletConfig) {
+class BugReportingService @Inject constructor(
+    private val sharedPrefsWrapper: CorePrefRepository,
+    private val walletConfig: WalletConfig,
+) {
 
     fun share(name: String, email: String, bugDescription: String) {
         val zippedFile = getZippedLogs()
         val eventId = Sentry.captureMessage(bugDescription) { scope ->
-            zippedFile?.let { scope.addAttachment(Attachment(zippedFile.absolutePath)) }
+            scope.addAttachment(Attachment(zippedFile.absolutePath))
         }
         val sentryUserFeedback = UserFeedback(eventId, name, email, bugDescription)
         Sentry.captureUserFeedback(sentryUserFeedback)
     }
 
-    private fun getZippedLogs(): File? {
-        // delete if zipped file exists
-        return runCatching {
-            val walletAddress = sharedPrefsWrapper.walletAddressBase58
+    private fun getZippedLogs(): File {
+        val walletAddress = sharedPrefsWrapper.walletAddressBase58
 
-            val logFilesDirPath = walletConfig.getWalletLogFilesDirPath()
-            val zipFile = File(logFilesDirPath, "ffi_logs_${walletAddress}.zip")
-            if (zipFile.exists()) {
-                zipFile.delete()
-            }
-            val fileOutStream = FileOutputStream(zipFile)
-            // zip!
-            val allLogFiles = walletConfig.getLogFiles()
-            ZipOutputStream(BufferedOutputStream(fileOutStream)).use { out ->
+        val logFilesDirPath = walletConfig.getWalletLogFilesDirPath()
+        val zipFile = File(logFilesDirPath, "ffi_logs_${walletAddress}.zip")
+        if (zipFile.exists()) {
+            zipFile.delete()
+        }
+
+        val allLogFiles = walletConfig.getLogFiles()
+
+        val fileOutStream: FileOutputStream
+        val bufferOutStream: BufferedOutputStream
+        val out: ZipOutputStream
+
+        try {
+            fileOutStream = FileOutputStream(zipFile)
+            bufferOutStream = BufferedOutputStream(fileOutStream)
+            out = ZipOutputStream(bufferOutStream)
+
+            try {
                 for (file in allLogFiles) {
-                    FileInputStream(file).use { inputStream ->
-                        BufferedInputStream(inputStream).use { origin ->
+                    val inputStream: FileInputStream
+                    val origin: BufferedInputStream
+
+                    try {
+                        inputStream = FileInputStream(file)
+                        origin = BufferedInputStream(inputStream)
+
+                        try {
                             val entry = ZipEntry(file.name)
                             out.putNextEntry(entry)
                             origin.copyTo(out, 1024)
+                        } finally {
                             origin.close()
+                            inputStream.close()
                         }
-                        inputStream.close()
+                    } catch (e: IOException) {
+                        error("Error reading or processing file: ${file.name}")
                     }
                 }
+            } finally {
                 out.closeEntry()
                 out.close()
+                bufferOutStream.close()
+                fileOutStream.close()
             }
-            zipFile
-        }.getOrNull()
+        } catch (e: FileNotFoundException) {
+            error("Output zip file not found: ${zipFile.absolutePath}")
+        } catch (e: IOException) {
+            error("Error creating zip file")
+        }
+        return zipFile.takeIf { it.exists() } ?: error("Zipped logs file is null or does not exist")
     }
 }

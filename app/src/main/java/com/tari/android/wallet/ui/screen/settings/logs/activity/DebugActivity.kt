@@ -56,8 +56,8 @@ class DebugActivity : CommonActivity<ActivityDebugBinding, DebugViewModel>() {
 
         setContainerId(ui.navContainer.id)
 
-        val navigationStr = intent.getStringExtra(navigation_key)
-        navigate(DebugNavigation.values().firstOrNull { it.toString() == navigationStr })
+        val navigationStr = intent.getStringExtra(NAVIGATION_KEY)
+        navigate(DebugNavigation.entries.firstOrNull { it.toString() == navigationStr })
     }
 
     fun navigate(navigation: DebugNavigation?, file: File? = null, rooted: Boolean = true) {
@@ -70,12 +70,12 @@ class DebugActivity : CommonActivity<ActivityDebugBinding, DebugViewModel>() {
     }
 
     companion object {
-        const val navigation_key = "Debugnavigation"
-        const val log_file = "Logs_detail"
+        const val NAVIGATION_KEY = "Debugnavigation"
+        const val LOG_FILE = "Logs_detail"
 
         fun launch(context: Context, navigation: DebugNavigation) {
             val intent = Intent(context, DebugActivity::class.java)
-            intent.putExtra("Debugnavigation", navigation.toString())
+            intent.putExtra(NAVIGATION_KEY, navigation.toString())
             context.startActivity(intent)
         }
     }

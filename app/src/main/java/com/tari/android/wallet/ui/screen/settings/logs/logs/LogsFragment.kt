@@ -44,7 +44,6 @@ import com.tari.android.wallet.util.extension.observe
 import com.tari.android.wallet.ui.common.CommonFragment
 import com.tari.android.wallet.ui.common.recyclerView.CommonAdapter
 import com.tari.android.wallet.ui.component.tari.toolbar.TariToolbarActionArg
-import com.tari.android.wallet.util.extension.serializable
 import com.tari.android.wallet.util.extension.setVisible
 import com.tari.android.wallet.ui.screen.settings.logs.activity.DebugActivity
 import com.tari.android.wallet.ui.screen.settings.logs.logs.adapter.LogListAdapter
@@ -64,16 +63,12 @@ class LogsFragment : CommonFragment<FragmentLogsBinding, LogsViewModel>() {
         val viewModel: LogsViewModel by viewModels()
         bindViewModel(viewModel)
 
-        arguments?.serializable<File>(DebugActivity.log_file)?.let {
-            this.ui.toolbar.setText(it.name)
-            viewModel.initWithFile(it)
-        }
-
         setupUI()
         observeUI()
     }
 
     private fun setupUI() = with(ui) {
+        ui.toolbar.setText(viewModel.file?.name)
         ui.toolbar.setRightArgs(TariToolbarActionArg(icon = R.drawable.vector_logs_filter, action = viewModel::showFilters))
         ui.toolbar.hideRightActions()
         recyclerViewAdapter = LogListAdapter()
@@ -98,7 +93,7 @@ class LogsFragment : CommonFragment<FragmentLogsBinding, LogsViewModel>() {
     companion object {
         fun getInstance(file: File): LogsFragment = LogsFragment().apply {
             arguments = Bundle().apply {
-                putSerializable(DebugActivity.log_file, file)
+                putSerializable(DebugActivity.LOG_FILE, file)
             }
         }
     }

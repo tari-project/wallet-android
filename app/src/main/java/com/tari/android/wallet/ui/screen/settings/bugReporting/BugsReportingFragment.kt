@@ -28,9 +28,9 @@ class BugsReportingFragment : CommonFragment<FragmentBugsReportingBinding, BugsR
     private fun setupUI() = with(ui) {
         sendButton.setOnClickListener {
             viewModel.send(
-                nameEditText.ui.editText.text?.toString().orEmpty(),
-                emailEditText.ui.editText.text?.toString().orEmpty(),
-                bugDescription.text?.toString().orEmpty()
+                name = nameEditText.ui.editText.text?.toString().orEmpty(),
+                email = emailEditText.ui.editText.text?.toString().orEmpty(),
+                bugDescription = bugDescription.text?.toString().orEmpty(),
             )
         }
         viewLogsButton.setOnClickListener { (requireActivity() as? DebugActivity)?.navigate(DebugNavigation.Logs, rooted = false) }

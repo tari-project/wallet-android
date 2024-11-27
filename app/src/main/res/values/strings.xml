@@ -412,9 +412,10 @@
     <string name="bugs_reporting_name_placeholder">Name (Optional)</string>
     <string name="bugs_reporting_email_placeholder">E-mail (Optional)</string>
     <string name="bugs_reporting_what_happened">What happened? (Crash / Strange behavior)</string>
-    <string name="bugs_reporting_additional_info">With this bug report you will send us information about your device model, Andro version and recent logs</string>
+    <string name="bugs_reporting_additional_info">With this bug report you will send us information about your device model, Android version and recent logs</string>
     <string name="bugs_reporting_send">Send</string>
     <string name="bugs_reporting_view_logs">View logs</string>
+    <string name="bugs_reporting_send_logs_error">Failed to send logs: %s</string>
 
     <string name="debug_log_filter_debug">Debug</string>
     <string name="debug_log_file_size_limit_exceeded_dialog_title">File Size Error</string>

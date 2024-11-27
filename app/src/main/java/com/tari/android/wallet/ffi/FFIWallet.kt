@@ -33,7 +33,6 @@
 package com.tari.android.wallet.ffi
 
 import com.orhanobut.logger.Logger
-import com.tari.android.wallet.BuildConfig
 import com.tari.android.wallet.application.walletManager.WalletCallbackListener
 import com.tari.android.wallet.data.sharedPrefs.network.TariNetwork
 import com.tari.android.wallet.model.BalanceInfo
@@ -50,6 +49,7 @@ import com.tari.android.wallet.model.tx.CompletedTx
 import com.tari.android.wallet.model.tx.PendingInboundTx
 import com.tari.android.wallet.model.tx.PendingOutboundTx
 import com.tari.android.wallet.util.Constants
+import com.tari.android.wallet.util.DebugConfig
 import java.math.BigInteger
 
 /**
@@ -66,10 +66,10 @@ class FFIWallet(
 
     companion object {
         // values for the wallet initialization
-        private val LOG_VERBOSITY: Int = if (BuildConfig.BUILD_TYPE == "debug") 11 else 4
+        private val LOG_VERBOSITY: Int = if (DebugConfig.isDebug()) 11 else 4
         private const val IS_DNS_SECURE_ON = false
-        private const val MAX_NUMBER_OF_ROLLING_LOG_FILES = 2
-        private const val ROLLING_LOG_FILE_MAX_SIZE_BYTES = 10 * 1024 * 1024
+        private val MAX_NUMBER_OF_ROLLING_LOG_FILES = if (DebugConfig.isDebug()) 10 else 2
+        private val ROLLING_LOG_FILE_MAX_SIZE_BYTES = (if (DebugConfig.isDebug()) 44 else 10) * 1024 * 1024
     }
 
     private external fun jniCreate(
