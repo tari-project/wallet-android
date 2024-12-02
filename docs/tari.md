@@ -1,3 +1,5 @@
+[//]: # (TODO remove or update this file)
+
 # Build system
 Expect standart android system we have script `downloadLibwallet` which downloading ffi side from github release page to local. It will appear in `libwallet` folder. It downloading `wallet.h` and `libminotari_wallet_ffi.a` for each architecture.
 If you want to test some local build you should turn off this download and put files manually
