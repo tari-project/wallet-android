@@ -164,7 +164,10 @@ android {
                 "com/itextpdf/io/font/cmap/MSung-Light.properties",
                 "com/itextpdf/io/font/cmap/MHei-Medium.properties",
                 "com/itextpdf/io/font/cmap/HeiseiMin-W3.properties",
-                "com/itextpdf/io/font/cmap/cjk_registry.properties"
+                "com/itextpdf/io/font/cmap/cjk_registry.properties",
+                "lib/arm64-v8a/libtor.so",
+                "lib/armeabi-v7a/libtor.so",
+                "lib/x86_64/libtor.so",
             )
         }
     }
