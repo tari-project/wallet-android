@@ -9,7 +9,7 @@ data class TxViewHolderItem(
     val gifViewModel: GifViewModel, // TODO try not to pass the repo as a param, but as an injection. This possible causes memory leaks!!
 ) : CommonViewHolderItem() {
 
-    override val viewHolderUUID: String = "TransactionItem" + txDto.tx.id
+    override val viewHolderUUID: String = "TransactionItem$txDto"
 
     fun contains(searchQuery: String): Boolean = txDto.tx.tariContact.walletAddress.fullEmojiId.contains(searchQuery, ignoreCase = true)
             || txDto.tx.tariContact.walletAddress.fullBase58.contains(searchQuery, ignoreCase = true)
