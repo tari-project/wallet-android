@@ -1,6 +1,7 @@
 @file:Suppress("UnstableApiUsage")
 
 import org.gradle.kotlin.dsl.android
+import java.io.ByteArrayOutputStream
 import java.nio.file.Files
 import java.nio.file.Paths
 import java.util.Properties
@@ -14,16 +15,25 @@ plugins {
     id("download-libwallet")
 }
 
+val commitNumber: Int by lazy {
+    val stdout = ByteArrayOutputStream()
+    rootProject.exec {
+        commandLine("git", "rev-list", "--count", "HEAD")
+        standardOutput = stdout
+    }
+    stdout.toString().trim().toInt()
+}
+
 android {
     namespace = "com.tari.android.wallet"
 
     defaultConfig {
         applicationId = "com.tari.android.wallet"
-        minSdk = 26
-        targetSdk = 34
-        compileSdk = 35
-        versionCode = BuildConfig.buildNumber
-        versionName = "${BuildConfig.versionNumber}-libwallet-${BuildConfig.LibWallet.libwalletVersion}"
+        minSdk = BuildConfig.minSdk
+        targetSdk = BuildConfig.targetSdk
+        compileSdk = BuildConfig.compileSdk
+        versionCode = commitNumber
+        versionName = "${BuildConfig.versionNumber}-libwallet-${BuildConfig.LibWallet.version}"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         multiDexEnabled = true
 
@@ -44,7 +54,7 @@ android {
 
         val dropboxProperties = loadDropboxProps()
         buildConfigField("String", "DROPBOX_ACCESS_TOKEN", "\"${dropboxProperties["dropbox_key"]}\"")
-        buildConfigField("String", "LIB_WALLET_MIN_VALID_VERSION", "\"${BuildConfig.LibWallet.libwalletMinValidVersion}\"")
+        buildConfigField("String", "LIB_WALLET_MIN_VALID_VERSION", "\"${BuildConfig.LibWallet.minValidVersion}\"")
     }
 
     flavorDimensions.add("privacy-mode")
@@ -199,121 +209,117 @@ fun loadProps(fileName: String): Properties {
     return properties
 }
 
-// Comment this line if you want to disable the automatic download and use the native libraries of your choice
+// Remove the "downloadLibwallet" task if you want to disable the automatic download and use the native libraries of your choice
 tasks.named("preBuild") { dependsOn("downloadLibwallet") }
 
 dependencies {
     // It's recommended to use the latest version of the library from the JitPack repository,
     // but you can also use a locally build version of the library by using the ":yatlib" module and `yat-lib-debug-snapshot.aar` file with your build
-    implementation("com.github.tari-project:yat-lib-android:0.5.0")
+    implementation(Dependencies.yatLibAndroid)
     // implementation project(":yatlib")
 
-    implementation("org.jetbrains.kotlin:kotlin-reflect:${BuildConfig.kotlinVersion}")
-    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:${BuildConfig.kotlinVersion}")
+    implementation(Dependencies.Kotlin.reflect)
+    implementation(Dependencies.Kotlin.stdlib)
 
-    implementation("androidx.appcompat:appcompat:1.7.0")
-    implementation("androidx.biometric:biometric:1.1.0")
-    implementation("androidx.constraintlayout:constraintlayout:2.2.0")
-    implementation("androidx.core:core-ktx:1.15.0")
-    implementation("androidx.legacy:legacy-support-v13:1.0.0")
-    implementation("androidx.lifecycle:lifecycle-extensions:2.2.0")
-    implementation("androidx.lifecycle:lifecycle-livedata-ktx:${BuildConfig.lifecycleVersion}")
-    implementation("androidx.lifecycle:lifecycle-reactivestreams-ktx:${BuildConfig.lifecycleVersion}")
-    implementation("androidx.lifecycle:lifecycle-runtime-ktx:${BuildConfig.lifecycleVersion}")
-    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:${BuildConfig.lifecycleVersion}")
-    implementation("androidx.recyclerview:recyclerview:1.3.2")
-    implementation("androidx.viewpager2:viewpager2:1.1.0")
-    implementation("androidx.biometric:biometric:1.1.0")
-    implementation("androidx.core:core-ktx:1.15.0")
-    implementation("androidx.recyclerview:recyclerview:1.3.2")
-    implementation("androidx.legacy:legacy-support-v13:1.0.0")
-    implementation("androidx.activity:activity-ktx:1.9.3")
-    implementation("androidx.fragment:fragment-ktx:1.8.5")
+    implementation(Dependencies.AndroidX.appcompat)
+    implementation(Dependencies.AndroidX.biometric)
+    implementation(Dependencies.AndroidX.constraintLayout)
+    implementation(Dependencies.AndroidX.coreKtx)
+    implementation(Dependencies.AndroidX.legacySupport)
+    implementation(Dependencies.AndroidX.recyclerview)
+    implementation(Dependencies.AndroidX.viewpager2)
+    implementation(Dependencies.AndroidX.activityKtx)
+    implementation(Dependencies.AndroidX.fragmentKtx)
+    implementation(Dependencies.AndroidX.Lifecycle.extensions)
+    implementation(Dependencies.AndroidX.Lifecycle.livedataKtx)
+    implementation(Dependencies.AndroidX.Lifecycle.reactivestreamsKtx)
+    implementation(Dependencies.AndroidX.Lifecycle.runtimeKtx)
+    implementation(Dependencies.AndroidX.Lifecycle.viewmodelKtx)
 
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:${BuildConfig.coroutinesVersion}")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:${BuildConfig.coroutinesVersion}")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-rx2:${BuildConfig.coroutinesVersion}")
+    implementation(Dependencies.Coroutines.android)
+    implementation(Dependencies.Coroutines.core)
+    implementation(Dependencies.Coroutines.rx2)
 
-    implementation("com.google.android.flexbox:flexbox:3.0.0")
+    implementation(Dependencies.flexbox)
 
-    implementation("com.github.bumptech.glide:glide:4.16.0")
-    ksp("com.github.bumptech.glide:compiler:4.16.0")
+    implementation(Dependencies.glide)
+    ksp(Dependencies.glideCompiler)
 
-    implementation("com.google.dagger:dagger:2.52")
-    ksp("com.google.dagger:dagger-compiler:2.52")
+    implementation(Dependencies.dagger)
+    ksp(Dependencies.daggerCompiler)
 
     // debugImplementation because LeakCanary should only run in debug builds.
-    debugImplementation("com.squareup.leakcanary:leakcanary-android:2.14")
+    debugImplementation(Dependencies.leakCanary)
 
     // encryption
-    implementation("com.github.adorsys:secure-storage-android:0.0.2")
+    implementation(Dependencies.secureStorage)
 
-    implementation(platform("com.google.firebase:firebase-bom:33.6.0"))
-    implementation("com.google.firebase:firebase-crashlytics")
-    implementation("com.google.android.gms:play-services-auth:21.2.0")
-    implementation("com.google.http-client:google-http-client-gson:1.45.1")
-    implementation("com.google.api-client:google-api-client-android:2.7.0") {
+    implementation(platform(Dependencies.Firebase.bom))
+    implementation(Dependencies.Firebase.crashlytics)
+
+    implementation(Dependencies.Google.playServicesAuth)
+    implementation(Dependencies.Google.httpClientGson)
+    implementation(Dependencies.Google.apiClientAndroid) {
         exclude(group = "org.apache.httpcomponents")
     }
-    implementation("com.google.apis:google-api-services-drive:v3-rev20241027-2.0.0") {
+    implementation(Dependencies.Google.apiServicesDrive) {
         exclude(group = "org.apache.httpcomponents")
     }
 
-    implementation("net.danlew:android.joda:2.13.0")
+    implementation(Dependencies.jodaTime)
 
-    implementation("com.google.code.gson:gson:2.11.0")
+    implementation(Dependencies.gson)
 
-    implementation("com.orhanobut:logger:2.2.0")
+    implementation(Dependencies.logger)
 
-    implementation("com.airbnb.android:lottie:6.6.0")
+    implementation(Dependencies.lottie)
 
     // QR scanner
-    implementation("com.github.yuriy-budiyev:code-scanner:2.3.2")
-    implementation("com.journeyapps:zxing-android-embedded:4.3.0")
+    implementation(Dependencies.codeScanner)
+    implementation(Dependencies.zxingAndroidEmbedded)
 
-    implementation("com.squareup.retrofit2:retrofit:2.11.0")
-    implementation("com.squareup.retrofit2:converter-gson:2.11.0")
-    implementation("com.squareup.okhttp3:logging-interceptor:5.0.0-alpha.14")
+    implementation(Dependencies.Retrofit.retrofit)
+    implementation(Dependencies.Retrofit.converterGson)
+    implementation(Dependencies.Retrofit.okhttpLoggingInterceptor)
 
-    implementation("com.squareup:seismic:1.0.3")
+    implementation(Dependencies.seismic)
 
     // sentry - crash analytics
-    implementation("io.sentry:sentry-android:7.18.0")
+    implementation(Dependencies.Sentry.sentryAndroid)
 
-    implementation("io.reactivex.rxjava2:rxandroid:2.1.1")
-    implementation("io.reactivex.rxjava2:rxjava:2.2.21")
+    implementation(Dependencies.rxandroid)
+    implementation(Dependencies.rxjava)
 
     // spring animation
-    implementation("androidx.dynamicanimation:dynamicanimation:1.0.0")
-    implementation("com.github.MasayukiSuda:EasingInterpolator:1.3.2")
+    implementation(Dependencies.AndroidX.dynamicAnimation)
+    implementation(Dependencies.easingInterpolator)
 
-    implementation("info.guardianproject:tor-android:0.4.8.7")
-    implementation("info.guardianproject:jtorctl:0.4.5.7")
+    implementation(Dependencies.torAndroid)
+    implementation(Dependencies.jtorctl)
 
     // used to read log files
-    implementation("commons-io:commons-io:2.18.0")
+    implementation(Dependencies.commonsIo)
 
-    implementation("com.dropbox.core:dropbox-core-sdk:5.4.6")
+    implementation(Dependencies.dropboxCoreSdk)
 
-    implementation("com.github.vestrel00:contacts-android:0.3.1")
+    implementation(Dependencies.contactsAndroid)
 
-    implementation("com.github.weliem:blessed-android:2.5.0")
+    implementation(Dependencies.blessedAndroid)
 
-    implementation("com.giphy.sdk:ui:2.3.15") {
+    implementation(Dependencies.giphySdkUi) {
         exclude(group = "com.android.support")
     }
 
-    implementation("com.itextpdf:itext7-core:9.0.0")
+    implementation(Dependencies.itext7Core)
 
-    implementation("net.yslibrary.keyboardvisibilityevent:keyboardvisibilityevent:2.3.0")
+    implementation(Dependencies.keyboardVisibilityEvent)
 
-    implementation("org.apache.maven:maven-artifact:3.9.9")
+    implementation(Dependencies.mavenArtifact)
 
-    // test
-    testImplementation("junit:junit:4.13.2")
-    testImplementation("io.mockk:mockk:1.13.13")
-    androidTestImplementation("io.mockk:mockk-android:1.13.13")
-    androidTestImplementation("androidx.test:core:1.6.1")
-    androidTestImplementation("androidx.test.ext:junit:1.2.1")
-    androidTestImplementation("androidx.test.espresso:espresso-core:3.6.1")
+    testImplementation(Dependencies.Test.junit)
+    testImplementation(Dependencies.Test.mockk)
+    androidTestImplementation(Dependencies.Test.mockkAndroid)
+    androidTestImplementation(Dependencies.Test.testCore)
+    androidTestImplementation(Dependencies.Test.testExtJunit)
+    androidTestImplementation(Dependencies.Test.espressoCore)
 }

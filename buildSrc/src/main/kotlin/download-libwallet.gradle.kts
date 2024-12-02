@@ -6,27 +6,27 @@ tasks.register("downloadLibwallet") {
     val armDir = "${rootProject.projectDir}/libwallet/arm64-v8a/"
     val x64Dir = "${rootProject.projectDir}/libwallet/x86_64/"
 
-    inputs.property("version", BuildConfig.LibWallet.libwalletVersion)
+    inputs.property("version", BuildConfig.LibWallet.version)
     outputs.dir(rootDir)
 
     doLast {
-        logger.info("Downloading binaries with version ${BuildConfig.LibWallet.libwalletVersion}")
-        println("Downloading binaries with version ${BuildConfig.LibWallet.libwalletVersion}")
+        logger.info("Downloading binaries with version ${BuildConfig.LibWallet.version}")
+        println("Downloading binaries with version ${BuildConfig.LibWallet.version}")
 
         val files = listOf(
-            BuildConfig.LibWallet.libwalletHeader,
-            BuildConfig.LibWallet.libwalletArmA,
-            BuildConfig.LibWallet.libwalletx64A,
+            BuildConfig.LibWallet.header,
+            BuildConfig.LibWallet.armA,
+            BuildConfig.LibWallet.x64A,
         )
 
         download(BuildConfig.LibWallet.headerFileUrl, rootDir)
-        copyFile(rootDir, rootDir, BuildConfig.LibWallet.libwalletHeader, "wallet.h")
+        copyFile(rootDir, rootDir, BuildConfig.LibWallet.header, "wallet.h")
 
         download(BuildConfig.LibWallet.x64AFileUrl, rootDir)
-        copyFile(rootDir, x64Dir, BuildConfig.LibWallet.libwalletx64A, "libminotari_wallet_ffi.a")
+        copyFile(rootDir, x64Dir, BuildConfig.LibWallet.x64A, "libminotari_wallet_ffi.a")
 
         download(BuildConfig.LibWallet.armAFileUrl, rootDir)
-        copyFile(rootDir, armDir, BuildConfig.LibWallet.libwalletArmA, "libminotari_wallet_ffi.a")
+        copyFile(rootDir, armDir, BuildConfig.LibWallet.armA, "libminotari_wallet_ffi.a")
 
         delete {
             delete(fileTree(rootDir).apply {

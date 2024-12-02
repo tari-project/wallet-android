@@ -6,9 +6,9 @@ buildscript {
     }
 
     dependencies {
-        classpath("com.android.tools.build:gradle:${BuildConfig.agpVersion}")
-        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:${BuildConfig.kotlinVersion}")
-        classpath("io.sentry:sentry-android-gradle-plugin:4.14.0")
+        classpath(Dependencies.gradlePlugin)
+        classpath(Dependencies.Kotlin.gradlePlugin)
+        classpath(Dependencies.Sentry.gradlePlugin)
     }
 }
 
