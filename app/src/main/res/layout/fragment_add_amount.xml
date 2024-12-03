@@ -170,7 +170,7 @@
                 tools:visibility="visible">
                 <!-- fee amount -->
 
-                <androidx.appcompat.widget.LinearLayoutCompat
+                <LinearLayout
                     android:id="@+id/network_traffic_text"
                     android:layout_width="wrap_content"
                     android:layout_height="22dp"
@@ -197,10 +197,9 @@
                         android:textColor="?attr/palette_text_body"
                         android:textSize="@dimen/add_amount_tx_fee_text_size"
                         app:customFont="heavy" />
+                </LinearLayout>
 
-                </androidx.appcompat.widget.LinearLayoutCompat>
-
-                <androidx.appcompat.widget.LinearLayoutCompat
+                <LinearLayout
                     android:id="@+id/fee_container"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -214,7 +213,6 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginEnd="6dp"
-                        android:layout_toLeftOf="@+id/tx_fee_desc_text_view"
                         android:textColor="?attr/palette_text_body"
                         android:textSize="@dimen/add_amount_tx_fee_text_size"
                         app:customFont="heavy"
@@ -230,8 +228,7 @@
                         android:textColor="?attr/palette_text_body"
                         android:textSize="@dimen/add_amount_tx_fee_text_size"
                         app:customFont="heavy" />
-
-                </androidx.appcompat.widget.LinearLayoutCompat>
+                </LinearLayout>
 
                 <com.tari.android.wallet.ui.component.tari.TariButton
                     android:id="@+id/modifyButton"
@@ -246,9 +243,7 @@
                     android:textSize="14sp"
                     android:visibility="invisible"
                     app:customFont="medium" />
-
             </RelativeLayout>
-
         </RelativeLayout>
 
         <!-- num pad -->
@@ -257,11 +252,13 @@
             layout="@layout/view_numpad" />
 
         <LinearLayout
+            android:id="@+id/one_side_payment_switch_view_container"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="10dp"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            tools:visibility="visible">
 
             <com.tari.android.wallet.ui.component.tari.TariTextView
                 android:id="@+id/one_side_payment_switch_view_title"

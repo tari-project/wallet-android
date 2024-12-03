@@ -45,6 +45,7 @@ import com.tari.android.wallet.service.service.WalletServiceLauncher
 /**
  * This receiver is responsible for restarting the service when it gets destroyed - i.e. when
  * the app gets terminated.
+ * TODO remove this once interactive payments are removed
  *
  * @author The Tari Development Team
  */

@@ -45,6 +45,7 @@ import com.tari.android.wallet.service.service.WalletServiceLauncher
 
 /**
  * This receiver is responsible for starting the service after boot finish.
+ * TODO remove this once interactive payments are moved
  *
  * @author The Tari Development Team
  */

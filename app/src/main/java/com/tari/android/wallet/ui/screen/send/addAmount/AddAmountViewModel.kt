@@ -21,6 +21,7 @@ import com.tari.android.wallet.ui.screen.send.addAmount.feeModule.FeeModule
 import com.tari.android.wallet.ui.screen.send.addAmount.feeModule.NetworkSpeed
 import com.tari.android.wallet.ui.screen.send.common.TransactionData
 import com.tari.android.wallet.util.Constants
+import com.tari.android.wallet.util.DebugConfig
 import com.tari.android.wallet.util.EffectChannelFlow
 import com.tari.android.wallet.util.extension.getOrNull
 import com.tari.android.wallet.util.extension.getWithError
@@ -49,7 +50,8 @@ class AddAmountViewModel(savedState: SavedStateHandle) : CommonViewModel() {
         savedState.get<ContactDto>(PARAMETER_CONTACT)?.let { contact ->
             AddAmountModel.UiState(
                 isOneSidedPaymentEnabled = tariSettingsSharedRepository.isOneSidePaymentEnabled,
-                isOneSidedPaymentForced = contact.contactInfo.requireWalletAddress().oneSided && !contact.contactInfo.requireWalletAddress().interactive,
+                isOneSidedPaymentForced = !DebugConfig.interactivePaymentsEnabled
+                        || (contact.contactInfo.requireWalletAddress().oneSided && !contact.contactInfo.requireWalletAddress().interactive),
                 amount = savedState.get<MicroTari>(PARAMETER_AMOUNT)?.tariValue?.toDouble() ?: Double.MIN_VALUE,
                 contactDto = contact,
                 note = savedState.get<String>(PARAMETER_NOTE).orEmpty(),

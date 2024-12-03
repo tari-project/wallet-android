@@ -129,6 +129,11 @@ class WalletService : Service() {
         }
     }
 
+    override fun onBind(intent: Intent?): IBinder? {
+        // Return null because this service is not meant to be bound to
+        return null
+    }
+
     /**
      * Called when a component decides to start or stop the foreground wallet service.
      */
@@ -194,11 +199,6 @@ class WalletService : Service() {
                         logger.i("error during scheduled expiration check $e")
                     }
                 }
-    }
-
-    override fun onBind(intent: Intent?): IBinder? {
-        // Return null because this service is not meant to be bound to
-        return null
     }
 
     /**

@@ -41,13 +41,13 @@ import com.tari.android.wallet.data.contacts.model.ContactDto
 import com.tari.android.wallet.data.contacts.model.FFIContactInfo
 import com.tari.android.wallet.data.tx.TxDto
 import com.tari.android.wallet.model.Base58
-import com.tari.android.wallet.model.tx.CompletedTx
 import com.tari.android.wallet.model.EmojiId
 import com.tari.android.wallet.model.TariContact
 import com.tari.android.wallet.model.TariUtxo
 import com.tari.android.wallet.model.TariWalletAddress
-import com.tari.android.wallet.model.tx.Tx
 import com.tari.android.wallet.model.TxStatus
+import com.tari.android.wallet.model.tx.CompletedTx
+import com.tari.android.wallet.model.tx.Tx
 import com.tari.android.wallet.ui.common.giphy.presentation.GifViewModel
 import com.tari.android.wallet.ui.common.giphy.repository.GifRepository
 import com.tari.android.wallet.ui.common.recyclerView.items.TitleViewHolderItem
@@ -96,6 +96,8 @@ object DebugConfig {
     val sweepFundsButtonEnabled = valueIfDebug(false)
 
     val selectBaseNodeEnabled = valueIfDebug(false)
+
+    val interactivePaymentsEnabled = valueIfDebug(false)
 
     fun isDebug() = BuildConfig.BUILD_TYPE == "debug"
 

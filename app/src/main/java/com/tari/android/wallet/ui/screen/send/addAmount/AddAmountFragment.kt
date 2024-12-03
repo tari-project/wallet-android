@@ -137,6 +137,8 @@ class AddAmountFragment : CommonFragment<FragmentAddAmountBinding, AddAmountView
     }
 
     private fun setupUI(uiState: AddAmountModel.UiState) {
+        ui.oneSidePaymentSwitchViewContainer.setVisible(DebugConfig.interactivePaymentsEnabled)
+
         keyboardController.setup(requireContext(), AmountCheckRunnable(), ui.numpad, ui.amount, uiState.amount)
         contactDto = uiState.contactDto
         note = uiState.note

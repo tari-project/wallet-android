@@ -41,6 +41,7 @@ import com.tari.android.wallet.databinding.FragmentBackgroundServiceSettingsBind
 import com.tari.android.wallet.util.extension.observe
 import com.tari.android.wallet.ui.common.CommonFragment
 
+// TODO remove once interactive payments are removed from the app features
 class BackgroundServiceSettingsFragment : CommonFragment<FragmentBackgroundServiceSettingsBinding, BackgroundServiceSettingsViewModel>() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =

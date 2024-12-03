@@ -9,6 +9,7 @@ import com.tari.android.wallet.ui.component.loadingSwitch.TariLoadingSwitchState
 import com.tari.android.wallet.ui.dialog.confirm.ConfirmDialogArgs
 import javax.inject.Inject
 
+// TODO remove once interactive payments are removed from the app features
 class BackgroundServiceSettingsViewModel : CommonViewModel() {
 
     @Inject
