@@ -53,18 +53,10 @@ import com.tari.android.wallet.service.service.WalletServiceLauncher.Companion.S
 import com.tari.android.wallet.service.service.WalletServiceLauncher.Companion.STOP_ACTION
 import com.tari.android.wallet.ui.common.domain.ResourceManager
 import com.tari.android.wallet.ui.screen.settings.logs.LogFilesManager
-import com.tari.android.wallet.util.Constants
-import io.reactivex.Observable
-import io.reactivex.disposables.Disposable
-import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
-import org.joda.time.DateTime
-import org.joda.time.Hours
-import org.joda.time.Minutes
-import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 /**
@@ -104,16 +96,6 @@ class WalletService : Service() {
 
     private val logger
         get() = Logger.t(WalletService::class.simpleName)
-
-    /**
-     * Check for expired txs every 30 minutes.
-     */
-    private val expirationCheckPeriodMinutes = Minutes.minutes(30)
-
-    /**
-     * Timer to trigger the expiration checks.
-     */
-    private var txExpirationCheckSubscription: Disposable? = null
 
     override fun onCreate() {
         super.onCreate()
@@ -177,28 +159,8 @@ class WalletService : Service() {
     private fun onWalletStarted(ffiWallet: FFIWallet) {
         wallet = ffiWallet
         lifecycleObserver = ServiceLifecycleCallbacks(wallet)
-        scheduleExpirationCheck()
         Handler(Looper.getMainLooper()).post { ProcessLifecycleOwner.get().lifecycle.addObserver(lifecycleObserver!!) }
         walletManager.onWalletStarted()
-    }
-
-    private fun scheduleExpirationCheck() {
-        txExpirationCheckSubscription =
-            Observable
-                .timer(expirationCheckPeriodMinutes.minutes.toLong(), TimeUnit.MINUTES)
-                .repeat()
-                .subscribeOn(Schedulers.io())
-                .observeOn(Schedulers.io())
-                .doOnError { logger.i("error during scheduled expiration check $it") }
-                .subscribe {
-                    try {
-                        logger.i("scheduled expiration check")
-                        cancelExpiredPendingInboundTxs()
-                        cancelExpiredPendingOutboundTxs()
-                    } catch (e: Exception) {
-                        logger.i("error during scheduled expiration check $e")
-                    }
-                }
     }
 
     /**
@@ -206,40 +168,9 @@ class WalletService : Service() {
      */
     override fun onDestroy() {
         logger.i("Wallet service destroyed")
-        txExpirationCheckSubscription?.dispose()
         sendBroadcast(Intent(this, ServiceRestartBroadcastReceiver::class.java))
         job.cancel()
         super.onDestroy()
-    }
-
-    /**
-     * Cancels expired pending inbound transactions.
-     * Expiration period is defined by Constants.Wallet.pendingTxExpirationPeriodHours
-     */
-    private fun cancelExpiredPendingInboundTxs() {
-        val now = DateTime.now().toLocalDateTime()
-        wallet.getPendingInboundTxs().forEach { tx ->
-            val txDate = DateTime(tx.timestamp.toLong() * 1000L).toLocalDateTime()
-            val hoursPassed = Hours.hoursBetween(txDate, now).hours
-            if (hoursPassed >= Constants.Wallet.PENDING_TX_EXPIRATION_PERIOD_HOURS) {
-                wallet.cancelPendingTx(tx.id)
-            }
-        }
-    }
-
-    /**
-     * Cancels expired pending outbound transactions.
-     * Expiration period is defined by Constants.Wallet.pendingTxExpirationPeriodHours
-     */
-    private fun cancelExpiredPendingOutboundTxs() {
-        val now = DateTime.now().toLocalDateTime()
-        wallet.getPendingOutboundTxs().forEach { tx ->
-            val txDate = DateTime(tx.timestamp.toLong() * 1000L).toLocalDateTime()
-            val hoursPassed = Hours.hoursBetween(txDate, now).hours
-            if (hoursPassed >= Constants.Wallet.PENDING_TX_EXPIRATION_PERIOD_HOURS) {
-                wallet.cancelPendingTx(tx.id)
-            }
-        }
     }
 
     companion object {

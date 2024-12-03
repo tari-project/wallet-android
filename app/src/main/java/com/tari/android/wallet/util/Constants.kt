@@ -127,9 +127,6 @@ object Constants {
         const val STORE_AND_FORWARD_MESSAGE_DURATION_SEC = 10800L
         const val EMOJI_FORMATTER_CHUNK_SIZE = 3
         const val PUSH_NOTIFICATION_SERVER_URL = "https://push.tari.com"
-        const val PENDING_TX_EXPIRATION_PERIOD_HOURS = 3 * 24
-        const val BACKUP_DELAY_MS = 60 * 1000L
-        const val BACKUP_RETRY_PERIOD_MS = 0L
         val DEFAULT_FEE_PER_GRAM = 10.toMicroTari()
     }
 
