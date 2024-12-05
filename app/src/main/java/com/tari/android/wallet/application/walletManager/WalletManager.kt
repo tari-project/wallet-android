@@ -35,18 +35,22 @@ package com.tari.android.wallet.application.walletManager
 import com.google.gson.Gson
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.BuildConfig
+import com.tari.android.wallet.application.AppStateHandler
 import com.tari.android.wallet.application.TariWalletApplication
 import com.tari.android.wallet.application.baseNodes.BaseNodesManager
 import com.tari.android.wallet.application.walletManager.WalletCallbackListener.Companion.MAIN_WALLET_CONTEXT_ID
 import com.tari.android.wallet.data.BalanceStateHandler
+import com.tari.android.wallet.data.baseNode.BaseNodeState
+import com.tari.android.wallet.data.baseNode.BaseNodeStateHandler
+import com.tari.android.wallet.data.baseNode.BaseNodeSyncState
+import com.tari.android.wallet.data.recovery.WalletRestorationState
+import com.tari.android.wallet.data.recovery.WalletRestorationStateHandler
 import com.tari.android.wallet.data.sharedPrefs.CorePrefRepository
 import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodeDto
 import com.tari.android.wallet.data.sharedPrefs.network.NetworkPrefRepository
 import com.tari.android.wallet.data.sharedPrefs.security.SecurityPrefRepository
 import com.tari.android.wallet.data.sharedPrefs.tariSettings.TariSettingsPrefRepository
 import com.tari.android.wallet.di.ApplicationScope
-import com.tari.android.wallet.util.EffectChannelFlow
-import com.tari.android.wallet.util.extension.safeCastTo
 import com.tari.android.wallet.ffi.Base58String
 import com.tari.android.wallet.ffi.FFIByteVector
 import com.tari.android.wallet.ffi.FFICommsConfig
@@ -63,24 +67,19 @@ import com.tari.android.wallet.ffi.NetAddressString
 import com.tari.android.wallet.ffi.TransactionValidationStatus
 import com.tari.android.wallet.ffi.runWithDestroy
 import com.tari.android.wallet.model.BalanceInfo
-import com.tari.android.wallet.model.tx.CancelledTx
-import com.tari.android.wallet.model.tx.CompletedTx
 import com.tari.android.wallet.model.MicroTari
-import com.tari.android.wallet.model.tx.PendingInboundTx
-import com.tari.android.wallet.model.tx.PendingOutboundTx
 import com.tari.android.wallet.model.TariContact
 import com.tari.android.wallet.model.TariWalletAddress
 import com.tari.android.wallet.model.TransactionSendStatus
-import com.tari.android.wallet.model.tx.Tx
 import com.tari.android.wallet.model.TxId
 import com.tari.android.wallet.model.fullBase58
 import com.tari.android.wallet.model.seedPhrase.SeedPhrase
+import com.tari.android.wallet.model.tx.CancelledTx
+import com.tari.android.wallet.model.tx.CompletedTx
+import com.tari.android.wallet.model.tx.PendingInboundTx
+import com.tari.android.wallet.model.tx.PendingOutboundTx
+import com.tari.android.wallet.model.tx.Tx
 import com.tari.android.wallet.notification.NotificationHelper
-import com.tari.android.wallet.data.recovery.WalletRestorationState
-import com.tari.android.wallet.data.recovery.WalletRestorationStateHandler
-import com.tari.android.wallet.data.baseNode.BaseNodeState
-import com.tari.android.wallet.data.baseNode.BaseNodeStateHandler
-import com.tari.android.wallet.data.baseNode.BaseNodeSyncState
 import com.tari.android.wallet.service.service.WalletServiceLauncher
 import com.tari.android.wallet.tor.TorConfig
 import com.tari.android.wallet.tor.TorProxyManager
@@ -90,6 +89,8 @@ import com.tari.android.wallet.ui.screen.home.HomeActivity
 import com.tari.android.wallet.ui.screen.send.finalize.FinalizeSendTxModel
 import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.DebugConfig
+import com.tari.android.wallet.util.EffectChannelFlow
+import com.tari.android.wallet.util.extension.safeCastTo
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -131,6 +132,7 @@ class WalletManager @Inject constructor(
     private val balanceStateHandler: BalanceStateHandler,
     private val walletCallbackListener: WalletCallbackListener,
     private val walletNotificationManager: WalletNotificationManager,
+    private val appStateHandler: AppStateHandler,
     @ApplicationScope private val applicationScope: CoroutineScope,
 ) {
 
@@ -162,6 +164,17 @@ class WalletManager @Inject constructor(
     private val walletValidationStatusMap: ConcurrentMap<WalletValidationType, WalletValidationResult> = ConcurrentHashMap()
 
     private var txBroadcastRestarted = false
+
+    init {
+        applicationScope.launch {
+            appStateHandler.appEvent.collect { event ->
+                when (event) {
+                    is AppStateHandler.AppEvent.AppBackgrounded,
+                    is AppStateHandler.AppEvent.AppForegrounded -> walletConfig.removeUnnecessaryLogs()
+                }
+            }
+        }
+    }
 
     @Synchronized
     fun start(seedWords: List<String>?) {
@@ -419,7 +432,7 @@ class WalletManager @Inject constructor(
             //  return walletInstance?.startRecovery(baseNodeFFI, recoveryOutputMessage) ?: false
             return false
         } else {
-            return walletInstance?.startRecovery(recoveryOutputMessage) ?: false
+            return walletInstance?.startRecovery(recoveryOutputMessage) == true
         }
     }
 

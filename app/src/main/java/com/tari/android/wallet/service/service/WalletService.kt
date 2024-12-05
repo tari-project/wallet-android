@@ -39,7 +39,6 @@ import android.os.IBinder
 import android.os.Looper
 import androidx.lifecycle.ProcessLifecycleOwner
 import com.orhanobut.logger.Logger
-import com.tari.android.wallet.application.AppStateHandler
 import com.tari.android.wallet.application.TariWalletApplication
 import com.tari.android.wallet.application.walletManager.WalletConfig
 import com.tari.android.wallet.application.walletManager.WalletManager
@@ -52,7 +51,6 @@ import com.tari.android.wallet.service.ServiceRestartBroadcastReceiver
 import com.tari.android.wallet.service.service.WalletServiceLauncher.Companion.START_ACTION
 import com.tari.android.wallet.service.service.WalletServiceLauncher.Companion.STOP_ACTION
 import com.tari.android.wallet.ui.common.domain.ResourceManager
-import com.tari.android.wallet.ui.screen.settings.logs.LogFilesManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -84,9 +82,6 @@ class WalletService : Service() {
     @Inject
     lateinit var backupManager: BackupManager
 
-    @Inject
-    lateinit var appStateHandler: AppStateHandler
-
     private var lifecycleObserver: ServiceLifecycleCallbacks? = null
 
     private lateinit var wallet: FFIWallet
@@ -100,15 +95,6 @@ class WalletService : Service() {
     override fun onCreate() {
         super.onCreate()
         DiContainer.appComponent.inject(this)
-
-        serviceScope.launch {
-            appStateHandler.appEvent.collect { event ->
-                when (event) {
-                    is AppStateHandler.AppEvent.AppBackgrounded,
-                    is AppStateHandler.AppEvent.AppForegrounded -> LogFilesManager(walletConfig).manage()
-                }
-            }
-        }
     }
 
     override fun onBind(intent: Intent?): IBinder? {

@@ -2,6 +2,8 @@ package com.tari.android.wallet.application.walletManager
 
 import android.content.Context
 import com.tari.android.wallet.data.sharedPrefs.network.NetworkPrefRepository
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.io.File
 import java.math.RoundingMode
 import java.text.DecimalFormat
@@ -66,6 +68,15 @@ class WalletConfig @Inject constructor(
 
     fun getWalletLogFilePath(): String = getOrCreateFilePath(getWalletLogFilesDirPath(), "$LOG_FILE_PREFIX.$LOG_FILE_EXTENSION")
 
+    suspend fun removeUnnecessaryLogs() = withContext(Dispatchers.IO) {
+        val files = getLogFiles()
+        if (files.size > MAX_LOG_FILES) {
+            files.sortedByDescending { it.lastModified() }.drop(10).forEach { fileToDelete ->
+                runCatching { fileToDelete.delete() }
+            }
+        }
+    }
+
     private fun getOrCreateFilePath(dirPath: String, fileName: String): String {
         val folder = File(dirPath)
         if (!folder.exists()) folder.mkdirs()
@@ -127,6 +138,8 @@ class WalletConfig @Inject constructor(
         private const val WALLET_DB_FULL_FILE_NAME = "$WALLET_DB_NAME.sqlite3"
         private const val MAIN_WALLET_DB_DIR = "" // Empty for the main wallet directory
         private const val TEMP_WALLET_DB_DIR = "temp_wallet_db"
+
+        private const val MAX_LOG_FILES = 10
 
         val balanceFormatter = DecimalFormat("#,##0.00").apply {
             roundingMode = RoundingMode.FLOOR
