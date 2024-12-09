@@ -3,18 +3,18 @@ package com.tari.android.wallet.ui.screen.restore.enterRestorationPassword
 import androidx.lifecycle.LiveData
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.walletManager.WalletConfig
+import com.tari.android.wallet.application.walletManager.WalletLauncher
 import com.tari.android.wallet.application.walletManager.doOnWalletFailed
 import com.tari.android.wallet.application.walletManager.doOnWalletRunning
 import com.tari.android.wallet.data.sharedPrefs.backup.BackupPrefRepository
-import com.tari.android.wallet.util.extension.launchOnIo
-import com.tari.android.wallet.util.extension.launchOnMain
 import com.tari.android.wallet.infrastructure.backup.BackupManager
 import com.tari.android.wallet.infrastructure.backup.WalletStartFailedException
-import com.tari.android.wallet.service.service.WalletServiceLauncher
+import com.tari.android.wallet.navigation.Navigation
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.common.SingleLiveEvent
 import com.tari.android.wallet.ui.dialog.modular.SimpleDialogArgs
-import com.tari.android.wallet.navigation.Navigation
+import com.tari.android.wallet.util.extension.launchOnIo
+import com.tari.android.wallet.util.extension.launchOnMain
 import java.security.GeneralSecurityException
 import javax.inject.Inject
 
@@ -30,7 +30,7 @@ class EnterRestorationPasswordViewModel : CommonViewModel() {
     lateinit var backupSettingsRepository: BackupPrefRepository
 
     @Inject
-    lateinit var walletServiceLauncher: WalletServiceLauncher
+    lateinit var walletLauncher: WalletLauncher
 
     init {
         component.inject(this)
@@ -76,7 +76,7 @@ class EnterRestorationPasswordViewModel : CommonViewModel() {
                 backupManager.restoreLatestBackup(password)
                 backupSettingsRepository.backupPassword = password
                 launchOnMain {
-                    walletServiceLauncher.start()
+                    walletLauncher.start()
                 }
             } catch (exception: Throwable) {
                 handleRestorationFailure(exception)

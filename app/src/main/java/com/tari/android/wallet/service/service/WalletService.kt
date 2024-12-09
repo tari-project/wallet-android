@@ -41,15 +41,15 @@ import androidx.lifecycle.ProcessLifecycleOwner
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.application.TariWalletApplication
 import com.tari.android.wallet.application.walletManager.WalletConfig
+import com.tari.android.wallet.application.walletManager.WalletLauncher
+import com.tari.android.wallet.application.walletManager.WalletLauncher.Companion.START_ACTION
+import com.tari.android.wallet.application.walletManager.WalletLauncher.Companion.STOP_ACTION
 import com.tari.android.wallet.application.walletManager.WalletManager
-import com.tari.android.wallet.application.walletManager.doOnWalletStarted
+import com.tari.android.wallet.application.walletManager.doOnWalletRunning
 import com.tari.android.wallet.di.DiContainer
 import com.tari.android.wallet.ffi.FFIWallet
 import com.tari.android.wallet.infrastructure.backup.BackupManager
 import com.tari.android.wallet.notification.NotificationHelper
-import com.tari.android.wallet.service.ServiceRestartBroadcastReceiver
-import com.tari.android.wallet.service.service.WalletServiceLauncher.Companion.START_ACTION
-import com.tari.android.wallet.service.service.WalletServiceLauncher.Companion.STOP_ACTION
 import com.tari.android.wallet.ui.common.domain.ResourceManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -108,7 +108,7 @@ class WalletService : Service() {
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
         startForeground()
         when (intent.action) {
-            START_ACTION -> startService(intent.getStringArrayExtra(WalletServiceLauncher.ARG_SEED_WORDS)?.toList())
+            START_ACTION -> startService(intent.getStringArrayExtra(WalletLauncher.Companion.ARG_SEED_WORDS)?.toList())
             STOP_ACTION -> stopService(startId)
             else -> throw RuntimeException("Unexpected intent action: ${intent.action}")
         }
@@ -120,8 +120,8 @@ class WalletService : Service() {
         DiContainer.appComponent.inject(this)
 
         serviceScope.launch {
-            walletManager.doOnWalletStarted {
-                onWalletStarted(it)
+            walletManager.doOnWalletRunning {
+                onWalletRunning(it)
             }
         }
         walletManager.start(seedWords)
@@ -142,11 +142,10 @@ class WalletService : Service() {
         lifecycleObserver?.let { ProcessLifecycleOwner.get().lifecycle.removeObserver(it) }
     }
 
-    private fun onWalletStarted(ffiWallet: FFIWallet) {
+    private fun onWalletRunning(ffiWallet: FFIWallet) {
         wallet = ffiWallet
         lifecycleObserver = ServiceLifecycleCallbacks(wallet)
         Handler(Looper.getMainLooper()).post { ProcessLifecycleOwner.get().lifecycle.addObserver(lifecycleObserver!!) }
-        walletManager.onWalletStarted()
     }
 
     /**
@@ -154,7 +153,6 @@ class WalletService : Service() {
      */
     override fun onDestroy() {
         logger.i("Wallet service destroyed")
-        sendBroadcast(Intent(this, ServiceRestartBroadcastReceiver::class.java))
         job.cancel()
         super.onDestroy()
     }

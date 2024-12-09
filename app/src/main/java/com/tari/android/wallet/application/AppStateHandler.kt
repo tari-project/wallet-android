@@ -13,16 +13,21 @@ class AppStateHandler @Inject constructor() {
     private val _appEvent = EffectChannelFlow<AppEvent>()
     val appEvent: Flow<AppEvent> = _appEvent.flow
 
+    suspend fun sendAppForegrounded() = withContext(Dispatchers.Main) {
+        _appEvent.send(AppEvent.AppForegrounded)
+    }
+
     suspend fun sendAppBackgrounded() = withContext(Dispatchers.Main) {
         _appEvent.send(AppEvent.AppBackgrounded)
     }
 
-    suspend fun sendAppForegrounded() = withContext(Dispatchers.Main) {
-        _appEvent.send(AppEvent.AppForegrounded)
+    suspend fun sendAppDestroyed() = withContext(Dispatchers.Main) {
+        _appEvent.send(AppEvent.AppDestroyed)
     }
 
     sealed class AppEvent {
         data object AppBackgrounded : AppEvent()
         data object AppForegrounded : AppEvent()
+        data object AppDestroyed : AppEvent()
     }
 }

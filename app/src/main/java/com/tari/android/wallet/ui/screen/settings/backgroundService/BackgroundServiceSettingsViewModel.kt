@@ -3,7 +3,7 @@ package com.tari.android.wallet.ui.screen.settings.backgroundService
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.tari.android.wallet.R
-import com.tari.android.wallet.service.service.WalletServiceLauncher
+import com.tari.android.wallet.application.walletManager.WalletLauncher
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.component.loadingSwitch.TariLoadingSwitchState
 import com.tari.android.wallet.ui.dialog.confirm.ConfirmDialogArgs
@@ -13,7 +13,7 @@ import javax.inject.Inject
 class BackgroundServiceSettingsViewModel : CommonViewModel() {
 
     @Inject
-    lateinit var serviceLauncher: WalletServiceLauncher
+    lateinit var serviceLauncher: WalletLauncher
 
     private val _switchState = MutableLiveData<TariLoadingSwitchState>()
     val switchState: LiveData<TariLoadingSwitchState> = _switchState

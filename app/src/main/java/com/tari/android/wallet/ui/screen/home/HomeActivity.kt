@@ -46,6 +46,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.deeplinks.DeeplinkManager
+import com.tari.android.wallet.application.walletManager.WalletLauncher
 import com.tari.android.wallet.data.sharedPrefs.network.NetworkPrefRepository
 import com.tari.android.wallet.data.sharedPrefs.security.SecurityPrefRepository
 import com.tari.android.wallet.data.sharedPrefs.tariSettings.TariSettingsPrefRepository
@@ -58,7 +59,6 @@ import com.tari.android.wallet.navigation.TariNavigator.Companion.INDEX_CONTACT_
 import com.tari.android.wallet.navigation.TariNavigator.Companion.INDEX_HOME
 import com.tari.android.wallet.navigation.TariNavigator.Companion.INDEX_SETTINGS
 import com.tari.android.wallet.navigation.TariNavigator.Companion.NO_SMOOTH_SCROLL
-import com.tari.android.wallet.service.service.WalletServiceLauncher
 import com.tari.android.wallet.ui.common.CommonActivity
 import com.tari.android.wallet.ui.common.domain.PaletteManager
 import com.tari.android.wallet.ui.common.domain.ResourceManager
@@ -83,7 +83,7 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>() {
     lateinit var securityPrefRepository: SecurityPrefRepository
 
     @Inject
-    lateinit var walletServiceLauncher: WalletServiceLauncher
+    lateinit var walletLauncher: WalletLauncher
 
     @Inject
     lateinit var networkRepository: NetworkPrefRepository

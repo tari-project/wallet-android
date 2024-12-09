@@ -32,8 +32,8 @@
  */
 package com.tari.android.wallet.application.walletManager
 
-import com.tari.android.wallet.util.extension.safeCastTo
 import com.tari.android.wallet.ffi.FFIException
+import com.tari.android.wallet.util.extension.safeCastTo
 
 /**
  * Used for async observation of the wallet state.
@@ -44,7 +44,6 @@ import com.tari.android.wallet.ffi.FFIException
 sealed class WalletState {
     data object NotReady : WalletState()
     data object Initializing : WalletState()
-    data object Started : WalletState()
     data object Running : WalletState()
     data class Failed(val exception: Exception) : WalletState()
 

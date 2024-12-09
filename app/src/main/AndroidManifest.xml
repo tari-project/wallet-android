@@ -70,12 +70,6 @@
                 android:resource="@xml/file_provider" />
         </provider>
 
-        <!-- this receiver restarts the service on destroy & keeps the service running -->
-        <receiver
-            android:name=".service.ServiceRestartBroadcastReceiver"
-            android:enabled="true"
-            android:exported="false" />
-
         <receiver
             android:name=".notification.NotificationBroadcastReceiver"
             android:enabled="true"
@@ -218,15 +212,5 @@
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.Light"
             android:windowSoftInputMode="adjustResize" />
-
-        <receiver
-            android:name=".service.BootDeviceReceiver"
-            android:enabled="true"
-            android:exported="true">
-
-            <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED" />
-            </intent-filter>
-        </receiver>
     </application>
 </manifest>

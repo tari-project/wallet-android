@@ -80,7 +80,6 @@ import com.tari.android.wallet.model.tx.PendingInboundTx
 import com.tari.android.wallet.model.tx.PendingOutboundTx
 import com.tari.android.wallet.model.tx.Tx
 import com.tari.android.wallet.notification.NotificationHelper
-import com.tari.android.wallet.service.service.WalletServiceLauncher
 import com.tari.android.wallet.tor.TorConfig
 import com.tari.android.wallet.tor.TorProxyManager
 import com.tari.android.wallet.tor.TorProxyStateHandler
@@ -127,7 +126,6 @@ class WalletManager @Inject constructor(
     private val app: TariWalletApplication,
     private val notificationHelper: NotificationHelper,
     private val walletRestorationStateHandler: WalletRestorationStateHandler,
-    private val walletServiceLauncher: WalletServiceLauncher,
     private val dialogManager: DialogManager,
     private val balanceStateHandler: BalanceStateHandler,
     private val walletCallbackListener: WalletCallbackListener,
@@ -170,7 +168,8 @@ class WalletManager @Inject constructor(
             appStateHandler.appEvent.collect { event ->
                 when (event) {
                     is AppStateHandler.AppEvent.AppBackgrounded,
-                    is AppStateHandler.AppEvent.AppForegrounded -> walletConfig.removeUnnecessaryLogs()
+                    is AppStateHandler.AppEvent.AppForegrounded,
+                    is AppStateHandler.AppEvent.AppDestroyed -> walletConfig.removeUnnecessaryLogs()
                 }
             }
         }
@@ -371,10 +370,6 @@ class WalletManager @Inject constructor(
         walletCallbackListener.removeListener(MAIN_WALLET_CONTEXT_ID)
     }
 
-    fun onWalletStarted() {
-        _walletState.update { WalletState.Running }
-    }
-
     fun getCommsConfig(): FFICommsConfig = FFICommsConfig(
         publicAddress = NetAddressString(address = "127.0.0.1", port = 39069).toString(),
         transport = getTorTransport(),
@@ -457,7 +452,6 @@ class WalletManager @Inject constructor(
         }
         walletConfig.clearWalletFiles()
         corePrefRepository.clear()
-        walletServiceLauncher.stop()
         walletCallbackListener.removeAllListeners()
     }
 
@@ -492,7 +486,7 @@ class WalletManager @Inject constructor(
             applicationScope.launch {
                 try {
                     initWallet(ffiSeedWords)
-                    _walletState.update { WalletState.Started }
+                    _walletState.update { WalletState.Running }
                     logger.i("Start wallet: Wallet was started")
                 } catch (e: Exception) {
                     val oldCode = walletState.value.errorCode

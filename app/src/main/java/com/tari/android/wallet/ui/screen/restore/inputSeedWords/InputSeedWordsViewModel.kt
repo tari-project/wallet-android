@@ -6,6 +6,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.map
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.baseNodes.BaseNodesManager
+import com.tari.android.wallet.application.walletManager.WalletLauncher
 import com.tari.android.wallet.application.walletManager.doOnWalletFailed
 import com.tari.android.wallet.application.walletManager.doOnWalletRunning
 import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodeDto
@@ -13,7 +14,6 @@ import com.tari.android.wallet.ffi.FFISeedWords
 import com.tari.android.wallet.model.WalletError
 import com.tari.android.wallet.model.seedPhrase.SeedPhrase
 import com.tari.android.wallet.navigation.Navigation
-import com.tari.android.wallet.service.service.WalletServiceLauncher
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.common.SingleLiveEvent
 import com.tari.android.wallet.ui.common.debounce
@@ -39,7 +39,7 @@ class InputSeedWordsViewModel : CommonViewModel() {
     private var mnemonicList = mutableListOf<String>()
 
     @Inject
-    lateinit var walletServiceLauncher: WalletServiceLauncher
+    lateinit var walletLauncher: WalletLauncher
 
     @Inject
     lateinit var baseNodesManager: BaseNodesManager
@@ -145,7 +145,7 @@ class InputSeedWordsViewModel : CommonViewModel() {
             }
         }
 
-        walletServiceLauncher.start(seedWords)
+        walletLauncher.start(seedWords)
     }
 
     private fun onError(restorationError: RestorationError) = showModularDialog(restorationError.args.getModular(resourceManager))

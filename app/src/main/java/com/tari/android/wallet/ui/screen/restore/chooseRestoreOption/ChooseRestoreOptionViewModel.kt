@@ -5,6 +5,7 @@ import androidx.fragment.app.Fragment
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.deeplinks.DeepLink
 import com.tari.android.wallet.application.walletManager.WalletConfig
+import com.tari.android.wallet.application.walletManager.WalletLauncher
 import com.tari.android.wallet.application.walletManager.doOnWalletFailed
 import com.tari.android.wallet.application.walletManager.doOnWalletRunning
 import com.tari.android.wallet.data.sharedPrefs.backup.BackupPrefRepository
@@ -16,7 +17,6 @@ import com.tari.android.wallet.infrastructure.backup.WalletStartFailedException
 import com.tari.android.wallet.model.TariWalletAddress
 import com.tari.android.wallet.model.WalletError
 import com.tari.android.wallet.navigation.Navigation
-import com.tari.android.wallet.service.service.WalletServiceLauncher
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.dialog.modular.ModularDialogArgs
 import com.tari.android.wallet.ui.dialog.modular.modules.body.BodyModule
@@ -44,7 +44,7 @@ class ChooseRestoreOptionViewModel : CommonViewModel() {
     lateinit var backupPrefRepository: BackupPrefRepository
 
     @Inject
-    lateinit var walletServiceLauncher: WalletServiceLauncher
+    lateinit var walletLauncher: WalletLauncher
 
     @Inject
     lateinit var walletConfig: WalletConfig
@@ -131,7 +131,7 @@ class ChooseRestoreOptionViewModel : CommonViewModel() {
             // try to restore with no password
             backupManager.restoreLatestBackup()
             launchOnMain {
-                walletServiceLauncher.start()
+                walletLauncher.start()
             }
         } catch (exception: Throwable) {
             handleException(exception)
@@ -140,7 +140,7 @@ class ChooseRestoreOptionViewModel : CommonViewModel() {
 
     private fun restoreFromPaperWallet(seedWords: List<String>) {
         _uiState.update { it.copy(paperWalletProgress = true) }
-        walletServiceLauncher.start(seedWords)
+        walletLauncher.start(seedWords)
         launchOnIo {
             walletManager.doOnWalletRunning {
                 _uiState.update { it.copy(paperWalletProgress = false) }
