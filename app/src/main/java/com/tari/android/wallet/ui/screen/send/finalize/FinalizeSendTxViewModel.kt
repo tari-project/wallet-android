@@ -24,8 +24,8 @@ import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonStyle
 import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
 import com.tari.android.wallet.ui.screen.send.common.TransactionData
 import com.tari.android.wallet.ui.screen.send.finalize.FinalizeSendTxModel.TxFailureReason
+import com.tari.android.wallet.util.BroadcastEffectFlow
 import com.tari.android.wallet.util.Constants
-import com.tari.android.wallet.util.EffectChannelFlow
 import com.tari.android.wallet.util.extension.collectFlow
 import com.tari.android.wallet.util.extension.launchOnIo
 import com.tari.android.wallet.util.extension.launchOnMain
@@ -59,7 +59,7 @@ class FinalizeSendTxViewModel(savedState: SavedStateHandle) : CommonViewModel() 
     )
     val uiState = _uiState.asStateFlow()
 
-    private val _effect = EffectChannelFlow<FinalizeSendTxModel.Effect>()
+    private val _effect = BroadcastEffectFlow<FinalizeSendTxModel.Effect>()
     val effect = _effect.flow
 
     init {

@@ -5,7 +5,7 @@ import androidx.lifecycle.SavedStateHandle
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.deeplinks.DeepLink
 import com.tari.android.wallet.application.deeplinks.DeeplinkManager
-import com.tari.android.wallet.util.EffectChannelFlow
+import com.tari.android.wallet.util.EffectFlow
 import com.tari.android.wallet.util.extension.launchOnIo
 import com.tari.android.wallet.util.extension.launchOnMain
 import com.tari.android.wallet.model.TariWalletAddress
@@ -32,7 +32,7 @@ class QrScannerViewModel(savedState: SavedStateHandle) : CommonViewModel() {
     private val _uiState = MutableStateFlow(QrScannerModel.UiState())
     val uiState: StateFlow<QrScannerModel.UiState> = _uiState.asStateFlow()
 
-    private val _effect = EffectChannelFlow<QrScannerModel.Effect>()
+    private val _effect = EffectFlow<QrScannerModel.Effect>()
     val effect: Flow<QrScannerModel.Effect> = _effect.flow
 
     private val qrScannerSource: QrScannerSource = savedState.get<QrScannerSource>(EXTRA_QR_DATA_SOURCE) ?: QrScannerSource.None

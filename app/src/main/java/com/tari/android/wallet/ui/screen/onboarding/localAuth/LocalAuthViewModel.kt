@@ -2,7 +2,7 @@ package com.tari.android.wallet.ui.screen.onboarding.localAuth
 
 import androidx.lifecycle.viewModelScope
 import com.tari.android.wallet.application.walletManager.doOnWalletRunning
-import com.tari.android.wallet.util.EffectChannelFlow
+import com.tari.android.wallet.util.EffectFlow
 import com.tari.android.wallet.util.extension.addTo
 import com.tari.android.wallet.util.extension.launchOnMain
 import com.tari.android.wallet.infrastructure.backup.BackupManager
@@ -30,7 +30,7 @@ class LocalAuthViewModel : CommonViewModel() {
     private val _secureState = MutableStateFlow(SecureState())
     val secureState = _secureState.asStateFlow()
 
-    private val _effect = EffectChannelFlow<Effect>()
+    private val _effect = EffectFlow<Effect>()
     val effect: Flow<Effect> = _effect.flow
 
     init {

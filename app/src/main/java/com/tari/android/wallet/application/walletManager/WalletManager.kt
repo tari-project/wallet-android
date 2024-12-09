@@ -86,9 +86,9 @@ import com.tari.android.wallet.tor.TorProxyStateHandler
 import com.tari.android.wallet.ui.common.DialogManager
 import com.tari.android.wallet.ui.screen.home.HomeActivity
 import com.tari.android.wallet.ui.screen.send.finalize.FinalizeSendTxModel
+import com.tari.android.wallet.util.BroadcastEffectFlow
 import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.DebugConfig
-import com.tari.android.wallet.util.EffectChannelFlow
 import com.tari.android.wallet.util.extension.safeCastTo
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -144,7 +144,7 @@ class WalletManager @Inject constructor(
     private val _walletState = MutableStateFlow<WalletState>(WalletState.NotReady)
     val walletState = _walletState.asStateFlow()
 
-    private val _walletEvent = EffectChannelFlow<WalletEvent>()
+    private val _walletEvent = BroadcastEffectFlow<WalletEvent>()
     val walletEvent: Flow<WalletEvent> = _walletEvent.flow
 
     private val _txSentConfirmations = MutableStateFlow(emptyList<TxSendResult>())

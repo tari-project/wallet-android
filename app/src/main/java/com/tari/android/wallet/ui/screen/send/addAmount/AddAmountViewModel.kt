@@ -22,7 +22,7 @@ import com.tari.android.wallet.ui.screen.send.addAmount.feeModule.NetworkSpeed
 import com.tari.android.wallet.ui.screen.send.common.TransactionData
 import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.DebugConfig
-import com.tari.android.wallet.util.EffectChannelFlow
+import com.tari.android.wallet.util.EffectFlow
 import com.tari.android.wallet.util.extension.getOrNull
 import com.tari.android.wallet.util.extension.getWithError
 import com.tari.android.wallet.util.extension.launchOnIo
@@ -60,7 +60,7 @@ class AddAmountViewModel(savedState: SavedStateHandle) : CommonViewModel() {
     )
     val uiState = _uiState.asStateFlow()
 
-    private val _effect = EffectChannelFlow<AddAmountModel.Effect>()
+    private val _effect = EffectFlow<AddAmountModel.Effect>()
     val effect = _effect.flow
 
     val walletBalance: BalanceInfo

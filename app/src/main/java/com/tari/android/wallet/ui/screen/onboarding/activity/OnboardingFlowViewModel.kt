@@ -2,7 +2,7 @@ package com.tari.android.wallet.ui.screen.onboarding.activity
 
 import androidx.lifecycle.viewModelScope
 import com.tari.android.wallet.R
-import com.tari.android.wallet.util.EffectChannelFlow
+import com.tari.android.wallet.util.EffectFlow
 import com.tari.android.wallet.navigation.Navigation
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.dialog.modular.modules.body.BodyModule
@@ -16,7 +16,7 @@ import kotlinx.coroutines.launch
 
 class OnboardingFlowViewModel : CommonViewModel() {
 
-    private val _effect = EffectChannelFlow<Effect>()
+    private val _effect = EffectFlow<Effect>()
     val effect: Flow<Effect> = _effect.flow
 
     fun showResetFlowDialog() {

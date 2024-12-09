@@ -1,6 +1,6 @@
 package com.tari.android.wallet.application
 
-import com.tari.android.wallet.util.EffectChannelFlow
+import com.tari.android.wallet.util.BroadcastEffectFlow
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
@@ -10,7 +10,7 @@ import javax.inject.Singleton
 @Singleton
 class AppStateHandler @Inject constructor() {
 
-    private val _appEvent = EffectChannelFlow<AppEvent>()
+    private val _appEvent = BroadcastEffectFlow<AppEvent>()
     val appEvent: Flow<AppEvent> = _appEvent.flow
 
     suspend fun sendAppForegrounded() = withContext(Dispatchers.Main) {

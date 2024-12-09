@@ -34,7 +34,7 @@ import com.tari.android.wallet.ui.screen.contactBook.contactSelection.ContactSel
 import com.tari.android.wallet.ui.screen.contactBook.contacts.adapter.contact.ContactItemViewHolderItem
 import com.tari.android.wallet.ui.screen.contactBook.contacts.adapter.contact.ContactlessPaymentItem
 import com.tari.android.wallet.util.Constants
-import com.tari.android.wallet.util.EffectChannelFlow
+import com.tari.android.wallet.util.EffectFlow
 import com.tari.android.wallet.util.EmojiUtil.Companion.getGraphemeLength
 import com.tari.android.wallet.util.extension.collectFlow
 import com.tari.android.wallet.util.extension.launchOnIo
@@ -88,7 +88,7 @@ class ContactSelectionViewModel : CommonViewModel() {
 
     val amount: MutableLiveData<MicroTari> = MutableLiveData()
 
-    private val _effect = EffectChannelFlow<Effect>()
+    private val _effect = EffectFlow<Effect>()
     val effect: Flow<Effect> = _effect.flow
 
     private val _yatState = MutableStateFlow(YatState())
