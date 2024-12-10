@@ -47,4 +47,4 @@
 -keep class **Fragment** { *; }
 -keep class **ViewModel** { *; }
 
--keep class com.tari.android.wallet.application.walletManager.WalletCallbackListener { *; }
+-keep class com.tari.android.wallet.application.walletManager.WalletCallbacks { *; }

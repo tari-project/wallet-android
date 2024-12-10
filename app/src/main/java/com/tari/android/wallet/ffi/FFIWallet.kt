@@ -33,7 +33,7 @@
 package com.tari.android.wallet.ffi
 
 import com.orhanobut.logger.Logger
-import com.tari.android.wallet.application.walletManager.WalletCallbackListener
+import com.tari.android.wallet.application.walletManager.WalletCallbacks
 import com.tari.android.wallet.data.sharedPrefs.network.TariNetwork
 import com.tari.android.wallet.model.BalanceInfo
 import com.tari.android.wallet.model.MicroTari
@@ -59,7 +59,7 @@ import java.math.BigInteger
  * @author The Tari Development Team
  */
 class FFIWallet(
-    private val walletCallbackListener: WalletCallbackListener,
+    private val walletCallbacks: WalletCallbacks,
 ) : FFIBase() {
 
     private val logger
@@ -70,7 +70,7 @@ class FFIWallet(
         private val LOG_VERBOSITY: Int = if (DebugConfig.isDebug()) 11 else 4
         private const val IS_DNS_SECURE_ON = false
         private val MAX_NUMBER_OF_ROLLING_LOG_FILES = if (DebugConfig.isDebug()) 10 else 2
-        private val ROLLING_LOG_FILE_MAX_SIZE_BYTES = (if (DebugConfig.isDebug()) 44 else 10) * 1024 * 1024
+        private val ROLLING_LOG_FILE_MAX_SIZE_BYTES = (if (DebugConfig.isDebug()) 4 else 10) * 1024 * 1024
     }
 
     private external fun jniCreate(
@@ -85,7 +85,7 @@ class FFIWallet(
         seedWords: FFISeedWords?,
         dnsPeer: String,
         isDnsSecureOn: Boolean,
-        walletCallbackListener: WalletCallbackListener,
+        walletCallbacks: WalletCallbacks,
         callbackReceivedTx: String,
         callbackReceivedTxSig: String,
         callbackReceivedTxReply: String,
@@ -165,7 +165,7 @@ class FFIWallet(
     private external fun jniSetConfirmations(number: String, libError: FFIError)
     private external fun jniEstimateTxFee(amount: String, gramFee: String, kernelCount: String, outputCount: String, libError: FFIError): ByteArray
     private external fun jniStartRecovery(
-        walletCallbackListener: WalletCallbackListener,
+        walletCallbacks: WalletCallbacks,
         callback: String,
         callbackSig: String,
         recoveryOutputMessage: String,
@@ -196,8 +196,8 @@ class FFIWallet(
         logPath: String,
         passphrase: String,
         seedWords: FFISeedWords?,
-        walletCallbackListener: WalletCallbackListener,
-    ) : this(walletCallbackListener) {
+        walletCallbacks: WalletCallbacks,
+    ) : this(walletCallbacks) {
         val error = FFIError()
         logger.i("Pre jniCreate")
 
@@ -214,24 +214,24 @@ class FFIWallet(
                 seedWords = seedWords,
                 dnsPeer = tariNetwork.dnsPeer,
                 isDnsSecureOn = IS_DNS_SECURE_ON,
-                walletCallbackListener = walletCallbackListener,
-                WalletCallbackListener::onTxReceived.name, "([BJ)V",
-                WalletCallbackListener::onTxReplyReceived.name, "([BJ)V",
-                WalletCallbackListener::onTxFinalized.name, "([BJ)V",
-                WalletCallbackListener::onTxBroadcast.name, "([BJ)V",
-                WalletCallbackListener::onTxMined.name, "([BJ)V",
-                WalletCallbackListener::onTxMinedUnconfirmed.name, "([BJ[B)V",
-                WalletCallbackListener::onTxFauxConfirmed.name, "([BJ)V",
-                WalletCallbackListener::onTxFauxUnconfirmed.name, "([BJ[B)V",
-                WalletCallbackListener::onDirectSendResult.name, "([B[BJ)V",
-                WalletCallbackListener::onTxCancelled.name, "([BJ[B)V",
-                WalletCallbackListener::onTXOValidationComplete.name, "([B[B[B)V",
-                WalletCallbackListener::onContactLivenessDataUpdated.name, "([BJ)V",
-                WalletCallbackListener::onBalanceUpdated.name, "([BJ)V",
-                WalletCallbackListener::onTxValidationComplete.name, "([B[B[B)V",
-                WalletCallbackListener::onConnectivityStatus.name, "([B[B)V",
-                WalletCallbackListener::onWalletScannedHeight.name, "([B[B)V",
-                WalletCallbackListener::onBaseNodeStatus.name, "([BJ)V",
+                walletCallbacks = walletCallbacks,
+                WalletCallbacks::onTxReceived.name, "([BJ)V",
+                WalletCallbacks::onTxReplyReceived.name, "([BJ)V",
+                WalletCallbacks::onTxFinalized.name, "([BJ)V",
+                WalletCallbacks::onTxBroadcast.name, "([BJ)V",
+                WalletCallbacks::onTxMined.name, "([BJ)V",
+                WalletCallbacks::onTxMinedUnconfirmed.name, "([BJ[B)V",
+                WalletCallbacks::onTxFauxConfirmed.name, "([BJ)V",
+                WalletCallbacks::onTxFauxUnconfirmed.name, "([BJ[B)V",
+                WalletCallbacks::onDirectSendResult.name, "([B[BJ)V",
+                WalletCallbacks::onTxCancelled.name, "([BJ[B)V",
+                WalletCallbacks::onTXOValidationComplete.name, "([B[B[B)V",
+                WalletCallbacks::onContactLivenessDataUpdated.name, "([BJ)V",
+                WalletCallbacks::onBalanceUpdated.name, "([BJ)V",
+                WalletCallbacks::onTxValidationComplete.name, "([B[B[B)V",
+                WalletCallbacks::onConnectivityStatus.name, "([B[B)V",
+                WalletCallbacks::onWalletScannedHeight.name, "([B[B)V",
+                WalletCallbacks::onBaseNodeStatus.name, "([BJ)V",
                 libError = error,
             )
         } catch (e: Throwable) {
@@ -272,7 +272,7 @@ class FFIWallet(
     fun removeContact(walletAddress: TariWalletAddress): Boolean = runWithError {
         findContactByWalletAddress(walletAddress)?.runWithDestroy { contact ->
             jniRemoveContact(contact, it)
-        } ?: false
+        } == true
     }
 
     fun getCompletedTxs(): List<CompletedTx> = runWithError { FFICompletedTxs(jniGetCompletedTxs(it)).iterateWithDestroy { tx -> CompletedTx(tx) } }
@@ -421,8 +421,8 @@ class FFIWallet(
     fun startRecovery(recoveryOutputMessage: String): Boolean =
         runWithError {
             jniStartRecovery(
-                walletCallbackListener = walletCallbackListener,
-                callback = walletCallbackListener::onWalletRecovery.name,
+                walletCallbacks = walletCallbacks,
+                callback = walletCallbacks::onWalletRecovery.name,
                 callbackSig = "([BI[B[B)V",
                 recoveryOutputMessage = recoveryOutputMessage,
                 libError = it,
