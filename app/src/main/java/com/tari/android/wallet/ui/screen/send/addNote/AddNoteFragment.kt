@@ -62,8 +62,8 @@ import com.tari.android.wallet.R
 import com.tari.android.wallet.R.dimen.add_note_gif_inner_margin
 import com.tari.android.wallet.R.dimen.add_note_slide_button_left_margin
 import com.tari.android.wallet.R.dimen.add_note_slide_button_width
+import com.tari.android.wallet.data.contacts.model.ContactDto
 import com.tari.android.wallet.databinding.FragmentAddNoteBinding
-import com.tari.android.wallet.util.extension.observe
 import com.tari.android.wallet.model.MicroTari
 import com.tari.android.wallet.model.TariWalletAddress
 import com.tari.android.wallet.model.TxNote
@@ -71,18 +71,6 @@ import com.tari.android.wallet.navigation.TariNavigator.Companion.PARAMETER_TRAN
 import com.tari.android.wallet.ui.common.CommonFragment
 import com.tari.android.wallet.ui.common.domain.PaletteManager
 import com.tari.android.wallet.ui.common.giphy.repository.GifItem
-import com.tari.android.wallet.util.extension.dimen
-import com.tari.android.wallet.util.extension.dimenPx
-import com.tari.android.wallet.util.extension.getStartMargin
-import com.tari.android.wallet.util.extension.gone
-import com.tari.android.wallet.util.extension.hideKeyboard
-import com.tari.android.wallet.util.extension.invisible
-import com.tari.android.wallet.util.extension.parcelable
-import com.tari.android.wallet.util.extension.postDelayed
-import com.tari.android.wallet.util.extension.setStartMargin
-import com.tari.android.wallet.util.extension.temporarilyDisableClick
-import com.tari.android.wallet.util.extension.visible
-import com.tari.android.wallet.data.contacts.model.ContactDto
 import com.tari.android.wallet.ui.screen.send.addNote.gif.ChooseGIFDialogFragment
 import com.tari.android.wallet.ui.screen.send.addNote.gif.GifContainer
 import com.tari.android.wallet.ui.screen.send.addNote.gif.GifThumbnailAdapter
@@ -94,6 +82,18 @@ import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.addressFirstEmojis
 import com.tari.android.wallet.util.addressLastEmojis
 import com.tari.android.wallet.util.addressPrefixEmojis
+import com.tari.android.wallet.util.extension.dimen
+import com.tari.android.wallet.util.extension.dimenPx
+import com.tari.android.wallet.util.extension.getStartMargin
+import com.tari.android.wallet.util.extension.gone
+import com.tari.android.wallet.util.extension.hideKeyboard
+import com.tari.android.wallet.util.extension.invisible
+import com.tari.android.wallet.util.extension.observe
+import com.tari.android.wallet.util.extension.parcelable
+import com.tari.android.wallet.util.extension.postDelayed
+import com.tari.android.wallet.util.extension.setStartMargin
+import com.tari.android.wallet.util.extension.temporarilyDisableClick
+import com.tari.android.wallet.util.extension.visible
 
 class AddNoteFragment : CommonFragment<FragmentAddNoteBinding, AddNoteViewModel>(), View.OnTouchListener {
 
@@ -270,7 +270,7 @@ class AddNoteFragment : CommonFragment<FragmentAddNoteBinding, AddNoteViewModel>
         val mActivity = activity ?: return
         ui.noteEditText.requestFocus()
         val imm = mActivity.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-        imm.showSoftInput(ui.noteEditText, InputMethodManager.HIDE_IMPLICIT_ONLY)
+        imm.showSoftInput(ui.noteEditText, InputMethodManager.SHOW_IMPLICIT)
     }
 
     @SuppressLint("ClickableViewAccessibility")
