@@ -3,14 +3,10 @@ package com.tari.android.wallet.application.walletManager
 import android.content.Context
 import android.content.Intent
 import androidx.core.content.ContextCompat
-import com.tari.android.wallet.application.AppStateHandler
 import com.tari.android.wallet.application.TariWalletApplication
 import com.tari.android.wallet.data.sharedPrefs.tariSettings.TariSettingsPrefRepository
-import com.tari.android.wallet.di.ApplicationScope
 import com.tari.android.wallet.service.service.WalletService
 import com.tari.android.wallet.util.DebugConfig
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -27,23 +23,7 @@ class WalletLauncher @Inject constructor(
     private val walletConfig: WalletConfig,
     private val walletManager: WalletManager,
     private val tariSettingsSharedRepository: TariSettingsPrefRepository,
-    private val appStateHandler: AppStateHandler,
-    @ApplicationScope private val applicationScope: CoroutineScope,
 ) {
-    init {
-        if (!DebugConfig.interactivePaymentsEnabled) {
-            applicationScope.launch {
-                appStateHandler.appEvent.collect { appEvent ->
-                    when (appEvent) {
-                        is AppStateHandler.AppEvent.AppForegrounded -> startOnAppForegrounded()
-
-                        is AppStateHandler.AppEvent.AppDestroyed,
-                        is AppStateHandler.AppEvent.AppBackgrounded -> stopOnAppBackgrounded()
-                    }
-                }
-            }
-        }
-    }
 
     fun startIfWalletExists(seedWords: List<String>? = null) {
         if (walletConfig.walletExists()) {
@@ -77,18 +57,6 @@ class WalletLauncher @Inject constructor(
             walletManager.stop()
         } else {
             ContextCompat.startForegroundService(context, Intent(context, WalletService::class.java).also { it.action = STOP_ACTION })
-        }
-    }
-
-    private fun startOnAppForegrounded() {
-        if (!DebugConfig.interactivePaymentsEnabled || !tariSettingsSharedRepository.backgroundServiceTurnedOn) {
-            start()
-        }
-    }
-
-    private fun stopOnAppBackgrounded() {
-        if (!DebugConfig.interactivePaymentsEnabled || !tariSettingsSharedRepository.backgroundServiceTurnedOn) {
-            stop()
         }
     }
 
