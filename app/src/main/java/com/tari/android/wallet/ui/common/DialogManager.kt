@@ -17,8 +17,8 @@ class DialogManager @Inject constructor() {
     private val dialogQueue = mutableListOf<ModularDialog>()
 
     fun replace(newDialog: ModularDialog) {
-        if (isDialogShowing(newDialog.args.dialogId)) {
-            getDialog(newDialog.args.dialogId)?.applyArgs(newDialog.args)
+        if (isDialogShowing(newDialog.args?.dialogId)) {
+            getDialog(newDialog.args?.dialogId)?.applyArgs(newDialog.args)
         } else {
             newDialog.addDismissListener { dialogQueue.remove(newDialog) }
             dialogQueue.add(newDialog)
@@ -49,7 +49,7 @@ class DialogManager @Inject constructor() {
         dialogQueue.clear()
     }
 
-    fun isDialogShowing(dialogId: Int) = dialogId != DialogId.NO_ID && dialogQueue.any { it.args.dialogId == dialogId }
+    fun isDialogShowing(dialogId: Int?) = dialogId != null && dialogId != DialogId.NO_ID && dialogQueue.any { it.args?.dialogId == dialogId }
 
     fun showNotReadyYetDialog(context: Activity) {
         replace(
@@ -63,6 +63,6 @@ class DialogManager @Inject constructor() {
         )
     }
 
-    private fun getDialog(dialogId: Int): ModularDialog? =
-        if (dialogId != DialogId.NO_ID) dialogQueue.firstOrNull { it.args.dialogId == dialogId } else null
+    private fun getDialog(dialogId: Int?): ModularDialog? =
+        if (dialogId!= null && dialogId != DialogId.NO_ID) dialogQueue.firstOrNull { it.args !=null && it.args?.dialogId == dialogId } else null
 }
