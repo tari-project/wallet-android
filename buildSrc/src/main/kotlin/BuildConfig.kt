@@ -1,6 +1,6 @@
 object BuildConfig {
 
-    const val versionNumber = "0.30.1"
+    const val versionNumber = "0.31.0"
 
     const val minSdk = 26
     const val targetSdk = 34
