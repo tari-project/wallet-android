@@ -10,13 +10,9 @@ import com.tari.android.wallet.R.string.finalize_send_tx_sending_step_2_desc_lin
 import com.tari.android.wallet.R.string.finalize_send_tx_sending_step_3_desc_line_1
 import com.tari.android.wallet.R.string.finalize_send_tx_sending_step_3_desc_line_2
 import com.tari.android.wallet.application.walletManager.WalletManager
-import com.tari.android.wallet.util.EffectChannelFlow
-import com.tari.android.wallet.util.extension.collectFlow
-import com.tari.android.wallet.util.extension.launchOnIo
-import com.tari.android.wallet.util.extension.launchOnMain
+import com.tari.android.wallet.data.network.NetworkConnectionStateHandler
 import com.tari.android.wallet.model.TariContact
 import com.tari.android.wallet.navigation.Navigation
-import com.tari.android.wallet.data.network.NetworkConnectionStateHandler
 import com.tari.android.wallet.tor.TorBootstrapStatus
 import com.tari.android.wallet.tor.TorProxyState
 import com.tari.android.wallet.tor.TorProxyStateHandler
@@ -28,7 +24,12 @@ import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonStyle
 import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
 import com.tari.android.wallet.ui.screen.send.common.TransactionData
 import com.tari.android.wallet.ui.screen.send.finalize.FinalizeSendTxModel.TxFailureReason
+import com.tari.android.wallet.util.BroadcastEffectFlow
 import com.tari.android.wallet.util.Constants
+import com.tari.android.wallet.util.extension.collectFlow
+import com.tari.android.wallet.util.extension.launchOnIo
+import com.tari.android.wallet.util.extension.launchOnMain
+import com.tari.android.wallet.util.extension.switchToMain
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.mapNotNull
@@ -58,7 +59,7 @@ class FinalizeSendTxViewModel(savedState: SavedStateHandle) : CommonViewModel() 
     )
     val uiState = _uiState.asStateFlow()
 
-    private val _effect = EffectChannelFlow<FinalizeSendTxModel.Effect>()
+    private val _effect = BroadcastEffectFlow<FinalizeSendTxModel.Effect>()
     val effect = _effect.flow
 
     init {
@@ -172,7 +173,7 @@ class FinalizeSendTxViewModel(savedState: SavedStateHandle) : CommonViewModel() 
             }
         }
 
-        override fun execute() = doOnWalletServiceConnected { onServiceConnected() }
+        override fun execute() = doOnWalletRunning { onServiceConnected() }
 
         private fun onServiceConnected() {
             // start checking network connection
@@ -200,7 +201,7 @@ class FinalizeSendTxViewModel(savedState: SavedStateHandle) : CommonViewModel() 
             if (torProxyState.bootstrapStatus.progress < TorBootstrapStatus.MAX_PROGRESS) {
                 launchOnIo {
                     torProxyStateHandler.doOnTorBootstrapped {
-                        launchOnMain {
+                        switchToMain {
                             checkConnectionStatus()
                         }
                     }

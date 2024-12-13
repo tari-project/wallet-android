@@ -41,11 +41,8 @@ import androidx.biometric.BiometricManager
 import androidx.core.content.ContextCompat
 import com.tari.android.wallet.BuildConfig
 import com.tari.android.wallet.application.TariWalletApplication
-import com.tari.android.wallet.application.walletManager.WalletConfig
-import com.tari.android.wallet.data.sharedPrefs.tariSettings.TariSettingsPrefRepository
 import com.tari.android.wallet.infrastructure.security.biometric.BiometricAuthenticationService
 import com.tari.android.wallet.notification.NotificationHelper
-import com.tari.android.wallet.service.service.WalletServiceLauncher
 import com.tari.android.wallet.ui.common.domain.ResourceManager
 import com.tari.android.wallet.ui.common.giphy.GiphyAdapter
 import dagger.Module
@@ -80,14 +77,6 @@ class ApplicationModule(private val app: TariWalletApplication) {
     @Provides
     @Singleton
     fun provideResourceManager(context: Context): ResourceManager = ResourceManager(context)
-
-    @Provides
-    @Singleton
-    fun provideWalletServiceLauncher(
-        context: Context,
-        tariSettingsSharedRepository: TariSettingsPrefRepository,
-        walletConfig: WalletConfig
-    ): WalletServiceLauncher = WalletServiceLauncher(context, walletConfig, tariSettingsSharedRepository)
 
     @Provides
     @Singleton

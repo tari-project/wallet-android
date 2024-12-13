@@ -335,9 +335,9 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniCreate(
         jobject jSeed_words,
         jstring jDnsPeer,
         jboolean isDnsSecureOn,
-        jobject jWalletCallbackListener,
-        jstring txReceivedCallbackMethodName,
-        jstring txReceivedCallbackMethodSignature,
+        jobject jWalletCallbacks,
+        jstring callback_received_tx,
+        jstring callback_received_tx_sig,
         jstring callback_received_tx_reply,
         jstring callback_received_tx_reply_sig,
         jstring callback_received_finalized_tx,
@@ -374,98 +374,98 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniCreate(
 
     int errorCode = 0;
     if (callbackHandler == nullptr) {
-        callbackHandler = jEnv->NewGlobalRef(jWalletCallbackListener);
+        callbackHandler = jEnv->NewGlobalRef(jWalletCallbacks);
     }
     jclass jClass = jEnv->GetObjectClass(jThis);
     if (jClass == nullptr) {
         SetNullPointerField(jEnv, jThis);
     }
 
-    txReceivedCallbackMethodId = getMethodId(jEnv, jWalletCallbackListener, txReceivedCallbackMethodName, txReceivedCallbackMethodSignature);
+    txReceivedCallbackMethodId = getMethodId(jEnv, jWalletCallbacks, callback_received_tx, callback_received_tx_sig);
     if (txReceivedCallbackMethodId == nullptr) {
         SetNullPointerField(jEnv, jThis);
     }
 
-    txReplyReceivedCallbackMethodId = getMethodId(jEnv, jWalletCallbackListener, callback_received_tx_reply, callback_received_tx_reply_sig);
+    txReplyReceivedCallbackMethodId = getMethodId(jEnv, jWalletCallbacks, callback_received_tx_reply, callback_received_tx_reply_sig);
     if (txReplyReceivedCallbackMethodId == nullptr) {
         SetNullPointerField(jEnv, jThis);
     }
 
-    txFinalizedCallbackMethodId = getMethodId(jEnv, jWalletCallbackListener, callback_received_finalized_tx, callback_received_finalized_tx_sig);
+    txFinalizedCallbackMethodId = getMethodId(jEnv, jWalletCallbacks, callback_received_finalized_tx, callback_received_finalized_tx_sig);
     if (txFinalizedCallbackMethodId == nullptr) {
         SetNullPointerField(jEnv, jThis);
     }
 
-    txBroadcastCallbackMethodId = getMethodId(jEnv, jWalletCallbackListener, callback_tx_broadcast, callback_tx_broadcast_sig);
+    txBroadcastCallbackMethodId = getMethodId(jEnv, jWalletCallbacks, callback_tx_broadcast, callback_tx_broadcast_sig);
     if (txBroadcastCallbackMethodId == nullptr) {
         SetNullPointerField(jEnv, jThis);
     }
 
-    txMinedCallbackMethodId = getMethodId(jEnv, jWalletCallbackListener, callback_tx_mined, callback_tx_mined_sig);
+    txMinedCallbackMethodId = getMethodId(jEnv, jWalletCallbacks, callback_tx_mined, callback_tx_mined_sig);
     if (txMinedCallbackMethodId == nullptr) {
         SetNullPointerField(jEnv, jThis);
     }
 
-    txMinedUnconfirmedCallbackMethodId = getMethodId(jEnv, jWalletCallbackListener, callback_tx_mined_unconfirmed, callback_tx_mined_unconfirmed_sig);
+    txMinedUnconfirmedCallbackMethodId = getMethodId(jEnv, jWalletCallbacks, callback_tx_mined_unconfirmed, callback_tx_mined_unconfirmed_sig);
     if (txMinedUnconfirmedCallbackMethodId == nullptr) {
         SetNullPointerField(jEnv, jThis);
     }
 
-    txFauxConfirmedCallbackMethodId = getMethodId(jEnv, jWalletCallbackListener, callback_tx_faux_confirmed, callback_tx_faux_confirmed_sig);
+    txFauxConfirmedCallbackMethodId = getMethodId(jEnv, jWalletCallbacks, callback_tx_faux_confirmed, callback_tx_faux_confirmed_sig);
     if (txFauxConfirmedCallbackMethodId == nullptr) {
         SetNullPointerField(jEnv, jThis);
     }
 
-    txFauxUnconfirmedCallbackMethodId = getMethodId(jEnv, jWalletCallbackListener, callback_tx_faux_unconfirmed, callback_tx_faux_unconfirmed_sig);
+    txFauxUnconfirmedCallbackMethodId = getMethodId(jEnv, jWalletCallbacks, callback_tx_faux_unconfirmed, callback_tx_faux_unconfirmed_sig);
     if (txFauxUnconfirmedCallbackMethodId == nullptr) {
         SetNullPointerField(jEnv, jThis);
     }
 
-    directSendResultCallbackMethodId = getMethodId(jEnv, jWalletCallbackListener, callback_direct_send_result, callback_direct_send_result_sig);
+    directSendResultCallbackMethodId = getMethodId(jEnv, jWalletCallbacks, callback_direct_send_result, callback_direct_send_result_sig);
     if (directSendResultCallbackMethodId == nullptr) {
         SetNullPointerField(jEnv, jThis);
     }
 
-    txCancellationCallbackMethodId = getMethodId(jEnv, jWalletCallbackListener, callback_tx_cancellation, callback_tx_cancellation_sig);
+    txCancellationCallbackMethodId = getMethodId(jEnv, jWalletCallbacks, callback_tx_cancellation, callback_tx_cancellation_sig);
     if (txCancellationCallbackMethodId == nullptr) {
         SetNullPointerField(jEnv, jThis);
     }
 
-    connectivityStatusCallbackId = getMethodId(jEnv, jWalletCallbackListener, callback_connectivity_status, callback_connectivity_status_sig);
+    connectivityStatusCallbackId = getMethodId(jEnv, jWalletCallbacks, callback_connectivity_status, callback_connectivity_status_sig);
     if (connectivityStatusCallbackId == nullptr) {
         SetNullPointerField(jEnv, jThis);
     }
 
-    txoValidationCompleteCallbackMethodId = getMethodId(jEnv, jWalletCallbackListener, callback_txo_validation_complete,
+    txoValidationCompleteCallbackMethodId = getMethodId(jEnv, jWalletCallbacks, callback_txo_validation_complete,
                                                         callback_txo_validation_complete_sig);
     if (txoValidationCompleteCallbackMethodId == nullptr) {
         SetNullPointerField(jEnv, jThis);
     }
 
-    transactionValidationCompleteCallbackMethodId = getMethodId(jEnv, jWalletCallbackListener, callback_transaction_validation_complete,
+    transactionValidationCompleteCallbackMethodId = getMethodId(jEnv, jWalletCallbacks, callback_transaction_validation_complete,
                                                                 callback_transaction_validation_complete_sig);
     if (transactionValidationCompleteCallbackMethodId == nullptr) {
         SetNullPointerField(jEnv, jThis);
     }
 
-    contactsLivenessDataUpdatedCallbackMethodId = getMethodId(jEnv, jWalletCallbackListener, callback_contacts_liveness_data_updated,
+    contactsLivenessDataUpdatedCallbackMethodId = getMethodId(jEnv, jWalletCallbacks, callback_contacts_liveness_data_updated,
                                                               callback_contacts_liveness_data_updated_sig);
     if (contactsLivenessDataUpdatedCallbackMethodId == nullptr) {
         SetNullPointerField(jEnv, jThis);
     }
 
-    balanceUpdatedCallbackMethodId = getMethodId(jEnv, jWalletCallbackListener, callback_balance_updated, callback_balance_updated_sig);
+    balanceUpdatedCallbackMethodId = getMethodId(jEnv, jWalletCallbacks, callback_balance_updated, callback_balance_updated_sig);
     if (balanceUpdatedCallbackMethodId == nullptr) {
         SetNullPointerField(jEnv, jThis);
     }
 
-    walletScannedHeightCallbackMethodId = getMethodId(jEnv, jWalletCallbackListener, callback_wallet_scanned_height,
+    walletScannedHeightCallbackMethodId = getMethodId(jEnv, jWalletCallbacks, callback_wallet_scanned_height,
                                                       callback_wallet_scanned_height_sig);
     if (walletScannedHeightCallbackMethodId == nullptr) {
         SetNullPointerField(jEnv, jThis);
     }
 
-    baseNodeStatusCallbackMethodId = getMethodId(jEnv, jWalletCallbackListener, callback_base_node_status, callback_base_node_status_sig);
+    baseNodeStatusCallbackMethodId = getMethodId(jEnv, jWalletCallbacks, callback_base_node_status, callback_base_node_status_sig);
     if (baseNodeStatusCallbackMethodId == nullptr) {
         SetNullPointerField(jEnv, jThis);
     }
@@ -1158,14 +1158,14 @@ JNIEXPORT jboolean JNICALL
 Java_com_tari_android_wallet_ffi_FFIWallet_jniStartRecovery(
         JNIEnv *jEnv,
         jobject jThis,
-        jobject jWalletCallbackListener,
+        jobject jWalletCallbacks,
         jstring callback,
         jstring callback_sig,
         jstring recovery_output_message,
         jobject error) {
     return ExecuteWithError<jboolean>(jEnv, error, [&](int *errorPointer) {
         auto pWallet = GetPointerField<TariWallet *>(jEnv, jThis);
-        recoveringProcessCompleteCallbackMethodId = getMethodId(jEnv, jWalletCallbackListener, callback, callback_sig);
+        recoveringProcessCompleteCallbackMethodId = getMethodId(jEnv, jWalletCallbacks, callback, callback_sig);
         if (recoveringProcessCompleteCallbackMethodId == nullptr) {
             SetNullPointerField(jEnv, jThis);
         }

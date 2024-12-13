@@ -39,32 +39,22 @@ import android.os.IBinder
 import android.os.Looper
 import androidx.lifecycle.ProcessLifecycleOwner
 import com.orhanobut.logger.Logger
-import com.tari.android.wallet.application.AppStateHandler
 import com.tari.android.wallet.application.TariWalletApplication
 import com.tari.android.wallet.application.walletManager.WalletConfig
+import com.tari.android.wallet.application.walletManager.WalletLauncher
+import com.tari.android.wallet.application.walletManager.WalletLauncher.Companion.START_ACTION
+import com.tari.android.wallet.application.walletManager.WalletLauncher.Companion.STOP_ACTION
 import com.tari.android.wallet.application.walletManager.WalletManager
-import com.tari.android.wallet.application.walletManager.doOnWalletStarted
+import com.tari.android.wallet.application.walletManager.doOnWalletRunning
 import com.tari.android.wallet.di.DiContainer
 import com.tari.android.wallet.ffi.FFIWallet
 import com.tari.android.wallet.infrastructure.backup.BackupManager
 import com.tari.android.wallet.notification.NotificationHelper
-import com.tari.android.wallet.service.ServiceRestartBroadcastReceiver
-import com.tari.android.wallet.service.service.WalletServiceLauncher.Companion.START_ACTION
-import com.tari.android.wallet.service.service.WalletServiceLauncher.Companion.STOP_ACTION
 import com.tari.android.wallet.ui.common.domain.ResourceManager
-import com.tari.android.wallet.ui.screen.settings.logs.LogFilesManager
-import com.tari.android.wallet.util.Constants
-import io.reactivex.Observable
-import io.reactivex.disposables.Disposable
-import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
-import org.joda.time.DateTime
-import org.joda.time.Hours
-import org.joda.time.Minutes
-import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 /**
@@ -92,11 +82,7 @@ class WalletService : Service() {
     @Inject
     lateinit var backupManager: BackupManager
 
-    @Inject
-    lateinit var appStateHandler: AppStateHandler
-
     private var lifecycleObserver: ServiceLifecycleCallbacks? = null
-    private val stubProxy = TariWalletServiceStubProxy()
 
     private lateinit var wallet: FFIWallet
 
@@ -106,28 +92,14 @@ class WalletService : Service() {
     private val logger
         get() = Logger.t(WalletService::class.simpleName)
 
-    /**
-     * Check for expired txs every 30 minutes.
-     */
-    private val expirationCheckPeriodMinutes = Minutes.minutes(30)
-
-    /**
-     * Timer to trigger the expiration checks.
-     */
-    private var txExpirationCheckSubscription: Disposable? = null
-
     override fun onCreate() {
         super.onCreate()
         DiContainer.appComponent.inject(this)
+    }
 
-        serviceScope.launch {
-            appStateHandler.appEvent.collect { event ->
-                when (event) {
-                    is AppStateHandler.AppEvent.AppBackgrounded,
-                    is AppStateHandler.AppEvent.AppForegrounded -> LogFilesManager(walletConfig).manage()
-                }
-            }
-        }
+    override fun onBind(intent: Intent?): IBinder? {
+        // Return null because this service is not meant to be bound to
+        return null
     }
 
     /**
@@ -136,7 +108,7 @@ class WalletService : Service() {
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
         startForeground()
         when (intent.action) {
-            START_ACTION -> startService(intent.getStringArrayExtra(WalletServiceLauncher.ARG_SEED_WORDS)?.toList())
+            START_ACTION -> startService(intent.getStringArrayExtra(WalletLauncher.Companion.ARG_SEED_WORDS)?.toList())
             STOP_ACTION -> stopService(startId)
             else -> throw RuntimeException("Unexpected intent action: ${intent.action}")
         }
@@ -148,8 +120,8 @@ class WalletService : Service() {
         DiContainer.appComponent.inject(this)
 
         serviceScope.launch {
-            walletManager.doOnWalletStarted {
-                onWalletStarted(it)
+            walletManager.doOnWalletRunning {
+                onWalletRunning(it)
             }
         }
         walletManager.start(seedWords)
@@ -170,42 +142,10 @@ class WalletService : Service() {
         lifecycleObserver?.let { ProcessLifecycleOwner.get().lifecycle.removeObserver(it) }
     }
 
-    private fun onWalletStarted(ffiWallet: FFIWallet) {
+    private fun onWalletRunning(ffiWallet: FFIWallet) {
         wallet = ffiWallet
         lifecycleObserver = ServiceLifecycleCallbacks(wallet)
-        stubProxy.stub = TariWalletServiceStubImpl(wallet)
-        scheduleExpirationCheck()
         Handler(Looper.getMainLooper()).post { ProcessLifecycleOwner.get().lifecycle.addObserver(lifecycleObserver!!) }
-        walletManager.onWalletStarted()
-    }
-
-    private fun scheduleExpirationCheck() {
-        txExpirationCheckSubscription =
-            Observable
-                .timer(expirationCheckPeriodMinutes.minutes.toLong(), TimeUnit.MINUTES)
-                .repeat()
-                .subscribeOn(Schedulers.io())
-                .observeOn(Schedulers.io())
-                .doOnError { logger.i("error during scheduled expiration check $it") }
-                .subscribe {
-                    try {
-                        logger.i("scheduled expiration check")
-                        cancelExpiredPendingInboundTxs()
-                        cancelExpiredPendingOutboundTxs()
-                    } catch (e: Exception) {
-                        logger.i("error during scheduled expiration check $e")
-                    }
-                }
-    }
-
-    override fun onBind(intent: Intent?): IBinder {
-        logger.i("Wallet service bound")
-        return stubProxy
-    }
-
-    override fun onUnbind(intent: Intent?): Boolean {
-        logger.i("Wallet service unbound")
-        return super.onUnbind(intent)
     }
 
     /**
@@ -213,40 +153,8 @@ class WalletService : Service() {
      */
     override fun onDestroy() {
         logger.i("Wallet service destroyed")
-        txExpirationCheckSubscription?.dispose()
-        sendBroadcast(Intent(this, ServiceRestartBroadcastReceiver::class.java))
         job.cancel()
         super.onDestroy()
-    }
-
-    /**
-     * Cancels expired pending inbound transactions.
-     * Expiration period is defined by Constants.Wallet.pendingTxExpirationPeriodHours
-     */
-    private fun cancelExpiredPendingInboundTxs() {
-        val now = DateTime.now().toLocalDateTime()
-        wallet.getPendingInboundTxs().forEach { tx ->
-            val txDate = DateTime(tx.timestamp.toLong() * 1000L).toLocalDateTime()
-            val hoursPassed = Hours.hoursBetween(txDate, now).hours
-            if (hoursPassed >= Constants.Wallet.PENDING_TX_EXPIRATION_PERIOD_HOURS) {
-                wallet.cancelPendingTx(tx.id)
-            }
-        }
-    }
-
-    /**
-     * Cancels expired pending outbound transactions.
-     * Expiration period is defined by Constants.Wallet.pendingTxExpirationPeriodHours
-     */
-    private fun cancelExpiredPendingOutboundTxs() {
-        val now = DateTime.now().toLocalDateTime()
-        wallet.getPendingOutboundTxs().forEach { tx ->
-            val txDate = DateTime(tx.timestamp.toLong() * 1000L).toLocalDateTime()
-            val hoursPassed = Hours.hoursBetween(txDate, now).hours
-            if (hoursPassed >= Constants.Wallet.PENDING_TX_EXPIRATION_PERIOD_HOURS) {
-                wallet.cancelPendingTx(tx.id)
-            }
-        }
     }
 
     companion object {

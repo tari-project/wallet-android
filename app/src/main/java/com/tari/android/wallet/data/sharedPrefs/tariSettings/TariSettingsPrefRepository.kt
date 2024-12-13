@@ -39,6 +39,7 @@ import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefGsonDelegate
 import com.tari.android.wallet.data.sharedPrefs.network.NetworkPrefRepository
 import com.tari.android.wallet.data.sharedPrefs.network.formatKey
 import com.tari.android.wallet.ui.screen.settings.themeSelector.TariTheme
+import com.tari.android.wallet.util.DebugConfig
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -59,7 +60,12 @@ class TariSettingsPrefRepository @Inject constructor(sharedPrefs: SharedPreferen
 
     var hasVerifiedSeedWords: Boolean by SharedPrefBooleanDelegate(sharedPrefs, this, formatKey(Key.HAS_VERIFIED_SEED_WORDS))
 
-    var backgroundServiceTurnedOn: Boolean by SharedPrefBooleanDelegate(sharedPrefs, this, formatKey(Key.BACKGROUND_SERVICE_TURNED_ON_KEY), true)
+    var backgroundServiceTurnedOn: Boolean by SharedPrefBooleanDelegate(
+        prefs = sharedPrefs,
+        commonRepository = this,
+        name = formatKey(Key.BACKGROUND_SERVICE_TURNED_ON_KEY),
+        defValue = DebugConfig.interactivePaymentsEnabled,
+    )
 
     var screenRecordingTurnedOn: Boolean by SharedPrefBooleanDelegate(sharedPrefs, this, formatKey(Key.SCREEN_RECORDING_TURNED_ON_KEY), false)
 
@@ -76,6 +82,6 @@ class TariSettingsPrefRepository @Inject constructor(sharedPrefs: SharedPreferen
     fun clear() {
         isRestoredWallet = false
         hasVerifiedSeedWords = false
-        backgroundServiceTurnedOn = true
+        backgroundServiceTurnedOn = DebugConfig.interactivePaymentsEnabled
     }
 }

@@ -38,17 +38,11 @@ import android.content.Intent
 import android.content.ServiceConnection
 import android.os.IBinder
 import androidx.lifecycle.ViewModel
-import com.orhanobut.logger.Logger
 import com.tari.android.wallet.application.TariWalletApplication
-import com.tari.android.wallet.util.extension.safeCastTo
-import com.tari.android.wallet.service.TariWalletService
 import com.tari.android.wallet.service.service.WalletService
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -56,14 +50,9 @@ import javax.inject.Singleton
 class TariWalletServiceConnection @Inject constructor(
     private val application: TariWalletApplication,
 ) : ViewModel(), ServiceConnection {
-    private val logger
-        get() = Logger.t(this::class.simpleName)
 
     private val _connection = MutableStateFlow<ServiceConnectionState>(ServiceConnectionState.NotYetConnected)
     private val connectionState = _connection.asStateFlow()
-    val walletService
-        get() = connectionState.value.safeCastTo<ServiceConnectionState.Connected>()?.service
-            ?: error("Accessing wallet service before it is connected")
 
     init {
         reconnectToService()
@@ -80,32 +69,16 @@ class TariWalletServiceConnection @Inject constructor(
     }
 
     override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
-        _connection.update { ServiceConnectionState.Connected(TariWalletService.Stub.asInterface(service)) }
+        _connection.update { ServiceConnectionState.Connected }
     }
 
     override fun onCleared() = application.unbindService(this)
 
     fun isWalletServiceConnected() = connectionState.value is ServiceConnectionState.Connected
-
-    suspend fun doOnWalletServiceConnected(action: suspend (walletService: TariWalletService) -> Unit) = withContext(Dispatchers.IO) {
-        connectionState.firstOrNull { it is ServiceConnectionState.Connected }
-            ?.safeCastTo<ServiceConnectionState.Connected>()?.service
-            ?.let {
-                action(it)
-            } ?: logger.i("Wallet service is not connected")
-    }
-
-    suspend fun <T> doOnWalletServiceConnectedWithValue(action: suspend (walletService: TariWalletService) -> T): T = withContext(Dispatchers.IO) {
-        connectionState.firstOrNull { it is ServiceConnectionState.Connected }
-            ?.safeCastTo<ServiceConnectionState.Connected>()?.service
-            ?.let {
-                action(it)
-            } ?: error("Wallet service is not connected")
-    }
 }
 
 sealed class ServiceConnectionState {
     data object NotYetConnected : ServiceConnectionState()
     data object Disconnected : ServiceConnectionState()
-    data class Connected(val service: TariWalletService) : ServiceConnectionState()
+    data object Connected : ServiceConnectionState()
 }

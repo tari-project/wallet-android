@@ -13,7 +13,7 @@ class MigrationManager @Inject constructor(
     private val walletManager: WalletManager,
 ) {
     suspend fun validateVersion(onValid: () -> Unit, onError: () -> Unit) = withContext(Dispatchers.IO) {
-        val walletVersion = walletManager.getCommsConfig().getLastVersion()
+        val walletVersion = walletManager.getLastAccessedToDbVersion()
             .replace("v", "")
             .takeIf { it.isNotEmpty() }
             ?.let { DefaultArtifactVersion(it) }

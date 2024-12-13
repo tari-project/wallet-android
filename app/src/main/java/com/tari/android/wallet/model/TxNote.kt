@@ -34,7 +34,7 @@ package com.tari.android.wallet.model
 
 import com.tari.android.wallet.model.tx.Tx
 
-class TxNote(val message: String?, val gifUrl: String?) {
+data class TxNote(val message: String?, val gifUrl: String?) {
 
     init {
         if (message == null && gifUrl == null) {
@@ -77,5 +77,4 @@ class TxNote(val message: String?, val gifUrl: String?) {
             ) else TxNote(note, null)
         }
     }
-
 }

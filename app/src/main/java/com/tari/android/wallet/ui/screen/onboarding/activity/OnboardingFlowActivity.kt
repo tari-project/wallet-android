@@ -39,15 +39,13 @@ import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
 import androidx.lifecycle.lifecycleScope
 import com.tari.android.wallet.R
+import com.tari.android.wallet.application.walletManager.WalletLauncher
 import com.tari.android.wallet.application.walletManager.WalletManager
 import com.tari.android.wallet.application.walletManager.doOnWalletFailed
 import com.tari.android.wallet.application.walletManager.doOnWalletRunning
 import com.tari.android.wallet.data.sharedPrefs.CorePrefRepository
 import com.tari.android.wallet.databinding.ActivityOnboardingFlowBinding
 import com.tari.android.wallet.di.DiContainer.appComponent
-import com.tari.android.wallet.util.extension.collectFlow
-import com.tari.android.wallet.util.extension.safeCastTo
-import com.tari.android.wallet.service.service.WalletServiceLauncher
 import com.tari.android.wallet.ui.common.CommonActivity
 import com.tari.android.wallet.ui.screen.onboarding.activity.OnboardingFlowModel.Effect
 import com.tari.android.wallet.ui.screen.onboarding.createWallet.CreateWalletFragment
@@ -55,6 +53,8 @@ import com.tari.android.wallet.ui.screen.onboarding.inroduction.IntroductionFrag
 import com.tari.android.wallet.ui.screen.onboarding.localAuth.LocalAuthFragment
 import com.tari.android.wallet.ui.screen.restore.walletRestoring.WalletRestoringFragment
 import com.tari.android.wallet.ui.screen.settings.networkSelection.NetworkSelectionFragment
+import com.tari.android.wallet.util.extension.collectFlow
+import com.tari.android.wallet.util.extension.safeCastTo
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -74,7 +74,7 @@ class OnboardingFlowActivity : CommonActivity<ActivityOnboardingFlowBinding, Onb
     lateinit var corePrefRepository: CorePrefRepository
 
     @Inject
-    lateinit var walletServiceLauncher: WalletServiceLauncher
+    lateinit var walletLauncher: WalletLauncher
 
     @Inject
     lateinit var walletManager: WalletManager
@@ -93,7 +93,7 @@ class OnboardingFlowActivity : CommonActivity<ActivityOnboardingFlowBinding, Onb
 
         when {
             paperWalletSeeds != null -> {
-                walletServiceLauncher.start(paperWalletSeeds)
+                walletLauncher.start(paperWalletSeeds)
 
                 lifecycleScope.launch {
                     walletManager.doOnWalletRunning {
@@ -103,13 +103,13 @@ class OnboardingFlowActivity : CommonActivity<ActivityOnboardingFlowBinding, Onb
             }
 
             corePrefRepository.onboardingAuthWasInterrupted -> {
-                walletServiceLauncher.start()
+                walletLauncher.start()
                 loadFragment(LocalAuthFragment())
             }
 
             corePrefRepository.onboardingWasInterrupted -> {
                 // start wallet service
-                walletServiceLauncher.start()
+                walletLauncher.start()
                 // clean existing files & restart onboarding
                 walletManager.deleteWallet()
                 loadFragment(CreateWalletFragment())

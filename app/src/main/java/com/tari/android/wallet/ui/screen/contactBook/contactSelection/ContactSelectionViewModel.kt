@@ -8,13 +8,18 @@ import com.tari.android.wallet.R
 import com.tari.android.wallet.application.YatAdapter
 import com.tari.android.wallet.application.deeplinks.DeepLink
 import com.tari.android.wallet.application.deeplinks.DeeplinkManager
+import com.tari.android.wallet.data.chat.ChatItemDto
+import com.tari.android.wallet.data.chat.ChatsRepository
+import com.tari.android.wallet.data.contacts.ContactsRepository
+import com.tari.android.wallet.data.contacts.model.ContactDto
+import com.tari.android.wallet.data.contacts.model.FFIContactInfo
+import com.tari.android.wallet.data.contacts.model.splitAlias
 import com.tari.android.wallet.data.sharedPrefs.CorePrefRepository
-import com.tari.android.wallet.util.EffectChannelFlow
-import com.tari.android.wallet.util.extension.collectFlow
-import com.tari.android.wallet.util.extension.launchOnIo
-import com.tari.android.wallet.util.extension.launchOnMain
+import com.tari.android.wallet.infrastructure.ShareManager
+import com.tari.android.wallet.model.EmojiId
 import com.tari.android.wallet.model.MicroTari
 import com.tari.android.wallet.model.TariWalletAddress
+import com.tari.android.wallet.navigation.Navigation
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.common.recyclerView.CommonViewHolderItem
 import com.tari.android.wallet.ui.common.recyclerView.items.TitleViewHolderItem
@@ -22,23 +27,18 @@ import com.tari.android.wallet.ui.component.clipboardController.WalletAddressVie
 import com.tari.android.wallet.ui.dialog.modular.modules.addressPoisoning.AddressPoisoningModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonStyle
-import com.tari.android.wallet.data.chat.ChatItemDto
-import com.tari.android.wallet.data.chat.ChatsRepository
 import com.tari.android.wallet.ui.screen.contactBook.addressPoisoning.AddressPoisoningChecker
 import com.tari.android.wallet.ui.screen.contactBook.addressPoisoning.SimilarAddressDto
 import com.tari.android.wallet.ui.screen.contactBook.contactSelection.ContactSelectionModel.Effect
 import com.tari.android.wallet.ui.screen.contactBook.contactSelection.ContactSelectionModel.YatState
 import com.tari.android.wallet.ui.screen.contactBook.contacts.adapter.contact.ContactItemViewHolderItem
 import com.tari.android.wallet.ui.screen.contactBook.contacts.adapter.contact.ContactlessPaymentItem
-import com.tari.android.wallet.data.contacts.ContactsRepository
-import com.tari.android.wallet.data.contacts.model.ContactDto
-import com.tari.android.wallet.data.contacts.model.FFIContactInfo
-import com.tari.android.wallet.data.contacts.model.splitAlias
-import com.tari.android.wallet.infrastructure.ShareManager
-import com.tari.android.wallet.navigation.Navigation
 import com.tari.android.wallet.util.Constants
-import com.tari.android.wallet.model.EmojiId
+import com.tari.android.wallet.util.EffectFlow
 import com.tari.android.wallet.util.EmojiUtil.Companion.getGraphemeLength
+import com.tari.android.wallet.util.extension.collectFlow
+import com.tari.android.wallet.util.extension.launchOnIo
+import com.tari.android.wallet.util.extension.launchOnMain
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -88,7 +88,7 @@ class ContactSelectionViewModel : CommonViewModel() {
 
     val amount: MutableLiveData<MicroTari> = MutableLiveData()
 
-    private val _effect = EffectChannelFlow<Effect>()
+    private val _effect = EffectFlow<Effect>()
     val effect: Flow<Effect> = _effect.flow
 
     private val _yatState = MutableStateFlow(YatState())
@@ -97,7 +97,7 @@ class ContactSelectionViewModel : CommonViewModel() {
     init {
         component.inject(this)
 
-        doOnWalletServiceConnected {
+        doOnWalletRunning {
             walletAddressViewModel.checkClipboardForValidEmojiId()
         }
 

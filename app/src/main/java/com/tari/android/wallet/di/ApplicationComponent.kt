@@ -34,6 +34,7 @@ package com.tari.android.wallet.di
 
 import android.content.ClipboardManager
 import com.tari.android.wallet.application.TariWalletApplication
+import com.tari.android.wallet.infrastructure.ShareManager
 import com.tari.android.wallet.notification.NotificationBroadcastReceiver
 import com.tari.android.wallet.service.service.WalletService
 import com.tari.android.wallet.ui.common.CommonViewModel
@@ -49,7 +50,6 @@ import com.tari.android.wallet.ui.screen.contactBook.contacts.ContactsViewModel
 import com.tari.android.wallet.ui.screen.contactBook.details.ContactDetailsViewModel
 import com.tari.android.wallet.ui.screen.contactBook.link.ContactLinkViewModel
 import com.tari.android.wallet.ui.screen.contactBook.root.ContactBookViewModel
-import com.tari.android.wallet.infrastructure.ShareManager
 import com.tari.android.wallet.ui.screen.home.HomeActivity
 import com.tari.android.wallet.ui.screen.home.HomeViewModel
 import com.tari.android.wallet.ui.screen.home.overview.HomeOverviewViewModel
@@ -88,7 +88,6 @@ import com.tari.android.wallet.ui.screen.settings.bluetoothSettings.BluetoothSet
 import com.tari.android.wallet.ui.screen.settings.bugReporting.BugsReportingViewModel
 import com.tari.android.wallet.ui.screen.settings.dataCollection.DataCollectionViewModel
 import com.tari.android.wallet.ui.screen.settings.deleteWallet.DeleteWalletViewModel
-import com.tari.android.wallet.ui.screen.settings.logs.LogFilesManager
 import com.tari.android.wallet.ui.screen.settings.logs.logFiles.LogFilesViewModel
 import com.tari.android.wallet.ui.screen.settings.logs.logs.LogsViewModel
 import com.tari.android.wallet.ui.screen.settings.networkSelection.NetworkSelectionViewModel
@@ -170,7 +169,6 @@ interface ApplicationComponent {
     fun inject(viewModel: LogFilesViewModel)
     fun inject(viewModel: LogsViewModel)
     fun inject(viewModel: BackupOptionViewModel)
-    fun inject(viewModel: LogFilesManager)
     fun inject(viewModel: ThemeSelectorViewModel)
     fun inject(viewModel: DeleteWalletViewModel)
     fun inject(viewModel: HomeViewModel)

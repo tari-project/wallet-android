@@ -39,13 +39,13 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ProcessLifecycleOwner
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.BuildConfig
+import com.tari.android.wallet.application.walletManager.WalletLauncher
+import com.tari.android.wallet.data.network.NetworkConnectionStateReceiver
 import com.tari.android.wallet.data.sharedPrefs.security.SecurityPrefRepository
 import com.tari.android.wallet.di.ApplicationScope
 import com.tari.android.wallet.di.DiContainer
 import com.tari.android.wallet.infrastructure.logging.LoggerAdapter
-import com.tari.android.wallet.data.network.NetworkConnectionStateReceiver
 import com.tari.android.wallet.notification.NotificationHelper
-import com.tari.android.wallet.service.service.WalletServiceLauncher
 import com.tari.android.wallet.ui.common.giphy.GiphyAdapter
 import io.sentry.android.core.SentryAndroid
 import kotlinx.coroutines.CoroutineScope
@@ -73,7 +73,7 @@ class TariWalletApplication : Application() {
     lateinit var securityPrefRepository: SecurityPrefRepository
 
     @Inject
-    lateinit var walletServiceLauncher: WalletServiceLauncher
+    lateinit var walletLauncher: WalletLauncher
 
     @Inject
     lateinit var appStateHandler: AppStateHandler
@@ -156,7 +156,6 @@ class TariWalletApplication : Application() {
             super.onStart(owner)
             logger.i("App in foreground")
             isInForeground = true
-            walletServiceLauncher.startOnAppForegrounded()
             applicationScope.launch { appStateHandler.sendAppForegrounded() }
         }
 
@@ -164,7 +163,6 @@ class TariWalletApplication : Application() {
             super.onStop(owner)
             logger.i("App in background")
             isInForeground = false
-            walletServiceLauncher.stopOnAppBackgrounded()
             applicationScope.launch { appStateHandler.sendAppBackgrounded() }
         }
 
@@ -172,7 +170,7 @@ class TariWalletApplication : Application() {
             super.onDestroy(owner)
             securityPrefRepository.isAuthenticated = false
             logger.i("App was destroyed")
-            walletServiceLauncher.stopOnAppBackgrounded()
+            applicationScope.launch { appStateHandler.sendAppDestroyed() }
         }
     }
 }

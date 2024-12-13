@@ -13,7 +13,7 @@ import com.tari.android.wallet.R.string.contact_book_contacts_book_link_success_
 import com.tari.android.wallet.R.string.contact_book_contacts_book_link_success_message_secondLine
 import com.tari.android.wallet.R.string.contact_book_contacts_book_link_title
 import com.tari.android.wallet.R.string.contact_book_contacts_book_unlink_success_title
-import com.tari.android.wallet.util.EffectChannelFlow
+import com.tari.android.wallet.util.EffectFlow
 import com.tari.android.wallet.util.extension.collectFlow
 import com.tari.android.wallet.util.extension.getRequired
 import com.tari.android.wallet.util.extension.launchOnIo
@@ -51,7 +51,7 @@ class ContactLinkViewModel(savedState: SavedStateHandle) : CommonViewModel() {
     private val _uiState = MutableStateFlow(ContactLinkModel.UiState())
     val uiState = _uiState.asStateFlow()
 
-    private val _effect = EffectChannelFlow<ContactLinkModel.Effect>()
+    private val _effect = EffectFlow<ContactLinkModel.Effect>()
     val effect = _effect.flow
 
     private val ffiContact: ContactDto = savedState.getRequired(PARAMETER_CONTACT)

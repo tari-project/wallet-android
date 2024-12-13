@@ -40,7 +40,6 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.content.Intent.FLAG_ACTIVITY_CLEAR_TOP
-import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
@@ -70,32 +69,30 @@ class NotificationHelper @Inject constructor(private val context: Context) {
         get() = Logger.t(NotificationHelper::class.simpleName)
 
     fun createNotificationChannels() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            // service notification channel
-            val serviceNotificationChannel = NotificationChannel(
-                SERVICE_NOTIFICATION_CHANNEL_ID,
-                context.getString(R.string.wallet_service_notification_channel_name),
-                NotificationManager.IMPORTANCE_DEFAULT
-            ).apply {
-                setSound(null, null)
-                setShowBadge(false)
-                description = context.getString(R.string.wallet_service_description)
-            }
-            notificationManager.createNotificationChannel(serviceNotificationChannel)
-            // app notification channel
-            val appNotificationChannel = NotificationChannel(
-                APP_NOTIFICATION_CHANNEL_ID,
-                context.getString(R.string.app_notification_channel_name),
-                NotificationManager.IMPORTANCE_HIGH
-            ).apply {
-                setShowBadge(false)
-                description = context.getString(R.string.wallet_service_description)
-                notificationManager.createNotificationChannel(this)
-                importance = NotificationManager.IMPORTANCE_HIGH
-            }
-            notificationManager.createNotificationChannel(appNotificationChannel)
-            logger.i("Channels was created")
+        // service notification channel
+        val serviceNotificationChannel = NotificationChannel(
+            SERVICE_NOTIFICATION_CHANNEL_ID,
+            context.getString(R.string.wallet_service_notification_channel_name),
+            NotificationManager.IMPORTANCE_DEFAULT
+        ).apply {
+            setSound(null, null)
+            setShowBadge(false)
+            description = context.getString(R.string.wallet_service_description)
         }
+        notificationManager.createNotificationChannel(serviceNotificationChannel)
+        // app notification channel
+        val appNotificationChannel = NotificationChannel(
+            APP_NOTIFICATION_CHANNEL_ID,
+            context.getString(R.string.app_notification_channel_name),
+            NotificationManager.IMPORTANCE_HIGH
+        ).apply {
+            setShowBadge(false)
+            description = context.getString(R.string.wallet_service_description)
+            notificationManager.createNotificationChannel(this)
+            importance = NotificationManager.IMPORTANCE_HIGH
+        }
+        notificationManager.createNotificationChannel(appNotificationChannel)
+        logger.i("Channels was created")
     }
 
     fun buildForegroundServiceNotification(): Notification {

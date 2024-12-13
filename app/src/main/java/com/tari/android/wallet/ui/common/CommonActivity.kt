@@ -167,7 +167,7 @@ abstract class CommonActivity<Binding : ViewBinding, VM : CommonViewModel> : App
             transaction.addToBackStack(null)
         }
         fragment.setFragmentPoppedListener(this)
-        transaction.commit()
+        transaction.commitAllowingStateLoss()
     }
 
     fun popUpTo(tag: String) {

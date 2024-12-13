@@ -39,6 +39,7 @@ import androidx.activity.addCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.coroutineScope
 import com.tari.android.wallet.application.walletManager.WalletConfig
+import com.tari.android.wallet.application.walletManager.WalletLauncher
 import com.tari.android.wallet.application.walletManager.WalletManager
 import com.tari.android.wallet.application.walletManager.doOnWalletNotReady
 import com.tari.android.wallet.data.sharedPrefs.CorePrefRepository
@@ -46,7 +47,6 @@ import com.tari.android.wallet.data.sharedPrefs.network.NetworkPrefRepository
 import com.tari.android.wallet.data.sharedPrefs.security.SecurityPrefRepository
 import com.tari.android.wallet.di.DiContainer
 import com.tari.android.wallet.di.DiContainer.appComponent
-import com.tari.android.wallet.service.service.WalletServiceLauncher
 import com.tari.android.wallet.ui.screen.auth.AuthActivity
 import com.tari.android.wallet.ui.screen.onboarding.activity.OnboardingFlowActivity
 import kotlinx.coroutines.launch
@@ -72,7 +72,7 @@ class SplashActivity : AppCompatActivity() {
     lateinit var networkRepository: NetworkPrefRepository
 
     @Inject
-    lateinit var walletServiceLauncher: WalletServiceLauncher
+    lateinit var walletLauncher: WalletLauncher
 
     @Inject
     lateinit var walletManager: WalletManager
@@ -116,7 +116,7 @@ class SplashActivity : AppCompatActivity() {
             }
         }
 
-        walletServiceLauncher.stop()
+        walletLauncher.stop()
     }
 
     private fun <T : Activity> launchActivity(destination: Class<T>) {

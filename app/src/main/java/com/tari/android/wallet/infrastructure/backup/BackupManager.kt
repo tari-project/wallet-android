@@ -115,7 +115,8 @@ class BackupManager @Inject constructor(
             appStateHandler.appEvent.collect { event ->
                 when (event) {
                     is AppStateHandler.AppEvent.AppBackgrounded,
-                    is AppStateHandler.AppEvent.AppForegrounded -> trigger.onNext(Unit)
+                    is AppStateHandler.AppEvent.AppForegrounded,
+                    is AppStateHandler.AppEvent.AppDestroyed -> trigger.onNext(Unit)
                 }
             }
         }
@@ -127,7 +128,7 @@ class BackupManager @Inject constructor(
     }
 
     suspend fun onSetupActivityResult(requestCode: Int, resultCode: Int, intent: Intent?): Boolean =
-        currentOption?.let { getStorageByOption(it).onSetupActivityResult(requestCode, resultCode, intent) } ?: false
+        currentOption?.let { getStorageByOption(it).onSetupActivityResult(requestCode, resultCode, intent) } == true
 
     fun backupNow() = trigger.onNext(Unit)
 

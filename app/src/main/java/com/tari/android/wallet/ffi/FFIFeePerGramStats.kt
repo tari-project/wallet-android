@@ -32,7 +32,7 @@
  */
 package com.tari.android.wallet.ffi
 
-class FFIFeePerGramStats(pointer: FFIPointer) : FFIBase() {
+class FFIFeePerGramStats(pointer: FFIPointer) : FFIIterableBase<FFIFeePerGramStat>() {
 
     private external fun jniFeePerGramStatsGetLength(libError: FFIError): Int
     private external fun jniGetAt(index: Int, libError: FFIError): FFIPointer
@@ -42,9 +42,9 @@ class FFIFeePerGramStats(pointer: FFIPointer) : FFIBase() {
         this.pointer = pointer
     }
 
-    fun getAt(position: Int): FFIFeePerGramStat = runWithError { FFIFeePerGramStat(jniGetAt(position, it)) }
+    override fun getAt(index: Int): FFIFeePerGramStat = runWithError { FFIFeePerGramStat(jniGetAt(index, it)) }
 
-    fun getLength(): Int = runWithError {  jniFeePerGramStatsGetLength(it) }
+    override fun getLength(): Int = runWithError {  jniFeePerGramStatsGetLength(it) }
 
     override fun destroy() = jniDestroy()
 }

@@ -40,13 +40,8 @@ import java.math.BigDecimal
 import java.math.BigInteger
 import java.math.RoundingMode
 
-/**
- * This wrapper is needed for amount parameters in AIDL methods.
- *
- * @author The Tari Development Team
- */
 @Parcelize
-data class MicroTari(val value: BigInteger = BigInteger("0")) : Parcelable, Comparable<MicroTari>, Serializable {
+data class MicroTari(val value: BigInteger) : Parcelable, Comparable<MicroTari>, Serializable {
 
     val tariValue: BigDecimal
         // Note: BigDecimal keeps track of both precision and scale, 1e6 != 1_000_000 in this case (scale 6, scale 0)

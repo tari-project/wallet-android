@@ -37,11 +37,11 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.activity.viewModels
 import com.tari.android.wallet.R
+import com.tari.android.wallet.application.walletManager.WalletLauncher
 import com.tari.android.wallet.data.sharedPrefs.CorePrefRepository
 import com.tari.android.wallet.data.sharedPrefs.tariSettings.TariSettingsPrefRepository
 import com.tari.android.wallet.databinding.ActivityWalletBackupBinding
 import com.tari.android.wallet.di.DiContainer.appComponent
-import com.tari.android.wallet.service.service.WalletServiceLauncher
 import com.tari.android.wallet.ui.common.CommonActivity
 import com.tari.android.wallet.ui.screen.restore.chooseRestoreOption.ChooseRestoreOptionFragment
 import javax.inject.Inject
@@ -55,7 +55,7 @@ class WalletRestoreActivity : CommonActivity<ActivityWalletBackupBinding, Wallet
     lateinit var tariSettingsSharedRepository: TariSettingsPrefRepository
 
     @Inject
-    lateinit var walletServiceLauncher: WalletServiceLauncher
+    lateinit var walletLauncher: WalletLauncher
 
     override fun onCreate(savedInstanceState: Bundle?) {
         appComponent.inject(this)
@@ -75,7 +75,7 @@ class WalletRestoreActivity : CommonActivity<ActivityWalletBackupBinding, Wallet
 
     override fun onDestroy() {
         if (!tariSettingsSharedRepository.isRestoredWallet) {
-            walletServiceLauncher.stop()
+            walletLauncher.stop()
         }
         super.onDestroy()
     }

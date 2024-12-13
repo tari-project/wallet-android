@@ -37,17 +37,15 @@ import com.tari.android.wallet.ffi.FFIPublicKey
 import com.tari.android.wallet.ffi.HexString
 import kotlinx.parcelize.Parcelize
 
-/**
- * This wrapper is needed for id parameters in AIDL methods.
- *
- * @author The Tari Development Team
- */
 @Parcelize
 data class PublicKey(
-    val hex: String = "",
-    val emojiId: String = "",
+    val hex: String,
+    val emojiId: String,
 ) : Parcelable {
-    constructor(ffiPublicKey: FFIPublicKey) : this(hex = HexString(ffiPublicKey.getByteVector()).hex)
+    constructor(ffiPublicKey: FFIPublicKey) : this(
+        hex = HexString(ffiPublicKey.getByteVector()).hex,
+        emojiId = "",
+    )
 
     override fun equals(other: Any?) = (other is PublicKey) && hex == other.hex
 

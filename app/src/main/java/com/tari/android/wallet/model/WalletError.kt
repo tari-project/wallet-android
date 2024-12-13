@@ -1,6 +1,5 @@
 package com.tari.android.wallet.model
 
-import android.os.Parcel
 import android.os.Parcelable
 import com.tari.android.wallet.ffi.FFIError
 import com.tari.android.wallet.ffi.FFIException
@@ -8,7 +7,7 @@ import kotlinx.parcelize.Parcelize
 
 @Parcelize
 data class WalletError(
-    override var code: Int = NoError.code,
+    override var code: Int,
     override var domain: String = "FFI",
 ) : CoreError(code, domain), Parcelable {
 
@@ -23,12 +22,6 @@ data class WalletError(
             else -> UnknownError.code
         },
     )
-
-    // This method is required despite of the @Parcelize annotation because it's used in AIDL declaration
-    fun readFromParcel(inParcel: Parcel) {
-        code = inParcel.readInt()
-        domain = inParcel.readString().orEmpty()
-    }
 
     companion object {
         val DatabaseDataError = WalletError(114)

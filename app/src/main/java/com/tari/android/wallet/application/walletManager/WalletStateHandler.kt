@@ -10,13 +10,6 @@ import kotlinx.coroutines.withContext
 private val logger
     get() = Logger.t(WalletManager::class.simpleName)
 
-suspend fun WalletManager.doOnWalletStarted(action: suspend (ffiWallet: FFIWallet) -> Unit) = withContext(Dispatchers.IO) {
-    walletState.firstOrNull { it is WalletState.Started }
-        ?.let {
-            action(walletInstance!!)
-        } ?: logger.i("Wallet service is not connected")
-}
-
 suspend fun WalletManager.doOnWalletRunning(action: suspend (ffiWallet: FFIWallet) -> Unit) = withContext(Dispatchers.IO) {
     walletState.firstOrNull { it is WalletState.Running }
         ?.let {

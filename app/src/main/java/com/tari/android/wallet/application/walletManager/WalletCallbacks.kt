@@ -1,6 +1,7 @@
 package com.tari.android.wallet.application.walletManager
 
 import com.orhanobut.logger.Logger
+import com.tari.android.wallet.data.recovery.WalletRestorationState
 import com.tari.android.wallet.ffi.FFIBalance
 import com.tari.android.wallet.ffi.FFICompletedTx
 import com.tari.android.wallet.ffi.FFIPendingInboundTx
@@ -10,14 +11,13 @@ import com.tari.android.wallet.ffi.FFITransactionSendStatus
 import com.tari.android.wallet.ffi.TransactionValidationStatus
 import com.tari.android.wallet.ffi.runWithDestroy
 import com.tari.android.wallet.model.BalanceInfo
+import com.tari.android.wallet.model.TransactionSendStatus
+import com.tari.android.wallet.model.TxId
 import com.tari.android.wallet.model.tx.CancelledTx
 import com.tari.android.wallet.model.tx.CompletedTx
 import com.tari.android.wallet.model.tx.PendingInboundTx
 import com.tari.android.wallet.model.tx.PendingOutboundTx
-import com.tari.android.wallet.model.TransactionSendStatus
 import com.tari.android.wallet.model.tx.Tx
-import com.tari.android.wallet.model.TxId
-import com.tari.android.wallet.data.recovery.WalletRestorationState
 import java.math.BigInteger
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -29,10 +29,10 @@ import javax.inject.Singleton
  * !! Should be added to proguard rules since method names are used in FFI callbacks. !!
  */
 @Singleton
-class WalletCallbackListener @Inject constructor() {
+class WalletCallbacks @Inject constructor() {
 
     private val logger
-        get() = Logger.t(WalletCallbackListener::class.simpleName)
+        get() = Logger.t(WalletCallbacks::class.simpleName)
 
     private val listeners = mutableMapOf<Int, FFIWalletListener>()
 

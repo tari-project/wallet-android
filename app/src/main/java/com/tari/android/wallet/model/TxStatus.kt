@@ -34,11 +34,6 @@ package com.tari.android.wallet.model
 
 import com.tari.android.wallet.ffi.FFITxStatus
 
-/**
- * Transaction status.
- *
- * @author The Tari Development Team
- */
 enum class TxStatus {
     TX_NULL_ERROR,
     COMPLETED,

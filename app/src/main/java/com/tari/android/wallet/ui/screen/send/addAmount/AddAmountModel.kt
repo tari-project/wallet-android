@@ -14,6 +14,6 @@ object AddAmountModel {
     )
 
     sealed class Effect {
-        data class OnServiceConnected(val uiState: UiState) : Effect()
+        data class SetupUi(val uiState: UiState) : Effect()
     }
 }

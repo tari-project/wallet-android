@@ -64,8 +64,6 @@ import com.tari.android.wallet.R.string.user_agreement_url
 import com.tari.android.wallet.application.YatAdapter
 import com.tari.android.wallet.data.sharedPrefs.CorePrefRepository
 import com.tari.android.wallet.data.sharedPrefs.backup.BackupPrefRepository
-import com.tari.android.wallet.util.extension.addTo
-import com.tari.android.wallet.util.extension.collectFlow
 import com.tari.android.wallet.infrastructure.backup.BackupManager
 import com.tari.android.wallet.infrastructure.backup.BackupMapState
 import com.tari.android.wallet.infrastructure.backup.BackupState
@@ -89,6 +87,8 @@ import com.tari.android.wallet.ui.screen.settings.allSettings.title.SettingsTitl
 import com.tari.android.wallet.ui.screen.settings.allSettings.version.SettingsVersionViewHolderItem
 import com.tari.android.wallet.ui.screen.settings.userAutorization.BiometricAuthenticationViewModel
 import com.tari.android.wallet.util.DebugConfig
+import com.tari.android.wallet.util.extension.addTo
+import com.tari.android.wallet.util.extension.collectFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -222,10 +222,10 @@ class AllSettingsViewModel : CommonViewModel() {
             SettingsRowViewHolderItem(resourceManager.getString(all_settings_select_theme), vector_all_settings_select_theme_icon) {
                 tariNavigator.navigate(AllSettings.ToThemeSelection)
             },
-            DividerViewHolderItem(),
+            DividerViewHolderItem().takeIf { DebugConfig.interactivePaymentsEnabled },
             SettingsRowViewHolderItem(resourceManager.getString(all_settings_background_service), vector_all_settings_background_service_icon) {
                 tariNavigator.navigate(AllSettings.ToBackgroundService)
-            },
+            }.takeIf { DebugConfig.interactivePaymentsEnabled },
             DividerViewHolderItem(),
             SettingsRowViewHolderItem(
                 title = resourceManager.getString(all_settings_screen_recording),
