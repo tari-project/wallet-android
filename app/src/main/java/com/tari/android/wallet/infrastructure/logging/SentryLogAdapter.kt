@@ -13,15 +13,13 @@ import io.sentry.SentryEvent
 import io.sentry.SentryLevel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 
 class SentryLogAdapter(
     val walletConfig: WalletConfig,
     private val sentryPrefRepository: SentryPrefRepository,
+    private val externalScope: CoroutineScope,
 ) : LogAdapter {
-
-    private var localScope = CoroutineScope(Job())
 
     override fun isLoggable(priority: Int, tag: String?): Boolean = sentryPrefRepository.isEnabled == true
 
@@ -29,7 +27,7 @@ class SentryLogAdapter(
         if (tag == BluetoothPeripheralManager::class.java.simpleName) return
 
         if (priority == Logger.ERROR) {
-            localScope.launch(Dispatchers.IO) {
+            externalScope.launch(Dispatchers.IO) {
                 try {
                     val files = walletConfig.getLogFiles()
                     val lines = files.firstOrNull()?.inputStream()?.bufferedReader()?.readLines()?.takeLast(100)?.joinToString("\n")

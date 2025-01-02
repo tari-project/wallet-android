@@ -11,8 +11,9 @@ import com.tari.android.wallet.application.deeplinks.DeepLink
 import com.tari.android.wallet.application.deeplinks.DeeplinkManager
 import com.tari.android.wallet.data.sharedPrefs.bluetooth.BluetoothPrefRepository
 import com.tari.android.wallet.data.sharedPrefs.bluetooth.BluetoothServerState
-import com.tari.android.wallet.util.extension.addTo
 import com.tari.android.wallet.util.ContactUtil
+import com.tari.android.wallet.util.extension.addTo
+import com.tari.android.wallet.util.extension.isNotTrue
 import com.welie.blessed.BluetoothCentral
 import com.welie.blessed.BluetoothPeripheralManager
 import com.welie.blessed.BluetoothPeripheralManagerCallback
@@ -24,7 +25,6 @@ import java.util.UUID
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import javax.inject.Singleton
-
 
 @Singleton
 class TariBluetoothServer @Inject constructor(
@@ -102,7 +102,7 @@ class TariBluetoothServer @Inject constructor(
                 if (characteristic.uuid.toString().lowercase() == CHARACTERISTIC_UUID.lowercase()) {
                     wholeData += value?.dropLast(1)?.toByteArray() ?: byteArrayOf()
 
-                    if ((value?.size ?: 0) < chunkSize && value?.lastOrNull() == 0.toByte()) {
+                    if ((value?.size ?: 0) < CHUNK_SIZE && value?.lastOrNull() == 0.toByte()) {
                         logger.i("share: read: wrong chunk size: ${value.size}")
                     }
                     logger.i("share: read: chunk size: ${value?.size ?: 0}")
@@ -151,7 +151,7 @@ class TariBluetoothServer @Inject constructor(
                     )
                 )
                 logger.i("contactlessPayment: read: whole data: $data")
-                val chunked = data.toByteArray(Charsets.UTF_8).toList().chunked(chunkSize)
+                val chunked = data.toByteArray(Charsets.UTF_8).toList().chunked(CHUNK_SIZE)
                 shareChunkedData =
                     chunked.mapIndexed { index, items -> (items + if (index == chunked.size - 1) 0 else 1).toByteArray() }.toMutableList()
             }
@@ -180,6 +180,10 @@ class TariBluetoothServer @Inject constructor(
 
         myService.addCharacteristic(myCharacteristic)
         myService.addCharacteristic(myProfileCharacteristic)
+
+        if (fragappCompatActivity == null || bluetoothManager == null
+            || bluetoothManager?.adapter?.isMultipleAdvertisementSupported().isNotTrue() // Need to check it to prevent error logs
+        ) return
 
         val manager = BluetoothPeripheralManager(fragappCompatActivity!!, bluetoothManager!!, callback)
         try {

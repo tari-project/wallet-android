@@ -8,6 +8,8 @@ import com.tari.android.wallet.BuildConfig
 import com.tari.android.wallet.application.walletManager.WalletManager
 import com.tari.android.wallet.application.walletManager.WalletConfig
 import com.tari.android.wallet.data.sharedPrefs.sentry.SentryPrefRepository
+import com.tari.android.wallet.di.ApplicationScope
+import kotlinx.coroutines.CoroutineScope
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -17,6 +19,7 @@ class LoggerAdapter @Inject constructor(
     private val walletConfig: WalletConfig,
     private val walletManager: WalletManager,
     private val sentryPrefRepository: SentryPrefRepository,
+    @ApplicationScope private val applicationScope: CoroutineScope,
 ) {
     fun init() {
         val formatStrategy: FormatStrategy = PrettyFormatStrategy.newBuilder()
@@ -30,7 +33,7 @@ class LoggerAdapter @Inject constructor(
         Logger.addLogAdapter(FFIFileAdapter(walletManager.walletInstance))
         @Suppress("KotlinConstantConditions")
         if (BuildConfig.FLAVOR != "privacy") {
-            Logger.addLogAdapter(SentryLogAdapter(walletConfig, sentryPrefRepository))
+            Logger.addLogAdapter(SentryLogAdapter(walletConfig, sentryPrefRepository, applicationScope))
         }
     }
 }
