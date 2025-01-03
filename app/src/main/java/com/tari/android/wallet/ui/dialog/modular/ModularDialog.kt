@@ -47,7 +47,6 @@ import com.tari.android.wallet.ui.dialog.modular.modules.shortEmoji.ShortEmojiId
 import com.tari.android.wallet.ui.dialog.modular.modules.shortEmoji.ShortEmojiModuleView
 import com.tari.android.wallet.ui.dialog.modular.modules.space.SpaceModule
 import com.tari.android.wallet.ui.dialog.modular.modules.space.SpaceModuleView
-import com.tari.android.wallet.util.extension.isStillAlive
 import com.tari.android.wallet.ui.screen.send.addAmount.feeModule.FeeModule
 import com.tari.android.wallet.ui.screen.send.addAmount.feeModule.FeeModuleView
 import com.tari.android.wallet.ui.screen.send.shareQr.ShareQRCodeModuleView
@@ -64,12 +63,13 @@ import com.tari.android.wallet.ui.screen.utxos.list.module.UtxoAmountModule
 import com.tari.android.wallet.ui.screen.utxos.list.module.UtxoAmountModuleView
 import com.tari.android.wallet.ui.screen.utxos.list.module.UtxoSplitModule
 import com.tari.android.wallet.ui.screen.utxos.list.module.UtxoSplitModuleView
+import com.tari.android.wallet.util.extension.isStillAlive
 import java.lang.ref.WeakReference
 
 open class ModularDialog(context: Activity) {
     private val weakContext = WeakReference(context)
 
-    lateinit var args: ModularDialogArgs
+    var args: ModularDialogArgs? = null
 
     // TODO we never clear listeners nor stop animations. May cause memory leaks.
     private val onDismissListeners = mutableListOf<() -> Unit>()
@@ -115,7 +115,9 @@ open class ModularDialog(context: Activity) {
         onDismissListeners.add(onDismiss)
     }
 
-    fun applyArgs(args: ModularDialogArgs) {
+    fun applyArgs(args: ModularDialogArgs?) {
+        if (args == null) return
+
         withContext { context ->
             this.args = args
             with(dialog) {
