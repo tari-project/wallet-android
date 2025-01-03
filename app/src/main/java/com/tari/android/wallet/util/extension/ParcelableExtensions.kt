@@ -35,31 +35,26 @@ package com.tari.android.wallet.util.extension
 import android.content.Intent
 import android.os.Build.VERSION.SDK_INT
 import android.os.Bundle
-import android.os.Parcel
 import android.os.Parcelable
-
-fun <T> Parcel.readS(clas: Class<T>): T = readSerializable(clas.classLoader, clas)!!
-
-fun <T> Parcel.readP(clas: Class<T>): T = readParcelable(clas.classLoader, clas)!!
-
-fun <T> Parcel.readList(list: List<T>, clas: Class<T>): List<T> = readParcelableList(list, clas.classLoader, clas)
+import androidx.core.content.IntentCompat
+import androidx.core.os.BundleCompat
 
 inline fun <reified T : Parcelable> Intent.parcelable(key: String): T? = when {
-    SDK_INT >= 33 -> getParcelableExtra(key, T::class.java)
+    SDK_INT >= 33 -> IntentCompat.getParcelableExtra<T>(this, key, T::class.java)
     else -> @Suppress("DEPRECATION") getParcelableExtra(key) as? T
 }
 
 inline fun <reified T : java.io.Serializable> Intent.serializable(key: String): T? = when {
-    SDK_INT >= 33 -> getSerializableExtra(key, T::class.java)
+    SDK_INT >= 33 -> IntentCompat.getSerializableExtra<T>(this, key, T::class.java)
     else -> @Suppress("DEPRECATION") getSerializableExtra(key) as? T
 }
 
 inline fun <reified T : Parcelable> Bundle.parcelable(key: String): T? = when {
-    SDK_INT >= 33 -> getParcelable(key, T::class.java)
+    SDK_INT >= 33 -> BundleCompat.getParcelable<T>(this, key, T::class.java)
     else -> @Suppress("DEPRECATION") getParcelable(key) as? T
 }
 
 inline fun <reified T : java.io.Serializable> Bundle.serializable(key: String): T? = when {
-    SDK_INT >= 33 -> getSerializable(key, T::class.java)
+    SDK_INT >= 33 -> BundleCompat.getSerializable<T>(this, key, T::class.java)
     else -> @Suppress("DEPRECATION") getSerializable(key) as? T
 }

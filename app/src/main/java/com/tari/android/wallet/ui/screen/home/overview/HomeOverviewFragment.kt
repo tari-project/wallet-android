@@ -47,8 +47,6 @@ import com.tari.android.wallet.R
 import com.tari.android.wallet.application.deeplinks.DeepLink
 import com.tari.android.wallet.application.walletManager.WalletConfig
 import com.tari.android.wallet.databinding.FragmentHomeOverviewBinding
-import com.tari.android.wallet.util.extension.collectFlow
-import com.tari.android.wallet.util.extension.takeIfIs
 import com.tari.android.wallet.model.BalanceInfo
 import com.tari.android.wallet.navigation.Navigation
 import com.tari.android.wallet.ui.common.CommonFragment
@@ -57,12 +55,14 @@ import com.tari.android.wallet.ui.common.recyclerView.CommonViewHolderItem
 import com.tari.android.wallet.ui.component.balanceController.BalanceViewController
 import com.tari.android.wallet.ui.component.networkStateIndicator.ConnectionIndicatorViewModel
 import com.tari.android.wallet.ui.component.questionMark.QuestionMarkViewModel
-import com.tari.android.wallet.util.extension.parcelable
-import com.tari.android.wallet.util.extension.setVisible
 import com.tari.android.wallet.ui.screen.qr.QrScannerActivity
 import com.tari.android.wallet.ui.screen.qr.QrScannerSource
-import com.tari.android.wallet.ui.screen.tx.adapter.TxViewHolderItem
 import com.tari.android.wallet.ui.screen.tx.adapter.TxListHomeViewHolder
+import com.tari.android.wallet.ui.screen.tx.adapter.TxViewHolderItem
+import com.tari.android.wallet.util.extension.collectFlow
+import com.tari.android.wallet.util.extension.parcelable
+import com.tari.android.wallet.util.extension.setVisible
+import com.tari.android.wallet.util.extension.takeIfIs
 
 class HomeOverviewFragment : CommonFragment<FragmentHomeOverviewBinding, HomeOverviewViewModel>() {
 
