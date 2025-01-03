@@ -199,7 +199,7 @@ class OnboardingFlowActivity : CommonActivity<ActivityOnboardingFlowBinding, Onb
 
     private fun clearBackStack() {
         if (supportFragmentManager.backStackEntryCount > 0) {
-            supportFragmentManager.popBackStack(supportFragmentManager.getBackStackEntryAt(0).id, FragmentManager.POP_BACK_STACK_INCLUSIVE)
+            supportFragmentManager.popBackStackImmediate(supportFragmentManager.getBackStackEntryAt(0).id, FragmentManager.POP_BACK_STACK_INCLUSIVE)
         }
     }
 
