@@ -90,8 +90,8 @@ class HomeOverviewFragment : CommonFragment<FragmentHomeOverviewBinding, HomeOve
         observeUI()
     }
 
-    private fun observeUI() = with(viewModel) {
-        collectFlow(uiState) { uiState ->
+    private fun observeUI() {
+        collectFlow(viewModel.uiState) { uiState ->
             updateBalanceInfoUI(uiState.balance)
 
             ui.avatar.text = uiState.avatarEmoji

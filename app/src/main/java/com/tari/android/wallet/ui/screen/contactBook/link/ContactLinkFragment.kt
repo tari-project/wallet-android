@@ -6,15 +6,15 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.tari.android.wallet.data.contacts.model.ContactDto
 import com.tari.android.wallet.databinding.FragmentContactsLinkBinding
-import com.tari.android.wallet.util.extension.collectFlow
-import com.tari.android.wallet.util.extension.takeIfIs
 import com.tari.android.wallet.navigation.TariNavigator.Companion.PARAMETER_CONTACT
 import com.tari.android.wallet.ui.common.CommonFragment
 import com.tari.android.wallet.ui.common.recyclerView.CommonAdapter
 import com.tari.android.wallet.ui.screen.contactBook.contacts.adapter.contact.ContactItemViewHolderItem
-import com.tari.android.wallet.data.contacts.model.ContactDto
 import com.tari.android.wallet.ui.screen.contactBook.link.adapter.LinkContactAdapter
+import com.tari.android.wallet.util.extension.collectFlow
+import com.tari.android.wallet.util.extension.takeIfIs
 
 class ContactLinkFragment : CommonFragment<FragmentContactsLinkBinding, ContactLinkViewModel>() {
 
@@ -34,9 +34,9 @@ class ContactLinkFragment : CommonFragment<FragmentContactsLinkBinding, ContactL
     }
 
     private fun observeUI() = with(viewModel) {
-        collectFlow(uiState) { adapter.update(it.viewItemList) }
+        this@ContactLinkFragment.collectFlow(uiState) { adapter.update(it.viewItemList) }
 
-        collectFlow(effect) { effect ->
+        this@ContactLinkFragment.collectFlow(effect) { effect ->
             when (effect) {
                 is ContactLinkModel.Effect.GrantPermission -> viewModel.grantPermission()
             }

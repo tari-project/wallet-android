@@ -42,15 +42,15 @@ import androidx.core.view.children
 import androidx.fragment.app.viewModels
 import com.tari.android.wallet.application.deeplinks.DeepLink
 import com.tari.android.wallet.databinding.FragmentChooseRestoreOptionBinding
-import com.tari.android.wallet.util.extension.collectFlow
 import com.tari.android.wallet.ui.common.CommonFragment
-import com.tari.android.wallet.util.extension.gone
-import com.tari.android.wallet.util.extension.parcelable
-import com.tari.android.wallet.util.extension.visible
 import com.tari.android.wallet.ui.screen.qr.QrScannerActivity
 import com.tari.android.wallet.ui.screen.restore.chooseRestoreOption.option.RecoveryOptionView
 import com.tari.android.wallet.ui.screen.settings.backup.data.BackupOption
 import com.tari.android.wallet.ui.screen.settings.backup.data.BackupOptionDto
+import com.tari.android.wallet.util.extension.collectFlow
+import com.tari.android.wallet.util.extension.gone
+import com.tari.android.wallet.util.extension.parcelable
+import com.tari.android.wallet.util.extension.visible
 
 class ChooseRestoreOptionFragment : CommonFragment<FragmentChooseRestoreOptionBinding, ChooseRestoreOptionViewModel>() {
 
@@ -89,8 +89,8 @@ class ChooseRestoreOptionFragment : CommonFragment<FragmentChooseRestoreOptionBi
         restoreWithPaperWalletCtaView.setOnClickListener { viewModel.onPaperWalletClicked(this@ChooseRestoreOptionFragment) }
     }
 
-    private fun observeUI() = with(viewModel) {
-        collectFlow(uiState) { uiState ->
+    private fun observeUI() {
+        collectFlow(viewModel.uiState) { uiState ->
             initOptions(uiState.backupOptions)
             uiState.selectedOption?.let { updateProgress(it, uiState.isStarted) }
 

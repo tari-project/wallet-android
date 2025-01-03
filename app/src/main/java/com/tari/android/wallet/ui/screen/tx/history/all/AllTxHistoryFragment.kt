@@ -8,12 +8,12 @@ import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.tari.android.wallet.databinding.FragmentAllTransactionHistoryBinding
-import com.tari.android.wallet.util.extension.collectFlow
 import com.tari.android.wallet.ui.common.CommonFragment
 import com.tari.android.wallet.ui.common.recyclerView.CommonAdapter
-import com.tari.android.wallet.util.extension.setVisible
 import com.tari.android.wallet.ui.screen.tx.adapter.TxListAdapter
 import com.tari.android.wallet.ui.screen.tx.adapter.TxViewHolderItem
+import com.tari.android.wallet.util.extension.collectFlow
+import com.tari.android.wallet.util.extension.setVisible
 
 class AllTxHistoryFragment : CommonFragment<FragmentAllTransactionHistoryBinding, AllTxHistoryViewModel>() {
 
@@ -32,8 +32,8 @@ class AllTxHistoryFragment : CommonFragment<FragmentAllTransactionHistoryBinding
         observeUI()
     }
 
-    private fun observeUI() = with(viewModel) {
-        collectFlow(uiState) { state ->
+    private fun observeUI() {
+        collectFlow(viewModel.uiState) { state ->
             ui.searchFullContainer.setVisible(state.searchBarVisible)
             ui.emptyState.setVisible(state.txEmptyStateVisible)
             ui.list.setVisible(state.txListVisible)

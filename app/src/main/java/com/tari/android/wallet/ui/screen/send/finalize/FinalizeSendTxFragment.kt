@@ -45,15 +45,15 @@ import com.daasuu.ei.Ease
 import com.daasuu.ei.EasingInterpolator
 import com.tari.android.wallet.R
 import com.tari.android.wallet.databinding.FragmentFinalizeSendTxBinding
-import com.tari.android.wallet.util.extension.collectFlow
 import com.tari.android.wallet.ui.common.CommonFragment
 import com.tari.android.wallet.ui.component.tari.TariTextView
+import com.tari.android.wallet.ui.screen.send.common.TransactionData
+import com.tari.android.wallet.util.Constants
+import com.tari.android.wallet.util.extension.collectFlow
 import com.tari.android.wallet.util.extension.getResourceUri
 import com.tari.android.wallet.util.extension.invisible
 import com.tari.android.wallet.util.extension.string
 import com.tari.android.wallet.util.extension.visible
-import com.tari.android.wallet.ui.screen.send.common.TransactionData
-import com.tari.android.wallet.util.Constants
 
 class FinalizeSendTxFragment : CommonFragment<FragmentFinalizeSendTxBinding, FinalizeSendTxViewModel>() {
 
@@ -74,12 +74,12 @@ class FinalizeSendTxFragment : CommonFragment<FragmentFinalizeSendTxBinding, Fin
         doOnBackPressed { viewModel.showCancelDialog() }
     }
 
-    private fun subscribeUI() = with(viewModel) {
-        collectFlow(uiState) { uiState ->
+    private fun subscribeUI() {
+        collectFlow(viewModel.uiState) { uiState ->
             createAllSteps(uiState.steps)
         }
 
-        collectFlow(effect) { effect ->
+        collectFlow(viewModel.effect) { effect ->
             when (effect) {
                 is FinalizeSendTxModel.Effect.SendTxSuccess -> onSuccess()
                 is FinalizeSendTxModel.Effect.ShowError -> onFailure()

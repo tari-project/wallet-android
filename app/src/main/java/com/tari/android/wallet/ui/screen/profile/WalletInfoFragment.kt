@@ -39,17 +39,17 @@ import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import com.tari.android.wallet.R
 import com.tari.android.wallet.databinding.FragmentWalletInfoBinding
-import com.tari.android.wallet.util.extension.collectFlow
-import com.tari.android.wallet.util.extension.makeTextBold
 import com.tari.android.wallet.ui.common.CommonFragment
 import com.tari.android.wallet.ui.component.tari.toolbar.TariToolbarActionArg
-import com.tari.android.wallet.util.extension.drawable
-import com.tari.android.wallet.util.extension.setVisible
-import com.tari.android.wallet.util.extension.string
 import com.tari.android.wallet.util.DebugConfig
 import com.tari.android.wallet.util.addressFirstEmojis
 import com.tari.android.wallet.util.addressLastEmojis
 import com.tari.android.wallet.util.addressPrefixEmojis
+import com.tari.android.wallet.util.extension.collectFlow
+import com.tari.android.wallet.util.extension.drawable
+import com.tari.android.wallet.util.extension.makeTextBold
+import com.tari.android.wallet.util.extension.setVisible
+import com.tari.android.wallet.util.extension.string
 
 class WalletInfoFragment : CommonFragment<FragmentWalletInfoBinding, WalletInfoViewModel>() {
 
@@ -70,8 +70,8 @@ class WalletInfoFragment : CommonFragment<FragmentWalletInfoBinding, WalletInfoV
         viewModel.refreshData()
     }
 
-    private fun subscribeUI() = with(viewModel) {
-        collectFlow(uiState) { uiState ->
+    private fun subscribeUI() {
+        collectFlow(viewModel.uiState) { uiState ->
             ui.emojiIdSummaryView.textViewEmojiPrefix.text = uiState.walletAddress.addressPrefixEmojis()
             ui.emojiIdSummaryView.textViewEmojiFirstPart.text = uiState.walletAddress.addressFirstEmojis()
             ui.emojiIdSummaryView.textViewEmojiLastPart.text = uiState.walletAddress.addressLastEmojis()

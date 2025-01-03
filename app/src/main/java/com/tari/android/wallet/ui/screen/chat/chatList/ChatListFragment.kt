@@ -8,15 +8,15 @@ import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.tari.android.wallet.R
 import com.tari.android.wallet.databinding.FragmentChatListBinding
-import com.tari.android.wallet.util.extension.collectFlow
 import com.tari.android.wallet.ui.common.CommonFragment
 import com.tari.android.wallet.ui.common.recyclerView.AdapterFactory
 import com.tari.android.wallet.ui.common.recyclerView.CommonAdapter
 import com.tari.android.wallet.ui.common.recyclerView.CommonViewHolderItem
 import com.tari.android.wallet.ui.component.tari.toolbar.TariToolbarActionArg
-import com.tari.android.wallet.util.extension.setVisible
 import com.tari.android.wallet.ui.screen.chat.chatList.adapter.ChatItemViewHolder
 import com.tari.android.wallet.ui.screen.chat.chatList.adapter.ChatItemViewHolderItem
+import com.tari.android.wallet.util.extension.collectFlow
+import com.tari.android.wallet.util.extension.setVisible
 
 class ChatListFragment : CommonFragment<FragmentChatListBinding, ChatListViewModel>() {
 
@@ -51,8 +51,8 @@ class ChatListFragment : CommonFragment<FragmentChatListBinding, ChatListViewMod
         })
     }
 
-    private fun subscribeUI() = with(viewModel) {
-        collectFlow(uiState) { uiState ->
+    private fun subscribeUI() {
+        collectFlow(viewModel.uiState) { uiState ->
             adapter.submitList(uiState.chatList)
             ui.list.setVisible(!uiState.showEmpty)
             ui.emptyState.setVisible(uiState.showEmpty)

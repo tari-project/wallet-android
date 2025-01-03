@@ -52,10 +52,10 @@ import com.tari.android.wallet.R
 import com.tari.android.wallet.application.deeplinks.DeepLink
 import com.tari.android.wallet.databinding.ActivityQrScannerBinding
 import com.tari.android.wallet.di.DiContainer.appComponent
-import com.tari.android.wallet.util.extension.collectFlow
 import com.tari.android.wallet.ui.common.CommonActivity
 import com.tari.android.wallet.ui.component.tari.toast.TariToast
 import com.tari.android.wallet.ui.component.tari.toast.TariToastArgs
+import com.tari.android.wallet.util.extension.collectFlow
 import com.tari.android.wallet.util.extension.setVisible
 
 /**
@@ -102,14 +102,14 @@ class QrScannerActivity : CommonActivity<ActivityQrScannerBinding, QrScannerView
         }
     }
 
-    private fun subscribeUI() = with(viewModel) {
-        collectFlow(uiState) { uiState ->
+    private fun subscribeUI() {
+        collectFlow(viewModel.uiState) { uiState ->
             ui.errorContainer.setVisible(uiState.scanError)
             ui.alternativeText.text = uiState.alternativeText
             ui.alternativeContainer.setVisible(uiState.alternativeText.isNotEmpty())
         }
 
-        collectFlow(effect) { effect ->
+        collectFlow(viewModel.effect) { effect ->
             when (effect) {
                 is QrScannerModel.Effect.FinishWithResult -> finishWithResult(effect.deepLink)
                 is QrScannerModel.Effect.ProceedScan -> codeScanner?.startPreview()

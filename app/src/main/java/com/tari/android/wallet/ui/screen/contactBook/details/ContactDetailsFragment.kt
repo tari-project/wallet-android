@@ -7,14 +7,14 @@ import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.tari.android.wallet.R
-import com.tari.android.wallet.databinding.FragmentContactsDetailsBinding
-import com.tari.android.wallet.util.extension.collectFlow
-import com.tari.android.wallet.ui.common.CommonFragment
-import com.tari.android.wallet.ui.component.tari.toolbar.TariToolbarActionArg
 import com.tari.android.wallet.data.contacts.ContactAction
 import com.tari.android.wallet.data.contacts.model.ContactDto
-import com.tari.android.wallet.ui.screen.contactBook.details.adapter.ContactDetailsAdapter
+import com.tari.android.wallet.databinding.FragmentContactsDetailsBinding
 import com.tari.android.wallet.navigation.TariNavigator.Companion.PARAMETER_CONTACT
+import com.tari.android.wallet.ui.common.CommonFragment
+import com.tari.android.wallet.ui.component.tari.toolbar.TariToolbarActionArg
+import com.tari.android.wallet.ui.screen.contactBook.details.adapter.ContactDetailsAdapter
+import com.tari.android.wallet.util.extension.collectFlow
 
 class ContactDetailsFragment : CommonFragment<FragmentContactsDetailsBinding, ContactDetailsViewModel>() {
 
@@ -34,7 +34,7 @@ class ContactDetailsFragment : CommonFragment<FragmentContactsDetailsBinding, Co
     }
 
     private fun observeUI() = with(viewModel) {
-        collectFlow(uiState) { uiState ->
+        this@ContactDetailsFragment.collectFlow(uiState) { uiState ->
             applyContact(uiState.contact)
             adapter.update(uiState.viewHolderItemList)
         }

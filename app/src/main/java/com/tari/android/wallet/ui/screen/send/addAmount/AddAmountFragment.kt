@@ -120,14 +120,14 @@ class AddAmountFragment : CommonFragment<FragmentAddAmountBinding, AddAmountView
         keyboardController.onDestroy()
     }
 
-    private fun subscribeVM() = with(viewModel) {
-        collectFlow(uiState) { uiState ->
+    private fun subscribeVM() {
+        collectFlow(viewModel.uiState) { uiState ->
             ui.oneSidePaymentSwitchView.isChecked = uiState.isOneSidedPaymentEnabled || uiState.isOneSidedPaymentForced
             ui.oneSidePaymentSwitchView.isEnabled = !uiState.isOneSidedPaymentForced
             showOrHideCustomFeeDialog(uiState.feePerGrams)
         }
 
-        collectFlow(effect) { effect ->
+        collectFlow(viewModel.effect) { effect ->
             when (effect) {
                 is AddAmountModel.Effect.SetupUi -> {
                     setupUI(effect.uiState)
