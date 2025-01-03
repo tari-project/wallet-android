@@ -48,12 +48,12 @@ import com.tari.android.wallet.databinding.ActivityAuthBinding
 import com.tari.android.wallet.infrastructure.security.biometric.BiometricAuthenticationException
 import com.tari.android.wallet.ui.common.CommonActivity
 import com.tari.android.wallet.ui.common.domain.PaletteManager
-import com.tari.android.wallet.util.extension.setColor
-import com.tari.android.wallet.util.extension.string
-import com.tari.android.wallet.util.extension.visible
 import com.tari.android.wallet.ui.screen.pinCode.EnterPinCodeFragment
 import com.tari.android.wallet.ui.screen.pinCode.PinCodeScreenBehavior
 import com.tari.android.wallet.ui.screen.settings.allSettings.TariVersionModel
+import com.tari.android.wallet.util.extension.setColor
+import com.tari.android.wallet.util.extension.string
+import com.tari.android.wallet.util.extension.visible
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -82,7 +82,7 @@ class AuthActivity : CommonActivity<ActivityAuthBinding, AuthViewModel>() {
             val pinCodeFragment = EnterPinCodeFragment.newInstance(PinCodeScreenBehavior.Auth, pinCode)
             supportFragmentManager.beginTransaction()
                 .replace(R.id.fragment_container, pinCodeFragment)
-                .commit()
+                .commitAllowingStateLoss()
         }
     }
 

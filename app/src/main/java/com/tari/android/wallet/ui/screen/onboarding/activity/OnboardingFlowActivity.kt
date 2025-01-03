@@ -194,7 +194,7 @@ class OnboardingFlowActivity : CommonActivity<ActivityOnboardingFlowBinding, Onb
             .apply { applyTransaction?.invoke(this) }
             .add(R.id.onboarding_fragment_container, fragment, fragment.javaClass.simpleName)
             .addToBackStack(null)
-            .commit()
+            .commitAllowingStateLoss()
     }
 
     private fun clearBackStack() {
