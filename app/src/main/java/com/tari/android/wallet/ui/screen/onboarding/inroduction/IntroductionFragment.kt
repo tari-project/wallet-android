@@ -235,6 +235,8 @@ class IntroductionFragment : OnboardingFlowFragment<FragmentIntroductionBinding,
     }
 
     private fun startTariWalletViewAnimation() {
+        if (!isAdded) return // fragment might be detached from activity
+
         val metrics = resources.displayMetrics
         val offset = (metrics.heightPixels / 2 - ui.tariLogoLottieAnimationView.height / 2 - ui.tariLogoLottieAnimationView.top).toFloat()
         val tariViewTranslateAnim = ObjectAnimator.ofFloat(ui.tariLogoLottieAnimationView, View.TRANSLATION_Y, offset).apply {
