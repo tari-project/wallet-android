@@ -113,8 +113,6 @@ open class CommonViewModel : ViewModel(), DialogHandler {
 
         currentTheme.value = tariSettingsSharedRepository.currentTheme
 
-        logger.t(LoggerTags.Navigation.name).i(this::class.simpleName + " was started")
-
         securityPrefRepository.updateNotifier.subscribe {
             checkAuthorization()
         }.addTo(compositeDisposable)
