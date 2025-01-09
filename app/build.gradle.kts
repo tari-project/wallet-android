@@ -32,7 +32,7 @@ android {
         minSdk = BuildConfig.minSdk
         targetSdk = BuildConfig.targetSdk
         compileSdk = BuildConfig.compileSdk
-        versionCode = 323 // FIXME: for some reason Bitrise can't get the commit number
+        versionCode = commitNumber
         versionName = "${BuildConfig.versionNumber}-libwallet-${BuildConfig.LibWallet.version}"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         multiDexEnabled = true
