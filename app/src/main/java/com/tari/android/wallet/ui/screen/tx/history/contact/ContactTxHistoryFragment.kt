@@ -7,20 +7,20 @@ import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.tari.android.wallet.R
+import com.tari.android.wallet.data.contacts.model.ContactDto
 import com.tari.android.wallet.databinding.FragmentContactTransactionHistoryBinding
-import com.tari.android.wallet.util.extension.collectFlow
 import com.tari.android.wallet.navigation.TariNavigator
 import com.tari.android.wallet.ui.common.CommonFragment
 import com.tari.android.wallet.ui.common.recyclerView.CommonAdapter
-import com.tari.android.wallet.util.extension.gone
-import com.tari.android.wallet.util.extension.setVisible
-import com.tari.android.wallet.util.extension.visible
-import com.tari.android.wallet.data.contacts.model.ContactDto
 import com.tari.android.wallet.ui.screen.tx.adapter.TxListAdapter
 import com.tari.android.wallet.ui.screen.tx.adapter.TxViewHolderItem
 import com.tari.android.wallet.util.addressFirstEmojis
 import com.tari.android.wallet.util.addressLastEmojis
 import com.tari.android.wallet.util.addressPrefixEmojis
+import com.tari.android.wallet.util.extension.collectFlow
+import com.tari.android.wallet.util.extension.gone
+import com.tari.android.wallet.util.extension.setVisible
+import com.tari.android.wallet.util.extension.visible
 import yat.android.ui.extension.HtmlHelper
 
 class ContactTxHistoryFragment : CommonFragment<FragmentContactTransactionHistoryBinding, ContactTxHistoryViewModel>() {
@@ -40,8 +40,8 @@ class ContactTxHistoryFragment : CommonFragment<FragmentContactTransactionHistor
         observeUI()
     }
 
-    private fun observeUI() = with(viewModel) {
-        collectFlow(uiState) { uiState ->
+    private fun observeUI() {
+        collectFlow(viewModel.uiState) { uiState ->
             ui.list.setVisible(uiState.txList.isNotEmpty())
             ui.descriptionViewContainer.setVisible(uiState.txList.isNotEmpty())
             ui.emptyState.setVisible(uiState.txList.isEmpty())

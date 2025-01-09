@@ -30,6 +30,7 @@ class WalletErrorArgs(
                 WalletError.InvalidPassphraseError -> R.string.error_wallet_message_428
                 WalletError.SeedWordsInvalidDataError -> R.string.error_wallet_message_429
                 WalletError.SeedWordsVersionMismatchError -> R.string.error_wallet_message_430
+                WalletError.RecoveringWrongAddress -> R.string.error_wallet_message_702
                 else -> R.string.error_wallet_message_generic
             }
             return resourceManager.getString(id)

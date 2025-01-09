@@ -3,7 +3,6 @@ package com.tari.android.wallet.application.walletManager
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.ffi.FFIWallet
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.withContext
 
@@ -25,9 +24,7 @@ suspend fun <T> WalletManager.doOnWalletRunningWithValue(action: suspend (ffiWal
 }
 
 suspend fun WalletManager.doOnWalletFailed(action: suspend (exception: Exception) -> Unit) = withContext(Dispatchers.IO) {
-    walletState
-        .debounce(300L) // todo this is a workaround for the issue that the wallet service is not connected yet
-        .firstOrNull { it is WalletState.Failed }
+    walletState.firstOrNull { it is WalletState.Failed }
         ?.let {
             action((it as WalletState.Failed).exception)
         } ?: logger.i("Wallet service is not connected")

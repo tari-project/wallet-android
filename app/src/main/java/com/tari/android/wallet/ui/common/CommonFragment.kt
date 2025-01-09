@@ -17,9 +17,12 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.viewbinding.ViewBinding
+import com.orhanobut.logger.Logger
+import com.orhanobut.logger.Printer
 import com.tari.android.wallet.BuildConfig
 import com.tari.android.wallet.R
 import com.tari.android.wallet.di.DiContainer
+import com.tari.android.wallet.infrastructure.logging.LoggerTags
 import com.tari.android.wallet.util.extension.observe
 import com.tari.android.wallet.ui.component.mainList.MutedBackPressedCallback
 import com.tari.android.wallet.ui.component.tari.toast.TariToast
@@ -44,6 +47,9 @@ abstract class CommonFragment<Binding : ViewBinding, VM : CommonViewModel> : Fra
 
     protected val animations = mutableListOf<Animator>()
 
+    val logger: Printer
+        get() = Logger.t(this::class.simpleName)
+
     //TODO make viewModel not lateinit. Sometimes it's not initialized in time and causes crashes, so we need to check if it's initialized
     private val blockScreenRecording
         get() = !BuildConfig.DEBUG &&
@@ -60,6 +66,14 @@ abstract class CommonFragment<Binding : ViewBinding, VM : CommonViewModel> : Fra
     }
 
     protected open fun screenRecordingAlwaysDisable() = false
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        if (savedInstanceState == null) {
+            logger.t(LoggerTags.Navigation.name).i(this::class.simpleName + " has been started")
+        }
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)

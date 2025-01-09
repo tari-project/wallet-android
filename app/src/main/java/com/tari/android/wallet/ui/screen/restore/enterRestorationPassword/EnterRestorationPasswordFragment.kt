@@ -47,12 +47,12 @@ import com.tari.android.wallet.R
 import com.tari.android.wallet.R.string.enter_backup_password_page_desc_general_part
 import com.tari.android.wallet.R.string.enter_backup_password_page_desc_highlighted_part
 import com.tari.android.wallet.databinding.FragmentEnterRestorePasswordBinding
-import com.tari.android.wallet.util.extension.observe
 import com.tari.android.wallet.ui.common.CommonFragment
 import com.tari.android.wallet.ui.common.domain.PaletteManager
 import com.tari.android.wallet.util.extension.colorFromAttribute
 import com.tari.android.wallet.util.extension.gone
 import com.tari.android.wallet.util.extension.hideKeyboard
+import com.tari.android.wallet.util.extension.observe
 import com.tari.android.wallet.util.extension.setOnThrottledClickListener
 import com.tari.android.wallet.util.extension.showKeyboard
 import com.tari.android.wallet.util.extension.string
@@ -142,9 +142,5 @@ class EnterRestorationPasswordFragment : CommonFragment<FragmentEnterRestorePass
             insert(generalPart.length + 1, highlightedPart)
             insert(generalPart.length + highlightedPart.length + 1, ".")
         }
-    }
-
-    companion object {
-        fun newInstance() = EnterRestorationPasswordFragment()
     }
 }

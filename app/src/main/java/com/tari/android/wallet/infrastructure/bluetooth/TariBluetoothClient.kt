@@ -120,7 +120,7 @@ class TariBluetoothClient @Inject constructor(val deeplinkManager: DeeplinkManag
                     val lastByte = value?.last() ?: 0
                     wholeData += value?.dropLast(1)?.toByteArray() ?: byteArrayOf()
 
-                    if ((value?.size ?: 0) < chunkSize && value?.lastOrNull() == 0.toByte()) {
+                    if ((value?.size ?: 0) < CHUNK_SIZE && value?.lastOrNull() == 0.toByte()) {
                         logger.i("share: read: wrong chunk size: ${value.size}")
                     }
 
@@ -171,7 +171,7 @@ class TariBluetoothClient @Inject constructor(val deeplinkManager: DeeplinkManag
                         logger.i("shareCharacteristic: write: whole data: ${String(shareData, Charsets.UTF_8)}")
                         runWithPermissions(bluetoothConnectPermission, true) {
                             viewModelScope.launch(Dispatchers.IO) {
-                                val chunked = shareData.toList().chunked(chunkSize)
+                                val chunked = shareData.toList().chunked(CHUNK_SIZE)
                                 chunks =
                                     chunked.mapIndexed { index, items -> (items + if (index == chunked.size - 1) 0 else 1).toByteArray() }.toList()
                                 chunkDevice = peripheral

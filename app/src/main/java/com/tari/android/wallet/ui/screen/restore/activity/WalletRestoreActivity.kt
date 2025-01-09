@@ -32,33 +32,16 @@
  */
 package com.tari.android.wallet.ui.screen.restore.activity
 
-import android.content.Context
-import android.content.Intent
 import android.os.Bundle
 import androidx.activity.viewModels
 import com.tari.android.wallet.R
-import com.tari.android.wallet.application.walletManager.WalletLauncher
-import com.tari.android.wallet.data.sharedPrefs.CorePrefRepository
-import com.tari.android.wallet.data.sharedPrefs.tariSettings.TariSettingsPrefRepository
 import com.tari.android.wallet.databinding.ActivityWalletBackupBinding
-import com.tari.android.wallet.di.DiContainer.appComponent
 import com.tari.android.wallet.ui.common.CommonActivity
 import com.tari.android.wallet.ui.screen.restore.chooseRestoreOption.ChooseRestoreOptionFragment
-import javax.inject.Inject
 
 class WalletRestoreActivity : CommonActivity<ActivityWalletBackupBinding, WalletRestoreViewModel>() {
 
-    @Inject
-    lateinit var prefs: CorePrefRepository
-
-    @Inject
-    lateinit var tariSettingsSharedRepository: TariSettingsPrefRepository
-
-    @Inject
-    lateinit var walletLauncher: WalletLauncher
-
     override fun onCreate(savedInstanceState: Bundle?) {
-        appComponent.inject(this)
         super.onCreate(savedInstanceState)
 
         ui = ActivityWalletBackupBinding.inflate(layoutInflater).apply { setContentView(root) }
@@ -74,13 +57,7 @@ class WalletRestoreActivity : CommonActivity<ActivityWalletBackupBinding, Wallet
     }
 
     override fun onDestroy() {
-        if (!tariSettingsSharedRepository.isRestoredWallet) {
-            walletLauncher.stop()
-        }
+        viewModel.checkIfWalletRestored()
         super.onDestroy()
-    }
-
-    companion object {
-        fun navigationIntent(context: Context) = Intent(context, WalletRestoreActivity::class.java)
     }
 }

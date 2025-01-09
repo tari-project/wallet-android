@@ -32,6 +32,7 @@ data class WalletError(
         val ValuesNotFound = WalletError(424)
         val SeedWordsInvalidDataError = WalletError(429)
         val SeedWordsVersionMismatchError = WalletError(430)
+        val RecoveringWrongAddress = WalletError(702)
         val UnknownError = WalletError(-1)
         val NoError = WalletError(0)
     }

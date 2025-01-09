@@ -203,9 +203,9 @@ class WalletManager @Inject constructor(
                     val newCode = e.safeCastTo<FFIException>()?.error?.code
 
                     if (oldCode == null || oldCode != newCode) {
-                        logger.e(e, "Start wallet: Wallet was failed")
+                        logger.i("Start wallet: Error starting wallet: $newCode")
+                        _walletState.update { WalletState.Failed(e) }
                     }
-                    _walletState.update { WalletState.Failed(e) }
                 }
             }
         }

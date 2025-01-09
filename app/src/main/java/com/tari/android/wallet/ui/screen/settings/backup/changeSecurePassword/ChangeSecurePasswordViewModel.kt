@@ -22,11 +22,11 @@ class ChangeSecurePasswordViewModel : CommonViewModel() {
     @Inject
     lateinit var backupStateHandler: BackupStateHandler
 
-    val backupState = backupStateHandler.backupState
-
     init {
         component.inject(this)
     }
+
+    val backupState = backupStateHandler.backupState
 
     fun backToBackupSettings() {
         tariNavigator.navigate(Navigation.AllSettings.BackToBackupSettings)

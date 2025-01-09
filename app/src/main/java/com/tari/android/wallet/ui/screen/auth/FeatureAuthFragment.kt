@@ -50,12 +50,12 @@ import com.tari.android.wallet.databinding.FragmentFeatureAuthBinding
 import com.tari.android.wallet.infrastructure.security.biometric.BiometricAuthenticationException
 import com.tari.android.wallet.ui.common.CommonFragment
 import com.tari.android.wallet.ui.common.domain.PaletteManager
-import com.tari.android.wallet.util.extension.setColor
-import com.tari.android.wallet.util.extension.string
-import com.tari.android.wallet.util.extension.visible
 import com.tari.android.wallet.ui.screen.pinCode.EnterPinCodeFragment
 import com.tari.android.wallet.ui.screen.pinCode.PinCodeScreenBehavior
 import com.tari.android.wallet.ui.screen.settings.allSettings.TariVersionModel
+import com.tari.android.wallet.util.extension.setColor
+import com.tari.android.wallet.util.extension.string
+import com.tari.android.wallet.util.extension.visible
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -81,7 +81,7 @@ class FeatureAuthFragment : CommonFragment<FragmentFeatureAuthBinding, AuthViewM
             val pinCodeFragment = EnterPinCodeFragment.newInstance(PinCodeScreenBehavior.FeatureAuth, pinCode)
             childFragmentManager.beginTransaction()
                 .replace(R.id.fragment_container, pinCodeFragment)
-                .commit()
+                .commitAllowingStateLoss()
         }
     }
 

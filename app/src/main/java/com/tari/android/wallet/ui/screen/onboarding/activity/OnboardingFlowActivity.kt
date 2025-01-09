@@ -37,7 +37,6 @@ import androidx.activity.viewModels
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
-import androidx.lifecycle.lifecycleScope
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.walletManager.WalletLauncher
 import com.tari.android.wallet.application.walletManager.WalletManager
@@ -54,8 +53,9 @@ import com.tari.android.wallet.ui.screen.onboarding.localAuth.LocalAuthFragment
 import com.tari.android.wallet.ui.screen.restore.walletRestoring.WalletRestoringFragment
 import com.tari.android.wallet.ui.screen.settings.networkSelection.NetworkSelectionFragment
 import com.tari.android.wallet.util.extension.collectFlow
+import com.tari.android.wallet.util.extension.launchOnIo
+import com.tari.android.wallet.util.extension.launchOnMain
 import com.tari.android.wallet.util.extension.safeCastTo
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 /**
@@ -91,13 +91,16 @@ class OnboardingFlowActivity : CommonActivity<ActivityOnboardingFlowBinding, Onb
 
         val paperWalletSeeds = intent.extras?.getStringArray(ARG_SEED_WORDS)?.toList()
 
+        // TODO move this logic to VM. We shouldn't manage scopes inside the activity
         when {
             paperWalletSeeds != null -> {
                 walletLauncher.start(paperWalletSeeds)
 
-                lifecycleScope.launch {
+                launchOnIo {
                     walletManager.doOnWalletRunning {
-                        loadFragment(WalletRestoringFragment())
+                        launchOnMain {
+                            loadFragment(WalletRestoringFragment())
+                        }
                     }
                 }
             }
@@ -120,16 +123,12 @@ class OnboardingFlowActivity : CommonActivity<ActivityOnboardingFlowBinding, Onb
 
         collectFlow(viewModel.effect) { effect ->
             when (effect) {
-                Effect.ResetFlow -> {
-                    resetFlow()
-                }
+                Effect.ResetFlow -> launchOnMain { resetFlow() }
             }
         }
 
-        lifecycleScope.launch {
-            walletManager.doOnWalletFailed {
-                resetFlow()
-            }
+        launchOnIo {
+            walletManager.doOnWalletFailed { launchOnMain { resetFlow() } }
         }
     }
 
@@ -194,12 +193,12 @@ class OnboardingFlowActivity : CommonActivity<ActivityOnboardingFlowBinding, Onb
             .apply { applyTransaction?.invoke(this) }
             .add(R.id.onboarding_fragment_container, fragment, fragment.javaClass.simpleName)
             .addToBackStack(null)
-            .commit()
+            .commitAllowingStateLoss()
     }
 
     private fun clearBackStack() {
         if (supportFragmentManager.backStackEntryCount > 0) {
-            supportFragmentManager.popBackStack(supportFragmentManager.getBackStackEntryAt(0).id, FragmentManager.POP_BACK_STACK_INCLUSIVE)
+            supportFragmentManager.popBackStackImmediate(supportFragmentManager.getBackStackEntryAt(0).id, FragmentManager.POP_BACK_STACK_INCLUSIVE)
         }
     }
 

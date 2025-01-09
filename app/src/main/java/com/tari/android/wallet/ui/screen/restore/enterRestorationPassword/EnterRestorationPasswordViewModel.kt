@@ -4,11 +4,9 @@ import androidx.lifecycle.LiveData
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.walletManager.WalletConfig
 import com.tari.android.wallet.application.walletManager.WalletLauncher
-import com.tari.android.wallet.application.walletManager.doOnWalletFailed
 import com.tari.android.wallet.application.walletManager.doOnWalletRunning
 import com.tari.android.wallet.data.sharedPrefs.backup.BackupPrefRepository
 import com.tari.android.wallet.infrastructure.backup.BackupManager
-import com.tari.android.wallet.infrastructure.backup.WalletStartFailedException
 import com.tari.android.wallet.navigation.Navigation
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.common.SingleLiveEvent
@@ -45,12 +43,6 @@ class EnterRestorationPasswordViewModel : CommonViewModel() {
                     walletManager.onWalletRestored()
                     tariNavigator.navigate(Navigation.SplashScreen(clearTop = false))
                 }
-            }
-        }
-
-        launchOnIo {
-            walletManager.doOnWalletFailed {
-                handleRestorationFailure(WalletStartFailedException(it))
             }
         }
     }

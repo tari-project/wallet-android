@@ -44,24 +44,21 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import com.daasuu.ei.Ease
 import com.daasuu.ei.EasingInterpolator
-import com.orhanobut.logger.Logger
 import com.tari.android.wallet.R.string.onboarding_auth_biometric_prompt
 import com.tari.android.wallet.R.string.onboarding_auth_title
 import com.tari.android.wallet.databinding.FragmentLocalAuthBinding
-import com.tari.android.wallet.util.extension.launchAndRepeatOnLifecycle
 import com.tari.android.wallet.infrastructure.security.biometric.BiometricAuthenticationException
-import com.tari.android.wallet.util.extension.doOnGlobalLayout
-import com.tari.android.wallet.util.extension.setOnThrottledClickListener
-import com.tari.android.wallet.util.extension.setVisible
-import com.tari.android.wallet.util.extension.string
 import com.tari.android.wallet.ui.screen.onboarding.activity.OnboardingFlowFragment
 import com.tari.android.wallet.ui.screen.onboarding.localAuth.LocalAuthModel.Effect
 import com.tari.android.wallet.util.Constants.UI.Auth
+import com.tari.android.wallet.util.extension.doOnGlobalLayout
+import com.tari.android.wallet.util.extension.launchAndRepeatOnLifecycle
+import com.tari.android.wallet.util.extension.setOnThrottledClickListener
+import com.tari.android.wallet.util.extension.setVisible
+import com.tari.android.wallet.util.extension.string
 import kotlinx.coroutines.launch
 
 class LocalAuthFragment : OnboardingFlowFragment<FragmentLocalAuthBinding, LocalAuthViewModel>() {
-    private val logger
-        get() = Logger.t(LocalAuthFragment::class.simpleName)
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
         FragmentLocalAuthBinding.inflate(inflater, container, false).also { ui = it }.root

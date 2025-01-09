@@ -57,10 +57,12 @@ import com.tari.android.wallet.R.string.introduction_selected_wallet
 import com.tari.android.wallet.R.string.privacy_policy_url
 import com.tari.android.wallet.R.string.user_agreement_url
 import com.tari.android.wallet.databinding.FragmentIntroductionBinding
-import com.tari.android.wallet.util.extension.applyURLStyle
-import com.tari.android.wallet.util.extension.collectFlow
+import com.tari.android.wallet.ui.screen.onboarding.activity.OnboardingFlowFragment
+import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.extension.addAnimatorListener
 import com.tari.android.wallet.util.extension.animateClick
+import com.tari.android.wallet.util.extension.applyURLStyle
+import com.tari.android.wallet.util.extension.collectFlow
 import com.tari.android.wallet.util.extension.doOnGlobalLayout
 import com.tari.android.wallet.util.extension.getResourceUri
 import com.tari.android.wallet.util.extension.gone
@@ -71,9 +73,6 @@ import com.tari.android.wallet.util.extension.setOnThrottledClickListener
 import com.tari.android.wallet.util.extension.string
 import com.tari.android.wallet.util.extension.temporarilyDisableClick
 import com.tari.android.wallet.util.extension.visible
-import com.tari.android.wallet.ui.screen.onboarding.activity.OnboardingFlowFragment
-import com.tari.android.wallet.ui.screen.restore.activity.WalletRestoreActivity
-import com.tari.android.wallet.util.Constants
 import kotlin.math.min
 
 /**
@@ -144,9 +143,7 @@ class IntroductionFragment : OnboardingFlowFragment<FragmentIntroductionBinding,
                 userAgreementAndPrivacyPolicyTextView.alpha = 0f
                 restoreWalletCtaView.alpha = 0f
                 ui.restoreWalletCtaView.setOnClickListener {
-                    activity?.let {
-                        it.startActivity(WalletRestoreActivity.navigationIntent(it))
-                    }
+                    viewModel.toWalletRestoreActivity()
                 }
                 networkInfoTextView.text = uiState.versionInfo
                 // highlight links
@@ -235,6 +232,8 @@ class IntroductionFragment : OnboardingFlowFragment<FragmentIntroductionBinding,
     }
 
     private fun startTariWalletViewAnimation() {
+        if (!isAdded) return // fragment might be detached from activity
+
         val metrics = resources.displayMetrics
         val offset = (metrics.heightPixels / 2 - ui.tariLogoLottieAnimationView.height / 2 - ui.tariLogoLottieAnimationView.top).toFloat()
         val tariViewTranslateAnim = ObjectAnimator.ofFloat(ui.tariLogoLottieAnimationView, View.TRANSLATION_Y, offset).apply {

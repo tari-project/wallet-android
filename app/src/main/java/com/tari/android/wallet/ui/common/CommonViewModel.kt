@@ -8,7 +8,6 @@ import com.orhanobut.logger.Logger
 import com.orhanobut.logger.Printer
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.walletManager.WalletManager
-import com.tari.android.wallet.application.walletManager.doOnWalletFailed
 import com.tari.android.wallet.application.walletManager.doOnWalletRunning
 import com.tari.android.wallet.data.connection.TariWalletServiceConnection
 import com.tari.android.wallet.data.sharedPrefs.CorePrefRepository
@@ -18,7 +17,6 @@ import com.tari.android.wallet.data.sharedPrefs.tariSettings.TariSettingsPrefRep
 import com.tari.android.wallet.di.ApplicationComponent
 import com.tari.android.wallet.di.DiContainer
 import com.tari.android.wallet.ffi.FFIWallet
-import com.tari.android.wallet.infrastructure.logging.LoggerTags
 import com.tari.android.wallet.infrastructure.permission.PermissionManager
 import com.tari.android.wallet.model.CoreError
 import com.tari.android.wallet.model.TariWalletAddress
@@ -113,17 +111,9 @@ open class CommonViewModel : ViewModel(), DialogHandler {
 
         currentTheme.value = tariSettingsSharedRepository.currentTheme
 
-        logger.t(LoggerTags.Navigation.name).i(this::class.simpleName + " was started")
-
         securityPrefRepository.updateNotifier.subscribe {
             checkAuthorization()
         }.addTo(compositeDisposable)
-
-        launchOnIo {
-            walletManager.doOnWalletFailed {
-                showErrorDialog(it)
-            }
-        }
     }
 
     override fun onCleared() {
@@ -176,8 +166,8 @@ open class CommonViewModel : ViewModel(), DialogHandler {
         showModularDialog(WalletErrorArgs(resourceManager, error).getModular())
     }
 
-    override fun showErrorDialog(exception: Throwable) {
-        showModularDialog(WalletErrorArgs(resourceManager, exception).getModular())
+    override fun showErrorDialog(exception: Throwable, onClose: () -> Unit) {
+        showModularDialog(WalletErrorArgs(resourceManager, exception, onClose).getModular())
     }
 
     override fun showNotReadyYetDialog() {
@@ -323,7 +313,7 @@ interface DialogHandler {
         onClose: () -> Unit = {}
     )
 
-    fun showErrorDialog(exception: Throwable)
+    fun showErrorDialog(exception: Throwable, onClose: () -> Unit = {})
     fun showErrorDialog(error: CoreError)
     fun showInputModalDialog(vararg modules: IDialogModule)
     fun showInputModalDialog(inputArgs: ModularDialogArgs)

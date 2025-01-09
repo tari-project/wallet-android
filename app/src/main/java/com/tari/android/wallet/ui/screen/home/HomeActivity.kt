@@ -103,7 +103,7 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>() {
 
         onBackPressedDispatcher.addCallback {
             if (supportFragmentManager.backStackEntryCount > 0) {
-                supportFragmentManager.popBackStack()
+                supportFragmentManager.popBackStackImmediate()
             } else {
                 if (ui.viewPager.currentItem == INDEX_HOME) {
                     finish()

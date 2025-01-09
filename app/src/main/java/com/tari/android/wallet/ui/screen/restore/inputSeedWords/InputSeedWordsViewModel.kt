@@ -7,11 +7,9 @@ import androidx.lifecycle.map
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.baseNodes.BaseNodesManager
 import com.tari.android.wallet.application.walletManager.WalletLauncher
-import com.tari.android.wallet.application.walletManager.doOnWalletFailed
 import com.tari.android.wallet.application.walletManager.doOnWalletRunning
 import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodeDto
 import com.tari.android.wallet.ffi.FFISeedWords
-import com.tari.android.wallet.model.WalletError
 import com.tari.android.wallet.model.seedPhrase.SeedPhrase
 import com.tari.android.wallet.navigation.Navigation
 import com.tari.android.wallet.ui.common.CommonViewModel
@@ -27,7 +25,6 @@ import com.tari.android.wallet.ui.screen.restore.inputSeedWords.suggestions.Sugg
 import com.tari.android.wallet.util.DebugConfig
 import com.tari.android.wallet.util.extension.launchOnIo
 import com.tari.android.wallet.util.extension.launchOnMain
-import io.reactivex.disposables.CompositeDisposable
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -83,7 +80,8 @@ class InputSeedWordsViewModel : CommonViewModel() {
 
         _words.value = mutableListOf()
         _focusedIndex.value = 0
-        clear()
+
+        walletManager.deleteWallet()
 
         loadSuggestions()
 
@@ -119,18 +117,6 @@ class InputSeedWordsViewModel : CommonViewModel() {
         _inProgress.postValue(true)
 
         launchOnIo {
-            walletManager.doOnWalletFailed { exception ->
-                if (WalletError(exception) == WalletError.NoError) {
-                    onError(RestorationError.Unknown(resourceManager))
-                } else {
-                    showErrorDialog(exception)
-                }
-                _inProgress.postValue(false)
-                clear()
-            }
-        }
-
-        launchOnIo {
             walletManager.doOnWalletRunning {
                 tariNavigator.navigate(Navigation.InputSeedWords.ToRestoreFromSeeds)
                 _inProgress.postValue(false)
@@ -149,12 +135,6 @@ class InputSeedWordsViewModel : CommonViewModel() {
     }
 
     private fun onError(restorationError: RestorationError) = showModularDialog(restorationError.args.getModular(resourceManager))
-
-    private fun clear() {
-        walletManager.deleteWallet()
-        compositeDisposable.dispose()
-        compositeDisposable = CompositeDisposable()
-    }
 
     fun addWord(index: Int, text: String = "") {
         val newWord = WordItemViewModel.create(text, mnemonicList)

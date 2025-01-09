@@ -15,10 +15,11 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.viewbinding.ViewBinding
+import com.orhanobut.logger.Logger
+import com.orhanobut.logger.Printer
 import com.squareup.seismic.ShakeDetector
 import com.tari.android.wallet.R
-import com.tari.android.wallet.util.extension.observe
-import com.tari.android.wallet.util.extension.safeCastTo
+import com.tari.android.wallet.infrastructure.logging.LoggerTags
 import com.tari.android.wallet.ui.component.networkStateIndicator.ConnectionIndicatorViewModel
 import com.tari.android.wallet.ui.component.tari.toast.TariToast
 import com.tari.android.wallet.ui.component.tari.toast.TariToastArgs
@@ -30,12 +31,14 @@ import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonStyle
 import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
 import com.tari.android.wallet.ui.dialog.modular.modules.option.OptionModule
 import com.tari.android.wallet.ui.dialog.modular.modules.space.SpaceModule
-import com.tari.android.wallet.util.extension.addEnterLeftAnimation
-import com.tari.android.wallet.util.extension.string
 import com.tari.android.wallet.ui.screen.settings.allSettings.TariVersionModel
 import com.tari.android.wallet.ui.screen.settings.logs.activity.DebugActivity
 import com.tari.android.wallet.ui.screen.settings.logs.activity.DebugNavigation
 import com.tari.android.wallet.ui.screen.settings.themeSelector.TariTheme
+import com.tari.android.wallet.util.extension.addEnterLeftAnimation
+import com.tari.android.wallet.util.extension.observe
+import com.tari.android.wallet.util.extension.safeCastTo
+import com.tari.android.wallet.util.extension.string
 import yat.android.lib.YatIntegration
 
 abstract class CommonActivity<Binding : ViewBinding, VM : CommonViewModel> : AppCompatActivity(), ShakeDetector.Listener, FragmentPoppedListener {
@@ -52,6 +55,9 @@ abstract class CommonActivity<Binding : ViewBinding, VM : CommonViewModel> : App
     private val shakeDetector by lazy { ShakeDetector(this) }
 
     private val connectionStateViewModel: ConnectionIndicatorViewModel by viewModels()
+
+    val logger: Printer
+        get() = Logger.t(this::class.simpleName)
 
     private val screenCaptureCallback: ScreenCaptureCallback? =
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.UPSIDE_DOWN_CAKE) { // Android 14
@@ -148,6 +154,10 @@ abstract class CommonActivity<Binding : ViewBinding, VM : CommonViewModel> : App
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        if (savedInstanceState == null) {
+            logger.t(LoggerTags.Navigation.name).i(this::class.simpleName + " has been started")
+        }
+
         subscribeToCommon(connectionStateViewModel)
     }
 
@@ -158,6 +168,7 @@ abstract class CommonActivity<Binding : ViewBinding, VM : CommonViewModel> : App
     fun addFragment(fragment: CommonFragment<*, *>, bundle: Bundle? = null, isRoot: Boolean = false, withAnimation: Boolean = true) {
         bundle?.let { fragment.arguments = it }
         if (supportFragmentManager.isDestroyed) return
+        if (containerId == null) error("Container id is not set while adding fragment ${fragment::class.java.simpleName}")
         val transaction = supportFragmentManager.beginTransaction()
         if (withAnimation) {
             transaction.addEnterLeftAnimation()
