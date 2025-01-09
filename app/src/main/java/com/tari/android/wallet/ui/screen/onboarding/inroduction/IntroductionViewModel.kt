@@ -1,6 +1,7 @@
 package com.tari.android.wallet.ui.screen.onboarding.inroduction
 
 import com.tari.android.wallet.application.walletManager.WalletLauncher
+import com.tari.android.wallet.navigation.Navigation
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.screen.settings.allSettings.TariVersionModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -26,5 +27,9 @@ class IntroductionViewModel : CommonViewModel() {
 
     fun onCreateWalletClick() {
         walletLauncher.start()
+    }
+
+    fun toWalletRestoreActivity() {
+        tariNavigator.navigate(Navigation.Restore.WalletRestoreActivity)
     }
 }

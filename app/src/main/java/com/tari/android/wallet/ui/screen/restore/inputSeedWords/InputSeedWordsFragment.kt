@@ -12,23 +12,23 @@ import androidx.lifecycle.Lifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.tari.android.wallet.R
 import com.tari.android.wallet.databinding.FragmentWalletInputSeedWordsBinding
+import com.tari.android.wallet.model.seedPhrase.SeedPhrase
+import com.tari.android.wallet.navigation.Navigation
+import com.tari.android.wallet.ui.common.CommonFragment
+import com.tari.android.wallet.ui.common.recyclerView.CommonAdapter
+import com.tari.android.wallet.ui.screen.restore.inputSeedWords.suggestions.SuggestionState
+import com.tari.android.wallet.ui.screen.restore.inputSeedWords.suggestions.SuggestionViewHolderItem
+import com.tari.android.wallet.ui.screen.restore.inputSeedWords.suggestions.SuggestionsAdapter
+import com.tari.android.wallet.util.DebugConfig
+import com.tari.android.wallet.util.extension.hideKeyboard
 import com.tari.android.wallet.util.extension.launchAndRepeatOnLifecycle
 import com.tari.android.wallet.util.extension.observe
 import com.tari.android.wallet.util.extension.observeOnLoad
-import com.tari.android.wallet.model.seedPhrase.SeedPhrase
-import com.tari.android.wallet.ui.common.CommonFragment
-import com.tari.android.wallet.ui.common.recyclerView.CommonAdapter
-import com.tari.android.wallet.util.extension.hideKeyboard
 import com.tari.android.wallet.util.extension.setOnThrottledClickListener
 import com.tari.android.wallet.util.extension.setSelectionToEnd
 import com.tari.android.wallet.util.extension.setTextSilently
 import com.tari.android.wallet.util.extension.setVisible
 import com.tari.android.wallet.util.extension.showKeyboard
-import com.tari.android.wallet.navigation.Navigation
-import com.tari.android.wallet.ui.screen.restore.inputSeedWords.suggestions.SuggestionState
-import com.tari.android.wallet.ui.screen.restore.inputSeedWords.suggestions.SuggestionViewHolderItem
-import com.tari.android.wallet.ui.screen.restore.inputSeedWords.suggestions.SuggestionsAdapter
-import com.tari.android.wallet.util.DebugConfig
 import kotlinx.coroutines.launch
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent
 import net.yslibrary.android.keyboardvisibilityevent.Unregistrar
@@ -209,9 +209,5 @@ class InputSeedWordsFragment : CommonFragment<FragmentWalletInputSeedWordsBindin
     private fun onFinishEntering() {
         requireActivity().hideKeyboard()
         requireActivity().currentFocus?.clearFocus()
-    }
-
-    companion object {
-        fun createFragment(): InputSeedWordsFragment = InputSeedWordsFragment()
     }
 }

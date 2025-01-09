@@ -137,13 +137,13 @@ class BackupManager @Inject constructor(
     private suspend fun backup(optionType: BackupOption) = backupMutex.withLock {
         val currentDto = backupSettingsRepository.getOptionList.firstOrNull { it.type == optionType } ?: return
         if (!currentDto.isEnable) {
-            logger.d("Backup is disabled. Exit.")
+//            logger.d("Backup is disabled. Exit.")
             return
         }
 
         val backupsState = backupStateHandler.backupState.value.copy()
         if (backupsState.states[optionType] is BackupState.BackupInProgress) {
-            logger.d("Backup is in progress. Exit.")
+//            logger.d("Backup is in progress. Exit.")
             return
         }
 

@@ -13,7 +13,7 @@ import com.tari.android.wallet.ui.dialog.modular.modules.imageModule.ImageModule
 /**
  * Simple dialog arguments for a dialog with a title, a description and a close button action.
  */
-class SimpleDialogArgs(
+data class SimpleDialogArgs(
     @DrawableRes val iconRes: Int? = null,
     val title: CharSequence,
     val description: CharSequence,

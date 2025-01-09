@@ -1,6 +1,5 @@
 package com.tari.android.wallet.ui.screen.settings.backup.backupOnboarding
 
-import BackupOnboardingFlowDataSource
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -13,10 +12,11 @@ import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.tabs.TabLayoutMediator
 import com.tari.android.wallet.databinding.FragmentBackupOnboardingFlowBinding
 import com.tari.android.wallet.ui.common.CommonFragment
-import com.tari.android.wallet.util.extension.setVisible
 import com.tari.android.wallet.ui.screen.home.HomeActivity
 import com.tari.android.wallet.ui.screen.settings.backup.backupOnboarding.item.BackupOnboardingArgs
+import com.tari.android.wallet.ui.screen.settings.backup.backupOnboarding.item.BackupOnboardingFlowDataSource
 import com.tari.android.wallet.ui.screen.settings.backup.backupOnboarding.item.BackupOnboardingFlowItemFragment
+import com.tari.android.wallet.util.extension.setVisible
 
 class BackupOnboardingFlowFragment : CommonFragment<FragmentBackupOnboardingFlowBinding, BackupOnboardingFlowViewModel>() {
 

@@ -73,13 +73,15 @@
     <string name="error_fee_more_than_amount_description">Sorry, the amount cannot be less than the fee.</string>
 
     <string name="error_wallet_message_generic">Something went wrong! Please try again later. Please send us a bug report if this problem persists.</string>
-    <string name="error_wallet_message_114">Something went wrong processing output. Please try again later or contact the support.</string>
+    <string name="error_wallet_message_114">The wallet could not be restored. The backup file is not supported. We updated the wallet version, old
+        backup files without a password are not valid anymore. You can download an older version, make a backup with a password and try again.</string>
     <string name="error_wallet_message_204">Transaction not found. Please try again later. Please submit a bug report using the \"Report a Bug\" option from the settings menu if this problem appears again.</string>
     <string name="error_wallet_message_401">Contact not found. Please try again later. Please submit a bug report using the \"Report a Bug\" option from the settings menu if this problem appears again.</string>
     <string name="error_wallet_message_420">Wallet was not encrypted but a passphrase was supplied. Please try again later or try to restore your wallet.</string>
     <string name="error_wallet_message_428">Unable to decrypt the wallet. Please try again later or try to restore your wallet.</string>
     <string name="error_wallet_message_429">Unable to recover your wallet from provided seed words. Please check the list of entered seed words and try again.</string>
     <string name="error_wallet_message_430">The provided seed words are not compatible with the current wallet version. Please get in touch with support for more details.</string>
+    <string name="error_wallet_message_702">Looks like your backup isn\'t compatible with this wallet version. Consider making a new one!</string>
 
     <!-- common -->
     <string name="common_continue">Continue</string>
@@ -570,7 +572,6 @@
     <string name="restore_wallet_page_title">Restore Your Wallet</string>
     <string name="restore_wallet_error_title">Restoration Error</string>
     <string name="restore_wallet_error_desc">Wallet could not be restored: %s</string>
-    <string name="restore_wallet_error_file_not_supported">The wallet could not be restored. The backup file is not supported. We updated the wallet version, old backup files without a password are not valid anymore. You can download an older version, make a backup with a password and try again</string>
     <string name="restore_wallet_error_file_not_found">Wallet could not be restored. Backup does not exist.</string>
     <string name="restore_wallet_restore_cta">Restore Wallet</string>
     <string name="restore_wallet_password_match_error">@string/enter_backup_password_password_match_error</string>
@@ -809,7 +810,7 @@
     <string name="staged_wallet_security_stages_1a_title">🔑🔑🔑</string>
     <string name="staged_wallet_security_stages_1a_subtitle">Write down your seed words</string>
     <string name="staged_wallet_security_stages_1a_message"><![CDATA[You now have <strong>real</strong> money in your wallet.<br><br>If you accidentally delete your wallet app or lose your device, your funds are lost, and there is no way to recover them unless you have safely kept a copy of your <strong>seed phrase</strong> safe somewhere.<br><br>Click \'Ok\' to review and save the phrase now, or \'Remind me later\' to do it at a more convenient time]]></string>
-    <string name="staged_wallet_security_stages_1a_buttons_positive">Ok</string>
+    <string name="staged_wallet_security_stages_1a_buttons_positive">OK</string>
     <string name="staged_wallet_security_stages_1b_title">🤑🤑🤑</string>
     <string name="staged_wallet_security_stages_1b_subtitle">Make a cloud backup</string>
     <string name="staged_wallet_security_stages_1b_message">Your wallet now holds a fair amount of value, which you probably don\'t want to lose. Unlike a physical wallet\'s notes, it\'s possible to make a copy of your wallet\'s contents that you can use to recover your funds in case you lose them.\n\nYou should think about making a copy of your wallet\'s coins, which we will keep up to date after every transaction.\n\nIf you have a copy of your seed phrase saved somewhere safe, and don\'t want to back up your coins into the cloud, you can skip this step.</string>

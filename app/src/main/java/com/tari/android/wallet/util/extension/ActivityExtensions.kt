@@ -36,6 +36,13 @@ import android.app.Activity
 import android.content.Context
 import android.view.View
 import android.view.inputmethod.InputMethodManager
+import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 
 fun Activity.hideKeyboard(view: View? = null) =
     (getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager)
@@ -44,3 +51,11 @@ fun Activity.hideKeyboard(view: View? = null) =
 fun Activity.showKeyboard(view: View? = null) =
     (getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager)
         .showSoftInput(currentFocus ?: view ?: View(this), InputMethodManager.SHOW_IMPLICIT)
+
+fun AppCompatActivity.launchOnIo(action: suspend () -> Unit): Job {
+    return lifecycleScope.launch(Dispatchers.IO) { repeatOnLifecycle(Lifecycle.State.STARTED) { action() } }
+}
+
+fun AppCompatActivity.launchOnMain(action: suspend () -> Unit): Job {
+    return lifecycleScope.launch(Dispatchers.Main) { repeatOnLifecycle(Lifecycle.State.STARTED) { action() } }
+}

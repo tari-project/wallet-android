@@ -2,11 +2,11 @@ package com.tari.android.wallet.navigation
 
 import android.net.Uri
 import com.tari.android.wallet.application.YatAdapter.ConnectedWallet
+import com.tari.android.wallet.data.contacts.model.ContactDto
 import com.tari.android.wallet.model.MicroTari
 import com.tari.android.wallet.model.TariWalletAddress
-import com.tari.android.wallet.model.tx.Tx
 import com.tari.android.wallet.model.TxId
-import com.tari.android.wallet.data.contacts.model.ContactDto
+import com.tari.android.wallet.model.tx.Tx
 import com.tari.android.wallet.ui.screen.pinCode.PinCodeScreenBehavior
 import com.tari.android.wallet.ui.screen.send.common.TransactionData
 
@@ -19,9 +19,15 @@ sealed class Navigation {
     data object BackToHome : Navigation()
 
     sealed class Auth : Navigation() {
-        data class AuthScreen(val uri: Uri? = null) : Navigation()
-        data object FeatureAuth : Navigation()
-        data object BackAfterAuth : Navigation()
+        data class AuthScreen(val uri: Uri? = null) : Auth()
+        data object FeatureAuth : Auth()
+        data object BackAfterAuth : Auth()
+    }
+
+    sealed class Restore : Navigation() {
+        data object WalletRestoreActivity : Restore()
+        data object ToEnterRestorePassword : Restore()
+        data object ToRestoreWithRecoveryPhrase : Restore()
     }
 
     sealed class CustomBridge : Navigation() {
@@ -84,11 +90,6 @@ sealed class Navigation {
     sealed class InputSeedWords : Navigation() {
         data object ToRestoreFromSeeds : InputSeedWords()
         data object ToBaseNodeSelection : InputSeedWords()
-    }
-
-    sealed class ChooseRestoreOption : Navigation() {
-        data object ToEnterRestorePassword : ChooseRestoreOption()
-        data object ToRestoreWithRecoveryPhrase : ChooseRestoreOption()
     }
 
     sealed class ContactBook : Navigation() {

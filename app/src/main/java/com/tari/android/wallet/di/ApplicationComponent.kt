@@ -62,7 +62,7 @@ import com.tari.android.wallet.ui.screen.pinCode.EnterPinCodeViewModel
 import com.tari.android.wallet.ui.screen.profile.WalletInfoViewModel
 import com.tari.android.wallet.ui.screen.qr.QrScannerActivity
 import com.tari.android.wallet.ui.screen.qr.QrScannerViewModel
-import com.tari.android.wallet.ui.screen.restore.activity.WalletRestoreActivity
+import com.tari.android.wallet.ui.screen.restore.activity.WalletRestoreViewModel
 import com.tari.android.wallet.ui.screen.restore.chooseRestoreOption.ChooseRestoreOptionViewModel
 import com.tari.android.wallet.ui.screen.restore.enterRestorationPassword.EnterRestorationPasswordViewModel
 import com.tari.android.wallet.ui.screen.restore.inputSeedWords.InputSeedWordsViewModel
@@ -132,7 +132,6 @@ interface ApplicationComponent {
     fun inject(activity: AuthActivity)
     fun inject(activity: HomeActivity)
     fun inject(activity: QrScannerActivity)
-    fun inject(activity: WalletRestoreActivity)
 
     fun inject(fragment: ChooseGIFDialogFragment)
     fun inject(fragment: CreateWalletFragment)
@@ -195,6 +194,7 @@ interface ApplicationComponent {
     fun inject(viewModel: DataCollectionViewModel)
     fun inject(viewModel: EnterPinCodeViewModel)
     fun inject(viewModel: ChangeBiometricsViewModel)
+    fun inject(viewModel: WalletRestoreViewModel)
 
     fun inject(notificationBroadcastReceiver: NotificationBroadcastReceiver)
 

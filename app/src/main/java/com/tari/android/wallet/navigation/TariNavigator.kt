@@ -6,22 +6,12 @@ import android.os.Bundle
 import android.provider.ContactsContract
 import com.tari.android.wallet.application.YatAdapter
 import com.tari.android.wallet.application.YatAdapter.ConnectedWallet
+import com.tari.android.wallet.data.contacts.model.ContactDto
 import com.tari.android.wallet.model.MicroTari
 import com.tari.android.wallet.model.TariWalletAddress
-import com.tari.android.wallet.navigation.Navigation.AddAmount
-import com.tari.android.wallet.navigation.Navigation.AllSettings
-import com.tari.android.wallet.navigation.Navigation.BackupSettings
-import com.tari.android.wallet.navigation.Navigation.Chat
-import com.tari.android.wallet.navigation.Navigation.ChooseRestoreOption
-import com.tari.android.wallet.navigation.Navigation.ContactBook
-import com.tari.android.wallet.navigation.Navigation.CustomBridge
-import com.tari.android.wallet.navigation.Navigation.InputSeedWords
-import com.tari.android.wallet.navigation.Navigation.TorBridge
-import com.tari.android.wallet.navigation.Navigation.TxList
-import com.tari.android.wallet.navigation.Navigation.VerifySeedPhrase
+import com.tari.android.wallet.navigation.Navigation.*
 import com.tari.android.wallet.ui.common.CommonActivity
 import com.tari.android.wallet.ui.common.CommonFragment
-import com.tari.android.wallet.util.extension.parcelable
 import com.tari.android.wallet.ui.screen.auth.AuthActivity
 import com.tari.android.wallet.ui.screen.auth.FeatureAuthFragment
 import com.tari.android.wallet.ui.screen.biometrics.ChangeBiometricsFragment
@@ -29,7 +19,6 @@ import com.tari.android.wallet.ui.screen.chat.addChat.AddChatFragment
 import com.tari.android.wallet.ui.screen.chat.chatDetails.ChatDetailsFragment
 import com.tari.android.wallet.ui.screen.contactBook.add.AddContactFragment
 import com.tari.android.wallet.ui.screen.contactBook.add.SelectUserContactFragment
-import com.tari.android.wallet.data.contacts.model.ContactDto
 import com.tari.android.wallet.ui.screen.contactBook.details.ContactDetailsFragment
 import com.tari.android.wallet.ui.screen.contactBook.link.ContactLinkFragment
 import com.tari.android.wallet.ui.screen.contactBook.root.ContactBookFragment
@@ -39,6 +28,7 @@ import com.tari.android.wallet.ui.screen.onboarding.activity.OnboardingFlowActiv
 import com.tari.android.wallet.ui.screen.onboarding.localAuth.LocalAuthFragment
 import com.tari.android.wallet.ui.screen.pinCode.EnterPinCodeFragment
 import com.tari.android.wallet.ui.screen.profile.WalletInfoFragment
+import com.tari.android.wallet.ui.screen.restore.activity.WalletRestoreActivity
 import com.tari.android.wallet.ui.screen.restore.enterRestorationPassword.EnterRestorationPasswordFragment
 import com.tari.android.wallet.ui.screen.restore.inputSeedWords.InputSeedWordsFragment
 import com.tari.android.wallet.ui.screen.restore.walletRestoring.WalletRestoringFragment
@@ -72,6 +62,7 @@ import com.tari.android.wallet.ui.screen.tx.details.TxDetailsFragment
 import com.tari.android.wallet.ui.screen.tx.history.all.AllTxHistoryFragment
 import com.tari.android.wallet.ui.screen.tx.history.contact.ContactTxHistoryFragment
 import com.tari.android.wallet.ui.screen.utxos.list.UtxosListFragment
+import com.tari.android.wallet.util.extension.parcelable
 import java.math.BigInteger
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -81,20 +72,25 @@ class TariNavigator @Inject constructor(
     private val yatAdapter: YatAdapter,
 ) {
 
-    // The activity on which the navigation intents are performed
+    // The activity on which the navigation intents are performed.
+    // Set in the #onResume method of the activity!
     lateinit var currentActivity: CommonActivity<*, *>
 
     fun navigate(navigation: Navigation) {
         when (navigation) {
-            is Navigation.EnterPinCode -> addFragment(EnterPinCodeFragment.newInstance(navigation.behavior, navigation.stashedPin))
-            is Navigation.ChangeBiometrics -> addFragment(ChangeBiometricsFragment())
-            is Navigation.SplashScreen -> toSplashActivity(navigation.seedWords, navigation.clearTop)
-            is Navigation.Home -> toHomeActivity(navigation.uri)
-            is Navigation.BackToHome -> popUpTo(HomeOverviewFragment::class.java.simpleName)
+            is EnterPinCode -> addFragment(EnterPinCodeFragment.newInstance(navigation.behavior, navigation.stashedPin))
+            is ChangeBiometrics -> addFragment(ChangeBiometricsFragment())
+            is SplashScreen -> toSplashActivity(navigation.seedWords, navigation.clearTop)
+            is Home -> toHomeActivity(navigation.uri)
+            is BackToHome -> popUpTo(HomeOverviewFragment::class.java.simpleName)
 
-            is Navigation.Auth.AuthScreen -> toAuthActivity(navigation.uri)
-            is Navigation.Auth.FeatureAuth -> addFragment(FeatureAuthFragment())
-            is Navigation.Auth.BackAfterAuth -> backAfterAuth()
+            is Restore.WalletRestoreActivity -> currentActivity.startActivity(Intent(currentActivity, WalletRestoreActivity::class.java))
+            is Restore.ToEnterRestorePassword -> addFragment(EnterRestorationPasswordFragment())
+            is Restore.ToRestoreWithRecoveryPhrase -> addFragment(InputSeedWordsFragment())
+
+            is Auth.AuthScreen -> toAuthActivity(navigation.uri)
+            is Auth.FeatureAuth -> addFragment(FeatureAuthFragment())
+            is Auth.BackAfterAuth -> backAfterAuth()
 
             is ContactBook.ToAddContact -> addFragment(AddContactFragment())
             is ContactBook.ToContactDetails -> addFragment(ContactDetailsFragment.createFragment(navigation.contact))
@@ -106,9 +102,6 @@ class TariNavigator @Inject constructor(
             is ContactBook.ToContactTransactionHistory -> addFragment(ContactTxHistoryFragment.createFragment(navigation.contact))
             is ContactBook.ToAddPhoneContact -> toAddPhoneContact()
             is ContactBook.ToSelectTariUser -> addFragment(SelectUserContactFragment.newInstance())
-
-            is ChooseRestoreOption.ToEnterRestorePassword -> addFragment(EnterRestorationPasswordFragment.newInstance())
-            is ChooseRestoreOption.ToRestoreWithRecoveryPhrase -> addFragment(InputSeedWordsFragment.createFragment())
 
             is AllSettings.ToBugReporting -> DebugActivity.launch(currentActivity, DebugNavigation.BugReport)
             is AllSettings.ToMyProfile -> addFragment(WalletInfoFragment())

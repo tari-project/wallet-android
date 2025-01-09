@@ -168,6 +168,7 @@ abstract class CommonActivity<Binding : ViewBinding, VM : CommonViewModel> : App
     fun addFragment(fragment: CommonFragment<*, *>, bundle: Bundle? = null, isRoot: Boolean = false, withAnimation: Boolean = true) {
         bundle?.let { fragment.arguments = it }
         if (supportFragmentManager.isDestroyed) return
+        if (containerId == null) error("Container id is not set while adding fragment ${fragment::class.java.simpleName}")
         val transaction = supportFragmentManager.beginTransaction()
         if (withAnimation) {
             transaction.addEnterLeftAnimation()

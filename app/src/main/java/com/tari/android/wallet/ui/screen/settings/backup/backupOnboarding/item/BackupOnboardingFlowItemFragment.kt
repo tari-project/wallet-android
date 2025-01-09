@@ -1,7 +1,9 @@
 package com.tari.android.wallet.ui.screen.settings.backup.backupOnboarding.item
 
 import android.os.Bundle
-import android.view.*
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import com.tari.android.wallet.databinding.FragmentBackupOnboardingFlowItemBinding
 import com.tari.android.wallet.ui.common.CommonFragment
 import com.tari.android.wallet.util.extension.setVisible
@@ -14,8 +16,8 @@ class BackupOnboardingFlowItemFragment : CommonFragment<FragmentBackupOnboarding
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val position = requireArguments().getInt(argsKey)
-        val args = BackupOnboardingFlowDataSource.getByPostion(position)
+        val position = requireArguments().getInt(ARGS_KEY)
+        val args = BackupOnboardingFlowDataSource.getByPosition(position)
 
         with(ui) {
             imageView.setImageResource(args.image)
@@ -31,9 +33,9 @@ class BackupOnboardingFlowItemFragment : CommonFragment<FragmentBackupOnboarding
 
     companion object {
 
-        private val argsKey = "tari_wallet_onboarding_args"
+        private const val ARGS_KEY = "tari_wallet_onboarding_args"
 
         fun createInstance(position: Int): BackupOnboardingFlowItemFragment =
-            BackupOnboardingFlowItemFragment().apply { arguments = Bundle().apply { putInt(argsKey, position) } }
+            BackupOnboardingFlowItemFragment().apply { arguments = Bundle().apply { putInt(ARGS_KEY, position) } }
     }
 }

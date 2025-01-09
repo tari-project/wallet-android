@@ -6,16 +6,13 @@ import com.tari.android.wallet.R
 import com.tari.android.wallet.application.deeplinks.DeepLink
 import com.tari.android.wallet.application.walletManager.WalletConfig
 import com.tari.android.wallet.application.walletManager.WalletLauncher
-import com.tari.android.wallet.application.walletManager.doOnWalletFailed
 import com.tari.android.wallet.application.walletManager.doOnWalletRunning
 import com.tari.android.wallet.data.sharedPrefs.backup.BackupPrefRepository
 import com.tari.android.wallet.infrastructure.backup.BackupFileIsEncryptedException
 import com.tari.android.wallet.infrastructure.backup.BackupManager
 import com.tari.android.wallet.infrastructure.backup.BackupStorageAuthRevokedException
 import com.tari.android.wallet.infrastructure.backup.BackupStorageTamperedException
-import com.tari.android.wallet.infrastructure.backup.WalletStartFailedException
 import com.tari.android.wallet.model.TariWalletAddress
-import com.tari.android.wallet.model.WalletError
 import com.tari.android.wallet.navigation.Navigation
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.dialog.modular.ModularDialogArgs
@@ -82,12 +79,6 @@ class ChooseRestoreOptionViewModel : CommonViewModel() {
                 }
             }
         }
-
-        launchOnIo {
-            walletManager.doOnWalletFailed {
-                handleException(WalletStartFailedException(it))
-            }
-        }
     }
 
     fun startRecovery(selectedOption: BackupOption, hostFragment: Fragment) {
@@ -96,7 +87,7 @@ class ChooseRestoreOptionViewModel : CommonViewModel() {
     }
 
     fun onRecoveryPhraseClicked() {
-        tariNavigator.navigate(Navigation.ChooseRestoreOption.ToRestoreWithRecoveryPhrase)
+        tariNavigator.navigate(Navigation.Restore.ToRestoreWithRecoveryPhrase)
     }
 
     fun onPaperWalletClicked(fragment: Fragment) {
@@ -164,22 +155,7 @@ class ChooseRestoreOptionViewModel : CommonViewModel() {
             }
 
             is BackupFileIsEncryptedException -> {
-                tariNavigator.navigate(Navigation.ChooseRestoreOption.ToEnterRestorePassword)
-            }
-
-            is WalletStartFailedException -> {
-                logger.i("Restore failed: wallet start failed")
-                launchOnMain {
-                    walletManager.deleteWallet()
-                }
-                val cause = WalletError(exception.cause)
-                if (cause == WalletError.DatabaseDataError) {
-                    showRestoreFailedDialog(resourceManager.getString(R.string.restore_wallet_error_file_not_supported))
-                } else if (cause != WalletError.NoError) {
-                    showErrorDialog(cause)
-                } else {
-                    showRestoreFailedDialog(exception.cause?.message)
-                }
+                tariNavigator.navigate(Navigation.Restore.ToEnterRestorePassword)
             }
 
             is IOException -> {
