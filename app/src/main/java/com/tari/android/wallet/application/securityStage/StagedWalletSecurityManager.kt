@@ -2,14 +2,13 @@ package com.tari.android.wallet.application.securityStage
 
 import com.tari.android.wallet.application.securityStage.StagedWalletSecurityManager.StagedSecurityEffect.NoStagedSecurityPopUp
 import com.tari.android.wallet.application.securityStage.StagedWalletSecurityManager.StagedSecurityEffect.ShowStagedSecurityPopUp
-import com.tari.android.wallet.data.sharedPrefs.securityStages.DisabledTimestampsDto
+import com.tari.android.wallet.data.sharedPrefs.backup.BackupPrefRepository
 import com.tari.android.wallet.data.sharedPrefs.securityStages.SecurityStagesPrefRepository
 import com.tari.android.wallet.data.sharedPrefs.securityStages.WalletSecurityStage
 import com.tari.android.wallet.data.sharedPrefs.tariSettings.TariSettingsPrefRepository
-import com.tari.android.wallet.util.extension.isAfterNow
 import com.tari.android.wallet.model.BalanceInfo
 import com.tari.android.wallet.model.MicroTari
-import com.tari.android.wallet.data.sharedPrefs.backup.BackupPrefRepository
+import com.tari.android.wallet.util.extension.isAfterNow
 import java.math.BigDecimal
 import java.util.Calendar
 import javax.inject.Inject
@@ -38,12 +37,6 @@ class StagedWalletSecurityManager @Inject constructor(
     private val disabledTimestampSinceNow: Calendar
         get() = Calendar.getInstance().also { it.add(Calendar.DAY_OF_YEAR, 7) }
 
-    private var disabledTimestamps: MutableMap<WalletSecurityStage, Calendar>
-        get() = securityStagesRepository.disabledTimestamps?.timestamps ?: DisabledTimestampsDto(mutableMapOf()).timestamps
-        set(value) {
-            securityStagesRepository.disabledTimestamps = DisabledTimestampsDto(value)
-        }
-
     /**
      * Check the current security stage based on the balance and the user's security settings.
      */
@@ -51,16 +44,11 @@ class StagedWalletSecurityManager @Inject constructor(
         val securityStage = checkSecurityStage(balance) ?: return NoStagedSecurityPopUp
         //todo Stage 3 is currently disabled
         if (securityStage == WalletSecurityStage.Stage3) return NoStagedSecurityPopUp
-        if (isActionDisabled(securityStage)) return NoStagedSecurityPopUp
+        if (securityStagesRepository.disabledTimestamp.isAfterNow()) return NoStagedSecurityPopUp
 
-        updateTimestamp(securityStage)
+        securityStagesRepository.disabledTimestamp = disabledTimestampSinceNow
 
         return ShowStagedSecurityPopUp(securityStage)
-    }
-
-    private fun updateTimestamp(securityStage: WalletSecurityStage) {
-        val newTimestamp = disabledTimestampSinceNow
-        disabledTimestamps = disabledTimestamps.also { it[securityStage] = newTimestamp }
     }
 
     /**
@@ -76,16 +64,6 @@ class StagedWalletSecurityManager @Inject constructor(
             balance >= SAFE_HOT_WALLET_BALANCE -> WalletSecurityStage.Stage3
             else -> null
         }
-    }
-
-    private fun isActionDisabled(securityStage: WalletSecurityStage): Boolean {
-        val timestamp = disabledTimestamps[securityStage] ?: return false
-        if (timestamp.isAfterNow()) {
-            return true
-        }
-
-        disabledTimestamps = disabledTimestamps.also { it.remove(securityStage) }
-        return false
     }
 
     sealed class StagedSecurityEffect {

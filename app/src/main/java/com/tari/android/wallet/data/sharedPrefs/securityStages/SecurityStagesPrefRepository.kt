@@ -34,9 +34,10 @@ package com.tari.android.wallet.data.sharedPrefs.securityStages
 
 import android.content.SharedPreferences
 import com.tari.android.wallet.data.sharedPrefs.CommonPrefRepository
-import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefGsonNullableDelegate
+import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefGsonDelegate
 import com.tari.android.wallet.data.sharedPrefs.network.NetworkPrefRepository
 import com.tari.android.wallet.data.sharedPrefs.network.formatKey
+import java.util.Calendar
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -45,18 +46,17 @@ class SecurityStagesPrefRepository @Inject constructor(sharedPrefs: SharedPrefer
     CommonPrefRepository(networkRepository) {
 
     private object Key {
-        const val DISABLED_TIMESTAMPS = "tari_disabled_timestamp"
+        const val DISABLED_TIMESTAMP = "tari_disabled_timestamp"
     }
 
-    var disabledTimestamps: DisabledTimestampsDto? by SharedPrefGsonNullableDelegate(
+    var disabledTimestamp: Calendar by SharedPrefGsonDelegate(
         prefs = sharedPrefs,
         commonRepository = this,
-        name = formatKey(Key.DISABLED_TIMESTAMPS),
-        type = DisabledTimestampsDto::class.java,
-        defValue = DisabledTimestampsDto(mutableMapOf()),
+        name = formatKey(Key.DISABLED_TIMESTAMP),
+        type = Calendar::class.java,
+        defValue = Calendar.getInstance(),
     )
 
     fun clear() {
-        disabledTimestamps = null
     }
 }
