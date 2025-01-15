@@ -44,19 +44,19 @@ import androidx.transition.Transition
 import androidx.transition.TransitionManager
 import com.tari.android.wallet.R
 import com.tari.android.wallet.databinding.FragmentWriteDownSeedPhraseBinding
-import com.tari.android.wallet.util.extension.observe
-import com.tari.android.wallet.ui.common.CommonFragment
-import com.tari.android.wallet.util.extension.ThrottleClick
-import com.tari.android.wallet.util.extension.animateClick
-import com.tari.android.wallet.util.extension.dimenPx
-import com.tari.android.wallet.util.extension.setVisible
 import com.tari.android.wallet.navigation.Navigation
+import com.tari.android.wallet.ui.common.CommonXmlFragment
 import com.tari.android.wallet.ui.screen.settings.backup.writeDownSeedWords.adapter.PhraseWordsAdapter
 import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.DebugConfig
+import com.tari.android.wallet.util.extension.ThrottleClick
+import com.tari.android.wallet.util.extension.animateClick
+import com.tari.android.wallet.util.extension.dimenPx
+import com.tari.android.wallet.util.extension.observe
+import com.tari.android.wallet.util.extension.setVisible
 
 
-class WriteDownSeedPhraseFragment : CommonFragment<FragmentWriteDownSeedPhraseBinding, WriteDownSeedPhraseViewModel>() {
+class WriteDownSeedPhraseFragment : CommonXmlFragment<FragmentWriteDownSeedPhraseBinding, WriteDownSeedPhraseViewModel>() {
 
     private val adapter = PhraseWordsAdapter()
     private var isExpanded = false

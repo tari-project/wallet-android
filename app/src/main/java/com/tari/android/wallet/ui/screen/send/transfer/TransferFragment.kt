@@ -12,12 +12,12 @@ import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.tabs.TabLayoutMediator
 import com.tari.android.wallet.R
 import com.tari.android.wallet.databinding.FragmentTransferBinding
-import com.tari.android.wallet.ui.common.CommonFragment
+import com.tari.android.wallet.ui.common.CommonXmlFragment
 import com.tari.android.wallet.ui.screen.contactBook.add.SelectUserContactFragment
 import com.tari.android.wallet.ui.screen.send.requestTari.RequestTariFragment
 import com.tari.android.wallet.ui.screen.send.requestTari.RequestTariViewModel
 
-class TransferFragment : CommonFragment<FragmentTransferBinding, RequestTariViewModel>() {
+class TransferFragment : CommonXmlFragment<FragmentTransferBinding, RequestTariViewModel>() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?) =
         FragmentTransferBinding.inflate(inflater, container, false).also { ui = it }.root

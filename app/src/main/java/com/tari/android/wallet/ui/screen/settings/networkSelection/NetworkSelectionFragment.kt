@@ -40,14 +40,14 @@ import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.tari.android.wallet.databinding.FragmentNetworkSelectionBinding
-import com.tari.android.wallet.util.extension.observe
-import com.tari.android.wallet.ui.common.CommonFragment
+import com.tari.android.wallet.ui.common.CommonXmlFragment
 import com.tari.android.wallet.ui.common.recyclerView.CommonAdapter
 import com.tari.android.wallet.ui.screen.settings.networkSelection.networkItem.NetworkAdapter
 import com.tari.android.wallet.ui.screen.settings.networkSelection.networkItem.NetworkViewHolderItem
 import com.tari.android.wallet.ui.screen.splash.SplashActivity
+import com.tari.android.wallet.util.extension.observe
 
-class NetworkSelectionFragment : CommonFragment<FragmentNetworkSelectionBinding, NetworkSelectionViewModel>() {
+class NetworkSelectionFragment : CommonXmlFragment<FragmentNetworkSelectionBinding, NetworkSelectionViewModel>() {
 
     private var adapter: NetworkAdapter = NetworkAdapter()
 

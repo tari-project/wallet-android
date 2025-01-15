@@ -31,10 +31,11 @@ import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonStyle
 import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
 import com.tari.android.wallet.ui.dialog.modular.modules.option.OptionModule
 import com.tari.android.wallet.ui.dialog.modular.modules.space.SpaceModule
+import com.tari.android.wallet.ui.screen.debug.DebugNavigation
+import com.tari.android.wallet.ui.screen.debug.activity.DebugActivity
 import com.tari.android.wallet.ui.screen.settings.allSettings.TariVersionModel
-import com.tari.android.wallet.ui.screen.settings.logs.activity.DebugActivity
-import com.tari.android.wallet.ui.screen.settings.logs.activity.DebugNavigation
 import com.tari.android.wallet.ui.screen.settings.themeSelector.TariTheme
+import com.tari.android.wallet.util.DebugConfig
 import com.tari.android.wallet.util.extension.addEnterLeftAnimation
 import com.tari.android.wallet.util.extension.observe
 import com.tari.android.wallet.util.extension.safeCastTo
@@ -165,7 +166,7 @@ abstract class CommonActivity<Binding : ViewBinding, VM : CommonViewModel> : App
         containerId = id
     }
 
-    fun addFragment(fragment: CommonFragment<*, *>, bundle: Bundle? = null, isRoot: Boolean = false, withAnimation: Boolean = true) {
+    fun addFragment(fragment: CommonFragment<*>, bundle: Bundle? = null, isRoot: Boolean = false, withAnimation: Boolean = true) {
         bundle?.let { fragment.arguments = it }
         if (supportFragmentManager.isDestroyed) return
         if (containerId == null) error("Container id is not set while adding fragment ${fragment::class.java.simpleName}")
@@ -195,7 +196,7 @@ abstract class CommonActivity<Binding : ViewBinding, VM : CommonViewModel> : App
 
     override fun onFragmentPopped(fragmentClass: Class<out Fragment>) {
         supportFragmentManager.fragments
-            .mapNotNull { it.safeCastTo<CommonFragment<*, *>>() }
+            .mapNotNull { it.safeCastTo<CommonFragment<*>>() }
             .forEach { fragment -> fragment.onFragmentPopped(fragmentClass) }
     }
 
@@ -207,7 +208,7 @@ abstract class CommonActivity<Binding : ViewBinding, VM : CommonViewModel> : App
         dialogHandler.showModularDialog(
             ModularDialogArgs(
                 dialogId = ModularDialogArgs.DialogId.DEBUG_MENU,
-                modules = listOf(
+                modules = listOfNotNull(
                     HeadModule(getString(R.string.debug_dialog_title)),
                     SpaceModule(8),
                     OptionModule(getString(R.string.debug_dialog_logs)) { openActivity(DebugNavigation.Logs) },
@@ -216,6 +217,8 @@ abstract class CommonActivity<Binding : ViewBinding, VM : CommonViewModel> : App
                         dialogHandler.hideDialog(ModularDialogArgs.DialogId.DEBUG_MENU)
                         connectionStateViewModel.showStatesDialog()
                     },
+                    OptionModule(getString(R.string.debug_dialog_sample_design_system)) { openActivity(DebugNavigation.SampleDesignSystem) }
+                        .takeIf { DebugConfig.isDebug() },
                     BodyModule(versionInfo),
                     ButtonModule(getString(R.string.common_close), ButtonStyle.Close),
                 ),

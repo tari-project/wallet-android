@@ -11,7 +11,7 @@ import com.tari.android.wallet.model.MicroTari
 import com.tari.android.wallet.model.TariWalletAddress
 import com.tari.android.wallet.navigation.Navigation.*
 import com.tari.android.wallet.ui.common.CommonActivity
-import com.tari.android.wallet.ui.common.CommonFragment
+import com.tari.android.wallet.ui.common.CommonXmlFragment
 import com.tari.android.wallet.ui.screen.auth.AuthActivity
 import com.tari.android.wallet.ui.screen.auth.FeatureAuthFragment
 import com.tari.android.wallet.ui.screen.biometrics.ChangeBiometricsFragment
@@ -22,6 +22,8 @@ import com.tari.android.wallet.ui.screen.contactBook.add.SelectUserContactFragme
 import com.tari.android.wallet.ui.screen.contactBook.details.ContactDetailsFragment
 import com.tari.android.wallet.ui.screen.contactBook.link.ContactLinkFragment
 import com.tari.android.wallet.ui.screen.contactBook.root.ContactBookFragment
+import com.tari.android.wallet.ui.screen.debug.DebugNavigation
+import com.tari.android.wallet.ui.screen.debug.activity.DebugActivity
 import com.tari.android.wallet.ui.screen.home.HomeActivity
 import com.tari.android.wallet.ui.screen.home.overview.HomeOverviewFragment
 import com.tari.android.wallet.ui.screen.onboarding.activity.OnboardingFlowActivity
@@ -51,8 +53,6 @@ import com.tari.android.wallet.ui.screen.settings.baseNodeConfig.changeBaseNode.
 import com.tari.android.wallet.ui.screen.settings.bluetoothSettings.BluetoothSettingsFragment
 import com.tari.android.wallet.ui.screen.settings.dataCollection.DataCollectionFragment
 import com.tari.android.wallet.ui.screen.settings.deleteWallet.DeleteWalletFragment
-import com.tari.android.wallet.ui.screen.settings.logs.activity.DebugActivity
-import com.tari.android.wallet.ui.screen.settings.logs.activity.DebugNavigation
 import com.tari.android.wallet.ui.screen.settings.networkSelection.NetworkSelectionFragment
 import com.tari.android.wallet.ui.screen.settings.screenRecording.ScreenRecordingSettingsFragment
 import com.tari.android.wallet.ui.screen.settings.themeSelector.ThemeSelectorFragment
@@ -153,7 +153,7 @@ class TariNavigator @Inject constructor(
         navigations.forEach { navigate(it) }
     }
 
-    private fun addFragment(fragment: CommonFragment<*, *>, bundle: Bundle? = null, isRoot: Boolean = false, withAnimation: Boolean = true) {
+    private fun addFragment(fragment: CommonXmlFragment<*, *>, bundle: Bundle? = null, isRoot: Boolean = false, withAnimation: Boolean = true) {
         currentActivity.addFragment(fragment, bundle, isRoot, withAnimation)
     }
 

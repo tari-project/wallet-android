@@ -24,24 +24,12 @@ import com.daasuu.ei.EasingInterpolator
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.deeplinks.DeepLink
 import com.tari.android.wallet.databinding.FragmentContactsSelectionBinding
-import com.tari.android.wallet.util.extension.launchAndRepeatOnLifecycle
-import com.tari.android.wallet.util.extension.observe
-import com.tari.android.wallet.util.extension.observeOnLoad
 import com.tari.android.wallet.model.TariWalletAddress
-import com.tari.android.wallet.ui.common.CommonFragment
+import com.tari.android.wallet.ui.common.CommonXmlFragment
 import com.tari.android.wallet.ui.common.domain.PaletteManager
 import com.tari.android.wallet.ui.common.recyclerView.CommonAdapter
 import com.tari.android.wallet.ui.component.clipboardController.ClipboardController
 import com.tari.android.wallet.ui.component.tari.toolbar.TariToolbarActionArg
-import com.tari.android.wallet.util.extension.gone
-import com.tari.android.wallet.util.extension.hideKeyboard
-import com.tari.android.wallet.util.extension.parcelable
-import com.tari.android.wallet.util.extension.postDelayed
-import com.tari.android.wallet.util.extension.setSelectionToEnd
-import com.tari.android.wallet.util.extension.setVisible
-import com.tari.android.wallet.util.extension.string
-import com.tari.android.wallet.util.extension.temporarilyDisableClick
-import com.tari.android.wallet.util.extension.visible
 import com.tari.android.wallet.ui.screen.contactBook.contactSelection.ContactSelectionModel.Effect
 import com.tari.android.wallet.ui.screen.contactBook.contactSelection.ContactSelectionModel.YatState
 import com.tari.android.wallet.ui.screen.contactBook.contacts.adapter.ContactListAdapter
@@ -53,10 +41,22 @@ import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.DebugConfig
 import com.tari.android.wallet.util.EmojiUtil
 import com.tari.android.wallet.util.containsNonEmoji
+import com.tari.android.wallet.util.extension.gone
+import com.tari.android.wallet.util.extension.hideKeyboard
+import com.tari.android.wallet.util.extension.launchAndRepeatOnLifecycle
+import com.tari.android.wallet.util.extension.observe
+import com.tari.android.wallet.util.extension.observeOnLoad
+import com.tari.android.wallet.util.extension.parcelable
+import com.tari.android.wallet.util.extension.postDelayed
+import com.tari.android.wallet.util.extension.setSelectionToEnd
+import com.tari.android.wallet.util.extension.setVisible
+import com.tari.android.wallet.util.extension.string
+import com.tari.android.wallet.util.extension.temporarilyDisableClick
+import com.tari.android.wallet.util.extension.visible
 import com.tari.android.wallet.util.firstNCharactersAreEmojis
 import kotlinx.coroutines.launch
 
-open class ContactSelectionFragment : CommonFragment<FragmentContactsSelectionBinding, ContactSelectionViewModel>(), TextWatcher {
+open class ContactSelectionFragment : CommonXmlFragment<FragmentContactsSelectionBinding, ContactSelectionViewModel>(), TextWatcher {
 
     private var clipboardController: ClipboardController? = null
 
@@ -85,7 +85,7 @@ open class ContactSelectionFragment : CommonFragment<FragmentContactsSelectionBi
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        withToolbar = arguments?.getBoolean("withToolbar") ?: true
+        withToolbar = arguments?.getBoolean("withToolbar") != false
 
         val viewModel: ContactSelectionViewModel by viewModels()
         bindViewModel(viewModel)

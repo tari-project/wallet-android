@@ -13,7 +13,7 @@ import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonStyle
 import com.tari.android.wallet.ui.dialog.modular.modules.checked.CheckedModule
 import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
 import com.tari.android.wallet.ui.dialog.modular.modules.space.SpaceModule
-import com.tari.android.wallet.ui.screen.settings.logs.activity.DebugActivity
+import com.tari.android.wallet.ui.screen.debug.activity.DebugActivity
 import com.tari.android.wallet.ui.screen.settings.logs.logs.adapter.DebugLog
 import com.tari.android.wallet.ui.screen.settings.logs.logs.adapter.LogViewHolderItem
 import com.tari.android.wallet.ui.screen.settings.logs.logs.module.LogLevelCheckedModule

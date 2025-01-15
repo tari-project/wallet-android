@@ -38,10 +38,10 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import com.tari.android.wallet.databinding.FragmentScreenRecordingSettingsBinding
+import com.tari.android.wallet.ui.common.CommonXmlFragment
 import com.tari.android.wallet.util.extension.collectFlow
-import com.tari.android.wallet.ui.common.CommonFragment
 
-class ScreenRecordingSettingsFragment : CommonFragment<FragmentScreenRecordingSettingsBinding, ScreenRecordingSettingsViewModel>() {
+class ScreenRecordingSettingsFragment : CommonXmlFragment<FragmentScreenRecordingSettingsBinding, ScreenRecordingSettingsViewModel>() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
         FragmentScreenRecordingSettingsBinding.inflate(inflater, container, false).also { ui = it }.root

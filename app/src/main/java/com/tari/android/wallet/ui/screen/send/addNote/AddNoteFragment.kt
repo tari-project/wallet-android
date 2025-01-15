@@ -68,7 +68,7 @@ import com.tari.android.wallet.model.MicroTari
 import com.tari.android.wallet.model.TariWalletAddress
 import com.tari.android.wallet.model.TxNote
 import com.tari.android.wallet.navigation.TariNavigator.Companion.PARAMETER_TRANSACTION
-import com.tari.android.wallet.ui.common.CommonFragment
+import com.tari.android.wallet.ui.common.CommonXmlFragment
 import com.tari.android.wallet.ui.common.domain.PaletteManager
 import com.tari.android.wallet.ui.common.giphy.repository.GifItem
 import com.tari.android.wallet.ui.screen.send.addNote.gif.ChooseGIFDialogFragment
@@ -95,7 +95,7 @@ import com.tari.android.wallet.util.extension.setStartMargin
 import com.tari.android.wallet.util.extension.temporarilyDisableClick
 import com.tari.android.wallet.util.extension.visible
 
-class AddNoteFragment : CommonFragment<FragmentAddNoteBinding, AddNoteViewModel>(), View.OnTouchListener {
+class AddNoteFragment : CommonXmlFragment<FragmentAddNoteBinding, AddNoteViewModel>(), View.OnTouchListener {
 
     // slide button animation related variables
     private var slideButtonXDelta = 0

@@ -395,6 +395,7 @@
     <string name="debug_dialog_logs">View logs</string>
     <string name="debug_dialog_report">Report a bug</string>
     <string name="debug_dialog_connection_status">View connection status</string>
+    <string name="debug_dialog_sample_design_system">Sample design system</string>
     <string name="debug_logs_title">Debug Logs</string>
     <string name="debug_logs_cant_open_file">Unable to open file. Please try again later</string>
     <string name="debug_logs_clipboard_text">Logs was copied to clipboard</string>

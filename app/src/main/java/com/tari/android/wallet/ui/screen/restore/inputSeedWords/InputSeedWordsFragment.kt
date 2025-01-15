@@ -14,7 +14,7 @@ import com.tari.android.wallet.R
 import com.tari.android.wallet.databinding.FragmentWalletInputSeedWordsBinding
 import com.tari.android.wallet.model.seedPhrase.SeedPhrase
 import com.tari.android.wallet.navigation.Navigation
-import com.tari.android.wallet.ui.common.CommonFragment
+import com.tari.android.wallet.ui.common.CommonXmlFragment
 import com.tari.android.wallet.ui.common.recyclerView.CommonAdapter
 import com.tari.android.wallet.ui.screen.restore.inputSeedWords.suggestions.SuggestionState
 import com.tari.android.wallet.ui.screen.restore.inputSeedWords.suggestions.SuggestionViewHolderItem
@@ -33,7 +33,7 @@ import kotlinx.coroutines.launch
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent
 import net.yslibrary.android.keyboardvisibilityevent.Unregistrar
 
-class InputSeedWordsFragment : CommonFragment<FragmentWalletInputSeedWordsBinding, InputSeedWordsViewModel>() {
+class InputSeedWordsFragment : CommonXmlFragment<FragmentWalletInputSeedWordsBinding, InputSeedWordsViewModel>() {
 
     private val suggestionsAdapter = SuggestionsAdapter()
     private var keyboardRegistrar: Unregistrar? = null

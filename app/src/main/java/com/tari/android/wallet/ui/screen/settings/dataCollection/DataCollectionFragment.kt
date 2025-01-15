@@ -6,11 +6,11 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import com.tari.android.wallet.databinding.FragmentDataCollectionBinding
-import com.tari.android.wallet.util.extension.observe
-import com.tari.android.wallet.ui.common.CommonFragment
+import com.tari.android.wallet.ui.common.CommonXmlFragment
 import com.tari.android.wallet.ui.component.loadingSwitch.TariLoadingSwitchState
+import com.tari.android.wallet.util.extension.observe
 
-class DataCollectionFragment : CommonFragment<FragmentDataCollectionBinding, DataCollectionViewModel>() {
+class DataCollectionFragment : CommonXmlFragment<FragmentDataCollectionBinding, DataCollectionViewModel>() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
         FragmentDataCollectionBinding.inflate(inflater, container, false).also { ui = it }.root

@@ -39,12 +39,12 @@ import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.GridLayoutManager
 import com.tari.android.wallet.databinding.FragmentThemeChangeBinding
-import com.tari.android.wallet.util.extension.observe
-import com.tari.android.wallet.ui.common.CommonFragment
+import com.tari.android.wallet.ui.common.CommonXmlFragment
 import com.tari.android.wallet.ui.common.recyclerView.CommonAdapter
 import com.tari.android.wallet.ui.screen.settings.themeSelector.adapter.ThemesAdapter
+import com.tari.android.wallet.util.extension.observe
 
-class ThemeSelectorFragment : CommonFragment<FragmentThemeChangeBinding, ThemeSelectorViewModel>() {
+class ThemeSelectorFragment : CommonXmlFragment<FragmentThemeChangeBinding, ThemeSelectorViewModel>() {
 
     private val adapter = ThemesAdapter()
 

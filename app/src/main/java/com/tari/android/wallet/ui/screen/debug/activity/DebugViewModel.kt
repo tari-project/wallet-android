@@ -1,4 +1,4 @@
-package com.tari.android.wallet.ui.screen.settings.logs.activity
+package com.tari.android.wallet.ui.screen.debug.activity
 
 import com.tari.android.wallet.ui.common.CommonViewModel
 

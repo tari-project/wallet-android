@@ -41,43 +41,43 @@ import androidx.fragment.app.viewModels
 import com.bumptech.glide.Glide
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.walletManager.WalletConfig
+import com.tari.android.wallet.data.contacts.model.ContactDto
 import com.tari.android.wallet.databinding.FragmentTxDetailsBinding
-import com.tari.android.wallet.util.extension.collectNonNullFlow
-import com.tari.android.wallet.util.extension.observe
-import com.tari.android.wallet.util.extension.txFormattedDate
-import com.tari.android.wallet.model.tx.CancelledTx
-import com.tari.android.wallet.model.tx.CompletedTx
 import com.tari.android.wallet.model.MicroTari
-import com.tari.android.wallet.model.tx.PendingOutboundTx
-import com.tari.android.wallet.model.tx.Tx
-import com.tari.android.wallet.model.tx.Tx.Direction.INBOUND
-import com.tari.android.wallet.model.tx.Tx.Direction.OUTBOUND
 import com.tari.android.wallet.model.TxId
 import com.tari.android.wallet.model.TxNote
 import com.tari.android.wallet.model.TxStatus.IMPORTED
 import com.tari.android.wallet.model.TxStatus.MINED_CONFIRMED
 import com.tari.android.wallet.model.TxStatus.PENDING
-import com.tari.android.wallet.ui.common.CommonFragment
+import com.tari.android.wallet.model.tx.CancelledTx
+import com.tari.android.wallet.model.tx.CompletedTx
+import com.tari.android.wallet.model.tx.PendingOutboundTx
+import com.tari.android.wallet.model.tx.Tx
+import com.tari.android.wallet.model.tx.Tx.Direction.INBOUND
+import com.tari.android.wallet.model.tx.Tx.Direction.OUTBOUND
+import com.tari.android.wallet.ui.common.CommonXmlFragment
 import com.tari.android.wallet.ui.dialog.modular.ModularDialog
 import com.tari.android.wallet.ui.dialog.tooltipDialog.TooltipDialogArgs
-import com.tari.android.wallet.util.extension.dimen
-import com.tari.android.wallet.util.extension.getFirstChild
-import com.tari.android.wallet.util.extension.getLastChild
-import com.tari.android.wallet.util.extension.gone
-import com.tari.android.wallet.util.extension.hideKeyboard
-import com.tari.android.wallet.util.extension.invisible
-import com.tari.android.wallet.util.extension.setLayoutSize
-import com.tari.android.wallet.util.extension.setTextSizePx
-import com.tari.android.wallet.util.extension.setVisible
-import com.tari.android.wallet.util.extension.string
-import com.tari.android.wallet.util.extension.visible
-import com.tari.android.wallet.data.contacts.model.ContactDto
 import com.tari.android.wallet.ui.screen.tx.details.gif.GifView
 import com.tari.android.wallet.ui.screen.tx.details.gif.GifViewModel
 import com.tari.android.wallet.ui.screen.tx.details.gif.TxState
 import com.tari.android.wallet.util.addressFirstEmojis
 import com.tari.android.wallet.util.addressLastEmojis
 import com.tari.android.wallet.util.addressPrefixEmojis
+import com.tari.android.wallet.util.extension.collectNonNullFlow
+import com.tari.android.wallet.util.extension.dimen
+import com.tari.android.wallet.util.extension.getFirstChild
+import com.tari.android.wallet.util.extension.getLastChild
+import com.tari.android.wallet.util.extension.gone
+import com.tari.android.wallet.util.extension.hideKeyboard
+import com.tari.android.wallet.util.extension.invisible
+import com.tari.android.wallet.util.extension.observe
+import com.tari.android.wallet.util.extension.setLayoutSize
+import com.tari.android.wallet.util.extension.setTextSizePx
+import com.tari.android.wallet.util.extension.setVisible
+import com.tari.android.wallet.util.extension.string
+import com.tari.android.wallet.util.extension.txFormattedDate
+import com.tari.android.wallet.util.extension.visible
 import java.util.Date
 
 /**
@@ -85,7 +85,7 @@ import java.util.Date
  *
  * @author The Tari Development Team
  */
-class TxDetailsFragment : CommonFragment<FragmentTxDetailsBinding, TxDetailsViewModel>() {
+class TxDetailsFragment : CommonXmlFragment<FragmentTxDetailsBinding, TxDetailsViewModel>() {
 
     /**
      * Values below are used for scaling up/down of the text size.

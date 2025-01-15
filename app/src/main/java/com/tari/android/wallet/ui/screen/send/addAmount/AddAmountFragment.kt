@@ -63,7 +63,7 @@ import com.tari.android.wallet.model.WalletError
 import com.tari.android.wallet.navigation.TariNavigator.Companion.PARAMETER_AMOUNT
 import com.tari.android.wallet.navigation.TariNavigator.Companion.PARAMETER_CONTACT
 import com.tari.android.wallet.navigation.TariNavigator.Companion.PARAMETER_NOTE
-import com.tari.android.wallet.ui.common.CommonFragment
+import com.tari.android.wallet.ui.common.CommonXmlFragment
 import com.tari.android.wallet.ui.dialog.modular.ModularDialog
 import com.tari.android.wallet.ui.dialog.modular.SimpleDialogArgs
 import com.tari.android.wallet.ui.dialog.tooltipDialog.TooltipDialogArgs
@@ -86,7 +86,7 @@ import com.tari.android.wallet.util.extension.visible
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-class AddAmountFragment : CommonFragment<FragmentAddAmountBinding, AddAmountViewModel>() {
+class AddAmountFragment : CommonXmlFragment<FragmentAddAmountBinding, AddAmountViewModel>() {
 
     /**
      * Recipient is either an emoji id or a user from contacts or recent txs.

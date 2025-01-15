@@ -39,14 +39,14 @@ import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.tari.android.wallet.databinding.FragmentLogFilesBinding
-import com.tari.android.wallet.util.extension.observe
-import com.tari.android.wallet.ui.common.CommonFragment
-import com.tari.android.wallet.ui.screen.settings.logs.activity.DebugActivity
-import com.tari.android.wallet.ui.screen.settings.logs.activity.DebugNavigation
+import com.tari.android.wallet.ui.common.CommonXmlFragment
+import com.tari.android.wallet.ui.screen.debug.DebugNavigation
+import com.tari.android.wallet.ui.screen.debug.activity.DebugActivity
 import com.tari.android.wallet.ui.screen.settings.logs.logFiles.adapter.LogFileListAdapter
+import com.tari.android.wallet.util.extension.observe
 import java.io.File
 
-class LogFilesFragment : CommonFragment<FragmentLogFilesBinding, LogFilesViewModel>() {
+class LogFilesFragment : CommonXmlFragment<FragmentLogFilesBinding, LogFilesViewModel>() {
 
     private lateinit var recyclerViewAdapter: LogFileListAdapter
 

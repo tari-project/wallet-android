@@ -8,13 +8,13 @@ import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.tari.android.wallet.R
 import com.tari.android.wallet.databinding.FragmentTariAboutBinding
-import com.tari.android.wallet.util.extension.observe
-import com.tari.android.wallet.ui.common.CommonFragment
+import com.tari.android.wallet.ui.common.CommonXmlFragment
 import com.tari.android.wallet.ui.common.recyclerView.CommonAdapter
 import com.tari.android.wallet.ui.screen.settings.allSettings.about.list.TariIconsAdapter
+import com.tari.android.wallet.util.extension.observe
 import yat.android.ui.extension.HtmlHelper
 
-class TariAboutFragment : CommonFragment<FragmentTariAboutBinding, TariAboutViewModel>() {
+class TariAboutFragment : CommonXmlFragment<FragmentTariAboutBinding, TariAboutViewModel>() {
 
     private val adapter = TariIconsAdapter()
 

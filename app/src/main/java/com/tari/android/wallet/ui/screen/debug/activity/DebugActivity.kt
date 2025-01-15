@@ -30,7 +30,7 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.tari.android.wallet.ui.screen.settings.logs.activity
+package com.tari.android.wallet.ui.screen.debug.activity
 
 import android.content.Context
 import android.content.Intent
@@ -38,6 +38,7 @@ import android.os.Bundle
 import androidx.activity.viewModels
 import com.tari.android.wallet.databinding.ActivityDebugBinding
 import com.tari.android.wallet.ui.common.CommonActivity
+import com.tari.android.wallet.ui.screen.debug.DebugNavigation
 import com.tari.android.wallet.ui.screen.settings.bugReporting.BugsReportingFragment
 import com.tari.android.wallet.ui.screen.settings.logs.logFiles.LogFilesFragment
 import com.tari.android.wallet.ui.screen.settings.logs.logs.LogsFragment
@@ -56,16 +57,15 @@ class DebugActivity : CommonActivity<ActivityDebugBinding, DebugViewModel>() {
 
         setContainerId(ui.navContainer.id)
 
-        val navigationStr = intent.getStringExtra(NAVIGATION_KEY)
-        navigate(DebugNavigation.entries.firstOrNull { it.toString() == navigationStr })
+        navigate(intent.getSerializableExtra(NAVIGATION_KEY, DebugNavigation::class.java) ?: error("Must provide navigation type"))
     }
 
-    fun navigate(navigation: DebugNavigation?, file: File? = null, rooted: Boolean = true) {
+    fun navigate(navigation: DebugNavigation, file: File? = null, rooted: Boolean = true) {
         when (navigation) {
             DebugNavigation.Logs -> addFragment(LogFilesFragment(), null, rooted)
-            DebugNavigation.LogDetail -> addFragment(LogsFragment.getInstance(file!!), null, rooted)
+            DebugNavigation.LogDetail -> addFragment(LogsFragment.getInstance(file ?: error("Must provide file")), null, rooted)
             DebugNavigation.BugReport -> addFragment(BugsReportingFragment(), null, rooted)
-            else -> Unit
+            DebugNavigation.SampleDesignSystem -> addFragment(BugsReportingFragment(), null, rooted)
         }
     }
 
@@ -75,7 +75,7 @@ class DebugActivity : CommonActivity<ActivityDebugBinding, DebugViewModel>() {
 
         fun launch(context: Context, navigation: DebugNavigation) {
             val intent = Intent(context, DebugActivity::class.java)
-            intent.putExtra(NAVIGATION_KEY, navigation.toString())
+            intent.putExtra(NAVIGATION_KEY, navigation)
             context.startActivity(intent)
         }
     }

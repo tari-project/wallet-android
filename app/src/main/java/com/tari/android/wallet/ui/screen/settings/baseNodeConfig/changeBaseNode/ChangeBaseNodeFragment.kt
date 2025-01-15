@@ -40,15 +40,15 @@ import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.tari.android.wallet.R
 import com.tari.android.wallet.databinding.FragmentBaseNodeChangeBinding
-import com.tari.android.wallet.util.extension.observe
-import com.tari.android.wallet.ui.common.CommonFragment
+import com.tari.android.wallet.ui.common.CommonXmlFragment
 import com.tari.android.wallet.ui.common.recyclerView.CommonAdapter.ItemClickListener
 import com.tari.android.wallet.ui.common.recyclerView.CommonAdapter.ItemLongClickListener
 import com.tari.android.wallet.ui.component.tari.toolbar.TariToolbarActionArg
 import com.tari.android.wallet.ui.screen.settings.baseNodeConfig.changeBaseNode.adapter.BaseNodeViewHolderItem
 import com.tari.android.wallet.ui.screen.settings.baseNodeConfig.changeBaseNode.adapter.ChangeBaseNodeAdapter
+import com.tari.android.wallet.util.extension.observe
 
-class ChangeBaseNodeFragment : CommonFragment<FragmentBaseNodeChangeBinding, ChangeBaseNodeViewModel>() {
+class ChangeBaseNodeFragment : CommonXmlFragment<FragmentBaseNodeChangeBinding, ChangeBaseNodeViewModel>() {
 
     private val adapter = ChangeBaseNodeAdapter()
 

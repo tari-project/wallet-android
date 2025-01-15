@@ -11,14 +11,14 @@ import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.tabs.TabLayoutMediator
 import com.tari.android.wallet.databinding.FragmentBackupOnboardingFlowBinding
-import com.tari.android.wallet.ui.common.CommonFragment
+import com.tari.android.wallet.ui.common.CommonXmlFragment
 import com.tari.android.wallet.ui.screen.home.HomeActivity
 import com.tari.android.wallet.ui.screen.settings.backup.backupOnboarding.item.BackupOnboardingArgs
 import com.tari.android.wallet.ui.screen.settings.backup.backupOnboarding.item.BackupOnboardingFlowDataSource
 import com.tari.android.wallet.ui.screen.settings.backup.backupOnboarding.item.BackupOnboardingFlowItemFragment
 import com.tari.android.wallet.util.extension.setVisible
 
-class BackupOnboardingFlowFragment : CommonFragment<FragmentBackupOnboardingFlowBinding, BackupOnboardingFlowViewModel>() {
+class BackupOnboardingFlowFragment : CommonXmlFragment<FragmentBackupOnboardingFlowBinding, BackupOnboardingFlowViewModel>() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
         FragmentBackupOnboardingFlowBinding.inflate(inflater, container, false).also { ui = it }.root

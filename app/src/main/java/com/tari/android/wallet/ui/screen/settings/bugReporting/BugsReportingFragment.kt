@@ -6,11 +6,11 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import com.tari.android.wallet.databinding.FragmentBugsReportingBinding
-import com.tari.android.wallet.ui.common.CommonFragment
-import com.tari.android.wallet.ui.screen.settings.logs.activity.DebugActivity
-import com.tari.android.wallet.ui.screen.settings.logs.activity.DebugNavigation
+import com.tari.android.wallet.ui.common.CommonXmlFragment
+import com.tari.android.wallet.ui.screen.debug.DebugNavigation
+import com.tari.android.wallet.ui.screen.debug.activity.DebugActivity
 
-class BugsReportingFragment : CommonFragment<FragmentBugsReportingBinding, BugsReportingViewModel>() {
+class BugsReportingFragment : CommonXmlFragment<FragmentBugsReportingBinding, BugsReportingViewModel>() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
         FragmentBugsReportingBinding.inflate(inflater, container, false).also { ui = it }.root

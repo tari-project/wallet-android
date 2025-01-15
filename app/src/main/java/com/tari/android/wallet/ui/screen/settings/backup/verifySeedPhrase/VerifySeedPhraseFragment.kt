@@ -43,15 +43,15 @@ import androidx.core.animation.addListener
 import androidx.core.view.get
 import androidx.fragment.app.viewModels
 import com.tari.android.wallet.databinding.FragmentVerifySeedPhraseBinding
-import com.tari.android.wallet.util.extension.observe
-import com.tari.android.wallet.ui.common.CommonFragment
+import com.tari.android.wallet.ui.common.CommonXmlFragment
 import com.tari.android.wallet.util.extension.ThrottleClick
 import com.tari.android.wallet.util.extension.animateClick
 import com.tari.android.wallet.util.extension.gone
+import com.tari.android.wallet.util.extension.observe
 import com.tari.android.wallet.util.extension.setVisible
 import com.tari.android.wallet.util.extension.visible
 
-class VerifySeedPhraseFragment : CommonFragment<FragmentVerifySeedPhraseBinding, VerifySeedPhraseViewModel>() {
+class VerifySeedPhraseFragment : CommonXmlFragment<FragmentVerifySeedPhraseBinding, VerifySeedPhraseViewModel>() {
 
     override fun screenRecordingAlwaysDisable() = true
 

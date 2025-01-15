@@ -39,13 +39,13 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import com.tari.android.wallet.databinding.FragmentDeleteWalletBinding
-import com.tari.android.wallet.util.extension.observe
-import com.tari.android.wallet.ui.common.CommonFragment
-import com.tari.android.wallet.util.extension.ThrottleClick
-import com.tari.android.wallet.util.extension.visible
+import com.tari.android.wallet.ui.common.CommonXmlFragment
 import com.tari.android.wallet.ui.screen.onboarding.activity.OnboardingFlowActivity
+import com.tari.android.wallet.util.extension.ThrottleClick
+import com.tari.android.wallet.util.extension.observe
+import com.tari.android.wallet.util.extension.visible
 
-class DeleteWalletFragment : CommonFragment<FragmentDeleteWalletBinding, DeleteWalletViewModel>() {
+class DeleteWalletFragment : CommonXmlFragment<FragmentDeleteWalletBinding, DeleteWalletViewModel>() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
         FragmentDeleteWalletBinding.inflate(inflater, container, false).also { ui = it }.root

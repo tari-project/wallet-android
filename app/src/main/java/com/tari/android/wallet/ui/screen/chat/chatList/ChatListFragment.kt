@@ -8,7 +8,7 @@ import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.tari.android.wallet.R
 import com.tari.android.wallet.databinding.FragmentChatListBinding
-import com.tari.android.wallet.ui.common.CommonFragment
+import com.tari.android.wallet.ui.common.CommonXmlFragment
 import com.tari.android.wallet.ui.common.recyclerView.AdapterFactory
 import com.tari.android.wallet.ui.common.recyclerView.CommonAdapter
 import com.tari.android.wallet.ui.common.recyclerView.CommonViewHolderItem
@@ -18,7 +18,7 @@ import com.tari.android.wallet.ui.screen.chat.chatList.adapter.ChatItemViewHolde
 import com.tari.android.wallet.util.extension.collectFlow
 import com.tari.android.wallet.util.extension.setVisible
 
-class ChatListFragment : CommonFragment<FragmentChatListBinding, ChatListViewModel>() {
+class ChatListFragment : CommonXmlFragment<FragmentChatListBinding, ChatListViewModel>() {
 
     val adapter: CommonAdapter<CommonViewHolderItem> by lazy { AdapterFactory.generate(ChatItemViewHolder.getBuilder()) }
 

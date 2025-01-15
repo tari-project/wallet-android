@@ -45,7 +45,7 @@ import com.daasuu.ei.Ease
 import com.daasuu.ei.EasingInterpolator
 import com.tari.android.wallet.R
 import com.tari.android.wallet.databinding.FragmentFinalizeSendTxBinding
-import com.tari.android.wallet.ui.common.CommonFragment
+import com.tari.android.wallet.ui.common.CommonXmlFragment
 import com.tari.android.wallet.ui.component.tari.TariTextView
 import com.tari.android.wallet.ui.screen.send.common.TransactionData
 import com.tari.android.wallet.util.Constants
@@ -55,7 +55,7 @@ import com.tari.android.wallet.util.extension.invisible
 import com.tari.android.wallet.util.extension.string
 import com.tari.android.wallet.util.extension.visible
 
-class FinalizeSendTxFragment : CommonFragment<FragmentFinalizeSendTxBinding, FinalizeSendTxViewModel>() {
+class FinalizeSendTxFragment : CommonXmlFragment<FragmentFinalizeSendTxBinding, FinalizeSendTxViewModel>() {
 
     private lateinit var stepViewList: List<FinalizingStepView>
 
