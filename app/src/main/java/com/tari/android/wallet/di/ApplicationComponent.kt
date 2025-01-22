@@ -50,6 +50,7 @@ import com.tari.android.wallet.ui.screen.contactBook.contacts.ContactsViewModel
 import com.tari.android.wallet.ui.screen.contactBook.details.ContactDetailsViewModel
 import com.tari.android.wallet.ui.screen.contactBook.link.ContactLinkViewModel
 import com.tari.android.wallet.ui.screen.contactBook.root.ContactBookViewModel
+import com.tari.android.wallet.ui.screen.debug.sampleDesign.SampleDesignSystemViewModel
 import com.tari.android.wallet.ui.screen.home.HomeActivity
 import com.tari.android.wallet.ui.screen.home.HomeViewModel
 import com.tari.android.wallet.ui.screen.home.overview.HomeOverviewViewModel
@@ -195,6 +196,7 @@ interface ApplicationComponent {
     fun inject(viewModel: EnterPinCodeViewModel)
     fun inject(viewModel: ChangeBiometricsViewModel)
     fun inject(viewModel: WalletRestoreViewModel)
+    fun inject(viewModel: SampleDesignSystemViewModel)
 
     fun inject(notificationBroadcastReceiver: NotificationBroadcastReceiver)
 

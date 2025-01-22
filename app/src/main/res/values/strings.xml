@@ -34,7 +34,7 @@
     <string name="emoji_hourglass">⏳</string>
     <string name="emoji_handshake">🤝</string>
 
-    <!-- fonts -->
+    <!-- font -->
     <string name="font_black" translatable="false">AVENIR_LT_STD_BLACK</string>
     <string name="font_heavy" translatable="false">AVENIR_LT_STD_HEAVY</string>
     <string name="font_medium" translatable="false">AVENIR_LT_STD_MEDIUM</string>

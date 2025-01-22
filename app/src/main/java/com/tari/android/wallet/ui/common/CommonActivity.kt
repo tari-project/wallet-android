@@ -136,7 +136,7 @@ abstract class CommonActivity<Binding : ViewBinding, VM : CommonViewModel> : App
 
         viewModel.tariNavigator.currentActivity = this@CommonActivity
 
-        if (viewModel.tariSettingsSharedRepository.currentTheme != viewModel.currentTheme.value) {
+        if (viewModel.tariSettingsSharedRepository.currentTheme != viewModel.currentTheme) {
             recreate()
         }
     }

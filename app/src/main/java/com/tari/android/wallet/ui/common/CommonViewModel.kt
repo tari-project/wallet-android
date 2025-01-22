@@ -35,7 +35,6 @@ import com.tari.android.wallet.ui.dialog.modular.modules.body.BodyModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonStyle
 import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
-import com.tari.android.wallet.ui.screen.settings.themeSelector.TariTheme
 import com.tari.android.wallet.util.extension.addTo
 import com.tari.android.wallet.util.extension.launchOnIo
 import com.tari.android.wallet.util.extension.launchOnMain
@@ -79,12 +78,16 @@ open class CommonViewModel : ViewModel(), DialogHandler {
     @Inject
     lateinit var dialogManager: DialogManager
 
+    init {
+        component.inject(this) // This injects the dependencies to the base class
+    }
+
     private var authorizedAction: (() -> Unit)? = null
 
     val logger: Printer
         get() = Logger.t(this::class.simpleName)
 
-    val currentTheme = SingleLiveEvent<TariTheme>()
+    val currentTheme = tariSettingsSharedRepository.currentTheme
 
     val backPressed = SingleLiveEvent<Unit>()
 
@@ -107,10 +110,6 @@ open class CommonViewModel : ViewModel(), DialogHandler {
     val blockedBackPressed: LiveData<Boolean> = _blockedBackPressed
 
     init {
-        component.inject(this) // This injects the dependencies to the base class
-
-        currentTheme.value = tariSettingsSharedRepository.currentTheme
-
         securityPrefRepository.updateNotifier.subscribe {
             checkAuthorization()
         }.addTo(compositeDisposable)

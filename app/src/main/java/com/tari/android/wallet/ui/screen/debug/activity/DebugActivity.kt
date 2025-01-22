@@ -39,6 +39,7 @@ import androidx.activity.viewModels
 import com.tari.android.wallet.databinding.ActivityDebugBinding
 import com.tari.android.wallet.ui.common.CommonActivity
 import com.tari.android.wallet.ui.screen.debug.DebugNavigation
+import com.tari.android.wallet.ui.screen.debug.sampleDesign.SampleDesignSystemFragment
 import com.tari.android.wallet.ui.screen.settings.bugReporting.BugsReportingFragment
 import com.tari.android.wallet.ui.screen.settings.logs.logFiles.LogFilesFragment
 import com.tari.android.wallet.ui.screen.settings.logs.logs.LogsFragment
@@ -65,7 +66,7 @@ class DebugActivity : CommonActivity<ActivityDebugBinding, DebugViewModel>() {
             DebugNavigation.Logs -> addFragment(LogFilesFragment(), null, rooted)
             DebugNavigation.LogDetail -> addFragment(LogsFragment.getInstance(file ?: error("Must provide file")), null, rooted)
             DebugNavigation.BugReport -> addFragment(BugsReportingFragment(), null, rooted)
-            DebugNavigation.SampleDesignSystem -> addFragment(BugsReportingFragment(), null, rooted)
+            DebugNavigation.SampleDesignSystem -> addFragment(SampleDesignSystemFragment(), null, rooted)
         }
     }
 
