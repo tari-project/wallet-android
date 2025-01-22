@@ -39,15 +39,15 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import com.tari.android.wallet.databinding.FragmentWalletBackupSettingsBinding
-import com.tari.android.wallet.util.extension.observe
-import com.tari.android.wallet.ui.common.CommonFragment
-import com.tari.android.wallet.util.extension.ThrottleClick
-import com.tari.android.wallet.util.extension.setVisible
+import com.tari.android.wallet.ui.common.CommonXmlFragment
 import com.tari.android.wallet.ui.screen.settings.backup.backupSettings.option.BackupOptionView
 import com.tari.android.wallet.ui.screen.settings.backup.backupSettings.option.BackupOptionViewModel
 import com.tari.android.wallet.ui.screen.settings.userAutorization.BiometricAuthenticationViewModel
+import com.tari.android.wallet.util.extension.ThrottleClick
+import com.tari.android.wallet.util.extension.observe
+import com.tari.android.wallet.util.extension.setVisible
 
-class BackupSettingsFragment : CommonFragment<FragmentWalletBackupSettingsBinding, BackupSettingsViewModel>() {
+class BackupSettingsFragment : CommonXmlFragment<FragmentWalletBackupSettingsBinding, BackupSettingsViewModel>() {
 
     private val biometricAuthenticationViewModel: BiometricAuthenticationViewModel by viewModels()
 

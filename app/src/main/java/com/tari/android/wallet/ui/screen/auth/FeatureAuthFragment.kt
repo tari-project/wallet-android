@@ -48,7 +48,7 @@ import com.tari.android.wallet.R.string.auth_title
 import com.tari.android.wallet.data.sharedPrefs.security.LoginAttemptDto
 import com.tari.android.wallet.databinding.FragmentFeatureAuthBinding
 import com.tari.android.wallet.infrastructure.security.biometric.BiometricAuthenticationException
-import com.tari.android.wallet.ui.common.CommonFragment
+import com.tari.android.wallet.ui.common.CommonXmlFragment
 import com.tari.android.wallet.ui.common.domain.PaletteManager
 import com.tari.android.wallet.ui.screen.pinCode.EnterPinCodeFragment
 import com.tari.android.wallet.ui.screen.pinCode.PinCodeScreenBehavior
@@ -59,7 +59,7 @@ import com.tari.android.wallet.util.extension.visible
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-class FeatureAuthFragment : CommonFragment<FragmentFeatureAuthBinding, AuthViewModel>() {
+class FeatureAuthFragment : CommonXmlFragment<FragmentFeatureAuthBinding, AuthViewModel>() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
         FragmentFeatureAuthBinding.inflate(inflater, container, false).also { ui = it }.root

@@ -40,17 +40,17 @@ import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.tari.android.wallet.R
 import com.tari.android.wallet.databinding.FragmentLogsBinding
-import com.tari.android.wallet.util.extension.observe
-import com.tari.android.wallet.ui.common.CommonFragment
+import com.tari.android.wallet.ui.common.CommonXmlFragment
 import com.tari.android.wallet.ui.common.recyclerView.CommonAdapter
 import com.tari.android.wallet.ui.component.tari.toolbar.TariToolbarActionArg
-import com.tari.android.wallet.util.extension.setVisible
-import com.tari.android.wallet.ui.screen.settings.logs.activity.DebugActivity
+import com.tari.android.wallet.ui.screen.debug.activity.DebugActivity
 import com.tari.android.wallet.ui.screen.settings.logs.logs.adapter.LogListAdapter
 import com.tari.android.wallet.ui.screen.settings.logs.logs.adapter.LogViewHolderItem
+import com.tari.android.wallet.util.extension.observe
+import com.tari.android.wallet.util.extension.setVisible
 import java.io.File
 
-class LogsFragment : CommonFragment<FragmentLogsBinding, LogsViewModel>() {
+class LogsFragment : CommonXmlFragment<FragmentLogsBinding, LogsViewModel>() {
 
     private lateinit var recyclerViewAdapter: LogListAdapter
 

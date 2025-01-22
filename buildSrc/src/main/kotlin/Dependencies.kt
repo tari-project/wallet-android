@@ -30,6 +30,15 @@ object Dependencies {
             const val runtimeKtx = "androidx.lifecycle:lifecycle-runtime-ktx:$version"
             const val viewmodelKtx = "androidx.lifecycle:lifecycle-viewmodel-ktx:$version"
         }
+
+        object Compose {
+            const val bom = "androidx.compose:compose-bom:2024.12.01"
+
+            const val material = "androidx.compose.material:material"
+            const val uiTooling = "androidx.compose.ui:ui-tooling"
+            const val uiToolingPreview = "androidx.compose.ui:ui-tooling-preview"
+            const val activity = "androidx.activity:activity-compose:1.9.2"
+        }
     }
 
     object Coroutines {

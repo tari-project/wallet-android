@@ -13,6 +13,7 @@ plugins {
     id("kotlin-parcelize")
     id("com.google.devtools.ksp")
     id("download-libwallet")
+    id("org.jetbrains.kotlin.plugin.compose") version Dependencies.Kotlin.version
 }
 
 val commitNumber: Int by lazy {
@@ -125,6 +126,7 @@ android {
     buildFeatures {
         viewBinding = true
         buildConfig = true
+        compose = true
     }
 
     packaging {
@@ -238,6 +240,11 @@ dependencies {
     implementation(Dependencies.AndroidX.Lifecycle.reactivestreamsKtx)
     implementation(Dependencies.AndroidX.Lifecycle.runtimeKtx)
     implementation(Dependencies.AndroidX.Lifecycle.viewmodelKtx)
+    implementation(platform(Dependencies.AndroidX.Compose.bom))
+    implementation(Dependencies.AndroidX.Compose.material)
+    implementation(Dependencies.AndroidX.Compose.uiTooling)
+    implementation(Dependencies.AndroidX.Compose.uiToolingPreview)
+    implementation(Dependencies.AndroidX.Compose.activity)
 
     implementation(Dependencies.Coroutines.android)
     implementation(Dependencies.Coroutines.core)

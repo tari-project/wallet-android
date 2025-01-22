@@ -39,12 +39,12 @@ import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.tari.android.wallet.databinding.FragmentBluetoothSettingsBinding
-import com.tari.android.wallet.util.extension.observe
-import com.tari.android.wallet.ui.common.CommonFragment
+import com.tari.android.wallet.ui.common.CommonXmlFragment
 import com.tari.android.wallet.ui.common.recyclerView.CommonAdapter
 import com.tari.android.wallet.ui.screen.settings.bluetoothSettings.adapter.BluetoothSettingsAdapter
+import com.tari.android.wallet.util.extension.observe
 
-class BluetoothSettingsFragment : CommonFragment<FragmentBluetoothSettingsBinding, BluetoothSettingsViewModel>() {
+class BluetoothSettingsFragment : CommonXmlFragment<FragmentBluetoothSettingsBinding, BluetoothSettingsViewModel>() {
 
     private val adapter = BluetoothSettingsAdapter()
 

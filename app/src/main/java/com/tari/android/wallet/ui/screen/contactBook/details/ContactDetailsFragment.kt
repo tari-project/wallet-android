@@ -11,12 +11,12 @@ import com.tari.android.wallet.data.contacts.ContactAction
 import com.tari.android.wallet.data.contacts.model.ContactDto
 import com.tari.android.wallet.databinding.FragmentContactsDetailsBinding
 import com.tari.android.wallet.navigation.TariNavigator.Companion.PARAMETER_CONTACT
-import com.tari.android.wallet.ui.common.CommonFragment
+import com.tari.android.wallet.ui.common.CommonXmlFragment
 import com.tari.android.wallet.ui.component.tari.toolbar.TariToolbarActionArg
 import com.tari.android.wallet.ui.screen.contactBook.details.adapter.ContactDetailsAdapter
 import com.tari.android.wallet.util.extension.collectFlow
 
-class ContactDetailsFragment : CommonFragment<FragmentContactsDetailsBinding, ContactDetailsViewModel>() {
+class ContactDetailsFragment : CommonXmlFragment<FragmentContactsDetailsBinding, ContactDetailsViewModel>() {
 
     private val adapter = ContactDetailsAdapter()
 

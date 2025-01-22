@@ -49,7 +49,7 @@ import com.tari.android.wallet.application.walletManager.WalletConfig
 import com.tari.android.wallet.databinding.FragmentHomeOverviewBinding
 import com.tari.android.wallet.model.BalanceInfo
 import com.tari.android.wallet.navigation.Navigation
-import com.tari.android.wallet.ui.common.CommonFragment
+import com.tari.android.wallet.ui.common.CommonXmlFragment
 import com.tari.android.wallet.ui.common.recyclerView.AdapterFactory
 import com.tari.android.wallet.ui.common.recyclerView.CommonViewHolderItem
 import com.tari.android.wallet.ui.component.balanceController.BalanceViewController
@@ -64,7 +64,7 @@ import com.tari.android.wallet.util.extension.parcelable
 import com.tari.android.wallet.util.extension.setVisible
 import com.tari.android.wallet.util.extension.takeIfIs
 
-class HomeOverviewFragment : CommonFragment<FragmentHomeOverviewBinding, HomeOverviewViewModel>() {
+class HomeOverviewFragment : CommonXmlFragment<FragmentHomeOverviewBinding, HomeOverviewViewModel>() {
 
     private val networkIndicatorViewModel: ConnectionIndicatorViewModel by viewModels()
     private val questionMarkViewModel: QuestionMarkViewModel by viewModels()

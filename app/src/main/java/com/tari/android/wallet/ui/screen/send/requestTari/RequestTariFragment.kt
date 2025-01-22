@@ -8,20 +8,20 @@ import androidx.core.app.ShareCompat
 import androidx.fragment.app.viewModels
 import com.tari.android.wallet.R
 import com.tari.android.wallet.databinding.FragmentRequestTariBinding
-import com.tari.android.wallet.ui.common.CommonFragment
+import com.tari.android.wallet.ui.common.CommonXmlFragment
 import com.tari.android.wallet.ui.dialog.modular.DialogArgs
 import com.tari.android.wallet.ui.dialog.modular.ModularDialog
 import com.tari.android.wallet.ui.dialog.modular.ModularDialogArgs
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonStyle
+import com.tari.android.wallet.ui.screen.send.addAmount.keyboard.KeyboardController
+import com.tari.android.wallet.ui.screen.send.shareQr.ShareQrCodeModule
 import com.tari.android.wallet.util.extension.hideKeyboard
 import com.tari.android.wallet.util.extension.setOnThrottledClickListener
 import com.tari.android.wallet.util.extension.setVisible
-import com.tari.android.wallet.ui.screen.send.addAmount.keyboard.KeyboardController
-import com.tari.android.wallet.ui.screen.send.shareQr.ShareQrCodeModule
 
 
-class RequestTariFragment : CommonFragment<FragmentRequestTariBinding, RequestTariViewModel>() {
+class RequestTariFragment : CommonXmlFragment<FragmentRequestTariBinding, RequestTariViewModel>() {
 
     companion object {
         fun newInstance(withToolbar: Boolean = true) = RequestTariFragment().apply {
@@ -59,7 +59,7 @@ class RequestTariFragment : CommonFragment<FragmentRequestTariBinding, RequestTa
 
     private fun setupUI() {
 
-        val withToolbar = arguments?.getBoolean("withToolbar") ?: true
+        val withToolbar = arguments?.getBoolean("withToolbar") != false
         ui.toolbar.setVisible(withToolbar)
 
         keyboardController.setup(requireContext(), AmountCheckRunnable(), ui.numpad, ui.amount)

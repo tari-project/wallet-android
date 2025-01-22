@@ -8,16 +8,16 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.tari.android.wallet.R
 import com.tari.android.wallet.databinding.FragmentEnterPincodeBinding
+import com.tari.android.wallet.ui.common.CommonXmlFragment
+import com.tari.android.wallet.ui.screen.auth.AuthActivity
+import com.tari.android.wallet.ui.screen.auth.FeatureAuthFragment
 import com.tari.android.wallet.util.extension.addTo
-import com.tari.android.wallet.util.extension.observe
-import com.tari.android.wallet.ui.common.CommonFragment
 import com.tari.android.wallet.util.extension.gone
 import com.tari.android.wallet.util.extension.invisible
+import com.tari.android.wallet.util.extension.observe
 import com.tari.android.wallet.util.extension.setOnThrottledClickListener
 import com.tari.android.wallet.util.extension.setVisible
 import com.tari.android.wallet.util.extension.visible
-import com.tari.android.wallet.ui.screen.auth.AuthActivity
-import com.tari.android.wallet.ui.screen.auth.FeatureAuthFragment
 import io.reactivex.Observable
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -25,7 +25,7 @@ import java.time.Duration
 import java.time.LocalDateTime
 import java.util.concurrent.TimeUnit
 
-class EnterPinCodeFragment : CommonFragment<FragmentEnterPincodeBinding, EnterPinCodeViewModel>() {
+class EnterPinCodeFragment : CommonXmlFragment<FragmentEnterPincodeBinding, EnterPinCodeViewModel>() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?) =
         FragmentEnterPincodeBinding.inflate(inflater, container, false).also { ui = it }.root
@@ -36,7 +36,7 @@ class EnterPinCodeFragment : CommonFragment<FragmentEnterPincodeBinding, EnterPi
         val viewModel: EnterPinCodeViewModel by viewModels()
         bindViewModel(viewModel)
 
-        val behavior = arguments?.getInt(PIN_CODE_EXTRA_KEY)?.let { PinCodeScreenBehavior.values()[it] } ?: PinCodeScreenBehavior.CreateConfirm
+        val behavior = arguments?.getInt(PIN_CODE_EXTRA_KEY)?.let { PinCodeScreenBehavior.entries[it] } ?: PinCodeScreenBehavior.CreateConfirm
         val stashedPinCode = arguments?.getString(PIN_CODE_STASHED_KEY)
         viewModel.init(behavior, stashedPinCode)
 

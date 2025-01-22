@@ -38,11 +38,11 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import com.tari.android.wallet.databinding.FragmentBackgroundServiceSettingsBinding
+import com.tari.android.wallet.ui.common.CommonXmlFragment
 import com.tari.android.wallet.util.extension.observe
-import com.tari.android.wallet.ui.common.CommonFragment
 
 // TODO remove once interactive payments are removed from the app features
-class BackgroundServiceSettingsFragment : CommonFragment<FragmentBackgroundServiceSettingsBinding, BackgroundServiceSettingsViewModel>() {
+class BackgroundServiceSettingsFragment : CommonXmlFragment<FragmentBackgroundServiceSettingsBinding, BackgroundServiceSettingsViewModel>() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
         FragmentBackgroundServiceSettingsBinding.inflate(inflater, container, false).also { ui = it }.root

@@ -10,15 +10,15 @@ import androidx.fragment.app.viewModels
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.deeplinks.DeepLink
 import com.tari.android.wallet.databinding.FragmentCustomTorBridgesBinding
-import com.tari.android.wallet.util.extension.observe
-import com.tari.android.wallet.ui.common.CommonFragment
+import com.tari.android.wallet.ui.common.CommonXmlFragment
 import com.tari.android.wallet.ui.component.tari.toolbar.TariToolbarActionArg
-import com.tari.android.wallet.util.extension.parcelable
-import com.tari.android.wallet.util.extension.setOnThrottledClickListener
 import com.tari.android.wallet.ui.screen.qr.QrScannerActivity
 import com.tari.android.wallet.ui.screen.qr.QrScannerSource
+import com.tari.android.wallet.util.extension.observe
+import com.tari.android.wallet.util.extension.parcelable
+import com.tari.android.wallet.util.extension.setOnThrottledClickListener
 
-class CustomTorBridgesFragment : CommonFragment<FragmentCustomTorBridgesBinding, CustomTorBridgesViewModel>() {
+class CustomTorBridgesFragment : CommonXmlFragment<FragmentCustomTorBridgesBinding, CustomTorBridgesViewModel>() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
         FragmentCustomTorBridgesBinding.inflate(inflater, container, false).also { ui = it }.root

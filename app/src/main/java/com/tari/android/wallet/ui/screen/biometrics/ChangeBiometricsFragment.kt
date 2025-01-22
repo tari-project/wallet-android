@@ -10,13 +10,13 @@ import com.tari.android.wallet.R.string.auth_biometric_prompt
 import com.tari.android.wallet.R.string.auth_device_lock_code_prompt
 import com.tari.android.wallet.R.string.auth_title
 import com.tari.android.wallet.databinding.FragmentChangeBiometricsBinding
-import com.tari.android.wallet.util.extension.observe
 import com.tari.android.wallet.infrastructure.security.biometric.BiometricAuthenticationException
-import com.tari.android.wallet.ui.common.CommonFragment
+import com.tari.android.wallet.ui.common.CommonXmlFragment
+import com.tari.android.wallet.util.extension.observe
 import com.tari.android.wallet.util.extension.string
 import kotlinx.coroutines.launch
 
-class ChangeBiometricsFragment : CommonFragment<FragmentChangeBiometricsBinding, ChangeBiometricsViewModel>() {
+class ChangeBiometricsFragment : CommonXmlFragment<FragmentChangeBiometricsBinding, ChangeBiometricsViewModel>() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
         FragmentChangeBiometricsBinding.inflate(inflater, container, false).also { ui = it }.root

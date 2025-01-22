@@ -8,13 +8,13 @@ import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.tari.android.wallet.R
 import com.tari.android.wallet.databinding.FragmentTorBridgeSelectionBinding
-import com.tari.android.wallet.util.extension.observe
-import com.tari.android.wallet.ui.common.CommonFragment
+import com.tari.android.wallet.ui.common.CommonXmlFragment
 import com.tari.android.wallet.ui.common.recyclerView.CommonAdapter
 import com.tari.android.wallet.ui.component.tari.toolbar.TariToolbarActionArg
 import com.tari.android.wallet.ui.screen.settings.torBridges.torItem.TorBridgesAdapter
+import com.tari.android.wallet.util.extension.observe
 
-class TorBridgesSelectionFragment : CommonFragment<FragmentTorBridgeSelectionBinding, TorBridgesSelectionViewModel>() {
+class TorBridgesSelectionFragment : CommonXmlFragment<FragmentTorBridgeSelectionBinding, TorBridgesSelectionViewModel>() {
 
     private var adapter: TorBridgesAdapter = TorBridgesAdapter()
 

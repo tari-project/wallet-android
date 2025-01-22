@@ -6,18 +6,18 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.tari.android.wallet.data.contacts.model.ContactDto
 import com.tari.android.wallet.databinding.FragmentChatBinding
-import com.tari.android.wallet.util.extension.collectFlow
 import com.tari.android.wallet.model.TariWalletAddress
-import com.tari.android.wallet.ui.common.CommonFragment
+import com.tari.android.wallet.ui.common.CommonXmlFragment
 import com.tari.android.wallet.ui.common.recyclerView.AdapterFactory
 import com.tari.android.wallet.ui.common.recyclerView.CommonViewHolderItem
-import com.tari.android.wallet.util.extension.setVisible
 import com.tari.android.wallet.ui.screen.chat.chatDetails.ChatDetailsModel.WALLET_ADDRESS
 import com.tari.android.wallet.ui.screen.chat.chatDetails.adapter.ChatMessageViewHolder
-import com.tari.android.wallet.data.contacts.model.ContactDto
+import com.tari.android.wallet.util.extension.collectFlow
+import com.tari.android.wallet.util.extension.setVisible
 
-class ChatDetailsFragment : CommonFragment<FragmentChatBinding, ChatDetailsViewModel>() {
+class ChatDetailsFragment : CommonXmlFragment<FragmentChatBinding, ChatDetailsViewModel>() {
 
     private val adapter = AdapterFactory.generate<CommonViewHolderItem>(ChatMessageViewHolder.getBuilder())
 

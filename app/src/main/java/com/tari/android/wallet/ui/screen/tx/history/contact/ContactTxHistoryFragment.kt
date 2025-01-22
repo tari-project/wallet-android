@@ -10,7 +10,7 @@ import com.tari.android.wallet.R
 import com.tari.android.wallet.data.contacts.model.ContactDto
 import com.tari.android.wallet.databinding.FragmentContactTransactionHistoryBinding
 import com.tari.android.wallet.navigation.TariNavigator
-import com.tari.android.wallet.ui.common.CommonFragment
+import com.tari.android.wallet.ui.common.CommonXmlFragment
 import com.tari.android.wallet.ui.common.recyclerView.CommonAdapter
 import com.tari.android.wallet.ui.screen.tx.adapter.TxListAdapter
 import com.tari.android.wallet.ui.screen.tx.adapter.TxViewHolderItem
@@ -23,7 +23,7 @@ import com.tari.android.wallet.util.extension.setVisible
 import com.tari.android.wallet.util.extension.visible
 import yat.android.ui.extension.HtmlHelper
 
-class ContactTxHistoryFragment : CommonFragment<FragmentContactTransactionHistoryBinding, ContactTxHistoryViewModel>() {
+class ContactTxHistoryFragment : CommonXmlFragment<FragmentContactTransactionHistoryBinding, ContactTxHistoryViewModel>() {
 
     private var adapter = TxListAdapter()
 

@@ -39,7 +39,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import com.tari.android.wallet.R
 import com.tari.android.wallet.databinding.FragmentWalletInfoBinding
-import com.tari.android.wallet.ui.common.CommonFragment
+import com.tari.android.wallet.ui.common.CommonXmlFragment
 import com.tari.android.wallet.ui.component.tari.toolbar.TariToolbarActionArg
 import com.tari.android.wallet.util.DebugConfig
 import com.tari.android.wallet.util.addressFirstEmojis
@@ -51,7 +51,7 @@ import com.tari.android.wallet.util.extension.makeTextBold
 import com.tari.android.wallet.util.extension.setVisible
 import com.tari.android.wallet.util.extension.string
 
-class WalletInfoFragment : CommonFragment<FragmentWalletInfoBinding, WalletInfoViewModel>() {
+class WalletInfoFragment : CommonXmlFragment<FragmentWalletInfoBinding, WalletInfoViewModel>() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         ui = FragmentWalletInfoBinding.inflate(inflater, container, false)

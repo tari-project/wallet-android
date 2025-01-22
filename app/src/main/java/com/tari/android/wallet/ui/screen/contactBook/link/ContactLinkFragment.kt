@@ -9,14 +9,14 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.tari.android.wallet.data.contacts.model.ContactDto
 import com.tari.android.wallet.databinding.FragmentContactsLinkBinding
 import com.tari.android.wallet.navigation.TariNavigator.Companion.PARAMETER_CONTACT
-import com.tari.android.wallet.ui.common.CommonFragment
+import com.tari.android.wallet.ui.common.CommonXmlFragment
 import com.tari.android.wallet.ui.common.recyclerView.CommonAdapter
 import com.tari.android.wallet.ui.screen.contactBook.contacts.adapter.contact.ContactItemViewHolderItem
 import com.tari.android.wallet.ui.screen.contactBook.link.adapter.LinkContactAdapter
 import com.tari.android.wallet.util.extension.collectFlow
 import com.tari.android.wallet.util.extension.takeIfIs
 
-class ContactLinkFragment : CommonFragment<FragmentContactsLinkBinding, ContactLinkViewModel>() {
+class ContactLinkFragment : CommonXmlFragment<FragmentContactsLinkBinding, ContactLinkViewModel>() {
 
     private val adapter: LinkContactAdapter by lazy { LinkContactAdapter() }
 

@@ -42,7 +42,7 @@ import androidx.core.view.children
 import androidx.fragment.app.viewModels
 import com.tari.android.wallet.application.deeplinks.DeepLink
 import com.tari.android.wallet.databinding.FragmentChooseRestoreOptionBinding
-import com.tari.android.wallet.ui.common.CommonFragment
+import com.tari.android.wallet.ui.common.CommonXmlFragment
 import com.tari.android.wallet.ui.screen.qr.QrScannerActivity
 import com.tari.android.wallet.ui.screen.restore.chooseRestoreOption.option.RecoveryOptionView
 import com.tari.android.wallet.ui.screen.settings.backup.data.BackupOption
@@ -52,7 +52,7 @@ import com.tari.android.wallet.util.extension.gone
 import com.tari.android.wallet.util.extension.parcelable
 import com.tari.android.wallet.util.extension.visible
 
-class ChooseRestoreOptionFragment : CommonFragment<FragmentChooseRestoreOptionBinding, ChooseRestoreOptionViewModel>() {
+class ChooseRestoreOptionFragment : CommonXmlFragment<FragmentChooseRestoreOptionBinding, ChooseRestoreOptionViewModel>() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?) =
         FragmentChooseRestoreOptionBinding.inflate(inflater, container, false).also { ui = it }.root

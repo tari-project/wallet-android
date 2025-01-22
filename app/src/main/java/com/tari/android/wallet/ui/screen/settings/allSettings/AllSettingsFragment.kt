@@ -40,12 +40,12 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.tari.android.wallet.databinding.FragmentAllSettingsBinding
+import com.tari.android.wallet.ui.common.CommonXmlFragment
+import com.tari.android.wallet.ui.screen.settings.userAutorization.BiometricAuthenticationViewModel
 import com.tari.android.wallet.util.extension.collectFlow
 import com.tari.android.wallet.util.extension.observe
-import com.tari.android.wallet.ui.common.CommonFragment
-import com.tari.android.wallet.ui.screen.settings.userAutorization.BiometricAuthenticationViewModel
 
-class AllSettingsFragment : CommonFragment<FragmentAllSettingsBinding, AllSettingsViewModel>() {
+class AllSettingsFragment : CommonXmlFragment<FragmentAllSettingsBinding, AllSettingsViewModel>() {
 
     private val optionsAdapter = AllSettingsOptionAdapter()
 

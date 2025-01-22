@@ -9,14 +9,8 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.tari.android.wallet.databinding.FragmentUtxosListBinding
-import com.tari.android.wallet.util.extension.observe
-import com.tari.android.wallet.util.extension.observeOnLoad
-import com.tari.android.wallet.ui.common.CommonFragment
+import com.tari.android.wallet.ui.common.CommonXmlFragment
 import com.tari.android.wallet.ui.common.recyclerView.CommonAdapter
-import com.tari.android.wallet.util.extension.gone
-import com.tari.android.wallet.util.extension.hideKeyboard
-import com.tari.android.wallet.util.extension.setVisible
-import com.tari.android.wallet.util.extension.visible
 import com.tari.android.wallet.ui.screen.utxos.list.adapters.UtxosListAdapter
 import com.tari.android.wallet.ui.screen.utxos.list.adapters.UtxosListTileAdapter
 import com.tari.android.wallet.ui.screen.utxos.list.controllers.BottomButtonsController
@@ -24,8 +18,14 @@ import com.tari.android.wallet.ui.screen.utxos.list.controllers.CheckedControlle
 import com.tari.android.wallet.ui.screen.utxos.list.controllers.ScreenState
 import com.tari.android.wallet.ui.screen.utxos.list.controllers.listType.ListType
 import com.tari.android.wallet.ui.screen.utxos.list.controllers.listType.ListTypeSwitchController
+import com.tari.android.wallet.util.extension.gone
+import com.tari.android.wallet.util.extension.hideKeyboard
+import com.tari.android.wallet.util.extension.observe
+import com.tari.android.wallet.util.extension.observeOnLoad
+import com.tari.android.wallet.util.extension.setVisible
+import com.tari.android.wallet.util.extension.visible
 
-class UtxosListFragment : CommonFragment<FragmentUtxosListBinding, UtxosListViewModel>() {
+class UtxosListFragment : CommonXmlFragment<FragmentUtxosListBinding, UtxosListViewModel>() {
 
     private lateinit var listTypeSwitchController: ListTypeSwitchController
     private lateinit var selectionController: CheckedController
@@ -106,6 +106,7 @@ class UtxosListFragment : CommonFragment<FragmentUtxosListBinding, UtxosListView
                 ui.utxosTileLeftList.gone()
                 ui.utxosTileRightList.gone()
             }
+
             ListType.Tile -> {
                 ui.utxosTextList.gone()
                 ui.tileContainer.visible()
@@ -122,11 +123,13 @@ class UtxosListFragment : CommonFragment<FragmentUtxosListBinding, UtxosListView
                 ui.loadingContainer.setVisible(true)
                 ui.dataContainer.setVisible(false)
             }
+
             ScreenState.Empty -> {
                 ui.emptyContainer.setVisible(true)
                 ui.loadingContainer.setVisible(false)
                 ui.dataContainer.setVisible(false)
             }
+
             ScreenState.Data -> {
                 ui.emptyContainer.setVisible(false)
                 ui.loadingContainer.setVisible(false)

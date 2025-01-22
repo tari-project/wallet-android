@@ -17,19 +17,11 @@ import com.google.android.material.tabs.TabLayoutMediator
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.deeplinks.DeepLink
 import com.tari.android.wallet.databinding.FragmentContactBookRootBinding
-import com.tari.android.wallet.util.extension.observe
 import com.tari.android.wallet.model.TariWalletAddress
 import com.tari.android.wallet.navigation.Navigation
-import com.tari.android.wallet.ui.common.CommonFragment
+import com.tari.android.wallet.ui.common.CommonXmlFragment
 import com.tari.android.wallet.ui.component.clipboardController.ClipboardController
 import com.tari.android.wallet.ui.component.tari.toolbar.TariToolbarActionArg
-import com.tari.android.wallet.util.extension.hideKeyboard
-import com.tari.android.wallet.util.extension.parcelable
-import com.tari.android.wallet.util.extension.postDelayed
-import com.tari.android.wallet.util.extension.setVisible
-import com.tari.android.wallet.util.extension.showKeyboard
-import com.tari.android.wallet.util.extension.string
-import com.tari.android.wallet.util.extension.temporarilyDisableClick
 import com.tari.android.wallet.ui.screen.contactBook.contacts.ContactsFragment
 import com.tari.android.wallet.ui.screen.contactBook.contacts.FavoritesFragment
 import com.tari.android.wallet.ui.screen.contactBook.root.share.ShareOptionArgs
@@ -38,9 +30,17 @@ import com.tari.android.wallet.ui.screen.home.HomeActivity
 import com.tari.android.wallet.ui.screen.qr.QrScannerActivity
 import com.tari.android.wallet.ui.screen.qr.QrScannerSource
 import com.tari.android.wallet.util.Constants
+import com.tari.android.wallet.util.extension.hideKeyboard
+import com.tari.android.wallet.util.extension.observe
+import com.tari.android.wallet.util.extension.parcelable
+import com.tari.android.wallet.util.extension.postDelayed
+import com.tari.android.wallet.util.extension.setVisible
+import com.tari.android.wallet.util.extension.showKeyboard
+import com.tari.android.wallet.util.extension.string
+import com.tari.android.wallet.util.extension.temporarilyDisableClick
 import java.lang.ref.WeakReference
 
-class ContactBookFragment : CommonFragment<FragmentContactBookRootBinding, ContactBookViewModel>() {
+class ContactBookFragment : CommonXmlFragment<FragmentContactBookRootBinding, ContactBookViewModel>() {
 
     private var clipboardController: ClipboardController? = null
 
@@ -172,8 +172,8 @@ class ContactBookFragment : CommonFragment<FragmentContactBookRootBinding, Conta
     }
 
     private fun updateSharedState() {
-        val sharedState = viewModel.contactSelectionRepository.isSelectionState.value ?: false
-        val possibleToShare = viewModel.contactSelectionRepository.isPossibleToShare.value ?: false
+        val sharedState = viewModel.contactSelectionRepository.isSelectionState.value == true
+        val possibleToShare = viewModel.contactSelectionRepository.isPossibleToShare.value == true
 
         if (sharedState) {
             val shareArgs = TariToolbarActionArg(title = string(R.string.common_share), isDisabled = possibleToShare.not()) {

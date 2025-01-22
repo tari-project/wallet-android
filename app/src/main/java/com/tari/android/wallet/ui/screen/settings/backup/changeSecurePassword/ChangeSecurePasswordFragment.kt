@@ -56,15 +56,15 @@ import com.tari.android.wallet.R.string.change_password_page_description_general
 import com.tari.android.wallet.R.string.change_password_page_description_highlight_part
 import com.tari.android.wallet.R.string.error_no_connection_title
 import com.tari.android.wallet.databinding.FragmentChangeSecurePasswordBinding
-import com.tari.android.wallet.util.extension.collectFlow
 import com.tari.android.wallet.infrastructure.backup.BackupState
 import com.tari.android.wallet.infrastructure.backup.BackupState.BackupFailed
 import com.tari.android.wallet.infrastructure.backup.BackupState.BackupUpToDate
-import com.tari.android.wallet.ui.common.CommonFragment
+import com.tari.android.wallet.ui.common.CommonXmlFragment
 import com.tari.android.wallet.ui.common.domain.PaletteManager
 import com.tari.android.wallet.ui.dialog.modular.ModularDialog
 import com.tari.android.wallet.ui.dialog.modular.SimpleDialogArgs
 import com.tari.android.wallet.util.extension.animateClick
+import com.tari.android.wallet.util.extension.collectFlow
 import com.tari.android.wallet.util.extension.gone
 import com.tari.android.wallet.util.extension.hideKeyboard
 import com.tari.android.wallet.util.extension.postDelayed
@@ -77,7 +77,7 @@ import kotlinx.coroutines.Job
 import java.net.UnknownHostException
 
 
-class ChangeSecurePasswordFragment : CommonFragment<FragmentChangeSecurePasswordBinding, ChangeSecurePasswordViewModel>() {
+class ChangeSecurePasswordFragment : CommonXmlFragment<FragmentChangeSecurePasswordBinding, ChangeSecurePasswordViewModel>() {
 
     private lateinit var inputService: InputMethodManager
 
