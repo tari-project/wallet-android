@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- Primary -->
+    <color name="palette_dark_primary_main">#C9EB00</color>
 
     <!--Neutral-->
     <color name="palette_dark_neutral_primary">#060606</color>
@@ -13,8 +15,7 @@
     <color name="palette_dark_brand_dark_blue">#40388A</color>
 
     <!--Buttons-->
-    <color name="palette_dark_button_primary_start">#9330FF</color>
-    <color name="palette_dark_button_primary_end">#3A0470</color>
+    <color name="palette_dark_button_primary">#F9F9F9</color>
     <color name="palette_dark_button_disable">#222222</color>
     <color name="palette_dark_button_primary_text">#FFFFFF</color>
     <color name="palette_dark_button_disabled_text">#545454</color>

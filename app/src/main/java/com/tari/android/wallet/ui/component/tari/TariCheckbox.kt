@@ -9,7 +9,7 @@ import com.tari.android.wallet.ui.common.domain.PaletteManager
 class TariCheckbox(context: Context, attrs: AttributeSet) : AppCompatCheckBox(context, attrs) {
 
     init {
-        buttonTintList = ColorStateList.valueOf(PaletteManager.getPurpleBrand(context))
+        buttonTintList = ColorStateList.valueOf(PaletteManager.getGreen(context))
         typeface = TariFont.getFromAttributeSet(context, attrs)
     }
 }

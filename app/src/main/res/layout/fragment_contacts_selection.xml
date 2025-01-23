@@ -112,7 +112,7 @@
                         android:layout_height="@dimen/add_recipient_search_text_view_height"
                         android:background="@color/transparent"
                         android:src="@drawable/vector_tari_yat_open"
-                        android:tint="?attr/palette_brand_purple"
+                        android:tint="?attr/palette_text_heading"
                         android:visibility="gone"
                         tools:visibility="visible" />
 
@@ -172,7 +172,7 @@
                         android:layout_height="@dimen/add_recipient_search_text_view_height"
                         android:background="@color/transparent"
                         android:src="@drawable/vector_opened_eye"
-                        android:tint="?attr/palette_brand_purple"
+                        android:tint="?attr/palette_text_heading"
                         android:visibility="gone"
                         tools:visibility="visible" />
 

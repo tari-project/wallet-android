@@ -145,7 +145,7 @@ class AuthActivity : CommonActivity<ActivityAuthBinding, AuthViewModel>() {
         viewModel.securityPrefRepository.saveAttempt(LoginAttemptDto(System.currentTimeMillis(), true))
         lifecycleScope.launch(Dispatchers.Main) {
             ui.loader.visible()
-            ui.progressBar.setColor(PaletteManager.getPurpleBrand(this@AuthActivity))
+            ui.progressBar.setColor(PaletteManager.getAccent(this@AuthActivity))
             continueToHomeActivity()
         }
     }

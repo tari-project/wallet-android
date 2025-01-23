@@ -2,7 +2,7 @@
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:state_enabled="true">
         <shape android:shape="rectangle">
-            <gradient android:angle="315" android:endColor="?attr/palette_button_primary_end" android:startColor="?attr/palette_button_primary_start" android:type="linear" />
+            <solid android:color="?attr/palette_button_primary" />
             <corners android:radius="30dp" />
         </shape>
     </item>

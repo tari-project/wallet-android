@@ -142,7 +142,7 @@ class FeatureAuthFragment : CommonXmlFragment<FragmentFeatureAuthBinding, AuthVi
         viewModel.securityPrefRepository.saveAttempt(LoginAttemptDto(System.currentTimeMillis(), true))
         lifecycleScope.launch(Dispatchers.Main) {
             ui.loader.visible()
-            ui.progressBar.setColor(PaletteManager.getPurpleBrand(requireContext()))
+            ui.progressBar.setColor(PaletteManager.getAccent(requireContext()))
 
             viewModel.securityPrefRepository.isFeatureAuthenticated = true
         }

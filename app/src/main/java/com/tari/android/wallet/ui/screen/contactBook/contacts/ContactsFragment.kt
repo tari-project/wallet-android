@@ -81,7 +81,7 @@ open class ContactsFragment : CommonXmlFragment<FragmentContactsBinding, Contact
     private fun setupUI() = with(ui) {
         setupRecyclerView()
         swipeRefreshLayout.setOnRefreshListener { viewModel.refresh() }
-        swipeRefreshLayout.setColorSchemeColors(PaletteManager.getPurpleBrand(requireContext()))
+        swipeRefreshLayout.setColorSchemeColors(PaletteManager.getTextHeading(requireContext()))
     }
 
     private fun setupRecyclerView() {

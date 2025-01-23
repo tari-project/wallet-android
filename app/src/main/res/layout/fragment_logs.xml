@@ -31,7 +31,7 @@
                     android:layout_height="44dp"
                     android:layout_gravity="center"
                     android:indeterminate="true"
-                    android:progressTint="?attr/palette_brand_purple" />
+                    android:progressTint="?attr/palette_primary_main" />
             </FrameLayout>
 
             <androidx.recyclerview.widget.RecyclerView

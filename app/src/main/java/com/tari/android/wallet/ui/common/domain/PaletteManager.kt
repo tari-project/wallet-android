@@ -5,7 +5,9 @@ import com.tari.android.wallet.R
 import com.tari.android.wallet.util.extension.color
 import com.tari.android.wallet.util.extension.colorFromAttribute
 
-object PaletteManager {
+object PaletteManager { // todo use Compose palette or remove obsolete palette
+
+    fun getAccent(context: Context): Int = context.colorFromAttribute(R.attr.palette_primary_main)
 
     fun getTextHeading(context: Context): Int = context.colorFromAttribute(R.attr.palette_text_heading)
 

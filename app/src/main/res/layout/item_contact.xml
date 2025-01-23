@@ -31,7 +31,7 @@
             android:layout_width="16dp"
             android:layout_height="16dp"
             app:alphaBackground="1"
-            app:backgroundColor="?attr/palette_brand_purple"
+            app:backgroundColor="?attr/palette_primary_main"
             app:cornerRadius="8dp">
 
             <androidx.appcompat.widget.AppCompatImageView
@@ -79,7 +79,7 @@
             android:layout_height="wrap_content"
             android:layout_marginEnd="22dp"
             android:src="@drawable/vector_star"
-            android:tint="?palette_brand_purple" />
+            android:tint="?palette_primary_main" />
     </LinearLayout>
 
     <com.tari.android.wallet.ui.component.tari.TariDivider

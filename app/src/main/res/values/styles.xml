@@ -1,6 +1,6 @@
 <resources>
 
-    <!--    &lt;!&ndash; splash screen theme &ndash;&gt;-->
+    <!-- splash screen theme -->
     <style name="AppTheme.Splash" parent="AppTheme.Light">
         <item name="android:background">@drawable/tari_splash_screen</item>
         <item name="android:windowTranslucentStatus">true</item>
@@ -38,7 +38,7 @@
     </style>
 
     <style name="PositiveButtonStyle" parent="Widget.AppCompat.Button.ButtonBar.AlertDialog">
-        <item name="android:textColor">?attr/palette_button_primary_start</item>
+        <item name="android:textColor">?attr/palette_button_primary</item>
     </style>
 
     <style name="BottomSlideDialog" parent="Theme.AppCompat.Dialog">

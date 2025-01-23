@@ -26,8 +26,6 @@ fun TariDesignSystem(
             }
 
             TariTheme.Light -> LocalTariTheme.Light
-
-            TariTheme.Purple,
             TariTheme.Dark -> LocalTariTheme.Dark
         },
         content = content,

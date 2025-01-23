@@ -258,7 +258,7 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>() {
 
     private fun enableNavigationView(view: ImageView) {
         arrayOf(ui.homeImageView, ui.storeImageView, ui.chatImageView, ui.settingsImageView).forEach { it.clearColorFilter() }
-        view.setColorFilter(PaletteManager.getPurpleBrand(this))
+        view.setColorFilter(PaletteManager.getTextHeading(this))
     }
 
     private fun checkScreensDeeplink(intent: Intent) {

@@ -120,7 +120,6 @@ abstract class CommonActivity<Binding : ViewBinding, VM : CommonViewModel> : App
 
             TariTheme.Light -> R.style.AppTheme_Light
             TariTheme.Dark -> R.style.AppTheme_Dark
-            TariTheme.Purple -> R.style.AppTheme_Purple
         }
         setTheme(themeStyle)
     }

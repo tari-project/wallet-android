@@ -271,7 +271,7 @@
             android:background="@drawable/vector_add_note_slide_button_bg"
             android:clickable="true"
             android:focusable="true"
-            android:textColor="?attr/palette_brand_purple">
+            android:textColor="?attr/palette_text_heading">
 
             <androidx.appcompat.widget.AppCompatImageView
                 android:id="@+id/add_note_img_slide_to_send_arrow_disabled"
@@ -289,7 +289,7 @@
                 android:layout_centerInParent="true"
                 android:rotation="180"
                 android:src="@drawable/vector_back_button"
-                android:tint="?attr/palette_brand_purple" />
+                android:tint="?attr/palette_text_heading" />
         </RelativeLayout>
     </RelativeLayout>
 </com.tari.android.wallet.ui.component.tari.background.obsolete.TariPrimaryBackgroundConstraint>
