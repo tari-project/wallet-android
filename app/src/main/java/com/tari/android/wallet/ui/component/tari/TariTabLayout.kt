@@ -31,7 +31,7 @@ class TariTabLayout(context: Context, val attrs: AttributeSet) : TabLayout(conte
     }
 
     private fun applyFont(tab: Tab) {
-        val font = TariFont.AVENIR_LT_STD_HEAVY.asTypeface(context)
+        val font = TariFont.HEAVY.asTypeface(context)
         val mainView = getChildAt(0) as ViewGroup
         val tabView = mainView.getChildAt(tab.position) as ViewGroup
         val tabViewChild: View = tabView.getChildAt(1)

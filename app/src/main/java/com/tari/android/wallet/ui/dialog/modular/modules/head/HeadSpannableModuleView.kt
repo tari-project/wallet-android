@@ -9,9 +9,9 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import com.tari.android.wallet.databinding.DialogModuleHeadBinding
 import com.tari.android.wallet.ui.common.CommonViewModel
+import com.tari.android.wallet.ui.component.common.CommonView
 import com.tari.android.wallet.ui.component.tari.TariFont
 import com.tari.android.wallet.ui.component.tari.TariTypefaceSpan
-import com.tari.android.wallet.ui.component.common.CommonView
 
 @SuppressLint("ViewConstructor")
 class HeadSpannableModuleView(context: Context, buttonModule: HeadSpannableModule) : CommonView<CommonViewModel, DialogModuleHeadBinding>(context) {
@@ -25,10 +25,10 @@ class HeadSpannableModuleView(context: Context, buttonModule: HeadSpannableModul
         val title = SpannableStringBuilder().apply {
             val highlightedPart = SpannableString(buttonModule.highlightedTitlePart)
             highlightedPart.setSpan(
-                TariTypefaceSpan("", TariFont.AVENIR_LT_STD_HEAVY.asTypeface(context)),
-                0,
-                highlightedPart.length,
-                Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+                /* what = */ TariTypefaceSpan("", TariFont.HEAVY.asTypeface(context)),
+                /* start = */ 0,
+                /* end = */ highlightedPart.length,
+                /* flags = */ Spanned.SPAN_EXCLUSIVE_EXCLUSIVE,
             )
             insert(0, buttonModule.regularTitlePart)
             insert(buttonModule.regularTitlePart.length, " ")

@@ -125,9 +125,9 @@ class CreateWalletFragment : OnboardingFlowFragment<FragmentCreateWalletBinding,
         ui.apply {
             yourEmojiIdTitleTextView.text = string(create_wallet_your_emoji_id_text_label).applyFontStyle(
                 context = requireActivity(),
-                defaultFont = TariFont.AVENIR_LT_STD_LIGHT,
+                defaultFont = TariFont.LIGHT,
                 search = listOf(string(create_wallet_your_emoji_id_text_label_bold_part)),
-                tariFont = TariFont.AVENIR_LT_STD_BLACK,
+                tariFont = TariFont.BLACK,
             )
             bottomSpinnerLottieAnimationView.alpha = 0f
             bottomSpinnerLottieAnimationView.scaleX = 0.5F

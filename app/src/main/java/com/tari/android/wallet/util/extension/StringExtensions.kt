@@ -164,7 +164,7 @@ fun SpannableString.applyCenterAlignment() {
  */
 fun String.makeTextBold(context: Context, vararg wordsToBeBold: String): SpannableString = this.applyFontStyle(
     context = context,
-    defaultFont = TariFont.AVENIR_LT_STD_LIGHT,
+    defaultFont = TariFont.LIGHT,
     search = if (wordsToBeBold.isEmpty()) listOf(this) else wordsToBeBold.toList(),
-    tariFont = TariFont.AVENIR_LT_STD_HEAVY,
+    tariFont = TariFont.HEAVY,
 )
