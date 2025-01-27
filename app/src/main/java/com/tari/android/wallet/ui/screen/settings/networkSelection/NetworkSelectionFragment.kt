@@ -42,9 +42,9 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.tari.android.wallet.databinding.FragmentNetworkSelectionBinding
 import com.tari.android.wallet.ui.common.CommonXmlFragment
 import com.tari.android.wallet.ui.common.recyclerView.CommonAdapter
+import com.tari.android.wallet.ui.screen.StartActivity
 import com.tari.android.wallet.ui.screen.settings.networkSelection.networkItem.NetworkAdapter
 import com.tari.android.wallet.ui.screen.settings.networkSelection.networkItem.NetworkViewHolderItem
-import com.tari.android.wallet.ui.screen.splash.SplashActivity
 import com.tari.android.wallet.util.extension.observe
 
 class NetworkSelectionFragment : CommonXmlFragment<FragmentNetworkSelectionBinding, NetworkSelectionViewModel>() {
@@ -78,7 +78,7 @@ class NetworkSelectionFragment : CommonXmlFragment<FragmentNetworkSelectionBindi
 
         observe(recreate) {
             requireActivity().finish()
-            requireActivity().startActivity(Intent(requireActivity(), SplashActivity::class.java))
+            requireActivity().startActivity(Intent(requireActivity(), StartActivity::class.java))
         }
     }
 }

@@ -30,7 +30,7 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.tari.android.wallet.ui.screen.splash
+package com.tari.android.wallet.ui.screen
 
 import android.app.Activity
 import android.content.Intent
@@ -53,11 +53,11 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 /**
- * Splash screen activity.
+ * Start activity decides which activity to launch based on the state of the app.
  *
  * @author The Tari Development Team
  */
-class SplashActivity : AppCompatActivity() {
+class StartActivity : AppCompatActivity() {
 
     @Inject
     lateinit var walletConfig: WalletConfig
