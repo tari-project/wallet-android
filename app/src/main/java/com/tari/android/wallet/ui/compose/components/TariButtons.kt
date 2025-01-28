@@ -7,10 +7,15 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.LocalRippleConfiguration
 import androidx.compose.material.OutlinedButton
+import androidx.compose.material.RippleConfiguration
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
+import androidx.compose.material.ripple.RippleAlpha
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -28,22 +33,24 @@ fun TariPrimaryButton(
     size: TariButtonSize = TariButtonSize.Large,
     modifier: Modifier = Modifier,
 ) {
-    Button(
-        onClick = onClick,
-        colors = ButtonDefaults.buttonColors(
-            backgroundColor = TariDesignSystem.colors.buttonPrimaryBackground,
-            disabledBackgroundColor = TariDesignSystem.colors.actionDisabledBackground,
-        ),
-        shape = TariDesignSystem.shapes.button,
-        modifier = modifier.defaultMinSize(minHeight = size.minHeight()),
-        enabled = enabled,
-    ) {
-        Text(
-            text = text,
-            modifier = Modifier.padding(horizontal = size.textHorizontalPadding()),
-            color = if (enabled) TariDesignSystem.colors.buttonPrimaryText else TariDesignSystem.colors.actionDisabled,
-            style = size.textStyle(),
-        )
+    WithRippleColor(TariDesignSystem.colors.buttonPrimaryText) {
+        Button(
+            onClick = onClick,
+            colors = ButtonDefaults.buttonColors(
+                backgroundColor = TariDesignSystem.colors.buttonPrimaryBackground,
+                disabledBackgroundColor = TariDesignSystem.colors.actionDisabledBackground,
+            ),
+            shape = TariDesignSystem.shapes.button,
+            modifier = modifier.defaultMinSize(minHeight = size.minHeight()),
+            enabled = enabled,
+        ) {
+            Text(
+                text = text,
+                modifier = Modifier.padding(horizontal = size.textHorizontalPadding()),
+                color = if (enabled) TariDesignSystem.colors.buttonPrimaryText else TariDesignSystem.colors.actionDisabled,
+                style = size.textStyle(),
+            )
+        }
     }
 }
 
@@ -55,22 +62,24 @@ fun TariSecondaryButton(
     size: TariButtonSize = TariButtonSize.Large,
     modifier: Modifier = Modifier,
 ) {
-    Button(
-        onClick = onClick,
-        colors = ButtonDefaults.buttonColors(
-            backgroundColor = TariDesignSystem.colors.primaryMain,
-            disabledBackgroundColor = TariDesignSystem.colors.actionDisabledBackground,
-        ),
-        shape = TariDesignSystem.shapes.button,
-        modifier = modifier.defaultMinSize(minHeight = size.minHeight()),
-        enabled = enabled,
-    ) {
-        Text(
-            text = text,
-            modifier = Modifier.padding(horizontal = size.textHorizontalPadding()),
-            color = if (enabled) Color.Black else TariDesignSystem.colors.actionDisabled,
-            style = size.textStyle(),
-        )
+    WithRippleColor(Color.Black) {
+        Button(
+            onClick = onClick,
+            colors = ButtonDefaults.buttonColors(
+                backgroundColor = TariDesignSystem.colors.primaryMain,
+                disabledBackgroundColor = TariDesignSystem.colors.actionDisabledBackground,
+            ),
+            shape = TariDesignSystem.shapes.button,
+            modifier = modifier.defaultMinSize(minHeight = size.minHeight()),
+            enabled = enabled,
+        ) {
+            Text(
+                text = text,
+                modifier = Modifier.padding(horizontal = size.textHorizontalPadding()),
+                color = if (enabled) Color.Black else TariDesignSystem.colors.actionDisabled,
+                style = size.textStyle(),
+            )
+        }
     }
 }
 
@@ -82,26 +91,29 @@ fun TariOutlinedButton(
     size: TariButtonSize = TariButtonSize.Large,
     modifier: Modifier = Modifier,
 ) {
-    OutlinedButton(
-        onClick = onClick,
-        border = BorderStroke(
-            width = 1.dp,
-            color = if (enabled) TariDesignSystem.colors.buttonPrimaryBackground else TariDesignSystem.colors.actionDisabledBackground,
-        ),
-        shape = TariDesignSystem.shapes.button,
-        colors = ButtonDefaults.outlinedButtonColors(backgroundColor = Color.Transparent, disabledContentColor = Color.Transparent),
-        modifier = modifier.defaultMinSize(minHeight = size.minHeight()),
-        enabled = enabled,
-    ) {
-        Text(
-            text = text,
-            modifier = Modifier.padding(horizontal = size.textHorizontalPadding()),
-            color = if (enabled) TariDesignSystem.colors.buttonPrimaryBackground else TariDesignSystem.colors.actionDisabled,
-            style = size.textStyle(),
-        )
+    WithRippleColor(TariDesignSystem.colors.textPrimary) {
+        OutlinedButton(
+            onClick = onClick,
+            border = BorderStroke(
+                width = 1.dp,
+                color = if (enabled) TariDesignSystem.colors.buttonPrimaryBackground else TariDesignSystem.colors.actionDisabledBackground,
+            ),
+            shape = TariDesignSystem.shapes.button,
+            colors = ButtonDefaults.outlinedButtonColors(backgroundColor = Color.Transparent, disabledContentColor = Color.Transparent),
+            modifier = modifier.defaultMinSize(minHeight = size.minHeight()),
+            enabled = enabled,
+        ) {
+            Text(
+                text = text,
+                modifier = Modifier.padding(horizontal = size.textHorizontalPadding()),
+                color = if (enabled) TariDesignSystem.colors.textPrimary else TariDesignSystem.colors.actionDisabled,
+                style = size.textStyle(),
+            )
+        }
     }
 }
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun TariInheritTextButton(
     text: String,
@@ -109,23 +121,25 @@ fun TariInheritTextButton(
     enabled: Boolean = true,
     modifier: Modifier = Modifier,
 ) {
-    OutlinedButton(
-        onClick = onClick,
-        border = BorderStroke(
-            width = 1.dp,
-            color = if (enabled) TariDesignSystem.colors.divider else TariDesignSystem.colors.actionDisabledBackground,
-        ),
-        shape = TariDesignSystem.shapes.button,
-        colors = ButtonDefaults.outlinedButtonColors(backgroundColor = Color.Transparent, disabledContentColor = Color.Transparent),
-        modifier = modifier.defaultMinSize(minHeight = TariButtonSize.Medium.minHeight()),
-        enabled = enabled,
-    ) {
-        Text(
-            text = text,
-            modifier = Modifier.padding(horizontal = TariButtonSize.Medium.textHorizontalPadding()),
-            color = if (enabled) TariDesignSystem.colors.textPrimary else TariDesignSystem.colors.actionDisabled,
-            style = TariButtonSize.Medium.textStyle(),
-        )
+    WithRippleColor(TariDesignSystem.colors.textPrimary) {
+        OutlinedButton(
+            onClick = onClick,
+            border = BorderStroke(
+                width = 1.dp,
+                color = if (enabled) TariDesignSystem.colors.divider else TariDesignSystem.colors.actionDisabledBackground,
+            ),
+            shape = TariDesignSystem.shapes.button,
+            colors = ButtonDefaults.outlinedButtonColors(backgroundColor = Color.Transparent, disabledContentColor = Color.Transparent),
+            modifier = modifier.defaultMinSize(minHeight = TariButtonSize.Medium.minHeight()),
+            enabled = enabled,
+        ) {
+            Text(
+                text = text,
+                modifier = Modifier.padding(horizontal = TariButtonSize.Medium.textHorizontalPadding()),
+                color = if (enabled) TariDesignSystem.colors.textPrimary else TariDesignSystem.colors.actionDisabled,
+                style = TariButtonSize.Medium.textStyle(),
+            )
+        }
     }
 }
 
@@ -136,18 +150,20 @@ fun TariTextButton(
     enabled: Boolean = true,
     modifier: Modifier = Modifier,
 ) {
-    TextButton(
-        onClick = onClick,
-        shape = TariDesignSystem.shapes.button,
-        modifier = modifier.defaultMinSize(minHeight = TariButtonSize.Medium.minHeight()),
-        enabled = enabled,
-    ) {
-        Text(
-            text = text,
-            modifier = Modifier.padding(horizontal = TariButtonSize.Medium.textHorizontalPadding()),
-            color = if (enabled) TariDesignSystem.colors.textPrimary else TariDesignSystem.colors.actionDisabled,
-            style = TariButtonSize.Medium.textStyle(),
-        )
+    WithRippleColor(TariDesignSystem.colors.textPrimary) {
+        TextButton(
+            onClick = onClick,
+            shape = TariDesignSystem.shapes.button,
+            modifier = modifier.defaultMinSize(minHeight = TariButtonSize.Medium.minHeight()),
+            enabled = enabled,
+        ) {
+            Text(
+                text = text,
+                modifier = Modifier.padding(horizontal = TariButtonSize.Medium.textHorizontalPadding()),
+                color = if (enabled) TariDesignSystem.colors.textPrimary else TariDesignSystem.colors.actionDisabled,
+                style = TariButtonSize.Medium.textStyle(),
+            )
+        }
     }
 }
 
@@ -175,6 +191,27 @@ private fun TariButtonSize.textHorizontalPadding() = when (this) {
     TariButtonSize.Medium -> 16.dp
     TariButtonSize.Large -> 22.dp
 }
+
+@OptIn(ExperimentalMaterialApi::class)
+@Composable
+private fun WithRippleColor(
+    rippleColor: Color,
+    content: @Composable () -> Unit,
+) {
+    CompositionLocalProvider(
+        LocalRippleConfiguration provides RippleConfiguration(
+            color = rippleColor,
+            rippleAlpha = RippleAlpha(
+                draggedAlpha = 0.3f,
+                focusedAlpha = 0.3f,
+                hoveredAlpha = 0.3f,
+                pressedAlpha = 0.3f,
+            )
+        ),
+        content = content,
+    )
+}
+
 
 @Preview
 @Composable
