@@ -6,8 +6,11 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextLinkStyles
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.sp
 import com.tari.android.wallet.ui.screen.settings.themeSelector.TariTheme
 
@@ -128,13 +131,18 @@ private fun TariDesignSystem(
             color = tariColors.textPrimary,
             letterSpacing = 0.4.sp,
         ),
+        linkSpan = TextLinkStyles(
+            style = SpanStyle(
+                textDecoration = TextDecoration.Underline,
+            ),
+        ),
     )
 
     CompositionLocalProvider(
         LocalTariObsoleteColors provides tariObsoleteColors,
         LocalTariColors provides tariColors,
         LocalTariShapes provides TariShapes(),
-        LocalTariTextStyles provides tariTextStyle
+        LocalTariTextStyles provides tariTextStyle,
     ) {
         MaterialTheme(
             content = content,
@@ -143,7 +151,7 @@ private fun TariDesignSystem(
 }
 
 object TariDesignSystem {
-    val textStyles: TariTextStyles
+    val typography: TariTextStyles
         @Composable
         get() = LocalTariTextStyles.current
     val shapes: TariShapes

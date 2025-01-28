@@ -58,7 +58,7 @@ import com.tari.android.wallet.databinding.FragmentCreateWalletBinding
 import com.tari.android.wallet.di.DiContainer
 import com.tari.android.wallet.ui.common.domain.PaletteManager
 import com.tari.android.wallet.ui.component.tari.TariFont
-import com.tari.android.wallet.ui.screen.onboarding.activity.OnboardingFlowFragment
+import com.tari.android.wallet.ui.screen.onboarding.activity.OnboardingFlowXmlFragment
 import com.tari.android.wallet.ui.screen.onboarding.createWallet.CreateWalletModel.Effect
 import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.Constants.UI.CreateEmojiId
@@ -87,7 +87,7 @@ import com.tari.android.wallet.util.extension.visible
  *
  * @author The Tari Development Team
  */
-class CreateWalletFragment : OnboardingFlowFragment<FragmentCreateWalletBinding, CreateWalletViewModel>() {
+class CreateWalletFragment : OnboardingFlowXmlFragment<FragmentCreateWalletBinding, CreateWalletViewModel>() {
 
     private val uiHandler = Handler(Looper.getMainLooper())
 
@@ -95,7 +95,7 @@ class CreateWalletFragment : OnboardingFlowFragment<FragmentCreateWalletBinding,
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        DiContainer.appComponent.inject(this)
+        DiContainer.appComponent.inject(this) // todo maybe we don't need this
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =

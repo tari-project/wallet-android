@@ -56,8 +56,8 @@ import com.tari.android.wallet.ui.screen.home.HomeActivity
 import com.tari.android.wallet.ui.screen.home.HomeViewModel
 import com.tari.android.wallet.ui.screen.home.overview.HomeOverviewViewModel
 import com.tari.android.wallet.ui.screen.onboarding.activity.OnboardingFlowActivity
-import com.tari.android.wallet.ui.screen.onboarding.createWallet.CreateWalletFragment
 import com.tari.android.wallet.ui.screen.onboarding.createWallet.CreateWalletViewModel
+import com.tari.android.wallet.ui.screen.onboarding.createWallet.CreateWalletFragment
 import com.tari.android.wallet.ui.screen.onboarding.inroduction.IntroductionViewModel
 import com.tari.android.wallet.ui.screen.onboarding.localAuth.LocalAuthViewModel
 import com.tari.android.wallet.ui.screen.pinCode.EnterPinCodeViewModel

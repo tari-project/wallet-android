@@ -10,7 +10,6 @@
     <dimen name="common_view_elevation">4dp</dimen>
     <dimen name="common_dialog_horizontal_margin">14dp</dimen>
     <dimen name="common_copy_emoji_id_button_visible_bottom_margin">-56dp</dimen>
-    <dimen name="common_network_and_version_info_text_size">8sp</dimen>
     <dimen name="common_zero">0dp</dimen>
 
     <!-- UI components -->
@@ -34,9 +33,7 @@
     <dimen name="onboarding_see_full_emoji_id_button_visible_top_margin">-56dp</dimen>
     <dimen name="onboarding_small_gem_top_margin">30dp</dimen>
     <!-- introduction -->
-    <dimen name="introduction_header_text_size">20sp</dimen>
     <dimen name="introduction_tari_logo_initial_margin_top">25dp</dimen>
-    <dimen name="introduction_create_wallet_button_margin_top">20dp</dimen>
     <dimen name="introduction_selected_network_button_margin_top">8dp</dimen>
     <dimen name="introduction_user_agreement_and_privacy_policy_margin_top">20dp</dimen>
     <dimen name="introduction_small_gem_margin_top">20dp</dimen>
@@ -74,7 +71,7 @@
     <dimen name="home_swipe_refresh_progress_view_container_height">68dp</dimen>
     <dimen name="home_swipe_refresh_progress_view_content_invisible_top_margin">-44dp</dimen>
     <dimen name="home_swipe_refresh_progress_view_content_visible_top_margin">12dp</dimen>
-    
+
     <!-- home TTL store dialog -->
 
     <!-- incompatible network dialog -->

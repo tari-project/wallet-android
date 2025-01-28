@@ -95,13 +95,6 @@ object Constants {
             const val yourEmojiIdTextAnimDurationMs = 300L
         }
 
-        object CreateWallet {
-            const val removeFragmentDelayDuration = 1200L
-            const val tariTextAnimViewDurationMs = 1600L
-            const val viewContainerFadeOutDurationMs = 800L
-            const val introductionBottomViewsFadeOutDelay = 1100L
-        }
-
         object AddAmount {
             const val numPadDigitEnterAnimDurationMs = 90L
         }
@@ -115,7 +108,6 @@ object Constants {
         object Auth {
             const val viewFadeAnimDelayMs = 200L
             const val localAuthAnimDurationMs = 800L
-            const val bottomViewsFadeOutDelay = 1200L
         }
     }
 

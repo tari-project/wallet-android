@@ -173,9 +173,9 @@ enum class TariButtonSize {
 
 @Composable
 private fun TariButtonSize.textStyle() = when (this) {
-    TariButtonSize.Small -> TariDesignSystem.textStyles.buttonSmall
-    TariButtonSize.Medium -> TariDesignSystem.textStyles.buttonMedium
-    TariButtonSize.Large -> TariDesignSystem.textStyles.buttonLarge
+    TariButtonSize.Small -> TariDesignSystem.typography.buttonSmall
+    TariButtonSize.Medium -> TariDesignSystem.typography.buttonMedium
+    TariButtonSize.Large -> TariDesignSystem.typography.buttonLarge
 }
 
 @Composable

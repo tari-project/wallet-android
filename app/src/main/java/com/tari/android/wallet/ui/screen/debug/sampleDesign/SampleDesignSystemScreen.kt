@@ -39,67 +39,67 @@ fun SampleDesignSystemScreen(
             Text(
                 modifier = Modifier.padding(horizontal = 20.dp, vertical = 10.dp),
                 text = "Heading Large Typography",
-                style = TariDesignSystem.textStyles.headingLarge,
+                style = TariDesignSystem.typography.headingLarge,
             )
 
             Text(
                 modifier = Modifier.padding(horizontal = 20.dp, vertical = 10.dp),
                 text = "Heading Medium Typography",
-                style = TariDesignSystem.textStyles.headingMedium,
+                style = TariDesignSystem.typography.headingMedium,
             )
 
             Text(
                 modifier = Modifier.padding(horizontal = 20.dp, vertical = 10.dp),
                 text = "Heading Small Typography",
-                style = TariDesignSystem.textStyles.headingSmall,
+                style = TariDesignSystem.typography.headingSmall,
             )
 
             Text(
                 modifier = Modifier.padding(horizontal = 20.dp, vertical = 10.dp),
                 text = "Body1 Typography",
-                style = TariDesignSystem.textStyles.body1,
+                style = TariDesignSystem.typography.body1,
             )
 
             Text(
                 modifier = Modifier.padding(horizontal = 20.dp, vertical = 10.dp),
                 text = "Body2 Typography",
-                style = TariDesignSystem.textStyles.body2,
+                style = TariDesignSystem.typography.body2,
             )
 
             Text(
                 modifier = Modifier.padding(horizontal = 20.dp, vertical = 10.dp),
                 text = "Modal Title Typography",
-                style = TariDesignSystem.textStyles.modalTitle,
+                style = TariDesignSystem.typography.modalTitle,
             )
 
             Text(
                 modifier = Modifier.padding(horizontal = 20.dp, vertical = 10.dp),
                 text = "Menu Item Typography",
-                style = TariDesignSystem.textStyles.menuItem,
+                style = TariDesignSystem.typography.menuItem,
             )
 
             Text(
                 modifier = Modifier.padding(horizontal = 20.dp, vertical = 10.dp),
                 text = "Button Text Typography",
-                style = TariDesignSystem.textStyles.buttonText,
+                style = TariDesignSystem.typography.buttonText,
             )
 
             Text(
                 modifier = Modifier.padding(horizontal = 20.dp, vertical = 10.dp),
                 text = "Button Large Typography",
-                style = TariDesignSystem.textStyles.buttonLarge,
+                style = TariDesignSystem.typography.buttonLarge,
             )
 
             Text(
                 modifier = Modifier.padding(horizontal = 20.dp, vertical = 10.dp),
                 text = "Button Medium Typography",
-                style = TariDesignSystem.textStyles.buttonMedium,
+                style = TariDesignSystem.typography.buttonMedium,
             )
 
             Text(
                 modifier = Modifier.padding(horizontal = 20.dp, vertical = 10.dp),
                 text = "Button Small Typography",
-                style = TariDesignSystem.textStyles.buttonSmall,
+                style = TariDesignSystem.typography.buttonSmall,
             )
 
             TariPrimaryButton(
