@@ -9,11 +9,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Lifecycle
 import com.tari.android.wallet.ui.compose.TariDesignSystem
 import com.tari.android.wallet.ui.screen.onboarding.activity.OnboardingFlowFragment
-import com.tari.android.wallet.util.extension.launchAndRepeatOnLifecycle
-import kotlinx.coroutines.launch
+import com.tari.android.wallet.util.extension.collectFlow
 import kotlin.getValue
 
 class IntroductionFragment : OnboardingFlowFragment<IntroductionViewModel>() {
@@ -41,14 +39,10 @@ class IntroductionFragment : OnboardingFlowFragment<IntroductionViewModel>() {
         val viewModel: IntroductionViewModel by viewModels()
         bindViewModel(viewModel)
 
-        viewLifecycleOwner.launchAndRepeatOnLifecycle(Lifecycle.State.STARTED) {
-            launch {
-                viewModel.effect.collect { effect ->
-                    when (effect) {
-                        is IntroductionModel.Effect.GoToCreateWallet -> {
-                            onboardingListener.continueToCreateWallet()
-                        }
-                    }
+        collectFlow(viewModel.effect) { effect ->
+            when (effect) {
+                is IntroductionModel.Effect.GoToCreateWallet -> {
+                    onboardingListener.continueToCreateWallet()
                 }
             }
         }
