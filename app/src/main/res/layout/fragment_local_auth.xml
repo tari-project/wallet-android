@@ -111,7 +111,7 @@
         android:singleLine="true"
         android:text="@string/auth_prompt_button_text"
         android:textAllCaps="false"
-        android:textColor="@color/white"
+        android:textColor="?attr/palette_text_button"
         android:textSize="16sp"
         app:customFont="heavy"
         app:layout_constraintBottom_toTopOf="@id/secure_with_biometrics" />
@@ -129,7 +129,7 @@
         android:singleLine="true"
         android:text="@string/auth_prompt_button_touch_id_text"
         android:textAllCaps="false"
-        android:textColor="@color/white"
+        android:textColor="?attr/palette_text_button"
         android:textSize="16sp"
         app:customFont="heavy"
         app:layout_constraintBottom_toTopOf="@+id/continue_btn" />
@@ -147,7 +147,7 @@
         android:singleLine="true"
         android:text="@string/common_continue"
         android:textAllCaps="false"
-        android:textColor="@color/white"
+        android:textColor="?attr/palette_text_button"
         android:textSize="16sp"
         app:customFont="heavy"
         app:layout_constraintBottom_toBottomOf="parent" />

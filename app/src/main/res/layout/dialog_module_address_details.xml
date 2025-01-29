@@ -196,7 +196,7 @@
             android:singleLine="true"
             android:text="@string/wallet_info_address_button_copy_base58"
             android:textAllCaps="false"
-            android:textColor="@color/white"
+            android:textColor="?attr/palette_text_button"
             android:textSize="16sp"
             app:customFont="heavy" />
 
@@ -215,7 +215,7 @@
             android:singleLine="true"
             android:text="@string/wallet_info_address_button_copy_emoji"
             android:textAllCaps="false"
-            android:textColor="@color/white"
+            android:textColor="?attr/palette_text_button"
             android:textSize="16sp"
             app:customFont="heavy" />
     </LinearLayout>

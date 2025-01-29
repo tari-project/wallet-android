@@ -24,17 +24,17 @@
     <color name="palette_light_text_heading">#000000</color>
     <color name="palette_light_text_body">#7F8599</color>
     <color name="palette_light_text_light">#C3C7D7</color>
-    <color name="palette_light_text_links">#9330FF</color>
+    <color name="palette_light_text_links">#C9EB00</color>
 
     <!--Icons-->
     <color name="palette_light_icons_default">#000000</color>
-    <color name="palette_light_icons_active">#9330FF</color>
+    <color name="palette_light_icons_active">#C9EB00</color>
     <color name="palette_light_icons_inactive">#C3C7D7</color>
 
     <!--Components-->
     <color name="palette_light_qr_background">#FFFFFF</color>
     <color name="palette_light_overlay">#FFFFFF</color>
-    <color name="palette_light_overlay_text">#9330FF</color>
+    <color name="palette_light_overlay_text">#000000</color>
 
     <!--System-->
     <color name="palette_light_system_red">#D32C44</color>

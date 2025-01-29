@@ -40,6 +40,7 @@
         <item name="palette_text_body">@color/palette_light_text_body</item>
         <item name="palette_text_light">@color/palette_light_text_light</item>
         <item name="palette_text_links">@color/palette_light_text_links</item>
+        <item name="palette_text_button">@color/palette_light_neutral_primary</item>
 
         <!--Icons-->
         <item name="palette_icons_default">@color/palette_light_icons_default</item>
@@ -97,6 +98,7 @@
         <item name="palette_text_body">@color/palette_dark_text_body</item>
         <item name="palette_text_light">@color/palette_dark_text_light</item>
         <item name="palette_text_links">@color/palette_dark_text_links</item>
+        <item name="palette_text_button">@color/palette_dark_neutral_primary</item>
 
         <!--Icons-->
         <item name="palette_icons_default">@color/palette_dark_icons_default</item>

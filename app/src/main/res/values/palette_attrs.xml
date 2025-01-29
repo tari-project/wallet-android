@@ -25,6 +25,7 @@
     <attr name="palette_text_body" format="reference" />
     <attr name="palette_text_light" format="reference" />
     <attr name="palette_text_links" format="reference" />
+    <attr name="palette_text_button" format="reference" />
 
     <!--Icons-->
     <attr name="palette_icons_default" format="reference" />

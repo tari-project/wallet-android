@@ -24,11 +24,11 @@
     <color name="palette_dark_text_heading">#FFFFFF</color>
     <color name="palette_dark_text_body">#C3C7D7</color>
     <color name="palette_dark_text_light">#646B84</color>
-    <color name="palette_dark_text_links">#9330FF</color>
+    <color name="palette_dark_text_links">#C9EB00</color>
 
     <!--Icons-->
     <color name="palette_dark_icons_default">#FFFFFF</color>
-    <color name="palette_dark_icons_active">#9330FF</color>
+    <color name="palette_dark_icons_active">#C9EB00</color>
     <color name="palette_dark_icons_inactive">#646B84</color>
 
     <!--Components-->

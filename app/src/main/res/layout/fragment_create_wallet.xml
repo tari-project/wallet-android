@@ -4,7 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/root_view"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true">
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -40,7 +41,7 @@
                     android:paddingHorizontal="20dp"
                     android:paddingVertical="10dp"
                     android:text="@string/tap_to_see_full_emoji_id"
-                    android:textColor="#9834F6"
+                    android:textColor="?attr/palette_text_heading"
                     android:textSize="14sp"
                     app:customFont="heavy" />
 
@@ -375,7 +376,7 @@
                 android:singleLine="true"
                 android:text="@string/common_continue"
                 android:textAllCaps="false"
-                android:textColor="@color/white"
+                android:textColor="?attr/palette_text_button"
                 android:textSize="16sp"
                 app:customFont="heavy" />
 
@@ -392,7 +393,7 @@
                 android:singleLine="true"
                 android:text="@string/create_wallet_continue_and_create_emoji_id"
                 android:textAllCaps="false"
-                android:textColor="@color/white"
+                android:textColor="?attr/palette_text_button"
                 android:textSize="16sp"
                 app:customFont="heavy" />
 
