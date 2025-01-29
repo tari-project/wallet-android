@@ -40,11 +40,6 @@ private fun TariDesignSystem(
     theme: LocalTariTheme,
     content: @Composable () -> Unit,
 ) {
-    val tariObsoleteColors = when (theme) {
-        LocalTariTheme.Light -> TariObsoleteLightColors
-        LocalTariTheme.Dark -> TariObsoleteDarkColors
-    }
-
     val tariColors = when (theme) {
         LocalTariTheme.Light -> TariLightColorPalette
         LocalTariTheme.Dark -> TariDarkColorPalette
@@ -139,7 +134,6 @@ private fun TariDesignSystem(
     )
 
     CompositionLocalProvider(
-        LocalTariObsoleteColors provides tariObsoleteColors,
         LocalTariColors provides tariColors,
         LocalTariShapes provides TariShapes(),
         LocalTariTextStyles provides tariTextStyle,
@@ -160,9 +154,6 @@ object TariDesignSystem {
     val colors: TariColors
         @Composable
         get() = LocalTariColors.current
-    val obsoleteColors: TariObsoleteColors
-        @Composable
-        get() = LocalTariObsoleteColors.current
 }
 
 private enum class LocalTariTheme {
