@@ -96,7 +96,7 @@ fun TariOutlinedButton(
             onClick = onClick,
             border = BorderStroke(
                 width = 1.dp,
-                color = if (enabled) TariDesignSystem.colors.buttonPrimaryBackground else TariDesignSystem.colors.actionDisabledBackground,
+                color = if (enabled) TariDesignSystem.colors.buttonOutlined else TariDesignSystem.colors.actionDisabledBackground,
             ),
             shape = TariDesignSystem.shapes.button,
             colors = ButtonDefaults.outlinedButtonColors(backgroundColor = Color.Transparent, disabledContentColor = Color.Transparent),
