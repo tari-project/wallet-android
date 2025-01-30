@@ -144,7 +144,6 @@ class FFIWallet(
         feePerGram: String,
         message: String,
         oneSided: Boolean,
-        paymentId: String,
         libError: FFIError
     ): ByteArray
 
@@ -328,7 +327,6 @@ class FFIWallet(
         feePerGram: BigInteger,
         message: String,
         isOneSided: Boolean,
-        paymentId: String,
     ): TxId {
         if (amount < BigInteger.valueOf(0L)) {
             throw FFIException(message = "Amount is less than 0.")
@@ -336,7 +334,7 @@ class FFIWallet(
         if (destination == getWalletAddress()) {
             throw FFIException(message = "Tx source and destination are the same.")
         }
-        val txIdBytes = runWithError { jniSendTx(destination, amount.toString(), feePerGram.toString(), message, isOneSided, paymentId, it) }
+        val txIdBytes = runWithError { jniSendTx(destination, amount.toString(), feePerGram.toString(), message, isOneSided, it) }
         return BigInteger(1, txIdBytes)
     }
 

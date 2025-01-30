@@ -1126,16 +1126,14 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniSendTx(
         jobject jDestination,
         jstring jAmount,
         jstring jFeePerGram,
-        jstring jMessage,
-        jboolean jOneSided,
         jstring jPaymentId,
+        jboolean jOneSided,
         jobject error) {
     return ExecuteWithError<jbyteArray>(jEnv, error, [&](int *errorPointer) {
         auto pWallet = GetPointerField<TariWallet *>(jEnv, jThis);
         auto pDestination = GetPointerField<TariWalletAddress *>(jEnv, jDestination);
         const char *nativeAmount = jEnv->GetStringUTFChars(jAmount, JNI_FALSE);
         const char *nativeFeePerGram = jEnv->GetStringUTFChars(jFeePerGram, JNI_FALSE);
-        const char *pMessage = jEnv->GetStringUTFChars(jMessage, JNI_FALSE);
         const char *pPaymentId = jEnv->GetStringUTFChars(jPaymentId, JNI_FALSE);
         char *pAmountEnd;
         char *pFeeEnd;
@@ -1144,11 +1142,11 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniSendTx(
 
         jbyteArray result = getBytesFromUnsignedLongLong(
                 jEnv,
-                wallet_send_transaction(pWallet, pDestination, amount, nullptr, feePerGram, pMessage,
+                wallet_send_transaction(pWallet, pDestination, amount, nullptr, feePerGram,
                                         jOneSided, pPaymentId, errorPointer));
         jEnv->ReleaseStringUTFChars(jAmount, nativeAmount);
         jEnv->ReleaseStringUTFChars(jFeePerGram, nativeFeePerGram);
-        jEnv->ReleaseStringUTFChars(jMessage, pMessage);
+        jEnv->ReleaseStringUTFChars(jPaymentId, pPaymentId);
         return result;
     });
 }

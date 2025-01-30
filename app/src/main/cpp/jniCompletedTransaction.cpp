@@ -131,7 +131,7 @@ Java_com_tari_android_wallet_ffi_FFICompletedTx_jniGetMessage(
         jobject error) {
     return ExecuteWithError<jstring>(jEnv, error, [&](int *errorPointer) {
         auto pCompletedTx = GetPointerField<TariCompletedTransaction *>(jEnv, jThis);
-        const char *pMessage = completed_transaction_get_message(pCompletedTx, errorPointer);
+        const char *pMessage = completed_transaction_get_payment_id(pCompletedTx, errorPointer);
         jstring result = jEnv->NewStringUTF(pMessage);
         string_destroy(const_cast<char *>(pMessage));
         return result;
