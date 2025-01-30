@@ -225,7 +225,6 @@ class FinalizeSendTxViewModel(savedState: SavedStateHandle) : CommonViewModel() 
                         feePerGram = transactionData.feePerGram ?: Constants.Wallet.DEFAULT_FEE_PER_GRAM,
                         message = transactionData.message,
                         isOneSidePayment = transactionData.isOneSidePayment,
-                        paymentId = transactionData.paymentId,
                     )
 
                     logger.i("Tx sent: $txId")

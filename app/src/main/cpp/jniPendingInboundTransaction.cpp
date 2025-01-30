@@ -83,7 +83,7 @@ Java_com_tari_android_wallet_ffi_FFIPendingInboundTx_jniGetMessage(
         jobject error) {
     return ExecuteWithError<jstring>(jEnv, error, [&](int *errorPointer) {
         auto pInboundTx = GetPointerField<TariPendingInboundTransaction *>(jEnv, jThis);
-        const char *pMessage = pending_inbound_transaction_get_message(pInboundTx, errorPointer);
+        const char *pMessage = pending_inbound_transaction_get_payment_id(pInboundTx, errorPointer);
         jstring result = jEnv->NewStringUTF(pMessage);
         string_destroy(const_cast<char *>(pMessage));
         return result;

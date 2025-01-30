@@ -96,7 +96,7 @@ Java_com_tari_android_wallet_ffi_FFIPendingOutboundTx_jniGetMessage(
         jobject error) {
     return ExecuteWithError<jstring>(jEnv, error, [&](int *errorPointer) {
         auto pOutboundTx = GetPointerField<TariPendingOutboundTransaction *>(jEnv, jThis);
-        const char *pMessage = pending_outbound_transaction_get_message(pOutboundTx, errorPointer);
+        const char *pMessage = pending_outbound_transaction_get_payment_id(pOutboundTx, errorPointer);
         jstring result = jEnv->NewStringUTF(pMessage);
         string_destroy(const_cast<char *>(pMessage));
         return result;

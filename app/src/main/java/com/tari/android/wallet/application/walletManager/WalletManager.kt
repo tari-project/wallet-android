@@ -407,11 +407,10 @@ class WalletManager @Inject constructor(
         feePerGram: MicroTari,
         message: String,
         isOneSidePayment: Boolean,
-        paymentId: String,
     ): TxId {
         val recipientAddress = FFITariWalletAddress(Base58String(tariContact.walletAddress.fullBase58))
 
-        val txId = requireWalletInstance.sendTx(recipientAddress, amount.value, feePerGram.value, message, isOneSidePayment, paymentId)
+        val txId = requireWalletInstance.sendTx(recipientAddress, amount.value, feePerGram.value, message, isOneSidePayment)
         walletNotificationManager.addOutboundTxNotification(txId, recipientAddress)
 
         recipientAddress.destroy()
