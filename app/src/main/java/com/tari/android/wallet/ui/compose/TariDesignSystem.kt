@@ -6,8 +6,11 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextLinkStyles
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.sp
 import com.tari.android.wallet.ui.screen.settings.themeSelector.TariTheme
 
@@ -26,8 +29,6 @@ fun TariDesignSystem(
             }
 
             TariTheme.Light -> LocalTariTheme.Light
-
-            TariTheme.Purple,
             TariTheme.Dark -> LocalTariTheme.Dark
         },
         content = content,
@@ -39,11 +40,6 @@ private fun TariDesignSystem(
     theme: LocalTariTheme,
     content: @Composable () -> Unit,
 ) {
-    val tariObsoleteColors = when (theme) {
-        LocalTariTheme.Light -> TariObsoleteLightColors
-        LocalTariTheme.Dark -> TariObsoleteDarkColors
-    }
-
     val tariColors = when (theme) {
         LocalTariTheme.Light -> TariLightColorPalette
         LocalTariTheme.Dark -> TariDarkColorPalette
@@ -130,13 +126,17 @@ private fun TariDesignSystem(
             color = tariColors.textPrimary,
             letterSpacing = 0.4.sp,
         ),
+        linkSpan = TextLinkStyles(
+            style = SpanStyle(
+                textDecoration = TextDecoration.Underline,
+            ),
+        ),
     )
 
     CompositionLocalProvider(
-        LocalTariObsoleteColors provides tariObsoleteColors,
         LocalTariColors provides tariColors,
         LocalTariShapes provides TariShapes(),
-        LocalTariTextStyles provides tariTextStyle
+        LocalTariTextStyles provides tariTextStyle,
     ) {
         MaterialTheme(
             content = content,
@@ -145,7 +145,7 @@ private fun TariDesignSystem(
 }
 
 object TariDesignSystem {
-    val textStyles: TariTextStyles
+    val typography: TariTextStyles
         @Composable
         get() = LocalTariTextStyles.current
     val shapes: TariShapes
@@ -154,9 +154,6 @@ object TariDesignSystem {
     val colors: TariColors
         @Composable
         get() = LocalTariColors.current
-    val obsoleteColors: TariObsoleteColors
-        @Composable
-        get() = LocalTariObsoleteColors.current
 }
 
 private enum class LocalTariTheme {

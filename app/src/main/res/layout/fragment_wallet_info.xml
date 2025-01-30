@@ -191,7 +191,7 @@
                 android:gravity="center"
                 android:padding="10dp"
                 android:text="@string/wallet_info_share_profile"
-                android:textColor="?attr/palette_brand_purple"
+                android:textColor="?attr/palette_text_heading"
                 android:textSize="14sp"
                 app:customFont="medium" />
         </LinearLayout>

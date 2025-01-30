@@ -77,7 +77,7 @@
 
         <!-- splash -->
         <activity
-            android:name=".ui.screen.splash.SplashActivity"
+            android:name=".ui.screen.StartActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:exported="true"
             android:launchMode="singleInstance"
@@ -99,7 +99,7 @@
             android:exported="false"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.Light"
-            android:windowSoftInputMode="stateAlwaysHidden" />
+            android:windowSoftInputMode="stateAlwaysHidden|adjustResize" />
 
         <!-- local authentication -->
         <activity

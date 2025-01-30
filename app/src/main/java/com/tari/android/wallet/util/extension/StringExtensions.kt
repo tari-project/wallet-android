@@ -40,30 +40,9 @@ import android.text.Spanned
 import android.text.style.AlignmentSpan
 import android.text.style.ForegroundColorSpan
 import android.text.style.RelativeSizeSpan
-import android.text.style.URLSpan
 import com.tari.android.wallet.ui.component.tari.TariFont
 import com.tari.android.wallet.ui.component.tari.TariLetterSpacingSpan
 import com.tari.android.wallet.ui.component.tari.TariTypefaceSpan
-
-/**
- * Process the URLs in the given spannable string.
- *
- * @param search substring to be marked as a link
- * @param url locator
- * @param applyToOnlyFirstOccurrence whether the span should be applied only to the first occurrence
- */
-fun SpannableString.applyURLStyle(search: String, url: String, applyToOnlyFirstOccurrence: Boolean = false): SpannableString {
-    var index = this.indexOf(search)
-    val span = URLSpan(url)
-    while (index >= 0) {
-        setSpan(span, index, index + search.length, Spanned.SPAN_EXCLUSIVE_INCLUSIVE)
-        if (applyToOnlyFirstOccurrence) {
-            break
-        }
-        index = this.indexOf(search, index + 1)
-    }
-    return this
-}
 
 /**
  * Used to apply partial font styles to a string.
@@ -164,7 +143,7 @@ fun SpannableString.applyCenterAlignment() {
  */
 fun String.makeTextBold(context: Context, vararg wordsToBeBold: String): SpannableString = this.applyFontStyle(
     context = context,
-    defaultFont = TariFont.AVENIR_LT_STD_LIGHT,
+    defaultFont = TariFont.LIGHT,
     search = if (wordsToBeBold.isEmpty()) listOf(this) else wordsToBeBold.toList(),
-    tariFont = TariFont.AVENIR_LT_STD_HEAVY,
+    tariFont = TariFont.HEAVY,
 )

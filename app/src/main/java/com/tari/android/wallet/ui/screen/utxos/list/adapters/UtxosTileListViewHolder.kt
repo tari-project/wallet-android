@@ -37,7 +37,7 @@ class UtxosTileListViewHolder(view: ItemUtxosTileBinding) : CommonViewHolder<Utx
 
         ui.root.updateLayoutParams<ViewGroup.LayoutParams> { this.height = itemView.context.dpToPx(item.height.toFloat()).toInt() }
 
-        val baseColor = Color.valueOf(PaletteManager.getPurpleBrand(itemView.context))
+        val baseColor = Color.valueOf(PaletteManager.getTextHeading(itemView.context))
         val newColor = Color.valueOf(getNext(baseColor.red()), getNext(baseColor.green()), getNext(baseColor.blue()))
 
         val shapeDrawable = ContextCompat.getDrawable(itemView.context, R.drawable.vector_utxos_list_tile_bg) as GradientDrawable

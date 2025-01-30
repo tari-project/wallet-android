@@ -43,6 +43,7 @@ import com.tari.android.wallet.ui.screen.debug.sampleDesign.SampleDesignSystemFr
 import com.tari.android.wallet.ui.screen.settings.bugReporting.BugsReportingFragment
 import com.tari.android.wallet.ui.screen.settings.logs.logFiles.LogFilesFragment
 import com.tari.android.wallet.ui.screen.settings.logs.logs.LogsFragment
+import com.tari.android.wallet.util.extension.serializable
 import java.io.File
 
 class DebugActivity : CommonActivity<ActivityDebugBinding, DebugViewModel>() {
@@ -58,7 +59,7 @@ class DebugActivity : CommonActivity<ActivityDebugBinding, DebugViewModel>() {
 
         setContainerId(ui.navContainer.id)
 
-        navigate(intent.getSerializableExtra(NAVIGATION_KEY, DebugNavigation::class.java) ?: error("Must provide navigation type"))
+        navigate(intent.serializable<DebugNavigation>(NAVIGATION_KEY) ?: error("Must provide navigation type"))
     }
 
     fun navigate(navigation: DebugNavigation, file: File? = null, rooted: Boolean = true) {

@@ -5,4 +5,8 @@ object IntroductionModel {
         val versionInfo: String,
         val networkName: String,
     )
+
+    sealed class Effect {
+        object GoToCreateWallet : Effect()
+    }
 }

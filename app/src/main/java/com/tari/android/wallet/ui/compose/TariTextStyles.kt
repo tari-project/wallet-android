@@ -2,6 +2,7 @@ package com.tari.android.wallet.ui.compose
 
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.compositionLocalOf
+import androidx.compose.ui.text.TextLinkStyles
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
@@ -22,6 +23,7 @@ data class TariTextStyles(
     val buttonLarge: TextStyle = TextStyle.Default,
     val buttonMedium: TextStyle = TextStyle.Default,
     val buttonSmall: TextStyle = TextStyle.Default,
+    val linkSpan: TextLinkStyles = TextLinkStyles(),
 )
 
 val LocalTariTextStyles = compositionLocalOf { TariTextStyles() }

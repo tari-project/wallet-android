@@ -62,12 +62,12 @@ import com.tari.android.wallet.navigation.TariNavigator.Companion.NO_SMOOTH_SCRO
 import com.tari.android.wallet.ui.common.CommonActivity
 import com.tari.android.wallet.ui.common.domain.PaletteManager
 import com.tari.android.wallet.ui.common.domain.ResourceManager
+import com.tari.android.wallet.ui.screen.StartActivity
 import com.tari.android.wallet.ui.screen.chat.chatList.ChatListFragment
 import com.tari.android.wallet.ui.screen.contactBook.root.ContactBookFragment
 import com.tari.android.wallet.ui.screen.home.overview.HomeOverviewFragment
 import com.tari.android.wallet.ui.screen.settings.allSettings.AllSettingsFragment
 import com.tari.android.wallet.ui.screen.settings.themeSelector.TariTheme
-import com.tari.android.wallet.ui.screen.splash.SplashActivity
 import com.tari.android.wallet.ui.screen.store.StoreFragment
 import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.DebugConfig
@@ -129,7 +129,7 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>() {
         setContainerId(R.id.nav_container)
 
         if (!securityPrefRepository.isAuthenticated) {
-            val intent = Intent(this, SplashActivity::class.java)
+            val intent = Intent(this, StartActivity::class.java)
                 .apply { flags = Intent.FLAG_ACTIVITY_NEW_TASK }
             this.intent?.data?.let(intent::setData)
             finish()
@@ -258,7 +258,7 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>() {
 
     private fun enableNavigationView(view: ImageView) {
         arrayOf(ui.homeImageView, ui.storeImageView, ui.chatImageView, ui.settingsImageView).forEach { it.clearColorFilter() }
-        view.setColorFilter(PaletteManager.getPurpleBrand(this))
+        view.setColorFilter(PaletteManager.getTextHeading(this))
     }
 
     private fun checkScreensDeeplink(intent: Intent) {

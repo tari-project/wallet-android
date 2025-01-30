@@ -56,6 +56,7 @@ data class TariColors(
     val backgroundPrimary: Color, // Used for background of top layer elements
     val backgroundSecondary: Color, // Used for background of the lower layer of the app
     val backgroundAccent: Color, // Used for background of the lower layer of the app
+    val backgroundPopup: Color, // Used for background of popups
 
     // Action Colors
     val actionActive: Color,
@@ -81,10 +82,13 @@ data class TariColors(
     // Button Colors
     val buttonPrimaryBackground: Color,
     val buttonPrimaryText: Color,
+    val buttonOutlined: Color,
 
     // Components Colors
     val componentsNavbarBackground: Color,
     val componentsNavbarIcons: Color,
+    val componentsChipBackground: Color,
+    val componentsChipText: Color,
 )
 
 val LocalTariColors = staticCompositionLocalOf {
@@ -131,6 +135,7 @@ val LocalTariColors = staticCompositionLocalOf {
         backgroundPrimary = Color.Unspecified,
         backgroundSecondary = Color.Unspecified,
         backgroundAccent = Color.Unspecified,
+        backgroundPopup = Color.Unspecified,
 
         actionActive = Color.Unspecified,
         actionHover = Color.Unspecified,
@@ -152,14 +157,17 @@ val LocalTariColors = staticCompositionLocalOf {
 
         buttonPrimaryBackground = Color.Unspecified,
         buttonPrimaryText = Color.Unspecified,
+        buttonOutlined = Color.Unspecified,
 
         componentsNavbarBackground = Color.Unspecified,
         componentsNavbarIcons = Color.Unspecified,
+        componentsChipBackground = Color.Unspecified,
+        componentsChipText = Color.Unspecified,
     )
 }
 
 val TariLightColorPalette = TariColors(
-    textPrimary = Color(0xFF000000),
+    textPrimary = Color(0xFF111111),
     textSecondary = Color(0xFF7F8599),
     textDisabled = Color(0x66000000),
 
@@ -183,9 +191,9 @@ val TariLightColorPalette = TariColors(
     successLight = Color(0xFF03FE66),
     successContrast = Color(0xFFFFFFFF),
 
-    errorMain = Color(0xFFD32C44),
-    errorDark = Color(0xFFB11F38),
-    errorLight = Color(0xFFE64D5B),
+    errorMain = Color(0xFFFF3232),
+    errorDark = Color(0xFFED1515),
+    errorLight = Color(0xFFFF6464),
     errorContrast = Color(0xFFFFFFFF),
 
     warningMain = Color(0xFFECA86A),
@@ -201,6 +209,7 @@ val TariLightColorPalette = TariColors(
     backgroundPrimary = Color(0xFFFFFFFF),
     backgroundSecondary = Color(0xFFF8F8F9),
     backgroundAccent = Color(0x1B19210A),
+    backgroundPopup = Color(0xFFF8F8F9),
 
     actionActive = Color(0x80000000),
     actionHover = Color(0x0D000000),
@@ -217,14 +226,17 @@ val TariLightColorPalette = TariColors(
     systemSecondaryGreen = Color(0xFFEDFFF3),
     systemYellow = Color(0xFFFCAA2F),
     systemSecondaryYellow = Color(0xFFFBE7C0),
-    systemRed = Color(0xFFD32C44),
+    systemRed = Color(0xFFFF3232),
     systemSecondaryRed = Color(0xFFF9E1E4),
 
     buttonPrimaryBackground = Color(0xFF000000),
     buttonPrimaryText = Color(0xFFFFFFFF),
+    buttonOutlined = Color(0xFF000000),
 
     componentsNavbarBackground = Color(0xFFFFFFFF),
     componentsNavbarIcons = Color(0xFF141B34),
+    componentsChipBackground = Color(0xFF000000),
+    componentsChipText = Color(0xFFFFFFFF),
 )
 
 val TariDarkColorPalette = TariColors(
@@ -252,9 +264,9 @@ val TariDarkColorPalette = TariColors(
     successLight = Color(0xFF00C047),
     successContrast = Color(0xFFFFFFFF),
 
-    errorMain = Color(0xFFD32C44),
-    errorDark = Color(0xFFE64D5B),
-    errorLight = Color(0xFFF17B83),
+    errorMain = Color(0xFFFF3232),
+    errorDark = Color(0xFFFF6464),
+    errorLight = Color(0xFFED1515),
     errorContrast = Color(0xFFFFFFFF),
 
     warningMain = Color(0xFFECA86A),
@@ -270,6 +282,7 @@ val TariDarkColorPalette = TariColors(
     backgroundPrimary = Color(0xFF161617),
     backgroundSecondary = Color(0xFF000000),
     backgroundAccent = Color(0x14FFFFFF),
+    backgroundPopup = Color(0xFF1D1D1D),
 
     actionActive = Color(0x80FFFFFF),
     actionHover = Color(0x1AFFFFFF),
@@ -286,12 +299,15 @@ val TariDarkColorPalette = TariColors(
     systemSecondaryGreen = Color(0xFFEDFFF3),
     systemYellow = Color(0xFFFCAA2F),
     systemSecondaryYellow = Color(0xFFFBE7C0),
-    systemRed = Color(0xFFD32C44),
+    systemRed = Color(0xFFFF3232),
     systemSecondaryRed = Color(0xFFF9E1E4),
 
-    buttonPrimaryBackground = Color(0xFFFFFFFF),
+    buttonPrimaryBackground = Color(0xFFF9F9F9),
     buttonPrimaryText = Color(0xFF000000),
+    buttonOutlined = Color(0xFFFFFFFF),
 
     componentsNavbarBackground = Color(0xFF1D1D1D),
     componentsNavbarIcons = Color(0xFFFFFFFF),
+    componentsChipBackground = Color(0xFFF9F9F9),
+    componentsChipText = Color(0xFF000000),
 )

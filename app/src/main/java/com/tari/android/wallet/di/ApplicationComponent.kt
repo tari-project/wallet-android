@@ -40,6 +40,7 @@ import com.tari.android.wallet.service.service.WalletService
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.component.clipboardController.WalletAddressViewModel
 import com.tari.android.wallet.ui.component.networkStateIndicator.ConnectionIndicatorViewModel
+import com.tari.android.wallet.ui.screen.StartActivity
 import com.tari.android.wallet.ui.screen.auth.AuthActivity
 import com.tari.android.wallet.ui.screen.auth.AuthViewModel
 import com.tari.android.wallet.ui.screen.biometrics.ChangeBiometricsViewModel
@@ -55,8 +56,8 @@ import com.tari.android.wallet.ui.screen.home.HomeActivity
 import com.tari.android.wallet.ui.screen.home.HomeViewModel
 import com.tari.android.wallet.ui.screen.home.overview.HomeOverviewViewModel
 import com.tari.android.wallet.ui.screen.onboarding.activity.OnboardingFlowActivity
-import com.tari.android.wallet.ui.screen.onboarding.createWallet.CreateWalletFragment
 import com.tari.android.wallet.ui.screen.onboarding.createWallet.CreateWalletViewModel
+import com.tari.android.wallet.ui.screen.onboarding.createWallet.CreateWalletFragment
 import com.tari.android.wallet.ui.screen.onboarding.inroduction.IntroductionViewModel
 import com.tari.android.wallet.ui.screen.onboarding.localAuth.LocalAuthViewModel
 import com.tari.android.wallet.ui.screen.pinCode.EnterPinCodeViewModel
@@ -97,7 +98,6 @@ import com.tari.android.wallet.ui.screen.settings.themeSelector.ThemeSelectorVie
 import com.tari.android.wallet.ui.screen.settings.torBridges.TorBridgesSelectionViewModel
 import com.tari.android.wallet.ui.screen.settings.torBridges.customBridges.CustomTorBridgesViewModel
 import com.tari.android.wallet.ui.screen.settings.userAutorization.BiometricAuthenticationViewModel
-import com.tari.android.wallet.ui.screen.splash.SplashActivity
 import com.tari.android.wallet.ui.screen.tx.details.TxDetailsViewModel
 import com.tari.android.wallet.ui.screen.tx.details.gif.GifViewModel
 import com.tari.android.wallet.ui.screen.tx.history.all.AllTxHistoryViewModel
@@ -128,7 +128,7 @@ interface ApplicationComponent {
 
     fun inject(service: WalletService)
 
-    fun inject(activity: SplashActivity)
+    fun inject(activity: StartActivity)
     fun inject(activity: OnboardingFlowActivity)
     fun inject(activity: AuthActivity)
     fun inject(activity: HomeActivity)

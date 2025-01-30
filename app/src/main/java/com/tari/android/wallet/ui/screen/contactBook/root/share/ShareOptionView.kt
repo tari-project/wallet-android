@@ -39,7 +39,7 @@ class ShareOptionView @JvmOverloads constructor(
         ui.text.text = args.title
         val textColor = if (args.isSelected) PaletteManager.getTextHeading(context) else PaletteManager.getTextBody(context)
         ui.text.setTextColor(textColor)
-        val backgroundColor = if (args.isSelected) PaletteManager.getPurpleBrand(context) else PaletteManager.getBackgroundPrimary(context)
+        val backgroundColor = if (args.isSelected) PaletteManager.getAccent(context) else PaletteManager.getBackgroundPrimary(context)
         ui.optionBackground.updateBack(backColor = backgroundColor)
         val iconColor = if (args.isSelected) PaletteManager.getBackgroundPrimary(context) else PaletteManager.getTextHeading(context)
         ui.icon.setColorFilter(iconColor)

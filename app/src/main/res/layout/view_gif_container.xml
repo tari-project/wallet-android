@@ -32,7 +32,7 @@
             android:clickable="true"
             android:focusable="true"
             android:text="@string/tx_list_retry_loading_gif"
-            android:textColor="?attr/palette_brand_purple"
+            android:textColor="?attr/palette_text_heading"
             android:textSize="13sp"
             android:visibility="gone"
             app:customFont="heavy" />

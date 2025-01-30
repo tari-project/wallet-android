@@ -40,7 +40,7 @@
                 android:id="@+id/view_pager_indicators"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:tabIndicatorColor="?attr/palette_brand_purple"
+                app:tabIndicatorColor="?attr/palette_primary_main"
                 app:tabTextAppearance="@style/TabLayoutTextAppearance" />
 
         </FrameLayout>

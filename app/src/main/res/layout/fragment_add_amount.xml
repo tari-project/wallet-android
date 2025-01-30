@@ -239,7 +239,7 @@
                     android:background="@null"
                     android:text="@string/add_amount_modify_fee_speed_up_transaction"
                     android:textAllCaps="false"
-                    android:textColor="?attr/palette_brand_purple"
+                    android:textColor="?attr/palette_primary_main"
                     android:textSize="14sp"
                     android:visibility="invisible"
                     app:customFont="medium" />

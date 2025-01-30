@@ -113,7 +113,7 @@
                 android:paddingHorizontal="10dp"
                 android:paddingVertical="5dp"
                 android:text="@string/common_retry"
-                android:textColor="?attr/palette_brand_purple"
+                android:textColor="?attr/palette_text_heading"
                 android:textSize="14sp"
                 app:customFont="medium" />
         </LinearLayout>

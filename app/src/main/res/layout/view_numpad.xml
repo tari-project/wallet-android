@@ -165,7 +165,7 @@
             android:foreground="?attr/selectableItemBackground"
             android:padding="8dp"
             android:src="@drawable/vector_fingerprint"
-            android:tint="?attr/palette_brand_purple"
+            android:tint="?attr/palette_text_heading"
             android:visibility="gone"
             tools:visibility="visible" />
 

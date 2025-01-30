@@ -27,7 +27,7 @@
                 android:id="@+id/color_container"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="?attr/palette_brand_purple"
+                android:background="?attr/palette_text_heading"
                 android:minHeight="100dp">
 
                 <androidx.appcompat.widget.AppCompatCheckBox

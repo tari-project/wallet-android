@@ -33,6 +33,7 @@
 package com.tari.android.wallet.ui.screen.onboarding.activity
 
 import android.os.Bundle
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
@@ -86,6 +87,8 @@ class OnboardingFlowActivity : CommonActivity<ActivityOnboardingFlowBinding, Onb
 
         val viewModel: OnboardingFlowViewModel by viewModels()
         bindViewModel(viewModel)
+
+        enableEdgeToEdge() // needed for transparent status bar and navigation bar
 
         setContainerId(R.id.onboarding_fragment_container)
 

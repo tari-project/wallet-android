@@ -15,7 +15,7 @@
         android:layout_width="wrap_content"
         android:layout_height="24dp"
         android:layout_marginTop="12dp"
-        android:buttonTint="?attr/palette_brand_purple"
+        android:buttonTint="?attr/palette_primary_main"
         android:visibility="gone"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />

@@ -48,7 +48,7 @@ import com.tari.android.wallet.R.string.onboarding_auth_biometric_prompt
 import com.tari.android.wallet.R.string.onboarding_auth_title
 import com.tari.android.wallet.databinding.FragmentLocalAuthBinding
 import com.tari.android.wallet.infrastructure.security.biometric.BiometricAuthenticationException
-import com.tari.android.wallet.ui.screen.onboarding.activity.OnboardingFlowFragment
+import com.tari.android.wallet.ui.screen.onboarding.activity.OnboardingFlowXmlFragment
 import com.tari.android.wallet.ui.screen.onboarding.localAuth.LocalAuthModel.Effect
 import com.tari.android.wallet.util.Constants.UI.Auth
 import com.tari.android.wallet.util.extension.doOnGlobalLayout
@@ -58,7 +58,7 @@ import com.tari.android.wallet.util.extension.setVisible
 import com.tari.android.wallet.util.extension.string
 import kotlinx.coroutines.launch
 
-class LocalAuthFragment : OnboardingFlowFragment<FragmentLocalAuthBinding, LocalAuthViewModel>() {
+class LocalAuthFragment : OnboardingFlowXmlFragment<FragmentLocalAuthBinding, LocalAuthViewModel>() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
         FragmentLocalAuthBinding.inflate(inflater, container, false).also { ui = it }.root
