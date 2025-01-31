@@ -161,7 +161,7 @@ class WalletManager @Inject constructor(
     // ------------------------------------------------------ Start Wallet ------------------------------------------------------
 
     @Synchronized
-    fun start(seedWords: List<String>?) {
+    fun start(seedWords: List<String>? = null) {
         val ffiSeedWords = SeedPhrase.createOrNull(seedWords)
 
         walletCallbacks.addListener(

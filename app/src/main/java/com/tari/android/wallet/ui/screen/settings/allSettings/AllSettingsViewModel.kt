@@ -3,7 +3,6 @@ package com.tari.android.wallet.ui.screen.settings.allSettings
 import androidx.lifecycle.LiveData
 import com.tari.android.wallet.R
 import com.tari.android.wallet.R.drawable.vector_all_settings_about_icon
-import com.tari.android.wallet.R.drawable.vector_all_settings_background_service_icon
 import com.tari.android.wallet.R.drawable.vector_all_settings_backup_options_icon
 import com.tari.android.wallet.R.drawable.vector_all_settings_block_explorer_icon
 import com.tari.android.wallet.R.drawable.vector_all_settings_bluetooth
@@ -25,7 +24,6 @@ import com.tari.android.wallet.R.drawable.vector_all_settings_visit_tari_icon
 import com.tari.android.wallet.R.drawable.vector_all_settings_yat_icon
 import com.tari.android.wallet.R.drawable.vector_fingerprint
 import com.tari.android.wallet.R.string.all_settings_advanced_settings_label
-import com.tari.android.wallet.R.string.all_settings_background_service
 import com.tari.android.wallet.R.string.all_settings_biometrics
 import com.tari.android.wallet.R.string.all_settings_bluetooth_settings
 import com.tari.android.wallet.R.string.all_settings_bridge_configuration
@@ -64,7 +62,6 @@ import com.tari.android.wallet.R.string.user_agreement_url
 import com.tari.android.wallet.application.YatAdapter
 import com.tari.android.wallet.data.sharedPrefs.CorePrefRepository
 import com.tari.android.wallet.data.sharedPrefs.backup.BackupPrefRepository
-import com.tari.android.wallet.infrastructure.backup.BackupManager
 import com.tari.android.wallet.infrastructure.backup.BackupMapState
 import com.tari.android.wallet.infrastructure.backup.BackupState
 import com.tari.android.wallet.infrastructure.backup.BackupStateHandler
@@ -107,9 +104,6 @@ class AllSettingsViewModel : CommonViewModel() {
 
     @Inject
     lateinit var backupSettingsRepository: BackupPrefRepository
-
-    @Inject
-    lateinit var backupManager: BackupManager
 
     @Inject
     lateinit var backupStateHandler: BackupStateHandler
@@ -222,10 +216,6 @@ class AllSettingsViewModel : CommonViewModel() {
             SettingsRowViewHolderItem(resourceManager.getString(all_settings_select_theme), vector_all_settings_select_theme_icon) {
                 tariNavigator.navigate(AllSettings.ToThemeSelection)
             },
-            DividerViewHolderItem().takeIf { DebugConfig.interactivePaymentsEnabled },
-            SettingsRowViewHolderItem(resourceManager.getString(all_settings_background_service), vector_all_settings_background_service_icon) {
-                tariNavigator.navigate(AllSettings.ToBackgroundService)
-            }.takeIf { DebugConfig.interactivePaymentsEnabled },
             DividerViewHolderItem(),
             SettingsRowViewHolderItem(
                 title = resourceManager.getString(all_settings_screen_recording),

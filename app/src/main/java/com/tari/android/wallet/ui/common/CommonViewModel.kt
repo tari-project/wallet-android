@@ -9,7 +9,6 @@ import com.orhanobut.logger.Printer
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.walletManager.WalletManager
 import com.tari.android.wallet.application.walletManager.doOnWalletRunning
-import com.tari.android.wallet.data.connection.TariWalletServiceConnection
 import com.tari.android.wallet.data.sharedPrefs.CorePrefRepository
 import com.tari.android.wallet.data.sharedPrefs.network.NetworkPrefRepository
 import com.tari.android.wallet.data.sharedPrefs.security.SecurityPrefRepository
@@ -68,9 +67,6 @@ open class CommonViewModel : ViewModel(), DialogHandler {
 
     @Inject
     lateinit var securityPrefRepository: SecurityPrefRepository
-
-    @Inject
-    lateinit var serviceConnection: TariWalletServiceConnection
 
     @Inject
     lateinit var walletManager: WalletManager

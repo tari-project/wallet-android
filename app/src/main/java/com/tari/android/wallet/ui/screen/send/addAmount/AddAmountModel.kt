@@ -4,8 +4,6 @@ import com.tari.android.wallet.data.contacts.model.ContactDto
 
 object AddAmountModel {
     data class UiState(
-        val isOneSidedPaymentEnabled: Boolean,
-        val isOneSidedPaymentForced: Boolean = false,
         val feePerGrams: FeePerGramOptions? = null,
 
         val amount: Double,

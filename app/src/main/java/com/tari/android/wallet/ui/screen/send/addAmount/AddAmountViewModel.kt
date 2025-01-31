@@ -21,7 +21,6 @@ import com.tari.android.wallet.ui.screen.send.addAmount.feeModule.FeeModule
 import com.tari.android.wallet.ui.screen.send.addAmount.feeModule.NetworkSpeed
 import com.tari.android.wallet.ui.screen.send.common.TransactionData
 import com.tari.android.wallet.util.Constants
-import com.tari.android.wallet.util.DebugConfig
 import com.tari.android.wallet.util.EffectFlow
 import com.tari.android.wallet.util.extension.getOrNull
 import com.tari.android.wallet.util.extension.getWithError
@@ -49,9 +48,6 @@ class AddAmountViewModel(savedState: SavedStateHandle) : CommonViewModel() {
     private val _uiState = MutableStateFlow(
         savedState.get<ContactDto>(PARAMETER_CONTACT)?.let { contact ->
             AddAmountModel.UiState(
-                isOneSidedPaymentEnabled = tariSettingsSharedRepository.isOneSidePaymentEnabled,
-                isOneSidedPaymentForced = !DebugConfig.interactivePaymentsEnabled
-                        || (contact.contactInfo.requireWalletAddress().oneSided && !contact.contactInfo.requireWalletAddress().interactive),
                 amount = savedState.get<MicroTari>(PARAMETER_AMOUNT)?.tariValue?.toDouble() ?: Double.MIN_VALUE,
                 contactDto = contact,
                 note = savedState.get<String>(PARAMETER_NOTE).orEmpty(),
@@ -82,11 +78,6 @@ class AddAmountViewModel(savedState: SavedStateHandle) : CommonViewModel() {
                 logger.i("Error loading fees: ${e.message}")
             }
         }
-    }
-
-    fun toggleOneSidePayment() {
-        val newValue = !tariSettingsSharedRepository.isOneSidePaymentEnabled
-        tariSettingsSharedRepository.isOneSidePaymentEnabled = newValue
     }
 
     fun showFeeDialog() {

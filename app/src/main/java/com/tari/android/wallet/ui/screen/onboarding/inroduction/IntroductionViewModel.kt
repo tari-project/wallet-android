@@ -1,6 +1,5 @@
 package com.tari.android.wallet.ui.screen.onboarding.inroduction
 
-import com.tari.android.wallet.application.walletManager.WalletLauncher
 import com.tari.android.wallet.navigation.Navigation
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.screen.settings.allSettings.TariVersionModel
@@ -8,12 +7,8 @@ import com.tari.android.wallet.util.EffectFlow
 import com.tari.android.wallet.util.extension.launchOnMain
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import javax.inject.Inject
 
 class IntroductionViewModel : CommonViewModel() {
-
-    @Inject
-    lateinit var walletLauncher: WalletLauncher
 
     private val _uiState = MutableStateFlow(
         IntroductionModel.UiState(
@@ -31,7 +26,7 @@ class IntroductionViewModel : CommonViewModel() {
     }
 
     fun onCreateWalletClick() {
-        walletLauncher.start()
+        walletManager.start()
         launchOnMain {
             _effect.send(IntroductionModel.Effect.GoToCreateWallet)
         }

@@ -3,7 +3,6 @@ package com.tari.android.wallet.ui.screen.auth
 import android.net.Uri
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.MigrationManager
-import com.tari.android.wallet.application.walletManager.WalletLauncher
 import com.tari.android.wallet.infrastructure.security.biometric.BiometricAuthenticationService
 import com.tari.android.wallet.navigation.Navigation
 import com.tari.android.wallet.ui.common.CommonViewModel
@@ -21,9 +20,6 @@ class AuthViewModel : CommonViewModel() {
     lateinit var authService: BiometricAuthenticationService
 
     @Inject
-    lateinit var walletLauncher: WalletLauncher
-
-    @Inject
     lateinit var migrationManager: MigrationManager
 
     init {
@@ -33,7 +29,7 @@ class AuthViewModel : CommonViewModel() {
             migrationManager.validateVersion(
                 onValid = {
                     launchOnMain {
-                        walletLauncher.start()
+                        walletManager.start()
                     }
                 },
                 onError = {
@@ -54,7 +50,7 @@ class AuthViewModel : CommonViewModel() {
                 deleteWallet()
             },
             ButtonModule(resourceManager.getString(R.string.ffi_validation_error_cancel), ButtonStyle.Close) {
-                walletLauncher.start()
+                walletManager.start()
                 hideDialog()
             }
         )

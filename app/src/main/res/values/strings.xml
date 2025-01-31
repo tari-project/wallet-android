@@ -1,9 +1,6 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name">Tari Aurora</string>
 
-    <!-- foreground service description -->
-    <string name="wallet_service_desc">This service is required to communicate with Tari services. Please keep this service running if you want to be able to communicate with the Tari system.</string>
-
     <!-- URLs, etc -->
     <string name="ttl_store_url" translatable="false">https://store.tarilabs.com</string>
     <string name="tari_url" translatable="false">https://tari.com</string>
@@ -125,12 +122,6 @@
     <!-- dialog -->
     <string name="internet_connection_error_dialog_title">Can\'t connect to the interwebs</string>
     <string name="internet_connection_error_dialog_description">Your phone is either offline or has a poor connection at the moment. We\'ll wait here until you find some stronger signal.</string>
-
-    <!-- service -->
-    <string name="wallet_service_title">Tari Aurora wallet service is running</string>
-    <string name="wallet_service_description">This service carries out wallet operations across applications</string>
-    <string name="wallet_service_error_testnet_tari_request">Could not allocate free tXTR</string>
-    <string name="wallet_service_error_no_internet_connection">No internet connection!</string>
 
     <!-- testnet UTXO messages -->
     <string name="faucet_error_title">Failed to claim tXTR</string>
@@ -287,8 +278,6 @@
     <string name="add_amount_funds_pending">Sorry, you can’t send this much tXTR. Please wait for at least one transaction to complete and then try again.</string>
     <string name="add_amount_tx_fee">Transaction Fee</string>
     <string name="add_amount_wallet_balance">Wallet Balance</string>
-    <string name="add_amount_one_side_payment_switcher">One Sided Payment</string>
-    <string name="add_amount_one_side_payment_question_mark">One-sided payments are broadcast instantly and do not require the recipient to be online. But they are less private. Use them if you know the recipient is offline for long periods, or for things like \'tip-jars\'.</string>
     <string name="add_amount_modify_fee_title">Modify Transaction Fee</string>
     <string name="add_amount_modify_fee_description">Choose how fast you would like to move your transaction to the blockchain.\n A higher fee will speed up the process.</string>
     <string name="add_amount_modify_fee_estimated">Estimated Fee:</string>
@@ -468,7 +457,6 @@
     <string name="all_settings_privacy_policy">Privacy Policy</string>
     <string name="all_settings_disclaimer">Disclaimer</string>
     <string name="all_settings_explorer">Block Explorer</string>
-    <string name="all_settings_background_service">Background Service</string>
     <string name="all_settings_screen_recording">Screen recording</string>
     <string name="all_settings_bluetooth_settings">Bluetooth Settings</string>
     <string name="all_settings_bridge_configuration">Bridge Configuration</string>
@@ -482,13 +470,6 @@
     <string name="all_settings_select_network_confirm_description">You will be logged out and switched to a different network. Do you want to continue?</string>
     <string name="all_settings_version_text_copy_title">Tari Wallet Version</string>
     <string name="all_settings_version_text_copy_toast_message">Tari version was copied</string>
-
-    <!-- Background service -->
-    <string name="background_service_title">Background service</string>
-    <string name="background_service_warning_text">The background service allow us to connect to a Tari node and receive updates and messages while you\'re doing other things on your phone. This is great for not missing any payments, but it does hurt your battery life. If you want to reduce battery strain and don\'t mind having Aurora in the foreground to keep your wallet up to date, then turn this setting off.</string>
-    <string name="background_service_button_title">Allow Tari to receive transactions and notifications in the background</string>
-    <string name="background_service_button_confirmation_title">Background service will be turned off</string>
-    <string name="background_service_button_confirmation_description">You will not get any notifications and updates. Are you sure you want to proceed?</string>
 
     <!-- Screen recording -->
     <string name="screen_recording_title">Screen recording</string>

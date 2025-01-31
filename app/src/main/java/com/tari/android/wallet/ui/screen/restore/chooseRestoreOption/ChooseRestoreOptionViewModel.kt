@@ -5,7 +5,6 @@ import androidx.fragment.app.Fragment
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.deeplinks.DeepLink
 import com.tari.android.wallet.application.walletManager.WalletConfig
-import com.tari.android.wallet.application.walletManager.WalletLauncher
 import com.tari.android.wallet.application.walletManager.doOnWalletRunning
 import com.tari.android.wallet.data.sharedPrefs.backup.BackupPrefRepository
 import com.tari.android.wallet.infrastructure.backup.BackupFileIsEncryptedException
@@ -39,9 +38,6 @@ class ChooseRestoreOptionViewModel : CommonViewModel() {
 
     @Inject
     lateinit var backupPrefRepository: BackupPrefRepository
-
-    @Inject
-    lateinit var walletLauncher: WalletLauncher
 
     @Inject
     lateinit var walletConfig: WalletConfig
@@ -122,7 +118,7 @@ class ChooseRestoreOptionViewModel : CommonViewModel() {
             // try to restore with no password
             backupManager.restoreLatestBackup()
             launchOnMain {
-                walletLauncher.start()
+                walletManager.start()
             }
         } catch (exception: Throwable) {
             handleException(exception)
@@ -131,7 +127,7 @@ class ChooseRestoreOptionViewModel : CommonViewModel() {
 
     private fun restoreFromPaperWallet(seedWords: List<String>) {
         _uiState.update { it.copy(paperWalletProgress = true) }
-        walletLauncher.start(seedWords)
+        walletManager.start(seedWords)
         launchOnIo {
             walletManager.doOnWalletRunning {
                 _uiState.update { it.copy(paperWalletProgress = false) }

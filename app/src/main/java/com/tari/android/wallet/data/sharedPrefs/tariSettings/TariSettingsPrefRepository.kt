@@ -39,7 +39,6 @@ import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefGsonDelegate
 import com.tari.android.wallet.data.sharedPrefs.network.NetworkPrefRepository
 import com.tari.android.wallet.data.sharedPrefs.network.formatKey
 import com.tari.android.wallet.ui.screen.settings.themeSelector.TariTheme
-import com.tari.android.wallet.util.DebugConfig
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -50,9 +49,7 @@ class TariSettingsPrefRepository @Inject constructor(sharedPrefs: SharedPreferen
     private object Key {
         const val IS_RESTORED_WALLET = "tari_is_restored_wallet"
         const val HAS_VERIFIED_SEED_WORDS = "tari_has_verified_seed_words"
-        const val BACKGROUND_SERVICE_TURNED_ON_KEY = "tari_background_service_turned_on"
         const val SCREEN_RECORDING_TURNED_ON_KEY = "tari_screen_recording_turned_on"
-        const val IS_ONE_SIDE_PAYMENT_ENABLED_KEY = "is_one_side_payment_enabled"
         const val THEME_KEY = "tari_theme_key"
     }
 
@@ -60,16 +57,7 @@ class TariSettingsPrefRepository @Inject constructor(sharedPrefs: SharedPreferen
 
     var hasVerifiedSeedWords: Boolean by SharedPrefBooleanDelegate(sharedPrefs, this, formatKey(Key.HAS_VERIFIED_SEED_WORDS))
 
-    var backgroundServiceTurnedOn: Boolean by SharedPrefBooleanDelegate(
-        prefs = sharedPrefs,
-        commonRepository = this,
-        name = formatKey(Key.BACKGROUND_SERVICE_TURNED_ON_KEY),
-        defValue = DebugConfig.interactivePaymentsEnabled,
-    )
-
     var screenRecordingTurnedOn: Boolean by SharedPrefBooleanDelegate(sharedPrefs, this, formatKey(Key.SCREEN_RECORDING_TURNED_ON_KEY), false)
-
-    var isOneSidePaymentEnabled: Boolean by SharedPrefBooleanDelegate(sharedPrefs, this, formatKey(Key.IS_ONE_SIDE_PAYMENT_ENABLED_KEY), false)
 
     var currentTheme: TariTheme by SharedPrefGsonDelegate(
         prefs = sharedPrefs,
@@ -82,6 +70,5 @@ class TariSettingsPrefRepository @Inject constructor(sharedPrefs: SharedPreferen
     fun clear() {
         isRestoredWallet = false
         hasVerifiedSeedWords = false
-        backgroundServiceTurnedOn = DebugConfig.interactivePaymentsEnabled
     }
 }

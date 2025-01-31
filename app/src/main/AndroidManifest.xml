@@ -51,14 +51,6 @@
         android:theme="@style/AppTheme.Light"
         tools:replace="android:supportsRtl,android:allowBackup">
 
-        <!-- Tari foreground service -->
-        <service
-            android:name=".service.service.WalletService"
-            android:description="@string/wallet_service_desc"
-            android:enabled="true"
-            android:exported="false"
-            android:foregroundServiceType="dataSync" />
-
         <!-- file provider to share log files with other applications (i.e. email clients) -->
         <provider
             android:name="androidx.core.content.FileProvider"

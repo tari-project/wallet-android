@@ -39,7 +39,6 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
 import com.tari.android.wallet.R
-import com.tari.android.wallet.application.walletManager.WalletLauncher
 import com.tari.android.wallet.application.walletManager.WalletManager
 import com.tari.android.wallet.application.walletManager.doOnWalletFailed
 import com.tari.android.wallet.application.walletManager.doOnWalletRunning
@@ -75,9 +74,6 @@ class OnboardingFlowActivity : CommonActivity<ActivityOnboardingFlowBinding, Onb
     lateinit var corePrefRepository: CorePrefRepository
 
     @Inject
-    lateinit var walletLauncher: WalletLauncher
-
-    @Inject
     lateinit var walletManager: WalletManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -97,7 +93,7 @@ class OnboardingFlowActivity : CommonActivity<ActivityOnboardingFlowBinding, Onb
         // TODO move this logic to VM. We shouldn't manage scopes inside the activity
         when {
             paperWalletSeeds != null -> {
-                walletLauncher.start(paperWalletSeeds)
+                walletManager.start(paperWalletSeeds)
 
                 launchOnIo {
                     walletManager.doOnWalletRunning {
@@ -109,13 +105,13 @@ class OnboardingFlowActivity : CommonActivity<ActivityOnboardingFlowBinding, Onb
             }
 
             corePrefRepository.onboardingAuthWasInterrupted -> {
-                walletLauncher.start()
+                walletManager.start()
                 loadFragment(LocalAuthFragment())
             }
 
             corePrefRepository.onboardingWasInterrupted -> {
                 // start wallet service
-                walletLauncher.start()
+                walletManager.start()
                 // clean existing files & restart onboarding
                 walletManager.deleteWallet()
                 loadFragment(CreateWalletFragment())

@@ -42,7 +42,6 @@ import com.tari.android.wallet.ui.screen.send.requestTari.RequestTariFragment
 import com.tari.android.wallet.ui.screen.send.transfer.TransferFragment
 import com.tari.android.wallet.ui.screen.settings.allSettings.AllSettingsFragment
 import com.tari.android.wallet.ui.screen.settings.allSettings.about.TariAboutFragment
-import com.tari.android.wallet.ui.screen.settings.backgroundService.BackgroundServiceSettingsFragment
 import com.tari.android.wallet.ui.screen.settings.backup.backupOnboarding.BackupOnboardingFlowFragment
 import com.tari.android.wallet.ui.screen.settings.backup.backupSettings.BackupSettingsFragment
 import com.tari.android.wallet.ui.screen.settings.backup.changeSecurePassword.ChangeSecurePasswordFragment
@@ -106,7 +105,6 @@ class TariNavigator @Inject constructor(
             is AllSettings.ToBugReporting -> DebugActivity.launch(currentActivity, DebugNavigation.BugReport)
             is AllSettings.ToMyProfile -> addFragment(WalletInfoFragment())
             is AllSettings.ToAbout -> addFragment(TariAboutFragment())
-            is AllSettings.ToBackgroundService -> addFragment(BackgroundServiceSettingsFragment())
             is AllSettings.ToScreenRecording -> addFragment(ScreenRecordingSettingsFragment())
             is AllSettings.ToBluetoothSettings -> addFragment(BluetoothSettingsFragment())
             is AllSettings.BackToBackupSettings -> popUpTo(BackupSettingsFragment::class.java.simpleName)
