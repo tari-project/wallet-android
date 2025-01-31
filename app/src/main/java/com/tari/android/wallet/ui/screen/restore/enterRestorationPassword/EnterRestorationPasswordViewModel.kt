@@ -3,7 +3,6 @@ package com.tari.android.wallet.ui.screen.restore.enterRestorationPassword
 import androidx.lifecycle.LiveData
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.walletManager.WalletConfig
-import com.tari.android.wallet.application.walletManager.WalletLauncher
 import com.tari.android.wallet.application.walletManager.doOnWalletRunning
 import com.tari.android.wallet.data.sharedPrefs.backup.BackupPrefRepository
 import com.tari.android.wallet.infrastructure.backup.BackupManager
@@ -26,9 +25,6 @@ class EnterRestorationPasswordViewModel : CommonViewModel() {
 
     @Inject
     lateinit var backupSettingsRepository: BackupPrefRepository
-
-    @Inject
-    lateinit var walletLauncher: WalletLauncher
 
     init {
         component.inject(this)
@@ -68,7 +64,7 @@ class EnterRestorationPasswordViewModel : CommonViewModel() {
                 backupManager.restoreLatestBackup(password)
                 backupSettingsRepository.backupPassword = password
                 launchOnMain {
-                    walletLauncher.start()
+                    walletManager.start()
                 }
             } catch (exception: Throwable) {
                 handleRestorationFailure(exception)

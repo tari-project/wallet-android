@@ -77,7 +77,6 @@ sealed class Navigation {
         data object BackToBackupSettings : AllSettings()
         data class ToBackupSettings(val withAnimation: Boolean) : AllSettings()
         data object ToDeleteWallet : AllSettings()
-        data object ToBackgroundService : AllSettings()
         data object ToScreenRecording : AllSettings()
         data object ToBluetoothSettings : AllSettings()
         data object ToThemeSelection : AllSettings()

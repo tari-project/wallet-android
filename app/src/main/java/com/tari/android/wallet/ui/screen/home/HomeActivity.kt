@@ -46,7 +46,6 @@ import androidx.lifecycle.Lifecycle
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.deeplinks.DeeplinkManager
-import com.tari.android.wallet.application.walletManager.WalletLauncher
 import com.tari.android.wallet.data.sharedPrefs.network.NetworkPrefRepository
 import com.tari.android.wallet.data.sharedPrefs.security.SecurityPrefRepository
 import com.tari.android.wallet.data.sharedPrefs.tariSettings.TariSettingsPrefRepository
@@ -81,9 +80,6 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>() {
 
     @Inject
     lateinit var securityPrefRepository: SecurityPrefRepository
-
-    @Inject
-    lateinit var walletLauncher: WalletLauncher
 
     @Inject
     lateinit var networkRepository: NetworkPrefRepository
@@ -195,11 +191,7 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>() {
 
         // onNewIntent might get called before onCreate, so we anticipate that here
         checkScreensDeeplink(intent)
-        if (viewModel.serviceConnection.isWalletServiceConnected()) {
-            processIntentDeepLink(intent)
-        } else {
-            setIntent(intent)
-        }
+        setIntent(intent)
     }
 
     override fun onSaveInstanceState(outState: Bundle) {

@@ -46,8 +46,6 @@ import com.daasuu.ei.EasingInterpolator
 import com.tari.android.wallet.R
 import com.tari.android.wallet.R.string.add_amount_funds_pending
 import com.tari.android.wallet.R.string.add_amount_not_enough_available_balance
-import com.tari.android.wallet.R.string.add_amount_one_side_payment_question_mark
-import com.tari.android.wallet.R.string.add_amount_one_side_payment_switcher
 import com.tari.android.wallet.R.string.add_amount_wallet_balance
 import com.tari.android.wallet.R.string.error_fee_more_than_amount_description
 import com.tari.android.wallet.R.string.error_fee_more_than_amount_title
@@ -122,8 +120,6 @@ class AddAmountFragment : CommonXmlFragment<FragmentAddAmountBinding, AddAmountV
 
     private fun subscribeVM() {
         collectFlow(viewModel.uiState) { uiState ->
-            ui.oneSidePaymentSwitchView.isChecked = uiState.isOneSidedPaymentEnabled || uiState.isOneSidedPaymentForced
-            ui.oneSidePaymentSwitchView.isEnabled = !uiState.isOneSidedPaymentForced
             showOrHideCustomFeeDialog(uiState.feePerGrams)
         }
 
@@ -137,8 +133,6 @@ class AddAmountFragment : CommonXmlFragment<FragmentAddAmountBinding, AddAmountV
     }
 
     private fun setupUI(uiState: AddAmountModel.UiState) {
-        ui.oneSidePaymentSwitchViewContainer.setVisible(DebugConfig.interactivePaymentsEnabled)
-
         keyboardController.setup(requireContext(), AmountCheckRunnable(), ui.numpad, ui.amount, uiState.amount)
         contactDto = uiState.contactDto
         note = uiState.note
@@ -165,10 +159,7 @@ class AddAmountFragment : CommonXmlFragment<FragmentAddAmountBinding, AddAmountV
         ui.backCtaView.setOnClickListener { onBackButtonClicked(it) }
         ui.emojiIdSummaryContainerView.setOnClickListener { viewModel.emojiIdClicked(contactDto.contactInfo.requireWalletAddress()) }
         ui.txFeeDescTextView.setOnClickListener { showTxFeeToolTip() }
-        ui.oneSidePaymentHelp.setOnClickListener { showOneSidePaymentTooltip() }
         ui.continueButton.setOnClickListener { continueButtonClicked() }
-        ui.oneSidePaymentSwitchViewTitle.setOnClickListener { ui.oneSidePaymentSwitchView.isChecked = !ui.oneSidePaymentSwitchView.isChecked }
-        ui.oneSidePaymentSwitchView.setOnClickListener { viewModel.toggleOneSidePayment() }
     }
 
     private fun showOrHideCustomFeeDialog(feePerGram: FeePerGramOptions?) {
@@ -212,14 +203,6 @@ class AddAmountFragment : CommonXmlFragment<FragmentAddAmountBinding, AddAmountV
     private fun showTxFeeToolTip() {
         val args = TooltipDialogArgs(string(tx_detail_fee_tooltip_transaction_fee), string(tx_detail_fee_tooltip_desc))
             .getModular(viewModel.resourceManager)
-        ModularDialog(requireActivity(), args).show()
-    }
-
-    private fun showOneSidePaymentTooltip() {
-        val args = TooltipDialogArgs(
-            string(add_amount_one_side_payment_switcher),
-            string(add_amount_one_side_payment_question_mark)
-        ).getModular(viewModel.resourceManager)
         ModularDialog(requireActivity(), args).show()
     }
 
@@ -272,13 +255,12 @@ class AddAmountFragment : CommonXmlFragment<FragmentAddAmountBinding, AddAmountV
     }
 
     private fun continueToNote() {
-        val isOneSidePayment = ui.oneSidePaymentSwitchView.isChecked
         val transactionData = TransactionData(
             recipientContact = contactDto,
             amount = keyboardController.currentAmount,
             note = note,
             feePerGram = viewModel.selectedFeeData!!.feePerGram,
-            isOneSidePayment = isOneSidePayment,
+            isOneSidePayment = true, // it's always true since we have only one side payments allowed
         )
 
         viewModel.continueToAddNote(transactionData)

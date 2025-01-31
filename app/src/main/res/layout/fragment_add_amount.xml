@@ -251,41 +251,6 @@
             android:id="@+id/numpad"
             layout="@layout/view_numpad" />
 
-        <LinearLayout
-            android:id="@+id/one_side_payment_switch_view_container"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginTop="10dp"
-            android:orientation="horizontal"
-            tools:visibility="visible">
-
-            <com.tari.android.wallet.ui.component.tari.TariTextView
-                android:id="@+id/one_side_payment_switch_view_title"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="12dp"
-                android:text="@string/add_amount_one_side_payment_switcher"
-                android:textColor="?attr/palette_text_heading"
-                android:textSize="16sp"
-                app:customFont="medium" />
-
-            <androidx.appcompat.widget.SwitchCompat
-                android:id="@+id/one_side_payment_switch_view"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:checked="true" />
-
-            <androidx.appcompat.widget.AppCompatImageView
-                android:id="@+id/one_side_payment_help"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:layout_gravity="center_vertical"
-                android:layout_marginStart="16dp"
-                android:foreground="?attr/selectableItemBackgroundBorderless"
-                android:src="@drawable/vector_help_icon_24dp" />
-        </LinearLayout>
-
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="74dp"

@@ -77,7 +77,7 @@ class NotificationHelper @Inject constructor(private val context: Context) {
         ).apply {
             setSound(null, null)
             setShowBadge(false)
-            description = context.getString(R.string.wallet_service_description)
+            description = ""
         }
         notificationManager.createNotificationChannel(serviceNotificationChannel)
         // app notification channel
@@ -87,26 +87,12 @@ class NotificationHelper @Inject constructor(private val context: Context) {
             NotificationManager.IMPORTANCE_HIGH
         ).apply {
             setShowBadge(false)
-            description = context.getString(R.string.wallet_service_description)
+            description = ""
             notificationManager.createNotificationChannel(this)
             importance = NotificationManager.IMPORTANCE_HIGH
         }
         notificationManager.createNotificationChannel(appNotificationChannel)
         logger.i("Channels was created")
-    }
-
-    fun buildForegroundServiceNotification(): Notification {
-        val intent = Intent(context, NotificationBroadcastReceiver::class.java)
-        val pendingIntent = PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_IMMUTABLE)
-        // prepare foreground service notification
-        return NotificationCompat.Builder(context, SERVICE_NOTIFICATION_CHANNEL_ID).run {
-            setContentTitle(context.getString(R.string.wallet_service_title))
-            setContentText(context.getString(R.string.wallet_service_description))
-            setContentIntent(pendingIntent)
-            setSound(null)
-            setSmallIcon(R.drawable.vector_notification_icon)
-            build()
-        }
     }
 
     private val txGroupNotification: Notification = NotificationCompat.Builder(context, APP_NOTIFICATION_CHANNEL_ID).run {

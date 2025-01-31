@@ -39,7 +39,6 @@ import androidx.activity.addCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.coroutineScope
 import com.tari.android.wallet.application.walletManager.WalletConfig
-import com.tari.android.wallet.application.walletManager.WalletLauncher
 import com.tari.android.wallet.application.walletManager.WalletManager
 import com.tari.android.wallet.application.walletManager.doOnWalletNotReady
 import com.tari.android.wallet.data.sharedPrefs.CorePrefRepository
@@ -70,9 +69,6 @@ class StartActivity : AppCompatActivity() {
 
     @Inject
     lateinit var networkRepository: NetworkPrefRepository
-
-    @Inject
-    lateinit var walletLauncher: WalletLauncher
 
     @Inject
     lateinit var walletManager: WalletManager
@@ -116,7 +112,7 @@ class StartActivity : AppCompatActivity() {
             }
         }
 
-        walletLauncher.stop()
+        walletManager.stop()
     }
 
     private fun <T : Activity> launchActivity(destination: Class<T>) {

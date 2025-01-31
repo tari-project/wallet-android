@@ -36,7 +36,6 @@ import android.content.ClipboardManager
 import com.tari.android.wallet.application.TariWalletApplication
 import com.tari.android.wallet.infrastructure.ShareManager
 import com.tari.android.wallet.notification.NotificationBroadcastReceiver
-import com.tari.android.wallet.service.service.WalletService
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.component.clipboardController.WalletAddressViewModel
 import com.tari.android.wallet.ui.component.networkStateIndicator.ConnectionIndicatorViewModel
@@ -56,8 +55,8 @@ import com.tari.android.wallet.ui.screen.home.HomeActivity
 import com.tari.android.wallet.ui.screen.home.HomeViewModel
 import com.tari.android.wallet.ui.screen.home.overview.HomeOverviewViewModel
 import com.tari.android.wallet.ui.screen.onboarding.activity.OnboardingFlowActivity
-import com.tari.android.wallet.ui.screen.onboarding.createWallet.CreateWalletViewModel
 import com.tari.android.wallet.ui.screen.onboarding.createWallet.CreateWalletFragment
+import com.tari.android.wallet.ui.screen.onboarding.createWallet.CreateWalletViewModel
 import com.tari.android.wallet.ui.screen.onboarding.inroduction.IntroductionViewModel
 import com.tari.android.wallet.ui.screen.onboarding.localAuth.LocalAuthViewModel
 import com.tari.android.wallet.ui.screen.pinCode.EnterPinCodeViewModel
@@ -77,7 +76,6 @@ import com.tari.android.wallet.ui.screen.send.finalize.FinalizeSendTxViewModel
 import com.tari.android.wallet.ui.screen.send.requestTari.RequestTariViewModel
 import com.tari.android.wallet.ui.screen.settings.allSettings.AllSettingsViewModel
 import com.tari.android.wallet.ui.screen.settings.allSettings.about.TariAboutViewModel
-import com.tari.android.wallet.ui.screen.settings.backgroundService.BackgroundServiceSettingsViewModel
 import com.tari.android.wallet.ui.screen.settings.backup.backupOnboarding.BackupOnboardingFlowViewModel
 import com.tari.android.wallet.ui.screen.settings.backup.backupOnboarding.item.BackupOnboardingFlowItemViewModel
 import com.tari.android.wallet.ui.screen.settings.backup.backupSettings.BackupSettingsViewModel
@@ -126,8 +124,6 @@ interface ApplicationComponent {
 
     fun inject(application: TariWalletApplication)
 
-    fun inject(service: WalletService)
-
     fun inject(activity: StartActivity)
     fun inject(activity: OnboardingFlowActivity)
     fun inject(activity: AuthActivity)
@@ -140,7 +136,6 @@ interface ApplicationComponent {
     fun inject(commonViewModel: CommonViewModel)
     fun inject(viewModel: ThumbnailGifViewModel)
     fun inject(viewModel: GifViewModel)
-    fun inject(viewModel: BackgroundServiceSettingsViewModel)
     fun inject(viewModel: ScreenRecordingSettingsViewModel)
     fun inject(viewModel: ConnectionIndicatorViewModel)
     fun inject(viewModel: ChooseRestoreOptionViewModel)

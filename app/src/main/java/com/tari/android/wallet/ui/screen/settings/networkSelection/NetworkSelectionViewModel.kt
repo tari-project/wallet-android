@@ -4,7 +4,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.walletManager.WalletConfig
-import com.tari.android.wallet.application.walletManager.WalletLauncher
 import com.tari.android.wallet.application.walletManager.doOnWalletNotReady
 import com.tari.android.wallet.data.sharedPrefs.network.TariNetwork
 import com.tari.android.wallet.di.DiContainer
@@ -20,9 +19,6 @@ class NetworkSelectionViewModel : CommonViewModel() {
 
     @Inject
     lateinit var walletConfig: WalletConfig
-
-    @Inject
-    lateinit var walletLauncher: WalletLauncher
 
     private val _networks = MutableLiveData<List<CommonViewHolderItem>>()
     val networks: LiveData<List<CommonViewHolderItem>> = _networks
@@ -71,6 +67,6 @@ class NetworkSelectionViewModel : CommonViewModel() {
             }
         }
 
-        walletLauncher.stop()
+        walletManager.stop()
     }
 }
