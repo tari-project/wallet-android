@@ -41,13 +41,14 @@ class BackupPrefRepository @Inject constructor(
         defValue = BackupOptionDto(BackupOption.Google),
     )
 
-    var dropboxOption: BackupOptionDto by SharedPrefGsonDelegate(
-        prefs = sharedPrefs,
-        commonRepository = this,
-        name = formatKey(Keys.DROPBOX_OPTIONS_KEY),
-        type = BackupOptionDto::class.java,
-        defValue = BackupOptionDto(BackupOption.Dropbox),
-    )
+//    var dropboxOption: BackupOptionDto by SharedPrefGsonDelegate(
+//        prefs = sharedPrefs,
+//        commonRepository = this,
+//        name = formatKey(Keys.DROPBOX_OPTIONS_KEY),
+//        type = BackupOptionDto::class.java,
+//        defValue = BackupOptionDto(BackupOption.Dropbox),
+//    )
+    // FIXME: Dropbox backup is not supported yet
 
     var dropboxCredential: DbxCredential? by SharedPrefGsonNullableDelegate(
         prefs = sharedPrefs,
@@ -81,7 +82,7 @@ class BackupPrefRepository @Inject constructor(
         get() = if (BuildConfig.FLAVOR == Constants.Build.privacyFlavor) {
             listOfNotNull(localFileOption)
         } else {
-            listOfNotNull(googleDriveOption, dropboxOption)
+            listOfNotNull(googleDriveOption/* dropboxOption */)
         }
 
     fun clear() {
@@ -89,21 +90,21 @@ class BackupPrefRepository @Inject constructor(
         localBackupFolderURI = null
         localFileOption = BackupOptionDto(BackupOption.Local)
         googleDriveOption = BackupOptionDto(BackupOption.Google)
-        dropboxOption = BackupOptionDto(BackupOption.Dropbox)
+//        dropboxOption = BackupOptionDto(BackupOption.Dropbox)
     }
 
     fun updateOption(option: BackupOptionDto) {
         when (option.type) {
             BackupOption.Google -> googleDriveOption = option
             BackupOption.Local -> localFileOption = option
-            BackupOption.Dropbox -> dropboxOption = option
+//            BackupOption.Dropbox -> dropboxOption = option
         }
     }
 
     fun getOptionDto(type: BackupOption): BackupOptionDto = when (type) {
         BackupOption.Google -> googleDriveOption
         BackupOption.Local -> localFileOption
-        BackupOption.Dropbox -> dropboxOption
+//        BackupOption.Dropbox -> dropboxOption
     }
 
     companion object {

@@ -77,7 +77,7 @@ class BackupManager @Inject constructor(
     private val logger
         get() = Logger.t(BackupManager::class.simpleName)
 
-    var currentOption: BackupOption? = BackupOption.Dropbox
+    var currentOption: BackupOption? = BackupOption.Google
 
     private val backupMutex = Mutex()
 
@@ -208,7 +208,7 @@ class BackupManager @Inject constructor(
     private fun getStorageByOption(optionType: BackupOption): BackupStorage = when (optionType) {
         BackupOption.Google -> googleDriveBackupStorage
         BackupOption.Local -> localFileBackupStorage
-        BackupOption.Dropbox -> dropboxBackupStorage
+//        BackupOption.Dropbox -> dropboxBackupStorage // FIXME: Dropbox backup is not supported yet
     }
 
     private fun postBackupFailedNotification(exception: Exception) {
