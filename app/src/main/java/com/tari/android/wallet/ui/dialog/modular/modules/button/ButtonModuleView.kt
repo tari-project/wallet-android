@@ -34,7 +34,7 @@ class ButtonModuleView : CommonView<CommonViewModel, DialogModuleButtonBinding> 
         when (buttonModule.style) {
             ButtonStyle.Normal -> {
                 ui.button.setTextColor(PaletteManager.getButtonPrimaryText(context))
-                ui.button.background = ContextCompat.getDrawable(context, R.drawable.vector_disable_able_gradient_button_bg)
+                ui.button.background = ContextCompat.getDrawable(context, R.drawable.vector_gradient_button_bg)
             }
 
             ButtonStyle.Warning -> {
