@@ -122,7 +122,7 @@ fun IntroductionScreen(
                     Spacer(modifier = Modifier.size(8.dp))
                     AgreementLinkedText(
                         modifier = Modifier
-                            .padding(horizontal = 64.dp)
+                            .padding(horizontal = 24.dp)
                             .align(Alignment.CenterHorizontally),
                     )
                     Spacer(modifier = Modifier.size(16.dp))

@@ -6,8 +6,6 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.tari.android.wallet.R
 import com.tari.android.wallet.data.sharedPrefs.backup.BackupPrefRepository
-import com.tari.android.wallet.util.extension.launchOnIo
-import com.tari.android.wallet.util.extension.safeCastTo
 import com.tari.android.wallet.infrastructure.backup.BackupException
 import com.tari.android.wallet.infrastructure.backup.BackupManager
 import com.tari.android.wallet.infrastructure.backup.BackupState
@@ -23,6 +21,8 @@ import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonStyle
 import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
 import com.tari.android.wallet.ui.screen.settings.backup.data.BackupOption
 import com.tari.android.wallet.ui.screen.settings.backup.data.BackupOptionDto
+import com.tari.android.wallet.util.extension.launchOnIo
+import com.tari.android.wallet.util.extension.safeCastTo
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.take
@@ -65,7 +65,7 @@ class BackupOptionViewModel : CommonViewModel() {
         get() = when (option.value!!.type) {
             BackupOption.Google -> R.string.back_up_wallet_google_title
             BackupOption.Local -> R.string.back_up_wallet_local_file_title
-            BackupOption.Dropbox -> R.string.back_up_wallet_dropbox_backup_title
+//            BackupOption.Dropbox -> R.string.back_up_wallet_dropbox_backup_title // FIXME: Dropbox backup is not supported yet
         }
 
     fun setup(option: BackupOption) {

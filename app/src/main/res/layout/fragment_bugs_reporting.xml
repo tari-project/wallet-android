@@ -98,12 +98,17 @@
                     android:textSize="14sp"
                     app:customFont="medium" />
 
-                <com.tari.android.wallet.ui.component.tari.TariGradientButton
+                <com.tari.android.wallet.ui.component.tari.TariButton
                     android:id="@+id/send_button"
                     android:layout_width="match_parent"
                     android:layout_height="@dimen/common_action_button_height"
                     android:layout_marginBottom="10dp"
-                    app:title="@string/bugs_reporting_send" />
+                    android:background="@drawable/vector_gradient_button_bg"
+                    android:text="@string/bugs_reporting_send"
+                    android:textAllCaps="false"
+                    android:textColor="?attr/palette_text_button"
+                    android:textSize="16sp"
+                    app:customFont="heavy" />
 
                 <com.tari.android.wallet.ui.component.tari.TariSecondaryButton
                     android:id="@+id/view_logs_button"

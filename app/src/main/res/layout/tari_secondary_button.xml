@@ -11,6 +11,6 @@
     android:singleLine="true"
     android:text="@string/dummy_text"
     android:textAllCaps="false"
-    android:textColor="?attr/palette_text_links"
+    android:textColor="?attr/palette_text_heading"
     android:textSize="16sp"
     app:customFont="heavy" />

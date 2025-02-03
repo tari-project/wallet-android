@@ -41,7 +41,7 @@ object PaletteManager { // todo use Compose palette or remove obsolete palette
 
     fun getBackgroundSecondary(context: Context) = context.colorFromAttribute(R.attr.palette_background_secondary)
 
-    fun getButtonPrimaryText(context: Context) = context.colorFromAttribute(R.attr.palette_button_primary_text)
+    fun getButtonPrimaryText(context: Context) = context.colorFromAttribute(R.attr.palette_text_button)
 
     fun getButtonDisabled(context: Context) = context.colorFromAttribute(R.attr.palette_button_disable)
 
