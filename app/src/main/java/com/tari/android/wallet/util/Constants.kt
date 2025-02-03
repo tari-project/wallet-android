@@ -118,7 +118,6 @@ object Constants {
         const val DISCOVERY_TIMEOUT_SEC = 20L
         const val STORE_AND_FORWARD_MESSAGE_DURATION_SEC = 10800L
         const val EMOJI_FORMATTER_CHUNK_SIZE = 3
-        const val PUSH_NOTIFICATION_SERVER_URL = "https://push.tari.com"
         val DEFAULT_FEE_PER_GRAM = 10.toMicroTari()
     }
 

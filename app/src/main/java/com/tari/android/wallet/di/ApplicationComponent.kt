@@ -113,7 +113,6 @@ import javax.inject.Singleton
 @Component(
     modules = [
         ApplicationModule::class,
-        ServiceModule::class,
         TorModule::class,
         RetrofitModule::class,
         CoroutinesDispatchersModule::class,

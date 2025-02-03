@@ -23,7 +23,6 @@ import com.tari.android.wallet.model.tx.CancelledTx
 import com.tari.android.wallet.model.tx.CompletedTx
 import com.tari.android.wallet.model.tx.PendingInboundTx
 import com.tari.android.wallet.model.tx.PendingOutboundTx
-import com.tari.android.wallet.notification.NotificationHelper
 import com.tari.android.wallet.util.DebugConfig
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -39,8 +38,6 @@ class MainFFIWalletListener(
     private val walletValidator: WalletValidator,
     private val externalScope: CoroutineScope,
     private val baseNodesManager: BaseNodesManager,
-    private val walletNotificationManager: WalletNotificationManager,
-    private val notificationHelper: NotificationHelper,
     private val balanceStateHandler: BalanceStateHandler,
     private val baseNodeStateHandler: BaseNodeStateHandler,
     private val walletRestorationStateHandler: WalletRestorationStateHandler,
@@ -61,7 +58,6 @@ class MainFFIWalletListener(
                 tx = pendingInboundTx.copy(tariContact = getUserByWalletAddress(pendingInboundTx.tariContact.walletAddress)),
             )
         )
-        walletNotificationManager.postTxNotification(pendingInboundTx)
     }
 
     override fun onTxReplyReceived(pendingOutboundTx: PendingOutboundTx) = runOnMain {
@@ -132,7 +128,6 @@ class MainFFIWalletListener(
 
     override fun onDirectSendResult(txId: TxId, status: TransactionSendStatus) = runOnMain {
         walletManager.updateTxSentConfirmations(TxSendResult(txId, status))
-        walletNotificationManager.sendOutboundTxNotification(walletManager.requireWalletInstance, txId, status)
     }
 
     override fun onTxCancelled(cancelledTx: CancelledTx, rejectionReason: Int) = runOnMain {
@@ -141,8 +136,6 @@ class MainFFIWalletListener(
                 tx = cancelledTx.copy(tariContact = getUserByWalletAddress(cancelledTx.tariContact.walletAddress)),
             )
         )
-
-        notificationHelper.postTxCanceledNotification(cancelledTx)
     }
 
     override fun onTXOValidationComplete(responseId: BigInteger, status: TransactionValidationStatus) = runOnMain {
