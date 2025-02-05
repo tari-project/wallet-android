@@ -14,6 +14,7 @@ plugins {
     id("com.google.devtools.ksp")
     id("download-libwallet")
     id("org.jetbrains.kotlin.plugin.compose") version Dependencies.Kotlin.version
+    id("com.google.gms.google-services")
 }
 
 val commitNumber: Int by lazy {
@@ -265,7 +266,7 @@ dependencies {
     implementation(Dependencies.secureStorage)
 
     implementation(platform(Dependencies.Firebase.bom))
-    implementation(Dependencies.Firebase.crashlytics)
+    implementation(Dependencies.Firebase.messaging)
 
     implementation(Dependencies.Google.playServicesAuth)
     implementation(Dependencies.Google.httpClientGson)

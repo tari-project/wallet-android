@@ -51,10 +51,10 @@ class NotificationHelper @Inject constructor(private val context: Context) {
 
     companion object {
         // notification channel id
-        private const val SERVICE_NOTIFICATION_CHANNEL_ID = "com.tari.android.wallet.service.WALLET_SERVICE_NOTIFICATION"
-        private const val APP_NOTIFICATION_CHANNEL_ID = "com.tari.android.wallet.WALLET_NOTIFICATION"
-        private const val APP_NOTIFICATION_GROUP_ID = 1000
-        private const val APP_NOTIFICATION_GROUP_NAME = "com.tari.android.wallet.notification.TX"
+        const val SERVICE_NOTIFICATION_CHANNEL_ID = "com.tari.android.wallet.service.WALLET_SERVICE_NOTIFICATION"
+        const val APP_NOTIFICATION_CHANNEL_ID = "com.tari.android.wallet.WALLET_NOTIFICATION"
+        const val APP_NOTIFICATION_GROUP_ID = 1000
+        const val APP_NOTIFICATION_GROUP_NAME = "com.tari.android.wallet.notification.TX"
     }
 
     private var notificationManager = NotificationManagerCompat.from(context)

@@ -9,6 +9,7 @@ buildscript {
         classpath(Dependencies.gradlePlugin)
         classpath(Dependencies.Kotlin.gradlePlugin)
         classpath(Dependencies.Sentry.gradlePlugin)
+        classpath(Dependencies.Firebase.gradlePlugin)
     }
 }
 

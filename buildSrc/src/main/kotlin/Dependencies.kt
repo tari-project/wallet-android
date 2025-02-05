@@ -50,8 +50,10 @@ object Dependencies {
     }
 
     object Firebase {
-        const val bom = "com.google.firebase:firebase-bom:33.6.0"
-        const val crashlytics = "com.google.firebase:firebase-crashlytics"
+        const val gradlePlugin = "com.google.gms:google-services:4.4.2"
+
+        const val bom = "com.google.firebase:firebase-bom:33.8.0"
+        const val messaging = "com.google.firebase:firebase-messaging"
     }
 
     object Retrofit {
