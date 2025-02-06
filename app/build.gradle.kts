@@ -89,12 +89,12 @@ android {
     productFlavors {
         create("regular") {
             dimension = "privacy-mode"
-            buildConfigField("String", "NOTIFICATIONS_API_KEY", "\"${loadSecretProps()["service.notifications.api_key"]}\"")
+            buildConfigField("String", "NOTIFICATIONS_API_KEY", "\"${loadSecretProps()["service.notifications.api_key"]}\"") // todo use new API KEY
             proguardFile("regular-proguard-rules.pro")
         }
         create("privacy") {
             dimension = "privacy-mode"
-            buildConfigField("String", "NOTIFICATIONS_API_KEY", "\"${loadSecretProps()["service.notifications.api_key"]}\"")
+            buildConfigField("String", "NOTIFICATIONS_API_KEY", "\"${loadSecretProps()["service.notifications.api_key"]}\"")// todo use new API KEY
         }
     }
 

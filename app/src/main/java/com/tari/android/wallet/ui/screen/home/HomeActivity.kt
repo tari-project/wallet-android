@@ -98,6 +98,8 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>() {
     @Inject
     lateinit var tariSettingsRepository: TariSettingsPrefRepository
 
+    // TODO check GP services installed GoogleApiAvailability.makeGooglePlayServicesAvailable()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         appComponent.inject(this)

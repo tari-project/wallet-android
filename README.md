@@ -7,6 +7,13 @@
 
 [![Actions Status](https://github.com/tari-project/wallet-android/workflows/PR%20Test%20Workflow/badge.svg)](https://github.com/tari-project/wallet-android/actions)
 
+[//]: # ( TODO Include Google Services)
+app/
+├── src/
+├── build.gradle
+├── ...
+└── google-services.json
+
 ## What is Aurora?
 Aurora is a reference-design mobile wallet app for the forthcoming [Tari](https://www.tari.com/) digital currency. The goal is for creators and developers to be able to use the open-source Aurora libraries and codebase as a starting point for developing their own Tari wallets and applications. Aurora also sets the bar for applications that use the Tari protocol. In its production-ready state, it will be a beautiful, easy to use Tari wallet focused on Tari as a default-private digital currency.
 
@@ -41,3 +48,22 @@ If you want to disable the automatic download and use the native libraries of yo
 
 ### For updating openssl
 https://github.com/217heidai/openssl_for_android/releases
+
+### Firebase Cloud Messaging Setup
+
+To enable Firebase Cloud Messaging (FCM) in the Aurora app, you need to add your `google-services.json` file to the root of the `app` module. This file contains the configuration details for your Firebase project.
+
+1. Obtain your `google-services.json` file from the Firebase Console.
+2. Place the `google-services.json` file in the root directory of the `app` module.
+
+The directory structure should look like this:
+
+```
+app/
+├── src/
+├── build.gradle
+├── ...
+└── google-services.json
+```
+
+This configuration is necessary for the app to use Firebase Cloud Messaging services.
