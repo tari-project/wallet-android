@@ -178,7 +178,7 @@ class ChooseRestoreOptionViewModel : CommonViewModel() {
                 hideDialog()
                 showEnterPassphraseDialog(deepLink)
             },
-            ButtonModule(resourceManager.getString(R.string.restore_wallet_paper_wallet_do_not_restore_button), ButtonStyle.Close),
+            ButtonModule(resourceManager.getString(R.string.common_close), ButtonStyle.Close),
         )
     }
 
