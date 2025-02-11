@@ -9,7 +9,7 @@ import com.tari.android.wallet.ui.common.giphy.presentation.GifState.ErrorState
 import com.tari.android.wallet.ui.common.giphy.presentation.GifState.LoadingState
 import com.tari.android.wallet.ui.common.giphy.presentation.GifState.NoGIFState
 import com.tari.android.wallet.ui.common.giphy.presentation.GifState.SuccessState
-import com.tari.android.wallet.ui.common.giphy.repository.GifRepository
+import com.tari.android.wallet.ui.common.giphy.repository.GiphyRestService
 import com.tari.android.wallet.ui.common.giphy.repository.GifItem
 import io.reactivex.Observable
 import io.reactivex.ObservableEmitter
@@ -18,7 +18,7 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.BehaviorSubject
 
-class GifViewModel(private val repository: GifRepository) {
+class GifViewModel(private val repository: GiphyRestService) {
     private val compositeDisposable = CompositeDisposable()
     private val subject = BehaviorSubject.create<Tx>()
     private val _gifState = MutableLiveData<GifState>()

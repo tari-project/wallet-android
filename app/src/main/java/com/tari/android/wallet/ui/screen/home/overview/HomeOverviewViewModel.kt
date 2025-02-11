@@ -22,7 +22,7 @@ import com.tari.android.wallet.model.tx.Tx
 import com.tari.android.wallet.navigation.Navigation
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.common.giphy.presentation.GifViewModel
-import com.tari.android.wallet.ui.common.giphy.repository.GifRepository
+import com.tari.android.wallet.ui.common.giphy.repository.GiphyRestService
 import com.tari.android.wallet.ui.dialog.modular.DialogArgs
 import com.tari.android.wallet.ui.dialog.modular.ModularDialogArgs
 import com.tari.android.wallet.ui.dialog.modular.modules.body.BodyModule
@@ -64,7 +64,7 @@ class HomeOverviewViewModel : CommonViewModel() {
     lateinit var balanceStateHandler: BalanceStateHandler
 
     @Inject
-    lateinit var gifRepository: GifRepository
+    lateinit var giphyRestService: GiphyRestService
 
     init {
         component.inject(this)
@@ -100,7 +100,7 @@ class HomeOverviewViewModel : CommonViewModel() {
                         .map { txDto ->
                             TxViewHolderItem(
                                 txDto = txDto,
-                                gifViewModel = GifViewModel(gifRepository),
+                                gifViewModel = GifViewModel(giphyRestService),
                             )
                         }
                         .take(TRANSACTION_AMOUNT_HOME_PAGE),

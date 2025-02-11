@@ -8,7 +8,7 @@ import com.tari.android.wallet.model.tx.Tx
 import com.tari.android.wallet.navigation.Navigation
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.common.giphy.presentation.GifViewModel
-import com.tari.android.wallet.ui.common.giphy.repository.GifRepository
+import com.tari.android.wallet.ui.common.giphy.repository.GiphyRestService
 import com.tari.android.wallet.ui.common.recyclerView.items.TitleViewHolderItem
 import com.tari.android.wallet.data.contacts.ContactsRepository
 import com.tari.android.wallet.ui.screen.tx.adapter.TxViewHolderItem
@@ -26,7 +26,7 @@ class AllTxHistoryViewModel : CommonViewModel() {
     lateinit var contactsRepository: ContactsRepository
 
     @Inject
-    lateinit var gifRepository: GifRepository
+    lateinit var giphyRestService: GiphyRestService
 
     private val _uiState = MutableStateFlow(AllTxHistoryModel.UiState())
     val uiState = _uiState.asStateFlow()
@@ -45,7 +45,7 @@ class AllTxHistoryViewModel : CommonViewModel() {
                         *pendingTxs.map { txDto ->
                             TxViewHolderItem(
                                 txDto = txDto,
-                                gifViewModel = GifViewModel(gifRepository),
+                                gifViewModel = GifViewModel(giphyRestService),
                             )
                         }.toTypedArray(),
 
@@ -56,7 +56,7 @@ class AllTxHistoryViewModel : CommonViewModel() {
                         *nonPendingTxs.map { txDto ->
                             TxViewHolderItem(
                                 txDto = txDto,
-                                gifViewModel = GifViewModel(gifRepository),
+                                gifViewModel = GifViewModel(giphyRestService),
                             )
                         }.toTypedArray(),
                     )

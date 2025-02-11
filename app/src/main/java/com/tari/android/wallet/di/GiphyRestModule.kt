@@ -33,8 +33,8 @@
 package com.tari.android.wallet.di
 
 import com.tari.android.wallet.BuildConfig
-import com.tari.android.wallet.ui.common.giphy.repository.GifRepository
-import com.tari.android.wallet.ui.common.giphy.repository.GiphyRESTRetrofitRepository
+import com.tari.android.wallet.ui.common.giphy.repository.GiphyRestService
+import com.tari.android.wallet.ui.common.giphy.repository.GiphyRepository
 import dagger.Module
 import dagger.Provides
 import okhttp3.Interceptor
@@ -47,7 +47,7 @@ import javax.inject.Named
 import javax.inject.Singleton
 
 @Module
-class PresentationModule {
+class GiphyRestModule {
 
     private companion object {
         private const val GIPHY_BASE_URL = "https://api.giphy.com"
@@ -85,7 +85,7 @@ class PresentationModule {
 
     @Provides
     @Singleton
-    fun provideGifRepository(@Named(GIPHY_RETROFIT) retrofit: Retrofit): GifRepository =
-        GiphyRESTRetrofitRepository(retrofit.create())
+    fun provideGifRepository(@Named(GIPHY_RETROFIT) retrofit: Retrofit): GiphyRestService =
+        GiphyRepository(retrofit.create())
 
 }
