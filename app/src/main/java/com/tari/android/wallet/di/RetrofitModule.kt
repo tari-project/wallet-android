@@ -33,8 +33,9 @@
 package com.tari.android.wallet.di
 
 import com.tari.android.wallet.BuildConfig
-import com.tari.android.wallet.ui.common.giphy.repository.GiphyRestService
+import com.tari.android.wallet.data.airdrop.AirdropRetrofitService
 import com.tari.android.wallet.ui.common.giphy.repository.GiphyRepository
+import com.tari.android.wallet.ui.common.giphy.repository.GiphyRestService
 import dagger.Module
 import dagger.Provides
 import okhttp3.Interceptor
@@ -47,24 +48,23 @@ import javax.inject.Named
 import javax.inject.Singleton
 
 @Module
-class GiphyRestModule {
+class RetrofitModule {
 
     private companion object {
         private const val GIPHY_BASE_URL = "https://api.giphy.com"
-        private const val GIPHY_HTTP_CLIENT = "giphy_http_client"
-        private const val GIPHY_RETROFIT = "giphy_retrofit"
+        private const val AIRDROP_BASE_URL = "https://airdrop.tari.com"
+
+        private const val RETROFIT_GIPHY = "giphy_retrofit"
+        private const val RETROFIT_AIRDROP = "airdrop_retrofit"
+
         private const val GIPHY_QUERY_PARAM_API_KEY = "api_key"
     }
 
     @Provides
-    @Named(GIPHY_HTTP_CLIENT)
+    @Named(RETROFIT_GIPHY)
     @Singleton
     fun provideGiphyHttpClient(): OkHttpClient = OkHttpClient.Builder()
-        .also { client ->
-            if (BuildConfig.DEBUG) HttpLoggingInterceptor()
-                .apply { level = HttpLoggingInterceptor.Level.BODY }
-                .also { client.addInterceptor(it) }
-        }
+        .addLoggingIfDebug()
         .addInterceptor { chain: Interceptor.Chain ->
             chain.request().url.newBuilder()
                 .addQueryParameter(GIPHY_QUERY_PARAM_API_KEY, BuildConfig.GIPHY_KEY).build()
@@ -74,9 +74,9 @@ class GiphyRestModule {
         .build()
 
     @Provides
-    @Named(GIPHY_RETROFIT)
+    @Named(RETROFIT_GIPHY)
     @Singleton
-    fun provideTestnetFaucetRetrofit(@Named(GIPHY_HTTP_CLIENT) client: OkHttpClient): Retrofit =
+    fun provideTestnetFaucetRetrofit(@Named(RETROFIT_GIPHY) client: OkHttpClient): Retrofit =
         Retrofit.Builder()
             .baseUrl(GIPHY_BASE_URL)
             .client(client)
@@ -85,7 +85,38 @@ class GiphyRestModule {
 
     @Provides
     @Singleton
-    fun provideGifRepository(@Named(GIPHY_RETROFIT) retrofit: Retrofit): GiphyRestService =
+    fun provideGifRepository(@Named(RETROFIT_GIPHY) retrofit: Retrofit): GiphyRestService =
         GiphyRepository(retrofit.create())
 
+    @Provides
+    @Named(RETROFIT_AIRDROP)
+    @Singleton
+    fun provideAirdropHttpClient(): OkHttpClient = OkHttpClient.Builder()
+        .addLoggingIfDebug()
+        .build()
+
+    @Provides
+    @Named(RETROFIT_AIRDROP)
+    @Singleton
+    fun provideAirdropRetrofit(@Named(RETROFIT_AIRDROP) client: OkHttpClient): Retrofit =
+        Retrofit.Builder()
+            .baseUrl(AIRDROP_BASE_URL)
+            .client(client)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+
+    @Provides
+    @Singleton
+    fun provideAirdropRepository(@Named(RETROFIT_AIRDROP) retrofit: Retrofit): AirdropRetrofitService =
+        retrofit.create(AirdropRetrofitService::class.java)
+
+    private fun OkHttpClient.Builder.addLoggingIfDebug(): OkHttpClient.Builder {
+        if (BuildConfig.DEBUG) {
+            val loggingInterceptor = HttpLoggingInterceptor().apply {
+                level = HttpLoggingInterceptor.Level.BODY
+            }
+            addInterceptor(loggingInterceptor)
+        }
+        return this
+    }
 }

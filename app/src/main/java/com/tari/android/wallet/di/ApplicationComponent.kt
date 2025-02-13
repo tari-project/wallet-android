@@ -115,7 +115,7 @@ import javax.inject.Singleton
         ApplicationModule::class,
         ServiceModule::class,
         TorModule::class,
-        GiphyRestModule::class,
+        RetrofitModule::class,
         CoroutinesDispatchersModule::class,
     ]
 )

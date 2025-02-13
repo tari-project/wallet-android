@@ -41,6 +41,7 @@ import com.tari.android.wallet.model.MicroTari
 import com.tari.android.wallet.model.TariWalletAddress
 import com.tari.android.wallet.util.extension.parseToBigInteger
 import kotlinx.parcelize.Parcelize
+import kotlin.text.orEmpty
 
 /**
  * Parses a deep link and contains the structured deep link details.
@@ -175,20 +176,31 @@ sealed class DeepLink : Parcelable {
     @Parcelize
     data class TorBridges(val torConfigurations: List<TorBridgeConfiguration>) : DeepLink()
 
-    // tari://esmeralda/paper_wallet?private_key=1LTWgW1kzx1e1EoY9vU1FCSDweVKjnJuNA9LysUJnFuy3x
+    // tari://esmeralda/paper_wallet?private_key=1234567890XX&anon_id=1234567890XX&balance=0%20%C2%B5T&tt=1234567890XX
     @Parcelize
-    data class PaperWallet(val privateKey: String) : DeepLink() {
+    data class PaperWallet(
+        val privateKey: String,
+        val anonId: String = "",
+        val balance: String = "",
+        val tt: String = "",
+    ) : DeepLink() {
 
         fun seedWords(passphrase: String): List<String>? = runCatching {
             FFISeedWords(this.privateKey, passphrase).runWithDestroy { seedWords -> (0 until seedWords.getLength()).map { seedWords.getAt(it) } }
         }.getOrNull()
 
         constructor(params: Map<String, String>) : this(
-            params[KEY_PRIVATE_KEY].orEmpty()
+            params[KEY_PRIVATE_KEY].orEmpty(),
+            params[KEY_ANON_ID].orEmpty(),
+            params[KEY_BALANCE].orEmpty(),
+            params[KEY_TT].orEmpty(),
         )
 
         override fun getParams(): Map<String, String> = hashMapOf<String, String>().apply {
             put(KEY_PRIVATE_KEY, privateKey)
+            put(KEY_ANON_ID, anonId)
+            put(KEY_BALANCE, balance)
+            put(KEY_TT, tt)
         }
 
         override fun getCommand(): String = COMMAND_PAPER_WALLET
@@ -196,6 +208,9 @@ sealed class DeepLink : Parcelable {
         companion object {
             const val COMMAND_PAPER_WALLET = "paper_wallet"
             const val KEY_PRIVATE_KEY = "private_key"
+            const val KEY_ANON_ID = "anon_id"
+            const val KEY_BALANCE = "balance"
+            const val KEY_TT = "tt"
         }
     }
 

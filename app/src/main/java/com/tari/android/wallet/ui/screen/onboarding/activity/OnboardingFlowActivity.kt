@@ -93,7 +93,7 @@ class OnboardingFlowActivity : CommonActivity<ActivityOnboardingFlowBinding, Onb
         // TODO move this logic to VM. We shouldn't manage scopes inside the activity
         when {
             paperWalletSeeds != null -> {
-                walletManager.start(paperWalletSeeds)
+                walletManager.start(paperWalletSeeds) // TODO add start balance value
 
                 launchOnIo {
                     walletManager.doOnWalletRunning {

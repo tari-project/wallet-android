@@ -160,8 +160,9 @@ class WalletManager @Inject constructor(
 
     // ------------------------------------------------------ Start Wallet ------------------------------------------------------
 
+    // TODO Use the startBalance properly
     @Synchronized
-    fun start(seedWords: List<String>? = null) {
+    fun start(seedWords: List<String>? = null, startBalance: String? = null) {
         val ffiSeedWords = SeedPhrase.createOrNull(seedWords)
 
         walletCallbacks.addListener(
@@ -182,12 +183,12 @@ class WalletManager @Inject constructor(
         torManager.run()
         applicationScope.launch {
             torProxyStateHandler.doOnTorReadyForWallet {
-                startWallet(ffiSeedWords)
+                startWallet(ffiSeedWords, startBalance)
             }
         }
     }
 
-    private fun startWallet(ffiSeedWords: FFISeedWords?) {
+    private fun startWallet(ffiSeedWords: FFISeedWords?, startBalance: String?) {
         if (walletState.value is WalletState.NotReady || walletState.value is WalletState.Failed) {
             logger.i("Start wallet: Initializing wallet...")
             _walletState.update { WalletState.Initializing }
