@@ -53,7 +53,7 @@
             android:paddingVertical="10dp"
             app:alphaBackground="0.7"
             app:backgroundColor="@color/black"
-            app:cornerRadius="10dp">
+            app:cornerRadius="54dp">
 
             <com.tari.android.wallet.ui.component.tari.TariTextView
                 android:layout_width="wrap_content"

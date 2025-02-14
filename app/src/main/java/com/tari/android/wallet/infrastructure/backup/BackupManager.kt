@@ -77,7 +77,7 @@ class BackupManager @Inject constructor(
     private val logger
         get() = Logger.t(BackupManager::class.simpleName)
 
-    var currentOption: BackupOption? = BackupOption.Google
+    var currentOption: BackupOption? = null
 
     private val backupMutex = Mutex()
 

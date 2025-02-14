@@ -4,7 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.tari.android.wallet.ui.common.CommonViewModel
-import com.tari.android.wallet.ui.common.giphy.repository.GifRepository
+import com.tari.android.wallet.ui.common.giphy.repository.GiphyRestService
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -17,7 +17,7 @@ class GifViewModel : CommonViewModel() {
     }
 
     @Inject
-    lateinit var repository: GifRepository
+    lateinit var repository: GiphyRestService
 
     private var gifId: String = ""
 

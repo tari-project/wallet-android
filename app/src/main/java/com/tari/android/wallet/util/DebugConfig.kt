@@ -49,7 +49,7 @@ import com.tari.android.wallet.model.TxStatus
 import com.tari.android.wallet.model.tx.CompletedTx
 import com.tari.android.wallet.model.tx.Tx
 import com.tari.android.wallet.ui.common.giphy.presentation.GifViewModel
-import com.tari.android.wallet.ui.common.giphy.repository.GifRepository
+import com.tari.android.wallet.ui.common.giphy.repository.GiphyRestService
 import com.tari.android.wallet.ui.common.recyclerView.items.TitleViewHolderItem
 import com.tari.android.wallet.ui.screen.contactBook.addressPoisoning.SimilarAddressDto
 import com.tari.android.wallet.ui.screen.tx.adapter.TxViewHolderItem
@@ -95,7 +95,7 @@ object DebugConfig {
 
     val sweepFundsButtonEnabled = valueIfDebug(false)
 
-    val selectBaseNodeEnabled = valueIfDebug(false)
+    val selectBaseNodeEnabled = valueIfDebug(false) // TODO remove all the code related to this ?
 
     fun isDebug() = BuildConfig.BUILD_TYPE == "debug"
 
@@ -160,28 +160,28 @@ object MockDataStub {
     )
 
     fun createTxList(
-        gifRepository: GifRepository,
+        giphyRestService: GiphyRestService,
         confirmationCount: Long,
         title: String = "Mocked Transactions"
     ) = listOf(
         TitleViewHolderItem(title = title, isFirst = true),
         createTxViewHolder(
-            gifRepository, confirmationCount,
+            giphyRestService, confirmationCount,
             amount = 1100000,
             contactAlias = "Alice",
         ),
         createTxViewHolder(
-            gifRepository, confirmationCount,
+            giphyRestService, confirmationCount,
             amount = 1200000,
             contactAlias = "Bob",
         ),
         createTxViewHolder(
-            gifRepository, confirmationCount,
+            giphyRestService, confirmationCount,
             amount = 1300000,
             contactAlias = "Charlie",
         ),
         createTxViewHolder(
-            gifRepository, confirmationCount,
+            giphyRestService, confirmationCount,
             amount = 1400000,
             contactAlias = "David",
             status = TxStatus.COINBASE,
@@ -189,7 +189,7 @@ object MockDataStub {
     )
 
     fun createTxViewHolder(
-        gifRepository: GifRepository,
+        giphyRestService: GiphyRestService,
         confirmationCount: Long,
         amount: Long = 100000,
         contactAlias: String = "Test",
@@ -212,7 +212,7 @@ object MockDataStub {
             contact = createContact(alias = contactAlias),
             requiredConfirmationCount = confirmationCount,
         ),
-        gifViewModel = GifViewModel(gifRepository),
+        gifViewModel = GifViewModel(giphyRestService),
     )
 
     fun createSimilarAddressList() = listOf(

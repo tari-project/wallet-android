@@ -8,10 +8,10 @@ import com.tari.android.wallet.ui.common.giphy.api.dto.SearchGIFResponse
 import com.tari.android.wallet.ui.common.giphy.api.dto.SearchGIFsResponse
 import retrofit2.Response
 
-class GiphyRESTRetrofitRepository(private val gateway: GiphyRESTGateway) : GifRepository {
+class GiphyRepository(private val gateway: GiphyRESTGateway) : GiphyRestService {
 
     private val logger
-        get() = Logger.t(GiphyRESTRetrofitRepository::class.simpleName)
+        get() = Logger.t(GiphyRepository::class.simpleName)
 
     override fun getAll(query: String, limit: Int): List<GifItem> {
         val response: Response<SearchGIFsResponse> = gateway.searchGIFs(query, limit).execute()

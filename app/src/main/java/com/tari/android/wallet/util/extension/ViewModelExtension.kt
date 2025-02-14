@@ -79,8 +79,8 @@ fun ViewModel.launchOnMain(action: suspend () -> Unit): Job {
     }
 }
 
-suspend fun switchToIo(action: suspend () -> Unit) = withContext(Dispatchers.IO) { action() }
+suspend fun <T> switchToIo(action: suspend () -> T): T = withContext(Dispatchers.IO) { action() }
 
-suspend fun switchToMain(action: suspend () -> Unit) = withContext(Dispatchers.Main) { action() }
+suspend fun <T> switchToMain(action: suspend () -> T): T = withContext(Dispatchers.Main) { action() }
 
 fun <T> SavedStateHandle.getRequired(key: String): T = this.get<T>(key) ?: error("Required value for key $key is missing")

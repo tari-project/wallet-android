@@ -533,7 +533,7 @@
     <string name="back_up_wallet_restore_with_google_drive">Restore with Google Drive</string>
     <string name="back_up_wallet_restore_with_local_files">Restore with Local files</string>
     <string name="back_up_wallet_restore_with_dropbox">Restore with Dropbox</string>
-    <string name="back_up_wallet_restore_with_paper_wallet">Restore from paper wallet</string>
+    <string name="back_up_wallet_restore_with_paper_wallet">Sync with Universe desktop</string>
 
     <!-- Wallet back up with seed phrase -->
     <string name="back_up_seed_phrase_page_title">Back Up With Seed Phrase</string>
@@ -552,7 +552,7 @@
     <string name="verify_seed_phrase_content_description_sequence_is_correct">Sequence is correct</string>
 
     <!-- Wallet restore -->
-    <string name="restore_wallet_page_title">Restore Your Wallet</string>
+    <string name="restore_wallet_page_title">Import Wallet</string>
     <string name="restore_wallet_error_title">Restoration Error</string>
     <string name="restore_wallet_error_desc">Wallet could not be restored: %s</string>
     <string name="restore_wallet_error_file_not_found">Wallet could not be restored. Backup does not exist.</string>
@@ -561,9 +561,9 @@
     <string name="restore_wallet_output_message">You recovered some funds</string>
     <string name="restore_wallet_invalid_qr_code">Invalid QR Code</string>
     <string name="restore_wallet_invalid_qr_code_description">The QR code you scanned does not contain valid paper wallet seeds</string>
-    <string name="restore_wallet_paper_wallet_title">Paper Wallet Detected</string>
-    <string name="restore_wallet_paper_wallet_body">You’ve scanned a paper wallet!\nWhat would you like to do?</string>
-    <string name="restore_wallet_paper_wallet_restore_button">Restore the wallet</string>
+    <string name="restore_wallet_paper_wallet_title">Sync your Universe wallet?</string>
+    <string name="restore_wallet_paper_wallet_body">You just scanned a wallet from the Tari Universe desktop app! Syncing it will let you track your real-time tXTM balance right on your phone.\nWhat would you like to do?</string>
+    <string name="restore_wallet_paper_wallet_restore_button">Sync Wallet</string>
     <string name="restore_wallet_paper_wallet_do_not_restore_button">Don\'t restore right now</string>
     <string name="restore_wallet_paper_wallet_sweep_funds_button">Sweep the funds</string>
     <string name="restore_wallet_paper_wallet_replace_wallet_button">Replace current wallet</string>
@@ -571,11 +571,11 @@
     <string name="restore_wallet_paper_wallet_remember_backup_body">Do you want to back up your current wallet before replacing it? If you don\’t back it up first, you will lose all the funds in your current wallet!</string>
     <string name="restore_wallet_paper_wallet_remember_backup_yes_button">Yes, back it up</string>
     <string name="restore_wallet_paper_wallet_remember_backup_no_button">No, just replace it</string>
-    <string name="restore_wallet_paper_wallet_enter_passphrase_title">Password</string>
-    <string name="restore_wallet_paper_wallet_enter_passphrase_body">Enter the paper wallet password</string>
-    <string name="restore_wallet_paper_wallet_enter_passphrase_hint">Password</string>
-    <string name="restore_wallet_paper_wallet_error_title">Incorrect password</string>
-    <string name="restore_wallet_paper_wallet_error_body">The password you entered is incorrect. Please try again.</string>
+    <string name="restore_wallet_paper_wallet_enter_passphrase_title">Sync Universe Wallet</string>
+    <string name="restore_wallet_paper_wallet_enter_passphrase_body">Add the identification code found in your desktop Tari Universe app</string>
+    <string name="restore_wallet_paper_wallet_enter_passphrase_hint">Enter Identification Code</string>
+    <string name="restore_wallet_paper_wallet_error_title">Incorrect code</string>
+    <string name="restore_wallet_paper_wallet_error_body">The identification code you entered is incorrect. Please try again.</string>
 
     <!-- Wallet recovery with seed phrase -->
     <string name="restore_from_seed_words_title">Restore With Seed Phrase</string>
@@ -601,8 +601,8 @@
     <string name="restore_from_seed_words_autocompletion_no_suggestions">here are no suggestions for the phrase</string>
     <string name="restore_from_seed_words_cancel_dialog_title">Are you sure you want to cancel?</string>
     <string name="restore_from_seed_words_cancel_dialog_description">You will lose your progress, but don\'t worry, you can always start over.</string>
-    <string name="recovery_success_dialog_title">You’re all set!</string>
-    <string name="recovery_success_dialog_description">Your funds have been imported and are being processed 😊</string>
+    <string name="recovery_success_dialog_title">Wallet Synced! 🎉</string>
+    <string name="recovery_success_dialog_description">Your real-time tXTM balance is now available on your phone. 🚀</string>
     <string name="recovery_success_dialog_close">Awesome, thanks!</string>
 
     <!--Restore -->

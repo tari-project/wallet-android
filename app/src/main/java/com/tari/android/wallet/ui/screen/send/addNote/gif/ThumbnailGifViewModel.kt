@@ -6,7 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.common.giphy.GiphyKeywordsRepository
 import com.tari.android.wallet.ui.common.giphy.repository.GifItem
-import com.tari.android.wallet.ui.common.giphy.repository.GifRepository
+import com.tari.android.wallet.ui.common.giphy.repository.GiphyRestService
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -19,7 +19,7 @@ class ThumbnailGifViewModel : CommonViewModel() {
     }
 
     @Inject
-    lateinit var gifsRepository: GifRepository
+    lateinit var gifsRepository: GiphyRestService
 
     @Inject
     lateinit var giphyKeywordsRepository: GiphyKeywordsRepository

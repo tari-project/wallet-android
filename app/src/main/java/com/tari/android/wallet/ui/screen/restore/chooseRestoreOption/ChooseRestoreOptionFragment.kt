@@ -68,11 +68,6 @@ class ChooseRestoreOptionFragment : CommonXmlFragment<FragmentChooseRestoreOptio
         observeUI()
     }
 
-    override fun onResume() {
-        super.onResume()
-        onActivityResult(0, 0, null)
-    }
-
     @Deprecated("Deprecated in Java")
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)

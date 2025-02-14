@@ -8,7 +8,7 @@ import com.tari.android.wallet.navigation.Navigation
 import com.tari.android.wallet.navigation.TariNavigator
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.common.giphy.presentation.GifViewModel
-import com.tari.android.wallet.ui.common.giphy.repository.GifRepository
+import com.tari.android.wallet.ui.common.giphy.repository.GiphyRestService
 import com.tari.android.wallet.data.contacts.ContactsRepository
 import com.tari.android.wallet.data.contacts.model.ContactDto
 import com.tari.android.wallet.ui.screen.tx.adapter.TxViewHolderItem
@@ -26,7 +26,7 @@ class ContactTxHistoryViewModel(savedState: SavedStateHandle) : CommonViewModel(
     lateinit var contactsRepository: ContactsRepository
 
     @Inject
-    lateinit var gifRepository: GifRepository
+    lateinit var giphyRestService: GiphyRestService
 
     init {
         component.inject(this)
@@ -47,7 +47,7 @@ class ContactTxHistoryViewModel(savedState: SavedStateHandle) : CommonViewModel(
                     .map { txDto ->
                         TxViewHolderItem(
                             txDto = txDto,
-                            gifViewModel = GifViewModel(gifRepository)
+                            gifViewModel = GifViewModel(giphyRestService)
                         )
                     }
                 )

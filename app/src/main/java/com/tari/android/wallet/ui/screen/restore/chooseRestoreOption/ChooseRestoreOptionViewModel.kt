@@ -125,9 +125,9 @@ class ChooseRestoreOptionViewModel : CommonViewModel() {
         }
     }
 
-    private fun restoreFromPaperWallet(seedWords: List<String>) {
+    private fun restoreFromPaperWallet(seedWords: List<String>, balance: String) {
         _uiState.update { it.copy(paperWalletProgress = true) }
-        walletManager.start(seedWords)
+        walletManager.start(seedWords, balance)
         launchOnIo {
             walletManager.doOnWalletRunning {
                 _uiState.update { it.copy(paperWalletProgress = false) }
@@ -178,7 +178,7 @@ class ChooseRestoreOptionViewModel : CommonViewModel() {
                 hideDialog()
                 showEnterPassphraseDialog(deepLink)
             },
-            ButtonModule(resourceManager.getString(R.string.restore_wallet_paper_wallet_do_not_restore_button), ButtonStyle.Close),
+            ButtonModule(resourceManager.getString(R.string.common_close), ButtonStyle.Close),
         )
     }
 
@@ -205,7 +205,7 @@ class ChooseRestoreOptionViewModel : CommonViewModel() {
             val seeds = deeplink.seedWords(passphraseModule.value.trim())
             if (seeds != null) {
                 hideDialog()
-                restoreFromPaperWallet(seeds)
+                restoreFromPaperWallet(seeds, deeplink.balance)
             } else {
                 showPaperWalletErrorDialog()
             }
