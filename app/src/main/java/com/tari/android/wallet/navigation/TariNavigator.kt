@@ -73,7 +73,7 @@ class TariNavigator @Inject constructor(
 
     // The activity on which the navigation intents are performed.
     // Set in the #onResume method of the activity!
-    lateinit var currentActivity: CommonActivity<*, *>
+    lateinit var currentActivity: CommonActivity<*>
 
     fun navigate(navigation: Navigation) {
         when (navigation) {

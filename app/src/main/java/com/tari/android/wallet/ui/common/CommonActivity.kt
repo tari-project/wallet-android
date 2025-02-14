@@ -14,7 +14,6 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import androidx.viewbinding.ViewBinding
 import com.orhanobut.logger.Logger
 import com.orhanobut.logger.Printer
 import com.squareup.seismic.ShakeDetector
@@ -42,11 +41,9 @@ import com.tari.android.wallet.util.extension.safeCastTo
 import com.tari.android.wallet.util.extension.string
 import yat.android.lib.YatIntegration
 
-abstract class CommonActivity<Binding : ViewBinding, VM : CommonViewModel> : AppCompatActivity(), ShakeDetector.Listener, FragmentPoppedListener {
+abstract class CommonActivity<VM : CommonViewModel> : AppCompatActivity(), ShakeDetector.Listener, FragmentPoppedListener {
 
     private var containerId: Int? = null
-
-    lateinit var ui: Binding
 
     lateinit var viewModel: VM
 

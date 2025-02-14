@@ -50,7 +50,7 @@ import com.tari.android.wallet.data.sharedPrefs.CorePrefRepository
 import com.tari.android.wallet.databinding.ActivityOnboardingFlowBinding
 import com.tari.android.wallet.di.DiContainer.appComponent
 import com.tari.android.wallet.notification.TariFirebaseMessagingService
-import com.tari.android.wallet.ui.common.CommonActivity
+import com.tari.android.wallet.ui.common.CommonXmlActivity
 import com.tari.android.wallet.ui.screen.onboarding.activity.OnboardingFlowModel.Effect
 import com.tari.android.wallet.ui.screen.onboarding.createWallet.CreateWalletFragment
 import com.tari.android.wallet.ui.screen.onboarding.inroduction.IntroductionFragment
@@ -73,7 +73,7 @@ import javax.inject.Inject
  *
  * @author The Tari Development Team
  */
-class OnboardingFlowActivity : CommonActivity<ActivityOnboardingFlowBinding, OnboardingFlowViewModel>(), OnboardingFlowListener {
+class OnboardingFlowActivity : CommonXmlActivity<ActivityOnboardingFlowBinding, OnboardingFlowViewModel>(), OnboardingFlowListener {
 
     @Inject
     lateinit var corePrefRepository: CorePrefRepository

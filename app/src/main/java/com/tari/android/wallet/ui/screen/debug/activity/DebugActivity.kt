@@ -37,7 +37,7 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.activity.viewModels
 import com.tari.android.wallet.databinding.ActivityDebugBinding
-import com.tari.android.wallet.ui.common.CommonActivity
+import com.tari.android.wallet.ui.common.CommonXmlActivity
 import com.tari.android.wallet.ui.screen.debug.DebugNavigation
 import com.tari.android.wallet.ui.screen.debug.sampleDesign.SampleDesignSystemFragment
 import com.tari.android.wallet.ui.screen.settings.bugReporting.BugsReportingFragment
@@ -46,7 +46,7 @@ import com.tari.android.wallet.ui.screen.settings.logs.logs.LogsFragment
 import com.tari.android.wallet.util.extension.serializable
 import java.io.File
 
-class DebugActivity : CommonActivity<ActivityDebugBinding, DebugViewModel>() {
+class DebugActivity : CommonXmlActivity<ActivityDebugBinding, DebugViewModel>() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

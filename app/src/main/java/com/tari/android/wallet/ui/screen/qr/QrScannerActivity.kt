@@ -33,7 +33,6 @@
 package com.tari.android.wallet.ui.screen.qr
 
 import android.Manifest
-import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
@@ -52,7 +51,7 @@ import com.tari.android.wallet.R
 import com.tari.android.wallet.application.deeplinks.DeepLink
 import com.tari.android.wallet.databinding.ActivityQrScannerBinding
 import com.tari.android.wallet.di.DiContainer.appComponent
-import com.tari.android.wallet.ui.common.CommonActivity
+import com.tari.android.wallet.ui.common.CommonXmlActivity
 import com.tari.android.wallet.ui.component.tari.toast.TariToast
 import com.tari.android.wallet.ui.component.tari.toast.TariToastArgs
 import com.tari.android.wallet.util.extension.collectFlow
@@ -63,7 +62,7 @@ import com.tari.android.wallet.util.extension.setVisible
  *
  * @author The Tari Development Team
  */
-class QrScannerActivity : CommonActivity<ActivityQrScannerBinding, QrScannerViewModel>() {
+class QrScannerActivity : CommonXmlActivity<ActivityQrScannerBinding, QrScannerViewModel>() {
 
     companion object {
         /**
@@ -149,7 +148,7 @@ class QrScannerActivity : CommonActivity<ActivityQrScannerBinding, QrScannerView
     private fun finishWithResult(deepLink: DeepLink) {
         val intent = Intent()
         intent.putExtra(EXTRA_DEEPLINK, deepLink)
-        setResult(Activity.RESULT_OK, intent)
+        setResult(RESULT_OK, intent)
         finish()
     }
 

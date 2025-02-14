@@ -63,7 +63,7 @@ import com.tari.android.wallet.navigation.TariNavigator.Companion.INDEX_HOME
 import com.tari.android.wallet.navigation.TariNavigator.Companion.INDEX_SETTINGS
 import com.tari.android.wallet.navigation.TariNavigator.Companion.NO_SMOOTH_SCROLL
 import com.tari.android.wallet.notification.TariFirebaseMessagingService
-import com.tari.android.wallet.ui.common.CommonActivity
+import com.tari.android.wallet.ui.common.CommonXmlActivity
 import com.tari.android.wallet.ui.common.domain.PaletteManager
 import com.tari.android.wallet.ui.common.domain.ResourceManager
 import com.tari.android.wallet.ui.screen.StartActivity
@@ -81,7 +81,7 @@ import com.tari.android.wallet.util.extension.setVisible
 import java.lang.ref.WeakReference
 import javax.inject.Inject
 
-class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>() {
+class HomeActivity : CommonXmlActivity<ActivityHomeBinding, HomeViewModel>() {
 
     @Inject
     lateinit var securityPrefRepository: SecurityPrefRepository
