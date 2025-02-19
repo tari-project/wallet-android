@@ -32,8 +32,7 @@ object Dependencies {
         }
 
         object Compose {
-            const val bom = "androidx.compose:compose-bom:2024.12.01"
-
+            const val bom = "androidx.compose:compose-bom:2025.02.00"
             const val material = "androidx.compose.material:material"
             const val uiTooling = "androidx.compose.ui:ui-tooling"
             const val uiToolingPreview = "androidx.compose.ui:ui-tooling-preview"
