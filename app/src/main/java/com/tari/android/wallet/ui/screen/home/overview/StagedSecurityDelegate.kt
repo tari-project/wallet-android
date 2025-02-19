@@ -6,7 +6,6 @@ import com.tari.android.wallet.R
 import com.tari.android.wallet.application.securityStage.StagedWalletSecurityManager
 import com.tari.android.wallet.application.securityStage.StagedWalletSecurityManager.StagedSecurityEffect
 import com.tari.android.wallet.data.sharedPrefs.securityStages.WalletSecurityStage
-import com.tari.android.wallet.util.extension.takeIfIs
 import com.tari.android.wallet.model.BalanceInfo
 import com.tari.android.wallet.navigation.Navigation
 import com.tari.android.wallet.navigation.TariNavigator
@@ -17,8 +16,9 @@ import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonStyle
 import com.tari.android.wallet.ui.dialog.modular.modules.securityStages.SecurityStageHeadModule
 import com.tari.android.wallet.ui.dialog.modular.modules.space.SpaceModule
-import com.tari.android.wallet.ui.screen.settings.backup.backupOnboarding.item.BackupOnboardingArgs
-import com.tari.android.wallet.ui.screen.settings.backup.backupOnboarding.module.BackupOnboardingFlowItemModule
+import com.tari.android.wallet.ui.screen.settings.backup.learnMore.item.BackupLearnMoreStageArgs
+import com.tari.android.wallet.ui.screen.settings.backup.learnMore.module.BackupLearnMoreItemModule
+import com.tari.android.wallet.util.extension.takeIfIs
 import yat.android.ui.extension.HtmlHelper
 
 class StagedSecurityDelegate(
@@ -42,7 +42,7 @@ class StagedSecurityDelegate(
 
     private fun showStagePopUp1A() {
         showPopup(
-            stage = BackupOnboardingArgs.StageOne(resourceManager, this::openStage1),
+            stage = BackupLearnMoreStageArgs.StageOne(resourceManager, this::openStage1),
             titleEmoji = resourceManager.getString(R.string.staged_wallet_security_stages_1a_title),
             title = resourceManager.getString(R.string.staged_wallet_security_stages_1a_subtitle),
             body = null,
@@ -54,7 +54,7 @@ class StagedSecurityDelegate(
 
     private fun showStagePopUp1B() {
         showPopup(
-            stage = BackupOnboardingArgs.StageTwo(resourceManager, this::openStage1B),
+            stage = BackupLearnMoreStageArgs.StageTwo(resourceManager, this::openStage1B),
             titleEmoji = resourceManager.getString(R.string.staged_wallet_security_stages_1b_title),
             title = resourceManager.getString(R.string.staged_wallet_security_stages_1b_subtitle),
             body = resourceManager.getString(R.string.staged_wallet_security_stages_1b_message),
@@ -65,7 +65,7 @@ class StagedSecurityDelegate(
 
     private fun showStagePopUp2() {
         showPopup(
-            stage = BackupOnboardingArgs.StageThree(resourceManager, this::openStage2),
+            stage = BackupLearnMoreStageArgs.StageThree(resourceManager, this::openStage2),
             titleEmoji = resourceManager.getString(R.string.staged_wallet_security_stages_2_title),
             title = resourceManager.getString(R.string.staged_wallet_security_stages_2_subtitle),
             body = resourceManager.getString(R.string.staged_wallet_security_stages_2_message),
@@ -76,7 +76,7 @@ class StagedSecurityDelegate(
 
     private fun showStagePopUp3() {
         showPopup(
-            stage = BackupOnboardingArgs.StageFour(resourceManager, this::openStage3),
+            stage = BackupLearnMoreStageArgs.StageFour(resourceManager, this::openStage3),
             titleEmoji = resourceManager.getString(R.string.staged_wallet_security_stages_3_title),
             title = resourceManager.getString(R.string.staged_wallet_security_stages_3_subtitle),
             body = resourceManager.getString(R.string.staged_wallet_security_stages_3_message),
@@ -117,7 +117,7 @@ class StagedSecurityDelegate(
     }
 
     private fun showPopup(
-        stage: BackupOnboardingArgs,
+        stage: BackupLearnMoreStageArgs,
         titleEmoji: String,
         title: String,
         body: String?,
@@ -133,9 +133,9 @@ class StagedSecurityDelegate(
         )
     }
 
-    private fun showBackupInfo(stage: BackupOnboardingArgs) {
+    private fun showBackupInfo(stage: BackupLearnMoreStageArgs) {
         dialogHandler.showModularDialog(
-            BackupOnboardingFlowItemModule(stage),
+            BackupLearnMoreItemModule(stage),
             SpaceModule(20),
         )
     }

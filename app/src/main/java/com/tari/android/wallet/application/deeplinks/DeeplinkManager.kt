@@ -4,6 +4,9 @@ import android.app.Activity
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.baseNodes.BaseNodesManager
 import com.tari.android.wallet.application.walletManager.WalletManager
+import com.tari.android.wallet.data.contacts.ContactsRepository
+import com.tari.android.wallet.data.contacts.model.ContactDto
+import com.tari.android.wallet.data.contacts.model.FFIContactInfo
 import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodeDto
 import com.tari.android.wallet.data.sharedPrefs.tor.TorPrefRepository
 import com.tari.android.wallet.di.ApplicationScope
@@ -21,9 +24,6 @@ import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonStyle
 import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
 import com.tari.android.wallet.ui.dialog.modular.modules.input.InputModule
-import com.tari.android.wallet.data.contacts.ContactsRepository
-import com.tari.android.wallet.data.contacts.model.ContactDto
-import com.tari.android.wallet.data.contacts.model.FFIContactInfo
 import com.tari.android.wallet.util.DebugConfig
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -51,28 +51,28 @@ class DeeplinkManager @Inject constructor(
     /**
      * Executes the given deeplink, but first shows a confirmation dialog.
      */
-    fun execute(context: Activity, deeplink: DeepLink) {
+    fun execute(activity: Activity, deeplink: DeepLink) {
         when (deeplink) {
-            is DeepLink.AddBaseNode -> showAddBaseNodeDialog(context, deeplink)
-            is DeepLink.Contacts -> showAddContactsDialog(context, deeplink)
+            is DeepLink.AddBaseNode -> showAddBaseNodeDialog(activity, deeplink)
+            is DeepLink.Contacts -> showAddContactsDialog(activity, deeplink)
             is DeepLink.Send -> sendAction(deeplink)
-            is DeepLink.UserProfile -> addUserProfile(context, deeplink)
+            is DeepLink.UserProfile -> addUserProfile(activity, deeplink)
             is DeepLink.TorBridges -> addTorBridges(deeplink)
-            is DeepLink.PaperWallet -> showPaperWalletDialog(context, deeplink)
+            is DeepLink.PaperWallet -> showPaperWalletDialog(activity, deeplink)
         }
     }
 
     /**
      * Executes the given deeplink without showing a confirmation dialog.
      */
-    fun executeRawDeeplink(context: Activity, deeplink: DeepLink) {
+    fun executeRawDeeplink(activity: Activity, deeplink: DeepLink) {
         when (deeplink) {
-            is DeepLink.AddBaseNode -> showAddBaseNodeDialog(context, deeplink)
+            is DeepLink.AddBaseNode -> showAddBaseNodeDialog(activity, deeplink)
             is DeepLink.Contacts -> addContactsAction(deeplink.data())
             is DeepLink.Send -> sendAction(deeplink)
             is DeepLink.UserProfile -> addContactsAction(deeplink.data()?.let { listOf(it) } ?: emptyList())
             is DeepLink.TorBridges -> addTorBridges(deeplink)
-            is DeepLink.PaperWallet -> showPaperWalletDialog(context, deeplink)
+            is DeepLink.PaperWallet -> showPaperWalletDialog(activity, deeplink)
         }
     }
 

@@ -42,10 +42,10 @@ import com.tari.android.wallet.ui.screen.send.requestTari.RequestTariFragment
 import com.tari.android.wallet.ui.screen.send.transfer.TransferFragment
 import com.tari.android.wallet.ui.screen.settings.allSettings.AllSettingsFragment
 import com.tari.android.wallet.ui.screen.settings.allSettings.about.TariAboutFragment
-import com.tari.android.wallet.ui.screen.settings.backup.backupOnboarding.BackupOnboardingFlowFragment
 import com.tari.android.wallet.ui.screen.settings.backup.backupSettings.BackupSettingsFragment
 import com.tari.android.wallet.ui.screen.settings.backup.changeSecurePassword.ChangeSecurePasswordFragment
 import com.tari.android.wallet.ui.screen.settings.backup.enterCurrentPassword.EnterCurrentPasswordFragment
+import com.tari.android.wallet.ui.screen.settings.backup.learnMore.BackupLearnMoreFragment
 import com.tari.android.wallet.ui.screen.settings.backup.verifySeedPhrase.VerifySeedPhraseFragment
 import com.tari.android.wallet.ui.screen.settings.backup.writeDownSeedWords.WriteDownSeedPhraseFragment
 import com.tari.android.wallet.ui.screen.settings.baseNodeConfig.changeBaseNode.ChangeBaseNodeFragment
@@ -137,7 +137,7 @@ class TariNavigator @Inject constructor(
             is BackupSettings.ToChangePassword -> addFragment(ChangeSecurePasswordFragment())
             is BackupSettings.ToConfirmPassword -> addFragment(EnterCurrentPasswordFragment())
             is BackupSettings.ToWalletBackupWithRecoveryPhrase -> addFragment(WriteDownSeedPhraseFragment())
-            is BackupSettings.ToLearnMore -> addFragment(BackupOnboardingFlowFragment())
+            is BackupSettings.ToLearnMore -> addFragment(BackupLearnMoreFragment())
 
             is CustomBridge.UploadQrCode -> Unit
 

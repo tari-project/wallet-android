@@ -51,8 +51,8 @@ import com.tari.android.wallet.ui.screen.send.addAmount.feeModule.FeeModule
 import com.tari.android.wallet.ui.screen.send.addAmount.feeModule.FeeModuleView
 import com.tari.android.wallet.ui.screen.send.shareQr.ShareQRCodeModuleView
 import com.tari.android.wallet.ui.screen.send.shareQr.ShareQrCodeModule
-import com.tari.android.wallet.ui.screen.settings.backup.backupOnboarding.module.BackupOnboardingFlowItemModule
-import com.tari.android.wallet.ui.screen.settings.backup.backupOnboarding.module.BackupOnboardingFlowItemModuleView
+import com.tari.android.wallet.ui.screen.settings.backup.learnMore.module.BackupLearnMoreItemModule
+import com.tari.android.wallet.ui.screen.settings.backup.learnMore.module.BackupLearnMoreItemModuleView
 import com.tari.android.wallet.ui.screen.settings.logs.logs.module.LogLevelCheckedModule
 import com.tari.android.wallet.ui.screen.settings.logs.logs.module.LogSourceCheckedModule
 import com.tari.android.wallet.ui.screen.utxos.list.module.DetailItemModule
@@ -163,7 +163,7 @@ open class ModularDialog(context: Activity) {
                 is UtxoSplitModule -> UtxoSplitModuleView(context, module)
                 is ConnectionStatusesModule -> ConnectionStatusesModuleView(context, module)
                 is SecurityStageHeadModule -> SecurityStageHeadModuleView(context, module)
-                is BackupOnboardingFlowItemModule -> BackupOnboardingFlowItemModuleView(context, module)
+                is BackupLearnMoreItemModule -> BackupLearnMoreItemModuleView(context, module)
                 is InputModule -> InputModuleView(context, module)
                 is ShortEmojiIdModule -> ShortEmojiModuleView(context, module)
                 is IconModule -> IconModuleView(context, module)

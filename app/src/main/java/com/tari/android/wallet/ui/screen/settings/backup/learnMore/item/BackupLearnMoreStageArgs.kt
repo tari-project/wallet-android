@@ -1,4 +1,4 @@
-package com.tari.android.wallet.ui.screen.settings.backup.backupOnboarding.item
+package com.tari.android.wallet.ui.screen.settings.backup.learnMore.item
 
 import android.graphics.Typeface
 import android.text.SpannableString
@@ -14,7 +14,7 @@ import com.tari.android.wallet.util.extension.applyTypefaceStyle
 import yat.android.ui.extension.HtmlHelper
 import java.io.Serializable
 
-sealed class BackupOnboardingArgs(
+sealed class BackupLearnMoreStageArgs(
     val image: Int,
     val title: SpannableString,
     val description: SpannableString,
@@ -22,7 +22,7 @@ sealed class BackupOnboardingArgs(
     val button: ButtonModule
 ) : Serializable {
 
-    class StageOne(resourceManager: ResourceManager, navigationAction: () -> Unit) : BackupOnboardingArgs(
+    class StageOne(resourceManager: ResourceManager, navigationAction: () -> Unit) : BackupLearnMoreStageArgs(
         R.drawable.vector_backup_onboarding_seed_words,
         getTitle(
             resourceManager,
@@ -36,7 +36,7 @@ sealed class BackupOnboardingArgs(
         }
     )
 
-    class StageTwo(resourceManager: ResourceManager, navigationAction: () -> Unit) : BackupOnboardingArgs(
+    class StageTwo(resourceManager: ResourceManager, navigationAction: () -> Unit) : BackupLearnMoreStageArgs(
         R.drawable.vector_backup_onboarding_cloud,
         getTitle(
             resourceManager,
@@ -50,7 +50,7 @@ sealed class BackupOnboardingArgs(
         }
     )
 
-    class StageThree(resourceManager: ResourceManager, navigationAction: () -> Unit) : BackupOnboardingArgs(
+    class StageThree(resourceManager: ResourceManager, navigationAction: () -> Unit) : BackupLearnMoreStageArgs(
         R.drawable.vector_backup_onboarding_password,
         getTitle(
             resourceManager,
@@ -64,7 +64,7 @@ sealed class BackupOnboardingArgs(
         }
     )
 
-    class StageFour(resourceManager: ResourceManager, navigationAction: () -> Unit) : BackupOnboardingArgs(
+    class StageFour(resourceManager: ResourceManager, navigationAction: () -> Unit) : BackupLearnMoreStageArgs(
         R.drawable.vector_backup_onboarding_final,
         getTitle(
             resourceManager,

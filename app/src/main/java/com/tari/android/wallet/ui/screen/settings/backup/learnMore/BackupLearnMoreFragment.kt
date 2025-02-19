@@ -1,4 +1,4 @@
-package com.tari.android.wallet.ui.screen.settings.backup.backupOnboarding
+package com.tari.android.wallet.ui.screen.settings.backup.learnMore
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -10,22 +10,22 @@ import androidx.fragment.app.viewModels
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.tabs.TabLayoutMediator
-import com.tari.android.wallet.databinding.FragmentBackupOnboardingFlowBinding
+import com.tari.android.wallet.databinding.FragmentBackupLearnMoreBinding
 import com.tari.android.wallet.ui.common.CommonXmlFragment
-import com.tari.android.wallet.ui.screen.settings.backup.backupOnboarding.item.BackupOnboardingArgs
-import com.tari.android.wallet.ui.screen.settings.backup.backupOnboarding.item.BackupOnboardingFlowDataSource
-import com.tari.android.wallet.ui.screen.settings.backup.backupOnboarding.item.BackupOnboardingFlowItemFragment
+import com.tari.android.wallet.ui.screen.settings.backup.learnMore.item.BackupLearnMoreDataSource
+import com.tari.android.wallet.ui.screen.settings.backup.learnMore.item.BackupLearnMoreItemFragment
+import com.tari.android.wallet.ui.screen.settings.backup.learnMore.item.BackupLearnMoreStageArgs
 import com.tari.android.wallet.util.extension.setVisible
 
-class BackupOnboardingFlowFragment : CommonXmlFragment<FragmentBackupOnboardingFlowBinding, BackupOnboardingFlowViewModel>() {
+class BackupLearnMoreFragment : CommonXmlFragment<FragmentBackupLearnMoreBinding, BackupLearnMoreViewModel>() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
-        FragmentBackupOnboardingFlowBinding.inflate(inflater, container, false).also { ui = it }.root
+        FragmentBackupLearnMoreBinding.inflate(inflater, container, false).also { ui = it }.root
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val viewModel: BackupOnboardingFlowViewModel by viewModels()
+        val viewModel: BackupLearnMoreViewModel by viewModels()
         bindViewModel(viewModel)
 
         setupUI()
@@ -51,14 +51,14 @@ class BackupOnboardingFlowFragment : CommonXmlFragment<FragmentBackupOnboardingF
     private inner class BackupOnboardingFlowAdapter(fm: FragmentActivity) : FragmentStateAdapter(fm) {
 
         private val args = arrayListOf(
-            BackupOnboardingArgs.StageOne(viewModel.resourceManager) { openStage1() },
-            BackupOnboardingArgs.StageTwo(viewModel.resourceManager) { openStage1B() },
-            BackupOnboardingArgs.StageThree(viewModel.resourceManager) { openStage2() },
-            BackupOnboardingArgs.StageFour(viewModel.resourceManager) { openStage3() },
+            BackupLearnMoreStageArgs.StageOne(viewModel.resourceManager) { openStage1() },
+            BackupLearnMoreStageArgs.StageTwo(viewModel.resourceManager) { openStage1B() },
+            BackupLearnMoreStageArgs.StageThree(viewModel.resourceManager) { openStage2() },
+            BackupLearnMoreStageArgs.StageFour(viewModel.resourceManager) { openStage3() },
         )
 
         init {
-            BackupOnboardingFlowDataSource.save(args)
+            BackupLearnMoreDataSource.save(args)
         }
 
         private fun openStage1() {
@@ -81,7 +81,7 @@ class BackupOnboardingFlowFragment : CommonXmlFragment<FragmentBackupOnboardingF
 
         override fun getItemCount(): Int = 4
 
-        override fun createFragment(position: Int): Fragment = BackupOnboardingFlowItemFragment.createInstance(position)
+        override fun createFragment(position: Int): Fragment = BackupLearnMoreItemFragment.createInstance(position)
     }
 
     private fun onBackPressed() {
