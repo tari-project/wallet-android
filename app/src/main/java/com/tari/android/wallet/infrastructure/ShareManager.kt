@@ -4,9 +4,13 @@ import androidx.lifecycle.MutableLiveData
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.deeplinks.DeepLink
 import com.tari.android.wallet.application.deeplinks.DeeplinkManager
+import com.tari.android.wallet.data.contacts.ContactsRepository
+import com.tari.android.wallet.data.contacts.model.ContactDto
+import com.tari.android.wallet.data.contacts.model.FFIContactInfo
 import com.tari.android.wallet.infrastructure.bluetooth.TariBluetoothClient
 import com.tari.android.wallet.infrastructure.bluetooth.TariBluetoothServer
 import com.tari.android.wallet.model.TariWalletAddress
+import com.tari.android.wallet.navigation.Navigation
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.common.SingleLiveEvent
 import com.tari.android.wallet.ui.dialog.modular.DialogArgs
@@ -16,11 +20,6 @@ import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonStyle
 import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
 import com.tari.android.wallet.ui.dialog.modular.modules.icon.IconModule
-import com.tari.android.wallet.data.contacts.ContactsRepository
-import com.tari.android.wallet.data.contacts.model.ContactDto
-import com.tari.android.wallet.data.contacts.model.FFIContactInfo
-import com.tari.android.wallet.ui.screen.home.HomeActivity
-import com.tari.android.wallet.navigation.Navigation
 import com.tari.android.wallet.ui.screen.send.shareQr.ShareQrCodeModule
 import com.tari.android.wallet.util.ContactUtil
 import javax.inject.Inject
@@ -157,9 +156,7 @@ class ShareManager : CommonViewModel() {
     }
 
     private fun onReceived(data: List<DeepLink.Contacts.DeeplinkContact>) {
-        HomeActivity.instance.get()?.let { context ->
-            deeplinkManager.execute(context, DeepLink.Contacts(data))
-        }
+        deeplinkManager.execute(tariNavigator.currentActivity, DeepLink.Contacts(data))
     }
 
     companion object {

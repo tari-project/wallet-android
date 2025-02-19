@@ -4,14 +4,13 @@ import android.graphics.Typeface
 import android.text.SpannableString
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.securityStage.STAGE_TWO_THRESHOLD_BALANCE
-import com.tari.android.wallet.util.extension.applyCenterAlignment
-import com.tari.android.wallet.util.extension.applyColorStyle
-import com.tari.android.wallet.util.extension.applyTypefaceStyle
 import com.tari.android.wallet.ui.common.domain.PaletteManager
 import com.tari.android.wallet.ui.common.domain.ResourceManager
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonStyle
-import com.tari.android.wallet.ui.screen.home.HomeActivity
+import com.tari.android.wallet.util.extension.applyCenterAlignment
+import com.tari.android.wallet.util.extension.applyColorStyle
+import com.tari.android.wallet.util.extension.applyTypefaceStyle
 import yat.android.ui.extension.HtmlHelper
 import java.io.Serializable
 
@@ -109,7 +108,7 @@ sealed class BackupOnboardingArgs(
                 )
             }
             val spannable = SpannableString("$firstPart $highlighted$part3")
-            spannable.applyColorStyle(highlighted, PaletteManager.getTextLinks(HomeActivity.instance.get()!!))
+            spannable.applyColorStyle(highlighted, PaletteManager.getTextLinks(resourceManager.context))
             spannable.applyCenterAlignment()
             return spannable
         }

@@ -40,10 +40,10 @@ import com.tari.android.wallet.data.recovery.WalletRestorationState
 import com.tari.android.wallet.data.recovery.WalletRestorationStateHandler
 import com.tari.android.wallet.di.DiContainer
 import com.tari.android.wallet.ui.screen.StartActivity
-import com.tari.android.wallet.ui.screen.home.HomeActivity
 import com.tari.android.wallet.ui.screen.restore.activity.WalletRestoreActivity
 import javax.inject.Inject
 
+// TODO remove?
 class NotificationBroadcastReceiver : BroadcastReceiver() {
 
     @Inject
@@ -62,11 +62,7 @@ class NotificationBroadcastReceiver : BroadcastReceiver() {
         val newIntent: Intent = if (restorationState !is WalletRestorationState.Completed) {
             Intent(context, WalletRestoreActivity::class.java)
         } else {
-            if (HomeActivity.instance.get() != null) {
-                Intent(context, HomeActivity::class.java)
-            } else {
-                Intent(context, StartActivity::class.java)
-            }
+            Intent(context, StartActivity::class.java)
         }
         context.startActivity(newIntent.apply {
             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)

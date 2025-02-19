@@ -12,7 +12,6 @@ import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.tabs.TabLayoutMediator
 import com.tari.android.wallet.databinding.FragmentBackupOnboardingFlowBinding
 import com.tari.android.wallet.ui.common.CommonXmlFragment
-import com.tari.android.wallet.ui.screen.home.HomeActivity
 import com.tari.android.wallet.ui.screen.settings.backup.backupOnboarding.item.BackupOnboardingArgs
 import com.tari.android.wallet.ui.screen.settings.backup.backupOnboarding.item.BackupOnboardingFlowDataSource
 import com.tari.android.wallet.ui.screen.settings.backup.backupOnboarding.item.BackupOnboardingFlowItemFragment
@@ -86,7 +85,7 @@ class BackupOnboardingFlowFragment : CommonXmlFragment<FragmentBackupOnboardingF
     }
 
     private fun onBackPressed() {
-        HomeActivity.instance.get()?.onBackPressed()
+        activity?.onBackPressed()
     }
 }
 

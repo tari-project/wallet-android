@@ -123,11 +123,10 @@ class TariNavigator @Inject constructor(
             is AddAmount.ContinueToAddNote -> addFragment(AddNoteFragment.newInstance(navigation.transactionData))
             is AddAmount.ContinueToFinalizing -> continueToFinalizeSendTx(navigation.transactionData)
 
-            is TxList.ToChat -> toChat()
             is TxList.ToTxDetails -> addFragment(TxDetailsFragment.newInstance(navigation.tx, navigation.txId))
             is TxList.ToSendTariToUser -> sendToUser(navigation.contact, navigation.amount, navigation.note)
             is TxList.ToUtxos -> addFragment(UtxosListFragment())
-            is TxList.ToAllSettings -> toAllSettings()
+            is TxList.ToAllSettings -> addFragment(AllSettingsFragment.newInstance())
             is TxList.ToTransfer -> addFragment(TransferFragment())
             is TxList.HomeTransactionHistory -> addFragment(AllTxHistoryFragment())
 
@@ -218,9 +217,6 @@ class TariNavigator @Inject constructor(
             addFragment(FinalizeSendTxFragment.create(transactionData))
         }
     }
-
-    private fun toChat() = (currentActivity as HomeActivity).ui.viewPager.setCurrentItem(INDEX_CHAT, NO_SMOOTH_SCROLL)
-    private fun toAllSettings() = (currentActivity as HomeActivity).ui.viewPager.setCurrentItem(INDEX_SETTINGS, NO_SMOOTH_SCROLL)
 
     private fun toExternalWallet(connectedWallet: ConnectedWallet) {
         try {
