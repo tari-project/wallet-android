@@ -1,5 +1,8 @@
 package com.tari.android.wallet.ui.screen.home
 
+import android.Manifest.permission.POST_NOTIFICATIONS
+import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
@@ -10,6 +13,9 @@ import com.tari.android.wallet.R
 import com.tari.android.wallet.databinding.ActivityHomeBinding
 import com.tari.android.wallet.ui.common.CommonXmlActivity
 import com.tari.android.wallet.ui.compose.TariDesignSystem
+import com.tari.android.wallet.ui.screen.StartActivity
+import com.tari.android.wallet.util.Constants
+import com.tari.android.wallet.util.extension.observe
 import kotlin.getValue
 
 class HomeActivity : CommonXmlActivity<ActivityHomeBinding, HomeViewModel>() {
@@ -26,8 +32,18 @@ class HomeActivity : CommonXmlActivity<ActivityHomeBinding, HomeViewModel>() {
         subscribeToCommon(viewModel.shareViewModel)
         subscribeToCommon(viewModel.shareViewModel.tariBluetoothServer)
         subscribeToCommon(viewModel.shareViewModel.tariBluetoothClient)
+        viewModel.shareViewModel.tariBluetoothServer.init(this)
+        viewModel.shareViewModel.tariBluetoothClient.init(this)
 
         setContainerId(R.id.nav_container)
+
+        if (!viewModel.isAuthenticated) {
+            val intent = Intent(this, StartActivity::class.java).apply { flags = Intent.FLAG_ACTIVITY_NEW_TASK }
+            this.intent?.data?.let(intent::setData)
+            finish()
+            startActivity(intent)
+            return
+        }
 
         enableEdgeToEdge()
 
@@ -45,6 +61,18 @@ class HomeActivity : CommonXmlActivity<ActivityHomeBinding, HomeViewModel>() {
                 }
             }
         }
+
+        if (savedInstanceState == null) {
+            viewModel.doOnWalletRunning {
+                ui.root.postDelayed({ viewModel.processIntentDeepLink(this, intent) }, Constants.UI.mediumDurationMs)
+            }
+        }
+
+        observe(viewModel.shareViewModel.shareText) { shareViaText(it) }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            requestPermissions(arrayOf(POST_NOTIFICATIONS), 0)
+        }
     }
 
     override fun onResume() {
@@ -54,5 +82,26 @@ class HomeActivity : CommonXmlActivity<ActivityHomeBinding, HomeViewModel>() {
             viewModel.navigateToAuth(this.intent.data)
             finish()
         }
+    }
+
+    @Deprecated("Deprecated in Java")
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        viewModel.shareViewModel.tariBluetoothServer.handleActivityResult(requestCode, resultCode, data)
+        viewModel.shareViewModel.tariBluetoothClient.handleActivityResult(requestCode, resultCode, data)
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+
+        // onNewIntent might get called before onCreate, so we anticipate that here
+        setIntent(intent)
+    }
+
+
+    override fun onDestroy() {
+        viewModel.onDestroy()
+        super.onDestroy()
+        viewModelStore.clear()
     }
 }

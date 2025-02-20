@@ -51,7 +51,6 @@ import com.tari.android.wallet.ui.screen.contactBook.details.ContactDetailsViewM
 import com.tari.android.wallet.ui.screen.contactBook.link.ContactLinkViewModel
 import com.tari.android.wallet.ui.screen.contactBook.root.ContactBookViewModel
 import com.tari.android.wallet.ui.screen.debug.sampleDesign.SampleDesignSystemViewModel
-import com.tari.android.wallet.ui.screen.home.HomeActivity
 import com.tari.android.wallet.ui.screen.home.HomeViewModel
 import com.tari.android.wallet.ui.screen.home.overview.HomeOverviewViewModel
 import com.tari.android.wallet.ui.screen.onboarding.activity.OnboardingFlowActivity
@@ -126,7 +125,6 @@ interface ApplicationComponent {
     fun inject(activity: StartActivity)
     fun inject(activity: OnboardingFlowActivity)
     fun inject(activity: AuthActivity)
-    fun inject(activity: HomeActivity)
     fun inject(activity: QrScannerActivity)
 
     fun inject(fragment: ChooseGIFDialogFragment)

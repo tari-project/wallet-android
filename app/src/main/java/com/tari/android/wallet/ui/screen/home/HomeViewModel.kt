@@ -1,6 +1,9 @@
 package com.tari.android.wallet.ui.screen.home
 
+import android.app.Activity
+import android.content.Intent
 import android.net.Uri
+import com.tari.android.wallet.application.deeplinks.DeeplinkManager
 import com.tari.android.wallet.application.walletManager.doOnWalletFailed
 import com.tari.android.wallet.data.contacts.ContactsRepository
 import com.tari.android.wallet.infrastructure.ShareManager
@@ -17,10 +20,16 @@ class HomeViewModel : CommonViewModel() {
     @Inject
     lateinit var contactsRepository: ContactsRepository
 
+    @Inject
+    lateinit var deeplinkManager: DeeplinkManager
+
     val shareViewModel = ShareManager()
 
     private val _uiState = MutableStateFlow(HomeModel.UiState())
     val uiState = _uiState.asStateFlow()
+
+    val isAuthenticated: Boolean
+        get() = securityPrefRepository.isAuthenticated
 
     init {
         component.inject(this)
@@ -57,5 +66,17 @@ class HomeViewModel : CommonViewModel() {
 
             HomeModel.BottomMenuOption.Gem -> showNotReadyYetDialog()
         }
+    }
+
+    fun processIntentDeepLink(activity: Activity, intent: Intent) {
+        intent.data?.toString()?.takeIf { it.isNotEmpty() }
+            ?.let { deeplinkString -> deeplinkManager.parseDeepLink(deeplinkString) }
+            ?.let { deeplink ->
+                deeplinkManager.execute(activity, deeplink)
+            }
+    }
+
+    fun onDestroy() {
+        securityPrefRepository.isAuthenticated = false
     }
 }

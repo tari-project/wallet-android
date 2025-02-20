@@ -238,11 +238,5 @@ class TariNavigator @Inject constructor(
         const val PARAMETER_AMOUNT = "amount"
         const val PARAMETER_TRANSACTION = "transaction_data"
         const val PARAMETER_CONTACT = "tari_contact_dto_args"
-
-        const val INDEX_HOME = 0
-        const val INDEX_CONTACT_BOOK = 1
-        const val INDEX_CHAT = 2
-        const val INDEX_SETTINGS = 3
-        const val NO_SMOOTH_SCROLL = false
     }
 }
