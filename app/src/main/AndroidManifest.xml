@@ -62,6 +62,14 @@
                 android:resource="@xml/file_provider" />
         </provider>
 
+        <service
+            android:name=".notification.TariFirebaseMessagingService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
+
         <receiver
             android:name=".notification.NotificationBroadcastReceiver"
             android:enabled="true"

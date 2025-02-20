@@ -38,12 +38,16 @@ import android.content.res.Configuration
 import android.os.Build
 import android.os.Bundle
 import android.widget.ImageView
+import android.widget.Toast
 import androidx.activity.addCallback
 import androidx.activity.viewModels
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.Lifecycle
 import androidx.viewpager2.adapter.FragmentStateAdapter
+import com.google.android.gms.tasks.OnCompleteListener
+import com.google.firebase.messaging.FirebaseMessaging
+import com.orhanobut.logger.Logger
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.deeplinks.DeeplinkManager
 import com.tari.android.wallet.data.sharedPrefs.network.NetworkPrefRepository
@@ -58,6 +62,7 @@ import com.tari.android.wallet.navigation.TariNavigator.Companion.INDEX_CONTACT_
 import com.tari.android.wallet.navigation.TariNavigator.Companion.INDEX_HOME
 import com.tari.android.wallet.navigation.TariNavigator.Companion.INDEX_SETTINGS
 import com.tari.android.wallet.navigation.TariNavigator.Companion.NO_SMOOTH_SCROLL
+import com.tari.android.wallet.notification.TariFirebaseMessagingService
 import com.tari.android.wallet.ui.common.CommonActivity
 import com.tari.android.wallet.ui.common.domain.PaletteManager
 import com.tari.android.wallet.ui.common.domain.ResourceManager
@@ -92,6 +97,8 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>() {
 
     @Inject
     lateinit var tariSettingsRepository: TariSettingsPrefRepository
+
+    // TODO check GP services installed GoogleApiAvailability.makeGooglePlayServicesAvailable()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -164,6 +171,26 @@ class HomeActivity : CommonActivity<ActivityHomeBinding, HomeViewModel>() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             requestPermissions(arrayOf(POST_NOTIFICATIONS), 0)
         }
+
+        pushTest()
+    }
+
+    // TODO Remove after testing!!
+    private fun pushTest() {
+        FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener { task ->
+            if (!task.isSuccessful) {
+                Logger.t(TariFirebaseMessagingService::class.simpleName).d("Fetching FCM registration token failed", task.exception)
+                return@OnCompleteListener
+            }
+
+            // Get new FCM registration token
+            val token = task.result
+
+            // Log and toast
+            val msg = "FCM registration token: $token"
+            Logger.t(TariFirebaseMessagingService::class.simpleName).d(msg)
+            Toast.makeText(baseContext, msg, Toast.LENGTH_SHORT).show()
+        })
     }
 
     override fun onResume() {

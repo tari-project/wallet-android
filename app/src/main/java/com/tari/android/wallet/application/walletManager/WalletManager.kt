@@ -69,7 +69,6 @@ import com.tari.android.wallet.model.tx.CancelledTx
 import com.tari.android.wallet.model.tx.CompletedTx
 import com.tari.android.wallet.model.tx.PendingInboundTx
 import com.tari.android.wallet.model.tx.PendingOutboundTx
-import com.tari.android.wallet.notification.NotificationHelper
 import com.tari.android.wallet.tor.TorConfig
 import com.tari.android.wallet.tor.TorProxyManager
 import com.tari.android.wallet.tor.TorProxyStateHandler
@@ -110,12 +109,10 @@ class WalletManager @Inject constructor(
     private val torConfig: TorConfig,
     private val torProxyStateHandler: TorProxyStateHandler,
     private val baseNodeStateHandler: BaseNodeStateHandler,
-    private val notificationHelper: NotificationHelper,
     private val walletRestorationStateHandler: WalletRestorationStateHandler,
     private val dialogManager: DialogManager,
     private val balanceStateHandler: BalanceStateHandler,
     private val walletCallbacks: WalletCallbacks,
-    private val walletNotificationManager: WalletNotificationManager,
     private val appStateHandler: AppStateHandler,
     @ApplicationScope private val applicationScope: CoroutineScope,
 ) {
@@ -171,9 +168,7 @@ class WalletManager @Inject constructor(
                 walletManager = this,
                 walletValidator = walletValidator,
                 externalScope = applicationScope,
-                walletNotificationManager = walletNotificationManager,
                 baseNodesManager = baseNodesManager,
-                notificationHelper = notificationHelper,
                 balanceStateHandler = balanceStateHandler,
                 baseNodeStateHandler = baseNodeStateHandler,
                 walletRestorationStateHandler = walletRestorationStateHandler,
@@ -412,7 +407,6 @@ class WalletManager @Inject constructor(
         val recipientAddress = FFITariWalletAddress(Base58String(tariContact.walletAddress.fullBase58))
 
         val txId = requireWalletInstance.sendTx(recipientAddress, amount.value, feePerGram.value, message, isOneSidePayment)
-        walletNotificationManager.addOutboundTxNotification(txId, recipientAddress)
 
         recipientAddress.destroy()
         return txId

@@ -14,6 +14,7 @@ plugins {
     id("com.google.devtools.ksp")
     id("download-libwallet")
     id("org.jetbrains.kotlin.plugin.compose") version Dependencies.Kotlin.version
+    id("com.google.gms.google-services")
 }
 
 val commitNumber: Int by lazy {
@@ -88,12 +89,12 @@ android {
     productFlavors {
         create("regular") {
             dimension = "privacy-mode"
-            buildConfigField("String", "NOTIFICATIONS_API_KEY", "\"${loadSecretProps()["service.notifications.api_key"]}\"")
+            buildConfigField("String", "NOTIFICATIONS_API_KEY", "\"${loadSecretProps()["service.notifications.api_key"]}\"") // todo use new API KEY
             proguardFile("regular-proguard-rules.pro")
         }
         create("privacy") {
             dimension = "privacy-mode"
-            buildConfigField("String", "NOTIFICATIONS_API_KEY", "\"${loadSecretProps()["service.notifications.api_key"]}\"")
+            buildConfigField("String", "NOTIFICATIONS_API_KEY", "\"${loadSecretProps()["service.notifications.api_key"]}\"")// todo use new API KEY
         }
     }
 
@@ -265,7 +266,7 @@ dependencies {
     implementation(Dependencies.secureStorage)
 
     implementation(platform(Dependencies.Firebase.bom))
-    implementation(Dependencies.Firebase.crashlytics)
+    implementation(Dependencies.Firebase.messaging)
 
     implementation(Dependencies.Google.playServicesAuth)
     implementation(Dependencies.Google.httpClientGson)
