@@ -51,7 +51,6 @@ import com.tari.android.wallet.ui.screen.contactBook.details.ContactDetailsViewM
 import com.tari.android.wallet.ui.screen.contactBook.link.ContactLinkViewModel
 import com.tari.android.wallet.ui.screen.contactBook.root.ContactBookViewModel
 import com.tari.android.wallet.ui.screen.debug.sampleDesign.SampleDesignSystemViewModel
-import com.tari.android.wallet.ui.screen.home.HomeActivity
 import com.tari.android.wallet.ui.screen.home.HomeViewModel
 import com.tari.android.wallet.ui.screen.home.overview.HomeOverviewViewModel
 import com.tari.android.wallet.ui.screen.onboarding.activity.OnboardingFlowActivity
@@ -76,12 +75,12 @@ import com.tari.android.wallet.ui.screen.send.finalize.FinalizeSendTxViewModel
 import com.tari.android.wallet.ui.screen.send.requestTari.RequestTariViewModel
 import com.tari.android.wallet.ui.screen.settings.allSettings.AllSettingsViewModel
 import com.tari.android.wallet.ui.screen.settings.allSettings.about.TariAboutViewModel
-import com.tari.android.wallet.ui.screen.settings.backup.backupOnboarding.BackupOnboardingFlowViewModel
-import com.tari.android.wallet.ui.screen.settings.backup.backupOnboarding.item.BackupOnboardingFlowItemViewModel
 import com.tari.android.wallet.ui.screen.settings.backup.backupSettings.BackupSettingsViewModel
 import com.tari.android.wallet.ui.screen.settings.backup.backupSettings.option.BackupOptionViewModel
 import com.tari.android.wallet.ui.screen.settings.backup.changeSecurePassword.ChangeSecurePasswordViewModel
 import com.tari.android.wallet.ui.screen.settings.backup.enterCurrentPassword.EnterCurrentPasswordViewModel
+import com.tari.android.wallet.ui.screen.settings.backup.learnMore.BackupLearnMoreViewModel
+import com.tari.android.wallet.ui.screen.settings.backup.learnMore.item.BackupLearnMoreItemViewModel
 import com.tari.android.wallet.ui.screen.settings.backup.verifySeedPhrase.VerifySeedPhraseViewModel
 import com.tari.android.wallet.ui.screen.settings.baseNodeConfig.changeBaseNode.ChangeBaseNodeViewModel
 import com.tari.android.wallet.ui.screen.settings.bluetoothSettings.BluetoothSettingsViewModel
@@ -126,7 +125,6 @@ interface ApplicationComponent {
     fun inject(activity: StartActivity)
     fun inject(activity: OnboardingFlowActivity)
     fun inject(activity: AuthActivity)
-    fun inject(activity: HomeActivity)
     fun inject(activity: QrScannerActivity)
 
     fun inject(fragment: ChooseGIFDialogFragment)
@@ -171,8 +169,8 @@ interface ApplicationComponent {
     fun inject(viewModel: EnterCurrentPasswordViewModel)
     fun inject(viewModel: ChangeSecurePasswordViewModel)
     fun inject(viewModel: AddNoteViewModel)
-    fun inject(viewModel: BackupOnboardingFlowViewModel)
-    fun inject(viewModel: BackupOnboardingFlowItemViewModel)
+    fun inject(viewModel: BackupLearnMoreViewModel)
+    fun inject(viewModel: BackupLearnMoreItemViewModel)
     fun inject(viewModel: ContactBookViewModel)
     fun inject(viewModel: ContactDetailsViewModel)
     fun inject(viewModel: ContactsViewModel)

@@ -1,21 +1,20 @@
-package com.tari.android.wallet.ui.screen.settings.backup.backupOnboarding.item
+package com.tari.android.wallet.ui.screen.settings.backup.learnMore.item
 
 import android.graphics.Typeface
 import android.text.SpannableString
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.securityStage.STAGE_TWO_THRESHOLD_BALANCE
-import com.tari.android.wallet.util.extension.applyCenterAlignment
-import com.tari.android.wallet.util.extension.applyColorStyle
-import com.tari.android.wallet.util.extension.applyTypefaceStyle
 import com.tari.android.wallet.ui.common.domain.PaletteManager
 import com.tari.android.wallet.ui.common.domain.ResourceManager
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonStyle
-import com.tari.android.wallet.ui.screen.home.HomeActivity
+import com.tari.android.wallet.util.extension.applyCenterAlignment
+import com.tari.android.wallet.util.extension.applyColorStyle
+import com.tari.android.wallet.util.extension.applyTypefaceStyle
 import yat.android.ui.extension.HtmlHelper
 import java.io.Serializable
 
-sealed class BackupOnboardingArgs(
+sealed class BackupLearnMoreStageArgs(
     val image: Int,
     val title: SpannableString,
     val description: SpannableString,
@@ -23,7 +22,7 @@ sealed class BackupOnboardingArgs(
     val button: ButtonModule
 ) : Serializable {
 
-    class StageOne(resourceManager: ResourceManager, navigationAction: () -> Unit) : BackupOnboardingArgs(
+    class StageOne(resourceManager: ResourceManager, navigationAction: () -> Unit) : BackupLearnMoreStageArgs(
         R.drawable.vector_backup_onboarding_seed_words,
         getTitle(
             resourceManager,
@@ -37,7 +36,7 @@ sealed class BackupOnboardingArgs(
         }
     )
 
-    class StageTwo(resourceManager: ResourceManager, navigationAction: () -> Unit) : BackupOnboardingArgs(
+    class StageTwo(resourceManager: ResourceManager, navigationAction: () -> Unit) : BackupLearnMoreStageArgs(
         R.drawable.vector_backup_onboarding_cloud,
         getTitle(
             resourceManager,
@@ -51,7 +50,7 @@ sealed class BackupOnboardingArgs(
         }
     )
 
-    class StageThree(resourceManager: ResourceManager, navigationAction: () -> Unit) : BackupOnboardingArgs(
+    class StageThree(resourceManager: ResourceManager, navigationAction: () -> Unit) : BackupLearnMoreStageArgs(
         R.drawable.vector_backup_onboarding_password,
         getTitle(
             resourceManager,
@@ -65,7 +64,7 @@ sealed class BackupOnboardingArgs(
         }
     )
 
-    class StageFour(resourceManager: ResourceManager, navigationAction: () -> Unit) : BackupOnboardingArgs(
+    class StageFour(resourceManager: ResourceManager, navigationAction: () -> Unit) : BackupLearnMoreStageArgs(
         R.drawable.vector_backup_onboarding_final,
         getTitle(
             resourceManager,
@@ -109,7 +108,7 @@ sealed class BackupOnboardingArgs(
                 )
             }
             val spannable = SpannableString("$firstPart $highlighted$part3")
-            spannable.applyColorStyle(highlighted, PaletteManager.getTextLinks(HomeActivity.instance.get()!!))
+            spannable.applyColorStyle(highlighted, PaletteManager.getTextLinks(resourceManager.context))
             spannable.applyCenterAlignment()
             return spannable
         }

@@ -1,8 +1,10 @@
 package com.tari.android.wallet.infrastructure.permission
 
+import android.content.Context
 import android.content.pm.PackageManager
 import androidx.core.content.ContextCompat
 import com.tari.android.wallet.R
+import com.tari.android.wallet.navigation.TariNavigator
 import com.tari.android.wallet.ui.common.SingleLiveEvent
 import com.tari.android.wallet.ui.common.domain.ResourceManager
 import com.tari.android.wallet.ui.dialog.modular.DialogArgs
@@ -12,11 +14,15 @@ import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonStyle
 import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
 import com.tari.android.wallet.ui.dialog.modular.modules.icon.IconModule
-import com.tari.android.wallet.ui.screen.home.HomeActivity
 import org.joda.time.DateTime
 import javax.inject.Inject
 
-class PermissionManager @Inject constructor(val resourceManager: ResourceManager) {
+// TODO refactor this. It doesn't work reliably
+class PermissionManager @Inject constructor(
+    private val context: Context,
+    private val resourceManager: ResourceManager,
+    private val tariNavigator: TariNavigator,
+) {
 
     val checkForPermission: SingleLiveEvent<List<String>> = SingleLiveEvent()
 
@@ -38,7 +44,7 @@ class PermissionManager @Inject constructor(val resourceManager: ResourceManager
 
         val notGranted = permissions.filter {
             ContextCompat.checkSelfPermission(
-                HomeActivity.instance.get()!!,
+                context,
                 it
             ) != PackageManager.PERMISSION_GRANTED
         }
@@ -48,7 +54,7 @@ class PermissionManager @Inject constructor(val resourceManager: ResourceManager
         }
 
         val shouldShowRationale = notGranted.any {
-            HomeActivity.instance.get()!!.shouldShowRequestPermissionRationale(it)
+            tariNavigator.currentActivity.shouldShowRequestPermissionRationale(it)
         }
 
         if (shouldShowRationale) {

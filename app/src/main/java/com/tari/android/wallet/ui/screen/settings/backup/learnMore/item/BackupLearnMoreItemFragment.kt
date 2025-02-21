@@ -1,23 +1,23 @@
-package com.tari.android.wallet.ui.screen.settings.backup.backupOnboarding.item
+package com.tari.android.wallet.ui.screen.settings.backup.learnMore.item
 
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.tari.android.wallet.databinding.FragmentBackupOnboardingFlowItemBinding
+import com.tari.android.wallet.databinding.FragmentBackupLearnMoreItemBinding
 import com.tari.android.wallet.ui.common.CommonXmlFragment
 import com.tari.android.wallet.util.extension.setVisible
 
-class BackupOnboardingFlowItemFragment : CommonXmlFragment<FragmentBackupOnboardingFlowItemBinding, BackupOnboardingFlowItemViewModel>() {
+class BackupLearnMoreItemFragment : CommonXmlFragment<FragmentBackupLearnMoreItemBinding, BackupLearnMoreItemViewModel>() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
-        FragmentBackupOnboardingFlowItemBinding.inflate(inflater, container, false).also { ui = it }.root
+        FragmentBackupLearnMoreItemBinding.inflate(inflater, container, false).also { ui = it }.root
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         val position = requireArguments().getInt(ARGS_KEY)
-        val args = BackupOnboardingFlowDataSource.getByPosition(position)
+        val args = BackupLearnMoreDataSource.getByPosition(position)
 
         with(ui) {
             imageView.setImageResource(args.image)
@@ -35,7 +35,7 @@ class BackupOnboardingFlowItemFragment : CommonXmlFragment<FragmentBackupOnboard
 
         private const val ARGS_KEY = "tari_wallet_onboarding_args"
 
-        fun createInstance(position: Int): BackupOnboardingFlowItemFragment =
-            BackupOnboardingFlowItemFragment().apply { arguments = Bundle().apply { putInt(ARGS_KEY, position) } }
+        fun createInstance(position: Int): BackupLearnMoreItemFragment =
+            BackupLearnMoreItemFragment().apply { arguments = Bundle().apply { putInt(ARGS_KEY, position) } }
     }
 }

@@ -1,9 +1,9 @@
-package com.tari.android.wallet.ui.screen.settings.backup.backupOnboarding
+package com.tari.android.wallet.ui.screen.settings.backup.learnMore
 
 import com.tari.android.wallet.navigation.Navigation
 import com.tari.android.wallet.ui.common.CommonViewModel
 
-class BackupOnboardingFlowViewModel : CommonViewModel() {
+class BackupLearnMoreViewModel : CommonViewModel() {
     init {
         component.inject(this)
     }

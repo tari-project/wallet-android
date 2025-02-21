@@ -42,10 +42,10 @@ import com.tari.android.wallet.ui.screen.send.requestTari.RequestTariFragment
 import com.tari.android.wallet.ui.screen.send.transfer.TransferFragment
 import com.tari.android.wallet.ui.screen.settings.allSettings.AllSettingsFragment
 import com.tari.android.wallet.ui.screen.settings.allSettings.about.TariAboutFragment
-import com.tari.android.wallet.ui.screen.settings.backup.backupOnboarding.BackupOnboardingFlowFragment
 import com.tari.android.wallet.ui.screen.settings.backup.backupSettings.BackupSettingsFragment
 import com.tari.android.wallet.ui.screen.settings.backup.changeSecurePassword.ChangeSecurePasswordFragment
 import com.tari.android.wallet.ui.screen.settings.backup.enterCurrentPassword.EnterCurrentPasswordFragment
+import com.tari.android.wallet.ui.screen.settings.backup.learnMore.BackupLearnMoreFragment
 import com.tari.android.wallet.ui.screen.settings.backup.verifySeedPhrase.VerifySeedPhraseFragment
 import com.tari.android.wallet.ui.screen.settings.backup.writeDownSeedWords.WriteDownSeedPhraseFragment
 import com.tari.android.wallet.ui.screen.settings.baseNodeConfig.changeBaseNode.ChangeBaseNodeFragment
@@ -73,7 +73,7 @@ class TariNavigator @Inject constructor(
 
     // The activity on which the navigation intents are performed.
     // Set in the #onResume method of the activity!
-    lateinit var currentActivity: CommonActivity<*, *>
+    lateinit var currentActivity: CommonActivity<*>
 
     fun navigate(navigation: Navigation) {
         when (navigation) {
@@ -123,11 +123,10 @@ class TariNavigator @Inject constructor(
             is AddAmount.ContinueToAddNote -> addFragment(AddNoteFragment.newInstance(navigation.transactionData))
             is AddAmount.ContinueToFinalizing -> continueToFinalizeSendTx(navigation.transactionData)
 
-            is TxList.ToChat -> toChat()
             is TxList.ToTxDetails -> addFragment(TxDetailsFragment.newInstance(navigation.tx, navigation.txId))
             is TxList.ToSendTariToUser -> sendToUser(navigation.contact, navigation.amount, navigation.note)
             is TxList.ToUtxos -> addFragment(UtxosListFragment())
-            is TxList.ToAllSettings -> toAllSettings()
+            is TxList.ToAllSettings -> addFragment(AllSettingsFragment.newInstance())
             is TxList.ToTransfer -> addFragment(TransferFragment())
             is TxList.HomeTransactionHistory -> addFragment(AllTxHistoryFragment())
 
@@ -138,7 +137,7 @@ class TariNavigator @Inject constructor(
             is BackupSettings.ToChangePassword -> addFragment(ChangeSecurePasswordFragment())
             is BackupSettings.ToConfirmPassword -> addFragment(EnterCurrentPasswordFragment())
             is BackupSettings.ToWalletBackupWithRecoveryPhrase -> addFragment(WriteDownSeedPhraseFragment())
-            is BackupSettings.ToLearnMore -> addFragment(BackupOnboardingFlowFragment())
+            is BackupSettings.ToLearnMore -> addFragment(BackupLearnMoreFragment())
 
             is CustomBridge.UploadQrCode -> Unit
 
@@ -219,9 +218,6 @@ class TariNavigator @Inject constructor(
         }
     }
 
-    private fun toChat() = (currentActivity as HomeActivity).ui.viewPager.setCurrentItem(INDEX_CHAT, NO_SMOOTH_SCROLL)
-    private fun toAllSettings() = (currentActivity as HomeActivity).ui.viewPager.setCurrentItem(INDEX_SETTINGS, NO_SMOOTH_SCROLL)
-
     private fun toExternalWallet(connectedWallet: ConnectedWallet) {
         try {
             val externalAddress = connectedWallet.getExternalLink()
@@ -242,11 +238,5 @@ class TariNavigator @Inject constructor(
         const val PARAMETER_AMOUNT = "amount"
         const val PARAMETER_TRANSACTION = "transaction_data"
         const val PARAMETER_CONTACT = "tari_contact_dto_args"
-
-        const val INDEX_HOME = 0
-        const val INDEX_CONTACT_BOOK = 1
-        const val INDEX_CHAT = 2
-        const val INDEX_SETTINGS = 3
-        const val NO_SMOOTH_SCROLL = false
     }
 }

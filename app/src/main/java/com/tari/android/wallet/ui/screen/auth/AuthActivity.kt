@@ -46,7 +46,7 @@ import com.tari.android.wallet.R.string.auth_title
 import com.tari.android.wallet.data.sharedPrefs.security.LoginAttemptDto
 import com.tari.android.wallet.databinding.ActivityAuthBinding
 import com.tari.android.wallet.infrastructure.security.biometric.BiometricAuthenticationException
-import com.tari.android.wallet.ui.common.CommonActivity
+import com.tari.android.wallet.ui.common.CommonXmlActivity
 import com.tari.android.wallet.ui.common.domain.PaletteManager
 import com.tari.android.wallet.ui.screen.pinCode.EnterPinCodeFragment
 import com.tari.android.wallet.ui.screen.pinCode.PinCodeScreenBehavior
@@ -57,7 +57,7 @@ import com.tari.android.wallet.util.extension.visible
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-class AuthActivity : CommonActivity<ActivityAuthBinding, AuthViewModel>() {
+class AuthActivity : CommonXmlActivity<ActivityAuthBinding, AuthViewModel>() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

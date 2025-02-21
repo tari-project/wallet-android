@@ -36,10 +36,10 @@ import android.os.Bundle
 import androidx.activity.viewModels
 import com.tari.android.wallet.R
 import com.tari.android.wallet.databinding.ActivityWalletBackupBinding
-import com.tari.android.wallet.ui.common.CommonActivity
+import com.tari.android.wallet.ui.common.CommonXmlActivity
 import com.tari.android.wallet.ui.screen.restore.chooseRestoreOption.ChooseRestoreOptionFragment
 
-class WalletRestoreActivity : CommonActivity<ActivityWalletBackupBinding, WalletRestoreViewModel>() {
+class WalletRestoreActivity : CommonXmlActivity<ActivityWalletBackupBinding, WalletRestoreViewModel>() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

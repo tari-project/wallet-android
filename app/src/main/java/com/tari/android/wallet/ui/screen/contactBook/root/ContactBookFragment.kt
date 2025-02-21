@@ -26,7 +26,6 @@ import com.tari.android.wallet.ui.screen.contactBook.contacts.ContactsFragment
 import com.tari.android.wallet.ui.screen.contactBook.contacts.FavoritesFragment
 import com.tari.android.wallet.ui.screen.contactBook.root.share.ShareOptionArgs
 import com.tari.android.wallet.ui.screen.contactBook.root.share.ShareOptionView
-import com.tari.android.wallet.ui.screen.home.HomeActivity
 import com.tari.android.wallet.ui.screen.qr.QrScannerActivity
 import com.tari.android.wallet.ui.screen.qr.QrScannerSource
 import com.tari.android.wallet.util.Constants
@@ -109,9 +108,9 @@ class ContactBookFragment : CommonXmlFragment<FragmentContactBookRootBinding, Co
             )
         }.attach()
 
-        ui.searchView.setOnQueryTextFocusChangeListener { _, hasFocus -> (requireActivity() as? HomeActivity)?.setBottomBarVisibility(!hasFocus) }
+//        ui.searchView.setOnQueryTextFocusChangeListener { _, hasFocus -> (requireActivity() as? HomeActivity)?.setBottomBarVisibility(!hasFocus) }
 
-        ui.searchView.setOnFocusChangeListener { _, hasFocus -> (requireActivity() as? HomeActivity)?.setBottomBarVisibility(!hasFocus) }
+//        ui.searchView.setOnFocusChangeListener { _, hasFocus -> (requireActivity() as? HomeActivity)?.setBottomBarVisibility(!hasFocus) }
 
         ui.searchView.setIconifiedByDefault(false)
 
@@ -137,7 +136,7 @@ class ContactBookFragment : CommonXmlFragment<FragmentContactBookRootBinding, Co
             }
 
             override fun focusOnEditText(isFocused: Boolean) {
-                (requireActivity() as? HomeActivity)?.setBottomBarVisibility(!isFocused)
+//                (requireActivity() as? HomeActivity)?.setBottomBarVisibility(!isFocused)
                 if (isFocused) {
                     focusEditTextAndShowKeyboard()
                 } else {

@@ -1,19 +1,19 @@
-package com.tari.android.wallet.ui.screen.settings.backup.backupOnboarding.module
+package com.tari.android.wallet.ui.screen.settings.backup.learnMore.module
 
 import android.annotation.SuppressLint
 import android.content.Context
 import android.view.*
-import com.tari.android.wallet.databinding.DialogModuleBackupOnboardingFlowItemBinding
+import com.tari.android.wallet.databinding.DialogModuleBackupLearnMoreItemBinding
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.component.common.CommonView
 import com.tari.android.wallet.util.extension.setVisible
 
 @SuppressLint("ViewConstructor")
-class BackupOnboardingFlowItemModuleView(context: Context, module: BackupOnboardingFlowItemModule) :
-    CommonView<CommonViewModel, DialogModuleBackupOnboardingFlowItemBinding>(context) {
+class BackupLearnMoreItemModuleView(context: Context, module: BackupLearnMoreItemModule) :
+    CommonView<CommonViewModel, DialogModuleBackupLearnMoreItemBinding>(context) {
 
-    override fun bindingInflate(layoutInflater: LayoutInflater, parent: ViewGroup?, attachToRoot: Boolean): DialogModuleBackupOnboardingFlowItemBinding =
-        DialogModuleBackupOnboardingFlowItemBinding.inflate(layoutInflater, parent, attachToRoot)
+    override fun bindingInflate(layoutInflater: LayoutInflater, parent: ViewGroup?, attachToRoot: Boolean): DialogModuleBackupLearnMoreItemBinding =
+        DialogModuleBackupLearnMoreItemBinding.inflate(layoutInflater, parent, attachToRoot)
 
     override fun setup() = Unit
 
