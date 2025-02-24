@@ -21,7 +21,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.tari.android.wallet.ui.compose.PreviewSurface
+import com.tari.android.wallet.ui.compose.PreviewSecondarySurface
 import com.tari.android.wallet.ui.compose.TariDesignSystem
 import com.tari.android.wallet.ui.screen.settings.themeSelector.TariTheme
 
@@ -99,7 +99,10 @@ fun TariOutlinedButton(
                 color = if (enabled) TariDesignSystem.colors.buttonOutlined else TariDesignSystem.colors.actionDisabledBackground,
             ),
             shape = TariDesignSystem.shapes.button,
-            colors = ButtonDefaults.outlinedButtonColors(backgroundColor = Color.Transparent, disabledContentColor = Color.Transparent),
+            colors = ButtonDefaults.outlinedButtonColors(
+                backgroundColor = TariDesignSystem.colors.backgroundPrimary,
+                disabledContentColor = TariDesignSystem.colors.backgroundPrimary,
+            ),
             modifier = modifier.defaultMinSize(minHeight = size.minHeight()),
             enabled = enabled,
         ) {
@@ -129,7 +132,10 @@ fun TariInheritTextButton(
                 color = if (enabled) TariDesignSystem.colors.divider else TariDesignSystem.colors.actionDisabledBackground,
             ),
             shape = TariDesignSystem.shapes.button,
-            colors = ButtonDefaults.outlinedButtonColors(backgroundColor = Color.Transparent, disabledContentColor = Color.Transparent),
+            colors = ButtonDefaults.outlinedButtonColors(
+                backgroundColor = TariDesignSystem.colors.backgroundPrimary,
+                disabledContentColor = TariDesignSystem.colors.backgroundPrimary,
+            ),
             modifier = modifier.defaultMinSize(minHeight = TariButtonSize.Medium.minHeight()),
             enabled = enabled,
         ) {
@@ -194,7 +200,7 @@ private fun TariButtonSize.textHorizontalPadding() = when (this) {
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-private fun WithRippleColor(
+fun WithRippleColor(
     rippleColor: Color,
     content: @Composable () -> Unit,
 ) {
@@ -216,7 +222,7 @@ private fun WithRippleColor(
 @Preview
 @Composable
 private fun TariButtonsPreview() {
-    PreviewSurface(TariTheme.Dark) {
+    PreviewSecondarySurface(TariTheme.Dark) {
         Column {
             TariPrimaryButton(
                 modifier = Modifier.padding(horizontal = 20.dp, vertical = 10.dp),

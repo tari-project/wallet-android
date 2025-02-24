@@ -46,6 +46,20 @@ private fun TariDesignSystem(
     }
 
     val tariTextStyle = TariTextStyles(
+        heading2XLarge = TextStyle(
+            fontFamily = PoppinsFontFamily,
+            fontSize = 24.sp,
+            fontWeight = FontWeight.SemiBold,
+            lineHeight = 36.sp,
+            color = tariColors.textPrimary,
+        ),
+        headingXLarge = TextStyle(
+            fontFamily = PoppinsFontFamily,
+            fontSize = 18.sp,
+            fontWeight = FontWeight.SemiBold,
+            lineHeight = 27.sp,
+            color = tariColors.textPrimary,
+        ),
         headingLarge = TextStyle(
             fontFamily = PoppinsFontFamily,
             fontSize = 16.sp,
@@ -80,6 +94,13 @@ private fun TariDesignSystem(
             fontWeight = FontWeight.Medium,
             lineHeight = 17.sp,
             color = tariColors.textSecondary,
+        ),
+        modalTitleLarge = TextStyle(
+            fontFamily = PoppinsFontFamily,
+            fontSize = 24.sp,
+            fontWeight = FontWeight.Medium,
+            lineHeight = 36.sp,
+            color = tariColors.textPrimary,
         ),
         modalTitle = TextStyle(
             fontFamily = PoppinsFontFamily,

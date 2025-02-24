@@ -1,6 +1,5 @@
 package com.tari.android.wallet.ui.screen.home
 
-import android.view.View
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -16,7 +15,6 @@ import androidx.compose.material.Scaffold
 import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -32,7 +30,7 @@ import androidx.fragment.app.FragmentContainerView
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.commit
 import com.tari.android.wallet.R
-import com.tari.android.wallet.ui.compose.PreviewSurface
+import com.tari.android.wallet.ui.compose.PreviewPrimarySurface
 import com.tari.android.wallet.ui.compose.TariDesignSystem
 import com.tari.android.wallet.ui.screen.home.HomeModel.BottomMenuOption
 import com.tari.android.wallet.ui.screen.home.overview.HomeOverviewFragment
@@ -40,6 +38,8 @@ import com.tari.android.wallet.ui.screen.profile.WalletInfoFragment
 import com.tari.android.wallet.ui.screen.settings.allSettings.AllSettingsFragment
 import com.tari.android.wallet.ui.screen.settings.themeSelector.TariTheme
 import com.tari.android.wallet.ui.screen.store.StoreFragment
+
+private const val FRAGMENT_CONTAINER_ID = 1
 
 @Composable
 fun HomeScreen(
@@ -172,16 +172,15 @@ private fun FragmentContainer(
     fragmentManager: FragmentManager,
     fragment: Fragment,
 ) {
-    val containerId by rememberSaveable { mutableIntStateOf(View.generateViewId()) }
     var initialized by rememberSaveable { mutableStateOf(false) }
 
     AndroidView(
         modifier = modifier,
-        factory = { context -> FragmentContainerView(context).apply { id = containerId } },
+        factory = { context -> FragmentContainerView(context).apply { id = FRAGMENT_CONTAINER_ID } },
         update = { view ->
             if (!initialized) {
                 fragmentManager.commit {
-                    // TODO check and remove the current fragment properly
+                    fragmentManager.findFragmentById(view.id)?.let { remove(it) }
                     replace(view.id, fragment, fragment.javaClass.simpleName)
                 }
 
@@ -196,7 +195,7 @@ private fun FragmentContainer(
 @Composable
 @Preview
 private fun NavigationMenuPreview() {
-    PreviewSurface(TariTheme.Dark) {
+    PreviewPrimarySurface(TariTheme.Dark) {
         Box(
             modifier = Modifier
                 .fillMaxSize()
