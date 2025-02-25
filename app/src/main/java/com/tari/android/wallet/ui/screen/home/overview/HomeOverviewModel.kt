@@ -14,8 +14,11 @@ class HomeOverviewModel {
             pendingOutgoingBalance = 0.toMicroTari(),
             timeLockedBalance = 0.toMicroTari(),
         ),
+        val ticker: String,
+        val activeMinersCount: Int? = null,
+        val isMining: Boolean = false,
 
-        val avatarEmoji: EmojiId,
-        val emojiMedium: EmojiId,
+        val avatarEmoji: EmojiId, // todo remove
+        val emojiMedium: EmojiId, // todo remove
     )
 }

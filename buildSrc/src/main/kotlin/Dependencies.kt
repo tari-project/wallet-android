@@ -36,6 +36,7 @@ object Dependencies {
             const val material = "androidx.compose.material:material"
             const val uiTooling = "androidx.compose.ui:ui-tooling"
             const val uiToolingPreview = "androidx.compose.ui:ui-tooling-preview"
+            const val foundation = "androidx.compose.foundation:foundation:1.8.0-beta02" // TODO use BOM version
             const val activity = "androidx.activity:activity-compose:1.9.2"
         }
     }
