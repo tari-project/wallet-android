@@ -21,42 +21,57 @@ inline fun LifecycleOwner.launchAndRepeatOnLifecycle(
     crossinline block: suspend CoroutineScope.() -> Unit,
 ) = lifecycleScope.launch { repeatOnLifecycle(state) { block() } }
 
-fun <T> AppCompatActivity.collectFlow(stateFlow: Flow<T>, action: suspend (T) -> Unit): Job {
+fun <T> AppCompatActivity.collectFlow(stateFlow: Flow<T>, onError: (Throwable) -> Unit = {}, action: suspend (T) -> Unit): Job {
     return launchAndRepeatOnLifecycle(Lifecycle.State.STARTED) {
-        stateFlow.collect { state ->
-            action(state)
+        try {
+            stateFlow.collect { state -> action(state) }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            onError(e)
         }
     }
 }
 
-fun <T> Fragment.collectFlow(stateFlow: Flow<T>, action: suspend (T) -> Unit): Job {
+fun <T> Fragment.collectFlow(stateFlow: Flow<T>, onError: (Throwable) -> Unit = {}, action: suspend (T) -> Unit): Job {
     return viewLifecycleOwner.launchAndRepeatOnLifecycle(Lifecycle.State.STARTED) {
-        stateFlow.collect { state ->
-            action(state)
+        try {
+            stateFlow.collect { state -> action(state) }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            onError(e)
         }
     }
 }
 
-fun <T> Fragment.collectNonNullFlow(stateFlow: Flow<T?>, action: suspend (T) -> Unit): Job {
+fun <T> Fragment.collectNonNullFlow(stateFlow: Flow<T?>, onError: (Throwable) -> Unit = {}, action: suspend (T) -> Unit): Job {
     return viewLifecycleOwner.launchAndRepeatOnLifecycle(Lifecycle.State.STARTED) {
-        stateFlow.filter { it != null }.collect { state ->
-            action(state!!)
+        try {
+            stateFlow.filter { it != null }.collect { state -> action(state!!) }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            onError(e)
         }
     }
 }
 
-fun <T> ViewModel.collectFlow(stateFlow: Flow<T>, action: suspend (T) -> Unit): Job {
+fun <T> ViewModel.collectFlow(stateFlow: Flow<T>, onError: (Throwable) -> Unit = {}, action: suspend (T) -> Unit): Job {
     return viewModelScope.launch {
-        stateFlow.collect { state ->
-            action(state)
+        try {
+            stateFlow.collect { state -> action(state) }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            onError(e)
         }
     }
 }
 
-fun <T> ViewModel.collectNonNullFlow(stateFlow: Flow<T?>, action: suspend (T) -> Unit): Job {
+fun <T> ViewModel.collectNonNullFlow(stateFlow: Flow<T?>, onError: (Throwable) -> Unit = {}, action: suspend (T) -> Unit): Job {
     return viewModelScope.launch {
-        stateFlow.filter { it != null }.collect { state ->
-            action(state!!)
+        try {
+            stateFlow.filter { it != null }.collect { state -> action(state!!) }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            onError(e)
         }
     }
 }

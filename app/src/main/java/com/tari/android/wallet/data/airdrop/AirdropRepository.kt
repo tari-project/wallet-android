@@ -19,8 +19,11 @@ class AirdropRepository @Inject constructor(
 
     fun getMinerStatsFlow(): Flow<Int> = flow<Int> {
         while (true) {
-            val activeMinersCount = getMinerStats()
-            emit(activeMinersCount)
+            try {
+                emit(getMinerStats())
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
             delay(MINERS_COUNT_REFRESH_INTERVAL)
         }
     }
