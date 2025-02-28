@@ -453,8 +453,6 @@ private fun HomeOverviewScreenPreview() {
         HomeOverviewScreen(
             uiState = HomeOverviewModel.UiState(
                 activeMinersCount = 10,
-                avatarEmoji = "🐱",
-                emojiMedium = "🐶",
                 isMining = false,
                 balance = BalanceInfo(
                     availableBalance = 4_836_150_000.toMicroTari(),
@@ -463,7 +461,6 @@ private fun HomeOverviewScreenPreview() {
                     timeLockedBalance = 0.toMicroTari(),
                 ),
                 ticker = "tXTR",
-                txList_Old = emptyList(),
                 txList = MockDataStub.createTxList(),
             ),
             onStartMiningClicked = {},

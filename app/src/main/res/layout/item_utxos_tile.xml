@@ -76,7 +76,7 @@
                         <com.tari.android.wallet.ui.component.tari.TariTextView
                             android:id="@+id/amount_decimal"
                             android:layout_width="wrap_content"
-                            android:layout_height="@dimen/home_balance_digit_decimal_height"
+                            android:layout_height="14dp"
                             android:layout_gravity="center_vertical"
                             android:layout_marginBottom="6dp"
                             android:textColor="@color/white"

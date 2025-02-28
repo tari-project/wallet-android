@@ -42,37 +42,19 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
-import androidx.recyclerview.widget.LinearLayoutManager
-import com.tari.android.wallet.R
 import com.tari.android.wallet.application.deeplinks.DeepLink
-import com.tari.android.wallet.application.walletManager.WalletConfig
 import com.tari.android.wallet.databinding.FragmentHomeOverviewBinding
-import com.tari.android.wallet.model.BalanceInfo
 import com.tari.android.wallet.navigation.Navigation
 import com.tari.android.wallet.ui.common.CommonXmlFragment
-import com.tari.android.wallet.ui.common.recyclerView.AdapterFactory
-import com.tari.android.wallet.ui.common.recyclerView.CommonViewHolderItem
-import com.tari.android.wallet.ui.component.balanceController.BalanceViewController
 import com.tari.android.wallet.ui.component.networkStateIndicator.ConnectionIndicatorViewModel
-import com.tari.android.wallet.ui.component.questionMark.QuestionMarkViewModel
 import com.tari.android.wallet.ui.screen.qr.QrScannerActivity
-import com.tari.android.wallet.ui.screen.tx.adapter.TxListHomeViewHolder
-import com.tari.android.wallet.ui.screen.tx.adapter.TxViewHolderItem
-import com.tari.android.wallet.util.extension.collectFlow
 import com.tari.android.wallet.util.extension.parcelable
-import com.tari.android.wallet.util.extension.setVisible
-import com.tari.android.wallet.util.extension.takeIfIs
 
 class HomeOverviewFragment_Old : CommonXmlFragment<FragmentHomeOverviewBinding, HomeOverviewViewModel>() {
 
     private val networkIndicatorViewModel: ConnectionIndicatorViewModel by viewModels() // TODO move it to the new screen? Or not??
-    private val questionMarkViewModel: QuestionMarkViewModel by viewModels()
 
     private val handler: Handler = Handler(Looper.getMainLooper())
-
-    private val adapter = AdapterFactory.generate<CommonViewHolderItem>(TxListHomeViewHolder.getBuilder())
-
-    private var balanceViewController: BalanceViewController? = null // TODO remove
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
         FragmentHomeOverviewBinding.inflate(inflater, container, false).also { ui = it }.root
@@ -86,24 +68,6 @@ class HomeOverviewFragment_Old : CommonXmlFragment<FragmentHomeOverviewBinding, 
         viewModel.checkPermission()
         setupUI()
         subscribeToViewModel()
-        observeUI()
-    }
-
-    private fun observeUI() {
-        collectFlow(viewModel.uiState) { uiState ->
-            updateBalanceInfoUI(uiState.balance)
-
-            ui.avatar.text = uiState.avatarEmoji
-            ui.emptyStateTextView.text = getString(R.string.home_empty_state, uiState.emojiMedium)
-
-            if (uiState.txList_Old != null) {
-                ui.transactionsRecyclerView.setVisible(uiState.txList_Old.isNotEmpty())
-                ui.viewAllTxsButton.setVisible(uiState.txList_Old.isNotEmpty())
-                ui.emptyState.setVisible(uiState.txList_Old.isEmpty())
-                adapter.update(uiState.txList_Old)
-                adapter.notifyDataSetChanged()
-            }
-        }
     }
 
     override fun onStop() {
@@ -116,27 +80,15 @@ class HomeOverviewFragment_Old : CommonXmlFragment<FragmentHomeOverviewBinding, 
         viewModel.grantContactsPermission()
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        balanceViewController?.onDestroy()
-    }
-
     @SuppressLint("ClickableViewAccessibility")
     private fun setupUI() = with(ui) {
-        viewAllTxsButton.setOnClickListener { viewModel.onAllTxClicked() }
         qrCodeButton.setOnClickListener { viewModel.onQrScannerClicked(this@HomeOverviewFragment_Old) }
-        transactionsRecyclerView.adapter = adapter
-        adapter.setClickListener { item -> item.takeIfIs<TxViewHolderItem>()?.let { viewModel.navigateToTxDetail(it.txDto.tx) } }
-        transactionsRecyclerView.layoutManager = LinearLayoutManager(requireContext())
         fullAvatarContainer.setOnClickListener { viewModel.tariNavigator.navigate(Navigation.AllSettings.ToMyProfile) }
     }
 
     private fun subscribeToViewModel() {
         ui.connectionButton.viewLifecycle = viewLifecycleOwner
         ui.connectionButton.bindViewModel(networkIndicatorViewModel)
-
-        ui.balanceQuestionMark.viewLifecycle = viewLifecycleOwner
-        ui.balanceQuestionMark.bindViewModel(questionMarkViewModel)
     }
 
     @Deprecated("Deprecated in Java")
@@ -145,25 +97,5 @@ class HomeOverviewFragment_Old : CommonXmlFragment<FragmentHomeOverviewBinding, 
             val qrDeepLink = data.parcelable<DeepLink>(QrScannerActivity.EXTRA_DEEPLINK) ?: return
             viewModel.handleDeeplink(requireActivity(), qrDeepLink)
         }
-    }
-
-    private fun updateBalanceInfoUI(balanceInfo: BalanceInfo) {
-        val availableBalance = WalletConfig.balanceFormatter.format(balanceInfo.availableBalance.tariValue)
-        ui.availableBalance.text = availableBalance
-
-        balanceViewController?.let {
-            it.balanceInfo = balanceInfo
-        } ?: run {
-            ui.balanceDigitContainerView.removeAllViews()
-            ui.balanceDecimalsDigitContainerView.removeAllViews()
-            createBalanceInfoController(balanceInfo).also { controller ->
-                balanceViewController = controller
-                controller.runStartupAnimation()
-            }
-        }
-    }
-
-    private fun createBalanceInfoController(info: BalanceInfo): BalanceViewController {
-        return BalanceViewController(requireContext(), ui.balanceDigitContainerView, ui.balanceDecimalsDigitContainerView, info)
     }
 }

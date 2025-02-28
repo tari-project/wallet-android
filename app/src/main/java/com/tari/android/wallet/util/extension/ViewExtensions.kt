@@ -57,21 +57,10 @@ import androidx.core.animation.addListener
 import androidx.core.graphics.BlendModeColorFilterCompat
 import androidx.core.graphics.BlendModeCompat
 import androidx.fragment.app.FragmentTransaction
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import com.airbnb.lottie.LottieAnimationView
 import com.tari.android.wallet.R
 import com.tari.android.wallet.util.Constants
 import timber.log.Timber
 import java.lang.ref.WeakReference
-import android.animation.Animator as LegacyAnimator
-import android.animation.Animator.AnimatorListener as LegacyAnimatorListener
-
-fun RecyclerView.isScrolledToTop(): Boolean {
-    val layoutManager = (layoutManager as? LinearLayoutManager) ?: return false
-    if (layoutManager.childCount == 0) return true
-    return (layoutManager.findFirstVisibleItemPosition() == 0 && layoutManager.findViewByPosition(0)?.top == 0)
-}
 
 fun View.visible() {
     this.visibility = View.VISIBLE
@@ -87,15 +76,6 @@ fun View.gone() {
 
 fun View.setVisible(visible: Boolean, hideState: Int = View.GONE) {
     visibility = if (visible) View.VISIBLE else hideState
-}
-
-/**
- * Sets the width of a TextView to the measured width of its contents
- * taking into account the text size and the typeface.
- */
-fun TextView.setWidthToMeasured() {
-    measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED)
-    setLayoutWidth(measuredWidth)
 }
 
 /**
@@ -136,20 +116,6 @@ fun ScrollView.scrollToBottom() {
     val bottom = lastChild.bottom + paddingBottom
     val delta = bottom - (scrollY + height)
     smoothScrollBy(0, delta)
-}
-
-fun LottieAnimationView.addAnimatorListener(
-    onStart: (LegacyAnimator?) -> Unit = {},
-    onEnd: (LegacyAnimator?) -> Unit = {},
-    onCancel: (LegacyAnimator?) -> Unit = {},
-    onRepeat: (LegacyAnimator?) -> Unit = {}
-) {
-    addAnimatorListener(object : LegacyAnimatorListener {
-        override fun onAnimationRepeat(animation: LegacyAnimator) = onRepeat(animation)
-        override fun onAnimationEnd(animation: LegacyAnimator) = onEnd(animation)
-        override fun onAnimationCancel(animation: LegacyAnimator) = onCancel(animation)
-        override fun onAnimationStart(animation: LegacyAnimator) = onStart(animation)
-    })
 }
 
 fun View.doOnGlobalLayout(block: () -> Unit) {
@@ -221,8 +187,6 @@ fun View.setLayoutSize(width: Int, height: Int) {
         }
     }
 }
-
-fun View.layoutParamsHeight() = (layoutParams as ViewGroup.MarginLayoutParams).height
 
 fun View.getBottomMargin() = (layoutParams as ViewGroup.MarginLayoutParams).bottomMargin
 
@@ -333,11 +297,6 @@ fun View.animateClick(onEnd: (Animator) -> Unit = {}) {
     animSet.addListener(onEnd = onEnd)
     animSet.playSequentially(scaleDownBtnAnim, scaleUpBtnAnim)
     animSet.start()
-}
-
-fun FragmentTransaction.addFadeInAnimation(): FragmentTransaction {
-    this.setCustomAnimations(R.anim.fade_in, R.anim.fade_out)
-    return this
 }
 
 fun FragmentTransaction.addEnterLeftAnimation(): FragmentTransaction {

@@ -34,8 +34,6 @@ import com.tari.android.wallet.ui.screen.qr.QrScannerSource
 import com.tari.android.wallet.ui.screen.send.finalize.FinalizeSendTxModel.TxFailureReason
 import com.tari.android.wallet.util.extension.collectFlow
 import com.tari.android.wallet.util.extension.launchOnIo
-import com.tari.android.wallet.util.extractEmojis
-import com.tari.android.wallet.util.shortString
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -82,8 +80,6 @@ class HomeOverviewViewModel : CommonViewModel() {
     private val _uiState = MutableStateFlow(
         HomeOverviewModel.UiState(
             ticker = networkRepository.currentNetwork.ticker,
-            avatarEmoji = corePrefRepository.walletAddress.coreKeyEmojis.extractEmojis().take(1).joinToString(""),
-            emojiMedium = corePrefRepository.walletAddress.shortString(),
         )
     )
     val uiState = _uiState.asStateFlow()
