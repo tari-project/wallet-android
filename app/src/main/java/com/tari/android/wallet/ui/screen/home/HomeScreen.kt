@@ -48,7 +48,7 @@ fun HomeScreen(
     onMenuItemClicked: (BottomMenuOption) -> Unit,
 ) {
     Scaffold(
-        backgroundColor = TariDesignSystem.colors.backgroundPrimary,
+        backgroundColor = TariDesignSystem.colors.backgroundSecondary,
         modifier = Modifier,
     ) { padding ->
         Box(
@@ -118,10 +118,7 @@ private fun NavigationMenu(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(
-                    top = 20.dp,
-                    bottom = 30.dp,
-                )
+                .padding(vertical = 20.dp)
                 .navigationBarsPadding(),
             horizontalArrangement = Arrangement.SpaceEvenly,
         ) {

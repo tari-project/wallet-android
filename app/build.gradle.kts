@@ -245,7 +245,6 @@ dependencies {
     implementation(Dependencies.AndroidX.Compose.material)
     implementation(Dependencies.AndroidX.Compose.uiTooling)
     implementation(Dependencies.AndroidX.Compose.uiToolingPreview)
-    implementation(Dependencies.AndroidX.Compose.foundation)
     implementation(Dependencies.AndroidX.Compose.activity)
 
     implementation(Dependencies.Coroutines.android)

@@ -22,8 +22,6 @@ import com.tari.android.wallet.data.tx.TxRepository
 import com.tari.android.wallet.model.tx.Tx
 import com.tari.android.wallet.navigation.Navigation
 import com.tari.android.wallet.ui.common.CommonViewModel
-import com.tari.android.wallet.ui.common.giphy.presentation.GifViewModel
-import com.tari.android.wallet.ui.common.giphy.repository.GiphyRestService
 import com.tari.android.wallet.ui.dialog.confirm.ConfirmDialogArgs
 import com.tari.android.wallet.ui.dialog.modular.DialogArgs
 import com.tari.android.wallet.ui.dialog.modular.ModularDialogArgs
@@ -34,7 +32,6 @@ import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
 import com.tari.android.wallet.ui.screen.qr.QrScannerActivity
 import com.tari.android.wallet.ui.screen.qr.QrScannerSource
 import com.tari.android.wallet.ui.screen.send.finalize.FinalizeSendTxModel.TxFailureReason
-import com.tari.android.wallet.ui.screen.tx.adapter.TxViewHolderItem
 import com.tari.android.wallet.util.extension.collectFlow
 import com.tari.android.wallet.util.extension.launchOnIo
 import com.tari.android.wallet.util.extractEmojis
@@ -69,9 +66,6 @@ class HomeOverviewViewModel : CommonViewModel() {
     lateinit var balanceStateHandler: BalanceStateHandler
 
     @Inject
-    lateinit var giphyRestService: GiphyRestService // TODO that's weird. We shouldn't include it here because it\s needed for tx items
-
-    @Inject
     lateinit var airdropRepository: AirdropRepository
 
     init {
@@ -103,15 +97,9 @@ class HomeOverviewViewModel : CommonViewModel() {
         }
 
         collectFlow(transactionRepository.allTxs) { txs ->
-            _uiState.update { state ->
-                state.copy(
+            _uiState.update {
+                it.copy(
                     txList = txs.sortedByDescending { it.tx.timestamp }
-                        .map { txDto ->
-                            TxViewHolderItem(
-                                txDto = txDto,
-                                gifViewModel = GifViewModel(giphyRestService),
-                            )
-                        }
                         .take(TRANSACTION_AMOUNT_HOME_PAGE),
                 )
             }
@@ -221,14 +209,14 @@ class HomeOverviewViewModel : CommonViewModel() {
     }
 
     fun onSendTariClicked() {
-        showNotReadyYetDialog()
+        tariNavigator.navigate(Navigation.TxList.ToTransfer)
     }
 
     fun onRequestTariClicked() {
-        showNotReadyYetDialog()
+        tariNavigator.navigate(Navigation.AllSettings.ToRequestTari)
     }
 
-    // TODO for the question mark icon
+    // FIXME for the question mark icon
     fun showUniversityDialog() {
         showModularDialog(
             ConfirmDialogArgs(
@@ -250,6 +238,6 @@ class HomeOverviewViewModel : CommonViewModel() {
     }
 
     companion object {
-        private const val TRANSACTION_AMOUNT_HOME_PAGE = 2
+        private const val TRANSACTION_AMOUNT_HOME_PAGE = 10
     }
 }

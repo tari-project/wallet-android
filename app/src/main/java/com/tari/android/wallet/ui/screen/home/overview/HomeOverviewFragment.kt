@@ -32,6 +32,7 @@ class HomeOverviewFragment : CommonFragment<HomeOverviewViewModel>() {
                         onStartMiningClicked = { viewModel.onStartMiningClicked() },
                         onSendTariClicked = { viewModel.onSendTariClicked() },
                         onRequestTariClicked = { viewModel.onRequestTariClicked() },
+                        onTxClick = { viewModel.navigateToTxDetail(it.tx) },
                     )
                 }
             }

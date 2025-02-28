@@ -1,6 +1,8 @@
 package com.tari.android.wallet.ui.screen.home.overview
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -12,15 +14,23 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.Card
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Icon
 import androidx.compose.material.Scaffold
-import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.blur
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.paint
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -33,14 +43,27 @@ import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.walletManager.WalletConfig
+import com.tari.android.wallet.data.tx.TxDto
 import com.tari.android.wallet.model.BalanceInfo
+import com.tari.android.wallet.model.TxNote
 import com.tari.android.wallet.ui.compose.PoppinsFontFamily
 import com.tari.android.wallet.ui.compose.PreviewSecondarySurface
 import com.tari.android.wallet.ui.compose.TariDesignSystem
+import com.tari.android.wallet.ui.compose.components.TariButtonSize
 import com.tari.android.wallet.ui.compose.components.TariInheritTextButton
+import com.tari.android.wallet.ui.compose.components.TariPrimaryButton
 import com.tari.android.wallet.ui.compose.widgets.StartMiningButton
 import com.tari.android.wallet.ui.screen.settings.themeSelector.TariTheme
+import com.tari.android.wallet.util.DebugConfig
+import com.tari.android.wallet.util.MockDataStub
 import com.tari.android.wallet.util.extension.toMicroTari
+import org.joda.time.DateTime
+import org.joda.time.Hours
+import org.joda.time.LocalDate
+import org.joda.time.Minutes
+import java.util.Locale
+
+private const val TX_ITEM_DATE_FORMAT = "E, MMM d"
 
 @Composable
 fun HomeOverviewScreen(
@@ -48,6 +71,7 @@ fun HomeOverviewScreen(
     onStartMiningClicked: () -> Unit,
     onSendTariClicked: () -> Unit,
     onRequestTariClicked: () -> Unit,
+    onTxClick: (txDto: TxDto) -> Unit,
 ) {
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -94,60 +118,120 @@ fun HomeOverviewScreen(
                     onClick = onRequestTariClicked,
                 )
             }
+            if (uiState.txList == null) {
+                CircularProgressIndicator(
+                    modifier = Modifier
+                        .padding(40.dp)
+                        .align(Alignment.CenterHorizontally),
+                    color = TariDesignSystem.colors.primaryMain,
+                )
+            } else if (uiState.txList.isEmpty()) {
+                EmptyTxList(
+                    onStartMiningClicked = onStartMiningClicked,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp)
+                        .padding(top = 80.dp),
+                )
+            } else {
+                LazyColumn(modifier = Modifier.fillMaxSize()) {
+                    item {
+                        Text(
+                            modifier = Modifier
+                                .padding(horizontal = 16.dp)
+                                .padding(top = 30.dp, bottom = 10.dp),
+                            text = stringResource(R.string.home_tx_list_recent_activity),
+                            style = TariDesignSystem.typography.headingXLarge,
+                        )
+                    }
+                    items(uiState.txList.size) { index ->
+                        val txItem = uiState.txList[index]
+                        TxItem(
+                            modifier = Modifier.padding(horizontal = 16.dp, vertical = 5.dp),
+                            txDto = txItem,
+                            ticker = uiState.ticker,
+                            onTxClick = { onTxClick(txItem) },
+                        )
+                    }
+                    item {
+                        Spacer(Modifier.height(48.dp))
+                    }
+                }
+            }
         }
     }
 }
 
 @Composable
 private fun ActiveMinersCard(
-    modifier: Modifier,
     isMining: Boolean,
     activeMinersCount: Int?,
     onStartMiningClicked: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
-    Surface(
+    val backgroundBrush = Brush.verticalGradient(
+        colors = listOf(
+            Color(0xFF07160B),
+            Color(0xFF0E1510),
+        ),
+    )
+
+    Card(
         modifier = modifier,
         shape = TariDesignSystem.shapes.card,
-        color = Color.Black,
+        elevation = 2.dp,
     ) {
-        Row(
-            modifier = Modifier.padding(horizontal = 20.dp, vertical = 15.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = stringResource(R.string.home_active_miners_title),
-                    color = Color.White,
-                    style = TariDesignSystem.typography.body2,
-                )
-                Row(
-                    modifier = Modifier.height(36.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.vector_home_overview_active_miners),
-                        contentDescription = null,
-                        tint = Color.White,
+        Box(modifier = Modifier.background(backgroundBrush)) {
+            Row(
+                modifier = Modifier.padding(horizontal = 20.dp, vertical = 15.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = stringResource(R.string.home_active_miners_title),
+                        color = Color.White,
+                        style = TariDesignSystem.typography.body2,
                     )
-                    Spacer(modifier = Modifier.width(6.dp))
-                    if (activeMinersCount != null) {
-                        Text(
-                            text = activeMinersCount.toString(),
-                            color = Color.White,
-                            style = TariDesignSystem.typography.heading2XLarge,
+                    Row(
+                        modifier = Modifier.height(36.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.vector_home_overview_active_miners),
+                            contentDescription = null,
+                            tint = Color.White,
                         )
-                    } else {
-                        CircularProgressIndicator(
-                            modifier = Modifier.size(16.dp),
-                            color = TariDesignSystem.colors.primaryMain,
-                        )
+                        Spacer(modifier = Modifier.width(6.dp))
+                        if (activeMinersCount != null) {
+                            Text(
+                                text = activeMinersCount.toString(),
+                                color = Color.White,
+                                style = TariDesignSystem.typography.heading2XLarge,
+                            )
+                        } else {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(16.dp),
+                                color = TariDesignSystem.colors.primaryMain,
+                            )
+                        }
                     }
                 }
+                if (DebugConfig.showActiveMinersButton) {
+                    Spacer(modifier = Modifier.width(8.dp))
+                    StartMiningButton(
+                        isMining = isMining,
+                        onClick = onStartMiningClicked,
+                    )
+                }
             }
-            Spacer(modifier = Modifier.width(8.dp))
-            StartMiningButton(
-                isMining = isMining,
-                onClick = onStartMiningClicked,
+
+            Image(
+                modifier = Modifier
+                    .alpha(0.44f)
+                    .align(Alignment.TopCenter)
+                    .blur(radius = 70.dp),
+                contentDescription = null,
+                painter = painterResource(R.drawable.tari_active_miners_card_ellipse),
             )
         }
     }
@@ -159,16 +243,19 @@ fun WalletBalanceCard(
     ticker: String,
     modifier: Modifier = Modifier,
 ) {
-    Surface(
+    var isBalanceHidden = remember { mutableStateOf(false) }
+
+    Card(
         modifier = modifier.height(200.dp),
         shape = TariDesignSystem.shapes.card,
+        elevation = 2.dp,
     ) {
         Box(
             modifier = Modifier
                 .fillMaxSize()
                 .paint(
                     painter = painterResource(R.drawable.tari_balance_card_background),
-                    contentScale = ContentScale.FillBounds
+                    contentScale = ContentScale.FillBounds,
                 )
         ) {
             Column(
@@ -189,15 +276,14 @@ fun WalletBalanceCard(
                     )
                     Spacer(modifier = Modifier.width(4.dp))
                     Image(
-                        modifier = Modifier.clickable(onClick = { /* TODO */ }),
+                        modifier = Modifier.clickable(onClick = { isBalanceHidden.value = !isBalanceHidden.value }),
                         painter = painterResource(id = R.drawable.vector_home_overview_hide_balance),
                         contentDescription = null,
                     )
                 }
-                Row {
+                if (isBalanceHidden.value) {
                     Text(
-                        modifier = Modifier.alignByBaseline(),
-                        text = WalletConfig.balanceFormatter.format(balance.availableBalance.tariValue),
+                        text = stringResource(R.string.home_wallet_balance_hidden),
                         style = TextStyle(
                             fontFamily = PoppinsFontFamily,
                             fontSize = 56.sp,
@@ -206,18 +292,30 @@ fun WalletBalanceCard(
                             color = Color.White,
                         ),
                     )
-                    Spacer(modifier = Modifier.width(4.dp))
-                    Text(
-                        modifier = Modifier.alignByBaseline(),
-                        text = ticker,
-                        style = TextStyle(
-                            fontFamily = PoppinsFontFamily,
-                            fontSize = 20.sp,
-                            fontWeight = FontWeight.SemiBold,
-                            lineHeight = 4.em,
-                            color = Color.White,
-                        ),
-                    )
+                } else {
+                    Row {
+                        Text(
+                            modifier = Modifier.alignByBaseline(),
+                            text = WalletConfig.balanceFormatter.format(balance.availableBalance.tariValue),
+                            style = TextStyle(
+                                fontFamily = PoppinsFontFamily,
+                                fontSize = 56.sp,
+                                fontWeight = FontWeight.SemiBold,
+                                color = Color.White,
+                            ),
+                        )
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text(
+                            modifier = Modifier.alignByBaseline(),
+                            text = ticker,
+                            style = TextStyle(
+                                fontFamily = PoppinsFontFamily,
+                                fontSize = 20.sp,
+                                fontWeight = FontWeight.SemiBold,
+                                color = Color.White,
+                            ),
+                        )
+                    }
                 }
             }
         }
@@ -225,9 +323,133 @@ fun WalletBalanceCard(
 }
 
 @Composable
+fun EmptyTxList(
+    onStartMiningClicked: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Box(
+        modifier = modifier,
+        contentAlignment = Alignment.Center,
+    ) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Text(
+                text = stringResource(R.string.home_empty_state_title),
+                style = TariDesignSystem.typography.headingMedium,
+            )
+            Text(
+                text = stringResource(R.string.home_empty_state_description),
+                style = TariDesignSystem.typography.body1,
+            )
+            if (DebugConfig.showActiveMinersButton) {
+                Spacer(modifier = Modifier.height(8.dp))
+                TariPrimaryButton(
+                    size = TariButtonSize.Small,
+                    text = stringResource(R.string.home_empty_state_button),
+                    onClick = onStartMiningClicked,
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun TxItem(
+    modifier: Modifier = Modifier,
+    txDto: TxDto,
+    ticker: String,
+    onTxClick: () -> Unit,
+) {
+    Card(
+        modifier = modifier,
+        shape = TariDesignSystem.shapes.card,
+        backgroundColor = TariDesignSystem.colors.backgroundPrimary,
+        border = BorderStroke(1.dp, TariDesignSystem.colors.elevationOutlined),
+        elevation = 2.dp,
+    ) {
+        Row(
+            modifier = Modifier
+                .clickable(onClick = onTxClick)
+                .padding(horizontal = 16.dp, vertical = 12.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(34.dp)
+                    .clip(CircleShape)
+                    .background(color = TariDesignSystem.colors.textPrimary),
+                contentAlignment = Alignment.Center,
+            ) {
+                Image(
+                    modifier = Modifier
+                        .size(22.dp)
+                        .clip(CircleShape),
+                    painter = painterResource(R.drawable.tari_sample_avatar), // FIXME: remove resource once the avatar is available
+                    contentDescription = null,
+                    contentScale = ContentScale.FillWidth,
+                )
+            }
+            Spacer(modifier = Modifier.width(10.dp))
+            Column(modifier = Modifier.weight(1f)) {
+                val message = TxNote.fromTx(txDto.tx).message
+                if (message != null) {
+                    Text(
+                        text = message,
+                        style = TariDesignSystem.typography.headingMedium,
+                    )
+                }
+                Text(
+                    text = txDto.tx.dateTime.txListItemFormattedDate(),
+                    style = TariDesignSystem.typography.body2,
+                )
+            }
+            Row {
+                Text(
+                    text = when {
+                        txDto.tx.isInbound -> "+"
+                        txDto.tx.isOutbound -> "-"
+                        else -> ""
+                    },
+                    style = TariDesignSystem.typography.headingLarge,
+                    color = when {
+                        txDto.tx.isInbound -> TariDesignSystem.colors.systemGreen
+                        txDto.tx.isOutbound -> TariDesignSystem.colors.systemRed
+                        else -> TariDesignSystem.colors.textPrimary
+                    },
+                )
+                Spacer(modifier = Modifier.width(4.dp))
+                Text(
+                    text = WalletConfig.amountFormatter.format(txDto.tx.amount.tariValue) + " " + ticker,
+                    style = TariDesignSystem.typography.headingLarge,
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun DateTime.txListItemFormattedDate(): String {
+    val txDate = this.toLocalDate()
+    val todayDate = LocalDate.now()
+    val yesterdayDate = todayDate.minusDays(1)
+    return when {
+        txDate.isEqual(todayDate) -> {
+            val minutesSinceTx = Minutes.minutesBetween(this, DateTime.now()).minutes
+            when {
+                minutesSinceTx == 0 -> stringResource(R.string.tx_list_now)
+                minutesSinceTx < 60 -> stringResource(R.string.tx_list_minutes_ago, minutesSinceTx)
+                else -> stringResource(R.string.tx_list_hours_ago, Hours.hoursBetween(this, DateTime.now()).hours)
+            }
+        }
+
+        txDate.isEqual(yesterdayDate) -> stringResource(R.string.home_tx_list_header_yesterday)
+        else -> txDate.toString(TX_ITEM_DATE_FORMAT, Locale.ENGLISH)
+    }
+}
+
+@Composable
 @Preview
 private fun HomeOverviewScreenPreview() {
-    TariDesignSystem(TariTheme.Light) {
+    TariDesignSystem(TariTheme.Dark) {
         HomeOverviewScreen(
             uiState = HomeOverviewModel.UiState(
                 activeMinersCount = 10,
@@ -241,10 +463,13 @@ private fun HomeOverviewScreenPreview() {
                     timeLockedBalance = 0.toMicroTari(),
                 ),
                 ticker = "tXTR",
+                txList_Old = emptyList(),
+                txList = MockDataStub.createTxList(),
             ),
             onStartMiningClicked = {},
             onSendTariClicked = {},
             onRequestTariClicked = {},
+            onTxClick = {},
         )
     }
 }
@@ -288,6 +513,17 @@ private fun BalanceCardPreview() {
                 timeLockedBalance = 0.toMicroTari(),
             ),
             ticker = "tXTR",
+        )
+    }
+}
+
+@Composable
+@Preview
+private fun EmptyTxListPreview() {
+    PreviewSecondarySurface(TariTheme.Light) {
+        EmptyTxList(
+            onStartMiningClicked = {},
+            modifier = Modifier.padding(horizontal = 16.dp, vertical = 48.dp),
         )
     }
 }

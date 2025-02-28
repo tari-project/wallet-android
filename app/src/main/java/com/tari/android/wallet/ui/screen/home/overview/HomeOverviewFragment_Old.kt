@@ -96,11 +96,13 @@ class HomeOverviewFragment_Old : CommonXmlFragment<FragmentHomeOverviewBinding, 
             ui.avatar.text = uiState.avatarEmoji
             ui.emptyStateTextView.text = getString(R.string.home_empty_state, uiState.emojiMedium)
 
-            ui.transactionsRecyclerView.setVisible(uiState.txList.isNotEmpty())
-            ui.viewAllTxsButton.setVisible(uiState.txList.isNotEmpty())
-            ui.emptyState.setVisible(uiState.txList.isEmpty())
-            adapter.update(uiState.txList)
-            adapter.notifyDataSetChanged()
+            if (uiState.txList_Old != null) {
+                ui.transactionsRecyclerView.setVisible(uiState.txList_Old.isNotEmpty())
+                ui.viewAllTxsButton.setVisible(uiState.txList_Old.isNotEmpty())
+                ui.emptyState.setVisible(uiState.txList_Old.isEmpty())
+                adapter.update(uiState.txList_Old)
+                adapter.notifyDataSetChanged()
+            }
         }
     }
 

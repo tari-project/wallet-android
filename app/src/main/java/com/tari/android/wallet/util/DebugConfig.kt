@@ -50,7 +50,6 @@ import com.tari.android.wallet.model.tx.CompletedTx
 import com.tari.android.wallet.model.tx.Tx
 import com.tari.android.wallet.ui.common.giphy.presentation.GifViewModel
 import com.tari.android.wallet.ui.common.giphy.repository.GiphyRestService
-import com.tari.android.wallet.ui.common.recyclerView.items.TitleViewHolderItem
 import com.tari.android.wallet.ui.screen.contactBook.addressPoisoning.SimilarAddressDto
 import com.tari.android.wallet.ui.screen.tx.adapter.TxViewHolderItem
 import com.tari.android.wallet.ui.screen.utxos.list.adapters.UtxosViewHolderItem
@@ -96,6 +95,8 @@ object DebugConfig {
     val sweepFundsButtonEnabled = valueIfDebug(false)
 
     val selectBaseNodeEnabled = valueIfDebug(false) // TODO remove all the code related to this ?
+
+    val showActiveMinersButton = false
 
     fun isDebug() = BuildConfig.BUILD_TYPE == "debug"
 
@@ -160,29 +161,26 @@ object MockDataStub {
     )
 
     fun createTxList(
-        giphyRestService: GiphyRestService,
-        confirmationCount: Long,
-        title: String = "Mocked Transactions"
+        confirmationCount: Long = 10000,
     ) = listOf(
-        TitleViewHolderItem(title = title, isFirst = true),
-        createTxViewHolder(
-            giphyRestService, confirmationCount,
-            amount = 1100000,
+        createTxDto(
+            confirmationCount,
+            amount = 1000000,
             contactAlias = "Alice",
         ),
-        createTxViewHolder(
-            giphyRestService, confirmationCount,
-            amount = 1200000,
+        createTxDto(
+            confirmationCount,
+            amount = 2000000,
             contactAlias = "Bob",
         ),
-        createTxViewHolder(
-            giphyRestService, confirmationCount,
-            amount = 1300000,
+        createTxDto(
+            confirmationCount,
+            amount = 3000000,
             contactAlias = "Charlie",
         ),
-        createTxViewHolder(
-            giphyRestService, confirmationCount,
-            amount = 1400000,
+        createTxDto(
+            confirmationCount,
+            amount = 4000000,
             contactAlias = "David",
             status = TxStatus.COINBASE,
         ),
@@ -213,6 +211,29 @@ object MockDataStub {
             requiredConfirmationCount = confirmationCount,
         ),
         gifViewModel = GifViewModel(giphyRestService),
+    )
+
+    fun createTxDto(
+        confirmationCount: Long,
+        amount: Long = 100000,
+        contactAlias: String = "Test",
+        status: TxStatus = TxStatus.MINED_CONFIRMED,
+    ) = TxDto(
+        tx = CompletedTx(
+            direction = Tx.Direction.INBOUND,
+            status = status,
+            amount = amount.toMicroTari(),
+            fee = 1000.toMicroTari(),
+            message = RANDOM_MESSAGES.random(),
+            paymentId = RANDOM_MESSAGES.random(),
+            timestamp = BigInteger.valueOf(System.currentTimeMillis()),
+            id = 1.toBigInteger(),
+            tariContact = TariContact(WALLET_ADDRESS, contactAlias),
+            confirmationCount = 0.toBigInteger(),
+            txKernel = null,
+        ),
+        contact = createContact(alias = contactAlias),
+        requiredConfirmationCount = confirmationCount,
     )
 
     fun createSimilarAddressList() = listOf(
