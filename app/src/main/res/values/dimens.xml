@@ -40,25 +40,13 @@
     <dimen name="introduction_network_margin_bottom">20dp</dimen>
 
     <!-- home -->
-    <dimen name="home_top_content_container_view_top_margin">16dp</dimen>
-    <dimen name="home_top_content_container_scroll_vertical_shift">20dp</dimen>
     <dimen name="home_grabber_container_height">40dp</dimen>
     <dimen name="home_grabber_corner_radius">15dp</dimen>
     <dimen name="home_tx_list_container_minimized_top_margin">120dp</dimen>
     <dimen name="home_scroll_view_startup_anim_height">60dp</dimen>
-    <dimen name="home_grabber_height">5dp</dimen>
-    <dimen name="home_grabber_width">55dp</dimen>
     <dimen name="home_balance_gem_height">14dp</dimen>
     <dimen name="home_balance_gem_width">14dp</dimen>
-    <dimen name="home_balance_digit_text_size">30sp</dimen>
-    <dimen name="home_balance_digit_height">36dp</dimen>
-    <dimen name="home_balance_digit_decimal_text_size">12sp</dimen>
-    <dimen name="home_balance_digit_decimal_height">14dp</dimen>
-    <dimen name="home_balance_decimal_container_top_margin">2dp</dimen>
-    <dimen name="home_main_content_top_margin">6dp</dimen>
     <dimen name="home_dialog_testnet_tari_dialog_margin">14dp</dimen>
-    <dimen name="home_wallet_info_button_initial_top_margin">45dp</dimen>
-    <dimen name="home_question_mark_size">15dp</dimen>
 
     <!-- tx list -->
     <dimen name="tx_list_item_gif_container_top_margin">8dp</dimen>

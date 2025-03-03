@@ -8,11 +8,15 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.tari.android.wallet.ui.compose.PreviewSurface
+import com.tari.android.wallet.ui.compose.PreviewPrimarySurface
 import com.tari.android.wallet.ui.compose.TariDesignSystem
 import com.tari.android.wallet.ui.compose.components.TariButtonSize
 import com.tari.android.wallet.ui.compose.components.TariInheritTextButton
@@ -20,6 +24,7 @@ import com.tari.android.wallet.ui.compose.components.TariOutlinedButton
 import com.tari.android.wallet.ui.compose.components.TariPrimaryButton
 import com.tari.android.wallet.ui.compose.components.TariSecondaryButton
 import com.tari.android.wallet.ui.compose.components.TariTextButton
+import com.tari.android.wallet.ui.compose.widgets.StartMiningButton
 import com.tari.android.wallet.ui.screen.settings.themeSelector.TariTheme
 
 
@@ -36,6 +41,18 @@ fun SampleDesignSystemScreen(
                 .padding(padding)
                 .verticalScroll(rememberScrollState()),
         ) {
+            Text(
+                modifier = Modifier.padding(horizontal = 20.dp, vertical = 10.dp),
+                text = "Heading 2XLarge Typography",
+                style = TariDesignSystem.typography.heading2XLarge,
+            )
+
+            Text(
+                modifier = Modifier.padding(horizontal = 20.dp, vertical = 10.dp),
+                text = "Heading XLarge Typography",
+                style = TariDesignSystem.typography.headingXLarge,
+            )
+
             Text(
                 modifier = Modifier.padding(horizontal = 20.dp, vertical = 10.dp),
                 text = "Heading Large Typography",
@@ -64,6 +81,12 @@ fun SampleDesignSystemScreen(
                 modifier = Modifier.padding(horizontal = 20.dp, vertical = 10.dp),
                 text = "Body2 Typography",
                 style = TariDesignSystem.typography.body2,
+            )
+
+            Text(
+                modifier = Modifier.padding(horizontal = 20.dp, vertical = 10.dp),
+                text = "Modal Title Large Typography",
+                style = TariDesignSystem.typography.modalTitleLarge,
             )
 
             Text(
@@ -165,7 +188,6 @@ fun SampleDesignSystemScreen(
                 enabled = false,
             )
 
-
             TariTextButton(
                 modifier = Modifier
                     .padding(horizontal = 20.dp, vertical = 10.dp)
@@ -199,6 +221,14 @@ fun SampleDesignSystemScreen(
                 onClick = { },
                 enabled = false,
             )
+
+            var isMining by rememberSaveable { mutableStateOf(false) }
+
+            StartMiningButton(
+                isMining = isMining,
+                onClick = { isMining = !isMining },
+                modifier = Modifier.padding(20.dp),
+            )
         }
     }
 }
@@ -206,7 +236,7 @@ fun SampleDesignSystemScreen(
 @Preview
 @Composable
 private fun LightThemePreview() {
-    PreviewSurface(TariTheme.Light) {
+    PreviewPrimarySurface(TariTheme.Light) {
         SampleDesignSystemScreen()
     }
 }
@@ -214,7 +244,7 @@ private fun LightThemePreview() {
 @Preview
 @Composable
 private fun DarkThemePreview() {
-    PreviewSurface(TariTheme.Dark) {
+    PreviewPrimarySurface(TariTheme.Dark) {
         SampleDesignSystemScreen()
     }
 }

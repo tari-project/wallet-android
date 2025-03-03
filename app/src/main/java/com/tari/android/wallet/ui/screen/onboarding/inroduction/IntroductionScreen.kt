@@ -28,7 +28,7 @@ import androidx.compose.ui.text.withLink
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.tari.android.wallet.R
-import com.tari.android.wallet.ui.compose.PreviewSurface
+import com.tari.android.wallet.ui.compose.PreviewPrimarySurface
 import com.tari.android.wallet.ui.compose.TariDesignSystem
 import com.tari.android.wallet.ui.compose.components.TariDivider
 import com.tari.android.wallet.ui.compose.components.TariOutlinedButton
@@ -167,7 +167,7 @@ private fun AgreementLinkedText(
 @Preview
 @Composable
 private fun IntroductionScreenLightPreview() {
-    PreviewSurface(TariTheme.Light) {
+    PreviewPrimarySurface(TariTheme.Light) {
         IntroductionScreen(
             uiState = IntroductionModel.UiState(
                 versionInfo = "Version 1.0.0",
@@ -182,7 +182,7 @@ private fun IntroductionScreenLightPreview() {
 @Preview
 @Composable
 private fun IntroductionScreenDarkPreview() {
-    PreviewSurface(TariTheme.Dark) {
+    PreviewPrimarySurface(TariTheme.Dark) {
         IntroductionScreen(
             uiState = IntroductionModel.UiState(
                 versionInfo = "Version 1.0.0",

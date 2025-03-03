@@ -37,6 +37,7 @@ import com.tari.android.wallet.model.MicroTari
 import com.tari.android.wallet.model.TariContact
 import com.tari.android.wallet.model.TxId
 import com.tari.android.wallet.model.TxStatus
+import org.joda.time.DateTime
 import java.math.BigInteger
 
 /**
@@ -70,6 +71,9 @@ abstract class Tx(
         get() = direction == Direction.INBOUND
     val isOutbound: Boolean
         get() = direction == Direction.OUTBOUND
+
+    val dateTime: DateTime
+        get() = DateTime(timestamp.toLong() * 1000L)
 
     override fun toString() = "Tx(id=$id, " +
             "direction=$direction, " +

@@ -12,11 +12,14 @@ import com.tari.android.wallet.R
 
 @Immutable
 data class TariTextStyles(
+    val heading2XLarge: TextStyle = TextStyle.Default,
+    val headingXLarge: TextStyle = TextStyle.Default,
     val headingLarge: TextStyle = TextStyle.Default,
     val headingMedium: TextStyle = TextStyle.Default,
     val headingSmall: TextStyle = TextStyle.Default,
     val body1: TextStyle = TextStyle.Default,
     val body2: TextStyle = TextStyle.Default,
+    val modalTitleLarge: TextStyle = TextStyle.Default,
     val modalTitle: TextStyle = TextStyle.Default,
     val menuItem: TextStyle = TextStyle.Default,
     val buttonText: TextStyle = TextStyle.Default,

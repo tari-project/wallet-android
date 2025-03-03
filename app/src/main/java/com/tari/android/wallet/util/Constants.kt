@@ -68,14 +68,6 @@ object Constants {
             const val clickScaleAnimReturnStartOffset = 120L
         }
 
-        object Home {
-            const val startupAnimDurationMs = 1500L
-            const val digitAnimDurationMs = 700L
-            const val digitShrinkExpandAnimDurationMs = 200L
-            const val welcomeAnimationDurationMs = 800L
-            const val showTariBotDialogDelayMs = 2000L
-        }
-
         object CreateEmojiId {
             const val helloTextAnimDurationMs = 800L
             const val whiteBgAnimDurationMs = 1000L

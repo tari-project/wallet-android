@@ -11,6 +11,7 @@ import androidx.compose.ui.unit.dp
 data class TariShapes(
     val card: CornerBasedShape = RoundedCornerShape(16.dp),
     val button: CornerBasedShape = CircleShape,
+    val startMiningButton: CornerBasedShape = RoundedCornerShape(10.dp),
     val bottomMenu: CornerBasedShape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp),
 )
 
