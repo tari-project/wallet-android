@@ -14,11 +14,13 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Card
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -52,6 +54,7 @@ import com.tari.android.wallet.ui.compose.TariDesignSystem
 import com.tari.android.wallet.ui.compose.components.TariButtonSize
 import com.tari.android.wallet.ui.compose.components.TariInheritTextButton
 import com.tari.android.wallet.ui.compose.components.TariPrimaryButton
+import com.tari.android.wallet.ui.compose.components.TariTextButton
 import com.tari.android.wallet.ui.compose.widgets.StartMiningButton
 import com.tari.android.wallet.ui.screen.settings.themeSelector.TariTheme
 import com.tari.android.wallet.util.DebugConfig
@@ -68,10 +71,13 @@ private const val TX_ITEM_DATE_FORMAT = "E, MMM d"
 @Composable
 fun HomeOverviewScreen(
     uiState: HomeOverviewModel.UiState,
+    onInviteFriendClick: () -> Unit,
+    onNotificationsClick: () -> Unit,
     onStartMiningClicked: () -> Unit,
     onSendTariClicked: () -> Unit,
     onRequestTariClicked: () -> Unit,
     onTxClick: (txDto: TxDto) -> Unit,
+    onViewAllTxsClick: () -> Unit,
 ) {
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -82,11 +88,33 @@ fun HomeOverviewScreen(
                 .fillMaxSize()
                 .padding(paddingValues),
         ) {
-            Text(
-                modifier = Modifier.padding(horizontal = 16.dp, vertical = 10.dp),
-                text = stringResource(R.string.home_title_tari_universe),
-                style = TariDesignSystem.typography.heading2XLarge,
-            )
+            Row(
+                modifier = Modifier
+                    .padding(horizontal = 16.dp, vertical = 10.dp)
+                    .fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text(
+                    modifier = Modifier.weight(1f),
+                    text = stringResource(R.string.home_title_tari_universe),
+                    style = TariDesignSystem.typography.heading2XLarge,
+                )
+                IconButton(onClick = onInviteFriendClick) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.vector_home_overview_invite_friend),
+                        contentDescription = null,
+                        tint = TariDesignSystem.colors.componentsNavbarIcons,
+                    )
+                }
+                IconButton(onClick = onNotificationsClick) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.vector_home_overview_notifications),
+                        contentDescription = null,
+                        tint = TariDesignSystem.colors.componentsNavbarIcons,
+                    )
+                }
+            }
+
             Spacer(modifier = Modifier.height(25.dp))
             ActiveMinersCard(
                 modifier = Modifier.padding(horizontal = 16.dp),
@@ -151,6 +179,16 @@ fun HomeOverviewScreen(
                             txDto = txItem,
                             ticker = uiState.ticker,
                             onTxClick = { onTxClick(txItem) },
+                        )
+                    }
+                    item {
+                        TariTextButton(
+                            modifier = Modifier
+                                .padding(horizontal = 16.dp, vertical = 20.dp)
+                                .fillMaxWidth()
+                                .wrapContentWidth(align = Alignment.CenterHorizontally),
+                            text = stringResource(R.string.home_transaction_view_all_txs),
+                            onClick = onViewAllTxsClick,
                         )
                     }
                     item {
@@ -463,10 +501,13 @@ private fun HomeOverviewScreenPreview() {
                 ticker = "tXTR",
                 txList = MockDataStub.createTxList(),
             ),
+            onInviteFriendClick = {},
+            onNotificationsClick = {},
             onStartMiningClicked = {},
             onSendTariClicked = {},
             onRequestTariClicked = {},
             onTxClick = {},
+            onViewAllTxsClick = {},
         )
     }
 }

@@ -29,10 +29,13 @@ class HomeOverviewFragment : CommonFragment<HomeOverviewViewModel>() {
                 TariDesignSystem(viewModel.currentTheme) {
                     HomeOverviewScreen(
                         uiState = uiState,
+                        onInviteFriendClick = { viewModel.onInviteFriendClicked() },
+                        onNotificationsClick = { viewModel.onNotificationsClicked() },
                         onStartMiningClicked = { viewModel.onStartMiningClicked() },
                         onSendTariClicked = { viewModel.onSendTariClicked() },
                         onRequestTariClicked = { viewModel.onRequestTariClicked() },
                         onTxClick = { viewModel.navigateToTxDetail(it.tx) },
+                        onViewAllTxsClick = { viewModel.onAllTxClicked() },
                     )
                 }
             }

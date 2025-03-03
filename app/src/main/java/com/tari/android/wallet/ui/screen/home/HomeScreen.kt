@@ -177,7 +177,6 @@ private fun FragmentContainer(
         update = { view ->
             if (!initialized) {
                 fragmentManager.commit {
-                    fragmentManager.findFragmentById(view.id)?.let { remove(it) }
                     replace(view.id, fragment, fragment.javaClass.simpleName)
                 }
 

@@ -233,7 +233,15 @@ class HomeOverviewViewModel : CommonViewModel() {
         QrScannerActivity.startScanner(fragment, QrScannerSource.Home)
     }
 
+    fun onInviteFriendClicked() {
+        showNotReadyYetDialog()
+    }
+
+    fun onNotificationsClicked() {
+        showNotReadyYetDialog()
+    }
+
     companion object {
-        private const val TRANSACTION_AMOUNT_HOME_PAGE = 10
+        private const val TRANSACTION_AMOUNT_HOME_PAGE = 5
     }
 }

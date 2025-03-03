@@ -29,6 +29,6 @@ class AirdropRepository @Inject constructor(
     }
 
     companion object {
-        private const val MINERS_COUNT_REFRESH_INTERVAL = 5000L
+        private const val MINERS_COUNT_REFRESH_INTERVAL = 60_000L
     }
 }
