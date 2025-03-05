@@ -33,15 +33,11 @@
 package com.tari.android.wallet.ui.screen.onboarding.activity
 
 import android.os.Bundle
-import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
-import com.google.android.gms.tasks.OnCompleteListener
-import com.google.firebase.messaging.FirebaseMessaging
-import com.orhanobut.logger.Logger
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.walletManager.WalletManager
 import com.tari.android.wallet.application.walletManager.doOnWalletFailed
@@ -49,7 +45,6 @@ import com.tari.android.wallet.application.walletManager.doOnWalletRunning
 import com.tari.android.wallet.data.sharedPrefs.CorePrefRepository
 import com.tari.android.wallet.databinding.ActivityOnboardingFlowBinding
 import com.tari.android.wallet.di.DiContainer.appComponent
-import com.tari.android.wallet.notification.TariFirebaseMessagingService
 import com.tari.android.wallet.ui.common.CommonXmlActivity
 import com.tari.android.wallet.ui.screen.onboarding.activity.OnboardingFlowModel.Effect
 import com.tari.android.wallet.ui.screen.onboarding.createWallet.CreateWalletFragment
@@ -134,26 +129,6 @@ class OnboardingFlowActivity : CommonXmlActivity<ActivityOnboardingFlowBinding, 
         launchOnIo {
             walletManager.doOnWalletFailed { launchOnMain { resetFlow() } }
         }
-
-        pushTest()
-    }
-
-    // TODO Remove after testing!!
-    private fun pushTest() {
-        FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener { task ->
-            if (!task.isSuccessful) {
-                Logger.t(TariFirebaseMessagingService::class.simpleName).d("Fetching FCM registration token failed", task.exception)
-                return@OnCompleteListener
-            }
-
-            // Get new FCM registration token
-            val token = task.result
-
-            // Log and toast
-            val msg = "FCM registration token: $token"
-            Logger.t(TariFirebaseMessagingService::class.simpleName).d(msg)
-            Toast.makeText(baseContext, msg, Toast.LENGTH_SHORT).show()
-        })
     }
 
     override fun onBackPressed() {

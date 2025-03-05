@@ -51,7 +51,6 @@ class NotificationHelper @Inject constructor(private val context: Context) {
 
     companion object {
         // notification channel id
-        const val SERVICE_NOTIFICATION_CHANNEL_ID = "com.tari.android.wallet.service.WALLET_SERVICE_NOTIFICATION"
         const val APP_NOTIFICATION_CHANNEL_ID = "com.tari.android.wallet.WALLET_NOTIFICATION"
         const val APP_NOTIFICATION_GROUP_ID = 1000
         const val APP_NOTIFICATION_GROUP_NAME = "com.tari.android.wallet.notification.TX"
@@ -62,22 +61,11 @@ class NotificationHelper @Inject constructor(private val context: Context) {
         get() = Logger.t(NotificationHelper::class.simpleName)
 
     fun createNotificationChannels() {
-        // service notification channel
-        val serviceNotificationChannel = NotificationChannel(
-            SERVICE_NOTIFICATION_CHANNEL_ID,
-            context.getString(R.string.wallet_service_notification_channel_name),
-            NotificationManager.IMPORTANCE_DEFAULT
-        ).apply {
-            setSound(null, null)
-            setShowBadge(false)
-            description = ""
-        }
-        notificationManager.createNotificationChannel(serviceNotificationChannel)
         // app notification channel
         val appNotificationChannel = NotificationChannel(
-            APP_NOTIFICATION_CHANNEL_ID,
-            context.getString(R.string.app_notification_channel_name),
-            NotificationManager.IMPORTANCE_HIGH
+            /* id = */ APP_NOTIFICATION_CHANNEL_ID,
+            /* name = */ context.getString(R.string.app_notification_channel_name),
+            /* importance = */ NotificationManager.IMPORTANCE_HIGH
         ).apply {
             setShowBadge(false)
             description = ""

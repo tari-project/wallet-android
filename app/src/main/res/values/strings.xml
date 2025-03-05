@@ -50,8 +50,7 @@
     <string name="dummy_text">Test text</string>
 
     <!-- notifications -->
-    <string name="wallet_service_notification_channel_name">Tari Aurora Service Notification Channel</string>
-    <string name="app_notification_channel_name">Tari Aurora Notification Channel</string>
+    <string name="app_notification_channel_name">Tari Wallet</string>
     <string name="notification_tx_received_title">You\'ve got tXTR!</string>
     <string name="notification_tx_canceled_title">Your transaction was cancelled</string>
     <string name="notification_tx_canceled_description">The sender cancelled the transaction before it was finalized, so the tXTR was returned to them</string>
