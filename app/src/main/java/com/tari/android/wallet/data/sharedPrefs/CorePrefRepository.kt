@@ -80,6 +80,7 @@ class CorePrefRepository @Inject constructor(
         const val EMOJI_ID = "tari_wallet_emoji_id_"
         const val NAME = "tari_wallet_name_"
         const val SURNAME = "tari_wallet_surname_"
+        const val ANON_ID = "ANON_ID"
         const val ONBOARDING_STARTED = "tari_wallet_onboarding_started"
         const val ONBOARDING_AUTH_SETUP_COMPLETED = "tari_wallet_onboarding_auth_setup_completed"
         const val ONBOARDING_AUTH_SETUP_STARTED = "tari_wallet_onboarding_auth_setup_started"
@@ -97,6 +98,8 @@ class CorePrefRepository @Inject constructor(
 
     var lastName: String? by SharedPrefStringDelegate(sharedPrefs, this, formatKey(Key.SURNAME))
 
+    var anonId: String? by SharedPrefStringDelegate(sharedPrefs, this, formatKey(Key.ANON_ID))
+
     var onboardingStarted: Boolean by SharedPrefBooleanDelegate(sharedPrefs, this, formatKey(Key.ONBOARDING_STARTED))
 
     var onboardingCompleted: Boolean by SharedPrefBooleanDelegate(sharedPrefs, this, formatKey(Key.ONBOARDING_COMPLETED))
@@ -113,7 +116,12 @@ class CorePrefRepository @Inject constructor(
 
     var onboardingDisplayedAtHome: Boolean by SharedPrefBooleanDelegate(sharedPrefs, this, formatKey(Key.ONBOARDING_DISPLAYED_AT_HOME))
 
-    var needToShowRecoverySuccessDialog: Boolean by SharedPrefBooleanDelegate(sharedPrefs, this, formatKey(Key.NEED_TO_SHOW_RECOVERY_SUCCESS_DIALOG), false)
+    var needToShowRecoverySuccessDialog: Boolean by SharedPrefBooleanDelegate(
+        prefs = sharedPrefs,
+        commonRepository = this,
+        name = formatKey(Key.NEED_TO_SHOW_RECOVERY_SUCCESS_DIALOG),
+        defValue = false,
+    )
 
     var isDataCleared: Boolean by SharedPrefBooleanDelegate(sharedPrefs, this, formatKey(Key.IS_DATA_CLEARED), true)
 
@@ -144,7 +152,7 @@ class CorePrefRepository @Inject constructor(
         onboardingAuthSetupStarted = false
         onboardingAuthSetupCompleted = false
         onboardingDisplayedAtHome = false
-
+        anonId = null
     }
 
     fun generateDatabasePassphrase(): String {

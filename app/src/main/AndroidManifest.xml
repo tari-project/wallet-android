@@ -62,18 +62,21 @@
                 android:resource="@xml/file_provider" />
         </provider>
 
+        <!-- Firebase Cloud Messaging -->
         <service
-            android:name=".notification.TariFirebaseMessagingService"
+            android:name=".notification.TariFcmService"
             android:exported="false">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
         </service>
 
-        <receiver
-            android:name=".notification.NotificationBroadcastReceiver"
-            android:enabled="true"
-            android:exported="false" />
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_icon"
+            android:resource="@drawable/vector_notification_icon" />
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_channel_id"
+            android:value="com.tari.android.wallet.WALLET_NOTIFICATION" />
 
         <!-- splash -->
         <activity

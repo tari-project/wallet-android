@@ -35,7 +35,7 @@ package com.tari.android.wallet.di
 import android.content.ClipboardManager
 import com.tari.android.wallet.application.TariWalletApplication
 import com.tari.android.wallet.infrastructure.ShareManager
-import com.tari.android.wallet.notification.NotificationBroadcastReceiver
+import com.tari.android.wallet.notification.TariFcmService
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.component.clipboardController.WalletAddressViewModel
 import com.tari.android.wallet.ui.component.networkStateIndicator.ConnectionIndicatorViewModel
@@ -190,7 +190,7 @@ interface ApplicationComponent {
     fun inject(viewModel: WalletRestoreViewModel)
     fun inject(viewModel: SampleDesignSystemViewModel)
 
-    fun inject(notificationBroadcastReceiver: NotificationBroadcastReceiver)
+    fun inject(tariFcmService: TariFcmService)
 
     fun getClipboardManager(): ClipboardManager
 }

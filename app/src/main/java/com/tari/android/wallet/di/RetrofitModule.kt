@@ -34,6 +34,7 @@ package com.tari.android.wallet.di
 
 import com.tari.android.wallet.BuildConfig
 import com.tari.android.wallet.data.airdrop.AirdropRetrofitService
+import com.tari.android.wallet.data.push.PushRetrofitService
 import com.tari.android.wallet.ui.common.giphy.repository.GiphyRepository
 import com.tari.android.wallet.ui.common.giphy.repository.GiphyRestService
 import dagger.Module
@@ -53,9 +54,11 @@ class RetrofitModule {
     private companion object {
         private const val GIPHY_BASE_URL = "https://api.giphy.com"
         private const val AIRDROP_BASE_URL = "https://airdrop.tari.com"
+        private const val PUSH_BASE_URL = "https://push.tari.com"
 
         private const val RETROFIT_GIPHY = "giphy_retrofit"
         private const val RETROFIT_AIRDROP = "airdrop_retrofit"
+        private const val RETROFIT_PUSH = "push_retrofit"
 
         private const val GIPHY_QUERY_PARAM_API_KEY = "api_key"
     }
@@ -109,6 +112,28 @@ class RetrofitModule {
     @Singleton
     fun provideAirdropRepository(@Named(RETROFIT_AIRDROP) retrofit: Retrofit): AirdropRetrofitService =
         retrofit.create(AirdropRetrofitService::class.java)
+
+    @Provides
+    @Named(RETROFIT_PUSH)
+    @Singleton
+    fun providePushHttpClient(): OkHttpClient = OkHttpClient.Builder()
+        .addLoggingIfDebug()
+        .build()
+
+    @Provides
+    @Named(RETROFIT_PUSH)
+    @Singleton
+    fun providePushRetrofit(@Named(RETROFIT_PUSH) client: OkHttpClient): Retrofit =
+        Retrofit.Builder()
+            .baseUrl(PUSH_BASE_URL)
+            .client(client)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+
+    @Provides
+    @Singleton
+    fun providePushRepository(@Named(RETROFIT_PUSH) retrofit: Retrofit): PushRetrofitService =
+        retrofit.create(PushRetrofitService::class.java)
 
     private fun OkHttpClient.Builder.addLoggingIfDebug(): OkHttpClient.Builder {
         if (BuildConfig.DEBUG) {

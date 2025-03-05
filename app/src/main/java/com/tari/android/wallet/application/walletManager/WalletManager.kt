@@ -69,6 +69,7 @@ import com.tari.android.wallet.model.tx.CancelledTx
 import com.tari.android.wallet.model.tx.CompletedTx
 import com.tari.android.wallet.model.tx.PendingInboundTx
 import com.tari.android.wallet.model.tx.PendingOutboundTx
+import com.tari.android.wallet.notification.FcmHelper
 import com.tari.android.wallet.tor.TorConfig
 import com.tari.android.wallet.tor.TorProxyManager
 import com.tari.android.wallet.tor.TorProxyStateHandler
@@ -114,6 +115,7 @@ class WalletManager @Inject constructor(
     private val balanceStateHandler: BalanceStateHandler,
     private val walletCallbacks: WalletCallbacks,
     private val appStateHandler: AppStateHandler,
+    private val fcmHelper: FcmHelper,
     @ApplicationScope private val applicationScope: CoroutineScope,
 ) {
 
@@ -241,6 +243,9 @@ class WalletManager @Inject constructor(
         }
 
         saveWalletAddressToSharedPrefs(wallet)
+
+        // register wallet for push notifications
+        fcmHelper.getFcmTokenAndRegister(wallet)
 
         return wallet
     }
