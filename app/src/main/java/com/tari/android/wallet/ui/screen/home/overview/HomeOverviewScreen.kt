@@ -43,11 +43,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
+import com.giphy.sdk.analytics.GiphyPingbacks.context
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.walletManager.WalletConfig
 import com.tari.android.wallet.data.tx.TxDto
 import com.tari.android.wallet.model.BalanceInfo
-import com.tari.android.wallet.model.TxNote
+import com.tari.android.wallet.model.tx.Tx
 import com.tari.android.wallet.ui.compose.PoppinsFontFamily
 import com.tari.android.wallet.ui.compose.PreviewSecondarySurface
 import com.tari.android.wallet.ui.compose.TariDesignSystem
@@ -60,6 +61,7 @@ import com.tari.android.wallet.ui.screen.settings.themeSelector.TariTheme
 import com.tari.android.wallet.util.DebugConfig
 import com.tari.android.wallet.util.MockDataStub
 import com.tari.android.wallet.util.extension.toMicroTari
+import com.tari.android.wallet.util.shortString
 import org.joda.time.DateTime
 import org.joda.time.Hours
 import org.joda.time.LocalDate
@@ -402,7 +404,7 @@ fun TxItem(
         shape = TariDesignSystem.shapes.card,
         backgroundColor = TariDesignSystem.colors.backgroundPrimary,
         border = BorderStroke(1.dp, TariDesignSystem.colors.elevationOutlined),
-        elevation = 2.dp,
+        elevation = 1.dp,
     ) {
         Row(
             modifier = Modifier
@@ -414,27 +416,23 @@ fun TxItem(
                 modifier = Modifier
                     .size(34.dp)
                     .clip(CircleShape)
-                    .background(color = TariDesignSystem.colors.textPrimary),
-                contentAlignment = Alignment.Center,
+                    .background(color = TariDesignSystem.colors.componentsNavbarIcons), contentAlignment = Alignment.Center
             ) {
-                Image(
+                Icon(
                     modifier = Modifier
-                        .size(22.dp)
+                        .size(16.dp)
                         .clip(CircleShape),
-                    painter = painterResource(R.drawable.tari_sample_avatar), // FIXME: remove resource once the avatar is available
+                    painter = painterResource(R.drawable.tari_sample_avatar),
                     contentDescription = null,
-                    contentScale = ContentScale.FillWidth,
+                    tint = TariDesignSystem.colors.componentsNavbarBackground,
                 )
             }
             Spacer(modifier = Modifier.width(10.dp))
             Column(modifier = Modifier.weight(1f)) {
-                val message = TxNote.fromTx(txDto.tx).message
-                if (message != null) {
-                    Text(
-                        text = message,
-                        style = TariDesignSystem.typography.headingMedium,
-                    )
-                }
+                Text(
+                    text = txDto.itemMessage(),
+                    style = TariDesignSystem.typography.headingMedium,
+                )
                 Text(
                     text = txDto.tx.dateTime.txListItemFormattedDate(),
                     style = TariDesignSystem.typography.body2,
@@ -485,9 +483,41 @@ fun DateTime.txListItemFormattedDate(): String {
 }
 
 @Composable
+fun TxDto.itemMessage(): String {
+    val txUser = tx.tariContact
+    return when {
+        tx.isCoinbase -> {
+            when (tx.direction) {
+                Tx.Direction.INBOUND -> stringResource(R.string.tx_details_coinbase_inbound)
+                Tx.Direction.OUTBOUND -> stringResource(R.string.tx_details_coinbase_outbound)
+            }
+        }
+
+        tx.isOneSided -> {
+            (stringResource(R.string.tx_list_someone) + " " + stringResource(R.string.tx_list_paid_you))
+        }
+
+        contact != null && contact.contactInfo.getAlias().isNotEmpty() || txUser.walletAddress.isUnknownUser() -> {
+            val alias = contact?.contactInfo?.getAlias().orEmpty().ifBlank { context.getString(R.string.unknown_source) }
+            when (tx.direction) {
+                Tx.Direction.INBOUND -> stringResource(R.string.tx_list_sent_a_payment, alias)
+                Tx.Direction.OUTBOUND -> stringResource(R.string.tx_list_you_paid_with_alias, alias)
+            }
+        }
+
+        else -> { // display emoji id
+            when (tx.direction) {
+                Tx.Direction.INBOUND -> txUser.walletAddress.shortString() + " " + stringResource(R.string.tx_list_paid_you)
+                Tx.Direction.OUTBOUND -> stringResource(R.string.tx_list_you_paid) + " " + txUser.walletAddress.shortString()
+            }
+        }
+    }
+}
+
+@Composable
 @Preview
 private fun HomeOverviewScreenPreview() {
-    TariDesignSystem(TariTheme.Dark) {
+    TariDesignSystem(TariTheme.Light) {
         HomeOverviewScreen(
             uiState = HomeOverviewModel.UiState(
                 activeMinersCount = 10,
