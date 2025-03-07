@@ -88,6 +88,7 @@ class CorePrefRepository @Inject constructor(
         const val ONBOARDING_DISPLAYED_AT_HOME = "tari_wallet_onboarding_displayed_at_home"
         const val NEED_TO_SHOW_RECOVERY_SUCCESS_DIALOG = "NEED_TO_SHOW_RECOVERY_SUCCESS_DIALOG"
         const val IS_DATA_CLEARED = "tari_is_data_cleared"
+        const val KEEP_SCREEN_AWAKE_WHEN_RESTORE = "KEEP_SCREEN_AWAKE_WHEN_RESTORE"
     }
 
     var walletAddressBase58: Base58? by SharedPrefStringDelegate(sharedPrefs, this, formatKey(Key.WALLET_ADDRESS_BASE58))
@@ -124,6 +125,13 @@ class CorePrefRepository @Inject constructor(
     )
 
     var isDataCleared: Boolean by SharedPrefBooleanDelegate(sharedPrefs, this, formatKey(Key.IS_DATA_CLEARED), true)
+
+    var keepScreenAwakeWhenRestore: Boolean by SharedPrefBooleanDelegate(
+        prefs = sharedPrefs,
+        commonRepository = this,
+        name = formatKey(Key.KEEP_SCREEN_AWAKE_WHEN_RESTORE),
+        defValue = true,
+    )
 
     val walletAddress: TariWalletAddress
         get() = walletAddressBase58?.let { TariWalletAddress.fromBase58(it) } ?: error("Wallet address is not set to shared preferences")
