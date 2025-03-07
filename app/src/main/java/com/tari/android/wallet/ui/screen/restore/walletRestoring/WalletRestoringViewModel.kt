@@ -42,6 +42,9 @@ class WalletRestoringViewModel : CommonViewModel() {
     private val _recoveryState = MutableStateFlow<RestorationState>(RestorationState.ConnectingToBaseNode(resourceManager))
     val recoveryState = _recoveryState.asStateFlow()
 
+    private val _keepScreenAwake = MutableStateFlow(sharedPrefsRepository.keepScreenAwakeWhenRestore)
+    val keepScreenAwake = _keepScreenAwake.asStateFlow()
+
     init {
         component.inject(this)
     }
@@ -163,6 +166,11 @@ class WalletRestoringViewModel : CommonViewModel() {
     private fun cancelRecovery() {
         walletManager.deleteWallet()
         tariNavigator.navigate(Navigation.SplashScreen())
+    }
+
+    fun toggleKeepScreenAwake(checked: Boolean) {
+        sharedPrefsRepository.keepScreenAwakeWhenRestore = checked
+        _keepScreenAwake.value = checked
     }
 
     sealed class RestorationError(title: String, message: String, dismissAction: () -> Unit) {

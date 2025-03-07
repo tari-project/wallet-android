@@ -36,9 +36,11 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.WindowManager
 import androidx.fragment.app.viewModels
 import com.tari.android.wallet.databinding.FragmentWalletRestoringBinding
 import com.tari.android.wallet.ui.common.CommonXmlFragment
+import com.tari.android.wallet.ui.component.loadingSwitch.TariLoadingSwitchState
 import com.tari.android.wallet.util.extension.collectFlow
 
 class WalletRestoringFragment : CommonXmlFragment<FragmentWalletRestoringBinding, WalletRestoringViewModel>() {
@@ -61,6 +63,16 @@ class WalletRestoringFragment : CommonXmlFragment<FragmentWalletRestoringBinding
 
     private fun subscribeUI() = with(viewModel) {
         collectFlow(recoveryState) { processRecoveryState(it) }
+        collectFlow(keepScreenAwake) { keep ->
+            ui.awakeSwitchView.setState(TariLoadingSwitchState(isChecked = keep))
+
+            if (keep) {
+                requireActivity().window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+            } else {
+                requireActivity().window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+            }
+        }
+        ui.awakeSwitchView.setOnCheckedChangeListener { toggleKeepScreenAwake(it) }
     }
 
     private fun processRecoveryState(state: WalletRestoringViewModel.RestorationState) {
