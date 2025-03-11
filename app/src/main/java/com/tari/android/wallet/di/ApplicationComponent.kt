@@ -38,7 +38,6 @@ import com.tari.android.wallet.infrastructure.ShareManager
 import com.tari.android.wallet.notification.TariFcmService
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.component.clipboardController.WalletAddressViewModel
-import com.tari.android.wallet.ui.component.networkStateIndicator.ConnectionIndicatorViewModel
 import com.tari.android.wallet.ui.screen.StartActivity
 import com.tari.android.wallet.ui.screen.auth.AuthActivity
 import com.tari.android.wallet.ui.screen.auth.AuthViewModel
@@ -134,7 +133,6 @@ interface ApplicationComponent {
     fun inject(viewModel: ThumbnailGifViewModel)
     fun inject(viewModel: GifViewModel)
     fun inject(viewModel: ScreenRecordingSettingsViewModel)
-    fun inject(viewModel: ConnectionIndicatorViewModel)
     fun inject(viewModel: ChooseRestoreOptionViewModel)
     fun inject(viewModel: EnterRestorationPasswordViewModel)
     fun inject(viewModel: WalletRestoringViewModel)

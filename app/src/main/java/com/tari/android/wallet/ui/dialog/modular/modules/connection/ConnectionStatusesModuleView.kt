@@ -1,4 +1,4 @@
-package com.tari.android.wallet.ui.component.networkStateIndicator.module
+package com.tari.android.wallet.ui.dialog.modular.modules.connection
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -33,6 +33,8 @@ class ConnectionStatusesModuleView(context: Context, module: ConnectionStatusesM
 
         ui.textChainTipWaiting.setVisible(module.showChainTipConnecting)
         ui.textChainTipValue.setVisible(!module.showChainTipConnecting)
-        ui.textChainTipValue.text = context.string(R.string.connection_status_dialog_chain_tip_value, module.walletScannedHeight, module.chainTip)
+        ui.textChainTipValue.text = context.string(
+            R.string.connection_status_dialog_chain_tip_value, module.connectionState.walletScannedHeight, module.connectionState.chainTip
+        )
     }
 }

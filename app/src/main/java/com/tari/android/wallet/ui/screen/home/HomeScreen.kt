@@ -130,10 +130,11 @@ private fun NavigationMenu(
                 iconRes = if (selectedItem == BottomMenuOption.Shop) R.drawable.vector_home_nav_menu_shop_filled else R.drawable.vector_home_nav_menu_shop,
                 onItemClick = { onMenuItemClicked(BottomMenuOption.Shop) },
             )
-            BottomNavigationItem(
-                iconRes = if (selectedItem == BottomMenuOption.Gem) R.drawable.vector_home_nav_menu_gem_filled else R.drawable.vector_home_nav_menu_gem,
-                onItemClick = { onMenuItemClicked(BottomMenuOption.Gem) },
-            )
+            // FIXME: uncomment once the gem feature is implemented
+//            BottomNavigationItem(
+//                iconRes = if (selectedItem == BottomMenuOption.Gem) R.drawable.vector_home_nav_menu_gem_filled else R.drawable.vector_home_nav_menu_gem,
+//                onItemClick = { onMenuItemClicked(BottomMenuOption.Gem) },
+//            )
             BottomNavigationItem(
                 iconRes = if (selectedItem == BottomMenuOption.Profile) R.drawable.vector_home_nav_menu_profile_filled else R.drawable.vector_home_nav_menu_profile,
                 onItemClick = { onMenuItemClicked(BottomMenuOption.Profile) },

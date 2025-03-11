@@ -13,6 +13,7 @@ data class TariShapes(
     val button: CornerBasedShape = CircleShape,
     val startMiningButton: CornerBasedShape = RoundedCornerShape(10.dp),
     val bottomMenu: CornerBasedShape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp),
+    val chip: CornerBasedShape = RoundedCornerShape(10.dp),
 )
 
 val LocalTariShapes = staticCompositionLocalOf { TariShapes() }

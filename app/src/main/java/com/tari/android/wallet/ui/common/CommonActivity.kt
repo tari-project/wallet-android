@@ -10,7 +10,6 @@ import android.os.Bundle
 import android.provider.Settings
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
@@ -19,7 +18,6 @@ import com.orhanobut.logger.Printer
 import com.squareup.seismic.ShakeDetector
 import com.tari.android.wallet.R
 import com.tari.android.wallet.infrastructure.logging.LoggerTags
-import com.tari.android.wallet.ui.component.networkStateIndicator.ConnectionIndicatorViewModel
 import com.tari.android.wallet.ui.component.tari.toast.TariToast
 import com.tari.android.wallet.ui.component.tari.toast.TariToastArgs
 import com.tari.android.wallet.ui.dialog.modular.ModularDialog
@@ -51,8 +49,6 @@ abstract class CommonActivity<VM : CommonViewModel> : AppCompatActivity(), Shake
         get() = viewModel
 
     private val shakeDetector by lazy { ShakeDetector(this) }
-
-    private val connectionStateViewModel: ConnectionIndicatorViewModel by viewModels()
 
     val logger: Printer
         get() = Logger.t(this::class.simpleName)
@@ -154,8 +150,6 @@ abstract class CommonActivity<VM : CommonViewModel> : AppCompatActivity(), Shake
         if (savedInstanceState == null) {
             logger.t(LoggerTags.Navigation.name).i(this::class.simpleName + " has been started")
         }
-
-        subscribeToCommon(connectionStateViewModel)
     }
 
     protected fun setContainerId(id: Int) {
@@ -211,7 +205,7 @@ abstract class CommonActivity<VM : CommonViewModel> : AppCompatActivity(), Shake
                     OptionModule(getString(R.string.debug_dialog_report)) { openActivity(DebugNavigation.BugReport) },
                     OptionModule(getString(R.string.debug_dialog_connection_status)) {
                         dialogHandler.hideDialog(ModularDialogArgs.DialogId.DEBUG_MENU)
-                        connectionStateViewModel.showStatesDialog()
+                        dialogHandler.showConnectionStatusDialog()
                     },
                     OptionModule(getString(R.string.debug_dialog_sample_design_system)) { openActivity(DebugNavigation.SampleDesignSystem) }
                         .takeIf { DebugConfig.isDebug() },
