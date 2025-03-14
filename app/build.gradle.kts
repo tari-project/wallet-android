@@ -31,11 +31,11 @@ android {
 
     defaultConfig {
         applicationId = "com.tari.android.wallet"
-        minSdk = BuildConfig.minSdk
-        targetSdk = BuildConfig.targetSdk
-        compileSdk = BuildConfig.compileSdk
+        minSdk = TariBuildConfig.minSdk
+        targetSdk = TariBuildConfig.targetSdk
+        compileSdk = TariBuildConfig.compileSdk
         versionCode = commitNumber
-        versionName = "${BuildConfig.versionNumber}-libwallet-${BuildConfig.LibWallet.version}"
+        versionName = "${TariBuildConfig.versionNumber}-libwallet-${TariBuildConfig.LibWallet.version}"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         multiDexEnabled = true
 
@@ -56,7 +56,8 @@ android {
 
         val dropboxProperties = loadDropboxProps()
         buildConfigField("String", "DROPBOX_ACCESS_TOKEN", "\"${dropboxProperties["dropbox_key"]}\"")
-        buildConfigField("String", "LIB_WALLET_MIN_VALID_VERSION", "\"${BuildConfig.LibWallet.minValidVersion}\"")
+        buildConfigField("String", "LIB_WALLET_MIN_VALID_VERSION", "\"${TariBuildConfig.LibWallet.minValidVersion}\"")
+        buildConfigField("String", "LIB_WALLET_VERSION", "\"${TariBuildConfig.LibWallet.version}\"")
     }
 
     flavorDimensions.add("privacy-mode")
@@ -243,6 +244,7 @@ dependencies {
     implementation(Dependencies.AndroidX.Lifecycle.viewmodelKtx)
     implementation(platform(Dependencies.AndroidX.Compose.bom))
     implementation(Dependencies.AndroidX.Compose.material)
+    implementation(Dependencies.AndroidX.Compose.material3)
     implementation(Dependencies.AndroidX.Compose.uiTooling)
     implementation(Dependencies.AndroidX.Compose.uiToolingPreview)
     implementation(Dependencies.AndroidX.Compose.activity)

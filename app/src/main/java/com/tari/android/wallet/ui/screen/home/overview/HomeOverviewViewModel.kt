@@ -3,7 +3,7 @@ package com.tari.android.wallet.ui.screen.home.overview
 
 import android.app.Activity
 import android.os.Build
-import androidx.fragment.app.Fragment
+import com.tari.android.wallet.BuildConfig
 import com.tari.android.wallet.R
 import com.tari.android.wallet.R.string.error_no_connection_description
 import com.tari.android.wallet.R.string.error_no_connection_title
@@ -22,20 +22,18 @@ import com.tari.android.wallet.data.tx.TxRepository
 import com.tari.android.wallet.model.tx.Tx
 import com.tari.android.wallet.navigation.Navigation
 import com.tari.android.wallet.ui.common.CommonViewModel
-import com.tari.android.wallet.ui.dialog.confirm.ConfirmDialogArgs
 import com.tari.android.wallet.ui.dialog.modular.DialogArgs
 import com.tari.android.wallet.ui.dialog.modular.ModularDialogArgs
 import com.tari.android.wallet.ui.dialog.modular.modules.body.BodyModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonStyle
 import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
-import com.tari.android.wallet.ui.screen.qr.QrScannerActivity
-import com.tari.android.wallet.ui.screen.qr.QrScannerSource
 import com.tari.android.wallet.ui.screen.send.finalize.FinalizeSendTxModel.TxFailureReason
 import com.tari.android.wallet.util.extension.collectFlow
 import com.tari.android.wallet.util.extension.launchOnIo
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 
@@ -80,6 +78,8 @@ class HomeOverviewViewModel : CommonViewModel() {
     private val _uiState = MutableStateFlow(
         HomeOverviewModel.UiState(
             ticker = networkRepository.currentNetwork.ticker,
+            networkName = networkRepository.currentNetwork.network.displayName,
+            ffiVersion = BuildConfig.LIB_WALLET_VERSION,
         )
     )
     val uiState = _uiState.asStateFlow()
@@ -111,6 +111,10 @@ class HomeOverviewViewModel : CommonViewModel() {
 
         collectFlow(airdropRepository.getMinerStatsFlow()) { activeMinersCount ->
             _uiState.update { it.copy(activeMinersCount = activeMinersCount) }
+        }
+
+        collectFlow(connectionState.map { it.indicatorState }) { indicatorState ->
+            _uiState.update { it.copy(connectionIndicatorState = indicatorState) }
         }
 
         checkForDataConsent()
@@ -212,25 +216,8 @@ class HomeOverviewViewModel : CommonViewModel() {
         tariNavigator.navigate(Navigation.AllSettings.ToRequestTari)
     }
 
-    // FIXME for the question mark icon
-    fun showUniversityDialog() {
-        showModularDialog(
-            ConfirmDialogArgs(
-                title = resourceManager.getString(R.string.home_balance_info_help_title),
-                description = resourceManager.getString(R.string.home_balance_info_help_description),
-                cancelButtonText = resourceManager.getString(R.string.common_cancel),
-                confirmButtonText = resourceManager.getString(R.string.home_balance_info_help_button),
-                onConfirm = { _openLink.postValue(resourceManager.getString(R.string.tari_lab_university_url)) },
-            ).getModular(resourceManager)
-        )
-    }
-
     fun onAllTxClicked() {
         tariNavigator.navigate(Navigation.TxList.HomeTransactionHistory)
-    }
-
-    fun onQrScannerClicked(fragment: Fragment) {
-        QrScannerActivity.startScanner(fragment, QrScannerSource.Home)
     }
 
     fun onInviteFriendClicked() {

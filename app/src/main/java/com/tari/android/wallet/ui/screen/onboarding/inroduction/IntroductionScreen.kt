@@ -30,7 +30,7 @@ import androidx.compose.ui.unit.dp
 import com.tari.android.wallet.R
 import com.tari.android.wallet.ui.compose.PreviewPrimarySurface
 import com.tari.android.wallet.ui.compose.TariDesignSystem
-import com.tari.android.wallet.ui.compose.components.TariDivider
+import com.tari.android.wallet.ui.compose.components.TariHorizontalDivider
 import com.tari.android.wallet.ui.compose.components.TariOutlinedButton
 import com.tari.android.wallet.ui.compose.components.TariPrimaryButton
 import com.tari.android.wallet.ui.compose.components.TariVerticalGradient
@@ -106,7 +106,7 @@ fun IntroductionScreen(
                             .fillMaxWidth(),
                     )
                     Spacer(modifier = Modifier.size(16.dp))
-                    TariDivider(
+                    TariHorizontalDivider(
                         modifier = Modifier
                             .padding(horizontal = 24.dp)
                             .fillMaxWidth(),

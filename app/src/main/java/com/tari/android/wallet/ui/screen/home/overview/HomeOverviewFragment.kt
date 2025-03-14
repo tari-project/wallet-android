@@ -36,6 +36,7 @@ class HomeOverviewFragment : CommonFragment<HomeOverviewViewModel>() {
                         onRequestTariClicked = { viewModel.onRequestTariClicked() },
                         onTxClick = { viewModel.navigateToTxDetail(it.tx) },
                         onViewAllTxsClick = { viewModel.onAllTxClicked() },
+                        onConnectionStatusClick = { viewModel.showConnectionStatusDialog() },
                     )
                 }
             }
@@ -47,6 +48,13 @@ class HomeOverviewFragment : CommonFragment<HomeOverviewViewModel>() {
 
         val viewModel: HomeOverviewViewModel by viewModels()
         bindViewModel(viewModel)
+
+        viewModel.checkPermission()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        viewModel.grantContactsPermission()
     }
 
     @Deprecated("Deprecated in Java")

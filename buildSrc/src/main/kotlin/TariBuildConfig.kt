@@ -1,4 +1,4 @@
-object BuildConfig {
+object TariBuildConfig {
 
     const val versionNumber = "0.31.3"
 

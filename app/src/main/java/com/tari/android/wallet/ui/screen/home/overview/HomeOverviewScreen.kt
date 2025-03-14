@@ -3,7 +3,9 @@ package com.tari.android.wallet.ui.screen.home.overview
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -14,15 +16,17 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.Card
-import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.Scaffold
-import androidx.compose.material.Text
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -39,15 +43,18 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
+import com.giphy.sdk.analytics.GiphyPingbacks.context
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.walletManager.WalletConfig
+import com.tari.android.wallet.data.ConnectionIndicatorState
 import com.tari.android.wallet.data.tx.TxDto
 import com.tari.android.wallet.model.BalanceInfo
-import com.tari.android.wallet.model.TxNote
+import com.tari.android.wallet.model.tx.Tx
 import com.tari.android.wallet.ui.compose.PoppinsFontFamily
 import com.tari.android.wallet.ui.compose.PreviewSecondarySurface
 import com.tari.android.wallet.ui.compose.TariDesignSystem
@@ -55,11 +62,13 @@ import com.tari.android.wallet.ui.compose.components.TariButtonSize
 import com.tari.android.wallet.ui.compose.components.TariInheritTextButton
 import com.tari.android.wallet.ui.compose.components.TariPrimaryButton
 import com.tari.android.wallet.ui.compose.components.TariTextButton
+import com.tari.android.wallet.ui.compose.components.TariVerticalDivider
 import com.tari.android.wallet.ui.compose.widgets.StartMiningButton
 import com.tari.android.wallet.ui.screen.settings.themeSelector.TariTheme
 import com.tari.android.wallet.util.DebugConfig
 import com.tari.android.wallet.util.MockDataStub
 import com.tari.android.wallet.util.extension.toMicroTari
+import com.tari.android.wallet.util.shortString
 import org.joda.time.DateTime
 import org.joda.time.Hours
 import org.joda.time.LocalDate
@@ -78,10 +87,11 @@ fun HomeOverviewScreen(
     onRequestTariClicked: () -> Unit,
     onTxClick: (txDto: TxDto) -> Unit,
     onViewAllTxsClick: () -> Unit,
+    onConnectionStatusClick: () -> Unit,
 ) {
     Scaffold(
         modifier = Modifier.fillMaxSize(),
-        backgroundColor = TariDesignSystem.colors.backgroundSecondary,
+        containerColor = TariDesignSystem.colors.backgroundSecondary,
     ) { paddingValues ->
         Column(
             modifier = Modifier
@@ -90,15 +100,24 @@ fun HomeOverviewScreen(
         ) {
             Row(
                 modifier = Modifier
-                    .padding(horizontal = 16.dp, vertical = 10.dp)
+                    .padding(vertical = 10.dp)
                     .fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
+                Spacer(Modifier.width(16.dp))
                 Text(
-                    modifier = Modifier.weight(1f),
                     text = stringResource(R.string.home_title_tari_universe),
                     style = TariDesignSystem.typography.heading2XLarge,
                 )
+                Spacer(Modifier.width(10.dp))
+                VersionCodeChip(
+                    modifier = Modifier.weight(1f),
+                    networkName = uiState.networkName,
+                    ffiVersion = uiState.ffiVersion,
+                    connectionIndicatorState = uiState.connectionIndicatorState,
+                    onVersionClick = onConnectionStatusClick,
+                )
+                Spacer(Modifier.width(10.dp))
                 IconButton(onClick = onInviteFriendClick) {
                     Icon(
                         painter = painterResource(id = R.drawable.vector_home_overview_invite_friend),
@@ -201,6 +220,63 @@ fun HomeOverviewScreen(
 }
 
 @Composable
+fun VersionCodeChip(
+    networkName: String,
+    ffiVersion: String,
+    connectionIndicatorState: ConnectionIndicatorState,
+    onVersionClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Row(
+        modifier = modifier
+            .wrapContentSize()
+            .height(20.dp)
+            .clip(TariDesignSystem.shapes.chip)
+            .border(width = 1.dp, color = TariDesignSystem.colors.elevationOutlined, shape = TariDesignSystem.shapes.chip)
+            .background(color = TariDesignSystem.colors.backgroundPrimary)
+            .clickable(onClick = onVersionClick)
+            .padding(horizontal = 6.dp),
+        horizontalArrangement = Arrangement.spacedBy(5.dp, Alignment.CenterHorizontally),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Box(
+            modifier = Modifier
+                .size(7.dp)
+                .clip(CircleShape)
+                .background(
+                    when (connectionIndicatorState) {
+                        ConnectionIndicatorState.Connected -> TariDesignSystem.colors.systemGreen
+                        ConnectionIndicatorState.ConnectedWithIssues -> TariDesignSystem.colors.systemYellow
+                        ConnectionIndicatorState.Disconnected -> TariDesignSystem.colors.systemRed
+                    }
+                ),
+        )
+        TariVerticalDivider(modifier = Modifier.padding(vertical = 5.dp))
+        Text(
+            text = networkName,
+            style = TextStyle(
+                fontFamily = PoppinsFontFamily,
+                fontSize = 11.sp,
+                fontWeight = FontWeight.SemiBold,
+                lineHeight = 27.sp,
+                color = TariDesignSystem.colors.textPrimary,
+            ),
+        )
+        Text(
+            text = ffiVersion,
+            style = TextStyle(
+                fontFamily = PoppinsFontFamily,
+                fontSize = 11.sp,
+                fontWeight = FontWeight.SemiBold,
+                lineHeight = 27.sp,
+                color = TariDesignSystem.colors.textSecondary,
+            ),
+            overflow = TextOverflow.Ellipsis,
+        )
+    }
+}
+
+@Composable
 private fun ActiveMinersCard(
     isMining: Boolean,
     activeMinersCount: Int?,
@@ -217,7 +293,7 @@ private fun ActiveMinersCard(
     Card(
         modifier = modifier,
         shape = TariDesignSystem.shapes.card,
-        elevation = 2.dp,
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
     ) {
         Box(modifier = Modifier.background(backgroundBrush)) {
             Row(
@@ -286,7 +362,7 @@ fun WalletBalanceCard(
     Card(
         modifier = modifier.height(200.dp),
         shape = TariDesignSystem.shapes.card,
-        elevation = 2.dp,
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
     ) {
         Box(
             modifier = Modifier
@@ -400,9 +476,9 @@ fun TxItem(
     Card(
         modifier = modifier,
         shape = TariDesignSystem.shapes.card,
-        backgroundColor = TariDesignSystem.colors.backgroundPrimary,
+        colors = CardDefaults.cardColors(TariDesignSystem.colors.backgroundPrimary),
         border = BorderStroke(1.dp, TariDesignSystem.colors.elevationOutlined),
-        elevation = 2.dp,
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
     ) {
         Row(
             modifier = Modifier
@@ -414,27 +490,23 @@ fun TxItem(
                 modifier = Modifier
                     .size(34.dp)
                     .clip(CircleShape)
-                    .background(color = TariDesignSystem.colors.textPrimary),
-                contentAlignment = Alignment.Center,
+                    .background(color = TariDesignSystem.colors.componentsNavbarIcons), contentAlignment = Alignment.Center
             ) {
-                Image(
+                Icon(
                     modifier = Modifier
-                        .size(22.dp)
+                        .size(16.dp)
                         .clip(CircleShape),
-                    painter = painterResource(R.drawable.tari_sample_avatar), // FIXME: remove resource once the avatar is available
+                    painter = painterResource(R.drawable.tari_sample_avatar),
                     contentDescription = null,
-                    contentScale = ContentScale.FillWidth,
+                    tint = TariDesignSystem.colors.componentsNavbarBackground,
                 )
             }
             Spacer(modifier = Modifier.width(10.dp))
             Column(modifier = Modifier.weight(1f)) {
-                val message = TxNote.fromTx(txDto.tx).message
-                if (message != null) {
-                    Text(
-                        text = message,
-                        style = TariDesignSystem.typography.headingMedium,
-                    )
-                }
+                Text(
+                    text = txDto.itemMessage(),
+                    style = TariDesignSystem.typography.headingMedium,
+                )
                 Text(
                     text = txDto.tx.dateTime.txListItemFormattedDate(),
                     style = TariDesignSystem.typography.body2,
@@ -485,9 +557,41 @@ fun DateTime.txListItemFormattedDate(): String {
 }
 
 @Composable
+fun TxDto.itemMessage(): String {
+    val txUser = tx.tariContact
+    return when {
+        tx.isCoinbase -> {
+            when (tx.direction) {
+                Tx.Direction.INBOUND -> stringResource(R.string.tx_details_coinbase_inbound)
+                Tx.Direction.OUTBOUND -> stringResource(R.string.tx_details_coinbase_outbound)
+            }
+        }
+
+        tx.isOneSided -> {
+            (stringResource(R.string.tx_list_someone) + " " + stringResource(R.string.tx_list_paid_you))
+        }
+
+        contact != null && contact.contactInfo.getAlias().isNotEmpty() || txUser.walletAddress.isUnknownUser() -> {
+            val alias = contact?.contactInfo?.getAlias().orEmpty().ifBlank { context.getString(R.string.unknown_source) }
+            when (tx.direction) {
+                Tx.Direction.INBOUND -> stringResource(R.string.tx_list_sent_a_payment, alias)
+                Tx.Direction.OUTBOUND -> stringResource(R.string.tx_list_you_paid_with_alias, alias)
+            }
+        }
+
+        else -> { // display emoji id
+            when (tx.direction) {
+                Tx.Direction.INBOUND -> txUser.walletAddress.shortString() + " " + stringResource(R.string.tx_list_paid_you)
+                Tx.Direction.OUTBOUND -> stringResource(R.string.tx_list_you_paid) + " " + txUser.walletAddress.shortString()
+            }
+        }
+    }
+}
+
+@Composable
 @Preview
 private fun HomeOverviewScreenPreview() {
-    TariDesignSystem(TariTheme.Dark) {
+    TariDesignSystem(TariTheme.Light) {
         HomeOverviewScreen(
             uiState = HomeOverviewModel.UiState(
                 activeMinersCount = 10,
@@ -499,6 +603,8 @@ private fun HomeOverviewScreenPreview() {
                     timeLockedBalance = 0.toMicroTari(),
                 ),
                 ticker = "tXTR",
+                networkName = "Testnet",
+                ffiVersion = "v1.11.0-rc.0",
                 txList = MockDataStub.createTxList(),
             ),
             onInviteFriendClick = {},
@@ -508,6 +614,7 @@ private fun HomeOverviewScreenPreview() {
             onRequestTariClicked = {},
             onTxClick = {},
             onViewAllTxsClick = {},
+            onConnectionStatusClick = {},
         )
     }
 }
@@ -562,6 +669,20 @@ private fun EmptyTxListPreview() {
         EmptyTxList(
             onStartMiningClicked = {},
             modifier = Modifier.padding(horizontal = 16.dp, vertical = 48.dp),
+        )
+    }
+}
+
+@Composable
+@Preview
+private fun VersionCodeChipPreview() {
+    PreviewSecondarySurface(TariTheme.Light) {
+        VersionCodeChip(
+            modifier = Modifier.padding(16.dp),
+            networkName = "NextNet",
+            ffiVersion = "v1.11.0-rc.0",
+            connectionIndicatorState = ConnectionIndicatorState.ConnectedWithIssues,
+            onVersionClick = {},
         )
     }
 }

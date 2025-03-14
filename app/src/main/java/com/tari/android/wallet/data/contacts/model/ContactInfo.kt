@@ -2,12 +2,12 @@ package com.tari.android.wallet.data.contacts.model
 
 import android.os.Parcelable
 import com.tari.android.wallet.R
+import com.tari.android.wallet.data.contacts.ContactAction
 import com.tari.android.wallet.ffi.FFIContact
 import com.tari.android.wallet.ffi.runWithDestroy
+import com.tari.android.wallet.model.EmojiId
 import com.tari.android.wallet.model.TariContact
 import com.tari.android.wallet.model.TariWalletAddress
-import com.tari.android.wallet.data.contacts.ContactAction
-import com.tari.android.wallet.model.EmojiId
 import kotlinx.parcelize.Parcelize
 
 sealed class ContactInfo(
@@ -22,7 +22,7 @@ sealed class ContactInfo(
     fun requireWalletAddress(): TariWalletAddress = extractWalletAddress()
         ?: error("Wallet address is required, but is null. Most probably this is a PhoneContactInfo which does not have a wallet address.")
 
-    open fun getAlias(): String = "$firstName $lastName"
+    open fun getAlias(): String = "$firstName${if (firstName.isNotEmpty() && lastName.isNotEmpty()) " " else ""}$lastName"
 
     fun getContactActions(): List<ContactAction> = listOfNotNull(
         ContactAction.Send.takeIf { this is FFIContactInfo || this is MergedContactInfo },

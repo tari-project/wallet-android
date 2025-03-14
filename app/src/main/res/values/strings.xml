@@ -10,7 +10,6 @@
     <string name="disclaimer_url" translatable="false">https://www.tari.com/disclaimer/</string>
     <string name="explorer_kernel_url" translatable="false">%s/kernel_search?nonces=%s&amp;signatures=%s</string>
     <string name="tor_bridges_url" translatable="false">https://bridges.torproject.org/bridges</string>
-    <string name="tari_lab_university_url" translatable="false">https://tlu.tarilabs.com/</string>
 
     <!-- digits -->
     <string name="digit_0">0</string>
@@ -210,9 +209,6 @@
     <string name="home_store_and_forward_progress_updating_txs">Updating your transactions</string>
     <string name="home_store_and_forward_progress_up_to_date">You are up to date!</string>
     <!--Balance label-->
-    <string name="home_balance_info_help_title">Why is some of my balance not spendable right now?</string>
-    <string name="home_balance_info_help_description">The Tari in your wallet is made up of notes, just as your real wallet contains notes and coins. When you spend Tari, you must use up entire notes and wait for change. While you\'re waiting, the change is not spendable until your transaction is mined. You can find out more about how Tari transactions work in TariLabs University</string>
-    <string name="home_balance_info_help_button">Go to TariLabs University</string>
     <string name="home_transaction_list_empty_description">Nothing to show here yet. Keep an eye on this screen to stay updated on the status of your transactions. Oh, and remember, you can also use the request function to ask someone to send you some Tari if you want!</string>
     <string name="home_transaction_list_title">No transactions found</string>
     <string name="home_transaction_view_all_txs">View all transactions</string>

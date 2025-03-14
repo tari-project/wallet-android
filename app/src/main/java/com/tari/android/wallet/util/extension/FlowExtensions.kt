@@ -76,6 +76,17 @@ fun <T> ViewModel.collectNonNullFlow(stateFlow: Flow<T?>, onError: (Throwable) -
     }
 }
 
+fun <T> CoroutineScope.collectFlow(stateFlow: Flow<T>, onError: (Throwable) -> Unit = {}, action: suspend (T) -> Unit): Job {
+    return launch {
+        try {
+            stateFlow.collect { state -> action(state) }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            onError(e)
+        }
+    }
+}
+
 fun <A, B> Flow<A>.combineToPair(other: Flow<B>): Flow<Pair<A, B>> {
     return this.combine(other) { a, b -> a to b }
 }

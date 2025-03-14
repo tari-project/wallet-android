@@ -11,8 +11,6 @@ import android.widget.LinearLayout
 import androidx.appcompat.widget.LinearLayoutCompat
 import androidx.core.animation.doOnEnd
 import com.tari.android.wallet.R
-import com.tari.android.wallet.ui.component.networkStateIndicator.module.ConnectionStatusesModule
-import com.tari.android.wallet.ui.component.networkStateIndicator.module.ConnectionStatusesModuleView
 import com.tari.android.wallet.ui.dialog.modular.modules.addressDetails.AddressDetailsModule
 import com.tari.android.wallet.ui.dialog.modular.modules.addressDetails.AddressDetailsModuleView
 import com.tari.android.wallet.ui.dialog.modular.modules.addressPoisoning.AddressPoisoningModule
@@ -23,6 +21,8 @@ import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonModuleView
 import com.tari.android.wallet.ui.dialog.modular.modules.checked.CheckedModule
 import com.tari.android.wallet.ui.dialog.modular.modules.checked.CheckedModuleView
+import com.tari.android.wallet.ui.dialog.modular.modules.connection.ConnectionStatusesModule
+import com.tari.android.wallet.ui.dialog.modular.modules.connection.ConnectionStatusesModuleView
 import com.tari.android.wallet.ui.dialog.modular.modules.customBaseNodeBody.CustomBaseNodeBodyModule
 import com.tari.android.wallet.ui.dialog.modular.modules.customBaseNodeBody.CustomBaseNodeBodyModuleView
 import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadBoldSpannableModule
