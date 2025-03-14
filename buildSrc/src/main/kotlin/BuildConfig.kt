@@ -1,14 +1,14 @@
 object BuildConfig {
 
-    const val versionNumber = "0.31.2"
+    const val versionNumber = "0.31.3"
 
     const val minSdk = 26
     const val targetSdk = 34
     const val compileSdk = 35
 
     object LibWallet {
-        const val version = "v1.11.0-rc.0"
-        const val minValidVersion = "v1.4.1-rc.0"
+        const val version = "v1.13.0-rc.0"
+        const val minValidVersion = "v1.13.0-rc.0"
 
         const val hostURL = "https://github.com/tari-project/tari/releases/download/"
         const val x64A = "libminotari_wallet_ffi.android_x86_64.a"
