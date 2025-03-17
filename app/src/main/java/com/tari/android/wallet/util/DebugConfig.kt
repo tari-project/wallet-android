@@ -214,7 +214,7 @@ object MockDataStub {
     )
 
     fun createTxDto(
-        confirmationCount: Long,
+        confirmationCount: Long = 10000,
         amount: Long = 100000,
         contactAlias: String = "Test",
         status: TxStatus = TxStatus.MINED_CONFIRMED,

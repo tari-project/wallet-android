@@ -16,7 +16,6 @@ import com.tari.android.wallet.application.walletManager.WalletManager.WalletEve
 import com.tari.android.wallet.data.BalanceStateHandler
 import com.tari.android.wallet.data.airdrop.AirdropRepository
 import com.tari.android.wallet.data.contacts.ContactsRepository
-import com.tari.android.wallet.data.sharedPrefs.CorePrefRepository
 import com.tari.android.wallet.data.sharedPrefs.sentry.SentryPrefRepository
 import com.tari.android.wallet.data.tx.TxRepository
 import com.tari.android.wallet.model.tx.Tx
@@ -39,9 +38,6 @@ import javax.inject.Inject
 
 
 class HomeOverviewViewModel : CommonViewModel() {
-
-    @Inject
-    lateinit var corePrefRepository: CorePrefRepository
 
     @Inject
     lateinit var contactsRepository: ContactsRepository
@@ -175,12 +171,21 @@ class HomeOverviewViewModel : CommonViewModel() {
     }
 
     private fun showRecoverySuccessIfNeeded() {
-        if (corePrefRepository.needToShowRecoverySuccessDialog) {
-            showSimpleDialog(
-                titleRes = R.string.recovery_success_dialog_title,
-                descriptionRes = R.string.recovery_success_dialog_description,
-                closeButtonTextRes = R.string.recovery_success_dialog_close,
-                onClose = { corePrefRepository.needToShowRecoverySuccessDialog = false },
+        if (sharedPrefsRepository.needToShowRecoverySuccessDialog) {
+            if (sharedPrefsRepository.anonId != null) { // anonId isn't null while wallet syncing from paper wallet seeds
+                _uiState.update { it.copy(showWalletSyncSuccessDialog = true) }
+            } else {
+                _uiState.update { it.copy(showWalletRestoreSuccessDialog = true) }
+            }
+        }
+    }
+
+    fun onSyncDialogDismiss() {
+        sharedPrefsRepository.needToShowRecoverySuccessDialog = false
+        _uiState.update {
+            it.copy(
+                showWalletSyncSuccessDialog = false,
+                showWalletRestoreSuccessDialog = false,
             )
         }
     }
