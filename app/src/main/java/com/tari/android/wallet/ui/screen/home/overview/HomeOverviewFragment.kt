@@ -16,7 +16,6 @@ import com.tari.android.wallet.ui.common.CommonFragment
 import com.tari.android.wallet.ui.compose.TariDesignSystem
 import com.tari.android.wallet.ui.screen.qr.QrScannerActivity
 import com.tari.android.wallet.util.extension.parcelable
-import kotlin.getValue
 
 class HomeOverviewFragment : CommonFragment<HomeOverviewViewModel>() {
 
@@ -37,6 +36,7 @@ class HomeOverviewFragment : CommonFragment<HomeOverviewViewModel>() {
                         onTxClick = { viewModel.navigateToTxDetail(it.tx) },
                         onViewAllTxsClick = { viewModel.onAllTxClicked() },
                         onConnectionStatusClick = { viewModel.showConnectionStatusDialog() },
+                        onSyncDialogDismiss = { viewModel.onSyncDialogDismiss() },
                     )
                 }
             }

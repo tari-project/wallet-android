@@ -22,5 +22,8 @@ class HomeOverviewModel {
 
         val activeMinersCount: Int? = null,
         val isMining: Boolean = false,
+
+        val showWalletSyncSuccessDialog: Boolean = false,
+        val showWalletRestoreSuccessDialog: Boolean = false,
     )
 }
