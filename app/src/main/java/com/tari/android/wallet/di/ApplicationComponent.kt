@@ -58,7 +58,8 @@ import com.tari.android.wallet.ui.screen.onboarding.createWallet.CreateWalletVie
 import com.tari.android.wallet.ui.screen.onboarding.inroduction.IntroductionViewModel
 import com.tari.android.wallet.ui.screen.onboarding.localAuth.LocalAuthViewModel
 import com.tari.android.wallet.ui.screen.pinCode.EnterPinCodeViewModel
-import com.tari.android.wallet.ui.screen.profile.WalletInfoViewModel
+import com.tari.android.wallet.ui.screen.profile.login.ProfileLoginViewModel
+import com.tari.android.wallet.ui.screen.profile.walletInfo.WalletInfoViewModel
 import com.tari.android.wallet.ui.screen.qr.QrScannerActivity
 import com.tari.android.wallet.ui.screen.qr.QrScannerViewModel
 import com.tari.android.wallet.ui.screen.restore.activity.WalletRestoreViewModel
@@ -187,6 +188,7 @@ interface ApplicationComponent {
     fun inject(viewModel: ChangeBiometricsViewModel)
     fun inject(viewModel: WalletRestoreViewModel)
     fun inject(viewModel: SampleDesignSystemViewModel)
+    fun inject(viewModel: ProfileLoginViewModel)
 
     fun inject(tariFcmService: TariFcmService)
 

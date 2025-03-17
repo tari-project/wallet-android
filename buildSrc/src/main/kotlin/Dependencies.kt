@@ -1,3 +1,5 @@
+@file:Suppress("ConstPropertyName")
+
 object Dependencies {
     const val gradlePlugin = "com.android.tools.build:gradle:8.7.2"
 
@@ -38,6 +40,7 @@ object Dependencies {
             const val uiTooling = "androidx.compose.ui:ui-tooling"
             const val uiToolingPreview = "androidx.compose.ui:ui-tooling-preview"
             const val activity = "androidx.activity:activity-compose:1.9.2"
+            const val webView = "io.github.kevinnzou:compose-webview:0.33.6"
         }
     }
 
