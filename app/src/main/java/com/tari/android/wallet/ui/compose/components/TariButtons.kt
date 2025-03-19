@@ -2,6 +2,7 @@ package com.tari.android.wallet.ui.compose.components
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -56,11 +57,11 @@ fun TariPrimaryButton(
 
 @Composable
 fun TariSecondaryButton(
-    text: String,
     onClick: () -> Unit,
+    modifier: Modifier = Modifier,
     enabled: Boolean = true,
     size: TariButtonSize = TariButtonSize.Large,
-    modifier: Modifier = Modifier,
+    content: @Composable RowScope.() -> Unit = {},
 ) {
     WithRippleColor(Color.Black) {
         Button(
@@ -72,14 +73,31 @@ fun TariSecondaryButton(
             shape = TariDesignSystem.shapes.button,
             modifier = modifier.defaultMinSize(minHeight = size.minHeight()),
             enabled = enabled,
-        ) {
-            Text(
-                text = text,
-                modifier = Modifier.padding(horizontal = size.textHorizontalPadding()),
-                color = if (enabled) Color.Black else TariDesignSystem.colors.actionDisabled,
-                style = size.textStyle(),
-            )
-        }
+            content = content,
+        )
+    }
+}
+
+@Composable
+fun TariSecondaryButton(
+    text: String,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    size: TariButtonSize = TariButtonSize.Large,
+) {
+    TariSecondaryButton(
+        onClick = onClick,
+        modifier = modifier,
+        enabled = enabled,
+        size = size,
+    ) {
+        Text(
+            text = text,
+            modifier = Modifier.padding(horizontal = size.textHorizontalPadding()),
+            color = if (enabled) Color.Black else TariDesignSystem.colors.actionDisabled,
+            style = size.textStyle(),
+        )
     }
 }
 

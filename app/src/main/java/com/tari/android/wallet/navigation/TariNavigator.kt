@@ -22,6 +22,7 @@ import com.tari.android.wallet.navigation.Navigation.EnterPinCode
 import com.tari.android.wallet.navigation.Navigation.Home
 import com.tari.android.wallet.navigation.Navigation.InputSeedWords
 import com.tari.android.wallet.navigation.Navigation.Restore
+import com.tari.android.wallet.navigation.Navigation.ShareText
 import com.tari.android.wallet.navigation.Navigation.SplashScreen
 import com.tari.android.wallet.navigation.Navigation.TorBridge
 import com.tari.android.wallet.navigation.Navigation.TxList
@@ -99,6 +100,8 @@ class TariNavigator @Inject constructor(
             is Home -> toHomeActivity(navigation.uri)
             is BackToHome -> popUpTo(HomeOverviewFragment::class.java.simpleName)
 
+            is ShareText -> shareText(navigation.text)
+
             is Restore.WalletRestoreActivity -> currentActivity.startActivity(Intent(currentActivity, WalletRestoreActivity::class.java))
             is Restore.ToEnterRestorePassword -> addFragment(EnterRestorationPasswordFragment())
             is Restore.ToRestoreWithRecoveryPhrase -> addFragment(InputSeedWordsFragment())
@@ -160,6 +163,17 @@ class TariNavigator @Inject constructor(
             is Chat.ToChat -> toChatDetail(navigation.walletAddress, navigation.isNew)
             is Chat.ToAddChat -> addFragment(AddChatFragment())
         }
+    }
+
+    private fun shareText(text: String) {
+        val sendIntent: Intent = Intent().apply {
+            action = Intent.ACTION_SEND
+            putExtra(Intent.EXTRA_TEXT, text)
+            type = "text/plain"
+        }
+
+        val shareIntent = Intent.createChooser(sendIntent, null)
+        currentActivity.startActivity(shareIntent)
     }
 
     fun navigateSequence(vararg navigations: Navigation) {

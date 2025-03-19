@@ -227,6 +227,13 @@
     <string name="home_sync_dialog_description">Your wallet has been successfully restored.</string>
     <string name="home_sync_dialog_button">Get Started!</string>
 
+    <!--    Airdrop Profile-->
+    <string name="airdrop_profile_tari_mined">Tari Mined</string>
+    <string name="airdrop_profile_gems_earned">Gems Earned</string>
+    <string name="airdrop_profile_invite_friends_title">Invite Friends, Earn 5000 Gems</string>
+    <string name="airdrop_profile_invite_friends_description">Earn gems by mining and referring friends to increase your airdrop reward during testnet! </string>
+    <string name="airdrop_profile_invite_friends_share">Share</string>
+
     <!-- tx list -->
     <string name="tx_list_sent_a_payment">%s sent a payment</string>
     <string name="tx_list_you_paid">You paid</string>

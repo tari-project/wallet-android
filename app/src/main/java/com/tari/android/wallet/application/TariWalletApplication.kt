@@ -32,8 +32,8 @@
  */
 package com.tari.android.wallet.application
 
-import android.app.Activity
 import android.app.Application
+import android.webkit.WebView
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ProcessLifecycleOwner
@@ -46,6 +46,7 @@ import com.tari.android.wallet.di.DiContainer
 import com.tari.android.wallet.infrastructure.logging.LoggerAdapter
 import com.tari.android.wallet.notification.NotificationHelper
 import com.tari.android.wallet.ui.common.giphy.GiphyAdapter
+import com.tari.android.wallet.util.DebugConfig
 import io.sentry.android.core.SentryAndroid
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -95,9 +96,6 @@ class TariWalletApplication : Application() {
         System.loadLibrary("native-lib")
     }
 
-    val currentActivity: Activity?
-        get() = activityLifecycleCallbacks.currentActivity
-
     @Suppress("KotlinConstantConditions")
     override fun onCreate() {
         super.onCreate()
@@ -121,6 +119,8 @@ class TariWalletApplication : Application() {
 
         ProcessLifecycleOwner.get().lifecycle.addObserver(AppObserver())
         logger.i("Application inited")
+
+        if (DebugConfig.isDebug()) WebView.setWebContentsDebuggingEnabled(true)
     }
 
     fun initApplication() {

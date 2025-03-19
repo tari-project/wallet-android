@@ -18,6 +18,8 @@ sealed class Navigation {
     data class Home(val uri: Uri? = null) : Navigation()
     data object BackToHome : Navigation()
 
+    data class ShareText(val text: String) : Navigation()
+
     sealed class Auth : Navigation() {
         data class AuthScreen(val uri: Uri? = null) : Auth()
         data object FeatureAuth : Auth()
