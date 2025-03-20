@@ -49,6 +49,8 @@
 
 -keep class com.tari.android.wallet.application.walletManager.WalletCallbacks { *; }
 
+-keep class com.tari.android.wallet.data.** { *; }
+
 # Please add these rules to your existing keep rules in order to suppress warnings.
 # This is generated automatically by the Android Gradle plugin.
 -dontwarn javax.naming.InvalidNameException
