@@ -584,8 +584,8 @@
     <string name="restore_wallet_paper_wallet_remember_backup_body">Do you want to back up your current wallet before replacing it? If you don\’t back it up first, you will lose all the funds in your current wallet!</string>
     <string name="restore_wallet_paper_wallet_remember_backup_yes_button">Yes, back it up</string>
     <string name="restore_wallet_paper_wallet_remember_backup_no_button">No, just replace it</string>
-    <string name="restore_wallet_paper_wallet_enter_passphrase_title">Sync Universe Wallet</string>
-    <string name="restore_wallet_paper_wallet_enter_passphrase_body">Add the identification code found in your desktop Tari Universe app</string>
+    <string name="restore_wallet_paper_wallet_enter_passphrase_title">Sync with Tari Universe</string>
+    <string name="restore_wallet_paper_wallet_enter_passphrase_body">Enter the identification code from your Tari Universe desktop app to import your wallet.</string>
     <string name="restore_wallet_paper_wallet_enter_passphrase_hint">Enter Identification Code</string>
     <string name="restore_wallet_paper_wallet_error_title">Incorrect code</string>
     <string name="restore_wallet_paper_wallet_error_body">The identification code you entered is incorrect. Please try again.</string>
