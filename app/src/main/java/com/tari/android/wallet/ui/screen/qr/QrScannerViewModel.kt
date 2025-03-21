@@ -69,7 +69,8 @@ class QrScannerViewModel(savedState: SavedStateHandle) : CommonViewModel() {
                     is DeepLink.UserProfile,
                     is DeepLink.Contacts,
                     is DeepLink.TorBridges,
-                    is DeepLink.AddBaseNode -> setAlternativeText(deepLink)
+                    is DeepLink.AddBaseNode,
+                    is DeepLink.AirdropLoginToken -> setAlternativeText(deepLink)
 
                     is DeepLink.PaperWallet -> returnResult(deepLink)
                 }
@@ -79,7 +80,8 @@ class QrScannerViewModel(savedState: SavedStateHandle) : CommonViewModel() {
                 when (deepLink) {
                     is DeepLink.Send,
                     is DeepLink.UserProfile,
-                    is DeepLink.PaperWallet -> returnResult(deepLink)
+                    is DeepLink.PaperWallet,
+                    is DeepLink.AirdropLoginToken -> returnResult(deepLink)
 
                     is DeepLink.Contacts,
                     is DeepLink.TorBridges,
@@ -90,7 +92,8 @@ class QrScannerViewModel(savedState: SavedStateHandle) : CommonViewModel() {
             QrScannerSource.AddContact -> {
                 when (deepLink) {
                     is DeepLink.UserProfile,
-                    is DeepLink.PaperWallet -> returnResult(deepLink)
+                    is DeepLink.PaperWallet,
+                    is DeepLink.AirdropLoginToken -> returnResult(deepLink)
 
                     is DeepLink.Send,
                     is DeepLink.Contacts,
@@ -104,7 +107,8 @@ class QrScannerViewModel(savedState: SavedStateHandle) : CommonViewModel() {
                     is DeepLink.Send,
                     is DeepLink.UserProfile,
                     is DeepLink.Contacts,
-                    is DeepLink.PaperWallet -> returnResult(deepLink)
+                    is DeepLink.PaperWallet,
+                    is DeepLink.AirdropLoginToken -> returnResult(deepLink)
 
                     is DeepLink.TorBridges,
                     is DeepLink.AddBaseNode -> setAlternativeText(deepLink)
@@ -118,7 +122,8 @@ class QrScannerViewModel(savedState: SavedStateHandle) : CommonViewModel() {
                     is DeepLink.UserProfile,
                     is DeepLink.AddBaseNode,
                     is DeepLink.Contacts,
-                    is DeepLink.PaperWallet -> setAlternativeText(deepLink)
+                    is DeepLink.PaperWallet,
+                    is DeepLink.AirdropLoginToken -> setAlternativeText(deepLink)
 
                     is DeepLink.TorBridges -> returnResult(deepLink)
                 }
@@ -130,7 +135,8 @@ class QrScannerViewModel(savedState: SavedStateHandle) : CommonViewModel() {
                     is DeepLink.UserProfile,
                     is DeepLink.Contacts,
                     is DeepLink.TorBridges,
-                    is DeepLink.AddBaseNode -> _uiState.update { it.copy(scanError = true) }
+                    is DeepLink.AddBaseNode,
+                    is DeepLink.AirdropLoginToken -> _uiState.update { it.copy(scanError = true) }
 
                     is DeepLink.PaperWallet -> returnResult(deepLink)
                 }
@@ -150,6 +156,7 @@ class QrScannerViewModel(savedState: SavedStateHandle) : CommonViewModel() {
             is DeepLink.AddBaseNode -> resourceManager.getString(R.string.qr_code_scanner_labels_actions_base_node_add)
             is DeepLink.TorBridges -> resourceManager.getString(R.string.qr_code_scanner_labels_actions_tor_bridges)
             is DeepLink.PaperWallet -> resourceManager.getString(R.string.qr_code_scanner_labels_actions_paper_wallet) // should never show. Show PW dialog instead
+            is DeepLink.AirdropLoginToken -> ""
         }
         _uiState.update { it.copy(alternativeText = text) }
     }

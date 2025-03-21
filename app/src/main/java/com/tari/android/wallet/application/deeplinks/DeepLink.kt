@@ -41,7 +41,6 @@ import com.tari.android.wallet.model.MicroTari
 import com.tari.android.wallet.model.TariWalletAddress
 import com.tari.android.wallet.util.extension.parseToBigInteger
 import kotlinx.parcelize.Parcelize
-import kotlin.text.orEmpty
 
 /**
  * Parses a deep link and contains the structured deep link details.
@@ -214,6 +213,32 @@ sealed class DeepLink : Parcelable {
         }
     }
 
+    // tari://nextnet/airdrop/auth?token=XXXXX&refreshToken=XXXXX
+    @Parcelize
+    data class AirdropLoginToken(
+        val token: String,
+        val refreshToken: String,
+    ) : DeepLink() {
+
+        constructor(params: Map<String, String>) : this(
+            params[KEY_TOKEN].orEmpty(),
+            params[KEY_REFRESH_TOKEN].orEmpty(),
+        )
+
+        override fun getParams(): Map<String, String> = hashMapOf<String, String>().apply {
+            put(KEY_TOKEN, token)
+            put(KEY_REFRESH_TOKEN, refreshToken)
+        }
+
+        override fun getCommand(): String = COMMAND_AIRDROP_LOGIN
+
+        companion object {
+            const val COMMAND_AIRDROP_LOGIN = "airdrop/auth"
+            const val KEY_TOKEN = "token"
+            const val KEY_REFRESH_TOKEN = "refreshToken"
+        }
+    }
+
     companion object {
 
         fun getByCommand(command: String, params: Map<String, String>): DeepLink? = when (command) {
@@ -222,6 +247,7 @@ sealed class DeepLink : Parcelable {
             AddBaseNode.COMMAND_ADD_NODE -> AddBaseNode(params)
             UserProfile.COMMAND_PROFILE -> UserProfile(params)
             PaperWallet.COMMAND_PAPER_WALLET -> PaperWallet(params)
+            AirdropLoginToken.COMMAND_AIRDROP_LOGIN -> AirdropLoginToken(params)
             else -> null
         }
     }
