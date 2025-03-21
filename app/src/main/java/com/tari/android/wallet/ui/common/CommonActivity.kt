@@ -1,6 +1,5 @@
 package com.tari.android.wallet.ui.common
 
-import android.app.Activity.ScreenCaptureCallback
 import android.content.Intent
 import android.content.res.Configuration.UI_MODE_NIGHT_MASK
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
@@ -37,7 +36,6 @@ import com.tari.android.wallet.util.extension.addEnterLeftAnimation
 import com.tari.android.wallet.util.extension.observe
 import com.tari.android.wallet.util.extension.safeCastTo
 import com.tari.android.wallet.util.extension.string
-import yat.android.lib.YatIntegration
 
 abstract class CommonActivity<VM : CommonViewModel> : AppCompatActivity(), ShakeDetector.Listener, FragmentPoppedListener {
 
@@ -141,7 +139,8 @@ abstract class CommonActivity<VM : CommonViewModel> : AppCompatActivity(), Shake
 
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
-        intent.data?.let { deepLink -> YatIntegration.processDeepLink(this, deepLink) }
+
+        viewModel.processIntentDeepLink(this, intent)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

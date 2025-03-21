@@ -5,7 +5,6 @@ import android.graphics.Bitmap
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.YatAdapter
 import com.tari.android.wallet.application.deeplinks.DeepLink
-import com.tari.android.wallet.application.deeplinks.DeeplinkManager
 import com.tari.android.wallet.data.contacts.model.splitAlias
 import com.tari.android.wallet.data.sharedPrefs.CorePrefRepository
 import com.tari.android.wallet.infrastructure.ShareManager
@@ -36,9 +35,6 @@ class WalletInfoViewModel : CommonViewModel() {
 
     @Inject
     lateinit var yatAdapter: YatAdapter
-
-    @Inject
-    lateinit var deeplinkManager: DeeplinkManager
 
     @Inject
     lateinit var contactUtil: ContactUtil

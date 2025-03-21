@@ -16,7 +16,6 @@ import com.tari.android.wallet.ui.compose.TariDesignSystem
 import com.tari.android.wallet.ui.screen.StartActivity
 import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.extension.observe
-import kotlin.getValue
 
 class HomeActivity : CommonXmlActivity<ActivityHomeBinding, HomeViewModel>() {
 

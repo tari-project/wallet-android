@@ -7,30 +7,27 @@ import com.tari.android.wallet.model.TariWalletAddress
 import javax.inject.Inject
 import javax.inject.Singleton
 
-
 @Singleton
 class DeeplinkParser @Inject constructor(private val networkRepository: NetworkPrefRepository) {
 
-    fun parse(deepLink: String): DeepLink? {
-        val torBridges = getTorDeeplink(deepLink.trim())
+    fun parse(deepLinkUri: Uri): DeepLink? {
+        val torBridges = getTorDeeplink(deepLinkUri.toString().trim())
         if (torBridges.isNotEmpty()) {
             return DeepLink.TorBridges(torBridges)
         }
 
-        val uri = runCatching { Uri.parse(deepLink.trim()) }.getOrNull() ?: return null
-
-        if (!uri.authority.equals(networkRepository.currentNetwork.network.uriComponent)) {
+        if (!deepLinkUri.authority.equals(networkRepository.currentNetwork.network.uriComponent)) {
             return null
         }
 
-        val command = uri.path.orEmpty().trimStart('/')
+        val command = deepLinkUri.path.orEmpty().trimStart('/')
         val parameters = if (command == DeepLink.Contacts.COMMAND_CONTACTS) { // list params
-            uri.query.orEmpty().split("&").associate {
+            deepLinkUri.query.orEmpty().split("&").associate {
                 val (key, value) = it.split("=")
                 key to value
             }
         } else {
-            uri.queryParameterNames.associateWith { uri.getQueryParameter(it).orEmpty() }
+            deepLinkUri.queryParameterNames.associateWith { deepLinkUri.getQueryParameter(it).orEmpty() }
         }
 
         return DeepLink.getByCommand(command, parameters)?.takeIf {

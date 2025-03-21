@@ -7,7 +7,6 @@ import androidx.lifecycle.viewModelScope
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.YatAdapter
 import com.tari.android.wallet.application.deeplinks.DeepLink
-import com.tari.android.wallet.application.deeplinks.DeeplinkManager
 import com.tari.android.wallet.data.chat.ChatItemDto
 import com.tari.android.wallet.data.chat.ChatsRepository
 import com.tari.android.wallet.data.contacts.ContactsRepository
@@ -64,9 +63,6 @@ class ContactSelectionViewModel : CommonViewModel() {
 
     @Inject
     lateinit var corePrefRepository: CorePrefRepository
-
-    @Inject
-    lateinit var deeplinkManager: DeeplinkManager
 
     var additionalFilter: (ContactItemViewHolderItem) -> Boolean = { true }
 

@@ -4,13 +4,12 @@ import android.app.Activity
 import androidx.lifecycle.SavedStateHandle
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.deeplinks.DeepLink
-import com.tari.android.wallet.application.deeplinks.DeeplinkManager
-import com.tari.android.wallet.util.EffectFlow
-import com.tari.android.wallet.util.extension.launchOnIo
-import com.tari.android.wallet.util.extension.launchOnMain
 import com.tari.android.wallet.model.TariWalletAddress
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.screen.qr.QrScannerActivity.Companion.EXTRA_QR_DATA_SOURCE
+import com.tari.android.wallet.util.EffectFlow
+import com.tari.android.wallet.util.extension.launchOnIo
+import com.tari.android.wallet.util.extension.launchOnMain
 import com.tari.android.wallet.util.shortString
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
@@ -18,12 +17,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
-import javax.inject.Inject
 
 class QrScannerViewModel(savedState: SavedStateHandle) : CommonViewModel() {
-
-    @Inject
-    lateinit var deeplinkManager: DeeplinkManager
 
     init {
         component.inject(this)

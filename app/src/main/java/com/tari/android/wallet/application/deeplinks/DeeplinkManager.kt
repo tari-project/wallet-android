@@ -1,6 +1,8 @@
 package com.tari.android.wallet.application.deeplinks
 
 import android.app.Activity
+import android.net.Uri
+import androidx.core.net.toUri
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.baseNodes.BaseNodesManager
 import com.tari.android.wallet.application.walletManager.WalletManager
@@ -44,7 +46,9 @@ class DeeplinkManager @Inject constructor(
     @ApplicationScope private val applicationScope: CoroutineScope,
 ) {
 
-    fun parseDeepLink(deepLink: String): DeepLink? = deeplinkParser.parse(deepLink)
+    fun parseDeepLink(deepLink: Uri): DeepLink? = deeplinkParser.parse(deepLink)
+
+    fun parseDeepLink(deepLink: String): DeepLink? = runCatching { deepLink.trim().toUri() }.getOrNull()?.let { deeplinkParser.parse(it) }
 
     fun getDeeplinkString(deeplink: DeepLink): String = deeplinkParser.toDeeplink(deeplink)
 

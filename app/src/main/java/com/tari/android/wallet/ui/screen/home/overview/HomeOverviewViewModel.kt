@@ -10,7 +10,6 @@ import com.tari.android.wallet.R.string.error_no_connection_title
 import com.tari.android.wallet.R.string.error_node_unreachable_description
 import com.tari.android.wallet.R.string.error_node_unreachable_title
 import com.tari.android.wallet.application.deeplinks.DeepLink
-import com.tari.android.wallet.application.deeplinks.DeeplinkManager
 import com.tari.android.wallet.application.securityStage.StagedWalletSecurityManager
 import com.tari.android.wallet.application.walletManager.WalletManager.WalletEvent
 import com.tari.android.wallet.data.BalanceStateHandler
@@ -50,9 +49,6 @@ class HomeOverviewViewModel : CommonViewModel() {
 
     @Inject
     lateinit var stagedWalletSecurityManager: StagedWalletSecurityManager
-
-    @Inject
-    lateinit var deeplinkManager: DeeplinkManager
 
     @Inject
     lateinit var balanceStateHandler: BalanceStateHandler
@@ -154,7 +150,8 @@ class HomeOverviewViewModel : CommonViewModel() {
         if (sentryPrefRepository.isEnabled == null) {
             sentryPrefRepository.isEnabled = false
             showModularDialog(
-                ModularDialogArgs(DialogArgs(cancelable = false, canceledOnTouchOutside = false), listOf(
+                ModularDialogArgs(
+                    DialogArgs(cancelable = false, canceledOnTouchOutside = false), listOf(
                     HeadModule(resourceManager.getString(R.string.data_collection_dialog_title)),
                     BodyModule(resourceManager.getString(R.string.data_collection_dialog_description)),
                     ButtonModule(resourceManager.getString(R.string.data_collection_dialog_positive), ButtonStyle.Normal) {
