@@ -6,6 +6,8 @@ import com.tari.android.wallet.util.extension.toMicroTari
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
+private const val FRIEND_INVITE_ADDRESS = "https://airdrop.tari.com/download/%s"
+
 class ProfileViewModel : CommonViewModel() {
 
     init {
@@ -25,6 +27,6 @@ class ProfileViewModel : CommonViewModel() {
     val uiState = _uiState.asStateFlow()
 
     fun onInviteLinkShareClick() {
-        tariNavigator.navigate(Navigation.ShareText(uiState.value.inviteLink))
+        tariNavigator.navigate(Navigation.ShareText(String.format(FRIEND_INVITE_ADDRESS, uiState.value.inviteLink)))
     }
 }

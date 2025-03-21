@@ -15,12 +15,14 @@ import com.tari.android.wallet.ui.compose.TariDesignSystem
 
 @SuppressLint("SetJavaScriptEnabled")
 @Composable
-fun ProfileLoginScreen() {
+fun ProfileLoginScreen(
+    authUrl: String,
+) {
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         containerColor = TariDesignSystem.colors.backgroundSecondary,
     ) { paddingValues ->
-        val webViewState = rememberWebViewState("https://airdrop.tari.com/auth") // TODO save to string resource
+        val webViewState = rememberWebViewState(authUrl)
 
         Box(modifier = Modifier.padding(paddingValues)) {
             CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))

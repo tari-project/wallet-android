@@ -16,7 +16,9 @@ class ProfileLoginFragment : CommonFragment<ProfileLoginViewModel>() {
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnLifecycleDestroyed(viewLifecycleOwner))
             setContent {
                 TariDesignSystem(viewModel.currentTheme) {
-                    ProfileLoginScreen()
+                    ProfileLoginScreen(
+                        authUrl = viewModel.authUrl
+                    )
                 }
             }
         }
