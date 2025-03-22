@@ -47,7 +47,7 @@ class EnterRestorationPasswordViewModel : CommonViewModel() {
     val state: LiveData<EnterRestorationPasswordState> = _state
 
     fun onBack() {
-        backPressed.postValue(Unit)
+        onBackPressed()
         launchOnIo {
             backupManager.signOut()
         }
@@ -86,11 +86,12 @@ class EnterRestorationPasswordViewModel : CommonViewModel() {
     }
 
     private fun showUnrecoverableExceptionDialog(message: String) {
-        val args = SimpleDialogArgs(title = resourceManager.getString(R.string.restore_wallet_error_title),
+        val args = SimpleDialogArgs(
+            title = resourceManager.getString(R.string.restore_wallet_error_title),
             description = message,
             cancelable = false,
             canceledOnTouchOutside = false,
-            onClose = { backPressed.call() })
+            onClose = { onBackPressed() })
         showModularDialog(args.getModular(resourceManager))
     }
 }

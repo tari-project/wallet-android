@@ -4,10 +4,10 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.map
 import com.tari.android.wallet.R
 import com.tari.android.wallet.data.sharedPrefs.security.LoginAttemptDto
-import com.tari.android.wallet.util.extension.addTo
 import com.tari.android.wallet.navigation.Navigation
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.common.SingleLiveEvent
+import com.tari.android.wallet.util.extension.addTo
 import java.time.LocalDateTime
 import java.time.OffsetDateTime
 
@@ -120,7 +120,7 @@ class EnterPinCodeViewModel : CommonViewModel() {
 
     private fun createPinCodeConfirm() {
         if (currentNums.value != stashedPin.value) {
-            backPressed.postValue(Unit)
+            onBackPressed()
             return
         }
         securityPrefRepository.pinCode = currentNums.value.orEmpty()
@@ -133,7 +133,7 @@ class EnterPinCodeViewModel : CommonViewModel() {
 
     private fun changeNewPinCodeConfirm() {
         if (currentNums.value != stashedPin.value) {
-            backPressed.postValue(Unit)
+            onBackPressed()
             return
         }
         securityPrefRepository.pinCode = currentNums.value.orEmpty()

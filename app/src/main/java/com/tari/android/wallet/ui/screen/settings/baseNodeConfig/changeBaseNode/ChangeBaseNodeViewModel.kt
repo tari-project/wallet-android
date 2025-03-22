@@ -49,7 +49,7 @@ class ChangeBaseNodeViewModel : CommonViewModel() {
     fun selectBaseNode(baseNodeDto: BaseNodeDto) {
         baseNodesManager.setBaseNode(baseNodeDto)
         walletManager.syncBaseNode()
-        backPressed.postValue(Unit)
+        onBackPressed()
     }
 
     fun showQrCode(baseNodeDto: BaseNodeDto) {

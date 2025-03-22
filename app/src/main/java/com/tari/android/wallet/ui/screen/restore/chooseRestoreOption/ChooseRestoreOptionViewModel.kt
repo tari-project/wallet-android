@@ -235,7 +235,7 @@ class ChooseRestoreOptionViewModel : CommonViewModel() {
         showSimpleDialog(
             title = resourceManager.getString(R.string.restore_wallet_error_title),
             description = resourceManager.getString(R.string.restore_wallet_error_file_not_found),
-            onClose = { backPressed.call() },
+            onClose = { onBackPressed() },
         )
     }
 

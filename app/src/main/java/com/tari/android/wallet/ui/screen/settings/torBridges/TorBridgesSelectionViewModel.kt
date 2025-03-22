@@ -176,7 +176,7 @@ class TorBridgesSelectionViewModel : CommonViewModel() {
                                 BodyModule(description),
                                 ButtonModule(resourceManager.getString(R.string.common_confirm), ButtonStyle.Normal) {
                                     hideDialog()
-                                    backPressed.postValue(Unit)
+                                    onBackPressed()
                                 },
                             )
                         )

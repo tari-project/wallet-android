@@ -50,7 +50,7 @@ class LogsViewModel(savedState: SavedStateHandle) : CommonViewModel() {
                     showSimpleDialog(
                         title = resourceManager.getString(R.string.common_error_title),
                         description = resourceManager.getString(R.string.debug_logs_cant_open_file),
-                        onClose = { backPressed.postValue(Unit) },
+                        onClose = { onBackPressed() },
                     )
                 }
                 logger.i("Error reading log file: ${e.message}")

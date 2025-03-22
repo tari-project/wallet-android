@@ -62,7 +62,7 @@ class CustomTorBridgesViewModel : CommonViewModel() {
         }
 
         newBridges.forEach { torSharedRepository.addTorBridgeConfiguration(it) }
-        backPressed.postValue(Unit)
+        onBackPressed()
     }
 
     fun handleQrCode(deeplink: DeepLink) {

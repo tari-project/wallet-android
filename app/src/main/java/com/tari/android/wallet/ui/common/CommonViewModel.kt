@@ -100,7 +100,8 @@ open class CommonViewModel : ViewModel(), DialogHandler {
 
     val connectionState = connectionStateHandler.connectionState
 
-    val backPressed = SingleLiveEvent<Unit>()
+    private val _backPressed = SingleLiveEvent<Unit>()
+    val backPressed: LiveData<Unit> = _backPressed
 
     protected val _openLink = SingleLiveEvent<String>()
     val openLink: LiveData<String> = _openLink
@@ -150,7 +151,7 @@ open class CommonViewModel : ViewModel(), DialogHandler {
     private fun checkAuthorization() {
         if (authorizedAction != null && securityPrefRepository.isFeatureAuthenticated) {
             securityPrefRepository.isFeatureAuthenticated = false
-            backPressed.value = Unit
+            onBackPressed()
             authorizedAction?.invoke()
             authorizedAction = null
         }
@@ -163,6 +164,10 @@ open class CommonViewModel : ViewModel(), DialogHandler {
         }?.let { deeplink ->
             deeplinkManager.execute(activity, deeplink)
         }
+    }
+
+     fun onBackPressed() {
+        _backPressed.call()
     }
 
     override fun showModularDialog(args: ModularDialogArgs) {

@@ -19,7 +19,7 @@ class BugsReportingViewModel : CommonViewModel() {
     fun send(name: String, email: String, bugDescription: String) = launchOnIo {
         try {
             bugReportingService.share(name, email, bugDescription)
-            backPressed.postValue(Unit)
+            onBackPressed()
             logger.i("Bug report sent: name=$name, email=$email, bugDescription=$bugDescription")
         } catch (e: Exception) {
             switchToMain {
