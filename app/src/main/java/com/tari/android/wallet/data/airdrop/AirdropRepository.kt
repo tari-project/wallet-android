@@ -54,7 +54,7 @@ class AirdropRepository @Inject constructor(
     // TODO: Use real data
     @Throws(HttpException::class)
 //    suspend fun getReferralStatus(): ReferralStatusResponse = switchToIo { airdropRetrofit.getReferralStatus() }
-    suspend fun getReferralStatus(): ReferralStatusResponse = ReferralStatusResponse(
+    suspend fun getReferralList(): ReferralStatusResponse = ReferralStatusResponse(
         referrals = List(10) { index ->
             Referral(
                 name = "sevi_$index",

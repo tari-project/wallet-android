@@ -23,7 +23,8 @@ class ProfileFragment : CommonFragment<ProfileViewModel>() {
                 TariDesignSystem(viewModel.currentTheme) {
                     ProfileScreen(
                         uiState = uiState,
-                        onInviteLinkShareClick = { viewModel.onInviteLinkShareClick() }
+                        onInviteLinkShareClick = { viewModel.onInviteLinkShareClick() },
+                        onStartMiningClicked = { viewModel.onStartMiningClicked() },
                     )
                 }
             }
