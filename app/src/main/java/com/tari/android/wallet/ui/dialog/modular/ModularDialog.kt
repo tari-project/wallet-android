@@ -43,14 +43,14 @@ import com.tari.android.wallet.ui.dialog.modular.modules.securityStages.Security
 import com.tari.android.wallet.ui.dialog.modular.modules.securityStages.SecurityStageHeadModuleView
 import com.tari.android.wallet.ui.dialog.modular.modules.shareOptions.ShareOptionsModule
 import com.tari.android.wallet.ui.dialog.modular.modules.shareOptions.ShareOptionsModuleView
+import com.tari.android.wallet.ui.dialog.modular.modules.shareQr.ShareQRCodeModuleView
+import com.tari.android.wallet.ui.dialog.modular.modules.shareQr.ShareQrCodeModule
 import com.tari.android.wallet.ui.dialog.modular.modules.shortEmoji.ShortEmojiIdModule
 import com.tari.android.wallet.ui.dialog.modular.modules.shortEmoji.ShortEmojiModuleView
 import com.tari.android.wallet.ui.dialog.modular.modules.space.SpaceModule
 import com.tari.android.wallet.ui.dialog.modular.modules.space.SpaceModuleView
 import com.tari.android.wallet.ui.screen.send.addAmount.feeModule.FeeModule
 import com.tari.android.wallet.ui.screen.send.addAmount.feeModule.FeeModuleView
-import com.tari.android.wallet.ui.screen.send.shareQr.ShareQRCodeModuleView
-import com.tari.android.wallet.ui.screen.send.shareQr.ShareQrCodeModule
 import com.tari.android.wallet.ui.screen.settings.backup.learnMore.module.BackupLearnMoreItemModule
 import com.tari.android.wallet.ui.screen.settings.backup.learnMore.module.BackupLearnMoreItemModuleView
 import com.tari.android.wallet.ui.screen.settings.logs.logs.module.LogLevelCheckedModule
