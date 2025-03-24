@@ -166,8 +166,8 @@ open class CommonViewModel : ViewModel(), DialogHandler {
         }
     }
 
-     fun onBackPressed() {
-        _backPressed.call()
+    fun onBackPressed() {
+        _backPressed.value = Unit
     }
 
     override fun showModularDialog(args: ModularDialogArgs) {

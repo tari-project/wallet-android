@@ -73,6 +73,7 @@ import com.tari.android.wallet.ui.screen.send.addNote.AddNoteViewModel
 import com.tari.android.wallet.ui.screen.send.addNote.gif.ChooseGIFDialogFragment
 import com.tari.android.wallet.ui.screen.send.addNote.gif.ThumbnailGifViewModel
 import com.tari.android.wallet.ui.screen.send.finalize.FinalizeSendTxViewModel
+import com.tari.android.wallet.ui.screen.send.receive.ReceiveViewModel
 import com.tari.android.wallet.ui.screen.send.requestTari.RequestTariViewModel
 import com.tari.android.wallet.ui.screen.settings.allSettings.AllSettingsViewModel
 import com.tari.android.wallet.ui.screen.settings.allSettings.about.TariAboutViewModel
@@ -191,6 +192,7 @@ interface ApplicationComponent {
     fun inject(viewModel: SampleDesignSystemViewModel)
     fun inject(viewModel: ProfileLoginViewModel)
     fun inject(viewModel: ProfileViewModel)
+    fun inject(viewModel: ReceiveViewModel)
 
     fun inject(tariFcmService: TariFcmService)
 

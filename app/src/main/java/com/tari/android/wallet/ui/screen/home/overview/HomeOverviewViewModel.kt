@@ -215,8 +215,7 @@ class HomeOverviewViewModel : CommonViewModel() {
     }
 
     fun onRequestTariClicked() {
-
-        tariNavigator.navigate(Navigation.AllSettings.ToRequestTari)
+        tariNavigator.navigate(Navigation.TxList.ToReceive)
     }
 
     fun onAllTxClicked() {

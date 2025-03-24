@@ -208,7 +208,7 @@ val TariLightColorPalette = TariColors(
 
     backgroundPrimary = Color(0xFFFFFFFF),
     backgroundSecondary = Color(0xFFF8F8F9),
-    backgroundAccent = Color(0x1B19210A),
+    backgroundAccent = Color(0x0A1B1921),
     backgroundPopup = Color(0xFFF8F8F9),
 
     actionActive = Color(0x80000000),
