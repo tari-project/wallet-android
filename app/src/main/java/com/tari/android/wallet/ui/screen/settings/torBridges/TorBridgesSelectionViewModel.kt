@@ -4,12 +4,9 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.deeplinks.DeepLink
-import com.tari.android.wallet.application.deeplinks.DeeplinkManager
 import com.tari.android.wallet.data.sharedPrefs.tor.TorBridgeConfigurationList
 import com.tari.android.wallet.data.sharedPrefs.tor.TorPrefRepository
-import com.tari.android.wallet.util.extension.collectFlow
-import com.tari.android.wallet.util.extension.launchOnIo
-import com.tari.android.wallet.util.extension.launchOnMain
+import com.tari.android.wallet.navigation.Navigation
 import com.tari.android.wallet.tor.TorProxyManager
 import com.tari.android.wallet.tor.TorProxyState
 import com.tari.android.wallet.tor.TorProxyStateHandler
@@ -21,10 +18,12 @@ import com.tari.android.wallet.ui.dialog.modular.modules.body.BodyModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonStyle
 import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
-import com.tari.android.wallet.navigation.Navigation
 import com.tari.android.wallet.ui.screen.send.shareQr.ShareQrCodeModule
 import com.tari.android.wallet.ui.screen.settings.torBridges.torItem.TorBridgeViewHolderItem
 import com.tari.android.wallet.util.DebugConfig
+import com.tari.android.wallet.util.extension.collectFlow
+import com.tari.android.wallet.util.extension.launchOnIo
+import com.tari.android.wallet.util.extension.launchOnMain
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
@@ -37,9 +36,6 @@ class TorBridgesSelectionViewModel : CommonViewModel() {
 
     @Inject
     lateinit var torProxyManager: TorProxyManager
-
-    @Inject
-    lateinit var deeplinkManager: DeeplinkManager
 
     @Inject
     lateinit var torProxyStateHandler: TorProxyStateHandler

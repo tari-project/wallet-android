@@ -42,7 +42,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.webkit.WebResourceError
-import android.webkit.WebView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.tari.android.wallet.R.drawable.vector_store_reload
@@ -50,15 +49,14 @@ import com.tari.android.wallet.R.drawable.vector_store_share
 import com.tari.android.wallet.R.string.store_no_application_to_open_the_link_error
 import com.tari.android.wallet.R.string.ttl_store_url
 import com.tari.android.wallet.databinding.FragmentStoreBinding
-import com.tari.android.wallet.util.extension.collectFlow
 import com.tari.android.wallet.ui.component.tari.toast.TariToast
 import com.tari.android.wallet.ui.component.tari.toast.TariToastArgs
 import com.tari.android.wallet.ui.component.tari.toolbar.TariToolbarActionArg
+import com.tari.android.wallet.ui.screen.store.EventsPropagatingWebViewClient.ExternalSiteOverride
+import com.tari.android.wallet.util.extension.collectFlow
 import com.tari.android.wallet.util.extension.gone
 import com.tari.android.wallet.util.extension.removeListenersAndCancel
 import com.tari.android.wallet.util.extension.string
-import com.tari.android.wallet.ui.screen.store.EventsPropagatingWebViewClient.ExternalSiteOverride
-import com.tari.android.wallet.util.DebugConfig
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 
@@ -131,7 +129,6 @@ class StoreFragment : Fragment() {
             }
         }
         ui.webView.loadUrl(string(ttl_store_url))
-        if (DebugConfig.isDebug()) WebView.setWebContentsDebuggingEnabled(true)
     }
 
     private fun shareStoreLink() {

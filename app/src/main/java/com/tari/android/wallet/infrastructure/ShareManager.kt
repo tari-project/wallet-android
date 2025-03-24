@@ -3,7 +3,6 @@ package com.tari.android.wallet.infrastructure
 import androidx.lifecycle.MutableLiveData
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.deeplinks.DeepLink
-import com.tari.android.wallet.application.deeplinks.DeeplinkManager
 import com.tari.android.wallet.data.contacts.ContactsRepository
 import com.tari.android.wallet.data.contacts.model.ContactDto
 import com.tari.android.wallet.data.contacts.model.FFIContactInfo
@@ -38,9 +37,6 @@ class ShareManager : CommonViewModel() {
 
     @Inject
     lateinit var contactUtil: ContactUtil
-
-    @Inject
-    lateinit var deeplinkManager: DeeplinkManager
 
     val shareText = SingleLiveEvent<String>()
 

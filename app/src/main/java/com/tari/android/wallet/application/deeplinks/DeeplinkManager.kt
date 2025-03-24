@@ -1,6 +1,9 @@
 package com.tari.android.wallet.application.deeplinks
 
 import android.app.Activity
+import android.net.Uri
+import androidx.core.net.toUri
+import com.orhanobut.logger.Logger
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.baseNodes.BaseNodesManager
 import com.tari.android.wallet.application.walletManager.WalletManager
@@ -44,7 +47,9 @@ class DeeplinkManager @Inject constructor(
     @ApplicationScope private val applicationScope: CoroutineScope,
 ) {
 
-    fun parseDeepLink(deepLink: String): DeepLink? = deeplinkParser.parse(deepLink)
+    fun parseDeepLink(deepLink: Uri): DeepLink? = deeplinkParser.parse(deepLink)
+
+    fun parseDeepLink(deepLink: String): DeepLink? = runCatching { deepLink.trim().toUri() }.getOrNull()?.let { deeplinkParser.parse(it) }
 
     fun getDeeplinkString(deeplink: DeepLink): String = deeplinkParser.toDeeplink(deeplink)
 
@@ -59,6 +64,7 @@ class DeeplinkManager @Inject constructor(
             is DeepLink.UserProfile -> addUserProfile(activity, deeplink)
             is DeepLink.TorBridges -> addTorBridges(deeplink)
             is DeepLink.PaperWallet -> showPaperWalletDialog(activity, deeplink)
+            is DeepLink.AirdropLoginToken -> handleAirdropTokenAction(deeplink)
         }
     }
 
@@ -73,6 +79,7 @@ class DeeplinkManager @Inject constructor(
             is DeepLink.UserProfile -> addContactsAction(deeplink.data()?.let { listOf(it) } ?: emptyList())
             is DeepLink.TorBridges -> addTorBridges(deeplink)
             is DeepLink.PaperWallet -> showPaperWalletDialog(activity, deeplink)
+            is DeepLink.AirdropLoginToken -> handleAirdropTokenAction(deeplink)
         }
     }
 
@@ -291,5 +298,10 @@ class DeeplinkManager @Inject constructor(
     private fun replaceWalletAction(seedWords: List<String>) {
         walletManager.deleteWallet()
         navigator.navigate(Navigation.SplashScreen(seedWords))
+    }
+
+    private fun handleAirdropTokenAction(deeplink: DeepLink.AirdropLoginToken) {
+        // TODO handle airdrop token action
+        Logger.t("Airdrop").d("Airdrop token action : ${deeplink.token} ${deeplink.refreshToken}")
     }
 }

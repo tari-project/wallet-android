@@ -1,4 +1,4 @@
-package com.tari.android.wallet.ui.screen.profile
+package com.tari.android.wallet.ui.screen.profile.walletInfo
 
 import android.content.Context
 import android.util.AttributeSet

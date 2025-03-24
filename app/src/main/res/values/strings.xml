@@ -227,6 +227,16 @@
     <string name="home_sync_dialog_description">Your wallet has been successfully restored.</string>
     <string name="home_sync_dialog_button">Get Started!</string>
 
+    <!--    Airdrop Profile-->
+    <string name="airdrop_profile_tari_mined">Tari Mined</string>
+    <string name="airdrop_profile_gems_earned">Gems Earned</string>
+    <string name="airdrop_profile_invite_friends_title">Invite Friends, Earn 5000 Gems</string>
+    <string name="airdrop_profile_invite_friends_description">Earn gems by mining and referring friends to increase your airdrop reward during testnet! </string>
+    <string name="airdrop_profile_invite_friends_share">Share</string>
+    <string name="airdrop_profile_friends_invited_title">Invited Friends (%s)</string>
+    <string name="airdrop_profile_friends_invited_empty_title">Miners are true friends</string>
+    <string name="airdrop_profile_friends_invited_empty_description">Your friends must use download the Tari Universe desktop app with YOUR referral code AND start mining for you to earn gem rewards.</string>
+
     <!-- tx list -->
     <string name="tx_list_sent_a_payment">%s sent a payment</string>
     <string name="tx_list_you_paid">You paid</string>
@@ -577,8 +587,8 @@
     <string name="restore_wallet_paper_wallet_remember_backup_body">Do you want to back up your current wallet before replacing it? If you don\’t back it up first, you will lose all the funds in your current wallet!</string>
     <string name="restore_wallet_paper_wallet_remember_backup_yes_button">Yes, back it up</string>
     <string name="restore_wallet_paper_wallet_remember_backup_no_button">No, just replace it</string>
-    <string name="restore_wallet_paper_wallet_enter_passphrase_title">Sync Universe Wallet</string>
-    <string name="restore_wallet_paper_wallet_enter_passphrase_body">Add the identification code found in your desktop Tari Universe app</string>
+    <string name="restore_wallet_paper_wallet_enter_passphrase_title">Sync with Tari Universe</string>
+    <string name="restore_wallet_paper_wallet_enter_passphrase_body">Enter the identification code from your Tari Universe desktop app to import your wallet.</string>
     <string name="restore_wallet_paper_wallet_enter_passphrase_hint">Enter Identification Code</string>
     <string name="restore_wallet_paper_wallet_error_title">Incorrect code</string>
     <string name="restore_wallet_paper_wallet_error_body">The identification code you entered is incorrect. Please try again.</string>

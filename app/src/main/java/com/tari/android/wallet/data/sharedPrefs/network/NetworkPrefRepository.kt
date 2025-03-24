@@ -38,6 +38,13 @@ class NetworkPrefRepository @Inject constructor(sharedPrefs: SharedPreferences) 
         private const val TICKER_MAINNET = "XTR"
         private const val TICKER_TESTNET = "tXTR"
 
+        private val NETWORK_MAINNET: TariNetwork = TariNetwork(
+            network = Network.MAINNET,
+            dnsPeer = "seeds.testmnet.tari.com",
+            blockExplorerUrl = "https://explore-mainnet.tari.com",
+            ticker = TICKER_MAINNET,
+            recommended = true,
+        )
         private val NETWORK_STAGENET: TariNetwork = TariNetwork(
             network = Network.STAGENET,
             dnsPeer = "seeds.stagenet.tari.com",

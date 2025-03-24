@@ -9,7 +9,6 @@ import android.os.Looper
 import android.os.ParcelUuid
 import androidx.lifecycle.viewModelScope
 import com.tari.android.wallet.application.deeplinks.DeepLink
-import com.tari.android.wallet.application.deeplinks.DeeplinkManager
 import com.welie.blessed.BluetoothCentralManager
 import com.welie.blessed.BluetoothCentralManagerCallback
 import com.welie.blessed.BluetoothPeripheral
@@ -24,7 +23,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class TariBluetoothClient @Inject constructor(val deeplinkManager: DeeplinkManager) : TariBluetoothAdapter() {
+class TariBluetoothClient @Inject constructor() : TariBluetoothAdapter() {
 
     var onSuccessSharing: () -> Unit = {}
     var onFailedSharing: (String) -> Unit = {}

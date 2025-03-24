@@ -17,7 +17,7 @@
     <!--Buttons-->
     <color name="palette_dark_button_primary">#F9F9F9</color>
     <color name="palette_dark_button_disable">#222222</color>
-    <color name="palette_dark_button_primary_text">#FFFFFF</color>
+    <color name="palette_dark_button_primary_text">#060606</color>
     <color name="palette_dark_button_disabled_text">#545454</color>
 
     <!--Text-->

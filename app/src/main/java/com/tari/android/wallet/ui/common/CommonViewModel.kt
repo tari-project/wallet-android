@@ -1,5 +1,7 @@
 package com.tari.android.wallet.ui.common
 
+import android.app.Activity
+import android.content.Intent
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.lifecycle.LiveData
@@ -7,6 +9,7 @@ import androidx.lifecycle.ViewModel
 import com.orhanobut.logger.Logger
 import com.orhanobut.logger.Printer
 import com.tari.android.wallet.R
+import com.tari.android.wallet.application.deeplinks.DeeplinkManager
 import com.tari.android.wallet.application.walletManager.WalletManager
 import com.tari.android.wallet.application.walletManager.doOnWalletRunning
 import com.tari.android.wallet.data.ConnectionStateHandler
@@ -41,6 +44,7 @@ import com.tari.android.wallet.util.extension.collectFlow
 import com.tari.android.wallet.util.extension.launchOnIo
 import com.tari.android.wallet.util.extension.launchOnMain
 import io.reactivex.disposables.CompositeDisposable
+import yat.android.lib.YatIntegration
 import javax.inject.Inject
 
 open class CommonViewModel : ViewModel(), DialogHandler {
@@ -79,6 +83,9 @@ open class CommonViewModel : ViewModel(), DialogHandler {
 
     @Inject
     lateinit var dialogManager: DialogManager
+
+    @Inject
+    lateinit var deeplinkManager: DeeplinkManager
 
     init {
         component.inject(this) // This injects the dependencies to the base class
@@ -146,6 +153,15 @@ open class CommonViewModel : ViewModel(), DialogHandler {
             backPressed.value = Unit
             authorizedAction?.invoke()
             authorizedAction = null
+        }
+    }
+
+    fun processIntentDeepLink(activity: Activity, intent: Intent) {
+        intent.data?.let { deeplinkUri ->
+            YatIntegration.processDeepLink(activity, deeplinkUri)
+            deeplinkManager.parseDeepLink(deeplinkUri)
+        }?.let { deeplink ->
+            deeplinkManager.execute(activity, deeplink)
         }
     }
 

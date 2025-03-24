@@ -1,6 +1,5 @@
 @file:Suppress("UnstableApiUsage")
 
-import org.gradle.kotlin.dsl.android
 import java.io.ByteArrayOutputStream
 import java.nio.file.Files
 import java.nio.file.Paths
@@ -248,6 +247,7 @@ dependencies {
     implementation(Dependencies.AndroidX.Compose.uiTooling)
     implementation(Dependencies.AndroidX.Compose.uiToolingPreview)
     implementation(Dependencies.AndroidX.Compose.activity)
+    implementation(Dependencies.AndroidX.Compose.webView)
 
     implementation(Dependencies.Coroutines.android)
     implementation(Dependencies.Coroutines.core)

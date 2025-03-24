@@ -8,7 +8,6 @@ import android.bluetooth.le.AdvertiseData
 import android.bluetooth.le.AdvertiseSettings
 import android.os.ParcelUuid
 import com.tari.android.wallet.application.deeplinks.DeepLink
-import com.tari.android.wallet.application.deeplinks.DeeplinkManager
 import com.tari.android.wallet.data.sharedPrefs.bluetooth.BluetoothPrefRepository
 import com.tari.android.wallet.data.sharedPrefs.bluetooth.BluetoothServerState
 import com.tari.android.wallet.util.ContactUtil
@@ -29,7 +28,6 @@ import javax.inject.Singleton
 @Singleton
 class TariBluetoothServer @Inject constructor(
     private val shareSettingsRepository: BluetoothPrefRepository,
-    private val deeplinkManager: DeeplinkManager,
     private val contactUtil: ContactUtil,
 ) : TariBluetoothAdapter() {
 

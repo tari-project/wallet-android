@@ -4,10 +4,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.baseNodes.BaseNodesManager
-import com.tari.android.wallet.application.deeplinks.DeeplinkManager
-import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodeDto
-import com.tari.android.wallet.util.extension.collectFlow
 import com.tari.android.wallet.data.baseNode.BaseNodeStateHandler
+import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodeDto
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.common.recyclerView.CommonViewHolderItem
 import com.tari.android.wallet.ui.dialog.modular.DialogArgs
@@ -20,6 +18,7 @@ import com.tari.android.wallet.ui.dialog.modular.modules.input.InputModule
 import com.tari.android.wallet.ui.screen.restore.inputSeedWords.CustomBaseNodeState
 import com.tari.android.wallet.ui.screen.send.shareQr.ShareQrCodeModule
 import com.tari.android.wallet.ui.screen.settings.baseNodeConfig.changeBaseNode.adapter.BaseNodeViewHolderItem
+import com.tari.android.wallet.util.extension.collectFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -32,9 +31,6 @@ class ChangeBaseNodeViewModel : CommonViewModel() {
 
     @Inject
     lateinit var baseNodeStateHandler: BaseNodeStateHandler
-
-    @Inject
-    lateinit var deeplinkManager: DeeplinkManager
 
     private val _baseNodeList = MutableLiveData<MutableList<CommonViewHolderItem>>()
     val baseNodeList: LiveData<MutableList<CommonViewHolderItem>> = _baseNodeList

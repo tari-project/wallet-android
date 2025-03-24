@@ -34,7 +34,8 @@ import com.tari.android.wallet.ui.compose.PreviewPrimarySurface
 import com.tari.android.wallet.ui.compose.TariDesignSystem
 import com.tari.android.wallet.ui.screen.home.HomeModel.BottomMenuOption
 import com.tari.android.wallet.ui.screen.home.overview.HomeOverviewFragment
-import com.tari.android.wallet.ui.screen.profile.WalletInfoFragment
+import com.tari.android.wallet.ui.screen.profile.login.ProfileLoginFragment
+import com.tari.android.wallet.ui.screen.profile.profile.ProfileFragment
 import com.tari.android.wallet.ui.screen.settings.allSettings.AllSettingsFragment
 import com.tari.android.wallet.ui.screen.settings.themeSelector.TariTheme
 import com.tari.android.wallet.ui.screen.store.StoreFragment
@@ -81,7 +82,7 @@ fun HomeScreen(
                     BottomMenuOption.Profile -> FragmentContainer(
                         modifier = Modifier.fillMaxSize(),
                         fragmentManager = fragmentManager,
-                        fragment = WalletInfoFragment(),
+                        fragment = if (uiState.airdropLoggedIn) ProfileFragment() else ProfileLoginFragment(),
                     )
 
                     BottomMenuOption.Settings -> FragmentContainer(

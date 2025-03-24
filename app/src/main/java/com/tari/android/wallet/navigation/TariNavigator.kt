@@ -9,7 +9,24 @@ import com.tari.android.wallet.application.YatAdapter.ConnectedWallet
 import com.tari.android.wallet.data.contacts.model.ContactDto
 import com.tari.android.wallet.model.MicroTari
 import com.tari.android.wallet.model.TariWalletAddress
-import com.tari.android.wallet.navigation.Navigation.*
+import com.tari.android.wallet.navigation.Navigation.AddAmount
+import com.tari.android.wallet.navigation.Navigation.AllSettings
+import com.tari.android.wallet.navigation.Navigation.Auth
+import com.tari.android.wallet.navigation.Navigation.BackToHome
+import com.tari.android.wallet.navigation.Navigation.BackupSettings
+import com.tari.android.wallet.navigation.Navigation.ChangeBiometrics
+import com.tari.android.wallet.navigation.Navigation.Chat
+import com.tari.android.wallet.navigation.Navigation.ContactBook
+import com.tari.android.wallet.navigation.Navigation.CustomBridge
+import com.tari.android.wallet.navigation.Navigation.EnterPinCode
+import com.tari.android.wallet.navigation.Navigation.Home
+import com.tari.android.wallet.navigation.Navigation.InputSeedWords
+import com.tari.android.wallet.navigation.Navigation.Restore
+import com.tari.android.wallet.navigation.Navigation.ShareText
+import com.tari.android.wallet.navigation.Navigation.SplashScreen
+import com.tari.android.wallet.navigation.Navigation.TorBridge
+import com.tari.android.wallet.navigation.Navigation.TxList
+import com.tari.android.wallet.navigation.Navigation.VerifySeedPhrase
 import com.tari.android.wallet.ui.common.CommonActivity
 import com.tari.android.wallet.ui.common.CommonXmlFragment
 import com.tari.android.wallet.ui.screen.auth.AuthActivity
@@ -29,7 +46,7 @@ import com.tari.android.wallet.ui.screen.home.overview.HomeOverviewFragment
 import com.tari.android.wallet.ui.screen.onboarding.activity.OnboardingFlowActivity
 import com.tari.android.wallet.ui.screen.onboarding.localAuth.LocalAuthFragment
 import com.tari.android.wallet.ui.screen.pinCode.EnterPinCodeFragment
-import com.tari.android.wallet.ui.screen.profile.WalletInfoFragment
+import com.tari.android.wallet.ui.screen.profile.walletInfo.WalletInfoFragment
 import com.tari.android.wallet.ui.screen.restore.activity.WalletRestoreActivity
 import com.tari.android.wallet.ui.screen.restore.enterRestorationPassword.EnterRestorationPasswordFragment
 import com.tari.android.wallet.ui.screen.restore.inputSeedWords.InputSeedWordsFragment
@@ -82,6 +99,8 @@ class TariNavigator @Inject constructor(
             is SplashScreen -> toSplashActivity(navigation.seedWords, navigation.clearTop)
             is Home -> toHomeActivity(navigation.uri)
             is BackToHome -> popUpTo(HomeOverviewFragment::class.java.simpleName)
+
+            is ShareText -> shareText(navigation.text)
 
             is Restore.WalletRestoreActivity -> currentActivity.startActivity(Intent(currentActivity, WalletRestoreActivity::class.java))
             is Restore.ToEnterRestorePassword -> addFragment(EnterRestorationPasswordFragment())
@@ -144,6 +163,17 @@ class TariNavigator @Inject constructor(
             is Chat.ToChat -> toChatDetail(navigation.walletAddress, navigation.isNew)
             is Chat.ToAddChat -> addFragment(AddChatFragment())
         }
+    }
+
+    private fun shareText(text: String) {
+        val sendIntent: Intent = Intent().apply {
+            action = Intent.ACTION_SEND
+            putExtra(Intent.EXTRA_TEXT, text)
+            type = "text/plain"
+        }
+
+        val shareIntent = Intent.createChooser(sendIntent, null)
+        currentActivity.startActivity(shareIntent)
     }
 
     fun navigateSequence(vararg navigations: Navigation) {
