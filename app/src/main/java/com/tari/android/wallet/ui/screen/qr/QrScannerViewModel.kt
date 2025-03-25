@@ -33,7 +33,7 @@ class QrScannerViewModel(savedState: SavedStateHandle) : CommonViewModel() {
     private val qrScannerSource: QrScannerSource = savedState.get<QrScannerSource>(EXTRA_QR_DATA_SOURCE) ?: QrScannerSource.None
 
     fun onAlternativeApply(context: Activity) {
-        backPressed.postValue(Unit)
+        onBackPressed()
         launchOnIo {
             delay(500)
             launchOnMain {

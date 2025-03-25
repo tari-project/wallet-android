@@ -105,6 +105,7 @@
     <string name="common_not_ready_yet_dialog_title">Hang tight, coming soon!</string>
     <string name="common_not_ready_yet_dialog_description">This feature is currently under construction. We\'re working hard to bring it to you soon. Stay tuned!</string>
     <string name="common_copied_to_clipboard">Copied to clipboard</string>
+    <string name="common_copy">Copy</string>
 
     <!-- emoji id copied view -->
     <string name="emoji_id_copied">COPIED</string>
@@ -270,6 +271,10 @@
     <string name="request_tari_generate_qr_code">Generate QR Code</string>
     <string name="request_tari_share">Share</string>
     <string name="request_tari_share_text">Hi! Please send me %s Tari(s) using this link: %s</string>
+
+    <!-- receive -->
+    <string name="receive_tari_topbar_title">Receive</string>
+    <string name="receive_tari_your_address">Your Address</string>
 
     <!-- send tari - add recipient -->
     <string name="add_recipient_recent_tx_contacts">Recent</string>

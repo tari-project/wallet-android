@@ -6,28 +6,22 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.platform.ComposeView
-import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.fragment.app.viewModels
 import com.tari.android.wallet.ui.common.CommonFragment
 import com.tari.android.wallet.ui.compose.TariDesignSystem
+import com.tari.android.wallet.util.extension.composeContent
 
 class ProfileFragment : CommonFragment<ProfileViewModel>() {
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        return ComposeView(requireContext()).apply {
-            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnLifecycleDestroyed(viewLifecycleOwner))
-            setContent {
-                val uiState by viewModel.uiState.collectAsState()
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?) = composeContent {
+        val uiState by viewModel.uiState.collectAsState()
 
-                TariDesignSystem(viewModel.currentTheme) {
-                    ProfileScreen(
-                        uiState = uiState,
-                        onInviteLinkShareClick = { viewModel.onInviteLinkShareClick() },
-                        onStartMiningClicked = { viewModel.onStartMiningClicked() },
-                    )
-                }
-            }
+        TariDesignSystem(viewModel.currentTheme) {
+            ProfileScreen(
+                uiState = uiState,
+                onInviteLinkShareClick = { viewModel.onInviteLinkShareClick() },
+                onStartMiningClicked = { viewModel.onStartMiningClicked() },
+            )
         }
     }
 

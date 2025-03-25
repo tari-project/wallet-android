@@ -58,6 +58,7 @@ sealed class Navigation {
         data class ToSendTariToUser(val contact: ContactDto, val amount: MicroTari? = null, val note: String = "") : TxList()
         data object HomeTransactionHistory : TxList()
         data object ToTransfer : TxList()
+        data object ToReceive : TxList()
     }
 
     sealed class Chat : Navigation() {

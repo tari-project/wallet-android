@@ -2,19 +2,20 @@ package com.tari.android.wallet.ui.compose.components
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.Button
-import androidx.compose.material.ButtonDefaults
-import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.LocalRippleConfiguration
-import androidx.compose.material.OutlinedButton
-import androidx.compose.material.RippleConfiguration
-import androidx.compose.material.Text
-import androidx.compose.material.TextButton
 import androidx.compose.material.ripple.RippleAlpha
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.LocalRippleConfiguration
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.RippleConfiguration
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
@@ -30,20 +31,21 @@ import com.tari.android.wallet.ui.screen.settings.themeSelector.TariTheme
 fun TariPrimaryButton(
     text: String,
     onClick: () -> Unit,
+    modifier: Modifier = Modifier,
     enabled: Boolean = true,
     size: TariButtonSize = TariButtonSize.Large,
-    modifier: Modifier = Modifier,
 ) {
     WithRippleColor(TariDesignSystem.colors.buttonPrimaryText) {
         Button(
             onClick = onClick,
             colors = ButtonDefaults.buttonColors(
-                backgroundColor = TariDesignSystem.colors.buttonPrimaryBackground,
-                disabledBackgroundColor = TariDesignSystem.colors.actionDisabledBackground,
+                containerColor = TariDesignSystem.colors.buttonPrimaryBackground,
+                disabledContainerColor = TariDesignSystem.colors.actionDisabledBackground,
             ),
             shape = TariDesignSystem.shapes.button,
             modifier = modifier.defaultMinSize(minHeight = size.minHeight()),
             enabled = enabled,
+            contentPadding = PaddingValues(0.dp),
         ) {
             Text(
                 text = text,
@@ -67,12 +69,13 @@ fun TariSecondaryButton(
         Button(
             onClick = onClick,
             colors = ButtonDefaults.buttonColors(
-                backgroundColor = TariDesignSystem.colors.primaryMain,
-                disabledBackgroundColor = TariDesignSystem.colors.actionDisabledBackground,
+                containerColor = TariDesignSystem.colors.primaryMain,
+                disabledContainerColor = TariDesignSystem.colors.actionDisabledBackground,
             ),
             shape = TariDesignSystem.shapes.button,
             modifier = modifier.defaultMinSize(minHeight = size.minHeight()),
             enabled = enabled,
+            contentPadding = PaddingValues(0.dp),
             content = content,
         )
     }
@@ -105,9 +108,9 @@ fun TariSecondaryButton(
 fun TariOutlinedButton(
     text: String,
     onClick: () -> Unit,
+    modifier: Modifier = Modifier,
     enabled: Boolean = true,
     size: TariButtonSize = TariButtonSize.Large,
-    modifier: Modifier = Modifier,
 ) {
     WithRippleColor(TariDesignSystem.colors.textPrimary) {
         OutlinedButton(
@@ -118,11 +121,12 @@ fun TariOutlinedButton(
             ),
             shape = TariDesignSystem.shapes.button,
             colors = ButtonDefaults.outlinedButtonColors(
-                backgroundColor = TariDesignSystem.colors.backgroundPrimary,
+                containerColor = TariDesignSystem.colors.backgroundPrimary,
                 disabledContentColor = TariDesignSystem.colors.backgroundPrimary,
             ),
             modifier = modifier.defaultMinSize(minHeight = size.minHeight()),
             enabled = enabled,
+            contentPadding = PaddingValues(0.dp),
         ) {
             Text(
                 text = text,
@@ -134,13 +138,12 @@ fun TariOutlinedButton(
     }
 }
 
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun TariInheritTextButton(
     text: String,
     onClick: () -> Unit,
-    enabled: Boolean = true,
     modifier: Modifier = Modifier,
+    enabled: Boolean = true,
 ) {
     WithRippleColor(TariDesignSystem.colors.textPrimary) {
         OutlinedButton(
@@ -151,7 +154,7 @@ fun TariInheritTextButton(
             ),
             shape = TariDesignSystem.shapes.button,
             colors = ButtonDefaults.outlinedButtonColors(
-                backgroundColor = TariDesignSystem.colors.backgroundPrimary,
+                containerColor = TariDesignSystem.colors.backgroundPrimary,
                 disabledContentColor = TariDesignSystem.colors.backgroundPrimary,
             ),
             modifier = modifier.defaultMinSize(minHeight = TariButtonSize.Medium.minHeight()),
@@ -171,8 +174,8 @@ fun TariInheritTextButton(
 fun TariTextButton(
     text: String,
     onClick: () -> Unit,
-    enabled: Boolean = true,
     modifier: Modifier = Modifier,
+    enabled: Boolean = true,
 ) {
     WithRippleColor(TariDesignSystem.colors.textPrimary) {
         TextButton(
@@ -216,7 +219,7 @@ private fun TariButtonSize.textHorizontalPadding() = when (this) {
     TariButtonSize.Large -> 22.dp
 }
 
-@OptIn(ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun WithRippleColor(
     rippleColor: Color,

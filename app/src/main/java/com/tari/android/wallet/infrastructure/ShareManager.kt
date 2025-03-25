@@ -19,7 +19,7 @@ import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonStyle
 import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
 import com.tari.android.wallet.ui.dialog.modular.modules.icon.IconModule
-import com.tari.android.wallet.ui.screen.send.shareQr.ShareQrCodeModule
+import com.tari.android.wallet.ui.dialog.modular.modules.shareQr.ShareQrCodeModule
 import com.tari.android.wallet.util.ContactUtil
 import javax.inject.Inject
 

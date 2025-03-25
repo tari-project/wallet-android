@@ -15,8 +15,8 @@ import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonStyle
 import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
 import com.tari.android.wallet.ui.dialog.modular.modules.input.InputModule
+import com.tari.android.wallet.ui.dialog.modular.modules.shareQr.ShareQrCodeModule
 import com.tari.android.wallet.ui.screen.restore.inputSeedWords.CustomBaseNodeState
-import com.tari.android.wallet.ui.screen.send.shareQr.ShareQrCodeModule
 import com.tari.android.wallet.ui.screen.settings.baseNodeConfig.changeBaseNode.adapter.BaseNodeViewHolderItem
 import com.tari.android.wallet.util.extension.collectFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -49,7 +49,7 @@ class ChangeBaseNodeViewModel : CommonViewModel() {
     fun selectBaseNode(baseNodeDto: BaseNodeDto) {
         baseNodesManager.setBaseNode(baseNodeDto)
         walletManager.syncBaseNode()
-        backPressed.postValue(Unit)
+        onBackPressed()
     }
 
     fun showQrCode(baseNodeDto: BaseNodeDto) {

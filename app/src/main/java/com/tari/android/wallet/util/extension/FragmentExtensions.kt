@@ -33,11 +33,15 @@
 package com.tari.android.wallet.util.extension
 
 import android.graphics.drawable.Drawable
+import android.view.View
 import androidx.annotation.AttrRes
 import androidx.annotation.ColorRes
 import androidx.annotation.DimenRes
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.fragment.app.Fragment
 
 fun Fragment.string(@StringRes id: Int): String = requireContext().string(id)
@@ -54,3 +58,8 @@ fun Fragment.dimenPx(@DimenRes id: Int): Int = requireContext().dimenPx(id)
 fun Fragment.dimen(@DimenRes id: Int): Float = requireContext().dimen(id)
 
 fun Fragment.drawable(@DrawableRes id: Int): Drawable? = requireContext().drawable(id)
+
+fun Fragment.composeContent(content: @Composable () -> Unit): View = ComposeView(requireContext()).apply {
+    setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnLifecycleDestroyed(viewLifecycleOwner))
+    setContent(content)
+}

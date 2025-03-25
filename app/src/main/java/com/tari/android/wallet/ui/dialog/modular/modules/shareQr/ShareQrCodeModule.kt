@@ -1,4 +1,4 @@
-package com.tari.android.wallet.ui.screen.send.shareQr
+package com.tari.android.wallet.ui.dialog.modular.modules.shareQr
 
 import com.tari.android.wallet.ui.dialog.modular.IDialogModule
 

@@ -4,23 +4,17 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.compose.ui.platform.ComposeView
-import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.fragment.app.viewModels
 import com.tari.android.wallet.ui.common.CommonFragment
 import com.tari.android.wallet.ui.compose.TariDesignSystem
+import com.tari.android.wallet.util.extension.composeContent
 
 class ProfileLoginFragment : CommonFragment<ProfileLoginViewModel>() {
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        return ComposeView(requireContext()).apply {
-            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnLifecycleDestroyed(viewLifecycleOwner))
-            setContent {
-                TariDesignSystem(viewModel.currentTheme) {
-                    ProfileLoginScreen(
-                        authUrl = viewModel.authUrl
-                    )
-                }
-            }
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?) = composeContent {
+        TariDesignSystem(viewModel.currentTheme) {
+            ProfileLoginScreen(
+                authUrl = viewModel.authUrl
+            )
         }
     }
 

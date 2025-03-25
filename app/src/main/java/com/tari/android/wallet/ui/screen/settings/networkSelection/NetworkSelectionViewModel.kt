@@ -39,7 +39,7 @@ class NetworkSelectionViewModel : CommonViewModel() {
 
     fun selectNetwork(networkViewHolderItem: NetworkViewHolderItem) {
         if (networkViewHolderItem.network.network == networkRepository.currentNetwork.network) {
-            backPressed.postValue(Unit)
+            onBackPressed()
             return
         }
 

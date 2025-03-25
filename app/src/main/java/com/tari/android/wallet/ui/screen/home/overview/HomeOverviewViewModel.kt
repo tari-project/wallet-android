@@ -152,17 +152,17 @@ class HomeOverviewViewModel : CommonViewModel() {
             showModularDialog(
                 ModularDialogArgs(
                     DialogArgs(cancelable = false, canceledOnTouchOutside = false), listOf(
-                    HeadModule(resourceManager.getString(R.string.data_collection_dialog_title)),
-                    BodyModule(resourceManager.getString(R.string.data_collection_dialog_description)),
-                    ButtonModule(resourceManager.getString(R.string.data_collection_dialog_positive), ButtonStyle.Normal) {
-                        sentryPrefRepository.isEnabled = true
-                        hideDialog()
-                    },
-                    ButtonModule(resourceManager.getString(R.string.data_collection_dialog_negative), ButtonStyle.Close) {
-                        sentryPrefRepository.isEnabled = false
-                        hideDialog()
-                    }
-                ))
+                        HeadModule(resourceManager.getString(R.string.data_collection_dialog_title)),
+                        BodyModule(resourceManager.getString(R.string.data_collection_dialog_description)),
+                        ButtonModule(resourceManager.getString(R.string.data_collection_dialog_positive), ButtonStyle.Normal) {
+                            sentryPrefRepository.isEnabled = true
+                            hideDialog()
+                        },
+                        ButtonModule(resourceManager.getString(R.string.data_collection_dialog_negative), ButtonStyle.Close) {
+                            sentryPrefRepository.isEnabled = false
+                            hideDialog()
+                        }
+                    ))
             )
         }
     }
@@ -215,7 +215,7 @@ class HomeOverviewViewModel : CommonViewModel() {
     }
 
     fun onRequestTariClicked() {
-        tariNavigator.navigate(Navigation.AllSettings.ToRequestTari)
+        tariNavigator.navigate(Navigation.TxList.ToReceive)
     }
 
     fun onAllTxClicked() {

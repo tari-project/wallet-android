@@ -14,8 +14,8 @@ import com.tari.android.wallet.ui.dialog.modular.ModularDialog
 import com.tari.android.wallet.ui.dialog.modular.ModularDialogArgs
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonStyle
+import com.tari.android.wallet.ui.dialog.modular.modules.shareQr.ShareQrCodeModule
 import com.tari.android.wallet.ui.screen.send.addAmount.keyboard.KeyboardController
-import com.tari.android.wallet.ui.screen.send.shareQr.ShareQrCodeModule
 import com.tari.android.wallet.util.extension.hideKeyboard
 import com.tari.android.wallet.util.extension.setOnThrottledClickListener
 import com.tari.android.wallet.util.extension.setVisible

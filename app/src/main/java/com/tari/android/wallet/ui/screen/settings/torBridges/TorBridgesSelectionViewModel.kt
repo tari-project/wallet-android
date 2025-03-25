@@ -18,7 +18,7 @@ import com.tari.android.wallet.ui.dialog.modular.modules.body.BodyModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonStyle
 import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
-import com.tari.android.wallet.ui.screen.send.shareQr.ShareQrCodeModule
+import com.tari.android.wallet.ui.dialog.modular.modules.shareQr.ShareQrCodeModule
 import com.tari.android.wallet.ui.screen.settings.torBridges.torItem.TorBridgeViewHolderItem
 import com.tari.android.wallet.util.DebugConfig
 import com.tari.android.wallet.util.extension.collectFlow
@@ -176,7 +176,7 @@ class TorBridgesSelectionViewModel : CommonViewModel() {
                                 BodyModule(description),
                                 ButtonModule(resourceManager.getString(R.string.common_confirm), ButtonStyle.Normal) {
                                     hideDialog()
-                                    backPressed.postValue(Unit)
+                                    onBackPressed()
                                 },
                             )
                         )

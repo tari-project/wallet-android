@@ -28,7 +28,7 @@ import com.tari.android.wallet.navigation.Navigation.TorBridge
 import com.tari.android.wallet.navigation.Navigation.TxList
 import com.tari.android.wallet.navigation.Navigation.VerifySeedPhrase
 import com.tari.android.wallet.ui.common.CommonActivity
-import com.tari.android.wallet.ui.common.CommonXmlFragment
+import com.tari.android.wallet.ui.common.CommonFragment
 import com.tari.android.wallet.ui.screen.auth.AuthActivity
 import com.tari.android.wallet.ui.screen.auth.FeatureAuthFragment
 import com.tari.android.wallet.ui.screen.biometrics.ChangeBiometricsFragment
@@ -55,6 +55,7 @@ import com.tari.android.wallet.ui.screen.send.addAmount.AddAmountFragment
 import com.tari.android.wallet.ui.screen.send.addNote.AddNoteFragment
 import com.tari.android.wallet.ui.screen.send.common.TransactionData
 import com.tari.android.wallet.ui.screen.send.finalize.FinalizeSendTxFragment
+import com.tari.android.wallet.ui.screen.send.receive.ReceiveFragment
 import com.tari.android.wallet.ui.screen.send.requestTari.RequestTariFragment
 import com.tari.android.wallet.ui.screen.send.transfer.TransferFragment
 import com.tari.android.wallet.ui.screen.settings.allSettings.AllSettingsFragment
@@ -147,6 +148,7 @@ class TariNavigator @Inject constructor(
             is TxList.ToUtxos -> addFragment(UtxosListFragment())
             is TxList.ToAllSettings -> addFragment(AllSettingsFragment.newInstance())
             is TxList.ToTransfer -> addFragment(TransferFragment())
+            is TxList.ToReceive -> addFragment(ReceiveFragment())
             is TxList.HomeTransactionHistory -> addFragment(AllTxHistoryFragment())
 
             is TorBridge.ToCustomBridges -> addFragment(CustomTorBridgesFragment())
@@ -180,7 +182,7 @@ class TariNavigator @Inject constructor(
         navigations.forEach { navigate(it) }
     }
 
-    private fun addFragment(fragment: CommonXmlFragment<*, *>, bundle: Bundle? = null, isRoot: Boolean = false, withAnimation: Boolean = true) {
+    private fun addFragment(fragment: CommonFragment<*>, bundle: Bundle? = null, isRoot: Boolean = false, withAnimation: Boolean = true) {
         currentActivity.addFragment(fragment, bundle, isRoot, withAnimation)
     }
 
