@@ -34,7 +34,6 @@ package com.tari.android.wallet.ui.screen.send.finalize
 
 import android.animation.ObjectAnimator
 import android.animation.ValueAnimator
-import android.media.AudioManager
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -43,14 +42,12 @@ import androidx.core.animation.addListener
 import androidx.fragment.app.viewModels
 import com.daasuu.ei.Ease
 import com.daasuu.ei.EasingInterpolator
-import com.tari.android.wallet.R
 import com.tari.android.wallet.databinding.FragmentFinalizeSendTxBinding
 import com.tari.android.wallet.ui.common.CommonXmlFragment
 import com.tari.android.wallet.ui.component.tari.TariTextView
 import com.tari.android.wallet.ui.screen.send.common.TransactionData
 import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.extension.collectFlow
-import com.tari.android.wallet.util.extension.getResourceUri
 import com.tari.android.wallet.util.extension.invisible
 import com.tari.android.wallet.util.extension.string
 import com.tari.android.wallet.util.extension.visible
@@ -88,21 +85,6 @@ class FinalizeSendTxFragment : CommonXmlFragment<FragmentFinalizeSendTxBinding, 
         }
     }
 
-    override fun onStart() {
-        super.onStart()
-        with(ui.backgroundAnimationVideoView) {
-            setAudioFocusRequest(AudioManager.AUDIOFOCUS_NONE)
-            setVideoURI(requireActivity().getResourceUri(R.raw.sending_background))
-            setOnPreparedListener { mp -> mp.isLooping = true }
-            start()
-        }
-    }
-
-    override fun onStop() {
-        ui.backgroundAnimationVideoView.stopPlayback()
-        super.onStop()
-    }
-
     private fun createAllSteps(steps: List<FinalizeSendTxViewModel.FinalizingStep>) {
         if (this::stepViewList.isInitialized) return
         stepViewList = steps.map { step ->
@@ -124,13 +106,11 @@ class FinalizeSendTxFragment : CommonXmlFragment<FragmentFinalizeSendTxBinding, 
     }
 
     private fun setupUi() = with(ui) {
-        lottieAnimationView.setMaxProgress(LOTTIE_ANIMATION_PAUSE_PROGRESS)
         infoLine1TextView.invisible()
         infoLine2TextView.invisible()
 
         rootView.postDelayed({
             fadeInProgressBarContainers()
-            ui.lottieAnimationView.playAnimation()
         }, Constants.UI.FinalizeSendTx.lottieAnimStartDelayMs)
     }
 
@@ -192,9 +172,6 @@ class FinalizeSendTxFragment : CommonXmlFragment<FragmentFinalizeSendTxBinding, 
 
     private fun onFailure() {
         stepViewList.forEach { it.progressAnim?.removeAllUpdateListeners() }
-        ui.lottieAnimationView.speed = -1f
-        ui.lottieAnimationView.playAnimation()
-        ui.lottieAnimationView.progress = LOTTIE_ANIMATION_PAUSE_PROGRESS
 
         // fade out text and progress
         animations += ValueAnimator.ofFloat(1f, 0f).apply {
@@ -209,7 +186,6 @@ class FinalizeSendTxFragment : CommonXmlFragment<FragmentFinalizeSendTxBinding, 
             addListener(onEnd = {
                 runCatching {
                     removeAllListeners()
-                    ui.lottieAnimationView.alpha = 0f
 
                     viewModel.trySendTxFailure()
                 }
@@ -220,9 +196,6 @@ class FinalizeSendTxFragment : CommonXmlFragment<FragmentFinalizeSendTxBinding, 
 
     private fun onSuccess() {
         stepViewList.forEach { it.progressAnim?.removeAllUpdateListeners() }
-        ui.lottieAnimationView.setMaxProgress(1.0f)
-        ui.lottieAnimationView.playAnimation()
-        ui.lottieAnimationView.progress = LOTTIE_ANIMATION_PAUSE_PROGRESS
 
         // fade out text and progress
         animations += ValueAnimator.ofFloat(1f, 0f).apply {
@@ -238,7 +211,6 @@ class FinalizeSendTxFragment : CommonXmlFragment<FragmentFinalizeSendTxBinding, 
             addListener(onEnd = {
                 runCatching {
                     removeAllListeners()
-                    ui.lottieAnimationView.alpha = 0f
 
                     viewModel.trySendTxSuccess()
                 }
@@ -250,7 +222,6 @@ class FinalizeSendTxFragment : CommonXmlFragment<FragmentFinalizeSendTxBinding, 
     companion object {
         const val MAX_PROGRESS = 100
         const val PROGRESS_BAR_FILL_DURATION_MS = 850L
-        const val LOTTIE_ANIMATION_PAUSE_PROGRESS = 0.3f
 
         fun create(transactionData: TransactionData): FinalizeSendTxFragment {
             return FinalizeSendTxFragment().apply {

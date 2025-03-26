@@ -1,39 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<com.tari.android.wallet.ui.component.tari.background.TariSecondaryBackground xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/root_view"
-    android:fitsSystemWindows="true"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white"
+    android:fitsSystemWindows="true"
     android:orientation="vertical">
-
-    <VideoView
-        android:id="@+id/background_animation_video_view"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentBottom="true" />
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:gravity="center_horizontal"
+        android:layout_height="match_parent"
+        android:gravity="center"
         android:orientation="vertical">
 
-        <com.airbnb.lottie.LottieAnimationView
-            android:id="@+id/lottie_animation_view"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:lottie_autoPlay="false"
-            app:lottie_enableMergePathsForKitKatAndAbove="true"
-            app:lottie_loop="false"
-            app:lottie_rawRes="@raw/sending_tari"
-            app:lottie_renderMode="automatic" />
+        <androidx.appcompat.widget.AppCompatImageButton
+            android:id="@+id/icon_view"
+            android:layout_width="52dp"
+            android:layout_height="52dp"
+            android:background="@drawable/vector_send_button_back"
+            android:src="@drawable/tari_splash_gem_small"
+            android:tint="?attr/palette_button_primary_text" />
 
         <LinearLayout
             android:id="@+id/finalize_send_tx_vw_info_line_1_container"
@@ -46,7 +33,8 @@
                 android:id="@+id/info_line_1_text_view"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="18sp"
+                android:textColor="?attr/palette_text_heading"
+                android:textSize="14sp"
                 app:customFont="light"
                 tools:text="@string/finalize_send_tx_sending_step_1_desc_line_1" />
         </LinearLayout>
@@ -55,13 +43,13 @@
             android:id="@+id/finalize_send_tx_vw_info_line_2_container"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
             android:gravity="bottom">
 
             <com.tari.android.wallet.ui.component.tari.TariTextView
                 android:id="@+id/info_line_2_text_view"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:textColor="?attr/palette_text_heading"
                 android:textSize="18sp"
                 app:customFont="black"
                 tools:text="@string/finalize_send_tx_sending_step_1_desc_line_2" />
@@ -75,4 +63,4 @@
             android:layout_marginTop="40dp"
             android:orientation="horizontal" />
     </LinearLayout>
-</RelativeLayout>
+</com.tari.android.wallet.ui.component.tari.background.TariSecondaryBackground>
