@@ -211,7 +211,7 @@ class HomeOverviewViewModel : CommonViewModel() {
     }
 
     fun onSendTariClicked() {
-        tariNavigator.navigate(Navigation.TxList.ToTransfer)
+        tariNavigator.navigate(Navigation.ContactBook.ToSelectTariUser)
     }
 
     fun onRequestTariClicked() {

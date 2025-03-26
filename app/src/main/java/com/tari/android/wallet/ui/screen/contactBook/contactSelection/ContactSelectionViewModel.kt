@@ -191,7 +191,11 @@ class ContactSelectionViewModel : CommonViewModel() {
 
             is ContinueButtonEffect.SelectUserContact -> {
                 val user = getUserDto()
-                tariNavigator.navigate(Navigation.TxList.ToSendTariToUser(user, amount.value))
+                if (user.walletAddress == corePrefRepository.walletAddress) {
+                    showCantSendYourselfDialog()
+                } else {
+                    tariNavigator.navigate(Navigation.TxList.ToSendTariToUser(user, amount.value))
+                }
             }
 
             is ContinueButtonEffect.AddChat -> {
@@ -214,6 +218,13 @@ class ContactSelectionViewModel : CommonViewModel() {
         showSimpleDialog(
             title = resourceManager.getString(R.string.contact_book_add_contact_cant_add_yourself_title),
             description = resourceManager.getString(R.string.contact_book_add_contact_cant_add_yourself_description),
+        )
+    }
+
+    private fun showCantSendYourselfDialog() {
+        showSimpleDialog(
+            title = resourceManager.getString(R.string.contact_book_select_contact_cant_send_to_yourself_title),
+            description = resourceManager.getString(R.string.contact_book_select_contact_cant_send_to_yourself_description),
         )
     }
 

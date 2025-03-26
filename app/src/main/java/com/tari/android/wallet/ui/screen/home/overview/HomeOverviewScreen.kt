@@ -11,14 +11,11 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -80,21 +77,22 @@ fun HomeOverviewScreen(
                     connectionIndicatorState = uiState.connectionIndicatorState,
                     onVersionClick = onConnectionStatusClick,
                 )
-                Spacer(Modifier.width(10.dp))
-                IconButton(onClick = onInviteFriendClick) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.vector_home_overview_invite_friend),
-                        contentDescription = null,
-                        tint = TariDesignSystem.colors.componentsNavbarIcons,
-                    )
-                }
-                IconButton(onClick = onNotificationsClick) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.vector_home_overview_notifications),
-                        contentDescription = null,
-                        tint = TariDesignSystem.colors.componentsNavbarIcons,
-                    )
-                }
+                // TODO actions are not used yet
+//                Spacer(Modifier.width(10.dp))
+//                IconButton(onClick = onInviteFriendClick) {
+//                    Icon(
+//                        painter = painterResource(id = R.drawable.vector_home_overview_invite_friend),
+//                        contentDescription = null,
+//                        tint = TariDesignSystem.colors.componentsNavbarIcons,
+//                    )
+//                }
+//                IconButton(onClick = onNotificationsClick) {
+//                    Icon(
+//                        painter = painterResource(id = R.drawable.vector_home_overview_notifications),
+//                        contentDescription = null,
+//                        tint = TariDesignSystem.colors.componentsNavbarIcons,
+//                    )
+//                }
             }
 
             Spacer(modifier = Modifier.height(25.dp))

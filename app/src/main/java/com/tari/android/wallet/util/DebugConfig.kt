@@ -96,7 +96,9 @@ object DebugConfig {
 
     val selectBaseNodeEnabled = valueIfDebug(false) // TODO remove all the code related to this ?
 
-    val showActiveMinersButton = false
+    const val showActiveMinersButton = false
+
+    const val skipAddingNote = true
 
     fun isDebug() = BuildConfig.BUILD_TYPE == "debug"
 
