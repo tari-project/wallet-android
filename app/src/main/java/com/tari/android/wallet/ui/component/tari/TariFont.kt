@@ -47,7 +47,7 @@ import com.tari.android.wallet.R
 enum class TariFont(@FontRes private val fontRes: Int) {
 
     // font files
-    BLACK(R.font.poppins_black),
+    BLACK(R.font.poppins_semibold),
     HEAVY(R.font.poppins_extrabold),
     MEDIUM(R.font.poppins_medium),
     ROMAN(R.font.poppins_regular),
