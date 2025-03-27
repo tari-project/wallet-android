@@ -39,7 +39,7 @@ fun VersionCodeChip(
 ) {
     Row(
         modifier = modifier
-            .wrapContentSize()
+            .wrapContentSize(align = Alignment.CenterStart)
             .height(20.dp)
             .clip(TariDesignSystem.shapes.chip)
             .border(width = 1.dp, color = TariDesignSystem.colors.elevationOutlined, shape = TariDesignSystem.shapes.chip)

@@ -30,8 +30,10 @@ import com.tari.android.wallet.ui.common.domain.PaletteManager
 import com.tari.android.wallet.ui.common.recyclerView.CommonAdapter
 import com.tari.android.wallet.ui.component.clipboardController.ClipboardController
 import com.tari.android.wallet.ui.component.tari.toolbar.TariToolbarActionArg
+import com.tari.android.wallet.ui.screen.contactBook.add.SelectUserContactFragment
 import com.tari.android.wallet.ui.screen.contactBook.contactSelection.ContactSelectionModel.Effect
 import com.tari.android.wallet.ui.screen.contactBook.contactSelection.ContactSelectionModel.YatState
+import com.tari.android.wallet.ui.screen.contactBook.contactSelection.ContactSelectionViewModel.ContinueButtonEffect
 import com.tari.android.wallet.ui.screen.contactBook.contacts.adapter.ContactListAdapter
 import com.tari.android.wallet.ui.screen.contactBook.contacts.adapter.contact.ContactItemViewHolderItem
 import com.tari.android.wallet.ui.screen.contactBook.contacts.adapter.contact.ContactlessPaymentItem
@@ -78,6 +80,8 @@ open class ContactSelectionFragment : CommonXmlFragment<FragmentContactsSelectio
     private var textChangedProcessRunnable = Runnable { processTextChanged() }
 
     private var withToolbar = true
+
+    private var nextButtonShown = false
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
         FragmentContactsSelectionBinding.inflate(inflater, container, false).also { ui = it }.root
@@ -198,6 +202,13 @@ open class ContactSelectionFragment : CommonXmlFragment<FragmentContactsSelectio
     }
 
     private fun showNextButton() {
+        // Workaround for skipping the first click and redirect to the next screen
+        // once the user selects a contact
+        if (!nextButtonShown && this is SelectUserContactFragment) {
+            viewModel.onContinueButtonClick(ContinueButtonEffect.SelectUserContact)
+        }
+        nextButtonShown = true
+
         ui.invalidEmojiIdTextView.gone()
         ui.toolbar.setRightArgs(TariToolbarActionArg(title = string(R.string.contact_book_add_contact_next_button)) { goToNext() })
         ui.toolbar.showRightActions()

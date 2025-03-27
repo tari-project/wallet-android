@@ -21,6 +21,7 @@ import com.tari.android.wallet.ui.screen.send.addAmount.feeModule.FeeModule
 import com.tari.android.wallet.ui.screen.send.addAmount.feeModule.NetworkSpeed
 import com.tari.android.wallet.ui.screen.send.common.TransactionData
 import com.tari.android.wallet.util.Constants
+import com.tari.android.wallet.util.DebugConfig
 import com.tari.android.wallet.util.EffectFlow
 import com.tari.android.wallet.util.extension.getOrNull
 import com.tari.android.wallet.util.extension.getWithError
@@ -124,10 +125,10 @@ class AddAmountViewModel(savedState: SavedStateHandle) : CommonViewModel() {
     fun continueToAddNote(transactionData: TransactionData) {
         if (!networkConnection.isNetworkConnected()) {
             showInternetConnectionErrorDialog()
-        } else if (transactionData.note.isNullOrEmpty()) {
-            tariNavigator.navigate(Navigation.AddAmount.ContinueToAddNote(transactionData))
-        } else {
+        } else if (transactionData.shouldSkipAddingNote()) {
             tariNavigator.navigate(Navigation.AddAmount.ContinueToFinalizing(transactionData))
+        } else {
+            tariNavigator.navigate(Navigation.AddAmount.ContinueToAddNote(transactionData))
         }
     }
 
@@ -137,6 +138,8 @@ class AddAmountViewModel(savedState: SavedStateHandle) : CommonViewModel() {
             description = resourceManager.getString(R.string.error_balance_exceeded_description),
         )
     }
+
+    private fun TransactionData.shouldSkipAddingNote() = note.isNullOrEmpty() || DebugConfig.skipAddingNote
 
     private fun calculateDefaultFees(amount: MicroTari) {
         val calculatedFee = walletManager.requireWalletInstance.getOrNull { wallet ->
