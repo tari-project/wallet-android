@@ -2,10 +2,12 @@ package com.tari.android.wallet.ui.screen.home
 
 import android.net.Uri
 import com.tari.android.wallet.application.walletManager.doOnWalletFailed
+import com.tari.android.wallet.data.airdrop.AirdropRepository
 import com.tari.android.wallet.data.contacts.ContactsRepository
 import com.tari.android.wallet.infrastructure.ShareManager
 import com.tari.android.wallet.navigation.Navigation
 import com.tari.android.wallet.ui.common.CommonViewModel
+import com.tari.android.wallet.util.extension.collectFlow
 import com.tari.android.wallet.util.extension.launchOnIo
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -17,17 +19,22 @@ class HomeViewModel : CommonViewModel() {
     @Inject
     lateinit var contactsRepository: ContactsRepository
 
+    @Inject
+    lateinit var airdropRepository: AirdropRepository
+
+    init {
+        component.inject(this)
+    }
+
     val shareViewModel = ShareManager()
 
-    private val _uiState = MutableStateFlow(HomeModel.UiState())
+    private val _uiState = MutableStateFlow(HomeModel.UiState(airdropLoggedIn = airdropRepository.isAirdropLoggedIn.value))
     val uiState = _uiState.asStateFlow()
 
     val isAuthenticated: Boolean
         get() = securityPrefRepository.isAuthenticated
 
     init {
-        component.inject(this)
-
         shareViewModel.tariBluetoothServer.doOnRequiredPermissions = { permissions, action ->
             permissionManager.runWithPermission(permissions, false, action)
         }
@@ -35,6 +42,8 @@ class HomeViewModel : CommonViewModel() {
         shareViewModel.tariBluetoothClient.doOnRequiredPermissions = { permissions, action ->
             permissionManager.runWithPermission(permissions, false, action)
         }
+
+        collectFlow(airdropRepository.isAirdropLoggedIn) { loggedIn -> _uiState.update { it.copy(airdropLoggedIn = loggedIn) } }
 
         launchOnIo {
             walletManager.doOnWalletFailed {

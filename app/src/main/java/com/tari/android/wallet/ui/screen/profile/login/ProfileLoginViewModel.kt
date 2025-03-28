@@ -2,7 +2,7 @@ package com.tari.android.wallet.ui.screen.profile.login
 
 import com.tari.android.wallet.ui.common.CommonViewModel
 
-private const val AUTH_URL_ADDRESS = "https://airdrop.tari.com/login?mobileNetwork=%s"
+private const val AUTH_URL_ADDRESS = "https://airdrop.tari.com/auth?mobile=%s"
 
 class ProfileLoginViewModel : CommonViewModel() {
 

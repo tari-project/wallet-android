@@ -4,11 +4,12 @@ import com.orhanobut.logger.Logger
 import com.tari.android.wallet.application.walletManager.WalletManager
 import com.tari.android.wallet.application.walletManager.WalletManager.WalletEvent
 import com.tari.android.wallet.application.walletManager.doOnWalletRunning
+import com.tari.android.wallet.data.contacts.ContactsRepository
 import com.tari.android.wallet.di.ApplicationScope
 import com.tari.android.wallet.model.tx.Tx
-import com.tari.android.wallet.data.contacts.ContactsRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.map
@@ -28,17 +29,17 @@ class TxRepository @Inject constructor(
 
     private val _txs = MutableStateFlow(TxListData(confirmationCount = DEFAULT_CONFIRMATION_COUNT))
     val txs = _txs.asStateFlow()
-    val pendingTxs = txs.map { txs ->
+    val pendingTxs: Flow<List<TxDto>> = txs.map { txs ->
         (txs.pendingInboundTxs + txs.pendingOutboundTxs + txs.minedUnconfirmedTxs)
             .sortedWith(compareByDescending(Tx::timestamp).thenByDescending { it.id })
             .map { it.toDto() }
     }
-    val nonPendingTxs = txs.map { txs ->
+    val nonPendingTxs: Flow<List<TxDto>> = txs.map { txs ->
         (txs.cancelledTxs + txs.nonMinedUnconfirmedCompletedTxs)
             .sortedWith(compareByDescending(Tx::timestamp).thenByDescending { it.id })
             .map { it.toDto() }
     }
-    val allTxs = pendingTxs.zip(nonPendingTxs) { pending, nonPending -> pending + nonPending }
+    val allTxs: Flow<List<TxDto>> = pendingTxs.zip(nonPendingTxs) { pending, nonPending -> pending + nonPending }
 
     init {
         applicationScope.launch(Dispatchers.IO) {

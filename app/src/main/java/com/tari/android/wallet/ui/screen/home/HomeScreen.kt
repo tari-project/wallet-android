@@ -79,11 +79,19 @@ fun HomeScreen(
 
                     BottomMenuOption.Gem -> TODO()
 
-                    BottomMenuOption.Profile -> FragmentContainer(
-                        modifier = Modifier.fillMaxSize(),
-                        fragmentManager = fragmentManager,
-                        fragment = if (uiState.airdropLoggedIn) ProfileFragment() else ProfileLoginFragment(),
-                    )
+                    BottomMenuOption.Profile -> if (uiState.airdropLoggedIn) {
+                        FragmentContainer(
+                            modifier = Modifier.fillMaxSize(),
+                            fragmentManager = fragmentManager,
+                            fragment = ProfileFragment(),
+                        )
+                    } else {
+                        FragmentContainer(
+                            modifier = Modifier.fillMaxSize(),
+                            fragmentManager = fragmentManager,
+                            fragment = ProfileLoginFragment(),
+                        )
+                    }
 
                     BottomMenuOption.Settings -> FragmentContainer(
                         modifier = Modifier.fillMaxSize(),
