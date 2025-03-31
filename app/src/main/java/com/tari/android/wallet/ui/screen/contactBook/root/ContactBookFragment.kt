@@ -1,7 +1,5 @@
 package com.tari.android.wallet.ui.screen.contactBook.root
 
-import android.app.Activity
-import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -15,7 +13,6 @@ import androidx.fragment.app.viewModels
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.google.android.material.tabs.TabLayoutMediator
 import com.tari.android.wallet.R
-import com.tari.android.wallet.application.deeplinks.DeepLink
 import com.tari.android.wallet.databinding.FragmentContactBookRootBinding
 import com.tari.android.wallet.model.TariWalletAddress
 import com.tari.android.wallet.navigation.Navigation
@@ -26,12 +23,10 @@ import com.tari.android.wallet.ui.screen.contactBook.contacts.ContactsFragment
 import com.tari.android.wallet.ui.screen.contactBook.contacts.FavoritesFragment
 import com.tari.android.wallet.ui.screen.contactBook.root.share.ShareOptionArgs
 import com.tari.android.wallet.ui.screen.contactBook.root.share.ShareOptionView
-import com.tari.android.wallet.ui.screen.qr.QrScannerActivity
 import com.tari.android.wallet.ui.screen.qr.QrScannerSource
 import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.extension.hideKeyboard
 import com.tari.android.wallet.util.extension.observe
-import com.tari.android.wallet.util.extension.parcelable
 import com.tari.android.wallet.util.extension.postDelayed
 import com.tari.android.wallet.util.extension.setVisible
 import com.tari.android.wallet.util.extension.showKeyboard
@@ -71,14 +66,6 @@ class ContactBookFragment : CommonXmlFragment<FragmentContactBookRootBinding, Co
         clipboardController?.onDestroy()
     }
 
-    @Deprecated("Deprecated in Java")
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        if (requestCode == QrScannerActivity.REQUEST_QR_SCANNER && resultCode == Activity.RESULT_OK && data != null) {
-            val qrDeeplink = data.parcelable<DeepLink>(QrScannerActivity.EXTRA_DEEPLINK) ?: return
-            viewModel.handleDeeplink(qrDeeplink)
-        }
-    }
-
     private fun subscribeUI() = with(viewModel) {
         observe(contactSelectionRepository.isSelectionState) { updateSharedState() }
 
@@ -108,10 +95,6 @@ class ContactBookFragment : CommonXmlFragment<FragmentContactBookRootBinding, Co
             )
         }.attach()
 
-//        ui.searchView.setOnQueryTextFocusChangeListener { _, hasFocus -> (requireActivity() as? HomeActivity)?.setBottomBarVisibility(!hasFocus) }
-
-//        ui.searchView.setOnFocusChangeListener { _, hasFocus -> (requireActivity() as? HomeActivity)?.setBottomBarVisibility(!hasFocus) }
-
         ui.searchView.setIconifiedByDefault(false)
 
         ui.searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
@@ -136,7 +119,6 @@ class ContactBookFragment : CommonXmlFragment<FragmentContactBookRootBinding, Co
             }
 
             override fun focusOnEditText(isFocused: Boolean) {
-//                (requireActivity() as? HomeActivity)?.setBottomBarVisibility(!isFocused)
                 if (isFocused) {
                     focusEditTextAndShowKeyboard()
                 } else {
@@ -155,7 +137,7 @@ class ContactBookFragment : CommonXmlFragment<FragmentContactBookRootBinding, Co
     }
 
     private fun startQRCodeActivity() {
-        QrScannerActivity.startScanner(this, QrScannerSource.ContactBook)
+        startQrScanner(QrScannerSource.ContactBook)
     }
 
     private fun focusEditTextAndShowKeyboard() {

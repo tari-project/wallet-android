@@ -63,16 +63,17 @@ class ContactBookViewModel : CommonViewModel() {
         shareList.postValue(list)
     }
 
-    fun handleDeeplink(deeplink: DeepLink) {
-        when (deeplink) {
-            is DeepLink.Contacts -> deeplink.contacts.firstOrNull()?.tariAddress
-            is DeepLink.Send -> deeplink.walletAddress
-            is DeepLink.UserProfile -> deeplink.tariAddress
-            else -> null
-        }?.let { TariWalletAddress.fromBase58OrNull(it) }
-            ?.let { walletAddress ->
-                query.postValue(walletAddress.fullEmojiId)
-            }
+    override fun handleDeeplink(deeplink: DeepLink) {
+        if (deeplink is DeepLink.Contacts || deeplink is DeepLink.Send || deeplink is DeepLink.UserProfile) {
+            when (deeplink) {
+                is DeepLink.Contacts -> deeplink.contacts.firstOrNull()?.tariAddress
+                is DeepLink.Send -> deeplink.walletAddress
+                is DeepLink.UserProfile -> deeplink.tariAddress
+                else -> null
+            }?.let { TariWalletAddress.fromBase58OrNull(it) }?.let { query.postValue(it.fullEmojiId) }
+        } else {
+            super.handleDeeplink(deeplink)
+        }
     }
 
     fun doSearch(query: String) {

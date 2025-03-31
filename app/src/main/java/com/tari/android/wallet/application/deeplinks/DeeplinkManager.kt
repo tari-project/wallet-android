@@ -1,6 +1,5 @@
 package com.tari.android.wallet.application.deeplinks
 
-import android.app.Activity
 import android.net.Uri
 import androidx.core.net.toUri
 import com.tari.android.wallet.R
@@ -16,11 +15,9 @@ import com.tari.android.wallet.di.ApplicationScope
 import com.tari.android.wallet.model.TariWalletAddress
 import com.tari.android.wallet.navigation.Navigation
 import com.tari.android.wallet.navigation.TariNavigator
-import com.tari.android.wallet.ui.common.DialogManager
+import com.tari.android.wallet.ui.common.DialogHandler
 import com.tari.android.wallet.ui.common.domain.ResourceManager
 import com.tari.android.wallet.ui.dialog.confirm.ConfirmDialogArgs
-import com.tari.android.wallet.ui.dialog.modular.InputModularDialog
-import com.tari.android.wallet.ui.dialog.modular.ModularDialogArgs
 import com.tari.android.wallet.ui.dialog.modular.ModularDialogArgs.DialogId
 import com.tari.android.wallet.ui.dialog.modular.modules.body.BodyModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonModule
@@ -40,7 +37,6 @@ class DeeplinkManager @Inject constructor(
     private val contactRepository: ContactsRepository,
     private val torSharedRepository: TorPrefRepository,
     private val resourceManager: ResourceManager,
-    private val dialogManager: DialogManager,
     private val walletManager: WalletManager,
     private val navigator: TariNavigator,
     private val deeplinkParser: DeeplinkParser,
@@ -54,55 +50,36 @@ class DeeplinkManager @Inject constructor(
 
     fun getDeeplinkString(deeplink: DeepLink): String = deeplinkParser.toDeeplink(deeplink)
 
-    /**
-     * Executes the given deeplink, but first shows a confirmation dialog.
-     */
-    fun execute(activity: Activity, deeplink: DeepLink) {
+    fun execute(dialogHandler: DialogHandler, deeplink: DeepLink) {
         when (deeplink) {
-            is DeepLink.AddBaseNode -> showAddBaseNodeDialog(activity, deeplink)
-            is DeepLink.Contacts -> showAddContactsDialog(activity, deeplink)
+            is DeepLink.AddBaseNode -> showAddBaseNodeDialog(dialogHandler, deeplink)
+            is DeepLink.Contacts -> showAddContactsDialog(dialogHandler, deeplink)
             is DeepLink.Send -> sendAction(deeplink)
-            is DeepLink.UserProfile -> addUserProfile(activity, deeplink)
+            is DeepLink.UserProfile -> showUserProfileDialog(dialogHandler, deeplink)
             is DeepLink.TorBridges -> addTorBridges(deeplink)
-            is DeepLink.PaperWallet -> showPaperWalletDialog(activity, deeplink)
+            is DeepLink.PaperWallet -> showPaperWalletDialog(dialogHandler, deeplink)
             is DeepLink.AirdropLoginToken -> handleAirdropTokenAction(deeplink)
         }
     }
 
-    /**
-     * Executes the given deeplink without showing a confirmation dialog.
-     */
-    fun executeRawDeeplink(activity: Activity, deeplink: DeepLink) {
-        when (deeplink) {
-            is DeepLink.AddBaseNode -> showAddBaseNodeDialog(activity, deeplink)
-            is DeepLink.Contacts -> addContactsAction(deeplink.data())
-            is DeepLink.Send -> sendAction(deeplink)
-            is DeepLink.UserProfile -> addContactsAction(deeplink.data()?.let { listOf(it) } ?: emptyList())
-            is DeepLink.TorBridges -> addTorBridges(deeplink)
-            is DeepLink.PaperWallet -> showPaperWalletDialog(activity, deeplink)
-            is DeepLink.AirdropLoginToken -> handleAirdropTokenAction(deeplink)
-        }
-    }
-
-    private fun showAddBaseNodeDialog(context: Activity, deeplink: DeepLink.AddBaseNode) {
+    private fun showAddBaseNodeDialog(dialogHandler: DialogHandler, deeplink: DeepLink.AddBaseNode) {
         val baseNode = deeplink.data()
-        dialogManager.replace(
-            context = context,
-            args = ConfirmDialogArgs(
+        dialogHandler.showModularDialog(
+            ConfirmDialogArgs(
                 dialogId = DialogId.DEEPLINK_ADD_BASE_NODE,
                 title = resourceManager.getString(R.string.home_custom_base_node_title),
                 description = resourceManager.getString(R.string.home_custom_base_node_description),
                 cancelButtonText = resourceManager.getString(R.string.home_custom_base_node_no_button),
                 confirmButtonText = resourceManager.getString(R.string.common_lets_do_it),
                 onConfirm = {
-                    dialogManager.dismiss(DialogId.DEEPLINK_ADD_BASE_NODE)
-                    addBaseNodeAction(context, baseNode)
+                    dialogHandler.hideDialog(DialogId.DEEPLINK_ADD_BASE_NODE)
+                    addBaseNodeAction(dialogHandler, baseNode)
                 },
-            ).getModular(baseNode, resourceManager),
+            ).getModular(baseNode, resourceManager)
         )
     }
 
-    private fun addUserProfile(context: Activity, deeplink: DeepLink.UserProfile) {
+    private fun showUserProfileDialog(dialogHandler: DialogHandler, deeplink: DeepLink.UserProfile) {
         val contact = DeepLink.Contacts(
             listOf(
                 DeepLink.Contacts.DeeplinkContact(
@@ -111,27 +88,22 @@ class DeeplinkManager @Inject constructor(
                 )
             )
         )
-        showAddContactsDialog(context, contact)
+        showAddContactsDialog(dialogHandler, contact)
     }
 
-    private fun showAddContactsDialog(context: Activity, deeplink: DeepLink.Contacts) {
+    private fun showAddContactsDialog(dialogHandler: DialogHandler, deeplink: DeepLink.Contacts) {
         val contactDtos = deeplink.data()
         if (contactDtos.isEmpty()) return
         val names = contactDtos.joinToString(", ") { it.contactInfo.getAlias().trim() }
-        dialogManager.replace(
-            context = context,
-            args = ModularDialogArgs(
-                dialogId = DialogId.DEEPLINK_ADD_CONTACTS,
-                modules = listOf(
-                    HeadModule(resourceManager.getString(R.string.contact_deeplink_title)),
-                    BodyModule(resourceManager.getString(R.string.contact_deeplink_message, contactDtos.size.toString()) + ". " + names),
-                    ButtonModule(resourceManager.getString(R.string.common_confirm), ButtonStyle.Normal) {
-                        addContactsAction(contactDtos)
-                        dialogManager.dismiss(DialogId.DEEPLINK_ADD_CONTACTS)
-                    },
-                    ButtonModule(resourceManager.getString(R.string.common_cancel), ButtonStyle.Close)
-                ),
-            )
+        dialogHandler.showModularDialog(
+            dialogId = DialogId.DEEPLINK_ADD_CONTACTS,
+            HeadModule(resourceManager.getString(R.string.contact_deeplink_title)),
+            BodyModule(resourceManager.getString(R.string.contact_deeplink_message, contactDtos.size.toString()) + ". " + names),
+            ButtonModule(resourceManager.getString(R.string.common_confirm), ButtonStyle.Normal) {
+                addContactsAction(contactDtos)
+                dialogHandler.hideDialog(DialogId.DEEPLINK_ADD_CONTACTS)
+            },
+            ButtonModule(resourceManager.getString(R.string.common_cancel), ButtonStyle.Close)
         )
     }
 
@@ -141,51 +113,43 @@ class DeeplinkManager @Inject constructor(
         }
     }
 
-    private fun showPaperWalletDialog(context: Activity, deeplink: DeepLink.PaperWallet) {
-        dialogManager.replace(
-            context = context,
-            args = ModularDialogArgs(
-                dialogId = DialogId.DEEPLINK_PAPER_WALLET,
-                modules = listOfNotNull(
-                    HeadModule(resourceManager.getString(R.string.restore_wallet_paper_wallet_title)),
-                    BodyModule(resourceManager.getString(R.string.restore_wallet_paper_wallet_body)),
-                    ButtonModule(resourceManager.getString(R.string.restore_wallet_paper_wallet_sweep_funds_button), ButtonStyle.Normal) {
-                        dialogManager.dismiss(DialogId.DEEPLINK_PAPER_WALLET)
-                        dialogManager.showNotReadyYetDialog(context)
-                    }.takeIf { DebugConfig.sweepFundsButtonEnabled },
-                    ButtonModule(resourceManager.getString(R.string.restore_wallet_paper_wallet_replace_wallet_button), ButtonStyle.Normal) {
-                        dialogManager.dismiss(DialogId.DEEPLINK_PAPER_WALLET)
-                        showRememberToBackupDialog(context, deeplink)
-                    },
-                    ButtonModule(resourceManager.getString(R.string.common_cancel), ButtonStyle.Close),
-                ),
-            )
+    private fun showPaperWalletDialog(dialogHandler: DialogHandler, deeplink: DeepLink.PaperWallet) {
+        dialogHandler.showModularDialog(
+            dialogId = DialogId.DEEPLINK_PAPER_WALLET,
+            *listOfNotNull(
+                HeadModule(resourceManager.getString(R.string.restore_wallet_paper_wallet_title)),
+                BodyModule(resourceManager.getString(R.string.restore_wallet_paper_wallet_body)),
+                ButtonModule(resourceManager.getString(R.string.restore_wallet_paper_wallet_sweep_funds_button), ButtonStyle.Normal) {
+                    dialogHandler.hideDialog(DialogId.DEEPLINK_PAPER_WALLET)
+                    dialogHandler.showNotReadyYetDialog()
+                }.takeIf { DebugConfig.sweepFundsButtonEnabled },
+                ButtonModule(resourceManager.getString(R.string.restore_wallet_paper_wallet_replace_wallet_button), ButtonStyle.Normal) {
+                    dialogHandler.hideDialog(DialogId.DEEPLINK_PAPER_WALLET)
+                    showRememberToBackupDialog(dialogHandler, deeplink)
+                },
+                ButtonModule(resourceManager.getString(R.string.common_cancel), ButtonStyle.Close),
+            ).toTypedArray(),
         )
     }
 
-    private fun showRememberToBackupDialog(context: Activity, deeplink: DeepLink.PaperWallet) {
-        dialogManager.replace(
-            context = context,
-            args = ModularDialogArgs(
-                dialogId = DialogId.DEEPLINK_PAPER_WALLET_REMEMBER_TO_BACKUP,
-                modules = listOf(
-                    HeadModule(resourceManager.getString(R.string.restore_wallet_paper_wallet_remember_backup_title)),
-                    BodyModule(resourceManager.getString(R.string.restore_wallet_paper_wallet_remember_backup_body)),
-                    ButtonModule(resourceManager.getString(R.string.restore_wallet_paper_wallet_remember_backup_yes_button), ButtonStyle.Normal) {
-                        dialogManager.dismiss(DialogId.DEEPLINK_PAPER_WALLET_REMEMBER_TO_BACKUP)
-                        goToBackupAction()
-                    },
-                    ButtonModule(resourceManager.getString(R.string.restore_wallet_paper_wallet_remember_backup_no_button), ButtonStyle.Normal) {
-                        dialogManager.dismiss(DialogId.DEEPLINK_PAPER_WALLET_REMEMBER_TO_BACKUP)
-                        showEnterPassphraseDialog(context, deeplink)
-                    },
-                    ButtonModule(resourceManager.getString(R.string.common_cancel), ButtonStyle.Close),
-                ),
-            )
+    private fun showRememberToBackupDialog(dialogHandler: DialogHandler, deeplink: DeepLink.PaperWallet) {
+        dialogHandler.showModularDialog(
+            dialogId = DialogId.DEEPLINK_PAPER_WALLET_REMEMBER_TO_BACKUP,
+            HeadModule(resourceManager.getString(R.string.restore_wallet_paper_wallet_remember_backup_title)),
+            BodyModule(resourceManager.getString(R.string.restore_wallet_paper_wallet_remember_backup_body)),
+            ButtonModule(resourceManager.getString(R.string.restore_wallet_paper_wallet_remember_backup_yes_button), ButtonStyle.Normal) {
+                dialogHandler.hideDialog(DialogId.DEEPLINK_PAPER_WALLET_REMEMBER_TO_BACKUP)
+                goToBackupAction()
+            },
+            ButtonModule(resourceManager.getString(R.string.restore_wallet_paper_wallet_remember_backup_no_button), ButtonStyle.Normal) {
+                dialogHandler.hideDialog(DialogId.DEEPLINK_PAPER_WALLET_REMEMBER_TO_BACKUP)
+                showEnterPassphraseDialog(dialogHandler, deeplink)
+            },
+            ButtonModule(resourceManager.getString(R.string.common_cancel), ButtonStyle.Close),
         )
     }
 
-    private fun showEnterPassphraseDialog(context: Activity, deeplink: DeepLink.PaperWallet) {
+    private fun showEnterPassphraseDialog(dialogHandler: DialogHandler, deeplink: DeepLink.PaperWallet) {
         var saveAction: () -> Boolean = { false }
 
         val headModule = HeadModule(
@@ -207,39 +171,27 @@ class DeeplinkManager @Inject constructor(
         saveAction = {
             val seeds = deeplink.seedWords(passphraseModule.value.trim())
             if (seeds != null) {
-                dialogManager.dismiss(DialogId.DEEPLINK_PAPER_WALLET_ENTER_PASSPHRASE)
+                dialogHandler.hideDialog(DialogId.DEEPLINK_PAPER_WALLET_ENTER_PASSPHRASE)
                 replaceWalletAction(seeds)
             } else {
-                showPaperWalletErrorDialog(context)
+                showPaperWalletErrorDialog(dialogHandler)
             }
             true
         }
 
-        dialogManager.replace(
-            InputModularDialog(
-                context = context,
-                args = ModularDialogArgs(
-                    dialogId = DialogId.DEEPLINK_PAPER_WALLET_ENTER_PASSPHRASE,
-                    modules = listOf(
-                        headModule,
-                        bodyModule,
-                        passphraseModule,
-                    ),
-                )
-            )
+        dialogHandler.showInputModalDialog(
+            dialogId = DialogId.DEEPLINK_PAPER_WALLET_ENTER_PASSPHRASE,
+            headModule,
+            bodyModule,
+            passphraseModule,
         )
     }
 
-    private fun showPaperWalletErrorDialog(context: Activity) {
-        dialogManager.replace(
-            context = context,
-            args = ModularDialogArgs(
-                modules = listOf(
-                    HeadModule(resourceManager.getString(R.string.restore_wallet_paper_wallet_error_title)),
-                    BodyModule(resourceManager.getString(R.string.restore_wallet_paper_wallet_error_body)),
-                    ButtonModule(resourceManager.getString(R.string.common_close), ButtonStyle.Close),
-                ),
-            )
+    private fun showPaperWalletErrorDialog(dialogHandler: DialogHandler) {
+        dialogHandler.showModularDialog(
+            HeadModule(resourceManager.getString(R.string.restore_wallet_paper_wallet_error_title)),
+            BodyModule(resourceManager.getString(R.string.restore_wallet_paper_wallet_error_body)),
+            ButtonModule(resourceManager.getString(R.string.common_close), ButtonStyle.Close),
         )
     }
 
@@ -279,13 +231,13 @@ class DeeplinkManager @Inject constructor(
         )
     }
 
-    private fun addBaseNodeAction(context: Activity, baseNodeDto: BaseNodeDto) {
+    private fun addBaseNodeAction(dialogHandler: DialogHandler, baseNodeDto: BaseNodeDto) {
         if (DebugConfig.selectBaseNodeEnabled) {
             baseNodesManager.addUserBaseNode(baseNodeDto)
             baseNodesManager.setBaseNode(baseNodeDto)
             walletManager.syncBaseNode()
         } else {
-            dialogManager.showNotReadyYetDialog(context)
+            dialogHandler.showNotReadyYetDialog()
         }
     }
 

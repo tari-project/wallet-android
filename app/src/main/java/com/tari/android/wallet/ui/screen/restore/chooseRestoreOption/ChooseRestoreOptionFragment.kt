@@ -32,7 +32,6 @@
  */
 package com.tari.android.wallet.ui.screen.restore.chooseRestoreOption
 
-import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -40,16 +39,13 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.children
 import androidx.fragment.app.viewModels
-import com.tari.android.wallet.application.deeplinks.DeepLink
 import com.tari.android.wallet.databinding.FragmentChooseRestoreOptionBinding
 import com.tari.android.wallet.ui.common.CommonXmlFragment
-import com.tari.android.wallet.ui.screen.qr.QrScannerActivity
 import com.tari.android.wallet.ui.screen.restore.chooseRestoreOption.option.RecoveryOptionView
 import com.tari.android.wallet.ui.screen.settings.backup.data.BackupOption
 import com.tari.android.wallet.ui.screen.settings.backup.data.BackupOptionDto
 import com.tari.android.wallet.util.extension.collectFlow
 import com.tari.android.wallet.util.extension.gone
-import com.tari.android.wallet.util.extension.parcelable
 import com.tari.android.wallet.util.extension.visible
 
 class ChooseRestoreOptionFragment : CommonXmlFragment<FragmentChooseRestoreOptionBinding, ChooseRestoreOptionViewModel>() {
@@ -71,12 +67,7 @@ class ChooseRestoreOptionFragment : CommonXmlFragment<FragmentChooseRestoreOptio
     @Deprecated("Deprecated in Java")
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == QrScannerActivity.REQUEST_QR_SCANNER && resultCode == Activity.RESULT_OK && data != null) {
-            val qrDeepLink = data.parcelable<DeepLink>(QrScannerActivity.EXTRA_DEEPLINK) ?: return
-            viewModel.handleDeeplink(qrDeepLink)
-        } else {
-            viewModel.onActivityResult(requestCode, resultCode, data)
-        }
+        viewModel.onActivityResult(requestCode, resultCode, data)
     }
 
     private fun setupUI() = with(ui) {

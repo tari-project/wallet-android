@@ -1,7 +1,6 @@
 package com.tari.android.wallet.ui.screen.home.overview
 
 
-import android.app.Activity
 import android.os.Build
 import com.tari.android.wallet.BuildConfig
 import com.tari.android.wallet.R
@@ -9,7 +8,6 @@ import com.tari.android.wallet.R.string.error_no_connection_description
 import com.tari.android.wallet.R.string.error_no_connection_title
 import com.tari.android.wallet.R.string.error_node_unreachable_description
 import com.tari.android.wallet.R.string.error_node_unreachable_title
-import com.tari.android.wallet.application.deeplinks.DeepLink
 import com.tari.android.wallet.application.securityStage.StagedWalletSecurityManager
 import com.tari.android.wallet.application.walletManager.WalletManager.WalletEvent
 import com.tari.android.wallet.data.BalanceStateHandler
@@ -140,10 +138,6 @@ class HomeOverviewViewModel : CommonViewModel() {
                 contactsRepository.grantContactPermissionAndRefresh()
             }
         }
-    }
-
-    fun handleDeeplink(context: Activity, deepLink: DeepLink) {
-        deeplinkManager.execute(context, deepLink)
     }
 
     private fun checkForDataConsent() {
