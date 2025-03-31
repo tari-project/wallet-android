@@ -1,20 +1,28 @@
 package com.tari.android.wallet.ui.screen.profile.login
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.net.toUri
 import androidx.fragment.app.viewModels
 import com.tari.android.wallet.ui.common.CommonFragment
 import com.tari.android.wallet.ui.compose.TariDesignSystem
+import com.tari.android.wallet.util.DebugConfig
 import com.tari.android.wallet.util.extension.composeContent
 
 class ProfileLoginFragment : CommonFragment<ProfileLoginViewModel>() {
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?) = composeContent {
-        TariDesignSystem(viewModel.currentTheme) {
-            ProfileLoginScreen(
-                authUrl = viewModel.authUrl
-            )
+        if (DebugConfig.airdropLoginInBrowser) {
+            openInBrowser(viewModel.authUrl)
+        } else {
+            TariDesignSystem(viewModel.currentTheme) {
+                ProfileLoginScreen(
+                    authUrl = viewModel.authUrl
+                )
+            }
         }
     }
 
@@ -23,5 +31,10 @@ class ProfileLoginFragment : CommonFragment<ProfileLoginViewModel>() {
 
         val viewModel: ProfileLoginViewModel by viewModels()
         bindViewModel(viewModel)
+    }
+
+    private fun openInBrowser(url: String) {
+        val intent = Intent(Intent.ACTION_VIEW, url.toUri())
+        startActivity(intent)
     }
 }

@@ -5,12 +5,18 @@ import java.math.BigDecimal
 
 object ProfileModel {
     data class UiState(
-        val userTag: String,
-        val noActivityYet: Boolean,
-        val tariMined: BigDecimal,
         val ticker: String,
-        val gemsEarned: Long,
-        val inviteLink: String,
-        val friends: List<ReferralStatusResponse.Referral> = emptyList(),
-    )
+        val tariMined: BigDecimal,
+        val userDetails: UserDetails? = null,
+        val friends: List<ReferralStatusResponse.Referral>? = null,
+    ) {
+        val noActivityYet: Boolean
+            get() = tariMined == 0.toBigDecimal()
+
+        data class UserDetails(
+            val userTag: String,
+            val gemsEarned: Double,
+            val inviteLink: String,
+        )
+    }
 }

@@ -2,6 +2,7 @@ package com.tari.android.wallet.data.airdrop
 
 import com.google.gson.annotations.SerializedName
 import retrofit2.http.GET
+import retrofit2.http.Header
 import retrofit2.http.Path
 
 interface AirdropRetrofitService {
@@ -9,15 +10,14 @@ interface AirdropRetrofitService {
     @GET("/api/miner/stats")
     suspend fun getMinerStats(): MinerStatsResponse
 
-    //  https://airdrop.tari.com/api/miner/status/e88fa464-ebc6-4c29-8bda-5b17122ac1bf
     @GET("/api/miner/status/{id}")
     suspend fun getMinerStatus(@Path("id") id: String): MiningStatusResponse
 
     @GET("/api/user/details")
-    suspend fun getUserDetails(): UserDetailsResponse
+    suspend fun getUserDetails(@Header("Authorization") token: String): UserDetailsResponse
 
     @GET("/api/user/referral-status")
-    suspend fun getReferralStatus(): ReferralStatusResponse
+    suspend fun getReferralStatus(@Header("Authorization") token: String): ReferralStatusResponse
 }
 
 data class MinerStatsResponse(
@@ -33,18 +33,18 @@ data class UserDetailsResponse(
 ) {
     data class User(
         @SerializedName("image_url") val imageUrl: String?,
-        @SerializedName("is_bot") val isBot: Boolean,
-        @SerializedName("twitter_followers") val twitterFollowers: Int,
         @SerializedName("id") val id: String,
         @SerializedName("referral_code") val referralCode: String,
         @SerializedName("yat_user_id") val yatUserId: String?,
         @SerializedName("display_name") val displayName: String,
         @SerializedName("name") val name: String,
-        @SerializedName("role") val role: String,
-        @SerializedName("provider") val provider: String,
-        @SerializedName("provider_id") val providerId: String,
         @SerializedName("profileimageurl") val profileImageUrl: String,
-    )
+        @SerializedName("rank") val rank: Rank,
+    ) {
+        data class Rank(
+            @SerializedName("gems") val gemsCount: Double,
+        )
+    }
 }
 
 data class ReferralStatusResponse(

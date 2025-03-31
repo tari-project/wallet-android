@@ -95,8 +95,10 @@ fun InviteLinkCard(
                         size = TariButtonSize.Small,
                         onClick = onShareClick,
                     ) {
+                        Spacer(Modifier.size(10.dp))
                         Icon(
                             painter = painterResource(id = R.drawable.vector_profile_invite_friend_copy),
+                            tint = Color.Black,
                             contentDescription = null,
                         )
                         Spacer(Modifier.size(4.dp))
@@ -105,6 +107,7 @@ fun InviteLinkCard(
                             color = Color.Black,
                             style = TariDesignSystem.typography.buttonSmall,
                         )
+                        Spacer(Modifier.size(10.dp))
                     }
                 }
             }

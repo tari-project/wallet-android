@@ -71,7 +71,7 @@ fun TariMinedCard(
 
 @Composable
 fun GemsEarnedCard(
-    gemsCount: Long,
+    gemsCount: Double,
     modifier: Modifier = Modifier,
 ) {
     Card(
@@ -128,7 +128,7 @@ fun GemsEarnedCardPreview() {
                 .padding(16.dp)
                 .height(120.dp)
                 .width(240.dp),
-            gemsCount = 24_836_150,
+            gemsCount = 24_836_150.0,
         )
     }
 }

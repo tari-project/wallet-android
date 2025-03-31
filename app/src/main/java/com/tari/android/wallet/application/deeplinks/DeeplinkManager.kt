@@ -3,10 +3,10 @@ package com.tari.android.wallet.application.deeplinks
 import android.app.Activity
 import android.net.Uri
 import androidx.core.net.toUri
-import com.orhanobut.logger.Logger
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.baseNodes.BaseNodesManager
 import com.tari.android.wallet.application.walletManager.WalletManager
+import com.tari.android.wallet.data.airdrop.AirdropRepository
 import com.tari.android.wallet.data.contacts.ContactsRepository
 import com.tari.android.wallet.data.contacts.model.ContactDto
 import com.tari.android.wallet.data.contacts.model.FFIContactInfo
@@ -44,6 +44,7 @@ class DeeplinkManager @Inject constructor(
     private val walletManager: WalletManager,
     private val navigator: TariNavigator,
     private val deeplinkParser: DeeplinkParser,
+    private val airdropRepository: AirdropRepository,
     @ApplicationScope private val applicationScope: CoroutineScope,
 ) {
 
@@ -301,7 +302,6 @@ class DeeplinkManager @Inject constructor(
     }
 
     private fun handleAirdropTokenAction(deeplink: DeepLink.AirdropLoginToken) {
-        // TODO handle airdrop token action
-        Logger.t("Airdrop").d("Airdrop token action : ${deeplink.token} ${deeplink.refreshToken}")
+        airdropRepository.saveAirdropToken(deeplink.token)
     }
 }

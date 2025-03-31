@@ -100,6 +100,8 @@ object DebugConfig {
 
     const val skipAddingNote = true
 
+    const val airdropLoginInBrowser = true
+
     fun isDebug() = BuildConfig.BUILD_TYPE == "debug"
 
     private fun valueIfDebug(value: Boolean) = isDebug() && value

@@ -1,5 +1,6 @@
 package com.tari.android.wallet.ui.screen.profile.profile
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -9,9 +10,19 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -28,89 +39,143 @@ import com.tari.android.wallet.ui.screen.profile.profile.widget.InviteLinkCard
 import com.tari.android.wallet.ui.screen.profile.profile.widget.TariMinedCard
 import com.tari.android.wallet.ui.screen.settings.themeSelector.TariTheme
 import com.tari.android.wallet.util.extension.toMicroTari
+import kotlinx.coroutines.delay
 
+
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileScreen(
     uiState: ProfileModel.UiState,
     onInviteLinkShareClick: () -> Unit,
     onStartMiningClicked: () -> Unit,
+    onPullToRefresh: () -> Unit,
 ) {
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         containerColor = TariDesignSystem.colors.backgroundSecondary,
     ) { paddingValues ->
-        LazyColumn(modifier = Modifier.padding(paddingValues)) {
-            item {
-                Spacer(Modifier.size(64.dp))
-                Text(
-                    modifier = Modifier.fillMaxWidth(),
-                    text = "@${uiState.userTag}",
-                    textAlign = TextAlign.Center,
-                    style = TariDesignSystem.typography.heading2XLarge,
-                )
+        var isLoading by remember { mutableStateOf(false) }
+        val pullToRefreshState = rememberPullToRefreshState()
 
-                if (uiState.noActivityYet) {
-                    Spacer(Modifier.size(10.dp))
-                    EmptyTxList(
-                        modifier = Modifier.fillMaxWidth(),
-                        onStartMiningClicked = onStartMiningClicked,
-                    )
-                }
-
-                Spacer(Modifier.size(76.dp))
-                Row(
-                    modifier = Modifier
-                        .height(120.dp)
-                        .padding(horizontal = 20.dp),
-                ) {
-                    TariMinedCard(
-                        modifier = Modifier.weight(1f),
-                        balance = uiState.tariMined,
-                        ticker = uiState.ticker,
-                    )
-                    Spacer(Modifier.width(10.dp))
-                    GemsEarnedCard(
-                        modifier = Modifier.weight(1f),
-                        gemsCount = uiState.gemsEarned,
-                    )
-                }
-                Spacer(Modifier.size(10.dp))
-                InviteLinkCard(
-                    link = uiState.inviteLink,
-                    onShareClick = onInviteLinkShareClick,
-                    modifier = Modifier
-                        .padding(horizontal = 20.dp),
-                )
-                Spacer(Modifier.size(20.dp))
-                Text(
-                    text = stringResource(R.string.airdrop_profile_friends_invited_title, uiState.friends.size),
-                    style = TariDesignSystem.typography.headingXLarge,
-                    modifier = Modifier.padding(horizontal = 20.dp)
-                )
-                Spacer(Modifier.size(10.dp))
+        LaunchedEffect(isLoading) {
+            if (isLoading) {
+                delay(1000)
+                isLoading = false
             }
+        }
 
-            if (uiState.friends.isEmpty()) {
+        PullToRefreshBox(
+            modifier = Modifier.padding(paddingValues),
+            state = pullToRefreshState,
+            isRefreshing = isLoading,
+            onRefresh = {
+                isLoading = true
+                onPullToRefresh()
+            }
+        ) {
+            LazyColumn {
+                if (uiState.userDetails != null) {
+                    item {
+                        Spacer(Modifier.size(64.dp))
+                        Text(
+                            modifier = Modifier.fillMaxWidth(),
+                            text = "@${uiState.userDetails.userTag}",
+                            textAlign = TextAlign.Center,
+                            style = TariDesignSystem.typography.heading2XLarge,
+                        )
+
+                        if (uiState.noActivityYet) {
+                            Spacer(Modifier.size(10.dp))
+                            EmptyTxList(
+                                modifier = Modifier.fillMaxWidth(),
+                                onStartMiningClicked = onStartMiningClicked,
+                            )
+                        }
+
+                        Spacer(Modifier.size(76.dp))
+                        Row(
+                            modifier = Modifier
+                                .height(120.dp)
+                                .padding(horizontal = 20.dp),
+                        ) {
+                            TariMinedCard(
+                                modifier = Modifier.weight(1f),
+                                balance = uiState.tariMined,
+                                ticker = uiState.ticker,
+                            )
+                            Spacer(Modifier.width(10.dp))
+                            GemsEarnedCard(
+                                modifier = Modifier.weight(1f),
+                                gemsCount = uiState.userDetails.gemsEarned,
+                            )
+                        }
+                        Spacer(Modifier.size(10.dp))
+                        InviteLinkCard(
+                            link = uiState.userDetails.inviteLink,
+                            onShareClick = onInviteLinkShareClick,
+                            modifier = Modifier
+                                .padding(horizontal = 20.dp),
+                        )
+                    }
+                } else {
+                    item {
+                        Spacer(Modifier.size(64.dp))
+                        Box(
+                            modifier = Modifier.fillMaxWidth(),
+                            contentAlignment = Alignment.Center,
+                        ) {
+                            CircularProgressIndicator(
+                                color = TariDesignSystem.colors.primaryMain,
+                            )
+                        }
+                        Spacer(Modifier.size(64.dp))
+                    }
+                }
+
                 item {
-                    Spacer(Modifier.size(52.dp))
-                    FriendListEmpty(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 40.dp),
+                    Spacer(Modifier.size(20.dp))
+                    Text(
+                        text = stringResource(R.string.airdrop_profile_friends_invited_title, uiState.friends?.size ?: "-"),
+                        style = TariDesignSystem.typography.headingXLarge,
+                        modifier = Modifier.padding(horizontal = 20.dp)
                     )
+                    Spacer(Modifier.size(10.dp))
                 }
-            } else {
-                items(uiState.friends.size) { index ->
-                    FriendListItem(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 20.dp, vertical = 5.dp),
-                        friend = uiState.friends[index],
-                    )
-                }
-            }
 
-            item { Spacer(Modifier.size(52.dp)) }
+                if (uiState.friends == null) {
+                    item {
+                        Spacer(Modifier.size(28.dp))
+                        Box(
+                            modifier = Modifier.fillMaxWidth(),
+                            contentAlignment = Alignment.Center,
+                        ) {
+                            CircularProgressIndicator(
+                                color = TariDesignSystem.colors.primaryMain,
+                            )
+                        }
+                    }
+                } else if (uiState.friends.isEmpty()) {
+                    item {
+                        Spacer(Modifier.size(52.dp))
+                        FriendListEmpty(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 40.dp),
+                        )
+                    }
+                } else {
+                    items(uiState.friends.size) { index ->
+                        FriendListItem(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 20.dp, vertical = 5.dp),
+                            friend = uiState.friends[index],
+                        )
+                    }
+                }
+
+                item { Spacer(Modifier.size(52.dp)) }
+            }
         }
     }
 }
@@ -122,12 +187,13 @@ fun ProfileScreenPreview() {
     TariDesignSystem(TariTheme.Light) {
         ProfileScreen(
             uiState = ProfileModel.UiState(
-                userTag = "NaveenSpark",
-                noActivityYet = true,
-                tariMined = 24_836_150_000.toMicroTari().tariValue,
-                ticker = "XTR",
-                gemsEarned = 24_836_150,
-                inviteLink = "tari-universe/129g78",
+                tariMined = 2_836_150_000.toMicroTari().tariValue,
+                ticker = "XTM",
+                userDetails = ProfileModel.UiState.UserDetails(
+                    userTag = "NaveenSpark",
+                    gemsEarned = 24_836_150.0,
+                    inviteLink = "tari-universe/129g78",
+                ),
                 friends = List(10) { index ->
                     Referral(
                         name = "sevi_$index",
@@ -138,6 +204,25 @@ fun ProfileScreenPreview() {
             ),
             onInviteLinkShareClick = {},
             onStartMiningClicked = {},
+            onPullToRefresh = {},
+        )
+    }
+}
+
+@Preview
+@Composable
+fun ProfileScreenLoadingPreview() {
+    TariDesignSystem(TariTheme.Light) {
+        ProfileScreen(
+            uiState = ProfileModel.UiState(
+                tariMined = 0.toMicroTari().tariValue,
+                ticker = "XTM",
+                userDetails = null,
+                friends = null,
+            ),
+            onInviteLinkShareClick = {},
+            onStartMiningClicked = {},
+            onPullToRefresh = {},
         )
     }
 }
