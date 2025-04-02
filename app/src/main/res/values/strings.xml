@@ -93,6 +93,8 @@
     <string name="common_apply">Apply</string>
     <string name="common_share">Share</string>
     <string name="common_error_title">Error</string>
+    <string name="common_error_description">Something went wrong. Please try again later.</string>
+    <string name="common_error_try_again_button">Try again</string>
     <string name="common_unknown_error">Unknown error</string>
     <string name="common_permission_required_dialog_body">We need access to %s to perform this action. Please, open the Settings app, find this permission in the list, and grant it</string>
     <string name="common_permission_required_button">To Settings</string>

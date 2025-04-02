@@ -1,8 +1,11 @@
 package com.tari.android.wallet.data.airdrop
 
 import com.google.gson.annotations.SerializedName
+import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.Header
+import retrofit2.http.Headers
+import retrofit2.http.POST
 import retrofit2.http.Path
 
 interface AirdropRetrofitService {
@@ -18,6 +21,10 @@ interface AirdropRetrofitService {
 
     @GET("/api/user/referral-status")
     suspend fun getReferralStatus(@Header("Authorization") token: String): ReferralStatusResponse
+
+    @POST("/api/auth/local/refresh")
+    @Headers("Content-Type: application/json", "Cache-Control: no-store")
+    suspend fun refreshAuthToken(@Body request: RefreshTokenRequest): RefreshTokenResponse
 }
 
 data class MinerStatsResponse(
@@ -57,5 +64,11 @@ data class ReferralStatusResponse(
     )
 }
 
+data class RefreshTokenRequest(
+    @SerializedName("refreshToken") val refreshToken: String
+)
 
-
+data class RefreshTokenResponse(
+    @SerializedName("token") val token: String,
+    @SerializedName("refreshToken") val refreshToken: String
+)

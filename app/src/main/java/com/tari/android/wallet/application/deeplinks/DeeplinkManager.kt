@@ -254,6 +254,6 @@ class DeeplinkManager @Inject constructor(
     }
 
     private fun handleAirdropTokenAction(deeplink: DeepLink.AirdropLoginToken) {
-        airdropRepository.saveAirdropToken(deeplink.token)
+        airdropRepository.saveAirdropToken(deeplink.token, deeplink.refreshToken)
     }
 }
