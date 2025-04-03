@@ -13,11 +13,11 @@ import com.tari.android.wallet.R
 import com.tari.android.wallet.data.sharedPrefs.CorePrefRepository
 import com.tari.android.wallet.data.sharedPrefs.network.NetworkPrefRepository
 import com.tari.android.wallet.data.sharedPrefs.yat.YatPrefRepository
+import com.tari.android.wallet.model.EmojiId
 import com.tari.android.wallet.ui.screen.send.common.TransactionData
 import com.tari.android.wallet.ui.screen.send.finalize.FinalizeSendTxViewModel
 import com.tari.android.wallet.ui.screen.send.finalize.YatFinalizeSendTxActivity
 import com.tari.android.wallet.util.DebugConfig
-import com.tari.android.wallet.model.EmojiId
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.parcelize.Parcelize
@@ -96,8 +96,7 @@ class YatAdapter @Inject constructor(
      */
     suspend fun checkYatDisconnected(): Boolean = connectedYat.takeIf { it.isNullOrBlank() }
         ?.let { searchTariYat(it) }?.address
-        ?.let { address -> address.lowercase() != commonRepository.walletAddressBase58.orEmpty().lowercase() }
-        ?: false
+        ?.let { address -> address.lowercase() != commonRepository.walletAddressBase58.orEmpty().lowercase() } == true
 
     /**
      * Load all connected wallets by Yat emojiId and return them as a list of [ConnectedWallet]
@@ -114,10 +113,10 @@ class YatAdapter @Inject constructor(
     }
 
     fun showOutcomingFinalizeActivity(activity: Activity, transactionData: TransactionData) {
-        val yatUser = transactionData.recipientContact?.yat ?: return
+        val yatUser = transactionData.recipientContact.yat ?: return
         val currentTicker = networkRepository.currentNetwork.ticker
         val data = YatLibOutcomingTransactionData(
-            amount = transactionData.amount!!.tariValue.toDouble(),
+            amount = transactionData.amount.tariValue.toDouble(),
             currency = currentTicker,
             yat = yatUser,
         )

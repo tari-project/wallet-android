@@ -7,10 +7,10 @@ import kotlinx.parcelize.Parcelize
 
 @Parcelize
 data class TransactionData(
-    val recipientContact: ContactDto?,
-    val amount: MicroTari?,
+    val recipientContact: ContactDto,
+    val amount: MicroTari,
     val note: String?,
-    val feePerGram: MicroTari?,
+    val feePerGram: MicroTari,
     val isOneSidePayment: Boolean,
 ) : Parcelable {
     val message: String

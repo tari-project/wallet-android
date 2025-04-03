@@ -94,6 +94,8 @@ import com.tari.android.wallet.util.extension.postDelayed
 import com.tari.android.wallet.util.extension.setStartMargin
 import com.tari.android.wallet.util.extension.temporarilyDisableClick
 import com.tari.android.wallet.util.extension.visible
+import androidx.core.net.toUri
+import androidx.core.view.isVisible
 
 class AddNoteFragment : CommonXmlFragment<FragmentAddNoteBinding, AddNoteViewModel>(), View.OnTouchListener {
 
@@ -204,8 +206,8 @@ class AddNoteFragment : CommonXmlFragment<FragmentAddNoteBinding, AddNoteViewMod
 
     private fun retrievePageArguments() {
         transactionData = requireArguments().parcelable(PARAMETER_TRANSACTION)!!
-        recipientUser = transactionData.recipientContact!!
-        amount = transactionData.amount!!
+        recipientUser = transactionData.recipientContact
+        amount = transactionData.amount
         isOneSidePayment = transactionData.isOneSidePayment
         note = transactionData.note.orEmpty()
     }
@@ -275,7 +277,7 @@ class AddNoteFragment : CommonXmlFragment<FragmentAddNoteBinding, AddNoteViewMod
 
     @SuppressLint("ClickableViewAccessibility")
     private fun enableCallToAction() {
-        if (ui.slideEnabledBgView.visibility == View.VISIBLE) {
+        if (ui.slideEnabledBgView.isVisible) {
             return
         }
         ui.slideView.setOnTouchListener(this)

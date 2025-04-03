@@ -126,9 +126,9 @@ class AddAmountViewModel(savedState: SavedStateHandle) : CommonViewModel() {
         if (!networkConnection.isNetworkConnected()) {
             showInternetConnectionErrorDialog()
         } else if (transactionData.shouldSkipAddingNote()) {
-            tariNavigator.navigate(Navigation.AddAmount.ContinueToFinalizing(transactionData))
+            tariNavigator.navigate(Navigation.TxSend.ToConfirm(transactionData))
         } else {
-            tariNavigator.navigate(Navigation.AddAmount.ContinueToAddNote(transactionData))
+            tariNavigator.navigate(Navigation.TxSend.ToAddNote(transactionData))
         }
     }
 

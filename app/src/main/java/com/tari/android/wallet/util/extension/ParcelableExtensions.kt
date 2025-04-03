@@ -38,6 +38,7 @@ import android.os.Bundle
 import android.os.Parcelable
 import androidx.core.content.IntentCompat
 import androidx.core.os.BundleCompat
+import androidx.lifecycle.SavedStateHandle
 
 inline fun <reified T : Parcelable> Intent.parcelable(key: String): T? = when {
     SDK_INT >= 33 -> IntentCompat.getParcelableExtra<T>(this, key, T::class.java)
@@ -58,3 +59,5 @@ inline fun <reified T : java.io.Serializable> Bundle.serializable(key: String): 
     SDK_INT >= 33 -> BundleCompat.getSerializable<T>(this, key, T::class.java)
     else -> @Suppress("DEPRECATION") getSerializable(key) as? T
 }
+
+fun <T> SavedStateHandle.getOrThrow(key: String): T = this.get<T>(key) ?: error("Key $key is required, but for some reason not provided")

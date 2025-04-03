@@ -322,6 +322,9 @@
     <string name="finalize_send_tx_sending_cancel_dialog_title">Cancel Sending</string>
     <string name="finalize_send_tx_sending_cancel_dialog_description">Are you sure you want to leave this screen? Your transaction may be cancelled.</string>
 
+    <!-- send tari - confirm & pay -->
+    <string name="confirm_tx_confirm_and_send_button">Confirm &amp; Send</string>
+
     <!-- wallet info -->
     <string name="wallet_info_my_profile">My Profile</string>
     <string name="wallet_info_qr_code_desc">Transacting in person? Others can scan this QR code from the Tari Aurora App to send you tXTR.</string>
