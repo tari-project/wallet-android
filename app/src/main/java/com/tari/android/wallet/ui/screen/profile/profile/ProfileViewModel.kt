@@ -52,28 +52,50 @@ class ProfileViewModel : CommonViewModel() {
         showNotReadyYetDialog()
     }
 
-    fun onPullToRefresh() {
-        refreshData()
+    fun refreshData() {
+        refreshUserDetails()
+        refreshFriendList()
     }
 
-    private fun refreshData() {
+    fun refreshUserDetails() {
         launchOnIo {
-            airdropRepository.getUserDetails().let { userDetails ->
-                _uiState.update {
-                    it.copy(
-                        userDetails = ProfileModel.UiState.UserDetails(
-                            userTag = userDetails.user.displayName,
-                            gemsEarned = userDetails.user.rank.gemsCount,
-                            inviteLink = String.format(FRIEND_INVITE_ADDRESS_SHORT, userDetails.user.referralCode),
-                        )
-                    )
-                }
+            _uiState.update { it.copy(userDetailsError = false) } // To start loading animation
+
+            airdropRepository.getUserDetails().let { userDetailsResult ->
+                userDetailsResult
+                    .onSuccess { userDetails ->
+                        _uiState.update {
+                            it.copy(
+                                userDetailsError = false,
+                                userDetails = ProfileModel.UiState.UserDetails(
+                                    userTag = userDetails.user.displayName,
+                                    gemsEarned = userDetails.user.rank.gemsCount,
+                                    inviteLink = String.format(FRIEND_INVITE_ADDRESS_SHORT, userDetails.user.referralCode),
+                                )
+                            )
+                        }
+                    }
+                    .onFailure {
+                        // show error only if userDetails has not been loaded yet
+                        _uiState.update { it.copy(userDetailsError = it.userDetails == null) }
+                    }
             }
         }
+    }
 
+    fun refreshFriendList() {
         launchOnIo {
-            airdropRepository.getReferralList().referrals.let { referrals ->
-                _uiState.update { it.copy(friends = referrals) }
+            _uiState.update { it.copy(friendsError = false) } // To start loading animation
+
+            airdropRepository.getReferralList().let { referralsResult ->
+                referralsResult
+                    .onSuccess { response ->
+                        _uiState.update { it.copy(friends = response.referrals) }
+                    }
+                    .onFailure {
+                        // show error only if friends has not been loaded yet
+                        _uiState.update { it.copy(friendsError = it.friends == null) }
+                    }
             }
         }
     }

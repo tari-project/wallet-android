@@ -21,7 +21,9 @@ class ProfileFragment : CommonFragment<ProfileViewModel>() {
                 uiState = uiState,
                 onInviteLinkShareClick = { viewModel.onInviteLinkShareClick() },
                 onStartMiningClicked = { viewModel.onStartMiningClicked() },
-                onPullToRefresh = { viewModel.onPullToRefresh() },
+                onPullToRefresh = { viewModel.refreshData() },
+                onDetailsRetryClick = { viewModel.refreshUserDetails() },
+                onFriendsRetryClick = { viewModel.refreshFriendList() },
             )
         }
     }

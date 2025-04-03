@@ -8,10 +8,6 @@ import com.tari.android.wallet.data.sharedPrefs.CorePrefRepository
 import com.tari.android.wallet.di.ApplicationScope
 import com.tari.android.wallet.ffi.FFIWallet
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.channels.awaitClose
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.callbackFlow
-import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -27,7 +23,7 @@ class FcmHelper @Inject constructor(
 
     fun getFcmTokenAndRegister(wallet: FFIWallet) {
         applicationScope.launch {
-            getFcmTokenFlow().firstOrNull()?.let { token ->
+            getFcmToken { token ->
                 registerFcmToken(wallet, token)
             }
         }
@@ -47,19 +43,16 @@ class FcmHelper @Inject constructor(
         }
     }
 
-    private fun getFcmTokenFlow(): Flow<String> = callbackFlow {
+    private fun getFcmToken(onTokenReceived: (token: String) -> Unit) {
         FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener { task ->
             if (task.isSuccessful) {
                 task.result?.let { token ->
                     logger.i("FCM registration token: $token")
-                    trySend(token).isSuccess
+                    onTokenReceived(token)
                 }
             } else {
                 logger.i("Fetching FCM registration token failed", task.exception)
-                close(task.exception)
             }
         })
-
-        awaitClose()
     }
 }
