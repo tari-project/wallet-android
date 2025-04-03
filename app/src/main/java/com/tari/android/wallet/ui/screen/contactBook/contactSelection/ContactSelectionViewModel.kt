@@ -1,6 +1,5 @@
 package com.tari.android.wallet.ui.screen.contactBook.contactSelection
 
-import android.app.Activity
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
@@ -105,29 +104,33 @@ class ContactSelectionViewModel : CommonViewModel() {
         contactList.addSource(isContactlessPayment) { updateContactList() }
     }
 
-    fun handleDeeplink(deeplink: DeepLink) {
-        val deeplinkBase58 = when (deeplink) {
-            is DeepLink.Contacts -> deeplink.contacts.firstOrNull()?.tariAddress
-            is DeepLink.Send -> deeplink.walletAddress
-            is DeepLink.UserProfile -> deeplink.tariAddress
-            else -> null
+    override fun handleDeeplink(deeplink: DeepLink) {
+        if (deeplink is DeepLink.Send || deeplink is DeepLink.Contacts || deeplink is DeepLink.UserProfile) {
+            val deeplinkBase58 = when (deeplink) {
+                is DeepLink.Contacts -> deeplink.contacts.firstOrNull()?.tariAddress
+                is DeepLink.Send -> deeplink.walletAddress
+                is DeepLink.UserProfile -> deeplink.tariAddress
+                else -> null
+            }
+
+            val name = when (deeplink) {
+                is DeepLink.Contacts -> deeplink.contacts.firstOrNull()?.alias
+                is DeepLink.UserProfile -> deeplink.alias
+                else -> null
+            }.orEmpty()
+
+            when (deeplink) {
+                is DeepLink.Send -> deeplink.amount?.let { amount.value = it }
+                else -> Unit
+            }
+
+            deeplinkBase58?.let { TariWalletAddress.fromBase58OrNull(it) }?.let { walletAddress ->
+                selectedContact.value = ContactDto(FFIContactInfo(walletAddress), uuid = name)
+                _yatState.update { it.copy(yatUser = null) }
+            } ?: run { logger.e("Wallet address not found for deeplink: $deeplink") }
+        } else {
+            super.handleDeeplink(deeplink)
         }
-
-        val name = when (deeplink) {
-            is DeepLink.Contacts -> deeplink.contacts.firstOrNull()?.alias
-            is DeepLink.UserProfile -> deeplink.alias
-            else -> null
-        }.orEmpty()
-
-        when (deeplink) {
-            is DeepLink.Send -> deeplink.amount?.let { amount.value = it }
-            else -> Unit
-        }
-
-        deeplinkBase58?.let { TariWalletAddress.fromBase58OrNull(it) }?.let { walletAddress ->
-            selectedContact.value = ContactDto(FFIContactInfo(walletAddress), uuid = name)
-            _yatState.update { it.copy(yatUser = null) }
-        } ?: run { logger.e("Wallet address not found for deeplink: $deeplink") }
     }
 
     fun onContactlessPaymentClick() {
@@ -208,9 +211,9 @@ class ContactSelectionViewModel : CommonViewModel() {
         }
     }
 
-    fun parseDeeplink(context: Activity, deeplinkString: String) {
+    fun parseDeeplink(deeplinkString: String) {
         val deeplink = deeplinkManager.parseDeepLink(deeplinkString)!!
-        deeplinkManager.execute(context, deeplink)
+        deeplinkManager.execute(this, deeplink)
         deselectTariWalletAddress()
     }
 

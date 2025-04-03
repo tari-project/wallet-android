@@ -56,7 +56,7 @@ class CustomTorBridgesViewModel : CommonViewModel() {
                 return
             }
         }
-        if (newBridges.size == 0) {
+        if (newBridges.isEmpty()) {
             incorrectFormat()
             return
         }
@@ -65,10 +65,12 @@ class CustomTorBridgesViewModel : CommonViewModel() {
         onBackPressed()
     }
 
-    fun handleQrCode(deeplink: DeepLink) {
+    override fun handleDeeplink(deeplink: DeepLink) {
         if (deeplink is DeepLink.TorBridges) {
             val text = deeplinkManager.getDeeplinkString(deeplink)
             this.text.postValue(text)
+        } else {
+            super.handleDeeplink(deeplink)
         }
     }
 

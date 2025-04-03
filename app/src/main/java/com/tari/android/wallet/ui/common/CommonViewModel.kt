@@ -9,6 +9,7 @@ import androidx.lifecycle.ViewModel
 import com.orhanobut.logger.Logger
 import com.orhanobut.logger.Printer
 import com.tari.android.wallet.R
+import com.tari.android.wallet.application.deeplinks.DeepLink
 import com.tari.android.wallet.application.deeplinks.DeeplinkManager
 import com.tari.android.wallet.application.walletManager.WalletManager
 import com.tari.android.wallet.application.walletManager.doOnWalletRunning
@@ -162,13 +163,19 @@ open class CommonViewModel : ViewModel(), DialogHandler {
             YatIntegration.processDeepLink(activity, deeplinkUri)
             deeplinkManager.parseDeepLink(deeplinkUri)
         }?.let { deeplink ->
-            deeplinkManager.execute(activity, deeplink)
+            deeplinkManager.execute(this, deeplink)
         }
+    }
+
+    open fun handleDeeplink(deeplink: DeepLink) {
+        deeplinkManager.execute(this, deeplink)
     }
 
     fun onBackPressed() {
         _backPressed.value = Unit
     }
+
+    /* ------------ Dialogs -------------- */
 
     override fun showModularDialog(args: ModularDialogArgs) {
         _modularDialog.postValue(args)
@@ -188,6 +195,10 @@ open class CommonViewModel : ViewModel(), DialogHandler {
 
     override fun showInputModalDialog(vararg modules: IDialogModule) {
         _inputDialog.postValue(ModularDialogArgs(modules = modules.toList()))
+    }
+
+    override fun showInputModalDialog(dialogId: Int, vararg modules: IDialogModule) {
+        _inputDialog.postValue(ModularDialogArgs(dialogId = dialogId, modules = modules.toList()))
     }
 
     override fun showErrorDialog(error: CoreError) {
@@ -360,6 +371,7 @@ interface DialogHandler {
     fun showErrorDialog(exception: Throwable, onClose: () -> Unit = {})
     fun showErrorDialog(error: CoreError)
     fun showInputModalDialog(vararg modules: IDialogModule)
+    fun showInputModalDialog(dialogId: Int = ModularDialogArgs.DialogId.NO_ID, vararg modules: IDialogModule)
     fun showInputModalDialog(inputArgs: ModularDialogArgs)
     fun hideDialog(dialogId: Int = ModularDialogArgs.DialogId.NO_ID)
     fun hideDialogImmediately(dialogId: Int = ModularDialogArgs.DialogId.NO_ID)

@@ -33,6 +33,7 @@
 package com.tari.android.wallet.ui.screen.qr
 
 import android.Manifest
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
@@ -40,7 +41,6 @@ import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.fragment.app.Fragment
 import com.budiyev.android.codescanner.AutoFocusMode
 import com.budiyev.android.codescanner.CodeScanner
 import com.budiyev.android.codescanner.DecodeCallback
@@ -64,23 +64,6 @@ import com.tari.android.wallet.util.extension.setVisible
  */
 class QrScannerActivity : CommonXmlActivity<ActivityQrScannerBinding, QrScannerViewModel>() {
 
-    companion object {
-        /**
-         * Activity result code.
-         */
-        const val REQUEST_QR_SCANNER = 101
-
-        fun startScanner(fragment: Fragment, source: QrScannerSource) {
-            val intent = Intent(fragment.requireActivity(), QrScannerActivity::class.java)
-            intent.putExtra(EXTRA_QR_DATA_SOURCE, source)
-            fragment.startActivityForResult(intent, REQUEST_QR_SCANNER)
-        }
-
-        private const val REQUEST_CAMERA_PERMISSION = 102
-        const val EXTRA_DEEPLINK = "EXTRA_DEEPLINK"
-        const val EXTRA_QR_DATA_SOURCE = "EXTRA_QR_DATA_SOURCE"
-    }
-
     private var codeScanner: CodeScanner? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -101,11 +84,30 @@ class QrScannerActivity : CommonXmlActivity<ActivityQrScannerBinding, QrScannerV
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        codeScanner?.startPreview()
+    }
+
+    override fun onPause() {
+        codeScanner?.releaseResources()
+        super.onPause()
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == REQUEST_CAMERA_PERMISSION) {
+            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                startScanning()
+            } else {
+                TariToast(this, TariToastArgs(getString(R.string.add_recipient_camera_permission_denied_message), Toast.LENGTH_LONG))
+            }
+        }
+    }
+
     private fun subscribeUI() {
         collectFlow(viewModel.uiState) { uiState ->
             ui.errorContainer.setVisible(uiState.scanError)
-            ui.alternativeText.text = uiState.alternativeText
-            ui.alternativeContainer.setVisible(uiState.alternativeText.isNotEmpty())
         }
 
         collectFlow(viewModel.effect) { effect ->
@@ -121,8 +123,6 @@ class QrScannerActivity : CommonXmlActivity<ActivityQrScannerBinding, QrScannerV
             finish()
         }
 
-        alternativeApply.setOnClickListener { viewModel.onAlternativeApply(this@QrScannerActivity) }
-        alternativeDeny.setOnClickListener { viewModel.onAlternativeDeny() }
         retryButton.setOnClickListener { viewModel.onRetry() }
     }
 
@@ -152,24 +152,13 @@ class QrScannerActivity : CommonXmlActivity<ActivityQrScannerBinding, QrScannerV
         finish()
     }
 
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (requestCode == REQUEST_CAMERA_PERMISSION) {
-            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                startScanning()
-            } else {
-                TariToast(this, TariToastArgs(getString(R.string.add_recipient_camera_permission_denied_message), Toast.LENGTH_LONG))
-            }
+    companion object {
+        private const val REQUEST_CAMERA_PERMISSION = 102
+        const val EXTRA_DEEPLINK = "EXTRA_DEEPLINK"
+        const val EXTRA_QR_DATA_SOURCE = "EXTRA_QR_DATA_SOURCE"
+
+        fun newIntent(context: Context, source: QrScannerSource) = Intent(context, QrScannerActivity::class.java).also {
+            it.putExtra(EXTRA_QR_DATA_SOURCE, source)
         }
-    }
-
-    override fun onResume() {
-        super.onResume()
-        codeScanner?.startPreview()
-    }
-
-    override fun onPause() {
-        codeScanner?.releaseResources()
-        super.onPause()
     }
 }

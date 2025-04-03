@@ -152,7 +152,7 @@ class ShareManager : CommonViewModel() {
     }
 
     private fun onReceived(data: List<DeepLink.Contacts.DeeplinkContact>) {
-        deeplinkManager.execute(tariNavigator.currentActivity, DeepLink.Contacts(data))
+        deeplinkManager.execute(this, DeepLink.Contacts(data))
     }
 
     companion object {

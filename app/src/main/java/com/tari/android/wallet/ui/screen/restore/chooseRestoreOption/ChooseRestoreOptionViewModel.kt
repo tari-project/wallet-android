@@ -13,6 +13,7 @@ import com.tari.android.wallet.infrastructure.backup.BackupStorageAuthRevokedExc
 import com.tari.android.wallet.infrastructure.backup.BackupStorageTamperedException
 import com.tari.android.wallet.model.TariWalletAddress
 import com.tari.android.wallet.navigation.Navigation
+import com.tari.android.wallet.ui.common.CommonFragment
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.dialog.modular.ModularDialogArgs
 import com.tari.android.wallet.ui.dialog.modular.modules.body.BodyModule
@@ -20,7 +21,6 @@ import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonStyle
 import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
 import com.tari.android.wallet.ui.dialog.modular.modules.input.InputModule
-import com.tari.android.wallet.ui.screen.qr.QrScannerActivity
 import com.tari.android.wallet.ui.screen.qr.QrScannerSource
 import com.tari.android.wallet.ui.screen.settings.backup.data.BackupOption
 import com.tari.android.wallet.util.extension.launchOnIo
@@ -86,13 +86,14 @@ class ChooseRestoreOptionViewModel : CommonViewModel() {
         tariNavigator.navigate(Navigation.Restore.ToRestoreWithRecoveryPhrase)
     }
 
-    fun onPaperWalletClicked(fragment: Fragment) {
-        QrScannerActivity.startScanner(fragment, QrScannerSource.PaperWallet)
+    fun onPaperWalletClicked(fragment: CommonFragment<*>) {
+        fragment.startQrScanner(QrScannerSource.PaperWallet)
     }
 
-    fun handleDeeplink(qrDeepLink: DeepLink) {
-        if (qrDeepLink is DeepLink.PaperWallet) {
-            showPaperWalletDialog(qrDeepLink)
+    override fun handleDeeplink(deepLink: DeepLink) {
+        // Don't call super to make only PaperWallet deeplink work here
+        if (deepLink is DeepLink.PaperWallet) {
+            showPaperWalletDialog(deepLink)
         } else {
             showInvalidQrDialog()
         }

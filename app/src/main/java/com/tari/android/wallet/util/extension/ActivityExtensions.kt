@@ -34,8 +34,10 @@ package com.tari.android.wallet.util.extension
 
 import android.app.Activity
 import android.content.Context
+import android.content.Intent
 import android.view.View
 import android.view.inputmethod.InputMethodManager
+import androidx.activity.result.ActivityResult
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -59,3 +61,7 @@ fun AppCompatActivity.launchOnIo(action: suspend () -> Unit): Job {
 fun AppCompatActivity.launchOnMain(action: suspend () -> Unit): Job {
     return lifecycleScope.launch(Dispatchers.Main) { repeatOnLifecycle(Lifecycle.State.STARTED) { action() } }
 }
+
+fun ActivityResult.resultOk() = this.resultCode == Activity.RESULT_OK
+
+fun ActivityResult.dataIfOk(): Intent? = this.data?.takeIf { this.resultOk() }

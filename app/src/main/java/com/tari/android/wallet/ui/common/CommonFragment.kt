@@ -14,11 +14,14 @@ import android.view.WindowManager
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.core.content.ContextCompat
+import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
 import com.orhanobut.logger.Logger
 import com.orhanobut.logger.Printer
 import com.tari.android.wallet.BuildConfig
+import com.tari.android.wallet.application.deeplinks.DeepLink
 import com.tari.android.wallet.di.DiContainer
 import com.tari.android.wallet.infrastructure.logging.LoggerTags
 import com.tari.android.wallet.ui.component.mainList.MutedBackPressedCallback
@@ -26,7 +29,11 @@ import com.tari.android.wallet.ui.component.tari.toast.TariToast
 import com.tari.android.wallet.ui.component.tari.toast.TariToastArgs
 import com.tari.android.wallet.ui.dialog.modular.InputModularDialog
 import com.tari.android.wallet.ui.dialog.modular.ModularDialog
+import com.tari.android.wallet.ui.screen.qr.QrScannerActivity
+import com.tari.android.wallet.ui.screen.qr.QrScannerSource
+import com.tari.android.wallet.util.extension.dataIfOk
 import com.tari.android.wallet.util.extension.observe
+import com.tari.android.wallet.util.extension.parcelable
 import com.tari.android.wallet.util.extension.removeListenersAndCancel
 
 abstract class CommonFragment<VM : CommonViewModel> : Fragment(), FragmentPoppedListener {
@@ -60,7 +67,10 @@ abstract class CommonFragment<VM : CommonViewModel> : Fragment(), FragmentPopped
         }
     }
 
-    protected open fun screenRecordingAlwaysDisable() = false
+    private val scanQrCode = registerForActivityResult(StartActivityForResult()) { result ->
+        val qrDeepLink = result.dataIfOk()?.parcelable<DeepLink>(QrScannerActivity.EXTRA_DEEPLINK) ?: return@registerForActivityResult
+        viewModel.handleDeeplink(qrDeepLink)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -97,14 +107,6 @@ abstract class CommonFragment<VM : CommonViewModel> : Fragment(), FragmentPopped
         }
     }
 
-    fun bindViewModel(viewModel: VM) = with(viewModel) {
-        this@CommonFragment.viewModel = this
-
-        subscribeVM(viewModel)
-
-        dialogManager = viewModel.dialogManager
-    }
-
     override fun onDestroy() {
         super.onDestroy()
 
@@ -122,15 +124,35 @@ abstract class CommonFragment<VM : CommonViewModel> : Fragment(), FragmentPopped
         // implement in subclass
     }
 
+    protected open fun screenRecordingAlwaysDisable() = false
+
+    fun bindViewModel(viewModel: VM) = with(viewModel) {
+        this@CommonFragment.viewModel = this
+
+        subscribeVM(viewModel)
+
+        dialogManager = viewModel.dialogManager
+    }
+
+
+    fun startQrScanner(source: QrScannerSource) {
+        scanQrCode.launch(QrScannerActivity.newIntent(requireContext(), source))
+    }
+
     fun setFragmentPoppedListener(listener: FragmentPoppedListener) {
         fragmentPoppedListener = listener
     }
 
+    fun ensureIsAdded(action: () -> Unit) {
+        if (isAdded && context != null) {
+            action()
+        }
+    }
 
     fun <VM : CommonViewModel> subscribeVM(viewModel: VM) = with(viewModel) {
         observe(backPressed) { requireActivity().onBackPressed() }
 
-        observe(openLink) { startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(it))) }
+        observe(openLink) { startActivity(Intent(Intent.ACTION_VIEW, it.toUri())) }
 
         observe(copyToClipboard) { copy(it) }
 
@@ -172,12 +194,6 @@ abstract class CommonFragment<VM : CommonViewModel> : Fragment(), FragmentPopped
     private fun copy(clipboardArgs: ClipboardArgs) {
         clipboardManager.setPrimaryClip(ClipData.newPlainText(clipboardArgs.clipLabel, clipboardArgs.clipText))
         TariToast(requireContext(), TariToastArgs(clipboardArgs.toastMessage, Toast.LENGTH_LONG))
-    }
-
-    fun ensureIsAdded(action: () -> Unit) {
-        if (isAdded && context != null) {
-            action()
-        }
     }
 }
 

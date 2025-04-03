@@ -1,17 +1,11 @@
 package com.tari.android.wallet.ui.screen.qr
 
-import android.app.Activity
 import androidx.lifecycle.SavedStateHandle
-import com.tari.android.wallet.R
 import com.tari.android.wallet.application.deeplinks.DeepLink
-import com.tari.android.wallet.model.TariWalletAddress
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.screen.qr.QrScannerActivity.Companion.EXTRA_QR_DATA_SOURCE
 import com.tari.android.wallet.util.EffectFlow
-import com.tari.android.wallet.util.extension.launchOnIo
 import com.tari.android.wallet.util.extension.launchOnMain
-import com.tari.android.wallet.util.shortString
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -30,139 +24,16 @@ class QrScannerViewModel(savedState: SavedStateHandle) : CommonViewModel() {
     private val _effect = EffectFlow<QrScannerModel.Effect>()
     val effect: Flow<QrScannerModel.Effect> = _effect.flow
 
+    @Suppress("unused") // It's unused now, but maybe in future we will need where is the QR code scanned
     private val qrScannerSource: QrScannerSource = savedState.get<QrScannerSource>(EXTRA_QR_DATA_SOURCE) ?: QrScannerSource.None
-
-    fun onAlternativeApply(context: Activity) {
-        onBackPressed()
-        launchOnIo {
-            delay(500)
-            launchOnMain {
-                deeplinkManager.executeRawDeeplink(context, uiState.value.scannedDeeplink!!)
-            }
-        }
-    }
-
-    fun onAlternativeDeny() {
-        launchOnMain {
-            _uiState.update { it.copy(alternativeText = "") }
-            _effect.send(QrScannerModel.Effect.ProceedScan)
-        }
-    }
 
     fun onScanResult(text: String?) {
         val deeplink = deeplinkManager.parseDeepLink(text.orEmpty())
         if (deeplink == null) {
             _uiState.update { it.copy(scanError = true) }
         } else {
-            handleDeeplink(deeplink)
+            returnResult(deeplink)
         }
-    }
-
-    private fun handleDeeplink(deepLink: DeepLink) {
-        _uiState.update { it.copy(scannedDeeplink = deepLink) }
-
-        when (qrScannerSource) {
-            QrScannerSource.None,
-            QrScannerSource.Home -> {
-                when (deepLink) {
-                    is DeepLink.Send,
-                    is DeepLink.UserProfile,
-                    is DeepLink.Contacts,
-                    is DeepLink.TorBridges,
-                    is DeepLink.AddBaseNode,
-                    is DeepLink.AirdropLoginToken -> setAlternativeText(deepLink)
-
-                    is DeepLink.PaperWallet -> returnResult(deepLink)
-                }
-            }
-
-            QrScannerSource.TransactionSend -> {
-                when (deepLink) {
-                    is DeepLink.Send,
-                    is DeepLink.UserProfile,
-                    is DeepLink.PaperWallet,
-                    is DeepLink.AirdropLoginToken -> returnResult(deepLink)
-
-                    is DeepLink.Contacts,
-                    is DeepLink.TorBridges,
-                    is DeepLink.AddBaseNode -> setAlternativeText(deepLink)
-                }
-            }
-
-            QrScannerSource.AddContact -> {
-                when (deepLink) {
-                    is DeepLink.UserProfile,
-                    is DeepLink.PaperWallet,
-                    is DeepLink.AirdropLoginToken -> returnResult(deepLink)
-
-                    is DeepLink.Send,
-                    is DeepLink.Contacts,
-                    is DeepLink.TorBridges,
-                    is DeepLink.AddBaseNode -> setAlternativeText(deepLink)
-                }
-            }
-
-            QrScannerSource.ContactBook -> {
-                when (deepLink) {
-                    is DeepLink.Send,
-                    is DeepLink.UserProfile,
-                    is DeepLink.Contacts,
-                    is DeepLink.PaperWallet,
-                    is DeepLink.AirdropLoginToken -> returnResult(deepLink)
-
-                    is DeepLink.TorBridges,
-                    is DeepLink.AddBaseNode -> setAlternativeText(deepLink)
-
-                }
-            }
-
-            QrScannerSource.TorBridges -> {
-                when (deepLink) {
-                    is DeepLink.Send,
-                    is DeepLink.UserProfile,
-                    is DeepLink.AddBaseNode,
-                    is DeepLink.Contacts,
-                    is DeepLink.PaperWallet,
-                    is DeepLink.AirdropLoginToken -> setAlternativeText(deepLink)
-
-                    is DeepLink.TorBridges -> returnResult(deepLink)
-                }
-            }
-
-            QrScannerSource.PaperWallet -> {
-                when (deepLink) {
-                    is DeepLink.Send,
-                    is DeepLink.UserProfile,
-                    is DeepLink.Contacts,
-                    is DeepLink.TorBridges,
-                    is DeepLink.AddBaseNode,
-                    is DeepLink.AirdropLoginToken -> _uiState.update { it.copy(scanError = true) }
-
-                    is DeepLink.PaperWallet -> returnResult(deepLink)
-                }
-            }
-        }
-    }
-
-    private fun setAlternativeText(deepLink: DeepLink) {
-        val text = when (deepLink) {
-            is DeepLink.Send -> {
-                val walletAddress = TariWalletAddress.fromBase58OrNull(deepLink.walletAddress) ?: return
-                resourceManager.getString(R.string.qr_code_scanner_labels_actions_transaction_send, walletAddress.shortString())
-            }
-
-            is DeepLink.UserProfile -> resourceManager.getString(R.string.qr_code_scanner_labels_actions_profile)
-            is DeepLink.Contacts -> resourceManager.getString(R.string.qr_code_scanner_labels_actions_contacts)
-            is DeepLink.AddBaseNode -> resourceManager.getString(R.string.qr_code_scanner_labels_actions_base_node_add)
-            is DeepLink.TorBridges -> resourceManager.getString(R.string.qr_code_scanner_labels_actions_tor_bridges)
-            is DeepLink.PaperWallet -> resourceManager.getString(R.string.qr_code_scanner_labels_actions_paper_wallet) // should never show. Show PW dialog instead
-            is DeepLink.AirdropLoginToken -> ""
-        }
-        _uiState.update { it.copy(alternativeText = text) }
-    }
-
-    private fun returnResult(deepLink: DeepLink) {
-        launchOnMain { _effect.send(QrScannerModel.Effect.FinishWithResult(deepLink)) }
     }
 
     fun onRetry() {
@@ -170,5 +41,9 @@ class QrScannerViewModel(savedState: SavedStateHandle) : CommonViewModel() {
             _effect.send(QrScannerModel.Effect.ProceedScan)
             _uiState.update { it.copy(scanError = false) }
         }
+    }
+
+    private fun returnResult(deepLink: DeepLink) {
+        launchOnMain { _effect.send(QrScannerModel.Effect.FinishWithResult(deepLink)) }
     }
 }

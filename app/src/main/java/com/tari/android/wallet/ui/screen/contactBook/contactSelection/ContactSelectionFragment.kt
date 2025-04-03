@@ -1,9 +1,7 @@
 package com.tari.android.wallet.ui.screen.contactBook.contactSelection
 
 import android.animation.ValueAnimator
-import android.app.Activity
 import android.content.Context
-import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -22,7 +20,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.daasuu.ei.Ease
 import com.daasuu.ei.EasingInterpolator
 import com.tari.android.wallet.R
-import com.tari.android.wallet.application.deeplinks.DeepLink
 import com.tari.android.wallet.databinding.FragmentContactsSelectionBinding
 import com.tari.android.wallet.model.TariWalletAddress
 import com.tari.android.wallet.ui.common.CommonXmlFragment
@@ -37,7 +34,6 @@ import com.tari.android.wallet.ui.screen.contactBook.contactSelection.ContactSel
 import com.tari.android.wallet.ui.screen.contactBook.contacts.adapter.ContactListAdapter
 import com.tari.android.wallet.ui.screen.contactBook.contacts.adapter.contact.ContactItemViewHolderItem
 import com.tari.android.wallet.ui.screen.contactBook.contacts.adapter.contact.ContactlessPaymentItem
-import com.tari.android.wallet.ui.screen.qr.QrScannerActivity
 import com.tari.android.wallet.ui.screen.qr.QrScannerSource
 import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.DebugConfig
@@ -48,7 +44,6 @@ import com.tari.android.wallet.util.extension.hideKeyboard
 import com.tari.android.wallet.util.extension.launchAndRepeatOnLifecycle
 import com.tari.android.wallet.util.extension.observe
 import com.tari.android.wallet.util.extension.observeOnLoad
-import com.tari.android.wallet.util.extension.parcelable
 import com.tari.android.wallet.util.extension.postDelayed
 import com.tari.android.wallet.util.extension.setSelectionToEnd
 import com.tari.android.wallet.util.extension.setVisible
@@ -243,7 +238,7 @@ open class ContactSelectionFragment : CommonXmlFragment<FragmentContactsSelectio
     }
 
     open fun startQRCodeActivity() {
-        QrScannerActivity.startScanner(this, QrScannerSource.AddContact)
+        startQrScanner(QrScannerSource.AddContact)
     }
 
     private fun focusEditTextAndShowKeyboard() {
@@ -261,14 +256,6 @@ open class ContactSelectionFragment : CommonXmlFragment<FragmentContactsSelectio
         requireActivity().hideKeyboard()
         clipboardController?.hidePasteEmojiIdViews(animate = true) {
             ui.rootView.postDelayed(Constants.UI.keyboardHideWaitMs) { startQRCodeActivity() }
-        }
-    }
-
-    @Deprecated("Deprecated in Java")
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        if (requestCode == QrScannerActivity.REQUEST_QR_SCANNER && resultCode == Activity.RESULT_OK && data != null) {
-            val qrDeepLink = data.parcelable<DeepLink>(QrScannerActivity.EXTRA_DEEPLINK) ?: return
-            viewModel.handleDeeplink(qrDeepLink)
         }
     }
 
@@ -355,7 +342,7 @@ open class ContactSelectionFragment : CommonXmlFragment<FragmentContactsSelectio
                 viewModel.addressEntered(textWithoutSeparators)
             }
         } else if (viewModel.deeplinkManager.parseDeepLink(text) != null) {
-            viewModel.parseDeeplink(requireActivity(), text)
+            viewModel.parseDeeplink(text)
         } else {
             val walletAddress = TariWalletAddress.fromBase58OrNull(text)
             if (walletAddress != null) {
