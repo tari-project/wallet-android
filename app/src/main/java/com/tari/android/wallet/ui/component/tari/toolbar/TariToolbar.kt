@@ -7,9 +7,10 @@ import android.widget.FrameLayout
 import com.giphy.sdk.ui.utils.px
 import com.tari.android.wallet.R
 import com.tari.android.wallet.databinding.TariToolbarBinding
-import com.tari.android.wallet.util.extension.repopulate
 import com.tari.android.wallet.util.extension.gone
+import com.tari.android.wallet.util.extension.invisible
 import com.tari.android.wallet.util.extension.obtain
+import com.tari.android.wallet.util.extension.repopulate
 import com.tari.android.wallet.util.extension.runRecycle
 import com.tari.android.wallet.util.extension.setEndMargin
 import com.tari.android.wallet.util.extension.setStartMargin
@@ -77,7 +78,7 @@ class TariToolbar(context: Context, attrs: AttributeSet) : FrameLayout(context, 
     }
 
     fun hideRightActions() {
-        ui.toolbarRightActions.gone()
+        ui.toolbarRightActions.invisible()
     }
 
     fun showLeftActions() {

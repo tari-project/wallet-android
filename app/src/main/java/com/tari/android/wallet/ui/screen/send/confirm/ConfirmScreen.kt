@@ -31,6 +31,7 @@ import com.tari.android.wallet.ui.screen.send.confirm.widget.SenderCard
 import com.tari.android.wallet.ui.screen.send.confirm.widget.TxDetailInfoCopyItem
 import com.tari.android.wallet.ui.screen.settings.themeSelector.TariTheme
 import com.tari.android.wallet.util.MockDataStub
+import com.tari.android.wallet.util.base58Ellipsized
 import com.tari.android.wallet.util.extension.toMicroTari
 
 @Composable
@@ -101,7 +102,7 @@ fun ConfirmScreen(
                     .fillMaxWidth()
                     .padding(horizontal = 40.dp),
                 title = stringResource(R.string.tx_details_recipient_address),
-                value = uiState.transactionData.recipientContact.walletAddress.fullBase58,
+                value = uiState.transactionData.recipientContact.walletAddress.base58Ellipsized(),
                 onCopyClicked = onCopyValueClick,
             )
             Spacer(Modifier.size(10.dp))
@@ -137,7 +138,7 @@ fun ConfirmScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 20.dp),
-                text = stringResource(R.string.confirm_tx_you_are_about_to_send),
+                text = stringResource(R.string.confirm_tx_confirm_and_send_button),
                 onClick = onConfirmClick,
             )
             Spacer(Modifier.size(16.dp))
