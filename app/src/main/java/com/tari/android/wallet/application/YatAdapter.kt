@@ -1,10 +1,8 @@
 package com.tari.android.wallet.application
 
 import android.app.Activity
-import android.app.ActivityOptions
 import android.app.Application
 import android.content.Context
-import android.content.Intent
 import android.os.Parcelable
 import com.google.gson.annotations.SerializedName
 import com.orhanobut.logger.Logger
@@ -15,8 +13,6 @@ import com.tari.android.wallet.data.sharedPrefs.network.NetworkPrefRepository
 import com.tari.android.wallet.data.sharedPrefs.yat.YatPrefRepository
 import com.tari.android.wallet.model.EmojiId
 import com.tari.android.wallet.ui.screen.send.common.TransactionData
-import com.tari.android.wallet.ui.screen.send.finalize.FinalizeSendTxViewModel
-import com.tari.android.wallet.ui.screen.send.finalize.YatFinalizeSendTxActivity
 import com.tari.android.wallet.util.DebugConfig
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -27,8 +23,6 @@ import yat.android.lib.YatConfiguration
 import yat.android.lib.YatIntegration
 import yat.android.lib.YatLibApi
 import yat.android.sdk.models.PaymentAddressResponseResult
-import yat.android.ui.transactions.outcoming.YatLibOutcomingTransactionActivity
-import yat.android.ui.transactions.outcoming.YatLibOutcomingTransactionData
 import java.lang.reflect.Field
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -113,19 +107,23 @@ class YatAdapter @Inject constructor(
     }
 
     fun showOutcomingFinalizeActivity(activity: Activity, transactionData: TransactionData) {
-        val yatUser = transactionData.recipientContact.yat ?: return
-        val currentTicker = networkRepository.currentNetwork.ticker
-        val data = YatLibOutcomingTransactionData(
-            amount = transactionData.amount.tariValue.toDouble(),
-            currency = currentTicker,
-            yat = yatUser,
-        )
-
-        val intent = Intent(activity, YatFinalizeSendTxActivity::class.java)
-        intent.putExtra(YatLibOutcomingTransactionActivity.DATA_KEY, data)
-        intent.putExtra(FinalizeSendTxViewModel.KEY_TRANSACTION_DATA, transactionData)
-        intent.flags = Intent.FLAG_ACTIVITY_NO_ANIMATION
-        activity.startActivity(intent, ActivityOptions.makeSceneTransitionAnimation(activity).toBundle())
+        // FIXME: show Yat animation !! Until it is implemented, it will be skipped
+        if (!DebugConfig.isYatEnabled) {
+            return
+        }
+//        val yatUser = transactionData.recipientContact.yat ?: return
+//        val currentTicker = networkRepository.currentNetwork.ticker
+//        val data = YatLibOutcomingTransactionData(
+//            amount = transactionData.amount.tariValue.toDouble(),
+//            currency = currentTicker,
+//            yat = yatUser,
+//        )
+//
+//        val intent = Intent(activity, YatFinalizeSendTxActivity::class.java)
+//        intent.putExtra(YatLibOutcomingTransactionActivity.DATA_KEY, data)
+//        intent.putExtra(FinalizeSendTxViewModel.KEY_TRANSACTION_DATA, transactionData)
+//        intent.flags = Intent.FLAG_ACTIVITY_NO_ANIMATION
+//        activity.startActivity(intent, ActivityOptions.makeSceneTransitionAnimation(activity).toBundle())
     }
 
     override fun onYatIntegrationComplete(yat: String) {

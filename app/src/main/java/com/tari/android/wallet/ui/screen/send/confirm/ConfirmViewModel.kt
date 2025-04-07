@@ -1,6 +1,8 @@
 package com.tari.android.wallet.ui.screen.send.confirm
 
 import androidx.lifecycle.SavedStateHandle
+import com.tari.android.wallet.R
+import com.tari.android.wallet.model.MicroTari
 import com.tari.android.wallet.navigation.Navigation
 import com.tari.android.wallet.navigation.TariNavigator.Companion.PARAMETER_TRANSACTION
 import com.tari.android.wallet.ui.common.CommonViewModel
@@ -28,13 +30,23 @@ class ConfirmViewModel(savedState: SavedStateHandle) : CommonViewModel() {
         tariNavigator.navigate(Navigation.TxSend.ToFinalizing(uiState.value.transactionData))
     }
 
+    fun copyTxValueToClipboard(value: String) {
+        copyToClipboard(
+            clipLabel = resourceManager.getString(R.string.tx_details_transaction_details),
+            clipText = value,
+        )
+    }
+
     data class UiState(
         val ticker: String,
         val transactionData: TransactionData,
     ) {
         val screenTitle: String
-            get() = transactionData.recipientContact.alias.takeIf { it.isNotBlank() }
-                ?: transactionData.recipientContact.walletAddress?.shortString().orEmpty()
+            get() = transactionData.recipientContact.getAlias().takeIf { it.isNotBlank() }
+                ?: transactionData.recipientContact.walletAddress.shortString()
+
+        val totalAmount: MicroTari
+            get() = transactionData.amount + transactionData.feePerGram
     }
 }
 

@@ -246,7 +246,7 @@ class TariNavigator @Inject constructor(
     private fun toBaseNodeSelection() = addFragment(ChangeBaseNodeFragment())
 
     private fun continueToFinalizeSendTx(transactionData: TransactionData) {
-        if (transactionData.recipientContact.yat != null) {
+        if (transactionData.yat != null) {
             yatAdapter.showOutcomingFinalizeActivity(this.currentActivity, transactionData)
         } else {
             addFragment(FinalizeSendTxFragment.create(transactionData))

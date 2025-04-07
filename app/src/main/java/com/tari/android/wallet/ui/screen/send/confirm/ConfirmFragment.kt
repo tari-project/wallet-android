@@ -22,6 +22,7 @@ class ConfirmFragment : CommonFragment<ConfirmViewModel>() {
             ConfirmScreen(
                 uiState = uiState,
                 onBackClick = { viewModel.onBackPressed() },
+                onCopyValueClick = { viewModel.copyTxValueToClipboard(it) },
                 onConfirmClick = { viewModel.onConfirmClicked() },
             )
         }

@@ -219,7 +219,7 @@ class FinalizeSendTxViewModel(savedState: SavedStateHandle) : CommonViewModel() 
             launchOnIo {
                 try {
                     val txId = walletManager.sendTari(
-                        tariContact = TariContact(transactionData.recipientContact.contactInfo.requireWalletAddress()),
+                        tariContact = TariContact(transactionData.recipientContact.walletAddress),
                         amount = transactionData.amount,
                         feePerGram = transactionData.feePerGram,
                         message = transactionData.message,

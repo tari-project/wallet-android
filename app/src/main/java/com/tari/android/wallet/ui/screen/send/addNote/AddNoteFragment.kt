@@ -49,6 +49,7 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.RelativeLayout
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.animation.addListener
+import androidx.core.view.isVisible
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
@@ -62,7 +63,7 @@ import com.tari.android.wallet.R
 import com.tari.android.wallet.R.dimen.add_note_gif_inner_margin
 import com.tari.android.wallet.R.dimen.add_note_slide_button_left_margin
 import com.tari.android.wallet.R.dimen.add_note_slide_button_width
-import com.tari.android.wallet.data.contacts.model.ContactDto
+import com.tari.android.wallet.data.contacts.model.FFIContactInfo
 import com.tari.android.wallet.databinding.FragmentAddNoteBinding
 import com.tari.android.wallet.model.MicroTari
 import com.tari.android.wallet.model.TariWalletAddress
@@ -94,8 +95,6 @@ import com.tari.android.wallet.util.extension.postDelayed
 import com.tari.android.wallet.util.extension.setStartMargin
 import com.tari.android.wallet.util.extension.temporarilyDisableClick
 import com.tari.android.wallet.util.extension.visible
-import androidx.core.net.toUri
-import androidx.core.view.isVisible
 
 class AddNoteFragment : CommonXmlFragment<FragmentAddNoteBinding, AddNoteViewModel>(), View.OnTouchListener {
 
@@ -106,7 +105,7 @@ class AddNoteFragment : CommonXmlFragment<FragmentAddNoteBinding, AddNoteViewMod
 
     // Tx properties.
     private lateinit var transactionData: TransactionData
-    private lateinit var recipientUser: ContactDto
+    private lateinit var recipientUser: FFIContactInfo
     private lateinit var amount: MicroTari
     private lateinit var note: String
     private var isOneSidePayment: Boolean = false
@@ -214,7 +213,7 @@ class AddNoteFragment : CommonXmlFragment<FragmentAddNoteBinding, AddNoteViewMod
 
     private fun setupCTAs() {
         ui.backCtaView.backPressedAction = { onBackButtonClicked() }
-        ui.emojiIdSummaryContainerView.setOnClickListener { viewModel.emojiIdClicked(recipientUser.contactInfo.requireWalletAddress()) }
+        ui.emojiIdSummaryContainerView.setOnClickListener { viewModel.emojiIdClicked(recipientUser.walletAddress) }
         ui.removeGifCtaView.setOnClickListener {
             changeScrollViewBottomConstraint(R.id.search_giphy_container_view)
             gifContainer.gifItem = null
@@ -240,8 +239,8 @@ class AddNoteFragment : CommonXmlFragment<FragmentAddNoteBinding, AddNoteViewMod
     }
 
     private fun displayAliasOrEmojiId() {
-        val alias = recipientUser.contactInfo.getAlias()
-        if (alias.isEmpty()) displayEmojiId(recipientUser.contactInfo.requireWalletAddress()) else displayAlias(alias)
+        val alias = recipientUser.getAlias()
+        if (alias.isEmpty()) displayEmojiId(recipientUser.walletAddress) else displayAlias(alias)
     }
 
     private fun displayAlias(alias: String) {
