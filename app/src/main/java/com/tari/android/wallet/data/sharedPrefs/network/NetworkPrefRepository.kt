@@ -35,8 +35,8 @@ class NetworkPrefRepository @Inject constructor(sharedPrefs: SharedPreferences) 
     }
 
     companion object {
-        private const val TICKER_MAINNET = "XTR"
-        private const val TICKER_TESTNET = "tXTR"
+        private const val TICKER_MAINNET = "XTM"
+        private const val TICKER_TESTNET = "tXTM"
 
         private val NETWORK_MAINNET: TariNetwork = TariNetwork(
             network = Network.MAINNET,

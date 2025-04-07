@@ -114,7 +114,7 @@ fun TariMinedCardPreview() {
                 .height(120.dp)
                 .width(240.dp),
             balance = 24_836_150_000.toMicroTari().tariValue,
-            ticker = "tXTR",
+            ticker = "XTM",
         )
     }
 }

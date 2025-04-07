@@ -173,7 +173,7 @@ private fun TxItemPreview() {
                 amount = 122334455,
                 contactAlias = "Alice",
             ),
-            ticker = "XTR",
+            ticker = "XTM",
             onTxClick = {},
         )
     }

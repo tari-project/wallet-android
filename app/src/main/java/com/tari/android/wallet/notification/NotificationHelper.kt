@@ -46,6 +46,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 
+//TODO: Review this class and remove any unused code
 @Singleton
 class NotificationHelper @Inject constructor(private val context: Context) {
 
