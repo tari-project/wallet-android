@@ -54,7 +54,7 @@ class NetworkPrefRepository @Inject constructor(sharedPrefs: SharedPreferences) 
         )
         private val NETWORK_NEXTNET: TariNetwork = TariNetwork(
             network = Network.NEXTNET,
-            dnsPeer = "seeds.nextnet.tari.com",
+            dnsPeer = "aurora.nextnet.tari.com",
             blockExplorerUrl = "https://explore-nextnet.tari.com",
             ticker = TICKER_TESTNET,
             recommended = false,
