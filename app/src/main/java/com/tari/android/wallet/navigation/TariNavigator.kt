@@ -4,12 +4,12 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.provider.ContactsContract
+import androidx.core.net.toUri
 import com.tari.android.wallet.application.YatAdapter
 import com.tari.android.wallet.application.YatAdapter.ConnectedWallet
 import com.tari.android.wallet.data.contacts.model.ContactDto
 import com.tari.android.wallet.model.MicroTari
 import com.tari.android.wallet.model.TariWalletAddress
-import com.tari.android.wallet.navigation.Navigation.AddAmount
 import com.tari.android.wallet.navigation.Navigation.AllSettings
 import com.tari.android.wallet.navigation.Navigation.Auth
 import com.tari.android.wallet.navigation.Navigation.BackToHome
@@ -26,6 +26,7 @@ import com.tari.android.wallet.navigation.Navigation.ShareText
 import com.tari.android.wallet.navigation.Navigation.SplashScreen
 import com.tari.android.wallet.navigation.Navigation.TorBridge
 import com.tari.android.wallet.navigation.Navigation.TxList
+import com.tari.android.wallet.navigation.Navigation.TxSend
 import com.tari.android.wallet.navigation.Navigation.VerifySeedPhrase
 import com.tari.android.wallet.ui.common.CommonActivity
 import com.tari.android.wallet.ui.common.CommonFragment
@@ -54,6 +55,7 @@ import com.tari.android.wallet.ui.screen.restore.walletRestoring.WalletRestoring
 import com.tari.android.wallet.ui.screen.send.addAmount.AddAmountFragment
 import com.tari.android.wallet.ui.screen.send.addNote.AddNoteFragment
 import com.tari.android.wallet.ui.screen.send.common.TransactionData
+import com.tari.android.wallet.ui.screen.send.confirm.ConfirmFragment
 import com.tari.android.wallet.ui.screen.send.finalize.FinalizeSendTxFragment
 import com.tari.android.wallet.ui.screen.send.receive.ReceiveFragment
 import com.tari.android.wallet.ui.screen.send.requestTari.RequestTariFragment
@@ -140,8 +142,9 @@ class TariNavigator @Inject constructor(
             is InputSeedWords.ToRestoreFromSeeds -> addFragment(WalletRestoringFragment.newInstance())
             is InputSeedWords.ToBaseNodeSelection -> toBaseNodeSelection()
 
-            is AddAmount.ContinueToAddNote -> addFragment(AddNoteFragment.newInstance(navigation.transactionData))
-            is AddAmount.ContinueToFinalizing -> continueToFinalizeSendTx(navigation.transactionData)
+            is TxSend.ToAddNote -> addFragment(AddNoteFragment.newInstance(navigation.transactionData))
+            is TxSend.ToFinalizing -> continueToFinalizeSendTx(navigation.transactionData)
+            is TxSend.ToConfirm -> addFragment(ConfirmFragment.newInstance(navigation.transactionData))
 
             is TxList.ToTxDetails -> addFragment(TxDetailsFragment.newInstance(navigation.tx, navigation.txId))
             is TxList.ToSendTariToUser -> sendToUser(navigation.contact, navigation.amount, navigation.note)
@@ -243,7 +246,7 @@ class TariNavigator @Inject constructor(
     private fun toBaseNodeSelection() = addFragment(ChangeBaseNodeFragment())
 
     private fun continueToFinalizeSendTx(transactionData: TransactionData) {
-        if (transactionData.recipientContact?.yat != null) {
+        if (transactionData.yat != null) {
             yatAdapter.showOutcomingFinalizeActivity(this.currentActivity, transactionData)
         } else {
             addFragment(FinalizeSendTxFragment.create(transactionData))
@@ -253,7 +256,7 @@ class TariNavigator @Inject constructor(
     private fun toExternalWallet(connectedWallet: ConnectedWallet) {
         try {
             val externalAddress = connectedWallet.getExternalLink()
-            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(externalAddress))
+            val intent = Intent(Intent.ACTION_VIEW, externalAddress.toUri())
 
             if (intent.resolveActivity(currentActivity.packageManager) != null) {
                 currentActivity.startActivity(intent)

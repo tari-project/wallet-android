@@ -94,7 +94,7 @@ object Constants {
         object FinalizeSendTx {
             const val lottieAnimStartDelayMs = 400L
             const val textAppearAnimStartDelayMs = 200L
-            const val successfulInfoFadeOutAnimStartDelayMs = 3130L
+            const val successfulInfoFadeOutAnimStartDelayMs = 1500L
         }
 
         object Auth {

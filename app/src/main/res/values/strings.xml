@@ -322,6 +322,10 @@
     <string name="finalize_send_tx_sending_cancel_dialog_title">Cancel Sending</string>
     <string name="finalize_send_tx_sending_cancel_dialog_description">Are you sure you want to leave this screen? Your transaction may be cancelled.</string>
 
+    <!-- send tari - confirm & pay -->
+    <string name="confirm_tx_confirm_and_send_button">Confirm &amp; Send</string>
+    <string name="confirm_tx_you_are_about_to_send">You are about to send</string>
+
     <!-- wallet info -->
     <string name="wallet_info_my_profile">My Profile</string>
     <string name="wallet_info_qr_code_desc">Transacting in person? Others can scan this QR code from the Tari Aurora App to send you tXTR.</string>
@@ -381,6 +385,9 @@
     <string name="tx_details_error_tx_not_found_desc">Please try again later</string>
     <string name="tx_details_coinbase_inbound">Mining Reward!</string>
     <string name="tx_details_coinbase_outbound">You paid the Miner</string>
+    <string name="tx_details_recipient_address">Recipient Address</string>
+    <string name="tx_details_total">Total</string>
+    <string name="tx_details_transaction_details">Transaction Details</string>
 
     <string name="tx_details_cancellation_reason_unknown">The transaction failed for an unknown reason.</string>
     <string name="tx_details_cancellation_reason_user_cancelled">The transaction was canceled by the sender.</string>

@@ -34,7 +34,7 @@ object Dependencies {
         }
 
         object Compose {
-            const val bom = "androidx.compose:compose-bom:2025.02.00"
+            const val bom = "androidx.compose:compose-bom:2025.03.00"
             const val material = "androidx.compose.material:material" // FIXME: check usage and replace with material3
             const val material3 = "androidx.compose.material3:material3"
             const val uiTooling = "androidx.compose.ui:ui-tooling"

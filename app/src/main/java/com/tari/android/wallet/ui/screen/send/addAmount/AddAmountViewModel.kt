@@ -47,13 +47,13 @@ class AddAmountViewModel(savedState: SavedStateHandle) : CommonViewModel() {
     }
 
     private val _uiState = MutableStateFlow(
-        savedState.get<ContactDto>(PARAMETER_CONTACT)?.let { contact ->
+        savedState.get<ContactDto>(PARAMETER_CONTACT)?.getFFIContactInfo()?.let { contact ->
             AddAmountModel.UiState(
                 amount = savedState.get<MicroTari>(PARAMETER_AMOUNT)?.tariValue?.toDouble() ?: Double.MIN_VALUE,
-                contactDto = contact,
+                recipientContactInfo = contact,
                 note = savedState.get<String>(PARAMETER_NOTE).orEmpty(),
             )
-        } ?: error("Contact is required, but not provided")
+        } ?: error("FFI contact is required, but not provided (maybe it is a PhoneContactInfo which does not have a wallet address).")
     )
     val uiState = _uiState.asStateFlow()
 
@@ -126,9 +126,9 @@ class AddAmountViewModel(savedState: SavedStateHandle) : CommonViewModel() {
         if (!networkConnection.isNetworkConnected()) {
             showInternetConnectionErrorDialog()
         } else if (transactionData.shouldSkipAddingNote()) {
-            tariNavigator.navigate(Navigation.AddAmount.ContinueToFinalizing(transactionData))
+            tariNavigator.navigate(Navigation.TxSend.ToConfirm(transactionData))
         } else {
-            tariNavigator.navigate(Navigation.AddAmount.ContinueToAddNote(transactionData))
+            tariNavigator.navigate(Navigation.TxSend.ToAddNote(transactionData))
         }
     }
 

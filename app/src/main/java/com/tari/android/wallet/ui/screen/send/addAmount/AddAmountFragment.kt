@@ -53,6 +53,7 @@ import com.tari.android.wallet.R.string.tx_detail_fee_tooltip_desc
 import com.tari.android.wallet.R.string.tx_detail_fee_tooltip_transaction_fee
 import com.tari.android.wallet.application.walletManager.WalletConfig
 import com.tari.android.wallet.data.contacts.model.ContactDto
+import com.tari.android.wallet.data.contacts.model.FFIContactInfo
 import com.tari.android.wallet.databinding.FragmentAddAmountBinding
 import com.tari.android.wallet.model.BalanceInfo
 import com.tari.android.wallet.model.MicroTari
@@ -83,13 +84,15 @@ import com.tari.android.wallet.util.extension.temporarilyDisableClick
 import com.tari.android.wallet.util.extension.visible
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import androidx.core.view.isVisible
+import androidx.core.view.isInvisible
 
 class AddAmountFragment : CommonXmlFragment<FragmentAddAmountBinding, AddAmountViewModel>() {
 
     /**
      * Recipient is either an emoji id or a user from contacts or recent txs.
      */
-    private lateinit var contactDto: ContactDto
+    private lateinit var recipientContact: FFIContactInfo
     private lateinit var note: String
 
     private var keyboardController: KeyboardController = KeyboardController()
@@ -134,7 +137,7 @@ class AddAmountFragment : CommonXmlFragment<FragmentAddAmountBinding, AddAmountV
 
     private fun setupUI(uiState: AddAmountModel.UiState) {
         keyboardController.setup(requireContext(), AmountCheckRunnable(), ui.numpad, ui.amount, uiState.amount)
-        contactDto = uiState.contactDto
+        recipientContact = uiState.recipientContactInfo
         note = uiState.note
         // hide tx fee
         ui.txFeeContainerView.invisible()
@@ -147,9 +150,9 @@ class AddAmountFragment : CommonXmlFragment<FragmentAddAmountBinding, AddAmountV
     }
 
     private fun displayAliasOrEmojiId() {
-        val alias = contactDto.contactInfo.getAlias()
+        val alias = recipientContact.getAlias()
         if (alias.isEmpty()) {
-            displayEmojiId(contactDto.contactInfo.requireWalletAddress())
+            displayEmojiId(recipientContact.walletAddress)
         } else {
             displayAlias(alias)
         }
@@ -157,7 +160,7 @@ class AddAmountFragment : CommonXmlFragment<FragmentAddAmountBinding, AddAmountV
 
     private fun setActionBindings() {
         ui.backCtaView.setOnClickListener { onBackButtonClicked(it) }
-        ui.emojiIdSummaryContainerView.setOnClickListener { viewModel.emojiIdClicked(contactDto.contactInfo.requireWalletAddress()) }
+        ui.emojiIdSummaryContainerView.setOnClickListener { viewModel.emojiIdClicked(recipientContact.walletAddress) }
         ui.txFeeDescTextView.setOnClickListener { showTxFeeToolTip() }
         ui.continueButton.setOnClickListener { continueButtonClicked() }
     }
@@ -256,7 +259,7 @@ class AddAmountFragment : CommonXmlFragment<FragmentAddAmountBinding, AddAmountV
 
     private fun continueToNote() {
         val transactionData = TransactionData(
-            recipientContact = contactDto,
+            recipientContact = recipientContact,
             amount = keyboardController.currentAmount,
             note = note,
             feePerGram = viewModel.selectedFeeData!!.feePerGram,
@@ -313,8 +316,8 @@ class AddAmountFragment : CommonXmlFragment<FragmentAddAmountBinding, AddAmountV
         private fun showOrHideFeeViewAnimated(showsTxFee: Boolean) = with(ui) {
             if (showsTxFee) feeCalculating.gone()
 
-            if ((showsTxFee && txFeeContainerView.visibility == View.VISIBLE) ||
-                (!showsTxFee && txFeeContainerView.visibility == View.INVISIBLE)
+            if ((showsTxFee && txFeeContainerView.isVisible) ||
+                (!showsTxFee && txFeeContainerView.isInvisible)
             ) {
                 return@with
             }

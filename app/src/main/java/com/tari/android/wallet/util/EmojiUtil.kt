@@ -36,12 +36,12 @@ import android.icu.text.BreakIterator
 import android.text.SpannableString
 import android.text.Spanned
 import android.text.style.ForegroundColorSpan
-import com.tari.android.wallet.util.extension.applyColorStyle
-import com.tari.android.wallet.util.extension.applyLetterSpacingStyle
-import com.tari.android.wallet.util.extension.applyRelativeTextSizeStyle
 import com.tari.android.wallet.ffi.FFIEmojiSet
 import com.tari.android.wallet.model.EmojiId
 import com.tari.android.wallet.model.TariWalletAddress
+import com.tari.android.wallet.util.extension.applyColorStyle
+import com.tari.android.wallet.util.extension.applyLetterSpacingStyle
+import com.tari.android.wallet.util.extension.applyRelativeTextSizeStyle
 
 /**
  * Number of emojis from the Tari emoji set in a string.
@@ -315,3 +315,10 @@ fun TariWalletAddress.addressLastEmojis(): EmojiId {
  * Returns a string with the address in the format "prefix|address1•••address2". E.g. "🐢💤|🐉🔋😎•••🍭🎤💍".
  */
 fun TariWalletAddress.shortString(): String = this.addressPrefixEmojis() + "|" + this.addressFirstEmojis() + "..." + this.addressLastEmojis()
+
+/**
+ * Returns a string with the Base58 address in the format of "AAAAAA...BBBBBB"
+ */
+fun TariWalletAddress.base58Ellipsized(charCount: Int = 6): String {
+    return fullBase58.substring(0, charCount) + "..." + fullBase58.substring(fullBase58.length - charCount)
+}

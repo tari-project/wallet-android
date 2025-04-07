@@ -25,7 +25,6 @@ import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
 import com.tari.android.wallet.ui.screen.send.common.TransactionData
 import com.tari.android.wallet.ui.screen.send.finalize.FinalizeSendTxModel.TxFailureReason
 import com.tari.android.wallet.util.BroadcastEffectFlow
-import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.extension.collectFlow
 import com.tari.android.wallet.util.extension.launchOnIo
 import com.tari.android.wallet.util.extension.launchOnMain
@@ -220,9 +219,9 @@ class FinalizeSendTxViewModel(savedState: SavedStateHandle) : CommonViewModel() 
             launchOnIo {
                 try {
                     val txId = walletManager.sendTari(
-                        tariContact = TariContact(transactionData.recipientContact!!.contactInfo.requireWalletAddress()),
-                        amount = transactionData.amount!!,
-                        feePerGram = transactionData.feePerGram ?: Constants.Wallet.DEFAULT_FEE_PER_GRAM,
+                        tariContact = TariContact(transactionData.recipientContact.walletAddress),
+                        amount = transactionData.amount,
+                        feePerGram = transactionData.feePerGram,
                         message = transactionData.message,
                         isOneSidePayment = transactionData.isOneSidePayment,
                     )

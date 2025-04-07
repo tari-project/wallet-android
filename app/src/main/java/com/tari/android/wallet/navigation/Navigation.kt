@@ -66,9 +66,10 @@ sealed class Navigation {
         data class ToChat(val walletAddress: TariWalletAddress, val isNew: Boolean) : Chat()
     }
 
-    sealed class AddAmount : Navigation() {
-        data class ContinueToAddNote(val transactionData: TransactionData) : AddAmount()
-        data class ContinueToFinalizing(val transactionData: TransactionData) : AddAmount()
+    sealed class TxSend : Navigation() {
+        data class ToAddNote(val transactionData: TransactionData) : TxSend()
+        data class ToFinalizing(val transactionData: TransactionData) : TxSend()
+        data class ToConfirm(val transactionData: TransactionData) : TxSend()
     }
 
     sealed class AllSettings : Navigation() {

@@ -18,9 +18,8 @@
             android:id="@+id/icon_view"
             android:layout_width="52dp"
             android:layout_height="52dp"
-            android:background="@drawable/vector_send_button_back"
-            android:src="@drawable/tari_splash_gem_small"
-            android:tint="?attr/palette_button_primary_text" />
+            android:background="@drawable/vector_purple_button_bg"
+            android:src="@drawable/tari_splash_gem_small" />
 
         <LinearLayout
             android:id="@+id/finalize_send_tx_vw_info_line_1_container"
