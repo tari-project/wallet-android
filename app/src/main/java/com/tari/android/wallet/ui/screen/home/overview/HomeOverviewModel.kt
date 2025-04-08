@@ -21,7 +21,9 @@ class HomeOverviewModel {
         val connectionIndicatorState: ConnectionIndicatorState = ConnectionIndicatorState.Disconnected,
 
         val activeMinersCount: Int? = null,
-        val isMining: Boolean = false,
+        val activeMinersCountError: Boolean = false,
+        val isMining: Boolean? = null,
+        val isMiningError: Boolean = false,
 
         val showWalletSyncSuccessDialog: Boolean = false,
         val showWalletRestoreSuccessDialog: Boolean = false,

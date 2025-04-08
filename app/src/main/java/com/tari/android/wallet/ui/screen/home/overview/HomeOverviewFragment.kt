@@ -19,6 +19,7 @@ class HomeOverviewFragment : CommonFragment<HomeOverviewViewModel>() {
         TariDesignSystem(viewModel.currentTheme) {
             HomeOverviewScreen(
                 uiState = uiState,
+                onPullToRefresh = { viewModel.refreshData() },
                 onInviteFriendClick = { viewModel.onInviteFriendClicked() },
                 onNotificationsClick = { viewModel.onNotificationsClicked() },
                 onStartMiningClicked = { viewModel.onStartMiningClicked() },

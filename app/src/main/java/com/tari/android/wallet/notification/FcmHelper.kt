@@ -35,7 +35,7 @@ class FcmHelper @Inject constructor(
                 pushRepository.registerPushToken(
                     wallet = wallet,
                     fcmToken = token,
-                    anonId = corePrefs.anonId,
+                    anonId = corePrefs.airdropAnonId,
                 )
             } catch (e: Exception) {
                 logger.i("FCM token registration failed for token: $token\n with exception: $e")

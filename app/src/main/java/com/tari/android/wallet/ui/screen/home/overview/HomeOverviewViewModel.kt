@@ -27,12 +27,14 @@ import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
 import com.tari.android.wallet.ui.screen.send.finalize.FinalizeSendTxModel.TxFailureReason
 import com.tari.android.wallet.util.extension.collectFlow
 import com.tari.android.wallet.util.extension.launchOnIo
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 
+private const val DATA_REFRESH_INTERVAL_MILLIS = 60_000L
 
 class HomeOverviewViewModel : CommonViewModel() {
 
@@ -99,17 +101,36 @@ class HomeOverviewViewModel : CommonViewModel() {
             }
         }
 
-        collectFlow(airdropRepository.getMinerStatsFlow()) { activeMinersCount ->
-            _uiState.update { it.copy(activeMinersCount = activeMinersCount) }
-        }
-
         collectFlow(connectionState.map { it.indicatorState }) { indicatorState ->
             _uiState.update { it.copy(connectionIndicatorState = indicatorState) }
+        }
+
+        launchOnIo {
+            while (true) {
+                refreshData()
+                delay(DATA_REFRESH_INTERVAL_MILLIS)
+            }
         }
 
         checkForDataConsent()
 
         showRecoverySuccessIfNeeded()
+    }
+
+    fun refreshData() {
+        launchOnIo {
+            _uiState.update { it.copy(isMiningError = false) }
+            airdropRepository.getMiningStatus()
+                .onSuccess { mining -> _uiState.update { it.copy(isMining = mining, isMiningError = false) } }
+                .onFailure { _uiState.update { it.copy(isMiningError = it.isMining == null) } }
+        }
+
+        launchOnIo {
+            _uiState.update { it.copy(activeMinersCountError = false) }
+            airdropRepository.getMinerStats()
+                .onSuccess { activeMinersCount -> _uiState.update { it.copy(activeMinersCount = activeMinersCount, activeMinersCountError = false) } }
+                .onFailure { _uiState.update { it.copy(activeMinersCountError = it.activeMinersCount == null) } }
+        }
     }
 
     fun navigateToTxDetail(tx: Tx) {
@@ -163,7 +184,7 @@ class HomeOverviewViewModel : CommonViewModel() {
 
     private fun showRecoverySuccessIfNeeded() {
         if (sharedPrefsRepository.needToShowRecoverySuccessDialog) {
-            if (sharedPrefsRepository.anonId != null) { // anonId isn't null while wallet syncing from paper wallet seeds
+            if (sharedPrefsRepository.airdropAnonId != null) { // anonId isn't null while wallet syncing from paper wallet seeds
                 _uiState.update { it.copy(showWalletSyncSuccessDialog = true) }
             } else {
                 _uiState.update { it.copy(showWalletRestoreSuccessDialog = true) }
