@@ -239,7 +239,7 @@ fun ReceiveScreenPreview() {
     PreviewSecondarySurface(TariTheme.Light) {
         ReceiveScreen(
             uiState = ReceiveViewModel.UiState(
-                ticker = "XTR",
+                ticker = "XTM",
                 networkName = "Mainnet",
                 tariAddress = MockDataStub.WALLET_ADDRESS,
                 qrBitmap = BitmapFactory.decodeResource(LocalContext.current.resources, R.drawable.tari_splash_screen),

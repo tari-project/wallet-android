@@ -41,7 +41,7 @@
             android:textColor="?attr/palette_text_heading"
             android:textSize="15sp"
             app:customFont="heavy"
-            tools:text="3,500.00 XTR" />
+            tools:text="3,500.00 XTM" />
 
         <com.tari.android.wallet.ui.component.tari.TariTextView
             android:id="@+id/additional_data"

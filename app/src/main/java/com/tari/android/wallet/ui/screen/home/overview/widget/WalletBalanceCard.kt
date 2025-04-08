@@ -135,7 +135,7 @@ private fun BalanceCardPreview() {
                 pendingOutgoingBalance = 0.toMicroTari(),
                 timeLockedBalance = 0.toMicroTari(),
             ),
-            ticker = "tXTR",
+            ticker = "XTM",
         )
     }
 }

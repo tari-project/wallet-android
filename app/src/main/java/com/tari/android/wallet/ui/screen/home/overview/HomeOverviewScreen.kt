@@ -202,7 +202,7 @@ private fun HomeOverviewScreenPreview() {
                     pendingOutgoingBalance = 0.toMicroTari(),
                     timeLockedBalance = 0.toMicroTari(),
                 ),
-                ticker = "tXTR",
+                ticker = "XTM",
                 networkName = "Testnet",
                 ffiVersion = "v1.11.0-rc.0",
                 txList = MockDataStub.createTxList(),
