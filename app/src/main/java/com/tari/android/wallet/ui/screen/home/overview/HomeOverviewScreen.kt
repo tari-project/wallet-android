@@ -1,6 +1,5 @@
 package com.tari.android.wallet.ui.screen.home.overview
 
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -10,7 +9,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -24,6 +22,8 @@ import com.tari.android.wallet.data.tx.TxDto
 import com.tari.android.wallet.model.BalanceInfo
 import com.tari.android.wallet.ui.compose.TariDesignSystem
 import com.tari.android.wallet.ui.compose.components.TariInheritTextButton
+import com.tari.android.wallet.ui.compose.components.TariProgressView
+import com.tari.android.wallet.ui.compose.components.TariPullToRefreshBox
 import com.tari.android.wallet.ui.compose.components.TariTextButton
 import com.tari.android.wallet.ui.screen.home.overview.widget.ActiveMinersCard
 import com.tari.android.wallet.ui.screen.home.overview.widget.EmptyTxList
@@ -39,6 +39,7 @@ import com.tari.android.wallet.util.extension.toMicroTari
 @Composable
 fun HomeOverviewScreen(
     uiState: HomeOverviewModel.UiState,
+    onPullToRefresh: () -> Unit,
     onInviteFriendClick: () -> Unit,
     onNotificationsClick: () -> Unit,
     onStartMiningClicked: () -> Unit,
@@ -52,12 +53,7 @@ fun HomeOverviewScreen(
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         containerColor = TariDesignSystem.colors.backgroundSecondary,
-    ) { paddingValues ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues),
-        ) {
+        topBar = {
             Row(
                 modifier = Modifier
                     .padding(vertical = 10.dp)
@@ -94,55 +90,64 @@ fun HomeOverviewScreen(
 //                    )
 //                }
             }
+        }
+    ) { paddingValues ->
+        TariPullToRefreshBox(
+            modifier = Modifier.padding(paddingValues),
+            onPullToRefresh = onPullToRefresh,
+        ) {
+            LazyColumn(modifier = Modifier.fillMaxSize()) {
+                item {
+                    Spacer(modifier = Modifier.height(25.dp))
+                    ActiveMinersCard(
+                        modifier = Modifier.padding(horizontal = 16.dp),
+                        activeMinersCount = uiState.activeMinersCount,
+                        activeMinersCountError = uiState.activeMinersCountError,
+                        isMining = uiState.isMining,
+                        showMiningStatus = !uiState.isMiningError,
+                        onStartMiningClicked = onStartMiningClicked,
+                    )
+                    Spacer(modifier = Modifier.height(10.dp))
+                    WalletBalanceCard(
+                        balance = uiState.balance,
+                        ticker = uiState.ticker,
+                        modifier = Modifier.padding(horizontal = 16.dp),
+                    )
+                    Spacer(modifier = Modifier.height(10.dp))
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp),
+                    ) {
+                        TariInheritTextButton(
+                            modifier = Modifier.weight(1f),
+                            text = stringResource(R.string.send_tari_subtitle),
+                            onClick = onSendTariClicked,
+                        )
+                        Spacer(modifier = Modifier.width(16.dp))
+                        TariInheritTextButton(
+                            modifier = Modifier.weight(1f),
+                            text = stringResource(R.string.request_tari_subtitle),
+                            onClick = onRequestTariClicked,
+                        )
+                    }
+                }
 
-            Spacer(modifier = Modifier.height(25.dp))
-            ActiveMinersCard(
-                modifier = Modifier.padding(horizontal = 16.dp),
-                activeMinersCount = uiState.activeMinersCount,
-                isMining = uiState.isMining,
-                onStartMiningClicked = onStartMiningClicked,
-            )
-            Spacer(modifier = Modifier.height(10.dp))
-            WalletBalanceCard(
-                balance = uiState.balance,
-                ticker = uiState.ticker,
-                modifier = Modifier.padding(horizontal = 16.dp),
-            )
-            Spacer(modifier = Modifier.height(10.dp))
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp),
-            ) {
-                TariInheritTextButton(
-                    modifier = Modifier.weight(1f),
-                    text = stringResource(R.string.send_tari_subtitle),
-                    onClick = onSendTariClicked,
-                )
-                Spacer(modifier = Modifier.width(16.dp))
-                TariInheritTextButton(
-                    modifier = Modifier.weight(1f),
-                    text = stringResource(R.string.request_tari_subtitle),
-                    onClick = onRequestTariClicked,
-                )
-            }
-            if (uiState.txList == null) {
-                CircularProgressIndicator(
-                    modifier = Modifier
-                        .padding(40.dp)
-                        .align(Alignment.CenterHorizontally),
-                    color = TariDesignSystem.colors.primaryMain,
-                )
-            } else if (uiState.txList.isEmpty()) {
-                EmptyTxList(
-                    onStartMiningClicked = onStartMiningClicked,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp)
-                        .padding(top = 80.dp),
-                )
-            } else {
-                LazyColumn(modifier = Modifier.fillMaxSize()) {
+                if (uiState.txList == null) {
+                    item {
+                        TariProgressView(modifier = Modifier.padding(40.dp))
+                    }
+                } else if (uiState.txList.isEmpty()) {
+                    item {
+                        EmptyTxList(
+                            onStartMiningClicked = onStartMiningClicked,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 16.dp)
+                                .padding(top = 80.dp),
+                        )
+                    }
+                } else {
                     item {
                         Text(
                             modifier = Modifier
@@ -155,7 +160,9 @@ fun HomeOverviewScreen(
                     items(uiState.txList.size) { index ->
                         val txItem = uiState.txList[index]
                         TxItem(
-                            modifier = Modifier.padding(horizontal = 16.dp, vertical = 5.dp),
+                            modifier = Modifier
+                                .padding(horizontal = 16.dp, vertical = 5.dp)
+                                .animateItem(),
                             txDto = txItem,
                             ticker = uiState.ticker,
                             onTxClick = { onTxClick(txItem) },
@@ -207,6 +214,7 @@ private fun HomeOverviewScreenPreview() {
                 ffiVersion = "v1.11.0-rc.0",
                 txList = MockDataStub.createTxList(),
             ),
+            onPullToRefresh = {},
             onInviteFriendClick = {},
             onNotificationsClick = {},
             onStartMiningClicked = {},
@@ -219,4 +227,3 @@ private fun HomeOverviewScreenPreview() {
         )
     }
 }
-

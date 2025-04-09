@@ -101,8 +101,6 @@ class CorePrefRepository @Inject constructor(
 
     var lastName: String? by SharedPrefStringDelegate(sharedPrefs, this, formatKey(Key.SURNAME))
 
-    var anonId: String? by SharedPrefStringDelegate(sharedPrefs, this, formatKey(Key.ANON_ID))
-
     var onboardingStarted: Boolean by SharedPrefBooleanDelegate(sharedPrefs, this, formatKey(Key.ONBOARDING_STARTED))
 
     var onboardingCompleted: Boolean by SharedPrefBooleanDelegate(sharedPrefs, this, formatKey(Key.ONBOARDING_COMPLETED))
@@ -137,6 +135,7 @@ class CorePrefRepository @Inject constructor(
 
     var airdropToken: String? by SharedPrefStringDelegate(sharedPrefs, this, formatKey(Key.AIRDROP_TOKEN))
     var airdropRefreshToken: String? by SharedPrefStringDelegate(sharedPrefs, this, formatKey(Key.AIRDROP_REFRESH_TOKEN))
+    var airdropAnonId: String? by SharedPrefStringDelegate(sharedPrefs, this, formatKey(Key.ANON_ID))
 
     val walletAddress: TariWalletAddress
         get() = walletAddressBase58?.let { TariWalletAddress.fromBase58(it) } ?: error("Wallet address is not set to shared preferences")
@@ -165,7 +164,9 @@ class CorePrefRepository @Inject constructor(
         onboardingAuthSetupStarted = false
         onboardingAuthSetupCompleted = false
         onboardingDisplayedAtHome = false
-        anonId = null
+        airdropAnonId = null
+        airdropToken = null
+        airdropRefreshToken = null
     }
 
     fun generateDatabasePassphrase(): String {

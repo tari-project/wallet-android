@@ -12,14 +12,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.pulltorefresh.PullToRefreshBox
-import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -28,10 +21,11 @@ import androidx.compose.ui.unit.dp
 import com.tari.android.wallet.R
 import com.tari.android.wallet.data.airdrop.ReferralStatusResponse.Referral
 import com.tari.android.wallet.ui.compose.TariDesignSystem
-import com.tari.android.wallet.ui.compose.widgets.TariErrorView
-import com.tari.android.wallet.ui.compose.widgets.TariLoadingLayout
-import com.tari.android.wallet.ui.compose.widgets.TariLoadingLayoutState
-import com.tari.android.wallet.ui.compose.widgets.TariProgressView
+import com.tari.android.wallet.ui.compose.components.TariErrorView
+import com.tari.android.wallet.ui.compose.components.TariLoadingLayout
+import com.tari.android.wallet.ui.compose.components.TariLoadingLayoutState
+import com.tari.android.wallet.ui.compose.components.TariProgressView
+import com.tari.android.wallet.ui.compose.components.TariPullToRefreshBox
 import com.tari.android.wallet.ui.screen.home.overview.widget.EmptyTxList
 import com.tari.android.wallet.ui.screen.profile.profile.widget.FriendListEmpty
 import com.tari.android.wallet.ui.screen.profile.profile.widget.FriendListItem
@@ -40,8 +34,6 @@ import com.tari.android.wallet.ui.screen.profile.profile.widget.InviteLinkCard
 import com.tari.android.wallet.ui.screen.profile.profile.widget.TariMinedCard
 import com.tari.android.wallet.ui.screen.settings.themeSelector.TariTheme
 import com.tari.android.wallet.util.extension.toMicroTari
-import kotlinx.coroutines.delay
-
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -57,24 +49,9 @@ fun ProfileScreen(
         modifier = Modifier.fillMaxSize(),
         containerColor = TariDesignSystem.colors.backgroundSecondary,
     ) { paddingValues ->
-        var isLoading by remember { mutableStateOf(false) }
-        val pullToRefreshState = rememberPullToRefreshState()
-
-        LaunchedEffect(isLoading) {
-            if (isLoading) {
-                delay(1000)
-                isLoading = false
-            }
-        }
-
-        PullToRefreshBox(
+        TariPullToRefreshBox(
             modifier = Modifier.padding(paddingValues),
-            state = pullToRefreshState,
-            isRefreshing = isLoading,
-            onRefresh = {
-                isLoading = true
-                onPullToRefresh()
-            }
+            onPullToRefresh = onPullToRefresh,
         ) {
             LazyColumn {
                 item {

@@ -91,6 +91,7 @@
     <string name="common_apply">Apply</string>
     <string name="common_share">Share</string>
     <string name="common_error_title">Error</string>
+    <string name="common_error_connection_title">Connection error</string>
     <string name="common_error_description">Something went wrong. Please try again later.</string>
     <string name="common_error_try_again_button">Try again</string>
     <string name="common_unknown_error">Unknown error</string>
@@ -203,6 +204,7 @@
     <string name="home_active_miners_title">Active Miners</string>
     <string name="home_active_miners_start_mining">Start mining</string>
     <string name="home_active_miners_you_mining">You\'re mining</string>
+    <string name="home_active_miners_you_not_mining">You\'re not mining</string>
     <string name="home_wallet_balance">Wallet Balance</string>
     <string name="home_wallet_balance_hidden">*******</string>
     <string name="home_empty_state_title">You don’t have any activity yet. </string>

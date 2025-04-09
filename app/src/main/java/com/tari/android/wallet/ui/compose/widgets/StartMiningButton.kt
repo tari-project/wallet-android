@@ -1,16 +1,14 @@
 package com.tari.android.wallet.ui.compose.widgets
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.Button
-import androidx.compose.material.ButtonDefaults
-import androidx.compose.material.OutlinedButton
-import androidx.compose.material.Text
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -24,78 +22,124 @@ import com.tari.android.wallet.ui.compose.PreviewPrimarySurface
 import com.tari.android.wallet.ui.compose.TariDesignSystem
 import com.tari.android.wallet.ui.compose.components.WithRippleColor
 import com.tari.android.wallet.ui.screen.settings.themeSelector.TariTheme
+import com.tari.android.wallet.util.DebugConfig
 
 @Composable
 fun StartMiningButton(
-    isMining: Boolean = false,
-    onClick: () -> Unit = {},
     modifier: Modifier = Modifier,
+    isMining: Boolean = false,
+    onStartMiningClick: () -> Unit = {},
 ) {
     if (!isMining) {
-        WithRippleColor(Color.Black) {
-            Button(
-                onClick = onClick,
-                colors = ButtonDefaults.buttonColors(
-                    backgroundColor = TariDesignSystem.colors.systemGreen,
-                    disabledBackgroundColor = TariDesignSystem.colors.actionDisabledBackground,
-                ),
-                shape = TariDesignSystem.shapes.startMiningButton,
-                modifier = modifier.defaultMinSize(minHeight = 42.dp, minWidth = 124.dp),
-            ) {
-                Text(
-                    text = stringResource(R.string.home_active_miners_start_mining),
-                    color = Color.Black,
-                    style = TariDesignSystem.typography.buttonSmall,
-                )
-            }
+        if (DebugConfig.showActiveMinersButton) {
+            NotMiningButton(
+                modifier = modifier,
+                onClick = onStartMiningClick,
+            )
+        } else {
+            NotMiningView(modifier)
         }
     } else {
-        WithRippleColor(TariDesignSystem.colors.systemGreen) {
-            // TODO values are hardcoded now. Probably need to be used the values from the palette
-            val buttonBackgroundBrush = Brush.radialGradient(
-                colors = listOf(
-                    Color(0x14FFFFFF), // rgba(255, 255, 255, 0.08)
-                    Color(0x00FFFFFF)  // rgba(255, 255, 255, 0.00)
-                ),
-                center = androidx.compose.ui.geometry.Offset(150f, 20f),
-                radius = 150f,
-            )
-            val buttonBorderBrush = Brush.horizontalGradient(listOf(Color(0x3302FE63), Color(0x0802FE63)))
+        MiningView(modifier)
+    }
+}
 
-            OutlinedButton(
-                onClick = onClick,
-                border = BorderStroke(
-                    width = 1.dp,
-                    brush = buttonBorderBrush,
-                ),
-                shape = TariDesignSystem.shapes.startMiningButton,
-                colors = ButtonDefaults.outlinedButtonColors(
-                    backgroundColor = Color.Transparent,
-                    disabledContentColor = Color.Transparent,
-                ),
-                contentPadding = PaddingValues(),
-                modifier = modifier,
-            ) {
-                Box(
-                    modifier = Modifier
-                        .background(buttonBackgroundBrush)
-                        .defaultMinSize(minHeight = 42.dp, minWidth = 124.dp),
-                    contentAlignment = Alignment.Center,
-                ) {
-                    Text(
-                        text = stringResource(R.string.home_active_miners_you_mining),
-                        color = TariDesignSystem.colors.systemGreen,
-                        style = TariDesignSystem.typography.buttonSmall,
-                    )
-                }
-            }
+@Composable
+private fun NotMiningButton(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    WithRippleColor(Color.Black) {
+        Button(
+            modifier = modifier.defaultMinSize(minHeight = 42.dp, minWidth = 124.dp),
+            onClick = onClick,
+            colors = ButtonDefaults.buttonColors(
+                containerColor = TariDesignSystem.colors.systemGreen,
+                disabledContainerColor = TariDesignSystem.colors.actionDisabledBackground,
+            ),
+            shape = TariDesignSystem.shapes.startMiningButton,
+        ) {
+            Text(
+                text = stringResource(R.string.home_active_miners_start_mining),
+                color = Color.Black,
+                style = TariDesignSystem.typography.buttonSmall,
+            )
         }
     }
 }
 
 @Composable
+private fun MiningView(
+    modifier: Modifier = Modifier,
+) {
+    val buttonBackgroundBrush = Brush.radialGradient(
+        colors = listOf(
+            Color(0x14FFFFFF), // rgba(255, 255, 255, 0.08)
+            Color(0x00FFFFFF)  // rgba(255, 255, 255, 0.00)
+        ),
+        center = androidx.compose.ui.geometry.Offset(150f, 20f),
+        radius = 150f,
+    )
+    val buttonBorderBrush = Brush.horizontalGradient(listOf(Color(0x3302FE63), Color(0x0802FE63)))
+
+    Box(
+        modifier = modifier
+            .border(
+                width = 1.dp,
+                brush = buttonBorderBrush, shape = TariDesignSystem.shapes.startMiningButton,
+            )
+            .background(buttonBackgroundBrush)
+            .defaultMinSize(minHeight = 42.dp, minWidth = 124.dp),
+        contentAlignment = Alignment.Center,
+    ) {
+
+        Text(
+            modifier = Modifier.padding(horizontal = 16.dp),
+            text = stringResource(R.string.home_active_miners_you_mining),
+            color = TariDesignSystem.colors.systemGreen,
+            style = TariDesignSystem.typography.buttonSmall,
+        )
+    }
+}
+
+@Composable
+private fun NotMiningView(
+    modifier: Modifier = Modifier,
+) {
+
+    val buttonBackgroundBrush = Brush.radialGradient(
+        colors = listOf(
+            Color(0x14FFFFFF), // rgba(255, 255, 255, 0.08)
+            Color(0x00FFFFFF)  // rgba(255, 255, 255, 0.00)
+        ),
+        center = androidx.compose.ui.geometry.Offset(150f, 20f),
+        radius = 150f,
+    )
+    val buttonBorderBrush = Brush.horizontalGradient(listOf(Color(0x33FF3232), Color(0x08FF3232)))
+
+    Box(
+        modifier = modifier
+            .border(
+                width = 1.dp,
+                brush = buttonBorderBrush, shape = TariDesignSystem.shapes.startMiningButton,
+            )
+            .background(buttonBackgroundBrush)
+            .defaultMinSize(minHeight = 42.dp, minWidth = 145.dp),
+        contentAlignment = Alignment.Center,
+    ) {
+
+        Text(
+            modifier = Modifier.padding(horizontal = 16.dp),
+            text = stringResource(R.string.home_active_miners_you_not_mining),
+            color = TariDesignSystem.colors.systemRed,
+            style = TariDesignSystem.typography.buttonSmall,
+        )
+    }
+}
+
+@Composable
 @Preview
-fun StartMiningButtonPreview() {
+private fun StartMiningButtonPreview() {
     PreviewPrimarySurface(TariTheme.Dark) {
         Column {
             StartMiningButton(

@@ -127,7 +127,7 @@ class ChooseRestoreOptionViewModel : CommonViewModel() {
     }
 
     private fun restoreFromPaperWallet(seedWords: List<String>, balance: String, anonId: String?) {
-        sharedPrefsRepository.anonId = anonId
+        sharedPrefsRepository.airdropAnonId = anonId
         _uiState.update { it.copy(paperWalletProgress = true) }
         walletManager.start(seedWords, balance)
         launchOnIo {
