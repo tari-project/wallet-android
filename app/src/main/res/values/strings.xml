@@ -172,7 +172,7 @@
 
     <!-- home -->
     <string name="home_available_balance">Balance</string>
-    <string name="home_available_to_spend_balance">Available to spend:</string>
+    <string name="home_available_to_spend_balance">Available: %s</string>
     <string name="home_tx_list_header_yesterday">Yesterday</string>
     <string name="home_txs">Transactions</string>
     <string name="home_setup_is_complete">Your wallet setup is complete.</string>
@@ -214,6 +214,10 @@
     <string name="home_sync_dialog_title">Welcome back!</string>
     <string name="home_sync_dialog_description">Your wallet has been successfully restored.</string>
     <string name="home_sync_dialog_button">Get Started!</string>
+    <string name="home_balance_info_modal_total_balance">Total Balance</string>
+    <string name="home_balance_info_modal_total_balance_description">This is everything you\'ve earned or received, including rewards that are still locked or pending.</string>
+    <string name="home_balance_info_modal_available_balance">Available Balance</string>
+    <string name="home_balance_info_modal_available_balance_description">This is the amount you can use right now. Some rewards take time to unlock or confirm.</string>
 
     <!--    Airdrop Profile-->
     <string name="airdrop_profile_tari_mined">Tari Mined</string>

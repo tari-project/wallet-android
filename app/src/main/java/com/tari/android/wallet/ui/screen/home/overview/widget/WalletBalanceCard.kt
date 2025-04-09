@@ -1,6 +1,7 @@
 package com.tari.android.wallet.ui.screen.home.overview.widget
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -9,7 +10,9 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Text
@@ -18,6 +21,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.paint
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
@@ -42,6 +46,7 @@ import com.tari.android.wallet.util.extension.toMicroTari
 fun WalletBalanceCard(
     balance: BalanceInfo,
     ticker: String,
+    onBalanceHelpClicked: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     var isBalanceHidden = remember { mutableStateOf(false) }
@@ -62,7 +67,8 @@ fun WalletBalanceCard(
             Column(
                 modifier = Modifier
                     .align(Alignment.BottomStart)
-                    .padding(horizontal = 20.dp),
+                    .padding(horizontal = 20.dp)
+                    .padding(bottom = 16.dp),
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(
@@ -97,10 +103,11 @@ fun WalletBalanceCard(
                     Row {
                         Text(
                             modifier = Modifier.alignByBaseline(),
-                            text = WalletConfig.balanceFormatter.format(balance.availableBalance.tariValue),
+                            text = WalletConfig.balanceFormatter.format(balance.totalBalance.tariValue),
                             style = TextStyle(
                                 fontFamily = PoppinsFontFamily,
                                 fontSize = 56.sp,
+                                lineHeight = 56.sp,
                                 fontWeight = FontWeight.SemiBold,
                                 color = Color.White,
                             ),
@@ -115,6 +122,40 @@ fun WalletBalanceCard(
                                 fontWeight = FontWeight.SemiBold,
                                 color = Color.White,
                             ),
+                        )
+                    }
+                }
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(
+                        text = stringResource(
+                            R.string.home_available_to_spend_balance,
+                            WalletConfig.balanceFormatter.format(balance.availableBalance.tariValue) + " " + ticker,
+                        ),
+                        style = TextStyle(
+                            fontFamily = PoppinsFontFamily,
+                            fontSize = 17.sp,
+                            fontWeight = FontWeight.Normal,
+                            lineHeight = 26.sp,
+                            color = Color.White.copy(alpha = 0.5f),
+                        ),
+                    )
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Box(
+                        Modifier
+                            .size(20.dp)
+                            .clip(CircleShape)
+                            .background(color = Color(0x33FFFFFF))
+                            .clickable(onClick = onBalanceHelpClicked),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        Text(
+                            text = "?",
+                            style = TextStyle(
+                                fontSize = 15.sp,
+                                fontFamily = PoppinsFontFamily,
+                                fontWeight = FontWeight.Normal,
+                                color = Color(0xFFE5E5E5),
+                            )
                         )
                     }
                 }
@@ -133,9 +174,10 @@ private fun BalanceCardPreview() {
                 availableBalance = 24_836_150_000.toMicroTari(),
                 pendingIncomingBalance = 0.toMicroTari(),
                 pendingOutgoingBalance = 0.toMicroTari(),
-                timeLockedBalance = 0.toMicroTari(),
+                timeLockedBalance = 4_836_150_000.toMicroTari(),
             ),
             ticker = "XTM",
+            onBalanceHelpClicked = {},
         )
     }
 }
