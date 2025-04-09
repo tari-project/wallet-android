@@ -26,6 +26,7 @@ import com.tari.android.wallet.ui.compose.components.TariProgressView
 import com.tari.android.wallet.ui.compose.components.TariPullToRefreshBox
 import com.tari.android.wallet.ui.compose.components.TariTextButton
 import com.tari.android.wallet.ui.screen.home.overview.widget.ActiveMinersCard
+import com.tari.android.wallet.ui.screen.home.overview.widget.BalanceInfoModal
 import com.tari.android.wallet.ui.screen.home.overview.widget.EmptyTxList
 import com.tari.android.wallet.ui.screen.home.overview.widget.RestoreSuccessModal
 import com.tari.android.wallet.ui.screen.home.overview.widget.SyncSuccessModal
@@ -49,6 +50,8 @@ fun HomeOverviewScreen(
     onViewAllTxsClick: () -> Unit,
     onConnectionStatusClick: () -> Unit,
     onSyncDialogDismiss: () -> Unit,
+    onBalanceInfoClicked: () -> Unit,
+    onBalanceInfoDialogDismiss: () -> Unit,
 ) {
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -109,9 +112,10 @@ fun HomeOverviewScreen(
                     )
                     Spacer(modifier = Modifier.height(10.dp))
                     WalletBalanceCard(
+                        modifier = Modifier.padding(horizontal = 16.dp),
                         balance = uiState.balance,
                         ticker = uiState.ticker,
-                        modifier = Modifier.padding(horizontal = 16.dp),
+                        onBalanceHelpClicked = onBalanceInfoClicked,
                     )
                     Spacer(modifier = Modifier.height(10.dp))
                     Row(
@@ -192,6 +196,15 @@ fun HomeOverviewScreen(
         if (uiState.showWalletRestoreSuccessDialog) {
             RestoreSuccessModal(onDismiss = onSyncDialogDismiss)
         }
+
+        if (uiState.showBalanceInfoDialog) {
+            BalanceInfoModal(
+                onDismiss = onBalanceInfoDialogDismiss,
+                totalBalance = uiState.balance.totalBalance,
+                availableBalance = uiState.balance.availableBalance,
+                ticker = uiState.ticker,
+            )
+        }
     }
 }
 
@@ -224,6 +237,8 @@ private fun HomeOverviewScreenPreview() {
             onViewAllTxsClick = {},
             onConnectionStatusClick = {},
             onSyncDialogDismiss = {},
+            onBalanceInfoClicked = {},
+            onBalanceInfoDialogDismiss = {},
         )
     }
 }

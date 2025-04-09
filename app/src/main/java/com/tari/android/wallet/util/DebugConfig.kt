@@ -102,6 +102,8 @@ object DebugConfig {
 
     const val airdropLoginInBrowser = true
 
+    const val showInvitedFriendsInProfile = false
+
     fun isDebug() = BuildConfig.BUILD_TYPE == "debug"
 
     private fun valueIfDebug(value: Boolean) = isDebug() && value

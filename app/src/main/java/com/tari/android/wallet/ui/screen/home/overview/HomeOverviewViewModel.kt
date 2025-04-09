@@ -202,6 +202,14 @@ class HomeOverviewViewModel : CommonViewModel() {
         }
     }
 
+    fun onBalanceInfoClicked() {
+        _uiState.update { it.copy(showBalanceInfoDialog = true) }
+    }
+
+    fun onBalanceInfoDialogDismiss() {
+        _uiState.update { it.copy(showBalanceInfoDialog = false) }
+    }
+
     private fun onTxSendFailed(failureReason: TxFailureReason) = when (failureReason) {
         TxFailureReason.NETWORK_CONNECTION_ERROR -> displayNetworkConnectionErrorDialog()
         TxFailureReason.BASE_NODE_CONNECTION_ERROR, TxFailureReason.SEND_ERROR -> displayBaseNodeConnectionErrorDialog()

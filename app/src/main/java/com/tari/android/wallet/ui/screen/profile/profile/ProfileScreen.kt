@@ -33,6 +33,7 @@ import com.tari.android.wallet.ui.screen.profile.profile.widget.GemsEarnedCard
 import com.tari.android.wallet.ui.screen.profile.profile.widget.InviteLinkCard
 import com.tari.android.wallet.ui.screen.profile.profile.widget.TariMinedCard
 import com.tari.android.wallet.ui.screen.settings.themeSelector.TariTheme
+import com.tari.android.wallet.util.DebugConfig
 import com.tari.android.wallet.util.extension.toMicroTari
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -121,51 +122,53 @@ fun ProfileScreen(
                     }
                 }
 
-                item {
-                    Spacer(Modifier.size(20.dp))
-                    Text(
-                        text = stringResource(R.string.airdrop_profile_friends_invited_title, uiState.friends?.size ?: "-"),
-                        style = TariDesignSystem.typography.headingXLarge,
-                        modifier = Modifier.padding(horizontal = 20.dp)
-                    )
-                    Spacer(Modifier.size(10.dp))
-                }
+                if (DebugConfig.showInvitedFriendsInProfile) {
+                    item {
+                        Spacer(Modifier.size(20.dp))
+                        Text(
+                            text = stringResource(R.string.airdrop_profile_friends_invited_title, uiState.friends?.size ?: "-"),
+                            style = TariDesignSystem.typography.headingXLarge,
+                            modifier = Modifier.padding(horizontal = 20.dp)
+                        )
+                        Spacer(Modifier.size(10.dp))
+                    }
 
-                if (uiState.friendsError) {
-                    item {
-                        TariErrorView(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(top = 28.dp),
-                            onTryAgainClick = onFriendsRetryClick,
-                        )
-                    }
-                } else if (uiState.friends == null) {
-                    item {
-                        TariProgressView(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(top = 28.dp),
-                        )
-                    }
-                } else if (uiState.friends.isEmpty()) {
-                    item {
-                        Spacer(Modifier.size(52.dp))
-                        FriendListEmpty(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(horizontal = 40.dp),
-                        )
-                    }
-                } else {
-                    items(uiState.friends.size) { index ->
-                        FriendListItem(
-                            modifier = Modifier
-                                .animateItem()
-                                .fillMaxWidth()
-                                .padding(horizontal = 20.dp, vertical = 5.dp),
-                            friend = uiState.friends[index],
-                        )
+                    if (uiState.friendsError) {
+                        item {
+                            TariErrorView(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(top = 28.dp),
+                                onTryAgainClick = onFriendsRetryClick,
+                            )
+                        }
+                    } else if (uiState.friends == null) {
+                        item {
+                            TariProgressView(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(top = 28.dp),
+                            )
+                        }
+                    } else if (uiState.friends.isEmpty()) {
+                        item {
+                            Spacer(Modifier.size(52.dp))
+                            FriendListEmpty(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 40.dp),
+                            )
+                        }
+                    } else {
+                        items(uiState.friends.size) { index ->
+                            FriendListItem(
+                                modifier = Modifier
+                                    .animateItem()
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 20.dp, vertical = 5.dp),
+                                friend = uiState.friends[index],
+                            )
+                        }
                     }
                 }
 
