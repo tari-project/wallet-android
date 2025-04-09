@@ -7,18 +7,18 @@ import com.bumptech.glide.request.RequestOptions
 import com.bumptech.glide.request.target.Target
 import com.tari.android.wallet.R
 import com.tari.android.wallet.databinding.ItemTxListBinding
-import com.tari.android.wallet.model.tx.Tx
 import com.tari.android.wallet.model.TxNote
+import com.tari.android.wallet.model.tx.Tx
 import com.tari.android.wallet.ui.common.giphy.presentation.GifStateConsumer
 import com.tari.android.wallet.ui.common.giphy.presentation.GlideGifListener
 import com.tari.android.wallet.ui.common.giphy.repository.GifItem
 import com.tari.android.wallet.ui.common.recyclerView.ViewHolderBuilder
+import com.tari.android.wallet.ui.screen.tx.details.statusString
 import com.tari.android.wallet.util.extension.dimen
 import com.tari.android.wallet.util.extension.gone
 import com.tari.android.wallet.util.extension.setTopMargin
 import com.tari.android.wallet.util.extension.setVisible
 import com.tari.android.wallet.util.extension.visible
-import com.tari.android.wallet.ui.screen.tx.details.statusString
 
 class TxListViewHolder(view: ItemTxListBinding) : CommonTxListViewHolder<TxViewHolderItem, ItemTxListBinding>(view), GifStateConsumer {
 
@@ -50,7 +50,7 @@ class TxListViewHolder(view: ItemTxListBinding) : CommonTxListViewHolder<TxViewH
 
     private fun displayMessage(tx: Tx) {
         val note = TxNote.fromTx(tx)
-        if (note.message.isNullOrBlank()) {
+        if (note.message.isNullOrBlank() || tx.isCoinbase) { // FIXME: we temporarily hide the message for coinbase txs because it's always "None"
             ui.messageTextView.gone()
         } else {
             ui.messageTextView.visible()
