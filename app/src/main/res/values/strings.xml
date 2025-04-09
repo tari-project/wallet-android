@@ -216,7 +216,7 @@
     <string name="home_sync_dialog_button">Get Started!</string>
     <string name="home_balance_info_modal_total_balance">Total Balance</string>
     <string name="home_balance_info_modal_total_balance_description">This is everything you\'ve earned or received, including rewards that are still locked or pending.</string>
-    <string name="home_balance_info_modal_available_balance">Available Balance</string>
+    <string name="home_balance_info_modal_available_balance">Available to spend</string>
     <string name="home_balance_info_modal_available_balance_description">This is the amount you can use right now. Some rewards take time to unlock or confirm.</string>
 
     <!--    Airdrop Profile-->
