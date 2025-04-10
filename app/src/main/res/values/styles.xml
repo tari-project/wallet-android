@@ -26,6 +26,9 @@
         <item name="android:editTextColor">?attr/palette_text_heading</item>
         <item name="android:textColorHint">?attr/palette_text_body</item>
         <item name="colorControlNormal">#FFFFFF</item>
+        <item name="fontFamily">@font/poppins_regular</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:letterSpacing">0.02</item>
     </style>
 
     <style name="SwitchTheme" parent="Widget.AppCompat.CompoundButton.Switch">
