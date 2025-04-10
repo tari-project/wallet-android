@@ -46,22 +46,13 @@ import com.tari.android.wallet.databinding.FragmentTxDetailsBinding
 import com.tari.android.wallet.model.MicroTari
 import com.tari.android.wallet.model.TxId
 import com.tari.android.wallet.model.TxNote
-import com.tari.android.wallet.model.TxStatus.IMPORTED
-import com.tari.android.wallet.model.TxStatus.MINED_CONFIRMED
-import com.tari.android.wallet.model.TxStatus.ONE_SIDED_CONFIRMED
-import com.tari.android.wallet.model.TxStatus.PENDING
+import com.tari.android.wallet.model.TxStatus
 import com.tari.android.wallet.model.tx.CancelledTx
 import com.tari.android.wallet.model.tx.CompletedTx
 import com.tari.android.wallet.model.tx.PendingOutboundTx
 import com.tari.android.wallet.model.tx.Tx
-import com.tari.android.wallet.model.tx.Tx.Direction.INBOUND
-import com.tari.android.wallet.model.tx.Tx.Direction.OUTBOUND
 import com.tari.android.wallet.ui.common.CommonXmlFragment
 import com.tari.android.wallet.ui.dialog.modular.ModularDialog
-import com.tari.android.wallet.ui.dialog.tooltipDialog.TooltipDialogArgs
-import com.tari.android.wallet.ui.screen.tx.details.gif.GifView
-import com.tari.android.wallet.ui.screen.tx.details.gif.GifViewModel
-import com.tari.android.wallet.ui.screen.tx.details.gif.TxState
 import com.tari.android.wallet.util.addressFirstEmojis
 import com.tari.android.wallet.util.addressLastEmojis
 import com.tari.android.wallet.util.addressPrefixEmojis
@@ -177,19 +168,18 @@ class TxDetailsFragment : CommonXmlFragment<FragmentTxDetailsBinding, TxDetailsV
     }
 
     private fun setTxPaymentData(tx: Tx) {
-        val state = TxState.from(tx)
         ui.amountTextView.text = WalletConfig.amountFormatter.format(tx.amount.tariValue)
         ui.paymentStateTextView.text = when {
             tx is CancelledTx -> string(R.string.tx_detail_payment_cancelled)
-            state.status == ONE_SIDED_CONFIRMED || state.status == MINED_CONFIRMED || state.status == IMPORTED ->
-                if (state.direction == INBOUND) string(R.string.tx_detail_payment_received)
+            tx.status == TxStatus.MINED_CONFIRMED || tx.status == TxStatus.IMPORTED ->
+                if (tx.isInbound) string(R.string.tx_detail_payment_received)
                 else string(R.string.tx_detail_payment_sent)
 
             else -> string(R.string.tx_detail_pending_payment_received)
         }
         when {
-            tx is CompletedTx && tx.direction == OUTBOUND -> setFeeData(tx.fee)
-            tx is CancelledTx && tx.direction == OUTBOUND -> setFeeData(tx.fee)
+            tx is CompletedTx && tx.isOutbound -> setFeeData(tx.fee)
+            tx is CancelledTx && tx.isOutbound -> setFeeData(tx.fee)
             tx is PendingOutboundTx -> setFeeData(tx.fee)
             else -> {
                 ui.txFeeTextView.gone()
@@ -218,8 +208,7 @@ class TxDetailsFragment : CommonXmlFragment<FragmentTxDetailsBinding, TxDetailsV
     }
 
     private fun setTxAddressData(tx: Tx) {
-        val state = TxState.from(tx)
-        ui.fromTextView.text = if (state.direction == INBOUND) string(R.string.common_from) else string(R.string.common_to)
+        ui.fromTextView.text = if (tx.isInbound) string(R.string.common_from) else string(R.string.common_to)
         if (tx.tariContact.walletAddress.isUnknownUser()) {
             ui.emojiIdViewContainer.root.gone()
             ui.unknownSource.visible()
@@ -233,11 +222,10 @@ class TxDetailsFragment : CommonXmlFragment<FragmentTxDetailsBinding, TxDetailsV
     }
 
     private fun setTxStatusData(tx: Tx) {
-        val state = TxState.from(tx)
         val statusText = tx.statusString(context = requireContext(), viewModel.requiredConfirmationCount)
         ui.statusTextView.text = statusText
         ui.statusContainerView.visibility = if (statusText.isEmpty()) View.GONE else View.VISIBLE
-        if (tx !is CancelledTx && state.direction == OUTBOUND && state.status == PENDING) {
+        if (tx !is CancelledTx && tx.isOutbound && tx.status == TxStatus.PENDING) {
             ui.cancelTxView.setOnClickListener { viewModel.onTransactionCancel() }
             ui.cancelTxView.visible()
         } else if (ui.cancelTxView.visibility == View.VISIBLE) {

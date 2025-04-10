@@ -46,7 +46,6 @@ import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
 import com.tari.android.wallet.ui.dialog.modular.modules.input.InputModule
 import com.tari.android.wallet.ui.screen.tx.details.TxDetailsFragment.Companion.TX_EXTRA_KEY
 import com.tari.android.wallet.ui.screen.tx.details.TxDetailsFragment.Companion.TX_ID_EXTRA_KEY
-import com.tari.android.wallet.ui.screen.tx.details.gif.TxState
 import com.tari.android.wallet.util.extension.collectFlow
 import com.tari.android.wallet.util.extension.launchOnMain
 import com.tari.android.wallet.util.extension.string
@@ -258,11 +257,10 @@ class TxDetailsViewModel(savedState: SavedStateHandle) : CommonViewModel() {
 }
 
 fun Tx.statusString(context: Context, requiredConfirmationCount: Long?): String {
-    val state = TxState.from(this)
     val confirmationCount = if (this is CompletedTx) this.confirmationCount.toInt() else null
 
-    return if (this is CancelledTx) "" else when (state.status) {
-        PENDING -> when (state.direction) {
+    return if (this is CancelledTx) "" else when (this.status) {
+        PENDING -> when (this.direction) {
             INBOUND -> context.string(R.string.tx_detail_waiting_for_sender_to_complete)
             OUTBOUND -> context.string(R.string.tx_detail_waiting_for_recipient)
         }
