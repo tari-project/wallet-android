@@ -475,6 +475,7 @@ class KeyboardController {
                 amountCheckRunnable,
                 actionWaitLengthMs
             )
+            elements[0].second.setWidthAndHeightToMeasured()
             return
         }
         // remove last element
