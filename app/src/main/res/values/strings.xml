@@ -1,5 +1,5 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <string name="app_name">Tari Aurora</string>
+    <string name="app_name">Tari Universe Wallet</string>
 
     <!-- URLs, etc -->
     <string name="ttl_store_url" translatable="false">https://store.tarilabs.com</string>
@@ -160,15 +160,15 @@
     <string name="exit">Exit</string>
     <!-- begin :: dialog -->
     <string name="onboarding_auth_title">Secure your wallet</string>
-    <string name="onboarding_auth_biometric_prompt">Please enter your biometrics. Tari Aurora will require it each time you open the app.</string>
-    <string name="onboarding_auth_device_lock_code_prompt">Please enter your smartphone\'s screen lock PIN, passcode, or pattern. Tari Aurora will require it each time you open the app.</string>
+    <string name="onboarding_auth_biometric_prompt">Please enter your biometrics. Tari Universe Wallet will require it each time you open the app.</string>
+    <string name="onboarding_auth_device_lock_code_prompt">Please enter your smartphone\'s screen lock PIN, passcode, or pattern. Tari Universe Wallet will require it each time you open the app.</string>
     <string name="auth_title">Unlock your wallet</string>
     <string name="auth_biometric_prompt">Please enter your biometrics to unlock your wallet.</string>
     <string name="auth_device_lock_code_prompt">Please enter your smartphone\'s screen lock PIN, passcode, or pattern to unlock your wallet.</string>
     <string name="auth_not_available_or_canceled_title">Authentication Error</string>
-    <string name="auth_not_available_or_canceled_desc">Tari Aurora was not able to authenticate you. Do you still want to proceed?</string>
+    <string name="auth_not_available_or_canceled_desc">Tari Universe Wallet was not able to authenticate you. Do you still want to proceed?</string>
     <string name="auth_failed_title">Authentication Failed</string>
-    <string name="auth_failed_desc">Tari Aurora was not able to authenticate you</string>
+    <string name="auth_failed_desc">Tari Universe Wallet was not able to authenticate you</string>
 
     <!-- home -->
     <string name="home_available_balance">Balance</string>
@@ -318,11 +318,11 @@
 
     <!-- wallet info -->
     <string name="wallet_info_my_profile">My Profile</string>
-    <string name="wallet_info_qr_code_desc">Transacting in person? Others can scan this QR code from the Tari Aurora App to send you XTM.</string>
+    <string name="wallet_info_qr_code_desc">Transacting in person? Others can scan this QR code from the Tari Universe Wallet App to send you XTM.</string>
     <string name="wallet_info_yat_disconnected_description">Your previously connected Yat has lost sync with the app. Click Connect Yats below if you\’d like to reconnect it.</string>
     <string name="wallet_info_yat_disconnected_description_connect_yats">Connect Yats</string>
     <string name="wallet_info_share_profile_title">Share Profile</string>
-    <string name="wallet_info_my_aurora_title">My Aurora</string>
+    <string name="wallet_info_my_aurora_title">My Tari Universe Wallet</string>
     <string name="wallet_info_wallet_button">Wallet</string>
     <string name="wallet_info_connect_yat_button">Connect Yats</string>
     <string name="wallet_info_address_details_title">Address Details</string>
@@ -347,7 +347,7 @@
 
     <!-- tx failed dialog -->
     <string name="tx_failed_title">Sorry, you can\'t send XTM to offline users</string>
-    <string name="tx_failed_description">Please make sure your recipient has a reliable internet connection and has the Aurora app open on their device, and then try again. If that doesn\'t work, please verify you have the correct Emoji ID.</string>
+    <string name="tx_failed_description">Please make sure your recipient has a reliable internet connection and has the Tari Universe Wallet app open on their device, and then try again. If that doesn\'t work, please verify you have the correct Emoji ID.</string>
 
     <!-- transaction detail -->
     <string name="tx_detail_payment_cancelled">Payment Cancelled</string>
@@ -411,10 +411,10 @@
     <string name="debug_log_filter_warning">Warning</string>
     <string name="debug_log_filter_error">Error</string>
     <string name="debug_log_filter_ffi">FFI</string>
-    <string name="debug_log_filter_aurora_general">Aurora - General</string>
-    <string name="debug_log_filter_aurora_connection">Aurora - Connection</string>
-    <string name="debug_log_filter_aurora_ui">Aurora - UI</string>
-    <string name="debug_log_filter_auroranavigation">Aurora - Navigation</string>
+    <string name="debug_log_filter_aurora_general">Tari Universe Wallet - General</string>
+    <string name="debug_log_filter_aurora_connection">Tari Universe Wallet - Connection</string>
+    <string name="debug_log_filter_aurora_ui">Tari Universe Wallet - UI</string>
+    <string name="debug_log_filter_auroranavigation">Tari Universe Wallet - Navigation</string>
 
     <string name="bugs_reporting_title">Report a Bug</string>
     <string name="bugs_reporting_description">Has something gone wrong? Please let us know!</string>
@@ -469,7 +469,7 @@
     <string name="all_settings_biometrics">Biometrics</string>
     <string name="all_settings_delete_wallet">Delete Your Wallet</string>
     <string name="all_settings_visit_site">Visit Tari.com</string>
-    <string name="all_settings_contribute">Contribute to Tari Aurora</string>
+    <string name="all_settings_contribute">Contribute to Tari Universe Wallet</string>
     <string name="all_settings_user_agreement">User Agreement</string>
     <string name="all_settings_privacy_policy">Privacy Policy</string>
     <string name="all_settings_disclaimer">Disclaimer</string>
@@ -645,15 +645,15 @@
     <string name="search_gifs_dialog_hint">Search GIPHY</string>
 
     <!--Data collection-->
-    <string name="data_collection_description">We\'re always striving to make Aurora better.\nTo achieve this, we use a third-party service to gather non-identifiable data like crash logs and usage statistics. This data helps us pinpoint and fix any issues, ultimately improving your experience</string>
+    <string name="data_collection_description">We\'re always striving to make Tari Universe Wallet better.\nTo achieve this, we use a third-party service to gather non-identifiable data like crash logs and usage statistics. This data helps us pinpoint and fix any issues, ultimately improving your experience</string>
     <string name="data_collection_option">I consent to data collection</string>
     <string name="data_collection_dialog_title">Help us improve</string>
-    <string name="data_collection_dialog_description">We\'re always striving to make Aurora better.\nTo achieve this, we use a third-party service to gather non-identifiable data like crash logs and usage statistics. This data helps us pinpoint and fix any issues, ultimately improving your experience.\n\nDo you consent to your data being collected?</string>
+    <string name="data_collection_dialog_description">We\'re always striving to make Tari Universe Wallet better.\nTo achieve this, we use a third-party service to gather non-identifiable data like crash logs and usage statistics. This data helps us pinpoint and fix any issues, ultimately improving your experience.\n\nDo you consent to your data being collected?</string>
     <string name="data_collection_dialog_positive">Yes, I consent</string>
     <string name="data_collection_dialog_negative">No, I decline</string>
 
     <!-- Biometrics -->
-    <string name="biometrics_description">We\'re dedicated to enhancing the security and convenience of Aurora\'s authorization process. To achieve this, we integrate a reliable Android native service for biometric authentication. Your unique biometric data ensures secure and effortless access to the application, simplifying your user experience.</string>
+    <string name="biometrics_description">We\'re dedicated to enhancing the security and convenience of Tari Universe Wallet\'s authorization process. To achieve this, we integrate a reliable Android native service for biometric authentication. Your unique biometric data ensures secure and effortless access to the application, simplifying your user experience.</string>
     <string name="biometrics_settings_use">Use biometrics</string>
     <string name="need_authorization">Authorization needed</string>
 
@@ -790,7 +790,7 @@
     <string name="change_password_page_title">Secure your backups</string>
     <string name="change_password_page_description_general_part">Ensure your wallet is safe even if your storage is compromised. Select a password you will remember or</string>
     <string name="change_password_page_description_highlight_part">you will not be able to recover your wallet</string>
-    <string name="enter_backup_password_page_desc_general_part">Enter the password you created in Aurora to secure your backups. If you cannot find the password,</string>
+    <string name="enter_backup_password_page_desc_general_part">Enter the password you created in Tari Universe Wallet to secure your backups. If you cannot find the password,</string>
     <string name="enter_backup_password_page_desc_highlighted_part">you will not be able to recover your wallet</string>
     <string name="check_backup_storage_status_error_title">Wallet Backup Incomplete</string>
     <string name="back_up_wallet_storage_setup_error_title">Wallet Backup Incomplete</string>
@@ -845,7 +845,7 @@
     <string name="onboarding_staged_wallet_security_page4_title_part2_bold">help keep your coins safe</string>
     <string name="onboarding_staged_wallet_security_page4_message_full">Try to keep your seed words and backups in a safe place. We also strongly recommend keeping a few copies of your seed words in different places and changing the backup password regularly</string>
     <string name="onboarding_staged_wallet_security_page4_action_button">Let’s Do This!</string>
-    <string name="onboarding_staged_wallet_security_footer_part1">Aurora helps you secure your funds</string>
+    <string name="onboarding_staged_wallet_security_footer_part1">Tari Universe Wallet helps you secure your funds</string>
     <string name="onboarding_staged_wallet_security_footer_part2_highlighted">when you need it</string>
     <string name="onboarding_staged_wallet_security_footer_part3_any_funds">. This step is triggered when you receive funds for the first time, but you can apply any step at any time from the settings</string>
     <string name="onboarding_staged_wallet_security_footer_part3_threshold">. This step is triggered when your balance exceeds %s for the first time, but you can apply any step at any time from the settings</string>
@@ -858,7 +858,7 @@
     <string name="contact_book_contacts_book_link_empty_state_title">Oh no, it’s empty in here!</string>
     <string name="contact_book_contacts_book_link_empty_state_no_contacts">Looks like you don’t have any contacts that we can link to yet. Once you’ve added a contact, you’ll be able to link to their profile.</string>
     <string name="contact_book_contacts_book_link_empty_state_empty_book">Looks like your phone’s contact book is empty. Once you’ve added a contact, you’ll be able to link to their profile.</string>
-    <string name="contact_book_contacts_book_link_empty_state_no_access">Aurora doesn’t currently have permission to access your phone’s contacts. If you would like to link to an existing contact, please click below and grant permission to the app to read from your contact book.</string>
+    <string name="contact_book_contacts_book_link_empty_state_no_access">Tari Universe Wallet doesn’t currently have permission to access your phone’s contacts. If you would like to link to an existing contact, please click below and grant permission to the app to read from your contact book.</string>
     <string name="contact_book_contacts_book_link_empty_state_error">An error occurred while trying to access your phone’s contacts. Please try again later.</string>
     <string name="contact_book_contacts_book_link_empty_state_add_contact">Add a contact</string>
     <string name="contact_book_contacts_book_link_empty_state_go_to_permission_settings">Go to permission settings</string>
@@ -904,7 +904,7 @@
     <string name="contact_book_details_edit_title">Edit Contact</string>
     <string name="contact_book_empty_state_title"><![CDATA[Find your <b>friends</b>]]></string>
     <string name="contact_book_empty_state_body"><![CDATA[Keep track of your contacts by saving them in the contact book. To <b>add a new contact,</b> tap the "add contact" icon at the top of the page]]></string>
-    <string name="contact_book_empty_state_body_no_permissions"><![CDATA[You can <b>add a new contact</b> by tapping on the "add contact" icon at the top of the page. Aurora can also automatically detect contacts with Tari addresses on you phone. We’ll need your permission to access your existing contact book to do this]]></string>
+    <string name="contact_book_empty_state_body_no_permissions"><![CDATA[You can <b>add a new contact</b> by tapping on the "add contact" icon at the top of the page. Tari Universe Wallet can also automatically detect contacts with Tari addresses on you phone. We’ll need your permission to access your existing contact book to do this]]></string>
     <string name="contact_book_empty_state_favorites_title"><![CDATA[Add some <b>favorites</b>]]></string>
     <string name="contact_book_empty_state_favorites_body"><![CDATA[You can <b>favorite contacts</b> to easily access them later. Tap on the contact’s name and then on the star icon to add them to your favorites list]]></string>
     <string name="contact_book_empty_state_grant_access_button">Grant app access to my contacts</string>
@@ -915,7 +915,7 @@
     <string name="contact_book_type_contact_book">Phone Contact</string>
     <string name="contact_book_type_merged">Linked Contact</string>
     <string name="contact_book_details_yat_not_found_dialog_title">Yat not found</string>
-    <string name="contact_book_details_yat_not_found_dialog_message">Aurora was unable to get data from the Yat service. Some contact details may be unavailable</string>
+    <string name="contact_book_details_yat_not_found_dialog_message">Tari Universe Wallet was unable to get data from the Yat service. Some contact details may be unavailable</string>
     <string name="share_contact_via_qr_code">QR Code</string>
     <string name="share_contact_via_qr_link">Link</string>
     <string name="share_contact_via_qr_nfc">NFC</string>
@@ -923,7 +923,7 @@
     <string name="wallet_info_alias_edit_title">Edit Name</string>
     <string name="tx_details_contact_name">Contact name here</string>
     <string name="share_via_qr_code_title">Share QR Code</string>
-    <string name="contact_book_default_alias">Aurora user %s</string>
+    <string name="contact_book_default_alias">Tari user %s</string>
     <string name="contact_details_empty_name_dialog_title">Name can\’t be empty</string>
     <string name="contact_details_empty_name_dialog_message">A contact without a name? That won\’t work. Please add one to keep things running smoothly.</string>
     <string name="contact_details_empty_name_dialog_button">Will do!</string>
@@ -950,8 +950,8 @@
 
     <string name="contactless_payment_title">Connect to a Device</string>
     <string name="contactless_payment_success_title">Device Detected</string>
-    <string name="contactless_payment_success_description">We just found a fellow Aurora user nearby!\nWould you like to send Tari to %s?</string>
-    <string name="contactless_payment_description">Aurora can grab contact info from users nearby using BLE (Bluetooth Low Energy)!\n\nSimply place your phones close to each other and make sure Bluetooth is turned on for both devices. Once connected, you’ll be able to send some Tari quick and easy! 😎</string>
+    <string name="contactless_payment_success_description">We just found a fellow Tari user nearby!\nWould you like to send Tari to %s?</string>
+    <string name="contactless_payment_description">Tari Universe Wallet can grab contact info from users nearby using BLE (Bluetooth Low Energy)!\n\nSimply place your phones close to each other and make sure Bluetooth is turned on for both devices. Once connected, you’ll be able to send some Tari quick and easy! 😎</string>
 
     <!--    Chat-->
     <string name="chat_title">Messages</string>
