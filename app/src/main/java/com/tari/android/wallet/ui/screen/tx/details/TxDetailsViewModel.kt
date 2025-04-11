@@ -14,8 +14,6 @@ import com.tari.android.wallet.data.contacts.ContactsRepository
 import com.tari.android.wallet.data.contacts.model.ContactDto
 import com.tari.android.wallet.data.contacts.model.splitAlias
 import com.tari.android.wallet.ffi.FFITxCancellationReason
-import com.tari.android.wallet.ffi.FFIWallet
-import com.tari.android.wallet.model.TxId
 import com.tari.android.wallet.model.TxStatus.BROADCAST
 import com.tari.android.wallet.model.TxStatus.COINBASE
 import com.tari.android.wallet.model.TxStatus.COINBASE_CONFIRMED
@@ -45,8 +43,8 @@ import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonStyle
 import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
 import com.tari.android.wallet.ui.dialog.modular.modules.input.InputModule
 import com.tari.android.wallet.ui.screen.tx.details.TxDetailsFragment.Companion.TX_EXTRA_KEY
-import com.tari.android.wallet.ui.screen.tx.details.TxDetailsFragment.Companion.TX_ID_EXTRA_KEY
 import com.tari.android.wallet.util.extension.collectFlow
+import com.tari.android.wallet.util.extension.getOrThrow
 import com.tari.android.wallet.util.extension.launchOnMain
 import com.tari.android.wallet.util.extension.string
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -61,12 +59,8 @@ class TxDetailsViewModel(savedState: SavedStateHandle) : CommonViewModel() {
 
     val requiredConfirmationCount: Long? = walletManager.walletInstance?.getRequiredConfirmationCount()
 
-    private var txId: TxId? = savedState.get<TxId>(TX_ID_EXTRA_KEY)
-
-    private val _tx = MutableStateFlow(savedState.get<Tx>(TX_EXTRA_KEY))
+    private val _tx = MutableStateFlow(savedState.getOrThrow<Tx>(TX_EXTRA_KEY))
     val tx = _tx.asStateFlow()
-    private val txValue: Tx
-        get() = _tx.value ?: error("Tx object is not initialized")
 
     private val _cancellationReason = MutableLiveData<String>()
     val cancellationReason: LiveData<String> = _cancellationReason
@@ -79,10 +73,6 @@ class TxDetailsViewModel(savedState: SavedStateHandle) : CommonViewModel() {
 
     init {
         component.inject(this)
-
-        doOnWalletRunning { wallet ->
-            findTxAndUpdateUI(wallet)
-        }
 
         collectFlow(contactsRepository.contactList) { updateContact() }
 
@@ -107,8 +97,7 @@ class TxDetailsViewModel(savedState: SavedStateHandle) : CommonViewModel() {
     }
 
     fun onTransactionCancel() {
-        val tx = txValue
-        if (tx is PendingOutboundTx && tx.direction == OUTBOUND && tx.status == PENDING) {
+        if (tx.value is PendingOutboundTx && tx.value.direction == OUTBOUND && tx.value.status == PENDING) {
             showTxCancelDialog()
         }
     }
@@ -127,7 +116,7 @@ class TxDetailsViewModel(savedState: SavedStateHandle) : CommonViewModel() {
     }
 
     private fun cancelTransaction() {
-        val isCancelled = walletManager.requireWalletInstance.cancelPendingTx(this.txValue.id)
+        val isCancelled = walletManager.requireWalletInstance.cancelPendingTx(this.tx.value.id)
         if (!isCancelled) {
             showSimpleDialog(
                 title = resourceManager.getString(R.string.tx_detail_cancellation_error_title),
@@ -149,10 +138,8 @@ class TxDetailsViewModel(savedState: SavedStateHandle) : CommonViewModel() {
     }
 
     private fun updateContact() {
-        this.tx.value?.let { tx ->
-            val contact = contactsRepository.getContactForTx(tx)
-            _contact.update { contact }
-        }
+        val contact = contactsRepository.getContactForTx(this.tx.value)
+        _contact.update { contact }
     }
 
     private fun getCancellationReason(tx: Tx): String {
@@ -172,24 +159,8 @@ class TxDetailsViewModel(savedState: SavedStateHandle) : CommonViewModel() {
     }
 
     private fun updateTxData(tx: Tx) {
-        if (tx.id == this.tx.value?.id) {
+        if (tx.id == this.tx.value.id) {
             setTxArg(tx)
-        }
-    }
-
-    private fun findTxAndUpdateUI(wallet: FFIWallet) {
-        txId ?: return
-
-        val foundTx = findTxById(txId!!, wallet)
-
-        if (foundTx == null) {
-            showSimpleDialog(
-                title = resourceManager.getString(R.string.tx_details_error_tx_not_found_title),
-                description = resourceManager.getString(R.string.tx_details_error_tx_not_found_desc),
-                onClose = { onBackPressed() },
-            )
-        } else {
-            setTxArg(foundTx)
         }
     }
 
@@ -205,13 +176,6 @@ class TxDetailsViewModel(savedState: SavedStateHandle) : CommonViewModel() {
             )
         }
     }
-
-    // TODO move to tx repository
-    private fun findTxById(id: TxId, wallet: FFIWallet): Tx? =
-        runCatching { wallet.getPendingInboundTxById(id) }.getOrNull()
-            ?: runCatching { wallet.getPendingOutboundTxById(id) }.getOrNull()
-            ?: runCatching { wallet.getCompletedTxById(id) }.getOrNull()
-            ?: runCatching { wallet.getCancelledTxById(id) }.getOrNull()
 
     private fun showEditNameInputs() {
         val contact = contact.value!!

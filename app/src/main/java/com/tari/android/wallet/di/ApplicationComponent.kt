@@ -99,7 +99,6 @@ import com.tari.android.wallet.ui.screen.settings.torBridges.TorBridgesSelection
 import com.tari.android.wallet.ui.screen.settings.torBridges.customBridges.CustomTorBridgesViewModel
 import com.tari.android.wallet.ui.screen.settings.userAutorization.BiometricAuthenticationViewModel
 import com.tari.android.wallet.ui.screen.tx.details.TxDetailsViewModel
-import com.tari.android.wallet.ui.screen.tx.details.gif.GifViewModel
 import com.tari.android.wallet.ui.screen.tx.history.all.AllTxHistoryViewModel
 import com.tari.android.wallet.ui.screen.tx.history.contact.ContactTxHistoryViewModel
 import com.tari.android.wallet.ui.screen.utxos.list.UtxosListViewModel
@@ -135,7 +134,6 @@ interface ApplicationComponent {
 
     fun inject(commonViewModel: CommonViewModel)
     fun inject(viewModel: ThumbnailGifViewModel)
-    fun inject(viewModel: GifViewModel)
     fun inject(viewModel: ScreenRecordingSettingsViewModel)
     fun inject(viewModel: ChooseRestoreOptionViewModel)
     fun inject(viewModel: EnterRestorationPasswordViewModel)

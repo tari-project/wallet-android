@@ -37,14 +37,13 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
-import com.bumptech.glide.Glide
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.walletManager.WalletConfig
 import com.tari.android.wallet.data.contacts.model.ContactDto
 import com.tari.android.wallet.databinding.FragmentTxDetailsBinding
 import com.tari.android.wallet.model.MicroTari
-import com.tari.android.wallet.model.TxId
 import com.tari.android.wallet.model.TxNote
 import com.tari.android.wallet.model.TxStatus
 import com.tari.android.wallet.model.tx.CancelledTx
@@ -53,6 +52,7 @@ import com.tari.android.wallet.model.tx.PendingOutboundTx
 import com.tari.android.wallet.model.tx.Tx
 import com.tari.android.wallet.ui.common.CommonXmlFragment
 import com.tari.android.wallet.ui.dialog.modular.ModularDialog
+import com.tari.android.wallet.ui.dialog.tooltipDialog.TooltipDialogArgs
 import com.tari.android.wallet.util.addressFirstEmojis
 import com.tari.android.wallet.util.addressLastEmojis
 import com.tari.android.wallet.util.addressPrefixEmojis
@@ -62,7 +62,6 @@ import com.tari.android.wallet.util.extension.getFirstChild
 import com.tari.android.wallet.util.extension.getLastChild
 import com.tari.android.wallet.util.extension.gone
 import com.tari.android.wallet.util.extension.hideKeyboard
-import com.tari.android.wallet.util.extension.invisible
 import com.tari.android.wallet.util.extension.observe
 import com.tari.android.wallet.util.extension.setLayoutSize
 import com.tari.android.wallet.util.extension.setTextSizePx
@@ -103,7 +102,6 @@ class TxDetailsFragment : CommonXmlFragment<FragmentTxDetailsBinding, TxDetailsV
 
     private fun observeVM() = with(viewModel) {
         collectNonNullFlow(tx) { tx ->
-            fetchGIFIfAttached(tx)
             bindTxData(tx)
         }
 
@@ -130,13 +128,6 @@ class TxDetailsFragment : CommonXmlFragment<FragmentTxDetailsBinding, TxDetailsV
         ui.cancellationReasonView.setVisible(text.isNotBlank())
     }
 
-    private fun fetchGIFIfAttached(tx: Tx) {
-        val gifId = TxNote.fromTx(tx).gifId ?: return
-        val gifViewModel: GifViewModel by viewModels()
-        gifViewModel.onGIFFetchRequested(gifId)
-        GifView(ui.gifContainer, Glide.with(this), gifViewModel, this).displayGif()
-    }
-
     private fun setupUI() {
         bindViews()
         setUICommands()
@@ -146,8 +137,6 @@ class TxDetailsFragment : CommonXmlFragment<FragmentTxDetailsBinding, TxDetailsV
     private fun bindViews() {
         currentTextSize = dimen(R.dimen.add_amount_element_text_size)
         currentAmountGemSize = dimen(R.dimen.add_amount_gem_size)
-
-        ui.gifContainer.root.invisible()
     }
 
     private fun setUICommands() {
@@ -204,7 +193,6 @@ class TxDetailsFragment : CommonXmlFragment<FragmentTxDetailsBinding, TxDetailsV
             ui.txNoteTextView.visible()
             ui.txNoteTextView.text = note.message
         }
-        ui.gifContainer.root.visible()
     }
 
     private fun setTxAddressData(tx: Tx) {
@@ -228,7 +216,7 @@ class TxDetailsFragment : CommonXmlFragment<FragmentTxDetailsBinding, TxDetailsV
         if (tx !is CancelledTx && tx.isOutbound && tx.status == TxStatus.PENDING) {
             ui.cancelTxView.setOnClickListener { viewModel.onTransactionCancel() }
             ui.cancelTxView.visible()
-        } else if (ui.cancelTxView.visibility == View.VISIBLE) {
+        } else if (ui.cancelTxView.isVisible) {
             ui.cancelTxView.setOnClickListener(null)
             ui.cancelTxView.gone()
         }
@@ -266,12 +254,10 @@ class TxDetailsFragment : CommonXmlFragment<FragmentTxDetailsBinding, TxDetailsV
 
     companion object {
         const val TX_EXTRA_KEY = "TX_EXTRA_KEY"
-        const val TX_ID_EXTRA_KEY = "TX_DETAIL_EXTRA_KEY"
 
-        fun newInstance(tx: Tx? = null, txId: TxId? = null) = TxDetailsFragment().apply {
+        fun newInstance(tx: Tx) = TxDetailsFragment().apply {
             arguments = Bundle().apply {
                 putParcelable(TX_EXTRA_KEY, tx)
-                putSerializable(TX_ID_EXTRA_KEY, txId)
             }
         }
     }

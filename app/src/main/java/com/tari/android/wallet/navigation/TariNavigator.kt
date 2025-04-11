@@ -146,7 +146,7 @@ class TariNavigator @Inject constructor(
             is TxSend.ToFinalizing -> continueToFinalizeSendTx(navigation.transactionData)
             is TxSend.ToConfirm -> addFragment(ConfirmFragment.newInstance(navigation.transactionData))
 
-            is TxList.ToTxDetails -> addFragment(TxDetailsFragment.newInstance(navigation.tx, navigation.txId))
+            is TxList.ToTxDetails -> addFragment(TxDetailsFragment.newInstance(navigation.tx))
             is TxList.ToSendTariToUser -> sendToUser(navigation.contact, navigation.amount, navigation.note)
             is TxList.ToUtxos -> addFragment(UtxosListFragment())
             is TxList.ToAllSettings -> addFragment(AllSettingsFragment.newInstance())

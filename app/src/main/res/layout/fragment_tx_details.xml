@@ -341,16 +341,6 @@
                     app:customFont="roman"
                     tools:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus feugiat, vestibulum nunc nec, ultricies nunc. Integer nec odio. Praesent libero." />
 
-                <include
-                    android:id="@+id/gif_container"
-                    layout="@layout/view_tx_details_gif_container"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginHorizontal="@dimen/common_horizontal_margin"
-                    android:layout_marginTop="0dp"
-                    android:layout_marginBottom="@dimen/common_horizontal_margin"
-                    android:visibility="visible" />
-
                 <LinearLayout
                     android:id="@+id/explorer_container_view"
                     android:layout_width="match_parent"
