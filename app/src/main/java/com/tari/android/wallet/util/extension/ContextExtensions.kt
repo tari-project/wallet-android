@@ -55,6 +55,7 @@ fun Context.dimenPx(@DimenRes id: Int): Int = resources.getDimensionPixelSize(id
 fun Context.dimen(@DimenRes id: Int): Float = resources.getDimension(id)
 
 fun Context.dpToPx(dp: Float): Float = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, resources?.displayMetrics)
+fun Int.dpToPx(context: Context): Float = (this * context.resources.displayMetrics.density)
 
 fun Context.drawable(@DrawableRes id: Int): Drawable? = ContextCompat.getDrawable(this, id)
 

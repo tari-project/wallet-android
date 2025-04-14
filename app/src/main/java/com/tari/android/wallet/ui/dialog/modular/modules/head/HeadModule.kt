@@ -9,4 +9,7 @@ class HeadModule(
     val rightButtonTitle: String = "",
     @DrawableRes val rightButtonIcon: Int? = null,
     val rightButtonAction: () -> Unit = {},
-) : IDialogModule()
+) : IDialogModule() {
+    val showRightAction: Boolean
+        get() = rightButtonTitle.isNotEmpty() || rightButtonIcon != null
+}
