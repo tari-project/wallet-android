@@ -39,6 +39,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
+import androidx.core.view.isInvisible
+import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.daasuu.ei.Ease
@@ -49,8 +51,6 @@ import com.tari.android.wallet.R.string.add_amount_not_enough_available_balance
 import com.tari.android.wallet.R.string.add_amount_wallet_balance
 import com.tari.android.wallet.R.string.error_fee_more_than_amount_description
 import com.tari.android.wallet.R.string.error_fee_more_than_amount_title
-import com.tari.android.wallet.R.string.tx_detail_fee_tooltip_desc
-import com.tari.android.wallet.R.string.tx_detail_fee_tooltip_transaction_fee
 import com.tari.android.wallet.application.walletManager.WalletConfig
 import com.tari.android.wallet.data.contacts.model.ContactDto
 import com.tari.android.wallet.data.contacts.model.FFIContactInfo
@@ -65,7 +65,6 @@ import com.tari.android.wallet.navigation.TariNavigator.Companion.PARAMETER_NOTE
 import com.tari.android.wallet.ui.common.CommonXmlFragment
 import com.tari.android.wallet.ui.dialog.modular.ModularDialog
 import com.tari.android.wallet.ui.dialog.modular.SimpleDialogArgs
-import com.tari.android.wallet.ui.dialog.tooltipDialog.TooltipDialogArgs
 import com.tari.android.wallet.ui.screen.send.addAmount.feeModule.NetworkSpeed
 import com.tari.android.wallet.ui.screen.send.addAmount.keyboard.KeyboardController
 import com.tari.android.wallet.ui.screen.send.amountView.AmountStyle
@@ -84,8 +83,6 @@ import com.tari.android.wallet.util.extension.temporarilyDisableClick
 import com.tari.android.wallet.util.extension.visible
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import androidx.core.view.isVisible
-import androidx.core.view.isInvisible
 
 class AddAmountFragment : CommonXmlFragment<FragmentAddAmountBinding, AddAmountViewModel>() {
 
@@ -161,7 +158,7 @@ class AddAmountFragment : CommonXmlFragment<FragmentAddAmountBinding, AddAmountV
     private fun setActionBindings() {
         ui.backCtaView.setOnClickListener { onBackButtonClicked(it) }
         ui.emojiIdSummaryContainerView.setOnClickListener { viewModel.emojiIdClicked(recipientContact.walletAddress) }
-        ui.txFeeDescTextView.setOnClickListener { showTxFeeToolTip() }
+        ui.txFeeDescTextView.setOnClickListener { viewModel.showTxFeeToolTip() }
         ui.continueButton.setOnClickListener { continueButtonClicked() }
     }
 
@@ -201,12 +198,6 @@ class AddAmountFragment : CommonXmlFragment<FragmentAddAmountBinding, AddAmountV
         view.temporarilyDisableClick()
         val mActivity = activity ?: return
         mActivity.onBackPressed()
-    }
-
-    private fun showTxFeeToolTip() {
-        val args = TooltipDialogArgs(string(tx_detail_fee_tooltip_transaction_fee), string(tx_detail_fee_tooltip_desc))
-            .getModular(viewModel.resourceManager)
-        ModularDialog(requireActivity(), args).show()
     }
 
     private fun continueButtonClicked() {

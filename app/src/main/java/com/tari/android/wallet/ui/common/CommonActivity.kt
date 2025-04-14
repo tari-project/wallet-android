@@ -11,6 +11,7 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
 import com.orhanobut.logger.Logger
 import com.orhanobut.logger.Printer
@@ -76,7 +77,7 @@ abstract class CommonActivity<VM : CommonViewModel> : AppCompatActivity(), Shake
     fun subscribeToCommon(commonViewModel: CommonViewModel) = with(commonViewModel) {
         observe(backPressed) { onBackPressed() }
 
-        observe(openLink) { startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(it))) }
+        observe(openLink) { startActivity(Intent(Intent.ACTION_VIEW, it.toUri())) }
 
         observe(modularDialog) { dialogManager.replace(ModularDialog(this@CommonActivity, it)) }
 
