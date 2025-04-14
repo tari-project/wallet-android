@@ -28,7 +28,7 @@ class TariAboutFragment : CommonXmlFragment<FragmentTariAboutBinding, TariAboutV
 
         ui.iconsList.adapter = adapter
         ui.iconsList.layoutManager = LinearLayoutManager(requireContext())
-        adapter.setClickListener(CommonAdapter.ItemClickListener { viewModel.openUrl(it) })
+        adapter.setClickListener(CommonAdapter.ItemClickListener { viewModel.openAboutUrl(it) })
         ui.description.setOnClickListener { viewModel.openLicense() }
         ui.description.text = HtmlHelper.getSpannedText(getString(R.string.tari_about_description))
 

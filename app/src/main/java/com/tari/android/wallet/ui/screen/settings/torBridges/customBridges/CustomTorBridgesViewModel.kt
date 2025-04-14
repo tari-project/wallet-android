@@ -21,7 +21,7 @@ class CustomTorBridgesViewModel : CommonViewModel() {
     }
 
     fun openRequestPage() {
-        _openLink.postValue(resourceManager.getString(R.string.tor_bridges_url))
+        openUrl(resourceManager.getString(R.string.tor_bridges_url))
     }
 
     fun navigateToUploadQr() {

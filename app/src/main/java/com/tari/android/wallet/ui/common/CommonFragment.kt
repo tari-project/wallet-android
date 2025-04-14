@@ -7,9 +7,7 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import android.view.WindowManager
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
@@ -24,9 +22,6 @@ import com.tari.android.wallet.BuildConfig
 import com.tari.android.wallet.application.deeplinks.DeepLink
 import com.tari.android.wallet.di.DiContainer
 import com.tari.android.wallet.infrastructure.logging.LoggerTags
-import com.tari.android.wallet.ui.component.mainList.MutedBackPressedCallback
-import com.tari.android.wallet.ui.component.tari.toast.TariToast
-import com.tari.android.wallet.ui.component.tari.toast.TariToastArgs
 import com.tari.android.wallet.ui.dialog.modular.InputModularDialog
 import com.tari.android.wallet.ui.dialog.modular.ModularDialog
 import com.tari.android.wallet.ui.screen.qr.QrScannerActivity
@@ -39,8 +34,6 @@ import com.tari.android.wallet.util.extension.removeListenersAndCancel
 abstract class CommonFragment<VM : CommonViewModel> : Fragment(), FragmentPoppedListener {
 
     private lateinit var clipboardManager: ClipboardManager
-
-    protected var blockingBackPressDispatcher = MutedBackPressedCallback(false)
 
     lateinit var viewModel: VM
 
@@ -88,12 +81,6 @@ abstract class CommonFragment<VM : CommonViewModel> : Fragment(), FragmentPopped
         view.isFocusable = true
 
         clipboardManager = DiContainer.appComponent.getClipboardManager()
-    }
-
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, blockingBackPressDispatcher)
-
-        return super.onCreateView(inflater, container, savedInstanceState)
     }
 
     override fun onResume() {
@@ -160,12 +147,6 @@ abstract class CommonFragment<VM : CommonViewModel> : Fragment(), FragmentPopped
 
         observe(inputDialog) { dialogManager.replace(InputModularDialog(requireActivity(), it)) }
 
-        observe(showToast) { TariToast(requireContext(), it) }
-
-        observe(blockedBackPressed) {
-            blockingBackPressDispatcher.isEnabled = it
-        }
-
         observe(permissionManager.checkForPermission) {
             launcher.launch(it.toTypedArray())
         }
@@ -193,7 +174,7 @@ abstract class CommonFragment<VM : CommonViewModel> : Fragment(), FragmentPopped
 
     private fun copy(clipboardArgs: ClipboardArgs) {
         clipboardManager.setPrimaryClip(ClipData.newPlainText(clipboardArgs.clipLabel, clipboardArgs.clipText))
-        TariToast(requireContext(), TariToastArgs(clipboardArgs.toastMessage, Toast.LENGTH_LONG))
+        Toast.makeText(requireContext(), clipboardArgs.toastMessage, Toast.LENGTH_LONG).show()
     }
 }
 

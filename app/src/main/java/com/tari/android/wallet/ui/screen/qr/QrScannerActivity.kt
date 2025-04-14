@@ -52,8 +52,6 @@ import com.tari.android.wallet.application.deeplinks.DeepLink
 import com.tari.android.wallet.databinding.ActivityQrScannerBinding
 import com.tari.android.wallet.di.DiContainer.appComponent
 import com.tari.android.wallet.ui.common.CommonXmlActivity
-import com.tari.android.wallet.ui.component.tari.toast.TariToast
-import com.tari.android.wallet.ui.component.tari.toast.TariToastArgs
 import com.tari.android.wallet.util.extension.collectFlow
 import com.tari.android.wallet.util.extension.setVisible
 
@@ -100,7 +98,7 @@ class QrScannerActivity : CommonXmlActivity<ActivityQrScannerBinding, QrScannerV
             if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 startScanning()
             } else {
-                TariToast(this, TariToastArgs(getString(R.string.add_recipient_camera_permission_denied_message), Toast.LENGTH_LONG))
+                Toast.makeText(this, getString(R.string.add_recipient_camera_permission_denied_message), Toast.LENGTH_LONG).show()
             }
         }
     }
@@ -139,7 +137,7 @@ class QrScannerActivity : CommonXmlActivity<ActivityQrScannerBinding, QrScannerV
         codeScanner?.decodeCallback = DecodeCallback { viewModel.onScanResult(it.text) }
 
         codeScanner?.errorCallback = ErrorCallback {
-            runOnUiThread { TariToast(this, TariToastArgs(getString(R.string.add_recipient_failed_init_camera_message), Toast.LENGTH_LONG)) }
+            runOnUiThread { Toast.makeText(this, getString(R.string.add_recipient_failed_init_camera_message), Toast.LENGTH_LONG).show() }
         }
 
         ui.scannerView.setOnClickListener { codeScanner?.startPreview() }

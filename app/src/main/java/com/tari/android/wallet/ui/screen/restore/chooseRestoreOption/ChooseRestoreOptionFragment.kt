@@ -110,7 +110,6 @@ class ChooseRestoreOptionFragment : CommonXmlFragment<FragmentChooseRestoreOptio
     }
 
     private fun updateProgress(backupOption: BackupOption, isStarted: Boolean) {
-        blockingBackPressDispatcher.isEnabled = isStarted
         getBackupOptionView(backupOption)?.updateLoading(isStarted)
     }
 

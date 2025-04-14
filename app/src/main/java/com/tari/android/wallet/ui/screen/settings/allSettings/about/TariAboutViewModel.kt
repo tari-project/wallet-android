@@ -82,11 +82,11 @@ class TariAboutViewModel : CommonViewModel() {
         )
     }
 
-    fun openUrl(item: TariIconViewHolderItem) {
-        _openLink.postValue(resourceManager.getString(item.iconLink))
+    fun openAboutUrl(item: TariIconViewHolderItem) {
+        openUrl(resourceManager.getString(item.iconLink))
     }
 
     fun openLicense() {
-        _openLink.postValue(resourceManager.getString(tari_about_license_url))
+        openUrl(resourceManager.getString(tari_about_license_url))
     }
 }

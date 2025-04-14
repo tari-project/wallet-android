@@ -792,7 +792,6 @@
     <string name="change_password_page_description_highlight_part">you will not be able to recover your wallet</string>
     <string name="enter_backup_password_page_desc_general_part">Enter the password you created in Tari Universe Wallet to secure your backups. If you cannot find the password,</string>
     <string name="enter_backup_password_page_desc_highlighted_part">you will not be able to recover your wallet</string>
-    <string name="check_backup_storage_status_error_title">Wallet Backup Incomplete</string>
     <string name="back_up_wallet_storage_setup_error_title">Wallet Backup Incomplete</string>
     <string name="backup_wallet_storage_full_title">Wallet Backup Incomplete</string>
     <string name="check_backup_storage_status_auth_revoked_error_description">Storage is not accessible</string>

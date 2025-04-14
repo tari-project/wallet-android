@@ -10,10 +10,9 @@ import android.widget.LinearLayout
 import androidx.lifecycle.LifecycleOwner
 import androidx.viewbinding.ViewBinding
 import com.tari.android.wallet.ui.common.CommonViewModel
-import com.tari.android.wallet.ui.common.DialogManager
-import com.tari.android.wallet.ui.component.tari.toast.TariToast
 import com.tari.android.wallet.ui.dialog.modular.ModularDialog
 import contacts.ui.view.activity
+import androidx.core.net.toUri
 
 abstract class CommonView<VM : CommonViewModel, VB : ViewBinding> : LinearLayout {
 
@@ -21,8 +20,6 @@ abstract class CommonView<VM : CommonViewModel, VB : ViewBinding> : LinearLayout
 
     lateinit var ui: VB
         private set
-
-    private var dialogManager: DialogManager? = null
 
     abstract fun bindingInflate(layoutInflater: LayoutInflater, parent: ViewGroup?, attachToRoot: Boolean): VB
 
@@ -57,10 +54,8 @@ abstract class CommonView<VM : CommonViewModel, VB : ViewBinding> : LinearLayout
 
         dialogManager = viewModel.dialogManager
 
-        openLink.observe(viewLifecycle) { context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(it))) }
+        openLink.observe(viewLifecycle) { context.startActivity(Intent(Intent.ACTION_VIEW, it.toUri())) }
 
         modularDialog.observe(viewLifecycle) { args -> activity?.let { activity -> dialogManager.replace(ModularDialog(activity, args)) } }
-
-        showToast.observe(viewLifecycle) { TariToast(context, it) }
     }
 }

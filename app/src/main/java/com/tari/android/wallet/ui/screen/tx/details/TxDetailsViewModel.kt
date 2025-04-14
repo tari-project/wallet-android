@@ -89,7 +89,7 @@ class TxDetailsViewModel(savedState: SavedStateHandle) : CommonViewModel() {
     fun addOrEditContact() = showEditNameInputs()
 
     fun openInBlockExplorer() {
-        _openLink.postValue(uiState.value.blockExplorerLink.orEmpty())
+        openUrl(uiState.value.blockExplorerLink.orEmpty())
     }
 
     fun onTransactionCancel() {
