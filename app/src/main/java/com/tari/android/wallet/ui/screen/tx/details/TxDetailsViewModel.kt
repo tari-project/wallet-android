@@ -8,6 +8,7 @@ import com.tari.android.wallet.R.string.tx_details_cancel_dialog_description
 import com.tari.android.wallet.R.string.tx_details_cancel_dialog_not_cancel
 import com.tari.android.wallet.application.walletManager.WalletManager.WalletEvent
 import com.tari.android.wallet.data.contacts.ContactsRepository
+import com.tari.android.wallet.data.contacts.model.ContactDto
 import com.tari.android.wallet.data.contacts.model.splitAlias
 import com.tari.android.wallet.model.tx.Tx
 import com.tari.android.wallet.ui.common.CommonViewModel
@@ -40,7 +41,7 @@ class TxDetailsViewModel(savedState: SavedStateHandle) : CommonViewModel() {
             tx = savedState.getOrThrow<Tx>(TX_EXTRA_KEY),
             ticker = networkRepository.currentNetwork.ticker,
             requiredConfirmationCount = walletManager.requireWalletInstance.getRequiredConfirmationCount(),
-            blockExplorerUrl = networkRepository.currentNetwork.blockExplorerBaseUrl,
+            blockExplorerBaseUrl = networkRepository.currentNetwork.blockExplorerBaseUrl,
         )
     )
     val uiState = _uiState.asStateFlow()
@@ -64,7 +65,37 @@ class TxDetailsViewModel(savedState: SavedStateHandle) : CommonViewModel() {
         }
     }
 
-    fun addOrEditContact() = showEditNameInputs()
+    fun onContactEditClicked() {
+        val contact = uiState.value.contact ?: return
+
+        val name = (contact.contactInfo.firstName + " " + contact.contactInfo.lastName).trim()
+
+        var saveAction: () -> Boolean = { false }
+
+        val nameModule = InputModule(
+            value = name,
+            hint = resourceManager.getString(R.string.contact_book_add_contact_first_name_hint),
+            isFirst = true,
+            isEnd = false,
+            onDoneAction = { saveAction.invoke() },
+        )
+
+        val headModule = HeadModule(
+            title = resourceManager.getString(R.string.contact_book_details_edit_title),
+            rightButtonTitle = resourceManager.getString(R.string.contact_book_add_contact_done_button),
+            rightButtonAction = { saveAction.invoke() },
+        )
+
+        saveAction = {
+            saveContactName(contact, nameModule.value)
+            true
+        }
+
+        showInputModalDialog(
+            headModule,
+            nameModule,
+        )
+    }
 
     fun openInBlockExplorer() {
         openUrl(uiState.value.blockExplorerLink.orEmpty())
@@ -115,44 +146,11 @@ class TxDetailsViewModel(savedState: SavedStateHandle) : CommonViewModel() {
         }
     }
 
-    private fun showEditNameInputs() {
-        val contact = uiState.value.contact ?: return
-
-        val name = (contact.contactInfo.firstName + " " + contact.contactInfo.lastName).trim()
-
-        var saveAction: () -> Boolean = { false }
-
-        val nameModule = InputModule(
-            value = name,
-            hint = resourceManager.getString(R.string.contact_book_add_contact_first_name_hint),
-            isFirst = true,
-            isEnd = false,
-            onDoneAction = { saveAction.invoke() },
-        )
-
-        val headModule = HeadModule(
-            title = resourceManager.getString(R.string.contact_book_details_edit_title),
-            rightButtonTitle = resourceManager.getString(R.string.contact_book_add_contact_done_button),
-            rightButtonAction = { saveAction.invoke() },
-        )
-
-        saveAction = {
-            saveDetails(nameModule.value)
-            true
-        }
-
-        showInputModalDialog(
-            headModule,
-            nameModule,
-        )
-    }
-
-    private fun saveDetails(newName: String) {
+    private fun saveContactName(contact: ContactDto, newName: String) {
         launchOnMain {
             val firstName = splitAlias(newName).firstName
             val lastName = splitAlias(newName).lastName
-            val contactDto = uiState.value.contact!!
-            _uiState.update { it.copy(contact = contactsRepository.updateContactInfo(contactDto, firstName, lastName, contactDto.yat)) }
+            _uiState.update { it.copy(contact = contactsRepository.updateContactInfo(contact, firstName, lastName, contact.yat)) }
             hideDialog()
         }
     }

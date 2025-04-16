@@ -292,7 +292,7 @@
                             android:background="@null"
                             android:ellipsize="end"
                             android:enabled="false"
-                            android:hint="@string/tx_details_contact_name"
+                            android:hint="@string/tx_details_add_contact_name_hint"
                             android:singleLine="true"
                             android:textColor="?attr/palette_text_heading"
                             android:textSize="14sp"

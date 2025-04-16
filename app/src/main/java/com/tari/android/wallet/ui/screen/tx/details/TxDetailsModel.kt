@@ -18,15 +18,14 @@ import java.util.Date
 object TxDetailsModel {
     const val TX_EXTRA_KEY = "TX_EXTRA_KEY"
 
-    const val BLOCK_EXPLORER_FORMAT = "%s/kernel_search?nonces=%s&amp;signatures=%s"
+    const val BLOCK_EXPLORER_FORMAT = "%s/kernel_search?nonces=%s&signatures=%s"
 
     data class UiState(
         val tx: Tx,
         val ticker: String,
-        private val blockExplorerUrl: String?,
+        private val blockExplorerBaseUrl: String?,
         val requiredConfirmationCount: Long,
         val contact: ContactDto? = null,
-        val explorerLink: String? = null,
     ) {
         val screenTitle: Int
             @StringRes get() = when {
@@ -41,7 +40,7 @@ object TxDetailsModel {
 
         val blockExplorerLink: String?
             get() = tx.safeCastTo<CompletedTx>()?.txKernel?.let { txKernel ->
-                String.format(BLOCK_EXPLORER_FORMAT, explorerLink, txKernel.publicNonce, txKernel.signature)
+                String.format(BLOCK_EXPLORER_FORMAT, blockExplorerBaseUrl, txKernel.publicNonce, txKernel.signature)
             }
 
         val tariTxnId: String?

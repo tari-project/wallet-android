@@ -29,6 +29,7 @@ import com.tari.android.wallet.ui.compose.components.TariPrimaryButton
 import com.tari.android.wallet.ui.compose.components.TariTextButton
 import com.tari.android.wallet.ui.compose.components.TariTopBar
 import com.tari.android.wallet.ui.screen.settings.themeSelector.TariTheme
+import com.tari.android.wallet.ui.screen.tx.details.widget.TxDetailInfoContactNameItem
 import com.tari.android.wallet.ui.screen.tx.details.widget.TxDetailInfoCopyItem
 import com.tari.android.wallet.ui.screen.tx.details.widget.TxDetailInfoItem
 import com.tari.android.wallet.ui.screen.tx.details.widget.TxDetailInfoStatusItem
@@ -42,6 +43,7 @@ fun TxDetailsScreen(
     onCancelTxClick: () -> Unit,
     onCopyValueClick: (value: String) -> Unit,
     onBlockExplorerClick: () -> Unit,
+    onContactEditClick: () -> Unit,
 ) {
     Scaffold(
         modifier = Modifier
@@ -84,15 +86,14 @@ fun TxDetailsScreen(
                 )
             }
 
-            uiState.contact?.alias?.takeIf { it.isNotEmpty() }?.let { alias ->
+            uiState.contact?.let { contact ->
                 Spacer(Modifier.size(10.dp))
-                TxDetailInfoCopyItem(
+                TxDetailInfoContactNameItem(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 24.dp),
-                    title = stringResource(R.string.tx_detail_contact_name),
-                    value = alias,
-                    onCopyClicked = onCopyValueClick,
+                    alias = contact.alias,
+                    onEditClicked = onContactEditClick,
                 )
             }
 
@@ -211,7 +212,7 @@ private fun TxDetailsScreenPreview() {
             uiState = TxDetailsModel.UiState(
                 tx = MockDataStub.createCompletedTx(25_000_000L),
                 ticker = "XTM",
-                blockExplorerUrl = "",
+                blockExplorerBaseUrl = "",
                 requiredConfirmationCount = 3L,
                 contact = MockDataStub.createContact(),
             ),
@@ -219,6 +220,7 @@ private fun TxDetailsScreenPreview() {
             onCancelTxClick = {},
             onCopyValueClick = {},
             onBlockExplorerClick = {},
+            onContactEditClick = {},
         )
     }
 }
@@ -234,7 +236,7 @@ private fun TxDetailsScreenPendingPreview() {
                     status = TxStatus.PENDING,
                 ),
                 ticker = "XTM",
-                blockExplorerUrl = "",
+                blockExplorerBaseUrl = "",
                 requiredConfirmationCount = 3L,
                 contact = MockDataStub.createContact(),
             ),
@@ -242,6 +244,7 @@ private fun TxDetailsScreenPendingPreview() {
             onCancelTxClick = {},
             onCopyValueClick = {},
             onBlockExplorerClick = {},
+            onContactEditClick = {},
         )
     }
 }
@@ -256,7 +259,7 @@ private fun TxDetailsScreenCancelledPreview() {
                     amount = 25_000_000L,
                 ),
                 ticker = "XTM",
-                blockExplorerUrl = "",
+                blockExplorerBaseUrl = "",
                 requiredConfirmationCount = 3L,
                 contact = MockDataStub.createContact(),
             ),
@@ -264,6 +267,7 @@ private fun TxDetailsScreenCancelledPreview() {
             onCancelTxClick = {},
             onCopyValueClick = {},
             onBlockExplorerClick = {},
+            onContactEditClick = {},
         )
     }
 }

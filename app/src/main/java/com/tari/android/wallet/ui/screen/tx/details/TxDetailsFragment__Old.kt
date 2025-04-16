@@ -117,15 +117,10 @@ class TxDetailsFragment__Old : CommonXmlFragment<FragmentTxDetailsBinding, TxDet
         ui.contactNameTextView.setText(contact.contactInfo.getAlias())
     }
 
-    private fun setCancellationReason(text: Int?) {
-        ui.cancellationReasonView.text = text?.let { resources.getString(it) }
-        ui.cancellationReasonView.setVisible(text != null)
-    }
-
     private fun setupUI() {
         ui.emojiIdSummaryContainerView.setOnClickListener { viewModel.onAddressDetailsClicked() }
         ui.feeLabelTextView.setOnClickListener { viewModel.showTxFeeToolTip() }
-        ui.editContactLabelTextView.setOnClickListener { viewModel.addOrEditContact() }
+        ui.editContactLabelTextView.setOnClickListener { viewModel.onContactEditClicked() }
         ui.cancelTxView.setOnClickListener { viewModel.onTransactionCancel() }
     }
 

@@ -1,6 +1,5 @@
 package com.tari.android.wallet.ui.screen.home.overview.widget
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -52,7 +51,6 @@ fun TxItem(
         modifier = modifier,
         shape = TariDesignSystem.shapes.card,
         colors = CardDefaults.cardColors(TariDesignSystem.colors.backgroundPrimary),
-        border = BorderStroke(1.dp, TariDesignSystem.colors.elevationOutlined),
         elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
     ) {
         Row(
@@ -142,16 +140,16 @@ fun TxDto.itemMessage(): String {
             }
         }
 
-        tx.isOneSided -> {
-            (stringResource(R.string.tx_list_someone) + " " + stringResource(R.string.tx_list_paid_you))
-        }
-
         contact != null && contact.contactInfo.getAlias().isNotEmpty() || txUser.walletAddress.isUnknownUser() -> {
             val alias = contact?.contactInfo?.getAlias().orEmpty().ifBlank { context.getString(R.string.unknown_source) }
             when (tx.direction) {
                 Tx.Direction.INBOUND -> stringResource(R.string.tx_list_sent_a_payment, alias)
                 Tx.Direction.OUTBOUND -> stringResource(R.string.tx_list_you_paid_with_alias, alias)
             }
+        }
+
+        tx.isOneSided -> {
+            (stringResource(R.string.tx_list_someone) + " " + stringResource(R.string.tx_list_paid_you))
         }
 
         else -> { // display emoji id

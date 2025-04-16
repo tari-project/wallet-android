@@ -1,5 +1,6 @@
 package com.tari.android.wallet.ui.screen.tx.details.widget
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -83,6 +84,48 @@ fun TxDetailInfoCopyItem(
 }
 
 @Composable
+fun TxDetailInfoContactNameItem(
+    modifier: Modifier = Modifier,
+    alias: String?,
+    onEditClicked: () -> Unit,
+) {
+    Column(modifier = modifier) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = stringResource(R.string.tx_detail_contact_name),
+                    style = TariDesignSystem.typography.body2,
+                )
+                Spacer(Modifier.size(4.dp))
+                if (alias.isNullOrEmpty()) {
+                    Text(
+                        text = stringResource(R.string.tx_details_add_contact_name_hint),
+                        style = TariDesignSystem.typography.body1,
+                        color = TariDesignSystem.colors.actionDisabled,
+                    )
+                } else {
+                    Text(
+                        text = alias,
+                        style = TariDesignSystem.typography.body1,
+                        color = TariDesignSystem.colors.textPrimary,
+                    )
+                }
+            }
+            IconButton(onClick = onEditClicked) {
+                Icon(
+                    painter = painterResource(R.drawable.vector_icon_edit_contact_pencil),
+                    contentDescription = null,
+                    tint = TariDesignSystem.colors.componentsNavbarIcons,
+                )
+            }
+        }
+
+        Spacer(Modifier.size(10.dp))
+        TariHorizontalDivider()
+    }
+}
+
+@Composable
 fun TxDetailInfoStatusItem(
     modifier: Modifier = Modifier,
     txStatus: TxDetailsModel.UiState.TxStatusText,
@@ -110,23 +153,37 @@ fun TxDetailInfoStatusItem(
 @Preview
 private fun TxDetailInfoItemPreview() {
     PreviewSecondarySurface(TariTheme.Light) {
-        TxDetailInfoItem(
-            modifier = Modifier.padding(20.dp),
-            title = "Transaction ID",
-            value = "0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef",
-        )
+        Column(verticalArrangement = Arrangement.SpaceBetween) {
+            TxDetailInfoItem(
+                modifier = Modifier.padding(20.dp),
+                title = "Transaction ID",
+                value = "0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef",
+            )
 
-        TxDetailInfoCopyItem(
-            modifier = Modifier.padding(20.dp),
-            title = "Transaction Date",
-            value = "2023-10-01 12:00:00",
-        )
+            TxDetailInfoCopyItem(
+                modifier = Modifier.padding(20.dp),
+                title = "Transaction Date",
+                value = "2023-10-01 12:00:00",
+            )
 
-        TxDetailInfoItem(
-            modifier = Modifier.padding(20.dp),
-            title = "Transaction Status",
-            value = "Pending",
-            valueTextColor = TariDesignSystem.colors.errorMain,
-        )
+            TxDetailInfoItem(
+                modifier = Modifier.padding(20.dp),
+                title = "Transaction Status",
+                value = "Error occurred while processing",
+                valueTextColor = TariDesignSystem.colors.errorMain,
+            )
+
+            TxDetailInfoContactNameItem(
+                modifier = Modifier.padding(20.dp),
+                alias = null,
+                onEditClicked = {},
+            )
+
+            TxDetailInfoContactNameItem(
+                modifier = Modifier.padding(20.dp),
+                alias = "John Doe",
+                onEditClicked = {},
+            )
+        }
     }
 }

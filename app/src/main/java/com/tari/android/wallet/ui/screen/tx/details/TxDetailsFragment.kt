@@ -25,6 +25,7 @@ class TxDetailsFragment : CommonFragment<TxDetailsViewModel>() {
                 onCancelTxClick = { viewModel.onTransactionCancel() },
                 onCopyValueClick = { viewModel.onCopyValueClicked(it) },
                 onBlockExplorerClick = { viewModel.openInBlockExplorer() },
+                onContactEditClick = { viewModel.onContactEditClicked() },
             )
         }
     }

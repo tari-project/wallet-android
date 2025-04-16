@@ -386,6 +386,7 @@
     <string name="tx_details_status">Status</string>
     <string name="tx_details_cancelled">Cancelled</string>
     <string name="tx_details_completed">Completed</string>
+    <string name="tx_details_add_contact_name_hint">Add contact name…</string>
 
     <string name="tx_details_cancellation_reason_unknown">The transaction failed for an unknown reason.</string>
     <string name="tx_details_cancellation_reason_user_cancelled">The transaction was canceled by the sender.</string>
@@ -929,7 +930,6 @@
     <string name="share_contact_via_qr_nfc">NFC</string>
     <string name="share_contact_via_qr_ble">BLE</string>
     <string name="wallet_info_alias_edit_title">Edit Name</string>
-    <string name="tx_details_contact_name">Contact name here</string>
     <string name="share_via_qr_code_title">Share QR Code</string>
     <string name="contact_book_default_alias">Tari user %s</string>
     <string name="contact_details_empty_name_dialog_title">Name can\’t be empty</string>

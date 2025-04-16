@@ -3,26 +3,26 @@ package com.tari.android.wallet.ui.screen.tx.adapter
 import androidx.viewbinding.ViewBinding
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.walletManager.WalletConfig
+import com.tari.android.wallet.data.contacts.model.ContactDto
 import com.tari.android.wallet.databinding.ViewAddressShortSmallBinding
-import com.tari.android.wallet.util.extension.makeTextBold
+import com.tari.android.wallet.model.TxStatus
 import com.tari.android.wallet.model.tx.CancelledTx
 import com.tari.android.wallet.model.tx.CompletedTx
 import com.tari.android.wallet.model.tx.PendingInboundTx
 import com.tari.android.wallet.model.tx.PendingOutboundTx
 import com.tari.android.wallet.model.tx.Tx
-import com.tari.android.wallet.model.TxStatus
 import com.tari.android.wallet.ui.common.domain.PaletteManager
 import com.tari.android.wallet.ui.common.recyclerView.CommonViewHolder
 import com.tari.android.wallet.ui.common.recyclerView.CommonViewHolderItem
 import com.tari.android.wallet.ui.component.tari.TariTextView
 import com.tari.android.wallet.ui.component.tari.background.TariRoundBackground
-import com.tari.android.wallet.util.extension.gone
-import com.tari.android.wallet.util.extension.string
-import com.tari.android.wallet.util.extension.visible
-import com.tari.android.wallet.data.contacts.model.ContactDto
 import com.tari.android.wallet.util.addressFirstEmojis
 import com.tari.android.wallet.util.addressLastEmojis
 import com.tari.android.wallet.util.addressPrefixEmojis
+import com.tari.android.wallet.util.extension.gone
+import com.tari.android.wallet.util.extension.makeTextBold
+import com.tari.android.wallet.util.extension.string
+import com.tari.android.wallet.util.extension.visible
 import org.joda.time.DateTime
 import org.joda.time.Hours
 import org.joda.time.LocalDate
@@ -52,15 +52,6 @@ abstract class CommonTxListViewHolder<T : CommonViewHolderItem, VB : ViewBinding
                 }
             }
 
-            tx.isOneSided -> {
-                val title = (string(R.string.tx_list_someone) + " " + string(R.string.tx_list_paid_you))
-                    .makeTextBold(itemView.context, string(R.string.tx_list_you), string(R.string.tx_list_someone))
-                participantTextView1.visible()
-                participantTextView1.text = title
-                participantTextView2.gone()
-                emojiIdViewContainer.root.gone()
-            }
-
             contact != null && contact.contactInfo.getAlias().isNotEmpty() || txUser.walletAddress.isUnknownUser() -> {
                 val alias = contact?.contactInfo?.getAlias().orEmpty().ifBlank { itemView.context.getString(R.string.unknown_source) }
                 val fullText = when (tx.direction) {
@@ -69,6 +60,15 @@ abstract class CommonTxListViewHolder<T : CommonViewHolderItem, VB : ViewBinding
                 }
                 participantTextView1.visible()
                 participantTextView1.text = fullText.makeTextBold(itemView.context, string(R.string.tx_list_you), alias)
+                participantTextView2.gone()
+                emojiIdViewContainer.root.gone()
+            }
+
+            tx.isOneSided -> {
+                val title = (string(R.string.tx_list_someone) + " " + string(R.string.tx_list_paid_you))
+                    .makeTextBold(itemView.context, string(R.string.tx_list_you), string(R.string.tx_list_someone))
+                participantTextView1.visible()
+                participantTextView1.text = title
                 participantTextView2.gone()
                 emojiIdViewContainer.root.gone()
             }
