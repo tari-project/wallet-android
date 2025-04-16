@@ -32,7 +32,7 @@
  */
 package com.tari.android.wallet.ui.screen.tx.details
 
-import android.annotation.SuppressLint
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -44,25 +44,35 @@ import com.tari.android.wallet.application.walletManager.WalletConfig
 import com.tari.android.wallet.data.contacts.model.ContactDto
 import com.tari.android.wallet.databinding.FragmentTxDetailsBinding
 import com.tari.android.wallet.model.MicroTari
-import com.tari.android.wallet.model.TxNote
-import com.tari.android.wallet.model.TxStatus
+import com.tari.android.wallet.model.TxStatus.BROADCAST
+import com.tari.android.wallet.model.TxStatus.COINBASE
+import com.tari.android.wallet.model.TxStatus.COINBASE_CONFIRMED
+import com.tari.android.wallet.model.TxStatus.COINBASE_NOT_IN_BLOCKCHAIN
+import com.tari.android.wallet.model.TxStatus.COINBASE_UNCONFIRMED
+import com.tari.android.wallet.model.TxStatus.COMPLETED
+import com.tari.android.wallet.model.TxStatus.IMPORTED
+import com.tari.android.wallet.model.TxStatus.MINED_CONFIRMED
+import com.tari.android.wallet.model.TxStatus.MINED_UNCONFIRMED
+import com.tari.android.wallet.model.TxStatus.ONE_SIDED_CONFIRMED
+import com.tari.android.wallet.model.TxStatus.ONE_SIDED_UNCONFIRMED
+import com.tari.android.wallet.model.TxStatus.PENDING
+import com.tari.android.wallet.model.TxStatus.QUEUED
+import com.tari.android.wallet.model.TxStatus.REJECTED
+import com.tari.android.wallet.model.TxStatus.TX_NULL_ERROR
+import com.tari.android.wallet.model.TxStatus.UNKNOWN
 import com.tari.android.wallet.model.tx.CancelledTx
 import com.tari.android.wallet.model.tx.CompletedTx
-import com.tari.android.wallet.model.tx.PendingOutboundTx
 import com.tari.android.wallet.model.tx.Tx
+import com.tari.android.wallet.model.tx.Tx.Direction.INBOUND
+import com.tari.android.wallet.model.tx.Tx.Direction.OUTBOUND
 import com.tari.android.wallet.ui.common.CommonXmlFragment
 import com.tari.android.wallet.ui.screen.tx.details.TxDetailsModel.TX_EXTRA_KEY
 import com.tari.android.wallet.util.addressFirstEmojis
 import com.tari.android.wallet.util.addressLastEmojis
 import com.tari.android.wallet.util.addressPrefixEmojis
 import com.tari.android.wallet.util.extension.collectFlow
-import com.tari.android.wallet.util.extension.dimen
-import com.tari.android.wallet.util.extension.getFirstChild
-import com.tari.android.wallet.util.extension.getLastChild
 import com.tari.android.wallet.util.extension.gone
 import com.tari.android.wallet.util.extension.hideKeyboard
-import com.tari.android.wallet.util.extension.setLayoutSize
-import com.tari.android.wallet.util.extension.setTextSizePx
 import com.tari.android.wallet.util.extension.setVisible
 import com.tari.android.wallet.util.extension.string
 import com.tari.android.wallet.util.extension.txFormattedDate
@@ -75,13 +85,6 @@ import java.util.Date
  * @author The Tari Development Team
  */
 class TxDetailsFragment__Old : CommonXmlFragment<FragmentTxDetailsBinding, TxDetailsViewModel>() {
-
-    /**
-     * Values below are used for scaling up/down of the text size.
-     */
-    private var currentTextSize = 0f
-    private var currentAmountGemSize = 0f
-
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
         FragmentTxDetailsBinding.inflate(layoutInflater, container, false).also { ui = it }.root
@@ -102,8 +105,8 @@ class TxDetailsFragment__Old : CommonXmlFragment<FragmentTxDetailsBinding, TxDet
         collectFlow(uiState) { uiState ->
             bindTxData(uiState.tx)
             uiState.contact?.let { updateContactInfo(it) }
-            setCancellationReason(uiState.cancellationReason)
             uiState.blockExplorerLink?.let { showExplorerLink(it) }
+            ui.paymentStateTextView.text = string(uiState.screenTitle)
         }
     }
 
@@ -120,17 +123,6 @@ class TxDetailsFragment__Old : CommonXmlFragment<FragmentTxDetailsBinding, TxDet
     }
 
     private fun setupUI() {
-        bindViews()
-        setUICommands()
-    }
-
-    @SuppressLint("ClickableViewAccessibility")
-    private fun bindViews() {
-        currentTextSize = dimen(R.dimen.add_amount_element_text_size)
-        currentAmountGemSize = dimen(R.dimen.add_amount_gem_size)
-    }
-
-    private fun setUICommands() {
         ui.emojiIdSummaryContainerView.setOnClickListener { viewModel.onAddressDetailsClicked() }
         ui.feeLabelTextView.setOnClickListener { viewModel.showTxFeeToolTip() }
         ui.editContactLabelTextView.setOnClickListener { viewModel.addOrEditContact() }
@@ -149,40 +141,27 @@ class TxDetailsFragment__Old : CommonXmlFragment<FragmentTxDetailsBinding, TxDet
 
     private fun setTxPaymentData(tx: Tx) {
         ui.amountTextView.text = WalletConfig.amountFormatter.format(tx.amount.tariValue)
-        ui.paymentStateTextView.text = when {
-            tx is CancelledTx -> string(R.string.tx_detail_payment_cancelled)
-            tx.status == TxStatus.MINED_CONFIRMED || tx.status == TxStatus.IMPORTED ->
-                if (tx.isInbound) string(R.string.tx_detail_payment_received)
-                else string(R.string.tx_detail_payment_sent)
-
-            else -> string(R.string.tx_detail_pending_payment_received)
-        }
-        when {
-            tx is CompletedTx && tx.isOutbound -> setFeeData(tx.fee)
-            tx is CancelledTx && tx.isOutbound -> setFeeData(tx.fee)
-            tx is PendingOutboundTx -> setFeeData(tx.fee)
-            else -> {
-                ui.txFeeTextView.gone()
-                ui.feeLabelTextView.gone()
-            }
-        }
-        scaleDownAmountTextViewIfRequired()
+        setFeeData(viewModel.uiState.value.txFee)
     }
 
-    private fun setFeeData(fee: MicroTari) {
-        ui.txFeeTextView.visible()
-        ui.feeLabelTextView.visible()
-        ui.txFeeTextView.text = string(R.string.tx_details_fee_value, WalletConfig.amountFormatter.format(fee.tariValue))
+    private fun setFeeData(fee: MicroTari?) {
+        if (fee != null) {
+            ui.txFeeTextView.visible()
+            ui.feeLabelTextView.visible()
+            ui.txFeeTextView.text = string(R.string.tx_details_fee_value, WalletConfig.amountFormatter.format(fee.tariValue))
+        } else {
+            ui.txFeeTextView.gone()
+            ui.feeLabelTextView.gone()
+        }
     }
 
     private fun setTxMetaData(tx: Tx) {
         ui.dateTextView.text = Date(tx.timestamp.toLong() * 1000).txFormattedDate()
-        val note = TxNote.fromTx(tx)
-        if (note.message.isNullOrBlank()) {
+        if (tx.note.isEmpty()) {
             ui.txNoteTextView.gone()
         } else {
             ui.txNoteTextView.visible()
-            ui.txNoteTextView.text = note.message
+            ui.txNoteTextView.text = tx.note
         }
     }
 
@@ -204,7 +183,7 @@ class TxDetailsFragment__Old : CommonXmlFragment<FragmentTxDetailsBinding, TxDet
         val statusText = tx.statusString(context = requireContext(), viewModel.uiState.value.requiredConfirmationCount)
         ui.statusTextView.text = statusText
         ui.statusContainerView.visibility = if (statusText.isEmpty()) View.GONE else View.VISIBLE
-        if (tx !is CancelledTx && tx.isOutbound && tx.status == TxStatus.PENDING) {
+        if (tx !is CancelledTx && tx.isOutbound && tx.status == PENDING) {
             ui.cancelTxView.setOnClickListener { viewModel.onTransactionCancel() }
             ui.cancelTxView.visible()
         } else if (ui.cancelTxView.isVisible) {
@@ -218,23 +197,31 @@ class TxDetailsFragment__Old : CommonXmlFragment<FragmentTxDetailsBinding, TxDet
         ui.explorerContainerView.setOnClickListener { viewModel.openInBlockExplorer() }
     }
 
-    /**
-     * Scales down the amount text if the amount overflows.
-     */
-    private fun scaleDownAmountTextViewIfRequired() {
-        val contentWidthPreInsert = ui.amountContainerView.getLastChild()!!.right - ui.amountContainerView.getFirstChild()!!.left
-        val contentWidthPostInsert = contentWidthPreInsert + ui.amountTextView.measuredWidth
-        // calculate scale factor
-        var scaleFactor = 1f
-        while ((contentWidthPostInsert * scaleFactor) > ui.amountContainerView.width) {
-            scaleFactor *= 0.95f
-        }
-        currentTextSize *= scaleFactor
-        currentAmountGemSize *= scaleFactor
 
-        // adjust gem size
-        ui.amountGemImageView.setLayoutSize(currentAmountGemSize.toInt(), currentAmountGemSize.toInt())
-        ui.amountTextView.setTextSizePx(currentTextSize)
+    private fun Tx.statusString(context: Context, requiredConfirmationCount: Long?): String {
+        val confirmationCount = if (this is CompletedTx) this.confirmationCount.toInt() else null
+
+        return if (this is CancelledTx) "" else when (this.status) {
+            PENDING -> when (this.direction) {
+                INBOUND -> context.string(R.string.tx_detail_waiting_for_sender_to_complete)
+                OUTBOUND -> context.string(R.string.tx_detail_waiting_for_recipient)
+            }
+
+            BROADCAST, COMPLETED -> if (requiredConfirmationCount != null) {
+                context.string(R.string.tx_detail_completing_final_processing_with_step, 1, requiredConfirmationCount + 1)
+            } else {
+                context.string(R.string.tx_detail_completing_final_processing)
+            }
+
+            MINED_UNCONFIRMED -> if (confirmationCount != null && requiredConfirmationCount != null) {
+                context.string(R.string.tx_detail_completing_final_processing_with_step, confirmationCount, requiredConfirmationCount + 1)
+            } else {
+                context.string(R.string.tx_detail_completing_final_processing)
+            }
+
+            TX_NULL_ERROR, IMPORTED, COINBASE, MINED_CONFIRMED, REJECTED, ONE_SIDED_UNCONFIRMED, ONE_SIDED_CONFIRMED, QUEUED, COINBASE_UNCONFIRMED,
+            COINBASE_CONFIRMED, COINBASE_NOT_IN_BLOCKCHAIN, UNKNOWN -> ""
+        }
     }
 
     companion object {

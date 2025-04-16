@@ -379,6 +379,13 @@
     <string name="tx_details_recipient_address">Recipient Address</string>
     <string name="tx_details_total">Total</string>
     <string name="tx_details_transaction_details">Transaction Details</string>
+    <string name="tx_details_paid">Paid</string>
+    <string name="tx_details_date">Date</string>
+    <string name="tx_details_txn_id">Tari Txn ID</string>
+    <string name="tx_details_txn_id_processing">Processing</string>
+    <string name="tx_details_status">Status</string>
+    <string name="tx_details_cancelled">Cancelled</string>
+    <string name="tx_details_completed">Completed</string>
 
     <string name="tx_details_cancellation_reason_unknown">The transaction failed for an unknown reason.</string>
     <string name="tx_details_cancellation_reason_user_cancelled">The transaction was canceled by the sender.</string>
@@ -388,6 +395,8 @@
     <string name="tx_details_cancellation_reason_time_locked">This transaction was cancelled due to the funds not having reached their time-lock period yet.</string>
     <string name="tx_details_cancellation_reason_invalid_transaction">The transaction failed to the invalid input data. This situation shouldn\'t happen. Please send a bug report or contact us directly.</string>
     <string name="tx_details_cancellation_reason_abandoned_coinbase">The coinbase was abandoned.</string>
+    <string name="tx_details_cancellation_reason_not_cancelled">The transaction was not cancelled, but for some reason looks like cancelled.
+        Please, contact us directly if you see this message.</string>
 
     <!-- Fee tooltip -->
     <string name="tx_detail_fee_tooltip_transaction_fee">Transaction Fee</string>

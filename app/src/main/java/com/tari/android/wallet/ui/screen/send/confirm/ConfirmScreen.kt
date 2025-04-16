@@ -28,8 +28,8 @@ import com.tari.android.wallet.ui.compose.components.TariTextButton
 import com.tari.android.wallet.ui.compose.components.TariTopBar
 import com.tari.android.wallet.ui.screen.send.common.TransactionData
 import com.tari.android.wallet.ui.screen.send.confirm.widget.SenderCard
-import com.tari.android.wallet.ui.screen.send.confirm.widget.TxDetailInfoCopyItem
 import com.tari.android.wallet.ui.screen.settings.themeSelector.TariTheme
+import com.tari.android.wallet.ui.screen.tx.details.widget.TxDetailInfoCopyItem
 import com.tari.android.wallet.util.MockDataStub
 import com.tari.android.wallet.util.base58Ellipsized
 import com.tari.android.wallet.util.extension.toMicroTari

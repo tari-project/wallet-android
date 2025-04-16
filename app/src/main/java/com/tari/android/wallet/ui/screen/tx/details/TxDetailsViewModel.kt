@@ -1,6 +1,5 @@
 package com.tari.android.wallet.ui.screen.tx.details
 
-import android.content.Context
 import androidx.lifecycle.SavedStateHandle
 import com.tari.android.wallet.R
 import com.tari.android.wallet.R.string.common_are_you_sure
@@ -10,28 +9,7 @@ import com.tari.android.wallet.R.string.tx_details_cancel_dialog_not_cancel
 import com.tari.android.wallet.application.walletManager.WalletManager.WalletEvent
 import com.tari.android.wallet.data.contacts.ContactsRepository
 import com.tari.android.wallet.data.contacts.model.splitAlias
-import com.tari.android.wallet.model.TxStatus.BROADCAST
-import com.tari.android.wallet.model.TxStatus.COINBASE
-import com.tari.android.wallet.model.TxStatus.COINBASE_CONFIRMED
-import com.tari.android.wallet.model.TxStatus.COINBASE_NOT_IN_BLOCKCHAIN
-import com.tari.android.wallet.model.TxStatus.COINBASE_UNCONFIRMED
-import com.tari.android.wallet.model.TxStatus.COMPLETED
-import com.tari.android.wallet.model.TxStatus.IMPORTED
-import com.tari.android.wallet.model.TxStatus.MINED_CONFIRMED
-import com.tari.android.wallet.model.TxStatus.MINED_UNCONFIRMED
-import com.tari.android.wallet.model.TxStatus.ONE_SIDED_CONFIRMED
-import com.tari.android.wallet.model.TxStatus.ONE_SIDED_UNCONFIRMED
-import com.tari.android.wallet.model.TxStatus.PENDING
-import com.tari.android.wallet.model.TxStatus.QUEUED
-import com.tari.android.wallet.model.TxStatus.REJECTED
-import com.tari.android.wallet.model.TxStatus.TX_NULL_ERROR
-import com.tari.android.wallet.model.TxStatus.UNKNOWN
-import com.tari.android.wallet.model.tx.CancelledTx
-import com.tari.android.wallet.model.tx.CompletedTx
-import com.tari.android.wallet.model.tx.PendingOutboundTx
 import com.tari.android.wallet.model.tx.Tx
-import com.tari.android.wallet.model.tx.Tx.Direction.INBOUND
-import com.tari.android.wallet.model.tx.Tx.Direction.OUTBOUND
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.dialog.modular.modules.body.BodyModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonModule
@@ -42,7 +20,6 @@ import com.tari.android.wallet.ui.screen.tx.details.TxDetailsModel.TX_EXTRA_KEY
 import com.tari.android.wallet.util.extension.collectFlow
 import com.tari.android.wallet.util.extension.getOrThrow
 import com.tari.android.wallet.util.extension.launchOnMain
-import com.tari.android.wallet.util.extension.string
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.map
@@ -61,6 +38,7 @@ class TxDetailsViewModel(savedState: SavedStateHandle) : CommonViewModel() {
     private val _uiState = MutableStateFlow(
         TxDetailsModel.UiState(
             tx = savedState.getOrThrow<Tx>(TX_EXTRA_KEY),
+            ticker = networkRepository.currentNetwork.ticker,
             requiredConfirmationCount = walletManager.requireWalletInstance.getRequiredConfirmationCount(),
             blockExplorerUrl = networkRepository.currentNetwork.blockExplorerBaseUrl,
         )
@@ -93,9 +71,15 @@ class TxDetailsViewModel(savedState: SavedStateHandle) : CommonViewModel() {
     }
 
     fun onTransactionCancel() {
-        if (uiState.value.tx is PendingOutboundTx && uiState.value.tx.direction == OUTBOUND && uiState.value.tx.status == PENDING) {
-            showTxCancelDialog()
-        }
+        showModularDialog(
+            HeadModule(resourceManager.getString(common_are_you_sure)),
+            BodyModule(resourceManager.getString(tx_details_cancel_dialog_description)),
+            ButtonModule(resourceManager.getString(tx_details_cancel_dialog_cancel), ButtonStyle.Normal) {
+                cancelTransaction()
+                hideDialog()
+            },
+            ButtonModule(resourceManager.getString(tx_details_cancel_dialog_not_cancel), ButtonStyle.Close),
+        )
     }
 
     fun onAddressDetailsClicked() {
@@ -123,18 +107,6 @@ class TxDetailsViewModel(savedState: SavedStateHandle) : CommonViewModel() {
                 description = resourceManager.getString(R.string.tx_detail_cancellation_error_description),
             )
         }
-    }
-
-    private fun showTxCancelDialog() {
-        showModularDialog(
-            HeadModule(resourceManager.getString(common_are_you_sure)),
-            BodyModule(resourceManager.getString(tx_details_cancel_dialog_description)),
-            ButtonModule(resourceManager.getString(tx_details_cancel_dialog_cancel), ButtonStyle.Normal) {
-                cancelTransaction()
-                hideDialog()
-            },
-            ButtonModule(resourceManager.getString(tx_details_cancel_dialog_not_cancel), ButtonStyle.Close),
-        )
     }
 
     private fun updateTxData(tx: Tx) {
@@ -184,30 +156,11 @@ class TxDetailsViewModel(savedState: SavedStateHandle) : CommonViewModel() {
             hideDialog()
         }
     }
-}
 
-fun Tx.statusString(context: Context, requiredConfirmationCount: Long?): String {
-    val confirmationCount = if (this is CompletedTx) this.confirmationCount.toInt() else null
-
-    return if (this is CancelledTx) "" else when (this.status) {
-        PENDING -> when (this.direction) {
-            INBOUND -> context.string(R.string.tx_detail_waiting_for_sender_to_complete)
-            OUTBOUND -> context.string(R.string.tx_detail_waiting_for_recipient)
-        }
-
-        BROADCAST, COMPLETED -> if (requiredConfirmationCount != null) {
-            context.string(R.string.tx_detail_completing_final_processing_with_step, 1, requiredConfirmationCount + 1)
-        } else {
-            context.string(R.string.tx_detail_completing_final_processing)
-        }
-
-        MINED_UNCONFIRMED -> if (confirmationCount != null && requiredConfirmationCount != null) {
-            context.string(R.string.tx_detail_completing_final_processing_with_step, confirmationCount, requiredConfirmationCount + 1)
-        } else {
-            context.string(R.string.tx_detail_completing_final_processing)
-        }
-
-        TX_NULL_ERROR, IMPORTED, COINBASE, MINED_CONFIRMED, REJECTED, ONE_SIDED_UNCONFIRMED, ONE_SIDED_CONFIRMED, QUEUED, COINBASE_UNCONFIRMED,
-        COINBASE_CONFIRMED, COINBASE_NOT_IN_BLOCKCHAIN, UNKNOWN -> ""
+    fun onCopyValueClicked(value: String) {
+        copyToClipboard(
+            clipLabel = resourceManager.getString(R.string.tx_details_transaction_details),
+            clipText = value,
+        )
     }
 }

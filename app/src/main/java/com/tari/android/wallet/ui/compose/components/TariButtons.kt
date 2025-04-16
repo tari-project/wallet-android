@@ -175,6 +175,7 @@ fun TariTextButton(
     text: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    warningColor: Boolean = false,
     enabled: Boolean = true,
 ) {
     WithRippleColor(TariDesignSystem.colors.textPrimary) {
@@ -187,7 +188,9 @@ fun TariTextButton(
             Text(
                 text = text,
                 modifier = Modifier.padding(horizontal = TariButtonSize.Medium.textHorizontalPadding()),
-                color = if (enabled) TariDesignSystem.colors.textPrimary else TariDesignSystem.colors.actionDisabled,
+                color = if (enabled) {
+                    if (warningColor) TariDesignSystem.colors.errorMain else TariDesignSystem.colors.textPrimary
+                } else TariDesignSystem.colors.actionDisabled,
                 style = TariButtonSize.Medium.textStyle(),
             )
         }
@@ -313,6 +316,15 @@ private fun TariButtonsPreview() {
                     .padding(horizontal = 20.dp, vertical = 10.dp)
                     .align(alignment = Alignment.CenterHorizontally),
                 text = "Text Button",
+                onClick = { },
+            )
+
+            TariTextButton(
+                modifier = Modifier
+                    .padding(horizontal = 20.dp, vertical = 10.dp)
+                    .align(alignment = Alignment.CenterHorizontally),
+                text = "Text Button Warning",
+                warningColor = true,
                 onClick = { },
             )
 

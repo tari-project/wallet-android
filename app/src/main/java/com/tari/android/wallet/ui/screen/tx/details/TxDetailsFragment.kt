@@ -22,6 +22,9 @@ class TxDetailsFragment : CommonFragment<TxDetailsViewModel>() {
             TxDetailsScreen(
                 uiState = uiState,
                 onBackClick = { viewModel.onBackPressed() },
+                onCancelTxClick = { viewModel.onTransactionCancel() },
+                onCopyValueClick = { viewModel.onCopyValueClicked(it) },
+                onBlockExplorerClick = { viewModel.openInBlockExplorer() },
             )
         }
     }
