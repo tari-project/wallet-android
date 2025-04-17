@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
@@ -28,13 +29,14 @@ import com.tari.android.wallet.ui.compose.TariDesignSystem
 import com.tari.android.wallet.ui.compose.components.TariPrimaryButton
 import com.tari.android.wallet.ui.compose.components.TariTextButton
 import com.tari.android.wallet.ui.compose.components.TariTopBar
+import com.tari.android.wallet.ui.compose.widgets.DotsAnimation
 import com.tari.android.wallet.ui.screen.settings.themeSelector.TariTheme
+import com.tari.android.wallet.ui.screen.tx.details.widget.TxDetailInfoAddressItem
 import com.tari.android.wallet.ui.screen.tx.details.widget.TxDetailInfoContactNameItem
 import com.tari.android.wallet.ui.screen.tx.details.widget.TxDetailInfoCopyItem
 import com.tari.android.wallet.ui.screen.tx.details.widget.TxDetailInfoItem
 import com.tari.android.wallet.ui.screen.tx.details.widget.TxDetailInfoStatusItem
 import com.tari.android.wallet.util.MockDataStub
-import com.tari.android.wallet.util.base58Ellipsized
 
 @Composable
 fun TxDetailsScreen(
@@ -44,6 +46,8 @@ fun TxDetailsScreen(
     onCopyValueClick: (value: String) -> Unit,
     onBlockExplorerClick: () -> Unit,
     onContactEditClick: () -> Unit,
+    onFeeInfoClick: () -> Unit,
+    onEmojiIdDetailsClick: () -> Unit,
 ) {
     Scaffold(
         modifier = Modifier
@@ -76,13 +80,13 @@ fun TxDetailsScreen(
 
             uiState.contact?.walletAddress?.let { walletAddress ->
                 Spacer(Modifier.size(10.dp))
-                TxDetailInfoCopyItem(
+                TxDetailInfoAddressItem(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 24.dp),
-                    title = stringResource(R.string.common_to),
-                    value = walletAddress.base58Ellipsized(),
+                    walletAddress = walletAddress,
                     onCopyClicked = onCopyValueClick,
+                    onEmojiIdDetailsClick = onEmojiIdDetailsClick,
                 )
             }
 
@@ -98,15 +102,34 @@ fun TxDetailsScreen(
             }
 
             uiState.txFee?.let { fee ->
+                val feeValue = "${WalletConfig.amountFormatter.format(fee.tariValue)} ${uiState.ticker}"
                 Spacer(Modifier.size(10.dp))
-                TxDetailInfoCopyItem(
+                TxDetailInfoItem(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 24.dp),
                     title = stringResource(R.string.tx_detail_transaction_fee),
-                    value = "${WalletConfig.amountFormatter.format(fee.tariValue)} ${uiState.ticker}",
-                    onCopyClicked = onCopyValueClick,
-                )
+                    value = feeValue,
+                ) {
+                    IconButton(
+                        modifier = Modifier.offset(x = 12.dp), // needed to remove "margin" between two IconButtons
+                        onClick = onFeeInfoClick,
+                    ) {
+                        Icon(
+                            painter = painterResource(R.drawable.vector_icon_question_circle),
+                            contentDescription = null,
+                            tint = TariDesignSystem.colors.componentsNavbarIcons,
+                        )
+                    }
+
+                    IconButton(onClick = { onCopyValueClick(feeValue) }) {
+                        Icon(
+                            painter = painterResource(R.drawable.vector_icon_copy),
+                            contentDescription = null,
+                            tint = TariDesignSystem.colors.componentsNavbarIcons,
+                        )
+                    }
+                }
             }
 
             Spacer(Modifier.size(10.dp))
@@ -142,7 +165,7 @@ fun TxDetailsScreen(
                 value = uiState.tariTxnId ?: stringResource(R.string.tx_details_txn_id_processing),
                 singleLine = false,
             ) {
-                uiState.blockExplorerLink?.let {
+                if (uiState.blockExplorerLink != null) {
                     IconButton(onClick = onBlockExplorerClick) {
                         Icon(
                             painter = painterResource(R.drawable.vector_icon_open_url),
@@ -150,6 +173,8 @@ fun TxDetailsScreen(
                             tint = TariDesignSystem.colors.componentsNavbarIcons,
                         )
                     }
+                } else {
+                    DotsAnimation(Modifier.size(40.dp))
                 }
             }
 
@@ -221,6 +246,8 @@ private fun TxDetailsScreenPreview() {
             onCopyValueClick = {},
             onBlockExplorerClick = {},
             onContactEditClick = {},
+            onFeeInfoClick = {},
+            onEmojiIdDetailsClick = {},
         )
     }
 }
@@ -245,6 +272,8 @@ private fun TxDetailsScreenPendingPreview() {
             onCopyValueClick = {},
             onBlockExplorerClick = {},
             onContactEditClick = {},
+            onFeeInfoClick = {},
+            onEmojiIdDetailsClick = {},
         )
     }
 }
@@ -268,6 +297,8 @@ private fun TxDetailsScreenCancelledPreview() {
             onCopyValueClick = {},
             onBlockExplorerClick = {},
             onContactEditClick = {},
+            onFeeInfoClick = {},
+            onEmojiIdDetailsClick = {},
         )
     }
 }

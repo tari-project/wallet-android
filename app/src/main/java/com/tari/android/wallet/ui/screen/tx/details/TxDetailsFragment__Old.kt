@@ -119,7 +119,7 @@ class TxDetailsFragment__Old : CommonXmlFragment<FragmentTxDetailsBinding, TxDet
 
     private fun setupUI() {
         ui.emojiIdSummaryContainerView.setOnClickListener { viewModel.onAddressDetailsClicked() }
-        ui.feeLabelTextView.setOnClickListener { viewModel.showTxFeeToolTip() }
+        ui.feeLabelTextView.setOnClickListener { viewModel.onFeeInfoClicked() }
         ui.editContactLabelTextView.setOnClickListener { viewModel.onContactEditClicked() }
         ui.cancelTxView.setOnClickListener { viewModel.onTransactionCancel() }
     }

@@ -119,7 +119,7 @@ class TxDetailsViewModel(savedState: SavedStateHandle) : CommonViewModel() {
         showAddressDetailsDialog(walletAddress)
     }
 
-    fun showTxFeeToolTip() {
+    fun onFeeInfoClicked() {
         showSimpleDialog(
             title = resourceManager.getString(R.string.tx_detail_fee_tooltip_transaction_fee),
             description = resourceManager.getString(R.string.tx_detail_fee_tooltip_desc),

@@ -174,7 +174,7 @@ abstract class CommonFragment<VM : CommonViewModel> : Fragment(), FragmentPopped
 
     private fun copy(clipboardArgs: ClipboardArgs) {
         clipboardManager.setPrimaryClip(ClipData.newPlainText(clipboardArgs.clipLabel, clipboardArgs.clipText))
-        Toast.makeText(requireContext(), clipboardArgs.toastMessage, Toast.LENGTH_LONG).show()
+        Toast.makeText(requireContext(), clipboardArgs.toastMessage, Toast.LENGTH_SHORT).show()
     }
 }
 

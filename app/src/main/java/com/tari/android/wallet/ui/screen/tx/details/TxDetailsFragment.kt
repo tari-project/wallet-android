@@ -26,6 +26,8 @@ class TxDetailsFragment : CommonFragment<TxDetailsViewModel>() {
                 onCopyValueClick = { viewModel.onCopyValueClicked(it) },
                 onBlockExplorerClick = { viewModel.openInBlockExplorer() },
                 onContactEditClick = { viewModel.onContactEditClicked() },
+                onFeeInfoClick = { viewModel.onFeeInfoClicked() },
+                onEmojiIdDetailsClick = { viewModel.onAddressDetailsClicked() },
             )
         }
     }
