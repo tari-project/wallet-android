@@ -16,12 +16,15 @@ import com.tari.android.wallet.util.extension.txFormattedDate
 import java.util.Date
 
 object TxDetailsModel {
+
     const val TX_EXTRA_KEY = "TX_EXTRA_KEY"
+    const val SHOW_CLOSE_BUTTON_EXTRA_KEY = "SHOW_CLOSE_BUTTON_EXTRA_KEY"
 
     const val BLOCK_EXPLORER_FORMAT = "%s/kernel_search?nonces=%s&signatures=%s"
 
     data class UiState(
         val tx: Tx,
+        val showCloseButton: Boolean,
         val ticker: String,
         private val blockExplorerBaseUrl: String?,
         val requiredConfirmationCount: Long,

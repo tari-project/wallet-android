@@ -51,7 +51,7 @@ sealed class Navigation {
     }
 
     sealed class TxList : Navigation() {
-        data class ToTxDetails(val tx: Tx) : TxList()
+        data class ToTxDetails(val tx: Tx, val showCloseButton: Boolean = false) : TxList()
         data object ToAllSettings : TxList()
         data object ToUtxos : TxList()
         data class ToSendTariToUser(val contact: ContactDto, val amount: MicroTari? = null, val note: String = "") : TxList()

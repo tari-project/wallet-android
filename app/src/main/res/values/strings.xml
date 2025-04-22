@@ -356,7 +356,6 @@
     <string name="tx_detail_pending_payment_received">Payment In Progress</string>
     <string name="tx_detail_contact_name">Contact Name</string>
     <string name="tx_detail_explorer_title">Information</string>
-    <string name="tx_detail_explorer_button">View on the Block Explorer</string>
     <string name="tx_detail_create_contact_hint">Add Contact Name</string>
     <string name="tx_detail_note">Note</string>
     <string name="tx_detail_edit">Edit</string>
@@ -403,7 +402,6 @@
     <string name="tx_detail_fee_tooltip_transaction_fee">Transaction Fee</string>
     <string name="tx_detail_fee_tooltip_desc">The transaction fee is distributed to the thousands of computers (also known as \"miners\") who
         ensure that your XTM transactions are fast and secure.</string>
-    <string name="tx_details_fee_value">+%s</string>
 
     <!-- debug screens -->
     <!-- logs -->

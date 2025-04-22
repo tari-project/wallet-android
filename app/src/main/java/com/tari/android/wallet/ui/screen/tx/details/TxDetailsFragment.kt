@@ -10,6 +10,7 @@ import androidx.fragment.app.viewModels
 import com.tari.android.wallet.model.tx.Tx
 import com.tari.android.wallet.ui.common.CommonFragment
 import com.tari.android.wallet.ui.compose.TariDesignSystem
+import com.tari.android.wallet.ui.screen.tx.details.TxDetailsModel.SHOW_CLOSE_BUTTON_EXTRA_KEY
 import com.tari.android.wallet.ui.screen.tx.details.TxDetailsModel.TX_EXTRA_KEY
 import com.tari.android.wallet.util.extension.composeContent
 
@@ -41,9 +42,10 @@ class TxDetailsFragment : CommonFragment<TxDetailsViewModel>() {
 
 
     companion object {
-        fun newInstance(tx: Tx) = TxDetailsFragment().apply {
+        fun newInstance(tx: Tx, showCloseButton: Boolean = false) = TxDetailsFragment().apply {
             arguments = Bundle().apply {
                 putParcelable(TX_EXTRA_KEY, tx)
+                putBoolean(SHOW_CLOSE_BUTTON_EXTRA_KEY, showCloseButton)
             }
         }
     }

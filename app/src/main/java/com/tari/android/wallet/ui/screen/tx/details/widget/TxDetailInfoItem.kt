@@ -98,6 +98,7 @@ fun TxDetailInfoContactNameItem(
     modifier: Modifier = Modifier,
     alias: String?,
     onEditClicked: () -> Unit,
+    editable: Boolean = true,
 ) {
     Column(modifier = modifier) {
         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -121,12 +122,14 @@ fun TxDetailInfoContactNameItem(
                     )
                 }
             }
-            IconButton(onClick = onEditClicked) {
-                Icon(
-                    painter = painterResource(R.drawable.vector_icon_edit_contact_pencil),
-                    contentDescription = null,
-                    tint = TariDesignSystem.colors.componentsNavbarIcons,
-                )
+            if (editable) {
+                IconButton(onClick = onEditClicked) {
+                    Icon(
+                        painter = painterResource(R.drawable.vector_icon_edit_contact_pencil),
+                        contentDescription = null,
+                        tint = TariDesignSystem.colors.componentsNavbarIcons,
+                    )
+                }
             }
         }
 
@@ -161,11 +164,11 @@ fun TxDetailInfoStatusItem(
 
 @Composable
 fun TxDetailInfoAddressItem(
+    title: String,
     walletAddress: TariWalletAddress,
     onCopyClicked: (value: String) -> Unit,
     onEmojiIdDetailsClick: () -> Unit,
     modifier: Modifier = Modifier,
-    title: String = stringResource(R.string.common_to),
 ) {
     var showEmojiId by remember { mutableStateOf(false) }
 
@@ -243,6 +246,7 @@ private fun TxDetailInfoItemPreview() {
                 walletAddress = MockDataStub.WALLET_ADDRESS,
                 onCopyClicked = {},
                 onEmojiIdDetailsClick = {},
+                title = stringResource(R.string.common_from),
             )
         }
     }

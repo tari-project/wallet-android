@@ -17,6 +17,7 @@ import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonStyle
 import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
 import com.tari.android.wallet.ui.dialog.modular.modules.input.InputModule
+import com.tari.android.wallet.ui.screen.tx.details.TxDetailsModel.SHOW_CLOSE_BUTTON_EXTRA_KEY
 import com.tari.android.wallet.ui.screen.tx.details.TxDetailsModel.TX_EXTRA_KEY
 import com.tari.android.wallet.util.extension.collectFlow
 import com.tari.android.wallet.util.extension.getOrThrow
@@ -39,6 +40,7 @@ class TxDetailsViewModel(savedState: SavedStateHandle) : CommonViewModel() {
     private val _uiState = MutableStateFlow(
         TxDetailsModel.UiState(
             tx = savedState.getOrThrow<Tx>(TX_EXTRA_KEY),
+            showCloseButton = savedState.getOrThrow<Boolean>(SHOW_CLOSE_BUTTON_EXTRA_KEY),
             ticker = networkRepository.currentNetwork.ticker,
             requiredConfirmationCount = walletManager.requireWalletInstance.getRequiredConfirmationCount(),
             blockExplorerBaseUrl = networkRepository.currentNetwork.blockExplorerBaseUrl,

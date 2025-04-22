@@ -35,6 +35,7 @@ import com.tari.android.wallet.ui.screen.tx.details.widget.TxDetailInfoContactNa
 import com.tari.android.wallet.ui.screen.tx.details.widget.TxDetailInfoItem
 import com.tari.android.wallet.ui.screen.tx.details.widget.TxDetailInfoStatusItem
 import com.tari.android.wallet.util.MockDataStub
+import com.tari.android.wallet.util.extension.isTrue
 
 @Composable
 fun TxDetailsScreen(
@@ -81,6 +82,7 @@ fun TxDetailsScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 24.dp),
+                    title = stringResource(if (uiState.tx.isOutbound) R.string.common_to else R.string.common_from),
                     walletAddress = walletAddress,
                     onCopyClicked = onCopyValueClick,
                     onEmojiIdDetailsClick = onEmojiIdDetailsClick,
@@ -89,12 +91,14 @@ fun TxDetailsScreen(
 
             uiState.contact?.let { contact ->
                 Spacer(Modifier.size(10.dp))
+                val unknownUser = contact.walletAddress?.isUnknownUser().isTrue()
                 TxDetailInfoContactNameItem(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 24.dp),
-                    alias = contact.alias,
+                    alias = if (unknownUser) stringResource(R.string.unknown_source) else contact.alias,
                     onEditClicked = onContactEditClick,
+                    editable = !unknownUser,
                 )
             }
 
@@ -189,13 +193,15 @@ fun TxDetailsScreen(
 
             Spacer(Modifier.weight(1f))
 
-            TariPrimaryButton(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 20.dp),
-                text = stringResource(R.string.common_close),
-                onClick = onBackClick,
-            )
+            if (uiState.showCloseButton) {
+                TariPrimaryButton(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 20.dp),
+                    text = stringResource(R.string.common_close),
+                    onClick = onBackClick,
+                )
+            }
             if (uiState.showCancelButton) {
                 Spacer(Modifier.size(16.dp))
                 TariTextButton(
@@ -219,6 +225,7 @@ private fun TxDetailsScreenPreview() {
         TxDetailsScreen(
             uiState = TxDetailsModel.UiState(
                 tx = MockDataStub.createCompletedTx(25_000_000L),
+                showCloseButton = true,
                 ticker = "XTM",
                 blockExplorerBaseUrl = "",
                 requiredConfirmationCount = 3L,
@@ -245,6 +252,7 @@ private fun TxDetailsScreenInProgressPreview() {
                     amount = 25_000_000L,
                     status = TxStatus.PENDING,
                 ),
+                showCloseButton = true,
                 ticker = "XTM",
                 blockExplorerBaseUrl = "",
                 requiredConfirmationCount = 3L,
@@ -270,6 +278,7 @@ private fun TxDetailsScreenCancelledPreview() {
                 tx = MockDataStub.createCancelledTx(
                     amount = 25_000_000L,
                 ),
+                showCloseButton = true,
                 ticker = "XTM",
                 blockExplorerBaseUrl = "",
                 requiredConfirmationCount = 3L,
@@ -295,6 +304,7 @@ private fun TxDetailsScreenPendingPreview() {
                 tx = MockDataStub.createPendingTx(
                     amount = 25_000_000L,
                 ),
+                showCloseButton = true,
                 ticker = "XTM",
                 blockExplorerBaseUrl = "",
                 requiredConfirmationCount = 3L,
