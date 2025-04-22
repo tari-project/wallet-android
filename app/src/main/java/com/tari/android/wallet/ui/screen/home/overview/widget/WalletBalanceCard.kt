@@ -17,8 +17,10 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -49,7 +51,7 @@ fun WalletBalanceCard(
     onBalanceHelpClicked: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    var isBalanceHidden = remember { mutableStateOf(false) }
+    var isBalanceHidden by remember { mutableStateOf(false) }
 
     Card(
         modifier = modifier.height(200.dp),
@@ -83,12 +85,12 @@ fun WalletBalanceCard(
                     )
                     Spacer(modifier = Modifier.width(4.dp))
                     Image(
-                        modifier = Modifier.clickable(onClick = { isBalanceHidden.value = !isBalanceHidden.value }),
+                        modifier = Modifier.clickable(onClick = { isBalanceHidden = !isBalanceHidden }),
                         painter = painterResource(id = R.drawable.vector_home_overview_hide_balance),
                         contentDescription = null,
                     )
                 }
-                if (isBalanceHidden.value) {
+                if (isBalanceHidden) {
                     Text(
                         text = stringResource(R.string.home_wallet_balance_hidden),
                         style = TextStyle(
@@ -129,7 +131,11 @@ fun WalletBalanceCard(
                     Text(
                         text = stringResource(
                             R.string.home_available_to_spend_balance,
-                            WalletConfig.balanceFormatter.format(balance.availableBalance.tariValue) + " " + ticker,
+                            if (isBalanceHidden) {
+                                stringResource(R.string.home_wallet_balance_hidden)
+                            } else {
+                                WalletConfig.balanceFormatter.format(balance.availableBalance.tariValue) + " " + ticker
+                            },
                         ),
                         style = TextStyle(
                             fontFamily = PoppinsFontFamily,

@@ -17,11 +17,13 @@ class BugsReportingViewModel : CommonViewModel() {
     }
 
     fun send(name: String, email: String, bugDescription: String) = launchOnIo {
-        try {
+        runCatching {
             bugReportingService.share(name, email, bugDescription)
-            onBackPressed()
-            logger.i("Bug report sent: name=$name, email=$email, bugDescription=$bugDescription")
-        } catch (e: Exception) {
+            switchToMain {
+                onBackPressed()
+                logger.i("Bug report sent: name=$name, email=$email, bugDescription=$bugDescription")
+            }
+        }.onFailure { e ->
             switchToMain {
                 showSimpleDialog(
                     title = resourceManager.getString(R.string.common_error_title),

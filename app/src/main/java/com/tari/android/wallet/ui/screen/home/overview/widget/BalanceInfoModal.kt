@@ -84,14 +84,18 @@ fun BalanceInfoModal(
         Spacer(modifier = Modifier.size(24.dp))
         TariHorizontalDivider(Modifier.padding(horizontal = 40.dp))
         Spacer(modifier = Modifier.size(24.dp))
+
         Row(modifier = Modifier.padding(horizontal = 40.dp)) {
             Text(
+                modifier = Modifier
+                    .weight(1f, false)
+                    .fillMaxWidth(),
                 text = stringResource(R.string.home_balance_info_modal_total_balance),
                 style = TariDesignSystem.typography.headingLarge,
             )
-            Spacer(Modifier.weight(1f))
+            Spacer(Modifier.size(16.dp))
             Text(
-                text = "${WalletConfig.amountFormatter.format(totalBalance.tariValue)} $ticker",
+                text = "${WalletConfig.balanceFormatter.format(totalBalance.tariValue)} $ticker",
                 style = TariDesignSystem.typography.headingLarge,
             )
         }
@@ -105,14 +109,18 @@ fun BalanceInfoModal(
         Spacer(modifier = Modifier.size(24.dp))
         TariHorizontalDivider(Modifier.padding(horizontal = 40.dp))
         Spacer(modifier = Modifier.size(24.dp))
+
         Row(modifier = Modifier.padding(horizontal = 40.dp)) {
             Text(
+                modifier = Modifier
+                    .weight(1f, false)
+                    .fillMaxWidth(),
                 text = stringResource(R.string.home_balance_info_modal_available_balance),
                 style = TariDesignSystem.typography.headingLarge,
             )
-            Spacer(Modifier.weight(1f))
+            Spacer(Modifier.size(16.dp))
             Text(
-                text = "${WalletConfig.amountFormatter.format(availableBalance.tariValue)} $ticker",
+                text = "${WalletConfig.balanceFormatter.format(availableBalance.tariValue)} $ticker",
                 style = TariDesignSystem.typography.headingLarge,
             )
         }
@@ -132,8 +140,8 @@ private fun BalanceInfoModalPreview() {
     PreviewSecondarySurface(TariTheme.Light) {
         BalanceInfoModal(
             onDismiss = {},
-            totalBalance = 4_836_150_000.toMicroTari(),
-            availableBalance = 2_583_150_000.toMicroTari(),
+            totalBalance = 4_836_150_123.toMicroTari(),
+            availableBalance = 2_583_150_123.toMicroTari(),
             ticker = "XTM",
         )
     }

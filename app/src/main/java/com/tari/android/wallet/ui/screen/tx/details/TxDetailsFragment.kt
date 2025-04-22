@@ -48,6 +48,7 @@ import com.tari.android.wallet.model.TxId
 import com.tari.android.wallet.model.TxNote
 import com.tari.android.wallet.model.TxStatus.IMPORTED
 import com.tari.android.wallet.model.TxStatus.MINED_CONFIRMED
+import com.tari.android.wallet.model.TxStatus.ONE_SIDED_CONFIRMED
 import com.tari.android.wallet.model.TxStatus.PENDING
 import com.tari.android.wallet.model.tx.CancelledTx
 import com.tari.android.wallet.model.tx.CompletedTx
@@ -180,7 +181,7 @@ class TxDetailsFragment : CommonXmlFragment<FragmentTxDetailsBinding, TxDetailsV
         ui.amountTextView.text = WalletConfig.amountFormatter.format(tx.amount.tariValue)
         ui.paymentStateTextView.text = when {
             tx is CancelledTx -> string(R.string.tx_detail_payment_cancelled)
-            state.status == MINED_CONFIRMED || state.status == IMPORTED ->
+            state.status == ONE_SIDED_CONFIRMED || state.status == MINED_CONFIRMED || state.status == IMPORTED ->
                 if (state.direction == INBOUND) string(R.string.tx_detail_payment_received)
                 else string(R.string.tx_detail_payment_sent)
 
