@@ -37,6 +37,17 @@ class ConfirmViewModel(savedState: SavedStateHandle) : CommonViewModel() {
         )
     }
 
+    fun onFeeInfoClicked() {
+        showSimpleDialog(
+            title = resourceManager.getString(R.string.tx_detail_fee_tooltip_transaction_fee),
+            description = resourceManager.getString(R.string.tx_detail_fee_tooltip_desc),
+        )
+    }
+
+    fun onAddressDetailsClicked() {
+        showAddressDetailsDialog(uiState.value.transactionData.recipientContact.walletAddress)
+    }
+
     data class UiState(
         val ticker: String,
         val transactionData: TransactionData,

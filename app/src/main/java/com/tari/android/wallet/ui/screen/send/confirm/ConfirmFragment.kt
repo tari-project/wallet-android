@@ -24,6 +24,8 @@ class ConfirmFragment : CommonFragment<ConfirmViewModel>() {
                 onBackClick = { viewModel.onBackPressed() },
                 onCopyValueClick = { viewModel.copyTxValueToClipboard(it) },
                 onConfirmClick = { viewModel.onConfirmClicked() },
+                onFeeInfoClick = { viewModel.onFeeInfoClicked() },
+                onEmojiIdDetailsClick = { viewModel.onAddressDetailsClicked() },
             )
         }
     }

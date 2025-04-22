@@ -161,10 +161,11 @@ fun TxDetailInfoStatusItem(
 
 @Composable
 fun TxDetailInfoAddressItem(
-    modifier: Modifier = Modifier,
     walletAddress: TariWalletAddress,
     onCopyClicked: (value: String) -> Unit,
     onEmojiIdDetailsClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    title: String = stringResource(R.string.common_to),
 ) {
     var showEmojiId by remember { mutableStateOf(false) }
 
@@ -180,7 +181,7 @@ fun TxDetailInfoAddressItem(
                 enabled = showEmojiId,
                 onClick = onEmojiIdDetailsClick,
             ),
-        title = stringResource(R.string.common_to),
+        title = title,
         value = value,
     ) {
         IconButton(

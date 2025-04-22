@@ -50,6 +50,7 @@ import com.tari.android.wallet.model.TariWalletAddress
 import com.tari.android.wallet.model.TxStatus
 import com.tari.android.wallet.model.tx.CancelledTx
 import com.tari.android.wallet.model.tx.CompletedTx
+import com.tari.android.wallet.model.tx.PendingOutboundTx
 import com.tari.android.wallet.model.tx.Tx
 import com.tari.android.wallet.ui.screen.contactBook.addressPoisoning.SimilarAddressDto
 import com.tari.android.wallet.ui.screen.utxos.list.adapters.UtxosViewHolderItem
@@ -231,6 +232,23 @@ object MockDataStub {
         tariContact = TariContact(WALLET_ADDRESS, contactAlias),
         fee = 1000.toMicroTari(),
         cancellationReason = FFITxCancellationReason.UserCancelled,
+    )
+
+    fun createPendingTx(
+        amount: Long = 100000,
+        direction: Tx.Direction = Tx.Direction.OUTBOUND,
+        contactAlias: String = "Test",
+        status: TxStatus = TxStatus.PENDING,
+    ) = PendingOutboundTx(
+        id = 1.toBigInteger(),
+        direction = direction,
+        amount = amount.toMicroTari(),
+        timestamp = BigInteger.valueOf(System.currentTimeMillis()),
+        message = RANDOM_MESSAGES.random(),
+        paymentId = RANDOM_MESSAGES.random(),
+        status = status,
+        tariContact = TariContact(WALLET_ADDRESS, contactAlias),
+        fee = 1000.toMicroTari(),
     )
 
     fun createTxDto(
