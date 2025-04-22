@@ -6,6 +6,7 @@ import com.tari.android.wallet.application.walletManager.WalletManager.WalletEve
 import com.tari.android.wallet.application.walletManager.doOnWalletRunning
 import com.tari.android.wallet.data.contacts.ContactsRepository
 import com.tari.android.wallet.di.ApplicationScope
+import com.tari.android.wallet.model.TxId
 import com.tari.android.wallet.model.tx.Tx
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -71,6 +72,10 @@ class TxRepository @Inject constructor(
         }
 
         refreshTxList()
+    }
+
+    fun findTxById(txId: TxId): Tx? {
+        return txs.value.allTxs.firstOrNull { it.id == txId }
     }
 
     /**
