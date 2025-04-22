@@ -33,7 +33,6 @@ import com.tari.android.wallet.ui.screen.contactBook.contactSelection.ContactSel
 import com.tari.android.wallet.ui.screen.contactBook.contactSelection.ContactSelectionViewModel.ContinueButtonEffect
 import com.tari.android.wallet.ui.screen.contactBook.contacts.adapter.ContactListAdapter
 import com.tari.android.wallet.ui.screen.contactBook.contacts.adapter.contact.ContactItemViewHolderItem
-import com.tari.android.wallet.ui.screen.contactBook.contacts.adapter.contact.ContactlessPaymentItem
 import com.tari.android.wallet.ui.screen.qr.QrScannerSource
 import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.DebugConfig
@@ -185,7 +184,6 @@ open class ContactSelectionFragment : CommonXmlFragment<FragmentContactsSelectio
         recyclerViewAdapter.setClickListener(CommonAdapter.ItemClickListener { holderItem ->
             when (holderItem) {
                 is ContactItemViewHolderItem -> viewModel.onContactClick(holderItem.contact)
-                is ContactlessPaymentItem -> viewModel.onContactlessPaymentClick()
             }
         })
         ui.contactsListRecyclerView.adapter = recyclerViewAdapter

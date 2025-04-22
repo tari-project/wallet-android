@@ -14,24 +14,22 @@ import com.tari.android.wallet.R.string.contact_book_empty_state_favorites_body
 import com.tari.android.wallet.R.string.contact_book_empty_state_favorites_title
 import com.tari.android.wallet.R.string.contact_book_empty_state_grant_access_button
 import com.tari.android.wallet.R.string.contact_book_empty_state_title
-import com.tari.android.wallet.util.extension.collectFlow
-import com.tari.android.wallet.util.extension.debounce
-import com.tari.android.wallet.util.extension.launchOnIo
-import com.tari.android.wallet.util.extension.launchOnMain
+import com.tari.android.wallet.data.contacts.ContactsRepository
+import com.tari.android.wallet.data.contacts.model.ContactDto
+import com.tari.android.wallet.data.contacts.model.PhoneContactInfo
 import com.tari.android.wallet.navigation.Navigation
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.common.SingleLiveEvent
 import com.tari.android.wallet.ui.common.recyclerView.CommonViewHolderItem
 import com.tari.android.wallet.ui.common.recyclerView.items.SpaceVerticalViewHolderItem
 import com.tari.android.wallet.ui.screen.contactBook.contacts.adapter.contact.ContactItemViewHolderItem
-import com.tari.android.wallet.ui.screen.contactBook.contacts.adapter.contact.ContactlessPaymentItem
 import com.tari.android.wallet.ui.screen.contactBook.contacts.adapter.emptyState.EmptyStateViewHolderItem
-import com.tari.android.wallet.data.contacts.ContactsRepository
-import com.tari.android.wallet.data.contacts.model.ContactDto
-import com.tari.android.wallet.data.contacts.model.PhoneContactInfo
 import com.tari.android.wallet.ui.screen.contactBook.root.ContactSelectionRepository
-import com.tari.android.wallet.infrastructure.ShareManager
 import com.tari.android.wallet.ui.screen.settings.allSettings.title.SettingsTitleViewHolderItem
+import com.tari.android.wallet.util.extension.collectFlow
+import com.tari.android.wallet.util.extension.debounce
+import com.tari.android.wallet.util.extension.launchOnIo
+import com.tari.android.wallet.util.extension.launchOnMain
 import yat.android.ui.extension.HtmlHelper
 import javax.inject.Inject
 
@@ -81,9 +79,7 @@ class ContactsViewModel : CommonViewModel() {
     }
 
     fun processItemClick(item: CommonViewHolderItem) {
-        if (item is ContactlessPaymentItem) {
-            ShareManager.currentInstant?.doContactlessPayment()
-        } else if (item is ContactItemViewHolderItem) {
+        if (item is ContactItemViewHolderItem) {
             if (contactSelectionRepository.isSelectionState.value == true) {
                 contactSelectionRepository.toggle(item)
                 refresh()
@@ -145,7 +141,7 @@ class ContactsViewModel : CommonViewModel() {
 
         for (item in filtered) {
             item.isSelected = selectedItems.contains(item.contact.uuid)
-            item.isSelectionState = contactSelectionRepository.isSelectionState.value ?: false
+            item.isSelectionState = contactSelectionRepository.isSelectionState.value == true
         }
 
         if (contactsRepository.contactPermissionGranted.not() || filtered.isEmpty()) {
