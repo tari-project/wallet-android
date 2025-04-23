@@ -105,7 +105,6 @@ class TxRepository @Inject constructor(
     private fun Tx.toDto() = TxDto(
         tx = this,
         contact = contactsRepository.getContactForTx(this),
-        requiredConfirmationCount = _txs.value.confirmationCount,
     )
 
     companion object {

@@ -27,7 +27,6 @@ object TxDetailsModel {
         val showCloseButton: Boolean,
         val ticker: String,
         private val blockExplorerBaseUrl: String?,
-        val requiredConfirmationCount: Long,
         val contact: ContactDto? = null,
     ) {
         val screenTitle: Int
@@ -87,26 +86,17 @@ object TxDetailsModel {
                     Direction.OUTBOUND -> TxStatusText.InProgress(R.string.tx_detail_waiting_for_recipient)
                 }
 
-                tx.status in listOf(TxStatus.BROADCAST, TxStatus.COMPLETED) -> TxStatusText.InProgressStep(
-                    textRes = R.string.tx_detail_completing_final_processing_with_step,
-                    step = 1,
-                    stepCount = requiredConfirmationCount.toInt() + 1,
-                )
-
-                tx.status == TxStatus.MINED_UNCONFIRMED -> tx.safeCastTo<CompletedTx>()?.confirmationCount?.let { confirmationCount ->
-                    TxStatusText.InProgressStep(
-                        textRes = R.string.tx_detail_completing_final_processing_with_step,
-                        step = confirmationCount.toInt(),
-                        stepCount = requiredConfirmationCount.toInt() + 1,
-                    )
-                } ?: TxStatusText.InProgress(R.string.tx_detail_completing_final_processing)
+                tx.status in listOf(
+                    TxStatus.BROADCAST,
+                    TxStatus.COMPLETED,
+                    TxStatus.MINED_UNCONFIRMED,
+                ) -> TxStatusText.InProgress(R.string.tx_detail_in_progress)
 
                 else -> TxStatusText.Completed
             }
 
         sealed class TxStatusText {
             data class InProgress(@StringRes val textRes: Int) : TxStatusText()
-            data class InProgressStep(@StringRes val textRes: Int, val step: Int, val stepCount: Int) : TxStatusText()
             data object Completed : TxStatusText()
             data class Cancelled(@StringRes val textRes: Int) : TxStatusText()
         }

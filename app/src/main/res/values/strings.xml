@@ -361,8 +361,7 @@
     <string name="tx_detail_transaction_fee">Transaction Fee</string>
     <string name="tx_detail_waiting_for_recipient">Waiting for recipient to come online</string>
     <string name="tx_detail_waiting_for_sender_to_complete">Waiting for sender to complete transaction</string>
-    <string name="tx_detail_completing_final_processing">Completing final processing…</string>
-    <string name="tx_detail_completing_final_processing_with_step">Completing final processing (%s of %s)</string>
+    <string name="tx_detail_in_progress">In progress</string>
     <string name="tx_detail_cancel_tx">Cancel transaction</string>
     <string name="tx_detail_cancellation_error_title">Oops…</string>
     <string name="tx_detail_cancellation_error_description">Error occurred during TX cancellation.</string>

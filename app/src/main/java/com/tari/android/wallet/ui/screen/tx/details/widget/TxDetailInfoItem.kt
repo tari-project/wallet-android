@@ -150,13 +150,11 @@ fun TxDetailInfoStatusItem(
             is TxDetailsModel.UiState.TxStatusText.Completed -> stringResource(R.string.tx_details_completed)
             is TxDetailsModel.UiState.TxStatusText.Cancelled -> stringResource(txStatus.textRes)
             is TxDetailsModel.UiState.TxStatusText.InProgress -> stringResource(txStatus.textRes)
-            is TxDetailsModel.UiState.TxStatusText.InProgressStep -> stringResource(txStatus.textRes, txStatus.step, txStatus.stepCount)
         },
         valueTextColor = when (txStatus) {
             is TxDetailsModel.UiState.TxStatusText.Completed -> TariDesignSystem.colors.successMain
             is TxDetailsModel.UiState.TxStatusText.Cancelled -> TariDesignSystem.colors.errorMain
-            is TxDetailsModel.UiState.TxStatusText.InProgress,
-            is TxDetailsModel.UiState.TxStatusText.InProgressStep -> TariDesignSystem.colors.warningMain
+            is TxDetailsModel.UiState.TxStatusText.InProgress -> TariDesignSystem.colors.warningMain
         },
         singleLine = false,
     )

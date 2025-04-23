@@ -42,7 +42,6 @@ class TxDetailsViewModel(savedState: SavedStateHandle) : CommonViewModel() {
             tx = savedState.getOrThrow<Tx>(TX_EXTRA_KEY),
             showCloseButton = savedState.getOrThrow<Boolean>(SHOW_CLOSE_BUTTON_EXTRA_KEY),
             ticker = networkRepository.currentNetwork.ticker,
-            requiredConfirmationCount = walletManager.requireWalletInstance.getRequiredConfirmationCount(),
             blockExplorerBaseUrl = networkRepository.currentNetwork.blockExplorerBaseUrl,
         )
     )

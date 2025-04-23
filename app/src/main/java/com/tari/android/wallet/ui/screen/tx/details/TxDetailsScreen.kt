@@ -91,14 +91,20 @@ fun TxDetailsScreen(
 
             uiState.contact?.let { contact ->
                 Spacer(Modifier.size(10.dp))
+
                 val unknownUser = contact.walletAddress?.isUnknownUser().isTrue()
+                val coinbase = uiState.tx.isCoinbase
                 TxDetailInfoContactNameItem(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 24.dp),
-                    alias = if (unknownUser) stringResource(R.string.unknown_source) else contact.alias,
+                    alias = when {
+                        coinbase -> stringResource(R.string.tx_details_coinbase_inbound)
+                        unknownUser -> stringResource(R.string.unknown_source)
+                        else -> contact.alias
+                    },
                     onEditClicked = onContactEditClick,
-                    editable = !unknownUser,
+                    editable = !unknownUser && !coinbase,
                 )
             }
 
@@ -228,7 +234,6 @@ private fun TxDetailsScreenPreview() {
                 showCloseButton = true,
                 ticker = "XTM",
                 blockExplorerBaseUrl = "",
-                requiredConfirmationCount = 3L,
                 contact = MockDataStub.createContact(),
             ),
             onBackClick = {},
@@ -255,7 +260,6 @@ private fun TxDetailsScreenInProgressPreview() {
                 showCloseButton = true,
                 ticker = "XTM",
                 blockExplorerBaseUrl = "",
-                requiredConfirmationCount = 3L,
                 contact = MockDataStub.createContact(),
             ),
             onBackClick = {},
@@ -281,7 +285,6 @@ private fun TxDetailsScreenCancelledPreview() {
                 showCloseButton = true,
                 ticker = "XTM",
                 blockExplorerBaseUrl = "",
-                requiredConfirmationCount = 3L,
                 contact = MockDataStub.createContact(),
             ),
             onBackClick = {},
@@ -307,7 +310,6 @@ private fun TxDetailsScreenPendingPreview() {
                 showCloseButton = true,
                 ticker = "XTM",
                 blockExplorerBaseUrl = "",
-                requiredConfirmationCount = 3L,
                 contact = MockDataStub.createContact(),
             ),
             onBackClick = {},

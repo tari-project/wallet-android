@@ -167,26 +167,20 @@ object MockDataStub {
         commitment = "Mocked Tari UTXO!!!",
     )
 
-    fun createTxList(
-        confirmationCount: Long = 10000,
-    ) = listOf(
+    fun createTxList() = listOf(
         createTxDto(
-            confirmationCount,
             amount = 1000000,
             contactAlias = "Alice",
         ),
         createTxDto(
-            confirmationCount,
             amount = 2000000,
             contactAlias = "Bob",
         ),
         createTxDto(
-            confirmationCount,
             amount = 3000000,
             contactAlias = "Charlie",
         ),
         createTxDto(
-            confirmationCount,
             amount = 4000000,
             contactAlias = "David",
             status = TxStatus.COINBASE,
@@ -252,7 +246,6 @@ object MockDataStub {
     )
 
     fun createTxDto(
-        confirmationCount: Long = 10000,
         amount: Long = 100000,
         contactAlias: String = "Test",
         status: TxStatus = TxStatus.MINED_CONFIRMED,
@@ -263,7 +256,6 @@ object MockDataStub {
             status = status,
         ),
         contact = createContact(alias = contactAlias),
-        requiredConfirmationCount = confirmationCount,
     )
 
     fun createSimilarAddressList() = listOf(
