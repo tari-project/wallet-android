@@ -11,14 +11,13 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
 import com.orhanobut.logger.Logger
 import com.orhanobut.logger.Printer
 import com.squareup.seismic.ShakeDetector
 import com.tari.android.wallet.R
 import com.tari.android.wallet.infrastructure.logging.LoggerTags
-import com.tari.android.wallet.ui.component.tari.toast.TariToast
-import com.tari.android.wallet.ui.component.tari.toast.TariToastArgs
 import com.tari.android.wallet.ui.dialog.modular.ModularDialog
 import com.tari.android.wallet.ui.dialog.modular.ModularDialogArgs
 import com.tari.android.wallet.ui.dialog.modular.modules.body.BodyModule
@@ -76,11 +75,9 @@ abstract class CommonActivity<VM : CommonViewModel> : AppCompatActivity(), Shake
     fun subscribeToCommon(commonViewModel: CommonViewModel) = with(commonViewModel) {
         observe(backPressed) { onBackPressed() }
 
-        observe(openLink) { startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(it))) }
+        observe(openLink) { startActivity(Intent(Intent.ACTION_VIEW, it.toUri())) }
 
         observe(modularDialog) { dialogManager.replace(ModularDialog(this@CommonActivity, it)) }
-
-        observe(showToast) { TariToast(this@CommonActivity, it) }
 
         observe(permissionManager.checkForPermission) {
             launcher.launch(it.toTypedArray())
@@ -223,7 +220,7 @@ abstract class CommonActivity<VM : CommonViewModel> : AppCompatActivity(), Shake
         if (shareIntent.resolveActivity(packageManager) != null) {
             startActivity(Intent.createChooser(shareIntent, null))
         } else {
-            TariToast(this, TariToastArgs(string(R.string.store_no_application_to_open_the_link_error), Toast.LENGTH_LONG))
+            Toast.makeText(this, string(R.string.store_no_application_to_open_the_link_error), Toast.LENGTH_LONG).show()
         }
     }
 

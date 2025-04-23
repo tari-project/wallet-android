@@ -75,6 +75,9 @@ abstract class Tx(
     val dateTime: DateTime
         get() = DateTime(timestamp.toLong() * 1000L)
 
+    val note: String
+        get() = paymentId.ifEmpty { message }
+
     override fun toString() = "Tx(id=$id, " +
             "direction=$direction, " +
             "amount=$amount, " +

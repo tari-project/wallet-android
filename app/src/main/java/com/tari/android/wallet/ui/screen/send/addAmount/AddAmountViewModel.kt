@@ -139,6 +139,13 @@ class AddAmountViewModel(savedState: SavedStateHandle) : CommonViewModel() {
         )
     }
 
+    fun showTxFeeToolTip() {
+        showSimpleDialog(
+            title = resourceManager.getString(R.string.tx_detail_fee_tooltip_transaction_fee),
+            description = resourceManager.getString(R.string.tx_detail_fee_tooltip_desc),
+        )
+    }
+
     private fun TransactionData.shouldSkipAddingNote() = note.isNullOrEmpty() || DebugConfig.skipAddingNote
 
     private fun calculateDefaultFees(amount: MicroTari) {

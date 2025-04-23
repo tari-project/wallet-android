@@ -13,7 +13,6 @@ import com.tari.android.wallet.data.contacts.model.ContactDto
 import com.tari.android.wallet.data.contacts.model.FFIContactInfo
 import com.tari.android.wallet.data.contacts.model.splitAlias
 import com.tari.android.wallet.data.sharedPrefs.CorePrefRepository
-import com.tari.android.wallet.infrastructure.ShareManager
 import com.tari.android.wallet.model.EmojiId
 import com.tari.android.wallet.model.MicroTari
 import com.tari.android.wallet.model.TariWalletAddress
@@ -30,7 +29,6 @@ import com.tari.android.wallet.ui.screen.contactBook.addressPoisoning.SimilarAdd
 import com.tari.android.wallet.ui.screen.contactBook.contactSelection.ContactSelectionModel.Effect
 import com.tari.android.wallet.ui.screen.contactBook.contactSelection.ContactSelectionModel.YatState
 import com.tari.android.wallet.ui.screen.contactBook.contacts.adapter.contact.ContactItemViewHolderItem
-import com.tari.android.wallet.ui.screen.contactBook.contacts.adapter.contact.ContactlessPaymentItem
 import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.EffectFlow
 import com.tari.android.wallet.util.EmojiUtil.Companion.getGraphemeLength
@@ -79,8 +77,6 @@ class ContactSelectionViewModel : CommonViewModel() {
 
     val walletAddressViewModel = WalletAddressViewModel()
 
-    val isContactlessPayment = MutableLiveData(false)
-
     val amount: MutableLiveData<MicroTari> = MutableLiveData()
 
     private val _effect = EffectFlow<Effect>()
@@ -101,7 +97,6 @@ class ContactSelectionViewModel : CommonViewModel() {
         }
         contactList.addSource(contactListSource) { updateContactList() }
         contactList.addSource(searchText) { updateContactList() }
-        contactList.addSource(isContactlessPayment) { updateContactList() }
     }
 
     override fun handleDeeplink(deeplink: DeepLink) {
@@ -131,10 +126,6 @@ class ContactSelectionViewModel : CommonViewModel() {
         } else {
             super.handleDeeplink(deeplink)
         }
-    }
-
-    fun onContactlessPaymentClick() {
-        ShareManager.currentInstant?.doContactlessPayment()
     }
 
     fun onContactClick(contact: ContactDto) {
@@ -256,8 +247,6 @@ class ContactSelectionViewModel : CommonViewModel() {
 
         contactList.postValue(
             listOfNotNull(
-                ContactlessPaymentItem().takeIf { isContactlessPayment.value == true },
-
                 TitleViewHolderItem(resourceManager.getString(R.string.add_recipient_recent_tx_contacts)).takeIf { resentUsed.isNotEmpty() },
                 *resentUsed.toTypedArray(),
 

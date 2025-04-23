@@ -24,10 +24,6 @@
 
     <!-- home TTL store dialog -->
 
-    <!-- tx details -->
-    <dimen name="tx_details_amount_section_vertical_padding">36dp</dimen>
-    <dimen name="tx_details_note_top_margin">24dp</dimen>
-
     <!-- send tari - common -->
     <dimen name="header_top_inset">24dp</dimen>
     <!-- send tari - add recipient -->

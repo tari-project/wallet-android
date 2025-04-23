@@ -51,7 +51,6 @@ import com.tari.android.wallet.R.string.all_settings_visit_site
 import com.tari.android.wallet.R.string.back_up_wallet_backup_status_in_progress
 import com.tari.android.wallet.R.string.back_up_wallet_backup_status_outdated
 import com.tari.android.wallet.R.string.back_up_wallet_backup_status_up_to_date
-import com.tari.android.wallet.R.string.check_backup_storage_status_error_title
 import com.tari.android.wallet.R.string.disclaimer_url
 import com.tari.android.wallet.R.string.github_repo_url
 import com.tari.android.wallet.R.string.privacy_policy_url
@@ -178,7 +177,7 @@ class AllSettingsViewModel : CommonViewModel() {
             },
             SettingsTitleViewHolderItem(resourceManager.getString(all_settings_secondary_settings_label)),
             SettingsRowViewHolderItem(resourceManager.getString(all_settings_store), vector_all_settings_cart) {
-                _openLink.postValue(resourceManager.getString(ttl_store_url))
+                openUrl(resourceManager.getString(ttl_store_url))
             },
             DividerViewHolderItem(),
             SettingsRowViewHolderItem(resourceManager.getString(tari_about_title), vector_all_settings_about_icon) {
@@ -190,27 +189,27 @@ class AllSettingsViewModel : CommonViewModel() {
             },
             DividerViewHolderItem(),
             SettingsRowViewHolderItem(resourceManager.getString(all_settings_visit_site), vector_all_settings_visit_tari_icon) {
-                _openLink.postValue(resourceManager.getString(tari_url))
+                openUrl(resourceManager.getString(tari_url))
             },
             DividerViewHolderItem(),
             SettingsRowViewHolderItem(resourceManager.getString(all_settings_contribute), vector_all_settings_contribute_to_tari_icon) {
-                _openLink.postValue(resourceManager.getString(github_repo_url))
+                openUrl(resourceManager.getString(github_repo_url))
             },
             DividerViewHolderItem(),
             SettingsRowViewHolderItem(resourceManager.getString(all_settings_user_agreement), vector_all_settings_user_agreement_icon) {
-                _openLink.postValue(resourceManager.getString(user_agreement_url))
+                openUrl(resourceManager.getString(user_agreement_url))
             },
             DividerViewHolderItem(),
             SettingsRowViewHolderItem(resourceManager.getString(all_settings_privacy_policy), vector_all_settings_privacy_policy_icon) {
-                _openLink.postValue(resourceManager.getString(privacy_policy_url))
+                openUrl(resourceManager.getString(privacy_policy_url))
             },
             DividerViewHolderItem(),
             SettingsRowViewHolderItem(resourceManager.getString(all_settings_disclaimer), vector_all_settings_disclaimer_icon) {
-                _openLink.postValue(resourceManager.getString(disclaimer_url))
+                openUrl(resourceManager.getString(disclaimer_url))
             },
             DividerViewHolderItem(),
             SettingsRowViewHolderItem(resourceManager.getString(all_settings_explorer), vector_all_settings_block_explorer_icon) {
-                _openLink.postValue(networkRepository.currentNetwork.blockExplorerUrl.orEmpty())
+                openUrl(networkRepository.currentNetwork.blockExplorerBaseUrl.orEmpty()) // TODO maybe we should open specific url, not base url?
             }.takeIf { networkRepository.currentNetwork.isBlockExplorerAvailable },
             SettingsTitleViewHolderItem(resourceManager.getString(all_settings_advanced_settings_label)),
             SettingsRowViewHolderItem(resourceManager.getString(all_settings_select_theme), vector_all_settings_select_theme_icon) {
@@ -280,12 +279,5 @@ class AllSettingsViewModel : CommonViewModel() {
             backupOption.backupState = presentationBackupState
         }
         _allSettingsOptions.update { generateOptions() }
-    }
-
-    private fun showBackupStorageCheckFailedDialog(message: String) {
-        showSimpleDialog(
-            title = resourceManager.getString(check_backup_storage_status_error_title),
-            description = message,
-        )
     }
 }

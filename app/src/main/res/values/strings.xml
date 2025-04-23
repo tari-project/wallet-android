@@ -232,8 +232,6 @@
     <!-- tx list -->
     <string name="tx_list_sent_a_payment">%s sent a payment</string>
     <string name="tx_list_you_paid">You paid</string>
-    <string name="bluetooth_connect">Bluetooth Connect 🤘</string>
-    <string name="bluetooth_connect_description">Connect and send Tari to someone nearby</string>
     <string name="tx_list_you_paid_with_alias">You paid %s</string>
     <string name="tx_list_paid_you">sent a payment</string>
     <string name="tx_list_seconds_ago">%ds ago</string>
@@ -356,7 +354,6 @@
     <string name="tx_detail_pending_payment_received">Payment In Progress</string>
     <string name="tx_detail_contact_name">Contact Name</string>
     <string name="tx_detail_explorer_title">Information</string>
-    <string name="tx_detail_explorer_button">View on the Block Explorer</string>
     <string name="tx_detail_create_contact_hint">Add Contact Name</string>
     <string name="tx_detail_note">Note</string>
     <string name="tx_detail_edit">Edit</string>
@@ -364,8 +361,7 @@
     <string name="tx_detail_transaction_fee">Transaction Fee</string>
     <string name="tx_detail_waiting_for_recipient">Waiting for recipient to come online</string>
     <string name="tx_detail_waiting_for_sender_to_complete">Waiting for sender to complete transaction</string>
-    <string name="tx_detail_completing_final_processing">Completing final processing…</string>
-    <string name="tx_detail_completing_final_processing_with_step">Completing final processing (%s of %s)</string>
+    <string name="tx_detail_in_progress">In progress</string>
     <string name="tx_detail_cancel_tx">Cancel transaction</string>
     <string name="tx_detail_cancellation_error_title">Oops…</string>
     <string name="tx_detail_cancellation_error_description">Error occurred during TX cancellation.</string>
@@ -379,6 +375,14 @@
     <string name="tx_details_recipient_address">Recipient Address</string>
     <string name="tx_details_total">Total</string>
     <string name="tx_details_transaction_details">Transaction Details</string>
+    <string name="tx_details_paid">Paid</string>
+    <string name="tx_details_date">Date</string>
+    <string name="tx_details_txn_id">Tari Txn ID</string>
+    <string name="tx_details_txn_id_processing">Processing</string>
+    <string name="tx_details_status">Status</string>
+    <string name="tx_details_cancelled">Cancelled</string>
+    <string name="tx_details_completed">Completed</string>
+    <string name="tx_details_add_contact_name_hint">Add contact name…</string>
 
     <string name="tx_details_cancellation_reason_unknown">The transaction failed for an unknown reason.</string>
     <string name="tx_details_cancellation_reason_user_cancelled">The transaction was canceled by the sender.</string>
@@ -388,12 +392,13 @@
     <string name="tx_details_cancellation_reason_time_locked">This transaction was cancelled due to the funds not having reached their time-lock period yet.</string>
     <string name="tx_details_cancellation_reason_invalid_transaction">The transaction failed to the invalid input data. This situation shouldn\'t happen. Please send a bug report or contact us directly.</string>
     <string name="tx_details_cancellation_reason_abandoned_coinbase">The coinbase was abandoned.</string>
+    <string name="tx_details_cancellation_reason_not_cancelled">The transaction was not cancelled, but for some reason looks like cancelled.
+        Please, contact us directly if you see this message.</string>
 
     <!-- Fee tooltip -->
     <string name="tx_detail_fee_tooltip_transaction_fee">Transaction Fee</string>
     <string name="tx_detail_fee_tooltip_desc">The transaction fee is distributed to the thousands of computers (also known as \"miners\") who
         ensure that your XTM transactions are fast and secure.</string>
-    <string name="tx_details_fee_value">+%s</string>
 
     <!-- debug screens -->
     <!-- logs -->
@@ -683,7 +688,7 @@
     <string name="tor_bridges_custom_bridges">Custom Bridges</string>
     <string name="tor_bridges_description">If you are in a country or using a connection that censor Tor, you might need to use bridges</string>
     <string name="tor_bridges_paste_bridges">Paste Bridges</string>
-    <string name="tor_bridges_hint" formatted="false">Available formates:\n• obfs4 &lt;IP ADDRESS>:&lt;PORT> &lt;FINGERPRINT> cert=&lt;CERTIFICATE> iat-mode=&lt;value>\nexample:\nobfs4 192.95.36.142:443 CDF2E852BF539B82BD10E27E9115A31734E378C2 cert=qUVQ0srL1JI/vO6V6m/24anYXiJD3QP2HgzUKQtQ7GRqqUvs7P+tG43RtAqdhLOALP7DJQ iat-mode=1\n\n • &lt;IP ADDRESS>:&lt;PORT> &lt;FINGERPRINT>\nexample:\n78.156.103.189:9301 2BD90810282F8B331FC7D47705167166253E1442"</string>
+    <string name="tor_bridges_hint" formatted="false">Available formates:\n• obfs4 &lt;IP ADDRESS>:&lt;PORT> &lt;FINGERPRINT> cert=&lt;CERTIFICATE> iat-mode=&lt;value>\nexample:\nobfs4 192.95.36.142:443 CDF2E852BF539B82BD10E27E9115A31734E378C2 cert=qUVQ0srL!JI/vO6V6m/24anYXiJD3QP2HgzUKQtQ7GRqqUvs7P+tG43RtAqdhLOALP7DJQ iat-mode=1\n\n • &lt;IP ADDRESS>:&lt;PORT> &lt;FINGERPRINT>\nexample:\n78.156.103.189:9301 2BD90810282F8B331FC7D47705167166253E1442"</string>
     <string name="tor_bridges_request">Request Bridges from torproject.org</string>
     <string name="tor_bridges_scan_qr">Scan QR Code</string>
     <string name="tor_bridges_upload_qr_code">Upload QR Code</string>
@@ -792,7 +797,6 @@
     <string name="change_password_page_description_highlight_part">you will not be able to recover your wallet</string>
     <string name="enter_backup_password_page_desc_general_part">Enter the password you created in Tari Universe Wallet to secure your backups. If you cannot find the password,</string>
     <string name="enter_backup_password_page_desc_highlighted_part">you will not be able to recover your wallet</string>
-    <string name="check_backup_storage_status_error_title">Wallet Backup Incomplete</string>
     <string name="back_up_wallet_storage_setup_error_title">Wallet Backup Incomplete</string>
     <string name="backup_wallet_storage_full_title">Wallet Backup Incomplete</string>
     <string name="check_backup_storage_status_auth_revoked_error_description">Storage is not accessible</string>
@@ -921,7 +925,6 @@
     <string name="share_contact_via_qr_nfc">NFC</string>
     <string name="share_contact_via_qr_ble">BLE</string>
     <string name="wallet_info_alias_edit_title">Edit Name</string>
-    <string name="tx_details_contact_name">Contact name here</string>
     <string name="share_via_qr_code_title">Share QR Code</string>
     <string name="contact_book_default_alias">Tari user %s</string>
     <string name="contact_details_empty_name_dialog_title">Name can\’t be empty</string>

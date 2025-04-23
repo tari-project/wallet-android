@@ -67,10 +67,6 @@
     <dimen name="create_wallet_button_bottom_margin">25dp</dimen>
     <dimen name="home_tx_list_item_height">74dp</dimen>
 
-    <!-- tx details -->
-    <dimen name="tx_details_amount_section_vertical_padding">20dp</dimen>
-    <dimen name="tx_details_note_top_margin">20dp</dimen>
-
     <!-- send tari - common -->
     <dimen name="header_top_inset">12dp</dimen>
     <!-- send tari - add recipient -->

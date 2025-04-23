@@ -6,9 +6,9 @@ data class TariNetwork(
     val network: Network,
     val dnsPeer: String,
     val ticker: String,
-    val blockExplorerUrl: String? = null,
+    val blockExplorerBaseUrl: String? = null,
     val recommended: Boolean = false,
 ) {
     val isBlockExplorerAvailable: Boolean
-        get() = blockExplorerUrl != null
+        get() = blockExplorerBaseUrl != null
 }

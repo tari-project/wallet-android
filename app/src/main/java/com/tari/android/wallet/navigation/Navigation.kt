@@ -5,7 +5,6 @@ import com.tari.android.wallet.application.YatAdapter.ConnectedWallet
 import com.tari.android.wallet.data.contacts.model.ContactDto
 import com.tari.android.wallet.model.MicroTari
 import com.tari.android.wallet.model.TariWalletAddress
-import com.tari.android.wallet.model.TxId
 import com.tari.android.wallet.model.tx.Tx
 import com.tari.android.wallet.ui.screen.pinCode.PinCodeScreenBehavior
 import com.tari.android.wallet.ui.screen.send.common.TransactionData
@@ -52,7 +51,7 @@ sealed class Navigation {
     }
 
     sealed class TxList : Navigation() {
-        data class ToTxDetails(val tx: Tx? = null, val txId: TxId? = null) : TxList()
+        data class ToTxDetails(val tx: Tx, val showCloseButton: Boolean = false) : TxList()
         data object ToAllSettings : TxList()
         data object ToUtxos : TxList()
         data class ToSendTariToUser(val contact: ContactDto, val amount: MicroTari? = null, val note: String = "") : TxList()

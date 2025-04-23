@@ -49,8 +49,6 @@ import com.tari.android.wallet.R.drawable.vector_store_share
 import com.tari.android.wallet.R.string.store_no_application_to_open_the_link_error
 import com.tari.android.wallet.R.string.ttl_store_url
 import com.tari.android.wallet.databinding.FragmentStoreBinding
-import com.tari.android.wallet.ui.component.tari.toast.TariToast
-import com.tari.android.wallet.ui.component.tari.toast.TariToastArgs
 import com.tari.android.wallet.ui.component.tari.toolbar.TariToolbarActionArg
 import com.tari.android.wallet.ui.screen.store.EventsPropagatingWebViewClient.ExternalSiteOverride
 import com.tari.android.wallet.util.extension.collectFlow
@@ -139,7 +137,7 @@ class StoreFragment : Fragment() {
         if (shareIntent.resolveActivity(requireContext().packageManager) != null) {
             startActivity(Intent.createChooser(shareIntent, null))
         } else {
-            TariToast(requireContext(), TariToastArgs(string(store_no_application_to_open_the_link_error), Toast.LENGTH_LONG))
+            Toast.makeText(requireContext(), string(store_no_application_to_open_the_link_error), Toast.LENGTH_LONG).show()
         }
     }
 

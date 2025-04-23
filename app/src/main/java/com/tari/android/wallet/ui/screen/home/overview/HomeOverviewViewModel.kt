@@ -15,6 +15,7 @@ import com.tari.android.wallet.data.airdrop.AirdropRepository
 import com.tari.android.wallet.data.contacts.ContactsRepository
 import com.tari.android.wallet.data.sharedPrefs.sentry.SentryPrefRepository
 import com.tari.android.wallet.data.tx.TxRepository
+import com.tari.android.wallet.model.TxId
 import com.tari.android.wallet.model.tx.Tx
 import com.tari.android.wallet.navigation.Navigation
 import com.tari.android.wallet.ui.common.CommonViewModel
@@ -96,6 +97,7 @@ class HomeOverviewViewModel : CommonViewModel() {
         collectFlow(walletManager.walletEvent) { event ->
             when (event) {
                 is WalletEvent.TxSend.TxSendFailed -> onTxSendFailed(event.failureReason)
+                is WalletEvent.TxSend.TxSendSuccessful -> showTxDetail(event.txId)
 
                 else -> Unit
             }
@@ -161,6 +163,48 @@ class HomeOverviewViewModel : CommonViewModel() {
         }
     }
 
+    fun onSyncDialogDismiss() {
+        sharedPrefsRepository.needToShowRecoverySuccessDialog = false
+        _uiState.update {
+            it.copy(
+                showWalletSyncSuccessDialog = false,
+                showWalletRestoreSuccessDialog = false,
+            )
+        }
+    }
+
+    fun onBalanceInfoClicked() {
+        _uiState.update { it.copy(showBalanceInfoDialog = true) }
+    }
+
+    fun onBalanceInfoDialogDismiss() {
+        _uiState.update { it.copy(showBalanceInfoDialog = false) }
+    }
+
+    fun onStartMiningClicked() {
+        showNotReadyYetDialog()
+    }
+
+    fun onSendTariClicked() {
+        tariNavigator.navigate(Navigation.ContactBook.ToSelectTariUser)
+    }
+
+    fun onRequestTariClicked() {
+        tariNavigator.navigate(Navigation.TxList.ToReceive)
+    }
+
+    fun onAllTxClicked() {
+        tariNavigator.navigate(Navigation.TxList.HomeTransactionHistory)
+    }
+
+    fun onInviteFriendClicked() {
+        showNotReadyYetDialog()
+    }
+
+    fun onNotificationsClicked() {
+        showNotReadyYetDialog()
+    }
+
     private fun checkForDataConsent() {
         if (sentryPrefRepository.isEnabled == null) {
             sentryPrefRepository.isEnabled = false
@@ -192,24 +236,6 @@ class HomeOverviewViewModel : CommonViewModel() {
         }
     }
 
-    fun onSyncDialogDismiss() {
-        sharedPrefsRepository.needToShowRecoverySuccessDialog = false
-        _uiState.update {
-            it.copy(
-                showWalletSyncSuccessDialog = false,
-                showWalletRestoreSuccessDialog = false,
-            )
-        }
-    }
-
-    fun onBalanceInfoClicked() {
-        _uiState.update { it.copy(showBalanceInfoDialog = true) }
-    }
-
-    fun onBalanceInfoDialogDismiss() {
-        _uiState.update { it.copy(showBalanceInfoDialog = false) }
-    }
-
     private fun onTxSendFailed(failureReason: TxFailureReason) = when (failureReason) {
         TxFailureReason.NETWORK_CONNECTION_ERROR -> displayNetworkConnectionErrorDialog()
         TxFailureReason.BASE_NODE_CONNECTION_ERROR, TxFailureReason.SEND_ERROR -> displayBaseNodeConnectionErrorDialog()
@@ -229,28 +255,13 @@ class HomeOverviewViewModel : CommonViewModel() {
         )
     }
 
-    fun onStartMiningClicked() {
-        showNotReadyYetDialog()
-    }
-
-    fun onSendTariClicked() {
-        tariNavigator.navigate(Navigation.ContactBook.ToSelectTariUser)
-    }
-
-    fun onRequestTariClicked() {
-        tariNavigator.navigate(Navigation.TxList.ToReceive)
-    }
-
-    fun onAllTxClicked() {
-        tariNavigator.navigate(Navigation.TxList.HomeTransactionHistory)
-    }
-
-    fun onInviteFriendClicked() {
-        showNotReadyYetDialog()
-    }
-
-    fun onNotificationsClicked() {
-        showNotReadyYetDialog()
+    private fun showTxDetail(txId: TxId) {
+        transactionRepository.findTxById(txId)?.let { tx ->
+            // show close button because it's a step in the send flow
+            tariNavigator.navigate(Navigation.TxList.ToTxDetails(tx, showCloseButton = true))
+        } ?: run {
+            logger.e("Transaction with ID $txId not found, but it was supposed to be sent")
+        }
     }
 
     companion object {

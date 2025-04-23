@@ -1,5 +1,6 @@
 package com.tari.android.wallet.ui.screen.tx.adapter
 
+import android.content.Context
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
@@ -8,16 +9,35 @@ import com.bumptech.glide.request.target.Target
 import com.tari.android.wallet.R
 import com.tari.android.wallet.databinding.ItemTxListBinding
 import com.tari.android.wallet.model.TxNote
+import com.tari.android.wallet.model.TxStatus.BROADCAST
+import com.tari.android.wallet.model.TxStatus.COINBASE
+import com.tari.android.wallet.model.TxStatus.COINBASE_CONFIRMED
+import com.tari.android.wallet.model.TxStatus.COINBASE_NOT_IN_BLOCKCHAIN
+import com.tari.android.wallet.model.TxStatus.COINBASE_UNCONFIRMED
+import com.tari.android.wallet.model.TxStatus.COMPLETED
+import com.tari.android.wallet.model.TxStatus.IMPORTED
+import com.tari.android.wallet.model.TxStatus.MINED_CONFIRMED
+import com.tari.android.wallet.model.TxStatus.MINED_UNCONFIRMED
+import com.tari.android.wallet.model.TxStatus.ONE_SIDED_CONFIRMED
+import com.tari.android.wallet.model.TxStatus.ONE_SIDED_UNCONFIRMED
+import com.tari.android.wallet.model.TxStatus.PENDING
+import com.tari.android.wallet.model.TxStatus.QUEUED
+import com.tari.android.wallet.model.TxStatus.REJECTED
+import com.tari.android.wallet.model.TxStatus.TX_NULL_ERROR
+import com.tari.android.wallet.model.TxStatus.UNKNOWN
+import com.tari.android.wallet.model.tx.CancelledTx
 import com.tari.android.wallet.model.tx.Tx
+import com.tari.android.wallet.model.tx.Tx.Direction.INBOUND
+import com.tari.android.wallet.model.tx.Tx.Direction.OUTBOUND
 import com.tari.android.wallet.ui.common.giphy.presentation.GifStateConsumer
 import com.tari.android.wallet.ui.common.giphy.presentation.GlideGifListener
 import com.tari.android.wallet.ui.common.giphy.repository.GifItem
 import com.tari.android.wallet.ui.common.recyclerView.ViewHolderBuilder
-import com.tari.android.wallet.ui.screen.tx.details.statusString
 import com.tari.android.wallet.util.extension.dimen
 import com.tari.android.wallet.util.extension.gone
 import com.tari.android.wallet.util.extension.setTopMargin
 import com.tari.android.wallet.util.extension.setVisible
+import com.tari.android.wallet.util.extension.string
 import com.tari.android.wallet.util.extension.visible
 
 class TxListViewHolder(view: ItemTxListBinding) : CommonTxListViewHolder<TxViewHolderItem, ItemTxListBinding>(view), GifStateConsumer {
@@ -43,7 +63,7 @@ class TxListViewHolder(view: ItemTxListBinding) : CommonTxListViewHolder<TxViewH
     }
 
     private fun displayStatus(tx: Tx) {
-        val status = tx.statusString(context = itemView.context, item!!.txDto.requiredConfirmationCount)
+        val status = tx.statusString(context = itemView.context)
         ui.statusTextView.setVisible(status.isNotEmpty())
         ui.statusTextView.text = status
     }
@@ -55,6 +75,20 @@ class TxListViewHolder(view: ItemTxListBinding) : CommonTxListViewHolder<TxViewH
         } else {
             ui.messageTextView.visible()
             ui.messageTextView.text = note.message
+        }
+    }
+
+    private fun Tx.statusString(context: Context): String {
+        return if (this is CancelledTx) "" else when (this.status) {
+            PENDING -> when (this.direction) {
+                INBOUND -> context.string(R.string.tx_detail_waiting_for_sender_to_complete)
+                OUTBOUND -> context.string(R.string.tx_detail_waiting_for_recipient)
+            }
+
+            BROADCAST, COMPLETED, MINED_UNCONFIRMED -> context.string(R.string.tx_detail_in_progress)
+
+            TX_NULL_ERROR, IMPORTED, COINBASE, MINED_CONFIRMED, REJECTED, ONE_SIDED_UNCONFIRMED, ONE_SIDED_CONFIRMED, QUEUED, COINBASE_UNCONFIRMED,
+            COINBASE_CONFIRMED, COINBASE_NOT_IN_BLOCKCHAIN, UNKNOWN -> ""
         }
     }
 

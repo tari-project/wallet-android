@@ -40,18 +40,19 @@ import com.tari.android.wallet.data.chat.ChatMessageItemDto
 import com.tari.android.wallet.data.contacts.model.ContactDto
 import com.tari.android.wallet.data.contacts.model.FFIContactInfo
 import com.tari.android.wallet.data.tx.TxDto
+import com.tari.android.wallet.ffi.FFITxCancellationReason
 import com.tari.android.wallet.model.Base58
+import com.tari.android.wallet.model.CompletedTransactionKernel
 import com.tari.android.wallet.model.EmojiId
 import com.tari.android.wallet.model.TariContact
 import com.tari.android.wallet.model.TariUtxo
 import com.tari.android.wallet.model.TariWalletAddress
 import com.tari.android.wallet.model.TxStatus
+import com.tari.android.wallet.model.tx.CancelledTx
 import com.tari.android.wallet.model.tx.CompletedTx
+import com.tari.android.wallet.model.tx.PendingOutboundTx
 import com.tari.android.wallet.model.tx.Tx
-import com.tari.android.wallet.ui.common.giphy.presentation.GifViewModel
-import com.tari.android.wallet.ui.common.giphy.repository.GiphyRestService
 import com.tari.android.wallet.ui.screen.contactBook.addressPoisoning.SimilarAddressDto
-import com.tari.android.wallet.ui.screen.tx.adapter.TxViewHolderItem
 import com.tari.android.wallet.ui.screen.utxos.list.adapters.UtxosViewHolderItem
 import com.tari.android.wallet.util.extension.minusHours
 import com.tari.android.wallet.util.extension.toMicroTari
@@ -166,80 +167,95 @@ object MockDataStub {
         commitment = "Mocked Tari UTXO!!!",
     )
 
-    fun createTxList(
-        confirmationCount: Long = 10000,
-    ) = listOf(
+    fun createTxList() = listOf(
         createTxDto(
-            confirmationCount,
             amount = 1000000,
             contactAlias = "Alice",
         ),
         createTxDto(
-            confirmationCount,
             amount = 2000000,
             contactAlias = "Bob",
         ),
         createTxDto(
-            confirmationCount,
             amount = 3000000,
             contactAlias = "Charlie",
         ),
         createTxDto(
-            confirmationCount,
             amount = 4000000,
             contactAlias = "David",
             status = TxStatus.COINBASE,
         ),
     )
 
-    fun createTxViewHolder(
-        giphyRestService: GiphyRestService,
-        confirmationCount: Long,
+    fun createCompletedTx(
         amount: Long = 100000,
+        direction: Tx.Direction = Tx.Direction.OUTBOUND,
         contactAlias: String = "Test",
         status: TxStatus = TxStatus.MINED_CONFIRMED,
-    ) = TxViewHolderItem(
-        txDto = TxDto(
-            tx = CompletedTx(
-                direction = Tx.Direction.INBOUND,
-                status = status,
-                amount = amount.toMicroTari(),
-                fee = 1000.toMicroTari(),
-                message = "https://giphy.com/embed/5885nYOgBHdCw",
-                paymentId = "1234567890",
-                timestamp = BigInteger.valueOf(System.currentTimeMillis()),
-                id = 1.toBigInteger(),
-                tariContact = TariContact(WALLET_ADDRESS, contactAlias),
-                confirmationCount = 0.toBigInteger(),
-                txKernel = null,
-            ),
-            contact = createContact(alias = contactAlias),
-            requiredConfirmationCount = confirmationCount,
+    ) = CompletedTx(
+        direction = direction,
+        status = status,
+        amount = amount.toMicroTari(),
+        fee = 1000.toMicroTari(),
+        message = RANDOM_MESSAGES.random(),
+        paymentId = RANDOM_MESSAGES.random(),
+        timestamp = BigInteger.valueOf(System.currentTimeMillis()),
+        id = 1.toBigInteger(),
+        tariContact = TariContact(WALLET_ADDRESS, contactAlias),
+        confirmationCount = 0.toBigInteger(),
+        txKernel = CompletedTransactionKernel(
+            excess = "excess",
+            publicNonce = "publicNonce",
+            signature = "signature",
         ),
-        gifViewModel = GifViewModel(giphyRestService),
+    )
+
+    fun createCancelledTx(
+        amount: Long = 100000,
+        direction: Tx.Direction = Tx.Direction.OUTBOUND,
+        contactAlias: String = "Test",
+        status: TxStatus = TxStatus.UNKNOWN,
+    ) = CancelledTx(
+        id = 1.toBigInteger(),
+        direction = direction,
+        amount = amount.toMicroTari(),
+        timestamp = BigInteger.valueOf(System.currentTimeMillis()),
+        message = RANDOM_MESSAGES.random(),
+        paymentId = RANDOM_MESSAGES.random(),
+        status = status,
+        tariContact = TariContact(WALLET_ADDRESS, contactAlias),
+        fee = 1000.toMicroTari(),
+        cancellationReason = FFITxCancellationReason.UserCancelled,
+    )
+
+    fun createPendingTx(
+        amount: Long = 100000,
+        direction: Tx.Direction = Tx.Direction.OUTBOUND,
+        contactAlias: String = "Test",
+        status: TxStatus = TxStatus.PENDING,
+    ) = PendingOutboundTx(
+        id = 1.toBigInteger(),
+        direction = direction,
+        amount = amount.toMicroTari(),
+        timestamp = BigInteger.valueOf(System.currentTimeMillis()),
+        message = RANDOM_MESSAGES.random(),
+        paymentId = RANDOM_MESSAGES.random(),
+        status = status,
+        tariContact = TariContact(WALLET_ADDRESS, contactAlias),
+        fee = 1000.toMicroTari(),
     )
 
     fun createTxDto(
-        confirmationCount: Long = 10000,
         amount: Long = 100000,
         contactAlias: String = "Test",
         status: TxStatus = TxStatus.MINED_CONFIRMED,
     ) = TxDto(
-        tx = CompletedTx(
-            direction = Tx.Direction.INBOUND,
+        tx = createCompletedTx(
+            amount = amount,
+            contactAlias = contactAlias,
             status = status,
-            amount = amount.toMicroTari(),
-            fee = 1000.toMicroTari(),
-            message = RANDOM_MESSAGES.random(),
-            paymentId = RANDOM_MESSAGES.random(),
-            timestamp = BigInteger.valueOf(System.currentTimeMillis()),
-            id = 1.toBigInteger(),
-            tariContact = TariContact(WALLET_ADDRESS, contactAlias),
-            confirmationCount = 0.toBigInteger(),
-            txKernel = null,
         ),
         contact = createContact(alias = contactAlias),
-        requiredConfirmationCount = confirmationCount,
     )
 
     fun createSimilarAddressList() = listOf(

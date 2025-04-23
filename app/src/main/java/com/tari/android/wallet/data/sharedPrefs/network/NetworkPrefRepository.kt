@@ -41,28 +41,28 @@ class NetworkPrefRepository @Inject constructor(sharedPrefs: SharedPreferences) 
         private val NETWORK_MAINNET: TariNetwork = TariNetwork(
             network = Network.MAINNET,
             dnsPeer = "seeds.testmnet.tari.com",
-            blockExplorerUrl = "https://explore-mainnet.tari.com",
+            blockExplorerBaseUrl = "https://explore-mainnet.tari.com",
             ticker = TICKER_MAINNET,
             recommended = true,
         )
         private val NETWORK_STAGENET: TariNetwork = TariNetwork(
             network = Network.STAGENET,
             dnsPeer = "seeds.stagenet.tari.com",
-            blockExplorerUrl = null,
+            blockExplorerBaseUrl = null,
             ticker = TICKER_TESTNET,
             recommended = true,
         )
         private val NETWORK_NEXTNET: TariNetwork = TariNetwork(
             network = Network.NEXTNET,
             dnsPeer = "aurora.nextnet.tari.com",
-            blockExplorerUrl = "https://explore-nextnet.tari.com",
+            blockExplorerBaseUrl = "https://explore-nextnet.tari.com",
             ticker = TICKER_TESTNET,
             recommended = false,
         )
         private val NETWORK_ESMERALDA: TariNetwork = TariNetwork(
             network = Network.ESMERALDA,
             dnsPeer = "seeds.esmeralda.tari.com",
-            blockExplorerUrl = null,
+            blockExplorerBaseUrl = null,
             ticker = TICKER_TESTNET,
             recommended = false,
         )

@@ -10,6 +10,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -28,10 +30,10 @@ import com.tari.android.wallet.ui.compose.components.TariTextButton
 import com.tari.android.wallet.ui.compose.components.TariTopBar
 import com.tari.android.wallet.ui.screen.send.common.TransactionData
 import com.tari.android.wallet.ui.screen.send.confirm.widget.SenderCard
-import com.tari.android.wallet.ui.screen.send.confirm.widget.TxDetailInfoCopyItem
 import com.tari.android.wallet.ui.screen.settings.themeSelector.TariTheme
+import com.tari.android.wallet.ui.screen.tx.details.widget.TxDetailInfoAddressItem
+import com.tari.android.wallet.ui.screen.tx.details.widget.TxDetailInfoItem
 import com.tari.android.wallet.util.MockDataStub
-import com.tari.android.wallet.util.base58Ellipsized
 import com.tari.android.wallet.util.extension.toMicroTari
 
 @Composable
@@ -40,6 +42,8 @@ fun ConfirmScreen(
     onBackClick: () -> Unit,
     onCopyValueClick: (value: String) -> Unit,
     onConfirmClick: () -> Unit,
+    onFeeInfoClick: () -> Unit,
+    onEmojiIdDetailsClick: () -> Unit,
 ) {
     Scaffold(
         modifier = Modifier
@@ -87,34 +91,45 @@ fun ConfirmScreen(
                     contentDescription = null,
                 )
             }
+
             Spacer(Modifier.size(24.dp))
-            TxDetailInfoCopyItem(
+            TxDetailInfoItem(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 40.dp),
                 title = stringResource(R.string.tx_detail_transaction_fee),
                 value = "${WalletConfig.amountFormatter.format(uiState.transactionData.feePerGram.tariValue)} ${uiState.ticker}",
-                onCopyClicked = onCopyValueClick,
-            )
+            ) {
+                IconButton(onClick = onFeeInfoClick) {
+                    Icon(
+                        painter = painterResource(R.drawable.vector_icon_question_circle),
+                        contentDescription = null,
+                        tint = TariDesignSystem.colors.componentsNavbarIcons,
+                    )
+                }
+            }
+
             Spacer(Modifier.size(10.dp))
-            TxDetailInfoCopyItem(
+            TxDetailInfoAddressItem(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 40.dp),
                 title = stringResource(R.string.tx_details_recipient_address),
-                value = uiState.transactionData.recipientContact.walletAddress.base58Ellipsized(),
+                walletAddress = uiState.transactionData.recipientContact.walletAddress,
                 onCopyClicked = onCopyValueClick,
+                onEmojiIdDetailsClick = onEmojiIdDetailsClick,
             )
+
             Spacer(Modifier.size(10.dp))
-            TxDetailInfoCopyItem(
+            TxDetailInfoItem(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 40.dp),
                 title = stringResource(R.string.tx_detail_note),
                 value = uiState.transactionData.note.orEmpty(),
                 singleLine = false,
-                onCopyClicked = onCopyValueClick,
             )
+
             Spacer(Modifier.size(16.dp))
             Row(
                 modifier = Modifier
@@ -172,6 +187,8 @@ private fun ConfirmScreenPreview() {
             onBackClick = {},
             onConfirmClick = {},
             onCopyValueClick = {},
+            onFeeInfoClick = {},
+            onEmojiIdDetailsClick = {},
         )
     }
 }

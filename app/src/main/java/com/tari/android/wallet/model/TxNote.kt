@@ -67,7 +67,7 @@ data class TxNote(val message: String?, val gifUrl: String?) {
     companion object {
         fun fromTx(tx: Tx, assetsDomain: String = "giphy.com", protocol: String = "https://"): TxNote {
             // The paymentId is a note value for one-sided txs, and message for interactive. But we can't properly check if a tx is OSP
-            val note = tx.paymentId.takeIf { it.isNotBlank() } ?: tx.message
+            val note = tx.note
             val lines = note.split(Regex(" "))
             return if (Regex("$protocol$assetsDomain.*").matches(lines.last())) TxNote(
                 message = lines.take(lines.size - 1).filter(String::isNotEmpty)
