@@ -39,6 +39,7 @@ import com.tari.android.wallet.ui.screen.profile.profile.ProfileFragment
 import com.tari.android.wallet.ui.screen.settings.allSettings.AllSettingsFragment
 import com.tari.android.wallet.ui.screen.settings.themeSelector.TariTheme
 import com.tari.android.wallet.ui.screen.store.StoreFragment
+import com.tari.android.wallet.util.DebugConfig
 
 private const val FRAGMENT_CONTAINER_ID = 1
 
@@ -135,10 +136,12 @@ private fun NavigationMenu(
                 iconRes = if (selectedItem == BottomMenuOption.Home) R.drawable.vector_home_nav_menu_home_filled else R.drawable.vector_home_nav_menu_home,
                 onItemClick = { onMenuItemClicked(BottomMenuOption.Home) },
             )
-            BottomNavigationItem(
-                iconRes = if (selectedItem == BottomMenuOption.Shop) R.drawable.vector_home_nav_menu_shop_filled else R.drawable.vector_home_nav_menu_shop,
-                onItemClick = { onMenuItemClicked(BottomMenuOption.Shop) },
-            )
+            if (DebugConfig.showTtlStoreMenu) {
+                BottomNavigationItem(
+                    iconRes = if (selectedItem == BottomMenuOption.Shop) R.drawable.vector_home_nav_menu_shop_filled else R.drawable.vector_home_nav_menu_shop,
+                    onItemClick = { onMenuItemClicked(BottomMenuOption.Shop) },
+                )
+            }
             // FIXME: uncomment once the gem feature is implemented
 //            BottomNavigationItem(
 //                iconRes = if (selectedItem == BottomMenuOption.Gem) R.drawable.vector_home_nav_menu_gem_filled else R.drawable.vector_home_nav_menu_gem,
