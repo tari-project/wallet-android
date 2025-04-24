@@ -480,7 +480,6 @@
     <string name="all_settings_disclaimer">Disclaimer</string>
     <string name="all_settings_explorer">Block Explorer</string>
     <string name="all_settings_screen_recording">Screen recording</string>
-    <string name="all_settings_bluetooth_settings">Bluetooth Settings</string>
     <string name="all_settings_bridge_configuration">Bridge Configuration</string>
     <string name="all_settings_connect_yats">Connect Yats</string>
     <string name="all_settings_select_base_node">Select Base Node</string>
@@ -503,14 +502,6 @@
     <string name="screen_recording_disabled_dialog_description">Oops! Screenshots are disabled in this app to keep your information safe. Thanks for keeping things secure!</string>
     <string name="screen_recording_disabled_dialog_confirm_button">No problem, mate!</string>
     <string name="screen_recording_disabled_dialog_cancel_button">Enable screenshots</string>
-
-    <!-- Bluetooth settings -->
-    <string name="bluetooth_settings_title">Bluetooth Settings</string>
-    <string name="bluetooth_settings_description">Other users can share their contacts using Bluetooth Low Energy (BLE) by moving their devices near your device. Your device will be visible to nearby Bluetooth devices when it\'s turned on.\n \n Choose an option below. BLE should be:</string>
-    <string name="bluetooth_settings_option_on">Always on</string>
-    <string name="bluetooth_settings_option_off">Turned off</string>
-    <string name="bluetooth_settings_option_while_up">Only active while the app is open</string>
-
 
     <!-- delete wallet -->
     <string name="delete_wallet_title">You\'re about to lose everything!</string>
@@ -922,20 +913,12 @@
     <string name="contact_book_details_yat_not_found_dialog_message">Tari Universe Wallet was unable to get data from the Yat service. Some contact details may be unavailable</string>
     <string name="share_contact_via_qr_code">QR Code</string>
     <string name="share_contact_via_qr_link">Link</string>
-    <string name="share_contact_via_qr_nfc">NFC</string>
-    <string name="share_contact_via_qr_ble">BLE</string>
     <string name="wallet_info_alias_edit_title">Edit Name</string>
     <string name="share_via_qr_code_title">Share QR Code</string>
     <string name="contact_book_default_alias">Tari user %s</string>
     <string name="contact_details_empty_name_dialog_title">Name can\’t be empty</string>
     <string name="contact_details_empty_name_dialog_message">A contact without a name? That won\’t work. Please add one to keep things running smoothly.</string>
     <string name="contact_details_empty_name_dialog_button">Will do!</string>
-
-    <string name="share_via_bluetooth_title">Share via BLE</string>
-    <string name="share_via_bluetooth_message">Bring the smartphone close to a BLE enabled device</string>
-
-    <string name="share_via_nfc_title">Share via NFC</string>
-    <string name="share_via_nfc_message">Bring the smartphone close to an NFC device</string>
 
     <string name="share_success_title">Profile Shared</string>
     <string name="share_success_message">Awesome! Your details have been shared successfully.</string>
@@ -950,11 +933,6 @@
     <string name="contact_details_transaction_history_description">Your transaction history with %s</string>
     <string name="contact_details_transaction_history_empty_state_title">No transactions found</string>
     <string name="contact_details_transaction_history_empty_state_description"><![CDATA[You don’t have any transactions with <strong>%s</strong> yet. Click the button below to send some Tari]]></string>
-
-    <string name="contactless_payment_title">Connect to a Device</string>
-    <string name="contactless_payment_success_title">Device Detected</string>
-    <string name="contactless_payment_success_description">We just found a fellow Tari user nearby!\nWould you like to send Tari to %s?</string>
-    <string name="contactless_payment_description">Tari Universe Wallet can grab contact info from users nearby using BLE (Bluetooth Low Energy)!\n\nSimply place your phones close to each other and make sure Bluetooth is turned on for both devices. Once connected, you’ll be able to send some Tari quick and easy! 😎</string>
 
     <!--    Chat-->
     <string name="chat_title">Messages</string>

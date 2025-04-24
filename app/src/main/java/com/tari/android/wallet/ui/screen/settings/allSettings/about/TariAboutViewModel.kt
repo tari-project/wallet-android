@@ -76,8 +76,6 @@ class TariAboutViewModel : CommonViewModel() {
             TariIconViewHolderItem(R.drawable.vector_contact_action_link, tari_about_icon_text_final, tari_about_icon_url_final),
             TariIconViewHolderItem(R.drawable.vector_contact_action_unlink, tari_about_icon_text_final, tari_about_icon_url_final),
             TariIconViewHolderItem(R.drawable.vector_contact_book_icon, tari_about_icon_text_final, tari_about_icon_url_final),
-            TariIconViewHolderItem(R.drawable.vector_share_bluetooth, tari_about_icon_text_final, tari_about_icon_url_final),
-            TariIconViewHolderItem(R.drawable.vector_share_nfc, tari_about_icon_text_final, tari_about_icon_url_final),
             TariIconViewHolderItem(R.drawable.vector_empty_wallet, tari_about_icon_text_final, tari_about_icon_url_final),
         )
     }

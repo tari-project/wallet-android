@@ -4,7 +4,6 @@ import android.net.Uri
 import com.tari.android.wallet.application.walletManager.doOnWalletFailed
 import com.tari.android.wallet.data.airdrop.AirdropRepository
 import com.tari.android.wallet.data.contacts.ContactsRepository
-import com.tari.android.wallet.infrastructure.ShareManager
 import com.tari.android.wallet.navigation.Navigation
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.util.extension.collectFlow
@@ -26,8 +25,6 @@ class HomeViewModel : CommonViewModel() {
         component.inject(this)
     }
 
-    val shareViewModel = ShareManager()
-
     private val _uiState = MutableStateFlow(HomeModel.UiState(airdropLoggedIn = airdropRepository.airdropToken.value != null))
     val uiState = _uiState.asStateFlow()
 
@@ -35,14 +32,6 @@ class HomeViewModel : CommonViewModel() {
         get() = securityPrefRepository.isAuthenticated
 
     init {
-        shareViewModel.tariBluetoothServer.doOnRequiredPermissions = { permissions, action ->
-            permissionManager.runWithPermission(permissions, false, action)
-        }
-
-        shareViewModel.tariBluetoothClient.doOnRequiredPermissions = { permissions, action ->
-            permissionManager.runWithPermission(permissions, false, action)
-        }
-
         collectFlow(airdropRepository.airdropToken) { token -> _uiState.update { it.copy(airdropLoggedIn = token != null) } }
 
         launchOnIo {

@@ -86,7 +86,6 @@ import com.tari.android.wallet.ui.screen.settings.backup.learnMore.BackupLearnMo
 import com.tari.android.wallet.ui.screen.settings.backup.learnMore.item.BackupLearnMoreItemViewModel
 import com.tari.android.wallet.ui.screen.settings.backup.verifySeedPhrase.VerifySeedPhraseViewModel
 import com.tari.android.wallet.ui.screen.settings.baseNodeConfig.changeBaseNode.ChangeBaseNodeViewModel
-import com.tari.android.wallet.ui.screen.settings.bluetoothSettings.BluetoothSettingsViewModel
 import com.tari.android.wallet.ui.screen.settings.bugReporting.BugsReportingViewModel
 import com.tari.android.wallet.ui.screen.settings.dataCollection.DataCollectionViewModel
 import com.tari.android.wallet.ui.screen.settings.deleteWallet.DeleteWalletViewModel
@@ -179,7 +178,6 @@ interface ApplicationComponent {
     fun inject(viewModel: TxDetailsViewModel)
     fun inject(viewModel: ShareManager)
     fun inject(viewModel: ContactTxHistoryViewModel)
-    fun inject(viewModel: BluetoothSettingsViewModel)
     fun inject(viewModel: WalletAddressViewModel)
     fun inject(viewModel: QrScannerViewModel)
     fun inject(viewModel: ChatListViewModel)
