@@ -22,6 +22,7 @@ import com.tari.android.wallet.R
 import com.tari.android.wallet.data.airdrop.ReferralStatusResponse.Referral
 import com.tari.android.wallet.ui.compose.TariDesignSystem
 import com.tari.android.wallet.ui.compose.components.TariErrorView
+import com.tari.android.wallet.ui.compose.components.TariInheritTextButton
 import com.tari.android.wallet.ui.compose.components.TariLoadingLayout
 import com.tari.android.wallet.ui.compose.components.TariLoadingLayoutState
 import com.tari.android.wallet.ui.compose.components.TariProgressView
@@ -45,6 +46,7 @@ fun ProfileScreen(
     onPullToRefresh: () -> Unit,
     onDetailsRetryClick: () -> Unit,
     onFriendsRetryClick: () -> Unit,
+    onDisconnectClick: () -> Unit,
 ) {
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -172,6 +174,19 @@ fun ProfileScreen(
                     }
                 }
 
+                if (uiState.userDetails != null) {
+                    item {
+                        Spacer(Modifier.size(20.dp))
+                        TariInheritTextButton(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 20.dp),
+                            text = stringResource(R.string.airdrop_profile_disconnect_button),
+                            onClick = onDisconnectClick,
+                        )
+                    }
+                }
+
                 item { Spacer(Modifier.size(52.dp)) }
             }
         }
@@ -204,6 +219,7 @@ private fun ProfileScreenPreview() {
             onPullToRefresh = {},
             onDetailsRetryClick = {},
             onFriendsRetryClick = {},
+            onDisconnectClick = {},
         )
     }
 }
@@ -234,6 +250,7 @@ private fun ProfileScreenNoDataPreview() {
             onPullToRefresh = {},
             onDetailsRetryClick = {},
             onFriendsRetryClick = {},
+            onDisconnectClick = {},
         )
     }
 }
@@ -254,6 +271,7 @@ private fun ProfileScreenLoadingPreview() {
             onPullToRefresh = {},
             onDetailsRetryClick = {},
             onFriendsRetryClick = {},
+            onDisconnectClick = {},
         )
     }
 }
@@ -276,6 +294,7 @@ private fun ProfileScreenErrorPreview() {
             onPullToRefresh = {},
             onDetailsRetryClick = {},
             onFriendsRetryClick = {},
+            onDisconnectClick = {},
         )
     }
 }

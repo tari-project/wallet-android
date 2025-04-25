@@ -24,6 +24,7 @@ class ProfileFragment : CommonFragment<ProfileViewModel>() {
                 onPullToRefresh = { viewModel.refreshData() },
                 onDetailsRetryClick = { viewModel.refreshUserDetails() },
                 onFriendsRetryClick = { viewModel.refreshFriendList() },
+                onDisconnectClick = { viewModel.onDisconnectClick() },
             )
         }
     }

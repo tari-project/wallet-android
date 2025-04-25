@@ -101,8 +101,6 @@ object DebugConfig {
 
     const val skipAddingNote = true
 
-    const val airdropLoginInBrowser = true
-
     const val showInvitedFriendsInProfile = false
 
     const val showTtlStoreMenu = false
