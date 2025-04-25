@@ -176,8 +176,8 @@ class AllSettingsViewModel : CommonViewModel() {
             SettingsTitleViewHolderItem(resourceManager.getString(all_settings_secondary_settings_label)),
             SettingsRowViewHolderItem(resourceManager.getString(all_settings_store), vector_all_settings_cart) {
                 openUrl(resourceManager.getString(ttl_store_url))
-            },
-            DividerViewHolderItem(),
+            }.takeIf { DebugConfig.showTtlStoreMenu },
+            DividerViewHolderItem().takeIf { DebugConfig.showTtlStoreMenu },
             SettingsRowViewHolderItem(resourceManager.getString(tari_about_title), vector_all_settings_about_icon) {
                 tariNavigator.navigate(AllSettings.ToAbout)
             },
