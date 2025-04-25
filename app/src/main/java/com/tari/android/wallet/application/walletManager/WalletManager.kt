@@ -38,6 +38,7 @@ import com.tari.android.wallet.application.AppStateHandler
 import com.tari.android.wallet.application.baseNodes.BaseNodesManager
 import com.tari.android.wallet.application.walletManager.WalletCallbacks.Companion.MAIN_WALLET_CONTEXT_ID
 import com.tari.android.wallet.data.BalanceStateHandler
+import com.tari.android.wallet.data.airdrop.AirdropRepository
 import com.tari.android.wallet.data.baseNode.BaseNodeStateHandler
 import com.tari.android.wallet.data.recovery.WalletRestorationStateHandler
 import com.tari.android.wallet.data.sharedPrefs.CorePrefRepository
@@ -78,6 +79,7 @@ import com.tari.android.wallet.ui.screen.send.finalize.FinalizeSendTxModel
 import com.tari.android.wallet.util.BroadcastEffectFlow
 import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.DebugConfig
+import com.tari.android.wallet.util.extension.collectFlow
 import com.tari.android.wallet.util.extension.safeCastTo
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -116,6 +118,7 @@ class WalletManager @Inject constructor(
     private val walletCallbacks: WalletCallbacks,
     private val appStateHandler: AppStateHandler,
     private val fcmHelper: FcmHelper,
+    private val airdropRepository: AirdropRepository,
     @ApplicationScope private val applicationScope: CoroutineScope,
 ) {
 
@@ -146,13 +149,17 @@ class WalletManager @Inject constructor(
     )
 
     init {
-        applicationScope.launch {
-            appStateHandler.appEvent.collect { event ->
-                when (event) {
-                    is AppStateHandler.AppEvent.AppBackgrounded,
-                    is AppStateHandler.AppEvent.AppForegrounded,
-                    is AppStateHandler.AppEvent.AppDestroyed -> walletConfig.removeUnnecessaryLogs()
-                }
+        applicationScope.collectFlow(appStateHandler.appEvent) { event ->
+            when (event) {
+                is AppStateHandler.AppEvent.AppBackgrounded,
+                is AppStateHandler.AppEvent.AppForegrounded,
+                is AppStateHandler.AppEvent.AppDestroyed -> walletConfig.removeUnnecessaryLogs()
+            }
+        }
+
+        applicationScope.collectFlow(airdropRepository.airdropToken) { airdropToken ->
+            if (airdropToken != null) {
+                doOnWalletRunning { fcmHelper.getFcmTokenAndRegister(it) }
             }
         }
     }

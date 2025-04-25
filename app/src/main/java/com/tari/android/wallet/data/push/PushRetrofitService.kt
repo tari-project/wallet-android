@@ -7,7 +7,7 @@ import retrofit2.http.Path
 
 interface PushRetrofitService {
 
-    @POST("https://push.tari.com/register/{publicKey}")
+    @POST("/register/{publicKey}")
     suspend fun register(
         @Path("publicKey") publicKey: String,
         @Body body: PushRegisterRequestBody,
@@ -15,16 +15,11 @@ interface PushRetrofitService {
 }
 
 data class PushRegisterRequestBody(
-    @SerializedName("token")
-    val token: String,
-    @SerializedName("signature")
-    val signature: String,
-    @SerializedName("appId")
-    val appId: String? = null,
-    @SerializedName("public_nonce")
-    val publicNonce: String,
-    @SerializedName("platform")
-    val platform: String = "android",
-    @SerializedName("sandbox")
-    val sandbox: Boolean = false,
+    @SerializedName("token") val token: String,
+    @SerializedName("signature") val signature: String,
+    @SerializedName("appId") val appId: String? = null,
+    @SerializedName("userId") val userId: String? = null,
+    @SerializedName("public_nonce") val publicNonce: String,
+    @SerializedName("platform") val platform: String = "android",
+    @SerializedName("sandbox") val sandbox: Boolean = false,
 )

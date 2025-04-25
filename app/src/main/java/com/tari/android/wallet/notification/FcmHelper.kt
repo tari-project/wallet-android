@@ -4,7 +4,6 @@ import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.messaging.FirebaseMessaging
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.data.push.PushRepository
-import com.tari.android.wallet.data.sharedPrefs.CorePrefRepository
 import com.tari.android.wallet.di.ApplicationScope
 import com.tari.android.wallet.ffi.FFIWallet
 import kotlinx.coroutines.CoroutineScope
@@ -15,7 +14,6 @@ import javax.inject.Singleton
 @Singleton
 class FcmHelper @Inject constructor(
     private val pushRepository: PushRepository,
-    private val corePrefs: CorePrefRepository,
     @ApplicationScope private val applicationScope: CoroutineScope,
 ) {
     private val logger
@@ -35,7 +33,6 @@ class FcmHelper @Inject constructor(
                 pushRepository.registerPushToken(
                     wallet = wallet,
                     fcmToken = token,
-                    anonId = corePrefs.airdropAnonId,
                 )
             } catch (e: Exception) {
                 logger.i("FCM token registration failed for token: $token\n with exception: $e")

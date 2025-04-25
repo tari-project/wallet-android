@@ -15,19 +15,19 @@ class AirdropRepository @Inject constructor(
     private val corePrefRepository: CorePrefRepository,
 ) {
 
-    private val _isAirdropLoggedIn = MutableStateFlow(corePrefRepository.airdropToken != null)
-    val isAirdropLoggedIn = _isAirdropLoggedIn.asStateFlow()
+    private val _airdropToken = MutableStateFlow(corePrefRepository.airdropToken)
+    val airdropToken = _airdropToken.asStateFlow()
 
     fun saveAirdropToken(token: String, refreshToken: String) {
         corePrefRepository.airdropToken = token
         corePrefRepository.airdropRefreshToken = refreshToken
-        _isAirdropLoggedIn.value = true
+        _airdropToken.value = token
     }
 
     fun clearAirdropToken() {
         corePrefRepository.airdropToken = null
         corePrefRepository.airdropRefreshToken = null
-        _isAirdropLoggedIn.value = false
+        _airdropToken.value = null
     }
 
     suspend fun getMinerStats(): Result<Int> = switchToIo {
@@ -35,9 +35,12 @@ class AirdropRepository @Inject constructor(
     }
 
     suspend fun getMiningStatus(): Result<Boolean> = switchToIo {
-        val airdropAnonId = corePrefRepository.airdropAnonId ?: return@switchToIo Result.failure(IllegalStateException("Airdrop anon ID is null"))
+        // any of airdropToken or anonId should be non-null  to get mining status
         runCatching {
-            airdropRetrofit.getMinerStatus(airdropAnonId).mining
+            airdropRetrofit.getMinerStatus(
+                token = "Bearer ${corePrefRepository.airdropToken}",
+                anonId = corePrefRepository.airdropAnonId ?: "unset",
+            ).mining
         }
     }
 
