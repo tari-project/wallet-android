@@ -27,6 +27,9 @@ class ContactBookViewModel : CommonViewModel() {
     @Inject
     lateinit var contactUtil: ContactUtil
 
+    @Inject
+    lateinit var shareManager: ShareManager
+
     val shareList = MutableLiveData<List<ShareOptionArgs>>()
 
     val walletAddressViewModel = WalletAddressViewModel()
@@ -51,13 +54,6 @@ class ContactBookViewModel : CommonViewModel() {
                 title = resourceManager.getString(R.string.share_contact_via_qr_link),
                 icon = R.drawable.vector_share_link,
             ) { shareViaLink() }
-        )
-        list.add(
-            ShareOptionArgs(
-                type = ShareType.BLE,
-                title = resourceManager.getString(R.string.share_contact_via_qr_ble),
-                icon = R.drawable.vector_share_ble,
-            ) { shareViaBLE() }
         )
 
         shareList.postValue(list)
@@ -105,14 +101,12 @@ class ContactBookViewModel : CommonViewModel() {
         val selectedContacts = contactSelectionRepository.selectedContacts.map { it.contact }
         contactSelectionRepository.clear()
         val deeplink = getDeeplink(selectedContacts)
-        ShareManager.currentInstant?.share(args.type, deeplink)
+        shareManager.share(dialogManager = this, type = args.type, deeplink = deeplink)
     }
 
     private fun shareViaQrCode() = setSelectedToShareType(ShareType.QR_CODE)
 
     private fun shareViaLink() = setSelectedToShareType(ShareType.LINK)
-
-    private fun shareViaBLE() = setSelectedToShareType(ShareType.BLE)
 
     private fun getDeeplink(selectedContacts: List<ContactDto>): String {
         val contacts = selectedContacts.map {

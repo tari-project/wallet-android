@@ -1,10 +1,15 @@
 package com.tari.android.wallet.ui.screen.profile.profile
 
+import com.tari.android.wallet.R
 import com.tari.android.wallet.data.airdrop.AirdropRepository
 import com.tari.android.wallet.data.tx.TxListData
 import com.tari.android.wallet.data.tx.TxRepository
 import com.tari.android.wallet.navigation.Navigation
 import com.tari.android.wallet.ui.common.CommonViewModel
+import com.tari.android.wallet.ui.dialog.modular.modules.body.BodyModule
+import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonModule
+import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonStyle
+import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
 import com.tari.android.wallet.util.extension.collectFlow
 import com.tari.android.wallet.util.extension.launchOnIo
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -100,8 +105,19 @@ class ProfileViewModel : CommonViewModel() {
         }
     }
 
+    fun onDisconnectClick() {
+        showModularDialog(
+            HeadModule(resourceManager.getString(R.string.airdrop_profile_disconnect_dialog_title)),
+            BodyModule(resourceManager.getString(R.string.airdrop_profile_disconnect_dialog_message)),
+            ButtonModule(resourceManager.getString(R.string.common_confirm), ButtonStyle.Warning) {
+                airdropRepository.clearAirdropToken()
+                hideDialog()
+            },
+            ButtonModule(resourceManager.getString(R.string.common_cancel), ButtonStyle.Close),
+        )
+    }
+
     private fun TxListData.minedTariCount(): BigDecimal = this.completedTxs
         .filter { it.isCoinbase }
         .sumOf { it.amount.tariValue }
-
 }

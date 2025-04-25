@@ -69,7 +69,6 @@ import com.tari.android.wallet.ui.screen.settings.backup.learnMore.BackupLearnMo
 import com.tari.android.wallet.ui.screen.settings.backup.verifySeedPhrase.VerifySeedPhraseFragment
 import com.tari.android.wallet.ui.screen.settings.backup.writeDownSeedWords.WriteDownSeedPhraseFragment
 import com.tari.android.wallet.ui.screen.settings.baseNodeConfig.changeBaseNode.ChangeBaseNodeFragment
-import com.tari.android.wallet.ui.screen.settings.bluetoothSettings.BluetoothSettingsFragment
 import com.tari.android.wallet.ui.screen.settings.dataCollection.DataCollectionFragment
 import com.tari.android.wallet.ui.screen.settings.deleteWallet.DeleteWalletFragment
 import com.tari.android.wallet.ui.screen.settings.networkSelection.NetworkSelectionFragment
@@ -128,7 +127,6 @@ class TariNavigator @Inject constructor(
             is AllSettings.ToMyProfile -> addFragment(WalletInfoFragment())
             is AllSettings.ToAbout -> addFragment(TariAboutFragment())
             is AllSettings.ToScreenRecording -> addFragment(ScreenRecordingSettingsFragment())
-            is AllSettings.ToBluetoothSettings -> addFragment(BluetoothSettingsFragment())
             is AllSettings.BackToBackupSettings -> popUpTo(BackupSettingsFragment::class.java.simpleName)
             is AllSettings.ToBackupSettings -> addFragment(BackupSettingsFragment.newInstance(), withAnimation = navigation.withAnimation)
             is AllSettings.ToBaseNodeSelection -> toBaseNodeSelection()
@@ -254,7 +252,7 @@ class TariNavigator @Inject constructor(
     }
 
     private fun toExternalWallet(connectedWallet: ConnectedWallet) {
-        try {
+        runCatching {
             val externalAddress = connectedWallet.getExternalLink()
             val intent = Intent(Intent.ACTION_VIEW, externalAddress.toUri())
 
@@ -263,7 +261,7 @@ class TariNavigator @Inject constructor(
             } else {
                 currentActivity.viewModel.showWalletErrorDialog()
             }
-        } catch (e: Throwable) {
+        }.onFailure {
             currentActivity.viewModel.showWalletErrorDialog()
         }
     }

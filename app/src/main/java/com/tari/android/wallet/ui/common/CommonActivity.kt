@@ -7,7 +7,6 @@ import android.hardware.SensorManager
 import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
-import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
@@ -32,9 +31,9 @@ import com.tari.android.wallet.ui.screen.settings.allSettings.TariVersionModel
 import com.tari.android.wallet.ui.screen.settings.themeSelector.TariTheme
 import com.tari.android.wallet.util.DebugConfig
 import com.tari.android.wallet.util.extension.addEnterLeftAnimation
+import com.tari.android.wallet.util.extension.castTo
 import com.tari.android.wallet.util.extension.observe
 import com.tari.android.wallet.util.extension.safeCastTo
-import com.tari.android.wallet.util.extension.string
 
 abstract class CommonActivity<VM : CommonViewModel> : AppCompatActivity(), ShakeDetector.Listener, FragmentPoppedListener {
 
@@ -113,7 +112,7 @@ abstract class CommonActivity<VM : CommonViewModel> : AppCompatActivity(), Shake
     }
 
     override fun onStart() {
-        (getSystemService(SENSOR_SERVICE) as? SensorManager)?.let(shakeDetector::start)
+        shakeDetector.start(getSystemService(SENSOR_SERVICE).castTo<SensorManager>(), SensorManager.SENSOR_DELAY_GAME)
         super.onStart()
         screenCaptureCallback?.let { registerScreenCaptureCallback(mainExecutor, it) }
     }
@@ -210,18 +209,6 @@ abstract class CommonActivity<VM : CommonViewModel> : AppCompatActivity(), Shake
                 ),
             )
         )
-    }
-
-    protected fun shareViaText(text: String) {
-        val shareIntent = Intent()
-        shareIntent.action = Intent.ACTION_SEND
-        shareIntent.putExtra(Intent.EXTRA_TEXT, text)
-        shareIntent.type = "text/plain"
-        if (shareIntent.resolveActivity(packageManager) != null) {
-            startActivity(Intent.createChooser(shareIntent, null))
-        } else {
-            Toast.makeText(this, string(R.string.store_no_application_to_open_the_link_error), Toast.LENGTH_LONG).show()
-        }
     }
 
     private fun openActivity(navigation: DebugNavigation) {

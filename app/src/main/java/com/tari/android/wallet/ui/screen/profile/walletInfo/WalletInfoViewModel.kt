@@ -39,6 +39,9 @@ class WalletInfoViewModel : CommonViewModel() {
     @Inject
     lateinit var contactUtil: ContactUtil
 
+    @Inject
+    lateinit var shareManager: ShareManager
+
     init {
         component.inject(this)
     }
@@ -94,7 +97,7 @@ class WalletInfoViewModel : CommonViewModel() {
     }
 
     private fun shareData(type: ShareType) {
-        ShareManager.currentInstant?.share(type, shareProfileDeeplink)
+        shareManager.share(dialogManager = this, type = type, deeplink = shareProfileDeeplink)
     }
 
     fun showEditAliasDialog() {
@@ -151,7 +154,6 @@ class WalletInfoViewModel : CommonViewModel() {
             ShareOptionsModule(
                 shareQr = { shareData(ShareType.QR_CODE) },
                 shareDeeplink = { shareData(ShareType.LINK) },
-                shareBle = { shareData(ShareType.BLE) },
             ),
             ButtonModule(resourceManager.getString(R.string.common_close), ButtonStyle.Close) { hideDialog() }
         )

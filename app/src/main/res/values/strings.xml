@@ -220,6 +220,9 @@
     <string name="home_balance_info_modal_available_balance_description">This is the amount you can use right now. Some rewards take time to unlock or confirm.</string>
 
     <!--    Airdrop Profile-->
+    <string name="airdrop_login_title">Log in to Tari Universe</string>
+    <string name="airdrop_login_subtitle">Log in and link your Tari Airdrop account to view your mining stats and track airdrop rewards.</string>
+    <string name="airdrop_login_connect_button">Connect my Airdrop account</string>
     <string name="airdrop_profile_tari_mined">Tari Mined</string>
     <string name="airdrop_profile_gems_earned">Gems Earned</string>
     <string name="airdrop_profile_invite_friends_title">Invite Friends, Earn 5000 Gems</string>
@@ -228,6 +231,9 @@
     <string name="airdrop_profile_friends_invited_title">Invited Friends (%s)</string>
     <string name="airdrop_profile_friends_invited_empty_title">Miners are true friends</string>
     <string name="airdrop_profile_friends_invited_empty_description">Your friends must use download the Tari Universe desktop app with YOUR referral code AND start mining for you to earn gem rewards.</string>
+    <string name="airdrop_profile_disconnect_button">Disconnect Airdrop Account</string>
+    <string name="airdrop_profile_disconnect_dialog_title">Disconnect Airdrop Account</string>
+    <string name="airdrop_profile_disconnect_dialog_message">Are you sure you want to disconnect your Airdrop account? You will no longer be able to view your mining stats or track airdrop rewards.</string>
 
     <!-- tx list -->
     <string name="tx_list_sent_a_payment">%s sent a payment</string>
@@ -480,7 +486,6 @@
     <string name="all_settings_disclaimer">Disclaimer</string>
     <string name="all_settings_explorer">Block Explorer</string>
     <string name="all_settings_screen_recording">Screen recording</string>
-    <string name="all_settings_bluetooth_settings">Bluetooth Settings</string>
     <string name="all_settings_bridge_configuration">Bridge Configuration</string>
     <string name="all_settings_connect_yats">Connect Yats</string>
     <string name="all_settings_select_base_node">Select Base Node</string>
@@ -503,14 +508,6 @@
     <string name="screen_recording_disabled_dialog_description">Oops! Screenshots are disabled in this app to keep your information safe. Thanks for keeping things secure!</string>
     <string name="screen_recording_disabled_dialog_confirm_button">No problem, mate!</string>
     <string name="screen_recording_disabled_dialog_cancel_button">Enable screenshots</string>
-
-    <!-- Bluetooth settings -->
-    <string name="bluetooth_settings_title">Bluetooth Settings</string>
-    <string name="bluetooth_settings_description">Other users can share their contacts using Bluetooth Low Energy (BLE) by moving their devices near your device. Your device will be visible to nearby Bluetooth devices when it\'s turned on.\n \n Choose an option below. BLE should be:</string>
-    <string name="bluetooth_settings_option_on">Always on</string>
-    <string name="bluetooth_settings_option_off">Turned off</string>
-    <string name="bluetooth_settings_option_while_up">Only active while the app is open</string>
-
 
     <!-- delete wallet -->
     <string name="delete_wallet_title">You\'re about to lose everything!</string>
@@ -922,20 +919,12 @@
     <string name="contact_book_details_yat_not_found_dialog_message">Tari Universe Wallet was unable to get data from the Yat service. Some contact details may be unavailable</string>
     <string name="share_contact_via_qr_code">QR Code</string>
     <string name="share_contact_via_qr_link">Link</string>
-    <string name="share_contact_via_qr_nfc">NFC</string>
-    <string name="share_contact_via_qr_ble">BLE</string>
     <string name="wallet_info_alias_edit_title">Edit Name</string>
     <string name="share_via_qr_code_title">Share QR Code</string>
     <string name="contact_book_default_alias">Tari user %s</string>
     <string name="contact_details_empty_name_dialog_title">Name can\’t be empty</string>
     <string name="contact_details_empty_name_dialog_message">A contact without a name? That won\’t work. Please add one to keep things running smoothly.</string>
     <string name="contact_details_empty_name_dialog_button">Will do!</string>
-
-    <string name="share_via_bluetooth_title">Share via BLE</string>
-    <string name="share_via_bluetooth_message">Bring the smartphone close to a BLE enabled device</string>
-
-    <string name="share_via_nfc_title">Share via NFC</string>
-    <string name="share_via_nfc_message">Bring the smartphone close to an NFC device</string>
 
     <string name="share_success_title">Profile Shared</string>
     <string name="share_success_message">Awesome! Your details have been shared successfully.</string>
@@ -950,11 +939,6 @@
     <string name="contact_details_transaction_history_description">Your transaction history with %s</string>
     <string name="contact_details_transaction_history_empty_state_title">No transactions found</string>
     <string name="contact_details_transaction_history_empty_state_description"><![CDATA[You don’t have any transactions with <strong>%s</strong> yet. Click the button below to send some Tari]]></string>
-
-    <string name="contactless_payment_title">Connect to a Device</string>
-    <string name="contactless_payment_success_title">Device Detected</string>
-    <string name="contactless_payment_success_description">We just found a fellow Tari user nearby!\nWould you like to send Tari to %s?</string>
-    <string name="contactless_payment_description">Tari Universe Wallet can grab contact info from users nearby using BLE (Bluetooth Low Energy)!\n\nSimply place your phones close to each other and make sure Bluetooth is turned on for both devices. Once connected, you’ll be able to send some Tari quick and easy! 😎</string>
 
     <!--    Chat-->
     <string name="chat_title">Messages</string>

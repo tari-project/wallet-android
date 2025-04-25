@@ -15,7 +15,6 @@ import com.tari.android.wallet.ui.common.CommonXmlActivity
 import com.tari.android.wallet.ui.compose.TariDesignSystem
 import com.tari.android.wallet.ui.screen.StartActivity
 import com.tari.android.wallet.util.Constants
-import com.tari.android.wallet.util.extension.observe
 
 class HomeActivity : CommonXmlActivity<ActivityHomeBinding, HomeViewModel>() {
 
@@ -26,13 +25,6 @@ class HomeActivity : CommonXmlActivity<ActivityHomeBinding, HomeViewModel>() {
 
         val viewModel: HomeViewModel by viewModels()
         bindViewModel(viewModel)
-
-        // TODO shareViewModel isn't a real view model!!
-        subscribeToCommon(viewModel.shareViewModel)
-        subscribeToCommon(viewModel.shareViewModel.tariBluetoothServer)
-        subscribeToCommon(viewModel.shareViewModel.tariBluetoothClient)
-        viewModel.shareViewModel.tariBluetoothServer.init(this)
-        viewModel.shareViewModel.tariBluetoothClient.init(this)
 
         setContainerId(R.id.nav_container)
 
@@ -67,8 +59,6 @@ class HomeActivity : CommonXmlActivity<ActivityHomeBinding, HomeViewModel>() {
             }
         }
 
-        observe(viewModel.shareViewModel.shareText) { shareViaText(it) }
-
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             requestPermissions(arrayOf(POST_NOTIFICATIONS), 0)
         }
@@ -81,13 +71,6 @@ class HomeActivity : CommonXmlActivity<ActivityHomeBinding, HomeViewModel>() {
             viewModel.navigateToAuth(this.intent.data)
             finish()
         }
-    }
-
-    @Deprecated("Deprecated in Java")
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        viewModel.shareViewModel.tariBluetoothServer.handleActivityResult(requestCode, resultCode, data)
-        viewModel.shareViewModel.tariBluetoothClient.handleActivityResult(requestCode, resultCode, data)
     }
 
     override fun onNewIntent(intent: Intent) {
