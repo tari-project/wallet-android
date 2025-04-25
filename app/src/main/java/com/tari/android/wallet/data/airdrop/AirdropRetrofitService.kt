@@ -14,7 +14,7 @@ interface AirdropRetrofitService {
     suspend fun getMinerStats(): MinerStatsResponse
 
     @GET("/api/miner/status/{id}")
-    suspend fun getMinerStatus(@Path("id") id: String): MiningStatusResponse
+    suspend fun getMinerStatus(@Header("Authorization") token: String, @Path("id") anonId: String): MiningStatusResponse
 
     @GET("/api/user/details")
     suspend fun getUserDetails(@Header("Authorization") token: String): UserDetailsResponse

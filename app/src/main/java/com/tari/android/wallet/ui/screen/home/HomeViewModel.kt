@@ -28,7 +28,7 @@ class HomeViewModel : CommonViewModel() {
 
     val shareViewModel = ShareManager()
 
-    private val _uiState = MutableStateFlow(HomeModel.UiState(airdropLoggedIn = airdropRepository.isAirdropLoggedIn.value))
+    private val _uiState = MutableStateFlow(HomeModel.UiState(airdropLoggedIn = airdropRepository.airdropToken.value != null))
     val uiState = _uiState.asStateFlow()
 
     val isAuthenticated: Boolean
@@ -43,7 +43,7 @@ class HomeViewModel : CommonViewModel() {
             permissionManager.runWithPermission(permissions, false, action)
         }
 
-        collectFlow(airdropRepository.isAirdropLoggedIn) { loggedIn -> _uiState.update { it.copy(airdropLoggedIn = loggedIn) } }
+        collectFlow(airdropRepository.airdropToken) { token -> _uiState.update { it.copy(airdropLoggedIn = token != null) } }
 
         launchOnIo {
             walletManager.doOnWalletFailed {
