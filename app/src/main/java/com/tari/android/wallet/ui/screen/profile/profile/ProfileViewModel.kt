@@ -73,8 +73,8 @@ class ProfileViewModel : CommonViewModel() {
                             it.copy(
                                 userDetailsError = false,
                                 userDetails = ProfileModel.UiState.UserDetails(
-                                    userTag = userDetails.user.displayName,
-                                    gemsEarned = userDetails.user.rank.gemsCount,
+                                    userTag = userDetails.user.displayName.orEmpty(),
+                                    gemsEarned = userDetails.user.rank?.gemsCount ?: 0.0,
                                     inviteLink = String.format(FRIEND_INVITE_ADDRESS_SHORT, userDetails.user.referralCode),
                                 )
                             )
