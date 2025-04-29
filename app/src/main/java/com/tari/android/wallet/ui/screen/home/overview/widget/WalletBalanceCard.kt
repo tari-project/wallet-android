@@ -13,6 +13,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.text.BasicText
+import androidx.compose.foundation.text.TextAutoSize
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Text
@@ -103,9 +105,13 @@ fun WalletBalanceCard(
                     )
                 } else {
                     Row {
-                        Text(
-                            modifier = Modifier.alignByBaseline(),
+                        BasicText(
+                            modifier = Modifier
+                                .alignByBaseline()
+                                .weight(1f, false),
                             text = WalletConfig.balanceFormatter.format(balance.totalBalance.tariValue),
+                            maxLines = 1,
+                            autoSize = TextAutoSize.StepBased(minFontSize = 10.sp, maxFontSize = 56.sp, stepSize = 1.sp),
                             style = TextStyle(
                                 fontFamily = PoppinsFontFamily,
                                 fontSize = 56.sp,
@@ -177,10 +183,34 @@ private fun BalanceCardPreview() {
         WalletBalanceCard(
             modifier = Modifier.padding(16.dp),
             balance = BalanceInfo(
-                availableBalance = 24_836_150_000.toMicroTari(),
+                availableBalance = 2_240_836_150_222_222_222.toMicroTari(),
                 pendingIncomingBalance = 0.toMicroTari(),
                 pendingOutgoingBalance = 0.toMicroTari(),
                 timeLockedBalance = 4_836_150_000.toMicroTari(),
+            ),
+            ticker = "XTM",
+            onBalanceHelpClicked = {},
+        )
+
+        WalletBalanceCard(
+            modifier = Modifier.padding(16.dp),
+            balance = BalanceInfo(
+                availableBalance = 24_836.toMicroTari(),
+                pendingIncomingBalance = 0.toMicroTari(),
+                pendingOutgoingBalance = 0.toMicroTari(),
+                timeLockedBalance = 4_836_150_000.toMicroTari(),
+            ),
+            ticker = "XTM",
+            onBalanceHelpClicked = {},
+        )
+
+        WalletBalanceCard(
+            modifier = Modifier.padding(16.dp),
+            balance = BalanceInfo(
+                availableBalance = 0.toMicroTari(),
+                pendingIncomingBalance = 0.toMicroTari(),
+                pendingOutgoingBalance = 0.toMicroTari(),
+                timeLockedBalance = 0.toMicroTari(),
             ),
             ticker = "XTM",
             onBalanceHelpClicked = {},
