@@ -33,8 +33,14 @@ object TxDetailsModel {
             @StringRes get() = when {
                 tx is CancelledTx -> R.string.tx_detail_payment_cancelled
 
-                tx.status == TxStatus.ONE_SIDED_CONFIRMED || tx.status == TxStatus.MINED_CONFIRMED || tx.status == TxStatus.IMPORTED -> {
-                    if (tx.isInbound) R.string.tx_detail_payment_received else R.string.tx_detail_payment_sent
+                tx.status in listOf(
+                    TxStatus.COINBASE_CONFIRMED,
+                    TxStatus.ONE_SIDED_CONFIRMED,
+                    TxStatus.MINED_CONFIRMED,
+                    TxStatus.IMPORTED,
+                ) -> when (tx.direction) {
+                    Direction.INBOUND -> R.string.tx_detail_payment_received
+                    Direction.OUTBOUND -> R.string.tx_detail_payment_sent
                 }
 
                 else -> R.string.tx_detail_pending_payment_received
