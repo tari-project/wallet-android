@@ -2,10 +2,10 @@ package com.tari.android.wallet.ui.compose
 
 import android.content.res.Configuration.UI_MODE_NIGHT_MASK
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
-import androidx.compose.material.MaterialTheme
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextLinkStyles
 import androidx.compose.ui.text.TextStyle
@@ -22,7 +22,7 @@ fun TariDesignSystem(
     TariDesignSystem(
         theme = when (theme) {
             TariTheme.AppBased -> {
-                when (LocalContext.current.resources.configuration.uiMode and UI_MODE_NIGHT_MASK) {
+                when (LocalConfiguration.current.uiMode and UI_MODE_NIGHT_MASK) {
                     UI_MODE_NIGHT_YES -> LocalTariTheme.Dark
                     else -> LocalTariTheme.Light
                 }

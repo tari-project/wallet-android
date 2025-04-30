@@ -8,6 +8,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.text.BasicText
+import androidx.compose.foundation.text.TextAutoSize
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Text
@@ -17,6 +19,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.walletManager.WalletConfig
 import com.tari.android.wallet.ui.compose.PreviewSecondarySurface
@@ -49,8 +52,12 @@ fun TariMinedCard(
             )
             Spacer(Modifier.weight(1f))
             Row {
-                Text(
-                    modifier = Modifier.alignByBaseline(),
+                BasicText(
+                    modifier = Modifier
+                        .alignByBaseline()
+                        .weight(1f, false),
+                    maxLines = 1,
+                    autoSize = TextAutoSize.StepBased(minFontSize = 10.sp, maxFontSize = 22.sp, stepSize = 1.sp),
                     text = WalletConfig.balanceFormatter.format(balance),
                     style = TariDesignSystem.typography.modalTitleLarge,
                 )
@@ -92,8 +99,11 @@ fun GemsEarnedCard(
             )
             Spacer(Modifier.weight(1f))
 
-            Text(
+            BasicText(
+                modifier = Modifier.weight(1f, false),
                 text = DecimalFormat("#,###,###").format(gemsCount),
+                autoSize = TextAutoSize.StepBased(minFontSize = 10.sp, maxFontSize = 22.sp, stepSize = 1.sp),
+                maxLines = 1,
                 style = TariDesignSystem.typography.modalTitleLarge,
             )
             Text(
@@ -108,27 +118,42 @@ fun GemsEarnedCard(
 @Preview
 fun TariMinedCardPreview() {
     PreviewSecondarySurface(TariTheme.Light) {
-        TariMinedCard(
-            modifier = Modifier
-                .padding(16.dp)
-                .height(120.dp)
-                .width(240.dp),
-            balance = 24_836_150_000.toMicroTari().tariValue,
-            ticker = "XTM",
-        )
-    }
-}
+        Row(modifier = Modifier.padding(16.dp)) {
+            TariMinedCard(
+                modifier = Modifier
+                    .weight(1f)
+                    .height(120.dp)
+                    .width(240.dp),
+                balance = 24_836_150.toMicroTari().tariValue,
+                ticker = "XTM",
+            )
+            Spacer(Modifier.size(16.dp))
+            GemsEarnedCard(
+                modifier = Modifier
+                    .weight(1f)
+                    .height(120.dp)
+                    .width(240.dp),
+                gemsCount = 24_836_150.0,
+            )
+        }
 
-@Composable
-@Preview
-fun GemsEarnedCardPreview() {
-    PreviewSecondarySurface(TariTheme.Light) {
-        GemsEarnedCard(
-            modifier = Modifier
-                .padding(16.dp)
-                .height(120.dp)
-                .width(240.dp),
-            gemsCount = 24_836_150.0,
-        )
+        Row(modifier = Modifier.padding(16.dp)) {
+            TariMinedCard(
+                modifier = Modifier
+                    .weight(1f)
+                    .height(120.dp)
+                    .width(240.dp),
+                balance = 24_836_150_000_836_150_00.toMicroTari().tariValue,
+                ticker = "XTM",
+            )
+            Spacer(Modifier.size(16.dp))
+            GemsEarnedCard(
+                modifier = Modifier
+                    .weight(1f)
+                    .height(120.dp)
+                    .width(240.dp),
+                gemsCount = 24_836_150_000_000_000.0,
+            )
+        }
     }
 }

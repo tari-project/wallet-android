@@ -43,10 +43,10 @@ data class UserDetailsResponse(
         @SerializedName("id") val id: String,
         @SerializedName("referral_code") val referralCode: String,
         @SerializedName("yat_user_id") val yatUserId: String?,
-        @SerializedName("display_name") val displayName: String,
+        @SerializedName("display_name") val displayName: String?,
         @SerializedName("name") val name: String,
         @SerializedName("profileimageurl") val profileImageUrl: String,
-        @SerializedName("rank") val rank: Rank,
+        @SerializedName("rank") val rank: Rank?,
     ) {
         data class Rank(
             @SerializedName("gems") val gemsCount: Double,

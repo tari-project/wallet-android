@@ -6,6 +6,8 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.text.BasicText
+import androidx.compose.foundation.text.TextAutoSize
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
@@ -44,13 +46,24 @@ fun BalanceInfoModal(
     ) { animatedDismiss ->
         Box(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(start = 40.dp),
+                .fillMaxWidth(),
         ) {
-            Row(modifier = Modifier.padding(top = 24.dp)) {
-                Text(
-                    modifier = Modifier.alignByBaseline(),
+            Row(
+                modifier = Modifier
+                    .align(Alignment.BottomStart)
+                    .padding(
+                        top = 24.dp,
+                        start = 40.dp,
+                        end = 56.dp,
+                    )
+            ) {
+                BasicText(
+                    modifier = Modifier
+                        .alignByBaseline()
+                        .weight(1f, false),
                     text = WalletConfig.balanceFormatter.format(totalBalance.tariValue),
+                    autoSize = TextAutoSize.StepBased(minFontSize = 10.sp, maxFontSize = 40.sp, stepSize = 1.sp),
+                    maxLines = 1,
                     style = TextStyle(
                         fontSize = 40.sp,
                         lineHeight = 40.sp,
