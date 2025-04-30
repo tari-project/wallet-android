@@ -1,5 +1,5 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <string name="app_name">Tari Universe Wallet</string>
+    <string name="app_name">Tari</string>
 
     <!-- URLs, etc -->
     <string name="ttl_store_url" translatable="false">https://store.tarilabs.com</string>
