@@ -218,6 +218,8 @@
     <string name="home_balance_info_modal_total_balance_description">This is everything you\'ve earned or received, including rewards that are still locked or pending.</string>
     <string name="home_balance_info_modal_available_balance">Available to spend</string>
     <string name="home_balance_info_modal_available_balance_description">This is the amount you can use right now. Some rewards take time to unlock or confirm.</string>
+    <string name="home_mainnet_modal_lets_go_button">Let\'s go!</string>
+    <string name="home_mainnet_modal_lets_watch_trailer_button">Watch The Trailer</string>
 
     <!--    Airdrop Profile-->
     <string name="airdrop_login_title">Log in to Tari Universe</string>
