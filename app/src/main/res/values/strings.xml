@@ -208,7 +208,7 @@
     <string name="home_wallet_balance">Wallet Balance</string>
     <string name="home_wallet_balance_hidden">*******</string>
     <string name="home_empty_state_title">You don’t have any activity yet. </string>
-    <string name="home_empty_state_description">Once you receive some tXTM, you’ll see it here.</string>
+    <string name="home_empty_state_description">Once you receive some XTM, you’ll see it here.</string>
     <string name="home_empty_state_button">Start Mining Tari</string>
     <string name="home_tx_list_recent_activity">Recent activity</string>
     <string name="home_sync_dialog_title">Welcome back!</string>
@@ -585,7 +585,7 @@
     <string name="restore_wallet_invalid_qr_code">Invalid QR Code</string>
     <string name="restore_wallet_invalid_qr_code_description">The QR code you scanned does not contain valid paper wallet seeds</string>
     <string name="restore_wallet_paper_wallet_title">Sync your Universe wallet?</string>
-    <string name="restore_wallet_paper_wallet_body">You just scanned a wallet from the Tari Universe desktop app! Syncing it will let you track your real-time tXTM balance right on your phone.\nWhat would you like to do?</string>
+    <string name="restore_wallet_paper_wallet_body">You just scanned a wallet from the Tari Universe desktop app! Syncing it will let you track your real-time XTM balance right on your phone.\nWhat would you like to do?</string>
     <string name="restore_wallet_paper_wallet_restore_button">Sync Wallet</string>
     <string name="restore_wallet_paper_wallet_do_not_restore_button">Don\'t restore right now</string>
     <string name="restore_wallet_paper_wallet_sweep_funds_button">Sweep the funds</string>
@@ -625,7 +625,7 @@
     <string name="restore_from_seed_words_cancel_dialog_title">Are you sure you want to cancel?</string>
     <string name="restore_from_seed_words_cancel_dialog_description">You will lose your progress, but don\'t worry, you can always start over.</string>
     <string name="recovery_success_dialog_title">Wallet Synced! 🎉</string>
-    <string name="recovery_success_dialog_description">Your real-time tXTM balance is now available on your phone. 🚀</string>
+    <string name="recovery_success_dialog_description">Your real-time XTM balance is now available on your phone. 🚀</string>
     <string name="recovery_success_dialog_close">Awesome, thanks!</string>
 
     <!--Restore -->

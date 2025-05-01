@@ -11,9 +11,9 @@ import javax.inject.Singleton
 @Singleton
 class NetworkPrefRepository @Inject constructor(sharedPrefs: SharedPreferences) {
     // defaultNetwork is the network that will be used if the current network is not set or is not supported
-    private val defaultNetwork = if (DebugConfig.mockNetwork) NETWORK_ESMERALDA else NETWORK_NEXTNET
+    private val defaultNetwork = if (DebugConfig.mockNetwork) NETWORK_ESMERALDA else NETWORK_MAINNET
 
-    var supportedNetworks: List<TariNetwork> = if (DebugConfig.mockNetwork) listOf(NETWORK_ESMERALDA) else listOf(NETWORK_NEXTNET)
+    var supportedNetworks: List<TariNetwork> = if (DebugConfig.mockNetwork) listOf(NETWORK_ESMERALDA) else listOf(NETWORK_MAINNET)
 
     private var _currentNetwork: Network by SharedPrefGsonDelegate(
         prefs = sharedPrefs,
@@ -40,7 +40,7 @@ class NetworkPrefRepository @Inject constructor(sharedPrefs: SharedPreferences) 
 
         private val NETWORK_MAINNET: TariNetwork = TariNetwork(
             network = Network.MAINNET,
-            dnsPeer = "seeds.testmnet.tari.com",
+            dnsPeer = "seeds.tari.com",
             blockExplorerBaseUrl = "https://explore-mainnet.tari.com",
             ticker = TICKER_MAINNET,
             recommended = true,

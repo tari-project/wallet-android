@@ -172,9 +172,11 @@ class CorePrefRepository @Inject constructor(
         onboardingAuthSetupStarted = false
         onboardingAuthSetupCompleted = false
         onboardingDisplayedAtHome = false
+        keepScreenAwakeWhenRestore = true
         airdropAnonId = null
         airdropToken = null
         airdropRefreshToken = null
+        mainnetLaunchModalShown = false
     }
 
     fun generateDatabasePassphrase(): String {
