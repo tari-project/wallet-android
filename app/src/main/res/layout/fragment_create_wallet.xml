@@ -266,6 +266,8 @@
                     android:layout_height="wrap_content"
                     android:layout_centerHorizontal="true"
                     android:layout_marginTop="26dp"
+                    android:background="@drawable/vector_check_mark_bg"
+                    android:padding="36dp"
                     android:scaleX="0.5"
                     android:scaleY="0.5"
                     android:visibility="gone"
