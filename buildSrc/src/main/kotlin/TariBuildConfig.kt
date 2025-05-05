@@ -9,8 +9,8 @@ object TariBuildConfig {
     const val compileSdk = 35
 
     object LibWallet {
-        const val version = "v2.0.0-alpha.1"
-        const val minValidVersion = "v2.0.0-alpha.1"
+        const val version = "v2.0.0-alpha.3"
+        const val minValidVersion = "v2.0.0-alpha.3"
 
         const val hostURL = "https://github.com/tari-project/tari/releases/download/"
         const val x64A = "libminotari_wallet_ffi.android_x86_64.a"
