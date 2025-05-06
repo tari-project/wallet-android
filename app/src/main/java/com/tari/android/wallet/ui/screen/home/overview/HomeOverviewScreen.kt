@@ -36,6 +36,7 @@ import com.tari.android.wallet.ui.screen.home.overview.widget.VersionCodeChip
 import com.tari.android.wallet.ui.screen.home.overview.widget.WalletBalanceCard
 import com.tari.android.wallet.ui.screen.settings.themeSelector.TariTheme
 import com.tari.android.wallet.util.MockDataStub
+import com.tari.android.wallet.util.extension.isTrue
 import com.tari.android.wallet.util.extension.toMicroTari
 
 @Composable
@@ -147,6 +148,7 @@ fun HomeOverviewScreen(
                 } else if (uiState.txList.isEmpty()) {
                     item {
                         EmptyTxList(
+                            showStartMiningButton = !uiState.isMining.isTrue(),
                             onStartMiningClicked = onStartMiningClicked,
                             modifier = Modifier
                                 .fillMaxWidth()

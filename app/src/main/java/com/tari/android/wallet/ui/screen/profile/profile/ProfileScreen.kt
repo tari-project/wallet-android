@@ -92,6 +92,7 @@ fun ProfileScreen(
                                 Spacer(Modifier.size(10.dp))
                                 EmptyTxList(
                                     modifier = Modifier.fillMaxWidth(),
+                                    showStartMiningButton = false,
                                     onStartMiningClicked = onStartMiningClicked,
                                 )
                             }
