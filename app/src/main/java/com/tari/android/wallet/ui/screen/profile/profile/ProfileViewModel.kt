@@ -10,6 +10,7 @@ import com.tari.android.wallet.ui.dialog.modular.modules.body.BodyModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonStyle
 import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
+import com.tari.android.wallet.ui.screen.home.overview.TARI_COM
 import com.tari.android.wallet.util.extension.collectFlow
 import com.tari.android.wallet.util.extension.launchOnIo
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -54,7 +55,7 @@ class ProfileViewModel : CommonViewModel() {
     }
 
     fun onStartMiningClicked() {
-        showNotReadyYetDialog()
+        openUrl(TARI_COM)
     }
 
     fun refreshData() {

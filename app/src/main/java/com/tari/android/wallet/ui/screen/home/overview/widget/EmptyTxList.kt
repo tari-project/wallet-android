@@ -18,7 +18,6 @@ import com.tari.android.wallet.ui.compose.TariDesignSystem
 import com.tari.android.wallet.ui.compose.components.TariButtonSize
 import com.tari.android.wallet.ui.compose.components.TariPrimaryButton
 import com.tari.android.wallet.ui.screen.settings.themeSelector.TariTheme
-import com.tari.android.wallet.util.DebugConfig
 
 @Composable
 fun EmptyTxList(
@@ -38,14 +37,12 @@ fun EmptyTxList(
                 text = stringResource(R.string.home_empty_state_description),
                 style = TariDesignSystem.typography.body1,
             )
-            if (DebugConfig.showActiveMinersButton) {
-                Spacer(modifier = Modifier.height(8.dp))
-                TariPrimaryButton(
-                    size = TariButtonSize.Small,
-                    text = stringResource(R.string.home_empty_state_button),
-                    onClick = onStartMiningClicked,
-                )
-            }
+            Spacer(modifier = Modifier.height(8.dp))
+            TariPrimaryButton(
+                size = TariButtonSize.Small,
+                text = stringResource(R.string.home_empty_state_button),
+                onClick = onStartMiningClicked,
+            )
         }
     }
 }
