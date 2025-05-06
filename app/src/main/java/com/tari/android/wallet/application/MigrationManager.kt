@@ -15,9 +15,10 @@ class MigrationManager @Inject constructor(
     suspend fun validateVersion(onValid: () -> Unit, onError: () -> Unit) = withContext(Dispatchers.IO) {
         val walletVersion = walletManager.getLastAccessedToDbVersion()
             .replace("v", "")
+            .replace("-", ".")
             .takeIf { it.isNotEmpty() }
             ?.let { DefaultArtifactVersion(it) }
-        val minValidVersion = DefaultArtifactVersion(BuildConfig.LIB_WALLET_MIN_VALID_VERSION.replace("v", ""))
+        val minValidVersion = DefaultArtifactVersion(BuildConfig.LIB_WALLET_MIN_VALID_VERSION.replace("v", "").replace("-", "."))
 
         if (walletVersion == null || walletVersion < minValidVersion) {
             onError()

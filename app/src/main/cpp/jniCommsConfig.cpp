@@ -67,7 +67,6 @@ Java_com_tari_android_wallet_ffi_FFICommsConfig_jniCreate(
                 pDatastorePath,
                 static_cast<unsigned long long int>(jDiscoveryTimeoutSec),
                 static_cast<unsigned long long int>(jSafDurationSec),
-                false,
                 errorPointer
         );
         jEnv->ReleaseStringUTFChars(jPublicAddress, pControlServiceAddress);

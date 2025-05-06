@@ -226,6 +226,7 @@ class CreateWalletFragment : OnboardingFlowXmlFragment<FragmentCreateWalletBindi
             override fun onAnimationEnd(animation: Animator) {
                 super.onAnimationEnd(animation)
                 startCreateEmojiIdAnimation()
+                ui.checkmarkLottieAnimationView.gone()
             }
         })
 
@@ -444,6 +445,7 @@ class CreateWalletFragment : OnboardingFlowXmlFragment<FragmentCreateWalletBindi
             addListener(object : AnimatorListenerAdapter() {
                 override fun onAnimationEnd(animation: Animator) {
                     ui.seeFullEmojiIdButton.isEnabled = true
+                    onSeeFullEmojiIdButtonClicked(ui.seeFullEmojiIdButton)
                     uiHandler.postDelayed({
                         hideFullEmojiId()
                     }, Constants.UI.mediumDurationMs)
