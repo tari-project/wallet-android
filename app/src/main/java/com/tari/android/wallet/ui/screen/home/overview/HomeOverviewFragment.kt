@@ -45,9 +45,4 @@ class HomeOverviewFragment : CommonFragment<HomeOverviewViewModel>() {
 
         viewModel.checkPermission()
     }
-
-    override fun onResume() {
-        super.onResume()
-        viewModel.grantContactsPermission()
-    }
 }

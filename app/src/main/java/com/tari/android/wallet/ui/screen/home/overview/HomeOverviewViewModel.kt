@@ -151,22 +151,6 @@ class HomeOverviewViewModel : CommonViewModel() {
                 logger.i("notification permission checked successfully")
             }
         }
-
-        grantContactsPermission()
-    }
-
-    fun grantContactsPermission() {
-        permissionManager.runWithPermission(
-            permissions = listOf(
-                android.Manifest.permission.READ_CONTACTS,
-                android.Manifest.permission.WRITE_CONTACTS,
-            ),
-            silently = true,
-        ) {
-            launchOnIo {
-                contactsRepository.grantContactPermissionAndRefresh()
-            }
-        }
     }
 
     fun onSyncDialogDismiss() {
