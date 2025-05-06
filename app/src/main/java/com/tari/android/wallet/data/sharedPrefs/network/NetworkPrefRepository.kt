@@ -1,19 +1,27 @@
 package com.tari.android.wallet.data.sharedPrefs.network
 
 import android.content.SharedPreferences
+import com.tari.android.wallet.BuildConfig
 import com.tari.android.wallet.application.Network
 import com.tari.android.wallet.data.sharedPrefs.SimplePrefRepository
 import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefGsonDelegate
-import com.tari.android.wallet.util.DebugConfig
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class NetworkPrefRepository @Inject constructor(sharedPrefs: SharedPreferences) {
     // defaultNetwork is the network that will be used if the current network is not set or is not supported
-    private val defaultNetwork = if (DebugConfig.mockNetwork) NETWORK_ESMERALDA else NETWORK_MAINNET
+    private val defaultNetwork = when (BuildConfig.LIB_WALLET_NETWORK) {
+        "MAINNET" -> NETWORK_MAINNET
+        "NEXTNET" -> NETWORK_NEXTNET
+        else -> error("Need to define lib versions for the network in TariBuildConfig")
+    }
 
-    var supportedNetworks: List<TariNetwork> = if (DebugConfig.mockNetwork) listOf(NETWORK_ESMERALDA) else listOf(NETWORK_MAINNET)
+    var supportedNetworks: List<TariNetwork> = when (BuildConfig.LIB_WALLET_NETWORK) {
+        "MAINNET" -> listOf(NETWORK_MAINNET)
+        "NEXTNET" -> listOf(NETWORK_NEXTNET)
+        else -> error("Need to define lib versions for the network in TariBuildConfig")
+    }
 
     private var _currentNetwork: Network by SharedPrefGsonDelegate(
         prefs = sharedPrefs,
