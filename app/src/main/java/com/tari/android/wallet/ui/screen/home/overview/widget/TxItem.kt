@@ -39,6 +39,7 @@ import org.joda.time.Minutes
 import java.util.Locale
 
 private const val TX_ITEM_DATE_FORMAT = "E, MMM d"
+private val MIN_ROUNDING = 10000.toBigInteger()
 
 @Composable
 fun TxItem(
@@ -101,7 +102,8 @@ fun TxItem(
                 )
                 Spacer(modifier = Modifier.width(4.dp))
                 Text(
-                    text = WalletConfig.amountFormatter.format(txDto.tx.amount.tariValue) + " " + ticker,
+                    text = (txDto.tx.amount.takeIf { it.value >= MIN_ROUNDING }?.tariValue?.let { WalletConfig.balanceFormatter.format(it) }
+                        ?: "<0.01") + " " + ticker,
                     style = TariDesignSystem.typography.headingLarge,
                 )
             }
@@ -171,7 +173,27 @@ private fun TxItemPreview() {
         TxItem(
             modifier = Modifier.padding(16.dp),
             txDto = MockDataStub.createTxDto(
-                amount = 122334455,
+                amount = 12345678,
+                contactAlias = "Alice",
+            ),
+            ticker = "XTM",
+            onTxClick = {},
+        )
+
+        TxItem(
+            modifier = Modifier.padding(16.dp),
+            txDto = MockDataStub.createTxDto(
+                amount = 12345,
+                contactAlias = "Alice",
+            ),
+            ticker = "XTM",
+            onTxClick = {},
+        )
+
+        TxItem(
+            modifier = Modifier.padding(16.dp),
+            txDto = MockDataStub.createTxDto(
+                amount = 1234,
                 contactAlias = "Alice",
             ),
             ticker = "XTM",
