@@ -680,6 +680,7 @@
     <string name="connection_status_dialog_chain_tip">Chain Tip: </string>
     <string name="connection_status_dialog_chain_tip_value">#%s (%s)</string>
     <string name="connection_status_dialog_chain_tip_waiting">Waiting for connection…</string>
+    <string name="connection_status_dialog_base_node_id">Base Node ID: %s</string>
 
     <string name="tor_bridges_title">Bridges Configuration</string>
     <string name="tor_bridges_connect">Connect</string>

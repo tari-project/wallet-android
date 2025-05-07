@@ -48,11 +48,12 @@ class ConnectionStateHandler @Inject constructor(
             _connectionState.update { it.copy(torProxyState = torProxyState) }
         }
 
-        applicationScope.collectFlow(baseNodesManager.walletScannedHeight.combineToPair(baseNodesManager.networkBlockHeight)) { (height, tip) ->
+        applicationScope.collectFlow(baseNodesManager.walletScannedHeight.combineToPair(baseNodesManager.baseNodeState)) { (height, baseNodeState) ->
             _connectionState.update {
                 it.copy(
                     walletScannedHeight = height,
-                    chainTip = tip.toInt(),
+                    chainTip = baseNodeState.heightOfLongestChain.toInt(),
+                    baseNodeIdHex = baseNodeState.nodeId,
                 )
             }
         }
@@ -66,6 +67,7 @@ data class ConnectionState(
     val baseNodeSyncState: BaseNodeSyncState = BaseNodeSyncState.NotStarted,
     val walletScannedHeight: Int = 0,
     val chainTip: Int = 0,
+    val baseNodeIdHex: String? = null,
 ) {
     val indicatorState: ConnectionIndicatorState
         get() = when (networkState) {

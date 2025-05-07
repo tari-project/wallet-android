@@ -180,7 +180,7 @@ class UtxosListViewModel : CommonViewModel() {
                 MockDataStub.createUtxoList()
             } else {
                 walletManager.requireWalletInstance.getAllUtxos().itemsList
-                    .map { UtxosViewHolderItem(it, baseNodesManager.networkBlockHeight.value.toLong()) }
+                    .map { UtxosViewHolderItem(it, baseNodesManager.baseNodeState.value.heightOfLongestChain.toLong()) }
                     .filter { it.showStatus }
             }
 

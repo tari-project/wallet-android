@@ -10,6 +10,7 @@ import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodePrefRepository
 import com.tari.android.wallet.data.sharedPrefs.network.NetworkPrefRepository
 import com.tari.android.wallet.ffi.FFITariBaseNodeState
 import com.tari.android.wallet.ffi.FFIWallet
+import com.tari.android.wallet.model.TariBaseNodeState
 import com.tari.android.wallet.util.DebugConfig
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -47,8 +48,13 @@ class BaseNodesManager @Inject constructor(
     private val _walletScannedHeight = MutableStateFlow(0)
     val walletScannedHeight = _walletScannedHeight.asStateFlow()
 
-    private val _networkBlockHeight = MutableStateFlow(BigInteger.ZERO)
-    val networkBlockHeight = _networkBlockHeight.asStateFlow()
+    private val _baseNodeState = MutableStateFlow(
+        TariBaseNodeState(
+            heightOfLongestChain = BigInteger.ZERO,
+            nodeId = null,
+        )
+    )
+    val baseNodeState = _baseNodeState.asStateFlow()
 
     val currentBaseNode: BaseNodeDto?
         get() = baseNodeSharedRepository.currentBaseNode
@@ -93,8 +99,8 @@ class BaseNodesManager @Inject constructor(
         }
     }
 
-    fun saveBaseNodeState(baseNodeState: FFITariBaseNodeState) {
-        _networkBlockHeight.update { baseNodeState.getHeightOfLongestChain() }
+    fun saveBaseNodeState(ffiBaseNodeState: FFITariBaseNodeState) {
+        _baseNodeState.update { TariBaseNodeState(ffiBaseNodeState) }
     }
 
     fun saveWalletScannedHeight(height: Int) {

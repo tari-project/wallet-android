@@ -252,5 +252,19 @@
                 tools:text="#8513 (8513)"
                 tools:visibility="gone" />
         </LinearLayout>
+
+        <com.tari.android.wallet.ui.component.tari.TariTextView
+            android:id="@+id/text_base_node_id"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginStart="5dp"
+            android:layout_marginTop="4dp"
+            android:gravity="center"
+            android:lineSpacingExtra="6sp"
+            android:textColor="?attr/palette_text_body"
+            android:textSize="14sp"
+            app:customFont="medium"
+            tools:text="Base Node ID: AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" />
     </LinearLayout>
 </com.tari.android.wallet.ui.component.tari.background.TariPrimaryBackground>

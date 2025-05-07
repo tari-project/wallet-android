@@ -36,5 +36,7 @@ class ConnectionStatusesModuleView(context: Context, module: ConnectionStatusesM
         ui.textChainTipValue.text = context.string(
             R.string.connection_status_dialog_chain_tip_value, module.connectionState.walletScannedHeight, module.connectionState.chainTip
         )
+
+        ui.textBaseNodeId.text = context.string(R.string.connection_status_dialog_base_node_id, module.connectionState.baseNodeIdHex ?: "--")
     }
 }
