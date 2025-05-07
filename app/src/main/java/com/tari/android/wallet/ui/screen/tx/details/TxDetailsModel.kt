@@ -60,7 +60,7 @@ object TxDetailsModel {
                 tx is CancelledTx && tx.isOutbound -> tx.fee
                 tx is PendingOutboundTx -> tx.fee
                 else -> null
-            }
+            }.takeIf { it?.value != 0.toBigInteger() } // FIXME: as for now, we consider 0 fee as undefined fee
 
         val formattedDate: String
             get() = Date(tx.timestamp.toLong() * 1000).txFormattedDate()

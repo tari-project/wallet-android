@@ -28,7 +28,6 @@ import com.tari.android.wallet.ui.compose.TariDesignSystem
 import com.tari.android.wallet.ui.compose.components.TariPrimaryButton
 import com.tari.android.wallet.ui.compose.components.TariTextButton
 import com.tari.android.wallet.ui.compose.components.TariTopBar
-import com.tari.android.wallet.ui.compose.widgets.DotsAnimation
 import com.tari.android.wallet.ui.screen.settings.themeSelector.TariTheme
 import com.tari.android.wallet.ui.screen.tx.details.widget.TxDetailInfoAddressItem
 import com.tari.android.wallet.ui.screen.tx.details.widget.TxDetailInfoContactNameItem
@@ -149,16 +148,16 @@ fun TxDetailsScreen(
                 )
             }
 
-            Spacer(Modifier.size(10.dp))
-            TxDetailInfoItem(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 24.dp),
-                title = stringResource(R.string.tx_details_txn_id),
-                value = uiState.tariTxnId ?: stringResource(R.string.tx_details_txn_id_processing),
-                singleLine = false,
-            ) {
-                if (uiState.blockExplorerLink != null) {
+            if (uiState.blockExplorerLink != null) {
+                Spacer(Modifier.size(10.dp))
+                TxDetailInfoItem(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 24.dp),
+                    title = stringResource(R.string.tx_details_txn_id),
+                    value = uiState.tariTxnId ?: stringResource(R.string.tx_details_txn_id_processing),
+                    singleLine = false,
+                ) {
                     IconButton(onClick = onBlockExplorerClick) {
                         Icon(
                             painter = painterResource(R.drawable.vector_icon_open_url),
@@ -166,8 +165,6 @@ fun TxDetailsScreen(
                             tint = TariDesignSystem.colors.componentsNavbarIcons,
                         )
                     }
-                } else {
-                    DotsAnimation(Modifier.size(40.dp))
                 }
             }
 
