@@ -149,7 +149,10 @@ fun TxDto.itemMessage(): String {
         }
 
         tx.isOneSided -> {
-            (stringResource(R.string.tx_list_someone) + " " + stringResource(R.string.tx_list_paid_you))
+            when (tx.direction) {
+                Tx.Direction.INBOUND -> stringResource(R.string.tx_list_someone) + " " + stringResource(R.string.tx_list_paid_you)
+                Tx.Direction.OUTBOUND -> stringResource(R.string.tx_list_you_paid) + " " + stringResource(R.string.tx_list_someone).lowercase()
+            }
         }
 
         else -> { // display emoji id
