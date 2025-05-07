@@ -8,7 +8,6 @@ import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodeDto
 import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodeList
 import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodePrefRepository
 import com.tari.android.wallet.data.sharedPrefs.network.NetworkPrefRepository
-import com.tari.android.wallet.ffi.FFITariBaseNodeState
 import com.tari.android.wallet.ffi.FFIWallet
 import com.tari.android.wallet.model.TariBaseNodeState
 import com.tari.android.wallet.util.DebugConfig
@@ -99,8 +98,8 @@ class BaseNodesManager @Inject constructor(
         }
     }
 
-    fun saveBaseNodeState(ffiBaseNodeState: FFITariBaseNodeState) {
-        _baseNodeState.update { TariBaseNodeState(ffiBaseNodeState) }
+    fun saveBaseNodeState(baseNodeState: TariBaseNodeState) {
+        _baseNodeState.update { baseNodeState }
     }
 
     fun saveWalletScannedHeight(height: Int) {

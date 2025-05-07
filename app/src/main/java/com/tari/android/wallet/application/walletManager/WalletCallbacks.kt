@@ -11,6 +11,7 @@ import com.tari.android.wallet.ffi.FFITransactionSendStatus
 import com.tari.android.wallet.ffi.TransactionValidationStatus
 import com.tari.android.wallet.ffi.runWithDestroy
 import com.tari.android.wallet.model.BalanceInfo
+import com.tari.android.wallet.model.TariBaseNodeState
 import com.tari.android.wallet.model.TransactionSendStatus
 import com.tari.android.wallet.model.TxId
 import com.tari.android.wallet.model.tx.CancelledTx
@@ -142,7 +143,8 @@ class WalletCallbacks @Inject constructor() {
         val walletContextId = BigInteger(1, contextPtr).toInt()
         val baseNodeState = FFITariBaseNodeState(baseNodeStatePointer)
         log(walletContextId, "Base node state updated (height of the longest chain is ${baseNodeState.getHeightOfLongestChain()})")
-        listeners[walletContextId]?.onBaseNodeStateChanged(baseNodeState)
+        listeners[walletContextId]?.onBaseNodeStateChanged(TariBaseNodeState(baseNodeState))
+        baseNodeState.destroy()
     }
 
     fun onConnectivityStatus(contextPtr: ByteArray, bytes: ByteArray) {
@@ -253,5 +255,5 @@ interface FFIWalletListener {
     fun onConnectivityStatus(status: Int) = Unit
     fun onWalletRestoration(state: WalletRestorationState) = Unit
     fun onWalletScannedHeight(height: Int) = Unit
-    fun onBaseNodeStateChanged(baseNodeState: FFITariBaseNodeState) = Unit
+    fun onBaseNodeStateChanged(baseNodeState: TariBaseNodeState) = Unit
 }
