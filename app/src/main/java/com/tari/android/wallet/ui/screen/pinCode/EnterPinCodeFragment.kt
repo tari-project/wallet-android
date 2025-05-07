@@ -27,6 +27,8 @@ import java.util.concurrent.TimeUnit
 
 class EnterPinCodeFragment : CommonXmlFragment<FragmentEnterPincodeBinding, EnterPinCodeViewModel>() {
 
+    override fun screenRecordingAlwaysDisable() = true
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?) =
         FragmentEnterPincodeBinding.inflate(inflater, container, false).also { ui = it }.root
 

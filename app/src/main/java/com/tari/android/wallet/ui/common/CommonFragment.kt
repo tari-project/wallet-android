@@ -45,7 +45,6 @@ abstract class CommonFragment<VM : CommonViewModel> : Fragment(), FragmentPopped
     val logger: Printer
         get() = Logger.t(this::class.simpleName)
 
-    //TODO make viewModel not lateinit. Sometimes it's not initialized in time and causes crashes, so we need to check if it's initialized
     private val blockScreenRecording
         get() = !BuildConfig.DEBUG &&
                 (screenRecordingAlwaysDisable() || !(this::viewModel.isInitialized) || !viewModel.tariSettingsSharedRepository.screenRecordingTurnedOn)
@@ -171,6 +170,8 @@ abstract class CommonFragment<VM : CommonViewModel> : Fragment(), FragmentPopped
             }
         })
     }
+
+    protected fun isFragmentOnTop() = requireActivity().supportFragmentManager.fragments.lastOrNull() == this
 
     private fun copy(clipboardArgs: ClipboardArgs) {
         clipboardManager.setPrimaryClip(ClipData.newPlainText(clipboardArgs.clipLabel, clipboardArgs.clipText))
