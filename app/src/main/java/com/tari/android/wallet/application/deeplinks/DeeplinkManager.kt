@@ -169,7 +169,7 @@ class DeeplinkManager @Inject constructor(
         )
 
         saveAction = {
-            val seeds = deeplink.seedWords(passphraseModule.value.trim())
+            val seeds = deeplink.seedWords(passphraseModule.value)
             if (seeds != null) {
                 dialogHandler.hideDialog(DialogId.DEEPLINK_PAPER_WALLET_ENTER_PASSPHRASE)
                 replaceWalletAction(seeds)

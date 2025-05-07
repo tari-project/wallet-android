@@ -147,3 +147,5 @@ fun String.makeTextBold(context: Context, vararg wordsToBeBold: String): Spannab
     search = if (wordsToBeBold.isEmpty()) listOf(this) else wordsToBeBold.toList(),
     tariFont = TariFont.HEAVY,
 )
+
+fun String.removeWhitespaces() = replace(" ", "")
