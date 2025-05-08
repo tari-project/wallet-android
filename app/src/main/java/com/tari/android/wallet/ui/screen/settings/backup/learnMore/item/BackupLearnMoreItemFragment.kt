@@ -17,17 +17,18 @@ class BackupLearnMoreItemFragment : CommonXmlFragment<FragmentBackupLearnMoreIte
         super.onViewCreated(view, savedInstanceState)
 
         val position = requireArguments().getInt(ARGS_KEY)
-        val args = BackupLearnMoreDataSource.getByPosition(position)
+        // For some reason args could be null at this point
+        BackupLearnMoreDataSource.getByPosition(position)?.let { args ->
+            with(ui) {
+                imageView.setImageResource(args.image)
+                title.text = args.title
+                description.text = args.description
+                moduleButton.initItem(args.button) { }
+                textBelow.text = args.bottomText
 
-        with(ui) {
-            imageView.setImageResource(args.image)
-            title.text = args.title
-            description.text = args.description
-            moduleButton.initItem(args.button) { }
-            textBelow.text = args.bottomText
-
-            divider.setVisible(args.bottomText.isNotEmpty())
-            textBelow.setVisible(args.bottomText.isNotEmpty())
+                divider.setVisible(args.bottomText.isNotEmpty())
+                textBelow.setVisible(args.bottomText.isNotEmpty())
+            }
         }
     }
 

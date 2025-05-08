@@ -4,7 +4,7 @@ object BackupLearnMoreDataSource {
 
     private val dataSource = mutableListOf<BackupLearnMoreStageArgs>()
 
-    fun getByPosition(position: Int): BackupLearnMoreStageArgs = dataSource[position]
+    fun getByPosition(position: Int): BackupLearnMoreStageArgs? = dataSource.getOrNull(position)
 
     fun save(list: List<BackupLearnMoreStageArgs>) {
         dataSource.clear()
