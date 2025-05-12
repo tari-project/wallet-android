@@ -23,6 +23,8 @@ class ConnectionStatusesModuleView(context: Context, module: ConnectionStatusesM
     init {
         ui.wifiStatusText.setText(module.networkText)
         ui.torText.setText(module.torText)
+        ui.torTextPercent.text = "${module.torBootstrapPercent}%"
+        ui.torTextPercent.setVisible(module.torBootstrapPercent != null)
         ui.baseNodeStatusText.setText(module.baseNodeStateText)
         ui.syncingStateText.setText(module.baseNodeSyncText)
 
