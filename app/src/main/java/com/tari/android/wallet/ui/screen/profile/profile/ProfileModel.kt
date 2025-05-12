@@ -20,7 +20,7 @@ object ProfileModel {
         data class UserDetails(
             val userTag: String,
             val gemsEarned: Double,
-            val inviteLink: String,
+            val referralCode: String,
         )
     }
 }

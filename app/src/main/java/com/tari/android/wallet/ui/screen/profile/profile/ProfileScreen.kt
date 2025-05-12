@@ -116,10 +116,9 @@ fun ProfileScreen(
                             }
                             Spacer(Modifier.size(10.dp))
                             InviteLinkCard(
-                                link = uiState.userDetails.inviteLink,
+                                modifier = Modifier.padding(horizontal = 20.dp),
+                                link = String.format(FRIEND_INVITE_ADDRESS_SHORT, uiState.userDetails.referralCode),
                                 onShareClick = onInviteLinkShareClick,
-                                modifier = Modifier
-                                    .padding(horizontal = 20.dp),
                             )
                         }
                     }
@@ -205,7 +204,7 @@ private fun ProfileScreenPreview() {
                 userDetails = ProfileModel.UiState.UserDetails(
                     userTag = "NaveenSpark",
                     gemsEarned = 24_836_150.0,
-                    inviteLink = "tari-universe/129g78",
+                    referralCode = "129g78",
                 ),
                 friends = List(10) { index ->
                     Referral(
@@ -236,7 +235,7 @@ private fun ProfileScreenNoDataPreview() {
                 userDetails = ProfileModel.UiState.UserDetails(
                     userTag = "NaveenSpark",
                     gemsEarned = 0.0,
-                    inviteLink = "tari-universe/129g78",
+                    referralCode = "129g78",
                 ),
                 friends = List(10) { index ->
                     Referral(

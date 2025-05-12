@@ -20,7 +20,7 @@ import java.math.BigDecimal
 import javax.inject.Inject
 
 private const val FRIEND_INVITE_ADDRESS = "https://airdrop.tari.com/download/%s"
-private const val FRIEND_INVITE_ADDRESS_SHORT = "tari-universe/%s"
+internal const val FRIEND_INVITE_ADDRESS_SHORT = "tari-universe/%s"
 
 class ProfileViewModel : CommonViewModel() {
 
@@ -51,7 +51,7 @@ class ProfileViewModel : CommonViewModel() {
     }
 
     fun onInviteLinkShareClick() {
-        tariNavigator.navigate(Navigation.ShareText(String.format(FRIEND_INVITE_ADDRESS, uiState.value.userDetails?.inviteLink)))
+        tariNavigator.navigate(Navigation.ShareText(String.format(FRIEND_INVITE_ADDRESS, uiState.value.userDetails?.referralCode)))
     }
 
     fun onStartMiningClicked() {
@@ -76,7 +76,7 @@ class ProfileViewModel : CommonViewModel() {
                                 userDetails = ProfileModel.UiState.UserDetails(
                                     userTag = userDetails.user.displayName.orEmpty(),
                                     gemsEarned = userDetails.user.rank?.gemsCount ?: 0.0,
-                                    inviteLink = String.format(FRIEND_INVITE_ADDRESS_SHORT, userDetails.user.referralCode),
+                                    referralCode = userDetails.user.referralCode,
                                 )
                             )
                         }
