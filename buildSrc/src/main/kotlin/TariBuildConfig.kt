@@ -2,7 +2,7 @@
 
 object TariBuildConfig {
 
-    const val versionNumber = "1.0.4"
+    const val versionNumber = "1.0.5"
 
     const val minSdk = 26
     const val targetSdk = 34
@@ -13,7 +13,7 @@ object TariBuildConfig {
         val network: LibWalletNetwork = LibWalletNetwork.MAINNET
 
         val version = when (network) {
-            LibWalletNetwork.MAINNET -> "v2.0.1"
+            LibWalletNetwork.MAINNET -> "v2.1.0"
             LibWalletNetwork.NEXTNET -> "v2.0.1-rc.0"
         }
         val minValidVersion = when (network) {
