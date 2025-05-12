@@ -15,4 +15,6 @@ data class TariBaseNodeState(
         heightOfLongestChain = ffiTariBaseNodeState.getHeightOfLongestChain(),
         nodeId = ffiTariBaseNodeState.getNodeId()?.hex(),
     )
+
+    override fun toString() = "BaseNodeState(heightOfLongestChain=$heightOfLongestChain, nodeId=$nodeId)"
 }

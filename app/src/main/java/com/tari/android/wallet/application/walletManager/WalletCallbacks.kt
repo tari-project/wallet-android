@@ -141,10 +141,9 @@ class WalletCallbacks @Inject constructor() {
 
     fun onBaseNodeStatus(contextPtr: ByteArray, baseNodeStatePointer: FFIPointer) {
         val walletContextId = BigInteger(1, contextPtr).toInt()
-        val baseNodeState = FFITariBaseNodeState(baseNodeStatePointer)
-        log(walletContextId, "Base node state updated (height of the longest chain is ${baseNodeState.getHeightOfLongestChain()})")
-        listeners[walletContextId]?.onBaseNodeStateChanged(TariBaseNodeState(baseNodeState))
-        baseNodeState.destroy()
+        val baseNodeState = FFITariBaseNodeState(baseNodeStatePointer).runWithDestroy { TariBaseNodeState(it) }
+        log(walletContextId, "Base node state changed: $baseNodeState")
+        listeners[walletContextId]?.onBaseNodeStateChanged(baseNodeState)
     }
 
     fun onConnectivityStatus(contextPtr: ByteArray, bytes: ByteArray) {
