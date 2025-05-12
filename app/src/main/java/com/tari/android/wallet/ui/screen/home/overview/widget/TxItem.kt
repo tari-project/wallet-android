@@ -26,11 +26,13 @@ import com.giphy.sdk.analytics.GiphyPingbacks.context
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.walletManager.WalletConfig
 import com.tari.android.wallet.data.tx.TxDto
+import com.tari.android.wallet.model.tx.CompletedTx
 import com.tari.android.wallet.model.tx.Tx
 import com.tari.android.wallet.ui.compose.PreviewSecondarySurface
 import com.tari.android.wallet.ui.compose.TariDesignSystem
 import com.tari.android.wallet.ui.screen.settings.themeSelector.TariTheme
 import com.tari.android.wallet.util.MockDataStub
+import com.tari.android.wallet.util.extension.safeCastTo
 import com.tari.android.wallet.util.shortString
 import org.joda.time.DateTime
 import org.joda.time.Hours
@@ -136,10 +138,7 @@ fun TxDto.itemMessage(): String {
     val txUser = tx.tariContact
     return when {
         tx.isCoinbase -> {
-            when (tx.direction) {
-                Tx.Direction.INBOUND -> stringResource(R.string.tx_details_coinbase_inbound)
-                Tx.Direction.OUTBOUND -> stringResource(R.string.tx_details_coinbase_outbound)
-            }
+            stringResource(R.string.tx_details_coinbase, tx.safeCastTo<CompletedTx>()?.minedHeight ?: "--")
         }
 
         contact != null && contact.contactInfo.getAlias().isNotEmpty() || txUser.walletAddress.isUnknownUser() -> {

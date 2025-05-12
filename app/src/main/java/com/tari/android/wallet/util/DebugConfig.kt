@@ -206,6 +206,8 @@ object MockDataStub {
             publicNonce = "publicNonce",
             signature = "signature",
         ),
+        minedTimestamp = BigInteger.valueOf(System.currentTimeMillis()),
+        minedHeight = 0.toBigInteger(),
     )
 
     fun createCancelledTx(

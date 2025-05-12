@@ -98,7 +98,7 @@ fun TxDetailsScreen(
                         .fillMaxWidth()
                         .padding(horizontal = 24.dp),
                     alias = when {
-                        coinbase -> stringResource(R.string.tx_details_coinbase_inbound)
+                        coinbase -> stringResource(R.string.tx_details_coinbase)
                         unknownUser -> stringResource(R.string.unknown_source)
                         else -> contact.alias
                     },

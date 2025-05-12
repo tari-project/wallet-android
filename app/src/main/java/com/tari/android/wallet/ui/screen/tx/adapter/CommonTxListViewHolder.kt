@@ -21,6 +21,7 @@ import com.tari.android.wallet.util.addressLastEmojis
 import com.tari.android.wallet.util.addressPrefixEmojis
 import com.tari.android.wallet.util.extension.gone
 import com.tari.android.wallet.util.extension.makeTextBold
+import com.tari.android.wallet.util.extension.safeCastTo
 import com.tari.android.wallet.util.extension.string
 import com.tari.android.wallet.util.extension.visible
 import org.joda.time.DateTime
@@ -45,11 +46,7 @@ abstract class CommonTxListViewHolder<T : CommonViewHolderItem, VB : ViewBinding
                 participantTextView1.visible()
                 participantTextView2.gone()
                 emojiIdViewContainer.root.gone()
-                participantTextView1.text = when (tx.direction) {
-                    Tx.Direction.INBOUND -> string(R.string.tx_details_coinbase_inbound).makeTextBold(itemView.context)
-                    Tx.Direction.OUTBOUND -> string(R.string.tx_details_coinbase_outbound)
-                        .makeTextBold(itemView.context, string(R.string.tx_list_you), string(R.string.tx_list_miner))
-                }
+                participantTextView1.text = string(R.string.tx_details_coinbase, tx.safeCastTo<CompletedTx>()?.minedHeight ?: "--")
             }
 
             contact != null && contact.contactInfo.getAlias().isNotEmpty() || txUser.walletAddress.isUnknownUser() -> {
