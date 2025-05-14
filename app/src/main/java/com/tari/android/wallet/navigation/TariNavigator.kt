@@ -77,7 +77,7 @@ import com.tari.android.wallet.ui.screen.settings.themeSelector.ThemeSelectorFra
 import com.tari.android.wallet.ui.screen.settings.torBridges.TorBridgesSelectionFragment
 import com.tari.android.wallet.ui.screen.settings.torBridges.customBridges.CustomTorBridgesFragment
 import com.tari.android.wallet.ui.screen.tx.details.TxDetailsFragment
-import com.tari.android.wallet.ui.screen.tx.history.all.AllTxHistoryFragment
+import com.tari.android.wallet.ui.screen.tx.history.TxHistoryFragment
 import com.tari.android.wallet.ui.screen.tx.history.contact.ContactTxHistoryFragment
 import com.tari.android.wallet.ui.screen.utxos.list.UtxosListFragment
 import com.tari.android.wallet.util.extension.parcelable
@@ -150,7 +150,7 @@ class TariNavigator @Inject constructor(
             is TxList.ToAllSettings -> addFragment(AllSettingsFragment.newInstance())
             is TxList.ToTransfer -> addFragment(TransferFragment())
             is TxList.ToReceive -> addFragment(ReceiveFragment())
-            is TxList.HomeTransactionHistory -> addFragment(AllTxHistoryFragment())
+            is TxList.HomeTransactionHistory -> addFragment(TxHistoryFragment())
 
             is TorBridge.ToCustomBridges -> addFragment(CustomTorBridgesFragment())
 

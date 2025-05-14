@@ -28,7 +28,7 @@ class TxRepository @Inject constructor(
     private val logger
         get() = Logger.t(TxRepository::class.java.simpleName)
 
-    private val _txs = MutableStateFlow(TxListData(confirmationCount = DEFAULT_CONFIRMATION_COUNT))
+    private val _txs = MutableStateFlow(TxListData())
     val txs = _txs.asStateFlow()
     val pendingTxs: Flow<List<TxDto>> = txs.map { txs ->
         (txs.pendingInboundTxs + txs.pendingOutboundTxs + txs.minedUnconfirmedTxs)
@@ -89,14 +89,12 @@ class TxRepository @Inject constructor(
                     completedTxs = wallet.getCompletedTxs(),
                     pendingInboundTxs = wallet.getPendingInboundTxs(),
                     pendingOutboundTxs = wallet.getPendingOutboundTxs(),
-                    confirmationCount = wallet.getRequiredConfirmationCount(),
                 )
                 logger.i(
                     "Refreshed tx list: ${_txs.value.completedTxs.size} completed, " +
                             "${_txs.value.pendingInboundTxs.size} pending inbound, " +
                             "${_txs.value.pendingOutboundTxs.size} pending outbound, " +
-                            "${_txs.value.cancelledTxs.size} cancelled (required confirmation count: " +
-                            "${_txs.value.confirmationCount})"
+                            "${_txs.value.cancelledTxs.size} cancelled"
                 )
             }
         }
@@ -106,8 +104,4 @@ class TxRepository @Inject constructor(
         tx = this,
         contact = contactsRepository.getContactForTx(this),
     )
-
-    companion object {
-        private const val DEFAULT_CONFIRMATION_COUNT = 3L
-    }
 }

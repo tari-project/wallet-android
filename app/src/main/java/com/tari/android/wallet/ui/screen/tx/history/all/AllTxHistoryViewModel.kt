@@ -2,16 +2,15 @@ package com.tari.android.wallet.ui.screen.tx.history.all
 
 import com.tari.android.wallet.R
 import com.tari.android.wallet.data.tx.TxRepository
-import com.tari.android.wallet.util.extension.collectFlow
-import com.tari.android.wallet.util.extension.zipToPair
 import com.tari.android.wallet.model.tx.Tx
 import com.tari.android.wallet.navigation.Navigation
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.common.giphy.presentation.GifViewModel
 import com.tari.android.wallet.ui.common.giphy.repository.GiphyRestService
 import com.tari.android.wallet.ui.common.recyclerView.items.TitleViewHolderItem
-import com.tari.android.wallet.data.contacts.ContactsRepository
 import com.tari.android.wallet.ui.screen.tx.adapter.TxViewHolderItem
+import com.tari.android.wallet.util.extension.collectFlow
+import com.tari.android.wallet.util.extension.zipToPair
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -21,9 +20,6 @@ class AllTxHistoryViewModel : CommonViewModel() {
 
     @Inject
     lateinit var txRepository: TxRepository
-
-    @Inject
-    lateinit var contactsRepository: ContactsRepository
 
     @Inject
     lateinit var giphyRestService: GiphyRestService
