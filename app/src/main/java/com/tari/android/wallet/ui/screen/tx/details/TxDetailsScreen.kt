@@ -71,7 +71,7 @@ fun TxDetailsScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 24.dp),
-                title = stringResource(R.string.tx_details_paid),
+                title = stringResource(if (uiState.tx.isOutbound) R.string.tx_details_paid else R.string.tx_details_received),
                 value = "${WalletConfig.amountFormatter.format(uiState.tx.amount.tariValue)} ${uiState.ticker}",
             )
 

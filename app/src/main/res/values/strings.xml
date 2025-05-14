@@ -382,6 +382,7 @@
     <string name="tx_details_total">Total</string>
     <string name="tx_details_transaction_details">Transaction Details</string>
     <string name="tx_details_paid">Paid</string>
+    <string name="tx_details_received">"Received</string>
     <string name="tx_details_date">Date</string>
     <string name="tx_details_txn_id">Tari Txn ID</string>
     <string name="tx_details_txn_id_processing">Processing</string>
