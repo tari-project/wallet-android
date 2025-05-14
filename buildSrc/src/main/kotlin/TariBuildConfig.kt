@@ -13,8 +13,8 @@ object TariBuildConfig {
         val network: LibWalletNetwork = LibWalletNetwork.MAINNET
 
         val version = when (network) {
-            LibWalletNetwork.MAINNET -> "v2.1.0"
-            LibWalletNetwork.NEXTNET -> "v2.0.1-rc.0"
+            LibWalletNetwork.MAINNET -> "v2.1.1"
+            LibWalletNetwork.NEXTNET -> "v2.1.1-rc.0"
         }
         val minValidVersion = when (network) {
             LibWalletNetwork.MAINNET -> "v0.0.0"
