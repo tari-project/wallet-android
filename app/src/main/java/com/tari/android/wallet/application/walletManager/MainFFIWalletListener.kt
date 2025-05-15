@@ -11,10 +11,10 @@ import com.tari.android.wallet.data.baseNode.BaseNodeState
 import com.tari.android.wallet.data.baseNode.BaseNodeStateHandler
 import com.tari.android.wallet.data.recovery.WalletRestorationState
 import com.tari.android.wallet.data.recovery.WalletRestorationStateHandler
-import com.tari.android.wallet.ffi.FFITariBaseNodeState
 import com.tari.android.wallet.ffi.TransactionValidationStatus
 import com.tari.android.wallet.ffi.runWithDestroy
 import com.tari.android.wallet.model.BalanceInfo
+import com.tari.android.wallet.model.TariBaseNodeState
 import com.tari.android.wallet.model.TariContact
 import com.tari.android.wallet.model.TariWalletAddress
 import com.tari.android.wallet.model.TransactionSendStatus
@@ -199,7 +199,7 @@ class MainFFIWalletListener(
         baseNodesManager.saveWalletScannedHeight(height)
     }
 
-    override fun onBaseNodeStateChanged(baseNodeState: FFITariBaseNodeState) = runOnMain {
+    override fun onBaseNodeStateChanged(baseNodeState: TariBaseNodeState) = runOnMain {
         baseNodesManager.saveBaseNodeState(baseNodeState)
     }
 

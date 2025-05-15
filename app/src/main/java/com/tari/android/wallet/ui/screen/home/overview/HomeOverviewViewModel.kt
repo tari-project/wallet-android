@@ -36,6 +36,8 @@ import kotlinx.coroutines.flow.update
 import java.time.LocalDate
 import javax.inject.Inject
 
+const val TARI_COM = "https://tari.com/"
+
 private const val DATA_REFRESH_INTERVAL_MILLIS = 60_000L
 private val MAINNET_DEADLINE = LocalDate.of(/* year = */ 2025, /* month = */ 6, /* dayOfMonth = */ 6)
 private const val TWITTER_TRAILER_URL = "https://x.com/tari/status/1915132135662297120"
@@ -149,22 +151,6 @@ class HomeOverviewViewModel : CommonViewModel() {
                 logger.i("notification permission checked successfully")
             }
         }
-
-        grantContactsPermission()
-    }
-
-    fun grantContactsPermission() {
-        permissionManager.runWithPermission(
-            permissions = listOf(
-                android.Manifest.permission.READ_CONTACTS,
-                android.Manifest.permission.WRITE_CONTACTS,
-            ),
-            silently = true,
-        ) {
-            launchOnIo {
-                contactsRepository.grantContactPermissionAndRefresh()
-            }
-        }
     }
 
     fun onSyncDialogDismiss() {
@@ -186,7 +172,7 @@ class HomeOverviewViewModel : CommonViewModel() {
     }
 
     fun onStartMiningClicked() {
-        showNotReadyYetDialog()
+        openUrl(TARI_COM)
     }
 
     fun onSendTariClicked() {

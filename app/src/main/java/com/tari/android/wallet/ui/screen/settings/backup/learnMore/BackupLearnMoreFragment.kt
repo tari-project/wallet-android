@@ -50,7 +50,7 @@ class BackupLearnMoreFragment : CommonXmlFragment<FragmentBackupLearnMoreBinding
 
     private inner class BackupOnboardingFlowAdapter(fm: FragmentActivity) : FragmentStateAdapter(fm) {
 
-        private val args = arrayListOf(
+        private val args = listOf(
             BackupLearnMoreStageArgs.StageOne(viewModel.resourceManager) { openStage1() },
             BackupLearnMoreStageArgs.StageTwo(viewModel.resourceManager) { openStage1B() },
             BackupLearnMoreStageArgs.StageThree(viewModel.resourceManager) { openStage2() },

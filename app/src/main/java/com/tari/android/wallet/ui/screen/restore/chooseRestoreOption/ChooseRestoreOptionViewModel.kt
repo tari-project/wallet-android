@@ -204,7 +204,7 @@ class ChooseRestoreOptionViewModel : CommonViewModel() {
         )
 
         saveAction = {
-            val seeds = deeplink.seedWords(passphraseModule.value.trim())
+            val seeds = deeplink.seedWords(passphraseModule.value)
             if (seeds != null) {
                 hideDialog()
                 restoreFromPaperWallet(seeds, deeplink.balance, deeplink.anonId)

@@ -10,6 +10,7 @@ import com.tari.android.wallet.ui.dialog.modular.modules.body.BodyModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonStyle
 import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
+import com.tari.android.wallet.ui.screen.home.overview.TARI_COM
 import com.tari.android.wallet.util.extension.collectFlow
 import com.tari.android.wallet.util.extension.launchOnIo
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -19,7 +20,7 @@ import java.math.BigDecimal
 import javax.inject.Inject
 
 private const val FRIEND_INVITE_ADDRESS = "https://airdrop.tari.com/download/%s"
-private const val FRIEND_INVITE_ADDRESS_SHORT = "tari-universe/%s"
+internal const val FRIEND_INVITE_ADDRESS_SHORT = "tari-universe/%s"
 
 class ProfileViewModel : CommonViewModel() {
 
@@ -50,11 +51,11 @@ class ProfileViewModel : CommonViewModel() {
     }
 
     fun onInviteLinkShareClick() {
-        tariNavigator.navigate(Navigation.ShareText(String.format(FRIEND_INVITE_ADDRESS, uiState.value.userDetails?.inviteLink)))
+        tariNavigator.navigate(Navigation.ShareText(String.format(FRIEND_INVITE_ADDRESS, uiState.value.userDetails?.referralCode)))
     }
 
     fun onStartMiningClicked() {
-        showNotReadyYetDialog()
+        openUrl(TARI_COM)
     }
 
     fun refreshData() {
@@ -75,7 +76,7 @@ class ProfileViewModel : CommonViewModel() {
                                 userDetails = ProfileModel.UiState.UserDetails(
                                     userTag = userDetails.user.displayName.orEmpty(),
                                     gemsEarned = userDetails.user.rank?.gemsCount ?: 0.0,
-                                    inviteLink = String.format(FRIEND_INVITE_ADDRESS_SHORT, userDetails.user.referralCode),
+                                    referralCode = userDetails.user.referralCode,
                                 )
                             )
                         }

@@ -344,7 +344,7 @@ open class ContactSelectionFragment : CommonXmlFragment<FragmentContactsSelectio
         } else {
             val walletAddress = TariWalletAddress.fromBase58OrNull(text)
             if (walletAddress != null) {
-                viewModel.addressEntered(walletAddress.fullEmojiId)
+                viewModel.addressEntered(walletAddress)
             } else {
                 viewModel.deselectTariWalletAddress()
                 ui.searchEditText.textAlignment = View.TEXT_ALIGNMENT_TEXT_START

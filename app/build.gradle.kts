@@ -57,6 +57,7 @@ android {
         buildConfigField("String", "DROPBOX_ACCESS_TOKEN", "\"${dropboxProperties["dropbox_key"]}\"")
         buildConfigField("String", "LIB_WALLET_MIN_VALID_VERSION", "\"${TariBuildConfig.LibWallet.minValidVersion}\"")
         buildConfigField("String", "LIB_WALLET_VERSION", "\"${TariBuildConfig.LibWallet.version}\"")
+        buildConfigField("String", "LIB_WALLET_NETWORK", "\"${TariBuildConfig.LibWallet.network}\"")
     }
 
     flavorDimensions.add("privacy-mode")

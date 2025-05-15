@@ -254,7 +254,6 @@
     <string name="tx_list_emoji_coinbase_payment_placeholder">🪙</string>
     <string name="tx_list_someone">Someone</string>
     <string name="tx_list_you">You</string>
-    <string name="tx_list_miner">Miner</string>
 
     <!-- send tari -->
     <string name="send_tari_title">Send To</string>
@@ -378,12 +377,12 @@
     <string name="tx_details_cancel_dialog_not_cancel">Not now</string>
     <string name="tx_details_error_tx_not_found_title">Requested transaction was not found</string>
     <string name="tx_details_error_tx_not_found_desc">Please try again later</string>
-    <string name="tx_details_coinbase_inbound">Mining Reward!</string>
-    <string name="tx_details_coinbase_outbound">You paid the Miner</string>
+    <string name="tx_details_coinbase">Block #%s</string>
     <string name="tx_details_recipient_address">Recipient Address</string>
     <string name="tx_details_total">Total</string>
     <string name="tx_details_transaction_details">Transaction Details</string>
     <string name="tx_details_paid">Paid</string>
+    <string name="tx_details_received">"Received</string>
     <string name="tx_details_date">Date</string>
     <string name="tx_details_txn_id">Tari Txn ID</string>
     <string name="tx_details_txn_id_processing">Processing</string>
@@ -680,6 +679,7 @@
     <string name="connection_status_dialog_chain_tip">Chain Tip: </string>
     <string name="connection_status_dialog_chain_tip_value">#%s (%s)</string>
     <string name="connection_status_dialog_chain_tip_waiting">Waiting for connection…</string>
+    <string name="connection_status_dialog_base_node_id">Base Node ID: %s</string>
 
     <string name="tor_bridges_title">Bridges Configuration</string>
     <string name="tor_bridges_connect">Connect</string>

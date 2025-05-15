@@ -163,6 +163,19 @@ class ContactSelectionViewModel : CommonViewModel() {
         }
     }
 
+    // For GRPC address which can't be parsed as EmojiId
+    fun addressEntered(walletAddress: TariWalletAddress) {
+        launchOnIo {
+            selectedTariWalletAddress.postValue(walletAddress)
+
+            addressPoisoningChecker.doOnAddressPoisoned(walletAddress) { addresses ->
+                showAddressPoisonedDialog(addresses)
+            }
+
+            _effect.send(Effect.ShowNextButton)
+        }
+    }
+
     fun onContinueButtonClick(effect: ContinueButtonEffect) {
         when (effect) {
             is ContinueButtonEffect.AddContact -> {

@@ -40,6 +40,7 @@ import com.tari.android.wallet.model.Base58
 import com.tari.android.wallet.model.MicroTari
 import com.tari.android.wallet.model.TariWalletAddress
 import com.tari.android.wallet.util.extension.parseToBigInteger
+import com.tari.android.wallet.util.extension.removeWhitespaces
 import kotlinx.parcelize.Parcelize
 
 /**
@@ -185,7 +186,9 @@ sealed class DeepLink : Parcelable {
     ) : DeepLink() {
 
         fun seedWords(passphrase: String): List<String>? = runCatching {
-            FFISeedWords(this.privateKey, passphrase).runWithDestroy { seedWords -> (0 until seedWords.getLength()).map { seedWords.getAt(it) } }
+            FFISeedWords(this.privateKey, passphrase.trim().removeWhitespaces().lowercase()).runWithDestroy { seedWords ->
+                (0 until seedWords.getLength()).map { seedWords.getAt(it) }
+            }
         }.getOrNull()
 
         constructor(params: Map<String, String>) : this(

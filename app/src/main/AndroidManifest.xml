@@ -145,7 +145,6 @@
             android:name="com.google.android.gms.auth.api.signin.internal.SignInHubActivity"
             android:excludeFromRecents="true"
             android:exported="false"
-            android:screenOrientation="portrait"
             android:theme="@style/GoogleSignInActivity"
             tools:replace="android:theme" />
 

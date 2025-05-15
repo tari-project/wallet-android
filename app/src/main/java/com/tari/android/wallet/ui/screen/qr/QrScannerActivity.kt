@@ -95,7 +95,7 @@ class QrScannerActivity : CommonXmlActivity<ActivityQrScannerBinding, QrScannerV
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (requestCode == REQUEST_CAMERA_PERMISSION) {
-            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            if (grantResults.getOrNull(0) == PackageManager.PERMISSION_GRANTED) {
                 startScanning()
             } else {
                 Toast.makeText(this, getString(R.string.add_recipient_camera_permission_denied_message), Toast.LENGTH_LONG).show()

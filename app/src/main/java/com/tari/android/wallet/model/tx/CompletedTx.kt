@@ -61,6 +61,8 @@ data class CompletedTx(
     val fee: MicroTari,
     val confirmationCount: BigInteger,
     val txKernel: CompletedTransactionKernel?,
+    val minedTimestamp: BigInteger,
+    val minedHeight: BigInteger,
 ) : Tx(id, direction, amount, timestamp, message, paymentId, status, tariContact), Parcelable {
 
     constructor(tx: FFICompletedTx) : this(
@@ -81,7 +83,9 @@ data class CompletedTx(
                 ?.let { CompletedTransactionKernel(it.getExcess(), it.getExcessPublicNonce(), it.getExcessSignature()) }
         } catch (e: Exception) {
             null
-        }
+        },
+        minedTimestamp = tx.getMinedTimestamp(),
+        minedHeight = tx.getMinedHeight(),
     )
 
     constructor(pointer: FFIPointer) : this(FFICompletedTx(pointer))

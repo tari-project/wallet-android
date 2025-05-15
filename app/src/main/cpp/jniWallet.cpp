@@ -605,7 +605,7 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniGetWalletAddress(
         jobject error) {
     return ExecuteWithErrorAndCast<TariWalletAddress *>(jEnv, error, [&](int *errorPointer) {
         auto pWallet = GetPointerField<TariWallet *>(jEnv, jThis);
-        return wallet_get_tari_interactive_address(pWallet, errorPointer);
+        return wallet_get_tari_one_sided_address(pWallet, errorPointer);
     });
 }
 

@@ -97,8 +97,6 @@ object DebugConfig {
 
     val selectBaseNodeEnabled = valueIfDebug(false) // TODO remove all the code related to this ?
 
-    const val showActiveMinersButton = false
-
     const val skipAddingNote = true
 
     const val showInvitedFriendsInProfile = false
@@ -208,6 +206,8 @@ object MockDataStub {
             publicNonce = "publicNonce",
             signature = "signature",
         ),
+        minedTimestamp = BigInteger.valueOf(System.currentTimeMillis()),
+        minedHeight = 0.toBigInteger(),
     )
 
     fun createCancelledTx(

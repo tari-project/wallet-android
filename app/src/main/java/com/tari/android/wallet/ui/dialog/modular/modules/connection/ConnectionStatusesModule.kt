@@ -7,6 +7,7 @@ import com.tari.android.wallet.data.baseNode.BaseNodeSyncState
 import com.tari.android.wallet.data.network.NetworkConnectionState
 import com.tari.android.wallet.tor.TorProxyState
 import com.tari.android.wallet.ui.dialog.modular.IDialogModule
+import com.tari.android.wallet.util.extension.safeCastTo
 
 class ConnectionStatusesModule(
     val connectionState: ConnectionState,
@@ -31,6 +32,8 @@ class ConnectionStatusesModule(
         is TorProxyState.Running -> R.string.connection_status_dialog_tor_status_connected
         is TorProxyState.Failed -> R.string.connection_status_dialog_tor_status_failed
     }
+
+    val torBootstrapPercent = connectionState.torProxyState.safeCastTo<TorProxyState.Initializing>()?.bootstrapStatus?.progress
 
     val torIcon = when (connectionState.torProxyState) {
         is TorProxyState.NotReady -> R.drawable.vector_network_status_dot_red

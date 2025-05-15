@@ -22,7 +22,6 @@ import com.tari.android.wallet.ui.compose.PreviewPrimarySurface
 import com.tari.android.wallet.ui.compose.TariDesignSystem
 import com.tari.android.wallet.ui.compose.components.WithRippleColor
 import com.tari.android.wallet.ui.screen.settings.themeSelector.TariTheme
-import com.tari.android.wallet.util.DebugConfig
 
 @Composable
 fun StartMiningButton(
@@ -31,14 +30,7 @@ fun StartMiningButton(
     onStartMiningClick: () -> Unit = {},
 ) {
     if (!isMining) {
-        if (DebugConfig.showActiveMinersButton) {
-            NotMiningButton(
-                modifier = modifier,
-                onClick = onStartMiningClick,
-            )
-        } else {
-            NotMiningView(modifier)
-        }
+        NotMiningView(modifier)
     } else {
         MiningView(modifier)
     }

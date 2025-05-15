@@ -26,11 +26,13 @@ import com.giphy.sdk.analytics.GiphyPingbacks.context
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.walletManager.WalletConfig
 import com.tari.android.wallet.data.tx.TxDto
+import com.tari.android.wallet.model.tx.CompletedTx
 import com.tari.android.wallet.model.tx.Tx
 import com.tari.android.wallet.ui.compose.PreviewSecondarySurface
 import com.tari.android.wallet.ui.compose.TariDesignSystem
 import com.tari.android.wallet.ui.screen.settings.themeSelector.TariTheme
 import com.tari.android.wallet.util.MockDataStub
+import com.tari.android.wallet.util.extension.safeCastTo
 import com.tari.android.wallet.util.shortString
 import org.joda.time.DateTime
 import org.joda.time.Hours
@@ -39,6 +41,7 @@ import org.joda.time.Minutes
 import java.util.Locale
 
 private const val TX_ITEM_DATE_FORMAT = "E, MMM d"
+private val MIN_ROUNDING = 10000.toBigInteger()
 
 @Composable
 fun TxItem(
@@ -101,7 +104,8 @@ fun TxItem(
                 )
                 Spacer(modifier = Modifier.width(4.dp))
                 Text(
-                    text = WalletConfig.amountFormatter.format(txDto.tx.amount.tariValue) + " " + ticker,
+                    text = (txDto.tx.amount.takeIf { it.value >= MIN_ROUNDING }?.tariValue?.let { WalletConfig.balanceFormatter.format(it) }
+                        ?: "<0.01") + " " + ticker,
                     style = TariDesignSystem.typography.headingLarge,
                 )
             }
@@ -134,10 +138,7 @@ fun TxDto.itemMessage(): String {
     val txUser = tx.tariContact
     return when {
         tx.isCoinbase -> {
-            when (tx.direction) {
-                Tx.Direction.INBOUND -> stringResource(R.string.tx_details_coinbase_inbound)
-                Tx.Direction.OUTBOUND -> stringResource(R.string.tx_details_coinbase_outbound)
-            }
+            stringResource(R.string.tx_details_coinbase, tx.safeCastTo<CompletedTx>()?.minedHeight ?: "--")
         }
 
         contact != null && contact.contactInfo.getAlias().isNotEmpty() || txUser.walletAddress.isUnknownUser() -> {
@@ -148,9 +149,13 @@ fun TxDto.itemMessage(): String {
             }
         }
 
-        tx.isOneSided -> {
-            (stringResource(R.string.tx_list_someone) + " " + stringResource(R.string.tx_list_paid_you))
-        }
+        // TODO as far as we use only OSP tx, all the txs are OSP, but we have contact address of them
+//        tx.isOneSided -> {
+//            when (tx.direction) {
+//                Tx.Direction.INBOUND -> stringResource(R.string.tx_list_someone) + " " + stringResource(R.string.tx_list_paid_you)
+//                Tx.Direction.OUTBOUND -> stringResource(R.string.tx_list_you_paid) + " " + stringResource(R.string.tx_list_someone).lowercase()
+//            }
+//        }
 
         else -> { // display emoji id
             when (tx.direction) {
@@ -168,7 +173,27 @@ private fun TxItemPreview() {
         TxItem(
             modifier = Modifier.padding(16.dp),
             txDto = MockDataStub.createTxDto(
-                amount = 122334455,
+                amount = 12345678,
+                contactAlias = "Alice",
+            ),
+            ticker = "XTM",
+            onTxClick = {},
+        )
+
+        TxItem(
+            modifier = Modifier.padding(16.dp),
+            txDto = MockDataStub.createTxDto(
+                amount = 12345,
+                contactAlias = "Alice",
+            ),
+            ticker = "XTM",
+            onTxClick = {},
+        )
+
+        TxItem(
+            modifier = Modifier.padding(16.dp),
+            txDto = MockDataStub.createTxDto(
+                amount = 1234,
                 contactAlias = "Alice",
             ),
             ticker = "XTM",

@@ -51,6 +51,9 @@ class AllSettingsFragment : CommonXmlFragment<FragmentAllSettingsBinding, AllSet
 
     private val biometricAuthenticationViewModel: BiometricAuthenticationViewModel by viewModels()
 
+    // We need to prevent screen recording when onResume is called when this fragment is not on top
+    override fun screenRecordingAlwaysDisable() = !isFragmentOnTop()
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
         FragmentAllSettingsBinding.inflate(inflater, container, false).also { ui = it }.root
 

@@ -2,15 +2,24 @@
 
 object TariBuildConfig {
 
-    const val versionNumber = "1.0.0"
+    const val versionNumber = "1.0.5"
 
     const val minSdk = 26
     const val targetSdk = 34
     const val compileSdk = 35
 
     object LibWallet {
-        const val version = "v2.0.0-alpha.3"
-        const val minValidVersion = "v2.0.0-alpha.3"
+        // We use different versions of the library for different networks, set $network to easily switch between them
+        val network: LibWalletNetwork = LibWalletNetwork.MAINNET
+
+        val version = when (network) {
+            LibWalletNetwork.MAINNET -> "v2.1.1"
+            LibWalletNetwork.NEXTNET -> "v2.1.1-rc.0"
+        }
+        val minValidVersion = when (network) {
+            LibWalletNetwork.MAINNET -> "v0.0.0"
+            LibWalletNetwork.NEXTNET -> "v1.18.0-rc.0"
+        }
 
         const val hostURL = "https://github.com/tari-project/tari/releases/download/"
         const val x64A = "libminotari_wallet_ffi.android_x86_64.a"
@@ -23,5 +32,7 @@ object TariBuildConfig {
             get() = "${hostURL}${version}/${armA}"
         val x64AFileUrl
             get() = "${hostURL}${version}/${x64A}"
+
+        enum class LibWalletNetwork { MAINNET, NEXTNET }
     }
 }

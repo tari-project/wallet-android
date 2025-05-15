@@ -124,6 +124,31 @@ Java_com_tari_android_wallet_ffi_FFICompletedTx_jniGetTimestamp(
 }
 
 extern "C"
+JNIEXPORT jbyteArray JNICALL
+Java_com_tari_android_wallet_ffi_FFICompletedTx_jniGetMinedTimestamp(
+        JNIEnv *jEnv,
+        jobject jThis,
+        jobject error) {
+    return ExecuteWithError<jbyteArray>(jEnv, error, [&](int *errorPointer) {
+        auto pCompletedTx = GetPointerField<TariCompletedTransaction *>(jEnv, jThis);
+        return getBytesFromUnsignedLongLong(jEnv, completed_transaction_get_mined_timestamp(pCompletedTx, errorPointer));
+    });
+}
+
+
+extern "C"
+JNIEXPORT jbyteArray JNICALL
+Java_com_tari_android_wallet_ffi_FFICompletedTx_jniGetMinedHeight(
+        JNIEnv *jEnv,
+        jobject jThis,
+        jobject error) {
+    return ExecuteWithError<jbyteArray>(jEnv, error, [&](int *errorPointer) {
+        auto pCompletedTx = GetPointerField<TariCompletedTransaction *>(jEnv, jThis);
+        return getBytesFromUnsignedLongLong(jEnv, completed_transaction_get_mined_height(pCompletedTx, errorPointer));
+    });
+}
+
+extern "C"
 JNIEXPORT jstring JNICALL
 Java_com_tari_android_wallet_ffi_FFICompletedTx_jniGetMessage(
         JNIEnv *jEnv,
