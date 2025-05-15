@@ -35,16 +35,12 @@ package com.tari.android.wallet.di
 import com.tari.android.wallet.BuildConfig
 import com.tari.android.wallet.data.airdrop.AirdropRetrofitService
 import com.tari.android.wallet.data.push.PushRetrofitService
-import com.tari.android.wallet.ui.common.giphy.repository.GiphyRepository
-import com.tari.android.wallet.ui.common.giphy.repository.GiphyRestService
 import dagger.Module
 import dagger.Provides
-import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import retrofit2.create
 import javax.inject.Named
 import javax.inject.Singleton
 
@@ -52,44 +48,12 @@ import javax.inject.Singleton
 class RetrofitModule {
 
     private companion object {
-        private const val GIPHY_BASE_URL = "https://api.giphy.com"
         private const val AIRDROP_BASE_URL = "https://airdrop.tari.com"
         private const val PUSH_BASE_URL = "https://push.tari.com"
 
-        private const val RETROFIT_GIPHY = "giphy_retrofit"
         private const val RETROFIT_AIRDROP = "airdrop_retrofit"
         private const val RETROFIT_PUSH = "push_retrofit"
-
-        private const val GIPHY_QUERY_PARAM_API_KEY = "api_key"
     }
-
-    @Provides
-    @Named(RETROFIT_GIPHY)
-    @Singleton
-    fun provideGiphyHttpClient(): OkHttpClient = OkHttpClient.Builder()
-        .addLoggingIfDebug()
-        .addInterceptor { chain: Interceptor.Chain ->
-            chain.request().url.newBuilder()
-                .addQueryParameter(GIPHY_QUERY_PARAM_API_KEY, BuildConfig.GIPHY_KEY).build()
-                .let { chain.request().newBuilder().url(it).build() }
-                .let(chain::proceed)
-        }
-        .build()
-
-    @Provides
-    @Named(RETROFIT_GIPHY)
-    @Singleton
-    fun provideTestnetFaucetRetrofit(@Named(RETROFIT_GIPHY) client: OkHttpClient): Retrofit =
-        Retrofit.Builder()
-            .baseUrl(GIPHY_BASE_URL)
-            .client(client)
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
-
-    @Provides
-    @Singleton
-    fun provideGifRepository(@Named(RETROFIT_GIPHY) retrofit: Retrofit): GiphyRestService =
-        GiphyRepository(retrofit.create())
 
     @Provides
     @Named(RETROFIT_AIRDROP)

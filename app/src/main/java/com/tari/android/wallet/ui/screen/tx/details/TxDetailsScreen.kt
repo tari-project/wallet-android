@@ -24,6 +24,7 @@ import androidx.compose.ui.unit.dp
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.walletManager.WalletConfig
 import com.tari.android.wallet.model.TxStatus
+import com.tari.android.wallet.model.tx.CompletedTx
 import com.tari.android.wallet.ui.compose.TariDesignSystem
 import com.tari.android.wallet.ui.compose.components.TariPrimaryButton
 import com.tari.android.wallet.ui.compose.components.TariTextButton
@@ -35,6 +36,7 @@ import com.tari.android.wallet.ui.screen.tx.details.widget.TxDetailInfoItem
 import com.tari.android.wallet.ui.screen.tx.details.widget.TxDetailInfoStatusItem
 import com.tari.android.wallet.util.MockDataStub
 import com.tari.android.wallet.util.extension.isTrue
+import com.tari.android.wallet.util.extension.safeCastTo
 
 @Composable
 fun TxDetailsScreen(
@@ -98,7 +100,7 @@ fun TxDetailsScreen(
                         .fillMaxWidth()
                         .padding(horizontal = 24.dp),
                     alias = when {
-                        coinbase -> stringResource(R.string.tx_details_coinbase)
+                        coinbase -> stringResource(R.string.tx_details_coinbase, uiState.tx.safeCastTo<CompletedTx>()?.minedHeight ?: "--")
                         unknownUser -> stringResource(R.string.unknown_source)
                         else -> contact.alias
                     },

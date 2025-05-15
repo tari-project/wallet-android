@@ -70,8 +70,6 @@ import com.tari.android.wallet.ui.screen.restore.inputSeedWords.InputSeedWordsVi
 import com.tari.android.wallet.ui.screen.restore.walletRestoring.WalletRestoringViewModel
 import com.tari.android.wallet.ui.screen.send.addAmount.AddAmountViewModel
 import com.tari.android.wallet.ui.screen.send.addNote.AddNoteViewModel
-import com.tari.android.wallet.ui.screen.send.addNote.gif.ChooseGIFDialogFragment
-import com.tari.android.wallet.ui.screen.send.addNote.gif.ThumbnailGifViewModel
 import com.tari.android.wallet.ui.screen.send.confirm.ConfirmViewModel
 import com.tari.android.wallet.ui.screen.send.finalize.FinalizeSendTxViewModel
 import com.tari.android.wallet.ui.screen.send.receive.ReceiveViewModel
@@ -99,8 +97,6 @@ import com.tari.android.wallet.ui.screen.settings.torBridges.customBridges.Custo
 import com.tari.android.wallet.ui.screen.settings.userAutorization.BiometricAuthenticationViewModel
 import com.tari.android.wallet.ui.screen.tx.details.TxDetailsViewModel
 import com.tari.android.wallet.ui.screen.tx.history.TxHistoryViewModel
-import com.tari.android.wallet.ui.screen.tx.history.all.AllTxHistoryViewModel
-import com.tari.android.wallet.ui.screen.tx.history.contact.ContactTxHistoryViewModel
 import com.tari.android.wallet.ui.screen.utxos.list.UtxosListViewModel
 import dagger.Component
 import javax.inject.Singleton
@@ -129,11 +125,9 @@ interface ApplicationComponent {
     fun inject(activity: AuthActivity)
     fun inject(activity: QrScannerActivity)
 
-    fun inject(fragment: ChooseGIFDialogFragment)
     fun inject(fragment: CreateWalletFragment)
 
     fun inject(commonViewModel: CommonViewModel)
-    fun inject(viewModel: ThumbnailGifViewModel)
     fun inject(viewModel: ScreenRecordingSettingsViewModel)
     fun inject(viewModel: ChooseRestoreOptionViewModel)
     fun inject(viewModel: EnterRestorationPasswordViewModel)
@@ -165,7 +159,6 @@ interface ApplicationComponent {
     fun inject(viewModel: DeleteWalletViewModel)
     fun inject(viewModel: HomeViewModel)
     fun inject(viewModel: HomeOverviewViewModel)
-    fun inject(viewModel: AllTxHistoryViewModel)
     fun inject(viewModel: TxHistoryViewModel)
     fun inject(viewModel: EnterCurrentPasswordViewModel)
     fun inject(viewModel: ChangeSecurePasswordViewModel)
@@ -179,7 +172,6 @@ interface ApplicationComponent {
     fun inject(viewModel: ContactSelectionViewModel)
     fun inject(viewModel: TxDetailsViewModel)
     fun inject(viewModel: ShareManager)
-    fun inject(viewModel: ContactTxHistoryViewModel)
     fun inject(viewModel: WalletAddressViewModel)
     fun inject(viewModel: QrScannerViewModel)
     fun inject(viewModel: ChatListViewModel)

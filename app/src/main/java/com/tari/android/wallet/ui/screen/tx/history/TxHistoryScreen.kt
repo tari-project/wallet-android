@@ -198,7 +198,7 @@ private fun TxHistoryScreenPreview() {
 @Composable
 @Preview
 private fun TxHistoryScreenEmptyPreview() {
-    TariDesignSystem(TariTheme.Dark) {
+    TariDesignSystem(TariTheme.Light) {
         TxHistoryScreen(
             uiState = TxHistoryViewModel.UiState(
                 pendingTxs = emptyList(),
@@ -234,7 +234,7 @@ private fun TxHistoryContactScreenPreview() {
 @Composable
 @Preview
 private fun TxHistoryContactScreenEmptyPreview() {
-    TariDesignSystem(TariTheme.Dark) {
+    TariDesignSystem(TariTheme.Light) {
         TxHistoryScreen(
             uiState = TxHistoryViewModel.UiState(
                 pendingTxs = emptyList(),

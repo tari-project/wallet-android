@@ -57,10 +57,13 @@ import androidx.core.animation.addListener
 import androidx.core.graphics.BlendModeColorFilterCompat
 import androidx.core.graphics.BlendModeCompat
 import androidx.fragment.app.FragmentTransaction
+import com.orhanobut.logger.Logger
 import com.tari.android.wallet.R
 import com.tari.android.wallet.util.Constants
-import timber.log.Timber
 import java.lang.ref.WeakReference
+
+private val logger
+    get() = Logger.t("ViewExtensions")
 
 fun View.visible() {
     this.visibility = View.VISIBLE
@@ -310,7 +313,7 @@ fun TypedArray.runRecycle(action: TypedArray.() -> Unit) {
     try {
         action.invoke(this)
     } catch (e: Throwable) {
-        Timber.e(e)
+        logger.e(e, "Error while running action on TypedArray")
     } finally {
         recycle()
     }

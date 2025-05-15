@@ -45,7 +45,6 @@ import com.tari.android.wallet.di.ApplicationScope
 import com.tari.android.wallet.di.DiContainer
 import com.tari.android.wallet.infrastructure.logging.LoggerAdapter
 import com.tari.android.wallet.notification.NotificationHelper
-import com.tari.android.wallet.ui.common.giphy.GiphyAdapter
 import com.tari.android.wallet.util.DebugConfig
 import io.sentry.android.core.SentryAndroid
 import kotlinx.coroutines.CoroutineScope
@@ -77,9 +76,6 @@ class TariWalletApplication : Application() {
 
     @Inject
     lateinit var yatAdapter: YatAdapter
-
-    @Inject
-    lateinit var giphyAdapter: GiphyAdapter
 
     @Inject
     @ApplicationScope
@@ -134,8 +130,6 @@ class TariWalletApplication : Application() {
         registerReceiver(connectionStateReceiver, connectionStateReceiver.intentFilter)
 
         yatAdapter.initYat(this)
-
-        giphyAdapter.init()
 
         loggerAdapter.init()
     }

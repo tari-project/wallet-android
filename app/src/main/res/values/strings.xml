@@ -248,8 +248,6 @@
     <string name="tx_list_days_ago">%dd ago</string>
     <string name="tx_list_just_now">Just now</string>
     <string name="tx_list_now">Now</string>
-    <string name="tx_list_loading_gif">Loading GIF</string>
-    <string name="tx_list_retry_loading_gif">Retry loading GIF</string>
     <string name="tx_list_emoji_one_side_payment_placeholder">➡️</string>
     <string name="tx_list_emoji_coinbase_payment_placeholder">🪙</string>
     <string name="tx_list_someone">Someone</string>
@@ -303,9 +301,6 @@
     <string name="add_note_prompt">Transaction Note</string>
     <string name="add_note_hint">Let the recipient know what the payment is for</string>
     <string name="add_note_slide_to_send">Slide to Send</string>
-    <string name="add_note_content_description_chosen_gif">chosen gif</string>
-    <string name="add_note_search_giphy_label">SEARCH GIPHY</string>
-    <string name="add_note_search_giphy_carousel_item_label">SEARCH GIFS</string>
 
     <!-- send tari - successful -->
     <string name="finalize_send_tx_sending_step_1_desc_line_1">Connecting to the</string>
@@ -645,7 +640,6 @@
     <string name="enter_backup_password_enter_password_label">Enter Password</string>
     <string name="enter_backup_password_password_match_error">That’s not it!</string>
     <string name="enter_backup_password_change_password_cta">Change Password</string>
-    <string name="search_gifs_dialog_hint">Search GIPHY</string>
 
     <!--Data collection-->
     <string name="data_collection_description">We\'re always striving to make Tari Universe Wallet better.\nTo achieve this, we use a third-party service to gather non-identifiable data like crash logs and usage statistics. This data helps us pinpoint and fix any issues, ultimately improving your experience</string>

@@ -33,7 +33,6 @@
 package com.tari.android.wallet.application.walletManager
 
 import com.orhanobut.logger.Logger
-import com.tari.android.wallet.BuildConfig
 import com.tari.android.wallet.application.AppStateHandler
 import com.tari.android.wallet.application.baseNodes.BaseNodesManager
 import com.tari.android.wallet.application.walletManager.WalletCallbacks.Companion.MAIN_WALLET_CONTEXT_ID
@@ -57,7 +56,6 @@ import com.tari.android.wallet.ffi.FFITariTransportConfig
 import com.tari.android.wallet.ffi.FFITariWalletAddress
 import com.tari.android.wallet.ffi.FFIWallet
 import com.tari.android.wallet.ffi.HexString
-import com.tari.android.wallet.ffi.LogFileObserver
 import com.tari.android.wallet.ffi.NetAddressString
 import com.tari.android.wallet.ffi.runWithDestroy
 import com.tari.android.wallet.model.MicroTari
@@ -138,7 +136,6 @@ class WalletManager @Inject constructor(
     private val _txSentConfirmations = MutableStateFlow(emptyList<TxSendResult>())
     val txSentConfirmations = _txSentConfirmations.asStateFlow()
 
-    private var logFileObserver: LogFileObserver? = null
     private val logger
         get() = Logger.t(WalletManager::class.simpleName)
 
@@ -230,8 +227,6 @@ class WalletManager @Inject constructor(
             walletCallbacks = walletCallbacks,
         )
 
-        startLogFileObserver()
-
         if (DebugConfig.selectBaseNodeEnabled) {
             baseNodesManager.refreshBaseNodeList(wallet)
             if (baseNodesManager.currentBaseNode == null) {
@@ -280,17 +275,6 @@ class WalletManager @Inject constructor(
             socksUsername = torConfig.sock5Username,
             socksPassword = torConfig.sock5Password,
         )
-    }
-
-    /**
-     * Starts the log file observer only in debug mode.
-     * Will skip if the app is in release config.
-     */
-    private fun startLogFileObserver() {
-        if (BuildConfig.DEBUG) {
-            logFileObserver = LogFileObserver(walletConfig.getWalletLogFilePath())
-            logFileObserver?.startWatching()
-        }
     }
 
     /**

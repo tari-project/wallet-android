@@ -39,12 +39,10 @@ import android.content.Context.MODE_PRIVATE
 import android.content.SharedPreferences
 import androidx.biometric.BiometricManager
 import androidx.core.content.ContextCompat
-import com.tari.android.wallet.BuildConfig
 import com.tari.android.wallet.application.TariWalletApplication
 import com.tari.android.wallet.infrastructure.security.biometric.BiometricAuthenticationService
 import com.tari.android.wallet.notification.NotificationHelper
 import com.tari.android.wallet.ui.common.domain.ResourceManager
-import com.tari.android.wallet.ui.common.giphy.GiphyAdapter
 import dagger.Module
 import dagger.Provides
 import java.io.File
@@ -94,10 +92,6 @@ class ApplicationModule(private val app: TariWalletApplication) {
             BiometricManager.from(context),
             context.getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager
         )
-
-    @Provides
-    @Singleton
-    fun provideGiphyAdapter(context: Context): GiphyAdapter = GiphyAdapter(context, BuildConfig.GIPHY_KEY)
 
     companion object {
         const val sharedPrefsFileName = "tari_wallet_shared_prefs"
