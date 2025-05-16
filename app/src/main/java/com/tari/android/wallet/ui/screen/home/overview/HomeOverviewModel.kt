@@ -1,6 +1,6 @@
 package com.tari.android.wallet.ui.screen.home.overview
 
-import com.tari.android.wallet.data.ConnectionIndicatorState
+import com.tari.android.wallet.data.ConnectionState
 import com.tari.android.wallet.data.tx.TxDto
 import com.tari.android.wallet.model.BalanceInfo
 import com.tari.android.wallet.util.extension.toMicroTari
@@ -18,7 +18,7 @@ class HomeOverviewModel {
         val ticker: String,
         val networkName: String,
         val ffiVersion: String,
-        val connectionIndicatorState: ConnectionIndicatorState = ConnectionIndicatorState.Disconnected,
+        val connectionState: ConnectionState = ConnectionState(),
 
         val activeMinersCount: Int? = null,
         val activeMinersCountError: Boolean = false,
