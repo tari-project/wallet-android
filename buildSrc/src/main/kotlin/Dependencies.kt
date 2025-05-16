@@ -41,7 +41,6 @@ object Dependencies {
             const val uiTooling = "androidx.compose.ui:ui-tooling"
             const val uiToolingPreview = "androidx.compose.ui:ui-tooling-preview"
             const val activity = "androidx.activity:activity-compose:1.9.2"
-            const val webView = "io.github.kevinnzou:compose-webview:0.33.6"
         }
     }
 
@@ -50,7 +49,6 @@ object Dependencies {
 
         const val android = "org.jetbrains.kotlinx:kotlinx-coroutines-android:$version"
         const val core = "org.jetbrains.kotlinx:kotlinx-coroutines-core:$version"
-        const val rx2 = "org.jetbrains.kotlinx:kotlinx-coroutines-rx2:$version"
     }
 
     object Firebase {
@@ -89,8 +87,6 @@ object Dependencies {
 
     const val yatLibAndroid = "com.github.tari-project:yat-lib-android:0.5.0"
     const val flexbox = "com.google.android.flexbox:flexbox:3.0.0"
-    const val glide = "com.github.bumptech.glide:glide:4.16.0"
-    const val glideCompiler = "com.github.bumptech.glide:compiler:4.16.0"
     const val dagger = "com.google.dagger:dagger:2.52"
     const val daggerCompiler = "com.google.dagger:dagger-compiler:2.52"
     const val leakCanary = "com.squareup.leakcanary:leakcanary-android:2.14"
@@ -102,7 +98,6 @@ object Dependencies {
     const val codeScanner = "com.github.yuriy-budiyev:code-scanner:2.3.2"
     const val zxingAndroidEmbedded = "com.journeyapps:zxing-android-embedded:4.3.0"
     const val seismic = "com.squareup:seismic:1.0.3"
-    const val rxandroid = "io.reactivex.rxjava2:rxandroid:2.1.1"
     const val rxjava = "io.reactivex.rxjava2:rxjava:2.2.21"
     const val easingInterpolator = "com.github.MasayukiSuda:EasingInterpolator:1.3.2"
     const val torAndroid = "info.guardianproject:tor-android:0.4.8.7"

@@ -52,9 +52,6 @@ object Constants {
         const val mediumDurationMs = 600L
         const val longDurationMs = 1000L
         const val xLongDurationMs = 1500L
-        const val xxLongDurationMs = 2000L
-
-        const val scrollDepthShadowViewMaxOpacity = 0.75f
 
         const val EMOJI_ID_CHUNK_SEPARATOR_RELATIVE_SCALE = 0.9f
         const val EMOJI_ID_CHUNK_SEPARATOR_LETTER_SPACING = 1f
@@ -75,7 +72,6 @@ object Constants {
             const val createEmojiButtonAnimDelayMs = 300L
             const val awesomeTextAnimDurationMs = 600L
             const val shortAlphaAnimDuration = 300L
-            const val viewChangeAnimDelayMs = 3000L
             const val viewOverlapDelayMs = 150L
             const val createEmojiViewAnimDurationMs = 1200L
             const val walletCreationFadeOutAnimDurationMs = 1000L

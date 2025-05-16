@@ -8,10 +8,6 @@
         <item name="android:navigationBarColor">@android:color/black</item>
     </style>
 
-    <style name="AppTheme.Auth" parent="AppTheme.Light">
-        <item name="android:windowTranslucentStatus">true</item>
-    </style>
-
     <!--
       Style that makes a dialog placed to the bottom slide from bottom on show and to bottom on hide.
       Simply put - like on iOS.

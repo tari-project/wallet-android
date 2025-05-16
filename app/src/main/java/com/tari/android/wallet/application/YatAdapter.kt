@@ -9,7 +9,6 @@ import com.orhanobut.logger.Logger
 import com.tari.android.wallet.BuildConfig
 import com.tari.android.wallet.R
 import com.tari.android.wallet.data.sharedPrefs.CorePrefRepository
-import com.tari.android.wallet.data.sharedPrefs.network.NetworkPrefRepository
 import com.tari.android.wallet.data.sharedPrefs.yat.YatPrefRepository
 import com.tari.android.wallet.model.EmojiId
 import com.tari.android.wallet.ui.screen.send.common.TransactionData
@@ -30,7 +29,6 @@ import javax.inject.Singleton
 @Singleton
 class YatAdapter @Inject constructor(
     private val yatSharedRepository: YatPrefRepository,
-    private val networkRepository: NetworkPrefRepository,
     private val commonRepository: CorePrefRepository
 ) : YatIntegration.Delegate {
 

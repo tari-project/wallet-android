@@ -15,9 +15,8 @@ import com.tari.android.wallet.databinding.FragmentTransferBinding
 import com.tari.android.wallet.ui.common.CommonXmlFragment
 import com.tari.android.wallet.ui.screen.contactBook.add.SelectUserContactFragment
 import com.tari.android.wallet.ui.screen.send.requestTari.RequestTariFragment
-import com.tari.android.wallet.ui.screen.send.requestTari.RequestTariViewModel
 
-class TransferFragment : CommonXmlFragment<FragmentTransferBinding, RequestTariViewModel>() {
+class TransferFragment : CommonXmlFragment<FragmentTransferBinding, TransferViewModel>() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?) =
         FragmentTransferBinding.inflate(inflater, container, false).also { ui = it }.root
@@ -25,7 +24,7 @@ class TransferFragment : CommonXmlFragment<FragmentTransferBinding, RequestTariV
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val viewModel: RequestTariViewModel by viewModels()
+        val viewModel: TransferViewModel by viewModels()
         bindViewModel(viewModel)
 
         setupUI()

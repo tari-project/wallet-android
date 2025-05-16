@@ -247,16 +247,11 @@ dependencies {
     implementation(Dependencies.AndroidX.Compose.uiTooling)
     implementation(Dependencies.AndroidX.Compose.uiToolingPreview)
     implementation(Dependencies.AndroidX.Compose.activity)
-    implementation(Dependencies.AndroidX.Compose.webView)
 
     implementation(Dependencies.Coroutines.android)
     implementation(Dependencies.Coroutines.core)
-    implementation(Dependencies.Coroutines.rx2)
 
     implementation(Dependencies.flexbox)
-
-    implementation(Dependencies.glide)
-    ksp(Dependencies.glideCompiler)
 
     implementation(Dependencies.dagger)
     ksp(Dependencies.daggerCompiler)
@@ -300,7 +295,6 @@ dependencies {
     // sentry - crash analytics
     implementation(Dependencies.Sentry.sentryAndroid)
 
-    implementation(Dependencies.rxandroid)
     implementation(Dependencies.rxjava)
 
     // spring animation

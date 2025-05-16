@@ -1,8 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Primary -->
-    <color name="palette_dark_primary_main">#C9EB00</color>
-
     <!--Neutral-->
     <color name="palette_dark_neutral_primary">#060606</color>
     <color name="palette_dark_neutral_secondary">#181818</color>

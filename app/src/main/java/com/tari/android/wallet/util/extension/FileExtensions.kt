@@ -32,7 +32,6 @@
  */
 package com.tari.android.wallet.util.extension
 
-import com.tari.android.wallet.infrastructure.backup.compress.CompressionMethod
 import com.tari.android.wallet.infrastructure.security.encryption.SymmetricEncryptionAlgorithm
 import java.io.File
 import java.io.FileInputStream
@@ -50,17 +49,6 @@ val File.extension: String
 fun File.getLastPathComponent(): String {
     val segments = absolutePath.split("/".toRegex()).toTypedArray()
     return if (segments.isEmpty()) "" else segments[segments.size - 1]
-}
-
-fun List<File>.compress(
-    compressionMethod: CompressionMethod,
-    targetFilePath: String
-): File {
-    compressionMethod.compress(
-        targetFilePath,
-        this
-    )
-    return File(targetFilePath)
 }
 
 fun File.encrypt(

@@ -43,28 +43,6 @@ import com.tari.android.wallet.util.extension.applyColorStyle
 import com.tari.android.wallet.util.extension.applyLetterSpacingStyle
 import com.tari.android.wallet.util.extension.applyRelativeTextSizeStyle
 
-/**
- * Number of emojis from the Tari emoji set in a string.
- */
-fun EmojiId.numberOfEmojis(emojiSet: Set<EmojiId> = EmojiUtil.FFI_EMOJI_SET): Int {
-    val it: BreakIterator = BreakIterator.getCharacterInstance()
-    it.setText(this)
-    var emojiCount = 0
-    var previous = 0
-    val codepointBuilder = StringBuilder()
-    while (it.next() != BreakIterator.DONE) {
-        for (i in previous until it.current()) {
-            codepointBuilder.append(this[i])
-        }
-        val codepoint = codepointBuilder.toString()
-        if (emojiSet.contains(codepoint)) {
-            emojiCount++
-        }
-        previous = it.current()
-        codepointBuilder.clear()
-    }
-    return emojiCount
-}
 
 /**
  * @return true if there is at least 1 character that is not included in the Tari emoji set.

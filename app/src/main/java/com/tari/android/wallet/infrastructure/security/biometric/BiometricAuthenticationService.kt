@@ -39,9 +39,8 @@ import androidx.biometric.BiometricPrompt
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import com.tari.android.wallet.R
+import com.tari.android.wallet.util.extension.isTrue
 import java.util.concurrent.Executor
-import javax.inject.Inject
-import javax.inject.Singleton
 import kotlin.coroutines.suspendCoroutine
 
 class BiometricAuthenticationService constructor(
@@ -50,7 +49,7 @@ class BiometricAuthenticationService constructor(
     private val keyguardManager: KeyguardManager?
 ) {
     val isDeviceSecured: Boolean
-        get() = keyguardManager?.isDeviceSecure ?: false
+        get() = keyguardManager?.isDeviceSecure.isTrue()
 
     val authType: BiometricAuthenticationType
         get() = when {
