@@ -68,11 +68,9 @@ android {
 
         getByName("debug") {
             isJniDebuggable = true
-            buildConfigField("String", "GIPHY_KEY", "\"${secretProperties["giphy.key"]}\"")
         }
 
         getByName("release") {
-            buildConfigField("String", "GIPHY_KEY", "\"${secretProperties["giphy.key"]}\"")
             isMinifyEnabled = true
             isShrinkResources = true
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
@@ -90,12 +88,12 @@ android {
     productFlavors {
         create("regular") {
             dimension = "privacy-mode"
-            buildConfigField("String", "NOTIFICATIONS_API_KEY", "\"${loadSecretProps()["service.notifications.api_key"]}\"") // todo use new API KEY
+            buildConfigField("String", "NOTIFICATIONS_API_KEY", "\"${loadSecretProps()["service.notifications.api_key"]}\"")
             proguardFile("regular-proguard-rules.pro")
         }
         create("privacy") {
             dimension = "privacy-mode"
-            buildConfigField("String", "NOTIFICATIONS_API_KEY", "\"${loadSecretProps()["service.notifications.api_key"]}\"")// todo use new API KEY
+            buildConfigField("String", "NOTIFICATIONS_API_KEY", "\"${loadSecretProps()["service.notifications.api_key"]}\"")
         }
     }
 
@@ -235,6 +233,7 @@ dependencies {
     implementation(Dependencies.AndroidX.legacySupport)
     implementation(Dependencies.AndroidX.recyclerview)
     implementation(Dependencies.AndroidX.viewpager2)
+    implementation(Dependencies.AndroidX.material)
     implementation(Dependencies.AndroidX.activityKtx)
     implementation(Dependencies.AndroidX.fragmentKtx)
     implementation(Dependencies.AndroidX.Lifecycle.extensions)
@@ -319,10 +318,6 @@ dependencies {
     implementation(Dependencies.contactsAndroid)
 
     implementation(Dependencies.blessedAndroid)
-
-    implementation(Dependencies.giphySdkUi) {
-        exclude(group = "com.android.support")
-    }
 
     implementation(Dependencies.itext7Core)
 

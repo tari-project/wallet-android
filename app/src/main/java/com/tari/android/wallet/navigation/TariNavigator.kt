@@ -77,8 +77,7 @@ import com.tari.android.wallet.ui.screen.settings.themeSelector.ThemeSelectorFra
 import com.tari.android.wallet.ui.screen.settings.torBridges.TorBridgesSelectionFragment
 import com.tari.android.wallet.ui.screen.settings.torBridges.customBridges.CustomTorBridgesFragment
 import com.tari.android.wallet.ui.screen.tx.details.TxDetailsFragment
-import com.tari.android.wallet.ui.screen.tx.history.all.AllTxHistoryFragment
-import com.tari.android.wallet.ui.screen.tx.history.contact.ContactTxHistoryFragment
+import com.tari.android.wallet.ui.screen.tx.history.TxHistoryFragment
 import com.tari.android.wallet.ui.screen.utxos.list.UtxosListFragment
 import com.tari.android.wallet.util.extension.parcelable
 import java.math.BigInteger
@@ -119,7 +118,7 @@ class TariNavigator @Inject constructor(
             is ContactBook.ToLinkContact -> addFragment(ContactLinkFragment.createFragment(navigation.contact))
             is ContactBook.BackToContactBook -> popUpTo(ContactBookFragment::class.java.simpleName)
             is ContactBook.ToExternalWallet -> toExternalWallet(navigation.connectedWallet)
-            is ContactBook.ToContactTransactionHistory -> addFragment(ContactTxHistoryFragment.createFragment(navigation.contact))
+            is ContactBook.ToContactTransactionHistory -> addFragment(TxHistoryFragment.newInstance(navigation.contact))
             is ContactBook.ToAddPhoneContact -> toAddPhoneContact()
             is ContactBook.ToSelectTariUser -> addFragment(SelectUserContactFragment.newInstance())
 
@@ -150,7 +149,7 @@ class TariNavigator @Inject constructor(
             is TxList.ToAllSettings -> addFragment(AllSettingsFragment.newInstance())
             is TxList.ToTransfer -> addFragment(TransferFragment())
             is TxList.ToReceive -> addFragment(ReceiveFragment())
-            is TxList.HomeTransactionHistory -> addFragment(AllTxHistoryFragment())
+            is TxList.HomeTransactionHistory -> addFragment(TxHistoryFragment.newInstance())
 
             is TorBridge.ToCustomBridges -> addFragment(CustomTorBridgesFragment())
 

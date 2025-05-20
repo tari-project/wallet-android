@@ -49,7 +49,6 @@
     <dimen name="home_dialog_testnet_tari_dialog_margin">14dp</dimen>
 
     <!-- tx list -->
-    <dimen name="tx_list_item_gif_container_top_margin">8dp</dimen>
     <dimen name="tx_list_item_content_container_view_normal_top_margin">36dp</dimen>
     <dimen name="home_header_top_margin">40dp</dimen>
 
@@ -95,8 +94,6 @@
     <dimen name="add_note_slide_button_width">40dp</dimen>
     <dimen name="add_note_prompt_text_size">12sp</dimen>
     <dimen name="add_note_note_text_size">16sp</dimen>
-    <dimen name="add_note_gif_thumbnail_size">64dp</dimen>
-    <dimen name="add_note_gif_inner_margin">9dp</dimen>
     <!-- auth -->
     <dimen name="auth_button_bottom_margin">25dp</dimen>
 

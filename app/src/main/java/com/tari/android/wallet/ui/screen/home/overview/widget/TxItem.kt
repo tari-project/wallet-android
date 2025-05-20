@@ -22,7 +22,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.giphy.sdk.analytics.GiphyPingbacks.context
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.walletManager.WalletConfig
 import com.tari.android.wallet.data.tx.TxDto
@@ -142,7 +141,7 @@ fun TxDto.itemMessage(): String {
         }
 
         contact != null && contact.contactInfo.getAlias().isNotEmpty() || txUser.walletAddress.isUnknownUser() -> {
-            val alias = contact?.contactInfo?.getAlias().orEmpty().ifBlank { context.getString(R.string.unknown_source) }
+            val alias = contact?.contactInfo?.getAlias().orEmpty().ifBlank { stringResource(R.string.unknown_source) }
             when (tx.direction) {
                 Tx.Direction.INBOUND -> stringResource(R.string.tx_list_sent_a_payment, alias)
                 Tx.Direction.OUTBOUND -> stringResource(R.string.tx_list_you_paid_with_alias, alias)

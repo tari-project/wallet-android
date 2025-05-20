@@ -1,10 +1,10 @@
 package com.tari.android.wallet.ui.component.tari.toolbar
 
 import android.content.Context
+import android.content.res.Resources.getSystem
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.widget.FrameLayout
-import com.giphy.sdk.ui.utils.px
 import com.tari.android.wallet.R
 import com.tari.android.wallet.databinding.TariToolbarBinding
 import com.tari.android.wallet.util.extension.gone
@@ -68,9 +68,9 @@ class TariToolbar(context: Context, attrs: AttributeSet) : FrameLayout(context, 
         }
 
         // set the same margin for the both sides if toolbar actions are present
-        val maxMargin = 16.px + max(leftArgs.size, rightArgs.size) * 48.px
-        ui.toolbarTitle.setStartMargin(maxMargin - leftArgs.size * 48.px)
-        ui.toolbarTitle.setEndMargin(maxMargin - rightArgs.size * 48.px)
+        val maxMargin = 16.dp + max(leftArgs.size, rightArgs.size) * 48.dp
+        ui.toolbarTitle.setStartMargin(maxMargin - leftArgs.size * 48.dp)
+        ui.toolbarTitle.setEndMargin(maxMargin - rightArgs.size * 48.dp)
     }
 
     fun showRightActions() {
@@ -88,4 +88,6 @@ class TariToolbar(context: Context, attrs: AttributeSet) : FrameLayout(context, 
     fun hideLeftActions() {
         ui.toolbarLeftActions.gone()
     }
+
+    val Int.dp: Int get() = (this / getSystem().displayMetrics.density).toInt()
 }

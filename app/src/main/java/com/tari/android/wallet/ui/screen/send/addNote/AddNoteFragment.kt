@@ -37,8 +37,6 @@ import android.animation.ObjectAnimator
 import android.animation.ValueAnimator
 import android.annotation.SuppressLint
 import android.content.Context
-import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.MotionEvent
@@ -52,44 +50,28 @@ import androidx.core.animation.addListener
 import androidx.core.view.isVisible
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.ViewModelProvider
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
 import com.daasuu.ei.Ease
 import com.daasuu.ei.EasingInterpolator
-import com.giphy.sdk.core.models.Media
 import com.tari.android.wallet.R
-import com.tari.android.wallet.R.dimen.add_note_gif_inner_margin
 import com.tari.android.wallet.R.dimen.add_note_slide_button_left_margin
 import com.tari.android.wallet.R.dimen.add_note_slide_button_width
 import com.tari.android.wallet.data.contacts.model.FFIContactInfo
 import com.tari.android.wallet.databinding.FragmentAddNoteBinding
 import com.tari.android.wallet.model.MicroTari
 import com.tari.android.wallet.model.TariWalletAddress
-import com.tari.android.wallet.model.TxNote
 import com.tari.android.wallet.navigation.TariNavigator.Companion.PARAMETER_TRANSACTION
 import com.tari.android.wallet.ui.common.CommonXmlFragment
 import com.tari.android.wallet.ui.common.domain.PaletteManager
-import com.tari.android.wallet.ui.common.giphy.repository.GifItem
-import com.tari.android.wallet.ui.screen.send.addNote.gif.ChooseGIFDialogFragment
-import com.tari.android.wallet.ui.screen.send.addNote.gif.GifContainer
-import com.tari.android.wallet.ui.screen.send.addNote.gif.GifThumbnailAdapter
-import com.tari.android.wallet.ui.screen.send.addNote.gif.HorizontalInnerMarginDecoration
-import com.tari.android.wallet.ui.screen.send.addNote.gif.ThumbnailGifViewModel
-import com.tari.android.wallet.ui.screen.send.addNote.gif.ThumbnailGifViewModel.Companion.REQUEST_CODE_GIF
 import com.tari.android.wallet.ui.screen.send.common.TransactionData
 import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.addressFirstEmojis
 import com.tari.android.wallet.util.addressLastEmojis
 import com.tari.android.wallet.util.addressPrefixEmojis
-import com.tari.android.wallet.util.extension.dimen
 import com.tari.android.wallet.util.extension.dimenPx
 import com.tari.android.wallet.util.extension.getStartMargin
 import com.tari.android.wallet.util.extension.gone
 import com.tari.android.wallet.util.extension.hideKeyboard
 import com.tari.android.wallet.util.extension.invisible
-import com.tari.android.wallet.util.extension.observe
 import com.tari.android.wallet.util.extension.parcelable
 import com.tari.android.wallet.util.extension.postDelayed
 import com.tari.android.wallet.util.extension.setStartMargin
@@ -110,10 +92,6 @@ class AddNoteFragment : CommonXmlFragment<FragmentAddNoteBinding, AddNoteViewMod
     private lateinit var note: String
     private var isOneSidePayment: Boolean = false
 
-    private lateinit var gifViewModel: ThumbnailGifViewModel
-    private lateinit var gifContainer: GifContainer
-    private lateinit var adapter: GifThumbnailAdapter
-
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?) =
         FragmentAddNoteBinding.inflate(inflater, container, false).also { ui = it }.root
 
@@ -124,56 +102,13 @@ class AddNoteFragment : CommonXmlFragment<FragmentAddNoteBinding, AddNoteViewMod
         val viewModel: AddNoteViewModel by viewModels()
         bindViewModel(viewModel)
 
-        initializeGIFsViewModel()
         retrievePageArguments()
-        setupUI(savedInstanceState)
+        setupUI()
         setupCTAs()
     }
 
-    private fun initializeGIFsViewModel() {
-        gifViewModel = ViewModelProvider(this)[ThumbnailGifViewModel::class.java]
-        observe(gifViewModel.state) {
-            if (it.isSuccessful) {
-                adapter.repopulate(it.gifItems!!)
-            }
-        }
-    }
-
-    @Deprecated("Deprecated in Java")
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == REQUEST_CODE_GIF) {
-            changeScrollViewBottomConstraint(R.id.slide_button_container_view)
-            val media = data?.parcelable<Media>(ChooseGIFDialogFragment.MEDIA_DELIVERY_KEY) ?: return
-            gifContainer.gifItem = media.let {
-                GifItem(it.id, Uri.parse(it.embedUrl), Uri.parse(it.images.original!!.gifUrl))
-            }
-            updateSliderState()
-        }
-    }
-
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-        gifContainer.save(outState)
-    }
-
-    override fun onDestroyView() {
-        gifContainer.dispose()
-        super.onDestroyView()
-    }
-
     @SuppressLint("ClickableViewAccessibility")
-    private fun setupUI(state: Bundle?) {
-        gifContainer = GifContainer(Glide.with(this), ui.gifContainerView, ui.gifImageView, ui.searchGiphyContainerView, state)
-        if (gifContainer.gifItem != null) changeScrollViewBottomConstraint(R.id.slide_button_container_view)
-        adapter = GifThumbnailAdapter(Glide.with(this), ::handleViewMoreGIFsIntent) {
-            if (gifContainer.isShown) {
-                changeScrollViewBottomConstraint(R.id.slide_button_container_view)
-                gifContainer.gifItem = it
-                updateSliderState()
-            }
-        }
-
+    private fun setupUI() {
         displayAliasOrEmojiId()
         ui.progressBar.setWhite()
         ui.noteEditText.addTextChangedListener(afterTextChanged = { updateSliderState() })
@@ -183,18 +118,12 @@ class AddNoteFragment : CommonXmlFragment<FragmentAddNoteBinding, AddNoteViewMod
         focusEditTextAndShowKeyboard()
         ui.promptTextView.setTextColor(PaletteManager.getTextHeading(requireContext()))
         ui.noteEditText.imeOptions = EditorInfo.IME_ACTION_DONE
-        ui.thumbnailGifsRecyclerView.also {
-            val margin = dimen(add_note_gif_inner_margin).toInt()
-            it.addItemDecoration(HorizontalInnerMarginDecoration(margin))
-            it.layoutManager = LinearLayoutManager(requireContext(), RecyclerView.HORIZONTAL, false)
-            it.adapter = adapter
-        }
         ui.noteEditText.setText(transactionData.note.orEmpty())
         updateSliderState()
     }
 
     private fun updateSliderState() {
-        if (ui.noteEditText.text?.toString().isNullOrEmpty() && gifContainer.gifItem == null) {
+        if (ui.noteEditText.text?.toString().isNullOrEmpty()) {
             ui.promptTextView.setTextColor(PaletteManager.getTextHeading(requireContext()))
             disableCallToAction()
         } else {
@@ -214,28 +143,6 @@ class AddNoteFragment : CommonXmlFragment<FragmentAddNoteBinding, AddNoteViewMod
     private fun setupCTAs() {
         ui.backCtaView.backPressedAction = { onBackButtonClicked() }
         ui.emojiIdSummaryContainerView.setOnClickListener { viewModel.emojiIdClicked(recipientUser.walletAddress) }
-        ui.removeGifCtaView.setOnClickListener {
-            changeScrollViewBottomConstraint(R.id.search_giphy_container_view)
-            gifContainer.gifItem = null
-            updateSliderState()
-        }
-        ui.searchGiphyCtaView.setOnClickListener { handleViewMoreGIFsIntent() }
-    }
-
-    private fun handleViewMoreGIFsIntent() {
-        if (gifContainer.isShown) {
-            requireActivity().hideKeyboard()
-            ChooseGIFDialogFragment.newInstance()
-                .apply { setTargetFragment(this@AddNoteFragment, REQUEST_CODE_GIF) }
-                .show(requireActivity().supportFragmentManager, null)
-        }
-
-    }
-
-    private fun changeScrollViewBottomConstraint(toTopOf: Int) {
-        val set = ConstraintSet().apply { clone(ui.rootView) }
-        set.connect(R.id.message_body_scroll_view, ConstraintSet.BOTTOM, toTopOf, ConstraintSet.TOP)
-        set.applyTo(ui.rootView)
     }
 
     private fun displayAliasOrEmojiId() {
@@ -411,7 +318,6 @@ class AddNoteFragment : CommonXmlFragment<FragmentAddNoteBinding, AddNoteViewMod
                 dialogHandler.showInternetConnectionErrorDialog()
             }
         } else {
-            ui.removeGifCtaView.isEnabled = false
             ui.progressBar.visible()
             ui.slideView.gone()
             continueToFinalizeSendTx()
@@ -425,7 +331,7 @@ class AddNoteFragment : CommonXmlFragment<FragmentAddNoteBinding, AddNoteViewMod
 
     private fun continueToFinalizeSendTx() {
         // notify listener (i.e. activity)
-        val note = TxNote(ui.noteEditText.editableText.toString(), gifContainer.gifItem?.embedUri?.toString()).compose()
+        val note = ui.noteEditText.editableText.toString()
         val newData = transactionData.copy(note = note)
 
         viewModel.continueToFinalizeSendTx(newData)

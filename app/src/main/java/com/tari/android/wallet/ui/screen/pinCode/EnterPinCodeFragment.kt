@@ -127,6 +127,7 @@ class EnterPinCodeFragment : CommonXmlFragment<FragmentEnterPincodeBinding, Ente
     private fun startCountdown(dateTime: LocalDateTime?) {
         if (dateTime != null && dateTime.isAfter(LocalDateTime.now())) {
             updateText(Duration.between(LocalDateTime.now(), dateTime))
+            // TODO use coroutines!!
             Observable.timer(1, TimeUnit.SECONDS)
                 .repeat()
                 .map { Duration.between(LocalDateTime.now(), dateTime) }

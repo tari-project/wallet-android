@@ -84,8 +84,6 @@ class HomeOverviewViewModel : CommonViewModel() {
     val uiState = _uiState.asStateFlow()
 
     init {
-        component.inject(this)
-
         collectFlow(balanceStateHandler.balanceState) { balanceInfo ->
             _uiState.update { it.copy(balance = balanceInfo) }
             stagedSecurityDelegate.handleStagedSecurity(balanceInfo)

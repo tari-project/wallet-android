@@ -58,6 +58,7 @@ fun TariTopBar(
                 modifier = Modifier
                     .fillMaxWidth()
                     .align(Alignment.Center)
+                    .padding(horizontal = if (onBack != null) 64.dp else 16.dp)
                     .padding(8.dp),
                 style = TariDesignSystem.typography.headingLarge,
                 textAlign = TextAlign.Center,
@@ -87,6 +88,20 @@ fun TariTopBarPreview() {
         Column {
             TariTopBar(
                 title = "Toolbar Title",
+                showShadow = false,
+                onBack = {},
+            )
+        }
+    }
+}
+
+@Composable
+@Preview
+fun TariTopBarLongTitlePreview() {
+    PreviewSecondarySurface(TariTheme.Light, Modifier.fillMaxSize()) {
+        Column {
+            TariTopBar(
+                title = "Toolbar very long title that should be truncated at some point and not overflow the screen",
                 showShadow = false,
                 onBack = {},
             )

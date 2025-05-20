@@ -36,14 +36,6 @@
 
 -keep enum com.tari.android.wallet.application.Network { *; }
 
--keep class com.tari.android.wallet.ui.common.giphy.api.dto.SearchGIFResponse { *; }
--keep class com.tari.android.wallet.ui.common.giphy.api.dto.SearchGIFsResponse { *; }
--keep class com.tari.android.wallet.ui.common.giphy.api.dto.Data { *; }
--keep class com.tari.android.wallet.ui.common.giphy.api.dto.Meta { *; }
--keep class com.tari.android.wallet.ui.common.giphy.api.dto.Images { *; }
--keep class com.tari.android.wallet.ui.common.giphy.api.dto.ImageVariant { *; }
--keep class com.tari.android.wallet.ui.common.giphy.api.dto.Original { *; }
-
 -keep class **Fragment** { *; }
 -keep class **ViewModel** { *; }
 
