@@ -150,6 +150,7 @@ class FFIWallet(
     private external fun jniSignMessage(message: String, libError: FFIError): String
     private external fun jniVerifyMessageSignature(publicKeyPtr: FFIPublicKey, message: String, signature: String, libError: FFIError): Boolean
     private external fun jniGetBaseNodePeers(libError: FFIError): FFIPointer
+    private external fun jniGetPrivateViewKey(libError: FFIError): FFIPointer
     private external fun jniAddBaseNodePeer(publicKey: FFIPublicKey, address: String, libError: FFIError): Boolean
     private external fun jniStartTXOValidation(libError: FFIError): ByteArray
     private external fun jniStartTxValidation(libError: FFIError): ByteArray
@@ -375,6 +376,8 @@ class FFIWallet(
             )
         ).runWithDestroy { TariCoinPreview(it) }
     }
+
+    fun getPrivateViewKey(): FFIPrivateKey = runWithError { FFIPrivateKey(jniGetPrivateViewKey(it)) }
 
     fun signMessage(message: String): String = runWithError { jniSignMessage(message, it) }
 

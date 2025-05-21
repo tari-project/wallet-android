@@ -43,6 +43,7 @@ import android.text.style.RelativeSizeSpan
 import com.tari.android.wallet.ui.component.tari.TariFont
 import com.tari.android.wallet.ui.component.tari.TariLetterSpacingSpan
 import com.tari.android.wallet.ui.component.tari.TariTypefaceSpan
+import java.security.MessageDigest
 
 /**
  * Used to apply partial font styles to a string.
@@ -149,3 +150,12 @@ fun String.makeTextBold(context: Context, vararg wordsToBeBold: String): Spannab
 )
 
 fun String.removeWhitespaces() = replace(" ", "")
+
+/**
+ * Computes the SHA-256 hash for the given String and returns a hexadecimal representation.
+ */
+fun String.sha256(): String {
+    val bytes = this.toByteArray(Charsets.UTF_8)
+    val digest = MessageDigest.getInstance("SHA-256").digest(bytes)
+    return digest.joinToString(separator = "") { "%02x".format(it) }
+}

@@ -1297,3 +1297,16 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniGetBaseNodePeers(
         return wallet_get_seed_peers(pWallet, error);
     });
 }
+
+extern "C"
+JNIEXPORT jlong JNICALL
+Java_com_tari_android_wallet_ffi_FFIWallet_jniGetPrivateViewKey(
+        JNIEnv *jEnv,
+        jobject jThis,
+        jobject error
+) {
+    return ExecuteWithErrorAndCast<TariPrivateKey *>(jEnv, error, [&](int *error) {
+        auto pWallet = GetPointerField<TariWallet *>(jEnv, jThis);
+        return wallet_get_private_view_key(pWallet, error);
+    });
+}
