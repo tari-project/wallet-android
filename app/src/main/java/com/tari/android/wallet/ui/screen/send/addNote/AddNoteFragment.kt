@@ -45,14 +45,12 @@ import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.RelativeLayout
-import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.animation.addListener
 import androidx.core.view.isVisible
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.viewModels
 import com.daasuu.ei.Ease
 import com.daasuu.ei.EasingInterpolator
-import com.tari.android.wallet.R
 import com.tari.android.wallet.R.dimen.add_note_slide_button_left_margin
 import com.tari.android.wallet.R.dimen.add_note_slide_button_width
 import com.tari.android.wallet.data.contacts.model.FFIContactInfo

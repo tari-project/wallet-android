@@ -30,13 +30,6 @@ abstract class TariBackground(context: Context, attrs: AttributeSet) : FrameLayo
         updateBack()
     }
 
-    fun updateBack(r: Float? = null, elevation: Float? = null, backColor: Int? = null) {
-        r?.let { radius = it }
-        elevation?.let { backElevation = it }
-        backColor?.let { this.backColor = it }
-        updateBack()
-    }
-
     private fun updateBack() {
         when {
             backElevation != 0.0F -> {

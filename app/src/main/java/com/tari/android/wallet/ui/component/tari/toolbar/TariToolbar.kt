@@ -7,7 +7,6 @@ import android.view.LayoutInflater
 import android.widget.FrameLayout
 import com.tari.android.wallet.R
 import com.tari.android.wallet.databinding.TariToolbarBinding
-import com.tari.android.wallet.util.extension.gone
 import com.tari.android.wallet.util.extension.invisible
 import com.tari.android.wallet.util.extension.obtain
 import com.tari.android.wallet.util.extension.repopulate
@@ -79,14 +78,6 @@ class TariToolbar(context: Context, attrs: AttributeSet) : FrameLayout(context, 
 
     fun hideRightActions() {
         ui.toolbarRightActions.invisible()
-    }
-
-    fun showLeftActions() {
-        ui.toolbarLeftActions.visible()
-    }
-
-    fun hideLeftActions() {
-        ui.toolbarLeftActions.gone()
     }
 
     val Int.dp: Int get() = (this / getSystem().displayMetrics.density).toInt()

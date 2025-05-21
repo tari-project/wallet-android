@@ -23,11 +23,6 @@ class TariSwitchedBackground(context: Context, attrs: AttributeSet) : TariBackgr
         }
     }
 
-    fun switch(turnedOn: Boolean) {
-        this.isTurnedOn = turnedOn
-        applySwitch()
-    }
-
     private fun applySwitch() {
         if (isTurnedOn) {
             restoreFullBack()

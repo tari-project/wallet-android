@@ -94,8 +94,6 @@ class AddAmountFragment : CommonXmlFragment<FragmentAddAmountBinding, AddAmountV
 
     private var keyboardController: KeyboardController = KeyboardController()
 
-    private var isFirstLaunch: Boolean = false
-
     private lateinit var balanceInfo: BalanceInfo
     private lateinit var availableBalance: MicroTari
 
@@ -109,7 +107,6 @@ class AddAmountFragment : CommonXmlFragment<FragmentAddAmountBinding, AddAmountV
         bindViewModel(viewModel)
         subscribeVM()
 
-        isFirstLaunch = savedInstanceState == null
         ui.modifyButton.setOnClickListener { viewModel.showFeeDialog() }
     }
 
