@@ -31,7 +31,6 @@ import com.tari.android.wallet.util.extension.launchOnIo
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import java.time.LocalDate
 import javax.inject.Inject
@@ -107,8 +106,8 @@ class HomeOverviewViewModel : CommonViewModel() {
             }
         }
 
-        collectFlow(connectionState.map { it.indicatorState }) { indicatorState ->
-            _uiState.update { it.copy(connectionIndicatorState = indicatorState) }
+        collectFlow(connectionState) { connectionState ->
+            _uiState.update { it.copy(connectionState = connectionState) }
         }
 
         launchOnIo {

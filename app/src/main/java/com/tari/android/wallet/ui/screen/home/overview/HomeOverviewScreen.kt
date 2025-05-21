@@ -27,6 +27,7 @@ import com.tari.android.wallet.ui.compose.components.TariPullToRefreshBox
 import com.tari.android.wallet.ui.compose.components.TariTextButton
 import com.tari.android.wallet.ui.screen.home.overview.widget.ActiveMinersCard
 import com.tari.android.wallet.ui.screen.home.overview.widget.BalanceInfoModal
+import com.tari.android.wallet.ui.screen.home.overview.widget.BlockSyncChip
 import com.tari.android.wallet.ui.screen.home.overview.widget.EmptyTxList
 import com.tari.android.wallet.ui.screen.home.overview.widget.MainnetAnnounceModal
 import com.tari.android.wallet.ui.screen.home.overview.widget.RestoreSuccessModal
@@ -77,7 +78,7 @@ fun HomeOverviewScreen(
                     modifier = Modifier.weight(1f),
                     networkName = uiState.networkName,
                     ffiVersion = uiState.ffiVersion,
-                    connectionIndicatorState = uiState.connectionIndicatorState,
+                    connectionIndicatorState = uiState.connectionState.indicatorState,
                     onVersionClick = onConnectionStatusClick,
                 )
                 // TODO actions are not used yet
@@ -158,13 +159,21 @@ fun HomeOverviewScreen(
                     }
                 } else {
                     item {
-                        Text(
+                        Row(
                             modifier = Modifier
                                 .padding(horizontal = 16.dp)
                                 .padding(top = 30.dp, bottom = 10.dp),
-                            text = stringResource(R.string.home_tx_list_recent_activity),
-                            style = TariDesignSystem.typography.headingXLarge,
-                        )
+                        ) {
+                            Text(
+                                text = stringResource(R.string.home_tx_list_recent_activity),
+                                style = TariDesignSystem.typography.headingXLarge,
+                            )
+                            Spacer(Modifier.weight(1f))
+                            BlockSyncChip(
+                                walletScannedHeight = uiState.connectionState.walletScannedHeight,
+                                chainTip = uiState.connectionState.chainTip,
+                            )
+                        }
                     }
                     items(uiState.txList.size) { index ->
                         val txItem = uiState.txList[index]
