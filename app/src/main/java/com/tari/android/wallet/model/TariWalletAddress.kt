@@ -33,11 +33,11 @@
 package com.tari.android.wallet.model
 
 import android.os.Parcelable
-import com.tari.android.wallet.util.extension.flag
 import com.tari.android.wallet.ffi.Base58String
 import com.tari.android.wallet.ffi.FFIException
 import com.tari.android.wallet.ffi.FFITariWalletAddress
 import com.tari.android.wallet.ffi.runWithDestroy
+import com.tari.android.wallet.util.extension.flag
 import com.tari.android.wallet.util.tariEmoji
 import kotlinx.parcelize.Parcelize
 
@@ -134,7 +134,8 @@ data class TariWalletAddress(
 
     enum class Feature(val mask: Byte) {
         ONE_SIDED(0b00000001),
-        INTERACTIVE(0b00000010);
+        INTERACTIVE(0b00000010),
+        PAYMENT_ID(0b00000100);
 
         companion object {
             fun get(features: Int): List<Feature> = entries.filter { features.toByte().flag(it.mask) }
