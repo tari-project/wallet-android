@@ -50,7 +50,6 @@ abstract class Tx(
     open val direction: Direction,
     open val amount: MicroTari,
     open val timestamp: BigInteger, // Seconds
-    open val message: String,
     open val paymentId: String,
     open val status: TxStatus,
     open val tariContact: TariContact, // This is the receiver for an outbound tx and sender for an inbound tx.
@@ -76,13 +75,12 @@ abstract class Tx(
         get() = DateTime(timestamp.toLong() * 1000L)
 
     val note: String
-        get() = paymentId.ifEmpty { message }
+        get() = paymentId
 
     override fun toString() = "Tx(id=$id, " +
             "direction=$direction, " +
             "amount=$amount, " +
             "timestamp=$timestamp, " +
-            "message='$message', " +
             "paymentId='$paymentId', " +
             "status=$status, " +
             "tariContact=$tariContact)"

@@ -53,13 +53,12 @@ data class CancelledTx(
     override val direction: Direction,
     override val amount: MicroTari,
     override val timestamp: BigInteger,
-    override val message: String,
     override val paymentId: String,
     override val status: TxStatus,
     override val tariContact: TariContact,
     val fee: MicroTari,
     val cancellationReason: FFITxCancellationReason,
-) : Tx(id, direction, amount, timestamp, message, paymentId, status, tariContact), Parcelable {
+) : Tx(id, direction, amount, timestamp, paymentId, status, tariContact), Parcelable {
 
     constructor(tx: FFICompletedTx) : this(
         id = tx.getId(),
@@ -67,7 +66,6 @@ data class CancelledTx(
         tariContact = tx.getContact(),
         amount = MicroTari(tx.getAmount()),
         timestamp = tx.getTimestamp(),
-        message = tx.getMessage(),
         paymentId = tx.getPaymentId(),
         status = TxStatus.map(tx.getStatus()),
         fee = MicroTari(tx.getFee()),

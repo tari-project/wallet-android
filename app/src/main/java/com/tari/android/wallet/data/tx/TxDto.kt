@@ -10,7 +10,6 @@ data class TxDto(
     fun contains(searchQuery: String): Boolean = this.tx.tariContact.walletAddress.fullEmojiId.contains(searchQuery, ignoreCase = true)
             || this.tx.tariContact.walletAddress.fullBase58.contains(searchQuery, ignoreCase = true)
             || this.tx.tariContact.alias.contains(searchQuery, ignoreCase = true)
-            || this.tx.message.contains(searchQuery, ignoreCase = true)
             || this.tx.paymentId.contains(searchQuery, ignoreCase = true)
             || this.tx.amount.formattedTariValue.contains(searchQuery, ignoreCase = true)
             || this.tx.amount.formattedValue.contains(searchQuery, ignoreCase = true)

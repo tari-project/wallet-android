@@ -90,7 +90,7 @@ Java_com_tari_android_wallet_ffi_FFIPendingOutboundTx_jniGetFee(
 
 extern "C"
 JNIEXPORT jstring JNICALL
-Java_com_tari_android_wallet_ffi_FFIPendingOutboundTx_jniGetMessage(
+Java_com_tari_android_wallet_ffi_FFIPendingOutboundTx_jniGetPaymentId(
         JNIEnv *jEnv,
         jobject jThis,
         jobject error) {

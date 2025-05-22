@@ -46,7 +46,7 @@ class FFIPendingInboundTx() : FFITxBase() {
     private external fun jniGetSourcePublicKey(libError: FFIError): FFIPointer
     private external fun jniGetAmount(libError: FFIError): ByteArray
     private external fun jniGetTimestamp(libError: FFIError): ByteArray
-    private external fun jniGetMessage(libError: FFIError): String
+    private external fun jniGetPaymentId(libError: FFIError): String
     private external fun jniGetStatus(libError: FFIError): Int
     private external fun jniDestroy()
 
@@ -67,7 +67,7 @@ class FFIPendingInboundTx() : FFITxBase() {
 
     fun getTimestamp(): BigInteger = runWithError { BigInteger(1, jniGetTimestamp(it)) }
 
-    fun getMessage(): String = runWithError { jniGetMessage(it) }
+    fun getPaymentId(): String = runWithError { jniGetPaymentId(it) }
 
     fun getStatus(): FFITxStatus {
         return when (runWithError { jniGetStatus(it) }) {
