@@ -2,11 +2,12 @@ package com.tari.android.wallet.ffi
 
 import com.tari.android.wallet.model.TariContact
 import com.tari.android.wallet.model.TariWalletAddress
-import com.tari.android.wallet.model.Tx
+import com.tari.android.wallet.model.tx.Tx
 
 abstract class FFITxBase() : FFIBase() {
 
     constructor(pointer: FFIPointer) : this() {
+        if (pointer.isNull()) error("Pointer must not be null")
         this.pointer = pointer
     }
 
@@ -17,15 +18,11 @@ abstract class FFITxBase() : FFIBase() {
     fun getContact(): TariContact {
         val publicKey = if (isOutbound()) {
             getDestinationPublicKey().runWithDestroy {
-                val destinationHex = it.toString()
-                val destinationEmoji = it.getEmojiId()
-                TariWalletAddress.createWalletAddress(destinationHex, destinationEmoji)
+                TariWalletAddress(it)
             }
         } else {
             getSourcePublicKey().runWithDestroy {
-                val sourceHex = it.toString()
-                val sourceEmoji = it.getEmojiId()
-                TariWalletAddress.createWalletAddress(sourceHex, sourceEmoji)
+                TariWalletAddress(it)
             }
         }
         return TariContact(publicKey)

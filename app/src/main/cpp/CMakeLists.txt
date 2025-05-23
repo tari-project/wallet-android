@@ -74,7 +74,6 @@ add_library(
         jniSeedWords.cpp
         jniEmojiSet.cpp
         jniTransactionSendStatus.cpp
-        jniCovenant.cpp
         jniOutputFeatures.cpp
         jniTariFeePerGramStats.cpp
         jniTariFeePerGramStat.cpp

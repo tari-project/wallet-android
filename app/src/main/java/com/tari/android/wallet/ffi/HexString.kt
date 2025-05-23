@@ -37,17 +37,15 @@ package com.tari.android.wallet.ffi
  */
 data class HexString(val hex: String) {
 
-    constructor(bytes: FFIByteVector) : this(
-        hex = if (bytes.getLength() > 0) {
-            val byteArray = ByteArray(bytes.getLength())
+    constructor(byteVector: FFIByteVector) : this(
+        hex = if (byteVector.getLength() > 0) {
+            val byteArray = ByteArray(byteVector.getLength())
             for (i in byteArray.indices) {
-                byteArray[i] = bytes.getAt(i).toByte()
+                byteArray[i] = byteVector.getAt(i).toByte()
             }
             byteArray.joinToString("") { "%02X".format(it) }
         } else {
             String()
         }
     )
-
-    override fun toString(): String = hex
 }

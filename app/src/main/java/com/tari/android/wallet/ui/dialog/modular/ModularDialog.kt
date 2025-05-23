@@ -3,7 +3,6 @@ package com.tari.android.wallet.ui.dialog.modular
 import android.animation.ValueAnimator
 import android.app.Activity
 import android.app.Dialog
-import android.content.Context
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.view.Gravity
@@ -12,11 +11,8 @@ import android.widget.LinearLayout
 import androidx.appcompat.widget.LinearLayoutCompat
 import androidx.core.animation.doOnEnd
 import com.tari.android.wallet.R
-import com.tari.android.wallet.data.sharedPrefs.securityStages.modules.SecurityStageHeadModule
-import com.tari.android.wallet.data.sharedPrefs.securityStages.modules.SecurityStageHeadModuleView
-import com.tari.android.wallet.ui.component.networkStateIndicator.module.ConnectionStatusesModule
-import com.tari.android.wallet.ui.component.networkStateIndicator.module.ConnectionStatusesModuleView
-import com.tari.android.wallet.ui.dialog.TariDialog
+import com.tari.android.wallet.ui.dialog.modular.modules.addressDetails.AddressDetailsModule
+import com.tari.android.wallet.ui.dialog.modular.modules.addressDetails.AddressDetailsModuleView
 import com.tari.android.wallet.ui.dialog.modular.modules.addressPoisoning.AddressPoisoningModule
 import com.tari.android.wallet.ui.dialog.modular.modules.addressPoisoning.AddressPoisoningModuleView
 import com.tari.android.wallet.ui.dialog.modular.modules.body.BodyModule
@@ -25,6 +21,8 @@ import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonModuleView
 import com.tari.android.wallet.ui.dialog.modular.modules.checked.CheckedModule
 import com.tari.android.wallet.ui.dialog.modular.modules.checked.CheckedModuleView
+import com.tari.android.wallet.ui.dialog.modular.modules.connection.ConnectionStatusesModule
+import com.tari.android.wallet.ui.dialog.modular.modules.connection.ConnectionStatusesModuleView
 import com.tari.android.wallet.ui.dialog.modular.modules.customBaseNodeBody.CustomBaseNodeBodyModule
 import com.tari.android.wallet.ui.dialog.modular.modules.customBaseNodeBody.CustomBaseNodeBodyModuleView
 import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadBoldSpannableModule
@@ -41,36 +39,42 @@ import com.tari.android.wallet.ui.dialog.modular.modules.input.InputModule
 import com.tari.android.wallet.ui.dialog.modular.modules.input.InputModuleView
 import com.tari.android.wallet.ui.dialog.modular.modules.option.OptionModule
 import com.tari.android.wallet.ui.dialog.modular.modules.option.OptionModuleView
+import com.tari.android.wallet.ui.dialog.modular.modules.securityStages.SecurityStageHeadModule
+import com.tari.android.wallet.ui.dialog.modular.modules.securityStages.SecurityStageHeadModuleView
+import com.tari.android.wallet.ui.dialog.modular.modules.shareOptions.ShareOptionsModule
+import com.tari.android.wallet.ui.dialog.modular.modules.shareOptions.ShareOptionsModuleView
+import com.tari.android.wallet.ui.dialog.modular.modules.shareQr.ShareQRCodeModuleView
+import com.tari.android.wallet.ui.dialog.modular.modules.shareQr.ShareQrCodeModule
 import com.tari.android.wallet.ui.dialog.modular.modules.shortEmoji.ShortEmojiIdModule
 import com.tari.android.wallet.ui.dialog.modular.modules.shortEmoji.ShortEmojiModuleView
 import com.tari.android.wallet.ui.dialog.modular.modules.space.SpaceModule
 import com.tari.android.wallet.ui.dialog.modular.modules.space.SpaceModuleView
-import com.tari.android.wallet.ui.dialog.modular.modules.yatInput.YatInputModule
-import com.tari.android.wallet.ui.dialog.modular.modules.yatInput.YatInputModuleView
-import com.tari.android.wallet.ui.fragment.send.addAmount.feeModule.FeeModule
-import com.tari.android.wallet.ui.fragment.send.addAmount.feeModule.FeeModuleView
-import com.tari.android.wallet.ui.fragment.send.shareQr.ShareQRCodeModuleView
-import com.tari.android.wallet.ui.fragment.send.shareQr.ShareQrCodeModule
-import com.tari.android.wallet.ui.fragment.settings.backup.backupOnboarding.module.BackupOnboardingFlowItemModule
-import com.tari.android.wallet.ui.fragment.settings.backup.backupOnboarding.module.BackupOnboardingFlowItemModuleView
-import com.tari.android.wallet.ui.fragment.settings.logs.logs.module.LogLevelCheckedModule
-import com.tari.android.wallet.ui.fragment.settings.logs.logs.module.LogSourceCheckedModule
-import com.tari.android.wallet.ui.fragment.utxos.list.module.DetailItemModule
-import com.tari.android.wallet.ui.fragment.utxos.list.module.DetailItemModuleView
-import com.tari.android.wallet.ui.fragment.utxos.list.module.ListItemModule
-import com.tari.android.wallet.ui.fragment.utxos.list.module.ListItemModuleView
-import com.tari.android.wallet.ui.fragment.utxos.list.module.UtxoAmountModule
-import com.tari.android.wallet.ui.fragment.utxos.list.module.UtxoAmountModuleView
-import com.tari.android.wallet.ui.fragment.utxos.list.module.UtxoSplitModule
-import com.tari.android.wallet.ui.fragment.utxos.list.module.UtxoSplitModuleView
+import com.tari.android.wallet.ui.screen.send.addAmount.feeModule.FeeModule
+import com.tari.android.wallet.ui.screen.send.addAmount.feeModule.FeeModuleView
+import com.tari.android.wallet.ui.screen.settings.backup.learnMore.module.BackupLearnMoreItemModule
+import com.tari.android.wallet.ui.screen.settings.backup.learnMore.module.BackupLearnMoreItemModuleView
+import com.tari.android.wallet.ui.screen.settings.logs.logs.module.LogLevelCheckedModule
+import com.tari.android.wallet.ui.screen.settings.logs.logs.module.LogSourceCheckedModule
+import com.tari.android.wallet.ui.screen.utxos.list.module.DetailItemModule
+import com.tari.android.wallet.ui.screen.utxos.list.module.DetailItemModuleView
+import com.tari.android.wallet.ui.screen.utxos.list.module.ListItemModule
+import com.tari.android.wallet.ui.screen.utxos.list.module.ListItemModuleView
+import com.tari.android.wallet.ui.screen.utxos.list.module.UtxoAmountModule
+import com.tari.android.wallet.ui.screen.utxos.list.module.UtxoAmountModuleView
+import com.tari.android.wallet.ui.screen.utxos.list.module.UtxoSplitModule
+import com.tari.android.wallet.ui.screen.utxos.list.module.UtxoSplitModuleView
+import com.tari.android.wallet.util.extension.isStillAlive
+import java.lang.ref.WeakReference
 
-open class ModularDialog(val context: Context) : TariDialog {
+open class ModularDialog(context: Activity) {
+    private val weakContext = WeakReference(context)
 
-    lateinit var args: ModularDialogArgs
+    var args: ModularDialogArgs? = null
 
+    // TODO we never clear listeners nor stop animations. May cause memory leaks.
     private val onDismissListeners = mutableListOf<() -> Unit>()
 
-    constructor(context: Context, args: ModularDialogArgs) : this(context) {
+    constructor(context: Activity, args: ModularDialogArgs) : this(context) {
         applyArgs(args)
     }
 
@@ -83,25 +87,57 @@ open class ModularDialog(val context: Context) : TariDialog {
         }
     }
 
-    fun applyArgs(args: ModularDialogArgs) {
-        this.args = args
-        with(dialog) {
-            setCancelable(args.dialogArgs.cancelable)
-            setCanceledOnTouchOutside(args.dialogArgs.canceledOnTouchOutside)
-            setOnDismissListener {
-                onDismissListeners.forEach { runCatching { it() } }
-                args.dialogArgs.onDismiss()
-            }
-            if (args.dialogArgs.canceledOnTouchOutside) {
-                findViewById<View>(R.id.back).setOnClickListener {
-                    this@ModularDialog.dismiss()
+    fun show() {
+        withContext {
+            dialog.show()
+            showAnimation(true)
+        }
+    }
+
+    /**
+     * forceDismiss - dismiss dialog without animation
+     */
+    fun dismiss(forceDismiss: Boolean = false) {
+        if (forceDismiss) {
+            dialog.dismiss()
+        } else {
+            withContext {
+                showAnimation(false) {
+                    runCatching {
+                        dialog.dismiss()
+                    }
                 }
             }
         }
-        updateModules(args.modules)
     }
 
-    private fun updateModules(modules: List<IDialogModule>) {
+    fun addDismissListener(onDismiss: () -> Unit) {
+        onDismissListeners.add(onDismiss)
+    }
+
+    fun applyArgs(args: ModularDialogArgs?) {
+        if (args == null) return
+
+        withContext { context ->
+            this.args = args
+            with(dialog) {
+                setCancelable(args.dialogArgs.cancelable)
+                setCanceledOnTouchOutside(args.dialogArgs.canceledOnTouchOutside)
+                setOnDismissListener {
+                    onDismissListeners.forEach { runCatching { it() } }
+                    args.dialogArgs.onDismiss()
+                }
+                if (args.dialogArgs.canceledOnTouchOutside) {
+                    findViewById<View>(R.id.back).setOnClickListener {
+                        this@ModularDialog.dismiss()
+                    }
+                }
+            }
+            updateModules(context, args.modules)
+        }
+    }
+
+    private fun updateModules(context: Activity, modules: List<IDialogModule>) {
         val root = dialog.findViewById<LinearLayoutCompat>(R.id.dialog_root_view)
         root.removeAllViews()
         for (module in modules) {
@@ -127,37 +163,17 @@ open class ModularDialog(val context: Context) : TariDialog {
                 is UtxoSplitModule -> UtxoSplitModuleView(context, module)
                 is ConnectionStatusesModule -> ConnectionStatusesModuleView(context, module)
                 is SecurityStageHeadModule -> SecurityStageHeadModuleView(context, module)
-                is BackupOnboardingFlowItemModule -> BackupOnboardingFlowItemModuleView(context, module)
-                is YatInputModule -> YatInputModuleView(context, module)
+                is BackupLearnMoreItemModule -> BackupLearnMoreItemModuleView(context, module)
                 is InputModule -> InputModuleView(context, module)
                 is ShortEmojiIdModule -> ShortEmojiModuleView(context, module)
                 is IconModule -> IconModuleView(context, module)
                 is AddressPoisoningModule -> AddressPoisoningModuleView(context, module)
+                is AddressDetailsModule -> AddressDetailsModuleView(context, module)
+                is ShareOptionsModule -> ShareOptionsModuleView(context, module)
                 else -> View(context)
             }
             root.addView(view)
         }
-    }
-
-    override fun show() {
-        dialog.show()
-        showAnimation(true)
-    }
-
-    override fun dismiss() {
-        showAnimation(false) {
-            runCatching {
-                if (context !is Activity || !context.isFinishing) {
-                    dialog.dismiss()
-                }
-            }
-        }
-    }
-
-    override fun isShowing(): Boolean = dialog.isShowing
-
-    override fun addDismissListener(onDismiss: () -> Unit) {
-        onDismissListeners.add(onDismiss)
     }
 
     private fun showAnimation(forward: Boolean, endAction: () -> Unit = {}) {
@@ -178,6 +194,12 @@ open class ModularDialog(val context: Context) : TariDialog {
             }
             doOnEnd { endAction() }
             start()
+        }
+    }
+
+    private fun withContext(block: (Activity) -> Unit) {
+        weakContext.get()?.takeIf { it.isStillAlive() }?.let {
+            block(it)
         }
     }
 }

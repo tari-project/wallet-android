@@ -1,28 +1,19 @@
 package com.tari.android.wallet.application.baseNodes
 
 import android.content.Context
-import com.google.gson.Gson
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.Network
-import com.tari.android.wallet.application.WalletState
 import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodeDto
 import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodeList
-import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodeSharedRepository
-import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
-import com.tari.android.wallet.di.ApplicationScope
-import com.tari.android.wallet.event.EventBus
-import com.tari.android.wallet.extension.addTo
-import com.tari.android.wallet.extension.getWithError
-import com.tari.android.wallet.ffi.FFIPublicKey
-import com.tari.android.wallet.ffi.FFITariBaseNodeState
+import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodePrefRepository
+import com.tari.android.wallet.data.sharedPrefs.network.NetworkPrefRepository
 import com.tari.android.wallet.ffi.FFIWallet
-import com.tari.android.wallet.ffi.HexString
-import com.tari.android.wallet.service.connection.TariWalletServiceConnection
+import com.tari.android.wallet.model.TariBaseNodeState
 import com.tari.android.wallet.util.DebugConfig
-import io.reactivex.disposables.CompositeDisposable
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import org.apache.commons.io.IOUtils
 import java.math.BigInteger
 import javax.inject.Inject
@@ -36,27 +27,11 @@ private const val REGEX_IPV4 = "([A-Fa-f0-9 ]{64}::/ip4/[0-9]{1,3}[.][0-9]{1,3}[
 @Singleton
 class BaseNodesManager @Inject constructor(
     private val context: Context,
-    private val baseNodeSharedRepository: BaseNodeSharedRepository,
-    private val networkRepository: NetworkRepository,
-    private val serviceConnection: TariWalletServiceConnection,
-    @ApplicationScope private val applicationScope: CoroutineScope,
+    private val baseNodeSharedRepository: BaseNodePrefRepository,
+    private val networkRepository: NetworkPrefRepository,
 ) {
     private val logger
         get() = Logger.t(this::class.simpleName)
-
-    private val compositeDisposable = CompositeDisposable()
-
-    private lateinit var baseNodeIterator: Iterator<BaseNodeDto>
-
-    init {
-        applicationScope.launch {
-            serviceConnection.doOnWalletServiceConnected { startSync() }
-        }
-
-        EventBus.walletState.publishSubject.subscribe {
-            startSync()
-        }.addTo(compositeDisposable)
-    }
 
     /**
      * Returns the list of base nodes in the resource file base_nodes.txt as triples of
@@ -69,26 +44,44 @@ class BaseNodesManager @Inject constructor(
             baseNodeSharedRepository.ffiBaseNodes
         }
 
-    val networkBlockHeight: BigInteger
-        get() = baseNodeSharedRepository.baseNodeHeightOfLongestChain
+    private val _walletScannedHeight = MutableStateFlow(0)
+    val walletScannedHeight = _walletScannedHeight.asStateFlow()
+
+    private val _baseNodeState = MutableStateFlow(
+        TariBaseNodeState(
+            heightOfLongestChain = BigInteger.ZERO,
+            nodeId = null,
+        )
+    )
+    val baseNodeState = _baseNodeState.asStateFlow()
+
+    val currentBaseNode: BaseNodeDto?
+        get() = baseNodeSharedRepository.currentBaseNode
+
+    val userBaseNodes: List<BaseNodeDto>
+        get() = baseNodeSharedRepository.userBaseNodes
 
     /**
      * Select a base node randomly from the list of base nodes in base_nodes.tx, and sets
      * the wallet and stored the values in shared prefs.
+     * @return the selected base node or null if the list is at its end.
      */
     @Synchronized
-    fun setNextBaseNode() {
-        if (!this::baseNodeIterator.isInitialized || !baseNodeIterator.hasNext()) {
-            baseNodeIterator = baseNodeList.iterator()
-        }
-        val baseNode = baseNodeIterator.next()
-        setBaseNode(baseNode)
+    fun setNextBaseNode(): BaseNodeDto? {
+        val currentBaseNode = baseNodeSharedRepository.currentBaseNode ?: baseNodeList.firstOrNull()
+        val nextBaseNode = baseNodeList.getOrNull(baseNodeList.indexOf(currentBaseNode) + 1)
+
+        baseNodeSharedRepository.currentBaseNode = nextBaseNode
+
+        return nextBaseNode
     }
 
+    /**
+     * Sets the base node to the given base node.
+     * Need to call WalletManager.syncBaseNode() after this method.
+     */
     fun setBaseNode(baseNode: BaseNodeDto) {
-        baseNodeSharedRepository.baseNodeLastSyncResult = null
         baseNodeSharedRepository.currentBaseNode = baseNode
-        startSync()
     }
 
     fun addUserBaseNode(baseNode: BaseNodeDto) {
@@ -105,30 +98,12 @@ class BaseNodesManager @Inject constructor(
         }
     }
 
-    fun saveBaseNodeState(baseNodeState: FFITariBaseNodeState) {
-        baseNodeSharedRepository.baseNodeHeightOfLongestChain = baseNodeState.getHeightOfLongestChain()
+    fun saveBaseNodeState(baseNodeState: TariBaseNodeState) {
+        _baseNodeState.update { baseNodeState }
     }
 
-    fun startSync() {
-        //essential for wallet creation flow
-        val baseNode = baseNodeSharedRepository.currentBaseNode ?: return
-        try {
-            logger.i("startSync")
-            if (serviceConnection.isWalletServiceConnected().not()) return
-            if (EventBus.walletState.publishSubject.value != WalletState.Running) return
-
-            logger.i("startSync:publicKeyHex: ${baseNode.publicKeyHex}")
-            logger.i("startSync:address: ${baseNode.address}")
-            logger.i("startSync:userBaseNodes: ${Gson().toJson(baseNodeSharedRepository.userBaseNodes)}")
-            val baseNodeKeyFFI = FFIPublicKey(HexString(baseNode.publicKeyHex))
-            FFIWallet.instance?.addBaseNodePeer(baseNodeKeyFFI, baseNode.address)
-            baseNodeKeyFFI.destroy()
-            serviceConnection.walletService.getWithError { error, wallet -> wallet.startBaseNodeSync(error) }
-        } catch (e: Throwable) {
-            logger.i("startSync:error connecting to base node $baseNode with an error: ${e.message}")
-            setNextBaseNode()
-            startSync()
-        }
+    fun saveWalletScannedHeight(height: Int) {
+        _walletScannedHeight.update { height }
     }
 
     /**
@@ -138,17 +113,17 @@ class BaseNodesManager @Inject constructor(
         return Regex(REGEX_ONION).matches(address) || Regex(REGEX_IPV4).matches(address)
     }
 
-    fun refreshBaseNodeList() {
-        baseNodeSharedRepository.ffiBaseNodes = loadBaseNodesFromFFI()
+    fun refreshBaseNodeList(wallet: FFIWallet) {
+        baseNodeSharedRepository.ffiBaseNodes = loadBaseNodesFromFFI(wallet)
     }
 
-    private fun loadBaseNodesFromFFI(): BaseNodeList = FFIWallet.instance?.getBaseNodePeers()
-        ?.mapIndexed { index, publicKey ->
+    private fun loadBaseNodesFromFFI(wallet: FFIWallet): BaseNodeList = wallet.getBaseNodePeers()
+        .mapIndexed { index, publicKey ->
             BaseNodeDto(
                 name = "${networkRepository.currentNetwork.network.displayName} ${index + 1}",
                 publicKeyHex = publicKey.hex,
             )
-        }?.toMutableList().orEmpty()
+        }
         .let { BaseNodeList(it) }
         .also { list -> logger.i("baseNodeList from FFI: \n${list.joinToString(separator = "\n")}") }
 

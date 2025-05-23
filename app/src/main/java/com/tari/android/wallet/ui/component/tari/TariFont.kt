@@ -35,35 +35,38 @@ package com.tari.android.wallet.ui.component.tari
 import android.content.Context
 import android.graphics.Typeface
 import android.util.AttributeSet
+import androidx.annotation.FontRes
+import com.tari.android.wallet.R
 
 /**
  * Custom font enumeration - used in layout files.
  *
  * @author The Tari Development Team
  */
-enum class TariFont(private val fileName: String) {
+
+enum class TariFont(@FontRes private val fontRes: Int) {
 
     // font files
-    AVENIR_LT_STD_BLACK("fonts/AvenirLTStd-Black.otf"),
-    AVENIR_LT_STD_HEAVY("fonts/AvenirLTStd-Heavy.otf"),
-    AVENIR_LT_STD_MEDIUM("fonts/AvenirLTStd-Medium.otf"),
-    AVENIR_LT_STD_ROMAN("fonts/AvenirLTStd-Roman.otf"),
-    AVENIR_NEXT_LT_PRO_REGULAR("fonts/AvenirNextLTPro-Regular.otf"),
-    AVENIR_LT_STD_LIGHT("fonts/AvenirLTStd-Light.otf");
+    BLACK(R.font.poppins_semibold),
+    HEAVY(R.font.poppins_semibold),
+    MEDIUM(R.font.poppins_medium),
+    ROMAN(R.font.poppins_regular),
+    REGULAR(R.font.poppins_regular),
+    LIGHT(R.font.poppins_light);
 
     fun asTypeface(context: Context): Typeface {
-        return Typeface.createFromAsset(context.assets, fileName)
+        return context.resources.getFont(fontRes)
     }
 
     companion object {
-        private const val sScheme = "http://schemas.android.com/apk/res-auto"
-        private const val sAttribute = "customFont"
+        private const val SCHEME = "http://schemas.android.com/apk/res-auto"
+        private const val ATTRIBUTE = "customFont"
 
         /**
          * Get font from attribute set. The default font is Medium.
          */
         fun getFromAttributeSet(context: Context, attr: AttributeSet): Typeface {
-            val fontName = attr.getAttributeValue(sScheme, sAttribute)?.toInt()
+            val fontName = attr.getAttributeValue(SCHEME, ATTRIBUTE)?.toInt()
             val uiFont = fontName?.let { UIFont.entries[it] } ?: UIFont.Medium
             return uiFont.toTariFont().asTypeface(context)
         }

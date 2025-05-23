@@ -32,6 +32,9 @@
  */
 package com.tari.android.wallet.ffi
 
+import com.tari.android.wallet.model.Base58
+import com.tari.android.wallet.model.EmojiId
+
 /**
  * Wrapper for native private key type.
  *
@@ -42,12 +45,17 @@ class FFITariWalletAddress() : FFIBase() {
     private external fun jniGetBytes(libError: FFIError): FFIPointer
     private external fun jniDestroy()
     private external fun jniCreate(byteVectorPtr: FFIByteVector, libError: FFIError)
-    private external fun jniFromHex(hexStr: String, libError: FFIError)
-    private external fun jniFromEmojiId(emoji: String, libError: FFIError)
-    private external fun jniFromPrivateKey(privateKeyPtr: FFIPrivateKey, libError: FFIError)
-    private external fun jniGetEmojiId(libError: FFIError): String
+    private external fun jniFromBase58(base58: Base58, libError: FFIError)
+    private external fun jniFromEmojiId(emoji: EmojiId, libError: FFIError)
+    private external fun jniGetEmojiId(libError: FFIError): EmojiId
+    private external fun jniGetNetwork(libError: FFIError): Int
+    private external fun jniGetFeatures(libError: FFIError): Int
+    private external fun jniGetViewKey(libError: FFIError): FFIPointer
+    private external fun jniGetSpendKey(libError: FFIError): FFIPointer
+    private external fun jniGetChecksum(libError: FFIError): Int
 
     constructor(pointer: FFIPointer) : this() {
+        if (pointer.isNull()) error("Pointer must not be null")
         this.pointer = pointer
     }
 
@@ -55,23 +63,29 @@ class FFITariWalletAddress() : FFIBase() {
         runWithError { jniCreate(byteVector, it) }
     }
 
-    constructor(hex: HexString) : this() {
-        runWithError { jniFromHex(hex.hex, it) }
+    constructor(base58: Base58String) : this() {
+        runWithError { jniFromBase58(base58.base58, it) }
     }
 
-    constructor(emojiId: String) : this() {
+    constructor(emojiId: EmojiId) : this() {
         runWithError { jniFromEmojiId(emojiId, it) }
     }
 
-    constructor(privateKey: FFIPrivateKey) : this() {
-        runWithError { jniFromPrivateKey(privateKey, it) }
-    }
+    fun getByteVector(): FFIByteVector = runWithError { FFIByteVector(jniGetBytes(it)) }
 
-    fun getBytes(): FFIByteVector = runWithError { FFIByteVector(jniGetBytes(it)) }
+    fun getEmojiId(): EmojiId = runWithError { jniGetEmojiId(it) }
 
-    fun getEmojiId(): String = runWithError { jniGetEmojiId(it) }
+    fun getNetwork(): Int = runWithError { jniGetNetwork(it) }
 
-    override fun toString(): String = getBytes().toString()
+    fun getFeatures(): Int = runWithError { jniGetFeatures(it) }
+
+    fun getViewKey(): FFIPublicKey? = runWithError { jniGetViewKey(it) }.takeIf { !it.isNull() }?.let { FFIPublicKey(it) }
+
+    fun getSpendKey(): FFIPublicKey = runWithError { FFIPublicKey(jniGetSpendKey(it)) }
+
+    fun getChecksum(): Int = runWithError { jniGetChecksum(it) }
+
+    override fun toString(): String = getEmojiId()
 
     override fun destroy() = jniDestroy()
 }

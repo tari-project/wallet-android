@@ -40,25 +40,42 @@ package com.tari.android.wallet
 import android.content.Context
 import androidx.test.core.app.ApplicationProvider.getApplicationContext
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
-import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodeSharedRepository
-import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepositoryImpl
+import com.tari.android.wallet.data.sharedPrefs.CorePrefRepository
+import com.tari.android.wallet.data.sharedPrefs.addressPoisoning.AddressPoisoningPrefRepository
+import com.tari.android.wallet.data.sharedPrefs.backup.BackupPrefRepository
+import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodePrefRepository
+import com.tari.android.wallet.data.sharedPrefs.chat.ChatsPrefRepository
 import com.tari.android.wallet.data.sharedPrefs.security.SecurityPrefRepository
-import com.tari.android.wallet.data.sharedPrefs.securityStages.SecurityStagesRepository
+import com.tari.android.wallet.data.sharedPrefs.securityStages.SecurityStagesPrefRepository
 import com.tari.android.wallet.data.sharedPrefs.sentry.SentryPrefRepository
-import com.tari.android.wallet.data.sharedPrefs.tariSettings.TariSettingsSharedRepository
-import com.tari.android.wallet.data.sharedPrefs.tor.TorSharedRepository
+import com.tari.android.wallet.data.sharedPrefs.tariSettings.TariSettingsPrefRepository
+import com.tari.android.wallet.data.sharedPrefs.tor.TorPrefRepository
+import com.tari.android.wallet.data.sharedPrefs.yat.YatPrefRepository
 import com.tari.android.wallet.di.ApplicationModule
-import com.tari.android.wallet.ffi.*
-import com.tari.android.wallet.model.*
+import com.tari.android.wallet.ffi.FFICommsConfig
+import com.tari.android.wallet.ffi.FFIContact
+import com.tari.android.wallet.ffi.FFIEmojiSet
+import com.tari.android.wallet.ffi.FFIException
+import com.tari.android.wallet.ffi.FFITariBaseNodeState
+import com.tari.android.wallet.ffi.FFITariTransportConfig
+import com.tari.android.wallet.ffi.FFIWallet
+import com.tari.android.wallet.application.walletManager.FFIWalletListener
+import com.tari.android.wallet.data.sharedPrefs.network.NetworkPrefRepository
+import com.tari.android.wallet.ffi.TransactionValidationStatus
+import com.tari.android.wallet.ffi.nullptr
+import com.tari.android.wallet.model.BalanceInfo
+import com.tari.android.wallet.model.tx.CancelledTx
+import com.tari.android.wallet.model.tx.CompletedTx
+import com.tari.android.wallet.model.tx.PendingInboundTx
+import com.tari.android.wallet.model.tx.PendingOutboundTx
+import com.tari.android.wallet.model.TransactionSendStatus
 import com.tari.android.wallet.model.recovery.WalletRestorationResult
 import com.tari.android.wallet.service.seedPhrase.SeedPhraseRepository
-import com.tari.android.wallet.ui.fragment.contact_book.data.localStorage.ContactSharedPrefRepository
-import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupSettingsRepository
 import com.tari.android.wallet.util.Constants
-import com.tari.android.wallet.yat.YatSharedRepository
 import org.junit.After
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotEquals
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -72,28 +89,31 @@ class FFIWalletTests {
     private lateinit var listener: TestAddRecipientAddNodeListener
     private val context = getApplicationContext<Context>()
     private val prefs = context.getSharedPreferences(ApplicationModule.sharedPrefsFileName, Context.MODE_PRIVATE)
-    private val networkRepository = NetworkRepositoryImpl(prefs)
-    private val baseNodeSharedPrefsRepository = BaseNodeSharedRepository(prefs, networkRepository)
-    private val backupSettingsRepository = BackupSettingsRepository(context, prefs, networkRepository)
-    private val yatSharedPrefsRepository = YatSharedRepository(prefs, networkRepository)
-    private val tariSettingsRepository = TariSettingsSharedRepository(prefs, networkRepository)
-    private val securityStagesRepository = SecurityStagesRepository(prefs, networkRepository)
-    private val contactSharedPrefRepository = ContactSharedPrefRepository(networkRepository, prefs)
+    private val networkRepository = NetworkPrefRepository(prefs)
+    private val baseNodeSharedPrefsRepository = BaseNodePrefRepository(prefs, networkRepository)
+    private val backupSettingsRepository = BackupPrefRepository(context, prefs, networkRepository)
+    private val yatSharedPrefsRepository = YatPrefRepository(prefs, networkRepository)
+    private val tariSettingsRepository = TariSettingsPrefRepository(prefs, networkRepository)
+    private val securityStagesRepository = SecurityStagesPrefRepository(prefs, networkRepository)
     private val sentryPrefRepository: SentryPrefRepository = SentryPrefRepository(prefs, networkRepository)
-    private val torSharedRepository = TorSharedRepository(prefs, networkRepository)
+    private val torSharedRepository = TorPrefRepository(prefs, networkRepository)
     private val securityPrefRepository = SecurityPrefRepository(context, prefs, networkRepository)
-    private val sharedPrefsRepository = SharedPrefsRepository(
-        prefs,
-        networkRepository,
-        backupSettingsRepository,
-        baseNodeSharedPrefsRepository,
-        yatSharedPrefsRepository,
-        torSharedRepository,
-        tariSettingsRepository,
-        securityStagesRepository,
-        contactSharedPrefRepository,
-        sentryPrefRepository,
-        securityPrefRepository,
+    private val addressPoisoningSharedRepository = AddressPoisoningPrefRepository(prefs, networkRepository)
+    private val chatPrefRepository = ChatsPrefRepository(prefs, networkRepository)
+
+    private val sharedPrefsRepository = CorePrefRepository(
+        sharedPrefs = prefs,
+        networkRepository = networkRepository,
+        backupSettingsRepository = backupSettingsRepository,
+        baseNodeSharedRepository = baseNodeSharedPrefsRepository,
+        yatSharedRepository = yatSharedPrefsRepository,
+        torSharedRepository = torSharedRepository,
+        tariSettingsSharedRepository = tariSettingsRepository,
+        securityStagesRepository = securityStagesRepository,
+        sentryPrefRepository = sentryPrefRepository,
+        securityPrefRepository = securityPrefRepository,
+        addressPoisoningSharedRepository = addressPoisoningSharedRepository,
+        chatPrefRepository = chatPrefRepository,
     )
 
     private val walletDirPath = context.filesDir.absolutePath
@@ -118,12 +138,13 @@ class FFIWalletTests {
             transport,
             FFITestUtil.WALLET_DB_NAME,
             walletDirPath,
-            Constants.Wallet.discoveryTimeoutSec,
-            Constants.Wallet.storeAndForwardMessageDurationSec,
+            Constants.Wallet.DISCOVERY_TIMEOUT_SEC,
+            Constants.Wallet.STORE_AND_FORWARD_MESSAGE_DURATION_SEC,
         )
         val logFile = File(walletDirPath, "test_log.log")
         // create wallet instance
-        wallet = FFIWallet(sharedPrefsRepository, securityPrefRepository, SeedPhraseRepository(), networkRepository, commsConfig, logFile.absolutePath)
+        wallet =
+            FFIWallet(sharedPrefsRepository, securityPrefRepository, SeedPhraseRepository(), networkRepository, commsConfig, logFile.absolutePath)
         // create listener
         listener = TestAddRecipientAddNodeListener()
         wallet.listener = listener
@@ -158,19 +179,6 @@ class FFIWalletTests {
     @Test
     fun testContacts() {
         val contactCount = 127
-        // add contacts
-        repeat(contactCount) {
-            val contactPrivateKey = FFIPrivateKey.generate()
-            val contactWalletAddress = FFITariWalletAddress(contactPrivateKey)
-            val contact = FFIContact(
-                FFITestUtil.generateRandomAlphanumericString(16),
-                contactWalletAddress
-            )
-            wallet.addUpdateContact(contact)
-            contactPrivateKey.destroy()
-            contactWalletAddress.destroy()
-            contact.destroy()
-        }
         // test get contacts
         var contacts = wallet.getContacts()
         assertEquals(contactCount, contacts.getLength())
@@ -220,7 +228,7 @@ class FFIWalletTests {
         val emojiSet = FFIEmojiSet()
         assertTrue(emojiSet.getLength() > 0)
         val emoji = emojiSet.getAt(0)
-        assertTrue(emoji.toString().isNotEmpty())
+        assertTrue(emoji.hex().isNotEmpty())
         emoji.destroy()
         emojiSet.destroy()
         assertEquals(nullptr, emojiSet.pointer)
@@ -308,6 +316,8 @@ class FFIWalletTests {
         override fun onTXOValidationComplete(responseId: BigInteger, status: TransactionValidationStatus) = Unit
 
         override fun onWalletRestoration(result: WalletRestorationResult) = Unit
+
+        override fun onBaseNodeStateChanged(baseNodeState: FFITariBaseNodeState) = Unit
 
         override fun onDirectSendResult(txId: BigInteger, status: TransactionSendStatus) = Unit
 

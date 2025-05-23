@@ -35,24 +35,32 @@
 package com.tari.android.wallet.util
 
 import com.tari.android.wallet.BuildConfig
-import com.tari.android.wallet.extension.toMicroTari
-import com.tari.android.wallet.model.CompletedTx
+import com.tari.android.wallet.data.chat.ChatItemDto
+import com.tari.android.wallet.data.chat.ChatMessageItemDto
+import com.tari.android.wallet.data.contacts.model.ContactDto
+import com.tari.android.wallet.data.contacts.model.FFIContactInfo
+import com.tari.android.wallet.data.tx.TxDto
+import com.tari.android.wallet.ffi.FFITxCancellationReason
+import com.tari.android.wallet.model.Base58
+import com.tari.android.wallet.model.CompletedTransactionKernel
+import com.tari.android.wallet.model.EmojiId
 import com.tari.android.wallet.model.TariContact
 import com.tari.android.wallet.model.TariUtxo
 import com.tari.android.wallet.model.TariWalletAddress
-import com.tari.android.wallet.model.Tx
 import com.tari.android.wallet.model.TxStatus
-import com.tari.android.wallet.ui.common.gyphy.presentation.GIFViewModel
-import com.tari.android.wallet.ui.common.gyphy.repository.GIFRepository
-import com.tari.android.wallet.ui.common.recyclerView.items.TitleViewHolderItem
-import com.tari.android.wallet.ui.fragment.contact_book.address_poisoning.SimilarAddressDto
-import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.ContactDto
-import com.tari.android.wallet.ui.fragment.contact_book.data.contacts.FFIContactDto
-import com.tari.android.wallet.ui.fragment.tx.adapter.TransactionItem
-import com.tari.android.wallet.ui.fragment.utxos.list.adapters.UtxosViewHolderItem
+import com.tari.android.wallet.model.tx.CancelledTx
+import com.tari.android.wallet.model.tx.CompletedTx
+import com.tari.android.wallet.model.tx.PendingOutboundTx
+import com.tari.android.wallet.model.tx.Tx
+import com.tari.android.wallet.ui.screen.contactBook.addressPoisoning.SimilarAddressDto
+import com.tari.android.wallet.ui.screen.utxos.list.adapters.UtxosViewHolderItem
+import com.tari.android.wallet.util.extension.minusHours
+import com.tari.android.wallet.util.extension.toMicroTari
 import org.joda.time.DateTime
 import yat.android.lib.YatIntegration
 import java.math.BigInteger
+import java.util.Date
+import java.util.UUID
 import kotlin.random.Random
 
 /**
@@ -60,42 +68,86 @@ import kotlin.random.Random
  */
 object DebugConfig {
 
-    private const val _mockedTurned = false
-    val mockedDataEnabled = _mockedTurned && isDebug() // TODO split this flag to multiple different types of mocked data
-
     val mockUtxos = valueIfDebug(false)
 
     val mockTxs = valueIfDebug(false)
+
+    val mockChatMessages = valueIfDebug(false)
+
+    val suppressAddAmountErrors = valueIfDebug(false)
+
+    val mockSeedPhraseSorting = valueIfDebug(false)
 
     val mockEveryAddressPoisoned: Boolean = valueIfDebug(false)
     val mockPoisonedAddresses: Boolean = valueIfDebug(false)
 
     const val isChatEnabled = false
 
-    private const val _useYatSandbox = false
-    val yatEnvironment = if (_useYatSandbox && isDebug()) YatEnvironment.SANDBOX else YatEnvironment.PRODUCTION
+    const val isYatEnabled = false
+    private val _useYatSandbox = valueIfDebug(false)
+    val yatEnvironment = if (_useYatSandbox) YatEnvironment.SANDBOX else YatEnvironment.PRODUCTION
 
-    private const val _mockNetwork = false
-    val mockNetwork = _mockNetwork && isDebug()
+    val mockNetwork = valueIfDebug(false)
 
-    private const val _hardcodedBaseNode = false
-    val hardcodedBaseNodes = _hardcodedBaseNode && isDebug()
+    val hardcodedBaseNodes = valueIfDebug(false)
 
-    private fun isDebug() = BuildConfig.BUILD_TYPE == "debug"
+    val showCopySeedsButton = valueIfDebug(true)
+
+    val sweepFundsButtonEnabled = valueIfDebug(false)
+
+    val selectBaseNodeEnabled = valueIfDebug(false) // TODO remove all the code related to this ?
+
+    const val skipAddingNote = true
+
+    const val showInvitedFriendsInProfile = false
+
+    const val showTtlStoreMenu = false
+
+    fun isDebug() = BuildConfig.BUILD_TYPE == "debug"
 
     private fun valueIfDebug(value: Boolean) = isDebug() && value
 }
 
 object MockDataStub {
-    private const val EMOJI_ID =
+    private const val EMOJI_ID: EmojiId =
         "\uD83C\uDF34\uD83C\uDF0D\uD83C\uDFB5\uD83C\uDFBA\uD83D\uDDFD\uD83C\uDF37\uD83D\uDE91\uD83C\uDF45\uD83D\uDC60\uD83C\uDF1F\uD83D\uDC8C\uD83D\uDE97\uD83D\uDC40\uD83D\uDD29\uD83C\uDF08\uD83D\uDC1D\uD83C\uDF37\uD83C\uDF70\uD83C\uDF38\uD83C\uDF81\uD83C\uDF55\uD83D\uDEBF\uD83D\uDC34\uD83D\uDCA6\uD83D\uDE0E\uD83D\uDEAA\uD83C\uDFE0\uD83D\uDD29\uD83C\uDFE0\uD83D\uDE82\uD83C\uDFBA\uD83C\uDFC6\uD83C\uDFB3"
-    private const val HEX = "C05575BE00EF016A209B1F493D9027B0E330F3E25FE89BBE6FA66D966EE5B6356"
+    private const val BASE58: Base58 = "C05575BE00EF016A209B1F493D9027B0E330F3E25FE89BBE6FA66D966EE5B6356"
 
-    private val EMOJI_ID_ZERO = (0..25).map { "\uD83C\uDF00" }.joinToString("")
-    private const val HEX_ZERO = TariWalletAddress.HEX_ZERO_66
+    // TODO make better mock stub
+    val WALLET_ADDRESS = TariWalletAddress(
+        network = TariWalletAddress.Network.NEXTNET,
+        features = listOf(TariWalletAddress.Feature.INTERACTIVE),
+        networkEmoji = EMOJI_ID,
+        featuresEmoji = EMOJI_ID,
+        viewKeyEmojis = EMOJI_ID,
+        spendKeyEmojis = EMOJI_ID,
+        checksumEmoji = EMOJI_ID,
+        fullBase58 = BASE58,
+        fullEmojiId = EMOJI_ID,
+        unknownAddress = false,
+    )
 
-    val WALLET_ADDRESS = TariWalletAddress(hexString = HEX, emojiId = EMOJI_ID)
-    val WALLET_ADDRESS_ZERO = TariWalletAddress(HEX_ZERO, EMOJI_ID_ZERO)
+    private val RANDOM_MESSAGES = listOf(
+        "Hello, how are you?",
+        "I'm fine, thank you!",
+        "What are you doing?",
+        "I'm working on a new feature.",
+        "That's great!",
+        "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+        "Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+        "Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
+        "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.",
+    )
+
+    fun createContact(
+        walletAddress: TariWalletAddress = WALLET_ADDRESS,
+        alias: String = "Alice",
+    ) = ContactDto(
+        contactInfo = FFIContactInfo(
+            walletAddress = walletAddress,
+            alias = alias,
+        ),
+    )
 
     fun createUtxoList() = List(20) {
         UtxosViewHolderItem(
@@ -113,61 +165,94 @@ object MockDataStub {
         commitment = "Mocked Tari UTXO!!!",
     )
 
-    fun createTxList(
-        gifRepository: GIFRepository,
-        confirmationCount: Long,
-        title: String = "Mocked Transactions"
-    ) = listOf(
-        TitleViewHolderItem(title = title, isFirst = true),
-        createTx(
-            gifRepository, confirmationCount,
-            amount = 1100000,
+    fun createTxList() = listOf(
+        createTxDto(
+            amount = 1000000,
             contactAlias = "Alice",
         ),
-        createTx(
-            gifRepository, confirmationCount,
-            amount = 1200000,
+        createTxDto(
+            amount = 2000000,
             contactAlias = "Bob",
         ),
-        createTx(
-            gifRepository, confirmationCount,
-            amount = 1300000,
+        createTxDto(
+            amount = 3000000,
             contactAlias = "Charlie",
         ),
-        createTx(
-            gifRepository, confirmationCount,
-            amount = 1400000,
+        createTxDto(
+            amount = 4000000,
             contactAlias = "David",
             status = TxStatus.COINBASE,
         ),
     )
 
-    fun createTx(
-        gifRepository: GIFRepository,
-        confirmationCount: Long,
+    fun createCompletedTx(
+        amount: Long = 100000,
+        direction: Tx.Direction = Tx.Direction.OUTBOUND,
+        contactAlias: String = "Test",
+        status: TxStatus = TxStatus.MINED_CONFIRMED,
+    ) = CompletedTx(
+        direction = direction,
+        status = status,
+        amount = amount.toMicroTari(),
+        fee = 1000.toMicroTari(),
+        paymentId = RANDOM_MESSAGES.random(),
+        timestamp = BigInteger.valueOf(System.currentTimeMillis()),
+        id = 1.toBigInteger(),
+        tariContact = TariContact(WALLET_ADDRESS, contactAlias),
+        confirmationCount = 0.toBigInteger(),
+        txKernel = CompletedTransactionKernel(
+            excess = "excess",
+            publicNonce = "publicNonce",
+            signature = "signature",
+        ),
+        minedTimestamp = BigInteger.valueOf(System.currentTimeMillis()),
+        minedHeight = 0.toBigInteger(),
+    )
+
+    fun createCancelledTx(
+        amount: Long = 100000,
+        direction: Tx.Direction = Tx.Direction.OUTBOUND,
+        contactAlias: String = "Test",
+        status: TxStatus = TxStatus.UNKNOWN,
+    ) = CancelledTx(
+        id = 1.toBigInteger(),
+        direction = direction,
+        amount = amount.toMicroTari(),
+        timestamp = BigInteger.valueOf(System.currentTimeMillis()),
+        paymentId = RANDOM_MESSAGES.random(),
+        status = status,
+        tariContact = TariContact(WALLET_ADDRESS, contactAlias),
+        fee = 1000.toMicroTari(),
+        cancellationReason = FFITxCancellationReason.UserCancelled,
+    )
+
+    fun createPendingTx(
+        amount: Long = 100000,
+        direction: Tx.Direction = Tx.Direction.OUTBOUND,
+        contactAlias: String = "Test",
+        status: TxStatus = TxStatus.PENDING,
+    ) = PendingOutboundTx(
+        id = 1.toBigInteger(),
+        direction = direction,
+        amount = amount.toMicroTari(),
+        timestamp = BigInteger.valueOf(System.currentTimeMillis()),
+        paymentId = RANDOM_MESSAGES.random(),
+        status = status,
+        tariContact = TariContact(WALLET_ADDRESS, contactAlias),
+        fee = 1000.toMicroTari(),
+    )
+
+    fun createTxDto(
         amount: Long = 100000,
         contactAlias: String = "Test",
         status: TxStatus = TxStatus.MINED_CONFIRMED,
-    ) = TransactionItem(
-        tx = CompletedTx(
-            direction = Tx.Direction.INBOUND,
+    ) = TxDto(
+        tx = createCompletedTx(
+            amount = amount,
+            contactAlias = contactAlias,
             status = status,
-            amount = amount.toMicroTari(),
-            fee = 1000.toMicroTari(),
-            message = "https://giphy.com/embed/5885nYOgBHdCw",
-            timestamp = BigInteger.valueOf(System.currentTimeMillis()),
-            id = 1.toBigInteger(),
-            tariContact = TariContact(WALLET_ADDRESS, contactAlias),
         ),
-        contact = ContactDto(
-            contact = FFIContactDto(
-                walletAddress = WALLET_ADDRESS,
-                alias = contactAlias,
-            ),
-        ),
-        position = 0,
-        viewModel = GIFViewModel(gifRepository),
-        requiredConfirmationCount = confirmationCount,
+        contact = createContact(alias = contactAlias),
     )
 
     fun createSimilarAddressList() = listOf(
@@ -178,18 +263,32 @@ object MockDataStub {
 
     fun createSimilarAddress(): SimilarAddressDto {
         return SimilarAddressDto(
-            contactDto = ContactDto(
-                contact = FFIContactDto(
-                    walletAddress = WALLET_ADDRESS,
-                    alias = "Alice",
-                ),
-            ),
+            contactDto = createContact(),
             numberOfTransaction = 10,
             lastTransactionTimestampMillis = System.currentTimeMillis(),
             trusted = false,
         )
     }
+
+    fun createChatList(count: Int = 20) = List(count) {
+        ChatItemDto(
+            uuid = UUID.randomUUID().toString(),
+            messages = createChatMessages(Random.nextInt(1, 20)),
+            walletAddress = WALLET_ADDRESS,
+        )
+    }
+
+    fun createChatMessages(count: Int = 20) = List(count) {
+        ChatMessageItemDto(
+            message = RANDOM_MESSAGES.random(),
+            date = Date().minusHours(Random.nextInt(0, 100)),
+            isMine = Random.nextBoolean(),
+            isRead = Random.nextBoolean(0.9),
+        )
+    }
 }
+
+fun Random.nextBoolean(probability: Double): Boolean = nextDouble() <= probability
 
 object YatEnvironment {
     val SANDBOX = YatIntegration.Environment("https://a.yat.fyi/", "https://yat.fyi/")

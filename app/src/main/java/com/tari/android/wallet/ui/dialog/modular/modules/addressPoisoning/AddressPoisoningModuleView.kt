@@ -12,7 +12,7 @@ import com.tari.android.wallet.ui.common.recyclerView.CommonAdapter
 import com.tari.android.wallet.ui.component.common.CommonView
 import com.tari.android.wallet.ui.dialog.modular.modules.addressPoisoning.adapter.SimilarAddressItem
 import com.tari.android.wallet.ui.dialog.modular.modules.addressPoisoning.adapter.SimilarAddressListAdapter
-import com.tari.android.wallet.ui.extension.string
+import com.tari.android.wallet.util.extension.string
 
 
 @SuppressLint("ViewConstructor")

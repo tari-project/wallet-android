@@ -34,79 +34,70 @@ package com.tari.android.wallet.di
 
 import android.content.ClipboardManager
 import com.tari.android.wallet.application.TariWalletApplication
-import com.tari.android.wallet.application.deeplinks.DeeplinkViewModel
-import com.tari.android.wallet.application.securityStage.StagedWalletSecurityManager
-import com.tari.android.wallet.service.service.WalletService
+import com.tari.android.wallet.infrastructure.ShareManager
+import com.tari.android.wallet.notification.TariFcmService
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.component.clipboardController.WalletAddressViewModel
-import com.tari.android.wallet.ui.component.networkStateIndicator.ConnectionIndicatorViewModel
-import com.tari.android.wallet.ui.fragment.auth.AuthActivity
-import com.tari.android.wallet.ui.fragment.auth.AuthViewModel
-import com.tari.android.wallet.ui.fragment.biometrics.ChangeBiometricsViewModel
-import com.tari.android.wallet.ui.fragment.chat_list.ChatListViewModel
-import com.tari.android.wallet.ui.fragment.chat_list.chat.ChatViewModel
-import com.tari.android.wallet.ui.fragment.contact_book.contactSelection.ContactSelectionViewModel
-import com.tari.android.wallet.ui.fragment.contact_book.contacts.ContactsViewModel
-import com.tari.android.wallet.ui.fragment.contact_book.details.ContactDetailsViewModel
-import com.tari.android.wallet.ui.fragment.contact_book.link.ContactLinkViewModel
-import com.tari.android.wallet.ui.fragment.contact_book.root.ContactBookViewModel
-import com.tari.android.wallet.ui.fragment.contact_book.root.ShareViewModel
-import com.tari.android.wallet.ui.fragment.contact_book.root.action_menu.ContactBookActionMenuViewModel
-import com.tari.android.wallet.ui.fragment.contact_book.transactionHistory.TransactionHistoryViewModel
-import com.tari.android.wallet.ui.fragment.home.HomeActivity
-import com.tari.android.wallet.ui.fragment.home.HomeViewModel
-import com.tari.android.wallet.ui.fragment.home.homeTransactionHistory.HomeTransactionHistoryViewModel
-import com.tari.android.wallet.ui.fragment.onboarding.activity.OnboardingFlowActivity
-import com.tari.android.wallet.ui.fragment.onboarding.createWallet.CreateWalletViewModel
-import com.tari.android.wallet.ui.fragment.onboarding.inroduction.IntroductionViewModel
-import com.tari.android.wallet.ui.fragment.onboarding.localAuth.LocalAuthViewModel
-import com.tari.android.wallet.ui.fragment.pinCode.EnterPinCodeViewModel
-import com.tari.android.wallet.ui.fragment.profile.WalletInfoViewModel
-import com.tari.android.wallet.ui.fragment.qr.QRScannerActivity
-import com.tari.android.wallet.ui.fragment.qr.QRScannerViewModel
-import com.tari.android.wallet.ui.fragment.restore.activity.WalletRestoreActivity
-import com.tari.android.wallet.ui.fragment.restore.chooseRestoreOption.ChooseRestoreOptionViewModel
-import com.tari.android.wallet.ui.fragment.restore.enterRestorationPassword.EnterRestorationPasswordViewModel
-import com.tari.android.wallet.ui.fragment.restore.inputSeedWords.InputSeedWordsViewModel
-import com.tari.android.wallet.ui.fragment.restore.walletRestoringFromSeedWords.WalletRestoringFromSeedWordsViewModel
-import com.tari.android.wallet.ui.fragment.send.addAmount.AddAmountViewModel
-import com.tari.android.wallet.ui.fragment.send.addNote.AddNoteFragment
-import com.tari.android.wallet.ui.fragment.send.addNote.AddNoteViewModel
-import com.tari.android.wallet.ui.fragment.send.addNote.gif.ChooseGIFDialogFragment
-import com.tari.android.wallet.ui.fragment.send.addNote.gif.ThumbnailGIFsViewModel
-import com.tari.android.wallet.ui.fragment.send.finalize.FinalizeSendTxViewModel
-import com.tari.android.wallet.ui.fragment.send.requestTari.RequestTariViewModel
-import com.tari.android.wallet.ui.fragment.send.transfer.TransferFragment
-import com.tari.android.wallet.ui.fragment.settings.allSettings.AllSettingsViewModel
-import com.tari.android.wallet.ui.fragment.settings.allSettings.about.TariAboutViewModel
-import com.tari.android.wallet.ui.fragment.settings.backgroundService.BackgroundServiceSettingsViewModel
-import com.tari.android.wallet.ui.fragment.settings.backup.backupOnboarding.BackupOnboardingFlowViewModel
-import com.tari.android.wallet.ui.fragment.settings.backup.backupOnboarding.item.BackupOnboardingFlowItemViewModel
-import com.tari.android.wallet.ui.fragment.settings.backup.backupSettings.BackupSettingsViewModel
-import com.tari.android.wallet.ui.fragment.settings.backup.backupSettings.option.BackupOptionViewModel
-import com.tari.android.wallet.ui.fragment.settings.backup.changeSecurePassword.ChangeSecurePasswordViewModel
-import com.tari.android.wallet.ui.fragment.settings.backup.enterCurrentPassword.EnterCurrentPasswordViewModel
-import com.tari.android.wallet.ui.fragment.settings.backup.verifySeedPhrase.VerifySeedPhraseViewModel
-import com.tari.android.wallet.ui.fragment.settings.baseNodeConfig.changeBaseNode.ChangeBaseNodeViewModel
-import com.tari.android.wallet.ui.fragment.settings.bluetoothSettings.BluetoothSettingsViewModel
-import com.tari.android.wallet.ui.fragment.settings.bugReporting.BugsReportingViewModel
-import com.tari.android.wallet.ui.fragment.settings.dataCollection.DataCollectionViewModel
-import com.tari.android.wallet.ui.fragment.settings.deleteWallet.DeleteWalletViewModel
-import com.tari.android.wallet.ui.fragment.settings.logs.LogFilesManager
-import com.tari.android.wallet.ui.fragment.settings.logs.logFiles.LogFilesViewModel
-import com.tari.android.wallet.ui.fragment.settings.logs.logs.LogsViewModel
-import com.tari.android.wallet.ui.fragment.settings.networkSelection.NetworkSelectionViewModel
-import com.tari.android.wallet.ui.fragment.settings.screenRecording.ScreenRecordingSettingsViewModel
-import com.tari.android.wallet.ui.fragment.settings.themeSelector.ThemeSelectorViewModel
-import com.tari.android.wallet.ui.fragment.settings.torBridges.TorBridgesSelectionViewModel
-import com.tari.android.wallet.ui.fragment.settings.torBridges.customBridges.CustomTorBridgesViewModel
-import com.tari.android.wallet.ui.fragment.settings.userAutorization.BiometricAuthenticationViewModel
-import com.tari.android.wallet.ui.fragment.splash.SplashActivity
-import com.tari.android.wallet.ui.fragment.tx.HomeFragmentViewModel
-import com.tari.android.wallet.ui.fragment.tx.TransactionRepository
-import com.tari.android.wallet.ui.fragment.tx.details.TxDetailsViewModel
-import com.tari.android.wallet.ui.fragment.tx.details.gif.GIFViewModel
-import com.tari.android.wallet.ui.fragment.utxos.list.UtxosListViewModel
+import com.tari.android.wallet.ui.screen.StartActivity
+import com.tari.android.wallet.ui.screen.auth.AuthActivity
+import com.tari.android.wallet.ui.screen.auth.AuthViewModel
+import com.tari.android.wallet.ui.screen.biometrics.ChangeBiometricsViewModel
+import com.tari.android.wallet.ui.screen.chat.chatDetails.ChatDetailsViewModel
+import com.tari.android.wallet.ui.screen.chat.chatList.ChatListViewModel
+import com.tari.android.wallet.ui.screen.contactBook.contactSelection.ContactSelectionViewModel
+import com.tari.android.wallet.ui.screen.contactBook.contacts.ContactsViewModel
+import com.tari.android.wallet.ui.screen.contactBook.details.ContactDetailsViewModel
+import com.tari.android.wallet.ui.screen.contactBook.link.ContactLinkViewModel
+import com.tari.android.wallet.ui.screen.contactBook.root.ContactBookViewModel
+import com.tari.android.wallet.ui.screen.debug.sampleDesign.SampleDesignSystemViewModel
+import com.tari.android.wallet.ui.screen.home.HomeViewModel
+import com.tari.android.wallet.ui.screen.home.overview.HomeOverviewViewModel
+import com.tari.android.wallet.ui.screen.onboarding.activity.OnboardingFlowActivity
+import com.tari.android.wallet.ui.screen.onboarding.createWallet.CreateWalletFragment
+import com.tari.android.wallet.ui.screen.onboarding.createWallet.CreateWalletViewModel
+import com.tari.android.wallet.ui.screen.onboarding.inroduction.IntroductionViewModel
+import com.tari.android.wallet.ui.screen.onboarding.localAuth.LocalAuthViewModel
+import com.tari.android.wallet.ui.screen.pinCode.EnterPinCodeViewModel
+import com.tari.android.wallet.ui.screen.profile.login.ProfileLoginViewModel
+import com.tari.android.wallet.ui.screen.profile.profile.ProfileViewModel
+import com.tari.android.wallet.ui.screen.profile.walletInfo.WalletInfoViewModel
+import com.tari.android.wallet.ui.screen.qr.QrScannerActivity
+import com.tari.android.wallet.ui.screen.qr.QrScannerViewModel
+import com.tari.android.wallet.ui.screen.restore.activity.WalletRestoreViewModel
+import com.tari.android.wallet.ui.screen.restore.chooseRestoreOption.ChooseRestoreOptionViewModel
+import com.tari.android.wallet.ui.screen.restore.enterRestorationPassword.EnterRestorationPasswordViewModel
+import com.tari.android.wallet.ui.screen.restore.inputSeedWords.InputSeedWordsViewModel
+import com.tari.android.wallet.ui.screen.restore.walletRestoring.WalletRestoringViewModel
+import com.tari.android.wallet.ui.screen.send.addAmount.AddAmountViewModel
+import com.tari.android.wallet.ui.screen.send.addNote.AddNoteViewModel
+import com.tari.android.wallet.ui.screen.send.confirm.ConfirmViewModel
+import com.tari.android.wallet.ui.screen.send.finalize.FinalizeSendTxViewModel
+import com.tari.android.wallet.ui.screen.send.receive.ReceiveViewModel
+import com.tari.android.wallet.ui.screen.send.requestTari.RequestTariViewModel
+import com.tari.android.wallet.ui.screen.settings.allSettings.AllSettingsViewModel
+import com.tari.android.wallet.ui.screen.settings.allSettings.about.TariAboutViewModel
+import com.tari.android.wallet.ui.screen.settings.backup.backupSettings.BackupSettingsViewModel
+import com.tari.android.wallet.ui.screen.settings.backup.backupSettings.option.BackupOptionViewModel
+import com.tari.android.wallet.ui.screen.settings.backup.changeSecurePassword.ChangeSecurePasswordViewModel
+import com.tari.android.wallet.ui.screen.settings.backup.enterCurrentPassword.EnterCurrentPasswordViewModel
+import com.tari.android.wallet.ui.screen.settings.backup.learnMore.BackupLearnMoreViewModel
+import com.tari.android.wallet.ui.screen.settings.backup.learnMore.item.BackupLearnMoreItemViewModel
+import com.tari.android.wallet.ui.screen.settings.backup.verifySeedPhrase.VerifySeedPhraseViewModel
+import com.tari.android.wallet.ui.screen.settings.baseNodeConfig.changeBaseNode.ChangeBaseNodeViewModel
+import com.tari.android.wallet.ui.screen.settings.bugReporting.BugsReportingViewModel
+import com.tari.android.wallet.ui.screen.settings.dataCollection.DataCollectionViewModel
+import com.tari.android.wallet.ui.screen.settings.deleteWallet.DeleteWalletViewModel
+import com.tari.android.wallet.ui.screen.settings.logs.logFiles.LogFilesViewModel
+import com.tari.android.wallet.ui.screen.settings.logs.logs.LogsViewModel
+import com.tari.android.wallet.ui.screen.settings.networkSelection.NetworkSelectionViewModel
+import com.tari.android.wallet.ui.screen.settings.screenRecording.ScreenRecordingSettingsViewModel
+import com.tari.android.wallet.ui.screen.settings.themeSelector.ThemeSelectorViewModel
+import com.tari.android.wallet.ui.screen.settings.torBridges.TorBridgesSelectionViewModel
+import com.tari.android.wallet.ui.screen.settings.torBridges.customBridges.CustomTorBridgesViewModel
+import com.tari.android.wallet.ui.screen.settings.userAutorization.BiometricAuthenticationViewModel
+import com.tari.android.wallet.ui.screen.tx.details.TxDetailsViewModel
+import com.tari.android.wallet.ui.screen.tx.history.TxHistoryViewModel
+import com.tari.android.wallet.ui.screen.utxos.list.UtxosListViewModel
 import dagger.Component
 import javax.inject.Singleton
 
@@ -119,11 +110,8 @@ import javax.inject.Singleton
 @Component(
     modules = [
         ApplicationModule::class,
-        WalletModule::class,
-        ServiceModule::class,
         TorModule::class,
-        PresentationModule::class,
-        YatModule::class,
+        RetrofitModule::class,
         CoroutinesDispatchersModule::class,
     ]
 )
@@ -132,27 +120,18 @@ interface ApplicationComponent {
 
     fun inject(application: TariWalletApplication)
 
-    fun inject(service: WalletService)
-
-    fun inject(activity: SplashActivity)
+    fun inject(activity: StartActivity)
     fun inject(activity: OnboardingFlowActivity)
     fun inject(activity: AuthActivity)
-    fun inject(activity: HomeActivity)
-    fun inject(activity: QRScannerActivity)
-    fun inject(activity: WalletRestoreActivity)
+    fun inject(activity: QrScannerActivity)
 
-    fun inject(fragment: AddNoteFragment)
-    fun inject(fragment: ChooseGIFDialogFragment)
+    fun inject(fragment: CreateWalletFragment)
 
     fun inject(commonViewModel: CommonViewModel)
-    fun inject(viewModel: ThumbnailGIFsViewModel)
-    fun inject(viewModel: GIFViewModel)
-    fun inject(viewModel: BackgroundServiceSettingsViewModel)
     fun inject(viewModel: ScreenRecordingSettingsViewModel)
-    fun inject(viewModel: ConnectionIndicatorViewModel)
     fun inject(viewModel: ChooseRestoreOptionViewModel)
     fun inject(viewModel: EnterRestorationPasswordViewModel)
-    fun inject(viewModel: WalletRestoringFromSeedWordsViewModel)
+    fun inject(viewModel: WalletRestoringViewModel)
     fun inject(viewModel: InputSeedWordsViewModel)
     fun inject(viewModel: VerifySeedPhraseViewModel)
     fun inject(viewModel: BackupSettingsViewModel)
@@ -166,7 +145,6 @@ interface ApplicationComponent {
     fun inject(viewModel: AddAmountViewModel)
     fun inject(viewModel: TorBridgesSelectionViewModel)
     fun inject(viewModel: CustomTorBridgesViewModel)
-    fun inject(viewModel: DeeplinkViewModel)
     fun inject(viewModel: LocalAuthViewModel)
     fun inject(viewModel: CreateWalletViewModel)
     fun inject(viewModel: IntroductionViewModel)
@@ -177,37 +155,38 @@ interface ApplicationComponent {
     fun inject(viewModel: LogFilesViewModel)
     fun inject(viewModel: LogsViewModel)
     fun inject(viewModel: BackupOptionViewModel)
-    fun inject(viewModel: LogFilesManager)
     fun inject(viewModel: ThemeSelectorViewModel)
     fun inject(viewModel: DeleteWalletViewModel)
     fun inject(viewModel: HomeViewModel)
-    fun inject(viewModel: HomeFragmentViewModel)
-    fun inject(viewModel: HomeTransactionHistoryViewModel)
+    fun inject(viewModel: HomeOverviewViewModel)
+    fun inject(viewModel: TxHistoryViewModel)
     fun inject(viewModel: EnterCurrentPasswordViewModel)
     fun inject(viewModel: ChangeSecurePasswordViewModel)
     fun inject(viewModel: AddNoteViewModel)
-    fun inject(viewModel: StagedWalletSecurityManager)
-    fun inject(viewModel: BackupOnboardingFlowViewModel)
-    fun inject(viewModel: BackupOnboardingFlowItemViewModel)
+    fun inject(viewModel: BackupLearnMoreViewModel)
+    fun inject(viewModel: BackupLearnMoreItemViewModel)
     fun inject(viewModel: ContactBookViewModel)
     fun inject(viewModel: ContactDetailsViewModel)
     fun inject(viewModel: ContactsViewModel)
     fun inject(viewModel: ContactLinkViewModel)
     fun inject(viewModel: ContactSelectionViewModel)
     fun inject(viewModel: TxDetailsViewModel)
-    fun inject(viewModel: ShareViewModel)
-    fun inject(viewModel: TransactionRepository)
-    fun inject(viewModel: TransactionHistoryViewModel)
-    fun inject(viewModel: BluetoothSettingsViewModel)
+    fun inject(viewModel: ShareManager)
     fun inject(viewModel: WalletAddressViewModel)
-    fun inject(viewModel: QRScannerViewModel)
-    fun inject(viewModel: TransferFragment)
-    fun inject(viewModel: ContactBookActionMenuViewModel)
+    fun inject(viewModel: QrScannerViewModel)
     fun inject(viewModel: ChatListViewModel)
-    fun inject(viewModel: ChatViewModel)
+    fun inject(viewModel: ChatDetailsViewModel)
     fun inject(viewModel: DataCollectionViewModel)
     fun inject(viewModel: EnterPinCodeViewModel)
     fun inject(viewModel: ChangeBiometricsViewModel)
+    fun inject(viewModel: WalletRestoreViewModel)
+    fun inject(viewModel: SampleDesignSystemViewModel)
+    fun inject(viewModel: ProfileLoginViewModel)
+    fun inject(viewModel: ProfileViewModel)
+    fun inject(viewModel: ReceiveViewModel)
+    fun inject(viewModel: ConfirmViewModel)
+
+    fun inject(tariFcmService: TariFcmService)
 
     fun getClipboardManager(): ClipboardManager
 }

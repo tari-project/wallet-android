@@ -1,19 +1,14 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <string name="app_name">Tari Aurora</string>
-
-    <!-- foreground service description -->
-    <string name="wallet_service_desc">This service is required to communicate with Tari services. Please keep this service running if you want to be able to communicate with the Tari system.</string>
+    <string name="app_name">Tari</string>
 
     <!-- URLs, etc -->
     <string name="ttl_store_url" translatable="false">https://store.tarilabs.com</string>
     <string name="tari_url" translatable="false">https://tari.com</string>
     <string name="github_repo_url" translatable="false">https://github.com/tari-project/wallet-android</string>
-    <string name="user_agreement_url">https://www.tari.com/user_agreement/</string>
-    <string name="privacy_policy_url">https://www.tari.com/privacy_policy/</string>
-    <string name="disclaimer_url">https://www.tari.com/disclaimer/</string>
-    <string name="explorer_kernel_url">%s/kernel_search?nonces=%s&amp;signatures=%s</string>
-    <string name="tor_bridges_url">https://bridges.torproject.org/bridges</string>
-    <string name="tari_lab_university_url" translatable="false">https://tlu.tarilabs.com/</string>
+    <string name="user_agreement_url" translatable="false">https://www.tari.com/user_agreement/</string>
+    <string name="privacy_policy_url" translatable="false">https://www.tari.com/privacy_policy/</string>
+    <string name="disclaimer_url" translatable="false">https://www.tari.com/disclaimer/</string>
+    <string name="tor_bridges_url" translatable="false">https://bridges.torproject.org/bridges</string>
 
     <!-- digits -->
     <string name="digit_0">0</string>
@@ -27,37 +22,21 @@
     <string name="digit_8">8</string>
     <string name="digit_9">9</string>
     <string name="digit_decimal_separator_bullet_char">.</string>
-    <string name="digit_thousands_separator">,</string>
-    <string name="digit_decimal_separator">.</string>
 
     <!-- emojis -->
-    <string name="emoji_hourglass">⏳</string>
-    <string name="emoji_handshake">🤝</string>
 
-    <!-- fonts -->
-    <string name="font_black" translatable="false">AVENIR_LT_STD_BLACK</string>
+    <!-- font -->
     <string name="font_heavy" translatable="false">AVENIR_LT_STD_HEAVY</string>
-    <string name="font_medium" translatable="false">AVENIR_LT_STD_MEDIUM</string>
-    <string name="font_regular" translatable="false">AVENIR_NEXT_LT_PRO_REGULAR</string>
-    <string name="font_light" translatable="false">AVENIR_LT_STD_LIGHT</string>
 
     <!-- dummy values - UI design placeholders -->
-    <string name="dummy_contact_alias">Sarah_D</string>
-    <string name="dummy_contact_initial">S</string>
     <string name="dummy_message">Thanks again for helping with my move</string>
-    <string name="long_dummy_message">Thanks again for helping with my move. Thanks again for helping with my move. Thanks again for helping with my move. Thanks again for helping with my move</string>
-    <string name="dummy_emoji">🍀</string>
-    <string name="dummy_emoji2">🍀🍀🍀</string>
+    <string name="long_dummy_message">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore
+        magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure
+        dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.\n Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</string>
     <string name="dummy_text">Test text</string>
 
     <!-- notifications -->
-    <string name="wallet_service_notification_channel_name">Tari Aurora Service Notification Channel</string>
-    <string name="app_notification_channel_name">Tari Aurora Notification Channel</string>
-    <string name="notification_tx_received_title">You\'ve got tXTR!</string>
-    <string name="notification_tx_received_description_format">Someone just sent you %1$s tXTR.</string>
-    <!--    <string name="notification_tx_canceled_title">Your transaction was cancelled by&#032;</string>-->
-    <string name="notification_tx_canceled_title">Your transaction was cancelled</string>
-    <string name="notification_tx_canceled_description">The sender cancelled the transaction before it was finalized, so the tXTR was returned to them</string>
+    <string name="app_notification_channel_name">Tari Wallet</string>
 
     <!-- errors -->
     <!-- node unreachable -->
@@ -68,18 +47,21 @@
     <string name="error_no_connection_description">Your phone appears to be offline or has a poor connection at the moment. Please try again when you\'ve found a stronger signal.</string>
     <!-- balance exceeded -->
     <string name="error_balance_exceeded_title">Hold your horses! 🐴</string>
-    <string name="error_balance_exceeded_description">Sorry, you can’t send this much tXTR until your previous transaction(s) are complete. Please wait for at least one transaction to complete and then try again.</string>
+    <string name="error_balance_exceeded_description">Sorry, you can’t send this much XTM until your previous transaction(s) are complete. Please
+        wait for at least one transaction to complete and then try again.</string>
     <string name="error_fee_more_than_amount_title">Amount Error</string>
     <string name="error_fee_more_than_amount_description">Sorry, the amount cannot be less than the fee.</string>
 
     <string name="error_wallet_message_generic">Something went wrong! Please try again later. Please send us a bug report if this problem persists.</string>
-    <string name="error_wallet_message_114">Something went wrong processing output. Please try again later or contact the support.</string>
+    <string name="error_wallet_message_114">The wallet could not be restored. The backup file is not supported. We updated the wallet version, old
+        backup files without a password are not valid anymore. You can download an older version, make a backup with a password and try again.</string>
     <string name="error_wallet_message_204">Transaction not found. Please try again later. Please submit a bug report using the \"Report a Bug\" option from the settings menu if this problem appears again.</string>
     <string name="error_wallet_message_401">Contact not found. Please try again later. Please submit a bug report using the \"Report a Bug\" option from the settings menu if this problem appears again.</string>
     <string name="error_wallet_message_420">Wallet was not encrypted but a passphrase was supplied. Please try again later or try to restore your wallet.</string>
     <string name="error_wallet_message_428">Unable to decrypt the wallet. Please try again later or try to restore your wallet.</string>
     <string name="error_wallet_message_429">Unable to recover your wallet from provided seed words. Please check the list of entered seed words and try again.</string>
     <string name="error_wallet_message_430">The provided seed words are not compatible with the current wallet version. Please get in touch with support for more details.</string>
+    <string name="error_wallet_message_702">Looks like your backup isn\'t compatible with this wallet version. Consider making a new one!</string>
 
     <!-- common -->
     <string name="common_continue">Continue</string>
@@ -87,7 +69,6 @@
     <string name="common_to">To</string>
     <string name="common_close">Close</string>
     <string name="common_done">Done</string>
-    <string name="common_new_uppercase">NEW</string>
     <string name="common_save">Save</string>
     <string name="common_cancel">Cancel</string>
     <string name="common_retry">Retry</string>
@@ -96,148 +77,142 @@
     <string name="common_apply">Apply</string>
     <string name="common_share">Share</string>
     <string name="common_error_title">Error</string>
+    <string name="common_error_connection_title">Connection error</string>
+    <string name="common_error_description">Something went wrong. Please try again later.</string>
+    <string name="common_error_try_again_button">Try again</string>
     <string name="common_unknown_error">Unknown error</string>
     <string name="common_permission_required_dialog_body">We need access to %s to perform this action. Please, open the Settings app, find this permission in the list, and grant it</string>
     <string name="common_permission_required_button">To Settings</string>
     <string name="common_delete">Delete</string>
     <string name="common_lets_do_it">Yes! Let\'s do it!</string>
-    <string name="common_lets_do_it_2">Yeah! Let\'s do it!</string>
-    <string name="common_no_2">Nah, not now</string>
     <string name="common_are_you_sure">Are you sure?</string>
     <string name="common_next">Next</string>
+    <string name="common_not_ready_yet_dialog_title">Hang tight, coming soon!</string>
+    <string name="common_not_ready_yet_dialog_description">This feature is currently under construction. We\'re working hard to bring it to you soon. Stay tuned!</string>
+    <string name="common_copied_to_clipboard">Copied to clipboard</string>
+    <string name="common_copy">Copy</string>
 
     <!-- emoji id copied view -->
-    <string name="emoji_id_copied">COPIED</string>
 
     <!-- emoji-id-related -->
     <string name="emoji_id_bullet_separator">•••</string>
     <string name="emoji_id_chunk_separator">l</string>
-    <string name="copy_emoji_id">Copy Emoji ID</string>
     <string name="paste_emoji_id">Paste copied Emoji ID</string>
     <string name="tap_to_see_full_emoji_id">Tap to see full Emoji ID</string>
-    <string name="full_emoji_id_long_tap_hint">ℹ️ You can long-press the Copy Emoji ID button to copy the address in hexadecimal format.</string>
 
     <!-- dialog -->
     <string name="internet_connection_error_dialog_title">Can\'t connect to the interwebs</string>
     <string name="internet_connection_error_dialog_description">Your phone is either offline or has a poor connection at the moment. We\'ll wait here until you find some stronger signal.</string>
 
-    <!-- service -->
-    <string name="wallet_service_title">Tari Aurora wallet service is running</string>
-    <string name="wallet_service_description">This service carries out wallet operations across applications</string>
-    <string name="wallet_service_error_testnet_tari_request">Could not allocate free tXTR</string>
-    <string name="wallet_service_error_no_internet_connection">No internet connection!</string>
-
-    <!-- testnet UTXO messages -->
-    <string name="faucet_error_title">Failed to claim tXTR</string>
-    <string name="faucet_error_common">No free tXTR is available right now! Hang tight, we\'ll get you some tXTR the moment it is available.</string>
-    <string name="first_testnet_utxo_tx_message">💸 Here’s some tXTR!</string>
-    <string name="second_testnet_utxo_tx_message">Nice work! Here\'s more tXTR to fill your coffers. Be sure to hit the Store icon to see real, exclusive items you can redeem with your "hard-earned" tXTR.</string>
-
     <!-- onboarding - introduction -->
-    <string name="introduction_crypto_wallet_title_text_line_1">Private by default.</string>
-    <string name="introduction_crypto_wallet_title_text_line_2">Useful by design.</string>
-    <string name="introduction_create_wallet">Create Your Wallet</string>
-    <string name="introduction_selected_wallet">Selected Network: %s</string>
+    <string name="introduction_create_wallet">Create A Wallet</string>
+    <string name="introduction_import_wallet">Import Wallet</string>
+    <string name="introduction_import_wallet_info">Import wallet if you\'re already mining on desktop</string>
 
     <!-- onboarding - create wallet -->
+    <string name="create_wallet_cancel_dialog_title">Cancel Wallet Creation</string>
+    <string name="create_wallet_cancel_dialog_description">Are you sure you want to cancel wallet creation? You will lose all progress.</string>
     <!-- screen #1 -->
     <string name="create_wallet_just_a_sec_label" tools:ignore="TypographyEllipsis">Hold on a sec...</string>
     <string name="create_wallet_just_sec_desc_text">We’re creating your wallet.</string>
-    <string name="create_wallet_user_agreement_and_privacy_policy">By creating a wallet, you agree to the terms\nof the User Agreement and Privacy Policy</string>
+    <string name="create_wallet_user_agreement_and_privacy_policy_part1">By creating a wallet, you agree to the terms\nof the</string>
     <string name="create_wallet_user_agreement">User Agreement</string>
+    <string name="create_wallet_user_agreement_and_privacy_policy_part2">and</string>
     <string name="create_wallet_privacy_policy">Privacy Policy</string>
-    <string name="create_wallet_restore_wallet_cta">Restore an Existing Wallet</string>
     <!-- screen #2 -->
     <string name="create_wallet_awesome">We’re off to a great start!</string>
     <string name="create_wallet_now_text">Now, let’s create your Emoji ID.</string>
-    <string name="create_wallet_address_desc">Your Emoji ID is your wallet address.\nIt’s how people can find you and send you tXTR.</string>
+    <string name="create_wallet_address_desc">Your Emoji ID is your wallet address.\nIt’s how people can find you and send you XTM.</string>
     <string name="create_wallet_continue_and_create_emoji_id">Create Your Emoji ID</string>
     <!-- screen #3 -->
     <string name="create_wallet_your_emoji_id_text_label">This is your Emoji ID</string>
     <string name="create_wallet_your_emoji_id_text_label_bold_part">Emoji ID</string>
-    <string name="create_wallet_set_of_emoji_your_wallet_address_desc">Your Emoji ID is your wallet’s address,\nand how others can find you and send you tXTR.</string>
+    <string name="create_wallet_set_of_emoji_your_wallet_address_desc">Your Emoji ID is your wallet’s address,\nand how others can find you and
+        send you XTM.</string>
     <!-- onboarding - local auth -->
     <string name="auth_prompt_title">🔑 Let’s secure your wallet. 🔑</string>
-    <string name="auth_prompt_desc">Sleep well at night knowing you’ve taken precautions to keep your tXTR wallet safe and sound.</string>
+    <string name="auth_prompt_desc">Sleep well at night knowing you’ve taken precautions to keep your XTM wallet safe and sound.</string>
     <string name="auth_prompt_button_text">Secure with Passcode</string>
     <string name="auth_prompt_button_touch_id_text">Secure with Biometrics</string>
 
     <!-- auth -->
-    <string name="proceed">Proceed</string>
     <string name="exit">Exit</string>
     <!-- begin :: dialog -->
     <string name="onboarding_auth_title">Secure your wallet</string>
-    <string name="onboarding_auth_biometric_prompt">Please enter your biometrics. Tari Aurora will require it each time you open the app.</string>
-    <string name="onboarding_auth_device_lock_code_prompt">Please enter your smartphone\'s screen lock PIN, passcode, or pattern. Tari Aurora will require it each time you open the app.</string>
+    <string name="onboarding_auth_biometric_prompt">Please enter your biometrics. Tari Universe Wallet will require it each time you open the app.</string>
     <string name="auth_title">Unlock your wallet</string>
     <string name="auth_biometric_prompt">Please enter your biometrics to unlock your wallet.</string>
     <string name="auth_device_lock_code_prompt">Please enter your smartphone\'s screen lock PIN, passcode, or pattern to unlock your wallet.</string>
     <string name="auth_not_available_or_canceled_title">Authentication Error</string>
-    <string name="auth_not_available_or_canceled_desc">Tari Aurora was not able to authenticate you. Do you still want to proceed?</string>
+    <string name="auth_not_available_or_canceled_desc">Tari Universe Wallet was not able to authenticate you. Do you still want to proceed?</string>
     <string name="auth_failed_title">Authentication Failed</string>
-    <string name="auth_failed_desc">Tari Aurora was not able to authenticate you</string>
+    <string name="auth_failed_desc">Tari Universe Wallet was not able to authenticate you</string>
 
     <!-- home -->
-    <string name="home_available_balance">Balance</string>
-    <string name="home_available_to_spend_balance">Available to spend:</string>
+    <string name="home_available_to_spend_balance">Available: %s</string>
     <string name="home_tx_list_header_yesterday">Yesterday</string>
-    <string name="home_txs">Transactions</string>
-    <string name="home_setup_is_complete">Your wallet setup is complete.</string>
-    <string name="home_you_are_ready_to_explore">You’re ready to start exploring</string>
-    <string name="home_empty_wallet">We don’t see any transactions yet.\nHopefully something happens soon…🤞</string>
-    <string name="homenavigation_content_description_navigate_to_settings">Navigate to settings</string>
-    <string name="homenavigation_content_description_navigate_to_wallet_info">Navigate to wallet info</string>
-    <string name="homenavigation_content_description_navigate_to_ttl_store">Navigate to TTL store</string>
-    <string name="homenavigation_content_description_navigate_to_transactions_list">Navigate to transactions list</string>
-    <string name="homenavigation_content_description_navigate_to_send_tari">Navigate to Tari send flow</string>
     <string name="home_pending_transactions_title">Pending Transactions</string>
     <string name="home_completed_transactions_title">Completed Transactions</string>
     <string name="home_custom_base_node_title">Add custom base node</string>
     <string name="home_custom_base_node_description">The QR code is a deep link request to assign your wallet to use this base node.</string>
     <string name="home_custom_base_node_full_description"><![CDATA[<strong>Name: </strong>%s<br><br><strong>Peer:</strong><br>%s]]></string>
     <string name="home_custom_base_node_no_button">Not this time</string>
-    <!--home tari bot dialog-->
-    <string name="home_tari_bot_you_got_tari_dlg_title">You just got some tXTR!</string>
-    <string name="home_tari_bot_dialog_desc">Try sending a bit of tXTR back to Tari Bot. It’s always better to give than to receive (and you’ll see how the wallet works too).</string>
-    <string name="home_tari_bot_try_later">Try it later</string>
-    <!-- home TTL store dialog -->
-    <string name="home_ttl_store_dlg_title">Spend tXTR on\nreal (exclusive) stuff</string>
-    <string name="home_ttl_store_dlg_title_bold_part">(exclusive) stuff</string>
-    <string name="home_ttl_store_dlg_desciption">Check out TTL to spend your "hard-earned" tXTR on exclusive, one-of-a-kind stuff produced by the team at Tari Labs. Enjoy!</string>
-    <string name="home_ttl_store_positive_btn">Visit the TTL Store</string>
-    <string name="home_ttl_store_negative_btn">I\'ll check it out later</string>
     <!-- store and forward update progress -->
-    <string name="home_store_and_forward_progress_checking_for_updates">Checking for updates</string>
-    <string name="home_store_and_forward_progress_receiving_txs">Receiving new transactions</string>
-    <string name="home_store_and_forward_progress_completing_txs">Completing your transactions</string>
-    <string name="home_store_and_forward_progress_updating_txs">Updating your transactions</string>
-    <string name="home_store_and_forward_progress_up_to_date">You are up to date!</string>
     <!--Balance label-->
-    <string name="home_balance_info_help_title">Why is some of my balance not spendable right now?</string>
-    <string name="home_balance_info_help_description">The Tari in your wallet is made up of notes, just as your real wallet contains notes and coins. When you spend Tari, you must use up entire notes and wait for change. While you\'re waiting, the change is not spendable until your transaction is mined. You can find out more about how Tari transactions work in TariLabs University</string>
-    <string name="home_balance_info_help_button">Go to TariLabs University</string>
     <string name="home_transaction_list_empty_description">Nothing to show here yet. Keep an eye on this screen to stay updated on the status of your transactions. Oh, and remember, you can also use the request function to ask someone to send you some Tari if you want!</string>
-    <string name="home_transaction_list_title">No transactions found</string>
     <string name="home_transaction_view_all_txs">View all transactions</string>
     <string name="home_search_hint">Enter Emoji ID or Contact Name</string>
-    <string name="home_empty_state">Hey there, %s\n\nWelcome to Aurora! Once you start making some transactions, they\'ll appear right here. In the meantime, you can click the "transact" button below to get things rolling</string>
+    <string name="home_title_tari_universe">Tari Universe</string>
+    <string name="home_active_miners_title">Active Miners</string>
+    <string name="home_active_miners_start_mining">Start mining</string>
+    <string name="home_active_miners_you_mining">You\'re mining</string>
+    <string name="home_active_miners_you_not_mining">You\'re not mining</string>
+    <string name="home_wallet_balance">Wallet Balance</string>
+    <string name="home_wallet_balance_hidden">*******</string>
+    <string name="home_empty_state_title">You don’t have any activity yet. </string>
+    <string name="home_empty_state_description">Once you receive some XTM, you’ll see it here.</string>
+    <string name="home_empty_state_button">Start Mining Tari</string>
+    <string name="home_tx_list_recent_activity">Recent activity</string>
+    <string name="home_sync_dialog_title">Welcome back!</string>
+    <string name="home_sync_dialog_description">Your wallet has been successfully restored.</string>
+    <string name="home_sync_dialog_button">Get Started!</string>
+    <string name="home_balance_info_modal_total_balance">Total Balance</string>
+    <string name="home_balance_info_modal_total_balance_description">This is everything you\'ve earned or received, including rewards that are still locked or pending.</string>
+    <string name="home_balance_info_modal_available_balance">Available to spend</string>
+    <string name="home_balance_info_modal_available_balance_description">This is the amount you can use right now. Some rewards take time to unlock or confirm.</string>
+    <string name="home_mainnet_modal_lets_go_button">Let\'s go!</string>
+    <string name="home_mainnet_modal_lets_watch_trailer_button">Watch The Trailer</string>
+    <string name="home_block_sync_synced">Synced to block #%s</string>
+    <string name="home_block_sync_blocks_remaining">%s blocks remaining</string>
+    <string name="home_block_sync_syncing">Syncing</string>
+
+    <!--    Airdrop Profile-->
+    <string name="airdrop_login_title">Log in to Tari Universe</string>
+    <string name="airdrop_login_subtitle">Log in and link your Tari Airdrop account to view your mining stats and track airdrop rewards.</string>
+    <string name="airdrop_login_connect_button">Connect my Airdrop account</string>
+    <string name="airdrop_profile_tari_mined">Tari Mined</string>
+    <string name="airdrop_profile_gems_earned">Gems Earned</string>
+    <string name="airdrop_profile_invite_friends_title">Invite Friends, Earn 5000 Gems</string>
+    <string name="airdrop_profile_invite_friends_description">Earn gems by mining and referring friends to increase your airdrop reward during testnet! </string>
+    <string name="airdrop_profile_invite_friends_share">Share</string>
+    <string name="airdrop_profile_friends_invited_title">Invited Friends (%s)</string>
+    <string name="airdrop_profile_friends_invited_empty_title">Miners are true friends</string>
+    <string name="airdrop_profile_friends_invited_empty_description">Your friends must use download the Tari Universe desktop app with YOUR referral code AND start mining for you to earn gem rewards.</string>
+    <string name="airdrop_profile_disconnect_button">Disconnect Airdrop Account</string>
+    <string name="airdrop_profile_disconnect_dialog_title">Disconnect Airdrop Account</string>
+    <string name="airdrop_profile_disconnect_dialog_message">Are you sure you want to disconnect your Airdrop account? You will no longer be able to view your mining stats or track airdrop rewards.</string>
 
     <!-- tx list -->
     <string name="tx_list_sent_a_payment">%s sent a payment</string>
     <string name="tx_list_you_paid">You paid</string>
-    <string name="bluetooth_connect">Bluetooth Connect 🤘</string>
-    <string name="bluetooth_connect_description">Connect and send Tari to someone nearby</string>
     <string name="tx_list_you_paid_with_alias">You paid %s</string>
-    <string name="tx_list_paid_you">paid you</string>
+    <string name="tx_list_paid_you">sent a payment</string>
+    <string name="tx_list_seconds_ago">%ds ago</string>
     <string name="tx_list_minutes_ago">%dm ago</string>
     <string name="tx_list_hours_ago">%dh ago</string>
+    <string name="tx_list_days_ago">%dd ago</string>
+    <string name="tx_list_just_now">Just now</string>
     <string name="tx_list_now">Now</string>
-    <string name="tx_list_loading_gif">Loading GIF</string>
-    <string name="tx_list_retry_loading_gif">Retry loading GIF</string>
-    <string name="tx_list_emoji_one_side_payment_placeholder">➡️</string>
-    <string name="tx_list_emoji_coinbase_payment_placeholder">🪙</string>
-    <string name="tx_list_someone">Someone</string>
-    <string name="tx_list_you_received_one_side_payment">You received a one side payment</string>
 
     <!-- send tari -->
     <string name="send_tari_title">Send To</string>
@@ -252,31 +227,28 @@
     <string name="request_tari_share">Share</string>
     <string name="request_tari_share_text">Hi! Please send me %s Tari(s) using this link: %s</string>
 
+    <!-- receive -->
+    <string name="receive_tari_topbar_title">Receive</string>
+    <string name="receive_tari_your_address">Your Address</string>
+
     <!-- send tari - add recipient -->
     <string name="add_recipient_recent_tx_contacts">Recent</string>
     <string name="add_recipient_my_contacts">My Contacts</string>
     <string name="add_recipient_invalid_emoji_id">Not a valid Emoji ID</string>
-    <string name="add_recipient_own_emoji_id">Sorry, you cannot send tXTR to yourself.</string>
+
     <!-- QR-scanner -->
     <string name="add_recipient_scan_qr_description">Scan Tari QR code in the box below</string>
     <string name="add_recipient_scan_qr_error">Invalid QR Code.\nYour request cannot be processed at this time.</string>
     <string name="add_recipient_failed_init_camera_message">Failed to initialize Camera</string>
     <string name="add_recipient_camera_permission_denied_message">Camera permission denied</string>
-    <string name="qr_code_scanner_labels_actions_transaction_send">This code contains a funds request.\nWould you like to send funds to %s?</string>
-    <string name="qr_code_scanner_labels_actions_base_node_add">This code contains base node information.\nWould you like to save it to the app?</string>
-    <string name="qr_code_scanner_labels_actions_contacts">This code contains contacts information. \nWould you like to add its to your contact book?</string>
-    <string name="qr_code_scanner_labels_actions_profile">This code contains contact information. \nWould you like to add it to your contact book?</string>
-    <string name="qr_code_scanner_labels_actions_tor_bridges">This code contains a custom bridge.\nWould you like to save it to the app?</string>
-
 
     <!-- send tari - amount -->
     <string name="add_amount_under_construction">Under Construction</string>
-    <string name="add_amount_not_enough_available_balance">Not enough tXTR in your available balance</string>
-    <string name="add_amount_funds_pending">Sorry, you can’t send this much tXTR. Please wait for at least one transaction to complete and then try again.</string>
+    <string name="add_amount_not_enough_available_balance">Not enough XTM in your available balance</string>
+    <string name="add_amount_funds_pending">Sorry, you can’t send this much XTM. Please wait for at least one transaction to complete and then try
+        again.</string>
     <string name="add_amount_tx_fee">Transaction Fee</string>
     <string name="add_amount_wallet_balance">Wallet Balance</string>
-    <string name="add_amount_one_side_payment_switcher">One Sided Payment</string>
-    <string name="add_amount_one_side_payment_question_mark">One-sided payments are broadcast instantly and do not require the recipient to be online. But they are less private. Use them if you know the recipient is offline for long periods, or for things like \'tip-jars\'.</string>
     <string name="add_amount_modify_fee_title">Modify Transaction Fee</string>
     <string name="add_amount_modify_fee_description">Choose how fast you would like to move your transaction to the blockchain.\n A higher fee will speed up the process.</string>
     <string name="add_amount_modify_fee_estimated">Estimated Fee:</string>
@@ -289,9 +261,6 @@
     <string name="add_note_prompt">Transaction Note</string>
     <string name="add_note_hint">Let the recipient know what the payment is for</string>
     <string name="add_note_slide_to_send">Slide to Send</string>
-    <string name="add_note_content_description_chosen_gif">chosen gif</string>
-    <string name="add_note_search_giphy_label">SEARCH GIPHY</string>
-    <string name="add_note_search_giphy_carousel_item_label">SEARCH GIFS</string>
 
     <!-- send tari - successful -->
     <string name="finalize_send_tx_sending_step_1_desc_line_1">Connecting to the</string>
@@ -300,20 +269,39 @@
     <string name="finalize_send_tx_sending_step_2_desc_line_2" tools:ignore="TypographyEllipsis">recipient on the Tari Network...</string>
     <string name="finalize_send_tx_sending_step_3_desc_line_1">Good to go!</string>
     <string name="finalize_send_tx_sending_step_3_desc_line_2" tools:ignore="TypographyEllipsis">Your transaction is on its way...</string>
+    <string name="finalize_send_tx_sending_cancel_dialog_title">Cancel Sending</string>
+    <string name="finalize_send_tx_sending_cancel_dialog_description">Are you sure you want to leave this screen? Your transaction may be cancelled.</string>
+
+    <!-- send tari - confirm & pay -->
+    <string name="confirm_tx_confirm_and_send_button">Confirm &amp; Send</string>
+    <string name="confirm_tx_you_are_about_to_send">You are about to send</string>
 
     <!-- wallet info -->
     <string name="wallet_info_my_profile">My Profile</string>
-    <string name="wallet_info_qr_code_desc">Easily receive tXTR from others by sharing your profile via one of the methods below:</string>
-    <string name="wallet_info_yat_disconnected_description">You\'ve previously connected this Yat.\n Do you want to re-connect it to your wallet?</string>
-    <string name="wallet_info_yat_disconnected_reconnect">Reconnect Yat</string>
-    <string name="wallet_info_share_profile_title">Share Profile</string>
-    <string name="wallet_info_my_aurora_title">My Aurora</string>
+    <string name="wallet_info_qr_code_desc">Transacting in person? Others can scan this QR code from the Tari Universe Wallet App to send you XTM.</string>
+    <string name="wallet_info_yat_disconnected_description">Your previously connected Yat has lost sync with the app. Click Connect Yats below if you\’d like to reconnect it.</string>
+    <string name="wallet_info_yat_disconnected_description_connect_yats">Connect Yats</string>
     <string name="wallet_info_wallet_button">Wallet</string>
     <string name="wallet_info_connect_yat_button">Connect Yats</string>
-
-    <!-- tx failed dialog -->
-    <string name="tx_failed_title">Sorry, you can\'t send tXTR to offline users</string>
-    <string name="tx_failed_description">Please make sure your recipient has a reliable internet connection and has the Aurora app open on their device, and then try again. If that doesn\'t work, please verify you have the correct Emoji ID.</string>
+    <string name="wallet_info_address_details_title">Address Details</string>
+    <string name="wallet_info_address_network">Network:</string>
+    <string name="wallet_info_address_features">Features:</string>
+    <string name="wallet_info_address_view_key">View Key:</string>
+    <string name="wallet_info_address_spend_key">Core Address:</string>
+    <string name="wallet_info_address_checksum">Checksum:</string>
+    <string name="wallet_info_address_button_copy_base58">Copy Base58</string>
+    <string name="wallet_info_address_button_copy_emoji">Copy Emojis</string>
+    <string name="wallet_info_address_one_side_payment">One Sided Payments</string>
+    <string name="wallet_info_address_interactive_payment">Interactive Payments</string>
+    <string name="wallet_info_address_payment_id">Payment ID</string>
+    <string name="wallet_info_address_copy_address_to_clipboard_label">Tari Wallet Identity</string>
+    <string name="wallet_info_share_profile">Share my address</string>
+    <string name="wallet_info_share_address_title">Share Address</string>
+    <string name="wallet_info_share_address_description">Easily receive XTM from others by sharing your profile via one of the following
+        methods:</string>
+    <string name="wallet_info_empty_name_dialog_title">Name can\’t be empty</string>
+    <string name="wallet_info_empty_name_dialog_message">You can\’t delete your name. Give it a quick update instead!</string>
+    <string name="wallet_info_empty_name_dialog_button">Okay, got it!</string>
 
     <!-- transaction detail -->
     <string name="tx_detail_payment_cancelled">Payment Cancelled</string>
@@ -321,25 +309,30 @@
     <string name="tx_detail_payment_sent">Payment Sent</string>
     <string name="tx_detail_pending_payment_received">Payment In Progress</string>
     <string name="tx_detail_contact_name">Contact Name</string>
-    <string name="tx_detail_explorer_title">Information</string>
-    <string name="tx_detail_explorer_button">View on the Block Explorer</string>
-    <string name="tx_detail_create_contact_hint">Add Contact Name</string>
     <string name="tx_detail_note">Note</string>
     <string name="tx_detail_edit">Edit</string>
-    <string name="tx_detail_add_contact">Add Contact Name</string>
     <string name="tx_detail_transaction_fee">Transaction Fee</string>
     <string name="tx_detail_waiting_for_recipient">Waiting for recipient to come online</string>
     <string name="tx_detail_waiting_for_sender_to_complete">Waiting for sender to complete transaction</string>
-    <string name="tx_detail_completing_final_processing">Completing final processing (%s of %s)</string>
+    <string name="tx_detail_in_progress">In progress</string>
     <string name="tx_detail_cancel_tx">Cancel transaction</string>
     <string name="tx_detail_cancellation_error_title">Oops…</string>
     <string name="tx_detail_cancellation_error_description">Error occurred during TX cancellation.</string>
     <string name="tx_details_cancel_dialog_description">You will have to start a new transaction if you change your mind.</string>
     <string name="tx_details_cancel_dialog_cancel">Yes, cancel</string>
     <string name="tx_details_cancel_dialog_not_cancel">Not now</string>
-    <string name="tx_details_error_tx_not_found_title">Requested transaction was not found</string>
-    <string name="tx_details_error_tx_not_found_desc">Please try again later</string>
-    <string name="tx_details_coinbase_placeholder">🪙 Coinbase</string>
+    <string name="tx_details_coinbase">Block #%s</string>
+    <string name="tx_details_recipient_address">Recipient Address</string>
+    <string name="tx_details_total">Total</string>
+    <string name="tx_details_transaction_details">Transaction Details</string>
+    <string name="tx_details_paid">Paid</string>
+    <string name="tx_details_received">"Received</string>
+    <string name="tx_details_date">Date</string>
+    <string name="tx_details_txn_id">Tari Txn ID</string>
+    <string name="tx_details_txn_id_processing">Processing</string>
+    <string name="tx_details_status">Status</string>
+    <string name="tx_details_completed">Completed</string>
+    <string name="tx_details_add_contact_name_hint">Add contact name…</string>
 
     <string name="tx_details_cancellation_reason_unknown">The transaction failed for an unknown reason.</string>
     <string name="tx_details_cancellation_reason_user_cancelled">The transaction was canceled by the sender.</string>
@@ -349,11 +342,13 @@
     <string name="tx_details_cancellation_reason_time_locked">This transaction was cancelled due to the funds not having reached their time-lock period yet.</string>
     <string name="tx_details_cancellation_reason_invalid_transaction">The transaction failed to the invalid input data. This situation shouldn\'t happen. Please send a bug report or contact us directly.</string>
     <string name="tx_details_cancellation_reason_abandoned_coinbase">The coinbase was abandoned.</string>
+    <string name="tx_details_cancellation_reason_not_cancelled">The transaction was not cancelled, but for some reason looks like cancelled.
+        Please, contact us directly if you see this message.</string>
 
     <!-- Fee tooltip -->
     <string name="tx_detail_fee_tooltip_transaction_fee">Transaction Fee</string>
-    <string name="tx_detail_fee_tooltip_desc">The transaction fee is distributed to the thousands of computers (also known as \"miners\") who ensure that your tXTR transactions are fast and secure.</string>
-    <string name="tx_details_fee_value">+%s</string>
+    <string name="tx_detail_fee_tooltip_desc">The transaction fee is distributed to the thousands of computers (also known as \"miners\") who
+        ensure that your XTM transactions are fast and secure.</string>
 
     <!-- debug screens -->
     <!-- logs -->
@@ -361,6 +356,7 @@
     <string name="debug_dialog_logs">View logs</string>
     <string name="debug_dialog_report">Report a bug</string>
     <string name="debug_dialog_connection_status">View connection status</string>
+    <string name="debug_dialog_sample_design_system">Sample design system</string>
     <string name="debug_logs_title">Debug Logs</string>
     <string name="debug_logs_cant_open_file">Unable to open file. Please try again later</string>
     <string name="debug_logs_clipboard_text">Logs was copied to clipboard</string>
@@ -370,40 +366,29 @@
     <string name="debug_log_filter_warning">Warning</string>
     <string name="debug_log_filter_error">Error</string>
     <string name="debug_log_filter_ffi">FFI</string>
-    <string name="debug_log_filter_aurora_general">Aurora - General</string>
-    <string name="debug_log_filter_aurora_connection">Aurora - Connection</string>
-    <string name="debug_log_filter_aurora_ui">Aurora - UI</string>
-    <string name="debug_log_filter_auroranavigation">Aurora - Navigation</string>
+    <string name="debug_log_filter_aurora_general">Tari Universe Wallet - General</string>
+    <string name="debug_log_filter_aurora_connection">Tari Universe Wallet - Connection</string>
+    <string name="debug_log_filter_aurora_ui">Tari Universe Wallet - UI</string>
+    <string name="debug_log_filter_auroranavigation">Tari Universe Wallet - Navigation</string>
 
     <string name="bugs_reporting_title">Report a Bug</string>
     <string name="bugs_reporting_description">Has something gone wrong? Please let us know!</string>
     <string name="bugs_reporting_name_placeholder">Name (Optional)</string>
     <string name="bugs_reporting_email_placeholder">E-mail (Optional)</string>
     <string name="bugs_reporting_what_happened">What happened? (Crash / Strange behavior)</string>
-    <string name="bugs_reporting_additional_info">With this bug report you will send us information about your device model, Andro version and recent logs</string>
+    <string name="bugs_reporting_additional_info">With this bug report you will send us information about your device model, Android version and recent logs</string>
     <string name="bugs_reporting_send">Send</string>
     <string name="bugs_reporting_view_logs">View logs</string>
+    <string name="bugs_reporting_send_logs_error">Failed to send logs: %s</string>
 
     <string name="debug_log_filter_debug">Debug</string>
-    <string name="debug_log_file_size_limit_exceeded_dialog_title">File Size Error</string>
-    <string name="debug_log_file_size_limit_exceeded_dialog_content">Cannot send: zipped file is over 25MB.</string>
     <!-- base node config -->
-    <string name="debug_base_node_custom">Custom</string>
     <string name="debug_change_base_node">Change base node</string>
-    <string name="debug_add_base_node">Add base node</string>
-    <string name="debug_custom_base_node">Custom Base Node</string>
-    <string name="debug_edit_base_node_name_hint">Base Node Name</string>
-    <string name="debug_edit_base_node_public_key_hint">Public Key HEX</string>
-    <string name="debug_edit_base_node_address_hint">Address</string>
-    <string name="debug_edit_base_node_invalid_public_key">Invalid public key hex.</string>
-    <string name="debug_edit_base_node_invalid_address">Invalid address.</string>
-    <string name="debug_edit_base_node_failed">Couldn\'t add base node peer.</string>
 
     <string name="select_theme_title">Select theme</string>
     <string name="select_theme_description">Select a theme below to change the color scheme</string>
     <string name="select_theme_dark">Dark</string>
     <string name="select_theme_light">Light</string>
-    <string name="select_theme_purple">Purple</string>
     <string name="select_theme_app_based">System</string>
 
     <!-- about -->
@@ -416,7 +401,6 @@
     <string name="all_settings_page_title">Settings</string>
     <string name="all_settings_security_label">Security</string>
     <string name="all_settings_advanced_settings_label">Advanced</string>
-    <string name="all_settings_yat_settings_label">Yat</string>
     <string name="all_settings_back_up_wallet_settings_entry">Wallet Backups</string>
     <string name="all_settings_back_up_wallet_settings_safety">Learn More</string>
     <string name="all_settings_secondary_settings_label">More</string>
@@ -428,14 +412,12 @@
     <string name="all_settings_biometrics">Biometrics</string>
     <string name="all_settings_delete_wallet">Delete Your Wallet</string>
     <string name="all_settings_visit_site">Visit Tari.com</string>
-    <string name="all_settings_contribute">Contribute to Tari Aurora</string>
+    <string name="all_settings_contribute">Contribute to Tari Universe Wallet</string>
     <string name="all_settings_user_agreement">User Agreement</string>
     <string name="all_settings_privacy_policy">Privacy Policy</string>
     <string name="all_settings_disclaimer">Disclaimer</string>
     <string name="all_settings_explorer">Block Explorer</string>
-    <string name="all_settings_background_service">Background Service</string>
     <string name="all_settings_screen_recording">Screen recording</string>
-    <string name="all_settings_bluetooth_settings">Bluetooth Settings</string>
     <string name="all_settings_bridge_configuration">Bridge Configuration</string>
     <string name="all_settings_connect_yats">Connect Yats</string>
     <string name="all_settings_select_base_node">Select Base Node</string>
@@ -448,27 +430,16 @@
     <string name="all_settings_version_text_copy_title">Tari Wallet Version</string>
     <string name="all_settings_version_text_copy_toast_message">Tari version was copied</string>
 
-    <!-- Background service -->
-    <string name="background_service_title">Background service</string>
-    <string name="background_service_warning_text">The background service allow us to connect to a Tari node and receive updates and messages while you\'re doing other things on your phone. This is great for not missing any payments, but it does hurt your battery life. If you want to reduce battery strain and don\'t mind having Aurora in the foreground to keep your wallet up to date, then turn this setting off.</string>
-    <string name="background_service_button_title">Allow Tari to receive transactions and notifications in the background</string>
-    <string name="background_service_button_confirmation_title">Background service will be turned off</string>
-    <string name="background_service_button_confirmation_description">You will not get any notifications and updates. Are you sure you want to proceed?</string>
-
     <!-- Screen recording -->
     <string name="screen_recording_title">Screen recording</string>
     <string name="screen_recording_warning_text">Screen recording and taking screenshots can capture your wallet data and transactions. To keep your wallet data private, you can disable this setting.\n\nNote: Screen recording and screenshots will always be disabled for the Seed Phrase screen.</string>
     <string name="screen_recording_button_title">Allow screen recording</string>
     <string name="screen_recording_button_confirmation_title">Screen recording will be enabled</string>
     <string name="screen_recording_button_confirmation_description">You will be able to record your screen. Are you sure you want to proceed?</string>
-
-    <!-- Bluetooth settings -->
-    <string name="bluetooth_settings_title">Bluetooth Settings</string>
-    <string name="bluetooth_settings_description">Other users can share their contacts using Bluetooth Low Energy (BLE) by moving their devices near your device. Your device will be visible to nearby Bluetooth devices when it\'s turned on.\n \n Choose an option below. BLE should be:</string>
-    <string name="bluetooth_settings_option_on">Always on</string>
-    <string name="bluetooth_settings_option_off">Turned off</string>
-    <string name="bluetooth_settings_option_while_up">Only active while the app is open</string>
-
+    <string name="screen_recording_disabled_dialog_title">Screenshots Disabled</string>
+    <string name="screen_recording_disabled_dialog_description">Oops! Screenshots are disabled in this app to keep your information safe. Thanks for keeping things secure!</string>
+    <string name="screen_recording_disabled_dialog_confirm_button">No problem, mate!</string>
+    <string name="screen_recording_disabled_dialog_cancel_button">Enable screenshots</string>
 
     <!-- delete wallet -->
     <string name="delete_wallet_title">You\'re about to lose everything!</string>
@@ -477,20 +448,14 @@
     <string name="delete_wallet_confirmation_description" formatted="false">Last chance! We\'re about to delete your wallet from this device. You will irreversibly lose your entire balance. Are you 100% sure we should do this?</string>
 
     <!-- incompatible network -->
-    <string name="incompatible_network_title">Time to move on</string>
-    <string name="incompatible_network_description">Good news: The Tari testnet has been reset, bringing a whole host of new features and upgrades.\n\nBad news: Your old tXTR is no longer good here, and the network will reset your balance to zero soon. But on the bright side, this is a great opportunity to start afresh with a spanking new wallet! What do you say?</string>
-    <string name="incompatible_network_description_bold_part_1">Good news:</string>
-    <string name="incompatible_network_description_bold_part_2">Bad news:</string>
-    <string name="incompatible_network_reset_later">I\'ll do it later</string>
-    <string name="incompatible_network_reset_now">Start over, I say!</string>
 
     <!-- Wallet back up -->
     <string name="back_up_wallet_page_title">Security</string>
     <string name="back_up_wallet_page_label">Wallet Backups</string>
     <string name="back_up_wallet_to_cloud_cta">Upload Now</string>
     <string name="back_up_wallet_with_recovery_phrase_cta">Write Down Seed Phrase</string>
-    <string name="back_up_wallet_page_description">By backing up your wallet, you’ll ensure that you don’t lose your tXTR if your phone is lost or broken.</string>
-    <string name="back_up_wallet_change_backup_password_cta">Change your secure password</string>
+    <string name="back_up_wallet_page_description">By backing up your wallet, you’ll ensure that you don’t lose your XTM if your phone is lost or
+        broken.</string>
 
     <string name="back_up_wallet_backup_status_checking_backup">Checking</string>
     <string name="back_up_wallet_backup_status_in_progress">In progress</string>
@@ -507,10 +472,10 @@
     <string name="back_up_wallet_turn_off_backup_warning_description">Are you sure you want to proceed?</string>
     <string name="back_up_wallet_google_title">Google Drive Backup</string>
     <string name="back_up_wallet_local_file_title">Local File Backup</string>
-    <string name="back_up_wallet_dropbox_backup_title">Dropbox Backup</string>
     <string name="back_up_wallet_restore_with_google_drive">Restore with Google Drive</string>
     <string name="back_up_wallet_restore_with_local_files">Restore with Local files</string>
-    <string name="back_up_wallet_restore_with_dropbox">Restore with Dropbox</string>
+    <string name="back_up_wallet_restore_with_paper_wallet">Sync with Universe desktop</string>
+    <string name="back_up_wallet_keep_screen_awake">Keep screen awake during sync</string>
 
     <!-- Wallet back up with seed phrase -->
     <string name="back_up_seed_phrase_page_title">Back Up With Seed Phrase</string>
@@ -518,6 +483,7 @@
     <string name="back_up_seed_phrase_verify_cta">Verify Seed Phrase</string>
     <string name="back_up_seep_phrase_losing_warning_label">I understand that if I lose my recovery seed phrase I will not be able to restore my wallet.</string>
     <string name="back_up_seed_phrase_error">Error while getting the wallet seed phrase. Please try again later.</string>
+    <string name="back_up_seed_phrase_copy_to_clipboard">Copy seed phrase</string>
 
     <!-- Verify seed phrase -->
     <string name="verify_seed_phrase_page_title">Verify Seed Phrase</string>
@@ -525,45 +491,57 @@
     <string name="verify_seed_phrase_select_words_description">Tap on the words below in the correct order</string>
     <string name="verify_seed_phrase_complete_verification_cta">Complete Verification</string>
     <string name="verify_seed_phrase_sequence_is_invalid_message">Nope, that’s not right</string>
-    <string name="verify_seed_phrase_content_description_sequence_is_correct">Sequence is correct</string>
 
     <!-- Wallet restore -->
-    <string name="restore_wallet_page_title">Restore Your Wallet</string>
+    <string name="restore_wallet_page_title">Import Wallet</string>
     <string name="restore_wallet_error_title">Restoration Error</string>
     <string name="restore_wallet_error_desc">Wallet could not be restored: %s</string>
-    <string name="restore_wallet_error_file_not_supported">The wallet could not be restored. The backup file is not supported. We updated the wallet version, old backup files without a password are not valid anymore. You can download an older version, make a backup with a password and try again</string>
     <string name="restore_wallet_error_file_not_found">Wallet could not be restored. Backup does not exist.</string>
     <string name="restore_wallet_restore_cta">Restore Wallet</string>
     <string name="restore_wallet_password_match_error">@string/enter_backup_password_password_match_error</string>
     <string name="restore_wallet_output_message">You recovered some funds</string>
+    <string name="restore_wallet_invalid_qr_code">Invalid QR Code</string>
+    <string name="restore_wallet_invalid_qr_code_description">The QR code you scanned does not contain valid paper wallet seeds</string>
+    <string name="restore_wallet_paper_wallet_title">Sync your Universe wallet?</string>
+    <string name="restore_wallet_paper_wallet_body">You just scanned a wallet from the Tari Universe desktop app! Syncing it will let you track your real-time XTM balance right on your phone.\nWhat would you like to do?</string>
+    <string name="restore_wallet_paper_wallet_restore_button">Sync Wallet</string>
+    <string name="restore_wallet_paper_wallet_sweep_funds_button">Sweep the funds</string>
+    <string name="restore_wallet_paper_wallet_replace_wallet_button">Replace current wallet</string>
+    <string name="restore_wallet_paper_wallet_remember_backup_title">Remember to back up first!</string>
+    <string name="restore_wallet_paper_wallet_remember_backup_body">Do you want to back up your current wallet before replacing it? If you don\’t back it up first, you will lose all the funds in your current wallet!</string>
+    <string name="restore_wallet_paper_wallet_remember_backup_yes_button">Yes, back it up</string>
+    <string name="restore_wallet_paper_wallet_remember_backup_no_button">No, just replace it</string>
+    <string name="restore_wallet_paper_wallet_enter_passphrase_title">Sync with Tari Universe</string>
+    <string name="restore_wallet_paper_wallet_enter_passphrase_body">Enter the identification code from your Tari Universe desktop app to import your wallet.</string>
+    <string name="restore_wallet_paper_wallet_enter_passphrase_hint">Enter Identification Code</string>
+    <string name="restore_wallet_paper_wallet_error_title">Incorrect code</string>
+    <string name="restore_wallet_paper_wallet_error_body">The identification code you entered is incorrect. Please try again.</string>
 
     <!-- Wallet recovery with seed phrase -->
     <string name="restore_from_seed_words_title">Restore With Seed Phrase</string>
     <string name="restore_from_seed_words_description">Enter your seed phrase to restore your wallet</string>
     <string name="restore_from_seed_words_select_node">Select base node</string>
     <string name="restore_from_seed_words_submit_title">Restore Wallet</string>
-    <string name="restore_from_seed_words_custom_node_name">Recovery Base Node</string>
     <string name="restore_from_seed_words_button_select_base_node_select">Select Custom Base Node</string>
     <string name="restore_from_seed_words_button_select_base_node_edit">Edit Base Node</string>
     <string name="restore_from_seed_words_form_error_message">Oops, looks like the address you entered isn\'t good. We had to revert your change.</string>
-
     <string name="restore_from_seed_words_error_invalid_seed_word">At least one of the entered seed words is invalid. Please review them and try again</string>
     <string name="restore_from_seed_words_error_phrase_too_short">You entered not enough seed words. Please add some more and try again</string>
     <string name="restore_from_seed_words_error_unknown">Unable to generate key from seed words. Please check your seed words and try again</string>
-
-    <string name="restore_from_seed_words_overlay_description">This could take between 1 to 3 minutes.\nPlease keep the app open</string>
-
     <string name="restore_from_seed_words_overlay_status_connecting">Waiting for connection</string>
     <string name="restore_from_seed_words_overlay_status_connected">Connection established. The process will start soon</string>
     <string name="restore_from_seed_words_overlay_status_progress">Restoring in progress:</string>
     <string name="restore_from_seed_words_overlay_status_connection_failed">Attempt %s out of %s</string>
-
     <string name="restore_from_seed_words_overlay_error_title">Recovery Failed</string>
     <string name="restore_from_seed_words_overlay_error_description_connection_failed">Unable to connect with base node. Please try again later</string>
     <string name="restore_from_seed_words_overlay_error_description_internal_error">Unable to recover your wallet due to the error</string>
-
     <string name="restore_from_seed_words_autocompletion_start_typing">Start typing to see suggestions</string>
     <string name="restore_from_seed_words_autocompletion_no_suggestions">here are no suggestions for the phrase</string>
+    <string name="restore_from_seed_words_cancel_dialog_title">Are you sure you want to cancel?</string>
+    <string name="restore_from_seed_words_cancel_dialog_description">You will lose your progress, but don\'t worry, you can always start over.</string>
+    <string name="recovery_success_dialog_title">Wallet Synced! 🎉</string>
+    <string name="recovery_success_dialog_description">Your real-time XTM balance is now available on your phone. 🚀</string>
+    <string name="recovery_success_dialog_close">Awesome, thanks!</string>
 
     <!--Restore -->
     <string name="restore_with_cloud_page_title">Enter your backup password</string>
@@ -583,18 +561,17 @@
     <string name="enter_backup_password_enter_password_label">Enter Password</string>
     <string name="enter_backup_password_password_match_error">That’s not it!</string>
     <string name="enter_backup_password_change_password_cta">Change Password</string>
-    <string name="search_gifs_dialog_hint">Search GIPHY</string>
 
     <!--Data collection-->
-    <string name="data_collection_description">We\'re always striving to make Aurora better.\nTo achieve this, we use a third-party service to gather non-identifiable data like crash logs and usage statistics. This data helps us pinpoint and fix any issues, ultimately improving your experience</string>
+    <string name="data_collection_description">We\'re always striving to make Tari Universe Wallet better.\nTo achieve this, we use a third-party service to gather non-identifiable data like crash logs and usage statistics. This data helps us pinpoint and fix any issues, ultimately improving your experience</string>
     <string name="data_collection_option">I consent to data collection</string>
     <string name="data_collection_dialog_title">Help us improve</string>
-    <string name="data_collection_dialog_description">We\'re always striving to make Aurora better.\nTo achieve this, we use a third-party service to gather non-identifiable data like crash logs and usage statistics. This data helps us pinpoint and fix any issues, ultimately improving your experience.\n\nDo you consent to your data being collected?</string>
+    <string name="data_collection_dialog_description">We\'re always striving to make Tari Universe Wallet better.\nTo achieve this, we use a third-party service to gather non-identifiable data like crash logs and usage statistics. This data helps us pinpoint and fix any issues, ultimately improving your experience.\n\nDo you consent to your data being collected?</string>
     <string name="data_collection_dialog_positive">Yes, I consent</string>
     <string name="data_collection_dialog_negative">No, I decline</string>
 
     <!-- Biometrics -->
-    <string name="biometrics_description">We\'re dedicated to enhancing the security and convenience of Aurora\'s authorization process. To achieve this, we integrate a reliable Android native service for biometric authentication. Your unique biometric data ensures secure and effortless access to the application, simplifying your user experience.</string>
+    <string name="biometrics_description">We\'re dedicated to enhancing the security and convenience of Tari Universe Wallet\'s authorization process. To achieve this, we integrate a reliable Android native service for biometric authentication. Your unique biometric data ensures secure and effortless access to the application, simplifying your user experience.</string>
     <string name="biometrics_settings_use">Use biometrics</string>
     <string name="need_authorization">Authorization needed</string>
 
@@ -603,6 +580,7 @@
     <string name="connection_status_dialog_network_status_disconnected">Disconnected from the Internet</string>
     <string name="connection_status_dialog_network_status_connected">Connected to the Internet</string>
     <string name="connection_status_dialog_tor_status_disconnected">Disconnected from Tor</string>
+    <string name="connection_status_dialog_tor_status_ready_for_wallet">Ready for Wallet Creation</string>
     <string name="connection_status_dialog_tor_status_connecting">Connecting with Tor</string>
     <string name="connection_status_dialog_tor_status_connected">Connected with Tor</string>
     <string name="connection_status_dialog_tor_status_failed">Failed to connect with Tor</string>
@@ -613,6 +591,10 @@
     <string name="connection_status_dialog_base_node_sync_pending">Syncing with Base Node</string>
     <string name="connection_status_dialog_base_node_sync_success">Synced with Base Node</string>
     <string name="connection_status_dialog_base_node_sync_failure">Failed sync with Base Node</string>
+    <string name="connection_status_dialog_chain_tip">Chain Tip: </string>
+    <string name="connection_status_dialog_chain_tip_value">#%s (%s)</string>
+    <string name="connection_status_dialog_chain_tip_waiting">Waiting for connection…</string>
+    <string name="connection_status_dialog_base_node_id">Base Node ID: %s</string>
 
     <string name="tor_bridges_title">Bridges Configuration</string>
     <string name="tor_bridges_connect">Connect</string>
@@ -620,7 +602,7 @@
     <string name="tor_bridges_custom_bridges">Custom Bridges</string>
     <string name="tor_bridges_description">If you are in a country or using a connection that censor Tor, you might need to use bridges</string>
     <string name="tor_bridges_paste_bridges">Paste Bridges</string>
-    <string name="tor_bridges_hint" formatted="false">Available formates:\n• obfs4 &lt;IP ADDRESS>:&lt;PORT> &lt;FINGERPRINT> cert=&lt;CERTIFICATE> iat-mode=&lt;value>\nexample:\nobfs4 192.95.36.142:443 CDF2E852BF539B82BD10E27E9115A31734E378C2 cert=qUVQ0srL1JI/vO6V6m/24anYXiJD3QP2HgzUKQtQ7GRqqUvs7P+tG43RtAqdhLOALP7DJQ iat-mode=1\n\n • &lt;IP ADDRESS>:&lt;PORT> &lt;FINGERPRINT>\nexample:\n78.156.103.189:9301 2BD90810282F8B331FC7D47705167166253E1442"</string>
+    <string name="tor_bridges_hint" formatted="false">Available formates:\n• obfs4 &lt;IP ADDRESS>:&lt;PORT> &lt;FINGERPRINT> cert=&lt;CERTIFICATE> iat-mode=&lt;value>\nexample:\nobfs4 192.95.36.142:443 CDF2E852BF539B82BD10E27E9115A31734E378C2 cert=qUVQ0srL!JI/vO6V6m/24anYXiJD3QP2HgzUKQtQ7GRqqUvs7P+tG43RtAqdhLOALP7DJQ iat-mode=1\n\n • &lt;IP ADDRESS>:&lt;PORT> &lt;FINGERPRINT>\nexample:\n78.156.103.189:9301 2BD90810282F8B331FC7D47705167166253E1442"</string>
     <string name="tor_bridges_request">Request Bridges from torproject.org</string>
     <string name="tor_bridges_scan_qr">Scan QR Code</string>
     <string name="tor_bridges_upload_qr_code">Upload QR Code</string>
@@ -656,12 +638,6 @@
     <string name="tari_about_icon_url_cloud">https://thenounproject.com/icon/cloud-3384041/</string>
     <string name="tari_about_icon_url_password">https://thenounproject.com/icon/password-3384056/</string>
     <string name="tari_about_icon_url_final">https://thenounproject.com/icon/key-3384048/</string>
-    <string name="tari_about_icon_url_link">https://thenounproject.com/browse/icons/term/link/</string>
-    <string name="tari_about_icon_url_unlink">https://thenounproject.com/browse/icons/term/unlink/</string>
-    <string name="tari_about_icon_url_contact_book">https://thenounproject.com/browse/icons/term/contact-book/</string>
-    <string name="tari_about_icon_url_bluetooth">https://thenounproject.com/browse/icons/term/bluetooth/</string>
-    <string name="tari_about_icon_url_nfc">https://thenounproject.com/browse/icons/term/nfc/</string>
-    <string name="tari_about_icon_url_empty_wallet">https://thenounproject.com/browse/icons/term/empty-wallet/</string>
 
 
     <string name="tari_about_icon_text_locked">Locked Lock by BlackActurus from\nNounProject.com</string>
@@ -682,12 +658,6 @@
     <string name="tari_about_icon_text_cloud">Cloud by Tippawan Sookruay from NounProject.com</string>
     <string name="tari_about_icon_text_password">Password by Tippawan Sookruay from NounProject.com</string>
     <string name="tari_about_icon_text_final">Key by Tippawan Sookruay from NounProject.com</string>
-    <string name="tari_about_icon_text_link">Link by Nasik Lababan from Noun Project</string>
-    <string name="tari_about_icon_text_unlink">Unlink by Nasik Lababan from Noun Project</string>
-    <string name="tari_about_icon_text_contact_book">contact book by Vectors Point from Noun Project</string>
-    <string name="tari_about_icon_text_bluetooth">Bluetooth by Winaldi from Noun Project</string>
-    <string name="tari_about_icon_text_nfc">NFC by Fauzan Adiima from Noun Project</string>
-    <string name="tari_about_icon_text_empty_wallet">Empty wallet by Fatkhul Karim from Noun Project</string>
 
 
     <string name="utxos_list_title">Wallet</string>
@@ -727,16 +697,14 @@
     <string name="change_password_page_title">Secure your backups</string>
     <string name="change_password_page_description_general_part">Ensure your wallet is safe even if your storage is compromised. Select a password you will remember or</string>
     <string name="change_password_page_description_highlight_part">you will not be able to recover your wallet</string>
-    <string name="enter_backup_password_page_desc_general_part">Enter the password you created in Aurora to secure your backups. If you cannot find the password,</string>
+    <string name="enter_backup_password_page_desc_general_part">Enter the password you created in Tari Universe Wallet to secure your backups. If you cannot find the password,</string>
     <string name="enter_backup_password_page_desc_highlighted_part">you will not be able to recover your wallet</string>
-    <string name="check_backup_storage_status_error_title">Wallet Backup Incomplete</string>
     <string name="back_up_wallet_storage_setup_error_title">Wallet Backup Incomplete</string>
     <string name="backup_wallet_storage_full_title">Wallet Backup Incomplete</string>
     <string name="check_backup_storage_status_auth_revoked_error_description">Storage is not accessible</string>
     <string name="back_up_wallet_storage_setup_error_desc">Storage setup was interrupt</string>
     <string name="backup_wallet_storage_full_desc">Your storage is full</string>
     <string name="backup_restored_tx">Funds recovered from your previous wallet</string>
-    <string name="home_question_mark">\?</string>
 
     <!--    FFI Validation-->
     <string name="ffi_validation_error_title">Incompatible version detected</string>
@@ -749,7 +717,7 @@
     <string name="staged_wallet_security_stages_1a_title">🔑🔑🔑</string>
     <string name="staged_wallet_security_stages_1a_subtitle">Write down your seed words</string>
     <string name="staged_wallet_security_stages_1a_message"><![CDATA[You now have <strong>real</strong> money in your wallet.<br><br>If you accidentally delete your wallet app or lose your device, your funds are lost, and there is no way to recover them unless you have safely kept a copy of your <strong>seed phrase</strong> safe somewhere.<br><br>Click \'Ok\' to review and save the phrase now, or \'Remind me later\' to do it at a more convenient time]]></string>
-    <string name="staged_wallet_security_stages_1a_buttons_positive">Ok</string>
+    <string name="staged_wallet_security_stages_1a_buttons_positive">OK</string>
     <string name="staged_wallet_security_stages_1b_title">🤑🤑🤑</string>
     <string name="staged_wallet_security_stages_1b_subtitle">Make a cloud backup</string>
     <string name="staged_wallet_security_stages_1b_message">Your wallet now holds a fair amount of value, which you probably don\'t want to lose. Unlike a physical wallet\'s notes, it\'s possible to make a copy of your wallet\'s contents that you can use to recover your funds in case you lose them.\n\nYou should think about making a copy of your wallet\'s coins, which we will keep up to date after every transaction.\n\nIf you have a copy of your seed phrase saved somewhere safe, and don\'t want to back up your coins into the cloud, you can skip this step.</string>
@@ -782,7 +750,7 @@
     <string name="onboarding_staged_wallet_security_page4_title_part2_bold">help keep your coins safe</string>
     <string name="onboarding_staged_wallet_security_page4_message_full">Try to keep your seed words and backups in a safe place. We also strongly recommend keeping a few copies of your seed words in different places and changing the backup password regularly</string>
     <string name="onboarding_staged_wallet_security_page4_action_button">Let’s Do This!</string>
-    <string name="onboarding_staged_wallet_security_footer_part1">Aurora helps you secure your funds</string>
+    <string name="onboarding_staged_wallet_security_footer_part1">Tari Universe Wallet helps you secure your funds</string>
     <string name="onboarding_staged_wallet_security_footer_part2_highlighted">when you need it</string>
     <string name="onboarding_staged_wallet_security_footer_part3_any_funds">. This step is triggered when you receive funds for the first time, but you can apply any step at any time from the settings</string>
     <string name="onboarding_staged_wallet_security_footer_part3_threshold">. This step is triggered when your balance exceeds %s for the first time, but you can apply any step at any time from the settings</string>
@@ -795,26 +763,34 @@
     <string name="contact_book_contacts_book_link_empty_state_title">Oh no, it’s empty in here!</string>
     <string name="contact_book_contacts_book_link_empty_state_no_contacts">Looks like you don’t have any contacts that we can link to yet. Once you’ve added a contact, you’ll be able to link to their profile.</string>
     <string name="contact_book_contacts_book_link_empty_state_empty_book">Looks like your phone’s contact book is empty. Once you’ve added a contact, you’ll be able to link to their profile.</string>
-    <string name="contact_book_contacts_book_link_empty_state_no_access">Aurora doesn’t currently have permission to access your phone’s contacts. If you would like to link to an existing contact, please click below and grant permission to the app to read from your contact book.</string>
+    <string name="contact_book_contacts_book_link_empty_state_no_access">Tari Universe Wallet doesn’t currently have permission to access your phone’s contacts. If you would like to link to an existing contact, please click below and grant permission to the app to read from your contact book.</string>
+    <string name="contact_book_contacts_book_link_empty_state_error">An error occurred while trying to access your phone’s contacts. Please try again later.</string>
     <string name="contact_book_contacts_book_link_empty_state_add_contact">Add a contact</string>
     <string name="contact_book_contacts_book_link_empty_state_go_to_permission_settings">Go to permission settings</string>
     <string name="contact_book_contacts_book_link_message_firstLine"><![CDATA[Click "confirm" below to link]]></string>
     <string name="contact_book_contacts_book_link_message_secondLine"><![CDATA[to <b>%s</b>]]></string>
     <string name="contact_book_contacts_book_link_success_message_firstLine"><![CDATA[You have successfully linked]]></string>
     <string name="contact_book_contacts_book_link_success_message_secondLine"><![CDATA[to <b>%s</b>]]></string>
-    <string name="contact_book_contacts_book_link_message">You can quickly associate an Emoji ID or Yat with a contact already present in your phone. Simply click on a name below and it will be linked to %s</string>
+    <string name="contact_book_contacts_book_link_message">You can quickly associate an Emoji ID or Yat with a contact already present in your phone. Simply click on a name below and it will be linked to:</string>
     <string name="contact_book_contacts_book_unlink_title">Unlink Contact</string>
     <string name="contact_book_contacts_book_unlink_message_firstLine"><![CDATA[Click "confirm" to unlink]]></string>
     <string name="contact_book_contacts_book_unlink_message_secondLine"><![CDATA[from <b>%s</b>]]></string>
     <string name="contact_book_contacts_book_unlink_success_title">Success!</string>
     <string name="contact_book_contacts_book_unlink_success_message_firstLine"><![CDATA[You have successfully unlinked]]></string>
     <string name="contact_book_contacts_book_unlink_success_message_secondLine"><![CDATA[from <b>%s</b>]]></string>
+    <string name="contact_book_add">Add</string>
+    <string name="contact_book_add_title">Add Contact</string>
     <string name="contact_book_contacts_title">Contacts</string>
     <string name="contact_book_favorites_title">Favorites</string>
     <string name="contact_book_add_contact_title">Add Contact</string>
     <string name="contact_book_add_contact_first_name_hint">Add Name</string>
     <string name="contact_book_add_contact_yat_hint">Yat</string>
     <string name="contact_book_add_contact_placeholder">Enter Emoji ID, Contact Name or Yat</string>
+    <string name="contact_book_add_contact_placeholder_no_yat">Scan QR code or Enter Address</string>
+    <string name="contact_book_add_contact_cant_add_yourself_title">Can’t add yourself</string>
+    <string name="contact_book_add_contact_cant_add_yourself_description">You can’t add your own Tari wallet address to your contact book</string>
+    <string name="contact_book_select_contact_cant_send_to_yourself_title">Can’t send Tari to yourself</string>
+    <string name="contact_book_select_contact_cant_send_to_yourself_description">You can’t send Tari to your own Tari wallet address</string>
     <string name="contact_book_search_hint">Find Contact</string>
     <string name="contact_book_details_send_tari">Send Tari</string>
     <string name="transaction_send_to">Send To</string>
@@ -833,39 +809,28 @@
     <string name="contact_book_details_edit_title">Edit Contact</string>
     <string name="contact_book_empty_state_title"><![CDATA[Find your <b>friends</b>]]></string>
     <string name="contact_book_empty_state_body"><![CDATA[Keep track of your contacts by saving them in the contact book. To <b>add a new contact,</b> tap the "add contact" icon at the top of the page]]></string>
-    <string name="contact_book_empty_state_body_no_permissions"><![CDATA[You can <b>add a new contact</b> by tapping on the "add contact" icon at the top of the page. Aurora can also automatically detect contacts with Tari addresses on you phone. We’ll need your permission to access your existing contact book to do this]]></string>
+    <string name="contact_book_empty_state_body_no_permissions"><![CDATA[You can <b>add a new contact</b> by tapping on the "add contact" icon at the top of the page. Tari Universe Wallet can also automatically detect contacts with Tari addresses on you phone. We’ll need your permission to access your existing contact book to do this]]></string>
     <string name="contact_book_empty_state_favorites_title"><![CDATA[Add some <b>favorites</b>]]></string>
     <string name="contact_book_empty_state_favorites_body"><![CDATA[You can <b>favorite contacts</b> to easily access them later. Tap on the contact’s name and then on the star icon to add them to your favorites list]]></string>
     <string name="contact_book_empty_state_grant_access_button">Grant app access to my contacts</string>
     <string name="contact_book_add_contact_done_button">Done</string>
     <string name="contact_book_add_contact_next_button">Next</string>
-    <string name="contact_book_type_yat">Yat Contact</string>
     <string name="contact_book_type_ffi">Tari Contact</string>
     <string name="contact_book_type_contact_book">Phone Contact</string>
     <string name="contact_book_type_merged">Linked Contact</string>
-    <string name="contact_book_loading_sec">%s %ss</string>
-    <string name="remove_all">Remove all contacts</string>
-    <string name="add_1000_contacts">Add 1000 contacts</string>
+    <string name="contact_book_details_yat_not_found_dialog_title">Yat not found</string>
+    <string name="contact_book_details_yat_not_found_dialog_message">Tari Universe Wallet was unable to get data from the Yat service. Some contact details may be unavailable</string>
     <string name="share_contact_via_qr_code">QR Code</string>
     <string name="share_contact_via_qr_link">Link</string>
-    <string name="share_contact_via_qr_nfc">NFC</string>
-    <string name="share_contact_via_qr_ble">BLE</string>
     <string name="wallet_info_alias_edit_title">Edit Name</string>
-    <string name="tx_details_contact_name">Contact name here</string>
     <string name="share_via_qr_code_title">Share QR Code</string>
-    <string name="contact_book_default_alias">Aurora user %s</string>
-
-    <string name="share_via_bluetooth_title">Share via BLE</string>
-    <string name="share_via_bluetooth_message">Bring the smartphone close to a BLE enabled device</string>
-
-    <string name="share_via_nfc_title">Share via NFC</string>
-    <string name="share_via_nfc_message">Bring the smartphone close to an NFC device</string>
+    <string name="contact_book_default_alias">Tari user %s</string>
+    <string name="contact_details_empty_name_dialog_title">Name can\’t be empty</string>
+    <string name="contact_details_empty_name_dialog_message">A contact without a name? That won\’t work. Please add one to keep things running smoothly.</string>
+    <string name="contact_details_empty_name_dialog_button">Will do!</string>
 
     <string name="share_success_title">Profile Shared</string>
     <string name="share_success_message">Awesome! Your details have been shared successfully.</string>
-
-    <string name="share_received_title">You received a message</string>
-    <string name="share_received_message">Charlie has sent you contact details</string>
 
     <string name="contact_deeplink_title">Contact Sharing</string>
     <string name="contact_deeplink_message">%s contacts will be added to your contact book</string>
@@ -873,12 +838,7 @@
     <string name="contact_details_transaction_history">Transaction History</string>
     <string name="contact_details_transaction_history_description">Your transaction history with %s</string>
     <string name="contact_details_transaction_history_empty_state_title">No transactions found</string>
-    <string name="contact_details_transaction_history_empty_state_description"><![CDATA[You don’t have any transactions with <strong>%s</strong> yet. Click the button below to send some Tari]]></string>
-
-    <string name="contactless_payment_title">Connect to a Device</string>
-    <string name="contactless_payment_success_title">Device Detected</string>
-    <string name="contactless_payment_success_description">We just found a fellow Aurora user nearby!\nWould you like to send Tari to %s?</string>
-    <string name="contactless_payment_description">Aurora can grab contact info from users nearby using BLE (Bluetooth Low Energy)!\n\nSimply place your phones close to each other and make sure Bluetooth is turned on for both devices. Once connected, you’ll be able to send some Tari quick and easy! 😎</string>
+    <string name="contact_details_transaction_history_empty_state_description">You don\’t have any transactions with %s yet.</string>
 
     <!--    Chat-->
     <string name="chat_title">Messages</string>
@@ -891,7 +851,6 @@
 
     <string name="pin_code_subtitle_create">Create a passcode</string>
     <string name="pin_code_subtitle_create_confirm">Confirm a passcode </string>
-    <string name="pin_code_subtitle_change_old">Enter the old passcode</string>
     <string name="pin_code_subtitle_change_new">Enter the new passcode</string>
     <string name="pin_code_subtitle_change_new_confirm">Confirm the new passcode</string>
     <string name="pin_code_subtitle_auth">Enter your passcode to log in</string>

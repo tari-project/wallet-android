@@ -38,19 +38,20 @@ package com.tari.android.wallet.ffi
  * @author The Tari Development Team
  */
 
-class FFIContacts() : FFIBase() {
+class FFIContacts() : FFIIterableBase<FFIContact>() {
 
     private external fun jniGetLength(libError: FFIError): Int
-    private external fun jniGetAt(index: Int, libError: FFIError): FFIContactPtr
+    private external fun jniGetAt(index: Int, libError: FFIError): FFIPointer
     private external fun jniDestroy()
 
     constructor(pointer: FFIPointer) : this() {
+        if (pointer.isNull()) error("Pointer must not be null")
         this.pointer = pointer
     }
 
-    fun getLength(): Int = runWithError { jniGetLength(it) }
+    override fun getLength(): Int = runWithError { jniGetLength(it) }
 
-    fun getAt(index: Int): FFIContact = runWithError { FFIContact(jniGetAt(index, it)) }
+    override fun getAt(index: Int): FFIContact = runWithError { FFIContact(jniGetAt(index, it)) }
 
     override fun destroy() = jniDestroy()
 }

@@ -45,7 +45,7 @@
         app:layout_constraintDimensionRatio="3:1"
         app:layout_constraintTop_toBottomOf="@id/qr_close_view">
 
-        <com.tari.android.wallet.ui.component.tari.TariAlphaBackground
+        <com.tari.android.wallet.ui.component.tari.background.TariAlphaBackground
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="15dp"
@@ -53,7 +53,7 @@
             android:paddingVertical="10dp"
             app:alphaBackground="0.7"
             app:backgroundColor="@color/black"
-            app:cornerRadius="10dp">
+            app:cornerRadius="54dp">
 
             <com.tari.android.wallet.ui.component.tari.TariTextView
                 android:layout_width="wrap_content"
@@ -64,17 +64,11 @@
                 android:textAlignment="center"
                 android:textColor="@color/white"
                 android:textSize="16sp"
-                app:customFont="heavy"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
-        </com.tari.android.wallet.ui.component.tari.TariAlphaBackground>
-
+                app:customFont="heavy" />
+        </com.tari.android.wallet.ui.component.tari.background.TariAlphaBackground>
     </LinearLayout>
 
-    <com.tari.android.wallet.ui.component.tari.TariAlphaBackground
+    <com.tari.android.wallet.ui.component.tari.background.TariAlphaBackground
         android:id="@+id/error_container"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -92,112 +86,36 @@
         app:layout_constraintVertical_bias="0.89"
         tools:visibility="visible">
 
-        <com.tari.android.wallet.ui.component.tari.TariTextView
-            android:id="@+id/error_text"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center"
-            android:lineSpacingExtra="12dp"
-            android:text="@string/add_recipient_scan_qr_error"
-            android:textAlignment="center"
-            android:textColor="@color/palette_light_system_red"
-            android:textSize="16sp"
-            app:customFont="heavy"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            android:gravity="center_horizontal"
+            android:orientation="vertical">
 
-        <com.tari.android.wallet.ui.component.tari.TariSecondaryButton
-            android:id="@+id/retry_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/error_text"
-            app:title="@string/common_retry" />
-
-    </com.tari.android.wallet.ui.component.tari.TariAlphaBackground>
-
-    <com.tari.android.wallet.ui.component.tari.TariAlphaBackground
-        android:id="@+id/alternative_container"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginHorizontal="15dp"
-        android:paddingHorizontal="24dp"
-        android:paddingVertical="15dp"
-        app:alphaBackground="0.7"
-        app:backgroundColor="@color/black"
-        app:cornerRadius="10dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.9"
-        tools:visibility="gone">
-
-        <com.tari.android.wallet.ui.component.tari.TariTextView
-            android:id="@+id/alternative_text"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:lineSpacingExtra="12dp"
-            android:text="@string/add_recipient_scan_qr_error"
-            android:textAlignment="center"
-            android:textColor="@color/white"
-            android:textSize="14sp"
-            app:customFont="heavy"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:text="This code contains contact information.  Would you like to add it to your contact book?" />
-
-        <com.tari.android.wallet.ui.component.tari.TariAlphaBackground
-            android:id="@+id/alternative_apply"
-            android:layout_width="44dp"
-            android:layout_height="44dp"
-            android:layout_marginTop="20dp"
-            app:alphaBackground="1"
-            app:backgroundColor="@color/white"
-            app:cornerRadius="22dp"
-            app:layout_constraintEnd_toStartOf="@+id/alternative_deny"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/alternative_text">
-
-            <androidx.appcompat.widget.AppCompatImageView
+            <com.tari.android.wallet.ui.component.tari.TariTextView
+                android:id="@+id/error_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:src="@drawable/ic_apply"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                android:gravity="center"
+                android:lineSpacingExtra="12dp"
+                android:text="@string/add_recipient_scan_qr_error"
+                android:textAlignment="center"
+                android:textColor="@color/palette_light_system_red"
+                android:textSize="16sp"
+                app:customFont="heavy" />
 
-        </com.tari.android.wallet.ui.component.tari.TariAlphaBackground>
-
-        <com.tari.android.wallet.ui.component.tari.TariAlphaBackground
-            android:id="@+id/alternative_deny"
-            android:layout_width="44dp"
-            android:layout_height="44dp"
-            android:layout_marginTop="20dp"
-            app:alphaBackground="1"
-            app:backgroundColor="@color/white"
-            app:cornerRadius="22dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/alternative_apply"
-            app:layout_constraintTop_toBottomOf="@+id/alternative_text">
-
-            <androidx.appcompat.widget.AppCompatImageView
+            <com.tari.android.wallet.ui.component.tari.TariTextView
+                android:id="@+id/retry_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:src="@drawable/ic_close_scanner"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
-        </com.tari.android.wallet.ui.component.tari.TariAlphaBackground>
-
-    </com.tari.android.wallet.ui.component.tari.TariAlphaBackground>
-
+                android:layout_marginTop="10dp"
+                android:foreground="?attr/selectableItemBackground"
+                android:paddingHorizontal="10dp"
+                android:paddingVertical="5dp"
+                android:text="@string/common_retry"
+                android:textColor="?attr/palette_text_heading"
+                android:textSize="14sp"
+                app:customFont="medium" />
+        </LinearLayout>
+    </com.tari.android.wallet.ui.component.tari.background.TariAlphaBackground>
 </androidx.constraintlayout.widget.ConstraintLayout>

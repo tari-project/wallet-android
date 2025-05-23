@@ -43,6 +43,7 @@ fun throwIf(error: FFIError) {
     }
 }
 
+@Throws(FFIException::class)
 fun <T> runWithError(action: (error: FFIError) -> T): T {
     val error = FFIError()
     val result = action(error)

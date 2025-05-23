@@ -42,17 +42,17 @@ import androidx.core.widget.addTextChangedListener
 import com.tari.android.wallet.R
 import com.tari.android.wallet.databinding.TariInputBinding
 import com.tari.android.wallet.ui.common.domain.PaletteManager
-import com.tari.android.wallet.ui.extension.*
+import com.tari.android.wallet.util.extension.obtain
+import com.tari.android.wallet.util.extension.runRecycle
+import com.tari.android.wallet.util.extension.setVisible
 
 class TariInput(context: Context, attrs: AttributeSet) : FrameLayout(context, attrs) {
 
-    val ui: TariInputBinding
-    val paletteManager = PaletteManager()
+    val ui: TariInputBinding = TariInputBinding.inflate(LayoutInflater.from(context), this, false).also { addView(it.root) }
 
     var textChangedListener: (text: CharSequence?, start: Int, before: Int, count: Int) -> Unit = { _, _, _, _ -> }
 
     init {
-        ui = TariInputBinding.inflate(LayoutInflater.from(context), this, false).also { addView(it.root) }
 
         setErrorText(null)
         setIsInvalid(false)
@@ -79,7 +79,7 @@ class TariInput(context: Context, attrs: AttributeSet) : FrameLayout(context, at
 
     fun setIsInvalid(isInvalid: Boolean) {
         ui.invalidMessage.setVisible(isInvalid)
-        val backColor = if (isInvalid) paletteManager.getRed(context) else paletteManager.getNeutralSecondary(context)
+        val backColor = if (isInvalid) PaletteManager.getRed(context) else PaletteManager.getNeutralSecondary(context)
         ui.divider.setBackgroundColor(backColor)
     }
 

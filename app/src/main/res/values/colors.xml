@@ -7,7 +7,5 @@
     <color name="light_gray">#3A000000</color>
     <color name="scroll_height_gradient_start_gray">#30000000</color>
     <color name="scroll_height_gradient_mid_gray">#10000000</color>
-    <color name="introduction_user_agreement_and_privacy_policy">#B2FFFFFF</color>
-    <color name="home_black_overlay">#FF000000</color>
 
 </resources>

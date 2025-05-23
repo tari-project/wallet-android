@@ -35,15 +35,11 @@ package com.tari.android.wallet.ui.component.tari
 import android.content.Context
 import android.util.AttributeSet
 import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
 import android.widget.FrameLayout
-import androidx.core.view.updateLayoutParams
 import com.tari.android.wallet.R
 import com.tari.android.wallet.databinding.TariSecondaryButtonBinding
-import com.tari.android.wallet.ui.extension.obtain
-import com.tari.android.wallet.ui.extension.runRecycle
+import com.tari.android.wallet.util.extension.obtain
+import com.tari.android.wallet.util.extension.runRecycle
 
 class TariSecondaryButton(context: Context, attrs: AttributeSet) : FrameLayout(context, attrs) {
 

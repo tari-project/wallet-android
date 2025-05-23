@@ -1,19 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/onboarding_fragment_container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
-
-    <FrameLayout
-        android:id="@+id/onboarding_fragment_container_1"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@color/black" />
-
-    <FrameLayout
-        android:id="@+id/onboarding_fragment_container_2"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@color/transparent" />
-
-</FrameLayout>
+    android:background="@color/black" />

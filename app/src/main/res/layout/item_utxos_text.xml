@@ -15,7 +15,7 @@
         android:layout_width="wrap_content"
         android:layout_height="24dp"
         android:layout_marginTop="12dp"
-        android:buttonTint="?attr/palette_brand_purple"
+        android:buttonTint="?attr/palette_primary_main"
         android:visibility="gone"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -41,7 +41,7 @@
             android:textColor="?attr/palette_text_heading"
             android:textSize="15sp"
             app:customFont="heavy"
-            tools:text="3,500.00 XTR" />
+            tools:text="3,500.00 XTM" />
 
         <com.tari.android.wallet.ui.component.tari.TariTextView
             android:id="@+id/additional_data"

@@ -124,16 +124,41 @@ Java_com_tari_android_wallet_ffi_FFICompletedTx_jniGetTimestamp(
 }
 
 extern "C"
+JNIEXPORT jbyteArray JNICALL
+Java_com_tari_android_wallet_ffi_FFICompletedTx_jniGetMinedTimestamp(
+        JNIEnv *jEnv,
+        jobject jThis,
+        jobject error) {
+    return ExecuteWithError<jbyteArray>(jEnv, error, [&](int *errorPointer) {
+        auto pCompletedTx = GetPointerField<TariCompletedTransaction *>(jEnv, jThis);
+        return getBytesFromUnsignedLongLong(jEnv, completed_transaction_get_mined_timestamp(pCompletedTx, errorPointer));
+    });
+}
+
+
+extern "C"
+JNIEXPORT jbyteArray JNICALL
+Java_com_tari_android_wallet_ffi_FFICompletedTx_jniGetMinedHeight(
+        JNIEnv *jEnv,
+        jobject jThis,
+        jobject error) {
+    return ExecuteWithError<jbyteArray>(jEnv, error, [&](int *errorPointer) {
+        auto pCompletedTx = GetPointerField<TariCompletedTransaction *>(jEnv, jThis);
+        return getBytesFromUnsignedLongLong(jEnv, completed_transaction_get_mined_height(pCompletedTx, errorPointer));
+    });
+}
+
+extern "C"
 JNIEXPORT jstring JNICALL
-Java_com_tari_android_wallet_ffi_FFICompletedTx_jniGetMessage(
+Java_com_tari_android_wallet_ffi_FFICompletedTx_jniGetPaymentId(
         JNIEnv *jEnv,
         jobject jThis,
         jobject error) {
     return ExecuteWithError<jstring>(jEnv, error, [&](int *errorPointer) {
         auto pCompletedTx = GetPointerField<TariCompletedTransaction *>(jEnv, jThis);
-        const char *pMessage = completed_transaction_get_message(pCompletedTx, errorPointer);
-        jstring result = jEnv->NewStringUTF(pMessage);
-        string_destroy(const_cast<char *>(pMessage));
+        const char *pPaymentId = completed_transaction_get_user_payment_id(pCompletedTx, errorPointer);
+        jstring result = jEnv->NewStringUTF(pPaymentId);
+        string_destroy(const_cast<char *>(pPaymentId));
         return result;
     });
 }

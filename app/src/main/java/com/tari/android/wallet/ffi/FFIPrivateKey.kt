@@ -33,33 +33,36 @@
 package com.tari.android.wallet.ffi
 
 /**
- * Wrapper for native private key type.
+ * Wrapper for native public key type.
  *
  * @author The Tari Development Team
  */
-class FFIPrivateKey private constructor() : FFIBase() {
+class FFIPrivateKey() : FFIBase() {
 
     private external fun jniGetBytes(libError: FFIError): FFIPointer
     private external fun jniDestroy()
     private external fun jniCreate(byteVectorPtr: FFIByteVector, libError: FFIError)
-    private external fun jniGenerate()
     private external fun jniFromHex(hexStr: String, libError: FFIError)
+    private external fun jniGetEmojiId(libError: FFIError): String
+
+    constructor(pointer: FFIPointer) : this() {
+        if (pointer.isNull()) error("Pointer must not be null")
+        this.pointer = pointer
+    }
 
     constructor(byteVector: FFIByteVector) : this() {
         runWithError { jniCreate(byteVector, it) }
     }
 
-    constructor(hexString: HexString) : this() {
-        runWithError { jniFromHex(hexString.hex, it) }
+    constructor(hex: HexString) : this() {
+        runWithError { jniFromHex(hex.hex, it) }
     }
 
-    fun getBytes(): FFIByteVector = runWithError { FFIByteVector(jniGetBytes(it)) }
+    fun getByteVector(): FFIByteVector = runWithError { FFIByteVector(jniGetBytes(it)) }
 
-    override fun toString(): String = runWithError { FFIByteVector(jniGetBytes(it)).toString() }
+    fun getEmojiId(): String = runWithError { jniGetEmojiId(it) }
+
+    override fun toString(): String = runWithError { FFIByteVector(jniGetBytes(it)).hex() }
 
     override fun destroy() = jniDestroy()
-
-    companion object {
-        fun generate(): FFIPrivateKey = FFIPrivateKey().apply { jniGenerate() }
-    }
 }

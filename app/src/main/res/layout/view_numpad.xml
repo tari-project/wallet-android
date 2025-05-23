@@ -20,6 +20,7 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:background="@color/transparent"
+            android:foreground="?attr/selectableItemBackground"
             android:text="@string/digit_1"
             android:textColor="?attr/palette_text_heading"
             android:textSize="@dimen/add_amount_keypad_text_size"
@@ -31,6 +32,7 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:background="@color/transparent"
+            android:foreground="?attr/selectableItemBackground"
             android:text="@string/digit_2"
             android:textColor="?attr/palette_text_heading"
             android:textSize="@dimen/add_amount_keypad_text_size"
@@ -42,6 +44,7 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:background="@color/transparent"
+            android:foreground="?attr/selectableItemBackground"
             android:text="@string/digit_3"
             android:textColor="?attr/palette_text_heading"
             android:textSize="@dimen/add_amount_keypad_text_size"
@@ -60,6 +63,7 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:background="@color/transparent"
+            android:foreground="?attr/selectableItemBackground"
             android:text="@string/digit_4"
             android:textColor="?attr/palette_text_heading"
             android:textSize="@dimen/add_amount_keypad_text_size"
@@ -71,6 +75,7 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:background="@color/transparent"
+            android:foreground="?attr/selectableItemBackground"
             android:text="@string/digit_5"
             android:textColor="?attr/palette_text_heading"
             android:textSize="@dimen/add_amount_keypad_text_size"
@@ -82,6 +87,7 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:background="@color/transparent"
+            android:foreground="?attr/selectableItemBackground"
             android:text="@string/digit_6"
             android:textColor="?attr/palette_text_heading"
             android:textSize="@dimen/add_amount_keypad_text_size"
@@ -100,6 +106,7 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:background="@color/transparent"
+            android:foreground="?attr/selectableItemBackground"
             android:text="@string/digit_7"
             android:textColor="?attr/palette_text_heading"
             android:textSize="@dimen/add_amount_keypad_text_size"
@@ -111,6 +118,7 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:background="@color/transparent"
+            android:foreground="?attr/selectableItemBackground"
             android:text="@string/digit_8"
             android:textColor="?attr/palette_text_heading"
             android:textSize="@dimen/add_amount_keypad_text_size"
@@ -122,6 +130,7 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:background="@color/transparent"
+            android:foreground="?attr/selectableItemBackground"
             android:text="@string/digit_9"
             android:textColor="?attr/palette_text_heading"
             android:textSize="@dimen/add_amount_keypad_text_size"
@@ -140,6 +149,7 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:background="@color/transparent"
+            android:foreground="?attr/selectableItemBackground"
             android:text="@string/digit_decimal_separator_bullet_char"
             android:textColor="?attr/palette_text_heading"
             android:textSize="@dimen/add_amount_keypad_text_size"
@@ -152,9 +162,10 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:background="@color/transparent"
+            android:foreground="?attr/selectableItemBackground"
             android:padding="8dp"
             android:src="@drawable/vector_fingerprint"
-            android:tint="?attr/palette_brand_purple"
+            android:tint="?attr/palette_text_heading"
             android:visibility="gone"
             tools:visibility="visible" />
 
@@ -165,17 +176,25 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:background="@color/transparent"
+            android:foreground="?attr/selectableItemBackground"
             android:text="@string/digit_0"
             android:textColor="?attr/palette_text_heading"
             android:textSize="@dimen/add_amount_keypad_text_size"
             app:customFont="heavy" />
         <!-- delete -->
-        <com.tari.android.wallet.ui.component.tari.TariIconView
+        <FrameLayout
             android:id="@+id/delete_button"
             android:layout_width="0dp"
-            android:layout_height="16dp"
+            android:layout_height="match_parent"
             android:layout_gravity="center_vertical"
             android:layout_weight="1"
-            android:src="@drawable/vector_delete_button" />
+            android:foreground="?attr/selectableItemBackground">
+
+            <com.tari.android.wallet.ui.component.tari.TariIconView
+                android:layout_width="wrap_content"
+                android:layout_height="16dp"
+                android:layout_gravity="center"
+                android:src="@drawable/vector_delete_button" />
+        </FrameLayout>
     </LinearLayout>
 </LinearLayout>

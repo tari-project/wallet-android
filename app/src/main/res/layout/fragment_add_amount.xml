@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.tari.android.wallet.ui.component.tari.TariPrimaryBackground xmlns:android="http://schemas.android.com/apk/res/android"
+<com.tari.android.wallet.ui.component.tari.background.obsolete.TariPrimaryBackgroundConstraint xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/root_view"
     android:layout_width="match_parent"
+    android:fitsSystemWindows="true"
     android:layout_height="match_parent">
 
     <com.tari.android.wallet.ui.component.tari.TariBackButton
@@ -33,12 +34,13 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@id/back_cta_view" />
 
-    <com.tari.android.wallet.ui.component.tari.TariPrimaryBackground
+    <com.tari.android.wallet.ui.component.tari.background.obsolete.TariPrimaryBackgroundConstraint
         android:id="@+id/emoji_id_summary_container_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:clickable="true"
         android:focusable="true"
+        android:foreground="?attr/selectableItemBackground"
         android:paddingStart="@dimen/emoji_id_container_horizontal_padding"
         android:paddingTop="@dimen/emoji_id_container_vertical_padding"
         android:paddingEnd="@dimen/emoji_id_container_horizontal_padding"
@@ -51,13 +53,12 @@
         app:layout_constraintTop_toTopOf="@id/back_cta_view">
 
         <include
-            android:id="@+id/emoji_id_summary_view"
-            layout="@layout/view_emoji_id_summary"
+            android:id="@+id/emoji_id_view_container"
+            layout="@layout/view_address_short_small"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:visibility="visible" />
-
-    </com.tari.android.wallet.ui.component.tari.TariPrimaryBackground>
+    </com.tari.android.wallet.ui.component.tari.background.obsolete.TariPrimaryBackgroundConstraint>
 
     <androidx.constraintlayout.widget.Barrier
         android:id="@+id/add_amount_header_barrier"
@@ -102,7 +103,7 @@
                     android:paddingBottom="@dimen/add_amount_balance_warning_container_bottom_padding"
                     tools:ignore="UselessParent">
 
-                    <com.tari.android.wallet.ui.fragment.send.amountView.AmountView
+                    <com.tari.android.wallet.ui.screen.send.amountView.AmountView
                         android:id="@+id/available_balance_container_view"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -132,14 +133,16 @@
                 android:id="@+id/amount"
                 layout="@layout/view_input_amount" />
 
-            <androidx.appcompat.widget.LinearLayoutCompat
+            <LinearLayout
                 android:id="@+id/fee_calculating"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentBottom="true"
                 android:layout_centerHorizontal="true"
                 android:layout_marginBottom="12dp"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:visibility="gone"
+                tools:visibility="visible">
 
                 <com.tari.android.wallet.ui.component.tari.TariProgressBar
                     android:layout_width="24dp"
@@ -155,8 +158,7 @@
                     android:textColor="#A9AFC4"
                     android:textSize="@dimen/add_amount_tx_fee_text_size"
                     app:customFont="heavy" />
-
-            </androidx.appcompat.widget.LinearLayoutCompat>
+            </LinearLayout>
 
             <RelativeLayout
                 android:id="@+id/tx_fee_container_view"
@@ -169,13 +171,15 @@
                 tools:visibility="visible">
                 <!-- fee amount -->
 
-                <androidx.appcompat.widget.LinearLayoutCompat
+                <LinearLayout
                     android:id="@+id/network_traffic_text"
                     android:layout_width="wrap_content"
                     android:layout_height="22dp"
                     android:layout_above="@+id/fee_container"
                     android:layout_centerHorizontal="true"
-                    android:orientation="horizontal">
+                    android:orientation="horizontal"
+                    android:visibility="gone"
+                    tools:visibility="visible">
 
                     <androidx.appcompat.widget.AppCompatImageView
                         android:id="@+id/network_traffic_icon"
@@ -194,10 +198,9 @@
                         android:textColor="?attr/palette_text_body"
                         android:textSize="@dimen/add_amount_tx_fee_text_size"
                         app:customFont="heavy" />
+                </LinearLayout>
 
-                </androidx.appcompat.widget.LinearLayoutCompat>
-
-                <androidx.appcompat.widget.LinearLayoutCompat
+                <LinearLayout
                     android:id="@+id/fee_container"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -211,7 +214,6 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginEnd="6dp"
-                        android:layout_toLeftOf="@+id/tx_fee_desc_text_view"
                         android:textColor="?attr/palette_text_body"
                         android:textSize="@dimen/add_amount_tx_fee_text_size"
                         app:customFont="heavy"
@@ -227,8 +229,7 @@
                         android:textColor="?attr/palette_text_body"
                         android:textSize="@dimen/add_amount_tx_fee_text_size"
                         app:customFont="heavy" />
-
-                </androidx.appcompat.widget.LinearLayoutCompat>
+                </LinearLayout>
 
                 <com.tari.android.wallet.ui.component.tari.TariButton
                     android:id="@+id/modifyButton"
@@ -239,52 +240,17 @@
                     android:background="@null"
                     android:text="@string/add_amount_modify_fee_speed_up_transaction"
                     android:textAllCaps="false"
-                    android:textColor="?attr/palette_brand_purple"
+                    android:textColor="?attr/palette_primary_main"
                     android:textSize="14sp"
                     android:visibility="invisible"
                     app:customFont="medium" />
-
             </RelativeLayout>
-
         </RelativeLayout>
 
         <!-- num pad -->
         <include
             android:id="@+id/numpad"
             layout="@layout/view_numpad" />
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginTop="10dp"
-            android:orientation="horizontal">
-
-            <com.tari.android.wallet.ui.component.tari.TariTextView
-                android:id="@+id/one_side_payment_switch_view_title"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="12dp"
-                android:text="@string/add_amount_one_side_payment_switcher"
-                android:textColor="?attr/palette_text_heading"
-                android:textSize="16sp"
-                app:customFont="medium" />
-
-            <androidx.appcompat.widget.SwitchCompat
-                android:id="@+id/one_side_payment_switch_view"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:checked="true" />
-
-            <androidx.appcompat.widget.AppCompatImageView
-                android:id="@+id/one_side_payment_help"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:layout_gravity="center_vertical"
-                android:layout_marginStart="16dp"
-                android:src="@drawable/vector_help_icon_24dp" />
-
-        </LinearLayout>
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -300,21 +266,6 @@
                 android:layout_height="@dimen/common_action_button_height"
                 android:layout_marginHorizontal="26dp"
                 app:title="@string/common_continue" />
-
         </RelativeLayout>
-
     </LinearLayout>
-
-    <!-- full emoji id outer container -->
-    <include
-        android:id="@+id/emoji_id_outer_container"
-        layout="@layout/view_full_emoji_id"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-</com.tari.android.wallet.ui.component.tari.TariPrimaryBackground>
+</com.tari.android.wallet.ui.component.tari.background.obsolete.TariPrimaryBackgroundConstraint>

@@ -32,42 +32,11 @@
  */
 package com.tari.android.wallet.model
 
-import android.os.Parcel
 import android.os.Parcelable
 import com.tari.android.wallet.ffi.FFITariUnblindedOutput
+import kotlinx.parcelize.Parcelize
 
-class TariUnblindedOutput() : Parcelable {
-
-    var json: String = ""
-
-    constructor(tx: FFITariUnblindedOutput) : this() {
-        json = tx.toJson()
-        tx.destroy()
-    }
-
-    constructor(json: String) : this() {
-        this.json = json
-    }
-
-    constructor(parcel: Parcel) : this() {
-        json = parcel.readString().orEmpty()
-    }
-
-    override fun writeToParcel(parcel: Parcel, flags: Int) {
-        parcel.writeString(json)
-    }
-
-    override fun describeContents(): Int {
-        return 0
-    }
-
-    companion object CREATOR : Parcelable.Creator<TariUnblindedOutput> {
-        override fun createFromParcel(parcel: Parcel): TariUnblindedOutput {
-            return TariUnblindedOutput(parcel)
-        }
-
-        override fun newArray(size: Int): Array<TariUnblindedOutput?> {
-            return arrayOfNulls(size)
-        }
-    }
+@Parcelize
+data class TariUnblindedOutput(val json: String) : Parcelable {
+    constructor(tx: FFITariUnblindedOutput) : this(tx.toJson())
 }

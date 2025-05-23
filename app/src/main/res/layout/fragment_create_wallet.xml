@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-
-<com.tari.android.wallet.ui.component.tari.TariSecondaryBackground xmlns:android="http://schemas.android.com/apk/res/android"
+<com.tari.android.wallet.ui.component.tari.background.TariSecondaryBackground xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/root_view"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true">
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -30,7 +30,7 @@
                 android:layout_height="wrap_content"
                 android:layout_alignTop="@id/emoji_id_summary_container_view"
                 android:layout_centerHorizontal="true"
-                android:layout_marginTop="0dp"
+                android:layout_marginTop="-45dp"
                 android:elevation="4dp">
 
                 <com.tari.android.wallet.ui.component.tari.TariTextView
@@ -41,7 +41,7 @@
                     android:paddingHorizontal="20dp"
                     android:paddingVertical="10dp"
                     android:text="@string/tap_to_see_full_emoji_id"
-                    android:textColor="#9834F6"
+                    android:textColor="?attr/palette_text_heading"
                     android:textSize="14sp"
                     app:customFont="heavy" />
 
@@ -64,7 +64,7 @@
                     android:src="@drawable/tari_speech_notch_down" />
             </RelativeLayout>
 
-            <RelativeLayout
+            <FrameLayout
                 android:id="@+id/emoji_id_summary_container_view"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -76,16 +76,18 @@
                 android:background="@drawable/vector_emoji_id_bg"
                 android:clickable="true"
                 android:focusable="true"
+                android:foreground="?attr/selectableItemBackground"
                 android:paddingHorizontal="@dimen/onboarding_emoji_id_container_horizontal_padding"
-                android:paddingVertical="@dimen/onboarding_emoji_id_container_vertical_padding">
+                android:paddingVertical="@dimen/onboarding_emoji_id_container_vertical_padding"
+                tools:alpha="1">
 
                 <include
-                    android:id="@+id/emoji_id_summary_view"
-                    layout="@layout/view_onboarding_emoji_id_summary"
+                    android:id="@+id/emoji_id_view_container"
+                    layout="@layout/view_address_short"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:visibility="visible" />
-            </RelativeLayout>
+            </FrameLayout>
 
             <RelativeLayout
                 android:id="@+id/emoji_id_container_view"
@@ -245,7 +247,8 @@
                     android:textColor="?attr/palette_text_heading"
                     android:textSize="18sp"
                     android:visibility="invisible"
-                    app:customFont="roman" />
+                    app:customFont="roman"
+                    tools:visibility="visible" />
 
                 <View
                     android:id="@+id/just_sec_desc_back_view"
@@ -263,6 +266,8 @@
                     android:layout_height="wrap_content"
                     android:layout_centerHorizontal="true"
                     android:layout_marginTop="26dp"
+                    android:background="@drawable/vector_check_mark_bg"
+                    android:padding="36dp"
                     android:scaleX="0.5"
                     android:scaleY="0.5"
                     android:visibility="gone"
@@ -373,7 +378,7 @@
                 android:singleLine="true"
                 android:text="@string/common_continue"
                 android:textAllCaps="false"
-                android:textColor="@color/white"
+                android:textColor="?attr/palette_text_button"
                 android:textSize="16sp"
                 app:customFont="heavy" />
 
@@ -390,7 +395,7 @@
                 android:singleLine="true"
                 android:text="@string/create_wallet_continue_and_create_emoji_id"
                 android:textAllCaps="false"
-                android:textColor="@color/white"
+                android:textColor="?attr/palette_text_button"
                 android:textSize="16sp"
                 app:customFont="heavy" />
 
@@ -412,5 +417,4 @@
             app:lottie_renderMode="automatic" />
 
     </RelativeLayout>
-
-</com.tari.android.wallet.ui.component.tari.TariSecondaryBackground>
+</com.tari.android.wallet.ui.component.tari.background.TariSecondaryBackground>

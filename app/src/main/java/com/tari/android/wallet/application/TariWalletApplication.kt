@@ -32,25 +32,23 @@
  */
 package com.tari.android.wallet.application
 
-import android.app.Activity
 import android.app.Application
+import android.webkit.WebView
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ProcessLifecycleOwner
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.BuildConfig
-import com.tari.android.wallet.data.sharedPrefs.SharedPrefsRepository
+import com.tari.android.wallet.data.network.NetworkConnectionStateReceiver
 import com.tari.android.wallet.data.sharedPrefs.security.SecurityPrefRepository
+import com.tari.android.wallet.di.ApplicationScope
 import com.tari.android.wallet.di.DiContainer
-import com.tari.android.wallet.event.Event
-import com.tari.android.wallet.event.EventBus
 import com.tari.android.wallet.infrastructure.logging.LoggerAdapter
-import com.tari.android.wallet.network.NetworkConnectionStateReceiver
 import com.tari.android.wallet.notification.NotificationHelper
-import com.tari.android.wallet.service.service.WalletServiceLauncher
-import com.tari.android.wallet.ui.common.gyphy.GiphyAdapter
-import com.tari.android.wallet.yat.YatAdapter
+import com.tari.android.wallet.util.DebugConfig
 import io.sentry.android.core.SentryAndroid
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import java.lang.ref.WeakReference
 import javax.inject.Inject
 
@@ -71,19 +69,17 @@ class TariWalletApplication : Application() {
     lateinit var connectionStateReceiver: NetworkConnectionStateReceiver
 
     @Inject
-    lateinit var sharedPrefsRepository: SharedPrefsRepository
-
-    @Inject
     lateinit var securityPrefRepository: SecurityPrefRepository
 
     @Inject
-    lateinit var walletServiceLauncher: WalletServiceLauncher
+    lateinit var appStateHandler: AppStateHandler
 
     @Inject
     lateinit var yatAdapter: YatAdapter
 
     @Inject
-    lateinit var giphyAdapter: GiphyAdapter
+    @ApplicationScope
+    lateinit var applicationScope: CoroutineScope
 
     private val activityLifecycleCallbacks = ActivityLifecycleCallbacks()
     private val logger
@@ -95,9 +91,6 @@ class TariWalletApplication : Application() {
     init {
         System.loadLibrary("native-lib")
     }
-
-    val currentActivity: Activity?
-        get() = activityLifecycleCallbacks.currentActivity
 
     @Suppress("KotlinConstantConditions")
     override fun onCreate() {
@@ -122,6 +115,8 @@ class TariWalletApplication : Application() {
 
         ProcessLifecycleOwner.get().lifecycle.addObserver(AppObserver())
         logger.i("Application inited")
+
+        if (DebugConfig.isDebug()) WebView.setWebContentsDebuggingEnabled(true)
     }
 
     fun initApplication() {
@@ -135,8 +130,6 @@ class TariWalletApplication : Application() {
         registerReceiver(connectionStateReceiver, connectionStateReceiver.intentFilter)
 
         yatAdapter.initYat(this)
-
-        giphyAdapter.init()
 
         loggerAdapter.init()
     }
@@ -153,24 +146,21 @@ class TariWalletApplication : Application() {
             super.onStart(owner)
             logger.i("App in foreground")
             isInForeground = true
-            walletServiceLauncher.startOnAppForegrounded()
-            EventBus.post(Event.App.AppForegrounded())
+            applicationScope.launch { appStateHandler.sendAppForegrounded() }
         }
 
         override fun onStop(owner: LifecycleOwner) {
             super.onStop(owner)
             logger.i("App in background")
             isInForeground = false
-            walletServiceLauncher.stopOnAppBackgrounded()
-            EventBus.post(Event.App.AppBackgrounded())
+            applicationScope.launch { appStateHandler.sendAppBackgrounded() }
         }
 
         override fun onDestroy(owner: LifecycleOwner) {
             super.onDestroy(owner)
             securityPrefRepository.isAuthenticated = false
             logger.i("App was destroyed")
-            walletServiceLauncher.stopOnAppBackgrounded()
+            applicationScope.launch { appStateHandler.sendAppDestroyed() }
         }
     }
 }
-

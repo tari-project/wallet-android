@@ -36,34 +36,25 @@ import android.app.Notification
 import android.app.Notification.DEFAULT_ALL
 import android.app.NotificationChannel
 import android.app.NotificationManager
-import android.app.PendingIntent
 import android.content.Context
-import android.content.Intent
-import android.content.Intent.FLAG_ACTIVITY_CLEAR_TOP
-import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.R
-import com.tari.android.wallet.model.CancelledTx
-import com.tari.android.wallet.model.Tx
-import com.tari.android.wallet.model.TxId
-import com.tari.android.wallet.ui.fragment.home.HomeDeeplinkScreens
-import com.tari.android.wallet.util.WalletUtil
 import javax.inject.Inject
 import javax.inject.Singleton
 
 
+//TODO: Review this class and remove any unused code
 @Singleton
 class NotificationHelper @Inject constructor(private val context: Context) {
 
     companion object {
         // notification channel id
-        private const val SERVICE_NOTIFICATION_CHANNEL_ID = "com.tari.android.wallet.service.WALLET_SERVICE_NOTIFICATION"
-        private const val APP_NOTIFICATION_CHANNEL_ID = "com.tari.android.wallet.WALLET_NOTIFICATION"
-        private const val APP_NOTIFICATION_GROUP_ID = 1000
-        private const val APP_NOTIFICATION_GROUP_NAME = "com.tari.android.wallet.notification.TX"
+        const val APP_NOTIFICATION_CHANNEL_ID = "com.tari.android.wallet.WALLET_NOTIFICATION"
+        const val APP_NOTIFICATION_GROUP_ID = 1000
+        const val APP_NOTIFICATION_GROUP_NAME = "com.tari.android.wallet.notification.TX"
     }
 
     private var notificationManager = NotificationManagerCompat.from(context)
@@ -71,46 +62,19 @@ class NotificationHelper @Inject constructor(private val context: Context) {
         get() = Logger.t(NotificationHelper::class.simpleName)
 
     fun createNotificationChannels() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            // service notification channel
-            val serviceNotificationChannel = NotificationChannel(
-                SERVICE_NOTIFICATION_CHANNEL_ID,
-                context.getString(R.string.wallet_service_notification_channel_name),
-                NotificationManager.IMPORTANCE_DEFAULT
-            ).apply {
-                setSound(null, null)
-                setShowBadge(false)
-                description = context.getString(R.string.wallet_service_description)
-            }
-            notificationManager.createNotificationChannel(serviceNotificationChannel)
-            // app notification channel
-            val appNotificationChannel = NotificationChannel(
-                APP_NOTIFICATION_CHANNEL_ID,
-                context.getString(R.string.app_notification_channel_name),
-                NotificationManager.IMPORTANCE_HIGH
-            ).apply {
-                setShowBadge(false)
-                description = context.getString(R.string.wallet_service_description)
-                notificationManager.createNotificationChannel(this)
-                importance = NotificationManager.IMPORTANCE_HIGH
-            }
-            notificationManager.createNotificationChannel(appNotificationChannel)
-            logger.i("Channels was created")
+        // app notification channel
+        val appNotificationChannel = NotificationChannel(
+            /* id = */ APP_NOTIFICATION_CHANNEL_ID,
+            /* name = */ context.getString(R.string.app_notification_channel_name),
+            /* importance = */ NotificationManager.IMPORTANCE_HIGH
+        ).apply {
+            setShowBadge(false)
+            description = ""
+            notificationManager.createNotificationChannel(this)
+            importance = NotificationManager.IMPORTANCE_HIGH
         }
-    }
-
-    fun buildForegroundServiceNotification(): Notification {
-        val intent = Intent(context, NotificationBroadcastReceiver::class.java)
-        val pendingIntent = PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_IMMUTABLE)
-        // prepare foreground service notification
-        return NotificationCompat.Builder(context, SERVICE_NOTIFICATION_CHANNEL_ID).run {
-            setContentTitle(context.getString(R.string.wallet_service_title))
-            setContentText(context.getString(R.string.wallet_service_description))
-            setContentIntent(pendingIntent)
-            setSound(null)
-            setSmallIcon(R.drawable.vector_notification_icon)
-            build()
-        }
+        notificationManager.createNotificationChannel(appNotificationChannel)
+        logger.i("Channels was created")
     }
 
     private val txGroupNotification: Notification = NotificationCompat.Builder(context, APP_NOTIFICATION_CHANNEL_ID).run {
@@ -123,90 +87,14 @@ class NotificationHelper @Inject constructor(private val context: Context) {
     }
 
     /**
-     * Posts custom-layout heads-up transaction notification.
-     */
-    fun postCustomLayoutTxNotification(tx: Tx) {
-        if (ContextCompat.checkSelfPermission(context, android.Manifest.permission.POST_NOTIFICATIONS) != android.content.pm.PackageManager.PERMISSION_GRANTED) return
-
-        logger.i("postCustomLayoutTxNotification: ${tx.id}")
-        val notificationTitle = context.getString(R.string.notification_tx_received_title)
-        // format spannable string
-        val formattedAmount = if (tx.amount.tariValue.toDouble() % 1 == 0.toDouble()) tx.amount.tariValue.toBigInteger().toString()
-        else WalletUtil.amountFormatter.format(tx.amount.tariValue)
-        val notificationBody = context.getString(R.string.notification_tx_received_description_format, formattedAmount)
-        val layout = CustomTxNotificationViewHolder(context, tx)
-        val intent = Intent(context, NotificationBroadcastReceiver::class.java).apply {
-            flags = FLAG_ACTIVITY_CLEAR_TOP
-            putExtra(HomeDeeplinkScreens.Key, HomeDeeplinkScreens.TxDetails.name)
-            putExtra(HomeDeeplinkScreens.KeyTxDetailsArgs, TxId(tx.id))
-        }
-        val pendingIntent = PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_IMMUTABLE)
-
-        // prepare transaction notification
-        val notification: Notification = NotificationCompat.Builder(context, APP_NOTIFICATION_CHANNEL_ID).run {
-            setContentTitle(notificationTitle)
-            setContentText(notificationBody)
-            setSmallIcon(R.drawable.tx_notification_icon)
-            setDefaults(DEFAULT_ALL)
-            setContentIntent(pendingIntent)
-            setStyle(NotificationCompat.DecoratedCustomViewStyle())
-            setCustomContentView(layout)
-            setAutoCancel(true)
-            setGroup(APP_NOTIFICATION_GROUP_NAME)
-            setCategory(NotificationCompat.CATEGORY_EVENT)
-            priority = NotificationCompat.PRIORITY_MAX
-            build()
-        }
-
-        // send group notification
-        try {
-            notificationManager.notify(APP_NOTIFICATION_GROUP_ID, txGroupNotification)
-            // send actual notification
-            notificationManager.notify(tx.id.toInt(), notification)
-        } catch (e: SecurityException) {
-            e.printStackTrace()
-        }
-    }
-
-    fun postTxCanceledNotification(tx: CancelledTx) {
-        if (ContextCompat.checkSelfPermission(context, android.Manifest.permission.POST_NOTIFICATIONS) != android.content.pm.PackageManager.PERMISSION_GRANTED) return
-
-        logger.i("postTxCanceledNotification: ${tx.id}")
-        val layout = TxCanceledViewHolder(context, tx)
-        val intent = Intent(context, NotificationBroadcastReceiver::class.java).apply {
-            flags = FLAG_ACTIVITY_CLEAR_TOP
-            putExtra(HomeDeeplinkScreens.Key, HomeDeeplinkScreens.TxDetails.name)
-            putExtra(HomeDeeplinkScreens.KeyTxDetailsArgs, TxId(tx.id))
-        }
-
-        val pendingIntent = PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_IMMUTABLE)
-        val notification = NotificationCompat.Builder(context, APP_NOTIFICATION_CHANNEL_ID).run {
-            setSmallIcon(R.drawable.tx_notification_icon)
-            setDefaults(DEFAULT_ALL)
-            setContentIntent(pendingIntent)
-            setStyle(NotificationCompat.DecoratedCustomViewStyle())
-            setCustomContentView(layout)
-            setAutoCancel(true)
-            setGroup(APP_NOTIFICATION_GROUP_NAME)
-            setCategory(NotificationCompat.CATEGORY_EVENT)
-            priority = NotificationCompat.PRIORITY_MAX
-            build()
-        }
-
-        try {
-            notificationManager.notify(APP_NOTIFICATION_GROUP_ID, txGroupNotification)
-            // send actual notification
-            notificationManager.notify(tx.id.toInt(), notification)
-        } catch (e: SecurityException) {
-            e.printStackTrace()
-        }
-    }
-
-    /**
      * Posts standard Android heads-up notification.
      */
     fun postNotification(title: String, body: String) {
-        if (ContextCompat.checkSelfPermission(context, android.Manifest.permission.POST_NOTIFICATIONS) != android.content.pm.PackageManager.PERMISSION_GRANTED) return
+        if (ContextCompat.checkSelfPermission(
+                context,
+                android.Manifest.permission.POST_NOTIFICATIONS
+            ) != android.content.pm.PackageManager.PERMISSION_GRANTED
+        ) return
 
         // prepare notification
         val notification = NotificationCompat.Builder(context, APP_NOTIFICATION_CHANNEL_ID).run {

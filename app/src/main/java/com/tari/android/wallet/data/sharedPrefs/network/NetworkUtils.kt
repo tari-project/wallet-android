@@ -1,9 +1,9 @@
 package com.tari.android.wallet.data.sharedPrefs.network
 
 import com.google.gson.Gson
-import com.tari.android.wallet.data.repository.CommonRepository
+import com.tari.android.wallet.data.sharedPrefs.CommonPrefRepository
 
-fun NetworkRepository.formatKey(key: String): String {
+fun NetworkPrefRepository.formatKey(key: String): String {
     val catching = runCatching { key + "_" + this.currentNetwork.network.displayName }
     if (catching.isSuccess) {
         return catching.getOrNull().orEmpty()
@@ -17,4 +17,4 @@ fun NetworkRepository.formatKey(key: String): String {
     }
 }
 
-fun CommonRepository.formatKey(key: String): String = this.networkRepository.formatKey(key)
+fun CommonPrefRepository.formatKey(key: String): String = this.networkRepository.formatKey(key)

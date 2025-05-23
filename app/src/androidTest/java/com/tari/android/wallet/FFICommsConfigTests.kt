@@ -39,8 +39,8 @@ package com.tari.android.wallet
 
 import android.content.Context
 import androidx.test.core.app.ApplicationProvider.getApplicationContext
-import com.tari.android.wallet.data.WalletConfig
-import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepositoryImpl
+import com.tari.android.wallet.application.walletManager.WalletConfig
+import com.tari.android.wallet.data.sharedPrefs.network.NetworkPrefRepository
 import com.tari.android.wallet.di.ApplicationModule
 import com.tari.android.wallet.ffi.FFICommsConfig
 import com.tari.android.wallet.ffi.FFIException
@@ -64,7 +64,7 @@ class FFICommsConfigTests {
         private var walletDir = ""
         private val context = getApplicationContext<Context>()
         private val prefs = context.getSharedPreferences(ApplicationModule.sharedPrefsFileName, Context.MODE_PRIVATE)
-        private val networkRepository = NetworkRepositoryImpl(prefs)
+        private val networkRepository = NetworkPrefRepository(prefs)
 
         @BeforeClass
         @JvmStatic
@@ -87,8 +87,8 @@ class FFICommsConfigTests {
             transport,
             DB_NAME,
             walletDir,
-            Constants.Wallet.discoveryTimeoutSec,
-            Constants.Wallet.storeAndForwardMessageDurationSec
+            Constants.Wallet.DISCOVERY_TIMEOUT_SEC,
+            Constants.Wallet.STORE_AND_FORWARD_MESSAGE_DURATION_SEC
         )
         assertNotEquals(nullptr, commsConfig.pointer)
         commsConfig.destroy()
@@ -104,8 +104,8 @@ class FFICommsConfigTests {
                 transport,
                 DB_NAME,
                 "${walletDir}_invalid_target",
-                Constants.Wallet.discoveryTimeoutSec,
-                Constants.Wallet.storeAndForwardMessageDurationSec
+                Constants.Wallet.DISCOVERY_TIMEOUT_SEC,
+                Constants.Wallet.STORE_AND_FORWARD_MESSAGE_DURATION_SEC
             )
         } catch (e: Throwable) {
             transport.destroy()

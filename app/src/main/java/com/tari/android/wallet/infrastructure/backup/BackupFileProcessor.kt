@@ -34,15 +34,14 @@ package com.tari.android.wallet.infrastructure.backup
 
 import com.google.gson.Gson
 import com.orhanobut.logger.Logger
-import com.tari.android.wallet.data.WalletConfig
+import com.tari.android.wallet.application.walletManager.WalletConfig
+import com.tari.android.wallet.application.walletManager.WalletManager
+import com.tari.android.wallet.data.sharedPrefs.backup.BackupPrefRepository
 import com.tari.android.wallet.data.sharedPrefs.security.SecurityPrefRepository
-import com.tari.android.wallet.extension.encrypt
-import com.tari.android.wallet.ffi.FFIError
-import com.tari.android.wallet.ffi.FFIWallet
-import com.tari.android.wallet.ffi.HexString
 import com.tari.android.wallet.infrastructure.backup.compress.CompressionMethod
 import com.tari.android.wallet.infrastructure.security.encryption.SymmetricEncryptionAlgorithm
-import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupSettingsRepository
+import com.tari.android.wallet.model.fullBase58
+import com.tari.android.wallet.util.extension.encrypt
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -53,10 +52,11 @@ import javax.inject.Singleton
 
 @Singleton
 class BackupFileProcessor @Inject constructor(
-    private val backupSettingsRepository: BackupSettingsRepository,
+    private val backupSettingsRepository: BackupPrefRepository,
     private val securityPrefRepository: SecurityPrefRepository,
     private val walletConfig: WalletConfig,
     private val namingPolicy: BackupNamingPolicy,
+    private val walletManager: WalletManager,
 ) {
     private val logger
         get() = Logger.t(BackupFileProcessor::class.simpleName)
@@ -68,7 +68,7 @@ class BackupFileProcessor @Inject constructor(
 
         delay(1000)
 
-        val databaseFile = File(walletConfig.walletDatabaseFilePath)
+        val databaseFile = File(walletConfig.getWalletDatabaseFilePath())
         val backupPassword = backupSettingsRepository.backupPassword
         val backupFileName = namingPolicy.getBackupFileName(backupPassword.isNullOrEmpty())
         val outputFile = File(walletConfig.getWalletTempDirPath(), backupFileName)
@@ -77,11 +77,14 @@ class BackupFileProcessor @Inject constructor(
         if (backupPassword.isNullOrEmpty()) {
             val mimeType = "application/json"
 
-            val ffiWallet = FFIWallet.instance!!
-            val outputs = ffiWallet.getUnbindedOutputs(FFIError())
-            val hexString = HexString(ffiWallet.getWalletAddress().getBytes())
-            val jsonObject = BackupUtxos(outputs.map { it.json }, hexString.hex)
-            val json = Gson().toJson(jsonObject)
+            val ffiWallet = walletManager.walletInstance ?: error("Wallet is not initialized during backup")
+
+            val json = Gson().toJson(
+                BackupUtxos(
+                    utxos = ffiWallet.getUnbindedOutputs().map { it.json },
+                    sourceBase58 = ffiWallet.getWalletAddress().fullBase58(),
+                )
+            )
 
             outputFile.bufferedWriter().use { it.append(json) }
 
@@ -137,7 +140,7 @@ class BackupFileProcessor @Inject constructor(
 
             unencryptedCompressedFile.delete()
 
-            if (!File(walletConfig.walletDatabaseFilePath).exists()) {
+            if (!File(walletConfig.getWalletDatabaseFilePath()).exists()) {
                 // delete uncompressed files
                 walletFilesDir.deleteRecursively()
                 throw BackupStorageTamperedException("Invalid encrypted backup.")
@@ -154,4 +157,3 @@ class BackupFileProcessor @Inject constructor(
         }
     }
 }
-

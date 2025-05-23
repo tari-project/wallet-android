@@ -8,7 +8,7 @@ import com.tari.android.wallet.ui.common.domain.PaletteManager
 class TariDivider(context: Context, attrs: AttributeSet) : View(context, attrs) {
 
     init {
-        val backColor = PaletteManager().getNeutralSecondary(context)
+        val backColor = PaletteManager.getNeutralSecondary(context)
         setBackgroundColor(backColor)
     }
 }

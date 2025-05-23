@@ -2,13 +2,12 @@ package com.tari.android.wallet.ui.common.domain
 
 import android.content.Context
 import com.tari.android.wallet.R
-import com.tari.android.wallet.ui.extension.color
-import com.tari.android.wallet.ui.extension.colorFromAttribute
-import javax.inject.Inject
-import javax.inject.Singleton
+import com.tari.android.wallet.util.extension.color
+import com.tari.android.wallet.util.extension.colorFromAttribute
 
-@Singleton
-class PaletteManager @Inject constructor() {
+object PaletteManager { // todo use Compose palette or remove obsolete palette
+
+    fun getAccent(context: Context): Int = context.colorFromAttribute(R.attr.palette_primary_main)
 
     fun getTextHeading(context: Context): Int = context.colorFromAttribute(R.attr.palette_text_heading)
 
@@ -42,7 +41,7 @@ class PaletteManager @Inject constructor() {
 
     fun getBackgroundSecondary(context: Context) = context.colorFromAttribute(R.attr.palette_background_secondary)
 
-    fun getButtonPrimaryText(context: Context) = context.colorFromAttribute(R.attr.palette_button_primary_text)
+    fun getButtonPrimaryText(context: Context) = context.colorFromAttribute(R.attr.palette_text_button)
 
     fun getButtonDisabled(context: Context) = context.colorFromAttribute(R.attr.palette_button_disable)
 
@@ -55,7 +54,6 @@ class PaletteManager @Inject constructor() {
     fun getIconInactive(context: Context) = context.colorFromAttribute(R.attr.palette_icons_inactive)
 
     fun getShadowBox(context: Context) = context.colorFromAttribute(R.attr.palette_shadow_box)
-
 
     fun getWhite(context: Context): Int = context.color(R.color.white)
 

@@ -32,9 +32,6 @@
  */
 package com.tari.android.wallet.ffi
 
-import com.orhanobut.logger.Logger
-import com.orhanobut.logger.Printer
-
 typealias FFIPointer = Long
 
 const val nullptr = 0L
@@ -50,9 +47,6 @@ abstract class FFIBase {
     var pointer = nullptr
         protected set
 
-    protected val logger: Printer
-        get() = Logger.t(this::class.simpleName)
-
     abstract fun destroy()
 
     protected fun finalize() {
@@ -60,4 +54,14 @@ abstract class FFIBase {
             destroy()
         }
     }
+}
+
+fun FFIPointer.isNull(): Boolean = this == nullptr
+
+/**
+ * Base class for FFI iterable entities. Used for proper memory management.
+ */
+abstract class FFIIterableBase<T> : FFIBase() {
+    abstract fun getLength(): Int
+    abstract fun getAt(index: Int): T
 }

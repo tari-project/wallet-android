@@ -5,14 +5,22 @@ import com.orhanobut.logger.FormatStrategy
 import com.orhanobut.logger.Logger
 import com.orhanobut.logger.PrettyFormatStrategy
 import com.tari.android.wallet.BuildConfig
-import com.tari.android.wallet.data.WalletConfig
+import com.tari.android.wallet.application.walletManager.WalletManager
+import com.tari.android.wallet.application.walletManager.WalletConfig
 import com.tari.android.wallet.data.sharedPrefs.sentry.SentryPrefRepository
+import com.tari.android.wallet.di.ApplicationScope
+import kotlinx.coroutines.CoroutineScope
 import javax.inject.Inject
 import javax.inject.Singleton
 
 
 @Singleton
-class LoggerAdapter @Inject constructor(val walletConfig: WalletConfig, private val sentryPrefRepository: SentryPrefRepository) {
+class LoggerAdapter @Inject constructor(
+    private val walletConfig: WalletConfig,
+    private val walletManager: WalletManager,
+    private val sentryPrefRepository: SentryPrefRepository,
+    @ApplicationScope private val applicationScope: CoroutineScope,
+) {
     fun init() {
         val formatStrategy: FormatStrategy = PrettyFormatStrategy.newBuilder()
             .showThreadInfo(false) // (Optional) Whether to show thread info or not. Default true
@@ -22,10 +30,10 @@ class LoggerAdapter @Inject constructor(val walletConfig: WalletConfig, private 
             .build()
 
         Logger.addLogAdapter(AndroidLogAdapter(formatStrategy))
-        Logger.addLogAdapter(FFIFileAdapter())
+        Logger.addLogAdapter(FFIFileAdapter(walletManager.walletInstance))
         @Suppress("KotlinConstantConditions")
         if (BuildConfig.FLAVOR != "privacy") {
-            Logger.addLogAdapter(SentryLogAdapter(walletConfig, sentryPrefRepository))
+            Logger.addLogAdapter(SentryLogAdapter(walletConfig, sentryPrefRepository, applicationScope))
         }
     }
 }

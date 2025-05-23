@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.tari.android.wallet.ui.component.tari.TariPrimaryBackground xmlns:android="http://schemas.android.com/apk/res/android"
+<com.tari.android.wallet.ui.component.tari.background.obsolete.TariPrimaryBackgroundConstraint xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/root_view"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true">
 
     <com.tari.android.wallet.ui.component.tari.toolbar.TariToolbar
         android:id="@+id/toolbar"
@@ -13,7 +14,7 @@
         app:layout_constraintTop_toTopOf="parent"
         app:text="@string/dummy_text" />
 
-    <com.tari.android.wallet.ui.component.tari.TariSecondaryBackground
+    <com.tari.android.wallet.ui.component.tari.background.obsolete.TariSecondaryBackgroundConstraint
         android:layout_width="match_parent"
         android:layout_height="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -238,6 +239,6 @@
             app:layout_constraintStart_toStartOf="parent"
             app:title="@string/dummy_text" />
 
-    </com.tari.android.wallet.ui.component.tari.TariSecondaryBackground>
+    </com.tari.android.wallet.ui.component.tari.background.obsolete.TariSecondaryBackgroundConstraint>
 
-</com.tari.android.wallet.ui.component.tari.TariPrimaryBackground>
+</com.tari.android.wallet.ui.component.tari.background.obsolete.TariPrimaryBackgroundConstraint>

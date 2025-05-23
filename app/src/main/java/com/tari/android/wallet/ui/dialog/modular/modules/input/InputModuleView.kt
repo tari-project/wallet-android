@@ -9,8 +9,8 @@ import android.view.inputmethod.EditorInfo
 import com.tari.android.wallet.databinding.DialogModuleInputBinding
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.component.common.CommonView
-import com.tari.android.wallet.ui.extension.setSelectionToEnd
-import com.tari.android.wallet.ui.extension.showKeyboard
+import com.tari.android.wallet.util.extension.setSelectionToEnd
+import com.tari.android.wallet.util.extension.showKeyboard
 
 @SuppressLint("ViewConstructor")
 class InputModuleView(context: Context, inputModule: InputModule) : CommonView<CommonViewModel, DialogModuleInputBinding>(context) {

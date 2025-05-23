@@ -33,7 +33,6 @@
 package com.tari.android.wallet.model
 
 import android.os.Parcelable
-import com.tari.android.wallet.extension.toMicroTari
 import kotlinx.parcelize.Parcelize
 
 /**
@@ -43,10 +42,10 @@ import kotlinx.parcelize.Parcelize
  */
 @Parcelize
 data class BalanceInfo(
-    val availableBalance: MicroTari = 0.toMicroTari(),
-    val pendingIncomingBalance: MicroTari = 0.toMicroTari(),
-    val pendingOutgoingBalance: MicroTari = 0.toMicroTari(),
-    val timeLockedBalance: MicroTari = 0.toMicroTari(),
+    val availableBalance: MicroTari,
+    val pendingIncomingBalance: MicroTari,
+    val pendingOutgoingBalance: MicroTari,
+    val timeLockedBalance: MicroTari,
 ) : Parcelable {
     val totalBalance: MicroTari
         get() = availableBalance + pendingIncomingBalance + timeLockedBalance

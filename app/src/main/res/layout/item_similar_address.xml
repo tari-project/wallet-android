@@ -8,7 +8,7 @@
     android:focusable="true"
     android:foreground="?attr/selectableItemBackground">
 
-    <com.tari.android.wallet.ui.component.tari.TariPrimaryBackground
+    <com.tari.android.wallet.ui.component.tari.background.TariPrimaryBackground
         android:id="@+id/root_view_selected"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -23,7 +23,7 @@
         <include
             android:id="@+id/layout_selected"
             layout="@layout/item_similar_address_content" />
-    </com.tari.android.wallet.ui.component.tari.TariPrimaryBackground>
+    </com.tari.android.wallet.ui.component.tari.background.TariPrimaryBackground>
 
     <LinearLayout
         android:id="@+id/root_view_not_selected"

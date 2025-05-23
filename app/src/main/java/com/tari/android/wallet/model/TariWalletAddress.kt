@@ -33,46 +33,118 @@
 package com.tari.android.wallet.model
 
 import android.os.Parcelable
+import com.tari.android.wallet.ffi.Base58String
+import com.tari.android.wallet.ffi.FFIException
+import com.tari.android.wallet.ffi.FFITariWalletAddress
+import com.tari.android.wallet.ffi.runWithDestroy
+import com.tari.android.wallet.util.extension.flag
+import com.tari.android.wallet.util.tariEmoji
 import kotlinx.parcelize.Parcelize
-import java.io.Serializable
 
-/**
- * This wrapper is needed for id parameters in AIDL methods.
- *
- * @author The Tari Development Team
- */
 @Parcelize
-data class TariWalletAddress(val hexString: String = "", val emojiId: String = "") : Parcelable, Serializable {
+data class TariWalletAddress(
+    val network: Network,
+    val features: List<Feature>,
 
-    fun isZeros(): Boolean = hexString == HEX_ZERO || hexString == HEX_ZERO_66 || hexString.all { it == '0' }
+    val networkEmoji: EmojiId,
+    val featuresEmoji: EmojiId,
+    val viewKeyEmojis: EmojiId?,
+    val spendKeyEmojis: EmojiId,
+    val checksumEmoji: EmojiId,
 
-    override fun equals(other: Any?): Boolean = (other is TariWalletAddress) && hexString == other.hexString
+    val fullBase58: Base58,
+    val fullEmojiId: EmojiId,
 
-    override fun hashCode(): Int = hexString.hashCode()
+    val unknownAddress: Boolean, // true for one-sided payment or phone contact
+) : Parcelable {
 
-    override fun toString(): String = "TariWalletAddress(hexString='$hexString', emojiId='$emojiId')"
+    constructor(ffiWalletAddress: FFITariWalletAddress) : this(
+        network = Network.get(ffiWalletAddress.getNetwork()),
+        features = Feature.get(ffiWalletAddress.getFeatures()),
+        networkEmoji = ffiWalletAddress.getNetwork().tariEmoji(),
+        featuresEmoji = ffiWalletAddress.getFeatures().tariEmoji(),
+        viewKeyEmojis = ffiWalletAddress.getViewKey()?.getEmojiId(),
+        spendKeyEmojis = ffiWalletAddress.getSpendKey().getEmojiId(),
+        checksumEmoji = ffiWalletAddress.getChecksum().tariEmoji(),
+        fullBase58 = ffiWalletAddress.fullBase58(),
+        fullEmojiId = ffiWalletAddress.getEmojiId(),
+        unknownAddress = ffiWalletAddress.getSpendKey().getByteVector().byteArray().all { it == 0.toByte() },
+    )
+
+    val uniqueIdentifier: String
+        get() = "$networkEmoji$spendKeyEmojis"
+
+    val coreKeyEmojis: EmojiId
+        get() = viewKeyEmojis + spendKeyEmojis + checksumEmoji
+
+    val oneSided: Boolean
+        get() = features.contains(Feature.ONE_SIDED)
+
+    val interactive: Boolean
+        get() = features.contains(Feature.INTERACTIVE)
+
+    fun isUnknownUser(): Boolean = unknownAddress
+
+    override fun equals(other: Any?): Boolean = (other is TariWalletAddress) && uniqueIdentifier == other.uniqueIdentifier
+
+    override fun hashCode(): Int = uniqueIdentifier.hashCode()
+
+    override fun toString(): String = "TariWalletAddress(base58='$fullBase58', emojiId='$fullEmojiId')"
 
     companion object {
-        const val HEX_ZERO = "0000000000000000000000000000000000000000000000000000000000000026"
-        const val HEX_ZERO_66 = "000000000000000000000000000000000000000000000000000000000000000026"
-        const val EMOJI_ZERO =
-            "\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF00\uD83C\uDF57"
 
-        fun createWalletAddress(hexString: String = HEX_ZERO, emojiId: String = ""): TariWalletAddress {
-            // crunch fix for not crashing on action related to wallet address
-            return if (hexString == HEX_ZERO) {
-                TariWalletAddress(
-                    hexString = HEX_ZERO_66,
-                    emojiId = EMOJI_ZERO,
-                )
-            } else {
-                TariWalletAddress(
-                    hexString = hexString,
-                    emojiId = emojiId,
-                )
+        @Throws(FFIException::class)
+        fun fromBase58(base58: Base58) = FFITariWalletAddress(base58 = Base58String(base58)).runWithDestroy { TariWalletAddress(it) }
+
+        @Throws(FFIException::class)
+        fun fromEmojiId(emojiId: EmojiId) = FFITariWalletAddress(emojiId = emojiId).runWithDestroy { TariWalletAddress(it) }
+
+        fun fromBase58OrNull(base58: Base58): TariWalletAddress? = runCatching { fromBase58(base58) }.getOrNull()
+
+        fun fromEmojiIdOrNull(emojiId: EmojiId): TariWalletAddress? = runCatching { fromEmojiId(emojiId) }.getOrNull()
+
+        /**
+         * Tries to create a TariWalletAddress from a base58 string or an emoji id.
+         */
+        @Throws(FFIException::class)
+        fun makeTariAddress(input: String): TariWalletAddress = runCatching { fromBase58(input) }.recoverCatching { fromEmojiId(input) }.getOrThrow()
+
+        fun makeTariAddressOrNull(input: String): TariWalletAddress? = runCatching { makeTariAddress(input) }.getOrNull()
+
+        fun validateBase58(base58: Base58): Boolean = fromBase58OrNull(base58) != null
+
+        fun validateEmojiId(emojiId: EmojiId): Boolean = fromEmojiIdOrNull(emojiId) != null
+    }
+
+    enum class Network {
+        MAINNET,
+        STAGENET,
+        NEXTNET,
+        TESTNET;
+
+        companion object {
+            fun get(value: Int) = when (value) {
+                0 -> MAINNET
+                1 -> STAGENET
+                2 -> NEXTNET
+                else -> TESTNET
             }
         }
+    }
 
-        fun validate(addressHex: String): Boolean = addressHex.length > 64
+    enum class Feature(val mask: Byte) {
+        ONE_SIDED(0b00000001),
+        INTERACTIVE(0b00000010),
+        PAYMENT_ID(0b00000100);
+
+        companion object {
+            fun get(features: Int): List<Feature> = entries.filter { features.toByte().flag(it.mask) }
+        }
     }
 }
+
+fun FFITariWalletAddress.fullBase58(): Base58 = listOf(
+    Base58String(this.getNetwork().toByte()).base58,
+    Base58String(this.getFeatures().toByte()).base58,
+    Base58String(this.getByteVector().byteArray().drop(2)).base58,
+).joinToString(separator = "")

@@ -1,56 +1,40 @@
 package com.tari.android.wallet.model
 
-import android.os.Parcel
 import android.os.Parcelable
 import com.tari.android.wallet.ffi.FFIError
 import com.tari.android.wallet.ffi.FFIException
+import kotlinx.parcelize.Parcelize
 
-open class WalletError : CoreError {
+@Parcelize
+data class WalletError(
+    override var code: Int,
+    override var domain: String = "FFI",
+) : CoreError(code, domain), Parcelable {
 
-    constructor() : super(NoError.code, "FFI")
+    constructor(ffiError: FFIError) : this(code = ffiError.code)
 
-    constructor(code: Int) : super(code, "FFI")
+    constructor(ffiException: FFIException) : this(code = ffiException.error?.code ?: NoError.code)
 
-    constructor(parcel: Parcel) : super(parcel)
-
-    object DatabaseDataError : WalletError(114)
-    object TransactionNotFoundError : WalletError(204)
-    object ContactNotFoundError : WalletError(401)
-    object InvalidPassphraseEncryptionCypherError : WalletError(420)
-    object InvalidPassphraseError : WalletError(428)
-    object ValuesNotFound : WalletError(424)
-    object SeedWordsInvalidDataError : WalletError(429)
-    object SeedWordsVersionMismatchError : WalletError(430)
-    object UnknownError : WalletError(-1)
-    object NoError : WalletError(0)
-
-    override fun writeToParcel(parcel: Parcel, flags: Int) {
-        parcel.writeInt(code)
-        parcel.writeString(domain)
-    }
-
-    override fun describeContents(): Int = 0
+    constructor(e: Throwable?) : this(
+        code = when (e) {
+            is FFIException -> e.error?.code ?: NoError.code
+            is WalletException -> e.walletError.code
+            else -> UnknownError.code
+        },
+    )
 
     companion object {
-        @JvmField
-        val CREATOR = object : Parcelable.Creator<CoreError> {
-            override fun createFromParcel(parcel: Parcel): CoreError = CoreError(parcel)
-
-            override fun newArray(size: Int): Array<CoreError?> = arrayOfNulls(size)
-        }
-
-        fun createFromFFI(error: FFIError): WalletError = WalletError(error.code)
-
-        fun createFromFFI(error: FFIException): WalletError = WalletError(error.error?.code ?: NoError.code)
-
-        fun createFromException(e: Throwable?): WalletError {
-            if (e is FFIException) {
-                return createFromFFI(e)
-            } else if (e is WalletException) {
-                return WalletError(e.walletError.code)
-            }
-            return UnknownError
-        }
+        val DatabaseDataError = WalletError(114)
+        val TransactionNotFoundError = WalletError(204)
+        val ContactNotFoundError = WalletError(401)
+        val InvalidPassphraseEncryptionCypherError = WalletError(420)
+        val InvalidPassphraseError = WalletError(428)
+        val ValuesNotFound = WalletError(424)
+        val SeedWordsInvalidDataError = WalletError(429)
+        val SeedWordsVersionMismatchError = WalletError(430)
+        val RecoveringWrongAddress = WalletError(702)
+        val UnknownError = WalletError(-1)
+        val NoError = WalletError(0)
     }
 }
 

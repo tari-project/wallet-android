@@ -1,44 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.tari.android.wallet.ui.component.tari.TariPrimaryBackground xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/root_view"
     android:layout_width="match_parent"
+    android:fitsSystemWindows="true"
     android:layout_height="match_parent"
-    android:background="?attr/palette_background_primary">
+    android:background="?attr/palette_background_primary"
+    android:orientation="vertical">
 
     <com.tari.android.wallet.ui.component.tari.toolbar.TariToolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
         app:text="@string/contact_book_contacts_book_details_title" />
 
-    <com.tari.android.wallet.ui.component.tari.TariSecondaryBackground
+    <com.tari.android.wallet.ui.component.tari.background.TariSecondaryBackground
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/toolbar">
+        android:layout_height="match_parent">
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/list_ui"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-    </com.tari.android.wallet.ui.component.tari.TariSecondaryBackground>
-
-    <!-- full emoji id outer container -->
-    <include
-        android:id="@+id/emoji_id_outer_container"
-        layout="@layout/view_full_emoji_id"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
-
-</com.tari.android.wallet.ui.component.tari.TariPrimaryBackground>
+            android:layout_height="match_parent"
+            tools:listitem="@layout/item_contact_profile" />
+    </com.tari.android.wallet.ui.component.tari.background.TariSecondaryBackground>
+</LinearLayout>

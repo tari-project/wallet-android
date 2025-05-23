@@ -35,9 +35,7 @@ package com.tari.android.wallet.tor
 import android.app.Service
 import android.content.Context
 import com.orhanobut.logger.Logger
-import com.tari.android.wallet.data.sharedPrefs.tor.TorSharedRepository
-import com.tari.android.wallet.event.EventBus
-import com.tari.android.wallet.infrastructure.logging.LoggerTags
+import com.tari.android.wallet.data.sharedPrefs.tor.TorPrefRepository
 import java.io.BufferedReader
 import java.io.InputStreamReader
 import javax.inject.Inject
@@ -52,30 +50,55 @@ import javax.inject.Singleton
 @Singleton
 class TorProxyManager @Inject constructor(
     private val context: Context,
-    private val torSharedRepository: TorSharedRepository,
-    private val torConfig: TorConfig
+    private val torPrefRepository: TorPrefRepository,
+    private val torConfig: TorConfig,
+    private val torProxyControl: TorProxyControl,
+    private val torProxyStateHandler: TorProxyStateHandler,
 ) {
 
     companion object {
-        const val torDataDirectoryName = "tor_data"
+        const val TOR_DATA_DIRECTORY_NAME = "tor_data"
     }
 
-    private val appCacheHome = context.getDir(torDataDirectoryName, Service.MODE_PRIVATE)
-    private val torProxyControl: TorProxyControl
+    private val appCacheHome = context.getDir(TOR_DATA_DIRECTORY_NAME, Service.MODE_PRIVATE)
     private val logger
-        get() = Logger.t(LoggerTags.Connection.name)
+        get() = Logger.t(TorProxyManager::class.java.simpleName)
 
     init {
-        EventBus.torProxyState.post(TorProxyState.NotReady)
-        torProxyControl = TorProxyControl(torConfig)
+        torProxyStateHandler.updateState(TorProxyState.NotReady)
+    }
+
+    @Synchronized
+    fun run() {
+        Thread {
+            try {
+                // start monitoring Tor on a separate thread
+                Thread { torProxyControl.startMonitoringTor() }.start()
+
+                installTorResources()
+
+                val torCmdString = "${torPrefRepository.torBinPath} DataDirectory ${appCacheHome.absolutePath} " +
+                        "--defaults-torrc ${torPrefRepository.torrcBinPath}.custom"
+
+                exec(torCmdString)
+            } catch (throwable: Throwable) {
+                logger.e(throwable, "Tor process launch failed")
+                torProxyStateHandler.updateState(TorProxyState.Failed(throwable))
+            }
+        }.start()
+    }
+
+    fun shutdown() {
+        torProxyControl.shutdownTor()
+        torProxyStateHandler.updateState(TorProxyState.NotReady)
     }
 
     private fun installTorResources() {
         // install Tor geoip resources
-        val torResourceInstaller = TorResourceInstaller(context, torSharedRepository, torConfig)
+        val torResourceInstaller = TorResourceInstaller(context, torPrefRepository, torConfig)
         torResourceInstaller.installResources()
-        torSharedRepository.torBinPath = torResourceInstaller.fileTor.absolutePath
-        torSharedRepository.torrcBinPath = torResourceInstaller.fileTorrc.absolutePath
+        torPrefRepository.torBinPath = torResourceInstaller.fileTor.absolutePath
+        torPrefRepository.torrcBinPath = torResourceInstaller.fileTorrc.absolutePath
     }
 
     /**
@@ -93,35 +116,10 @@ class TorProxyManager @Inject constructor(
 
         val process = Runtime.getRuntime().exec(command)
         logger.i("Tor process started")
-        EventBus.torProxyState.post(TorProxyState.Initializing(null))
+        torProxyStateHandler.updateState(TorProxyState.Initializing(bootstrapStatus = null))
         val response = BufferedReader(InputStreamReader(process.inputStream)).use(BufferedReader::readText)
         logger.i("Tor proxy response: $response")
         process.waitFor()
         logger.i("Tor proxy stopped")
-    }
-
-    @Synchronized
-    fun run() {
-        Thread {
-            try {
-                // start monitoring Tor on a separate thread
-                Thread { torProxyControl.startMonitoringTor() }.start()
-
-                installTorResources()
-
-                val torCmdString = "${torSharedRepository.torBinPath} DataDirectory ${appCacheHome.absolutePath} " +
-                        "--defaults-torrc ${torSharedRepository.torrcBinPath}.custom"
-
-                exec(torCmdString)
-            } catch (throwable: Throwable) {
-                logger.e(throwable, "Tor process launch failed")
-                EventBus.torProxyState.post(TorProxyState.Failed(throwable))
-            }
-        }.start()
-    }
-
-    fun shutdown() {
-        torProxyControl.shutdownTor()
-        EventBus.torProxyState.post(TorProxyState.NotReady)
     }
 }

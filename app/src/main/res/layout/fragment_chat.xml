@@ -1,52 +1,44 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.tari.android.wallet.ui.component.tari.TariPrimaryBackground xmlns:android="http://schemas.android.com/apk/res/android"
+<com.tari.android.wallet.ui.component.tari.background.TariPrimaryBackground xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/root_view"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true">
 
-    <com.tari.android.wallet.ui.component.tari.toolbar.TariToolbar
-        android:id="@+id/toolbar"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:text="@string/chat_title" />
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
-    <com.tari.android.wallet.ui.component.tari.TariSecondaryBackground
-        android:id="@+id/main_content"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/toolbar">
+        <com.tari.android.wallet.ui.component.tari.toolbar.TariToolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:text="@string/chat_title" />
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@id/list"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            app:layout_constraintBottom_toTopOf="@+id/input_container"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <LinearLayout
-            android:id="@+id/empty_state"
+        <com.tari.android.wallet.ui.component.tari.background.TariSecondaryBackground
+            android:id="@+id/main_content"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:orientation="vertical"
-            app:layout_constraintBottom_toTopOf="@id/input_container"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHeight_default="wrap"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
+            android:layout_weight="1">
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/list"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:visibility="gone"
+                tools:listitem="@layout/item_chat_message_item"
+                tools:visibility="visible" />
 
             <FrameLayout
+                android:id="@+id/empty_state"
                 android:layout_width="match_parent"
-                android:layout_height="166dp">
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:visibility="visible"
+                tools:visibility="gone">
 
                 <androidx.appcompat.widget.AppCompatImageView
                     android:id="@+id/image_back"
@@ -62,71 +54,58 @@
                     android:layout_gravity="center"
                     android:src="@drawable/vector_chat_empty_messages"
                     android:tint="?attr/palette_icons_default" />
-
             </FrameLayout>
+        </com.tari.android.wallet.ui.component.tari.background.TariSecondaryBackground>
 
-        </LinearLayout>
-
-        <com.tari.android.wallet.ui.component.tari.TariAlphaBackground
+        <com.tari.android.wallet.ui.component.tari.background.TariAlphaBackground
             android:id="@+id/input_container"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:minHeight="66dp"
+            android:layout_height="66dp"
             android:paddingHorizontal="24dp"
             app:alphaBackground="1"
-            app:backgroundColor="?attr/palette_neutral_tertiary"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent">
+            app:backgroundColor="?attr/palette_neutral_tertiary">
 
-            <androidx.appcompat.widget.AppCompatImageView
-                android:id="@+id/attach_button"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:src="@drawable/vector_chat_input_attach"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:tint="?attr/palette_icons_active" />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
 
-            <com.tari.android.wallet.ui.component.tari.TariPrimaryBackground
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:layout_margin="10dp"
-                app:cornerRadius="6dp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@+id/send_tari_button"
-                app:layout_constraintStart_toEndOf="@+id/attach_button"
-                app:layout_constraintTop_toTopOf="parent">
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/attach_button"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:foreground="?attr/selectableItemBackground"
+                    android:src="@drawable/vector_chat_input_attach"
+                    app:tint="?attr/palette_icons_active" />
 
-                <com.tari.android.wallet.ui.component.tari.TariInput
-                    android:id="@+id/message_input"
+                <com.tari.android.wallet.ui.component.tari.background.TariPrimaryBackground
                     android:layout_width="0dp"
-                    android:layout_height="0dp"
-                    android:paddingHorizontal="12dp"
-                    android:paddingVertical="2dp"
-                    app:hintText="@string/chat_input_hint"
+                    android:layout_height="match_parent"
+                    android:layout_margin="10dp"
+                    android:layout_weight="1"
+                    app:cornerRadius="6dp">
+
+                    <com.tari.android.wallet.ui.component.tari.TariInput
+                        android:id="@+id/message_input"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:paddingHorizontal="12dp"
+                        android:paddingVertical="2dp"
+                        app:hintText="@string/chat_input_hint" />
+                </com.tari.android.wallet.ui.component.tari.background.TariPrimaryBackground>
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/send_tari_button"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:foreground="?attr/selectableItemBackground"
+                    android:src="@drawable/vector_chat_input_send"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHeight_default="spread"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
-
-
-            </com.tari.android.wallet.ui.component.tari.TariPrimaryBackground>
-
-            <androidx.appcompat.widget.AppCompatImageView
-                android:id="@+id/send_tari_button"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:src="@drawable/vector_chat_input_send"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:tint="?attr/palette_icons_active" />
-
-        </com.tari.android.wallet.ui.component.tari.TariAlphaBackground>
-
-    </com.tari.android.wallet.ui.component.tari.TariSecondaryBackground>
-
-</com.tari.android.wallet.ui.component.tari.TariPrimaryBackground>
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:tint="?attr/palette_icons_active" />
+            </LinearLayout>
+        </com.tari.android.wallet.ui.component.tari.background.TariAlphaBackground>
+    </LinearLayout>
+</com.tari.android.wallet.ui.component.tari.background.TariPrimaryBackground>

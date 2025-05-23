@@ -2,14 +2,13 @@ package com.tari.android.wallet.application.securityStage
 
 import com.tari.android.wallet.application.securityStage.StagedWalletSecurityManager.StagedSecurityEffect.NoStagedSecurityPopUp
 import com.tari.android.wallet.application.securityStage.StagedWalletSecurityManager.StagedSecurityEffect.ShowStagedSecurityPopUp
-import com.tari.android.wallet.data.sharedPrefs.securityStages.DisabledTimestampsDto
-import com.tari.android.wallet.data.sharedPrefs.securityStages.SecurityStagesRepository
+import com.tari.android.wallet.data.sharedPrefs.backup.BackupPrefRepository
+import com.tari.android.wallet.data.sharedPrefs.securityStages.SecurityStagesPrefRepository
 import com.tari.android.wallet.data.sharedPrefs.securityStages.WalletSecurityStage
-import com.tari.android.wallet.data.sharedPrefs.tariSettings.TariSettingsSharedRepository
-import com.tari.android.wallet.extension.isAfterNow
+import com.tari.android.wallet.data.sharedPrefs.tariSettings.TariSettingsPrefRepository
 import com.tari.android.wallet.model.BalanceInfo
 import com.tari.android.wallet.model.MicroTari
-import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupSettingsRepository
+import com.tari.android.wallet.util.extension.isAfterNow
 import java.math.BigDecimal
 import java.util.Calendar
 import javax.inject.Inject
@@ -22,9 +21,9 @@ val MAX_HOT_WALLET_BALANCE = MicroTari((BigDecimal.valueOf(1_000_000_000) * Micr
 
 @Singleton
 class StagedWalletSecurityManager @Inject constructor(
-    private val securityStagesRepository: SecurityStagesRepository,
-    private val backupPrefsRepository: BackupSettingsRepository,
-    private val tariSettingsSharedRepository: TariSettingsSharedRepository,
+    private val securityStagesRepository: SecurityStagesPrefRepository,
+    private val backupPrefsRepository: BackupPrefRepository,
+    private val tariSettingsSharedRepository: TariSettingsPrefRepository,
 ) {
     private val hasVerifiedSeedPhrase
         get() = tariSettingsSharedRepository.hasVerifiedSeedWords
@@ -38,12 +37,6 @@ class StagedWalletSecurityManager @Inject constructor(
     private val disabledTimestampSinceNow: Calendar
         get() = Calendar.getInstance().also { it.add(Calendar.DAY_OF_YEAR, 7) }
 
-    private var disabledTimestamps: MutableMap<WalletSecurityStage, Calendar>
-        get() = securityStagesRepository.disabledTimestamps?.timestamps ?: DisabledTimestampsDto(mutableMapOf()).timestamps
-        set(value) {
-            securityStagesRepository.disabledTimestamps = DisabledTimestampsDto(value)
-        }
-
     /**
      * Check the current security stage based on the balance and the user's security settings.
      */
@@ -51,16 +44,11 @@ class StagedWalletSecurityManager @Inject constructor(
         val securityStage = checkSecurityStage(balance) ?: return NoStagedSecurityPopUp
         //todo Stage 3 is currently disabled
         if (securityStage == WalletSecurityStage.Stage3) return NoStagedSecurityPopUp
-        if (isActionDisabled(securityStage)) return NoStagedSecurityPopUp
+        if (securityStagesRepository.disabledTimestamp.isAfterNow()) return NoStagedSecurityPopUp
 
-        updateTimestamp(securityStage)
+        securityStagesRepository.disabledTimestamp = disabledTimestampSinceNow
 
         return ShowStagedSecurityPopUp(securityStage)
-    }
-
-    private fun updateTimestamp(securityStage: WalletSecurityStage) {
-        val newTimestamp = disabledTimestampSinceNow
-        disabledTimestamps = disabledTimestamps.also { it[securityStage] = newTimestamp }
     }
 
     /**
@@ -78,18 +66,8 @@ class StagedWalletSecurityManager @Inject constructor(
         }
     }
 
-    private fun isActionDisabled(securityStage: WalletSecurityStage): Boolean {
-        val timestamp = disabledTimestamps[securityStage] ?: return false
-        if (timestamp.isAfterNow()) {
-            return true
-        }
-
-        disabledTimestamps = disabledTimestamps.also { it.remove(securityStage) }
-        return false
-    }
-
     sealed class StagedSecurityEffect {
         data class ShowStagedSecurityPopUp(val stage: WalletSecurityStage) : StagedSecurityEffect()
-        object NoStagedSecurityPopUp : StagedSecurityEffect()
+        data object NoStagedSecurityPopUp : StagedSecurityEffect()
     }
 }

@@ -2,9 +2,8 @@ package com.tari.android.wallet.infrastructure.logging
 
 import com.orhanobut.logger.LogAdapter
 import com.orhanobut.logger.Logger
-import com.tari.android.wallet.data.WalletConfig
+import com.tari.android.wallet.application.walletManager.WalletConfig
 import com.tari.android.wallet.data.sharedPrefs.sentry.SentryPrefRepository
-import com.tari.android.wallet.util.WalletUtil
 import com.welie.blessed.BluetoothPeripheralManager
 import io.sentry.Attachment
 import io.sentry.Breadcrumb
@@ -14,13 +13,13 @@ import io.sentry.SentryEvent
 import io.sentry.SentryLevel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 
-class SentryLogAdapter(val walletConfig: WalletConfig,
-                       private val sentryPrefRepository: SentryPrefRepository) : LogAdapter {
-
-    private var localScope = CoroutineScope(Job())
+class SentryLogAdapter(
+    val walletConfig: WalletConfig,
+    private val sentryPrefRepository: SentryPrefRepository,
+    private val externalScope: CoroutineScope,
+) : LogAdapter {
 
     override fun isLoggable(priority: Int, tag: String?): Boolean = sentryPrefRepository.isEnabled == true
 
@@ -28,9 +27,9 @@ class SentryLogAdapter(val walletConfig: WalletConfig,
         if (tag == BluetoothPeripheralManager::class.java.simpleName) return
 
         if (priority == Logger.ERROR) {
-            localScope.launch(Dispatchers.IO) {
+            externalScope.launch(Dispatchers.IO) {
                 try {
-                    val files = WalletUtil.getLogFilesFromDirectory(walletConfig.getWalletLogFilesDirPath()).toMutableList()
+                    val files = walletConfig.getLogFiles()
                     val lines = files.firstOrNull()?.inputStream()?.bufferedReader()?.readLines()?.takeLast(100)?.joinToString("\n")
 
                     val breadcrumb = Breadcrumb(message).apply {

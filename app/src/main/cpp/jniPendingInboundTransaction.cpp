@@ -77,13 +77,13 @@ Java_com_tari_android_wallet_ffi_FFIPendingInboundTx_jniGetAmount(
 
 extern "C"
 JNIEXPORT jstring JNICALL
-Java_com_tari_android_wallet_ffi_FFIPendingInboundTx_jniGetMessage(
+Java_com_tari_android_wallet_ffi_FFIPendingInboundTx_jniGetPaymentId(
         JNIEnv *jEnv,
         jobject jThis,
         jobject error) {
     return ExecuteWithError<jstring>(jEnv, error, [&](int *errorPointer) {
         auto pInboundTx = GetPointerField<TariPendingInboundTransaction *>(jEnv, jThis);
-        const char *pMessage = pending_inbound_transaction_get_message(pInboundTx, errorPointer);
+        const char *pMessage = pending_inbound_transaction_get_payment_id(pInboundTx, errorPointer);
         jstring result = jEnv->NewStringUTF(pMessage);
         string_destroy(const_cast<char *>(pMessage));
         return result;

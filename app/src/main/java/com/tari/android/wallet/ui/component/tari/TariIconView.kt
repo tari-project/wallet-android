@@ -9,6 +9,6 @@ import com.tari.android.wallet.ui.common.domain.PaletteManager
 class TariIconView(context: Context, attrs: AttributeSet) : AppCompatImageView(context, attrs) {
 
     init {
-        imageTintList = ColorStateList.valueOf(PaletteManager().getIconDefault(context))
+        imageTintList = ColorStateList.valueOf(PaletteManager.getIconDefault(context))
     }
 }

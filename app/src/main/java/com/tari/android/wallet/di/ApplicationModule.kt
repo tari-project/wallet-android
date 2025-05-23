@@ -39,18 +39,10 @@ import android.content.Context.MODE_PRIVATE
 import android.content.SharedPreferences
 import androidx.biometric.BiometricManager
 import androidx.core.content.ContextCompat
-import com.tari.android.wallet.BuildConfig
 import com.tari.android.wallet.application.TariWalletApplication
-import com.tari.android.wallet.data.WalletConfig
-import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
-import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepositoryImpl
-import com.tari.android.wallet.data.sharedPrefs.tariSettings.TariSettingsSharedRepository
 import com.tari.android.wallet.infrastructure.security.biometric.BiometricAuthenticationService
 import com.tari.android.wallet.notification.NotificationHelper
-import com.tari.android.wallet.service.service.WalletServiceLauncher
 import com.tari.android.wallet.ui.common.domain.ResourceManager
-import com.tari.android.wallet.ui.common.gyphy.GiphyAdapter
-import com.tari.android.wallet.util.ContactUtil
 import dagger.Module
 import dagger.Provides
 import java.io.File
@@ -82,19 +74,7 @@ class ApplicationModule(private val app: TariWalletApplication) {
 
     @Provides
     @Singleton
-    fun provideNetworkRepository(prefs: SharedPreferences): NetworkRepository = NetworkRepositoryImpl(prefs)
-
-    @Provides
-    @Singleton
     fun provideResourceManager(context: Context): ResourceManager = ResourceManager(context)
-
-    @Provides
-    @Singleton
-    fun provideWalletServiceLauncher(
-        context: Context,
-        tariSettingsSharedRepository: TariSettingsSharedRepository,
-        walletConfig: WalletConfig
-    ): WalletServiceLauncher = WalletServiceLauncher(context, walletConfig, tariSettingsSharedRepository)
 
     @Provides
     @Singleton
@@ -112,14 +92,6 @@ class ApplicationModule(private val app: TariWalletApplication) {
             BiometricManager.from(context),
             context.getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager
         )
-
-    @Provides
-    @Singleton
-    fun provideGiphyAdapter(context: Context): GiphyAdapter = GiphyAdapter(context, BuildConfig.GIPHY_KEY)
-
-    @Provides
-    @Singleton
-    fun provideContactUtil(resourceManager: ResourceManager): ContactUtil = ContactUtil(resourceManager)
 
     companion object {
         const val sharedPrefsFileName = "tari_wallet_shared_prefs"

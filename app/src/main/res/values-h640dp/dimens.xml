@@ -4,32 +4,10 @@
     <!-- common -->
     <dimen name="common_horizontal_margin">25dp</dimen>
     <dimen name="common_action_button_height">54dp</dimen>
-    <dimen name="common_network_and_version_info_text_size">9sp</dimen>
-
-    <!-- introduction -->
-    <dimen name="introduction_tari_logo_initial_margin_top">40dp</dimen>
-    <dimen name="introduction_create_wallet_button_margin_top">30dp</dimen>
-    <dimen name="introduction_header_text_size">30sp</dimen>
-    <dimen name="introduction_network_margin_bottom">30dp</dimen>
 
     <!-- onboarding -->
     <dimen name="onboarding_bottom_progress_bar_bottom_margin">25dp</dimen>
     <dimen name="onboarding_small_gem_top_margin">46dp</dimen>
-
-    <!-- home -->
-
-    <!-- home swipe refresh -->
-    <dimen name="home_swipe_refresh_max_scroll_y">180dp</dimen>
-    <dimen name="home_swipe_refresh_progress_view_height">48dp</dimen>
-    <dimen name="home_swipe_refresh_progress_view_container_height">88dp</dimen>
-    <dimen name="home_swipe_refresh_progress_view_content_invisible_top_margin">-48dp</dimen>
-    <dimen name="home_swipe_refresh_progress_view_content_visible_top_margin">20dp</dimen>
-
-    <!-- home TTL store dialog -->
-
-    <!-- tx details -->
-    <dimen name="tx_details_amount_section_vertical_padding">36dp</dimen>
-    <dimen name="tx_details_note_top_margin">24dp</dimen>
 
     <!-- send tari - common -->
     <dimen name="header_top_inset">24dp</dimen>

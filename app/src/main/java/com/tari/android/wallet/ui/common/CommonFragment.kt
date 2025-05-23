@@ -1,45 +1,50 @@
 package com.tari.android.wallet.ui.common
 
+import android.animation.Animator
 import android.content.ClipData
 import android.content.ClipboardManager
-import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import android.view.WindowManager
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.core.content.ContextCompat
+import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
-import androidx.viewbinding.ViewBinding
+import com.orhanobut.logger.Logger
+import com.orhanobut.logger.Printer
 import com.tari.android.wallet.BuildConfig
-import com.tari.android.wallet.R
+import com.tari.android.wallet.application.deeplinks.DeepLink
 import com.tari.android.wallet.di.DiContainer
-import com.tari.android.wallet.extension.observe
-import com.tari.android.wallet.ui.component.mainList.MutedBackPressedCallback
-import com.tari.android.wallet.ui.component.tari.toast.TariToast
-import com.tari.android.wallet.ui.component.tari.toast.TariToastArgs
+import com.tari.android.wallet.infrastructure.logging.LoggerTags
 import com.tari.android.wallet.ui.dialog.modular.InputModularDialog
 import com.tari.android.wallet.ui.dialog.modular.ModularDialog
-import com.tari.android.wallet.ui.extension.string
+import com.tari.android.wallet.ui.screen.qr.QrScannerActivity
+import com.tari.android.wallet.ui.screen.qr.QrScannerSource
+import com.tari.android.wallet.util.extension.dataIfOk
+import com.tari.android.wallet.util.extension.observe
+import com.tari.android.wallet.util.extension.parcelable
+import com.tari.android.wallet.util.extension.removeListenersAndCancel
 
-abstract class CommonFragment<Binding : ViewBinding, VM : CommonViewModel> : Fragment(), FragmentPoppedListener {
+abstract class CommonFragment<VM : CommonViewModel> : Fragment(), FragmentPoppedListener {
 
     private lateinit var clipboardManager: ClipboardManager
 
-    private val dialogManager = DialogManager()
-
-    protected var blockingBackPressDispatcher = MutedBackPressedCallback(false)
-
-    protected lateinit var ui: Binding
-
     lateinit var viewModel: VM
 
-    //TODO make viewModel not lateinit. Sometimes it's not initialized in time and causes crashes, so we need to check if it's initialized
+    protected val dialogHandler: DialogHandler
+        get() = viewModel
+
+    protected val animations = mutableListOf<Animator>()
+
+    val logger: Printer
+        get() = Logger.t(this::class.simpleName)
+
     private val blockScreenRecording
         get() = !BuildConfig.DEBUG &&
                 (screenRecordingAlwaysDisable() || !(this::viewModel.isInitialized) || !viewModel.tariSettingsSharedRepository.screenRecordingTurnedOn)
@@ -54,7 +59,18 @@ abstract class CommonFragment<Binding : ViewBinding, VM : CommonViewModel> : Fra
         }
     }
 
-    protected open fun screenRecordingAlwaysDisable() = false
+    private val scanQrCode = registerForActivityResult(StartActivityForResult()) { result ->
+        val qrDeepLink = result.dataIfOk()?.parcelable<DeepLink>(QrScannerActivity.EXTRA_DEEPLINK) ?: return@registerForActivityResult
+        viewModel.handleDeeplink(qrDeepLink)
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        if (savedInstanceState == null) {
+            logger.t(LoggerTags.Navigation.name).i(this::class.simpleName + " has been started")
+        }
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -64,17 +80,6 @@ abstract class CommonFragment<Binding : ViewBinding, VM : CommonViewModel> : Fra
         view.isFocusable = true
 
         clipboardManager = DiContainer.appComponent.getClipboardManager()
-    }
-
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        dialogManager.context = context
-    }
-
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, blockingBackPressDispatcher)
-
-        return super.onCreateView(inflater, container, savedInstanceState)
     }
 
     override fun onResume() {
@@ -88,10 +93,11 @@ abstract class CommonFragment<Binding : ViewBinding, VM : CommonViewModel> : Fra
         }
     }
 
-    fun bindViewModel(viewModel: VM) = with(viewModel) {
-        this@CommonFragment.viewModel = this
+    override fun onDestroy() {
+        super.onDestroy()
 
-        subscribeVM(viewModel)
+        animations.forEach { it.removeListenersAndCancel() }
+        animations.clear()
     }
 
     override fun onDetach() {
@@ -104,33 +110,41 @@ abstract class CommonFragment<Binding : ViewBinding, VM : CommonViewModel> : Fra
         // implement in subclass
     }
 
+    protected open fun screenRecordingAlwaysDisable() = false
+
+    fun bindViewModel(viewModel: VM) = with(viewModel) {
+        this@CommonFragment.viewModel = this
+
+        subscribeVM(viewModel)
+
+        dialogManager = viewModel.dialogManager
+    }
+
+
+    fun startQrScanner(source: QrScannerSource) {
+        scanQrCode.launch(QrScannerActivity.newIntent(requireContext(), source))
+    }
+
     fun setFragmentPoppedListener(listener: FragmentPoppedListener) {
         fragmentPoppedListener = listener
     }
 
+    fun ensureIsAdded(action: () -> Unit) {
+        if (isAdded && context != null) {
+            action()
+        }
+    }
 
     fun <VM : CommonViewModel> subscribeVM(viewModel: VM) = with(viewModel) {
         observe(backPressed) { requireActivity().onBackPressed() }
 
-        observe(openLink) { startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(it))) }
+        observe(openLink) { startActivity(Intent(Intent.ACTION_VIEW, it.toUri())) }
 
         observe(copyToClipboard) { copy(it) }
 
-        observe(modularDialog) { dialogManager.replace(ModularDialog(requireContext(), it)) }
+        observe(modularDialog) { dialogManager.replace(ModularDialog(requireActivity(), it)) }
 
-        observe(inputDialog) { dialogManager.replace(InputModularDialog(requireContext(), it)) }
-
-        observe(loadingDialog) { dialogManager.handleProgress(it) }
-
-        observe(dismissDialog) { dialogManager.dismiss() }
-
-        observe(showToast) { TariToast(requireContext(), it) }
-
-        observe(blockedBackPressed) {
-            blockingBackPressDispatcher.isEnabled = it
-        }
-
-        observe(navigation) { viewModel.tariNavigator.navigate(it) }
+        observe(inputDialog) { dialogManager.replace(InputModularDialog(requireActivity(), it)) }
 
         observe(permissionManager.checkForPermission) {
             launcher.launch(it.toTypedArray())
@@ -138,7 +152,7 @@ abstract class CommonFragment<Binding : ViewBinding, VM : CommonViewModel> : Fra
 
         observe(permissionManager.openSettings) { openSettings() }
 
-        observe(permissionManager.dialog) { dialogManager.replace(ModularDialog(requireContext(), it)) }
+        observe(permissionManager.dialog) { dialogManager.replace(ModularDialog(requireActivity(), it)) }
     }
 
     private fun openSettings() {
@@ -149,38 +163,19 @@ abstract class CommonFragment<Binding : ViewBinding, VM : CommonViewModel> : Fra
         }
     }
 
-    protected fun changeOnBackPressed(isBlocked: Boolean) {
-        blockingBackPressDispatcher.isEnabled = false
-        blockingBackPressDispatcher = MutedBackPressedCallback(isBlocked)
-        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, blockingBackPressDispatcher)
+    protected fun doOnBackPressed(onBackPressedAction: () -> Unit) {
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                onBackPressedAction()
+            }
+        })
     }
+
+    protected fun isFragmentOnTop() = requireActivity().supportFragmentManager.fragments.lastOrNull() == this
 
     private fun copy(clipboardArgs: ClipboardArgs) {
         clipboardManager.setPrimaryClip(ClipData.newPlainText(clipboardArgs.clipLabel, clipboardArgs.clipText))
-        TariToast(requireContext(), TariToastArgs(clipboardArgs.toastMessage, Toast.LENGTH_LONG))
-    }
-
-    protected fun shareViaText(text: String) {
-        val shareIntent = Intent()
-        shareIntent.action = Intent.ACTION_SEND
-        shareIntent.putExtra(Intent.EXTRA_TEXT, text)
-        shareIntent.type = "text/plain"
-        if (shareIntent.resolveActivity(requireContext().packageManager) != null) {
-            startActivity(Intent.createChooser(shareIntent, null))
-        } else {
-            TariToast(requireContext(), TariToastArgs(string(R.string.store_no_application_to_open_the_link_error), Toast.LENGTH_LONG))
-        }
-    }
-
-    fun ensureIsAdded(action: () -> Unit) {
-        if (isAdded && context != null) {
-            action()
-        }
-    }
-
-    override fun onDestroy() {
-        dialogManager.dismiss()
-        super.onDestroy()
+        Toast.makeText(requireContext(), clipboardArgs.toastMessage, Toast.LENGTH_SHORT).show()
     }
 }
 

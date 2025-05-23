@@ -46,8 +46,8 @@ import com.google.api.client.googleapis.extensions.android.gms.auth.UserRecovera
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.BuildConfig
 import com.tari.android.wallet.R
-import com.tari.android.wallet.data.WalletConfig
-import com.tari.android.wallet.data.sharedPrefs.delegates.SerializableTime
+import com.tari.android.wallet.application.walletManager.WalletConfig
+import com.tari.android.wallet.data.sharedPrefs.backup.BackupPrefRepository
 import com.tari.android.wallet.infrastructure.backup.BackupException
 import com.tari.android.wallet.infrastructure.backup.BackupFileProcessor
 import com.tari.android.wallet.infrastructure.backup.BackupNamingPolicy
@@ -55,7 +55,6 @@ import com.tari.android.wallet.infrastructure.backup.BackupStorage
 import com.tari.android.wallet.infrastructure.backup.BackupStorageAuthRevokedException
 import com.tari.android.wallet.infrastructure.backup.BackupStorageSetupCancelled
 import com.tari.android.wallet.infrastructure.backup.BackupStorageTamperedException
-import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupSettingsRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.joda.time.DateTime
@@ -69,7 +68,7 @@ import javax.inject.Singleton
 class DropboxBackupStorage @Inject constructor(
     private val context: Context,
     private val namingPolicy: BackupNamingPolicy,
-    private val backupSettingsRepository: BackupSettingsRepository,
+    private val backupSettingsRepository: BackupPrefRepository,
     private val walletConfig: WalletConfig,
     private val backupFileProcessor: BackupFileProcessor
 ) : BackupStorage {
@@ -181,8 +180,9 @@ class DropboxBackupStorage @Inject constructor(
             backupFileProcessor.restoreBackupFile(tempFile, password)
             backupFileProcessor.clearTempFolder()
             // restore successful, turn on automated backup
-            backupSettingsRepository.dropboxOption =
-                backupSettingsRepository.dropboxOption!!.copy(lastSuccessDate = SerializableTime(DateTime.now()))
+            // FIXME: Dropbox backup is not supported yet
+//            backupSettingsRepository.dropboxOption =
+//                backupSettingsRepository.dropboxOption!!.copy(lastSuccessDate = SerializableTime(DateTime.now()))
             backupSettingsRepository.backupPassword = password
         }
     }

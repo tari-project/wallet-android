@@ -1,26 +1,29 @@
 package com.tari.android.wallet.ui.component.tari.toolbar
 
 import android.content.Context
+import android.content.res.Resources.getSystem
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.widget.FrameLayout
 import com.tari.android.wallet.R
 import com.tari.android.wallet.databinding.TariToolbarBinding
-import com.tari.android.wallet.ui.extension.gone
-import com.tari.android.wallet.ui.extension.obtain
-import com.tari.android.wallet.ui.extension.runRecycle
-import com.tari.android.wallet.ui.extension.visible
-
+import com.tari.android.wallet.util.extension.invisible
+import com.tari.android.wallet.util.extension.obtain
+import com.tari.android.wallet.util.extension.repopulate
+import com.tari.android.wallet.util.extension.runRecycle
+import com.tari.android.wallet.util.extension.setEndMargin
+import com.tari.android.wallet.util.extension.setStartMargin
+import com.tari.android.wallet.util.extension.visible
+import kotlin.math.max
 
 class TariToolbar(context: Context, attrs: AttributeSet) : FrameLayout(context, attrs) {
 
-    private var rightArgs = mutableListOf<TariToolbarActionArg>()
-    private var leftArgs = mutableListOf<TariToolbarActionArg>()
+    private val rightArgs = mutableListOf<TariToolbarActionArg>()
+    private val leftArgs = mutableListOf<TariToolbarActionArg>()
 
-    val ui: TariToolbarBinding
+    val ui: TariToolbarBinding = TariToolbarBinding.inflate(LayoutInflater.from(context), this, false)
 
     init {
-        ui = TariToolbarBinding.inflate(LayoutInflater.from(context), this, false)
         addView(ui.root)
 
         layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
@@ -44,24 +47,29 @@ class TariToolbar(context: Context, attrs: AttributeSet) : FrameLayout(context, 
     }
 
     fun setRightArgs(vararg args: TariToolbarActionArg) {
-        rightArgs = args.toMutableList()
+        rightArgs.repopulate(args.toMutableList())
         invalidateToolbar()
     }
 
     fun setLeftArgs(vararg args: TariToolbarActionArg) {
-        leftArgs = args.toMutableList()
+        leftArgs.repopulate(args.toMutableList())
         invalidateToolbar()
     }
 
     private fun invalidateToolbar() {
         ui.toolbarRightActions.removeAllViews()
         for (action in rightArgs) {
-            ui.toolbarRightActions.addView(TariToolbarActionView(context).apply { setArgs(action, true) })
+            ui.toolbarRightActions.addView(TariToolbarActionView(context).apply { setArgs(action) })
         }
         ui.toolbarLeftActions.removeAllViews()
         for (action in leftArgs) {
-            ui.toolbarLeftActions.addView(TariToolbarActionView(context).apply { setArgs(action, false) })
+            ui.toolbarLeftActions.addView(TariToolbarActionView(context).apply { setArgs(action) })
         }
+
+        // set the same margin for the both sides if toolbar actions are present
+        val maxMargin = 16.dp + max(leftArgs.size, rightArgs.size) * 48.dp
+        ui.toolbarTitle.setStartMargin(maxMargin - leftArgs.size * 48.dp)
+        ui.toolbarTitle.setEndMargin(maxMargin - rightArgs.size * 48.dp)
     }
 
     fun showRightActions() {
@@ -69,14 +77,8 @@ class TariToolbar(context: Context, attrs: AttributeSet) : FrameLayout(context, 
     }
 
     fun hideRightActions() {
-        ui.toolbarRightActions.gone()
+        ui.toolbarRightActions.invisible()
     }
 
-    fun showLeftActions() {
-        ui.toolbarLeftActions.visible()
-    }
-
-    fun hideLeftActions() {
-        ui.toolbarLeftActions.gone()
-    }
+    val Int.dp: Int get() = (this / getSystem().displayMetrics.density).toInt()
 }

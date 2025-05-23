@@ -4,13 +4,17 @@ import com.tari.android.wallet.R
 import com.tari.android.wallet.model.CoreError
 import com.tari.android.wallet.model.WalletError
 import com.tari.android.wallet.ui.common.domain.ResourceManager
+import com.tari.android.wallet.ui.dialog.modular.SimpleDialogArgs
 
-class WalletErrorArgs(val resourceManager: ResourceManager, val error: CoreError, val dismissAction: () -> Unit = {}) {
-
+class WalletErrorArgs(
+    val resourceManager: ResourceManager,
+    val error: CoreError,
+    val dismissAction: () -> Unit = {},
+) {
     constructor(resourceManager: ResourceManager, exception: Throwable, dismissAction: () -> Unit = { }) : this(
-        resourceManager,
-        WalletError.createFromException(exception),
-        dismissAction
+        resourceManager = resourceManager,
+        error = WalletError(exception),
+        dismissAction = dismissAction,
     )
 
     val title: String
@@ -26,10 +30,15 @@ class WalletErrorArgs(val resourceManager: ResourceManager, val error: CoreError
                 WalletError.InvalidPassphraseError -> R.string.error_wallet_message_428
                 WalletError.SeedWordsInvalidDataError -> R.string.error_wallet_message_429
                 WalletError.SeedWordsVersionMismatchError -> R.string.error_wallet_message_430
+                WalletError.RecoveringWrongAddress -> R.string.error_wallet_message_702
                 else -> R.string.error_wallet_message_generic
             }
             return resourceManager.getString(id)
         }
 
-    fun getErrorArgs() : ErrorDialogArgs = ErrorDialogArgs(title, description, onClose = dismissAction)
+    fun getModular() = SimpleDialogArgs(
+        title = title,
+        description = description,
+        onClose = dismissAction,
+    ).getModular(resourceManager)
 }

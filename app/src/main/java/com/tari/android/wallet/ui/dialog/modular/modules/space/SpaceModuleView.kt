@@ -7,8 +7,8 @@ import android.view.ViewGroup
 import com.tari.android.wallet.databinding.DialogModuleSpaceBinding
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.component.common.CommonView
-import com.tari.android.wallet.ui.extension.dpToPx
-import com.tari.android.wallet.ui.extension.setLayoutHeight
+import com.tari.android.wallet.util.extension.dpToPx
+import com.tari.android.wallet.util.extension.setLayoutHeight
 
 @SuppressLint("ViewConstructor")
 class SpaceModuleView(context: Context, spaceModule: SpaceModule) : CommonView<CommonViewModel, DialogModuleSpaceBinding>(context) {

@@ -1,15 +1,11 @@
 <resources>
 
-    <!--    &lt;!&ndash; splash screen theme &ndash;&gt;-->
+    <!-- splash screen theme -->
     <style name="AppTheme.Splash" parent="AppTheme.Light">
         <item name="android:background">@drawable/tari_splash_screen</item>
         <item name="android:windowTranslucentStatus">true</item>
         <item name="android:statusBarColor">@android:color/black</item>
         <item name="android:navigationBarColor">@android:color/black</item>
-    </style>
-
-    <style name="AppTheme.Auth" parent="AppTheme.Light">
-        <item name="android:windowTranslucentStatus">true</item>
     </style>
 
     <!--
@@ -26,6 +22,9 @@
         <item name="android:editTextColor">?attr/palette_text_heading</item>
         <item name="android:textColorHint">?attr/palette_text_body</item>
         <item name="colorControlNormal">#FFFFFF</item>
+        <item name="fontFamily">@font/poppins_regular</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:letterSpacing">0.02</item>
     </style>
 
     <style name="SwitchTheme" parent="Widget.AppCompat.CompoundButton.Switch">
@@ -38,7 +37,7 @@
     </style>
 
     <style name="PositiveButtonStyle" parent="Widget.AppCompat.Button.ButtonBar.AlertDialog">
-        <item name="android:textColor">?attr/palette_button_primary_start</item>
+        <item name="android:textColor">?attr/palette_button_primary</item>
     </style>
 
     <style name="BottomSlideDialog" parent="Theme.AppCompat.Dialog">
@@ -55,17 +54,6 @@
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">match_parent</item>
     </style>
-
-    <style name="ChooseGIFDialog" parent="android:Theme.Panel">
-        <item name="android:windowAnimationStyle">@style/ChooseGIFBottomSlideDialogAnimation</item>
-        <item name="android:windowTranslucentNavigation">true</item>
-    </style>
-
-    <style name="ChooseGIFBottomSlideDialogAnimation">
-        <item name="android:windowEnterAnimation">@null</item>
-        <item name="android:windowExitAnimation">@null</item>
-    </style>
-
 
     <!-- Google sign in activity transition overrides -->
     <style name="GoogleSignInActivity" parent="android:Theme.Translucent.NoTitleBar">

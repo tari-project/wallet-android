@@ -9,7 +9,7 @@ import com.tari.android.wallet.ui.common.domain.PaletteManager
 class TariSeekbar(context: Context, attrs: AttributeSet) : AppCompatSeekBar(context, attrs) {
 
     init {
-        val brandColor = PaletteManager().getPurpleBrand(context)
+        val brandColor = PaletteManager.getTextHeading(context)
         thumbTintList = ColorStateList.valueOf(brandColor)
         progressBackgroundTintList = ColorStateList.valueOf(brandColor)
         progressTintList = ColorStateList.valueOf(brandColor)

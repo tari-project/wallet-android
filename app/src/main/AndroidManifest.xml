@@ -1,14 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:ignore="LockedOrientationActivity,IntentFilterUniqueDataAttributes">
+    tools:ignore="LockedOrientationActivity">
 
     <uses-feature
         android:name="android.hardware.camera"
-        android:required="false" />
-
-    <uses-feature
-        android:name="android.hardware.nfc"
         android:required="false" />
 
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
@@ -16,26 +12,13 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.READ_CONTACTS" />
     <uses-permission android:name="android.permission.WRITE_CONTACTS" />
-    <uses-permission android:name="android.permission.BLUETOOTH" />
-    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
-    <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
-    <uses-permission android:name="android.permission.BLUETOOTH_SCAN" />
-    <uses-permission android:name="android.permission.BLUETOOTH_ADVERTISE" />
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.NFC" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" /> <!-- For GSuite API -->
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
-    <uses-permission android:name="android.permission.HIGH_SAMPLING_RATE_SENSORS" />
     <uses-permission android:name="android.permission.MANAGE_ACCOUNTS" /> <!-- remove billing support in case it gets included by a 3rd party lib -->
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
-
-    <uses-permission
-        android:name="com.android.vending.BILLING"
-        tools:node="remove" />
+    <uses-permission android:name="android.permission.DETECT_SCREEN_CAPTURE" />
 
     <queries>
         <intent>
@@ -46,7 +29,6 @@
     <application
         android:name=".application.TariWalletApplication"
         android:allowBackup="false"
-        android:extractNativeLibs="true"
         android:hardwareAccelerated="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -54,18 +36,6 @@
         android:supportsRtl="false"
         android:theme="@style/AppTheme.Light"
         tools:replace="android:supportsRtl,android:allowBackup">
-
-        <!-- Tari foreground service -->
-        <service
-            android:name=".service.service.WalletService"
-            android:description="@string/wallet_service_desc"
-            android:enabled="true"
-            android:exported="false"
-            android:foregroundServiceType="dataSync">
-            <intent-filter>
-                <action android:name="com.tari.android.wallet.service.TariWalletService" />
-            </intent-filter>
-        </service>
 
         <!-- file provider to share log files with other applications (i.e. email clients) -->
         <provider
@@ -78,24 +48,29 @@
                 android:resource="@xml/file_provider" />
         </provider>
 
-        <!-- this receiver restarts the service on destroy & keeps the service running -->
-        <receiver
-            android:name=".service.ServiceRestartBroadcastReceiver"
-            android:enabled="true"
-            android:exported="false" />
+        <!-- Firebase Cloud Messaging -->
+        <service
+            android:name=".notification.TariFcmService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
 
-        <receiver
-            android:name=".notification.NotificationBroadcastReceiver"
-            android:enabled="true"
-            android:exported="false" />
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_icon"
+            android:resource="@drawable/vector_notification_icon" />
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_channel_id"
+            android:value="com.tari.android.wallet.WALLET_NOTIFICATION" />
 
         <!-- splash -->
         <activity
-            android:name=".ui.fragment.splash.SplashActivity"
+            android:name=".ui.screen.StartActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:exported="true"
-            android:screenOrientation="portrait"
             android:launchMode="singleInstance"
+            android:screenOrientation="portrait"
             android:theme="@style/AppTheme.Splash"
             android:windowSoftInputMode="stateAlwaysHidden">
             <intent-filter>
@@ -108,26 +83,26 @@
 
         <!-- onboarding flow -->
         <activity
-            android:name=".ui.fragment.onboarding.activity.OnboardingFlowActivity"
+            android:name=".ui.screen.onboarding.activity.OnboardingFlowActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
+            android:exported="false"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.Light"
-            android:exported="false"
-            android:windowSoftInputMode="stateAlwaysHidden" />
+            android:windowSoftInputMode="stateAlwaysHidden|adjustResize" />
 
         <!-- local authentication -->
         <activity
-            android:name=".ui.fragment.auth.AuthActivity"
+            android:name=".ui.screen.auth.AuthActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
+            android:exported="false"
             android:launchMode="singleInstance"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.Light"
-            android:exported="false"
             android:windowSoftInputMode="stateAlwaysHidden" />
 
         <!-- home (transaction list) -->
         <activity
-            android:name=".ui.fragment.home.HomeActivity"
+            android:name=".ui.screen.home.HomeActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:exported="true"
             android:launchMode="singleInstance"
@@ -141,34 +116,14 @@
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
 
-                <data
-                    android:host="mainnet"
-                    android:scheme="tari" />
+                <data android:scheme="tari" />
 
-                <data
-                    android:host="nextnet"
-                    android:scheme="tari" />
-
-                <data
-                    android:host="stagenet"
-                    android:scheme="tari" />
-
-                <data
-                    android:host="esmeralda"
-                    android:scheme="tari" />
-
-                <data
-                    android:host="tari.esmeralda"
-                    android:scheme="https" />
-
-                <data
-                    android:host="y.at"
-                    android:scheme="tari" />
-
-                <data
-                    android:host="yat.fyi"
-                    android:scheme="tari" />
-
+                <data android:host="mainnet" />
+                <data android:host="nextnet" />
+                <data android:host="stagenet" />
+                <data android:host="esmeralda" />
+                <data android:host="y.at" />
+                <data android:host="yat.fyi" />
             </intent-filter>
 
             <intent-filter>
@@ -190,7 +145,6 @@
             android:name="com.google.android.gms.auth.api.signin.internal.SignInHubActivity"
             android:excludeFromRecents="true"
             android:exported="false"
-            android:screenOrientation="portrait"
             android:theme="@style/GoogleSignInActivity"
             tools:replace="android:theme" />
 
@@ -211,7 +165,7 @@
         </activity>
 
         <activity
-            android:name=".ui.fragment.qr.QRScannerActivity"
+            android:name=".ui.screen.qr.QrScannerActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:exported="false"
             android:theme="@style/AppTheme.Light"
@@ -219,7 +173,7 @@
 
         <!-- send tari -->
         <activity
-            android:name=".ui.fragment.send.finalize.YatFinalizeSendTxActivity"
+            android:name=".ui.screen.send.finalize.YatFinalizeSendTxActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:exported="true"
             android:launchMode="singleInstance"
@@ -228,34 +182,23 @@
             android:windowSoftInputMode="stateAlwaysHidden" />
 
         <activity
-            android:name=".ui.fragment.settings.logs.activity.DebugActivity"
+            android:name=".ui.screen.debug.activity.DebugActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:exported="false"
             android:launchMode="singleInstance"
-            android:parentActivityName=".ui.fragment.home.HomeActivity"
+            android:parentActivityName=".ui.screen.home.HomeActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.Light"
             android:windowSoftInputMode="adjustResize|stateAlwaysHidden" />
 
         <activity
-            android:name=".ui.fragment.restore.activity.WalletRestoreActivity"
+            android:name=".ui.screen.restore.activity.WalletRestoreActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:exported="false"
             android:launchMode="singleInstance"
-            android:parentActivityName=".ui.fragment.onboarding.activity.OnboardingFlowActivity"
+            android:parentActivityName=".ui.screen.onboarding.activity.OnboardingFlowActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.Light"
             android:windowSoftInputMode="adjustResize" />
-
-        <receiver
-            android:name=".service.BootDeviceReceiver"
-            android:enabled="true"
-            android:exported="true">
-
-            <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED" />
-            </intent-filter>
-        </receiver>
     </application>
-
 </manifest>

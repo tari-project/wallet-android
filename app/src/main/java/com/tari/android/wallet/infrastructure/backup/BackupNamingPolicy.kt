@@ -32,12 +32,12 @@
  */
 package com.tari.android.wallet.infrastructure.backup
 
-import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
+import com.tari.android.wallet.data.sharedPrefs.network.NetworkPrefRepository
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class BackupNamingPolicy @Inject constructor(val networkRepository: NetworkRepository) {
+class BackupNamingPolicy @Inject constructor(val networkRepository: NetworkPrefRepository) {
 
     private val backupFileNamePrefix = "Tari-Aurora-Backup-${networkRepository.currentNetwork.network.uriComponent}"
 

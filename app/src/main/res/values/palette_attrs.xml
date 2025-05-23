@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- Primary -->
+    <attr name="palette_primary_main" format="reference" />
+
     <!--Neutral-->
     <attr name="palette_neutral_primary" format="reference" />
     <attr name="palette_neutral_secondary" format="reference" />
@@ -12,8 +15,7 @@
     <attr name="palette_brand_dark_blue" format="reference" />
 
     <!--Buttons-->
-    <attr name="palette_button_primary_start" format="reference" />
-    <attr name="palette_button_primary_end" format="reference" />
+    <attr name="palette_button_primary" format="reference" />
     <attr name="palette_button_disable" format="reference" />
     <attr name="palette_button_primary_text" format="reference" />
     <attr name="palette_button_disabled_text" format="reference" />
@@ -23,6 +25,7 @@
     <attr name="palette_text_body" format="reference" />
     <attr name="palette_text_light" format="reference" />
     <attr name="palette_text_links" format="reference" />
+    <attr name="palette_text_button" format="reference" />
 
     <!--Icons-->
     <attr name="palette_icons_default" format="reference" />

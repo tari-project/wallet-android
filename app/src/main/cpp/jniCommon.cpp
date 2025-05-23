@@ -34,6 +34,7 @@
 #include <android/log.h>
 #include <string>
 #include <cmath>
+#include <functional>
 #include <android/log.h>
 
 #define LOG_TAG "Tari Wallet"

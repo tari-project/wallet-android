@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.tari.android.wallet.ui.component.tari.TariPrimaryBackground xmlns:android="http://schemas.android.com/apk/res/android"
+<com.tari.android.wallet.ui.component.tari.background.obsolete.TariPrimaryBackgroundConstraint xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/root_view"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true">
 
     <!-- back -->
     <com.tari.android.wallet.ui.component.tari.TariBackButton
@@ -34,14 +34,15 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@id/back_cta_view" />
 
-    <com.tari.android.wallet.ui.component.tari.TariPrimaryBackground
+    <com.tari.android.wallet.ui.component.tari.background.TariPrimaryBackground
         android:id="@+id/emoji_id_summary_container_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
         android:clickable="true"
-        android:elevation="@dimen/common_view_elevation"
+        android:elevation="5dp"
         android:focusable="true"
+        android:foreground="?attr/selectableItemBackground"
         android:paddingStart="@dimen/emoji_id_container_horizontal_padding"
         android:paddingTop="@dimen/emoji_id_container_vertical_padding"
         android:paddingEnd="@dimen/emoji_id_container_horizontal_padding"
@@ -54,13 +55,12 @@
         app:layout_constraintTop_toTopOf="@id/back_cta_view">
 
         <include
-            android:id="@+id/emoji_id_summary_view"
-            layout="@layout/view_emoji_id_summary"
+            android:id="@+id/emoji_id_view_container"
+            layout="@layout/view_address_short_small"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:visibility="visible" />
-
-    </com.tari.android.wallet.ui.component.tari.TariPrimaryBackground>
+    </com.tari.android.wallet.ui.component.tari.background.TariPrimaryBackground>
 
     <androidx.constraintlayout.widget.Barrier
         android:id="@+id/add_note_header_barrier"
@@ -74,7 +74,7 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginTop="@dimen/common_horizontal_margin"
-        app:layout_constraintBottom_toTopOf="@id/search_giphy_container_view"
+        app:layout_constraintBottom_toTopOf="@id/slide_button_container_view"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/add_note_header_barrier">
@@ -113,99 +113,8 @@
                 android:textColorHint="?attr/palette_text_light"
                 android:textSize="@dimen/add_note_note_text_size"
                 app:customFont="medium" />
-
-            <FrameLayout
-                android:id="@+id/gif_container_view"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="8dp">
-
-                <androidx.appcompat.widget.AppCompatImageView
-                    android:id="@+id/gif_image_view"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:adjustViewBounds="true"
-                    android:scaleType="fitCenter" />
-
-                <androidx.appcompat.widget.AppCompatImageView
-                    android:id="@+id/remove_gif_cta_view"
-                    android:layout_width="22dp"
-                    android:layout_height="22dp"
-                    android:layout_gravity="top|end"
-                    android:layout_marginTop="10dp"
-                    android:layout_marginEnd="10dp"
-                    android:src="@drawable/vector_icon_remove_gif" />
-
-            </FrameLayout>
-
         </LinearLayout>
     </ScrollView>
-
-    <LinearLayout
-        android:id="@+id/search_giphy_container_view"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:paddingHorizontal="10dp"
-        app:layout_constraintBottom_toTopOf="@id/slide_button_container_view"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
-
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <LinearLayout
-                android:id="@+id/search_giphy_cta_view"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:background="@drawable/tari_search_giphy_cta_bg"
-                android:orientation="horizontal"
-                android:paddingHorizontal="9dp"
-                android:paddingVertical="4dp">
-
-                <androidx.appcompat.widget.AppCompatImageView
-                    android:layout_width="9dp"
-                    android:layout_height="9dp"
-                    android:layout_gravity="center_vertical"
-                    android:src="@drawable/vector_giphy_search" />
-
-                <com.tari.android.wallet.ui.component.tari.TariTextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="3dp"
-                    android:text="@string/add_note_search_giphy_label"
-                    android:textColor="@color/white"
-                    android:textSize="9sp"
-                    app:customFont="black"
-                    tools:ignore="SmallSp" />
-
-            </LinearLayout>
-
-            <androidx.appcompat.widget.AppCompatImageView
-                android:id="@+id/powered_by_giphy_image_view"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
-                android:layout_centerVertical="true"
-                android:background="@drawable/tari_search_giphy_cta_bg"
-                android:src="@drawable/taripowered_by_giphy"
-                android:tint="@color/white" />
-
-        </RelativeLayout>
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/thumbnail_gifs_recycler_view"
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/add_note_gif_thumbnail_size"
-            android:layout_marginTop="10dp"
-            android:layout_marginBottom="14dp"
-            app:gphDirection="horizontal"
-            app:gphSpanCount="1" />
-
-    </LinearLayout>
 
     <!-- slide button container -->
     <RelativeLayout
@@ -271,7 +180,7 @@
             android:background="@drawable/vector_add_note_slide_button_bg"
             android:clickable="true"
             android:focusable="true"
-            android:textColor="?attr/palette_brand_purple">
+            android:textColor="?attr/palette_text_heading">
 
             <androidx.appcompat.widget.AppCompatImageView
                 android:id="@+id/add_note_img_slide_to_send_arrow_disabled"
@@ -289,21 +198,7 @@
                 android:layout_centerInParent="true"
                 android:rotation="180"
                 android:src="@drawable/vector_back_button"
-                android:tint="?attr/palette_brand_purple" />
-
+                android:tint="?attr/palette_text_heading" />
         </RelativeLayout>
-
     </RelativeLayout>
-
-    <!-- full emoji id outer container -->
-    <include
-        android:id="@+id/emoji_id_outer_container"
-        layout="@layout/view_full_emoji_id"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-</com.tari.android.wallet.ui.component.tari.TariPrimaryBackground>
+</com.tari.android.wallet.ui.component.tari.background.obsolete.TariPrimaryBackgroundConstraint>

@@ -32,8 +32,7 @@
  */
 package com.tari.android.wallet.util
 
-import com.tari.android.wallet.model.MicroTari
-import java.math.BigInteger
+import com.tari.android.wallet.util.extension.toMicroTari
 
 /**
  * Contains application-wide constant values.
@@ -53,12 +52,9 @@ object Constants {
         const val mediumDurationMs = 600L
         const val longDurationMs = 1000L
         const val xLongDurationMs = 1500L
-        const val xxLongDurationMs = 2000L
 
-        const val scrollDepthShadowViewMaxOpacity = 0.75f
-
-        const val emojiIdChunkSeparatorRelativeScale = 0.9f
-        const val emojiIdChunkSeparatorLetterSpacing = 1f
+        const val EMOJI_ID_CHUNK_SEPARATOR_RELATIVE_SCALE = 0.9f
+        const val EMOJI_ID_CHUNK_SEPARATOR_LETTER_SPACING = 1f
 
         object Button {
             const val clickScaleAnimFullScale = 1f
@@ -69,14 +65,6 @@ object Constants {
             const val clickScaleAnimReturnStartOffset = 120L
         }
 
-        object Home {
-            const val startupAnimDurationMs = 1500L
-            const val digitAnimDurationMs = 700L
-            const val digitShrinkExpandAnimDurationMs = 200L
-            const val welcomeAnimationDurationMs = 800L
-            const val showTariBotDialogDelayMs = 2000L
-        }
-
         object CreateEmojiId {
             const val helloTextAnimDurationMs = 800L
             const val whiteBgAnimDurationMs = 1000L
@@ -84,7 +72,6 @@ object Constants {
             const val createEmojiButtonAnimDelayMs = 300L
             const val awesomeTextAnimDurationMs = 600L
             const val shortAlphaAnimDuration = 300L
-            const val viewChangeAnimDelayMs = 3000L
             const val viewOverlapDelayMs = 150L
             const val createEmojiViewAnimDurationMs = 1200L
             const val walletCreationFadeOutAnimDurationMs = 1000L
@@ -96,13 +83,6 @@ object Constants {
             const val yourEmojiIdTextAnimDurationMs = 300L
         }
 
-        object CreateWallet {
-            const val removeFragmentDelayDuration = 1200L
-            const val tariTextAnimViewDurationMs = 1600L
-            const val viewContainerFadeOutDurationMs = 800L
-            const val introductionBottomViewsFadeOutDelay = 1100L
-        }
-
         object AddAmount {
             const val numPadDigitEnterAnimDurationMs = 90L
         }
@@ -110,13 +90,12 @@ object Constants {
         object FinalizeSendTx {
             const val lottieAnimStartDelayMs = 400L
             const val textAppearAnimStartDelayMs = 200L
-            const val successfulInfoFadeOutAnimStartDelayMs = 3130L
+            const val successfulInfoFadeOutAnimStartDelayMs = 1500L
         }
 
         object Auth {
             const val viewFadeAnimDelayMs = 200L
             const val localAuthAnimDurationMs = 800L
-            const val bottomViewsFadeOutDelay = 1200L
         }
     }
 
@@ -124,21 +103,14 @@ object Constants {
      * Wallet constants.
      */
     object Wallet {
-        const val maxNumberOfRollingLogFiles = 2
-        const val rollingLogFileMaxSizeBytes = 10 * 1024 * 1024
-        const val discoveryTimeoutSec = 20L
-        const val storeAndForwardMessageDurationSec = 10800L
-        const val emojiIdLength = 33
-        const val emojiFormatterChunkSize = 3
-        const val pushNotificationServerUrl = "https://push.tari.com"
-        const val pendingTxExpirationPeriodHours = 3 * 24
-        const val backupDelayMs = 60 * 1000L
-        const val backupRetryPeriodMs = 0L
-        val defaultFeePerGram = MicroTari(BigInteger.valueOf(10))
+        const val DISCOVERY_TIMEOUT_SEC = 20L
+        const val STORE_AND_FORWARD_MESSAGE_DURATION_SEC = 10800L
+        const val EMOJI_FORMATTER_CHUNK_SIZE = 3
+        val DEFAULT_FEE_PER_GRAM = 10.toMicroTari()
     }
 
     object Contacts {
-        const val recentContactCount = 3
+        const val RECENT_CONTACTS_COUNT = 3
     }
 
     object Build {

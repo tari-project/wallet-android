@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.tari.android.wallet.ui.component.tari.TariSecondaryBackground xmlns:android="http://schemas.android.com/apk/res/android"
+<com.tari.android.wallet.ui.component.tari.background.TariSecondaryBackground xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/step_progress_bar_container_view"
     android:layout_width="55dp"
     android:layout_height="match_parent"
@@ -12,6 +12,5 @@
         android:layout_height="match_parent"
         android:indeterminate="false"
         android:progress="0" />
-
-</com.tari.android.wallet.ui.component.tari.TariSecondaryBackground>
+</com.tari.android.wallet.ui.component.tari.background.TariSecondaryBackground>
 

@@ -3,14 +3,12 @@ package com.tari.android.wallet.ui.component.tari.toolbar
 import android.content.Context
 import android.util.AttributeSet
 import android.view.LayoutInflater
-import android.view.View
 import android.widget.FrameLayout
-import com.tari.android.wallet.R
 import com.tari.android.wallet.databinding.ViewTariToolbarActionBinding
-import com.tari.android.wallet.ui.extension.setEndMargin
-import com.tari.android.wallet.ui.extension.setOnThrottledClickListener
-import com.tari.android.wallet.ui.extension.setStartMargin
-import com.tari.android.wallet.ui.extension.visible
+import com.tari.android.wallet.util.extension.setEndMargin
+import com.tari.android.wallet.util.extension.setOnThrottledClickListener
+import com.tari.android.wallet.util.extension.setStartMargin
+import com.tari.android.wallet.util.extension.visible
 
 class TariToolbarActionView @JvmOverloads constructor(
     context: Context,
@@ -21,11 +19,10 @@ class TariToolbarActionView @JvmOverloads constructor(
 
     private val ui = ViewTariToolbarActionBinding.inflate(LayoutInflater.from(context), this, true)
 
-    fun setArgs(args: TariToolbarActionArg, isRight: Boolean) {
+    fun setArgs(args: TariToolbarActionArg) {
         this.setOnThrottledClickListener { args.action?.invoke() }
         this.isClickable = args.isDisabled.not()
         this.isFocusable = args.isDisabled.not()
-        setMargins(ui.root, isRight)
         when {
             args.title != null -> {
                 ui.toolbarText.visible()
@@ -55,10 +52,5 @@ class TariToolbarActionView @JvmOverloads constructor(
                 args.action?.let { ui.backCtaView.ui.backCtaView.setOnClickListener { it() } }
             }
         }
-    }
-
-    private fun setMargins(view: View, isRight: Boolean) {
-        view.setStartMargin(if (isRight) 0 else context.resources.getDimensionPixelSize(R.dimen.common_horizontal_margin))
-        view.setEndMargin(if (!isRight) 0 else context.resources.getDimensionPixelSize(R.dimen.common_horizontal_margin))
     }
 }

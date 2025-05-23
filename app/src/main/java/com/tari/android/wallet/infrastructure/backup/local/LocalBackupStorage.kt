@@ -38,9 +38,9 @@ import android.content.Intent
 import androidx.documentfile.provider.DocumentFile
 import androidx.fragment.app.Fragment
 import com.orhanobut.logger.Logger
-import com.tari.android.wallet.data.WalletConfig
-import com.tari.android.wallet.data.sharedPrefs.network.NetworkRepository
-import com.tari.android.wallet.extension.getLastPathComponent
+import com.tari.android.wallet.application.walletManager.WalletConfig
+import com.tari.android.wallet.data.sharedPrefs.network.NetworkPrefRepository
+import com.tari.android.wallet.util.extension.getLastPathComponent
 import com.tari.android.wallet.infrastructure.backup.BackupFileProcessor
 import com.tari.android.wallet.infrastructure.backup.BackupNamingPolicy
 import com.tari.android.wallet.infrastructure.backup.BackupStorage
@@ -48,7 +48,7 @@ import com.tari.android.wallet.infrastructure.backup.BackupStorageAuthRevokedExc
 import com.tari.android.wallet.infrastructure.backup.BackupStorageSetupCancelled
 import com.tari.android.wallet.infrastructure.backup.BackupStorageSetupException
 import com.tari.android.wallet.infrastructure.backup.BackupStorageTamperedException
-import com.tari.android.wallet.ui.fragment.settings.backup.data.BackupSettingsRepository
+import com.tari.android.wallet.data.sharedPrefs.backup.BackupPrefRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.apache.commons.io.FileUtils
@@ -60,10 +60,10 @@ import javax.inject.Singleton
 @Singleton
 class LocalBackupStorage @Inject constructor(
     private val context: Context,
-    private val backupSettingsRepository: BackupSettingsRepository,
+    private val backupSettingsRepository: BackupPrefRepository,
     private val namingPolicy: BackupNamingPolicy,
     private val walletConfig: WalletConfig,
-    private val networkRepository: NetworkRepository,
+    private val networkRepository: NetworkPrefRepository,
     private val backupFileProcessor: BackupFileProcessor
 ) : BackupStorage {
 

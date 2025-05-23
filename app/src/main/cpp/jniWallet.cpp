@@ -98,192 +98,219 @@ jmethodID txoValidationCompleteCallbackMethodId;
 jmethodID transactionValidationCompleteCallbackMethodId;
 jmethodID recoveringProcessCompleteCallbackMethodId;
 jmethodID balanceUpdatedCallbackMethodId;
+jmethodID walletScannedHeightCallbackMethodId;
 jmethodID baseNodeStatusCallbackMethodId;
 
-void txBroadcastCallback(TariCompletedTransaction *pCompletedTransaction) {
+void txBroadcastCallback(void *context, TariCompletedTransaction *pCompletedTransaction) {
     auto *jniEnv = getJNIEnv();
     if (jniEnv == nullptr || callbackHandler == nullptr) {
         return;
     }
     auto jpCompletedTransaction = reinterpret_cast<jlong>(pCompletedTransaction);
-    jniEnv->CallVoidMethod(callbackHandler, txBroadcastCallbackMethodId, jpCompletedTransaction);
+    jbyteArray contextBytes = getBytesFromUnsignedLongLong(jniEnv, reinterpret_cast<uint64_t>(context));
+    jniEnv->CallVoidMethod(callbackHandler, txBroadcastCallbackMethodId, contextBytes, jpCompletedTransaction);
     g_vm->DetachCurrentThread();
 }
 
-void txMinedCallback(TariCompletedTransaction *pCompletedTransaction) {
+void txMinedCallback(void *context, TariCompletedTransaction *pCompletedTransaction) {
     auto *jniEnv = getJNIEnv();
     if (jniEnv == nullptr || callbackHandler == nullptr) {
         return;
     }
     auto jpCompletedTransaction = reinterpret_cast<jlong>(pCompletedTransaction);
-    jniEnv->CallVoidMethod(callbackHandler, txMinedCallbackMethodId, jpCompletedTransaction);
+    jbyteArray contextBytes = getBytesFromUnsignedLongLong(jniEnv, reinterpret_cast<uint64_t>(context));
+    jniEnv->CallVoidMethod(callbackHandler, txMinedCallbackMethodId, contextBytes, jpCompletedTransaction);
     g_vm->DetachCurrentThread();
 }
 
-void txMinedUnconfirmedCallback(TariCompletedTransaction *pCompletedTransaction, uint64_t confirmationCount) {
-    auto *jniEnv = getJNIEnv();
-    if (jniEnv == nullptr || callbackHandler == nullptr) {
-        return;
-    }
-    jbyteArray bytes = getBytesFromUnsignedLongLong(jniEnv, confirmationCount);
-    auto jpCompletedTransaction = reinterpret_cast<jlong>(pCompletedTransaction);
-    jniEnv->CallVoidMethod(callbackHandler, txMinedUnconfirmedCallbackMethodId, jpCompletedTransaction, bytes);
-    g_vm->DetachCurrentThread();
-}
-
-void txFauxConfirmedCallback(TariCompletedTransaction *pCompletedTransaction) {
-    auto *jniEnv = getJNIEnv();
-    if (jniEnv == nullptr || callbackHandler == nullptr) {
-        return;
-    }
-    auto jpCompletedTransaction = reinterpret_cast<jlong>(pCompletedTransaction);
-    jniEnv->CallVoidMethod(callbackHandler, txFauxConfirmedCallbackMethodId, jpCompletedTransaction);
-    g_vm->DetachCurrentThread();
-}
-
-void txFauxUnconfirmedCallback(TariCompletedTransaction *pCompletedTransaction, uint64_t confirmationCount) {
+void txMinedUnconfirmedCallback(void *context, TariCompletedTransaction *pCompletedTransaction, uint64_t confirmationCount) {
     auto *jniEnv = getJNIEnv();
     if (jniEnv == nullptr || callbackHandler == nullptr) {
         return;
     }
     jbyteArray bytes = getBytesFromUnsignedLongLong(jniEnv, confirmationCount);
     auto jpCompletedTransaction = reinterpret_cast<jlong>(pCompletedTransaction);
-    jniEnv->CallVoidMethod(callbackHandler, txFauxUnconfirmedCallbackMethodId, jpCompletedTransaction, bytes);
+    jbyteArray contextBytes = getBytesFromUnsignedLongLong(jniEnv, reinterpret_cast<uint64_t>(context));
+    jniEnv->CallVoidMethod(callbackHandler, txMinedUnconfirmedCallbackMethodId, contextBytes, jpCompletedTransaction, bytes);
     g_vm->DetachCurrentThread();
 }
 
-void txReceivedCallback(TariPendingInboundTransaction *pPendingInboundTransaction) {
+void txFauxConfirmedCallback(void *context, TariCompletedTransaction *pCompletedTransaction) {
+    auto *jniEnv = getJNIEnv();
+    if (jniEnv == nullptr || callbackHandler == nullptr) {
+        return;
+    }
+    auto jpCompletedTransaction = reinterpret_cast<jlong>(pCompletedTransaction);
+    jbyteArray contextBytes = getBytesFromUnsignedLongLong(jniEnv, reinterpret_cast<uint64_t>(context));
+    jniEnv->CallVoidMethod(callbackHandler, txFauxConfirmedCallbackMethodId, contextBytes, jpCompletedTransaction);
+    g_vm->DetachCurrentThread();
+}
+
+void txFauxUnconfirmedCallback(void *context, TariCompletedTransaction *pCompletedTransaction, uint64_t confirmationCount) {
+    auto *jniEnv = getJNIEnv();
+    if (jniEnv == nullptr || callbackHandler == nullptr) {
+        return;
+    }
+    jbyteArray bytes = getBytesFromUnsignedLongLong(jniEnv, confirmationCount);
+    auto jpCompletedTransaction = reinterpret_cast<jlong>(pCompletedTransaction);
+    jbyteArray contextBytes = getBytesFromUnsignedLongLong(jniEnv, reinterpret_cast<uint64_t>(context));
+    jniEnv->CallVoidMethod(callbackHandler, txFauxUnconfirmedCallbackMethodId, contextBytes, jpCompletedTransaction, bytes);
+    g_vm->DetachCurrentThread();
+}
+
+void txReceivedCallback(void *context, TariPendingInboundTransaction *pPendingInboundTransaction) {
     auto *jniEnv = getJNIEnv();
     if (jniEnv == nullptr || callbackHandler == nullptr) {
         return;
     }
     auto jpPendingInboundTransaction = reinterpret_cast<jlong>(pPendingInboundTransaction);
-    jniEnv->CallVoidMethod(callbackHandler, txReceivedCallbackMethodId, jpPendingInboundTransaction);
+    jbyteArray contextBytes = getBytesFromUnsignedLongLong(jniEnv, reinterpret_cast<uint64_t>(context));
+    jniEnv->CallVoidMethod(callbackHandler, txReceivedCallbackMethodId, contextBytes, jpPendingInboundTransaction);
     g_vm->DetachCurrentThread();
 }
 
-void txReplyReceivedCallback(TariCompletedTransaction *pCompletedTransaction) {
+void txReplyReceivedCallback(void *context, TariCompletedTransaction *pCompletedTransaction) {
     auto *jniEnv = getJNIEnv();
     if (jniEnv == nullptr || callbackHandler == nullptr) {
         return;
     }
     auto jpCompletedTransaction = reinterpret_cast<jlong>(pCompletedTransaction);
-    jniEnv->CallVoidMethod(callbackHandler, txReplyReceivedCallbackMethodId, jpCompletedTransaction);
+    jbyteArray contextBytes = getBytesFromUnsignedLongLong(jniEnv, reinterpret_cast<uint64_t>(context));
+    jniEnv->CallVoidMethod(callbackHandler, txReplyReceivedCallbackMethodId, contextBytes, jpCompletedTransaction);
     g_vm->DetachCurrentThread();
 }
 
-void txFinalizedCallback(TariCompletedTransaction *pCompletedTransaction) {
+void txFinalizedCallback(void *context, TariCompletedTransaction *pCompletedTransaction) {
     auto *jniEnv = getJNIEnv();
     if (jniEnv == nullptr || callbackHandler == nullptr) {
         return;
     }
     auto jpCompletedTransaction = reinterpret_cast<jlong>(pCompletedTransaction);
-    jniEnv->CallVoidMethod(callbackHandler, txFinalizedCallbackMethodId, jpCompletedTransaction);
+    jbyteArray contextBytes = getBytesFromUnsignedLongLong(jniEnv, reinterpret_cast<uint64_t>(context));
+    jniEnv->CallVoidMethod(callbackHandler, txFinalizedCallbackMethodId, contextBytes, jpCompletedTransaction);
     g_vm->DetachCurrentThread();
 }
 
-void txDirectSendResultCallback(unsigned long long txId, TariTransactionSendStatus *status) {
+void txDirectSendResultCallback(void *context, unsigned long long txId, TariTransactionSendStatus *status) {
     auto *jniEnv = getJNIEnv();
     if (jniEnv == nullptr || callbackHandler == nullptr) {
         return;
     }
     jbyteArray bytes = getBytesFromUnsignedLongLong(jniEnv, txId);
-    jniEnv->CallVoidMethod(callbackHandler, directSendResultCallbackMethodId, bytes, status);
+    jbyteArray contextBytes = getBytesFromUnsignedLongLong(jniEnv, reinterpret_cast<uint64_t>(context));
+    jniEnv->CallVoidMethod(callbackHandler, directSendResultCallbackMethodId, contextBytes, bytes, status);
     g_vm->DetachCurrentThread();
 }
 
-void
-txCancellationCallback(TariCompletedTransaction *pCompletedTransaction, uint64_t rejectionReason) {
+void txCancellationCallback(void *context, TariCompletedTransaction *pCompletedTransaction, uint64_t rejectionReason) {
     auto *jniEnv = getJNIEnv();
     if (jniEnv == nullptr || callbackHandler == nullptr) {
         return;
     }
     jbyteArray bytes = getBytesFromUnsignedLongLong(jniEnv, rejectionReason);
     auto jpCompletedTransaction = reinterpret_cast<jlong>(pCompletedTransaction);
-    jniEnv->CallVoidMethod(callbackHandler, txCancellationCallbackMethodId, jpCompletedTransaction, bytes);
+    jbyteArray contextBytes = getBytesFromUnsignedLongLong(jniEnv, reinterpret_cast<uint64_t>(context));
+    jniEnv->CallVoidMethod(callbackHandler, txCancellationCallbackMethodId, contextBytes, jpCompletedTransaction, bytes);
     g_vm->DetachCurrentThread();
 }
 
-void txoValidationCompleteCallback(uint64_t requestId, uint64_t status) {
+void txoValidationCompleteCallback(void *context, uint64_t requestId, uint64_t status) {
     auto *jniEnv = getJNIEnv();
     if (jniEnv == nullptr || callbackHandler == nullptr) {
         return;
     }
     jbyteArray requestIdBytes = getBytesFromUnsignedLongLong(jniEnv, requestId);
     jbyteArray statusBytes = getBytesFromUnsignedLongLong(jniEnv, status);
-    jniEnv->CallVoidMethod(callbackHandler, txoValidationCompleteCallbackMethodId, requestIdBytes, statusBytes);
+    jbyteArray contextBytes = getBytesFromUnsignedLongLong(jniEnv, reinterpret_cast<uint64_t>(context));
+    jniEnv->CallVoidMethod(callbackHandler, txoValidationCompleteCallbackMethodId, contextBytes, requestIdBytes, statusBytes);
     g_vm->DetachCurrentThread();
 }
 
-void contactsLivenessDataUpdatedCallback(TariContactsLivenessData *pTariContactsLivenessData) {
+void contactsLivenessDataUpdatedCallback(void *context, TariContactsLivenessData *pTariContactsLivenessData) {
     auto *jniEnv = getJNIEnv();
     if (jniEnv == nullptr || callbackHandler == nullptr) {
         return;
     }
     auto jpTariContactsLivenessData = reinterpret_cast<jlong>(pTariContactsLivenessData);
-    jniEnv->CallVoidMethod(callbackHandler, contactsLivenessDataUpdatedCallbackMethodId, jpTariContactsLivenessData);
+    jbyteArray contextBytes = getBytesFromUnsignedLongLong(jniEnv, reinterpret_cast<uint64_t>(context));
+    jniEnv->CallVoidMethod(callbackHandler, contactsLivenessDataUpdatedCallbackMethodId, contextBytes, jpTariContactsLivenessData);
     g_vm->DetachCurrentThread();
 }
 
-void transactionValidationCompleteCallback(uint64_t requestId, uint64_t status) {
+void transactionValidationCompleteCallback(void *context, uint64_t requestId, uint64_t status) {
     auto *jniEnv = getJNIEnv();
     if (jniEnv == nullptr || callbackHandler == nullptr) {
         return;
     }
     jbyteArray requestIdBytes = getBytesFromUnsignedLongLong(jniEnv, requestId);
     jbyteArray statusBytes = getBytesFromUnsignedLongLong(jniEnv, status);
-    jniEnv->CallVoidMethod(callbackHandler, transactionValidationCompleteCallbackMethodId, requestIdBytes, statusBytes);
+    jbyteArray contextBytes = getBytesFromUnsignedLongLong(jniEnv, reinterpret_cast<uint64_t>(context));
+    jniEnv->CallVoidMethod(callbackHandler, transactionValidationCompleteCallbackMethodId, contextBytes, requestIdBytes, statusBytes);
     g_vm->DetachCurrentThread();
 }
 
-void connectivityStatusCallback(uint64_t status) {
+void connectivityStatusCallback(void *context, uint64_t status) {
     auto *jniEnv = getJNIEnv();
     if (jniEnv == nullptr || callbackHandler == nullptr) {
         return;
     }
+    jbyteArray contextBytes = getBytesFromUnsignedLongLong(jniEnv, reinterpret_cast<uint64_t>(context));
     jbyteArray requestIdBytes = getBytesFromUnsignedLongLong(jniEnv, status);
-    jniEnv->CallVoidMethod(callbackHandler, connectivityStatusCallbackId, requestIdBytes);
+    jniEnv->CallVoidMethod(callbackHandler, connectivityStatusCallbackId, contextBytes, requestIdBytes);
     g_vm->DetachCurrentThread();
 }
 
-void balanceUpdatedCallback(TariBalance *pBalance) {
+void walletScannedHeightCallback(void *context, uint64_t height) {
+    auto *jniEnv = getJNIEnv();
+    if (jniEnv == nullptr || callbackHandler == nullptr) {
+        return;
+    }
+    jbyteArray bytes = getBytesFromUnsignedLongLong(jniEnv, height);
+    jbyteArray contextBytes = getBytesFromUnsignedLongLong(jniEnv, reinterpret_cast<uint64_t>(context));
+    jniEnv->CallVoidMethod(callbackHandler, walletScannedHeightCallbackMethodId, contextBytes, bytes);
+    g_vm->DetachCurrentThread();
+}
+
+void balanceUpdatedCallback(void *context, TariBalance *pBalance) {
     auto *jniEnv = getJNIEnv();
     if (jniEnv == nullptr || callbackHandler == nullptr) {
         return;
     }
     auto jpBalance = reinterpret_cast<jlong>(pBalance);
-    jniEnv->CallVoidMethod(callbackHandler, balanceUpdatedCallbackMethodId, jpBalance);
+    jbyteArray contextBytes = getBytesFromUnsignedLongLong(jniEnv, reinterpret_cast<uint64_t>(context));
+    jniEnv->CallVoidMethod(callbackHandler, balanceUpdatedCallbackMethodId, contextBytes, jpBalance);
     g_vm->DetachCurrentThread();
 }
 
-void storeAndForwardMessagesReceivedCallback() {
+void storeAndForwardMessagesReceivedCallback(void *context) {
     // no-op
 }
 
-void baseNodeStatusCallback(TariBaseNodeState *pBaseNodeState) {
+void baseNodeStatusCallback(void *context, TariBaseNodeState *pBaseNodeState) {
     auto *jniEnv = getJNIEnv();
     if (jniEnv == nullptr || callbackHandler == nullptr) {
         return;
     }
     auto jpBaseNodeState = reinterpret_cast<jlong>(pBaseNodeState);
-    jniEnv->CallVoidMethod(callbackHandler, baseNodeStatusCallbackMethodId, jpBaseNodeState);
+    jbyteArray contextBytes = getBytesFromUnsignedLongLong(jniEnv, reinterpret_cast<uint64_t>(context));
+    jniEnv->CallVoidMethod(callbackHandler, baseNodeStatusCallbackMethodId, contextBytes, jpBaseNodeState);
     g_vm->DetachCurrentThread();
 }
 
-
-void recoveringProcessCompleteCallback(uint8_t first, uint64_t second, uint64_t third) {
+void recoveringProcessCompleteCallback(void *context, uint8_t first, uint64_t second, uint64_t third) {
     auto *jniEnv = getJNIEnv();
     if (jniEnv == nullptr || callbackHandler == nullptr) {
         return;
     }
     jbyteArray bytes2 = getBytesFromUnsignedLongLong(jniEnv, second);
     jbyteArray bytes3 = getBytesFromUnsignedLongLong(jniEnv, third);
-    jniEnv->CallVoidMethod(callbackHandler, recoveringProcessCompleteCallbackMethodId, static_cast<jint>(first), bytes2, bytes3);
+    jbyteArray contextBytes = getBytesFromUnsignedLongLong(jniEnv, reinterpret_cast<uint64_t>(context));
+    jniEnv->CallVoidMethod(callbackHandler, recoveringProcessCompleteCallbackMethodId, contextBytes, static_cast<jint>(first), bytes2, bytes3);
     g_vm->DetachCurrentThread();
 }
 
-jmethodID getMethodId(JNIEnv *jniEnv, jobject jThis, jstring methodName, jstring methodSignature) {
-    jclass jClass = jniEnv->GetObjectClass(jThis);
+jmethodID getMethodId(JNIEnv *jniEnv, jobject object, jstring methodName, jstring methodSignature) {
+    jclass jClass = jniEnv->GetObjectClass(object);
     const char *method = jniEnv->GetStringUTFChars(methodName, JNI_FALSE);
     const char *signature = jniEnv->GetStringUTFChars(methodSignature, JNI_FALSE);
     jmethodID methodId = jniEnv->GetMethodID(jClass, method, signature);
@@ -297,6 +324,7 @@ JNIEXPORT void JNICALL
 Java_com_tari_android_wallet_ffi_FFIWallet_jniCreate(
         JNIEnv *jEnv,
         jobject jThis,
+        jint jpContext,
         jobject jpWalletConfig,
         jstring jLogPath,
         jint logVerbosity,
@@ -307,8 +335,9 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniCreate(
         jobject jSeed_words,
         jstring jDnsPeer,
         jboolean isDnsSecureOn,
-        jstring txReceivedCallbackMethodName,
-        jstring txReceivedCallbackMethodSignature,
+        jobject jWalletCallbacks,
+        jstring callback_received_tx,
+        jstring callback_received_tx_sig,
         jstring callback_received_tx_reply,
         jstring callback_received_tx_reply_sig,
         jstring callback_received_finalized_tx,
@@ -337,101 +366,111 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniCreate(
         jstring callback_transaction_validation_complete_sig,
         jstring callback_connectivity_status,
         jstring callback_connectivity_status_sig,
+        jstring callback_wallet_scanned_height,
+        jstring callback_wallet_scanned_height_sig,
         jstring callback_base_node_status,
         jstring callback_base_node_status_sig,
         jobject error) {
 
     int errorCode = 0;
     if (callbackHandler == nullptr) {
-        callbackHandler = jEnv->NewGlobalRef(jThis);
+        callbackHandler = jEnv->NewGlobalRef(jWalletCallbacks);
     }
     jclass jClass = jEnv->GetObjectClass(jThis);
     if (jClass == nullptr) {
         SetNullPointerField(jEnv, jThis);
     }
 
-    txReceivedCallbackMethodId = getMethodId(jEnv, jThis, txReceivedCallbackMethodName, txReceivedCallbackMethodSignature);
+    txReceivedCallbackMethodId = getMethodId(jEnv, jWalletCallbacks, callback_received_tx, callback_received_tx_sig);
     if (txReceivedCallbackMethodId == nullptr) {
         SetNullPointerField(jEnv, jThis);
     }
 
-    txReplyReceivedCallbackMethodId = getMethodId(jEnv, jThis, callback_received_tx_reply, callback_received_tx_reply_sig);
+    txReplyReceivedCallbackMethodId = getMethodId(jEnv, jWalletCallbacks, callback_received_tx_reply, callback_received_tx_reply_sig);
     if (txReplyReceivedCallbackMethodId == nullptr) {
         SetNullPointerField(jEnv, jThis);
     }
 
-    txFinalizedCallbackMethodId = getMethodId(jEnv, jThis, callback_received_finalized_tx, callback_received_finalized_tx_sig);
+    txFinalizedCallbackMethodId = getMethodId(jEnv, jWalletCallbacks, callback_received_finalized_tx, callback_received_finalized_tx_sig);
     if (txFinalizedCallbackMethodId == nullptr) {
         SetNullPointerField(jEnv, jThis);
     }
 
-    txBroadcastCallbackMethodId = getMethodId(jEnv, jThis, callback_tx_broadcast, callback_tx_broadcast_sig);
+    txBroadcastCallbackMethodId = getMethodId(jEnv, jWalletCallbacks, callback_tx_broadcast, callback_tx_broadcast_sig);
     if (txBroadcastCallbackMethodId == nullptr) {
         SetNullPointerField(jEnv, jThis);
     }
 
-    txMinedCallbackMethodId = getMethodId(jEnv, jThis, callback_tx_mined, callback_tx_mined_sig);
+    txMinedCallbackMethodId = getMethodId(jEnv, jWalletCallbacks, callback_tx_mined, callback_tx_mined_sig);
     if (txMinedCallbackMethodId == nullptr) {
         SetNullPointerField(jEnv, jThis);
     }
 
-    txMinedUnconfirmedCallbackMethodId = getMethodId(jEnv, jThis, callback_tx_mined_unconfirmed, callback_tx_mined_unconfirmed_sig);
+    txMinedUnconfirmedCallbackMethodId = getMethodId(jEnv, jWalletCallbacks, callback_tx_mined_unconfirmed, callback_tx_mined_unconfirmed_sig);
     if (txMinedUnconfirmedCallbackMethodId == nullptr) {
         SetNullPointerField(jEnv, jThis);
     }
 
-    txFauxConfirmedCallbackMethodId = getMethodId(jEnv, jThis, callback_tx_faux_confirmed, callback_tx_faux_confirmed_sig);
+    txFauxConfirmedCallbackMethodId = getMethodId(jEnv, jWalletCallbacks, callback_tx_faux_confirmed, callback_tx_faux_confirmed_sig);
     if (txFauxConfirmedCallbackMethodId == nullptr) {
         SetNullPointerField(jEnv, jThis);
     }
 
-    txFauxUnconfirmedCallbackMethodId = getMethodId(jEnv, jThis, callback_tx_faux_unconfirmed, callback_tx_faux_unconfirmed_sig);
+    txFauxUnconfirmedCallbackMethodId = getMethodId(jEnv, jWalletCallbacks, callback_tx_faux_unconfirmed, callback_tx_faux_unconfirmed_sig);
     if (txFauxUnconfirmedCallbackMethodId == nullptr) {
         SetNullPointerField(jEnv, jThis);
     }
 
-    directSendResultCallbackMethodId = getMethodId(jEnv, jThis, callback_direct_send_result, callback_direct_send_result_sig);
+    directSendResultCallbackMethodId = getMethodId(jEnv, jWalletCallbacks, callback_direct_send_result, callback_direct_send_result_sig);
     if (directSendResultCallbackMethodId == nullptr) {
         SetNullPointerField(jEnv, jThis);
     }
 
-    txCancellationCallbackMethodId = getMethodId(jEnv, jThis, callback_tx_cancellation, callback_tx_cancellation_sig);
+    txCancellationCallbackMethodId = getMethodId(jEnv, jWalletCallbacks, callback_tx_cancellation, callback_tx_cancellation_sig);
     if (txCancellationCallbackMethodId == nullptr) {
         SetNullPointerField(jEnv, jThis);
     }
 
-    connectivityStatusCallbackId = getMethodId(jEnv, jThis, callback_connectivity_status, callback_connectivity_status_sig);
+    connectivityStatusCallbackId = getMethodId(jEnv, jWalletCallbacks, callback_connectivity_status, callback_connectivity_status_sig);
     if (connectivityStatusCallbackId == nullptr) {
         SetNullPointerField(jEnv, jThis);
     }
 
-    txoValidationCompleteCallbackMethodId = getMethodId(jEnv, jThis, callback_txo_validation_complete, callback_txo_validation_complete_sig);
+    txoValidationCompleteCallbackMethodId = getMethodId(jEnv, jWalletCallbacks, callback_txo_validation_complete,
+                                                        callback_txo_validation_complete_sig);
     if (txoValidationCompleteCallbackMethodId == nullptr) {
         SetNullPointerField(jEnv, jThis);
     }
 
-    transactionValidationCompleteCallbackMethodId = getMethodId(jEnv, jThis, callback_transaction_validation_complete,
+    transactionValidationCompleteCallbackMethodId = getMethodId(jEnv, jWalletCallbacks, callback_transaction_validation_complete,
                                                                 callback_transaction_validation_complete_sig);
     if (transactionValidationCompleteCallbackMethodId == nullptr) {
         SetNullPointerField(jEnv, jThis);
     }
 
-    contactsLivenessDataUpdatedCallbackMethodId = getMethodId(jEnv, jThis, callback_contacts_liveness_data_updated,
+    contactsLivenessDataUpdatedCallbackMethodId = getMethodId(jEnv, jWalletCallbacks, callback_contacts_liveness_data_updated,
                                                               callback_contacts_liveness_data_updated_sig);
     if (contactsLivenessDataUpdatedCallbackMethodId == nullptr) {
         SetNullPointerField(jEnv, jThis);
     }
 
-    balanceUpdatedCallbackMethodId = getMethodId(jEnv, jThis, callback_balance_updated, callback_balance_updated_sig);
+    balanceUpdatedCallbackMethodId = getMethodId(jEnv, jWalletCallbacks, callback_balance_updated, callback_balance_updated_sig);
     if (balanceUpdatedCallbackMethodId == nullptr) {
         SetNullPointerField(jEnv, jThis);
     }
 
-    baseNodeStatusCallbackMethodId = getMethodId(jEnv, jThis, callback_base_node_status, callback_base_node_status_sig);
+    walletScannedHeightCallbackMethodId = getMethodId(jEnv, jWalletCallbacks, callback_wallet_scanned_height,
+                                                      callback_wallet_scanned_height_sig);
+    if (walletScannedHeightCallbackMethodId == nullptr) {
+        SetNullPointerField(jEnv, jThis);
+    }
+
+    baseNodeStatusCallbackMethodId = getMethodId(jEnv, jWalletCallbacks, callback_base_node_status, callback_base_node_status_sig);
     if (baseNodeStatusCallbackMethodId == nullptr) {
         SetNullPointerField(jEnv, jThis);
     }
 
+    auto pContext = reinterpret_cast<int *>(jpContext);
     auto pWalletConfig = GetPointerField<TariCommsConfig *>(jEnv, jpWalletConfig);
 
     const char *pLogPath = jEnv->GetStringUTFChars(jLogPath, JNI_FALSE);
@@ -463,15 +502,18 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniCreate(
     }
 
     TariWallet *pWallet = wallet_create(
+            pContext,
             pWalletConfig,
             pLogPath,
             logVerbosity,
             static_cast<unsigned int>(maxNumberOfRollingLogFiles),
             static_cast<unsigned int>(rollingLogFileMaxSizeBytes),
             pPassphrase,
+            nullptr,
             pSeedWords,
             pNetwork,
             pDnsPeer,
+            nullptr,
             isDnsSecureOn,
             txReceivedCallback,
             txReplyReceivedCallback,
@@ -489,6 +531,7 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniCreate(
             transactionValidationCompleteCallback,
             storeAndForwardMessagesReceivedCallback,
             connectivityStatusCallback,
+            walletScannedHeightCallback,
             baseNodeStatusCallback,
             pRecovery,
             &errorCode);
@@ -562,7 +605,7 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniGetWalletAddress(
         jobject error) {
     return ExecuteWithErrorAndCast<TariWalletAddress *>(jEnv, error, [&](int *errorPointer) {
         auto pWallet = GetPointerField<TariWallet *>(jEnv, jThis);
-        return wallet_get_tari_address(pWallet, errorPointer);
+        return wallet_get_tari_one_sided_address(pWallet, errorPointer);
     });
 }
 
@@ -1083,7 +1126,7 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniSendTx(
         jobject jDestination,
         jstring jAmount,
         jstring jFeePerGram,
-        jstring jMessage,
+        jstring jPaymentId,
         jboolean jOneSided,
         jobject error) {
     return ExecuteWithError<jbyteArray>(jEnv, error, [&](int *errorPointer) {
@@ -1091,7 +1134,7 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniSendTx(
         auto pDestination = GetPointerField<TariWalletAddress *>(jEnv, jDestination);
         const char *nativeAmount = jEnv->GetStringUTFChars(jAmount, JNI_FALSE);
         const char *nativeFeePerGram = jEnv->GetStringUTFChars(jFeePerGram, JNI_FALSE);
-        const char *pMessage = jEnv->GetStringUTFChars(jMessage, JNI_FALSE);
+        const char *pPaymentId = jEnv->GetStringUTFChars(jPaymentId, JNI_FALSE);
         char *pAmountEnd;
         char *pFeeEnd;
         unsigned long long feePerGram = strtoull(nativeFeePerGram, &pFeeEnd, 10);
@@ -1099,11 +1142,11 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniSendTx(
 
         jbyteArray result = getBytesFromUnsignedLongLong(
                 jEnv,
-                wallet_send_transaction(pWallet, pDestination, amount, nullptr, feePerGram, pMessage,
-                                        jOneSided, errorPointer));
+                wallet_send_transaction(pWallet, pDestination, amount, nullptr, feePerGram,
+                                        jOneSided, pPaymentId, errorPointer));
         jEnv->ReleaseStringUTFChars(jAmount, nativeAmount);
         jEnv->ReleaseStringUTFChars(jFeePerGram, nativeFeePerGram);
-        jEnv->ReleaseStringUTFChars(jMessage, pMessage);
+        jEnv->ReleaseStringUTFChars(jPaymentId, pPaymentId);
         return result;
     });
 }
@@ -1113,25 +1156,23 @@ JNIEXPORT jboolean JNICALL
 Java_com_tari_android_wallet_ffi_FFIWallet_jniStartRecovery(
         JNIEnv *jEnv,
         jobject jThis,
-        jobject base_node_public_key,
+        jobject jWalletCallbacks,
         jstring callback,
         jstring callback_sig,
         jstring recovery_output_message,
         jobject error) {
     return ExecuteWithError<jboolean>(jEnv, error, [&](int *errorPointer) {
         auto pWallet = GetPointerField<TariWallet *>(jEnv, jThis);
-        auto pTariPublicKey = GetPointerField<TariPublicKey *>(jEnv, base_node_public_key);
-        recoveringProcessCompleteCallbackMethodId = getMethodId(jEnv, jThis, callback, callback_sig);
+        recoveringProcessCompleteCallbackMethodId = getMethodId(jEnv, jWalletCallbacks, callback, callback_sig);
         if (recoveringProcessCompleteCallbackMethodId == nullptr) {
             SetNullPointerField(jEnv, jThis);
         }
 
         const char *pRecoveryOutputMessage = jEnv->GetStringUTFChars(recovery_output_message, JNI_FALSE);
 
-        return wallet_start_recovery(pWallet, pTariPublicKey, recoveringProcessCompleteCallback, pRecoveryOutputMessage, errorPointer);
+        return wallet_start_recovery(pWallet, nullptr, recoveringProcessCompleteCallback, pRecoveryOutputMessage, errorPointer);
     });
 }
-
 
 extern "C"
 JNIEXPORT jstring JNICALL
@@ -1254,5 +1295,18 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniGetBaseNodePeers(
     return ExecuteWithErrorAndCast<TariPublicKeys *>(jEnv, error, [&](int *error) {
         auto pWallet = GetPointerField<TariWallet *>(jEnv, jThis);
         return wallet_get_seed_peers(pWallet, error);
+    });
+}
+
+extern "C"
+JNIEXPORT jlong JNICALL
+Java_com_tari_android_wallet_ffi_FFIWallet_jniGetPrivateViewKey(
+        JNIEnv *jEnv,
+        jobject jThis,
+        jobject error
+) {
+    return ExecuteWithErrorAndCast<TariPrivateKey *>(jEnv, error, [&](int *error) {
+        auto pWallet = GetPointerField<TariWallet *>(jEnv, jThis);
+        return wallet_get_private_view_key(pWallet, error);
     });
 }
