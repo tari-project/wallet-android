@@ -1,5 +1,3 @@
-@file:Suppress("UnstableApiUsage")
-
 import java.io.ByteArrayOutputStream
 import java.nio.file.Files
 import java.nio.file.Paths
@@ -55,16 +53,18 @@ android {
 
         val dropboxProperties = loadDropboxProps()
         buildConfigField("String", "DROPBOX_ACCESS_TOKEN", "\"${dropboxProperties["dropbox_key"]}\"")
+
         buildConfigField("String", "LIB_WALLET_MIN_VALID_VERSION", "\"${TariBuildConfig.LibWallet.minValidVersion}\"")
         buildConfigField("String", "LIB_WALLET_VERSION", "\"${TariBuildConfig.LibWallet.version}\"")
         buildConfigField("String", "LIB_WALLET_NETWORK", "\"${TariBuildConfig.LibWallet.network}\"")
+
+        buildConfigField("String", "NOTIFICATIONS_API_KEY", "\"${loadSecretProps()["service.notifications.api_key"]}\"")
     }
 
     flavorDimensions.add("privacy-mode")
 
     buildTypes {
         loadSentryProps()
-        val secretProperties = loadSecretProps()
 
         getByName("debug") {
             isJniDebuggable = true
@@ -88,12 +88,9 @@ android {
     productFlavors {
         create("regular") {
             dimension = "privacy-mode"
-            buildConfigField("String", "NOTIFICATIONS_API_KEY", "\"${loadSecretProps()["service.notifications.api_key"]}\"")
-            proguardFile("regular-proguard-rules.pro")
         }
         create("privacy") {
             dimension = "privacy-mode"
-            buildConfigField("String", "NOTIFICATIONS_API_KEY", "\"${loadSecretProps()["service.notifications.api_key"]}\"")
         }
     }
 

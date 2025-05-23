@@ -57,3 +57,8 @@
 -dontwarn org.ietf.jgss.GSSManager
 -dontwarn org.ietf.jgss.GSSName
 -dontwarn org.ietf.jgss.Oid
+
+# Google Drive v3 SDK
+-keep class * extends com.google.api.client.json.GenericJson { *; }
+-keep class com.google.** { *; }
+-keep class com.fasterxml.** { *; }

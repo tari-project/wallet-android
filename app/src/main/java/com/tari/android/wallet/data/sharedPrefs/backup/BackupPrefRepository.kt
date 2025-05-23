@@ -79,10 +79,10 @@ class BackupPrefRepository @Inject constructor(
     )
 
     val getOptionList: List<BackupOptionDto>
-        get() = if (BuildConfig.FLAVOR == Constants.Build.privacyFlavor) {
-            listOfNotNull(localFileOption)
-        } else {
-            listOfNotNull(googleDriveOption/* dropboxOption */)
+        get() = when (BuildConfig.FLAVOR) {
+            Constants.Build.privacyFlavor -> listOfNotNull(localFileOption)
+            Constants.Build.regularFlavor -> listOfNotNull(googleDriveOption/* dropboxOption */)
+            else -> error("Unknown build flavor: ${BuildConfig.FLAVOR}")
         }
 
     fun clear() {

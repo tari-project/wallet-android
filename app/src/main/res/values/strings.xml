@@ -466,6 +466,7 @@
     <string name="back_up_wallet_backing_up_error_title">Wallet Backup Incomplete</string>
     <string name="back_up_wallet_backing_up_error_desc">Error occurred during backup: %s</string>
     <string name="back_up_wallet_backing_up_unknown_error">Unknown error</string>
+    <string name="back_up_wallet_backing_up_disabled_error">No backup available.\nCreate a backup using Google Drive first</string>
     <string name="back_up_wallet_last_successful_backup">Last sync: %s at %s</string>
     <string name="back_up_wallet_turn_off_backup_warning_title">Your backup will be deleted</string>
     <string name="back_up_wallet_turn_off_backup_warning_description">Are you sure you want to proceed?</string>
