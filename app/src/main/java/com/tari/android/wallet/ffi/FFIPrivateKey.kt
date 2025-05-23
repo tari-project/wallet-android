@@ -32,57 +32,37 @@
  */
 package com.tari.android.wallet.ffi
 
-import java.math.BigInteger
-
 /**
- * Pending inbound transaction wrapper.
+ * Wrapper for native public key type.
  *
  * @author The Tari Development Team
  */
+class FFIPrivateKey() : FFIBase() {
 
-class FFIPendingInboundTx() : FFITxBase() {
-
-    private external fun jniGetId(libError: FFIError): ByteArray
-    private external fun jniGetSourcePublicKey(libError: FFIError): FFIPointer
-    private external fun jniGetAmount(libError: FFIError): ByteArray
-    private external fun jniGetTimestamp(libError: FFIError): ByteArray
-    private external fun jniGetPaymentId(libError: FFIError): String
-    private external fun jniGetStatus(libError: FFIError): Int
+    private external fun jniGetBytes(libError: FFIError): FFIPointer
     private external fun jniDestroy()
+    private external fun jniCreate(byteVectorPtr: FFIByteVector, libError: FFIError)
+    private external fun jniFromHex(hexStr: String, libError: FFIError)
+    private external fun jniGetEmojiId(libError: FFIError): String
 
     constructor(pointer: FFIPointer) : this() {
         if (pointer.isNull()) error("Pointer must not be null")
         this.pointer = pointer
     }
 
-    fun getId(): BigInteger = runWithError { BigInteger(1, jniGetId(it)) }
-
-    override fun getSourcePublicKey(): FFITariWalletAddress = runWithError { FFITariWalletAddress(jniGetSourcePublicKey(it)) }
-
-    override fun getDestinationPublicKey(): FFITariWalletAddress = TODO()
-
-    override fun isOutbound(): Boolean = false
-
-    fun getAmount(): BigInteger = runWithError { BigInteger(1, jniGetAmount(it)) }
-
-    fun getTimestamp(): BigInteger = runWithError { BigInteger(1, jniGetTimestamp(it)) }
-
-    fun getPaymentId(): String = runWithError { jniGetPaymentId(it) }
-
-    fun getStatus(): FFITxStatus {
-        return when (runWithError { jniGetStatus(it) }) {
-            -1 -> FFITxStatus.TX_NULL_ERROR
-            0 -> FFITxStatus.COMPLETED
-            1 -> FFITxStatus.BROADCAST
-            2 -> FFITxStatus.MINED_UNCONFIRMED
-            3 -> FFITxStatus.IMPORTED
-            4 -> FFITxStatus.PENDING
-            5 -> FFITxStatus.COINBASE
-            6 -> FFITxStatus.MINED_CONFIRMED
-            7 -> FFITxStatus.UNKNOWN
-            else -> throw FFIException(message = "Unexpected status: $this")
-        }
+    constructor(byteVector: FFIByteVector) : this() {
+        runWithError { jniCreate(byteVector, it) }
     }
+
+    constructor(hex: HexString) : this() {
+        runWithError { jniFromHex(hex.hex, it) }
+    }
+
+    fun getByteVector(): FFIByteVector = runWithError { FFIByteVector(jniGetBytes(it)) }
+
+    fun getEmojiId(): String = runWithError { jniGetEmojiId(it) }
+
+    override fun toString(): String = runWithError { FFIByteVector(jniGetBytes(it)).hex() }
 
     override fun destroy() = jniDestroy()
 }

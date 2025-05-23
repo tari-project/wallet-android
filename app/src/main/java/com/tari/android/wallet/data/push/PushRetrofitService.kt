@@ -22,4 +22,5 @@ data class PushRegisterRequestBody(
     @SerializedName("public_nonce") val publicNonce: String,
     @SerializedName("platform") val platform: String = "android",
     @SerializedName("sandbox") val sandbox: Boolean = false,
+    @SerializedName("walletViewKeyHashed") val walletViewKeyHashed: String,
 )

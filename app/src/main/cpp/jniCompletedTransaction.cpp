@@ -150,28 +150,13 @@ Java_com_tari_android_wallet_ffi_FFICompletedTx_jniGetMinedHeight(
 
 extern "C"
 JNIEXPORT jstring JNICALL
-Java_com_tari_android_wallet_ffi_FFICompletedTx_jniGetMessage(
-        JNIEnv *jEnv,
-        jobject jThis,
-        jobject error) {
-    return ExecuteWithError<jstring>(jEnv, error, [&](int *errorPointer) {
-        auto pCompletedTx = GetPointerField<TariCompletedTransaction *>(jEnv, jThis);
-        const char *pMessage = completed_transaction_get_payment_id(pCompletedTx, errorPointer);
-        jstring result = jEnv->NewStringUTF(pMessage);
-        string_destroy(const_cast<char *>(pMessage));
-        return result;
-    });
-}
-
-extern "C"
-JNIEXPORT jstring JNICALL
 Java_com_tari_android_wallet_ffi_FFICompletedTx_jniGetPaymentId(
         JNIEnv *jEnv,
         jobject jThis,
         jobject error) {
     return ExecuteWithError<jstring>(jEnv, error, [&](int *errorPointer) {
         auto pCompletedTx = GetPointerField<TariCompletedTransaction *>(jEnv, jThis);
-        const char *pPaymentId = completed_transaction_get_payment_id(pCompletedTx, errorPointer);
+        const char *pPaymentId = completed_transaction_get_user_payment_id(pCompletedTx, errorPointer);
         jstring result = jEnv->NewStringUTF(pPaymentId);
         string_destroy(const_cast<char *>(pPaymentId));
         return result;

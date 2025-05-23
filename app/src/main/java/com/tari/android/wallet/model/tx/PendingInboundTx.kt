@@ -33,13 +33,13 @@
 package com.tari.android.wallet.model.tx
 
 import android.os.Parcelable
-import com.tari.android.wallet.util.extension.toMicroTari
 import com.tari.android.wallet.ffi.FFICompletedTx
 import com.tari.android.wallet.ffi.FFIPendingInboundTx
 import com.tari.android.wallet.model.MicroTari
 import com.tari.android.wallet.model.TariContact
 import com.tari.android.wallet.model.TxId
 import com.tari.android.wallet.model.TxStatus
+import com.tari.android.wallet.util.extension.toMicroTari
 import kotlinx.parcelize.Parcelize
 import java.math.BigInteger
 
@@ -54,11 +54,10 @@ data class PendingInboundTx(
     override val direction: Direction,
     override val amount: MicroTari,
     override val timestamp: BigInteger,
-    override val message: String,
     override val paymentId: String,
     override val status: TxStatus,
     override val tariContact: TariContact,
-) : Tx(id, direction, amount, timestamp, message, paymentId, status, tariContact), Parcelable {
+) : Tx(id, direction, amount, timestamp, paymentId, status, tariContact), Parcelable {
 
     constructor(tx: FFICompletedTx) : this(
         id = tx.getId(),
@@ -66,7 +65,6 @@ data class PendingInboundTx(
         tariContact = tx.getContact(),
         amount = tx.getAmount().toMicroTari(),
         timestamp = tx.getTimestamp(),
-        message = tx.getMessage(),
         paymentId = tx.getPaymentId(),
         status = TxStatus.map(tx.getStatus()),
     )
@@ -77,8 +75,7 @@ data class PendingInboundTx(
         tariContact = tx.getContact(),
         amount = MicroTari(tx.getAmount()),
         timestamp = tx.getTimestamp(),
-        message = tx.getMessage(),
-        paymentId = "", // Can't get payment id from pending inbound tx
+        paymentId = tx.getPaymentId(),
         status = TxStatus.map(tx.getStatus()),
     )
 
