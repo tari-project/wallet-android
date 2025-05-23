@@ -1,8 +1,6 @@
-@file:Suppress("ConstPropertyName")
-
 object TariBuildConfig {
 
-    const val versionNumber = "1.0.5"
+    const val versionNumber = "1.1.0"
 
     const val minSdk = 26
     const val targetSdk = 34
@@ -13,8 +11,8 @@ object TariBuildConfig {
         val network: LibWalletNetwork = LibWalletNetwork.MAINNET
 
         val version = when (network) {
-            LibWalletNetwork.MAINNET -> "v2.1.1"
-            LibWalletNetwork.NEXTNET -> "v2.1.1-rc.0"
+            LibWalletNetwork.MAINNET -> "v3.0.0"
+            LibWalletNetwork.NEXTNET -> "v3.0.0-rc.3"
         }
         val minValidVersion = when (network) {
             LibWalletNetwork.MAINNET -> "v0.0.0"
