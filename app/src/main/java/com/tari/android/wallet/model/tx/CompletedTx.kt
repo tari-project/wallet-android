@@ -35,6 +35,7 @@ package com.tari.android.wallet.model.tx
 import android.os.Parcelable
 import com.tari.android.wallet.ffi.FFICompletedTx
 import com.tari.android.wallet.ffi.FFIPointer
+import com.tari.android.wallet.ffi.getPaymentIdSafely
 import com.tari.android.wallet.model.CompletedTransactionKernel
 import com.tari.android.wallet.model.MicroTari
 import com.tari.android.wallet.model.TariContact
@@ -54,7 +55,7 @@ data class CompletedTx(
     override val direction: Direction,
     override val amount: MicroTari,
     override val timestamp: BigInteger,
-    override val paymentId: String,
+    override val paymentId: String?,
     override val status: TxStatus,
     override val tariContact: TariContact,
     val fee: MicroTari,
@@ -69,7 +70,7 @@ data class CompletedTx(
         direction = tx.getDirection(),
         amount = MicroTari(tx.getAmount()),
         timestamp = tx.getTimestamp(),
-        paymentId = tx.getPaymentId(),
+        paymentId = tx.getPaymentIdSafely(),
         status = TxStatus.map(tx.getStatus()),
         tariContact = tx.getContact(),
         fee = MicroTari(tx.getFee()),

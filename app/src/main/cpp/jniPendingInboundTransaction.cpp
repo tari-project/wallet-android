@@ -83,12 +83,37 @@ Java_com_tari_android_wallet_ffi_FFIPendingInboundTx_jniGetPaymentId(
         jobject error) {
     return ExecuteWithError<jstring>(jEnv, error, [&](int *errorPointer) {
         auto pInboundTx = GetPointerField<TariPendingInboundTransaction *>(jEnv, jThis);
-        const char *pMessage = pending_inbound_transaction_get_payment_id(pInboundTx, errorPointer);
-        jstring result = jEnv->NewStringUTF(pMessage);
-        string_destroy(const_cast<char *>(pMessage));
+        const char *pPaymentId = pending_inbound_transaction_get_payment_id(pInboundTx, errorPointer);
+        jstring result = jEnv->NewStringUTF(pPaymentId);
+        string_destroy(const_cast<char *>(pPaymentId));
         return result;
     });
 }
+
+extern "C"
+JNIEXPORT jlong JNICALL
+Java_com_tari_android_wallet_ffi_FFIPendingInboundTx_jniGetPaymentIdBytes(
+        JNIEnv *jEnv,
+        jobject jThis,
+        jobject error) {
+    return ExecuteWithErrorAndCast<ByteVector *>(jEnv, error, [&](int *errorPointer) {
+        auto pInboundTx = GetPointerField<TariPendingInboundTransaction *>(jEnv, jThis);
+        return pending_inbound_transaction_get_payment_id_as_bytes(pInboundTx, errorPointer);
+    });
+}
+
+extern "C"
+JNIEXPORT jlong JNICALL
+Java_com_tari_android_wallet_ffi_FFIPendingInboundTx_jniGetPaymentIdUserBytes(
+        JNIEnv *jEnv,
+        jobject jThis,
+        jobject error) {
+    return ExecuteWithErrorAndCast<ByteVector *>(jEnv, error, [&](int *errorPointer) {
+        auto pInboundTx = GetPointerField<TariPendingInboundTransaction *>(jEnv, jThis);
+        return pending_inbound_transaction_get_user_payment_id_as_bytes(pInboundTx, errorPointer);
+    });
+}
+
 
 extern "C"
 JNIEXPORT jbyteArray JNICALL

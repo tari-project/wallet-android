@@ -310,6 +310,7 @@
     <string name="tx_detail_pending_payment_received">Payment In Progress</string>
     <string name="tx_detail_contact_name">Contact Name</string>
     <string name="tx_detail_note">Note</string>
+    <string name="tx_detail_payment_id_error">An error occurred while retrieving the Payment ID</string>
     <string name="tx_detail_edit">Edit</string>
     <string name="tx_detail_transaction_fee">Transaction Fee</string>
     <string name="tx_detail_waiting_for_recipient">Waiting for recipient to come online</string>

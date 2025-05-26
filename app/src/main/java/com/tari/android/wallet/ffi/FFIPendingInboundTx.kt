@@ -32,6 +32,7 @@
  */
 package com.tari.android.wallet.ffi
 
+import com.orhanobut.logger.Logger
 import java.math.BigInteger
 
 /**
@@ -47,6 +48,8 @@ class FFIPendingInboundTx() : FFITxBase() {
     private external fun jniGetAmount(libError: FFIError): ByteArray
     private external fun jniGetTimestamp(libError: FFIError): ByteArray
     private external fun jniGetPaymentId(libError: FFIError): String
+    private external fun jniGetPaymentIdBytes(libError: FFIError): FFIPointer
+    private external fun jniGetPaymentIdUserBytes(libError: FFIError): FFIPointer
     private external fun jniGetStatus(libError: FFIError): Int
     private external fun jniDestroy()
 
@@ -68,6 +71,8 @@ class FFIPendingInboundTx() : FFITxBase() {
     fun getTimestamp(): BigInteger = runWithError { BigInteger(1, jniGetTimestamp(it)) }
 
     fun getPaymentId(): String = runWithError { jniGetPaymentId(it) }
+    fun getPaymentIdBytes(): FFIByteVector = runWithError { FFIByteVector(jniGetPaymentIdBytes(it)) }
+    fun getPaymentIdUserBytes(): FFIByteVector = runWithError { FFIByteVector(jniGetPaymentIdUserBytes(it)) }
 
     fun getStatus(): FFITxStatus {
         return when (runWithError { jniGetStatus(it) }) {
@@ -85,4 +90,26 @@ class FFIPendingInboundTx() : FFITxBase() {
     }
 
     override fun destroy() = jniDestroy()
+}
+
+/**
+ * Safely retrieves the payment ID from the FFICompletedTx instance.
+ * If an error occurs, it logs the error and returns null.
+ *
+ * FIXME: remove this method once the Payment ID issue is fixed in the FFI layer.
+ */
+fun FFIPendingInboundTx.getPaymentIdSafely(): String? {
+    return runCatching { getPaymentId() }
+        .getOrElse {
+            Logger.t("FFICompletedTx").e(
+                it,
+                "Error getting payment ID: ${it.message}" +
+                        "\n" +
+                        "PaymentID bytes: ${runCatching { getPaymentIdBytes() }.getOrElse { "Error during calculation(\"${it.message}\")" }}" +
+                        "\n" +
+                        "PaymentID user bytes: ${runCatching { getPaymentIdUserBytes() }.getOrElse { "Error during calculation(\"${it.message}\")" }}"
+            )
+
+            null
+        }
 }
