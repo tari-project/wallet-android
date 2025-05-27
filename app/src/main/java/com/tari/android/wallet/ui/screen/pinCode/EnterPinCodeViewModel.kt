@@ -62,7 +62,10 @@ class EnterPinCodeViewModel : CommonViewModel() {
         component.inject(this)
 
         doFraudLogic()
-        securityPrefRepository.updateNotifier.subscribe { doFraudLogic() }.addTo(compositeDisposable)
+        securityPrefRepository.updateNotifier.subscribe(
+            /* onNext = */ { doFraudLogic() },
+            /* onError = */ { logger.d("Error updating fraud logic", it) },
+        ).addTo(compositeDisposable)
     }
 
     private fun doFraudLogic() {

@@ -121,7 +121,10 @@ class AllSettingsViewModel : CommonViewModel() {
     init {
         collectFlow(backupStateHandler.backupState) { onBackupStateChanged(it) }
 
-        settingsRepository.updateNotifier.subscribe { generateOptions() }.addTo(compositeDisposable)
+        settingsRepository.updateNotifier.subscribe(
+            /* onNext = */ { generateOptions() },
+            /* onError = */ { logger.d("Error updating settings options", it) },
+        ).addTo(compositeDisposable)
     }
 
     fun updateOptions() {
