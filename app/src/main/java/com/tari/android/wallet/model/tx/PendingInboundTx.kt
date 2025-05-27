@@ -35,6 +35,7 @@ package com.tari.android.wallet.model.tx
 import android.os.Parcelable
 import com.tari.android.wallet.ffi.FFICompletedTx
 import com.tari.android.wallet.ffi.FFIPendingInboundTx
+import com.tari.android.wallet.ffi.getPaymentIdSafely
 import com.tari.android.wallet.model.MicroTari
 import com.tari.android.wallet.model.TariContact
 import com.tari.android.wallet.model.TxId
@@ -54,7 +55,7 @@ data class PendingInboundTx(
     override val direction: Direction,
     override val amount: MicroTari,
     override val timestamp: BigInteger,
-    override val paymentId: String,
+    override val paymentId: String?,
     override val status: TxStatus,
     override val tariContact: TariContact,
 ) : Tx(id, direction, amount, timestamp, paymentId, status, tariContact), Parcelable {
@@ -65,7 +66,7 @@ data class PendingInboundTx(
         tariContact = tx.getContact(),
         amount = tx.getAmount().toMicroTari(),
         timestamp = tx.getTimestamp(),
-        paymentId = tx.getPaymentId(),
+        paymentId = tx.getPaymentIdSafely(),
         status = TxStatus.map(tx.getStatus()),
     )
 
@@ -75,7 +76,7 @@ data class PendingInboundTx(
         tariContact = tx.getContact(),
         amount = MicroTari(tx.getAmount()),
         timestamp = tx.getTimestamp(),
-        paymentId = tx.getPaymentId(),
+        paymentId = tx.getPaymentIdSafely(),
         status = TxStatus.map(tx.getStatus()),
     )
 
