@@ -1,11 +1,11 @@
 package com.tari.android.wallet.ui.screen.contactBook.addressPoisoning
 
 import androidx.annotation.VisibleForTesting
+import com.tari.android.wallet.data.contacts.ContactsRepository
 import com.tari.android.wallet.data.sharedPrefs.addressPoisoning.AddressPoisoningPrefRepository
 import com.tari.android.wallet.data.tx.TxRepository
 import com.tari.android.wallet.model.TariWalletAddress
 import com.tari.android.wallet.model.tx.Tx
-import com.tari.android.wallet.data.contacts.ContactsRepository
 import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.DebugConfig
 import com.tari.android.wallet.util.MockDataStub
@@ -16,7 +16,6 @@ import javax.inject.Singleton
 private const val MIN_SAME_CHARS = 3
 private const val USED_PREFIX_SUFFIX_CHARS = Constants.Wallet.EMOJI_FORMATTER_CHUNK_SIZE
 
-// TODO probably we need to completely test the address poisoning feature
 @Singleton
 class AddressPoisoningChecker @Inject constructor(
     private val addressPoisoningSharedRepository: AddressPoisoningPrefRepository,
@@ -86,6 +85,7 @@ class AddressPoisoningChecker @Inject constructor(
 @VisibleForTesting
 fun TariWalletAddress?.isSimilarTo(other: TariWalletAddress): Boolean {
     if (this == null) return false
+    if (this.safetrade && other.safetrade) return this.fullBase58 == other.fullBase58 // We need to compare full base58 for Tari addresses with payment IDs
 
     val thisEmojis = this.coreKeyEmojis.extractEmojis()
     val otherEmojis = other.coreKeyEmojis.extractEmojis()

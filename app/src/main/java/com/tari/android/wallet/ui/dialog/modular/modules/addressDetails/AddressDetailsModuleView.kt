@@ -48,7 +48,7 @@ class AddressDetailsModuleView(context: Context, addressDetailsModule: AddressDe
         when (it) {
             Feature.ONE_SIDED -> string(R.string.wallet_info_address_one_side_payment)
             Feature.INTERACTIVE -> string(R.string.wallet_info_address_interactive_payment)
-            Feature.PAYMENT_ID -> string(R.string.wallet_info_address_payment_id)
+            Feature.PAYMENT_ID -> string(R.string.wallet_info_address_safetrade)
         }
     }
 }

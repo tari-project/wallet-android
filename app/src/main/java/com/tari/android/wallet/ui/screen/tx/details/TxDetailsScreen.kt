@@ -96,6 +96,7 @@ fun TxDetailsScreen(
 
                 val unknownUser = contact.walletAddress?.isUnknownUser().isTrue()
                 val coinbase = uiState.tx.isCoinbase
+                val safetrade = contact.walletAddress?.safetrade.isTrue()
                 TxDetailInfoContactNameItem(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -103,10 +104,11 @@ fun TxDetailsScreen(
                     alias = when {
                         coinbase -> stringResource(R.string.tx_details_coinbase, uiState.tx.safeCastTo<CompletedTx>()?.minedHeight ?: "--")
                         unknownUser -> stringResource(R.string.unknown_source)
+                        safetrade -> stringResource(R.string.tx_details_safetrade_alias_warning)
                         else -> contact.alias
                     },
                     onEditClicked = onContactEditClick,
-                    editable = !unknownUser && !coinbase,
+                    editable = !unknownUser && !coinbase && !safetrade,
                 )
             }
 
@@ -146,7 +148,11 @@ fun TxDetailsScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 24.dp),
-                    title = stringResource(R.string.tx_detail_note),
+                    title = if (uiState.contact?.walletAddress?.safetrade.isTrue()) {
+                        stringResource(R.string.tx_detail_payment_id)
+                    } else {
+                        stringResource(R.string.tx_detail_note)
+                    },
                     value = uiState.tx.paymentId ?: stringResource(R.string.tx_detail_payment_id_error),
                     valueTextColor = if (uiState.tx.paymentId == null) TariDesignSystem.colors.errorMain else TariDesignSystem.colors.textPrimary,
                     singleLine = false,
