@@ -13,7 +13,6 @@ import com.tari.android.wallet.ui.screen.settings.backup.changeSecurePassword.Ch
 import com.tari.android.wallet.util.EffectFlow
 import com.tari.android.wallet.util.extension.collectFlow
 import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.take
 import java.net.UnknownHostException
 import javax.inject.Inject
@@ -44,7 +43,7 @@ class ChangeSecurePasswordViewModel : CommonViewModel() {
     }
 
     fun performBackupAndUpdatePassword(password: String) {
-        collectFlow(backupStateHandler.backupState.map { it.backupsState }.filter { it !is BackupState.BackupInProgress }.take(1)) { backupState ->
+        collectFlow(backupStateHandler.backupState.filter { it !is BackupState.BackupInProgress }.take(1)) { backupState ->
             when (backupState) {
                 is BackupState.BackupUpToDate -> {
                     _effect.send(ShowBackupPasswordUpdated)

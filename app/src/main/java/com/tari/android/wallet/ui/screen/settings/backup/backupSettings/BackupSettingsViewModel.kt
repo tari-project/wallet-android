@@ -6,7 +6,6 @@ import androidx.lifecycle.MutableLiveData
 import com.tari.android.wallet.R
 import com.tari.android.wallet.data.sharedPrefs.backup.BackupPrefRepository
 import com.tari.android.wallet.infrastructure.backup.BackupManager
-import com.tari.android.wallet.infrastructure.backup.BackupMapState
 import com.tari.android.wallet.infrastructure.backup.BackupState
 import com.tari.android.wallet.infrastructure.backup.BackupStateHandler
 import com.tari.android.wallet.infrastructure.backup.BackupStorageAuthRevokedException
@@ -30,7 +29,7 @@ class BackupSettingsViewModel : CommonViewModel() {
     @Inject
     lateinit var backupStateHandler: BackupStateHandler
 
-    val options = MutableLiveData<List<BackupOptionViewModel>>()
+    val optionViewModel = MutableLiveData<BackupOptionViewModel>()
 
     private val _isBackupNowAvailable = MutableLiveData<Boolean>()
     val isBackupNowAvailable: LiveData<Boolean> = _isBackupNowAvailable
@@ -47,7 +46,7 @@ class BackupSettingsViewModel : CommonViewModel() {
 
         backupStateChanged.postValue(Unit)
 
-        options.postValue(backupSettingsRepository.getOptionList.map { option -> BackupOptionViewModel().apply { setup(option.type) } })
+        optionViewModel.postValue(BackupOptionViewModel().apply { setup() })
 
         loadOptionData()
     }
@@ -55,8 +54,9 @@ class BackupSettingsViewModel : CommonViewModel() {
     fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         launchOnIo {
             runCatching {
-                options.value.orEmpty().firstOrNull { it.option.value!!.type == backupManager.currentOption }
-                    ?.onActivityResult(requestCode, resultCode, data)
+                optionViewModel.value?.onActivityResult(requestCode, resultCode, data)
+            }.onFailure {
+                logger.i("Error handling activity result: ${it.message}")
             }
         }
     }
@@ -83,21 +83,18 @@ class BackupSettingsViewModel : CommonViewModel() {
 
     fun onBackupToCloud() = backupManager.backupNow()
 
-    private fun onBackupStateChanged(backupState: BackupMapState) {
-        backupState.states.forEach { state ->
-            options.value.orEmpty().firstOrNull { it.option.value!!.type == state.key }?.onBackupStateChanged(state.value)
-        }
+    private fun onBackupStateChanged(backupState: BackupState) {
+        optionViewModel.value?.onBackupStateChanged(backupState)
 
         loadOptionData()
 
-        (backupState.backupsState as? BackupState.BackupFailed)?.let { showBackupFailureDialog(it.backupException) }
+        if (backupState is BackupState.BackupFailed) showBackupFailureDialog(backupState.backupException)
     }
 
     private fun loadOptionData() {
-        val backupState = backupStateHandler.backupState.value
-        val optionsDto = backupSettingsRepository.getOptionList
-        _updatePasswordEnabled.postValue(optionsDto.any { it.isEnable })
-        _isBackupNowAvailable.postValue(optionsDto.any { it.isEnable } && backupState.states.all { it.value !is BackupState.BackupInProgress })
+        val currentOption = backupSettingsRepository.currentBackupOption
+        _updatePasswordEnabled.postValue(currentOption.isEnable)
+        _isBackupNowAvailable.postValue(currentOption.isEnable && !backupStateHandler.inProgress)
     }
 
     private fun showBackupFailureDialog(exception: Throwable?) {

@@ -22,7 +22,6 @@ import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonStyle
 import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
 import com.tari.android.wallet.ui.dialog.modular.modules.input.InputModule
 import com.tari.android.wallet.ui.screen.qr.QrScannerSource
-import com.tari.android.wallet.ui.screen.settings.backup.data.BackupOption
 import com.tari.android.wallet.util.extension.launchOnIo
 import com.tari.android.wallet.util.extension.launchOnMain
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -46,7 +45,7 @@ class ChooseRestoreOptionViewModel : CommonViewModel() {
         component.inject(this)
     }
 
-    private val _uiState = MutableStateFlow(ChooseRestoreOptionModel.UiState(backupOptions = backupPrefRepository.getOptionList))
+    private val _uiState = MutableStateFlow(ChooseRestoreOptionModel.UiState(backupOption = backupPrefRepository.currentBackupOption))
     val uiState = _uiState.asStateFlow()
 
     init {
@@ -77,9 +76,9 @@ class ChooseRestoreOptionViewModel : CommonViewModel() {
         }
     }
 
-    fun startRecovery(selectedOption: BackupOption, hostFragment: Fragment) {
+    fun startRecovery(hostFragment: Fragment) {
         _uiState.update { it.copy(isStarted = true) }
-        backupManager.setupStorage(selectedOption, hostFragment)
+        backupManager.setupStorage(hostFragment)
     }
 
     fun onRecoveryPhraseClicked() {

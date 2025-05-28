@@ -59,7 +59,6 @@ import com.tari.android.wallet.R.string.user_agreement_url
 import com.tari.android.wallet.application.YatAdapter
 import com.tari.android.wallet.data.sharedPrefs.CorePrefRepository
 import com.tari.android.wallet.data.sharedPrefs.backup.BackupPrefRepository
-import com.tari.android.wallet.infrastructure.backup.BackupMapState
 import com.tari.android.wallet.infrastructure.backup.BackupState
 import com.tari.android.wallet.infrastructure.backup.BackupStateHandler
 import com.tari.android.wallet.navigation.Navigation
@@ -252,25 +251,12 @@ class AllSettingsViewModel : CommonViewModel() {
         )
     }
 
-    private fun onBackupStateChanged(backupState: BackupMapState?) {
-        if (backupState == null) {
-            backupOption.backupState = PresentationBackupState(Warning)
-        } else {
-            val presentationBackupState = when (backupState.backupsState) {
-                is BackupState.BackupDisabled -> PresentationBackupState(Warning)
-                is BackupState.BackupInProgress -> {
-                    PresentationBackupState(InProgress, back_up_wallet_backup_status_in_progress, R.attr.palette_text_body)
-                }
-
-                is BackupState.BackupUpToDate -> {
-                    PresentationBackupState(Success, back_up_wallet_backup_status_up_to_date, R.attr.palette_system_green)
-                }
-
-                is BackupState.BackupFailed -> {
-                    PresentationBackupState(Warning, back_up_wallet_backup_status_outdated, R.attr.palette_system_red)
-                }
-            }
-            backupOption.backupState = presentationBackupState
+    private fun onBackupStateChanged(backupState: BackupState) {
+        backupOption.backupState = when (backupState) {
+            is BackupState.BackupDisabled -> PresentationBackupState(Warning)
+            is BackupState.BackupInProgress -> PresentationBackupState(InProgress, back_up_wallet_backup_status_in_progress, R.attr.palette_text_body)
+            is BackupState.BackupUpToDate -> PresentationBackupState(Success, back_up_wallet_backup_status_up_to_date, R.attr.palette_system_green)
+            is BackupState.BackupFailed -> PresentationBackupState(Warning, back_up_wallet_backup_status_outdated, R.attr.palette_system_red)
         }
         _allSettingsOptions.update { generateOptions() }
     }

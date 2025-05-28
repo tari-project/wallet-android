@@ -51,9 +51,6 @@ android {
         buildConfigField("String", "YAT_ORGANIZATION_KEY", "\"${yatProperties["yat.key"]}\"")
         buildConfigField("String", "YAT_ORGANIZATION_RETURN_URL", "\"${yatProperties["yat.returnUrl"]}\"")
 
-        val dropboxProperties = loadDropboxProps()
-        buildConfigField("String", "DROPBOX_ACCESS_TOKEN", "\"${dropboxProperties["dropbox_key"]}\"")
-
         buildConfigField("String", "LIB_WALLET_MIN_VALID_VERSION", "\"${TariBuildConfig.LibWallet.minValidVersion}\"")
         buildConfigField("String", "LIB_WALLET_VERSION", "\"${TariBuildConfig.LibWallet.version}\"")
         buildConfigField("String", "LIB_WALLET_NETWORK", "\"${TariBuildConfig.LibWallet.network}\"")
@@ -95,7 +92,6 @@ android {
     }
 
     applicationVariants.configureEach {
-        this.mergedFlavor.manifestPlaceholders["dropboxApiKey"] = loadDropboxProps()["dropbox_key"].toString()
         this.mergedFlavor.manifestPlaceholders["sentryPublicDSN"] = loadSecretProps()["sentry.public_dsn"].toString()
     }
 
@@ -196,7 +192,6 @@ android {
 fun loadSecretProps(): Properties = loadProps("secret")
 fun loadSentryProps(): Properties = loadProps("sentry")
 fun loadYatProps(): Properties = loadProps("yat")
-fun loadDropboxProps(): Properties = loadProps("dropbox")
 
 fun loadProps(fileName: String): Properties {
     val props = project.rootProject.file("$fileName.properties")
@@ -303,8 +298,6 @@ dependencies {
 
     // used to read log files
     implementation(Dependencies.commonsIo)
-
-    implementation(Dependencies.dropboxCoreSdk)
 
     implementation(Dependencies.contactsAndroid)
 

@@ -92,16 +92,14 @@ class BackupSettingsFragment : CommonXmlFragment<FragmentWalletBackupSettingsBin
 
         observe(setPasswordVisible) { ui.updatePasswordCtaView.setVisible(it) }
 
-        observe(options) { initBackupOptions(it) }
+        observe(optionViewModel) { initBackupOptions(it) }
     }
 
-    private fun initBackupOptions(options: List<BackupOptionViewModel>) {
-        for (option in options) {
-            val backupOptionView = BackupOptionView(requireContext())
-            backupOptionView.viewLifecycle = viewLifecycleOwner
-            backupOptionView.init(this, option)
-            ui.optionsContainer.addView(backupOptionView)
-        }
+    private fun initBackupOptions(optionViewModel: BackupOptionViewModel) {
+        val backupOptionView = BackupOptionView(requireContext())
+        backupOptionView.viewLifecycle = viewLifecycleOwner
+        backupOptionView.init(this, optionViewModel)
+        ui.optionsContainer.addView(backupOptionView)
     }
 
     private fun resetStatusIcons() {

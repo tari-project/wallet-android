@@ -103,7 +103,6 @@ object Dependencies {
     const val torAndroid = "info.guardianproject:tor-android:0.4.8.7"
     const val jtorctl = "info.guardianproject:jtorctl:0.4.5.7"
     const val commonsIo = "commons-io:commons-io:2.18.0"
-    const val dropboxCoreSdk = "com.dropbox.core:dropbox-core-sdk:5.4.6"
     const val contactsAndroid = "com.github.vestrel00:contacts-android:0.3.1"
     const val blessedAndroid = "com.github.weliem:blessed-android:2.5.0"
     const val itext7Core = "com.itextpdf:itext7-core:9.0.0"

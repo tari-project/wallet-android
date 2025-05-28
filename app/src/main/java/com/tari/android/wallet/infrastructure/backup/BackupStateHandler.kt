@@ -9,10 +9,13 @@ import javax.inject.Singleton
 @Singleton
 class BackupStateHandler @Inject constructor() {
 
-    private val _backupState = MutableStateFlow(BackupMapState())
+    private val _backupState = MutableStateFlow<BackupState>(BackupState.BackupDisabled)
     val backupState = _backupState.asStateFlow()
 
-    fun updateBackupState(backupMapState: BackupMapState) {
-        _backupState.update { backupMapState }
+    val inProgress: Boolean
+        get() = _backupState.value is BackupState.BackupInProgress
+
+    fun updateBackupState(backupState: BackupState) {
+        _backupState.update { backupState }
     }
 }

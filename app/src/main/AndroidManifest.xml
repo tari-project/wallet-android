@@ -149,22 +149,6 @@
             tools:replace="android:theme" />
 
         <activity
-            android:name="com.dropbox.core.android.AuthActivity"
-            android:configChanges="orientation|keyboard"
-            android:exported="true"
-            android:launchMode="singleInstance"
-            android:screenOrientation="portrait">
-
-            <intent-filter>
-                <data android:scheme="db-${dropboxApiKey}" />
-                <action android:name="android.intent.action.VIEW" />
-
-                <category android:name="android.intent.category.BROWSABLE" />
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-        </activity>
-
-        <activity
             android:name=".ui.screen.qr.QrScannerActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:exported="false"
