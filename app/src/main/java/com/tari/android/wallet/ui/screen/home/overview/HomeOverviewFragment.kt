@@ -31,8 +31,6 @@ class HomeOverviewFragment : CommonFragment<HomeOverviewViewModel>() {
                 onSyncDialogDismiss = { viewModel.onSyncDialogDismiss() },
                 onBalanceInfoClicked = { viewModel.onBalanceInfoClicked() },
                 onBalanceInfoDialogDismiss = { viewModel.onBalanceInfoDialogDismiss() },
-                onMainnetDismiss = { viewModel.onMainnetDismiss() },
-                onMainnetWatchTrailerClick = { viewModel.onMainnetWatchTrailerClicked() },
             )
         }
     }

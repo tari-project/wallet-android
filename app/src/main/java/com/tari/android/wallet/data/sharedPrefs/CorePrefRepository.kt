@@ -91,7 +91,6 @@ class CorePrefRepository @Inject constructor(
         const val KEEP_SCREEN_AWAKE_WHEN_RESTORE = "KEEP_SCREEN_AWAKE_WHEN_RESTORE"
         const val AIRDROP_TOKEN = "airdrop_token"
         const val AIRDROP_REFRESH_TOKEN = "AIRDROP_REFRESH_TOKEN"
-        const val MAINNET_LAUNCH_MODAL_SHOWN = "MAINNET_LAUNCH_MODAL_SHOWN"
     }
 
     var walletAddressBase58: Base58? by SharedPrefStringDelegate(sharedPrefs, this, formatKey(Key.WALLET_ADDRESS_BASE58))
@@ -141,13 +140,6 @@ class CorePrefRepository @Inject constructor(
     val walletAddress: TariWalletAddress
         get() = walletAddressBase58?.let { TariWalletAddress.fromBase58(it) } ?: error("Wallet address is not set to shared preferences")
 
-    var mainnetLaunchModalShown: Boolean by SharedPrefBooleanDelegate(
-        prefs = sharedPrefs,
-        commonRepository = this,
-        name = formatKey(Key.MAINNET_LAUNCH_MODAL_SHOWN),
-        defValue = false,
-    )
-
     /**
      * Sometimes the wallet address is not set to the shared preferences (e.g. after a wallet removing).
      * TODO: Investigate why the app accesses the wallet address when it is not set
@@ -176,7 +168,6 @@ class CorePrefRepository @Inject constructor(
         airdropAnonId = null
         airdropToken = null
         airdropRefreshToken = null
-        mainnetLaunchModalShown = false
     }
 
     fun generateDatabasePassphrase(): String {

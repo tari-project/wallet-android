@@ -32,14 +32,11 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
-import java.time.LocalDate
 import javax.inject.Inject
 
 const val TARI_COM = "https://tari.com/"
 
 private const val DATA_REFRESH_INTERVAL_MILLIS = 60_000L
-private val MAINNET_DEADLINE = LocalDate.of(/* year = */ 2025, /* month = */ 6, /* dayOfMonth = */ 6)
-private const val TWITTER_TRAILER_URL = "https://x.com/tari/status/1915132135662297120"
 
 class HomeOverviewViewModel : CommonViewModel() {
 
@@ -77,7 +74,6 @@ class HomeOverviewViewModel : CommonViewModel() {
             ticker = networkRepository.currentNetwork.ticker,
             networkName = networkRepository.currentNetwork.network.displayName,
             ffiVersion = BuildConfig.LIB_WALLET_VERSION,
-            showMainnetAnnounceModal = !sharedPrefsRepository.mainnetLaunchModalShown && LocalDate.now().isBefore(MAINNET_DEADLINE)
         )
     )
     val uiState = _uiState.asStateFlow()
@@ -190,15 +186,6 @@ class HomeOverviewViewModel : CommonViewModel() {
 
     fun onNotificationsClicked() {
         showNotReadyYetDialog()
-    }
-
-    fun onMainnetDismiss() {
-        _uiState.update { it.copy(showMainnetAnnounceModal = false) }
-        sharedPrefsRepository.mainnetLaunchModalShown = true
-    }
-
-    fun onMainnetWatchTrailerClicked() {
-        openUrl(TWITTER_TRAILER_URL)
     }
 
     private fun checkForDataConsent() {
