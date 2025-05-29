@@ -11,12 +11,14 @@ object TariBuildConfig {
         val network: LibWalletNetwork = LibWalletNetwork.MAINNET
 
         val version = when (network) {
-            LibWalletNetwork.MAINNET -> "v3.0.0"
-            LibWalletNetwork.NEXTNET -> "v3.0.0-rc.3"
+            LibWalletNetwork.MAINNET -> "v4.0.0"
+            LibWalletNetwork.NEXTNET -> "v4.0.0-rc.0"
+            LibWalletNetwork.ESMERALDA -> "v4.0.0-pre.0"
         }
         val minValidVersion = when (network) {
             LibWalletNetwork.MAINNET -> "v0.0.0"
-            LibWalletNetwork.NEXTNET -> "v1.18.0-rc.0"
+            LibWalletNetwork.NEXTNET -> "v4.0.0-rc.0"
+            LibWalletNetwork.ESMERALDA -> "v4.0.0-pre.0"
         }
 
         const val hostURL = "https://github.com/tari-project/tari/releases/download/"
@@ -31,6 +33,6 @@ object TariBuildConfig {
         val x64AFileUrl
             get() = "${hostURL}${version}/${x64A}"
 
-        enum class LibWalletNetwork { MAINNET, NEXTNET }
+        enum class LibWalletNetwork { MAINNET, NEXTNET, ESMERALDA }
     }
 }
