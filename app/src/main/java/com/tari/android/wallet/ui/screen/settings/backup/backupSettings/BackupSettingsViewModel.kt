@@ -3,22 +3,19 @@ package com.tari.android.wallet.ui.screen.settings.backup.backupSettings
 import android.content.Intent
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.viewModelScope
 import com.tari.android.wallet.R
 import com.tari.android.wallet.data.sharedPrefs.backup.BackupPrefRepository
-import com.tari.android.wallet.util.extension.collectFlow
 import com.tari.android.wallet.infrastructure.backup.BackupManager
 import com.tari.android.wallet.infrastructure.backup.BackupMapState
 import com.tari.android.wallet.infrastructure.backup.BackupState
 import com.tari.android.wallet.infrastructure.backup.BackupStateHandler
 import com.tari.android.wallet.infrastructure.backup.BackupStorageAuthRevokedException
 import com.tari.android.wallet.infrastructure.backup.BackupStorageFullException
-import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.navigation.Navigation
+import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.screen.settings.backup.backupSettings.option.BackupOptionViewModel
-import com.tari.android.wallet.ui.screen.settings.userAutorization.BiometricAuthenticationViewModel
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import com.tari.android.wallet.util.extension.collectFlow
+import com.tari.android.wallet.util.extension.launchOnIo
 import java.net.UnknownHostException
 import javax.inject.Inject
 
@@ -32,8 +29,6 @@ class BackupSettingsViewModel : CommonViewModel() {
 
     @Inject
     lateinit var backupStateHandler: BackupStateHandler
-
-    lateinit var biometricAuthenticationViewModel: BiometricAuthenticationViewModel
 
     val options = MutableLiveData<List<BackupOptionViewModel>>()
 
@@ -58,8 +53,8 @@ class BackupSettingsViewModel : CommonViewModel() {
     }
 
     fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        viewModelScope.launch(Dispatchers.IO) {
-            kotlin.runCatching {
+        launchOnIo {
+            runCatching {
                 options.value.orEmpty().firstOrNull { it.option.value!!.type == backupManager.currentOption }
                     ?.onActivityResult(requestCode, resultCode, data)
             }
@@ -67,13 +62,13 @@ class BackupSettingsViewModel : CommonViewModel() {
     }
 
     fun onBackupWithRecoveryPhrase() {
-        biometricAuthenticationViewModel.requireAuthorization {
+        runWithAuthorization {
             tariNavigator.navigate(Navigation.BackupSettings.ToWalletBackupWithRecoveryPhrase)
         }
     }
 
     fun onUpdatePassword() {
-        biometricAuthenticationViewModel.requireAuthorization {
+        runWithAuthorization {
             if (backupSettingsRepository.backupPassword == null) {
                 tariNavigator.navigate(Navigation.BackupSettings.ToChangePassword)
             } else {
@@ -111,14 +106,8 @@ class BackupSettingsViewModel : CommonViewModel() {
             else -> resourceManager.getString(R.string.back_up_wallet_backing_up_error_title)
         }
         val errorDescription = when {
-            exception is BackupStorageFullException -> resourceManager.getString(
-                R.string.backup_wallet_storage_full_desc
-            )
-
-            exception is BackupStorageAuthRevokedException -> resourceManager.getString(
-                R.string.check_backup_storage_status_auth_revoked_error_description
-            )
-
+            exception is BackupStorageFullException -> resourceManager.getString(R.string.backup_wallet_storage_full_desc)
+            exception is BackupStorageAuthRevokedException -> resourceManager.getString(R.string.check_backup_storage_status_auth_revoked_error_description)
             exception is UnknownHostException -> resourceManager.getString(R.string.error_no_connection_title)
             exception?.message == null -> resourceManager.getString(R.string.back_up_wallet_backing_up_unknown_error)
             else -> resourceManager.getString(R.string.back_up_wallet_backing_up_error_desc, exception.message!!)

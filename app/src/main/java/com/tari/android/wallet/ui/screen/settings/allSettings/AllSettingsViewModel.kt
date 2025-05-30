@@ -79,7 +79,6 @@ import com.tari.android.wallet.ui.screen.settings.allSettings.row.SettingsRowSty
 import com.tari.android.wallet.ui.screen.settings.allSettings.row.SettingsRowViewHolderItem
 import com.tari.android.wallet.ui.screen.settings.allSettings.title.SettingsTitleViewHolderItem
 import com.tari.android.wallet.ui.screen.settings.allSettings.version.SettingsVersionViewHolderItem
-import com.tari.android.wallet.ui.screen.settings.userAutorization.BiometricAuthenticationViewModel
 import com.tari.android.wallet.util.DebugConfig
 import com.tari.android.wallet.util.extension.addTo
 import com.tari.android.wallet.util.extension.collectFlow
@@ -89,8 +88,6 @@ import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 
 class AllSettingsViewModel : CommonViewModel() {
-
-    lateinit var authenticationViewModel: BiometricAuthenticationViewModel
 
     private val backupOption = SettingsBackupOptionViewHolderItem(leftIconId = vector_all_settings_backup_options_icon) {
         runWithAuthorization { tariNavigator.navigate(AllSettings.ToBackupSettings(true)) }

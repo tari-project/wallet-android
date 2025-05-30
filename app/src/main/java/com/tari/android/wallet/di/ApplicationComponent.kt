@@ -94,7 +94,6 @@ import com.tari.android.wallet.ui.screen.settings.screenRecording.ScreenRecordin
 import com.tari.android.wallet.ui.screen.settings.themeSelector.ThemeSelectorViewModel
 import com.tari.android.wallet.ui.screen.settings.torBridges.TorBridgesSelectionViewModel
 import com.tari.android.wallet.ui.screen.settings.torBridges.customBridges.CustomTorBridgesViewModel
-import com.tari.android.wallet.ui.screen.settings.userAutorization.BiometricAuthenticationViewModel
 import com.tari.android.wallet.ui.screen.tx.details.TxDetailsViewModel
 import com.tari.android.wallet.ui.screen.tx.history.TxHistoryViewModel
 import com.tari.android.wallet.ui.screen.utxos.list.UtxosListViewModel
@@ -135,7 +134,6 @@ interface ApplicationComponent {
     fun inject(viewModel: InputSeedWordsViewModel)
     fun inject(viewModel: VerifySeedPhraseViewModel)
     fun inject(viewModel: BackupSettingsViewModel)
-    fun inject(viewModel: BiometricAuthenticationViewModel)
     fun inject(viewModel: ChangeBaseNodeViewModel)
     fun inject(viewModel: NetworkSelectionViewModel)
     fun inject(viewModel: AllSettingsViewModel)

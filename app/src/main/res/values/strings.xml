@@ -145,8 +145,6 @@
     <string name="auth_device_lock_code_prompt">Please enter your smartphone\'s screen lock PIN, passcode, or pattern to unlock your wallet.</string>
     <string name="auth_not_available_or_canceled_title">Authentication Error</string>
     <string name="auth_not_available_or_canceled_desc">Tari Universe Wallet was not able to authenticate you. Do you still want to proceed?</string>
-    <string name="auth_failed_title">Authentication Failed</string>
-    <string name="auth_failed_desc">Tari Universe Wallet was not able to authenticate you</string>
 
     <!-- home -->
     <string name="home_available_to_spend_balance">Available: %s</string>
