@@ -82,23 +82,13 @@ class FFIPendingOutboundTx() : FFITxBase() {
 }
 
 /**
- * Safely retrieves the payment ID from the FFICompletedTx instance.
+ * Safely retrieves the payment ID from the FFIPendingOutboundTx instance.
  * If an error occurs, it logs the error and returns null.
  *
  * FIXME: remove this method once the Payment ID issue is fixed in the FFI layer.
  */
 fun FFIPendingOutboundTx.getPaymentIdSafely(): String? {
-    return runCatching { getPaymentId() }
-        .getOrElse {
-            Logger.t("FFICompletedTx").e(
-                it,
-                "Error getting payment ID: ${it.message}" +
-                        "\n" +
-                        "PaymentID bytes: ${runCatching { getPaymentIdBytes() }.getOrElse { "Error during calculation(\"${it.message}\")" }}" +
-                        "\n" +
-                        "PaymentID user bytes: ${runCatching { getPaymentIdUserBytes() }.getOrElse { "Error during calculation(\"${it.message}\")" }}"
-            )
-
-            null
-        }
+    return runCatching { getPaymentId() }.getOrNull()
+        ?: runCatching { "PaymentID bytes: ${getPaymentIdBytes()}" }.getOrNull()
+        ?: runCatching { "PaymentID user bytes: ${getPaymentIdUserBytes()}" }.getOrNull()
 }
