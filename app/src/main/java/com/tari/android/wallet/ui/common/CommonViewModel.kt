@@ -118,9 +118,10 @@ open class CommonViewModel : ViewModel(), DialogHandler {
     val inputDialog: LiveData<ModularDialogArgs> = _inputDialog
 
     init {
-        securityPrefRepository.updateNotifier.subscribe {
-            checkAuthorization()
-        }.addTo(compositeDisposable)
+        securityPrefRepository.updateNotifier.subscribe(
+            /* onNext = */ { checkAuthorization() },
+            /* onError = */ { logger.e("Error checking authorization", it) },
+        ).addTo(compositeDisposable)
 
         collectFlow(connectionState) { connectionState ->
             showConnectionStatusDialog(refresh = true)

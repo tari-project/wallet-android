@@ -32,8 +32,7 @@ class EnterRestorationPasswordViewModel : CommonViewModel() {
         launchOnIo {
             walletManager.doOnWalletRunning {
                 if (walletConfig.walletExists()) {
-                    val dto = backupSettingsRepository.getOptionDto(backupManager.currentOption!!).copy(isEnable = true)
-                    backupSettingsRepository.updateOption(dto)
+                    backupSettingsRepository.updateOption(backupSettingsRepository.currentBackupOption.copy(isEnable = true))
                     backupManager.backupNow()
 
                     walletManager.onWalletRestored()

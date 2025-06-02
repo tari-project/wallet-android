@@ -108,7 +108,7 @@ class ContactSelectionViewModel : CommonViewModel() {
                 else -> null
             }
 
-            val name = when (deeplink) {
+            when (deeplink) {
                 is DeepLink.Contacts -> deeplink.contacts.firstOrNull()?.alias
                 is DeepLink.UserProfile -> deeplink.alias
                 else -> null
@@ -120,8 +120,9 @@ class ContactSelectionViewModel : CommonViewModel() {
             }
 
             deeplinkBase58?.let { TariWalletAddress.fromBase58OrNull(it) }?.let { walletAddress ->
-                selectedContact.value = ContactDto(FFIContactInfo(walletAddress), uuid = name)
                 _yatState.update { it.copy(yatUser = null) }
+
+                addressEntered(walletAddress)
             } ?: run { logger.e("Wallet address not found for deeplink: $deeplink") }
         } else {
             super.handleDeeplink(deeplink)

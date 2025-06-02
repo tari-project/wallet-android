@@ -59,7 +59,6 @@ import com.tari.android.wallet.R.string.user_agreement_url
 import com.tari.android.wallet.application.YatAdapter
 import com.tari.android.wallet.data.sharedPrefs.CorePrefRepository
 import com.tari.android.wallet.data.sharedPrefs.backup.BackupPrefRepository
-import com.tari.android.wallet.infrastructure.backup.BackupMapState
 import com.tari.android.wallet.infrastructure.backup.BackupState
 import com.tari.android.wallet.infrastructure.backup.BackupStateHandler
 import com.tari.android.wallet.navigation.Navigation
@@ -79,7 +78,6 @@ import com.tari.android.wallet.ui.screen.settings.allSettings.row.SettingsRowSty
 import com.tari.android.wallet.ui.screen.settings.allSettings.row.SettingsRowViewHolderItem
 import com.tari.android.wallet.ui.screen.settings.allSettings.title.SettingsTitleViewHolderItem
 import com.tari.android.wallet.ui.screen.settings.allSettings.version.SettingsVersionViewHolderItem
-import com.tari.android.wallet.ui.screen.settings.userAutorization.BiometricAuthenticationViewModel
 import com.tari.android.wallet.util.DebugConfig
 import com.tari.android.wallet.util.extension.addTo
 import com.tari.android.wallet.util.extension.collectFlow
@@ -89,8 +87,6 @@ import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 
 class AllSettingsViewModel : CommonViewModel() {
-
-    lateinit var authenticationViewModel: BiometricAuthenticationViewModel
 
     private val backupOption = SettingsBackupOptionViewHolderItem(leftIconId = vector_all_settings_backup_options_icon) {
         runWithAuthorization { tariNavigator.navigate(AllSettings.ToBackupSettings(true)) }
@@ -121,7 +117,10 @@ class AllSettingsViewModel : CommonViewModel() {
     init {
         collectFlow(backupStateHandler.backupState) { onBackupStateChanged(it) }
 
-        settingsRepository.updateNotifier.subscribe { generateOptions() }.addTo(compositeDisposable)
+        settingsRepository.updateNotifier.subscribe(
+            /* onNext = */ { generateOptions() },
+            /* onError = */ { logger.d("Error updating settings options", it) },
+        ).addTo(compositeDisposable)
     }
 
     fun updateOptions() {
@@ -252,25 +251,12 @@ class AllSettingsViewModel : CommonViewModel() {
         )
     }
 
-    private fun onBackupStateChanged(backupState: BackupMapState?) {
-        if (backupState == null) {
-            backupOption.backupState = PresentationBackupState(Warning)
-        } else {
-            val presentationBackupState = when (backupState.backupsState) {
-                is BackupState.BackupDisabled -> PresentationBackupState(Warning)
-                is BackupState.BackupInProgress -> {
-                    PresentationBackupState(InProgress, back_up_wallet_backup_status_in_progress, R.attr.palette_text_body)
-                }
-
-                is BackupState.BackupUpToDate -> {
-                    PresentationBackupState(Success, back_up_wallet_backup_status_up_to_date, R.attr.palette_system_green)
-                }
-
-                is BackupState.BackupFailed -> {
-                    PresentationBackupState(Warning, back_up_wallet_backup_status_outdated, R.attr.palette_system_red)
-                }
-            }
-            backupOption.backupState = presentationBackupState
+    private fun onBackupStateChanged(backupState: BackupState) {
+        backupOption.backupState = when (backupState) {
+            is BackupState.BackupDisabled -> PresentationBackupState(Warning)
+            is BackupState.BackupInProgress -> PresentationBackupState(InProgress, back_up_wallet_backup_status_in_progress, R.attr.palette_text_body)
+            is BackupState.BackupUpToDate -> PresentationBackupState(Success, back_up_wallet_backup_status_up_to_date, R.attr.palette_system_green)
+            is BackupState.BackupFailed -> PresentationBackupState(Warning, back_up_wallet_backup_status_outdated, R.attr.palette_system_red)
         }
         _allSettingsOptions.update { generateOptions() }
     }

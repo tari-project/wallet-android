@@ -41,15 +41,12 @@ import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.tari.android.wallet.databinding.FragmentAllSettingsBinding
 import com.tari.android.wallet.ui.common.CommonXmlFragment
-import com.tari.android.wallet.ui.screen.settings.userAutorization.BiometricAuthenticationViewModel
 import com.tari.android.wallet.util.extension.collectFlow
 import com.tari.android.wallet.util.extension.observe
 
 class AllSettingsFragment : CommonXmlFragment<FragmentAllSettingsBinding, AllSettingsViewModel>() {
 
     private val optionsAdapter = AllSettingsOptionAdapter()
-
-    private val biometricAuthenticationViewModel: BiometricAuthenticationViewModel by viewModels()
 
     // We need to prevent screen recording when onResume is called when this fragment is not on top
     override fun screenRecordingAlwaysDisable() = !isFragmentOnTop()
@@ -62,9 +59,6 @@ class AllSettingsFragment : CommonXmlFragment<FragmentAllSettingsBinding, AllSet
 
         val viewModel: AllSettingsViewModel by viewModels()
         bindViewModel(viewModel)
-
-        BiometricAuthenticationViewModel.bindToFragment(biometricAuthenticationViewModel, this)
-        viewModel.authenticationViewModel = biometricAuthenticationViewModel
 
         setupUI()
         observeUI()
@@ -100,4 +94,3 @@ class AllSettingsFragment : CommonXmlFragment<FragmentAllSettingsBinding, AllSet
         fun newInstance() = AllSettingsFragment()
     }
 }
-

@@ -52,19 +52,18 @@ import com.google.api.services.drive.model.FileList
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.walletManager.WalletConfig
-import com.tari.android.wallet.util.extension.getLastPathComponent
 import com.tari.android.wallet.infrastructure.backup.BackupFileProcessor
 import com.tari.android.wallet.infrastructure.backup.BackupNamingPolicy
 import com.tari.android.wallet.infrastructure.backup.BackupStorage
 import com.tari.android.wallet.infrastructure.backup.BackupStorageAuthRevokedException
 import com.tari.android.wallet.infrastructure.backup.BackupStorageFullException
 import com.tari.android.wallet.infrastructure.backup.BackupStorageTamperedException
+import com.tari.android.wallet.util.extension.getLastPathComponent
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.joda.time.DateTime
 import java.io.File
 import java.io.FileOutputStream
-import java.io.IOException
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -87,14 +86,14 @@ class GoogleDriveBackupStorage @Inject constructor(
             .build()
     )
 
-    private var drive: Drive? = null
+    private var googleDrive: Drive? = null
 
     init {
         val googleAccount = GoogleSignIn.getLastSignedInAccount(context)
         if (googleAccount != null) {
             val credential = GoogleAccountCredential.usingOAuth2(context, listOf(DriveScopes.DRIVE_APPDATA))
                 .apply { selectedAccount = googleAccount.account }
-            drive = Drive.Builder(NetHttpTransport(), GsonFactory(), credential)
+            googleDrive = Drive.Builder(NetHttpTransport(), GsonFactory(), credential)
                 .setApplicationName(context.resources.getString(R.string.app_name))
                 .build()
         }
@@ -116,7 +115,7 @@ class GoogleDriveBackupStorage @Inject constructor(
     private fun saveDrive(intent: Intent?) {
         val result = GoogleSignIn.getSignedInAccountFromIntent(intent).result
         val credential = GoogleAccountCredential.usingOAuth2(context, listOf(DriveScopes.DRIVE_APPDATA)).apply { selectedAccount = result.account }
-        drive = Drive.Builder(NetHttpTransport(), GsonFactory(), credential)
+        googleDrive = Drive.Builder(NetHttpTransport(), GsonFactory(), credential)
             .setApplicationName(context.resources.getString(R.string.app_name))
             .build()
     }
@@ -154,11 +153,12 @@ class GoogleDriveBackupStorage @Inject constructor(
                 .setParents(listOf(DRIVE_BACKUP_PARENT_FOLDER_NAME))
                 .setMimeType(mimeType)
                 .setName(file.getLastPathComponent())
-        drive!!.files()
-            .create(metadata, FileContent(mimeType, file))
-            .setFields("id")
-            .execute()
-            ?: throw IOException("Null result when requesting file creation.")
+        googleDrive?.let {
+            it.files()
+                .create(metadata, FileContent(mimeType, file))
+                .setFields("id")
+                .execute()
+        } ?: error("Google Drive client is not initialized.")
     }
 
     override suspend fun hasBackup(): Boolean {
@@ -192,7 +192,8 @@ class GoogleDriveBackupStorage @Inject constructor(
                 tempFile.createNewFile()
             }
             FileOutputStream(tempFile).use { targetOutputStream ->
-                drive!!.files().get(backupFileId).executeMediaAndDownloadTo(targetOutputStream)
+                googleDrive?.let { it.files().get(backupFileId).executeMediaAndDownloadTo(targetOutputStream) }
+                    ?: error("Google Drive client is not initialized.")
             }
             backupFileProcessor.restoreBackupFile(tempFile, password)
             backupFileProcessor.clearTempFolder()
@@ -204,16 +205,17 @@ class GoogleDriveBackupStorage @Inject constructor(
         return file.id to file.name
     }
 
-    private fun searchForBackups(pageToken: String? = null): FileList =
-        drive!!.files().list()
+    private fun searchForBackups(pageToken: String? = null): FileList = googleDrive?.let {
+        it.files().list()
             .setSpaces(DRIVE_BACKUP_PARENT_FOLDER_NAME)
             .setQ("'$DRIVE_BACKUP_PARENT_FOLDER_NAME' in parents")
             .setFields("nextPageToken, files(id, name)")
             .setPageToken(pageToken)
             .execute()
+    } ?: error("Google Drive client is not initialized.")
 
     override suspend fun deleteAllBackupFiles() {
-        val driveFiles = drive?.files() ?: return
+        val driveFiles = googleDrive?.files() ?: return
         var pageToken: String? = null
         do {
             pageToken = searchForBackups(pageToken).let {

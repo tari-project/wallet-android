@@ -48,21 +48,16 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.TextView
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.viewModels
-import com.tari.android.wallet.R.string.back_up_wallet_backing_up_error_desc
 import com.tari.android.wallet.R.string.back_up_wallet_backing_up_error_title
-import com.tari.android.wallet.R.string.back_up_wallet_backing_up_unknown_error
 import com.tari.android.wallet.R.string.change_password_change_password_cta
 import com.tari.android.wallet.R.string.change_password_page_description_general_part
 import com.tari.android.wallet.R.string.change_password_page_description_highlight_part
-import com.tari.android.wallet.R.string.error_no_connection_title
 import com.tari.android.wallet.databinding.FragmentChangeSecurePasswordBinding
-import com.tari.android.wallet.infrastructure.backup.BackupState
-import com.tari.android.wallet.infrastructure.backup.BackupState.BackupFailed
-import com.tari.android.wallet.infrastructure.backup.BackupState.BackupUpToDate
 import com.tari.android.wallet.ui.common.CommonXmlFragment
 import com.tari.android.wallet.ui.common.domain.PaletteManager
 import com.tari.android.wallet.ui.dialog.modular.ModularDialog
 import com.tari.android.wallet.ui.dialog.modular.SimpleDialogArgs
+import com.tari.android.wallet.ui.screen.settings.backup.changeSecurePassword.ChangeSecurePasswordViewModel.Effect
 import com.tari.android.wallet.util.extension.animateClick
 import com.tari.android.wallet.util.extension.collectFlow
 import com.tari.android.wallet.util.extension.gone
@@ -73,9 +68,6 @@ import com.tari.android.wallet.util.extension.scrollToTop
 import com.tari.android.wallet.util.extension.showKeyboard
 import com.tari.android.wallet.util.extension.string
 import com.tari.android.wallet.util.extension.visible
-import kotlinx.coroutines.Job
-import java.net.UnknownHostException
-
 
 class ChangeSecurePasswordFragment : CommonXmlFragment<FragmentChangeSecurePasswordBinding, ChangeSecurePasswordViewModel>() {
 
@@ -86,8 +78,6 @@ class ChangeSecurePasswordFragment : CommonXmlFragment<FragmentChangeSecurePassw
 
     private val confirmInput
         get() = ui.confirmPasswordEditText.ui.editText
-
-    private var collectStateJob: Job? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
         FragmentChangeSecurePasswordBinding.inflate(inflater, container, false).also { ui = it }.root
@@ -101,11 +91,22 @@ class ChangeSecurePasswordFragment : CommonXmlFragment<FragmentChangeSecurePassw
         inputService = requireActivity().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
 
         setupViews()
-    }
 
-    override fun onDestroyView() {
-        collectStateJob?.cancel()
-        super.onDestroyView()
+        collectFlow(viewModel.effect) { effect ->
+            when (effect) {
+                is Effect.ShowBackupPasswordUpdated -> {
+                    allowExitAndPasswordEditing()
+                    viewModel.backToBackupSettings()
+                }
+
+                is Effect.ShowBackupPasswordError -> {
+                    showBackupErrorDialog(effect.errorText) {
+                        allowExitAndPasswordEditing()
+                        setSecurePasswordCtaIdleState()
+                    }
+                }
+            }
+        }
     }
 
     private fun setupViews() {
@@ -231,7 +232,7 @@ class ChangeSecurePasswordFragment : CommonXmlFragment<FragmentChangeSecurePassw
             requireActivity().hideKeyboard()
             preventExitAndPasswordEditing()
             setSecurePasswordCtaClickedState()
-            performBackupAndUpdatePassword()
+            viewModel.performBackupAndUpdatePassword(passwordInput.text?.toString().orEmpty())
         }
     }
 
@@ -257,37 +258,6 @@ class ChangeSecurePasswordFragment : CommonXmlFragment<FragmentChangeSecurePassw
         ui.setPasswordCtaTextView.text = string(change_password_change_password_cta)
     }
 
-    private fun performBackupAndUpdatePassword() {
-        // start listening to wallet events
-        collectStateJob = collectFlow(viewModel.backupState) { onBackupStateChanged(it.backupsState) }
-        viewModel.backupSharedPrefsRepository.backupPassword = passwordInput.text!!.toString()
-        viewModel.backupManager.backupNow()
-    }
-
-    private fun onBackupStateChanged(backupState: BackupState?) {
-        when (backupState) {
-            is BackupUpToDate -> {
-                allowExitAndPasswordEditing()
-                viewModel.backToBackupSettings()
-            }
-
-            is BackupFailed -> { // backup failed
-                showBackupErrorDialog(deductBackupErrorMessage(backupState.backupException)) {
-                    allowExitAndPasswordEditing()
-                    setSecurePasswordCtaIdleState()
-                }
-            }
-
-            else -> Unit
-        }
-    }
-
-    private fun deductBackupErrorMessage(e: Throwable?): String = when {
-        e is UnknownHostException -> string(error_no_connection_title)
-        e?.message != null -> string(back_up_wallet_backing_up_error_desc, e.message!!)
-        else -> string(back_up_wallet_backing_up_unknown_error)
-    }
-
     private fun showBackupErrorDialog(message: String, onClose: () -> Unit) {
         val args = SimpleDialogArgs(
             title = string(back_up_wallet_backing_up_error_title),
@@ -303,5 +273,4 @@ class ChangeSecurePasswordFragment : CommonXmlFragment<FragmentChangeSecurePassw
         private const val KEYBOARD_SHOW_UP_DELAY_AFTER_LOCAL_AUTH = 500L
         private const val KEYBOARD_ANIMATION_TIME = 100L
     }
-
 }

@@ -43,7 +43,6 @@ import com.tari.android.wallet.application.walletManager.WalletManager.WalletEve
 import com.tari.android.wallet.data.sharedPrefs.backup.BackupPrefRepository
 import com.tari.android.wallet.data.sharedPrefs.delegates.SerializableTime
 import com.tari.android.wallet.di.ApplicationScope
-import com.tari.android.wallet.infrastructure.backup.dropbox.DropboxBackupStorage
 import com.tari.android.wallet.infrastructure.backup.googleDrive.GoogleDriveBackupStorage
 import com.tari.android.wallet.infrastructure.backup.local.LocalBackupStorage
 import com.tari.android.wallet.notification.NotificationHelper
@@ -66,7 +65,6 @@ class BackupManager @Inject constructor(
     private val backupSettingsRepository: BackupPrefRepository,
     private val localFileBackupStorage: LocalBackupStorage,
     private val googleDriveBackupStorage: GoogleDriveBackupStorage,
-    private val dropboxBackupStorage: DropboxBackupStorage,
     private val notificationHelper: NotificationHelper,
     private val walletManager: WalletManager,
     private val appStateHandler: AppStateHandler,
@@ -77,18 +75,18 @@ class BackupManager @Inject constructor(
     private val logger
         get() = Logger.t(BackupManager::class.simpleName)
 
-    var currentOption: BackupOption? = null
+    val currentOption: BackupOptionDto
+        get() = backupSettingsRepository.currentBackupOption
 
     private val backupMutex = Mutex()
 
     private val trigger = BehaviorSubject.create<Unit>()
     private val debouncedJob = trigger.debounce(300L, TimeUnit.MILLISECONDS) // TODO don't use rx for debounce
-        .doOnEach { applicationScope.launch { backupAll() } }
+        .doOnEach { applicationScope.launch { backup() } }
         .subscribe()
 
     init {
-        val backupsState = BackupMapState(backupSettingsRepository.getOptionList.associate { Pair(it.type, getBackupStateByOption(it)) })
-        backupStateHandler.updateBackupState(backupsState)
+        backupStateHandler.updateBackupState(getBackupStateByOption(currentOption))
 
         applicationScope.launch {
             walletManager.walletEvent.collect { event ->
@@ -104,7 +102,7 @@ class BackupManager @Inject constructor(
                     is WalletEvent.Tx.TxFauxMinedUnconfirmed,
                     is WalletEvent.Tx.TxCancelled -> trigger.onNext(Unit)
 
-                    is WalletEvent.OnWalletRemove -> turnOffAll()
+                    is WalletEvent.OnWalletRemove -> turnOff()
 
                     else -> Unit
                 }
@@ -122,81 +120,72 @@ class BackupManager @Inject constructor(
         }
     }
 
-    fun setupStorage(option: BackupOption, hostFragment: Fragment) {
-        currentOption = option
-        getStorageByOption(option).setup(hostFragment)
+    fun setupStorage(hostFragment: Fragment) {
+        currentOption.getStorage().setup(hostFragment)
     }
 
     suspend fun onSetupActivityResult(requestCode: Int, resultCode: Int, intent: Intent?): Boolean =
-        currentOption?.let { getStorageByOption(it).onSetupActivityResult(requestCode, resultCode, intent) } == true
+        currentOption.getStorage().onSetupActivityResult(requestCode, resultCode, intent)
 
     fun backupNow() = trigger.onNext(Unit)
 
-    private suspend fun backupAll() = backupSettingsRepository.getOptionList.forEach { backup(it.type) }
-
-    private suspend fun backup(optionType: BackupOption) = backupMutex.withLock {
-        val currentDto = backupSettingsRepository.getOptionList.firstOrNull { it.type == optionType } ?: return
-        if (!currentDto.isEnable) {
-//            logger.d("Backup is disabled. Exit.")
+    private suspend fun backup() = backupMutex.withLock {
+        if (!currentOption.isEnable) {
+            logger.d("Backup is disabled. Exit.")
+            // TODO do we need logs?
             return
         }
 
-        val backupsState = backupStateHandler.backupState.value.copy()
-        if (backupsState.states[optionType] is BackupState.BackupInProgress) {
-//            logger.d("Backup is in progress. Exit.")
+        if (backupStateHandler.inProgress) {
+            logger.d("Backup is in progress. Exit.")
             return
-        }
-
-        fun updateState(state: BackupState) {
-            backupStateHandler.updateBackupState(backupsState.copy(states = backupsState.states.toMutableMap().also { it[optionType] = state }))
         }
 
         logger.i("Backup started")
-        updateState(BackupState.BackupInProgress)
+        backupStateHandler.updateBackupState(BackupState.BackupInProgress)
         try {
-            val backupDate = getStorageByOption(optionType).backup()
+            val backupDate = currentOption.getStorage().backup()
             backupSettingsRepository.updateOption(
-                currentDto.copy(
+                currentOption.copy(
                     isEnable = true,
                     lastSuccessDate = SerializableTime(backupDate),
                     lastFailureDate = null
                 )
             )
             logger.i("Backup successful")
-            updateState(BackupState.BackupUpToDate)
+            backupStateHandler.updateBackupState(BackupState.BackupUpToDate)
         } catch (exception: Throwable) {
             logger.i("Backup failed $exception")
             if (exception is BackupStorageAuthRevokedException) {
                 logger.i("Error happened on backup BackupStorageAuthRevokedException")
-                turnOff(optionType)
+                turnOff()
                 postBackupFailedNotification(exception)
             }
             logger.i("Error happened while backing up")
-            updateState(BackupState.BackupFailed(exception))
-            backupSettingsRepository.updateOption(currentDto.copy(lastSuccessDate = null, lastFailureDate = SerializableTime(DateTime.now())))
+            backupStateHandler.updateBackupState(BackupState.BackupFailed(exception))
+            backupSettingsRepository.updateOption(currentOption.copy(lastSuccessDate = null, lastFailureDate = SerializableTime(DateTime.now())))
         }
     }
 
-    fun turnOffAll() = applicationScope.launch {
-        backupSettingsRepository.getOptionList.forEach { turnOff(it.type) }
-    }
-
-    fun turnOff(optionType: BackupOption) = with(backupMutex) {
-        val backupsState = backupStateHandler.backupState.value.copy()
-        backupSettingsRepository.updateOption(BackupOptionDto(optionType))
+    fun turnOff() = with(backupMutex) {
+        backupSettingsRepository.updateOption(
+            currentOption.copy(
+                isEnable = false,
+                lastSuccessDate = null,
+                lastFailureDate = null,
+            )
+        )
         backupSettingsRepository.backupPassword = null
-        val newState = backupsState.copy(states = backupsState.states.toMutableMap().also { it[optionType] = BackupState.BackupDisabled })
-        backupStateHandler.updateBackupState(newState)
-        val backupStorage = getStorageByOption(optionType)
-        applicationScope.launch { backupStorage.signOut() }
+        backupStateHandler.updateBackupState(BackupState.BackupDisabled)
+        applicationScope.launch { currentOption.getStorage().signOut() }
     }
 
     suspend fun signOut() {
-        getStorageByOption(currentOption!!).signOut()
+        currentOption.getStorage().signOut()
     }
 
     suspend fun restoreLatestBackup(password: String? = null) = backupMutex.withLock {
-        getStorageByOption(currentOption!!).restoreLatestBackup(password)
+        currentOption.getStorage().restoreLatestBackup(password)
     }
 
     private fun getBackupStateByOption(optionDto: BackupOptionDto): BackupState = when {
@@ -205,10 +194,9 @@ class BackupManager @Inject constructor(
         else -> BackupState.BackupUpToDate
     }
 
-    private fun getStorageByOption(optionType: BackupOption): BackupStorage = when (optionType) {
+    private fun BackupOptionDto.getStorage(): BackupStorage = when (this.type) {
         BackupOption.Google -> googleDriveBackupStorage
         BackupOption.Local -> localFileBackupStorage
-//        BackupOption.Dropbox -> dropboxBackupStorage // FIXME: Dropbox backup is not supported yet
     }
 
     private fun postBackupFailedNotification(exception: Exception) {

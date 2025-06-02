@@ -77,7 +77,7 @@ class ChooseRestoreOptionFragment : CommonXmlFragment<FragmentChooseRestoreOptio
 
     private fun observeUI() {
         collectFlow(viewModel.uiState) { uiState ->
-            initOptions(uiState.backupOptions)
+            initOption(uiState.backupOption)
             uiState.selectedOption?.let { updateProgress(it, uiState.isStarted) }
 
             if (uiState.paperWalletProgress) {
@@ -92,21 +92,18 @@ class ChooseRestoreOptionFragment : CommonXmlFragment<FragmentChooseRestoreOptio
         }
     }
 
-    private fun initOptions(options: List<BackupOptionDto>) {
+    private fun initOption(option: BackupOptionDto) {
         ui.optionsContainer.removeAllViews()
-        for (option in options) {
-            val view = RecoveryOptionView(requireContext()).apply {
-                viewLifecycle = viewLifecycleOwner
-                ui.restoreWalletCtaView.setOnClickListener {
-                    this@ChooseRestoreOptionFragment.viewModel.startRecovery(
-                        selectedOption = option.type,
-                        hostFragment = this@ChooseRestoreOptionFragment,
-                    )
-                }
-                init(option.type)
+        val view = RecoveryOptionView(requireContext()).apply {
+            viewLifecycle = viewLifecycleOwner
+            ui.restoreWalletCtaView.setOnClickListener {
+                this@ChooseRestoreOptionFragment.viewModel.startRecovery(
+                    hostFragment = this@ChooseRestoreOptionFragment,
+                )
             }
-            ui.optionsContainer.addView(view)
+            init(option.type)
         }
+        ui.optionsContainer.addView(view)
     }
 
     private fun updateProgress(backupOption: BackupOption, isStarted: Boolean) {
@@ -116,4 +113,3 @@ class ChooseRestoreOptionFragment : CommonXmlFragment<FragmentChooseRestoreOptio
     private fun getBackupOptionView(backupOptions: BackupOption): RecoveryOptionView? =
         ui.optionsContainer.children.mapNotNull { it as? RecoveryOptionView }.firstOrNull { it.viewModel.option == backupOptions }
 }
-

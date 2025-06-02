@@ -32,7 +32,6 @@
  */
 package com.tari.android.wallet.ffi
 
-import com.orhanobut.logger.Logger
 import java.math.BigInteger
 
 
@@ -101,17 +100,7 @@ class FFICompletedTx() : FFITxBase() {
  * FIXME: remove this method once the Payment ID issue is fixed in the FFI layer.
  */
 fun FFICompletedTx.getPaymentIdSafely(): String? {
-    return runCatching { getPaymentId() }
-        .getOrElse {
-            Logger.t("FFICompletedTx").e(
-                it,
-                "Error getting payment ID: ${it.message}" +
-                        "\n" +
-                        "PaymentID bytes: ${runCatching { getPaymentIdBytes() }.getOrElse { "Error during calculation(\"${it.message}\")" }}" +
-                        "\n" +
-                        "PaymentID user bytes: ${runCatching { getPaymentIdUserBytes() }.getOrElse { "Error during calculation(\"${it.message}\")" }}"
-            )
-
-            null
-        }
+    return runCatching { getPaymentId() }.getOrNull()
+        ?: runCatching { "PaymentID bytes: ${getPaymentIdBytes()}" }.getOrNull()
+        ?: runCatching { "PaymentID user bytes: ${getPaymentIdUserBytes()}" }.getOrNull()
 }
