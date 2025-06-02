@@ -96,7 +96,7 @@ fun TxDetailsScreen(
 
                 val unknownUser = contact.walletAddress?.isUnknownUser().isTrue()
                 val coinbase = uiState.tx.isCoinbase
-                val safetrade = contact.walletAddress?.safetrade.isTrue()
+                val paymentIdAddress = contact.walletAddress?.paymentIdAddress.isTrue()
                 TxDetailInfoContactNameItem(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -104,11 +104,11 @@ fun TxDetailsScreen(
                     alias = when {
                         coinbase -> stringResource(R.string.tx_details_coinbase, uiState.tx.safeCastTo<CompletedTx>()?.minedHeight ?: "--")
                         unknownUser -> stringResource(R.string.unknown_source)
-                        safetrade -> stringResource(R.string.tx_details_safetrade_alias_warning)
+                        paymentIdAddress -> stringResource(R.string.tx_details_payment_id_alias_warning)
                         else -> contact.alias
                     },
                     onEditClicked = onContactEditClick,
-                    editable = !unknownUser && !coinbase && !safetrade,
+                    editable = !unknownUser && !coinbase && !paymentIdAddress,
                 )
             }
 
@@ -148,7 +148,7 @@ fun TxDetailsScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 24.dp),
-                    title = if (uiState.contact?.walletAddress?.safetrade.isTrue()) {
+                    title = if (uiState.contact?.walletAddress?.paymentIdAddress.isTrue()) {
                         stringResource(R.string.tx_detail_payment_id)
                     } else {
                         stringResource(R.string.tx_detail_note)

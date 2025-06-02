@@ -85,7 +85,7 @@ class AddressPoisoningChecker @Inject constructor(
 @VisibleForTesting
 fun TariWalletAddress?.isSimilarTo(other: TariWalletAddress): Boolean {
     if (this == null) return false
-    if (this.safetrade && other.safetrade) return this.fullBase58 == other.fullBase58 // We need to compare full base58 for Tari addresses with payment IDs
+    if (this.paymentIdAddress && other.paymentIdAddress) return this.fullBase58 == other.fullBase58 // We need to compare full base58 for Tari addresses with payment IDs
 
     val thisEmojis = this.coreKeyEmojis.extractEmojis()
     val otherEmojis = other.coreKeyEmojis.extractEmojis()

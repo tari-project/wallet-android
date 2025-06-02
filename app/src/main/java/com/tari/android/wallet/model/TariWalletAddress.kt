@@ -83,8 +83,7 @@ data class TariWalletAddress(
     val interactive: Boolean
         get() = features.contains(Feature.INTERACTIVE)
 
-    // SafeTrade is a feature that allows the use of payment IDs in transactions.
-    val safetrade: Boolean
+    val paymentIdAddress: Boolean
         get() = features.contains(Feature.PAYMENT_ID)
 
     fun isUnknownUser(): Boolean = unknownAddress
@@ -93,7 +92,7 @@ data class TariWalletAddress(
         if (this === other) return true
         if (other !is TariWalletAddress) return false
 
-        return if (this.safetrade && other.safetrade) { // We need to compare full base58 for Tari addresses with payment IDs
+        return if (this.paymentIdAddress && other.paymentIdAddress) { // We need to compare full base58 for Tari addresses with payment IDs
             this.fullBase58 == other.fullBase58
         } else {
             this.uniqueIdentifier == other.uniqueIdentifier

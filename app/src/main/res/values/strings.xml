@@ -289,7 +289,7 @@
     <string name="wallet_info_address_button_copy_emoji">Copy Emojis</string>
     <string name="wallet_info_address_one_side_payment">One Sided Payments</string>
     <string name="wallet_info_address_interactive_payment">Interactive Payments</string>
-    <string name="wallet_info_address_safetrade">Safetrade</string>
+    <string name="wallet_info_address_payment_id_payment">Payment ID</string>
     <string name="wallet_info_address_copy_address_to_clipboard_label">Tari Wallet Identity</string>
     <string name="wallet_info_share_profile">Share my address</string>
     <string name="wallet_info_share_address_title">Share Address</string>
@@ -320,7 +320,7 @@
     <string name="tx_details_cancel_dialog_cancel">Yes, cancel</string>
     <string name="tx_details_cancel_dialog_not_cancel">Not now</string>
     <string name="tx_details_coinbase">Block #%s</string>
-    <string name="tx_details_safetrade_alias_warning">Safetrade address. Please be aware that this address can\'t be saved to your contacts list.</string>
+    <string name="tx_details_payment_id_alias_warning">Payment ID address. Please be aware that this address can\'t be saved to your contacts list.</string>
     <string name="tx_details_recipient_address">Recipient Address</string>
     <string name="tx_details_total">Total</string>
     <string name="tx_details_transaction_details">Transaction Details</string>
