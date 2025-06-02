@@ -53,6 +53,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="12dp"
+            android:layout_marginBottom="11dp"
             android:layout_weight="1"
             android:lineSpacingMultiplier="1.5"
             android:text="@string/back_up_seep_phrase_losing_warning_label"

@@ -286,7 +286,7 @@ fun TariWalletAddress.addressFirstEmojis(): EmojiId {
  * Returns the last 3 emojis of the address in the format "| prefix | address1 ••• address2". E.g. "| 🐢💤| 🐉🔋😎 ••• 🍭🎤💍".
  */
 fun TariWalletAddress.addressLastEmojis(): EmojiId {
-    return this.coreKeyEmojis.extractEmojis().takeLast(3).joinToString("")
+    return this.fullEmojiId.extractEmojis().takeLast(3).joinToString("") // Need to check fullEmojiId because of addresses with payment IDs
 }
 
 /**

@@ -1,5 +1,3 @@
-@file:Suppress("UnstableApiUsage")
-
 import java.io.ByteArrayOutputStream
 import java.nio.file.Files
 import java.nio.file.Paths
@@ -53,18 +51,17 @@ android {
         buildConfigField("String", "YAT_ORGANIZATION_KEY", "\"${yatProperties["yat.key"]}\"")
         buildConfigField("String", "YAT_ORGANIZATION_RETURN_URL", "\"${yatProperties["yat.returnUrl"]}\"")
 
-        val dropboxProperties = loadDropboxProps()
-        buildConfigField("String", "DROPBOX_ACCESS_TOKEN", "\"${dropboxProperties["dropbox_key"]}\"")
         buildConfigField("String", "LIB_WALLET_MIN_VALID_VERSION", "\"${TariBuildConfig.LibWallet.minValidVersion}\"")
         buildConfigField("String", "LIB_WALLET_VERSION", "\"${TariBuildConfig.LibWallet.version}\"")
         buildConfigField("String", "LIB_WALLET_NETWORK", "\"${TariBuildConfig.LibWallet.network}\"")
+
+        buildConfigField("String", "NOTIFICATIONS_API_KEY", "\"${loadSecretProps()["service.notifications.api_key"]}\"")
     }
 
     flavorDimensions.add("privacy-mode")
 
     buildTypes {
         loadSentryProps()
-        val secretProperties = loadSecretProps()
 
         getByName("debug") {
             isJniDebuggable = true
@@ -88,17 +85,13 @@ android {
     productFlavors {
         create("regular") {
             dimension = "privacy-mode"
-            buildConfigField("String", "NOTIFICATIONS_API_KEY", "\"${loadSecretProps()["service.notifications.api_key"]}\"")
-            proguardFile("regular-proguard-rules.pro")
         }
         create("privacy") {
             dimension = "privacy-mode"
-            buildConfigField("String", "NOTIFICATIONS_API_KEY", "\"${loadSecretProps()["service.notifications.api_key"]}\"")
         }
     }
 
     applicationVariants.configureEach {
-        this.mergedFlavor.manifestPlaceholders["dropboxApiKey"] = loadDropboxProps()["dropbox_key"].toString()
         this.mergedFlavor.manifestPlaceholders["sentryPublicDSN"] = loadSecretProps()["sentry.public_dsn"].toString()
     }
 
@@ -199,7 +192,6 @@ android {
 fun loadSecretProps(): Properties = loadProps("secret")
 fun loadSentryProps(): Properties = loadProps("sentry")
 fun loadYatProps(): Properties = loadProps("yat")
-fun loadDropboxProps(): Properties = loadProps("dropbox")
 
 fun loadProps(fileName: String): Properties {
     val props = project.rootProject.file("$fileName.properties")
@@ -306,8 +298,6 @@ dependencies {
 
     // used to read log files
     implementation(Dependencies.commonsIo)
-
-    implementation(Dependencies.dropboxCoreSdk)
 
     implementation(Dependencies.contactsAndroid)
 

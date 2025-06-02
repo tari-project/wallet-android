@@ -339,8 +339,6 @@ open class ContactSelectionFragment : CommonXmlFragment<FragmentContactsSelectio
             } else {
                 viewModel.addressEntered(textWithoutSeparators)
             }
-        } else if (viewModel.deeplinkManager.parseDeepLink(text) != null) {
-            viewModel.parseDeeplink(text)
         } else {
             val walletAddress = TariWalletAddress.fromBase58OrNull(text)
             if (walletAddress != null) {

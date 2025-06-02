@@ -139,26 +139,34 @@ class WalletCallbacks @Inject constructor() {
         }
     }
 
+    private var oldBaseNodeStatusMessage = ""
     fun onBaseNodeStatus(contextPtr: ByteArray, baseNodeStatePointer: FFIPointer) {
         val walletContextId = BigInteger(1, contextPtr).toInt()
         val baseNodeState = FFITariBaseNodeState(baseNodeStatePointer).runWithDestroy { TariBaseNodeState(it) }
-        log(walletContextId, "Base node state changed: $baseNodeState")
+
+        val newMessage = "Base node state changed: $baseNodeState"
+        log(walletContextId, newMessage, oldBaseNodeStatusMessage)
+        oldBaseNodeStatusMessage = newMessage
+
         listeners[walletContextId]?.onBaseNodeStateChanged(baseNodeState)
     }
 
+    private var oldConnectivityStatusMessage = ""
     fun onConnectivityStatus(contextPtr: ByteArray, bytes: ByteArray) {
         val walletContextId = BigInteger(1, contextPtr).toInt()
         val connectivityStatus = BigInteger(1, bytes)
-        log(
-            walletContextId, "Connectivity status is [${
-                when (connectivityStatus.toInt()) {
-                    0 -> "Connecting"
-                    1 -> "Online"
-                    2 -> "Offline"
-                    else -> "Unknown"
-                }
-            }]"
-        )
+
+        val newMessage = "Connectivity status is [${
+            when (connectivityStatus.toInt()) {
+                0 -> "Connecting"
+                1 -> "Online"
+                2 -> "Offline"
+                else -> "Unknown"
+            }
+        }]"
+        log(walletContextId, newMessage, oldConnectivityStatusMessage)
+        oldConnectivityStatusMessage = newMessage
+
         listeners[walletContextId]?.onConnectivityStatus(connectivityStatus.toInt())
     }
 
@@ -225,7 +233,8 @@ class WalletCallbacks @Inject constructor() {
         listeners[walletContextId]?.onWalletRestoration(state)
     }
 
-    private fun log(walletContextId: Int, message: String) {
+    private fun log(walletContextId: Int, message: String, oldMessage: String = "") {
+        if (message == oldMessage) return
         logger.i("${if (walletContextId == PAPER_WALLET_CONTEXT_ID) "(Paper wallet) " else ""}$message")
     }
 

@@ -164,6 +164,30 @@ Java_com_tari_android_wallet_ffi_FFICompletedTx_jniGetPaymentId(
 }
 
 extern "C"
+JNIEXPORT jlong JNICALL
+Java_com_tari_android_wallet_ffi_FFICompletedTx_jniGetPaymentIdBytes(
+        JNIEnv *jEnv,
+        jobject jThis,
+        jobject error) {
+    return ExecuteWithErrorAndCast<ByteVector *>(jEnv, error, [&](int *errorPointer) {
+        auto pCompletedTx = GetPointerField<TariCompletedTransaction *>(jEnv, jThis);
+        return completed_transaction_get_payment_id_as_bytes(pCompletedTx, errorPointer);
+    });
+}
+
+extern "C"
+JNIEXPORT jlong JNICALL
+Java_com_tari_android_wallet_ffi_FFICompletedTx_jniGetPaymentIdUserBytes(
+        JNIEnv *jEnv,
+        jobject jThis,
+        jobject error) {
+    return ExecuteWithErrorAndCast<ByteVector *>(jEnv, error, [&](int *errorPointer) {
+        auto pCompletedTx = GetPointerField<TariCompletedTransaction *>(jEnv, jThis);
+        return completed_transaction_get_user_payment_id_as_bytes(pCompletedTx, errorPointer);
+    });
+}
+
+extern "C"
 JNIEXPORT jint JNICALL
 Java_com_tari_android_wallet_ffi_FFICompletedTx_jniGetStatus(
         JNIEnv *jEnv,

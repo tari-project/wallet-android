@@ -35,6 +35,7 @@ import com.tari.android.wallet.ui.screen.tx.details.widget.TxDetailInfoContactNa
 import com.tari.android.wallet.ui.screen.tx.details.widget.TxDetailInfoItem
 import com.tari.android.wallet.ui.screen.tx.details.widget.TxDetailInfoStatusItem
 import com.tari.android.wallet.util.MockDataStub
+import com.tari.android.wallet.util.extension.isNotTrue
 import com.tari.android.wallet.util.extension.isTrue
 import com.tari.android.wallet.util.extension.safeCastTo
 
@@ -95,6 +96,7 @@ fun TxDetailsScreen(
 
                 val unknownUser = contact.walletAddress?.isUnknownUser().isTrue()
                 val coinbase = uiState.tx.isCoinbase
+                val paymentIdAddress = contact.walletAddress?.paymentIdAddress.isTrue()
                 TxDetailInfoContactNameItem(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -102,10 +104,11 @@ fun TxDetailsScreen(
                     alias = when {
                         coinbase -> stringResource(R.string.tx_details_coinbase, uiState.tx.safeCastTo<CompletedTx>()?.minedHeight ?: "--")
                         unknownUser -> stringResource(R.string.unknown_source)
+                        paymentIdAddress -> stringResource(R.string.tx_details_payment_id_alias_warning)
                         else -> contact.alias
                     },
                     onEditClicked = onContactEditClick,
-                    editable = !unknownUser && !coinbase,
+                    editable = !unknownUser && !coinbase && !paymentIdAddress,
                 )
             }
 
@@ -138,17 +141,24 @@ fun TxDetailsScreen(
                 singleLine = false,
             )
 
-            uiState.tx.note.takeIf { it.isNotEmpty() }?.let { note ->
+            // Hide payment ID if it is non-null AND empty
+            if (uiState.tx.paymentId?.isEmpty().isNotTrue()) {
                 Spacer(Modifier.size(10.dp))
                 TxDetailInfoItem(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 24.dp),
-                    title = stringResource(R.string.tx_detail_note),
-                    value = note,
+                    title = if (uiState.contact?.walletAddress?.paymentIdAddress.isTrue()) {
+                        stringResource(R.string.tx_detail_payment_id)
+                    } else {
+                        stringResource(R.string.tx_detail_note)
+                    },
+                    value = uiState.tx.paymentId ?: stringResource(R.string.tx_detail_payment_id_error),
+                    valueTextColor = if (uiState.tx.paymentId == null) TariDesignSystem.colors.errorMain else TariDesignSystem.colors.textPrimary,
                     singleLine = false,
                 )
             }
+
 
             if (uiState.blockExplorerLink != null) {
                 Spacer(Modifier.size(10.dp))

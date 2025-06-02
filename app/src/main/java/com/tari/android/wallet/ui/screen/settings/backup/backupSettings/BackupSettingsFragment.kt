@@ -42,14 +42,11 @@ import com.tari.android.wallet.databinding.FragmentWalletBackupSettingsBinding
 import com.tari.android.wallet.ui.common.CommonXmlFragment
 import com.tari.android.wallet.ui.screen.settings.backup.backupSettings.option.BackupOptionView
 import com.tari.android.wallet.ui.screen.settings.backup.backupSettings.option.BackupOptionViewModel
-import com.tari.android.wallet.ui.screen.settings.userAutorization.BiometricAuthenticationViewModel
 import com.tari.android.wallet.util.extension.ThrottleClick
 import com.tari.android.wallet.util.extension.observe
 import com.tari.android.wallet.util.extension.setVisible
 
 class BackupSettingsFragment : CommonXmlFragment<FragmentWalletBackupSettingsBinding, BackupSettingsViewModel>() {
-
-    private val biometricAuthenticationViewModel: BiometricAuthenticationViewModel by viewModels()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
         FragmentWalletBackupSettingsBinding.inflate(inflater, container, false).also { ui = it }.root
@@ -59,9 +56,6 @@ class BackupSettingsFragment : CommonXmlFragment<FragmentWalletBackupSettingsBin
 
         val viewModel: BackupSettingsViewModel by viewModels()
         bindViewModel(viewModel)
-
-        BiometricAuthenticationViewModel.bindToFragment(biometricAuthenticationViewModel, this)
-        viewModel.biometricAuthenticationViewModel = biometricAuthenticationViewModel
 
         setupCTAs()
         subscribeUI()
@@ -98,16 +92,14 @@ class BackupSettingsFragment : CommonXmlFragment<FragmentWalletBackupSettingsBin
 
         observe(setPasswordVisible) { ui.updatePasswordCtaView.setVisible(it) }
 
-        observe(options) { initBackupOptions(it) }
+        observe(optionViewModel) { initBackupOptions(it) }
     }
 
-    private fun initBackupOptions(options: List<BackupOptionViewModel>) {
-        for (option in options) {
-            val backupOptionView = BackupOptionView(requireContext())
-            backupOptionView.viewLifecycle = viewLifecycleOwner
-            backupOptionView.init(this, option)
-            ui.optionsContainer.addView(backupOptionView)
-        }
+    private fun initBackupOptions(optionViewModel: BackupOptionViewModel) {
+        val backupOptionView = BackupOptionView(requireContext())
+        backupOptionView.viewLifecycle = viewLifecycleOwner
+        backupOptionView.init(this, optionViewModel)
+        ui.optionsContainer.addView(backupOptionView)
     }
 
     private fun resetStatusIcons() {

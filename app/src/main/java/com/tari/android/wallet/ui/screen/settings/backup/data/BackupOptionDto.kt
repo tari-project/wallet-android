@@ -5,7 +5,7 @@ import java.io.Serializable
 
 data class BackupOptionDto(
     val type: BackupOption,
-    val isEnable: Boolean = false,
-    val lastSuccessDate: SerializableTime? = null,
-    val lastFailureDate: SerializableTime? = null
-) : Serializable
+    val isEnable: Boolean,
+    val lastSuccessDate: SerializableTime?,
+    val lastFailureDate: SerializableTime?,
+) : Serializable // TODO Parcelable?

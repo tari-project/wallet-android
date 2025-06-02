@@ -45,6 +45,8 @@ class FFICompletedTx() : FFITxBase() {
     private external fun jniGetFee(libError: FFIError): ByteArray
     private external fun jniGetTimestamp(libError: FFIError): ByteArray
     private external fun jniGetPaymentId(libError: FFIError): String
+    private external fun jniGetPaymentIdBytes(libError: FFIError): FFIPointer
+    private external fun jniGetPaymentIdUserBytes(libError: FFIError): FFIPointer
     private external fun jniGetMinedTimestamp(libError: FFIError): ByteArray
     private external fun jniGetMinedHeight(libError: FFIError): ByteArray
     private external fun jniGetStatus(libError: FFIError): Int
@@ -73,6 +75,8 @@ class FFICompletedTx() : FFITxBase() {
     fun getTimestamp(): BigInteger = runWithError { BigInteger(1, jniGetTimestamp(it)) }
 
     fun getPaymentId(): String = runWithError { jniGetPaymentId(it) }
+    fun getPaymentIdBytes(): FFIByteVector = runWithError { FFIByteVector(jniGetPaymentIdBytes(it)) }
+    fun getPaymentIdUserBytes(): FFIByteVector = runWithError { FFIByteVector(jniGetPaymentIdUserBytes(it)) }
 
     fun getMinedTimestamp(): BigInteger = runWithError { BigInteger(1, jniGetMinedTimestamp(it)) }
 
@@ -87,4 +91,16 @@ class FFICompletedTx() : FFITxBase() {
     fun getCancellationReason(): FFITxCancellationReason = runWithError { FFITxCancellationReason.map(jniGetCancellationReason(it)) }
 
     fun getTransactionKernel(): FFICompletedTxKernel = runWithError { FFICompletedTxKernel(jniGetTransactionKernel(it)) }
+}
+
+/**
+ * Safely retrieves the payment ID from the FFICompletedTx instance.
+ * If an error occurs, it logs the error and returns null.
+ *
+ * FIXME: remove this method once the Payment ID issue is fixed in the FFI layer.
+ */
+fun FFICompletedTx.getPaymentIdSafely(): String? {
+    return runCatching { getPaymentId() }.getOrNull()
+        ?: runCatching { "PaymentID bytes: ${getPaymentIdBytes()}" }.getOrNull()
+        ?: runCatching { "PaymentID user bytes: ${getPaymentIdUserBytes()}" }.getOrNull()
 }

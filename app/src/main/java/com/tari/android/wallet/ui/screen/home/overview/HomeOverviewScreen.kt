@@ -29,7 +29,6 @@ import com.tari.android.wallet.ui.screen.home.overview.widget.ActiveMinersCard
 import com.tari.android.wallet.ui.screen.home.overview.widget.BalanceInfoModal
 import com.tari.android.wallet.ui.screen.home.overview.widget.BlockSyncChip
 import com.tari.android.wallet.ui.screen.home.overview.widget.EmptyTxList
-import com.tari.android.wallet.ui.screen.home.overview.widget.MainnetAnnounceModal
 import com.tari.android.wallet.ui.screen.home.overview.widget.RestoreSuccessModal
 import com.tari.android.wallet.ui.screen.home.overview.widget.SyncSuccessModal
 import com.tari.android.wallet.ui.screen.home.overview.widget.TxItem
@@ -55,8 +54,6 @@ fun HomeOverviewScreen(
     onSyncDialogDismiss: () -> Unit,
     onBalanceInfoClicked: () -> Unit,
     onBalanceInfoDialogDismiss: () -> Unit,
-    onMainnetDismiss: () -> Unit,
-    onMainnetWatchTrailerClick: () -> Unit,
 ) {
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -219,13 +216,6 @@ fun HomeOverviewScreen(
                 ticker = uiState.ticker,
             )
         }
-
-        if (uiState.showMainnetAnnounceModal) {
-            MainnetAnnounceModal(
-                onDismiss = onMainnetDismiss,
-                onWatchTrailerClick = onMainnetWatchTrailerClick,
-            )
-        }
     }
 }
 
@@ -260,8 +250,6 @@ private fun HomeOverviewScreenPreview() {
             onSyncDialogDismiss = {},
             onBalanceInfoClicked = {},
             onBalanceInfoDialogDismiss = {},
-            onMainnetDismiss = {},
-            onMainnetWatchTrailerClick = {},
         )
     }
 }

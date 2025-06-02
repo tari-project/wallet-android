@@ -1,8 +1,10 @@
 package com.tari.android.wallet.data.chat
 
+import com.orhanobut.logger.Logger
 import com.tari.android.wallet.data.sharedPrefs.chat.ChatsPrefRepository
 import com.tari.android.wallet.di.ApplicationScope
 import com.tari.android.wallet.model.TariWalletAddress
+import com.tari.android.wallet.notification.NotificationHelper
 import com.tari.android.wallet.util.DebugConfig
 import com.tari.android.wallet.util.MockDataStub
 import kotlinx.coroutines.CoroutineScope
@@ -18,12 +20,18 @@ class ChatsRepository @Inject constructor(
     private val chatsPrefRepository: ChatsPrefRepository,
     @ApplicationScope private val applicationScope: CoroutineScope,
 ) {
+    private val logger
+        get() = Logger.t(NotificationHelper::class.simpleName)
+
     private val _chatList = MutableStateFlow<List<ChatItemDto>>(emptyList())
     val chatList = _chatList.asStateFlow()
 
     init {
         applicationScope.launch {
-            chatsPrefRepository.updateNotifier.subscribe { updateList() }
+            chatsPrefRepository.updateNotifier.subscribe(
+                /* onNext = */ { updateList() },
+                /* onError = */ { logger.d("Error updating chat list", it) },
+            )
         }
     }
 

@@ -5,7 +5,7 @@ import com.tari.android.wallet.ui.screen.settings.backup.data.BackupOptionDto
 
 object ChooseRestoreOptionModel {
     data class UiState(
-        val backupOptions: List<BackupOptionDto> = emptyList(),
+        val backupOption: BackupOptionDto,
 
         val selectedOption: BackupOption? = null,
         val isStarted: Boolean = false,

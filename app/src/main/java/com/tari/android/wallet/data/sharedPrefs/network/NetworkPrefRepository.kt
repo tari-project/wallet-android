@@ -14,12 +14,14 @@ class NetworkPrefRepository @Inject constructor(sharedPrefs: SharedPreferences) 
     private val defaultNetwork = when (BuildConfig.LIB_WALLET_NETWORK) {
         "MAINNET" -> NETWORK_MAINNET
         "NEXTNET" -> NETWORK_NEXTNET
+        "ESMERALDA" -> NETWORK_ESMERALDA
         else -> error("Need to define lib versions for the network in TariBuildConfig")
     }
 
     var supportedNetworks: List<TariNetwork> = when (BuildConfig.LIB_WALLET_NETWORK) {
         "MAINNET" -> listOf(NETWORK_MAINNET)
         "NEXTNET" -> listOf(NETWORK_NEXTNET)
+        "ESMERALDA" -> listOf(NETWORK_ESMERALDA)
         else -> error("Need to define lib versions for the network in TariBuildConfig")
     }
 

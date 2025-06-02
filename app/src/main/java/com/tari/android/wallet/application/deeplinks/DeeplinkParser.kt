@@ -11,6 +11,12 @@ import javax.inject.Singleton
 class DeeplinkParser @Inject constructor(private val networkRepository: NetworkPrefRepository) {
 
     fun parse(deepLinkUri: Uri): DeepLink? {
+        // Try to parse the URI as a pure Tari address (e.g. the QR code from Safe Trade scan)
+        val walletAddress = TariWalletAddress.makeTariAddressOrNull(deepLinkUri.toString())
+        if (walletAddress != null) {
+            return DeepLink.UserProfile(tariAddress = walletAddress.fullBase58)
+        }
+
         val torBridges = getTorDeeplink(deepLinkUri.toString().trim())
         if (torBridges.isNotEmpty()) {
             return DeepLink.TorBridges(torBridges)
