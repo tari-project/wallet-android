@@ -3,10 +3,10 @@ package com.tari.android.wallet.ui.screen.contactBook.add
 import android.os.Bundle
 import android.view.View
 import com.tari.android.wallet.R
-import com.tari.android.wallet.util.extension.string
-import com.tari.android.wallet.util.extension.visible
 import com.tari.android.wallet.ui.screen.contactBook.contactSelection.ContactSelectionFragment
 import com.tari.android.wallet.ui.screen.contactBook.contactSelection.ContactSelectionViewModel.ContinueButtonEffect
+import com.tari.android.wallet.util.extension.string
+import com.tari.android.wallet.util.extension.visible
 
 class AddContactFragment : ContactSelectionFragment() {
 
@@ -16,7 +16,7 @@ class AddContactFragment : ContactSelectionFragment() {
         ui.toolbar.ui.toolbarTitle.text = string(R.string.contact_book_add_contact_title)
         ui.addFirstNameInput.visible()
 
-        viewModel.additionalFilter = { it.contact.getFFIContactInfo() != null && it.contact.contactInfo.getAlias().isEmpty() }
+        viewModel.additionalFilter = { it.contact.alias.isNullOrEmpty() }
     }
 
     override fun goToNext() {

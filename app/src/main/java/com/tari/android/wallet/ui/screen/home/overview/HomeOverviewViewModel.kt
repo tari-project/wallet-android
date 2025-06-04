@@ -35,8 +35,8 @@ import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 
 const val TARI_COM = "https://tari.com/"
-
 private const val DATA_REFRESH_INTERVAL_MILLIS = 60_000L
+private const val TRANSACTION_AMOUNT_HOME_PAGE = 5
 
 class HomeOverviewViewModel : CommonViewModel() {
 
@@ -245,9 +245,5 @@ class HomeOverviewViewModel : CommonViewModel() {
         } ?: run {
             logger.e("Transaction with ID $txId not found, but it was supposed to be sent")
         }
-    }
-
-    companion object {
-        private const val TRANSACTION_AMOUNT_HOME_PAGE = 5
     }
 }

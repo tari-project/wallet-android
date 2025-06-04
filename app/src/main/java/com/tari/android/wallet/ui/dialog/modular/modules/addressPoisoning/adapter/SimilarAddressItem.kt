@@ -2,7 +2,6 @@ package com.tari.android.wallet.ui.dialog.modular.modules.addressPoisoning.adapt
 
 import com.tari.android.wallet.ui.common.recyclerView.CommonViewHolderItem
 import com.tari.android.wallet.ui.screen.contactBook.addressPoisoning.SimilarAddressDto
-import com.tari.android.wallet.data.contacts.model.FFIContactInfo
 import java.util.Date
 
 data class SimilarAddressItem(
@@ -10,12 +9,10 @@ data class SimilarAddressItem(
     val lastItem: Boolean = false,
 ) : CommonViewHolderItem() {
     override val viewHolderUUID
-        get() = dto.contactDto.uuid
+        get() = dto.contact.walletAddress.fullBase58
 
-    val ffiContact: FFIContactInfo?
-        get() = dto.contactDto.getFFIContactInfo()
     val contactName: String
-        get() = dto.contactDto.contactInfo.getAlias()
+        get() = dto.contact.alias.orEmpty()
     val numberOfTransaction: Int
         get() = dto.numberOfTransaction
     val lastTransactionDate: Date?

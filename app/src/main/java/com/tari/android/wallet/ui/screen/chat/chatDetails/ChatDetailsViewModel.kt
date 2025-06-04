@@ -2,17 +2,17 @@ package com.tari.android.wallet.ui.screen.chat.chatDetails
 
 import androidx.lifecycle.SavedStateHandle
 import com.tari.android.wallet.R
+import com.tari.android.wallet.data.chat.ChatMessageItemDto
+import com.tari.android.wallet.data.chat.ChatsRepository
+import com.tari.android.wallet.data.contacts.ContactsRepository
 import com.tari.android.wallet.model.TariWalletAddress
+import com.tari.android.wallet.navigation.Navigation
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonStyle
 import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
 import com.tari.android.wallet.ui.screen.chat.chatDetails.ChatDetailsModel.WALLET_ADDRESS
 import com.tari.android.wallet.ui.screen.chat.chatDetails.adapter.ChatMessageViewHolderItem
-import com.tari.android.wallet.data.chat.ChatMessageItemDto
-import com.tari.android.wallet.data.chat.ChatsRepository
-import com.tari.android.wallet.data.contacts.ContactsRepository
-import com.tari.android.wallet.navigation.Navigation
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -38,7 +38,7 @@ class ChatDetailsViewModel(savedState: SavedStateHandle) : CommonViewModel() {
     private val _uiState = MutableStateFlow(
         ChatDetailsModel.UiState(
             walletAddress = walletAddress,
-            contact = contactsRepository.getContactByAddress(walletAddress),
+            contact = contactsRepository.findOrCreateContact(walletAddress),
             messages = chatRepository.getChatByWalletAddress(walletAddress)?.messages.orEmpty().map { ChatMessageViewHolderItem(it) }
         )
     )

@@ -2,7 +2,7 @@ package com.tari.android.wallet.ui.screen.tx.details
 
 import androidx.annotation.StringRes
 import com.tari.android.wallet.R
-import com.tari.android.wallet.data.contacts.model.ContactDto
+import com.tari.android.wallet.data.contacts.Contact
 import com.tari.android.wallet.ffi.FFITxCancellationReason
 import com.tari.android.wallet.model.MicroTari
 import com.tari.android.wallet.model.TxStatus
@@ -27,7 +27,7 @@ object TxDetailsModel {
         val showCloseButton: Boolean,
         val ticker: String,
         private val blockExplorerBaseUrl: String?,
-        val contact: ContactDto? = null,
+        val contact: Contact? = null,
     ) {
         val screenTitle: Int
             @StringRes get() = when {

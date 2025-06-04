@@ -6,7 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.tari.android.wallet.data.contacts.model.ContactDto
+import com.tari.android.wallet.data.contacts.Contact
 import com.tari.android.wallet.databinding.FragmentChatBinding
 import com.tari.android.wallet.model.TariWalletAddress
 import com.tari.android.wallet.ui.common.CommonXmlFragment
@@ -56,8 +56,8 @@ class ChatDetailsFragment : CommonXmlFragment<FragmentChatBinding, ChatDetailsVi
         }
     }
 
-    private fun showContact(contact: ContactDto) {
-        ui.toolbar.setText(contact.contactInfo.getAlias())
+    private fun showContact(contact: Contact) {
+        ui.toolbar.setText(contact.alias)
     }
 
     companion object {

@@ -6,7 +6,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.orhanobut.logger.Logger
@@ -82,5 +81,3 @@ fun ViewModel.launchOnMain(action: suspend () -> Unit): Job {
 suspend fun <T> switchToIo(action: suspend () -> T): T = withContext(Dispatchers.IO) { action() }
 
 suspend fun <T> switchToMain(action: suspend () -> T): T = withContext(Dispatchers.Main) { action() }
-
-fun <T> SavedStateHandle.getRequired(key: String): T = this.get<T>(key) ?: error("Required value for key $key is missing")

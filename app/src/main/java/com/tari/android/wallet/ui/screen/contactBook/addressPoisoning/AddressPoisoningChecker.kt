@@ -58,21 +58,21 @@ class AddressPoisoningChecker @Inject constructor(
 
             return (contactsRepository.contactList.value
                     // add the current wallet address to the list because it may not exist if there were no interactions with it
-                    + contactsRepository.getContactByAddress(this))
+                    + contactsRepository.findOrCreateContact(this))
                 .filter { it.walletAddress.isSimilarTo(this) }
-                .map { contactDto ->
+                .map { contact ->
                     SimilarAddressDto(
-                        contactDto = contactDto,
-                        numberOfTransaction = allTxs.filterByWalletAddress(contactDto.contactInfo.requireWalletAddress()).size,
-                        lastTransactionTimestampMillis = allTxs.filterByWalletAddress(contactDto.contactInfo.requireWalletAddress())
+                        contact = contact,
+                        numberOfTransaction = allTxs.filterByWalletAddress(contact.walletAddress).size,
+                        lastTransactionTimestampMillis = allTxs.filterByWalletAddress(contact.walletAddress)
                             .maxOfOrNull { it.timestamp }
                             ?.let { it.toLong() * 1000L },
-                        trusted = addressPoisoningSharedRepository.getTrustedContactList().contains(contactDto.contactInfo.requireWalletAddress()),
+                        trusted = addressPoisoningSharedRepository.getTrustedContactList().contains(contact.walletAddress),
                     )
                 }.let { similarContacts ->
                     // put the current wallet address to the first place
-                    listOf(similarContacts.first { it.contactDto.walletAddress == this }) +
-                            similarContacts.filter { it.contactDto.walletAddress != this }
+                    listOf(similarContacts.first { it.contact.walletAddress == this }) +
+                            similarContacts.filter { it.contact.walletAddress != this }
                 }
         }
     }

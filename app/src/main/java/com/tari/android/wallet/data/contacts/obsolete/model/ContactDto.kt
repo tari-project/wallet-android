@@ -1,12 +1,13 @@
-package com.tari.android.wallet.data.contacts.model
+package com.tari.android.wallet.data.contacts.obsolete.model
 
 import android.os.Parcelable
-import com.tari.android.wallet.model.TariWalletAddress
-import com.tari.android.wallet.data.contacts.ContactAction
+import com.tari.android.wallet.data.contacts.obsolete.ContactAction
 import com.tari.android.wallet.model.EmojiId
+import com.tari.android.wallet.model.TariWalletAddress
 import kotlinx.parcelize.Parcelize
 import java.util.UUID
 
+@Deprecated("Use Contact")
 @Parcelize
 data class ContactDto(
     val contactInfo: ContactInfo,

@@ -102,6 +102,6 @@ class TxRepository @Inject constructor(
 
     private fun Tx.toDto() = TxDto(
         tx = this,
-        contact = contactsRepository.getContactForTx(this),
+        contact = contactsRepository.findOrCreateContact(this.tariContact.walletAddress),
     )
 }

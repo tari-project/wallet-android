@@ -5,7 +5,6 @@ import android.graphics.Bitmap
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.YatAdapter
 import com.tari.android.wallet.application.deeplinks.DeepLink
-import com.tari.android.wallet.data.contacts.model.splitAlias
 import com.tari.android.wallet.data.sharedPrefs.CorePrefRepository
 import com.tari.android.wallet.infrastructure.ShareManager
 import com.tari.android.wallet.infrastructure.ShareType
@@ -50,7 +49,7 @@ class WalletInfoViewModel : CommonViewModel() {
         WalletInfoModel.UiState(
             walletAddress = corePrefRepository.walletAddress,
             yat = yatAdapter.connectedYat.orEmpty(),
-            alias = corePrefRepository.firstName.orEmpty() + " " + corePrefRepository.lastName.orEmpty(),
+            alias = corePrefRepository.alias.orEmpty(),
         )
     )
     val uiState = _uiState.asStateFlow()
@@ -71,7 +70,7 @@ class WalletInfoViewModel : CommonViewModel() {
             it.copy(
                 walletAddress = corePrefRepository.walletAddress,
                 yat = yatAdapter.connectedYat,
-                alias = corePrefRepository.firstName.orEmpty() + " " + corePrefRepository.lastName.orEmpty(),
+                alias = corePrefRepository.alias.orEmpty(),
             )
         }
 
@@ -101,7 +100,7 @@ class WalletInfoViewModel : CommonViewModel() {
     }
 
     fun showEditAliasDialog() {
-        val name = (corePrefRepository.firstName.orEmpty() + " " + corePrefRepository.lastName.orEmpty()).trim()
+        val name = corePrefRepository.alias.orEmpty().trim()
 
         var saveAction: () -> Boolean = { false }
 
@@ -128,17 +127,16 @@ class WalletInfoViewModel : CommonViewModel() {
         showInputModalDialog(ModularDialogArgs(DialogArgs(), moduleList))
     }
 
-    private fun saveDetails(name: String) {
-        if (name.isBlank()) {
+    private fun saveDetails(newName: String) {
+        if (newName.isBlank()) {
             showSimpleDialog(
                 titleRes = R.string.wallet_info_empty_name_dialog_title,
                 descriptionRes = R.string.wallet_info_empty_name_dialog_message,
                 closeButtonTextRes = R.string.wallet_info_empty_name_dialog_button,
             )
         } else {
-            corePrefRepository.firstName = splitAlias(name).firstName
-            corePrefRepository.lastName = splitAlias(name).lastName
-            _uiState.update { it.copy(alias = name) }
+            corePrefRepository.alias = newName
+            _uiState.update { it.copy(alias = newName) }
             hideDialog()
         }
     }

@@ -134,17 +134,22 @@ fun DateTime.txListItemFormattedDate(): String {
 
 @Composable
 fun TxDto.itemMessage(): String {
-    val txUser = tx.tariContact
     return when {
         tx.isCoinbase -> {
             stringResource(R.string.tx_details_coinbase, tx.safeCastTo<CompletedTx>()?.minedHeight ?: "--")
         }
 
-        contact != null && contact.contactInfo.getAlias().isNotEmpty() || txUser.walletAddress.isUnknownUser() -> {
-            val alias = contact?.contactInfo?.getAlias().orEmpty().ifBlank { stringResource(R.string.unknown_source) }
+        !contact.alias.isNullOrEmpty() -> {
             when (tx.direction) {
-                Tx.Direction.INBOUND -> stringResource(R.string.tx_list_sent_a_payment, alias)
-                Tx.Direction.OUTBOUND -> stringResource(R.string.tx_list_you_paid_with_alias, alias)
+                Tx.Direction.INBOUND -> stringResource(R.string.tx_list_sent_a_payment, contact.alias)
+                Tx.Direction.OUTBOUND -> stringResource(R.string.tx_list_you_paid_with_alias, contact.alias)
+            }
+        }
+
+        contact.walletAddress.isUnknownUser() -> {
+            when (tx.direction) {
+                Tx.Direction.INBOUND -> stringResource(R.string.tx_list_sent_a_payment, stringResource(R.string.unknown_source))
+                Tx.Direction.OUTBOUND -> stringResource(R.string.tx_list_you_paid_with_alias, stringResource(R.string.unknown_source))
             }
         }
 
@@ -158,8 +163,8 @@ fun TxDto.itemMessage(): String {
 
         else -> { // display emoji id
             when (tx.direction) {
-                Tx.Direction.INBOUND -> txUser.walletAddress.shortString() + " " + stringResource(R.string.tx_list_paid_you)
-                Tx.Direction.OUTBOUND -> stringResource(R.string.tx_list_you_paid) + " " + txUser.walletAddress.shortString()
+                Tx.Direction.INBOUND -> contact.walletAddress.shortString() + " " + stringResource(R.string.tx_list_paid_you)
+                Tx.Direction.OUTBOUND -> stringResource(R.string.tx_list_you_paid) + " " + contact.walletAddress.shortString()
             }
         }
     }

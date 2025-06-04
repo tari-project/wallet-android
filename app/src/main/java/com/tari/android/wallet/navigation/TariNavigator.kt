@@ -7,7 +7,7 @@ import android.provider.ContactsContract
 import androidx.core.net.toUri
 import com.tari.android.wallet.application.YatAdapter
 import com.tari.android.wallet.application.YatAdapter.ConnectedWallet
-import com.tari.android.wallet.data.contacts.model.ContactDto
+import com.tari.android.wallet.data.contacts.Contact
 import com.tari.android.wallet.model.MicroTari
 import com.tari.android.wallet.model.TariWalletAddress
 import com.tari.android.wallet.navigation.Navigation.AllSettings
@@ -221,8 +221,8 @@ class TariNavigator @Inject constructor(
         }
     }
 
-    private fun sendToUser(recipientUser: ContactDto, amount: MicroTari? = null, note: String = "") {
-        val contact = currentActivity.intent.parcelable<ContactDto>(PARAMETER_CONTACT) ?: recipientUser
+    private fun sendToUser(recipientUser: Contact, amount: MicroTari? = null, note: String = "") {
+        val contact = currentActivity.intent.parcelable<Contact>(PARAMETER_CONTACT) ?: recipientUser
         val innerAmount = currentActivity.intent.getDoubleExtra(PARAMETER_AMOUNT, Double.MIN_VALUE)
         val tariAmount = amount ?: MicroTari(BigInteger.valueOf(innerAmount.toLong())).takeIf { innerAmount != Double.MIN_VALUE }
 

@@ -25,7 +25,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.tari.android.wallet.R
-import com.tari.android.wallet.data.contacts.model.ContactDto
+import com.tari.android.wallet.data.contacts.Contact
 import com.tari.android.wallet.data.tx.TxDto
 import com.tari.android.wallet.ui.compose.TariDesignSystem
 import com.tari.android.wallet.ui.compose.components.TariSearchField
@@ -51,7 +51,7 @@ fun TxHistoryScreen(
         topBar = {
             TariTopBar(
                 title = if (uiState.selectedContact != null) {
-                    stringResource(R.string.contact_details_transaction_history_description, uiState.selectedContact.contactInfo.getAlias())
+                    stringResource(R.string.contact_details_transaction_history_description, uiState.selectedContact.alias.orEmpty())
                 } else {
                     stringResource(R.string.contact_details_transaction_history)
                 },
@@ -120,7 +120,7 @@ fun TxHistoryScreen(
 }
 
 @Composable
-private fun EmptyState(selectedContact: ContactDto?, modifier: Modifier = Modifier) {
+private fun EmptyState(selectedContact: Contact?, modifier: Modifier = Modifier) {
     Column(modifier = modifier, horizontalAlignment = Alignment.CenterHorizontally) {
         Text(
             text = stringResource(R.string.contact_details_transaction_history_empty_state_title),
@@ -132,7 +132,7 @@ private fun EmptyState(selectedContact: ContactDto?, modifier: Modifier = Modifi
         Text(
             textAlign = TextAlign.Center,
             text = if (selectedContact != null) {
-                stringResource(R.string.contact_details_transaction_history_empty_state_description, selectedContact.contactInfo.getAlias())
+                stringResource(R.string.contact_details_transaction_history_empty_state_description, selectedContact.alias.orEmpty())
             } else {
                 stringResource(R.string.home_transaction_list_empty_description)
             },

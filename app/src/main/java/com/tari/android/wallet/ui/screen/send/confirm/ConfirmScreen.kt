@@ -180,7 +180,7 @@ private fun ConfirmScreenPreview() {
                     amount = 1200000.toMicroTari(),
                     feePerGram = 1000.toMicroTari(),
                     note = "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-                    recipientContact = MockDataStub.createContact().getFFIContactInfo()!!,
+                    recipientContact = MockDataStub.createContact(),
                     isOneSidePayment = true,
                 ),
             ),

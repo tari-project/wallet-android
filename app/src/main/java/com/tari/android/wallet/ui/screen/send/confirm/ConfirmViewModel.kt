@@ -53,7 +53,7 @@ class ConfirmViewModel(savedState: SavedStateHandle) : CommonViewModel() {
         val transactionData: TransactionData,
     ) {
         val screenTitle: String
-            get() = transactionData.recipientContact.getAlias().takeIf { it.isNotBlank() }
+            get() = transactionData.recipientContact.alias.orEmpty().takeIf { it.isNotBlank() }
                 ?: transactionData.recipientContact.walletAddress.shortString()
 
         val totalAmount: MicroTari

@@ -64,7 +64,7 @@ class ReceiveViewModel : CommonViewModel() {
                 DeepLink.UserProfile(
                     tariAddress = sharedPrefsRepository.walletAddressBase58.orEmpty(),
                     alias = contactUtil.normalizeAlias(
-                        alias = sharedPrefsRepository.firstName.orEmpty() + " " + sharedPrefsRepository.lastName.orEmpty(),
+                        alias = sharedPrefsRepository.alias.orEmpty(),
                         walletAddress = sharedPrefsRepository.walletAddress,
                     ),
                 )

@@ -52,8 +52,6 @@ class ContactBookFragment : CommonXmlFragment<FragmentContactBookRootBinding, Co
         setupUI()
 
         subscribeUI()
-
-        viewModel.grantPermission()
     }
 
     override fun onResume() {

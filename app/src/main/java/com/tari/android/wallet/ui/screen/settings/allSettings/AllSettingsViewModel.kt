@@ -132,7 +132,7 @@ class AllSettingsViewModel : CommonViewModel() {
 
         val versionText = TariVersionModel(networkRepository).versionInfo
 
-        val alias = settingsRepository.firstName.orEmpty() + " " + settingsRepository.lastName.orEmpty()
+        val alias = settingsRepository.alias.orEmpty()
         val pinCode = securityPrefRepository.pinCode
 
         return listOfNotNull(

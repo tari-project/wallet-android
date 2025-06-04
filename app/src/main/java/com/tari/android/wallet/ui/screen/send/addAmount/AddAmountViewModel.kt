@@ -2,7 +2,7 @@ package com.tari.android.wallet.ui.screen.send.addAmount
 
 import androidx.lifecycle.SavedStateHandle
 import com.tari.android.wallet.R
-import com.tari.android.wallet.data.contacts.model.ContactDto
+import com.tari.android.wallet.data.contacts.Contact
 import com.tari.android.wallet.data.network.NetworkConnectionStateHandler
 import com.tari.android.wallet.model.BalanceInfo
 import com.tari.android.wallet.model.MicroTari
@@ -47,10 +47,10 @@ class AddAmountViewModel(savedState: SavedStateHandle) : CommonViewModel() {
     }
 
     private val _uiState = MutableStateFlow(
-        savedState.get<ContactDto>(PARAMETER_CONTACT)?.getFFIContactInfo()?.let { contact ->
+        savedState.get<Contact>(PARAMETER_CONTACT)?.let { contact ->
             AddAmountModel.UiState(
                 amount = savedState.get<MicroTari>(PARAMETER_AMOUNT)?.tariValue?.toDouble() ?: Double.MIN_VALUE,
-                recipientContactInfo = contact,
+                recipientContact = contact,
                 note = savedState.get<String>(PARAMETER_NOTE).orEmpty(),
             )
         } ?: error("FFI contact is required, but not provided (maybe it is a PhoneContactInfo which does not have a wallet address).")

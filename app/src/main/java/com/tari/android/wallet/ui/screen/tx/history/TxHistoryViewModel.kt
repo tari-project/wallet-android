@@ -1,8 +1,8 @@
 package com.tari.android.wallet.ui.screen.tx.history
 
 import androidx.lifecycle.SavedStateHandle
+import com.tari.android.wallet.data.contacts.Contact
 import com.tari.android.wallet.data.contacts.ContactsRepository
-import com.tari.android.wallet.data.contacts.model.ContactDto
 import com.tari.android.wallet.data.tx.TxDto
 import com.tari.android.wallet.data.tx.TxRepository
 import com.tari.android.wallet.model.tx.Tx
@@ -30,7 +30,7 @@ class TxHistoryViewModel(savedState: SavedStateHandle) : CommonViewModel() {
 
     private val _uiState = MutableStateFlow(
         UiState(
-            selectedContact = savedState.get<ContactDto>(TariNavigator.PARAMETER_CONTACT)?.uuid?.let { contactsRepository.getByUuid(it) },
+            selectedContact = savedState.get<Contact>(TariNavigator.PARAMETER_CONTACT),
             pendingTxs = emptyList(),
             nonPendingTxs = emptyList(),
             ticker = networkRepository.currentNetwork.ticker,
@@ -58,7 +58,7 @@ class TxHistoryViewModel(savedState: SavedStateHandle) : CommonViewModel() {
     }
 
     data class UiState(
-        val selectedContact: ContactDto? = null, // null if not contact tx history
+        val selectedContact: Contact? = null, // null if not contact tx history
         val pendingTxs: List<TxDto>,
         val nonPendingTxs: List<TxDto>,
         val ticker: String,

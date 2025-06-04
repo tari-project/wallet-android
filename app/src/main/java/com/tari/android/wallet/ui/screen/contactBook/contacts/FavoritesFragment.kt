@@ -40,6 +40,7 @@ class FavoritesFragment : ContactsFragment() {
         super.onViewCreated(view, savedInstanceState)
 
         viewModel.isFavorite = true
-        viewModel.addFilter { contactItem -> contactItem.contact.contactInfo.isFavorite }
+        // FIXME: uncomment this line when the favorite filter is implemented
+//        viewModel.addFilter { contactItem -> contactItem.contact.contactInfo.isFavorite }
     }
 }

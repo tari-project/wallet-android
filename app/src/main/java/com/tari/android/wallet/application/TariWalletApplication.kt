@@ -46,6 +46,7 @@ import com.tari.android.wallet.di.DiContainer
 import com.tari.android.wallet.infrastructure.logging.LoggerAdapter
 import com.tari.android.wallet.notification.NotificationHelper
 import com.tari.android.wallet.util.DebugConfig
+import io.paperdb.Paper
 import io.sentry.android.core.SentryAndroid
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -85,14 +86,10 @@ class TariWalletApplication : Application() {
     private val logger
         get() = Logger.t(TariWalletApplication::class.simpleName)
 
-    var isInForeground = false
-        private set
-
     init {
         System.loadLibrary("native-lib")
     }
 
-    @Suppress("KotlinConstantConditions")
     override fun onCreate() {
         super.onCreate()
         INSTANCE = WeakReference(this)
@@ -111,7 +108,6 @@ class TariWalletApplication : Application() {
 
         DiContainer.initContainer(this)
         initApplication()
-
 
         ProcessLifecycleOwner.get().lifecycle.addObserver(AppObserver())
         logger.i("Application inited")
@@ -132,6 +128,8 @@ class TariWalletApplication : Application() {
         yatAdapter.initYat(this)
 
         loggerAdapter.init()
+
+        Paper.init(this)
     }
 
     companion object {
@@ -145,14 +143,12 @@ class TariWalletApplication : Application() {
         override fun onStart(owner: LifecycleOwner) {
             super.onStart(owner)
             logger.i("App in foreground")
-            isInForeground = true
             applicationScope.launch { appStateHandler.sendAppForegrounded() }
         }
 
         override fun onStop(owner: LifecycleOwner) {
             super.onStop(owner)
             logger.i("App in background")
-            isInForeground = false
             applicationScope.launch { appStateHandler.sendAppBackgrounded() }
         }
 
