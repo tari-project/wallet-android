@@ -31,6 +31,7 @@ import com.tari.android.wallet.util.extension.launchOnIo
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 
@@ -84,13 +85,17 @@ class HomeOverviewViewModel : CommonViewModel() {
             stagedSecurityDelegate.handleStagedSecurity(balanceInfo)
         }
 
-        collectFlow(transactionRepository.allTxs) { txs ->
+        collectFlow(transactionRepository.txs.map { it.allTxs }) { txs ->
             _uiState.update {
                 it.copy(
                     txList = txs.sortedByDescending { it.tx.timestamp }
                         .take(TRANSACTION_AMOUNT_HOME_PAGE),
                 )
             }
+        }
+
+        collectFlow(transactionRepository.txsInitialized) { txsInitialized ->
+            _uiState.update { it.copy(txListInitialized = txsInitialized) }
         }
 
         collectFlow(walletManager.walletEvent) { event ->
@@ -180,14 +185,6 @@ class HomeOverviewViewModel : CommonViewModel() {
         tariNavigator.navigate(Navigation.TxList.HomeTransactionHistory)
     }
 
-    fun onInviteFriendClicked() {
-        showNotReadyYetDialog()
-    }
-
-    fun onNotificationsClicked() {
-        showNotReadyYetDialog()
-    }
-
     private fun checkForDataConsent() {
         if (sentryPrefRepository.isEnabled == null) {
             sentryPrefRepository.isEnabled = false
@@ -239,7 +236,7 @@ class HomeOverviewViewModel : CommonViewModel() {
     }
 
     private fun showTxDetail(txId: TxId) {
-        transactionRepository.findTxById(txId)?.let { tx ->
+        transactionRepository.findTxById(txId)?.tx?.let { tx ->
             // show close button because it's a step in the send flow
             tariNavigator.navigate(Navigation.TxList.ToTxDetails(tx, showCloseButton = true))
         } ?: run {

@@ -3,9 +3,9 @@ package com.tari.android.wallet.ui.screen.contactBook.addressPoisoning
 import androidx.annotation.VisibleForTesting
 import com.tari.android.wallet.data.contacts.ContactsRepository
 import com.tari.android.wallet.data.sharedPrefs.addressPoisoning.AddressPoisoningPrefRepository
+import com.tari.android.wallet.data.tx.TxDto
 import com.tari.android.wallet.data.tx.TxRepository
 import com.tari.android.wallet.model.TariWalletAddress
-import com.tari.android.wallet.model.tx.Tx
 import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.DebugConfig
 import com.tari.android.wallet.util.MockDataStub
@@ -65,7 +65,7 @@ class AddressPoisoningChecker @Inject constructor(
                         contact = contact,
                         numberOfTransaction = allTxs.filterByWalletAddress(contact.walletAddress).size,
                         lastTransactionTimestampMillis = allTxs.filterByWalletAddress(contact.walletAddress)
-                            .maxOfOrNull { it.timestamp }
+                            .maxOfOrNull { it.tx.timestamp }
                             ?.let { it.toLong() * 1000L },
                         trusted = addressPoisoningSharedRepository.getTrustedContactList().contains(contact.walletAddress),
                     )
@@ -77,8 +77,8 @@ class AddressPoisoningChecker @Inject constructor(
         }
     }
 
-    private fun List<Tx>.filterByWalletAddress(walletAddress: TariWalletAddress): List<Tx> {
-        return this.filter { it.tariContact.walletAddress == walletAddress }
+    private fun List<TxDto>.filterByWalletAddress(walletAddress: TariWalletAddress): List<TxDto> {
+        return this.filter { it.tx.tariContact.walletAddress == walletAddress }
     }
 }
 

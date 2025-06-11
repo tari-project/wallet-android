@@ -10,7 +10,6 @@ import com.tari.android.wallet.navigation.Navigation
 import com.tari.android.wallet.navigation.TariNavigator
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.util.extension.collectFlow
-import com.tari.android.wallet.util.extension.zipToPair
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -39,11 +38,11 @@ class TxHistoryViewModel(savedState: SavedStateHandle) : CommonViewModel() {
     val uiState = _uiState.asStateFlow()
 
     init {
-        collectFlow(txRepository.pendingTxs.zipToPair(txRepository.nonPendingTxs)) { (pendingTxs, nonPendingTxs) ->
+        collectFlow(txRepository.txs) { txs ->
             _uiState.update {
                 it.copy(
-                    pendingTxs = pendingTxs,
-                    nonPendingTxs = nonPendingTxs,
+                    pendingTxs = txs.pendingTxs,
+                    nonPendingTxs = txs.nonPendingTxs,
                 )
             }
         }

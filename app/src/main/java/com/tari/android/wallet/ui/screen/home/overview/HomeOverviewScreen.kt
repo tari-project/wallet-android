@@ -43,8 +43,6 @@ import com.tari.android.wallet.util.extension.toMicroTari
 fun HomeOverviewScreen(
     uiState: HomeOverviewModel.UiState,
     onPullToRefresh: () -> Unit,
-    onInviteFriendClick: () -> Unit,
-    onNotificationsClick: () -> Unit,
     onStartMiningClicked: () -> Unit,
     onSendTariClicked: () -> Unit,
     onRequestTariClicked: () -> Unit,
@@ -78,22 +76,6 @@ fun HomeOverviewScreen(
                     connectionIndicatorState = uiState.connectionState.indicatorState,
                     onVersionClick = onConnectionStatusClick,
                 )
-                // TODO actions are not used yet
-//                Spacer(Modifier.width(10.dp))
-//                IconButton(onClick = onInviteFriendClick) {
-//                    Icon(
-//                        painter = painterResource(id = R.drawable.vector_home_overview_invite_friend),
-//                        contentDescription = null,
-//                        tint = TariDesignSystem.colors.componentsNavbarIcons,
-//                    )
-//                }
-//                IconButton(onClick = onNotificationsClick) {
-//                    Icon(
-//                        painter = painterResource(id = R.drawable.vector_home_overview_notifications),
-//                        contentDescription = null,
-//                        tint = TariDesignSystem.colors.componentsNavbarIcons,
-//                    )
-//                }
             }
         }
     ) { paddingValues ->
@@ -139,20 +121,39 @@ fun HomeOverviewScreen(
                     }
                 }
 
-                if (uiState.txList == null) {
+                if (uiState.txList.isEmpty()) {
                     item {
-                        TariProgressView(modifier = Modifier.padding(40.dp))
-                    }
-                } else if (uiState.txList.isEmpty()) {
-                    item {
-                        EmptyTxList(
-                            showStartMiningButton = !uiState.isMining.isTrue(),
-                            onStartMiningClicked = onStartMiningClicked,
+                        Row(
                             modifier = Modifier
-                                .fillMaxWidth()
                                 .padding(horizontal = 16.dp)
-                                .padding(top = 80.dp),
-                        )
+                                .padding(top = 30.dp, bottom = 10.dp),
+                        ) {
+                            Spacer(Modifier.weight(1f))
+                            BlockSyncChip(
+                                walletScannedHeight = uiState.connectionState.walletScannedHeight,
+                                chainTip = uiState.connectionState.chainTip,
+                            )
+                        }
+                    }
+                    if (!uiState.txListInitialized) {
+                        item {
+                            TariProgressView(
+                                modifier = Modifier
+                                    .padding(40.dp)
+                                    .fillMaxWidth()
+                            )
+                        }
+                    } else {
+                        item {
+                            EmptyTxList(
+                                showStartMiningButton = !uiState.isMining.isTrue(),
+                                onStartMiningClicked = onStartMiningClicked,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 16.dp)
+                                    .padding(top = 80.dp),
+                            )
+                        }
                     }
                 } else {
                     item {
@@ -239,8 +240,75 @@ private fun HomeOverviewScreenPreview() {
                 txList = MockDataStub.createTxList(),
             ),
             onPullToRefresh = {},
-            onInviteFriendClick = {},
-            onNotificationsClick = {},
+            onStartMiningClicked = {},
+            onSendTariClicked = {},
+            onRequestTariClicked = {},
+            onTxClick = {},
+            onViewAllTxsClick = {},
+            onConnectionStatusClick = {},
+            onSyncDialogDismiss = {},
+            onBalanceInfoClicked = {},
+            onBalanceInfoDialogDismiss = {},
+        )
+    }
+}
+
+@Composable
+@Preview
+private fun HomeOverviewEmptyScreenPreview() {
+    TariDesignSystem(TariTheme.Light) {
+        HomeOverviewScreen(
+            uiState = HomeOverviewModel.UiState(
+                activeMinersCount = 10,
+                isMining = false,
+                balance = BalanceInfo(
+                    availableBalance = 4_836_150_000.toMicroTari(),
+                    pendingIncomingBalance = 0.toMicroTari(),
+                    pendingOutgoingBalance = 0.toMicroTari(),
+                    timeLockedBalance = 0.toMicroTari(),
+                ),
+                ticker = "XTM",
+                networkName = "Testnet",
+                ffiVersion = "v1.11.0-rc.0",
+                txList = emptyList(),
+                txListInitialized = true,
+            ),
+            onPullToRefresh = {},
+            onStartMiningClicked = {},
+            onSendTariClicked = {},
+            onRequestTariClicked = {},
+            onTxClick = {},
+            onViewAllTxsClick = {},
+            onConnectionStatusClick = {},
+            onSyncDialogDismiss = {},
+            onBalanceInfoClicked = {},
+            onBalanceInfoDialogDismiss = {},
+        )
+    }
+}
+
+
+@Composable
+@Preview
+private fun HomeOverviewProgressScreenPreview() {
+    TariDesignSystem(TariTheme.Light) {
+        HomeOverviewScreen(
+            uiState = HomeOverviewModel.UiState(
+                activeMinersCount = 10,
+                isMining = false,
+                balance = BalanceInfo(
+                    availableBalance = 4_836_150_000.toMicroTari(),
+                    pendingIncomingBalance = 0.toMicroTari(),
+                    pendingOutgoingBalance = 0.toMicroTari(),
+                    timeLockedBalance = 0.toMicroTari(),
+                ),
+                ticker = "XTM",
+                networkName = "Testnet",
+                ffiVersion = "v1.11.0-rc.0",
+                txList = emptyList(),
+                txListInitialized = false,
+            ),
+            onPullToRefresh = {},
             onStartMiningClicked = {},
             onSendTariClicked = {},
             onRequestTariClicked = {},

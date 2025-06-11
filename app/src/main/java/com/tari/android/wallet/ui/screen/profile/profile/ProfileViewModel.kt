@@ -119,6 +119,7 @@ class ProfileViewModel : CommonViewModel() {
     }
 
     private fun TxListData.minedTariCount(): BigDecimal = this.completedTxs
+        .map { it.tx }
         .filter { it.isCoinbase }
         .sumOf { it.amount.tariValue }
 }
