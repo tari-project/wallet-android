@@ -83,6 +83,7 @@ add_library(
         jniTariWalletAddress.cpp
         jniTariUnblindedOutput.cpp
         jniTariBaseNodeState.cpp
+        jniTariPaymentRecord.cpp
 )
 
 find_library(

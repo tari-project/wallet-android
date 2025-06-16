@@ -209,3 +209,37 @@ Java_com_tari_android_wallet_ffi_FFITariUnblindedOutputs_jniDestroy(
     unblinded_outputs_destroy(GetPointerField<TariUnblindedOutputs *>(jEnv, jThis));
     SetNullPointerField(jEnv, jThis);
 }
+
+extern "C"
+JNIEXPORT jint JNICALL
+Java_com_tari_android_wallet_ffi_FFITariPaymentRecords_jniGetLength(
+        JNIEnv *jEnv,
+        jobject jThis,
+        jobject error) {
+    return ExecuteWithError<jint>(jEnv, error, [&](int *errorPointer) {
+        auto pPaymentRecords = GetPointerField<TariPaymentRecords *>(jEnv, jThis);
+        return payment_records_get_length(pPaymentRecords, errorPointer);
+    });
+}
+
+extern "C"
+JNIEXPORT jlong JNICALL
+Java_com_tari_android_wallet_ffi_FFITariPaymentRecords_jniGetAt(
+        JNIEnv *jEnv,
+        jobject jThis,
+        jint index,
+        jobject error) {
+    return ExecuteWithErrorAndCast<TariPaymentRecord *>(jEnv, error, [&](int *errorPointer) {
+        auto pPaymentRecords = GetPointerField<TariPaymentRecords *>(jEnv, jThis);
+        return payment_records_get_at(pPaymentRecords, static_cast<unsigned int>(index), errorPointer);
+    });
+}
+
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_tari_android_wallet_ffi_FFITariPaymentRecords_jniDestroy(
+        JNIEnv *jEnv,
+        jobject jThis) {
+    payment_records_destroy(GetPointerField<TariPaymentRecords *>(jEnv, jThis));
+    SetNullPointerField(jEnv, jThis);
+}

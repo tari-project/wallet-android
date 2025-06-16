@@ -49,3 +49,14 @@ data class HexString(val hex: String) {
         }
     )
 }
+
+fun ByteArray.toHex(): String {
+    val hexChars = "0123456789ABCDEF"
+    val result = StringBuilder(size * 2)
+    forEach { byte ->
+        val octet = byte.toInt() and 0xFF
+        result.append(hexChars[octet ushr 4])
+        result.append(hexChars[octet and 0x0F])
+    }
+    return result.toString()
+}

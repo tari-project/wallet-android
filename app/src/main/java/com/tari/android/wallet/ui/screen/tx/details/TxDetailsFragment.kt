@@ -29,6 +29,8 @@ class TxDetailsFragment : CommonFragment<TxDetailsViewModel>() {
                 onContactEditClick = { viewModel.onContactEditClicked() },
                 onFeeInfoClick = { viewModel.onFeeInfoClicked() },
                 onEmojiIdDetailsClick = { viewModel.onAddressDetailsClicked() },
+                onRawDetailsClick = { viewModel.onRawDetailsClicked() },
+                onPaymentReferenceInfoClick = { viewModel.onPaymentReferenceInfoClicked() },
             )
         }
     }
