@@ -7,9 +7,8 @@ import com.tari.android.wallet.R.string.tx_details_cancel_dialog_cancel
 import com.tari.android.wallet.R.string.tx_details_cancel_dialog_description
 import com.tari.android.wallet.R.string.tx_details_cancel_dialog_not_cancel
 import com.tari.android.wallet.application.walletManager.WalletManager.WalletEvent
+import com.tari.android.wallet.data.contacts.Contact
 import com.tari.android.wallet.data.contacts.ContactsRepository
-import com.tari.android.wallet.data.contacts.model.ContactDto
-import com.tari.android.wallet.data.contacts.model.splitAlias
 import com.tari.android.wallet.model.tx.Tx
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.dialog.modular.modules.body.BodyModule
@@ -48,7 +47,9 @@ class TxDetailsViewModel(savedState: SavedStateHandle) : CommonViewModel() {
     val uiState = _uiState.asStateFlow()
 
     init {
-        collectFlow(contactsRepository.contactList.map { contactsRepository.getContactForTx(this.uiState.value.tx) }) { contact ->
+        collectFlow(
+            contactsRepository.contactList.map { contactsRepository.findOrCreateContact(this.uiState.value.tx.tariContact.walletAddress) }
+        ) { contact ->
             _uiState.update { it.copy(contact = contact) }
         }
 
@@ -69,7 +70,7 @@ class TxDetailsViewModel(savedState: SavedStateHandle) : CommonViewModel() {
     fun onContactEditClicked() {
         val contact = uiState.value.contact ?: return
 
-        val name = (contact.contactInfo.firstName + " " + contact.contactInfo.lastName).trim()
+        val name = contact.alias.orEmpty().trim()
 
         var saveAction: () -> Boolean = { false }
 
@@ -147,11 +148,9 @@ class TxDetailsViewModel(savedState: SavedStateHandle) : CommonViewModel() {
         }
     }
 
-    private fun saveContactName(contact: ContactDto, newName: String) {
+    private fun saveContactName(contact: Contact, newAlias: String) {
         launchOnMain {
-            val firstName = splitAlias(newName).firstName
-            val lastName = splitAlias(newName).lastName
-            _uiState.update { it.copy(contact = contactsRepository.updateContactInfo(contact, firstName, lastName, contact.yat)) }
+            _uiState.update { it.copy(contact = contactsRepository.updateContactInfo(contact, newAlias)) }
             hideDialog()
         }
     }

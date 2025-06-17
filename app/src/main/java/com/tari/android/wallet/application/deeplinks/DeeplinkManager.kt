@@ -6,9 +6,8 @@ import com.tari.android.wallet.R
 import com.tari.android.wallet.application.baseNodes.BaseNodesManager
 import com.tari.android.wallet.application.walletManager.WalletManager
 import com.tari.android.wallet.data.airdrop.AirdropRepository
+import com.tari.android.wallet.data.contacts.Contact
 import com.tari.android.wallet.data.contacts.ContactsRepository
-import com.tari.android.wallet.data.contacts.model.ContactDto
-import com.tari.android.wallet.data.contacts.model.FFIContactInfo
 import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodeDto
 import com.tari.android.wallet.data.sharedPrefs.tor.TorPrefRepository
 import com.tari.android.wallet.di.ApplicationScope
@@ -94,7 +93,7 @@ class DeeplinkManager @Inject constructor(
     private fun showAddContactsDialog(dialogHandler: DialogHandler, deeplink: DeepLink.Contacts) {
         val contactDtos = deeplink.data()
         if (contactDtos.isEmpty()) return
-        val names = contactDtos.joinToString(", ") { it.contactInfo.getAlias().trim() }
+        val names = contactDtos.joinToString(", ") { it.alias.orEmpty().trim() }
         dialogHandler.showModularDialog(
             dialogId = DialogId.DEEPLINK_ADD_CONTACTS,
             HeadModule(resourceManager.getString(R.string.contact_deeplink_title)),
@@ -197,24 +196,14 @@ class DeeplinkManager @Inject constructor(
 
     private fun DeepLink.AddBaseNode.data(): BaseNodeDto = BaseNodeDto.fromDeeplink(this)
 
-    private fun DeepLink.Contacts.data(): List<ContactDto> = this.contacts.mapNotNull {
+    private fun DeepLink.Contacts.data(): List<Contact> = this.contacts.mapNotNull {
         runCatching {
             val tariWalletAddress = TariWalletAddress.fromBase58(it.tariAddress)
-            ContactDto(FFIContactInfo(walletAddress = tariWalletAddress, alias = it.alias))
+            Contact(walletAddress = tariWalletAddress, alias = it.alias)
         }.getOrNull()
     }
 
-    private fun DeepLink.Send.data(): ContactDto? = runCatching {
-        val tariWalletAddress = TariWalletAddress.fromBase58(this.walletAddress)
-        ContactDto(FFIContactInfo(walletAddress = tariWalletAddress, alias = ""))
-    }.getOrNull()
-
-    private fun DeepLink.UserProfile.data(): ContactDto? = runCatching {
-        val tariWalletAddress = TariWalletAddress.fromBase58(this.tariAddress)
-        ContactDto(FFIContactInfo(walletAddress = tariWalletAddress, alias = this.alias))
-    }.getOrNull()
-
-    private fun addContactsAction(contacts: List<ContactDto>) {
+    private fun addContactsAction(contacts: List<Contact>) {
         applicationScope.launch(Dispatchers.IO) {
             contactRepository.addContactList(contacts)
         }
@@ -223,7 +212,7 @@ class DeeplinkManager @Inject constructor(
     private fun sendAction(deeplink: DeepLink.Send) {
         walletManager.walletInstance?.getWalletAddress()
         val address = TariWalletAddress.fromBase58(deeplink.walletAddress)
-        val contact = contactRepository.getContactByAddress(address)
+        val contact = contactRepository.findOrCreateContact(address)
 
         navigator.navigateSequence(
             Navigation.BackToHome,

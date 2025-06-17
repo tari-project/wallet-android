@@ -3,8 +3,8 @@ package com.tari.android.wallet.ui.screen.contactBook.root
 import androidx.lifecycle.MutableLiveData
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.deeplinks.DeepLink
+import com.tari.android.wallet.data.contacts.Contact
 import com.tari.android.wallet.data.contacts.ContactsRepository
-import com.tari.android.wallet.data.contacts.model.ContactDto
 import com.tari.android.wallet.infrastructure.ShareManager
 import com.tari.android.wallet.infrastructure.ShareType
 import com.tari.android.wallet.model.TariWalletAddress
@@ -12,8 +12,6 @@ import com.tari.android.wallet.navigation.Navigation
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.component.clipboardController.WalletAddressViewModel
 import com.tari.android.wallet.ui.screen.contactBook.root.share.ShareOptionArgs
-import com.tari.android.wallet.util.ContactUtil
-import com.tari.android.wallet.util.extension.launchOnIo
 import javax.inject.Inject
 
 class ContactBookViewModel : CommonViewModel() {
@@ -23,9 +21,6 @@ class ContactBookViewModel : CommonViewModel() {
 
     @Inject
     lateinit var contactSelectionRepository: ContactSelectionRepository
-
-    @Inject
-    lateinit var contactUtil: ContactUtil
 
     @Inject
     lateinit var shareManager: ShareManager
@@ -78,22 +73,8 @@ class ContactBookViewModel : CommonViewModel() {
 
     fun send() {
         val walletAddress = walletAddressViewModel.discoveredWalletAddressFromQuery.value!!
-        val contact = contactsRepository.getContactByAddress(walletAddress)
+        val contact = contactsRepository.findOrCreateContact(walletAddress)
         tariNavigator.navigate(Navigation.TxList.ToSendTariToUser(contact))
-    }
-
-    fun grantPermission() {
-        permissionManager.runWithPermission(
-            permissions = listOf(
-                android.Manifest.permission.READ_CONTACTS,
-                android.Manifest.permission.WRITE_CONTACTS,
-            ),
-            silently = true,
-        ) {
-            launchOnIo {
-                contactsRepository.grantContactPermissionAndRefresh()
-            }
-        }
     }
 
     fun shareSelectedContacts() {
@@ -108,11 +89,11 @@ class ContactBookViewModel : CommonViewModel() {
 
     private fun shareViaLink() = setSelectedToShareType(ShareType.LINK)
 
-    private fun getDeeplink(selectedContacts: List<ContactDto>): String {
+    private fun getDeeplink(selectedContacts: List<Contact>): String {
         val contacts = selectedContacts.map {
             DeepLink.Contacts.DeeplinkContact(
-                alias = contactUtil.normalizeAlias(it.contactInfo.getAlias(), it.contactInfo.requireWalletAddress()),
-                tariAddress = it.contactInfo.requireWalletAddress().fullBase58,
+                alias = it.alias.orEmpty(),
+                tariAddress = it.walletAddress.fullBase58,
             )
         }
         return deeplinkManager.getDeeplinkString(DeepLink.Contacts(contacts))

@@ -309,6 +309,8 @@ dependencies {
 
     implementation(Dependencies.mavenArtifact)
 
+    implementation(Dependencies.paperDb)
+
     testImplementation(Dependencies.Test.junit)
     testImplementation(Dependencies.Test.mockk)
     androidTestImplementation(Dependencies.Test.mockkAndroid)

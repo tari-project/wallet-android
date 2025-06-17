@@ -5,11 +5,11 @@ import com.tari.android.wallet.R
 import com.tari.android.wallet.databinding.ItemContactProfileBinding
 import com.tari.android.wallet.ui.common.recyclerView.CommonViewHolder
 import com.tari.android.wallet.ui.common.recyclerView.ViewHolderBuilder
-import com.tari.android.wallet.util.extension.drawable
-import com.tari.android.wallet.util.extension.setVisible
 import com.tari.android.wallet.util.addressFirstEmojis
 import com.tari.android.wallet.util.addressLastEmojis
 import com.tari.android.wallet.util.addressPrefixEmojis
+import com.tari.android.wallet.util.extension.drawable
+import com.tari.android.wallet.util.extension.setVisible
 
 class ContactProfileViewHolder(view: ItemContactProfileBinding) :
     CommonViewHolder<ContactProfileViewHolderItem, ItemContactProfileBinding>(view) {
@@ -20,25 +20,26 @@ class ContactProfileViewHolder(view: ItemContactProfileBinding) :
         super.bind(item)
 
         // Show yat first if wallet address is null
-        showYat = item.contactDto.walletAddress == null && item.contactDto.yat != null
+//        showYat = item.contact.walletAddress == null && item.contact.yat != null
 
-        ui.alias.setVisible(item.contactDto.alias.isNotEmpty())
-        ui.alias.text = item.contactDto.alias
+        ui.alias.setVisible(item.contact.alias.orEmpty().isNotEmpty())
+        ui.alias.text = item.contact.alias
 
-        ui.emojiIdSummaryContainer.setVisible(item.contactDto.walletAddress != null || item.contactDto.yat != null)
-        ui.emojiIdView.textViewEmojiPrefix.text = item.contactDto.walletAddress?.addressPrefixEmojis()
-        ui.emojiIdView.textViewEmojiFirstPart.text = item.contactDto.walletAddress?.addressFirstEmojis()
-        ui.emojiIdView.textViewEmojiLastPart.text = item.contactDto.walletAddress?.addressLastEmojis()
-        ui.yatAddressText.text = item.contactDto.yat
+//        ui.emojiIdSummaryContainer.setVisible(item.contact.walletAddress != null || item.contact.yat != null)
+        ui.emojiIdSummaryContainer.setVisible(true)
+        ui.emojiIdView.textViewEmojiPrefix.text = item.contact.walletAddress.addressPrefixEmojis()
+        ui.emojiIdView.textViewEmojiFirstPart.text = item.contact.walletAddress.addressFirstEmojis()
+        ui.emojiIdView.textViewEmojiLastPart.text = item.contact.walletAddress.addressLastEmojis()
+//        ui.yatAddressText.text = item.contact.yat
 
-        ui.yatButton.setVisible(item.contactDto.walletAddress != null && item.contactDto.yat != null)
+        ui.yatButton.setVisible(false)
         ui.yatButton.setOnClickListener {
             showYat = !showYat
             setAddressVisibility(showYat)
         }
         setAddressVisibility(showYat)
 
-        item.contactDto.walletAddress?.let { address ->
+        item.contact.walletAddress.let { address ->
             ui.emojiIdSummaryContainerView.setOnClickListener { item.onAddressClick(address) }
         }
     }

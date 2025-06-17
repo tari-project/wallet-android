@@ -1,12 +1,12 @@
-package com.tari.android.wallet.data.contacts
+package com.tari.android.wallet.data.contacts.obsolete
 
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.application.walletManager.WalletManager
 import com.tari.android.wallet.application.walletManager.doOnWalletRunning
 import com.tari.android.wallet.application.walletManager.doOnWalletRunningWithValue
-import com.tari.android.wallet.data.contacts.model.ContactDto
-import com.tari.android.wallet.data.contacts.model.FFIContactInfo
-import com.tari.android.wallet.data.contacts.model.MergedContactInfo
+import com.tari.android.wallet.data.contacts.obsolete.model.ContactDto
+import com.tari.android.wallet.data.contacts.obsolete.model.FFIContactInfo
+import com.tari.android.wallet.data.contacts.obsolete.model.MergedContactInfo
 import com.tari.android.wallet.ffi.iterateWithDestroy
 import com.tari.android.wallet.util.ContactUtil
 

@@ -53,7 +53,7 @@ import com.daasuu.ei.Ease
 import com.daasuu.ei.EasingInterpolator
 import com.tari.android.wallet.R.dimen.add_note_slide_button_left_margin
 import com.tari.android.wallet.R.dimen.add_note_slide_button_width
-import com.tari.android.wallet.data.contacts.model.FFIContactInfo
+import com.tari.android.wallet.data.contacts.Contact
 import com.tari.android.wallet.databinding.FragmentAddNoteBinding
 import com.tari.android.wallet.model.MicroTari
 import com.tari.android.wallet.model.TariWalletAddress
@@ -85,7 +85,7 @@ class AddNoteFragment : CommonXmlFragment<FragmentAddNoteBinding, AddNoteViewMod
 
     // Tx properties.
     private lateinit var transactionData: TransactionData
-    private lateinit var recipientUser: FFIContactInfo
+    private lateinit var recipientUser: Contact
     private lateinit var amount: MicroTari
     private lateinit var note: String
     private var isOneSidePayment: Boolean = false
@@ -144,7 +144,7 @@ class AddNoteFragment : CommonXmlFragment<FragmentAddNoteBinding, AddNoteViewMod
     }
 
     private fun displayAliasOrEmojiId() {
-        val alias = recipientUser.getAlias()
+        val alias = recipientUser.alias.orEmpty()
         if (alias.isEmpty()) displayEmojiId(recipientUser.walletAddress) else displayAlias(alias)
     }
 

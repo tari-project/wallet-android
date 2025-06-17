@@ -1,4 +1,4 @@
-package com.tari.android.wallet.data.contacts
+package com.tari.android.wallet.data.contacts.obsolete
 
 import com.tari.android.wallet.R
 

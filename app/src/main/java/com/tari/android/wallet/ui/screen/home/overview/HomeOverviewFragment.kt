@@ -20,8 +20,6 @@ class HomeOverviewFragment : CommonFragment<HomeOverviewViewModel>() {
             HomeOverviewScreen(
                 uiState = uiState,
                 onPullToRefresh = { viewModel.refreshData() },
-                onInviteFriendClick = { viewModel.onInviteFriendClicked() },
-                onNotificationsClick = { viewModel.onNotificationsClicked() },
                 onStartMiningClicked = { viewModel.onStartMiningClicked() },
                 onSendTariClicked = { viewModel.onSendTariClicked() },
                 onRequestTariClicked = { viewModel.onRequestTariClicked() },

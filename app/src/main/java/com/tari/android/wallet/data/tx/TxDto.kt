@@ -1,12 +1,12 @@
 package com.tari.android.wallet.data.tx
 
-import com.tari.android.wallet.data.contacts.model.ContactDto
+import com.tari.android.wallet.data.contacts.Contact
 import com.tari.android.wallet.model.tx.Tx
 import com.tari.android.wallet.util.extension.isTrue
 
 data class TxDto(
     val tx: Tx,
-    val contact: ContactDto?,
+    val contact: Contact,
 ) {
     fun contains(searchQuery: String): Boolean = this.tx.tariContact.walletAddress.fullEmojiId.contains(searchQuery, ignoreCase = true)
             || this.tx.tariContact.walletAddress.fullBase58.contains(searchQuery, ignoreCase = true)
@@ -14,5 +14,5 @@ data class TxDto(
             || this.tx.paymentId?.contains(searchQuery, ignoreCase = true).isTrue()
             || this.tx.amount.formattedTariValue.contains(searchQuery, ignoreCase = true)
             || this.tx.amount.formattedValue.contains(searchQuery, ignoreCase = true)
-            || this.contact?.contactInfo?.getAlias()?.contains(searchQuery, ignoreCase = true).isTrue()
+            || this.contact.alias?.contains(searchQuery, ignoreCase = true).isTrue()
 }

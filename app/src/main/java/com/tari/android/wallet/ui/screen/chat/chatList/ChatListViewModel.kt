@@ -1,14 +1,14 @@
 package com.tari.android.wallet.ui.screen.chat.chatList
 
-import com.tari.android.wallet.util.extension.collectFlow
-import com.tari.android.wallet.ui.common.CommonViewModel
-import com.tari.android.wallet.ui.screen.chat.chatList.adapter.ChatItemViewHolderItem
 import com.tari.android.wallet.data.chat.ChatItemDto
 import com.tari.android.wallet.data.chat.ChatsRepository
 import com.tari.android.wallet.data.contacts.ContactsRepository
 import com.tari.android.wallet.navigation.Navigation
+import com.tari.android.wallet.ui.common.CommonViewModel
+import com.tari.android.wallet.ui.screen.chat.chatList.adapter.ChatItemViewHolderItem
 import com.tari.android.wallet.util.DebugConfig
 import com.tari.android.wallet.util.MockDataStub
+import com.tari.android.wallet.util.extension.collectFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -43,9 +43,9 @@ class ChatListViewModel : CommonViewModel() {
                             contact = if (DebugConfig.mockChatMessages) {
                                 MockDataStub.createContact()
                             } else {
-                                contactsRepository.getContactByAddress(chat.walletAddress)
+                                contactsRepository.findOrCreateContact(chat.walletAddress)
                             },
-                            isOnline = contactsRepository.isContactOnline(chat.walletAddress),
+                            isOnline = true,
                             resourceManager = resourceManager,
                         )
                     }

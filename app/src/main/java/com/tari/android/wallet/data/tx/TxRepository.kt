@@ -10,11 +10,8 @@ import com.tari.android.wallet.model.TxId
 import com.tari.android.wallet.model.tx.Tx
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.zip
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -30,17 +27,9 @@ class TxRepository @Inject constructor(
 
     private val _txs = MutableStateFlow(TxListData())
     val txs = _txs.asStateFlow()
-    val pendingTxs: Flow<List<TxDto>> = txs.map { txs ->
-        (txs.pendingInboundTxs + txs.pendingOutboundTxs + txs.minedUnconfirmedTxs)
-            .sortedWith(compareByDescending(Tx::timestamp).thenByDescending { it.id })
-            .map { it.toDto() }
-    }
-    val nonPendingTxs: Flow<List<TxDto>> = txs.map { txs ->
-        (txs.cancelledTxs + txs.nonMinedUnconfirmedCompletedTxs)
-            .sortedWith(compareByDescending(Tx::timestamp).thenByDescending { it.id })
-            .map { it.toDto() }
-    }
-    val allTxs: Flow<List<TxDto>> = pendingTxs.zip(nonPendingTxs) { pending, nonPending -> pending + nonPending }
+
+    private val _txsInitialized = MutableStateFlow(false)
+    val txsInitialized = _txsInitialized.asStateFlow()
 
     init {
         applicationScope.launch(Dispatchers.IO) {
@@ -74,8 +63,8 @@ class TxRepository @Inject constructor(
         refreshTxList()
     }
 
-    fun findTxById(txId: TxId): Tx? {
-        return txs.value.allTxs.firstOrNull { it.id == txId }
+    fun findTxById(txId: TxId): TxDto? {
+        return txs.value.allTxs.firstOrNull { it.tx.id == txId }
     }
 
     /**
@@ -85,11 +74,13 @@ class TxRepository @Inject constructor(
         applicationScope.launch(Dispatchers.IO) {
             walletManager.doOnWalletRunning { wallet ->
                 _txs.value = TxListData(
-                    cancelledTxs = wallet.getCancelledTxs(),
-                    completedTxs = wallet.getCompletedTxs(),
-                    pendingInboundTxs = wallet.getPendingInboundTxs(),
-                    pendingOutboundTxs = wallet.getPendingOutboundTxs(),
+                    cancelledTxs = wallet.getCancelledTxs().map { it.toDto() },
+                    completedTxs = wallet.getCompletedTxs().map { it.toDto() },
+                    pendingInboundTxs = wallet.getPendingInboundTxs().map { it.toDto() },
+                    pendingOutboundTxs = wallet.getPendingOutboundTxs().map { it.toDto() },
                 )
+                _txsInitialized.value = true
+
                 logger.i(
                     "Refreshed tx list: ${_txs.value.completedTxs.size} completed, " +
                             "${_txs.value.pendingInboundTxs.size} pending inbound, " +
@@ -102,6 +93,6 @@ class TxRepository @Inject constructor(
 
     private fun Tx.toDto() = TxDto(
         tx = this,
-        contact = contactsRepository.getContactForTx(this),
+        contact = contactsRepository.findOrCreateContact(this.tariContact.walletAddress),
     )
 }

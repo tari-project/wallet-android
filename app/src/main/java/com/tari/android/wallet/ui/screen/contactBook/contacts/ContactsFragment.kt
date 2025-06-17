@@ -71,8 +71,6 @@ open class ContactsFragment : CommonXmlFragment<FragmentContactsBinding, Contact
             recyclerViewAdapter.update(it)
         }
 
-        observe(grantPermission) { viewModel.grantPermission() }
-
         observeOnLoad(listUpdateTrigger)
         observeOnLoad(debouncedList)
         observeOnLoad(selectionTrigger)

@@ -78,8 +78,7 @@ class CorePrefRepository @Inject constructor(
     private object Key {
         const val WALLET_ADDRESS_BASE58 = "tari_wallet_public_key_hex_string"
         const val EMOJI_ID = "tari_wallet_emoji_id_"
-        const val NAME = "tari_wallet_name_"
-        const val SURNAME = "tari_wallet_surname_"
+        const val ALIAS = "tari_wallet_surname_"
         const val ANON_ID = "ANON_ID"
         const val ONBOARDING_STARTED = "tari_wallet_onboarding_started"
         const val ONBOARDING_AUTH_SETUP_COMPLETED = "tari_wallet_onboarding_auth_setup_completed"
@@ -97,9 +96,7 @@ class CorePrefRepository @Inject constructor(
 
     var emojiId: String? by SharedPrefStringDelegate(sharedPrefs, this, formatKey(Key.EMOJI_ID))
 
-    var firstName: String? by SharedPrefStringDelegate(sharedPrefs, this, formatKey(Key.NAME))
-
-    var lastName: String? by SharedPrefStringDelegate(sharedPrefs, this, formatKey(Key.SURNAME))
+    var alias: String? by SharedPrefStringDelegate(sharedPrefs, this, formatKey(Key.ALIAS))
 
     var onboardingStarted: Boolean by SharedPrefBooleanDelegate(sharedPrefs, this, formatKey(Key.ONBOARDING_STARTED))
 

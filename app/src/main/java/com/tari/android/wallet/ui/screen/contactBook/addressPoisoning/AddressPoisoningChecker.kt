@@ -3,9 +3,9 @@ package com.tari.android.wallet.ui.screen.contactBook.addressPoisoning
 import androidx.annotation.VisibleForTesting
 import com.tari.android.wallet.data.contacts.ContactsRepository
 import com.tari.android.wallet.data.sharedPrefs.addressPoisoning.AddressPoisoningPrefRepository
+import com.tari.android.wallet.data.tx.TxDto
 import com.tari.android.wallet.data.tx.TxRepository
 import com.tari.android.wallet.model.TariWalletAddress
-import com.tari.android.wallet.model.tx.Tx
 import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.DebugConfig
 import com.tari.android.wallet.util.MockDataStub
@@ -58,27 +58,27 @@ class AddressPoisoningChecker @Inject constructor(
 
             return (contactsRepository.contactList.value
                     // add the current wallet address to the list because it may not exist if there were no interactions with it
-                    + contactsRepository.getContactByAddress(this))
+                    + contactsRepository.findOrCreateContact(this))
                 .filter { it.walletAddress.isSimilarTo(this) }
-                .map { contactDto ->
+                .map { contact ->
                     SimilarAddressDto(
-                        contactDto = contactDto,
-                        numberOfTransaction = allTxs.filterByWalletAddress(contactDto.contactInfo.requireWalletAddress()).size,
-                        lastTransactionTimestampMillis = allTxs.filterByWalletAddress(contactDto.contactInfo.requireWalletAddress())
-                            .maxOfOrNull { it.timestamp }
+                        contact = contact,
+                        numberOfTransaction = allTxs.filterByWalletAddress(contact.walletAddress).size,
+                        lastTransactionTimestampMillis = allTxs.filterByWalletAddress(contact.walletAddress)
+                            .maxOfOrNull { it.tx.timestamp }
                             ?.let { it.toLong() * 1000L },
-                        trusted = addressPoisoningSharedRepository.getTrustedContactList().contains(contactDto.contactInfo.requireWalletAddress()),
+                        trusted = addressPoisoningSharedRepository.getTrustedContactList().contains(contact.walletAddress),
                     )
                 }.let { similarContacts ->
                     // put the current wallet address to the first place
-                    listOf(similarContacts.first { it.contactDto.walletAddress == this }) +
-                            similarContacts.filter { it.contactDto.walletAddress != this }
+                    listOf(similarContacts.first { it.contact.walletAddress == this }) +
+                            similarContacts.filter { it.contact.walletAddress != this }
                 }
         }
     }
 
-    private fun List<Tx>.filterByWalletAddress(walletAddress: TariWalletAddress): List<Tx> {
-        return this.filter { it.tariContact.walletAddress == walletAddress }
+    private fun List<TxDto>.filterByWalletAddress(walletAddress: TariWalletAddress): List<TxDto> {
+        return this.filter { it.tx.tariContact.walletAddress == walletAddress }
     }
 }
 

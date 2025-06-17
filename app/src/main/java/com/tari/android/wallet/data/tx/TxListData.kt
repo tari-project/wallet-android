@@ -1,22 +1,23 @@
 package com.tari.android.wallet.data.tx
 
 import com.tari.android.wallet.model.TxStatus
-import com.tari.android.wallet.model.tx.CancelledTx
-import com.tari.android.wallet.model.tx.CompletedTx
-import com.tari.android.wallet.model.tx.PendingInboundTx
-import com.tari.android.wallet.model.tx.PendingOutboundTx
-import com.tari.android.wallet.model.tx.Tx
 
 data class TxListData(
-    val cancelledTxs: List<CancelledTx> = emptyList(),
-    val completedTxs: List<CompletedTx> = emptyList(),
-    val pendingInboundTxs: List<PendingInboundTx> = emptyList(),
-    val pendingOutboundTxs: List<PendingOutboundTx> = emptyList(),
+    val cancelledTxs: List<TxDto> = emptyList(), // List<CancelledTx>
+    val completedTxs: List<TxDto> = emptyList(), // List<CompletedTx>
+    val pendingInboundTxs: List<TxDto> = emptyList(), // List<PendingInboundTx>
+    val pendingOutboundTxs: List<TxDto> = emptyList(), // List<PendingOutboundTx>
 ) {
-    val minedUnconfirmedTxs: List<CompletedTx>
-        get() = completedTxs.filter { it.status == TxStatus.MINED_UNCONFIRMED }
-    val nonMinedUnconfirmedCompletedTxs: List<CompletedTx>
-        get() = completedTxs.filter { it.status != TxStatus.MINED_UNCONFIRMED }
-    val allTxs: List<Tx>
+    val minedUnconfirmedTxs: List<TxDto>
+        get() = completedTxs.filter { it.tx.status == TxStatus.MINED_UNCONFIRMED }
+    val nonMinedUnconfirmedCompletedTxs: List<TxDto>
+        get() = completedTxs.filter { it.tx.status != TxStatus.MINED_UNCONFIRMED }
+    val pendingTxs: List<TxDto>
+        get() = (pendingInboundTxs + pendingOutboundTxs + minedUnconfirmedTxs)
+            .sortedWith(compareByDescending<TxDto> { it.tx.timestamp }.thenByDescending { it.tx.id })
+    val nonPendingTxs: List<TxDto>
+        get() = (cancelledTxs + nonMinedUnconfirmedCompletedTxs)
+            .sortedWith(compareByDescending<TxDto> { it.tx.timestamp }.thenByDescending { it.tx.id })
+    val allTxs: List<TxDto>
         get() = cancelledTxs + completedTxs + pendingInboundTxs + pendingOutboundTxs
 }

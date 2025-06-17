@@ -37,8 +37,7 @@ package com.tari.android.wallet.util
 import com.tari.android.wallet.BuildConfig
 import com.tari.android.wallet.data.chat.ChatItemDto
 import com.tari.android.wallet.data.chat.ChatMessageItemDto
-import com.tari.android.wallet.data.contacts.model.ContactDto
-import com.tari.android.wallet.data.contacts.model.FFIContactInfo
+import com.tari.android.wallet.data.contacts.Contact
 import com.tari.android.wallet.data.tx.TxDto
 import com.tari.android.wallet.ffi.FFITxCancellationReason
 import com.tari.android.wallet.model.Base58
@@ -142,11 +141,9 @@ object MockDataStub {
     fun createContact(
         walletAddress: TariWalletAddress = WALLET_ADDRESS,
         alias: String = "Alice",
-    ) = ContactDto(
-        contactInfo = FFIContactInfo(
-            walletAddress = walletAddress,
-            alias = alias,
-        ),
+    ) = Contact(
+        walletAddress = walletAddress,
+        alias = alias,
     )
 
     fun createUtxoList() = List(20) {
@@ -263,7 +260,7 @@ object MockDataStub {
 
     fun createSimilarAddress(): SimilarAddressDto {
         return SimilarAddressDto(
-            contactDto = createContact(),
+            contact = createContact(),
             numberOfTransaction = 10,
             lastTransactionTimestampMillis = System.currentTimeMillis(),
             trusted = false,
