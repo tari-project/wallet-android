@@ -101,7 +101,10 @@ class HomeOverviewViewModel : CommonViewModel() {
         collectFlow(walletManager.walletEvent) { event ->
             when (event) {
                 is WalletEvent.TxSend.TxSendFailed -> onTxSendFailed(event.failureReason)
-                is WalletEvent.TxSend.TxSendSuccessful -> showTxDetail(event.txId)
+                is WalletEvent.TxSend.TxSendSuccessful -> {
+                    delay(300L) // Sometimes this callback arrives before we have cleared fragment navigation stack, so we need to wait a bit
+                    showTxDetail(event.txId)
+                }
 
                 else -> Unit
             }

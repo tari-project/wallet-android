@@ -90,4 +90,19 @@ data class CompletedTx(
     constructor(pointer: FFIPointer) : this(FFICompletedTx(pointer))
 
     override fun toString() = "CompletedTx(fee=$fee, status=$status, confirmationCount=$confirmationCount) ${super.toString()}"
+
+    override val rawDetails: String
+        get() = "{" +
+                "\"id\":\"$id\"," +
+                "\"direction\":\"$direction\"," +
+                "\"amount\":\"${amount.value}\"," +
+                "\"fee\":\"${fee.value}\"," +
+                "\"timestamp\":\"$timestamp\"," +
+                "\"paymentId\":\"$paymentId\"," +
+                "\"status\":\"$status\"," +
+                "\"confirmationCount\":\"$confirmationCount\"," +
+                "\"txKernel\":${txKernel?.let { "{\"excess\":\"${it.excess}\",\"publicNonce\":\"${it.publicNonce}\"," + "\"signature\":\"${it.signature}\"}" } ?: "null"}," +
+                "\"minedTimestamp\":\"$minedTimestamp\"," +
+                "\"minedHeight\":\"$minedHeight\"" +
+                "}"
 }

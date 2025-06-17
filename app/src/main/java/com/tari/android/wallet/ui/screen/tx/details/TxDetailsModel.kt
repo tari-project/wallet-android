@@ -5,6 +5,7 @@ import com.tari.android.wallet.R
 import com.tari.android.wallet.data.contacts.Contact
 import com.tari.android.wallet.ffi.FFITxCancellationReason
 import com.tari.android.wallet.model.MicroTari
+import com.tari.android.wallet.model.TariPaymentRecord
 import com.tari.android.wallet.model.TxStatus
 import com.tari.android.wallet.model.tx.CancelledTx
 import com.tari.android.wallet.model.tx.CompletedTx
@@ -13,6 +14,7 @@ import com.tari.android.wallet.model.tx.Tx
 import com.tari.android.wallet.model.tx.Tx.Direction
 import com.tari.android.wallet.util.extension.safeCastTo
 import com.tari.android.wallet.util.extension.txFormattedDate
+import java.math.BigInteger
 import java.util.Date
 
 object TxDetailsModel {
@@ -22,12 +24,16 @@ object TxDetailsModel {
 
     const val BLOCK_EXPLORER_FORMAT = "%s/kernel_search?nonces=%s&signatures=%s"
 
+    const val CONFIRMATION_BLOCKS_COUNT = 5
+
     data class UiState(
         val tx: Tx,
         val showCloseButton: Boolean,
         val ticker: String,
         private val blockExplorerBaseUrl: String?,
         val contact: Contact? = null,
+        private val paymentReference: TariPaymentRecord? = null,
+        val heightOfLongestChain: Int,
     ) {
         val screenTitle: Int
             @StringRes get() = when {
@@ -51,8 +57,8 @@ object TxDetailsModel {
                 String.format(BLOCK_EXPLORER_FORMAT, blockExplorerBaseUrl, txKernel.publicNonce, txKernel.signature)
             }
 
-        val tariTxnId: String?
-            get() = tx.safeCastTo<CompletedTx>()?.txKernel?.publicNonce
+        val minedHeight: BigInteger?
+            get() = tx.safeCastTo<CompletedTx>()?.minedHeight
 
         val txFee: MicroTari?
             get() = when {
@@ -101,10 +107,27 @@ object TxDetailsModel {
                 else -> TxStatusText.Completed
             }
 
+        val payRefStatus: PayRefStatus?
+            get() = paymentReference?.let { paymentReference ->
+                if (heightOfLongestChain >= paymentReference.blockHeight + CONFIRMATION_BLOCKS_COUNT) {
+                    PayRefStatus.Ready(paymentReferenceHex = paymentReference.paymentReference)
+                } else {
+                    PayRefStatus.Waiting(
+                        step = heightOfLongestChain - paymentReference.blockHeight.toInt(),
+                        totalSteps = CONFIRMATION_BLOCKS_COUNT,
+                    )
+                }
+            }
+
         sealed class TxStatusText {
             data class InProgress(@StringRes val textRes: Int) : TxStatusText()
             data object Completed : TxStatusText()
             data class Cancelled(@StringRes val textRes: Int) : TxStatusText()
+        }
+
+        sealed class PayRefStatus {
+            data class Ready(val paymentReferenceHex: String) : PayRefStatus()
+            data class Waiting(val step: Int, val totalSteps: Int) : PayRefStatus()
         }
     }
 }

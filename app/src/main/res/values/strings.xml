@@ -310,6 +310,7 @@
     <string name="tx_detail_payment_id_error">An error occurred while retrieving the Payment ID</string>
     <string name="tx_detail_edit">Edit</string>
     <string name="tx_detail_transaction_fee">Transaction Fee</string>
+    <string name="tx_detail_payment_reference">Payment Reference</string>
     <string name="tx_detail_waiting_for_recipient">Waiting for recipient to come online</string>
     <string name="tx_detail_waiting_for_sender_to_complete">Waiting for sender to complete transaction</string>
     <string name="tx_detail_in_progress">In progress</string>
@@ -327,11 +328,12 @@
     <string name="tx_details_paid">Paid</string>
     <string name="tx_details_received">"Received</string>
     <string name="tx_details_date">Date</string>
-    <string name="tx_details_txn_id">Tari Txn ID</string>
-    <string name="tx_details_txn_id_processing">Processing</string>
+    <string name="tx_details_block_height">Mined in Block Height</string>
+    <string name="tx_details_txn_id_processing">Processing...</string>
     <string name="tx_details_status">Status</string>
     <string name="tx_details_completed">Completed</string>
     <string name="tx_details_add_contact_name_hint">Add contact name…</string>
+    <string name="tx_details_copy_raw_data_button">Copy Raw Details</string>
 
     <string name="tx_details_cancellation_reason_unknown">The transaction failed for an unknown reason.</string>
     <string name="tx_details_cancellation_reason_user_cancelled">The transaction was canceled by the sender.</string>
@@ -343,11 +345,13 @@
     <string name="tx_details_cancellation_reason_abandoned_coinbase">The coinbase was abandoned.</string>
     <string name="tx_details_cancellation_reason_not_cancelled">The transaction was not cancelled, but for some reason looks like cancelled.
         Please, contact us directly if you see this message.</string>
-
-    <!-- Fee tooltip -->
     <string name="tx_detail_fee_tooltip_transaction_fee">Transaction Fee</string>
     <string name="tx_detail_fee_tooltip_desc">The transaction fee is distributed to the thousands of computers (also known as \"miners\") who
         ensure that your XTM transactions are fast and secure.</string>
+    <string name="tx_detail_payment_reference_tooltip_title">Your unique payment ID!</string>
+    <string name="tx_detail_payment_reference_tooltip_desc">Share this with anyone who needs to confirm your payment –
+    they can look it up on a block explorer while your privacy stays protected.</string>
+    <string name="tx_detail_payment_reference_waiting">Waiting for %s block confirmations (%s of %s confirmed)</string>
 
     <!-- debug screens -->
     <!-- logs -->

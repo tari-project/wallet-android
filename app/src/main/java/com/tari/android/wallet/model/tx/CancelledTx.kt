@@ -74,4 +74,16 @@ data class CancelledTx(
     )
 
     override fun toString() = "CanceledTx(fee=$fee, status=$status) ${super.toString()}"
+
+    override val rawDetails: String
+        get() = "{" +
+                "\"id\":\"$id\"," +
+                "\"direction\":\"$direction\"," +
+                "\"amount\":\"${amount.value}\"," +
+                "\"fee\":\"${fee.value}\"," +
+                "\"timestamp\":\"$timestamp\"," +
+                "\"paymentId\":\"$paymentId\"," +
+                "\"status\":\"$status\"," +
+                "\"cancellationReason\":\"$cancellationReason\"," +
+                "}"
 }

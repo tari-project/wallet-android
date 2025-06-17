@@ -1310,3 +1310,20 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniGetPrivateViewKey(
         return wallet_get_private_view_key(pWallet, error);
     });
 }
+
+extern "C"
+JNIEXPORT jlong JNICALL
+Java_com_tari_android_wallet_ffi_FFIWallet_jniGetTxPayRefs(
+        JNIEnv *jEnv,
+        jobject jThis,
+        jstring jTxId,
+        jobject error
+) {
+    return ExecuteWithErrorAndCast<TariPaymentRecords *>(jEnv, error, [&](int *errorPointer) {
+        auto pWallet = GetPointerField<TariWallet *>(jEnv, jThis);
+        const char *nativeString = jEnv->GetStringUTFChars(jTxId, JNI_FALSE);
+        char *pEnd;
+        unsigned long long id = strtoull(nativeString, &pEnd, 10);
+        return wallet_get_transaction_payrefs(pWallet, id, errorPointer);
+    });
+}

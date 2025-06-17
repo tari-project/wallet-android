@@ -26,6 +26,7 @@ import com.tari.android.wallet.application.walletManager.WalletConfig
 import com.tari.android.wallet.model.TxStatus
 import com.tari.android.wallet.model.tx.CompletedTx
 import com.tari.android.wallet.ui.compose.TariDesignSystem
+import com.tari.android.wallet.ui.compose.components.TariOutlinedButton
 import com.tari.android.wallet.ui.compose.components.TariPrimaryButton
 import com.tari.android.wallet.ui.compose.components.TariTextButton
 import com.tari.android.wallet.ui.compose.components.TariTopBar
@@ -33,6 +34,7 @@ import com.tari.android.wallet.ui.screen.settings.themeSelector.TariTheme
 import com.tari.android.wallet.ui.screen.tx.details.widget.TxDetailInfoAddressItem
 import com.tari.android.wallet.ui.screen.tx.details.widget.TxDetailInfoContactNameItem
 import com.tari.android.wallet.ui.screen.tx.details.widget.TxDetailInfoItem
+import com.tari.android.wallet.ui.screen.tx.details.widget.TxDetailInfoPayRefItem
 import com.tari.android.wallet.ui.screen.tx.details.widget.TxDetailInfoStatusItem
 import com.tari.android.wallet.util.MockDataStub
 import com.tari.android.wallet.util.extension.isNotTrue
@@ -44,10 +46,12 @@ fun TxDetailsScreen(
     uiState: TxDetailsModel.UiState,
     onBackClick: () -> Unit,
     onCancelTxClick: () -> Unit,
+    onRawDetailsClick: () -> Unit,
     onCopyValueClick: (value: String) -> Unit,
     onBlockExplorerClick: () -> Unit,
     onContactEditClick: () -> Unit,
     onFeeInfoClick: () -> Unit,
+    onPaymentReferenceInfoClick: () -> Unit,
     onEmojiIdDetailsClick: () -> Unit,
 ) {
     Scaffold(
@@ -90,6 +94,20 @@ fun TxDetailsScreen(
                     onEmojiIdDetailsClick = onEmojiIdDetailsClick,
                 )
             }
+
+            uiState.payRefStatus
+                ?.takeIf { uiState.heightOfLongestChain > 0 }
+                ?.let { payRefStatus ->
+                    Spacer(Modifier.size(10.dp))
+                    TxDetailInfoPayRefItem(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 24.dp),
+                        paymentReference = payRefStatus,
+                        onInfoClicked = onPaymentReferenceInfoClick,
+                        onCopyClicked = onCopyValueClick,
+                    )
+                }
 
             uiState.contact?.let { contact ->
                 Spacer(Modifier.size(10.dp))
@@ -157,17 +175,16 @@ fun TxDetailsScreen(
                 )
             }
 
-
-            if (uiState.blockExplorerLink != null) {
-                Spacer(Modifier.size(10.dp))
-                TxDetailInfoItem(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 24.dp),
-                    title = stringResource(R.string.tx_details_txn_id),
-                    value = uiState.tariTxnId ?: stringResource(R.string.tx_details_txn_id_processing),
-                    singleLine = false,
-                ) {
+            Spacer(Modifier.size(10.dp))
+            TxDetailInfoItem(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 24.dp),
+                title = stringResource(R.string.tx_details_block_height),
+                value = uiState.minedHeight?.toString() ?: stringResource(R.string.tx_details_txn_id_processing),
+                singleLine = false,
+            ) {
+                if (uiState.blockExplorerLink != null) {
                     IconButton(onClick = onBlockExplorerClick) {
                         Icon(
                             painter = painterResource(R.drawable.vector_icon_open_url),
@@ -206,7 +223,16 @@ fun TxDetailsScreen(
 
             Spacer(Modifier.weight(1f))
 
+            TariOutlinedButton(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 20.dp),
+                text = stringResource(R.string.tx_details_copy_raw_data_button),
+                onClick = onRawDetailsClick,
+            )
+
             if (uiState.showCloseButton) {
+                Spacer(Modifier.size(16.dp))
                 TariPrimaryButton(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -242,6 +268,7 @@ private fun TxDetailsScreenPreview() {
                 ticker = "XTM",
                 blockExplorerBaseUrl = "",
                 contact = MockDataStub.createContact(),
+                heightOfLongestChain = 1000,
             ),
             onBackClick = {},
             onCancelTxClick = {},
@@ -250,6 +277,8 @@ private fun TxDetailsScreenPreview() {
             onContactEditClick = {},
             onFeeInfoClick = {},
             onEmojiIdDetailsClick = {},
+            onRawDetailsClick = {},
+            onPaymentReferenceInfoClick = {},
         )
     }
 }
@@ -268,14 +297,17 @@ private fun TxDetailsScreenInProgressPreview() {
                 ticker = "XTM",
                 blockExplorerBaseUrl = "",
                 contact = MockDataStub.createContact(),
+                heightOfLongestChain = 1000,
             ),
             onBackClick = {},
             onCancelTxClick = {},
+            onRawDetailsClick = {},
             onCopyValueClick = {},
             onBlockExplorerClick = {},
             onContactEditClick = {},
             onFeeInfoClick = {},
             onEmojiIdDetailsClick = {},
+            onPaymentReferenceInfoClick = {},
         )
     }
 }
@@ -293,14 +325,17 @@ private fun TxDetailsScreenCancelledPreview() {
                 ticker = "XTM",
                 blockExplorerBaseUrl = "",
                 contact = MockDataStub.createContact(),
+                heightOfLongestChain = 1000,
             ),
             onBackClick = {},
             onCancelTxClick = {},
+            onRawDetailsClick = {},
             onCopyValueClick = {},
             onBlockExplorerClick = {},
             onContactEditClick = {},
             onFeeInfoClick = {},
             onEmojiIdDetailsClick = {},
+            onPaymentReferenceInfoClick = {},
         )
     }
 }
@@ -318,14 +353,17 @@ private fun TxDetailsScreenPendingPreview() {
                 ticker = "XTM",
                 blockExplorerBaseUrl = "",
                 contact = MockDataStub.createContact(),
+                heightOfLongestChain = 1000,
             ),
             onBackClick = {},
+            onRawDetailsClick = {},
             onCancelTxClick = {},
             onCopyValueClick = {},
             onBlockExplorerClick = {},
             onContactEditClick = {},
             onFeeInfoClick = {},
             onEmojiIdDetailsClick = {},
+            onPaymentReferenceInfoClick = {},
         )
     }
 }
