@@ -14,9 +14,7 @@ class ContactSelectionRepository @Inject constructor() {
     val isPossibleToShare = MutableLiveData(false)
 
     fun toggle(item: ContactItemViewHolderItem) {
-        if (item.contact.getFFIContactInfo() == null) return
-
-        val contact = selectedContacts.firstOrNull { it.contact.uuid == item.contact.uuid }
+        val contact = selectedContacts.firstOrNull { it.contact.walletAddress == item.contact.walletAddress }
         if (contact != null) {
             selectedContacts.remove(contact)
         } else {

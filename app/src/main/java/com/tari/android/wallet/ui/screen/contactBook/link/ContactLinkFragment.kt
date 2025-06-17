@@ -6,7 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.tari.android.wallet.data.contacts.model.ContactDto
+import com.tari.android.wallet.data.contacts.Contact
 import com.tari.android.wallet.databinding.FragmentContactsLinkBinding
 import com.tari.android.wallet.navigation.TariNavigator.Companion.PARAMETER_CONTACT
 import com.tari.android.wallet.ui.common.CommonXmlFragment
@@ -35,12 +35,6 @@ class ContactLinkFragment : CommonXmlFragment<FragmentContactsLinkBinding, Conta
 
     private fun observeUI() = with(viewModel) {
         this@ContactLinkFragment.collectFlow(uiState) { adapter.update(it.viewItemList) }
-
-        this@ContactLinkFragment.collectFlow(effect) { effect ->
-            when (effect) {
-                is ContactLinkModel.Effect.GrantPermission -> viewModel.grantPermission()
-            }
-        }
     }
 
     private fun initUI() = with(ui) {
@@ -53,7 +47,7 @@ class ContactLinkFragment : CommonXmlFragment<FragmentContactsLinkBinding, Conta
     }
 
     companion object {
-        fun createFragment(args: ContactDto): ContactLinkFragment = ContactLinkFragment().apply {
+        fun createFragment(args: Contact): ContactLinkFragment = ContactLinkFragment().apply {
             arguments = Bundle().apply { putParcelable(PARAMETER_CONTACT, args) }
         }
     }

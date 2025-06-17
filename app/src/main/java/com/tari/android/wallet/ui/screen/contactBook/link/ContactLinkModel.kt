@@ -1,10 +1,10 @@
 package com.tari.android.wallet.ui.screen.contactBook.link
 
-import com.tari.android.wallet.data.contacts.model.ContactDto
+import com.tari.android.wallet.data.contacts.Contact
 
 object ContactLinkModel {
     data class UiState(
-        val contacts: List<ContactDto> = emptyList(),
+        val contacts: List<Contact> = emptyList(),
         val searchQuery: String = "",
     )
 

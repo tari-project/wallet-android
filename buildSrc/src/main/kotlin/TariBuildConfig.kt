@@ -1,6 +1,6 @@
 object TariBuildConfig {
 
-    const val versionNumber = "1.1.3"
+    const val versionNumber = "1.1.4"
 
     const val minSdk = 26
     const val targetSdk = 34
@@ -10,10 +10,11 @@ object TariBuildConfig {
         // We use different versions of the library for different networks, set $network to easily switch between them
         val network: LibWalletNetwork = LibWalletNetwork.MAINNET
 
+        private const val LIB_VERSION = "v4.4.0"
         val version = when (network) {
-            LibWalletNetwork.MAINNET -> "v4.0.0"
-            LibWalletNetwork.NEXTNET -> "v4.0.0-rc.0"
-            LibWalletNetwork.ESMERALDA -> "v4.0.0-pre.0"
+            LibWalletNetwork.MAINNET -> LIB_VERSION
+            LibWalletNetwork.NEXTNET -> "$LIB_VERSION-rc.0"
+            LibWalletNetwork.ESMERALDA -> "$LIB_VERSION-pre.0"
         }
         val minValidVersion = when (network) {
             LibWalletNetwork.MAINNET -> "v0.0.0"

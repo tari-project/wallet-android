@@ -26,8 +26,6 @@ class SelectUserContactFragment : ContactSelectionFragment() {
 
         ui.toolbar.ui.toolbarTitle.text = string(R.string.transaction_send_to)
         ui.addFirstNameInput.gone()
-
-        viewModel.additionalFilter = { it.contact.getFFIContactInfo() != null }
     }
 
     override fun startQRCodeActivity() {

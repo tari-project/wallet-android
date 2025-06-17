@@ -3,7 +3,7 @@ package com.tari.android.wallet.ui.screen.home
 import android.net.Uri
 import com.tari.android.wallet.application.walletManager.doOnWalletFailed
 import com.tari.android.wallet.data.airdrop.AirdropRepository
-import com.tari.android.wallet.data.contacts.ContactsRepository
+import com.tari.android.wallet.data.contacts.obsolete.ContactsRepository
 import com.tari.android.wallet.navigation.Navigation
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.util.extension.collectFlow

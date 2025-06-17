@@ -113,8 +113,8 @@ open class ContactSelectionFragment : CommonXmlFragment<FragmentContactsSelectio
         observe(selectedTariWalletAddress) { address -> address?.fullEmojiId?.let { putEmojiId(it) } }
 
         observe(selectedContact) { contactDto ->
-            putEmojiId(contactDto.contactInfo.requireWalletAddress().fullEmojiId)
-            ui.addFirstNameInput.setText((contactDto.contactInfo.firstName + " " + contactDto.contactInfo.lastName).trim())
+            putEmojiId(contactDto.walletAddress.fullEmojiId)
+            ui.addFirstNameInput.setText(contactDto.alias.orEmpty().trim())
         }
 
         observeOnLoad(clipboardChecker)

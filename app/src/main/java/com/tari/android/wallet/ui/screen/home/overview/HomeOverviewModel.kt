@@ -7,7 +7,8 @@ import com.tari.android.wallet.util.extension.toMicroTari
 
 class HomeOverviewModel {
     data class UiState(
-        val txList: List<TxDto>? = emptyList(), // FIXME: distinguish between no transactions and empty transactions
+        val txList: List<TxDto> = emptyList(),
+        val txListInitialized: Boolean = false,
         val balance: BalanceInfo = BalanceInfo(
             availableBalance = 0.toMicroTari(),
             pendingIncomingBalance = 0.toMicroTari(),

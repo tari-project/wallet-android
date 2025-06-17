@@ -52,8 +52,7 @@ import com.tari.android.wallet.R.string.add_amount_wallet_balance
 import com.tari.android.wallet.R.string.error_fee_more_than_amount_description
 import com.tari.android.wallet.R.string.error_fee_more_than_amount_title
 import com.tari.android.wallet.application.walletManager.WalletConfig
-import com.tari.android.wallet.data.contacts.model.ContactDto
-import com.tari.android.wallet.data.contacts.model.FFIContactInfo
+import com.tari.android.wallet.data.contacts.Contact
 import com.tari.android.wallet.databinding.FragmentAddAmountBinding
 import com.tari.android.wallet.model.BalanceInfo
 import com.tari.android.wallet.model.MicroTari
@@ -89,7 +88,7 @@ class AddAmountFragment : CommonXmlFragment<FragmentAddAmountBinding, AddAmountV
     /**
      * Recipient is either an emoji id or a user from contacts or recent txs.
      */
-    private lateinit var recipientContact: FFIContactInfo
+    private lateinit var recipientContact: Contact
     private lateinit var note: String
 
     private var keyboardController: KeyboardController = KeyboardController()
@@ -131,7 +130,7 @@ class AddAmountFragment : CommonXmlFragment<FragmentAddAmountBinding, AddAmountV
 
     private fun setupUI(uiState: AddAmountModel.UiState) {
         keyboardController.setup(requireContext(), AmountCheckRunnable(), ui.numpad, ui.amount, uiState.amount)
-        recipientContact = uiState.recipientContactInfo
+        recipientContact = uiState.recipientContact
         note = uiState.note
         // hide tx fee
         ui.txFeeContainerView.invisible()
@@ -144,7 +143,7 @@ class AddAmountFragment : CommonXmlFragment<FragmentAddAmountBinding, AddAmountV
     }
 
     private fun displayAliasOrEmojiId() {
-        val alias = recipientContact.getAlias()
+        val alias = recipientContact.alias.orEmpty()
         if (alias.isEmpty()) {
             displayEmojiId(recipientContact.walletAddress)
         } else {
@@ -375,7 +374,7 @@ class AddAmountFragment : CommonXmlFragment<FragmentAddAmountBinding, AddAmountV
     }
 
     companion object {
-        fun newInstance(contact: ContactDto, amount: MicroTari?, note: String = "") = AddAmountFragment().apply {
+        fun newInstance(contact: Contact, amount: MicroTari?, note: String = "") = AddAmountFragment().apply {
             arguments = Bundle().apply {
                 putParcelable(PARAMETER_CONTACT, contact)
                 putParcelable(PARAMETER_AMOUNT, amount)

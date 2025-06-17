@@ -5,9 +5,9 @@ import com.tari.android.wallet.databinding.ItemSimilarAddressBinding
 import com.tari.android.wallet.ui.common.domain.PaletteManager
 import com.tari.android.wallet.ui.common.recyclerView.CommonViewHolder
 import com.tari.android.wallet.ui.common.recyclerView.ViewHolderBuilder
+import com.tari.android.wallet.util.EmojiUtil
 import com.tari.android.wallet.util.extension.setVisible
 import com.tari.android.wallet.util.extension.string
-import com.tari.android.wallet.util.EmojiUtil
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -20,14 +20,13 @@ class SimilarAddressItemViewHolder(view: ItemSimilarAddressBinding) : CommonView
         ui.rootViewSelected.setVisible(item.selected)
         ui.rootViewNotSelected.setVisible(!item.selected)
 
-        val emojiId = item.ffiContact?.let { ffiContact ->
-            EmojiUtil.getFullEmojiIdSpannable(
-                emojiId = ffiContact.walletAddress.fullEmojiId,
-                separator = string(R.string.emoji_id_chunk_separator),
-                darkColor = PaletteManager.getBlack(itemView.context),
-                lightColor = PaletteManager.getLightGray(itemView.context),
-            )
-        } ?: "" // the contact _should_ always be an FFIContactDto, because it has a wallet address
+        val emojiId = EmojiUtil.getFullEmojiIdSpannable(
+            emojiId = item.dto.contact.walletAddress.fullEmojiId,
+            separator = string(R.string.emoji_id_chunk_separator),
+            darkColor = PaletteManager.getBlack(itemView.context),
+            lightColor = PaletteManager.getLightGray(itemView.context),
+        )
+
         val contactName = item.contactName
         val numberOfTransactions = string(R.string.address_poisoning_number_of_transactions, item.numberOfTransaction)
         val lastTransactionDate = string(

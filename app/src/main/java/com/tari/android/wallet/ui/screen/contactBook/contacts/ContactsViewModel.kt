@@ -8,27 +8,22 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.map
 import com.tari.android.wallet.R
 import com.tari.android.wallet.R.string.contact_book_details_phone_contacts
-import com.tari.android.wallet.R.string.contact_book_empty_state_body
 import com.tari.android.wallet.R.string.contact_book_empty_state_body_no_permissions
 import com.tari.android.wallet.R.string.contact_book_empty_state_favorites_body
 import com.tari.android.wallet.R.string.contact_book_empty_state_favorites_title
 import com.tari.android.wallet.R.string.contact_book_empty_state_grant_access_button
 import com.tari.android.wallet.R.string.contact_book_empty_state_title
+import com.tari.android.wallet.data.contacts.Contact
 import com.tari.android.wallet.data.contacts.ContactsRepository
-import com.tari.android.wallet.data.contacts.model.ContactDto
-import com.tari.android.wallet.data.contacts.model.PhoneContactInfo
 import com.tari.android.wallet.navigation.Navigation
 import com.tari.android.wallet.ui.common.CommonViewModel
-import com.tari.android.wallet.ui.common.SingleLiveEvent
 import com.tari.android.wallet.ui.common.recyclerView.CommonViewHolderItem
 import com.tari.android.wallet.ui.common.recyclerView.items.SpaceVerticalViewHolderItem
 import com.tari.android.wallet.ui.screen.contactBook.contacts.adapter.contact.ContactItemViewHolderItem
-import com.tari.android.wallet.ui.screen.contactBook.contacts.adapter.emptyState.EmptyStateViewHolderItem
 import com.tari.android.wallet.ui.screen.contactBook.root.ContactSelectionRepository
 import com.tari.android.wallet.ui.screen.settings.allSettings.title.SettingsTitleViewHolderItem
 import com.tari.android.wallet.util.extension.collectFlow
 import com.tari.android.wallet.util.extension.debounce
-import com.tari.android.wallet.util.extension.launchOnIo
 import com.tari.android.wallet.util.extension.launchOnMain
 import yat.android.ui.extension.HtmlHelper
 import javax.inject.Inject
@@ -42,8 +37,6 @@ class ContactsViewModel : CommonViewModel() {
     lateinit var contactSelectionRepository: ContactSelectionRepository
 
     var isFavorite = false
-
-    val grantPermission = SingleLiveEvent<Unit>()
 
     val selectionTrigger: LiveData<Unit>
 
@@ -94,20 +87,6 @@ class ContactsViewModel : CommonViewModel() {
         _listUpdateTrigger.postValue(Unit)
     }
 
-    fun grantPermission() {
-        permissionManager.runWithPermission(
-            permissions = listOf(
-                android.Manifest.permission.READ_CONTACTS,
-                android.Manifest.permission.WRITE_CONTACTS,
-            ),
-            silently = false,
-        ) {
-            launchOnIo {
-                contactsRepository.grantContactPermissionAndRefresh()
-            }
-        }
-    }
-
     fun search(text: String) {
         searchText.postValue(text)
     }
@@ -116,7 +95,7 @@ class ContactsViewModel : CommonViewModel() {
         filters.value = filters.value!! + filter
     }
 
-    private fun updateContacts(contacts: List<ContactDto>) {
+    private fun updateContacts(contacts: List<Contact>) {
         val newItems = contacts.map { contactDto ->
             ContactItemViewHolderItem(
                 contact = contactDto.copy(),
@@ -131,32 +110,23 @@ class ContactsViewModel : CommonViewModel() {
     }
 
     private fun updateList() {
-        val searchText = searchText.value ?: return
+        searchText.value ?: return
         var sourceList = sourceList.value ?: return
-        val filters = filters.value ?: return
-        val selectedItems = contactSelectionRepository.selectedContacts.map { it.contact.uuid }.toList()
+        filters.value ?: return
+        val selectedItems = contactSelectionRepository.selectedContacts.map { it.contact.walletAddress }.toList()
         sourceList = sourceList.map { it.copy() }
 
-        val filtered = sourceList.filter { contact -> contact.filtered(searchText) && filters.all { it.invoke(contact) } }
+        val filtered = sourceList
 
         for (item in filtered) {
-            item.isSelected = selectedItems.contains(item.contact.uuid)
+            item.isSelected = selectedItems.contains(item.contact.walletAddress)
             item.isSelectionState = contactSelectionRepository.isSelectionState.value == true
         }
 
-        if (contactsRepository.contactPermissionGranted.not() || filtered.isEmpty()) {
-            contactList.postValue(
-                listOf(
-                    EmptyStateViewHolderItem(
-                        title = getEmptyTitle(),
-                        body = getEmptyBody(),
-                        image = getEmptyImage(),
-                        buttonTitle = getButtonTitle()
-                    ) { grantPermission.postValue(Unit) }
-                )
-            )
+        if (filtered.isEmpty()) {
+
         } else {
-            val (phoneContacts, notPhoneContacts) = filtered.partition { it.contact.contactInfo is PhoneContactInfo }
+            val (phoneContacts, notPhoneContacts) = emptyList<ContactItemViewHolderItem>() to filtered
 
             contactList.postValue(
                 listOfNotNull(
@@ -178,14 +148,13 @@ class ContactsViewModel : CommonViewModel() {
 
     private fun getEmptyBody(): SpannedString {
         val resource = if (isFavorite) contact_book_empty_state_favorites_body else
-            (if (contactsRepository.contactPermissionGranted) contact_book_empty_state_body else contact_book_empty_state_body_no_permissions)
+            (contact_book_empty_state_body_no_permissions)
         return SpannedString(HtmlHelper.getSpannedText(resourceManager.getString(resource)))
     }
 
     private fun getEmptyImage(): Int = if (isFavorite) R.drawable.vector_contact_favorite_empty_state else R.drawable.vector_contact_empty_state
 
-    private fun getButtonTitle(): String =
-        if (contactsRepository.contactPermissionGranted) "" else resourceManager.getString(contact_book_empty_state_grant_access_button)
+    private fun getButtonTitle(): String = resourceManager.getString(contact_book_empty_state_grant_access_button)
 
     companion object {
         private const val LIST_UPDATE_DEBOUNCE = 200L

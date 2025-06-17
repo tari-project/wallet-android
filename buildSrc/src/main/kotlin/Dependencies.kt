@@ -108,4 +108,5 @@ object Dependencies {
     const val itext7Core = "com.itextpdf:itext7-core:9.0.0"
     const val keyboardVisibilityEvent = "net.yslibrary.keyboardvisibilityevent:keyboardvisibilityevent:2.3.0"
     const val mavenArtifact = "org.apache.maven:maven-artifact:3.9.9"
+    const val paperDb = "io.github.pilgr:paperdb:2.7.2"
 }
