@@ -10,7 +10,7 @@ object TariBuildConfig {
         // We use different versions of the library for different networks, set $network to easily switch between them
         val network: LibWalletNetwork = LibWalletNetwork.MAINNET
 
-        private const val LIB_VERSION = "v4.4.0"
+        private const val LIB_VERSION = "v4.5.0"
         val version = when (network) {
             LibWalletNetwork.MAINNET -> LIB_VERSION
             LibWalletNetwork.NEXTNET -> "$LIB_VERSION-rc.0"
