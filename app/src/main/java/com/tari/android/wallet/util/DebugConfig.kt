@@ -73,14 +73,10 @@ object DebugConfig {
 
     val mockChatMessages = valueIfDebug(false)
 
-    val suppressAddAmountErrors = valueIfDebug(false)
-
     val mockSeedPhraseSorting = valueIfDebug(false)
 
     val mockEveryAddressPoisoned: Boolean = valueIfDebug(false)
     val mockPoisonedAddresses: Boolean = valueIfDebug(false)
-
-    const val isChatEnabled = false
 
     const val isYatEnabled = false
     private val _useYatSandbox = valueIfDebug(false)
