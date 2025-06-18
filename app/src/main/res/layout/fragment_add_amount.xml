@@ -4,8 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/root_view"
     android:layout_width="match_parent"
-    android:fitsSystemWindows="true"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true">
 
     <com.tari.android.wallet.ui.component.tari.TariBackButton
         android:id="@+id/back_cta_view"
@@ -169,42 +169,12 @@
                 android:layout_marginBottom="12dp"
                 android:visibility="invisible"
                 tools:visibility="visible">
-                <!-- fee amount -->
-
-                <LinearLayout
-                    android:id="@+id/network_traffic_text"
-                    android:layout_width="wrap_content"
-                    android:layout_height="22dp"
-                    android:layout_above="@+id/fee_container"
-                    android:layout_centerHorizontal="true"
-                    android:orientation="horizontal"
-                    android:visibility="gone"
-                    tools:visibility="visible">
-
-                    <androidx.appcompat.widget.AppCompatImageView
-                        android:id="@+id/network_traffic_icon"
-                        android:layout_width="16dp"
-                        android:layout_height="16dp"
-                        android:layout_gravity="center_vertical"
-                        android:layout_marginEnd="6dp"
-                        android:src="@drawable/vector_network_medium"
-                        android:tint="?attr/palette_text_body" />
-
-                    <com.tari.android.wallet.ui.component.tari.TariTextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center_vertical"
-                        android:text="@string/add_amount_modify_fee_network_traffic"
-                        android:textColor="?attr/palette_text_body"
-                        android:textSize="@dimen/add_amount_tx_fee_text_size"
-                        app:customFont="heavy" />
-                </LinearLayout>
 
                 <LinearLayout
                     android:id="@+id/fee_container"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_above="@+id/modifyButton"
+                    android:layout_alignParentBottom="true"
                     android:layout_centerHorizontal="true"
                     android:layout_marginBottom="0dp"
                     android:orientation="horizontal">
@@ -230,20 +200,6 @@
                         android:textSize="@dimen/add_amount_tx_fee_text_size"
                         app:customFont="heavy" />
                 </LinearLayout>
-
-                <com.tari.android.wallet.ui.component.tari.TariButton
-                    android:id="@+id/modifyButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="21dp"
-                    android:layout_alignParentBottom="true"
-                    android:layout_centerHorizontal="true"
-                    android:background="@null"
-                    android:text="@string/add_amount_modify_fee_speed_up_transaction"
-                    android:textAllCaps="false"
-                    android:textColor="?attr/palette_primary_main"
-                    android:textSize="14sp"
-                    android:visibility="invisible"
-                    app:customFont="medium" />
             </RelativeLayout>
         </RelativeLayout>
 

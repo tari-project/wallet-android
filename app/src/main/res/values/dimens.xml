@@ -50,7 +50,6 @@
     <dimen name="add_amount_leftmost_digit_margin_start">10dp</dimen>
     <dimen name="add_amount_available_balance_error_amount_nudge_distance">40dp</dimen>
     <dimen name="add_amount_balance_text_size">13sp</dimen>
-    <dimen name="add_amount_custom_fee_size">26sp</dimen>
     <dimen name="add_amount_tx_fee_text_size">12sp</dimen>
     <dimen name="add_amount_balance_warning_container_top_margin">2dp</dimen>
     <dimen name="add_amount_balance_warning_container_top_padding">8dp</dimen>

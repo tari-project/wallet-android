@@ -64,19 +64,16 @@ import com.tari.android.wallet.navigation.TariNavigator.Companion.PARAMETER_NOTE
 import com.tari.android.wallet.ui.common.CommonXmlFragment
 import com.tari.android.wallet.ui.dialog.modular.ModularDialog
 import com.tari.android.wallet.ui.dialog.modular.SimpleDialogArgs
-import com.tari.android.wallet.ui.screen.send.addAmount.feeModule.NetworkSpeed
 import com.tari.android.wallet.ui.screen.send.addAmount.keyboard.KeyboardController
 import com.tari.android.wallet.ui.screen.send.amountView.AmountStyle
 import com.tari.android.wallet.ui.screen.send.common.TransactionData
 import com.tari.android.wallet.util.Constants
-import com.tari.android.wallet.util.DebugConfig
 import com.tari.android.wallet.util.addressFirstEmojis
 import com.tari.android.wallet.util.addressLastEmojis
 import com.tari.android.wallet.util.addressPrefixEmojis
 import com.tari.android.wallet.util.extension.collectFlow
 import com.tari.android.wallet.util.extension.gone
 import com.tari.android.wallet.util.extension.invisible
-import com.tari.android.wallet.util.extension.setVisible
 import com.tari.android.wallet.util.extension.string
 import com.tari.android.wallet.util.extension.temporarilyDisableClick
 import com.tari.android.wallet.util.extension.visible
@@ -105,8 +102,6 @@ class AddAmountFragment : CommonXmlFragment<FragmentAddAmountBinding, AddAmountV
         val viewModel: AddAmountViewModel by viewModels()
         bindViewModel(viewModel)
         subscribeVM()
-
-        ui.modifyButton.setOnClickListener { viewModel.showFeeDialog() }
     }
 
     override fun onDestroy() {
@@ -116,7 +111,11 @@ class AddAmountFragment : CommonXmlFragment<FragmentAddAmountBinding, AddAmountV
 
     private fun subscribeVM() {
         collectFlow(viewModel.uiState) { uiState ->
-            showOrHideCustomFeeDialog(uiState.feePerGrams)
+            if (uiState.feePerGram == null) {
+                ui.feeCalculating.visible()
+            } else {
+                ui.feeCalculating.gone()
+            }
         }
 
         collectFlow(viewModel.effect) { effect ->
@@ -158,24 +157,6 @@ class AddAmountFragment : CommonXmlFragment<FragmentAddAmountBinding, AddAmountV
         ui.continueButton.setOnClickListener { continueButtonClicked() }
     }
 
-    private fun showOrHideCustomFeeDialog(feePerGram: FeePerGramOptions?) {
-        if (feePerGram == null) {
-            ui.feeCalculating.visible()
-            ui.networkTrafficText.gone()
-            ui.modifyButton.gone()
-        } else {
-            ui.feeCalculating.gone()
-            ui.networkTrafficText.visible()
-            ui.modifyButton.setVisible(feePerGram.networkSpeed != NetworkSpeed.Slow, View.INVISIBLE)
-            val iconId = when (feePerGram.networkSpeed) {
-                NetworkSpeed.Slow -> R.drawable.vector_network_slow
-                NetworkSpeed.Medium -> R.drawable.vector_network_medium
-                NetworkSpeed.Fast -> R.drawable.vector_network_fast
-            }
-            ui.networkTrafficIcon.setImageDrawable(ContextCompat.getDrawable(requireContext(), iconId))
-        }
-    }
-
     private fun displayAlias(alias: String) {
         ui.emojiIdSummaryContainerView.gone()
         ui.titleTextView.visible()
@@ -203,17 +184,15 @@ class AddAmountFragment : CommonXmlFragment<FragmentAddAmountBinding, AddAmountV
 
     private fun checkAmountAndFee() {
         val balanceInfo = viewModel.walletBalance
-        val fee = viewModel.selectedFeeData?.calculatedFee
-
         val amount = keyboardController.currentAmount
-        if (fee != null) {
-            if (amount > balanceInfo.availableBalance && !DebugConfig.suppressAddAmountErrors) {
+        viewModel.feeData?.calculatedFee?.let { fee ->
+            if (amount > balanceInfo.availableBalance) {
                 lifecycleScope.launch(Dispatchers.Main) {
                     actualBalanceExceeded()
                 }
             } else {
                 lifecycleScope.launch(Dispatchers.Main) {
-                    if (fee > amount && !DebugConfig.suppressAddAmountErrors) {
+                    if (fee > amount) {
                         val args = SimpleDialogArgs(
                             title = string(error_fee_more_than_amount_title),
                             description = string(error_fee_more_than_amount_description),
@@ -226,7 +205,7 @@ class AddAmountFragment : CommonXmlFragment<FragmentAddAmountBinding, AddAmountV
                     }
                 }
             }
-        } else {
+        } ?: run {
             lifecycleScope.launch(Dispatchers.Main) {
                 ui.continueButton.isClickable = true
             }
@@ -249,7 +228,7 @@ class AddAmountFragment : CommonXmlFragment<FragmentAddAmountBinding, AddAmountV
             recipientContact = recipientContact,
             amount = keyboardController.currentAmount,
             note = note,
-            feePerGram = viewModel.selectedFeeData!!.feePerGram,
+            feePerGram = viewModel.feeDataRequired.feePerGram,
             isOneSidePayment = true, // it's always true since we have only one side payments allowed
         )
 
@@ -262,27 +241,26 @@ class AddAmountFragment : CommonXmlFragment<FragmentAddAmountBinding, AddAmountV
     private inner class AmountCheckRunnable : Runnable {
 
         override fun run() {
-            // TODO error handling should be in the view model
             try {
                 viewModel.calculateFee(keyboardController.currentAmount)
             } catch (error: Exception) {
                 showErrorState(WalletError(error))
                 return
             }
-            viewModel.selectedFeeData ?: return
+            viewModel.feeData?.let { feeData ->
+                updateBalanceInfo()
 
-            updateBalanceInfo()
-
-            if (!DebugConfig.suppressAddAmountErrors && (keyboardController.currentAmount + viewModel.selectedFeeData?.calculatedFee!!) > availableBalance) {
-                showErrorState()
-            } else {
-                showSuccessState()
+                if ((keyboardController.currentAmount + feeData.calculatedFee) > availableBalance) {
+                    showErrorState()
+                } else {
+                    showSuccessState()
+                }
             }
         }
 
         @SuppressLint("SetTextI18n")
         private fun showSuccessState() = with(ui) {
-            val fee = viewModel.selectedFeeData?.calculatedFee!!
+            val fee = viewModel.feeDataRequired.calculatedFee
             notEnoughBalanceDescriptionTextView.text = string(add_amount_wallet_balance)
             availableBalanceContainerView.visible()
 

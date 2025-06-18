@@ -1,3 +1,4 @@
+@file:Suppress("Unused")
 /**
  * Copyright 2020 The Tari Project
  *
@@ -50,9 +51,9 @@ import com.tari.android.wallet.model.tx.CompletedTx
 import com.tari.android.wallet.model.tx.PendingInboundTx
 import com.tari.android.wallet.model.tx.PendingOutboundTx
 import com.tari.android.wallet.model.tx.Tx
-import com.tari.android.wallet.ui.screen.send.addAmount.FeePerGramOptions
 import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.DebugConfig
+import com.tari.android.wallet.util.extension.toMicroTari
 import java.math.BigInteger
 
 /**
@@ -434,8 +435,11 @@ class FFIWallet(
             )
         }
 
-    fun getFeePerGramStats(): FeePerGramOptions = runWithError { error ->
-        FFIFeePerGramStats(jniWalletGetFeePerGramStats(3, error)).runWithDestroy { FeePerGramOptions(it) }
+    fun getLowestFeePerGram(): MicroTari = runWithError { error ->
+        FFIFeePerGramStats(jniWalletGetFeePerGramStats(3, error)).runWithDestroy {
+            it.getAt(0).getMin().toMicroTari().takeIf { it > 0.toMicroTari() }
+                ?: 1.toMicroTari() // Sometimes the minimum fee can be 0, so we set it to 1 microTari
+        }
     }
 
     fun getUnbindedOutputs(): List<TariUnblindedOutput> = runWithError { error ->
