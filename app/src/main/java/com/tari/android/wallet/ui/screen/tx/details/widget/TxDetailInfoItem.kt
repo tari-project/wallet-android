@@ -31,6 +31,7 @@ import com.tari.android.wallet.ui.compose.TariDesignSystem
 import com.tari.android.wallet.ui.compose.components.TariHorizontalDivider
 import com.tari.android.wallet.ui.screen.settings.themeSelector.TariTheme
 import com.tari.android.wallet.ui.screen.tx.details.TxDetailsModel
+import com.tari.android.wallet.ui.screen.tx.details.TxDetailsModel.UiState.PayRefStatus
 import com.tari.android.wallet.util.MockDataStub
 import com.tari.android.wallet.util.base58Ellipsized
 import com.tari.android.wallet.util.shortString
@@ -207,6 +208,55 @@ fun TxDetailInfoAddressItem(
 }
 
 @Composable
+fun TxDetailInfoPayRefItem(
+    paymentReference: PayRefStatus,
+    onCopyClicked: (value: String) -> Unit,
+    onInfoClicked: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    TxDetailInfoItem(
+        modifier = modifier,
+        title = stringResource(R.string.tx_detail_payment_reference),
+        value = when (paymentReference) {
+            is PayRefStatus.Ready -> paymentReference.paymentReferenceHex
+            is PayRefStatus.Waiting -> stringResource(
+                R.string.tx_detail_payment_reference_waiting,
+                paymentReference.totalSteps,
+                paymentReference.step,
+                paymentReference.totalSteps,
+            )
+        },
+        valueTextColor = when (paymentReference) {
+            is PayRefStatus.Ready -> TariDesignSystem.colors.textPrimary
+            is PayRefStatus.Waiting -> TariDesignSystem.colors.warningMain
+        },
+        singleLine = false,
+    ) {
+        IconButton(
+            // needed to remove "margin" between two IconButtons
+            modifier = Modifier.offset(x = if (paymentReference is PayRefStatus.Ready) 12.dp else 0.dp),
+            onClick = onInfoClicked,
+        ) {
+            Icon(
+                painter = painterResource(R.drawable.vector_icon_question_circle),
+                contentDescription = null,
+                tint = TariDesignSystem.colors.componentsNavbarIcons,
+            )
+        }
+
+        if (paymentReference is PayRefStatus.Ready) {
+            IconButton(onClick = { onCopyClicked(paymentReference.paymentReferenceHex) }) {
+                Icon(
+                    painter = painterResource(R.drawable.vector_icon_copy),
+                    contentDescription = null,
+                    tint = TariDesignSystem.colors.componentsNavbarIcons,
+                )
+            }
+        }
+    }
+}
+
+@Composable
 @Preview
 private fun TxDetailInfoItemPreview() {
     PreviewSecondarySurface(TariTheme.Light) {
@@ -245,6 +295,18 @@ private fun TxDetailInfoItemPreview() {
                 onCopyClicked = {},
                 onEmojiIdDetailsClick = {},
                 title = stringResource(R.string.common_from),
+            )
+
+            TxDetailInfoPayRefItem(
+                paymentReference = PayRefStatus.Ready("1234567890abcdef1234567890abcdef"),
+                onCopyClicked = {},
+                onInfoClicked = {},
+            )
+
+            TxDetailInfoPayRefItem(
+                paymentReference = PayRefStatus.Waiting(step = 3, totalSteps = 5),
+                onCopyClicked = {},
+                onInfoClicked = {},
             )
         }
     }

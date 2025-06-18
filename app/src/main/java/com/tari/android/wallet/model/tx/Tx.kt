@@ -55,6 +55,8 @@ abstract class Tx(
     open val tariContact: TariContact, // This is the receiver for an outbound tx and sender for an inbound tx.
 ) : Parcelable {
 
+    abstract val rawDetails: String
+
     enum class Direction {
         INBOUND,
         OUTBOUND

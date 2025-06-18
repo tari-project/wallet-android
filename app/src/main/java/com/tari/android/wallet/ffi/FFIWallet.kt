@@ -39,6 +39,7 @@ import com.tari.android.wallet.model.BalanceInfo
 import com.tari.android.wallet.model.MicroTari
 import com.tari.android.wallet.model.PublicKey
 import com.tari.android.wallet.model.TariCoinPreview
+import com.tari.android.wallet.model.TariPaymentRecord
 import com.tari.android.wallet.model.TariUnblindedOutput
 import com.tari.android.wallet.model.TariUtxo
 import com.tari.android.wallet.model.TariVector
@@ -48,6 +49,7 @@ import com.tari.android.wallet.model.tx.CancelledTx
 import com.tari.android.wallet.model.tx.CompletedTx
 import com.tari.android.wallet.model.tx.PendingInboundTx
 import com.tari.android.wallet.model.tx.PendingOutboundTx
+import com.tari.android.wallet.model.tx.Tx
 import com.tari.android.wallet.ui.screen.send.addAmount.FeePerGramOptions
 import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.DebugConfig
@@ -186,6 +188,8 @@ class FFIWallet(
         message: String,
         libError: FFIError
     ): ByteArray
+
+    private external fun jniGetTxPayRefs(txId: String, libError: FFIError): FFIPointer
 
     private external fun jniDestroy()
 
@@ -446,6 +450,16 @@ class FFIWallet(
                 }
             }
         }
+    }
+
+    fun getTxPaymentReference(tx: Tx): TariPaymentRecord? = runWithError { error ->
+        FFITariPaymentRecords(jniGetTxPayRefs(tx.id.toString(), error))
+            .iterateWithDestroy { TariPaymentRecord(it) }
+            .filter { it.blockHeight != 0L } // Need to filter invalid instances of TariPaymentRecord
+            .firstOrNull { record ->
+                tx.isInbound && record.direction == TariPaymentRecord.Direction.Inbound
+                        || tx.isOutbound && record.direction == TariPaymentRecord.Direction.Outbound
+            }
     }
 
     override fun destroy() {

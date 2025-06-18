@@ -6,6 +6,7 @@ import com.tari.android.wallet.R.string.common_are_you_sure
 import com.tari.android.wallet.R.string.tx_details_cancel_dialog_cancel
 import com.tari.android.wallet.R.string.tx_details_cancel_dialog_description
 import com.tari.android.wallet.R.string.tx_details_cancel_dialog_not_cancel
+import com.tari.android.wallet.application.baseNodes.BaseNodesManager
 import com.tari.android.wallet.application.walletManager.WalletManager.WalletEvent
 import com.tari.android.wallet.data.contacts.Contact
 import com.tari.android.wallet.data.contacts.ContactsRepository
@@ -32,6 +33,9 @@ class TxDetailsViewModel(savedState: SavedStateHandle) : CommonViewModel() {
     @Inject
     lateinit var contactsRepository: ContactsRepository
 
+    @Inject
+    lateinit var baseNodesManager: BaseNodesManager
+
     init {
         component.inject(this)
     }
@@ -42,6 +46,7 @@ class TxDetailsViewModel(savedState: SavedStateHandle) : CommonViewModel() {
             showCloseButton = savedState.getOrThrow<Boolean>(SHOW_CLOSE_BUTTON_EXTRA_KEY),
             ticker = networkRepository.currentNetwork.ticker,
             blockExplorerBaseUrl = networkRepository.currentNetwork.blockExplorerBaseUrl,
+            heightOfLongestChain = baseNodesManager.baseNodeState.value.heightOfLongestChain.toInt(),
         )
     )
     val uiState = _uiState.asStateFlow()
@@ -64,6 +69,20 @@ class TxDetailsViewModel(savedState: SavedStateHandle) : CommonViewModel() {
                 is WalletEvent.Tx.TxCancelled -> updateTxData(event.tx)
                 else -> Unit
             }
+        }
+
+        collectFlow(baseNodesManager.baseNodeState) { baseNodeState ->
+            _uiState.update {
+                it.copy(
+                    // need to refresh payRef data, cos it could be invalid in the first try and okay once the network mined next block
+                    paymentReference = walletManager.requireWalletInstance.getTxPaymentReference(_uiState.value.tx),
+                    heightOfLongestChain = baseNodeState.heightOfLongestChain.toInt(),
+                )
+            }
+        }
+
+        doOnWalletRunning { wallet ->
+            _uiState.update { it.copy(paymentReference = wallet.getTxPaymentReference(_uiState.value.tx)) }
         }
     }
 
@@ -128,6 +147,27 @@ class TxDetailsViewModel(savedState: SavedStateHandle) : CommonViewModel() {
         )
     }
 
+    fun onPaymentReferenceInfoClicked() {
+        showSimpleDialog(
+            title = resourceManager.getString(R.string.tx_detail_payment_reference_tooltip_title),
+            description = resourceManager.getString(R.string.tx_detail_payment_reference_tooltip_desc),
+        )
+    }
+
+    fun onCopyValueClicked(value: String) {
+        copyToClipboard(
+            clipLabel = resourceManager.getString(R.string.tx_details_transaction_details),
+            clipText = value,
+        )
+    }
+
+    fun onRawDetailsClicked() {
+        copyToClipboard(
+            clipLabel = resourceManager.getString(R.string.tx_details_transaction_details),
+            clipText = _uiState.value.tx.rawDetails,
+        )
+    }
+
     private fun setTx(tx: Tx) {
         _uiState.update { it.copy(tx = tx) }
     }
@@ -153,12 +193,5 @@ class TxDetailsViewModel(savedState: SavedStateHandle) : CommonViewModel() {
             _uiState.update { it.copy(contact = contactsRepository.updateContactInfo(contact, newAlias)) }
             hideDialog()
         }
-    }
-
-    fun onCopyValueClicked(value: String) {
-        copyToClipboard(
-            clipLabel = resourceManager.getString(R.string.tx_details_transaction_details),
-            clipText = value,
-        )
     }
 }

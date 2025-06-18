@@ -81,4 +81,14 @@ data class PendingInboundTx(
     )
 
     override fun toString() = "PendingInboundTx(status=$status) ${super.toString()}"
+
+    override val rawDetails: String
+        get() = "{" +
+                "\"id\":\"$id\"," +
+                "\"direction\":\"$direction\"," +
+                "\"amount\":\"${amount.value}\"," +
+                "\"timestamp\":\"$timestamp\"," +
+                "\"paymentId\":\"$paymentId\"," +
+                "\"status\":\"$status\"," +
+                "}"
 }
