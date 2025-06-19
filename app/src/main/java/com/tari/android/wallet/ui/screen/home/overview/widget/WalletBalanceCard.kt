@@ -19,10 +19,6 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -51,10 +47,10 @@ fun WalletBalanceCard(
     balance: BalanceInfo,
     ticker: String,
     onBalanceHelpClicked: () -> Unit,
+    onHideBalanceClicked: () -> Unit,
+    isBalanceHidden: Boolean,
     modifier: Modifier = Modifier,
 ) {
-    var isBalanceHidden by remember { mutableStateOf(false) }
-
     Card(
         modifier = modifier.height(200.dp),
         shape = TariDesignSystem.shapes.card,
@@ -87,7 +83,7 @@ fun WalletBalanceCard(
                     )
                     Spacer(modifier = Modifier.width(4.dp))
                     Image(
-                        modifier = Modifier.clickable(onClick = { isBalanceHidden = !isBalanceHidden }),
+                        modifier = Modifier.clickable(onClick = onHideBalanceClicked),
                         painter = painterResource(id = R.drawable.vector_home_overview_hide_balance),
                         contentDescription = null,
                     )
@@ -190,6 +186,8 @@ private fun BalanceCardPreview() {
             ),
             ticker = "XTM",
             onBalanceHelpClicked = {},
+            onHideBalanceClicked = {},
+            isBalanceHidden = false,
         )
 
         WalletBalanceCard(
@@ -202,6 +200,8 @@ private fun BalanceCardPreview() {
             ),
             ticker = "XTM",
             onBalanceHelpClicked = {},
+            onHideBalanceClicked = {},
+            isBalanceHidden = false,
         )
 
         WalletBalanceCard(
@@ -214,6 +214,22 @@ private fun BalanceCardPreview() {
             ),
             ticker = "XTM",
             onBalanceHelpClicked = {},
+            onHideBalanceClicked = {},
+            isBalanceHidden = false,
+        )
+
+        WalletBalanceCard(
+            modifier = Modifier.padding(16.dp),
+            balance = BalanceInfo(
+                availableBalance = 0.toMicroTari(),
+                pendingIncomingBalance = 0.toMicroTari(),
+                pendingOutgoingBalance = 0.toMicroTari(),
+                timeLockedBalance = 0.toMicroTari(),
+            ),
+            ticker = "XTM",
+            onBalanceHelpClicked = {},
+            onHideBalanceClicked = {},
+            isBalanceHidden = true,
         )
     }
 }

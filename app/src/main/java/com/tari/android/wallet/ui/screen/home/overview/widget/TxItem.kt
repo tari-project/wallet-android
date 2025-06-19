@@ -48,6 +48,7 @@ fun TxItem(
     txDto: TxDto,
     ticker: String,
     onTxClick: () -> Unit,
+    balanceHidden: Boolean = false,
 ) {
     Card(
         modifier = modifier,
@@ -103,8 +104,12 @@ fun TxItem(
                 )
                 Spacer(modifier = Modifier.width(4.dp))
                 Text(
-                    text = (txDto.tx.amount.takeIf { it.value >= MIN_ROUNDING }?.tariValue?.let { WalletConfig.balanceFormatter.format(it) }
-                        ?: "<0.01") + " " + ticker,
+                    text = if (balanceHidden) {
+                        stringResource(R.string.home_wallet_balance_hidden)
+                    } else {
+                        (txDto.tx.amount.takeIf { it.value >= MIN_ROUNDING }?.tariValue?.let { WalletConfig.balanceFormatter.format(it) }
+                            ?: "<0.01") + " " + ticker
+                    },
                     style = TariDesignSystem.typography.headingLarge,
                 )
             }
@@ -181,6 +186,7 @@ private fun TxItemPreview() {
                 contactAlias = "Alice",
             ),
             ticker = "XTM",
+            balanceHidden = false,
             onTxClick = {},
         )
 
@@ -191,6 +197,7 @@ private fun TxItemPreview() {
                 contactAlias = "Alice",
             ),
             ticker = "XTM",
+            balanceHidden = false,
             onTxClick = {},
         )
 
@@ -201,6 +208,18 @@ private fun TxItemPreview() {
                 contactAlias = "Alice",
             ),
             ticker = "XTM",
+            balanceHidden = false,
+            onTxClick = {},
+        )
+
+        TxItem(
+            modifier = Modifier.padding(16.dp),
+            txDto = MockDataStub.createTxDto(
+                amount = 1234,
+                contactAlias = "Alice",
+            ),
+            ticker = "XTM",
+            balanceHidden = true,
             onTxClick = {},
         )
     }

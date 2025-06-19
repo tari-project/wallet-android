@@ -16,6 +16,8 @@ class HomeOverviewModel {
             timeLockedBalance = 0.toMicroTari(),
         ),
 
+        val balanceHidden: Boolean = false,
+
         val ticker: String,
         val networkName: String,
         val ffiVersion: String,
