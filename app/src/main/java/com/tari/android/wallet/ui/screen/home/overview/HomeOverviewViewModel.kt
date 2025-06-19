@@ -249,4 +249,8 @@ class HomeOverviewViewModel : CommonViewModel() {
             logger.e("Transaction with ID $txId not found, but it was supposed to be sent")
         }
     }
+
+    fun toggleBalanceHidden() {
+        _uiState.update { it.copy(balanceHidden = !it.balanceHidden) }
+    }
 }
