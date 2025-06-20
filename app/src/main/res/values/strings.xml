@@ -396,6 +396,7 @@
 
     <!-- Settings -->
     <string name="all_settings_page_title">Settings</string>
+    <string name="all_settings_contact_label">Contacts</string>
     <string name="all_settings_security_label">Security</string>
     <string name="all_settings_advanced_settings_label">Advanced</string>
     <string name="all_settings_back_up_wallet_settings_entry">Wallet Backups</string>
@@ -404,6 +405,7 @@
     <string name="all_settings_report_a_bug">Report a Bug</string>
     <string name="all_settings_store">The TTL Store</string>
     <string name="all_settings_data_collection">Data Collection</string>
+    <string name="all_settings_contacts">Contact Book</string>
     <string name="all_settings_pin_code">Change Passcode</string>
     <string name="all_settings_create_pin_code">Create Passcode</string>
     <string name="all_settings_biometrics">Biometrics</string>
