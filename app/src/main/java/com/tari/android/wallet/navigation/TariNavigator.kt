@@ -35,6 +35,7 @@ import com.tari.android.wallet.ui.screen.auth.FeatureAuthFragment
 import com.tari.android.wallet.ui.screen.biometrics.ChangeBiometricsFragment
 import com.tari.android.wallet.ui.screen.chat.addChat.AddChatFragment
 import com.tari.android.wallet.ui.screen.chat.chatDetails.ChatDetailsFragment
+import com.tari.android.wallet.ui.screen.contactBook.list.ContactListFragment
 import com.tari.android.wallet.ui.screen.contactBook.obsolete.add.AddContactFragment
 import com.tari.android.wallet.ui.screen.contactBook.obsolete.add.SelectUserContactFragment
 import com.tari.android.wallet.ui.screen.contactBook.obsolete.details.ContactDetailsFragment
@@ -111,6 +112,7 @@ class TariNavigator @Inject constructor(
             is Auth.FeatureAuth -> addFragment(FeatureAuthFragment())
             is Auth.BackAfterAuth -> backAfterAuth()
 
+            is ContactBook.AllContacts -> addFragment(ContactListFragment())
             is ContactBook.ToAddContact -> addFragment(AddContactFragment())
             is ContactBook.ToContactDetails -> addFragment(ContactDetailsFragment.createFragment(navigation.contact))
             is ContactBook.ToRequestTari -> sendToUser(navigation.contact)

@@ -44,6 +44,7 @@ import com.tari.android.wallet.ui.screen.auth.AuthViewModel
 import com.tari.android.wallet.ui.screen.biometrics.ChangeBiometricsViewModel
 import com.tari.android.wallet.ui.screen.chat.chatDetails.ChatDetailsViewModel
 import com.tari.android.wallet.ui.screen.chat.chatList.ChatListViewModel
+import com.tari.android.wallet.ui.screen.contactBook.list.ContactListViewModel
 import com.tari.android.wallet.ui.screen.contactBook.obsolete.contactSelection.ContactSelectionViewModel
 import com.tari.android.wallet.ui.screen.contactBook.obsolete.contacts.ContactsViewModel
 import com.tari.android.wallet.ui.screen.contactBook.obsolete.details.ContactDetailsViewModel
@@ -183,6 +184,7 @@ interface ApplicationComponent {
     fun inject(viewModel: ProfileViewModel)
     fun inject(viewModel: ReceiveViewModel)
     fun inject(viewModel: ConfirmViewModel)
+    fun inject(viewModel: ContactListViewModel)
 
     fun inject(tariFcmService: TariFcmService)
 

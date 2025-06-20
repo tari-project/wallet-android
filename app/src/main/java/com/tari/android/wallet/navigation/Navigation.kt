@@ -93,6 +93,7 @@ sealed class Navigation {
     }
 
     sealed class ContactBook : Navigation() {
+        data object AllContacts : ContactBook()
         data class ToContactDetails(val contact: Contact) : ContactBook()
         data object ToAddContact : ContactBook()
         data object ToAddPhoneContact : ContactBook()
