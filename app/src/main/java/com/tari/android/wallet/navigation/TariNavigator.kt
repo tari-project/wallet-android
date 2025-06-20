@@ -35,11 +35,11 @@ import com.tari.android.wallet.ui.screen.auth.FeatureAuthFragment
 import com.tari.android.wallet.ui.screen.biometrics.ChangeBiometricsFragment
 import com.tari.android.wallet.ui.screen.chat.addChat.AddChatFragment
 import com.tari.android.wallet.ui.screen.chat.chatDetails.ChatDetailsFragment
-import com.tari.android.wallet.ui.screen.contactBook.add.AddContactFragment
-import com.tari.android.wallet.ui.screen.contactBook.add.SelectUserContactFragment
-import com.tari.android.wallet.ui.screen.contactBook.details.ContactDetailsFragment
-import com.tari.android.wallet.ui.screen.contactBook.link.ContactLinkFragment
-import com.tari.android.wallet.ui.screen.contactBook.root.ContactBookFragment
+import com.tari.android.wallet.ui.screen.contactBook.obsolete.add.AddContactFragment
+import com.tari.android.wallet.ui.screen.contactBook.obsolete.add.SelectUserContactFragment
+import com.tari.android.wallet.ui.screen.contactBook.obsolete.details.ContactDetailsFragment
+import com.tari.android.wallet.ui.screen.contactBook.obsolete.link.ContactLinkFragment
+import com.tari.android.wallet.ui.screen.contactBook.obsolete.root.ContactBookFragment
 import com.tari.android.wallet.ui.screen.debug.DebugNavigation
 import com.tari.android.wallet.ui.screen.debug.activity.DebugActivity
 import com.tari.android.wallet.ui.screen.home.HomeActivity

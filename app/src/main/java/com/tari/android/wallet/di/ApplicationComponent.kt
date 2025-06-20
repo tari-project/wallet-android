@@ -44,11 +44,11 @@ import com.tari.android.wallet.ui.screen.auth.AuthViewModel
 import com.tari.android.wallet.ui.screen.biometrics.ChangeBiometricsViewModel
 import com.tari.android.wallet.ui.screen.chat.chatDetails.ChatDetailsViewModel
 import com.tari.android.wallet.ui.screen.chat.chatList.ChatListViewModel
-import com.tari.android.wallet.ui.screen.contactBook.contactSelection.ContactSelectionViewModel
-import com.tari.android.wallet.ui.screen.contactBook.contacts.ContactsViewModel
-import com.tari.android.wallet.ui.screen.contactBook.details.ContactDetailsViewModel
-import com.tari.android.wallet.ui.screen.contactBook.link.ContactLinkViewModel
-import com.tari.android.wallet.ui.screen.contactBook.root.ContactBookViewModel
+import com.tari.android.wallet.ui.screen.contactBook.obsolete.contactSelection.ContactSelectionViewModel
+import com.tari.android.wallet.ui.screen.contactBook.obsolete.contacts.ContactsViewModel
+import com.tari.android.wallet.ui.screen.contactBook.obsolete.details.ContactDetailsViewModel
+import com.tari.android.wallet.ui.screen.contactBook.obsolete.link.ContactLinkViewModel
+import com.tari.android.wallet.ui.screen.contactBook.obsolete.root.ContactBookViewModel
 import com.tari.android.wallet.ui.screen.debug.sampleDesign.SampleDesignSystemViewModel
 import com.tari.android.wallet.ui.screen.home.HomeViewModel
 import com.tari.android.wallet.ui.screen.home.overview.HomeOverviewViewModel
