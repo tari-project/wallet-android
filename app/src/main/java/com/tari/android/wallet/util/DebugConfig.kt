@@ -134,6 +134,19 @@ object MockDataStub {
         "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.",
     )
 
+    private val RANDOM_NAMES = listOf(
+        "Alice",
+        "Bob",
+        "Charlie",
+        "David",
+        "Eve",
+        "Frank",
+        "Grace",
+        "Heidi",
+        "Ivan",
+        "Judy",
+    )
+
     fun createContact(
         walletAddress: TariWalletAddress = WALLET_ADDRESS,
         alias: String = "Alice",
@@ -141,6 +154,16 @@ object MockDataStub {
         walletAddress = walletAddress,
         alias = alias,
     )
+
+    fun createContactList(count: Int = 20) = List(count) {
+        createContact(
+            walletAddress = WALLET_ADDRESS.copy(
+                fullBase58 = WALLET_ADDRESS.fullBase58 + it,
+                fullEmojiId = WALLET_ADDRESS.fullEmojiId + it,
+            ),
+            alias = RANDOM_NAMES.random() + " $it",
+        )
+    }
 
     fun createUtxoList() = List(20) {
         UtxosViewHolderItem(

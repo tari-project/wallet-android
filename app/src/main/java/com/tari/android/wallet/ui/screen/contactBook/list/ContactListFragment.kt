@@ -20,6 +20,8 @@ class ContactListFragment : CommonFragment<ContactListViewModel>() {
                 uiState = state,
                 onBackClick = { viewModel.onBackPressed() },
                 onAddContactClick = { viewModel.onAddContactClicked() },
+                onSearchQueryChange = { viewModel.onQueryChange(it) },
+                onContactItemClick = { viewModel.onContactItemClicked(it) },
             )
         }
     }

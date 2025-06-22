@@ -830,6 +830,9 @@
     <string name="contact_details_empty_name_dialog_button">Will do!</string>
     <string name="contact_book_empty_title">Stay connected!</string>
     <string name="contact_book_empty_description">Save your friends and favourite\ncontacts right here!</string>
+    <string name="contact_book_recents">Recents</string>
+    <string name="contact_book_contacts">Contacts</string>
+    <string name="contact_book_no_alias">(no alias associated)</string>
 
     <string name="share_success_title">Profile Shared</string>
     <string name="share_success_message">Awesome! Your details have been shared successfully.</string>
