@@ -1,4 +1,4 @@
-package com.tari.android.wallet.ui.screen.contactBook.addressPoisoning
+package com.tari.android.wallet.application.addressPoisoning
 
 import com.tari.android.wallet.data.contacts.Contact
 

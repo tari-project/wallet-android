@@ -5,6 +5,8 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.YatAdapter
+import com.tari.android.wallet.application.addressPoisoning.AddressPoisoningChecker
+import com.tari.android.wallet.application.addressPoisoning.SimilarAddressDto
 import com.tari.android.wallet.application.deeplinks.DeepLink
 import com.tari.android.wallet.data.chat.ChatItemDto
 import com.tari.android.wallet.data.chat.ChatsRepository
@@ -22,8 +24,6 @@ import com.tari.android.wallet.ui.component.clipboardController.WalletAddressVie
 import com.tari.android.wallet.ui.dialog.modular.modules.addressPoisoning.AddressPoisoningModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonStyle
-import com.tari.android.wallet.ui.screen.contactBook.addressPoisoning.AddressPoisoningChecker
-import com.tari.android.wallet.ui.screen.contactBook.addressPoisoning.SimilarAddressDto
 import com.tari.android.wallet.ui.screen.contactBook.obsolete.contactSelection.ContactSelectionModel.Effect
 import com.tari.android.wallet.ui.screen.contactBook.obsolete.contactSelection.ContactSelectionModel.YatState
 import com.tari.android.wallet.ui.screen.contactBook.obsolete.contacts.adapter.contact.ContactItemViewHolderItem

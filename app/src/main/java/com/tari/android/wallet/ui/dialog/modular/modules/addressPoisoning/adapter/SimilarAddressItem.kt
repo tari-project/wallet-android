@@ -1,7 +1,7 @@
 package com.tari.android.wallet.ui.dialog.modular.modules.addressPoisoning.adapter
 
+import com.tari.android.wallet.application.addressPoisoning.SimilarAddressDto
 import com.tari.android.wallet.ui.common.recyclerView.CommonViewHolderItem
-import com.tari.android.wallet.ui.screen.contactBook.addressPoisoning.SimilarAddressDto
 import java.util.Date
 
 data class SimilarAddressItem(

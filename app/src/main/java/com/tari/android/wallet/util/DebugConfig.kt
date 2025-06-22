@@ -35,6 +35,7 @@
 package com.tari.android.wallet.util
 
 import com.tari.android.wallet.BuildConfig
+import com.tari.android.wallet.application.addressPoisoning.SimilarAddressDto
 import com.tari.android.wallet.data.chat.ChatItemDto
 import com.tari.android.wallet.data.chat.ChatMessageItemDto
 import com.tari.android.wallet.data.contacts.Contact
@@ -51,7 +52,6 @@ import com.tari.android.wallet.model.tx.CancelledTx
 import com.tari.android.wallet.model.tx.CompletedTx
 import com.tari.android.wallet.model.tx.PendingOutboundTx
 import com.tari.android.wallet.model.tx.Tx
-import com.tari.android.wallet.ui.screen.contactBook.addressPoisoning.SimilarAddressDto
 import com.tari.android.wallet.ui.screen.utxos.list.adapters.UtxosViewHolderItem
 import com.tari.android.wallet.util.extension.minusHours
 import com.tari.android.wallet.util.extension.toMicroTari
