@@ -35,11 +35,10 @@ import com.tari.android.wallet.ui.screen.auth.FeatureAuthFragment
 import com.tari.android.wallet.ui.screen.biometrics.ChangeBiometricsFragment
 import com.tari.android.wallet.ui.screen.chat.addChat.AddChatFragment
 import com.tari.android.wallet.ui.screen.chat.chatDetails.ChatDetailsFragment
+import com.tari.android.wallet.ui.screen.contactBook.details.ContactDetailsFragment
 import com.tari.android.wallet.ui.screen.contactBook.list.ContactListFragment
 import com.tari.android.wallet.ui.screen.contactBook.obsolete.add.AddContactFragment
 import com.tari.android.wallet.ui.screen.contactBook.obsolete.add.SelectUserContactFragment
-import com.tari.android.wallet.ui.screen.contactBook.obsolete.details.ContactDetailsFragment
-import com.tari.android.wallet.ui.screen.contactBook.obsolete.link.ContactLinkFragment
 import com.tari.android.wallet.ui.screen.contactBook.obsolete.root.ContactBookFragment
 import com.tari.android.wallet.ui.screen.debug.DebugNavigation
 import com.tari.android.wallet.ui.screen.debug.activity.DebugActivity
@@ -113,14 +112,12 @@ class TariNavigator @Inject constructor(
             is Auth.BackAfterAuth -> backAfterAuth()
 
             is ContactBook.AllContacts -> addFragment(ContactListFragment())
+            is ContactBook.ContactDetails -> addFragment(ContactDetailsFragment.createFragment(navigation.contact))
             is ContactBook.ToAddContact -> addFragment(AddContactFragment())
-            is ContactBook.ToContactDetails -> addFragment(ContactDetailsFragment.createFragment(navigation.contact))
             is ContactBook.ToRequestTari -> sendToUser(navigation.contact)
             is ContactBook.ToSendTari -> sendToUser(navigation.contact)
-            is ContactBook.ToLinkContact -> addFragment(ContactLinkFragment.createFragment(navigation.contact))
             is ContactBook.BackToContactBook -> popUpTo(ContactBookFragment::class.java.simpleName)
             is ContactBook.ToExternalWallet -> toExternalWallet(navigation.connectedWallet)
-            is ContactBook.ToContactTransactionHistory -> addFragment(TxHistoryFragment.newInstance(navigation.contact))
             is ContactBook.ToAddPhoneContact -> toAddPhoneContact()
             is ContactBook.ToSelectTariUser -> addFragment(SelectUserContactFragment.newInstance())
 

@@ -30,7 +30,7 @@ class ContactsRepository @Inject constructor(
         contactToUpdate: Contact,
         alias: String?,
     ): Contact {
-        val newContact = contactToUpdate.copy(alias = alias)
+        val newContact = contactToUpdate.copy(alias = alias?.trim())
 
         if (newContact.alias == null) {
             contactsDb.deleteContact(contactToUpdate.walletAddress.fullBase58)

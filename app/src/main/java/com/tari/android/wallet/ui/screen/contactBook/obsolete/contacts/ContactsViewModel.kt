@@ -77,7 +77,7 @@ class ContactsViewModel : CommonViewModel() {
                 contactSelectionRepository.toggle(item)
                 refresh()
             } else {
-                tariNavigator.navigate(Navigation.ContactBook.ToContactDetails(item.contact))
+                tariNavigator.navigate(Navigation.ContactBook.ContactDetails(item.contact))
             }
         }
     }

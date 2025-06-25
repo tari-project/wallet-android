@@ -7,7 +7,6 @@ import android.view.ViewGroup
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.fragment.app.viewModels
-import com.tari.android.wallet.data.contacts.Contact
 import com.tari.android.wallet.ui.common.CommonFragment
 import com.tari.android.wallet.ui.compose.TariDesignSystem
 import com.tari.android.wallet.util.extension.composeContent
@@ -35,10 +34,7 @@ class TxHistoryFragment : CommonFragment<TxHistoryViewModel>() {
     }
 
     companion object {
-        const val PARAMETER_CONTACT = "PARAMETER_CONTACT"
 
-        fun newInstance(contact: Contact? = null): TxHistoryFragment = TxHistoryFragment().apply {
-            arguments = Bundle().apply { putParcelable(PARAMETER_CONTACT, contact) }
-        }
+        fun newInstance(): TxHistoryFragment = TxHistoryFragment()
     }
 }

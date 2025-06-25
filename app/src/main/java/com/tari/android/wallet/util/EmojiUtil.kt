@@ -43,6 +43,20 @@ import com.tari.android.wallet.util.extension.applyColorStyle
 import com.tari.android.wallet.util.extension.applyLetterSpacingStyle
 import com.tari.android.wallet.util.extension.applyRelativeTextSizeStyle
 
+private val DEFAULT_EMOJI_SET = mutableSetOf(
+    "🐢", "📟", "🌈", "🌊", "🎯", "🐋", "🌙", "🤔", "🌕", "⭐", "🎋", "🌰", "🌴", "🌵",
+    "🌲", "🌸", "🌹", "🌻", "🌽", "🍀", "🍁", "🍄", "🥑", "🍆", "🍇", "🍈", "🍉", "🍊", "🍋", "🍌", "🍍", "🍎", "🍐", "🍑", "🍒", "🍓",
+    "🍔", "🍕", "🍗", "🍚", "🍞", "🍟", "🥝", "🍣", "🍦", "🍩", "🍪", "🍫", "🍬", "🍭", "🍯", "🥐", "🍳", "🥄", "🍵", "🍶", "🍷", "🍸",
+    "🍾", "🍺", "🍼", "🎀", "🎁", "🎂", "🎃", "🤖", "🎈", "🎉", "🎒", "🎓", "🎠", "🎡", "🎢", "🎣", "🎤", "🎥", "🎧", "🎨", "🎩", "🎪",
+    "🎬", "🎭", "🎮", "🎰", "🎱", "🎲", "🎳", "🎵", "🎷", "🎸", "🎹", "🎺", "🎻", "🎼", "🎽", "🎾", "🎿", "🏀", "🏁", "🏆", "🏈", "⚽",
+    "🏠", "🏥", "🏦", "🏭", "🏰", "🐀", "🐉", "🐊", "🐌", "🐍", "🦁", "🐐", "🐑", "🐔", "🙈", "🐗", "🐘", "🐙", "🐚", "🐛", "🐜", "🐝",
+    "🐞", "🦋", "🐣", "🐨", "🦀", "🐪", "🐬", "🐭", "🐮", "🐯", "🐰", "🦆", "🦂", "🐴", "🐵", "🐶", "🐷", "🐸", "🐺", "🐻", "🐼", "🐽",
+    "🐾", "👀", "👅", "👑", "👒", "🧢", "💅", "👕", "👖", "👗", "👘", "👙", "💃", "👛", "👞", "👟", "👠", "🥊", "👢", "👣", "🤡", "👻",
+    "👽", "👾", "🤠", "👃", "💄", "💈", "💉", "💊", "💋", "👂", "💍", "💎", "💐", "💔", "🔒", "🧩", "💡", "💣", "💤", "💦", "💨", "💩",
+    "➕", "💯", "💰", "💳", "💵", "💺", "💻", "💼", "📈", "📜", "📌", "📎", "📖", "📿", "📡", "⏰", "📱", "📷", "🔋", "🔌", "🚰", "🔑",
+    "🔔", "🔥", "🔦", "🔧", "🔨", "🔩", "🔪", "🔫", "🔬", "🔭", "🔮", "🔱", "🗽", "😂", "😇", "😈", "🤑", "😍", "😎", "😱", "😷", "🤢",
+    "👍", "👶", "🚀", "🚁", "🚂", "🚚", "🚑", "🚒", "🚓", "🛵", "🚗", "🚜", "🚢", "🚦", "🚧", "🚨", "🚪", "🚫", "🚲", "🚽", "🚿", "🧲"
+)
 
 /**
  * @return true if there is at least 1 character that is not included in the Tari emoji set.
@@ -71,7 +85,9 @@ fun EmojiId.containsNonEmoji(emojiSet: Set<EmojiId> = EmojiUtil.FFI_EMOJI_SET): 
 /**
  * @return emojis in the string that are from the Tari emoji set
  */
-fun EmojiId.extractEmojis(emojiSet: Set<String> = EmojiUtil.FFI_EMOJI_SET): List<EmojiId> {
+fun EmojiId.extractEmojis(): List<EmojiId> {
+    // This is a workaround for Compose Preview, since we cannot use FFI in the preview for evaluating the @EmojiUtil.FFI_EMOJI_SET.
+    val emojiSet: Set<String> = runCatching { EmojiUtil.FFI_EMOJI_SET }.getOrElse { DEFAULT_EMOJI_SET }
     // iterate through the codepoints
     val it: BreakIterator = BreakIterator.getCharacterInstance()
     it.setText(this)
@@ -299,4 +315,9 @@ fun TariWalletAddress.shortString(): String = this.addressPrefixEmojis() + "|" +
  */
 fun TariWalletAddress.base58Ellipsized(charCount: Int = 6): String {
     return fullBase58.substring(0, charCount) + "..." + fullBase58.substring(fullBase58.length - charCount)
+}
+
+fun TariWalletAddress.emojiIdEllipsized(charCount: Int = 6): String {
+    return fullEmojiId.extractEmojis().take(charCount).joinToString("") + "..." +
+            fullEmojiId.extractEmojis().takeLast(charCount).joinToString("")
 }

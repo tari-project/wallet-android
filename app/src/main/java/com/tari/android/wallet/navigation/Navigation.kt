@@ -94,15 +94,13 @@ sealed class Navigation {
 
     sealed class ContactBook : Navigation() {
         data object AllContacts : ContactBook()
-        data class ToContactDetails(val contact: Contact) : ContactBook()
+        data class ContactDetails(val contact: Contact) : ContactBook()
         data object ToAddContact : ContactBook()
         data object ToAddPhoneContact : ContactBook()
         data class ToSendTari(val contact: Contact) : ContactBook()
         data object ToSelectTariUser : ContactBook()
         data class ToRequestTari(val contact: Contact) : ContactBook()
         data class ToExternalWallet(val connectedWallet: ConnectedWallet) : ContactBook()
-        data class ToLinkContact(val contact: Contact) : ContactBook()
-        data class ToContactTransactionHistory(val contact: Contact) : ContactBook()
         data object BackToContactBook : ContactBook()
     }
 }

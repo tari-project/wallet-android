@@ -45,8 +45,6 @@ import com.tari.android.wallet.ui.dialog.modular.modules.shareOptions.ShareOptio
 import com.tari.android.wallet.ui.dialog.modular.modules.shareOptions.ShareOptionsModuleView
 import com.tari.android.wallet.ui.dialog.modular.modules.shareQr.ShareQRCodeModuleView
 import com.tari.android.wallet.ui.dialog.modular.modules.shareQr.ShareQrCodeModule
-import com.tari.android.wallet.ui.dialog.modular.modules.shortEmoji.ShortEmojiIdModule
-import com.tari.android.wallet.ui.dialog.modular.modules.shortEmoji.ShortEmojiModuleView
 import com.tari.android.wallet.ui.dialog.modular.modules.space.SpaceModule
 import com.tari.android.wallet.ui.dialog.modular.modules.space.SpaceModuleView
 import com.tari.android.wallet.ui.screen.settings.backup.learnMore.module.BackupLearnMoreItemModule
@@ -162,7 +160,6 @@ open class ModularDialog(context: Activity) {
                 is SecurityStageHeadModule -> SecurityStageHeadModuleView(context, module)
                 is BackupLearnMoreItemModule -> BackupLearnMoreItemModuleView(context, module)
                 is InputModule -> InputModuleView(context, module)
-                is ShortEmojiIdModule -> ShortEmojiModuleView(context, module)
                 is IconModule -> IconModuleView(context, module)
                 is AddressPoisoningModule -> AddressPoisoningModuleView(context, module)
                 is AddressDetailsModule -> AddressDetailsModuleView(context, module)
