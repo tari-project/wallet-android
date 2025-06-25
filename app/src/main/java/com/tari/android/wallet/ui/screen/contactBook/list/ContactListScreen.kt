@@ -173,7 +173,7 @@ private fun EmptyState(modifier: Modifier, onAddContactClick: () -> Unit) {
         Spacer(Modifier.size(24.dp))
         TariPrimaryButton(
             size = TariButtonSize.Small,
-            text = stringResource(R.string.contact_book_add_title),
+            text = stringResource(R.string.contact_book_empty_add_contact),
             onClick = onAddContactClick,
         )
     }

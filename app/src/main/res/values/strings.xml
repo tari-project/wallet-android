@@ -755,7 +755,6 @@
 
     <!-- Contact book -->
     <string name="contact_book_contacts_book_title">Contact Book</string>
-    <string name="contact_book_add_title">Add Contact</string>
     <string name="contact_book_contacts_title">Contacts</string>
     <string name="contact_book_favorites_title">Favorites</string>
     <string name="contact_book_add_contact_title">Add Contact</string>
@@ -767,16 +766,12 @@
     <string name="contact_book_select_contact_cant_send_to_yourself_title">Can’t send Tari to yourself</string>
     <string name="contact_book_select_contact_cant_send_to_yourself_description">You can’t send Tari to your own Tari wallet address</string>
     <string name="contact_book_search_hint">Find Contact</string>
-    <string name="contact_book_details_send_tari">Send Tari</string>
     <string name="transaction_send_to">Send To</string>
-    <string name="contact_book_details_add_to_favorites">Add to Favorites</string>
-    <string name="contact_book_details_remove_from_favorites">Remove from Favorites</string>
     <string name="contact_book_details_phone_contacts">Phone Contact</string>
     <string name="contact_book_details_connected_wallets_bitcoin">Open Bitcoin Wallet</string>
     <string name="contact_book_details_connected_wallets_etherium">Open Etherium Wallet</string>
     <string name="contact_book_details_connected_wallets_monero">Open Monero Wallet</string>
     <string name="contact_book_details_connected_wallets_no_application">Unfortunately, there are no applications that could open this type of address. Try to install corresponding application</string>
-    <string name="contact_book_details_edit">Edit</string>
     <string name="contact_book_details_edit_title">Edit Contact</string>
     <string name="contact_book_empty_state_title"><![CDATA[Find your <b>friends</b>]]></string>
     <string name="contact_book_empty_state_body_no_permissions"><![CDATA[You can <b>add a new contact</b> by tapping on the "add contact" icon at the top of the page. Tari Universe Wallet can also automatically detect contacts with Tari addresses on you phone. We’ll need your permission to access your existing contact book to do this]]></string>
@@ -795,6 +790,7 @@
     <string name="contact_book_default_alias">Tari user %s</string>
     <string name="contact_book_empty_title">Stay connected!</string>
     <string name="contact_book_empty_description">Save your friends and favourite\ncontacts right here!</string>
+    <string name="contact_book_empty_add_contact">Add Contact</string>
     <string name="contact_book_recents">Recents</string>
     <string name="contact_book_contacts">Contacts</string>
     <string name="contact_book_no_alias">(no alias associated)</string>
