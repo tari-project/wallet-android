@@ -3,10 +3,7 @@ package com.tari.android.wallet.navigation
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.provider.ContactsContract
-import androidx.core.net.toUri
 import com.tari.android.wallet.application.YatAdapter
-import com.tari.android.wallet.application.YatAdapter.ConnectedWallet
 import com.tari.android.wallet.data.contacts.Contact
 import com.tari.android.wallet.model.MicroTari
 import com.tari.android.wallet.model.TariWalletAddress
@@ -114,11 +111,8 @@ class TariNavigator @Inject constructor(
             is ContactBook.AllContacts -> addFragment(ContactListFragment())
             is ContactBook.ContactDetails -> addFragment(ContactDetailsFragment.createFragment(navigation.contact))
             is ContactBook.ToAddContact -> addFragment(AddContactFragment())
-            is ContactBook.ToRequestTari -> sendToUser(navigation.contact)
             is ContactBook.ToSendTari -> sendToUser(navigation.contact)
             is ContactBook.BackToContactBook -> popUpTo(ContactBookFragment::class.java.simpleName)
-            is ContactBook.ToExternalWallet -> toExternalWallet(navigation.connectedWallet)
-            is ContactBook.ToAddPhoneContact -> toAddPhoneContact()
             is ContactBook.ToSelectTariUser -> addFragment(SelectUserContactFragment.newInstance())
 
             is AllSettings.ToBugReporting -> DebugActivity.launch(currentActivity, DebugNavigation.BugReport)
@@ -235,10 +229,6 @@ class TariNavigator @Inject constructor(
         addFragment(ChatDetailsFragment.newInstance(walletAddress))
     }
 
-    private fun toAddPhoneContact() {
-        currentActivity.startActivity(Intent(Intent.ACTION_INSERT, ContactsContract.Contacts.CONTENT_URI))
-    }
-
     private fun toBaseNodeSelection() = addFragment(ChangeBaseNodeFragment())
 
     private fun continueToFinalizeSendTx(transactionData: TransactionData) {
@@ -246,21 +236,6 @@ class TariNavigator @Inject constructor(
             yatAdapter.showOutcomingFinalizeActivity(this.currentActivity, transactionData)
         } else {
             addFragment(FinalizeSendTxFragment.create(transactionData))
-        }
-    }
-
-    private fun toExternalWallet(connectedWallet: ConnectedWallet) {
-        runCatching {
-            val externalAddress = connectedWallet.getExternalLink()
-            val intent = Intent(Intent.ACTION_VIEW, externalAddress.toUri())
-
-            if (intent.resolveActivity(currentActivity.packageManager) != null) {
-                currentActivity.startActivity(intent)
-            } else {
-                currentActivity.viewModel.showWalletErrorDialog()
-            }
-        }.onFailure {
-            currentActivity.viewModel.showWalletErrorDialog()
         }
     }
 

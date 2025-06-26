@@ -1,7 +1,6 @@
 package com.tari.android.wallet.navigation
 
 import android.net.Uri
-import com.tari.android.wallet.application.YatAdapter.ConnectedWallet
 import com.tari.android.wallet.data.contacts.Contact
 import com.tari.android.wallet.model.MicroTari
 import com.tari.android.wallet.model.TariWalletAddress
@@ -96,11 +95,8 @@ sealed class Navigation {
         data object AllContacts : ContactBook()
         data class ContactDetails(val contact: Contact) : ContactBook()
         data object ToAddContact : ContactBook()
-        data object ToAddPhoneContact : ContactBook()
         data class ToSendTari(val contact: Contact) : ContactBook()
         data object ToSelectTariUser : ContactBook()
-        data class ToRequestTari(val contact: Contact) : ContactBook()
-        data class ToExternalWallet(val connectedWallet: ConnectedWallet) : ContactBook()
         data object BackToContactBook : ContactBook()
     }
 }

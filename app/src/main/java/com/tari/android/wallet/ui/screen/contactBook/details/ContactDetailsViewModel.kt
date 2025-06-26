@@ -53,13 +53,11 @@ class ContactDetailsViewModel(savedState: SavedStateHandle) : CommonViewModel() 
     }
 
     fun onSendTariClicked() {
-//        tariNavigator.navigate(Navigation.ContactBook.ToSelectTariUser)
-        showNotReadyYetDialog()
+        tariNavigator.navigate(Navigation.ContactBook.ToSendTari(uiState.value.contact))
     }
 
     fun onRequestTariClicked() {
-//        tariNavigator.navigate(Navigation.TxList.ToReceive)
-        showNotReadyYetDialog()
+        tariNavigator.navigate(Navigation.AllSettings.ToRequestTari)
     }
 
     fun onEmojiCopyClick() {
