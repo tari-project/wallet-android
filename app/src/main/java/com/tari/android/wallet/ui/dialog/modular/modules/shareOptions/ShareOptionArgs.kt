@@ -1,4 +1,4 @@
-package com.tari.android.wallet.ui.screen.contactBook.obsolete.root.share
+package com.tari.android.wallet.ui.dialog.modular.modules.shareOptions
 
 import com.tari.android.wallet.infrastructure.ShareType
 

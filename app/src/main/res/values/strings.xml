@@ -209,7 +209,6 @@
     <string name="tx_list_now">Now</string>
 
     <!-- send tari -->
-    <string name="send_tari_title">Send To</string>
     <string name="send_tari">Send Tari</string>
     <string name="request_tari_title">Receive Tari</string>
     <string name="request_tari">Request Tari</string>
@@ -755,10 +754,14 @@
 
     <!-- Contact book -->
     <string name="contact_book_contacts_book_title">Contact Book</string>
-    <string name="contact_book_contacts_title">Contacts</string>
-    <string name="contact_book_favorites_title">Favorites</string>
     <string name="contact_book_add_contact_title">Add Contact</string>
     <string name="contact_book_add_contact_first_name_hint">Add Name</string>
+    <string name="contact_book_add_contact_alias_field_title">Name *</string>
+    <string name="contact_book_add_contact_alias_field_hint">Enter contact name</string>
+    <string name="contact_book_add_contact_address_field_title">Address *</string>
+    <string name="contact_book_add_contact_address_field_hint">Recipient address</string>
+    <string name="contact_book_add_contact_address_field_error_text">Invalid wallet address</string>
+    <string name="contact_book_add_contact_save_button">Save Contact</string>
     <string name="contact_book_add_contact_placeholder">Enter Emoji ID, Contact Name or Yat</string>
     <string name="contact_book_add_contact_placeholder_no_yat">Scan QR code or Enter Address</string>
     <string name="contact_book_add_contact_cant_add_yourself_title">Can’t add yourself</string>
@@ -767,22 +770,13 @@
     <string name="contact_book_select_contact_cant_send_to_yourself_description">You can’t send Tari to your own Tari wallet address</string>
     <string name="contact_book_search_hint">Find Contact</string>
     <string name="transaction_send_to">Send To</string>
-    <string name="contact_book_details_phone_contacts">Phone Contact</string>
     <string name="contact_book_details_connected_wallets_bitcoin">Open Bitcoin Wallet</string>
     <string name="contact_book_details_connected_wallets_etherium">Open Etherium Wallet</string>
     <string name="contact_book_details_connected_wallets_monero">Open Monero Wallet</string>
     <string name="contact_book_details_connected_wallets_no_application">Unfortunately, there are no applications that could open this type of address. Try to install corresponding application</string>
     <string name="contact_book_details_edit_title">Edit Contact</string>
-    <string name="contact_book_empty_state_title"><![CDATA[Find your <b>friends</b>]]></string>
-    <string name="contact_book_empty_state_body_no_permissions"><![CDATA[You can <b>add a new contact</b> by tapping on the "add contact" icon at the top of the page. Tari Universe Wallet can also automatically detect contacts with Tari addresses on you phone. We’ll need your permission to access your existing contact book to do this]]></string>
-    <string name="contact_book_empty_state_favorites_title"><![CDATA[Add some <b>favorites</b>]]></string>
-    <string name="contact_book_empty_state_favorites_body"><![CDATA[You can <b>favorite contacts</b> to easily access them later. Tap on the contact’s name and then on the star icon to add them to your favorites list]]></string>
-    <string name="contact_book_empty_state_grant_access_button">Grant app access to my contacts</string>
     <string name="contact_book_add_contact_done_button">Done</string>
     <string name="contact_book_add_contact_next_button">Next</string>
-    <string name="contact_book_type_ffi">Tari Contact</string>
-    <string name="contact_book_type_contact_book">Phone Contact</string>
-    <string name="contact_book_type_merged">Linked Contact</string>
     <string name="share_contact_via_qr_code">QR Code</string>
     <string name="share_contact_via_qr_link">Link</string>
     <string name="wallet_info_alias_edit_title">Edit Name</string>

@@ -10,6 +10,8 @@ import com.tari.android.wallet.ui.screen.send.common.TransactionData
 
 sealed class Navigation {
 
+    data object Back : Navigation()
+
     data class EnterPinCode(val behavior: PinCodeScreenBehavior, val stashedPin: String? = null) : Navigation()
     data object ChangeBiometrics : Navigation()
     data class SplashScreen(val seedWords: List<String>? = null, val clearTop: Boolean = true, val uri: Uri? = null) : Navigation()
@@ -55,7 +57,6 @@ sealed class Navigation {
         data object ToUtxos : TxList()
         data class ToSendTariToUser(val contact: Contact, val amount: MicroTari? = null, val note: String = "") : TxList()
         data object HomeTransactionHistory : TxList()
-        data object ToTransfer : TxList()
         data object ToReceive : TxList()
     }
 
@@ -94,9 +95,8 @@ sealed class Navigation {
     sealed class ContactBook : Navigation() {
         data object AllContacts : ContactBook()
         data class ContactDetails(val contact: Contact) : ContactBook()
-        data object ToAddContact : ContactBook()
+        data object AddContact : ContactBook()
         data class ToSendTari(val contact: Contact) : ContactBook()
         data object ToSelectTariUser : ContactBook()
-        data object BackToContactBook : ContactBook()
     }
 }

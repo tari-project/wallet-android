@@ -15,6 +15,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -60,6 +61,15 @@ fun ContactListScreen(
             TariTopBar(
                 title = stringResource(R.string.contact_book_contacts_book_title),
                 onBack = onBackClick,
+                action = {
+                    IconButton(onClick = onAddContactClick) {
+                        Icon(
+                            painter = painterResource(R.drawable.vector_add_contact),
+                            contentDescription = null,
+                            tint = TariDesignSystem.colors.componentsNavbarIcons,
+                        )
+                    }
+                },
             )
         }
     ) { paddingValues ->

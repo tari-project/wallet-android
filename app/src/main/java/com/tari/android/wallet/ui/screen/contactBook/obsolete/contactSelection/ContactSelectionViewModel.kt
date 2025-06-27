@@ -32,7 +32,6 @@ import com.tari.android.wallet.util.EmojiUtil.Companion.getGraphemeLength
 import com.tari.android.wallet.util.extension.collectFlow
 import com.tari.android.wallet.util.extension.launchOnIo
 import com.tari.android.wallet.util.extension.launchOnMain
-import com.tari.android.wallet.util.extension.switchToMain
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -178,21 +177,6 @@ class ContactSelectionViewModel : CommonViewModel() {
 
     fun onContinueButtonClick(effect: ContinueButtonEffect) {
         when (effect) {
-            is ContinueButtonEffect.AddContact -> {
-                val user = getUserDto()
-
-                if (user.walletAddress == corePrefRepository.walletAddress) {
-                    showCantAddYourselfDialog()
-                } else {
-                    launchOnIo {
-                        contactsRepository.updateContactInfo(user, effect.name)
-                        switchToMain {
-                            tariNavigator.navigate(Navigation.ContactBook.BackToContactBook)
-                        }
-                    }
-                }
-            }
-
             is ContinueButtonEffect.SelectUserContact -> {
                 val user = getUserDto()
                 if (user.walletAddress == corePrefRepository.walletAddress) {
@@ -218,13 +202,6 @@ class ContactSelectionViewModel : CommonViewModel() {
         deselectTariWalletAddress()
     }
 
-    private fun showCantAddYourselfDialog() {
-        showSimpleDialog(
-            title = resourceManager.getString(R.string.contact_book_add_contact_cant_add_yourself_title),
-            description = resourceManager.getString(R.string.contact_book_add_contact_cant_add_yourself_description),
-        )
-    }
-
     private fun showCantSendYourselfDialog() {
         showSimpleDialog(
             title = resourceManager.getString(R.string.contact_book_select_contact_cant_send_to_yourself_title),
@@ -243,10 +220,6 @@ class ContactSelectionViewModel : CommonViewModel() {
         searchText.value ?: return
 
         var list = source.filter { additionalFilter.invoke(it) }
-//        FIXME: This is a temporary fix until we implement contact database properly
-//        val resentUsed = list.filter { it.contact.getFFIContactInfo()?.lastUsedTimeMillis != null }
-//            .sortedByDescending { it.contact.getFFIContactInfo()?.lastUsedTimeMillis }
-//            .take(Constants.Contacts.RECENT_CONTACTS_COUNT)
 
         val resentUsed = emptyList<ContactItemViewHolderItem>()
 
@@ -316,7 +289,6 @@ class ContactSelectionViewModel : CommonViewModel() {
     }
 
     sealed class ContinueButtonEffect {
-        data class AddContact(val name: String) : ContinueButtonEffect()
         data object SelectUserContact : ContinueButtonEffect()
         data object AddChat : ContinueButtonEffect()
     }

@@ -53,6 +53,19 @@ sealed class DeepLink : Parcelable {
     open fun getParams(): Map<String, String> = emptyMap()
     open fun getCommand(): String = ""
 
+    fun getAliasOrNull(): String? = when (this) {
+        is Contacts -> contacts.firstOrNull()?.alias
+        is UserProfile -> alias
+        else -> null
+    }
+
+    fun getTariAddressOrNull(): Base58? = when (this) {
+        is Contacts -> contacts.firstOrNull()?.tariAddress
+        is Send -> walletAddress
+        is UserProfile -> tariAddress
+        else -> null
+    }
+
     // tari://esmeralda/contacts?list[0][alias]=Name&list[0][tariAddress]=tariAddress&list[1][alias]=Name&list[1][tariAddress]=tariAddress
     @Parcelize
     data class Contacts(val contacts: List<DeeplinkContact>) : DeepLink() {

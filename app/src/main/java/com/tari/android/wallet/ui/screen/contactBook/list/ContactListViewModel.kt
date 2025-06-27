@@ -38,7 +38,7 @@ class ContactListViewModel : CommonViewModel() {
     }
 
     fun onAddContactClicked() {
-        showNotReadyYetDialog()
+        tariNavigator.navigate(Navigation.ContactBook.AddContact)
     }
 
     fun onQueryChange(query: String) {

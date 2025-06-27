@@ -6,7 +6,6 @@ import com.tari.android.wallet.ui.common.recyclerView.ViewHolderBuilder
 import com.tari.android.wallet.ui.common.recyclerView.viewHolders.SpaceVerticalViewHolder
 import com.tari.android.wallet.ui.common.recyclerView.viewHolders.TitleViewHolder
 import com.tari.android.wallet.ui.screen.contactBook.obsolete.contacts.adapter.contact.ContactItemViewHolder
-import com.tari.android.wallet.ui.screen.contactBook.obsolete.contacts.adapter.emptyState.EmptyStateViewHolder
 import com.tari.android.wallet.ui.screen.settings.allSettings.title.SettingsTitleViewHolder
 
 class ContactListAdapter : CommonAdapter<CommonViewHolderItem>() {
@@ -14,7 +13,6 @@ class ContactListAdapter : CommonAdapter<CommonViewHolderItem>() {
         TitleViewHolder.getBuilder(),
         ContactItemViewHolder.getBuilder(),
         SettingsTitleViewHolder.getBuilder(),
-        EmptyStateViewHolder.getBuilder(),
         SpaceVerticalViewHolder.getBuilder(),
     )
 }

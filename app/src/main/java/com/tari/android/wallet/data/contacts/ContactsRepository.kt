@@ -48,6 +48,16 @@ class ContactsRepository @Inject constructor(
         return newContact
     }
 
+    suspend fun addContact(contact: Contact) {
+        contactsDb.upsertContact(
+            ContactsDb.ContactDto(
+                alias = contact.alias.orEmpty(),
+                walletAddressBase58 = contact.walletAddress.fullBase58,
+            ),
+        )
+        refreshContactList()
+    }
+
     suspend fun addContactList(contacts: List<Contact>) {
         contactsDb.upsertContactList(contacts.map { contact ->
             ContactsDb.ContactDto(
