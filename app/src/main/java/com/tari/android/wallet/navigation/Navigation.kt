@@ -3,7 +3,6 @@ package com.tari.android.wallet.navigation
 import android.net.Uri
 import com.tari.android.wallet.data.contacts.Contact
 import com.tari.android.wallet.model.MicroTari
-import com.tari.android.wallet.model.TariWalletAddress
 import com.tari.android.wallet.model.tx.Tx
 import com.tari.android.wallet.ui.screen.pinCode.PinCodeScreenBehavior
 import com.tari.android.wallet.ui.screen.send.common.TransactionData
@@ -58,11 +57,6 @@ sealed class Navigation {
         data class ToSendTariToUser(val contact: Contact, val amount: MicroTari? = null, val note: String = "") : TxList()
         data object HomeTransactionHistory : TxList()
         data object ToReceive : TxList()
-    }
-
-    sealed class Chat : Navigation() {
-        data object ToAddChat : Chat()
-        data class ToChat(val walletAddress: TariWalletAddress, val isNew: Boolean) : Chat()
     }
 
     sealed class TxSend : Navigation() {

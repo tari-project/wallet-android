@@ -8,8 +8,6 @@ import com.tari.android.wallet.application.YatAdapter
 import com.tari.android.wallet.application.addressPoisoning.AddressPoisoningChecker
 import com.tari.android.wallet.application.addressPoisoning.SimilarAddressDto
 import com.tari.android.wallet.application.deeplinks.DeepLink
-import com.tari.android.wallet.data.chat.ChatItemDto
-import com.tari.android.wallet.data.chat.ChatsRepository
 import com.tari.android.wallet.data.contacts.Contact
 import com.tari.android.wallet.data.contacts.ContactsRepository
 import com.tari.android.wallet.data.sharedPrefs.CorePrefRepository
@@ -38,7 +36,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import java.util.UUID
 import javax.inject.Inject
 
 class ContactSelectionViewModel : CommonViewModel() {
@@ -48,9 +45,6 @@ class ContactSelectionViewModel : CommonViewModel() {
 
     @Inject
     lateinit var contactsRepository: ContactsRepository
-
-    @Inject
-    lateinit var chatsRepository: ChatsRepository
 
     @Inject
     lateinit var addressPoisoningChecker: AddressPoisoningChecker
@@ -175,31 +169,13 @@ class ContactSelectionViewModel : CommonViewModel() {
         }
     }
 
-    fun onContinueButtonClick(effect: ContinueButtonEffect) {
-        when (effect) {
-            is ContinueButtonEffect.SelectUserContact -> {
-                val user = getUserDto()
-                if (user.walletAddress == corePrefRepository.walletAddress) {
-                    showCantSendYourselfDialog()
-                } else {
-                    tariNavigator.navigate(Navigation.TxList.ToSendTariToUser(user, amount.value))
-                }
-            }
-
-            is ContinueButtonEffect.AddChat -> {
-                val user = getUserDto()
-                val chatDto = ChatItemDto(UUID.randomUUID().toString(), listOf(), user.walletAddress)
-                chatsRepository.addChat(chatDto)
-
-                tariNavigator.navigate(Navigation.Chat.ToChat(user.walletAddress, true))
-            }
+    fun onContinueButtonClick() {
+        val user = getUserDto()
+        if (user.walletAddress == corePrefRepository.walletAddress) {
+            showCantSendYourselfDialog()
+        } else {
+            tariNavigator.navigate(Navigation.TxList.ToSendTariToUser(user, amount.value))
         }
-    }
-
-    fun parseDeeplink(deeplinkString: String) {
-        val deeplink = deeplinkManager.parseDeepLink(deeplinkString)!!
-        deeplinkManager.execute(this, deeplink)
-        deselectTariWalletAddress()
     }
 
     private fun showCantSendYourselfDialog() {
@@ -286,10 +262,5 @@ class ContactSelectionViewModel : CommonViewModel() {
 
     companion object {
         private const val YAT_MAX_LENGTH = 5
-    }
-
-    sealed class ContinueButtonEffect {
-        data object SelectUserContact : ContinueButtonEffect()
-        data object AddChat : ContinueButtonEffect()
     }
 }

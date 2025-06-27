@@ -9,14 +9,12 @@ import android.view.inputmethod.InputMethodManager
 import com.tari.android.wallet.application.YatAdapter
 import com.tari.android.wallet.data.contacts.Contact
 import com.tari.android.wallet.model.MicroTari
-import com.tari.android.wallet.model.TariWalletAddress
 import com.tari.android.wallet.navigation.Navigation.AllSettings
 import com.tari.android.wallet.navigation.Navigation.Auth
 import com.tari.android.wallet.navigation.Navigation.Back
 import com.tari.android.wallet.navigation.Navigation.BackToHome
 import com.tari.android.wallet.navigation.Navigation.BackupSettings
 import com.tari.android.wallet.navigation.Navigation.ChangeBiometrics
-import com.tari.android.wallet.navigation.Navigation.Chat
 import com.tari.android.wallet.navigation.Navigation.ContactBook
 import com.tari.android.wallet.navigation.Navigation.CustomBridge
 import com.tari.android.wallet.navigation.Navigation.EnterPinCode
@@ -34,8 +32,6 @@ import com.tari.android.wallet.ui.common.CommonFragment
 import com.tari.android.wallet.ui.screen.auth.AuthActivity
 import com.tari.android.wallet.ui.screen.auth.FeatureAuthFragment
 import com.tari.android.wallet.ui.screen.biometrics.ChangeBiometricsFragment
-import com.tari.android.wallet.ui.screen.chat.addChat.AddChatFragment
-import com.tari.android.wallet.ui.screen.chat.chatDetails.ChatDetailsFragment
 import com.tari.android.wallet.ui.screen.contactBook.add.AddContactFragment
 import com.tari.android.wallet.ui.screen.contactBook.details.ContactDetailsFragment
 import com.tari.android.wallet.ui.screen.contactBook.list.ContactListFragment
@@ -158,9 +154,6 @@ class TariNavigator @Inject constructor(
             is BackupSettings.ToLearnMore -> addFragment(BackupLearnMoreFragment())
 
             is CustomBridge.UploadQrCode -> Unit
-
-            is Chat.ToChat -> toChatDetail(navigation.walletAddress, navigation.isNew)
-            is Chat.ToAddChat -> addFragment(AddChatFragment())
         }
     }
 
@@ -228,13 +221,6 @@ class TariNavigator @Inject constructor(
         val tariAmount = amount ?: MicroTari(BigInteger.valueOf(innerAmount.toLong())).takeIf { innerAmount != Double.MIN_VALUE }
 
         addFragment(AddAmountFragment.newInstance(contact, tariAmount, note))
-    }
-
-    private fun toChatDetail(walletAddress: TariWalletAddress, isNew: Boolean) {
-        if (isNew) {
-            currentActivity.onBackPressed()
-        }
-        addFragment(ChatDetailsFragment.newInstance(walletAddress))
     }
 
     private fun toBaseNodeSelection() = addFragment(ChangeBaseNodeFragment())

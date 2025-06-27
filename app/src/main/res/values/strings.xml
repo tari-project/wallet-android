@@ -201,17 +201,12 @@
     <string name="tx_list_you_paid">You paid</string>
     <string name="tx_list_you_paid_with_alias">You paid %s</string>
     <string name="tx_list_paid_you">sent a payment</string>
-    <string name="tx_list_seconds_ago">%ds ago</string>
     <string name="tx_list_minutes_ago">%dm ago</string>
     <string name="tx_list_hours_ago">%dh ago</string>
-    <string name="tx_list_days_ago">%dd ago</string>
-    <string name="tx_list_just_now">Just now</string>
     <string name="tx_list_now">Now</string>
 
     <!-- send tari -->
-    <string name="send_tari">Send Tari</string>
     <string name="request_tari_title">Receive Tari</string>
-    <string name="request_tari">Request Tari</string>
     <string name="send_tari_subtitle">Send</string>
     <string name="request_tari_subtitle">Receive</string>
 
@@ -806,13 +801,7 @@
     <string name="contact_details_add_contact_alias_empty_error_title">Name can’t be empty</string>
     <string name="contact_details_add_contact_alias_empty_error_message">Every contact needs a name to help you identify them. Please add a name to continue.\nIf you want to delete the contact, you can use the Delete Contact button.</string>
 
-    <!--    Chat-->
-    <string name="chat_title">Messages</string>
-    <string name="chat_add_chat">New Chat</string>
-    <string name="chat_input_hint">Type message</string>
-    <string name="chat_empty_state_title">No messages yet</string>
-    <string name="chat_empty_state_description">Just tap the \'New Message\' icon up top to kick things off!</string>
-    <string name="chat_options_title">Options</string>
+
     <string name="unknown_source">Unknown source</string>
 
     <string name="pin_code_subtitle_create">Create a passcode</string>

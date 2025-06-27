@@ -36,8 +36,6 @@ package com.tari.android.wallet.util
 
 import com.tari.android.wallet.BuildConfig
 import com.tari.android.wallet.application.addressPoisoning.SimilarAddressDto
-import com.tari.android.wallet.data.chat.ChatItemDto
-import com.tari.android.wallet.data.chat.ChatMessageItemDto
 import com.tari.android.wallet.data.contacts.Contact
 import com.tari.android.wallet.data.tx.TxDto
 import com.tari.android.wallet.ffi.FFITxCancellationReason
@@ -53,13 +51,10 @@ import com.tari.android.wallet.model.tx.CompletedTx
 import com.tari.android.wallet.model.tx.PendingOutboundTx
 import com.tari.android.wallet.model.tx.Tx
 import com.tari.android.wallet.ui.screen.utxos.list.adapters.UtxosViewHolderItem
-import com.tari.android.wallet.util.extension.minusHours
 import com.tari.android.wallet.util.extension.toMicroTari
 import org.joda.time.DateTime
 import yat.android.lib.YatIntegration
 import java.math.BigInteger
-import java.util.Date
-import java.util.UUID
 import kotlin.random.Random
 
 /**
@@ -70,8 +65,6 @@ object DebugConfig {
     val mockUtxos = valueIfDebug(false)
 
     val mockTxs = valueIfDebug(false)
-
-    val mockChatMessages = valueIfDebug(false)
 
     val mockSeedPhraseSorting = valueIfDebug(false)
 
@@ -285,26 +278,7 @@ object MockDataStub {
             trusted = false,
         )
     }
-
-    fun createChatList(count: Int = 20) = List(count) {
-        ChatItemDto(
-            uuid = UUID.randomUUID().toString(),
-            messages = createChatMessages(Random.nextInt(1, 20)),
-            walletAddress = WALLET_ADDRESS,
-        )
-    }
-
-    fun createChatMessages(count: Int = 20) = List(count) {
-        ChatMessageItemDto(
-            message = RANDOM_MESSAGES.random(),
-            date = Date().minusHours(Random.nextInt(0, 100)),
-            isMine = Random.nextBoolean(),
-            isRead = Random.nextBoolean(0.9),
-        )
-    }
 }
-
-fun Random.nextBoolean(probability: Double): Boolean = nextDouble() <= probability
 
 object YatEnvironment {
     val SANDBOX = YatIntegration.Environment("https://a.yat.fyi/", "https://yat.fyi/")

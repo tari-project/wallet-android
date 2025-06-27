@@ -36,7 +36,6 @@ import android.content.SharedPreferences
 import com.tari.android.wallet.data.sharedPrefs.addressPoisoning.AddressPoisoningPrefRepository
 import com.tari.android.wallet.data.sharedPrefs.backup.BackupPrefRepository
 import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodePrefRepository
-import com.tari.android.wallet.data.sharedPrefs.chat.ChatsPrefRepository
 import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefBooleanDelegate
 import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefStringDelegate
 import com.tari.android.wallet.data.sharedPrefs.network.NetworkPrefRepository
@@ -72,7 +71,6 @@ class CorePrefRepository @Inject constructor(
     private val sentryPrefRepository: SentryPrefRepository,
     private val securityPrefRepository: SecurityPrefRepository,
     private val addressPoisoningSharedRepository: AddressPoisoningPrefRepository,
-    private val chatPrefRepository: ChatsPrefRepository,
 ) : CommonPrefRepository(networkRepository) {
 
     private object Key {
@@ -153,7 +151,6 @@ class CorePrefRepository @Inject constructor(
         sentryPrefRepository.clear()
         securityPrefRepository.clear()
         addressPoisoningSharedRepository.clear()
-        chatPrefRepository.clear()
         walletAddressBase58 = null
         emojiId = null
         onboardingStarted = false

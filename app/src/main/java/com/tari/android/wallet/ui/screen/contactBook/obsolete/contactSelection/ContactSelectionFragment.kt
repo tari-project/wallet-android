@@ -27,10 +27,8 @@ import com.tari.android.wallet.ui.common.domain.PaletteManager
 import com.tari.android.wallet.ui.common.recyclerView.CommonAdapter
 import com.tari.android.wallet.ui.component.clipboardController.ClipboardController
 import com.tari.android.wallet.ui.component.tari.toolbar.TariToolbarActionArg
-import com.tari.android.wallet.ui.screen.contactBook.obsolete.add.SelectUserContactFragment
 import com.tari.android.wallet.ui.screen.contactBook.obsolete.contactSelection.ContactSelectionModel.Effect
 import com.tari.android.wallet.ui.screen.contactBook.obsolete.contactSelection.ContactSelectionModel.YatState
-import com.tari.android.wallet.ui.screen.contactBook.obsolete.contactSelection.ContactSelectionViewModel.ContinueButtonEffect
 import com.tari.android.wallet.ui.screen.contactBook.obsolete.contacts.adapter.ContactListAdapter
 import com.tari.android.wallet.ui.screen.contactBook.obsolete.contacts.adapter.contact.ContactItemViewHolderItem
 import com.tari.android.wallet.ui.screen.qr.QrScannerSource
@@ -197,8 +195,8 @@ open class ContactSelectionFragment : CommonXmlFragment<FragmentContactsSelectio
     private fun showNextButton() {
         // Workaround for skipping the first click and redirect to the next screen
         // once the user selects a contact
-        if (!nextButtonShown && this is SelectUserContactFragment) {
-            viewModel.onContinueButtonClick(ContinueButtonEffect.SelectUserContact)
+        if (!nextButtonShown) {
+            viewModel.onContinueButtonClick()
         }
         nextButtonShown = true
 

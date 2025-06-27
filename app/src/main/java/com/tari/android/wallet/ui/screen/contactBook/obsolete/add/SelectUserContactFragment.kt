@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.view.View
 import com.tari.android.wallet.R
 import com.tari.android.wallet.ui.screen.contactBook.obsolete.contactSelection.ContactSelectionFragment
-import com.tari.android.wallet.ui.screen.contactBook.obsolete.contactSelection.ContactSelectionViewModel.ContinueButtonEffect
 import com.tari.android.wallet.ui.screen.qr.QrScannerSource
 import com.tari.android.wallet.util.extension.gone
 import com.tari.android.wallet.util.extension.setVisible
@@ -35,6 +34,6 @@ class SelectUserContactFragment : ContactSelectionFragment() {
     override fun goToNext() {
         super.goToNext()
 
-        viewModel.onContinueButtonClick(ContinueButtonEffect.SelectUserContact)
+        viewModel.onContinueButtonClick()
     }
 }
