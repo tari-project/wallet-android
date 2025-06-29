@@ -30,7 +30,7 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.tari.android.wallet.ui.screen.send.addAmount
+package com.tari.android.wallet.ui.screen.send.obsolete.addAmount
 
 import android.animation.ValueAnimator
 import android.annotation.SuppressLint
@@ -57,6 +57,7 @@ import com.tari.android.wallet.databinding.FragmentAddAmountBinding
 import com.tari.android.wallet.model.BalanceInfo
 import com.tari.android.wallet.model.MicroTari
 import com.tari.android.wallet.model.TariWalletAddress
+import com.tari.android.wallet.model.TransactionData
 import com.tari.android.wallet.model.WalletError
 import com.tari.android.wallet.navigation.TariNavigator.Companion.PARAMETER_AMOUNT
 import com.tari.android.wallet.navigation.TariNavigator.Companion.PARAMETER_CONTACT
@@ -64,9 +65,8 @@ import com.tari.android.wallet.navigation.TariNavigator.Companion.PARAMETER_NOTE
 import com.tari.android.wallet.ui.common.CommonXmlFragment
 import com.tari.android.wallet.ui.dialog.modular.ModularDialog
 import com.tari.android.wallet.ui.dialog.modular.SimpleDialogArgs
-import com.tari.android.wallet.ui.screen.send.addAmount.keyboard.KeyboardController
-import com.tari.android.wallet.ui.screen.send.amountView.AmountStyle
-import com.tari.android.wallet.ui.screen.send.common.TransactionData
+import com.tari.android.wallet.ui.screen.send.obsolete.addAmount.keyboard.KeyboardController
+import com.tari.android.wallet.ui.screen.send.obsolete.amountView.AmountStyle
 import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.addressFirstEmojis
 import com.tari.android.wallet.util.addressLastEmojis

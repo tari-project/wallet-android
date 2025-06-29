@@ -13,7 +13,6 @@ import com.tari.android.wallet.application.walletManager.WalletManager.WalletEve
 import com.tari.android.wallet.application.walletManager.doOnWalletRunning
 import com.tari.android.wallet.data.BalanceStateHandler
 import com.tari.android.wallet.data.airdrop.AirdropRepository
-import com.tari.android.wallet.data.contacts.ContactsRepository
 import com.tari.android.wallet.data.sharedPrefs.sentry.SentryPrefRepository
 import com.tari.android.wallet.data.tx.TxRepository
 import com.tari.android.wallet.model.TxId
@@ -26,7 +25,7 @@ import com.tari.android.wallet.ui.dialog.modular.modules.body.BodyModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonStyle
 import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
-import com.tari.android.wallet.ui.screen.send.finalize.FinalizeSendTxModel.TxFailureReason
+import com.tari.android.wallet.ui.screen.send.obsolete.finalize.FinalizeSendTxModel.TxFailureReason
 import com.tari.android.wallet.util.extension.collectFlow
 import com.tari.android.wallet.util.extension.launchOnIo
 import kotlinx.coroutines.delay
@@ -41,9 +40,6 @@ private const val DATA_REFRESH_INTERVAL_MILLIS = 60_000L
 private const val TRANSACTION_AMOUNT_HOME_PAGE = 5
 
 class HomeOverviewViewModel : CommonViewModel() {
-
-    @Inject
-    lateinit var contactsRepository: ContactsRepository
 
     @Inject
     lateinit var transactionRepository: TxRepository

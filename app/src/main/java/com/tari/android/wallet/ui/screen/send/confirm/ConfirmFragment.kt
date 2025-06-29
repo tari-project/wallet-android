@@ -7,10 +7,10 @@ import android.view.ViewGroup
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.fragment.app.viewModels
+import com.tari.android.wallet.model.TransactionData
 import com.tari.android.wallet.navigation.TariNavigator.Companion.PARAMETER_TRANSACTION
 import com.tari.android.wallet.ui.common.CommonFragment
 import com.tari.android.wallet.ui.compose.TariDesignSystem
-import com.tari.android.wallet.ui.screen.send.common.TransactionData
 import com.tari.android.wallet.util.extension.composeContent
 
 class ConfirmFragment : CommonFragment<ConfirmViewModel>() {

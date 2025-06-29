@@ -1,11 +1,11 @@
-package com.tari.android.wallet.ui.screen.send.finalize
+package com.tari.android.wallet.ui.screen.send.obsolete.finalize
 
 import android.os.Bundle
 import androidx.activity.viewModels
 import com.orhanobut.logger.Logger
+import com.tari.android.wallet.model.TransactionData
 import com.tari.android.wallet.util.extension.collectFlow
 import com.tari.android.wallet.util.extension.parcelable
-import com.tari.android.wallet.ui.screen.send.common.TransactionData
 import yat.android.ui.transactions.outcoming.TransactionState
 import yat.android.ui.transactions.outcoming.YatLibOutcomingTransactionActivity
 

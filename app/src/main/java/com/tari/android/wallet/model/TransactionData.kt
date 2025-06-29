@@ -1,9 +1,7 @@
-package com.tari.android.wallet.ui.screen.send.common
+package com.tari.android.wallet.model
 
 import android.os.Parcelable
 import com.tari.android.wallet.data.contacts.Contact
-import com.tari.android.wallet.model.EmojiId
-import com.tari.android.wallet.model.MicroTari
 import kotlinx.parcelize.Parcelize
 
 @Parcelize

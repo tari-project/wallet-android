@@ -65,12 +65,12 @@ import com.tari.android.wallet.ui.screen.restore.chooseRestoreOption.ChooseResto
 import com.tari.android.wallet.ui.screen.restore.enterRestorationPassword.EnterRestorationPasswordViewModel
 import com.tari.android.wallet.ui.screen.restore.inputSeedWords.InputSeedWordsViewModel
 import com.tari.android.wallet.ui.screen.restore.walletRestoring.WalletRestoringViewModel
-import com.tari.android.wallet.ui.screen.send.addAmount.AddAmountViewModel
-import com.tari.android.wallet.ui.screen.send.addNote.AddNoteViewModel
 import com.tari.android.wallet.ui.screen.send.confirm.ConfirmViewModel
-import com.tari.android.wallet.ui.screen.send.finalize.FinalizeSendTxViewModel
+import com.tari.android.wallet.ui.screen.send.obsolete.addAmount.AddAmountViewModel
+import com.tari.android.wallet.ui.screen.send.obsolete.addNote.AddNoteViewModel
+import com.tari.android.wallet.ui.screen.send.obsolete.finalize.FinalizeSendTxViewModel
+import com.tari.android.wallet.ui.screen.send.obsolete.requestTari.RequestTariViewModel
 import com.tari.android.wallet.ui.screen.send.receive.ReceiveViewModel
-import com.tari.android.wallet.ui.screen.send.requestTari.RequestTariViewModel
 import com.tari.android.wallet.ui.screen.settings.allSettings.AllSettingsViewModel
 import com.tari.android.wallet.ui.screen.settings.allSettings.about.TariAboutViewModel
 import com.tari.android.wallet.ui.screen.settings.backup.backupSettings.BackupSettingsViewModel

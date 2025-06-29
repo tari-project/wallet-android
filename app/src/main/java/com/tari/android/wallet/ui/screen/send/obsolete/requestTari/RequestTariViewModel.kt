@@ -1,4 +1,4 @@
-package com.tari.android.wallet.ui.screen.send.requestTari
+package com.tari.android.wallet.ui.screen.send.obsolete.requestTari
 
 import com.tari.android.wallet.application.deeplinks.DeepLink
 import com.tari.android.wallet.data.sharedPrefs.CorePrefRepository

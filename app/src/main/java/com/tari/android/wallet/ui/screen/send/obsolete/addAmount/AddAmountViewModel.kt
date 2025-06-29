@@ -1,4 +1,4 @@
-package com.tari.android.wallet.ui.screen.send.addAmount
+package com.tari.android.wallet.ui.screen.send.obsolete.addAmount
 
 import androidx.lifecycle.SavedStateHandle
 import com.tari.android.wallet.R
@@ -7,13 +7,13 @@ import com.tari.android.wallet.data.network.NetworkConnectionStateHandler
 import com.tari.android.wallet.model.BalanceInfo
 import com.tari.android.wallet.model.MicroTari
 import com.tari.android.wallet.model.TariWalletAddress
+import com.tari.android.wallet.model.TransactionData
 import com.tari.android.wallet.model.WalletError
 import com.tari.android.wallet.navigation.Navigation
 import com.tari.android.wallet.navigation.TariNavigator.Companion.PARAMETER_AMOUNT
 import com.tari.android.wallet.navigation.TariNavigator.Companion.PARAMETER_CONTACT
 import com.tari.android.wallet.navigation.TariNavigator.Companion.PARAMETER_NOTE
 import com.tari.android.wallet.ui.common.CommonViewModel
-import com.tari.android.wallet.ui.screen.send.common.TransactionData
 import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.DebugConfig
 import com.tari.android.wallet.util.EffectFlow

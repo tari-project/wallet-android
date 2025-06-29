@@ -1,4 +1,4 @@
-package com.tari.android.wallet.ui.screen.send.amountView
+package com.tari.android.wallet.ui.screen.send.obsolete.amountView
 
 import android.content.Context
 import android.util.AttributeSet
@@ -23,16 +23,12 @@ class AmountView : CommonView<CommonViewModel, ViewAmountBinding> {
     override fun bindingInflate(layoutInflater: LayoutInflater, parent: ViewGroup?, attachToRoot: Boolean): ViewAmountBinding =
         ViewAmountBinding.inflate(layoutInflater, parent, attachToRoot)
 
-    fun setupArgs(textSize: Float) {
-        ui.balanceView.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize)
-    }
-
     fun setupArgs(args: MicroTari) {
         ui.balanceView.text = args.formattedTariValue
     }
 
     fun setupArgs(style: AmountStyle) {
-        val color = when(style) {
+        val color = when (style) {
             AmountStyle.Normal -> PaletteManager.getTextHeading(context)
             AmountStyle.Warning -> PaletteManager.getRed(context)
         }

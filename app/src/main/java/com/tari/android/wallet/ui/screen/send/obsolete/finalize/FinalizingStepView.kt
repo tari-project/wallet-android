@@ -1,4 +1,4 @@
-package com.tari.android.wallet.ui.screen.send.finalize
+package com.tari.android.wallet.ui.screen.send.obsolete.finalize
 
 import android.animation.ValueAnimator
 import android.content.Context
@@ -9,10 +9,10 @@ import androidx.core.animation.addListener
 import com.daasuu.ei.Ease
 import com.daasuu.ei.EasingInterpolator
 import com.tari.android.wallet.databinding.ViewFinalizingStepBinding
+import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.extension.invisible
 import com.tari.android.wallet.util.extension.removeListenersAndCancel
 import com.tari.android.wallet.util.extension.visible
-import com.tari.android.wallet.util.Constants
 
 class FinalizingStepView : FrameLayout {
 

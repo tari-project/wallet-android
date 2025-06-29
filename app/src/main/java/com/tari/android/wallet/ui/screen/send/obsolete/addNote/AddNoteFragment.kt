@@ -30,7 +30,7 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.tari.android.wallet.ui.screen.send.addNote
+package com.tari.android.wallet.ui.screen.send.obsolete.addNote
 
 import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
@@ -57,10 +57,10 @@ import com.tari.android.wallet.data.contacts.Contact
 import com.tari.android.wallet.databinding.FragmentAddNoteBinding
 import com.tari.android.wallet.model.MicroTari
 import com.tari.android.wallet.model.TariWalletAddress
+import com.tari.android.wallet.model.TransactionData
 import com.tari.android.wallet.navigation.TariNavigator.Companion.PARAMETER_TRANSACTION
 import com.tari.android.wallet.ui.common.CommonXmlFragment
 import com.tari.android.wallet.ui.common.domain.PaletteManager
-import com.tari.android.wallet.ui.screen.send.common.TransactionData
 import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.addressFirstEmojis
 import com.tari.android.wallet.util.addressLastEmojis

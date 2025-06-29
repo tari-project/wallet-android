@@ -1,4 +1,4 @@
-package com.tari.android.wallet.ui.screen.send.finalize
+package com.tari.android.wallet.ui.screen.send.obsolete.finalize
 
 import androidx.annotation.StringRes
 import androidx.lifecycle.SavedStateHandle
@@ -12,6 +12,7 @@ import com.tari.android.wallet.R.string.finalize_send_tx_sending_step_3_desc_lin
 import com.tari.android.wallet.application.walletManager.WalletManager
 import com.tari.android.wallet.data.network.NetworkConnectionStateHandler
 import com.tari.android.wallet.model.TariContact
+import com.tari.android.wallet.model.TransactionData
 import com.tari.android.wallet.navigation.Navigation
 import com.tari.android.wallet.tor.TorBootstrapStatus
 import com.tari.android.wallet.tor.TorProxyState
@@ -22,8 +23,7 @@ import com.tari.android.wallet.ui.dialog.modular.modules.body.BodyModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonStyle
 import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
-import com.tari.android.wallet.ui.screen.send.common.TransactionData
-import com.tari.android.wallet.ui.screen.send.finalize.FinalizeSendTxModel.TxFailureReason
+import com.tari.android.wallet.ui.screen.send.obsolete.finalize.FinalizeSendTxModel.TxFailureReason
 import com.tari.android.wallet.util.BroadcastEffectFlow
 import com.tari.android.wallet.util.extension.collectFlow
 import com.tari.android.wallet.util.extension.launchOnIo

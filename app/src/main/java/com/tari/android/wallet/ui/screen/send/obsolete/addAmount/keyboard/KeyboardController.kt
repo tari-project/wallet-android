@@ -1,4 +1,4 @@
-package com.tari.android.wallet.ui.screen.send.addAmount.keyboard
+package com.tari.android.wallet.ui.screen.send.obsolete.addAmount.keyboard
 
 import android.animation.Animator
 import android.animation.ValueAnimator
@@ -16,6 +16,7 @@ import com.tari.android.wallet.application.walletManager.WalletConfig
 import com.tari.android.wallet.databinding.ViewInputAmountBinding
 import com.tari.android.wallet.databinding.ViewNumpadBinding
 import com.tari.android.wallet.model.MicroTari
+import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.extension.dimen
 import com.tari.android.wallet.util.extension.dimenPx
 import com.tari.android.wallet.util.extension.getFirstChild
@@ -27,7 +28,6 @@ import com.tari.android.wallet.util.extension.setStartMargin
 import com.tari.android.wallet.util.extension.setTextSizePx
 import com.tari.android.wallet.util.extension.setTopMargin
 import com.tari.android.wallet.util.extension.setWidthAndHeightToMeasured
-import com.tari.android.wallet.util.Constants
 import java.math.BigInteger
 import kotlin.math.min
 

@@ -1,4 +1,4 @@
-package com.tari.android.wallet.ui.screen.send.finalize
+package com.tari.android.wallet.ui.screen.send.obsolete.finalize
 
 import com.tari.android.wallet.model.TxId
 

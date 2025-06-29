@@ -1,4 +1,4 @@
-package com.tari.android.wallet.ui.screen.send.addAmount
+package com.tari.android.wallet.ui.screen.send.obsolete.addAmount
 
 import com.tari.android.wallet.data.contacts.Contact
 import com.tari.android.wallet.model.MicroTari

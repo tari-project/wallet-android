@@ -30,7 +30,7 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.tari.android.wallet.ui.screen.send.finalize
+package com.tari.android.wallet.ui.screen.send.obsolete.finalize
 
 import android.animation.ObjectAnimator
 import android.animation.ValueAnimator
@@ -43,9 +43,9 @@ import androidx.fragment.app.viewModels
 import com.daasuu.ei.Ease
 import com.daasuu.ei.EasingInterpolator
 import com.tari.android.wallet.databinding.FragmentFinalizeSendTxBinding
+import com.tari.android.wallet.model.TransactionData
 import com.tari.android.wallet.ui.common.CommonXmlFragment
 import com.tari.android.wallet.ui.component.tari.TariTextView
-import com.tari.android.wallet.ui.screen.send.common.TransactionData
 import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.extension.collectFlow
 import com.tari.android.wallet.util.extension.invisible

@@ -9,6 +9,7 @@ import android.view.inputmethod.InputMethodManager
 import com.tari.android.wallet.application.YatAdapter
 import com.tari.android.wallet.data.contacts.Contact
 import com.tari.android.wallet.model.MicroTari
+import com.tari.android.wallet.model.TransactionData
 import com.tari.android.wallet.navigation.Navigation.AllSettings
 import com.tari.android.wallet.navigation.Navigation.Auth
 import com.tari.android.wallet.navigation.Navigation.Back
@@ -48,13 +49,12 @@ import com.tari.android.wallet.ui.screen.restore.activity.WalletRestoreActivity
 import com.tari.android.wallet.ui.screen.restore.enterRestorationPassword.EnterRestorationPasswordFragment
 import com.tari.android.wallet.ui.screen.restore.inputSeedWords.InputSeedWordsFragment
 import com.tari.android.wallet.ui.screen.restore.walletRestoring.WalletRestoringFragment
-import com.tari.android.wallet.ui.screen.send.addAmount.AddAmountFragment
-import com.tari.android.wallet.ui.screen.send.addNote.AddNoteFragment
-import com.tari.android.wallet.ui.screen.send.common.TransactionData
 import com.tari.android.wallet.ui.screen.send.confirm.ConfirmFragment
-import com.tari.android.wallet.ui.screen.send.finalize.FinalizeSendTxFragment
+import com.tari.android.wallet.ui.screen.send.obsolete.addAmount.AddAmountFragment
+import com.tari.android.wallet.ui.screen.send.obsolete.addNote.AddNoteFragment
+import com.tari.android.wallet.ui.screen.send.obsolete.finalize.FinalizeSendTxFragment
+import com.tari.android.wallet.ui.screen.send.obsolete.requestTari.RequestTariFragment
 import com.tari.android.wallet.ui.screen.send.receive.ReceiveFragment
-import com.tari.android.wallet.ui.screen.send.requestTari.RequestTariFragment
 import com.tari.android.wallet.ui.screen.settings.allSettings.AllSettingsFragment
 import com.tari.android.wallet.ui.screen.settings.allSettings.about.TariAboutFragment
 import com.tari.android.wallet.ui.screen.settings.backup.backupSettings.BackupSettingsFragment
