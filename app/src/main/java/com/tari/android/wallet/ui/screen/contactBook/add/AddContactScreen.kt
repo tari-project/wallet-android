@@ -11,15 +11,16 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextRange
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.tari.android.wallet.R
@@ -61,18 +62,21 @@ fun AddContactScreen(
                 .padding(paddingValues),
         ) {
             Spacer(Modifier.size(24.dp))
-            Text(
-                modifier = Modifier.padding(horizontal = 24.dp),
-                text = stringResource(R.string.contact_book_add_contact_alias_field_title),
-                style = TariDesignSystem.typography.body1.copy(color = TariDesignSystem.colors.textPrimary),
-            )
-            Spacer(Modifier.size(8.dp))
+
+
+            var aliasValue by remember { mutableStateOf(TextFieldValue(uiState.alias)) }
+            // TODO maybe make it more elegant. make an extension function for TextFieldValue?
+            uiState.alias.takeIf { it != aliasValue.text }?.let { aliasValue = TextFieldValue(it, selection = TextRange(it.length)) }
             TariTextField(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 24.dp),
-                value = uiState.alias,
-                onValueChanged = onAliasChange,
+                value = aliasValue,
+                onValueChanged = {
+                    onAliasChange(it.text)
+                    aliasValue = it
+                },
+                title = stringResource(R.string.contact_book_add_contact_alias_field_title),
                 hint = stringResource(R.string.contact_book_add_contact_alias_field_hint),
             )
 
@@ -80,17 +84,8 @@ fun AddContactScreen(
             TariHorizontalDivider(Modifier.padding(horizontal = 24.dp))
             Spacer(Modifier.size(24.dp))
 
-            Text(
-                modifier = Modifier.padding(horizontal = 24.dp),
-                text = stringResource(R.string.contact_book_add_contact_address_field_title),
-                style = TariDesignSystem.typography.body1.copy(
-                    color = if (!uiState.isValidWalletAddress) TariDesignSystem.colors.errorMain else TariDesignSystem.colors.textPrimary
-                ),
-            )
-            Spacer(Modifier.size(8.dp))
-
-            var addressValue by rememberSaveable { mutableStateOf(uiState.walletAddress?.fullBase58.orEmpty()) }
-            uiState.walletAddress?.let { addressValue = it.fullBase58 }
+            var addressValue by remember { mutableStateOf(TextFieldValue(uiState.walletAddress?.fullBase58.orEmpty())) }
+            uiState.walletAddress?.let { addressValue = TextFieldValue(it.fullBase58, selection = TextRange(it.fullBase58.length)) }
             TariTextField(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -98,8 +93,9 @@ fun AddContactScreen(
                 value = addressValue,
                 onValueChanged = {
                     addressValue = it
-                    onAddressChange(it)
+                    onAddressChange(it.text)
                 },
+                title = stringResource(R.string.contact_book_add_contact_address_field_title),
                 hint = stringResource(R.string.contact_book_add_contact_address_field_hint),
                 errorText = stringResource(R.string.contact_book_add_contact_address_field_error_text).takeIf { !uiState.isValidWalletAddress },
                 trailingIcon = {
