@@ -7,6 +7,7 @@ import com.tari.android.wallet.R.drawable.vector_all_settings_backup_options_ico
 import com.tari.android.wallet.R.drawable.vector_all_settings_block_explorer_icon
 import com.tari.android.wallet.R.drawable.vector_all_settings_bridge_configuration_icon
 import com.tari.android.wallet.R.drawable.vector_all_settings_cart
+import com.tari.android.wallet.R.drawable.vector_all_settings_contacts_icon
 import com.tari.android.wallet.R.drawable.vector_all_settings_contribute_to_tari_icon
 import com.tari.android.wallet.R.drawable.vector_all_settings_data_collection
 import com.tari.android.wallet.R.drawable.vector_all_settings_delete_button_icon
@@ -26,6 +27,8 @@ import com.tari.android.wallet.R.string.all_settings_advanced_settings_label
 import com.tari.android.wallet.R.string.all_settings_biometrics
 import com.tari.android.wallet.R.string.all_settings_bridge_configuration
 import com.tari.android.wallet.R.string.all_settings_connect_yats
+import com.tari.android.wallet.R.string.all_settings_contact_label
+import com.tari.android.wallet.R.string.all_settings_contacts
 import com.tari.android.wallet.R.string.all_settings_contribute
 import com.tari.android.wallet.R.string.all_settings_create_pin_code
 import com.tari.android.wallet.R.string.all_settings_data_collection
@@ -146,6 +149,10 @@ class AllSettingsViewModel : CommonViewModel() {
             SettingsRowViewHolderItem(resourceManager.getString(all_settings_connect_yats), vector_all_settings_yat_icon) {
                 _openYatOnboarding.postValue(Unit)
             }.takeIf { DebugConfig.isYatEnabled },
+            SettingsTitleViewHolderItem(resourceManager.getString(all_settings_contact_label)),
+            SettingsRowViewHolderItem(resourceManager.getString(all_settings_contacts), vector_all_settings_contacts_icon) {
+                tariNavigator.navigate(Navigation.ContactBook.AllContacts)
+            },
             SettingsTitleViewHolderItem(resourceManager.getString(all_settings_security_label)),
             backupOption,
             DividerViewHolderItem(),

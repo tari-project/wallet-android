@@ -25,7 +25,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.tari.android.wallet.R
-import com.tari.android.wallet.data.contacts.Contact
 import com.tari.android.wallet.data.tx.TxDto
 import com.tari.android.wallet.ui.compose.TariDesignSystem
 import com.tari.android.wallet.ui.compose.components.TariSearchField
@@ -50,31 +49,25 @@ fun TxHistoryScreen(
         containerColor = TariDesignSystem.colors.backgroundSecondary,
         topBar = {
             TariTopBar(
-                title = if (uiState.selectedContact != null) {
-                    stringResource(R.string.contact_details_transaction_history_description, uiState.selectedContact.alias.orEmpty())
-                } else {
-                    stringResource(R.string.contact_details_transaction_history)
-                },
+                title = stringResource(R.string.contact_details_transaction_history),
                 onBack = onBackClick,
             )
         }
     ) { paddingValues ->
         LazyColumn(modifier = Modifier.padding(paddingValues)) {
-            if (uiState.selectedContact == null) {
-                item {
-                    Spacer(Modifier.size(20.dp))
-                    TariSearchField(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 20.dp),
-                        searchQuery = searchQuery,
-                        hint = stringResource(R.string.home_search_hint),
-                        onQueryChanged = {
-                            onSearchQueryChange(it)
-                            searchQuery = it
-                        },
-                    )
-                }
+            item {
+                Spacer(Modifier.size(20.dp))
+                TariSearchField(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 20.dp),
+                    searchQuery = searchQuery,
+                    hint = stringResource(R.string.home_search_hint),
+                    onQueryChanged = {
+                        onSearchQueryChange(it)
+                        searchQuery = it
+                    },
+                )
             }
 
             item { Spacer(Modifier.size(20.dp)) }
@@ -86,7 +79,6 @@ fun TxHistoryScreen(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(horizontal = 40.dp, vertical = 20.dp),
-                            selectedContact = uiState.selectedContact,
                         )
                     }
                 }
@@ -120,7 +112,7 @@ fun TxHistoryScreen(
 }
 
 @Composable
-private fun EmptyState(selectedContact: Contact?, modifier: Modifier = Modifier) {
+private fun EmptyState(modifier: Modifier = Modifier) {
     Column(modifier = modifier, horizontalAlignment = Alignment.CenterHorizontally) {
         Text(
             text = stringResource(R.string.contact_details_transaction_history_empty_state_title),
@@ -131,11 +123,7 @@ private fun EmptyState(selectedContact: Contact?, modifier: Modifier = Modifier)
         Spacer(Modifier.size(8.dp))
         Text(
             textAlign = TextAlign.Center,
-            text = if (selectedContact != null) {
-                stringResource(R.string.contact_details_transaction_history_empty_state_description, selectedContact.alias.orEmpty())
-            } else {
-                stringResource(R.string.home_transaction_list_empty_description)
-            },
+            text = stringResource(R.string.home_transaction_list_empty_description),
             style = TariDesignSystem.typography.body2,
             color = TariDesignSystem.colors.textSecondary,
         )
@@ -186,7 +174,6 @@ private fun TxHistoryScreenPreview() {
                 pendingTxs = MockDataStub.createTxList(),
                 nonPendingTxs = MockDataStub.createTxList(),
                 ticker = "XTM",
-                selectedContact = null,
             ),
             onSearchQueryChange = {},
             onBackClick = {},
@@ -204,43 +191,6 @@ private fun TxHistoryScreenEmptyPreview() {
                 pendingTxs = emptyList(),
                 nonPendingTxs = emptyList(),
                 ticker = "XTM",
-                selectedContact = null,
-            ),
-            onSearchQueryChange = {},
-            onBackClick = {},
-            onTxClick = {},
-        )
-    }
-}
-
-@Composable
-@Preview
-private fun TxHistoryContactScreenPreview() {
-    TariDesignSystem(TariTheme.Light) {
-        TxHistoryScreen(
-            uiState = TxHistoryViewModel.UiState(
-                pendingTxs = MockDataStub.createTxList(),
-                nonPendingTxs = MockDataStub.createTxList(),
-                ticker = "XTM",
-                selectedContact = MockDataStub.createContact(),
-            ),
-            onSearchQueryChange = {},
-            onBackClick = {},
-            onTxClick = {},
-        )
-    }
-}
-
-@Composable
-@Preview
-private fun TxHistoryContactScreenEmptyPreview() {
-    TariDesignSystem(TariTheme.Light) {
-        TxHistoryScreen(
-            uiState = TxHistoryViewModel.UiState(
-                pendingTxs = emptyList(),
-                nonPendingTxs = emptyList(),
-                ticker = "XTM",
-                selectedContact = MockDataStub.createContact(),
             ),
             onSearchQueryChange = {},
             onBackClick = {},

@@ -1,15 +1,15 @@
 package com.tari.android.wallet.navigation
 
 import android.net.Uri
-import com.tari.android.wallet.application.YatAdapter.ConnectedWallet
 import com.tari.android.wallet.data.contacts.Contact
 import com.tari.android.wallet.model.MicroTari
-import com.tari.android.wallet.model.TariWalletAddress
 import com.tari.android.wallet.model.tx.Tx
 import com.tari.android.wallet.ui.screen.pinCode.PinCodeScreenBehavior
 import com.tari.android.wallet.ui.screen.send.common.TransactionData
 
 sealed class Navigation {
+
+    data object Back : Navigation()
 
     data class EnterPinCode(val behavior: PinCodeScreenBehavior, val stashedPin: String? = null) : Navigation()
     data object ChangeBiometrics : Navigation()
@@ -56,13 +56,7 @@ sealed class Navigation {
         data object ToUtxos : TxList()
         data class ToSendTariToUser(val contact: Contact, val amount: MicroTari? = null, val note: String = "") : TxList()
         data object HomeTransactionHistory : TxList()
-        data object ToTransfer : TxList()
         data object ToReceive : TxList()
-    }
-
-    sealed class Chat : Navigation() {
-        data object ToAddChat : Chat()
-        data class ToChat(val walletAddress: TariWalletAddress, val isNew: Boolean) : Chat()
     }
 
     sealed class TxSend : Navigation() {
@@ -93,15 +87,10 @@ sealed class Navigation {
     }
 
     sealed class ContactBook : Navigation() {
-        data class ToContactDetails(val contact: Contact) : ContactBook()
-        data object ToAddContact : ContactBook()
-        data object ToAddPhoneContact : ContactBook()
+        data object AllContacts : ContactBook()
+        data class ContactDetails(val contact: Contact) : ContactBook()
+        data object AddContact : ContactBook()
         data class ToSendTari(val contact: Contact) : ContactBook()
         data object ToSelectTariUser : ContactBook()
-        data class ToRequestTari(val contact: Contact) : ContactBook()
-        data class ToExternalWallet(val connectedWallet: ConnectedWallet) : ContactBook()
-        data class ToLinkContact(val contact: Contact) : ContactBook()
-        data class ToContactTransactionHistory(val contact: Contact) : ContactBook()
-        data object BackToContactBook : ContactBook()
     }
 }

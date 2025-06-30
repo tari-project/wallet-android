@@ -1,21 +1,20 @@
 package com.tari.android.wallet.navigation
 
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.provider.ContactsContract
-import androidx.core.net.toUri
+import android.view.View
+import android.view.inputmethod.InputMethodManager
 import com.tari.android.wallet.application.YatAdapter
-import com.tari.android.wallet.application.YatAdapter.ConnectedWallet
 import com.tari.android.wallet.data.contacts.Contact
 import com.tari.android.wallet.model.MicroTari
-import com.tari.android.wallet.model.TariWalletAddress
 import com.tari.android.wallet.navigation.Navigation.AllSettings
 import com.tari.android.wallet.navigation.Navigation.Auth
+import com.tari.android.wallet.navigation.Navigation.Back
 import com.tari.android.wallet.navigation.Navigation.BackToHome
 import com.tari.android.wallet.navigation.Navigation.BackupSettings
 import com.tari.android.wallet.navigation.Navigation.ChangeBiometrics
-import com.tari.android.wallet.navigation.Navigation.Chat
 import com.tari.android.wallet.navigation.Navigation.ContactBook
 import com.tari.android.wallet.navigation.Navigation.CustomBridge
 import com.tari.android.wallet.navigation.Navigation.EnterPinCode
@@ -33,13 +32,10 @@ import com.tari.android.wallet.ui.common.CommonFragment
 import com.tari.android.wallet.ui.screen.auth.AuthActivity
 import com.tari.android.wallet.ui.screen.auth.FeatureAuthFragment
 import com.tari.android.wallet.ui.screen.biometrics.ChangeBiometricsFragment
-import com.tari.android.wallet.ui.screen.chat.addChat.AddChatFragment
-import com.tari.android.wallet.ui.screen.chat.chatDetails.ChatDetailsFragment
 import com.tari.android.wallet.ui.screen.contactBook.add.AddContactFragment
-import com.tari.android.wallet.ui.screen.contactBook.add.SelectUserContactFragment
 import com.tari.android.wallet.ui.screen.contactBook.details.ContactDetailsFragment
-import com.tari.android.wallet.ui.screen.contactBook.link.ContactLinkFragment
-import com.tari.android.wallet.ui.screen.contactBook.root.ContactBookFragment
+import com.tari.android.wallet.ui.screen.contactBook.list.ContactListFragment
+import com.tari.android.wallet.ui.screen.contactBook.obsolete.add.SelectUserContactFragment
 import com.tari.android.wallet.ui.screen.debug.DebugNavigation
 import com.tari.android.wallet.ui.screen.debug.activity.DebugActivity
 import com.tari.android.wallet.ui.screen.home.HomeActivity
@@ -59,7 +55,6 @@ import com.tari.android.wallet.ui.screen.send.confirm.ConfirmFragment
 import com.tari.android.wallet.ui.screen.send.finalize.FinalizeSendTxFragment
 import com.tari.android.wallet.ui.screen.send.receive.ReceiveFragment
 import com.tari.android.wallet.ui.screen.send.requestTari.RequestTariFragment
-import com.tari.android.wallet.ui.screen.send.transfer.TransferFragment
 import com.tari.android.wallet.ui.screen.settings.allSettings.AllSettingsFragment
 import com.tari.android.wallet.ui.screen.settings.allSettings.about.TariAboutFragment
 import com.tari.android.wallet.ui.screen.settings.backup.backupSettings.BackupSettingsFragment
@@ -94,7 +89,11 @@ class TariNavigator @Inject constructor(
     lateinit var currentActivity: CommonActivity<*>
 
     fun navigate(navigation: Navigation) {
+        hideSoftKeyboard()
+
         when (navigation) {
+            is Back -> navigateBack()
+
             is EnterPinCode -> addFragment(EnterPinCodeFragment.newInstance(navigation.behavior, navigation.stashedPin))
             is ChangeBiometrics -> addFragment(ChangeBiometricsFragment())
             is SplashScreen -> toSplashActivity(navigation.seedWords, navigation.clearTop)
@@ -111,15 +110,10 @@ class TariNavigator @Inject constructor(
             is Auth.FeatureAuth -> addFragment(FeatureAuthFragment())
             is Auth.BackAfterAuth -> backAfterAuth()
 
-            is ContactBook.ToAddContact -> addFragment(AddContactFragment())
-            is ContactBook.ToContactDetails -> addFragment(ContactDetailsFragment.createFragment(navigation.contact))
-            is ContactBook.ToRequestTari -> sendToUser(navigation.contact)
+            is ContactBook.AllContacts -> addFragment(ContactListFragment())
+            is ContactBook.ContactDetails -> addFragment(ContactDetailsFragment.createFragment(navigation.contact))
+            is ContactBook.AddContact -> addFragment(AddContactFragment())
             is ContactBook.ToSendTari -> sendToUser(navigation.contact)
-            is ContactBook.ToLinkContact -> addFragment(ContactLinkFragment.createFragment(navigation.contact))
-            is ContactBook.BackToContactBook -> popUpTo(ContactBookFragment::class.java.simpleName)
-            is ContactBook.ToExternalWallet -> toExternalWallet(navigation.connectedWallet)
-            is ContactBook.ToContactTransactionHistory -> addFragment(TxHistoryFragment.newInstance(navigation.contact))
-            is ContactBook.ToAddPhoneContact -> toAddPhoneContact()
             is ContactBook.ToSelectTariUser -> addFragment(SelectUserContactFragment.newInstance())
 
             is AllSettings.ToBugReporting -> DebugActivity.launch(currentActivity, DebugNavigation.BugReport)
@@ -147,7 +141,6 @@ class TariNavigator @Inject constructor(
             is TxList.ToSendTariToUser -> sendToUser(navigation.contact, navigation.amount, navigation.note)
             is TxList.ToUtxos -> addFragment(UtxosListFragment())
             is TxList.ToAllSettings -> addFragment(AllSettingsFragment.newInstance())
-            is TxList.ToTransfer -> addFragment(TransferFragment())
             is TxList.ToReceive -> addFragment(ReceiveFragment())
             is TxList.HomeTransactionHistory -> addFragment(TxHistoryFragment.newInstance())
 
@@ -161,10 +154,15 @@ class TariNavigator @Inject constructor(
             is BackupSettings.ToLearnMore -> addFragment(BackupLearnMoreFragment())
 
             is CustomBridge.UploadQrCode -> Unit
-
-            is Chat.ToChat -> toChatDetail(navigation.walletAddress, navigation.isNew)
-            is Chat.ToAddChat -> addFragment(AddChatFragment())
         }
+    }
+
+    fun navigateSequence(vararg navigations: Navigation) {
+        navigations.forEach { navigate(it) }
+    }
+
+    fun navigateBack() {
+        currentActivity.supportFragmentManager.popBackStack()
     }
 
     private fun shareText(text: String) {
@@ -176,10 +174,6 @@ class TariNavigator @Inject constructor(
 
         val shareIntent = Intent.createChooser(sendIntent, null)
         currentActivity.startActivity(shareIntent)
-    }
-
-    fun navigateSequence(vararg navigations: Navigation) {
-        navigations.forEach { navigate(it) }
     }
 
     private fun addFragment(fragment: CommonFragment<*>, bundle: Bundle? = null, isRoot: Boolean = false, withAnimation: Boolean = true) {
@@ -229,17 +223,6 @@ class TariNavigator @Inject constructor(
         addFragment(AddAmountFragment.newInstance(contact, tariAmount, note))
     }
 
-    private fun toChatDetail(walletAddress: TariWalletAddress, isNew: Boolean) {
-        if (isNew) {
-            currentActivity.onBackPressed()
-        }
-        addFragment(ChatDetailsFragment.newInstance(walletAddress))
-    }
-
-    private fun toAddPhoneContact() {
-        currentActivity.startActivity(Intent(Intent.ACTION_INSERT, ContactsContract.Contacts.CONTENT_URI))
-    }
-
     private fun toBaseNodeSelection() = addFragment(ChangeBaseNodeFragment())
 
     private fun continueToFinalizeSendTx(transactionData: TransactionData) {
@@ -250,19 +233,10 @@ class TariNavigator @Inject constructor(
         }
     }
 
-    private fun toExternalWallet(connectedWallet: ConnectedWallet) {
-        runCatching {
-            val externalAddress = connectedWallet.getExternalLink()
-            val intent = Intent(Intent.ACTION_VIEW, externalAddress.toUri())
-
-            if (intent.resolveActivity(currentActivity.packageManager) != null) {
-                currentActivity.startActivity(intent)
-            } else {
-                currentActivity.viewModel.showWalletErrorDialog()
-            }
-        }.onFailure {
-            currentActivity.viewModel.showWalletErrorDialog()
-        }
+    private fun hideSoftKeyboard() {
+        val imm = currentActivity.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        val view = currentActivity.currentFocus ?: View(currentActivity)
+        imm.hideSoftInputFromWindow(view.windowToken, 0)
     }
 
     companion object {

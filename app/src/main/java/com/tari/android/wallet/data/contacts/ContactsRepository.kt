@@ -30,7 +30,7 @@ class ContactsRepository @Inject constructor(
         contactToUpdate: Contact,
         alias: String?,
     ): Contact {
-        val newContact = contactToUpdate.copy(alias = alias)
+        val newContact = contactToUpdate.copy(alias = alias?.trim())
 
         if (newContact.alias == null) {
             contactsDb.deleteContact(contactToUpdate.walletAddress.fullBase58)
@@ -46,6 +46,16 @@ class ContactsRepository @Inject constructor(
         refreshContactList()
 
         return newContact
+    }
+
+    suspend fun addContact(contact: Contact) {
+        contactsDb.upsertContact(
+            ContactsDb.ContactDto(
+                alias = contact.alias.orEmpty(),
+                walletAddressBase58 = contact.walletAddress.fullBase58,
+            ),
+        )
+        refreshContactList()
     }
 
     suspend fun addContactList(contacts: List<Contact>) {

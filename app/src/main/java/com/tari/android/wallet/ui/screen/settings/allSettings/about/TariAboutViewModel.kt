@@ -73,8 +73,6 @@ class TariAboutViewModel : CommonViewModel() {
             TariIconViewHolderItem(R.drawable.vector_backup_onboarding_cloud, tari_about_icon_text_cloud, tari_about_icon_url_cloud),
             TariIconViewHolderItem(R.drawable.vector_backup_onboarding_password, tari_about_icon_text_password, tari_about_icon_url_password),
             TariIconViewHolderItem(R.drawable.vector_backup_onboarding_final, tari_about_icon_text_final, tari_about_icon_url_final),
-            TariIconViewHolderItem(R.drawable.vector_contact_action_link, tari_about_icon_text_final, tari_about_icon_url_final),
-            TariIconViewHolderItem(R.drawable.vector_contact_action_unlink, tari_about_icon_text_final, tari_about_icon_url_final),
             TariIconViewHolderItem(R.drawable.vector_contact_book_icon, tari_about_icon_text_final, tari_about_icon_url_final),
             TariIconViewHolderItem(R.drawable.vector_empty_wallet, tari_about_icon_text_final, tari_about_icon_url_final),
         )

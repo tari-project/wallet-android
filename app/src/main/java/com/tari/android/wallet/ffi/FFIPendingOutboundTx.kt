@@ -32,7 +32,6 @@
  */
 package com.tari.android.wallet.ffi
 
-import com.orhanobut.logger.Logger
 import java.math.BigInteger
 
 /**

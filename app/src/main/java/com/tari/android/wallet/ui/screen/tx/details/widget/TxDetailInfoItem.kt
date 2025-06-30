@@ -15,6 +15,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -170,21 +171,28 @@ fun TxDetailInfoAddressItem(
     modifier: Modifier = Modifier,
 ) {
     var showEmojiId by remember { mutableStateOf(false) }
+    var showFullBase58 by rememberSaveable { mutableStateOf(false) }
 
     val value = if (showEmojiId) {
         walletAddress.shortString()
+    } else if (showFullBase58) {
+        walletAddress.fullBase58
     } else {
         walletAddress.base58Ellipsized()
     }
 
     TxDetailInfoItem(
         modifier = modifier
-            .clickable(
-                enabled = showEmojiId,
-                onClick = onEmojiIdDetailsClick,
-            ),
+            .clickable {
+                if (showEmojiId) {
+                    onEmojiIdDetailsClick()
+                } else {
+                    showFullBase58 = !showFullBase58
+                }
+            },
         title = title,
         value = value,
+        singleLine = false,
     ) {
         IconButton(
             modifier = Modifier.offset(x = 12.dp), // needed to remove "margin" between two IconButtons
