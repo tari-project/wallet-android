@@ -10,6 +10,7 @@ import com.tari.android.wallet.R.string.error_node_unreachable_description
 import com.tari.android.wallet.R.string.error_node_unreachable_title
 import com.tari.android.wallet.application.securityStage.StagedWalletSecurityManager
 import com.tari.android.wallet.application.walletManager.WalletManager.WalletEvent
+import com.tari.android.wallet.application.walletManager.doOnWalletRunning
 import com.tari.android.wallet.data.BalanceStateHandler
 import com.tari.android.wallet.data.airdrop.AirdropRepository
 import com.tari.android.wallet.data.contacts.ContactsRepository
@@ -129,9 +130,11 @@ class HomeOverviewViewModel : CommonViewModel() {
     fun refreshData() {
         launchOnIo {
             _uiState.update { it.copy(isMiningError = false) }
-            airdropRepository.getMiningStatus()
-                .onSuccess { mining -> _uiState.update { it.copy(isMining = mining, isMiningError = false) } }
-                .onFailure { _uiState.update { it.copy(isMiningError = it.isMining == null) } }
+            walletManager.doOnWalletRunning { wallet ->
+                airdropRepository.getMiningStatus(wallet)
+                    .onSuccess { mining -> _uiState.update { it.copy(isMining = mining, isMiningError = false) } }
+                    .onFailure { _uiState.update { it.copy(isMiningError = it.isMining == null) } }
+            }
         }
 
         launchOnIo {
@@ -245,5 +248,9 @@ class HomeOverviewViewModel : CommonViewModel() {
         } ?: run {
             logger.e("Transaction with ID $txId not found, but it was supposed to be sent")
         }
+    }
+
+    fun toggleBalanceHidden() {
+        _uiState.update { it.copy(balanceHidden = !it.balanceHidden) }
     }
 }

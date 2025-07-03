@@ -1,8 +1,8 @@
 package com.tari.android.wallet.ui.dialog.modular.modules.addressPoisoning
 
+import com.tari.android.wallet.application.addressPoisoning.SimilarAddressDto
 import com.tari.android.wallet.ui.dialog.modular.IDialogModule
 import com.tari.android.wallet.ui.dialog.modular.modules.addressPoisoning.adapter.SimilarAddressItem
-import com.tari.android.wallet.ui.screen.contactBook.addressPoisoning.SimilarAddressDto
 
 data class AddressPoisoningModule(
     private val addresses: List<SimilarAddressDto> = emptyList(),

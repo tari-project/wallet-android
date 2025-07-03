@@ -4,7 +4,6 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -32,17 +31,14 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.tari.android.wallet.R
-import com.tari.android.wallet.model.TariWalletAddress
 import com.tari.android.wallet.ui.compose.PreviewSecondarySurface
 import com.tari.android.wallet.ui.compose.TariDesignSystem
-import com.tari.android.wallet.ui.compose.components.TariButtonSize
-import com.tari.android.wallet.ui.compose.components.TariHorizontalDivider
 import com.tari.android.wallet.ui.compose.components.TariPrimaryButton
 import com.tari.android.wallet.ui.compose.components.TariTopBar
+import com.tari.android.wallet.ui.compose.widgets.AddressCard
 import com.tari.android.wallet.ui.screen.settings.themeSelector.TariTheme
 import com.tari.android.wallet.util.MockDataStub
 
@@ -89,6 +85,7 @@ fun ReceiveScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 20.dp),
+                cardTitle = stringResource(R.string.receive_tari_your_address),
                 address = uiState.tariAddress,
                 onEmojiCopyClick = onEmojiCopyClick,
                 onBase58CopyClick = onBase58CopyClick,
@@ -170,72 +167,8 @@ private fun QrCodeCard(qrBitmap: Bitmap?, modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun AddressCard(
-    address: TariWalletAddress,
-    onEmojiCopyClick: () -> Unit,
-    onBase58CopyClick: () -> Unit,
-    onEmojiDetailClick: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    Column(
-        modifier = modifier
-            .clip(TariDesignSystem.shapes.chip)
-            .background(color = TariDesignSystem.colors.backgroundAccent)
-            .padding(horizontal = 16.dp),
-    ) {
-        Spacer(Modifier.size(16.dp))
-        Text(
-            text = stringResource(R.string.receive_tari_your_address),
-            style = TariDesignSystem.typography.body1,
-        )
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Text(
-                modifier = Modifier
-                    .weight(1f)
-                    .clickable(onClick = onEmojiDetailClick),
-                text = address.fullEmojiId,
-                style = TariDesignSystem.typography.body1,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-            )
-            Spacer(Modifier.size(8.dp))
-            TariPrimaryButton(
-                size = TariButtonSize.Small,
-                text = stringResource(R.string.common_copy),
-                onClick = onEmojiCopyClick,
-            )
-        }
-        Spacer(Modifier.size(8.dp))
-        TariHorizontalDivider()
-        Spacer(Modifier.size(8.dp))
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Text(
-                modifier = Modifier.weight(1f),
-                text = address.fullBase58,
-                style = TariDesignSystem.typography.body1,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-            )
-            Spacer(Modifier.size(8.dp))
-            TariPrimaryButton(
-                size = TariButtonSize.Small,
-                text = stringResource(R.string.common_copy),
-                onClick = onBase58CopyClick,
-            )
-        }
-        Spacer(Modifier.size(8.dp))
-    }
-}
-
-@Composable
 @Preview
-fun ReceiveScreenPreview() {
+private fun ReceiveScreenPreview() {
     PreviewSecondarySurface(TariTheme.Light) {
         ReceiveScreen(
             uiState = ReceiveViewModel.UiState(

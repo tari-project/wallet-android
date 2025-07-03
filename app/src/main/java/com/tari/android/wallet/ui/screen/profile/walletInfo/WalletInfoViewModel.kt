@@ -54,7 +54,7 @@ class WalletInfoViewModel : CommonViewModel() {
     )
     val uiState = _uiState.asStateFlow()
 
-    private val shareProfileDeeplink = deeplinkManager.getDeeplinkString(
+    private val shareProfileDeeplink: String = deeplinkManager.getDeeplinkString(
         DeepLink.UserProfile(
             tariAddress = corePrefRepository.walletAddressBase58.orEmpty(),
             alias = contactUtil.normalizeAlias(uiState.value.alias, corePrefRepository.walletAddress),

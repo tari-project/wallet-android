@@ -13,20 +13,13 @@ import com.tari.android.wallet.navigation.TariNavigator.Companion.PARAMETER_AMOU
 import com.tari.android.wallet.navigation.TariNavigator.Companion.PARAMETER_CONTACT
 import com.tari.android.wallet.navigation.TariNavigator.Companion.PARAMETER_NOTE
 import com.tari.android.wallet.ui.common.CommonViewModel
-import com.tari.android.wallet.ui.dialog.modular.modules.body.BodyModule
-import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonModule
-import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonStyle
-import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
-import com.tari.android.wallet.ui.screen.send.addAmount.feeModule.FeeModule
-import com.tari.android.wallet.ui.screen.send.addAmount.feeModule.NetworkSpeed
 import com.tari.android.wallet.ui.screen.send.common.TransactionData
 import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.DebugConfig
 import com.tari.android.wallet.util.EffectFlow
 import com.tari.android.wallet.util.extension.getOrNull
+import com.tari.android.wallet.util.extension.getOrThrow
 import com.tari.android.wallet.util.extension.getWithError
-import com.tari.android.wallet.util.extension.launchOnIo
-import com.tari.android.wallet.util.extension.toMicroTari
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -37,23 +30,20 @@ class AddAmountViewModel(savedState: SavedStateHandle) : CommonViewModel() {
     @Inject
     lateinit var networkConnection: NetworkConnectionStateHandler
 
-    var selectedFeeData: FeeData? = null
-    private var selectedSpeed: NetworkSpeed = NetworkSpeed.Medium
-
-    private var feeData: List<FeeData> = listOf()
+    var feeData: FeeData? = null
+    val feeDataRequired
+        get() = feeData ?: error("Fee data is required but not set. Please call calculateFee() first.")
 
     init {
         component.inject(this)
     }
 
     private val _uiState = MutableStateFlow(
-        savedState.get<Contact>(PARAMETER_CONTACT)?.let { contact ->
-            AddAmountModel.UiState(
-                amount = savedState.get<MicroTari>(PARAMETER_AMOUNT)?.tariValue?.toDouble() ?: Double.MIN_VALUE,
-                recipientContact = contact,
-                note = savedState.get<String>(PARAMETER_NOTE).orEmpty(),
-            )
-        } ?: error("FFI contact is required, but not provided (maybe it is a PhoneContactInfo which does not have a wallet address).")
+        AddAmountModel.UiState(
+            amount = savedState.get<MicroTari>(PARAMETER_AMOUNT)?.tariValue?.toDouble() ?: Double.MIN_VALUE,
+            recipientContact = savedState.getOrThrow<Contact>(PARAMETER_CONTACT),
+            note = savedState.get<String>(PARAMETER_NOTE).orEmpty(),
+        )
     )
     val uiState = _uiState.asStateFlow()
 
@@ -70,30 +60,9 @@ class AddAmountViewModel(savedState: SavedStateHandle) : CommonViewModel() {
     }
 
     private fun loadFees() = doOnWalletRunning { wallet ->
-        launchOnIo {
-            try {
-                _uiState.update {
-                    it.copy(feePerGrams = wallet.getFeePerGramStats())
-                }
-            } catch (e: Throwable) {
-                logger.i("Error loading fees: ${e.message}")
-            }
-        }
-    }
-
-    fun showFeeDialog() {
-        val feeModule = FeeModule(0.toMicroTari(), feeData, selectedSpeed)
-        showModularDialog(
-            HeadModule(resourceManager.getString(R.string.add_amount_modify_fee_title)),
-            BodyModule(resourceManager.getString(R.string.add_amount_modify_fee_description)),
-            feeModule,
-            ButtonModule(resourceManager.getString(R.string.add_amount_modify_fee_use), ButtonStyle.Normal) {
-                selectedSpeed = feeModule.selectedSpeed
-                selectedFeeData = feeModule.feePerGram
-                hideDialog()
-            },
-            ButtonModule(resourceManager.getString(R.string.common_cancel), ButtonStyle.Close)
-        )
+        runCatching {
+            _uiState.update { it.copy(feePerGram = wallet.getLowestFeePerGram()) }
+        }.onFailure { logger.i("Error loading fees: ${it.message}") }
     }
 
     fun emojiIdClicked(walletAddress: TariWalletAddress) {
@@ -101,25 +70,19 @@ class AddAmountViewModel(savedState: SavedStateHandle) : CommonViewModel() {
     }
 
     fun calculateFee(amount: MicroTari) {
-        val grams = uiState.value.feePerGrams
-        if (grams == null) {
+        val feePerGram = uiState.value.feePerGram
+        if (feePerGram == null) {
             calculateDefaultFees(amount)
             return
         }
 
-        val wallet = walletManager.requireWalletInstance
-
-        val slowFee = wallet.getWithError(this::showFeeError) { it.estimateTxFee(amount, grams.slow) }
-        val mediumFee = wallet.getWithError(this::showFeeError) { it.estimateTxFee(amount, grams.medium) }
-        val fastFee = wallet.getWithError(this::showFeeError) { it.estimateTxFee(amount, grams.fast) }
-
-        if (slowFee == null || mediumFee == null || fastFee == null) {
+        val fee = walletManager.requireWalletInstance.getWithError(this::showFeeError) { it.estimateTxFee(amount, feePerGram) }
+        if (fee == null) {
             calculateDefaultFees(amount)
             return
         }
 
-        feeData = listOf(FeeData(grams.slow, slowFee), FeeData(grams.medium, mediumFee), FeeData(grams.fast, fastFee))
-        selectedFeeData = feeData[1]
+        feeData = FeeData(feePerGram, fee)
     }
 
     fun continueToAddNote(transactionData: TransactionData) {
@@ -152,7 +115,7 @@ class AddAmountViewModel(savedState: SavedStateHandle) : CommonViewModel() {
         val calculatedFee = walletManager.requireWalletInstance.getOrNull { wallet ->
             wallet.estimateTxFee(amount, Constants.Wallet.DEFAULT_FEE_PER_GRAM)
         } ?: return
-        selectedFeeData = FeeData(Constants.Wallet.DEFAULT_FEE_PER_GRAM, calculatedFee)
+        feeData = FeeData(Constants.Wallet.DEFAULT_FEE_PER_GRAM, calculatedFee)
     }
 
     private fun showFeeError(walletError: WalletError) {
@@ -162,4 +125,9 @@ class AddAmountViewModel(savedState: SavedStateHandle) : CommonViewModel() {
     }
 
     private fun showFeeError() = Unit
+
+    data class FeeData(
+        val feePerGram: MicroTari,
+        val calculatedFee: MicroTari,
+    )
 }

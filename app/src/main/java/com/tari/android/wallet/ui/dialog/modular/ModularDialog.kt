@@ -45,12 +45,8 @@ import com.tari.android.wallet.ui.dialog.modular.modules.shareOptions.ShareOptio
 import com.tari.android.wallet.ui.dialog.modular.modules.shareOptions.ShareOptionsModuleView
 import com.tari.android.wallet.ui.dialog.modular.modules.shareQr.ShareQRCodeModuleView
 import com.tari.android.wallet.ui.dialog.modular.modules.shareQr.ShareQrCodeModule
-import com.tari.android.wallet.ui.dialog.modular.modules.shortEmoji.ShortEmojiIdModule
-import com.tari.android.wallet.ui.dialog.modular.modules.shortEmoji.ShortEmojiModuleView
 import com.tari.android.wallet.ui.dialog.modular.modules.space.SpaceModule
 import com.tari.android.wallet.ui.dialog.modular.modules.space.SpaceModuleView
-import com.tari.android.wallet.ui.screen.send.addAmount.feeModule.FeeModule
-import com.tari.android.wallet.ui.screen.send.addAmount.feeModule.FeeModuleView
 import com.tari.android.wallet.ui.screen.settings.backup.learnMore.module.BackupLearnMoreItemModule
 import com.tari.android.wallet.ui.screen.settings.backup.learnMore.module.BackupLearnMoreItemModuleView
 import com.tari.android.wallet.ui.screen.settings.logs.logs.module.LogLevelCheckedModule
@@ -156,7 +152,6 @@ open class ModularDialog(context: Activity) {
                 is LogLevelCheckedModule -> CheckedModuleView(context, module.checkedModule)
                 is CustomBaseNodeBodyModule -> CustomBaseNodeBodyModuleView(context, module)
                 is ShareQrCodeModule -> ShareQRCodeModuleView(context, module)
-                is FeeModule -> FeeModuleView(context, module)
                 is ListItemModule -> ListItemModuleView(context, module)
                 is DetailItemModule -> DetailItemModuleView(context, module)
                 is UtxoAmountModule -> UtxoAmountModuleView(context, module)
@@ -165,7 +160,6 @@ open class ModularDialog(context: Activity) {
                 is SecurityStageHeadModule -> SecurityStageHeadModuleView(context, module)
                 is BackupLearnMoreItemModule -> BackupLearnMoreItemModuleView(context, module)
                 is InputModule -> InputModuleView(context, module)
-                is ShortEmojiIdModule -> ShortEmojiModuleView(context, module)
                 is IconModule -> IconModuleView(context, module)
                 is AddressPoisoningModule -> AddressPoisoningModuleView(context, module)
                 is AddressDetailsModule -> AddressDetailsModuleView(context, module)

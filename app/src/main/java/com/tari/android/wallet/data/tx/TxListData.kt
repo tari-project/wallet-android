@@ -1,6 +1,8 @@
 package com.tari.android.wallet.data.tx
 
+import com.tari.android.wallet.data.contacts.Contact
 import com.tari.android.wallet.model.TxStatus
+import java.math.BigInteger
 
 data class TxListData(
     val cancelledTxs: List<TxDto> = emptyList(), // List<CancelledTx>
@@ -20,4 +22,8 @@ data class TxListData(
             .sortedWith(compareByDescending<TxDto> { it.tx.timestamp }.thenByDescending { it.tx.id })
     val allTxs: List<TxDto>
         get() = cancelledTxs + completedTxs + pendingInboundTxs + pendingOutboundTxs
+
+    fun lastUsedTimestamp(contact: Contact): BigInteger {
+        return allTxs.filter { it.tx.tariContact.walletAddress == contact.walletAddress }.maxOfOrNull { it.tx.timestamp } ?: BigInteger.ZERO
+    }
 }

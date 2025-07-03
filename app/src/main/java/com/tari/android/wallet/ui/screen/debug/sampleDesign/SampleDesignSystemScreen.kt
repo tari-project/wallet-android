@@ -1,8 +1,10 @@
 package com.tari.android.wallet.ui.screen.debug.sampleDesign
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Scaffold
@@ -22,8 +24,10 @@ import com.tari.android.wallet.ui.compose.components.TariButtonSize
 import com.tari.android.wallet.ui.compose.components.TariInheritTextButton
 import com.tari.android.wallet.ui.compose.components.TariOutlinedButton
 import com.tari.android.wallet.ui.compose.components.TariPrimaryButton
+import com.tari.android.wallet.ui.compose.components.TariSearchField
 import com.tari.android.wallet.ui.compose.components.TariSecondaryButton
 import com.tari.android.wallet.ui.compose.components.TariTextButton
+import com.tari.android.wallet.ui.compose.components.TariTextField
 import com.tari.android.wallet.ui.compose.widgets.StartMiningButton
 import com.tari.android.wallet.ui.screen.settings.themeSelector.TariTheme
 
@@ -223,12 +227,33 @@ fun SampleDesignSystemScreen(
             )
 
             var isMining by rememberSaveable { mutableStateOf(false) }
-
             StartMiningButton(
                 isMining = isMining,
                 onStartMiningClick = { isMining = !isMining },
                 modifier = Modifier.padding(20.dp),
             )
+
+            var textFieldValue by rememberSaveable { mutableStateOf("") }
+            TariTextField(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 20.dp, vertical = 10.dp),
+                value = textFieldValue,
+                onValueChanged = { textFieldValue = it },
+                hint = "Hint",
+            )
+
+            var searchFieldValue by rememberSaveable { mutableStateOf("") }
+            TariSearchField(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 20.dp, vertical = 10.dp),
+                searchQuery = searchFieldValue,
+                onQueryChanged = { searchFieldValue = it },
+                hint = "Search hint",
+            )
+
+            Spacer(Modifier.size(80.dp))
         }
     }
 }

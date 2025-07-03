@@ -18,7 +18,9 @@ fun PreviewPrimarySurface(
             modifier = modifier,
             color = TariDesignSystem.colors.backgroundPrimary,
         ) {
-            Column(content = content)
+            Column(
+                content = content,
+            )
         }
     }
 }
@@ -34,7 +36,9 @@ fun PreviewSecondarySurface(
             modifier = modifier,
             color = TariDesignSystem.colors.backgroundSecondary,
         ) {
-            Column(content = content)
+            Column(
+                content = content,
+            )
         }
     }
 }

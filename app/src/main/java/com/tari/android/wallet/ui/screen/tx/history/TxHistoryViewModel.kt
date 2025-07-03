@@ -1,13 +1,10 @@
 package com.tari.android.wallet.ui.screen.tx.history
 
-import androidx.lifecycle.SavedStateHandle
-import com.tari.android.wallet.data.contacts.Contact
 import com.tari.android.wallet.data.contacts.ContactsRepository
 import com.tari.android.wallet.data.tx.TxDto
 import com.tari.android.wallet.data.tx.TxRepository
 import com.tari.android.wallet.model.tx.Tx
 import com.tari.android.wallet.navigation.Navigation
-import com.tari.android.wallet.navigation.TariNavigator
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.util.extension.collectFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -15,7 +12,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 
-class TxHistoryViewModel(savedState: SavedStateHandle) : CommonViewModel() {
+class TxHistoryViewModel() : CommonViewModel() {
 
     @Inject
     lateinit var txRepository: TxRepository
@@ -29,7 +26,6 @@ class TxHistoryViewModel(savedState: SavedStateHandle) : CommonViewModel() {
 
     private val _uiState = MutableStateFlow(
         UiState(
-            selectedContact = savedState.get<Contact>(TariNavigator.PARAMETER_CONTACT),
             pendingTxs = emptyList(),
             nonPendingTxs = emptyList(),
             ticker = networkRepository.currentNetwork.ticker,
@@ -57,7 +53,6 @@ class TxHistoryViewModel(savedState: SavedStateHandle) : CommonViewModel() {
     }
 
     data class UiState(
-        val selectedContact: Contact? = null, // null if not contact tx history
         val pendingTxs: List<TxDto>,
         val nonPendingTxs: List<TxDto>,
         val ticker: String,
@@ -67,19 +62,14 @@ class TxHistoryViewModel(savedState: SavedStateHandle) : CommonViewModel() {
             get() = pendingTxs + nonPendingTxs
 
         val sortedTxList: List<TxDto>
-            get() = allTxList.filterByContact().filterByQuery()
+            get() = allTxList.filterByQuery()
 
         val showEmptyState: Boolean
             get() = allTxList.isEmpty()
         val showSortedList: Boolean
-            get() = selectedContact != null || allTxList.isNotEmpty() && searchQuery.isNotBlank()
+            get() = allTxList.isNotEmpty() && searchQuery.isNotBlank()
 
-        private fun List<TxDto>.filterByContact(): List<TxDto> = selectedContact?.let { contact ->
-            filter { it.tx.tariContact.walletAddress == contact.walletAddress }
-        } ?: this
-
-        private fun List<TxDto>.filterByQuery(): List<TxDto> = searchQuery.trim().takeIf { it.isNotBlank() }?.let { query ->
-            filter { it.contains(query) }
-        } ?: this
+        private fun List<TxDto>.filterByQuery(): List<TxDto> = searchQuery.trim().takeIf { it.isNotBlank() }
+            ?.let { query -> filter { it.contains(query) } } ?: this
     }
 }

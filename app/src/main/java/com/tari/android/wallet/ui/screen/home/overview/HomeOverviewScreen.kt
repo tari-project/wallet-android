@@ -52,6 +52,7 @@ fun HomeOverviewScreen(
     onSyncDialogDismiss: () -> Unit,
     onBalanceInfoClicked: () -> Unit,
     onBalanceInfoDialogDismiss: () -> Unit,
+    onHideBalanceClicked: () -> Unit,
 ) {
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -100,6 +101,8 @@ fun HomeOverviewScreen(
                         balance = uiState.balance,
                         ticker = uiState.ticker,
                         onBalanceHelpClicked = onBalanceInfoClicked,
+                        onHideBalanceClicked = onHideBalanceClicked,
+                        isBalanceHidden = uiState.balanceHidden,
                     )
                     Spacer(modifier = Modifier.height(10.dp))
                     Row(
@@ -181,6 +184,7 @@ fun HomeOverviewScreen(
                                 .animateItem(),
                             txDto = txItem,
                             ticker = uiState.ticker,
+                            balanceHidden = uiState.balanceHidden,
                             onTxClick = { onTxClick(txItem) },
                         )
                     }
@@ -249,6 +253,42 @@ private fun HomeOverviewScreenPreview() {
             onSyncDialogDismiss = {},
             onBalanceInfoClicked = {},
             onBalanceInfoDialogDismiss = {},
+            onHideBalanceClicked = {},
+        )
+    }
+}
+
+@Composable
+@Preview
+private fun HomeOverviewScreenHiddenPreview() {
+    TariDesignSystem(TariTheme.Light) {
+        HomeOverviewScreen(
+            uiState = HomeOverviewModel.UiState(
+                activeMinersCount = 10,
+                isMining = false,
+                balance = BalanceInfo(
+                    availableBalance = 4_836_150_000.toMicroTari(),
+                    pendingIncomingBalance = 0.toMicroTari(),
+                    pendingOutgoingBalance = 0.toMicroTari(),
+                    timeLockedBalance = 0.toMicroTari(),
+                ),
+                ticker = "XTM",
+                networkName = "Testnet",
+                ffiVersion = "v1.11.0-rc.0",
+                txList = MockDataStub.createTxList(),
+                balanceHidden = true,
+            ),
+            onPullToRefresh = {},
+            onStartMiningClicked = {},
+            onSendTariClicked = {},
+            onRequestTariClicked = {},
+            onTxClick = {},
+            onViewAllTxsClick = {},
+            onConnectionStatusClick = {},
+            onSyncDialogDismiss = {},
+            onBalanceInfoClicked = {},
+            onBalanceInfoDialogDismiss = {},
+            onHideBalanceClicked = {},
         )
     }
 }
@@ -283,6 +323,7 @@ private fun HomeOverviewEmptyScreenPreview() {
             onSyncDialogDismiss = {},
             onBalanceInfoClicked = {},
             onBalanceInfoDialogDismiss = {},
+            onHideBalanceClicked = {},
         )
     }
 }
@@ -318,6 +359,7 @@ private fun HomeOverviewProgressScreenPreview() {
             onSyncDialogDismiss = {},
             onBalanceInfoClicked = {},
             onBalanceInfoDialogDismiss = {},
+            onHideBalanceClicked = {},
         )
     }
 }

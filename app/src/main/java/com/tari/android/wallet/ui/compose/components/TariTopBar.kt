@@ -1,6 +1,7 @@
 package com.tari.android.wallet.ui.compose.components
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
@@ -29,6 +30,7 @@ fun TariTopBar(
     modifier: Modifier = Modifier,
     onBack: (() -> Unit)? = null,
     showShadow: Boolean = true,
+    action: (@Composable BoxScope.() -> Unit)? = null,
 ) {
     Surface(
         modifier = modifier
@@ -63,6 +65,15 @@ fun TariTopBar(
                 style = TariDesignSystem.typography.headingLarge,
                 textAlign = TextAlign.Center,
             )
+
+            if (action != null) {
+                Box(
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .padding(8.dp),
+                    content = action,
+                )
+            }
         }
     }
 }
@@ -74,8 +85,17 @@ fun TariTopBarShadowPreview() {
         Column {
             TariTopBar(
                 title = "Toolbar Title",
-                showShadow = true,
                 onBack = {},
+                showShadow = true,
+                action = {
+                    IconButton(onClick = {}) {
+                        Icon(
+                            painter = painterResource(R.drawable.vector_icon_share),
+                            contentDescription = null,
+                            tint = TariDesignSystem.colors.componentsNavbarIcons,
+                        )
+                    }
+                },
             )
         }
     }
@@ -88,8 +108,8 @@ fun TariTopBarPreview() {
         Column {
             TariTopBar(
                 title = "Toolbar Title",
-                showShadow = false,
                 onBack = {},
+                showShadow = false,
             )
         }
     }
@@ -102,8 +122,17 @@ fun TariTopBarLongTitlePreview() {
         Column {
             TariTopBar(
                 title = "Toolbar very long title that should be truncated at some point and not overflow the screen",
-                showShadow = false,
                 onBack = {},
+                showShadow = false,
+                action = {
+                    IconButton(onClick = {}) {
+                        Icon(
+                            painter = painterResource(R.drawable.vector_icon_share),
+                            contentDescription = null,
+                            tint = TariDesignSystem.colors.componentsNavbarIcons,
+                        )
+                    }
+                },
             )
         }
     }

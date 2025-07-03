@@ -38,6 +38,7 @@ import com.tari.android.wallet.ffi.FFIException
 import com.tari.android.wallet.ffi.FFITariWalletAddress
 import com.tari.android.wallet.ffi.runWithDestroy
 import com.tari.android.wallet.util.extension.flag
+import com.tari.android.wallet.util.extension.isTrue
 import com.tari.android.wallet.util.tariEmoji
 import kotlinx.parcelize.Parcelize
 
@@ -87,6 +88,17 @@ data class TariWalletAddress(
         get() = features.contains(Feature.PAYMENT_ID)
 
     fun isUnknownUser(): Boolean = unknownAddress
+
+    fun contains(query: String): Boolean {
+        return fullBase58.contains(query, ignoreCase = true) ||
+                fullEmojiId.contains(query, ignoreCase = true) ||
+                uniqueIdentifier.contains(query, ignoreCase = true) ||
+                networkEmoji.contains(query, ignoreCase = true) ||
+                featuresEmoji.contains(query, ignoreCase = true) ||
+                viewKeyEmojis?.contains(query, ignoreCase = true).isTrue() ||
+                spendKeyEmojis.contains(query, ignoreCase = true) ||
+                checksumEmoji.contains(query, ignoreCase = true)
+    }
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
