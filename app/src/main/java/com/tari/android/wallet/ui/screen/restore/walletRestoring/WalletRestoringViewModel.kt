@@ -2,11 +2,11 @@ package com.tari.android.wallet.ui.screen.restore.walletRestoring
 
 import androidx.lifecycle.viewModelScope
 import com.tari.android.wallet.R
+import com.tari.android.wallet.application.Navigation
 import com.tari.android.wallet.application.baseNodes.BaseNodesManager
 import com.tari.android.wallet.data.recovery.WalletRestorationState
 import com.tari.android.wallet.data.recovery.WalletRestorationStateHandler
 import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodeDto
-import com.tari.android.wallet.navigation.Navigation
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.common.domain.ResourceManager
 import com.tari.android.wallet.ui.dialog.modular.SimpleDialogArgs

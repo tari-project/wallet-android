@@ -1,6 +1,6 @@
 package com.tari.android.wallet.ui.screen.settings.backup.learnMore
 
-import com.tari.android.wallet.navigation.Navigation
+import com.tari.android.wallet.application.Navigation
 import com.tari.android.wallet.ui.common.CommonViewModel
 
 class BackupLearnMoreViewModel : CommonViewModel() {

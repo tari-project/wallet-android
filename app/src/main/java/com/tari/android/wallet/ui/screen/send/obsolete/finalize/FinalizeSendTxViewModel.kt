@@ -9,11 +9,11 @@ import com.tari.android.wallet.R.string.finalize_send_tx_sending_step_2_desc_lin
 import com.tari.android.wallet.R.string.finalize_send_tx_sending_step_2_desc_line_2
 import com.tari.android.wallet.R.string.finalize_send_tx_sending_step_3_desc_line_1
 import com.tari.android.wallet.R.string.finalize_send_tx_sending_step_3_desc_line_2
+import com.tari.android.wallet.application.Navigation
 import com.tari.android.wallet.application.walletManager.WalletManager
 import com.tari.android.wallet.data.network.NetworkConnectionStateHandler
 import com.tari.android.wallet.model.TariContact
 import com.tari.android.wallet.model.TransactionData
-import com.tari.android.wallet.navigation.Navigation
 import com.tari.android.wallet.tor.TorBootstrapStatus
 import com.tari.android.wallet.tor.TorProxyState
 import com.tari.android.wallet.tor.TorProxyStateHandler

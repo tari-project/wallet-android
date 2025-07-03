@@ -3,6 +3,7 @@ package com.tari.android.wallet.ui.screen.send.send
 import androidx.annotation.StringRes
 import androidx.lifecycle.SavedStateHandle
 import com.tari.android.wallet.R
+import com.tari.android.wallet.application.Navigation
 import com.tari.android.wallet.application.addressPoisoning.AddressPoisoningChecker
 import com.tari.android.wallet.application.deeplinks.DeepLink
 import com.tari.android.wallet.data.BalanceStateHandler
@@ -14,7 +15,6 @@ import com.tari.android.wallet.model.MicroTari
 import com.tari.android.wallet.model.TariWalletAddress
 import com.tari.android.wallet.model.TransactionData
 import com.tari.android.wallet.model.WalletError
-import com.tari.android.wallet.navigation.Navigation
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.dialog.modular.modules.addressPoisoning.AddressPoisoningModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonModule

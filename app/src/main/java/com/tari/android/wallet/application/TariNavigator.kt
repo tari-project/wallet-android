@@ -1,4 +1,4 @@
-package com.tari.android.wallet.navigation
+package com.tari.android.wallet.application
 
 import android.content.Context
 import android.content.Intent
@@ -6,26 +6,28 @@ import android.net.Uri
 import android.os.Bundle
 import android.view.View
 import android.view.inputmethod.InputMethodManager
-import com.tari.android.wallet.application.YatAdapter
+import com.tari.android.wallet.application.Navigation.AllSettings
+import com.tari.android.wallet.application.Navigation.Auth
+import com.tari.android.wallet.application.Navigation.Back
+import com.tari.android.wallet.application.Navigation.BackToHome
+import com.tari.android.wallet.application.Navigation.BackupSettings
+import com.tari.android.wallet.application.Navigation.ChangeBiometrics
+import com.tari.android.wallet.application.Navigation.ContactBook
+import com.tari.android.wallet.application.Navigation.CustomBridge
+import com.tari.android.wallet.application.Navigation.EnterPinCode
+import com.tari.android.wallet.application.Navigation.Home
+import com.tari.android.wallet.application.Navigation.InputSeedWords
+import com.tari.android.wallet.application.Navigation.Restore
+import com.tari.android.wallet.application.Navigation.ShareText
+import com.tari.android.wallet.application.Navigation.SplashScreen
+import com.tari.android.wallet.application.Navigation.TorBridge
+import com.tari.android.wallet.application.Navigation.TxList
+import com.tari.android.wallet.application.Navigation.TxSend
+import com.tari.android.wallet.application.Navigation.VerifySeedPhrase
+import com.tari.android.wallet.data.contacts.Contact
+import com.tari.android.wallet.model.MicroTari
 import com.tari.android.wallet.model.TransactionData
-import com.tari.android.wallet.navigation.Navigation.AllSettings
-import com.tari.android.wallet.navigation.Navigation.Auth
-import com.tari.android.wallet.navigation.Navigation.Back
-import com.tari.android.wallet.navigation.Navigation.BackToHome
-import com.tari.android.wallet.navigation.Navigation.BackupSettings
-import com.tari.android.wallet.navigation.Navigation.ChangeBiometrics
-import com.tari.android.wallet.navigation.Navigation.ContactBook
-import com.tari.android.wallet.navigation.Navigation.CustomBridge
-import com.tari.android.wallet.navigation.Navigation.EnterPinCode
-import com.tari.android.wallet.navigation.Navigation.Home
-import com.tari.android.wallet.navigation.Navigation.InputSeedWords
-import com.tari.android.wallet.navigation.Navigation.Restore
-import com.tari.android.wallet.navigation.Navigation.ShareText
-import com.tari.android.wallet.navigation.Navigation.SplashScreen
-import com.tari.android.wallet.navigation.Navigation.TorBridge
-import com.tari.android.wallet.navigation.Navigation.TxList
-import com.tari.android.wallet.navigation.Navigation.TxSend
-import com.tari.android.wallet.navigation.Navigation.VerifySeedPhrase
+import com.tari.android.wallet.model.tx.Tx
 import com.tari.android.wallet.ui.common.CommonActivity
 import com.tari.android.wallet.ui.common.CommonFragment
 import com.tari.android.wallet.ui.screen.auth.AuthActivity
@@ -42,13 +44,13 @@ import com.tari.android.wallet.ui.screen.home.overview.HomeOverviewFragment
 import com.tari.android.wallet.ui.screen.onboarding.activity.OnboardingFlowActivity
 import com.tari.android.wallet.ui.screen.onboarding.localAuth.LocalAuthFragment
 import com.tari.android.wallet.ui.screen.pinCode.EnterPinCodeFragment
+import com.tari.android.wallet.ui.screen.pinCode.PinCodeScreenBehavior
 import com.tari.android.wallet.ui.screen.profile.walletInfo.WalletInfoFragment
 import com.tari.android.wallet.ui.screen.restore.activity.WalletRestoreActivity
 import com.tari.android.wallet.ui.screen.restore.enterRestorationPassword.EnterRestorationPasswordFragment
 import com.tari.android.wallet.ui.screen.restore.inputSeedWords.InputSeedWordsFragment
 import com.tari.android.wallet.ui.screen.restore.walletRestoring.WalletRestoringFragment
 import com.tari.android.wallet.ui.screen.send.confirm.ConfirmFragment
-import com.tari.android.wallet.ui.screen.send.obsolete.addNote.AddNoteFragment
 import com.tari.android.wallet.ui.screen.send.obsolete.finalize.FinalizeSendTxFragment
 import com.tari.android.wallet.ui.screen.send.obsolete.requestTari.RequestTariFragment
 import com.tari.android.wallet.ui.screen.send.receive.ReceiveFragment
@@ -79,7 +81,6 @@ import javax.inject.Singleton
 class TariNavigator @Inject constructor(
     private val yatAdapter: YatAdapter,
 ) {
-
     // The activity on which the navigation intents are performed.
     // Set in the #onResume method of the activity!
     lateinit var currentActivity: CommonActivity<*>
@@ -128,7 +129,6 @@ class TariNavigator @Inject constructor(
             is InputSeedWords.ToRestoreFromSeeds -> addFragment(WalletRestoringFragment.newInstance())
             is InputSeedWords.ToBaseNodeSelection -> toBaseNodeSelection()
 
-            is TxSend.ToAddNote -> addFragment(AddNoteFragment.newInstance(navigation.transactionData))
             is TxSend.ToFinalizing -> continueToFinalizeSendTx(navigation.transactionData)
             is TxSend.Send -> addFragment(SendFragment.newInstance(navigation.contact, navigation.amount, navigation.note))
             is TxSend.Confirm -> addFragment(ConfirmFragment.newInstance(navigation.transactionData))
@@ -225,11 +225,90 @@ class TariNavigator @Inject constructor(
         val view = currentActivity.currentFocus ?: View(currentActivity)
         imm.hideSoftInputFromWindow(view.windowToken, 0)
     }
+}
 
-    companion object {
-        const val PARAMETER_NOTE = "note"
-        const val PARAMETER_AMOUNT = "amount"
-        const val PARAMETER_TRANSACTION = "transaction_data"
-        const val PARAMETER_CONTACT = "tari_contact_dto_args"
+sealed class Navigation {
+
+    data object Back : Navigation()
+
+    data class EnterPinCode(val behavior: PinCodeScreenBehavior, val stashedPin: String? = null) : Navigation()
+    data object ChangeBiometrics : Navigation()
+    data class SplashScreen(val seedWords: List<String>? = null, val clearTop: Boolean = true, val uri: Uri? = null) : Navigation()
+    data class Home(val uri: Uri? = null) : Navigation()
+    data object BackToHome : Navigation()
+
+    data class ShareText(val text: String) : Navigation()
+
+    sealed class Auth : Navigation() {
+        data class AuthScreen(val uri: Uri? = null) : Auth()
+        data object FeatureAuth : Auth()
+        data object BackAfterAuth : Auth()
+    }
+
+    sealed class Restore : Navigation() {
+        data object WalletRestoreActivity : Restore()
+        data object ToEnterRestorePassword : Restore()
+        data object ToRestoreWithRecoveryPhrase : Restore()
+    }
+
+    sealed class CustomBridge : Navigation() {
+        data object UploadQrCode : CustomBridge()
+    }
+
+    sealed class BackupSettings : Navigation() {
+        data object ToLearnMore : BackupSettings()
+        data object ToWalletBackupWithRecoveryPhrase : BackupSettings()
+        data object ToChangePassword : BackupSettings()
+        data object ToConfirmPassword : BackupSettings()
+    }
+
+    sealed class VerifySeedPhrase : Navigation() {
+        data class ToSeedPhraseVerification(val seedWords: List<String>) : VerifySeedPhrase()
+    }
+
+    sealed class TorBridge : Navigation() {
+        data object ToCustomBridges : TorBridge()
+    }
+
+    sealed class TxList : Navigation() {
+        data class ToTxDetails(val tx: Tx, val showCloseButton: Boolean = false) : TxList()
+        data object ToAllSettings : TxList()
+        data object ToUtxos : TxList()
+        data object HomeTransactionHistory : TxList()
+        data object ToReceive : TxList()
+    }
+
+    sealed class TxSend : Navigation() {
+        data class ToFinalizing(val transactionData: TransactionData) : TxSend()
+        data class Send(val contact: Contact? = null, val amount: MicroTari? = null, val note: String? = null) : TxSend()
+        data class Confirm(val transactionData: TransactionData) : TxSend()
+    }
+
+    sealed class AllSettings : Navigation() {
+        data object ToMyProfile : AllSettings()
+        data object ToBugReporting : AllSettings()
+        data object ToDataCollection : AllSettings()
+        data object ToAbout : AllSettings()
+        data object BackToBackupSettings : AllSettings()
+        data class ToBackupSettings(val withAnimation: Boolean) : AllSettings()
+        data object ToDeleteWallet : AllSettings()
+        data object ToScreenRecording : AllSettings()
+        data object ToThemeSelection : AllSettings()
+        data object ToTorBridges : AllSettings()
+        data object ToNetworkSelection : AllSettings()
+        data object ToBaseNodeSelection : AllSettings()
+        data object ToRequestTari : AllSettings()
+    }
+
+    sealed class InputSeedWords : Navigation() {
+        data object ToRestoreFromSeeds : InputSeedWords()
+        data object ToBaseNodeSelection : InputSeedWords()
+    }
+
+    sealed class ContactBook : Navigation() {
+        data object AllContacts : ContactBook()
+        data class ContactDetails(val contact: Contact) : ContactBook()
+        data object AddContact : ContactBook()
+        data object ToSelectTariUser : ContactBook()
     }
 }

@@ -45,12 +45,6 @@
     <!-- no connection -->
     <string name="error_no_connection_title">Can\'t connect to the internet</string>
     <string name="error_no_connection_description">Your phone appears to be offline or has a poor connection at the moment. Please try again when you\'ve found a stronger signal.</string>
-    <!-- balance exceeded -->
-    <string name="error_balance_exceeded_title">Hold your horses! 🐴</string>
-    <string name="error_balance_exceeded_description">Sorry, you can’t send this much XTM until your previous transaction(s) are complete. Please
-        wait for at least one transaction to complete and then try again.</string>
-    <string name="error_fee_more_than_amount_title">Amount Error</string>
-    <string name="error_fee_more_than_amount_description">Sorry, the amount cannot be less than the fee.</string>
 
     <string name="error_wallet_message_generic">Something went wrong! Please try again later. Please send us a bug report if this problem persists.</string>
     <string name="error_wallet_message_114">The wallet could not be restored. The backup file is not supported. We updated the wallet version, old
@@ -244,18 +238,7 @@
     <string name="add_recipient_camera_permission_denied_message">Camera permission denied</string>
 
     <!-- send tari - amount -->
-    <string name="add_amount_under_construction">Under Construction</string>
-    <string name="add_amount_not_enough_available_balance">Not enough XTM in your available balance</string>
-    <string name="add_amount_funds_pending">Sorry, you can’t send this much XTM. Please wait for at least one transaction to complete and then try
-        again.</string>
     <string name="add_amount_tx_fee">Transaction Fee</string>
-    <string name="add_amount_wallet_balance">Wallet Balance</string>
-    <string name="add_amount_modify_fee_calculating_fees">Calculating transaction fee…</string>
-
-    <!-- send tari - note -->
-    <string name="add_note_prompt">Transaction Note</string>
-    <string name="add_note_hint">Let the recipient know what the payment is for</string>
-    <string name="add_note_slide_to_send">Slide to Send</string>
 
     <!-- send tari - successful -->
     <string name="finalize_send_tx_sending_step_1_desc_line_1">Connecting to the</string>

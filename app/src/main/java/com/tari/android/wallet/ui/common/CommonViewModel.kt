@@ -9,6 +9,9 @@ import androidx.lifecycle.ViewModel
 import com.orhanobut.logger.Logger
 import com.orhanobut.logger.Printer
 import com.tari.android.wallet.R
+import com.tari.android.wallet.application.Navigation
+import com.tari.android.wallet.application.Navigation.AllSettings
+import com.tari.android.wallet.application.TariNavigator
 import com.tari.android.wallet.application.deeplinks.DeepLink
 import com.tari.android.wallet.application.deeplinks.DeeplinkManager
 import com.tari.android.wallet.application.walletManager.WalletManager
@@ -25,9 +28,6 @@ import com.tari.android.wallet.ffi.FFIWallet
 import com.tari.android.wallet.infrastructure.permission.PermissionManager
 import com.tari.android.wallet.model.CoreError
 import com.tari.android.wallet.model.TariWalletAddress
-import com.tari.android.wallet.navigation.Navigation
-import com.tari.android.wallet.navigation.Navigation.AllSettings
-import com.tari.android.wallet.navigation.TariNavigator
 import com.tari.android.wallet.ui.common.domain.ResourceManager
 import com.tari.android.wallet.ui.dialog.confirm.ConfirmDialogArgs
 import com.tari.android.wallet.ui.dialog.error.WalletErrorArgs

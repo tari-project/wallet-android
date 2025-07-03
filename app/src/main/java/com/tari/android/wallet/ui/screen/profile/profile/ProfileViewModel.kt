@@ -1,10 +1,10 @@
 package com.tari.android.wallet.ui.screen.profile.profile
 
 import com.tari.android.wallet.R
+import com.tari.android.wallet.application.Navigation
 import com.tari.android.wallet.data.airdrop.AirdropRepository
 import com.tari.android.wallet.data.tx.TxListData
 import com.tari.android.wallet.data.tx.TxRepository
-import com.tari.android.wallet.navigation.Navigation
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.dialog.modular.modules.body.BodyModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonModule

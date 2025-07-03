@@ -2,9 +2,9 @@ package com.tari.android.wallet.ui.screen.send.confirm
 
 import androidx.lifecycle.SavedStateHandle
 import com.tari.android.wallet.R
+import com.tari.android.wallet.application.Navigation
 import com.tari.android.wallet.model.MicroTari
 import com.tari.android.wallet.model.TransactionData
-import com.tari.android.wallet.navigation.Navigation
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.screen.send.confirm.ConfirmFragment.Companion.PARAMETER_TRANSACTION
 import com.tari.android.wallet.util.extension.getOrThrow

@@ -66,8 +66,6 @@ import com.tari.android.wallet.ui.screen.restore.enterRestorationPassword.EnterR
 import com.tari.android.wallet.ui.screen.restore.inputSeedWords.InputSeedWordsViewModel
 import com.tari.android.wallet.ui.screen.restore.walletRestoring.WalletRestoringViewModel
 import com.tari.android.wallet.ui.screen.send.confirm.ConfirmViewModel
-import com.tari.android.wallet.ui.screen.send.obsolete.addAmount.AddAmountViewModel
-import com.tari.android.wallet.ui.screen.send.obsolete.addNote.AddNoteViewModel
 import com.tari.android.wallet.ui.screen.send.obsolete.finalize.FinalizeSendTxViewModel
 import com.tari.android.wallet.ui.screen.send.obsolete.requestTari.RequestTariViewModel
 import com.tari.android.wallet.ui.screen.send.receive.ReceiveViewModel
@@ -138,7 +136,6 @@ interface ApplicationComponent {
     fun inject(viewModel: FinalizeSendTxViewModel)
     fun inject(viewModel: WalletInfoViewModel)
     fun inject(viewModel: RequestTariViewModel)
-    fun inject(viewModel: AddAmountViewModel)
     fun inject(viewModel: TorBridgesSelectionViewModel)
     fun inject(viewModel: CustomTorBridgesViewModel)
     fun inject(viewModel: LocalAuthViewModel)
@@ -158,7 +155,6 @@ interface ApplicationComponent {
     fun inject(viewModel: TxHistoryViewModel)
     fun inject(viewModel: EnterCurrentPasswordViewModel)
     fun inject(viewModel: ChangeSecurePasswordViewModel)
-    fun inject(viewModel: AddNoteViewModel)
     fun inject(viewModel: BackupLearnMoreViewModel)
     fun inject(viewModel: BackupLearnMoreItemViewModel)
     fun inject(viewModel: ContactSelectionViewModel)

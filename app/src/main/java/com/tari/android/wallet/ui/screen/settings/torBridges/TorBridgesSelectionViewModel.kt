@@ -3,10 +3,10 @@ package com.tari.android.wallet.ui.screen.settings.torBridges
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.tari.android.wallet.R
+import com.tari.android.wallet.application.Navigation
 import com.tari.android.wallet.application.deeplinks.DeepLink
 import com.tari.android.wallet.data.sharedPrefs.tor.TorBridgeConfigurationList
 import com.tari.android.wallet.data.sharedPrefs.tor.TorPrefRepository
-import com.tari.android.wallet.navigation.Navigation
 import com.tari.android.wallet.tor.TorProxyManager
 import com.tari.android.wallet.tor.TorProxyState
 import com.tari.android.wallet.tor.TorProxyStateHandler

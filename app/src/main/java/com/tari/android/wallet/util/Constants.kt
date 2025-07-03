@@ -109,10 +109,6 @@ object Constants {
         val DEFAULT_FEE_PER_GRAM = 10.toMicroTari()
     }
 
-    object Contacts {
-        const val RECENT_CONTACTS_COUNT = 3
-    }
-
     object Build {
         const val regularFlavor = "regular"
         const val privacyFlavor = "privacy"

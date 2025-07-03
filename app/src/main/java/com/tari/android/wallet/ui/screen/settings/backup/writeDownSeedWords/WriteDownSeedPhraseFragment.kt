@@ -43,8 +43,8 @@ import androidx.transition.ChangeBounds
 import androidx.transition.Transition
 import androidx.transition.TransitionManager
 import com.tari.android.wallet.R
+import com.tari.android.wallet.application.Navigation
 import com.tari.android.wallet.databinding.FragmentWriteDownSeedPhraseBinding
-import com.tari.android.wallet.navigation.Navigation
 import com.tari.android.wallet.ui.common.CommonXmlFragment
 import com.tari.android.wallet.ui.screen.settings.backup.writeDownSeedWords.adapter.PhraseWordsAdapter
 import com.tari.android.wallet.util.Constants

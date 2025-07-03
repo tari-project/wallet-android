@@ -9,21 +9,11 @@
     <dimen name="onboarding_bottom_progress_bar_bottom_margin">25dp</dimen>
     <dimen name="onboarding_small_gem_top_margin">46dp</dimen>
 
-    <!-- send tari - common -->
-    <dimen name="header_top_inset">24dp</dimen>
     <!-- send tari - add recipient -->
     <dimen name="add_recipient_search_bar_container_height">96dp</dimen>
     <!-- send tari - add amount -->
     <dimen name="add_amount_element_text_size">72sp</dimen>
     <dimen name="add_amount_keypad_row_height">52dp</dimen>
     <dimen name="add_amount_keypad_text_size">36sp</dimen>
-    <dimen name="add_amount_balance_text_size">14sp</dimen>
-    <dimen name="add_amount_tx_fee_text_size">13sp</dimen>
-    <dimen name="add_amount_balance_warning_container_top_margin">8dp</dimen>
-    <dimen name="add_amount_balance_warning_container_top_padding">12dp</dimen>
-    <dimen name="add_amount_balance_warning_container_bottom_padding">10dp</dimen>
-    <!-- send tari - add note -->
-    <dimen name="add_note_prompt_text_size">16sp</dimen>
-    <dimen name="add_note_note_text_size">20sp</dimen>
 
 </resources>
