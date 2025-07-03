@@ -1,4 +1,5 @@
 @file:Suppress("Unused")
+
 /**
  * Copyright 2020 The Tari Project
  *
@@ -310,7 +311,7 @@ class FFIWallet(
 
     fun cancelPendingTx(id: BigInteger): Boolean = runWithError { jniCancelPendingTx(id.toString(), it) }
 
-    fun estimateTxFee(amount: MicroTari, feePerGram: MicroTari?): MicroTari = runWithError { error ->
+    fun estimateTxFee(amount: MicroTari, feePerGram: MicroTari): MicroTari = runWithError { error ->
         val defaultKernelCount = BigInteger("1")
         val defaultOutputCount = BigInteger("2")
         val gram = feePerGram?.value ?: Constants.Wallet.DEFAULT_FEE_PER_GRAM.value
@@ -436,8 +437,8 @@ class FFIWallet(
         }
 
     fun getLowestFeePerGram(): MicroTari = runWithError { error ->
-        FFIFeePerGramStats(jniWalletGetFeePerGramStats(3, error)).runWithDestroy {
-            it.getAt(0).getMin().toMicroTari().takeIf { it > 0.toMicroTari() }
+        FFIFeePerGramStats(jniWalletGetFeePerGramStats(3, error)).runWithDestroy { stats ->
+            stats.getAt(0).getMin().toMicroTari().takeIf { it > 0.toMicroTari() }
                 ?: 1.toMicroTari() // Sometimes the minimum fee can be 0, so we set it to 1 microTari
         }
     }

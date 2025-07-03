@@ -26,13 +26,18 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.OffsetMapping
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.input.TransformedText
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.tari.android.wallet.ui.compose.PreviewSecondarySurface
 import com.tari.android.wallet.ui.compose.TariDesignSystem
 import com.tari.android.wallet.ui.screen.settings.themeSelector.TariTheme
+import java.text.NumberFormat
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -106,6 +111,7 @@ fun TariTextField(
             ),
             textStyle = TariDesignSystem.typography.body1.copy(color = TariDesignSystem.colors.textPrimary),
             keyboardOptions = if (numberKeyboard) KeyboardOptions(keyboardType = KeyboardType.Number) else KeyboardOptions.Default,
+            visualTransformation = if (numberKeyboard) AmountVisualTransformation() else VisualTransformation.None,
         )
 
         if (errorText != null) {
@@ -116,6 +122,29 @@ fun TariTextField(
                 style = TariDesignSystem.typography.body2.copy(color = TariDesignSystem.colors.errorMain),
             )
         }
+    }
+}
+
+class AmountVisualTransformation : VisualTransformation {
+    override fun filter(text: AnnotatedString): TransformedText {
+        // Split the text into integer and fractional parts
+        val parts = text.text.split('.', limit = 2)
+        val intPart = parts.getOrNull(0) ?: ""
+        val fracPart = parts.getOrNull(1)
+        // Format the integer part with thousand separators; fallback to plain text if not a valid number
+        val formattedInt = intPart.toLongOrNull()?.let {
+            NumberFormat.getInstance().format(it)
+        } ?: intPart
+
+        val newText = if (fracPart != null) "$formattedInt.$fracPart" else formattedInt
+
+        // Since the formatting changes the length or position of characters, use a simple OffsetMapping
+        val offsetMapping = object : OffsetMapping {
+            override fun originalToTransformed(offset: Int): Int = newText.length
+            override fun transformedToOriginal(offset: Int): Int = text.text.length
+        }
+
+        return TransformedText(AnnotatedString(newText), offsetMapping)
     }
 }
 

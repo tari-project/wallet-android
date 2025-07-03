@@ -71,6 +71,7 @@ import com.tari.android.wallet.ui.screen.send.obsolete.addNote.AddNoteViewModel
 import com.tari.android.wallet.ui.screen.send.obsolete.finalize.FinalizeSendTxViewModel
 import com.tari.android.wallet.ui.screen.send.obsolete.requestTari.RequestTariViewModel
 import com.tari.android.wallet.ui.screen.send.receive.ReceiveViewModel
+import com.tari.android.wallet.ui.screen.send.send.SendViewModel
 import com.tari.android.wallet.ui.screen.settings.allSettings.AllSettingsViewModel
 import com.tari.android.wallet.ui.screen.settings.allSettings.about.TariAboutViewModel
 import com.tari.android.wallet.ui.screen.settings.backup.backupSettings.BackupSettingsViewModel
@@ -177,6 +178,7 @@ interface ApplicationComponent {
     fun inject(viewModel: ContactListViewModel)
     fun inject(viewModel: ContactDetailsViewModel)
     fun inject(viewModel: AddContactViewModel)
+    fun inject(viewModel: SendViewModel)
 
     fun inject(tariFcmService: TariFcmService)
 

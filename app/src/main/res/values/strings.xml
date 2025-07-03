@@ -220,6 +220,17 @@
     <string name="receive_tari_your_address">Your Address</string>
 
     <string name="send_screen_title">Send</string>
+    <string name="send_recipient_address_field_title">To</string>
+    <string name="send_recipient_address_field_hint">Recipient address</string>
+    <string name="send_amount_field_title">Amount</string>
+    <string name="send_amount_field_hint">Enter XTM amount to send</string>
+    <string name="send_amount_field_error">Amount is not valid</string>
+    <string name="send_amount_field_error_not_enough_funds">Sorry, you can’t send this much XTM until your previous transaction(s) are complete. Please wait for at least one transaction to complete and then try again.</string>
+    <string name="send_amount_field_error_lower_than_fee">Sorry, the amount cannot be less than the fee.</string>
+    <string name="send_amount_field_error_fee_funds_pending">Sorry, you can’t send this much XTM. Please wait for at least one transaction to complete and then try again.</string>
+    <string name="send_amount_field_error_fee_default">Not enough XTM in your available balance</string>
+    <string name="send_note_field_title">Note (Optional)</string>
+    <string name="send_note_field_hint">Add note or payment reference</string>
 
     <!-- send tari - add recipient -->
     <string name="add_recipient_recent_tx_contacts">Recent</string>

@@ -54,7 +54,6 @@ sealed class Navigation {
         data class ToTxDetails(val tx: Tx, val showCloseButton: Boolean = false) : TxList()
         data object ToAllSettings : TxList()
         data object ToUtxos : TxList()
-        data class ToSendTariToUser(val contact: Contact, val amount: MicroTari? = null, val note: String = "") : TxList()
         data object HomeTransactionHistory : TxList()
         data object ToReceive : TxList()
     }
@@ -62,7 +61,8 @@ sealed class Navigation {
     sealed class TxSend : Navigation() {
         data class ToAddNote(val transactionData: TransactionData) : TxSend()
         data class ToFinalizing(val transactionData: TransactionData) : TxSend()
-        data class ToConfirm(val transactionData: TransactionData) : TxSend()
+        data class Send(val contact: Contact? = null, val amount: MicroTari? = null, val note: String? = null) : TxSend()
+        data class Confirm(val transactionData: TransactionData) : TxSend()
     }
 
     sealed class AllSettings : Navigation() {
@@ -90,7 +90,6 @@ sealed class Navigation {
         data object AllContacts : ContactBook()
         data class ContactDetails(val contact: Contact) : ContactBook()
         data object AddContact : ContactBook()
-        data class ToSendTari(val contact: Contact) : ContactBook()
         data object ToSelectTariUser : ContactBook()
     }
 }

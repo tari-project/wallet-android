@@ -174,7 +174,7 @@ class ContactSelectionViewModel : CommonViewModel() {
         if (user.walletAddress == corePrefRepository.walletAddress) {
             showCantSendYourselfDialog()
         } else {
-            tariNavigator.navigate(Navigation.TxList.ToSendTariToUser(user, amount.value))
+            tariNavigator.navigate(Navigation.TxSend.Send(contact = user, amount = amount.value))
         }
     }
 

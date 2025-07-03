@@ -8,7 +8,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.fragment.app.viewModels
 import com.tari.android.wallet.model.TransactionData
-import com.tari.android.wallet.navigation.TariNavigator.Companion.PARAMETER_TRANSACTION
 import com.tari.android.wallet.ui.common.CommonFragment
 import com.tari.android.wallet.ui.compose.TariDesignSystem
 import com.tari.android.wallet.util.extension.composeContent
@@ -39,6 +38,8 @@ class ConfirmFragment : CommonFragment<ConfirmViewModel>() {
 
 
     companion object {
+        const val PARAMETER_TRANSACTION = "PARAMETER_TRANSACTION"
+
         fun newInstance(transactionData: TransactionData) = ConfirmFragment().apply {
             arguments = Bundle().apply {
                 putParcelable(PARAMETER_TRANSACTION, transactionData)

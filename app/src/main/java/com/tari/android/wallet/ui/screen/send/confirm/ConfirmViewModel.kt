@@ -5,8 +5,8 @@ import com.tari.android.wallet.R
 import com.tari.android.wallet.model.MicroTari
 import com.tari.android.wallet.model.TransactionData
 import com.tari.android.wallet.navigation.Navigation
-import com.tari.android.wallet.navigation.TariNavigator.Companion.PARAMETER_TRANSACTION
 import com.tari.android.wallet.ui.common.CommonViewModel
+import com.tari.android.wallet.ui.screen.send.confirm.ConfirmFragment.Companion.PARAMETER_TRANSACTION
 import com.tari.android.wallet.util.extension.getOrThrow
 import com.tari.android.wallet.util.shortString
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -21,7 +21,7 @@ class ConfirmViewModel(savedState: SavedStateHandle) : CommonViewModel() {
     private val _uiState = MutableStateFlow(
         UiState(
             ticker = networkRepository.currentNetwork.ticker,
-            transactionData = savedState.getOrThrow<TransactionData>(PARAMETER_TRANSACTION),
+            transactionData = savedState.getOrThrow(PARAMETER_TRANSACTION),
         )
     )
     val uiState = _uiState.asStateFlow()

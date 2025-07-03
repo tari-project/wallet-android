@@ -7,8 +7,6 @@ import android.os.Bundle
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import com.tari.android.wallet.application.YatAdapter
-import com.tari.android.wallet.data.contacts.Contact
-import com.tari.android.wallet.model.MicroTari
 import com.tari.android.wallet.model.TransactionData
 import com.tari.android.wallet.navigation.Navigation.AllSettings
 import com.tari.android.wallet.navigation.Navigation.Auth
@@ -50,11 +48,11 @@ import com.tari.android.wallet.ui.screen.restore.enterRestorationPassword.EnterR
 import com.tari.android.wallet.ui.screen.restore.inputSeedWords.InputSeedWordsFragment
 import com.tari.android.wallet.ui.screen.restore.walletRestoring.WalletRestoringFragment
 import com.tari.android.wallet.ui.screen.send.confirm.ConfirmFragment
-import com.tari.android.wallet.ui.screen.send.obsolete.addAmount.AddAmountFragment
 import com.tari.android.wallet.ui.screen.send.obsolete.addNote.AddNoteFragment
 import com.tari.android.wallet.ui.screen.send.obsolete.finalize.FinalizeSendTxFragment
 import com.tari.android.wallet.ui.screen.send.obsolete.requestTari.RequestTariFragment
 import com.tari.android.wallet.ui.screen.send.receive.ReceiveFragment
+import com.tari.android.wallet.ui.screen.send.send.SendFragment
 import com.tari.android.wallet.ui.screen.settings.allSettings.AllSettingsFragment
 import com.tari.android.wallet.ui.screen.settings.allSettings.about.TariAboutFragment
 import com.tari.android.wallet.ui.screen.settings.backup.backupSettings.BackupSettingsFragment
@@ -74,8 +72,6 @@ import com.tari.android.wallet.ui.screen.settings.torBridges.customBridges.Custo
 import com.tari.android.wallet.ui.screen.tx.details.TxDetailsFragment
 import com.tari.android.wallet.ui.screen.tx.history.TxHistoryFragment
 import com.tari.android.wallet.ui.screen.utxos.list.UtxosListFragment
-import com.tari.android.wallet.util.extension.parcelable
-import java.math.BigInteger
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -113,7 +109,6 @@ class TariNavigator @Inject constructor(
             is ContactBook.AllContacts -> addFragment(ContactListFragment())
             is ContactBook.ContactDetails -> addFragment(ContactDetailsFragment.createFragment(navigation.contact))
             is ContactBook.AddContact -> addFragment(AddContactFragment())
-            is ContactBook.ToSendTari -> sendToUser(navigation.contact)
             is ContactBook.ToSelectTariUser -> addFragment(SelectUserContactFragment.newInstance())
 
             is AllSettings.ToBugReporting -> DebugActivity.launch(currentActivity, DebugNavigation.BugReport)
@@ -135,10 +130,10 @@ class TariNavigator @Inject constructor(
 
             is TxSend.ToAddNote -> addFragment(AddNoteFragment.newInstance(navigation.transactionData))
             is TxSend.ToFinalizing -> continueToFinalizeSendTx(navigation.transactionData)
-            is TxSend.ToConfirm -> addFragment(ConfirmFragment.newInstance(navigation.transactionData))
+            is TxSend.Send -> addFragment(SendFragment.newInstance(navigation.contact, navigation.amount, navigation.note))
+            is TxSend.Confirm -> addFragment(ConfirmFragment.newInstance(navigation.transactionData))
 
             is TxList.ToTxDetails -> addFragment(TxDetailsFragment.newInstance(navigation.tx, navigation.showCloseButton))
-            is TxList.ToSendTariToUser -> sendToUser(navigation.contact, navigation.amount, navigation.note)
             is TxList.ToUtxos -> addFragment(UtxosListFragment())
             is TxList.ToAllSettings -> addFragment(AllSettingsFragment.newInstance())
             is TxList.ToReceive -> addFragment(ReceiveFragment())
@@ -213,14 +208,6 @@ class TariNavigator @Inject constructor(
         } else {
             popUpTo(LocalAuthFragment::class.java.simpleName)
         }
-    }
-
-    private fun sendToUser(recipientUser: Contact, amount: MicroTari? = null, note: String = "") {
-        val contact = currentActivity.intent.parcelable<Contact>(PARAMETER_CONTACT) ?: recipientUser
-        val innerAmount = currentActivity.intent.getDoubleExtra(PARAMETER_AMOUNT, Double.MIN_VALUE)
-        val tariAmount = amount ?: MicroTari(BigInteger.valueOf(innerAmount.toLong())).takeIf { innerAmount != Double.MIN_VALUE }
-
-        addFragment(AddAmountFragment.newInstance(contact, tariAmount, note))
     }
 
     private fun toBaseNodeSelection() = addFragment(ChangeBaseNodeFragment())

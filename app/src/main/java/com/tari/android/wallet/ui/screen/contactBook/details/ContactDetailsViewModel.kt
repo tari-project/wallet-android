@@ -53,7 +53,7 @@ class ContactDetailsViewModel(savedState: SavedStateHandle) : CommonViewModel() 
     }
 
     fun onSendTariClicked() {
-        tariNavigator.navigate(Navigation.ContactBook.ToSendTari(uiState.value.contact))
+        tariNavigator.navigate(Navigation.TxSend.Send(uiState.value.contact))
     }
 
     fun onRequestTariClicked() {

@@ -216,7 +216,7 @@ class DeeplinkManager @Inject constructor(
 
         navigator.navigateSequence(
             Navigation.BackToHome,
-            Navigation.TxList.ToSendTariToUser(contact, deeplink.amount, deeplink.note),
+            Navigation.TxSend.Send(contact, deeplink.amount, deeplink.note),
         )
     }
 
