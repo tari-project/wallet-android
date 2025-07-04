@@ -151,7 +151,7 @@ class AllSettingsViewModel : CommonViewModel() {
             }.takeIf { DebugConfig.isYatEnabled },
             SettingsTitleViewHolderItem(resourceManager.getString(all_settings_contact_label)),
             SettingsRowViewHolderItem(resourceManager.getString(all_settings_contacts), vector_all_settings_contacts_icon) {
-                tariNavigator.navigate(Navigation.ContactBook.AllContacts)
+                tariNavigator.navigate(Navigation.ContactBook.AllContacts())
             },
             SettingsTitleViewHolderItem(resourceManager.getString(all_settings_security_label)),
             backupOption,

@@ -36,7 +36,6 @@ import com.tari.android.wallet.ui.screen.biometrics.ChangeBiometricsFragment
 import com.tari.android.wallet.ui.screen.contactBook.add.AddContactFragment
 import com.tari.android.wallet.ui.screen.contactBook.details.ContactDetailsFragment
 import com.tari.android.wallet.ui.screen.contactBook.list.ContactListFragment
-import com.tari.android.wallet.ui.screen.contactBook.obsolete.add.SelectUserContactFragment
 import com.tari.android.wallet.ui.screen.debug.DebugNavigation
 import com.tari.android.wallet.ui.screen.debug.activity.DebugActivity
 import com.tari.android.wallet.ui.screen.home.HomeActivity
@@ -107,10 +106,9 @@ class TariNavigator @Inject constructor(
             is Auth.FeatureAuth -> addFragment(FeatureAuthFragment())
             is Auth.BackAfterAuth -> backAfterAuth()
 
-            is ContactBook.AllContacts -> addFragment(ContactListFragment())
+            is ContactBook.AllContacts -> addFragment(ContactListFragment.newInstance(navigation.startForSelectResult))
             is ContactBook.ContactDetails -> addFragment(ContactDetailsFragment.createFragment(navigation.contact))
             is ContactBook.AddContact -> addFragment(AddContactFragment())
-            is ContactBook.ToSelectTariUser -> addFragment(SelectUserContactFragment.newInstance())
 
             is AllSettings.ToBugReporting -> DebugActivity.launch(currentActivity, DebugNavigation.BugReport)
             is AllSettings.ToMyProfile -> addFragment(WalletInfoFragment())
@@ -306,9 +304,8 @@ sealed class Navigation {
     }
 
     sealed class ContactBook : Navigation() {
-        data object AllContacts : ContactBook()
+        data class AllContacts(val startForSelectResult: Boolean = false) : ContactBook()
         data class ContactDetails(val contact: Contact) : ContactBook()
         data object AddContact : ContactBook()
-        data object ToSelectTariUser : ContactBook()
     }
 }

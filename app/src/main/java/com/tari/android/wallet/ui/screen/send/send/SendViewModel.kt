@@ -93,28 +93,11 @@ class SendViewModel(savedState: SavedStateHandle) : CommonViewModel() {
         }
     }
 
-    private fun checkAddressPoisoning(address: TariWalletAddress?) {
-        addressPoisoningChecker.doOnAddressPoisoned(address) { addresses ->
-            val addressPoisoningModule = AddressPoisoningModule(addresses)
-            val continueButtonModule = ButtonModule(
-                text = resourceManager.getString(R.string.common_continue),
-                style = ButtonStyle.Normal,
-                action = {
-                    addressPoisoningModule.selectedAddress.contact.walletAddress.let { selectedAddress ->
-                        addressPoisoningChecker.markAsTrusted(selectedAddress, addressPoisoningModule.markAsTrusted)
-                        launchOnMain { hideDialog() }
-                    }
-                }
-            )
-            val cancelButtonModule = ButtonModule(
-                text = resourceManager.getString(R.string.common_cancel),
-                style = ButtonStyle.Close,
-            )
-
-            showModularDialog(
-                addressPoisoningModule,
-                continueButtonModule,
-                cancelButtonModule,
+    fun selectContact(selectedContact: Contact) {
+        _uiState.update {
+            it.copy(
+                contact = selectedContact,
+                isContactAddressValid = true,
             )
         }
     }
@@ -155,8 +138,7 @@ class SendViewModel(savedState: SavedStateHandle) : CommonViewModel() {
     }
 
     fun onContactBookClick() {
-        // TODO
-        showNotReadyYetDialog()
+        tariNavigator.navigate(Navigation.ContactBook.AllContacts(startForSelectResult = true))
     }
 
     fun onContinueClick() {
@@ -167,6 +149,32 @@ class SendViewModel(savedState: SavedStateHandle) : CommonViewModel() {
         } else {
             uiState.value.transactionData?.let { tariNavigator.navigate(Navigation.TxSend.Confirm(it)) }
                 ?: logger.i("Transaction data is null, cannot continue.")
+        }
+    }
+
+    private fun checkAddressPoisoning(address: TariWalletAddress?) {
+        addressPoisoningChecker.doOnAddressPoisoned(address) { addresses ->
+            val addressPoisoningModule = AddressPoisoningModule(addresses)
+            val continueButtonModule = ButtonModule(
+                text = resourceManager.getString(R.string.common_continue),
+                style = ButtonStyle.Normal,
+                action = {
+                    addressPoisoningModule.selectedAddress.contact.walletAddress.let { selectedAddress ->
+                        addressPoisoningChecker.markAsTrusted(selectedAddress, addressPoisoningModule.markAsTrusted)
+                        launchOnMain { hideDialog() }
+                    }
+                }
+            )
+            val cancelButtonModule = ButtonModule(
+                text = resourceManager.getString(R.string.common_cancel),
+                style = ButtonStyle.Close,
+            )
+
+            showModularDialog(
+                addressPoisoningModule,
+                continueButtonModule,
+                cancelButtonModule,
+            )
         }
     }
 
@@ -187,7 +195,7 @@ class SendViewModel(savedState: SavedStateHandle) : CommonViewModel() {
 
         val feePerGram: MicroTari = Constants.Wallet.DEFAULT_FEE_PER_GRAM,
         val fee: MicroTari? = null,
-        @StringRes val feeError: Int? = null,
+        @param:StringRes val feeError: Int? = null,
 
         val note: String = "",
 
@@ -211,7 +219,6 @@ class SendViewModel(savedState: SavedStateHandle) : CommonViewModel() {
                 )
             }
 
-
         val amountError: Int?
             @StringRes get() = when {
                 !isAmountValid -> R.string.send_amount_field_error
@@ -225,4 +232,3 @@ class SendViewModel(savedState: SavedStateHandle) : CommonViewModel() {
             get() = (amount?.plus(fee ?: 0.toMicroTari())).greaterThan(availableBalance)
     }
 }
-
