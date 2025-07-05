@@ -50,7 +50,7 @@ data class MicroTari(val value: BigInteger) : Parcelable, Comparable<MicroTari>,
     val formattedTariValue: String
         get() = getFormattedValue(tariValue.toString())
 
-    val formattedValue: String
+    val formattedMicroTariValue: String
         get() = getFormattedValue(value.toBigDecimal().setScale(6).toString())
 
     private fun getFormattedValue(value: String): String = value.trimEnd { it == '0' }.trimEnd { it == '.' }.trimEnd { it == ',' }

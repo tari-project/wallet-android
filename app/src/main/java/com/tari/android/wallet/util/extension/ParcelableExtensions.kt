@@ -60,4 +60,4 @@ inline fun <reified T : java.io.Serializable> Bundle.serializable(key: String): 
     else -> @Suppress("DEPRECATION") getSerializable(key) as? T
 }
 
-fun <T> SavedStateHandle.getOrThrow(key: String): T = this.get<T>(key) ?: error("Key $key is required, but for some reason not provided")
+fun <T> SavedStateHandle.getOrThrow(key: String): T = this.get(key) ?: error("Key $key is required, but for some reason not provided")

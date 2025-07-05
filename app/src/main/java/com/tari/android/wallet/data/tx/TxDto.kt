@@ -13,6 +13,6 @@ data class TxDto(
             || this.tx.tariContact.alias.contains(searchQuery, ignoreCase = true)
             || this.tx.paymentId?.contains(searchQuery, ignoreCase = true).isTrue()
             || this.tx.amount.formattedTariValue.contains(searchQuery, ignoreCase = true)
-            || this.tx.amount.formattedValue.contains(searchQuery, ignoreCase = true)
+            || this.tx.amount.formattedMicroTariValue.contains(searchQuery, ignoreCase = true)
             || this.contact.alias?.contains(searchQuery, ignoreCase = true).isTrue()
 }

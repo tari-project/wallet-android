@@ -3,12 +3,12 @@ package com.tari.android.wallet.ui.screen.home.overview
 import android.text.SpannableString
 import android.text.Spanned
 import com.tari.android.wallet.R
+import com.tari.android.wallet.application.Navigation
+import com.tari.android.wallet.application.TariNavigator
 import com.tari.android.wallet.application.securityStage.StagedWalletSecurityManager
 import com.tari.android.wallet.application.securityStage.StagedWalletSecurityManager.StagedSecurityEffect
 import com.tari.android.wallet.data.sharedPrefs.securityStages.WalletSecurityStage
 import com.tari.android.wallet.model.BalanceInfo
-import com.tari.android.wallet.navigation.Navigation
-import com.tari.android.wallet.navigation.TariNavigator
 import com.tari.android.wallet.ui.common.DialogHandler
 import com.tari.android.wallet.ui.common.domain.ResourceManager
 import com.tari.android.wallet.ui.dialog.modular.modules.body.BodyModule

@@ -11,9 +11,9 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.tari.android.wallet.R
+import com.tari.android.wallet.application.Navigation
 import com.tari.android.wallet.databinding.FragmentWalletInputSeedWordsBinding
 import com.tari.android.wallet.model.seedPhrase.SeedPhrase
-import com.tari.android.wallet.navigation.Navigation
 import com.tari.android.wallet.ui.common.CommonXmlFragment
 import com.tari.android.wallet.ui.common.recyclerView.CommonAdapter
 import com.tari.android.wallet.ui.screen.restore.inputSeedWords.suggestions.SuggestionState

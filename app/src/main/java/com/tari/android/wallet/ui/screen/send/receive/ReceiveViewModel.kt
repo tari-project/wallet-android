@@ -2,9 +2,9 @@ package com.tari.android.wallet.ui.screen.send.receive
 
 import android.graphics.Bitmap
 import com.tari.android.wallet.R
+import com.tari.android.wallet.application.Navigation
 import com.tari.android.wallet.application.deeplinks.DeepLink
 import com.tari.android.wallet.model.TariWalletAddress
-import com.tari.android.wallet.navigation.Navigation
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.util.ContactUtil
 import com.tari.android.wallet.util.QrUtil

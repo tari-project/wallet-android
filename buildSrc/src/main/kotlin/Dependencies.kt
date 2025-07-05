@@ -4,7 +4,7 @@ object Dependencies {
     const val gradlePlugin = "com.android.tools.build:gradle:8.7.2"
 
     object Kotlin {
-        const val version = "2.0.21"
+        const val version = "2.2.0"
 
         const val reflect = "org.jetbrains.kotlin:kotlin-reflect:$version"
         const val stdlib = "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$version"

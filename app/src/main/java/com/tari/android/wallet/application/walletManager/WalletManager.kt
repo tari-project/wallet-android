@@ -73,7 +73,7 @@ import com.tari.android.wallet.tor.TorConfig
 import com.tari.android.wallet.tor.TorProxyManager
 import com.tari.android.wallet.tor.TorProxyStateHandler
 import com.tari.android.wallet.ui.common.DialogManager
-import com.tari.android.wallet.ui.screen.send.finalize.FinalizeSendTxModel
+import com.tari.android.wallet.ui.screen.send.obsolete.finalize.FinalizeSendTxModel
 import com.tari.android.wallet.util.BroadcastEffectFlow
 import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.DebugConfig
@@ -117,7 +117,7 @@ class WalletManager @Inject constructor(
     private val appStateHandler: AppStateHandler,
     private val fcmHelper: FcmHelper,
     private val airdropRepository: AirdropRepository,
-    @ApplicationScope private val applicationScope: CoroutineScope,
+    @param:ApplicationScope private val applicationScope: CoroutineScope,
 ) {
 
     private var atomicInstance = AtomicReference<FFIWallet>()
@@ -163,9 +163,8 @@ class WalletManager @Inject constructor(
 
     // ------------------------------------------------------ Start Wallet ------------------------------------------------------
 
-    // TODO Use the startBalance properly
     @Synchronized
-    fun start(seedWords: List<String>? = null, startBalance: String? = null) {
+    fun start(seedWords: List<String>? = null) {
         val ffiSeedWords = SeedPhrase.createOrNull(seedWords)
 
         walletCallbacks.addListener(
@@ -184,12 +183,12 @@ class WalletManager @Inject constructor(
         torManager.run()
         applicationScope.launch {
             torProxyStateHandler.doOnTorReadyForWallet {
-                startWallet(ffiSeedWords, startBalance)
+                startWallet(ffiSeedWords)
             }
         }
     }
 
-    private fun startWallet(ffiSeedWords: FFISeedWords?, startBalance: String?) {
+    private fun startWallet(ffiSeedWords: FFISeedWords?) {
         if (walletState.value is WalletState.NotReady || walletState.value is WalletState.Failed) {
             logger.i("Start wallet: Initializing wallet...")
             _walletState.update { WalletState.Initializing }

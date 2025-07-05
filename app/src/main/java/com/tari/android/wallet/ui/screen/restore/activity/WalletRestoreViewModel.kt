@@ -1,7 +1,7 @@
 package com.tari.android.wallet.ui.screen.restore.activity
 
+import com.tari.android.wallet.application.Navigation
 import com.tari.android.wallet.application.walletManager.doOnWalletFailed
-import com.tari.android.wallet.navigation.Navigation
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.util.extension.launchOnIo
 import com.tari.android.wallet.util.extension.launchOnMain
