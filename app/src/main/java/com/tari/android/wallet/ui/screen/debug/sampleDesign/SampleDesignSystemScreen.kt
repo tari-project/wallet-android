@@ -255,6 +255,17 @@ fun SampleDesignSystemScreen(
                 hint = "Search hint",
             )
 
+            TariTextField(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 20.dp, vertical = 10.dp),
+                value = TextFieldValue("Disabled Text Field"),
+                onValueChanged = {},
+                hint = "Hint",
+                title = "Address",
+                enabled = false,
+            )
+
             Spacer(Modifier.size(80.dp))
         }
     }

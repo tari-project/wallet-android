@@ -29,6 +29,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.walletManager.WalletConfig
+import com.tari.android.wallet.model.TariWalletAddress
 import com.tari.android.wallet.ui.compose.PreviewSecondarySurface
 import com.tari.android.wallet.ui.compose.TariDesignSystem
 import com.tari.android.wallet.ui.compose.components.TariHorizontalDivider
@@ -174,8 +175,11 @@ fun SendScreen(
             Spacer(Modifier.size(16.dp))
 
             var noteValue by remember { mutableStateOf(TextFieldValue(uiState.note)) }
-            noteValue = noteValue.newValueIfChanged(uiState.note)
-            // TODO maybe disable note for ST addresses
+            noteValue = if (uiState.disabledNoteField) {
+                TextFieldValue(stringResource(R.string.send_note_field_disabled_payment_id))
+            } else {
+                noteValue.newValueIfChanged(uiState.note)
+            }
             TariTextField(
                 modifier = Modifier.padding(horizontal = 24.dp),
                 value = noteValue,
@@ -185,6 +189,7 @@ fun SendScreen(
                 },
                 title = stringResource(R.string.send_note_field_title),
                 hint = stringResource(R.string.send_note_field_hint),
+                enabled = !uiState.disabledNoteField,
             )
 
             Spacer(Modifier.weight(1f))
@@ -257,6 +262,35 @@ private fun SendScreenErrorPreview() {
                 contact = MockDataStub.createContact(),
                 isContactAddressValid = false,
                 amountValue = "123456.789",
+                availableBalance = 124_000_000.toMicroTari(),
+                fee = 1234.toMicroTari(),
+                note = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+            ),
+            onBackClick = {},
+            onRecipientAddressChange = {},
+            onAmountChange = {},
+            onNoteChange = {},
+            onFeeHelpClicked = {},
+            onContinueClick = {},
+            onScanQrClick = {},
+            onContactBookClick = {},
+        )
+    }
+}
+
+@Composable
+@Preview
+private fun SendScreenPaymentIdPreview() {
+    PreviewSecondarySurface(TariTheme.Light) {
+        SendScreen(
+            uiState = SendViewModel.UiState(
+                ticker = "TXM",
+                contact = MockDataStub.createContact().copy(
+                    walletAddress = MockDataStub.WALLET_ADDRESS.copy(
+                        features = listOf(TariWalletAddress.Feature.PAYMENT_ID),
+                    )
+                ),
+                amountValue = "123.456789",
                 availableBalance = 124_000_000.toMicroTari(),
                 fee = 1234.toMicroTari(),
                 note = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",

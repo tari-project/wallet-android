@@ -8,7 +8,9 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.AccountCircle
 import androidx.compose.material.icons.rounded.Clear
@@ -52,6 +54,7 @@ fun TariTextField(
     trailingIcon: @Composable (() -> Unit)? = null,
     errorText: String? = null,
     numberKeyboard: Boolean = false,
+    enabled: Boolean = true,
 ) {
     Column(modifier = modifier) {
         Row(verticalAlignment = Alignment.Bottom) {
@@ -109,9 +112,12 @@ fun TariTextField(
                 disabledIndicatorColor = Color.Transparent,
                 cursorColor = TariDesignSystem.colors.primaryMain,
             ),
-            textStyle = TariDesignSystem.typography.body1.copy(color = TariDesignSystem.colors.textPrimary),
+            textStyle = TariDesignSystem.typography.body1.copy(
+                color = if (enabled) TariDesignSystem.colors.textPrimary else TariDesignSystem.colors.textDisabled,
+            ),
             keyboardOptions = if (numberKeyboard) KeyboardOptions(keyboardType = KeyboardType.Number) else KeyboardOptions.Default,
             visualTransformation = if (numberKeyboard) AmountVisualTransformation() else VisualTransformation.None,
+            enabled = enabled,
         )
 
         if (errorText != null) {
@@ -184,7 +190,10 @@ fun TariSearchField(
 @Preview
 @Composable
 private fun TariTextFieldPreview() {
-    PreviewSecondarySurface(TariTheme.Light) {
+    PreviewSecondarySurface(
+        modifier = Modifier.verticalScroll(rememberScrollState()),
+        theme = TariTheme.Light,
+    ) {
         TariTextField(
             modifier = Modifier
                 .fillMaxWidth()
@@ -267,6 +276,16 @@ private fun TariTextFieldPreview() {
                     style = TariDesignSystem.typography.body1,
                 )
             }
+        )
+
+        TariTextField(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 20.dp, vertical = 10.dp),
+            value = TextFieldValue("Disabled text field"),
+            onValueChanged = {},
+            hint = "Hint",
+            enabled = false,
         )
     }
 }

@@ -224,6 +224,7 @@
     <string name="send_amount_field_error_fee_default">Not enough XTM in your available balance</string>
     <string name="send_note_field_title">Note (Optional)</string>
     <string name="send_note_field_hint">Add note or payment reference</string>
+    <string name="send_note_field_disabled_payment_id">Your address does already have a Payment ID. You can\’t add another one.</string>
 
     <!-- QR-scanner -->
     <string name="add_recipient_scan_qr_description">Scan Tari QR code in the box below</string>

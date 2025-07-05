@@ -25,6 +25,7 @@ import com.tari.android.wallet.ui.screen.send.send.SendFragment.Companion.PARAME
 import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.extension.collectFlow
 import com.tari.android.wallet.util.extension.greaterThan
+import com.tari.android.wallet.util.extension.isTrue
 import com.tari.android.wallet.util.extension.launchOnMain
 import com.tari.android.wallet.util.extension.letNotNull
 import com.tari.android.wallet.util.extension.toMicroTari
@@ -230,5 +231,8 @@ class SendViewModel(savedState: SavedStateHandle) : CommonViewModel() {
 
         val availableBalanceError: Boolean
             get() = (amount?.plus(fee ?: 0.toMicroTari())).greaterThan(availableBalance)
+
+        val disabledNoteField: Boolean
+            get() = contact?.walletAddress?.paymentIdAddress.isTrue()
     }
 }
