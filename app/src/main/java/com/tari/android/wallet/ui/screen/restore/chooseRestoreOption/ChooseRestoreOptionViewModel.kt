@@ -125,10 +125,10 @@ class ChooseRestoreOptionViewModel : CommonViewModel() {
         }
     }
 
-    private fun restoreFromPaperWallet(seedWords: List<String>, balance: String, anonId: String?) {
+    private fun restoreFromPaperWallet(seedWords: List<String>, anonId: String?) {
         sharedPrefsRepository.airdropAnonId = anonId
         _uiState.update { it.copy(paperWalletProgress = true) }
-        walletManager.start(seedWords, balance)
+        walletManager.start(seedWords)
         launchOnIo {
             walletManager.doOnWalletRunning {
                 _uiState.update { it.copy(paperWalletProgress = false) }
@@ -206,7 +206,7 @@ class ChooseRestoreOptionViewModel : CommonViewModel() {
             val seeds = deeplink.seedWords(passphraseModule.value)
             if (seeds != null) {
                 hideDialog()
-                restoreFromPaperWallet(seeds, deeplink.balance, deeplink.anonId)
+                restoreFromPaperWallet(seeds, deeplink.anonId)
             } else {
                 showPaperWalletErrorDialog()
             }

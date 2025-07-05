@@ -19,7 +19,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -32,6 +31,7 @@ import com.tari.android.wallet.ui.compose.components.TariTextField
 import com.tari.android.wallet.ui.compose.components.TariTopBar
 import com.tari.android.wallet.ui.screen.settings.themeSelector.TariTheme
 import com.tari.android.wallet.util.MockDataStub
+import com.tari.android.wallet.util.extension.newValueIfChanged
 
 
 @Composable
@@ -65,8 +65,7 @@ fun AddContactScreen(
 
 
             var aliasValue by remember { mutableStateOf(TextFieldValue(uiState.alias)) }
-            // TODO maybe make it more elegant. make an extension function for TextFieldValue?
-            uiState.alias.takeIf { it != aliasValue.text }?.let { aliasValue = TextFieldValue(it, selection = TextRange(it.length)) }
+            aliasValue = aliasValue.newValueIfChanged(uiState.alias)
             TariTextField(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -85,7 +84,7 @@ fun AddContactScreen(
             Spacer(Modifier.size(24.dp))
 
             var addressValue by remember { mutableStateOf(TextFieldValue(uiState.walletAddress?.fullBase58.orEmpty())) }
-            uiState.walletAddress?.let { addressValue = TextFieldValue(it.fullBase58, selection = TextRange(it.fullBase58.length)) }
+            addressValue = addressValue.newValueIfChanged(uiState.walletAddress?.fullBase58)
             TariTextField(
                 modifier = Modifier
                     .fillMaxWidth()

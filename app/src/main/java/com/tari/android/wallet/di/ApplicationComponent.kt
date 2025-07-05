@@ -37,7 +37,6 @@ import com.tari.android.wallet.application.TariWalletApplication
 import com.tari.android.wallet.infrastructure.ShareManager
 import com.tari.android.wallet.notification.TariFcmService
 import com.tari.android.wallet.ui.common.CommonViewModel
-import com.tari.android.wallet.ui.component.clipboardController.WalletAddressViewModel
 import com.tari.android.wallet.ui.screen.StartActivity
 import com.tari.android.wallet.ui.screen.auth.AuthActivity
 import com.tari.android.wallet.ui.screen.auth.AuthViewModel
@@ -45,7 +44,6 @@ import com.tari.android.wallet.ui.screen.biometrics.ChangeBiometricsViewModel
 import com.tari.android.wallet.ui.screen.contactBook.add.AddContactViewModel
 import com.tari.android.wallet.ui.screen.contactBook.details.ContactDetailsViewModel
 import com.tari.android.wallet.ui.screen.contactBook.list.ContactListViewModel
-import com.tari.android.wallet.ui.screen.contactBook.obsolete.contactSelection.ContactSelectionViewModel
 import com.tari.android.wallet.ui.screen.debug.sampleDesign.SampleDesignSystemViewModel
 import com.tari.android.wallet.ui.screen.home.HomeViewModel
 import com.tari.android.wallet.ui.screen.home.overview.HomeOverviewViewModel
@@ -157,10 +155,8 @@ interface ApplicationComponent {
     fun inject(viewModel: ChangeSecurePasswordViewModel)
     fun inject(viewModel: BackupLearnMoreViewModel)
     fun inject(viewModel: BackupLearnMoreItemViewModel)
-    fun inject(viewModel: ContactSelectionViewModel)
     fun inject(viewModel: TxDetailsViewModel)
     fun inject(viewModel: ShareManager)
-    fun inject(viewModel: WalletAddressViewModel)
     fun inject(viewModel: QrScannerViewModel)
     fun inject(viewModel: DataCollectionViewModel)
     fun inject(viewModel: EnterPinCodeViewModel)

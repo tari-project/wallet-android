@@ -46,7 +46,6 @@ object Constants {
      */
     object UI {
 
-        const val keyboardHideWaitMs = 100L
         const val xShortDurationMs = 100L
         const val shortDurationMs = 300L
         const val mediumDurationMs = 600L

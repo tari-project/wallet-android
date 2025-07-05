@@ -9,8 +9,6 @@
     <dimen name="onboarding_bottom_progress_bar_bottom_margin">25dp</dimen>
     <dimen name="onboarding_small_gem_top_margin">46dp</dimen>
 
-    <!-- send tari - add recipient -->
-    <dimen name="add_recipient_search_bar_container_height">96dp</dimen>
     <!-- send tari - add amount -->
     <dimen name="add_amount_element_text_size">72sp</dimen>
     <dimen name="add_amount_keypad_row_height">52dp</dimen>

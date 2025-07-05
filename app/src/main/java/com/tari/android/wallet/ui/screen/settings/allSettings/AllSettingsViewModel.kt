@@ -213,7 +213,7 @@ class AllSettingsViewModel : CommonViewModel() {
             },
             DividerViewHolderItem(),
             SettingsRowViewHolderItem(resourceManager.getString(all_settings_explorer), vector_all_settings_block_explorer_icon) {
-                openUrl(networkRepository.currentNetwork.blockExplorerBaseUrl.orEmpty()) // TODO maybe we should open specific url, not base url?
+                openUrl(networkRepository.currentNetwork.blockExplorerBaseUrl.orEmpty())
             }.takeIf { networkRepository.currentNetwork.isBlockExplorerAvailable },
             SettingsTitleViewHolderItem(resourceManager.getString(all_settings_advanced_settings_label)),
             SettingsRowViewHolderItem(resourceManager.getString(all_settings_select_theme), vector_all_settings_select_theme_icon) {

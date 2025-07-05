@@ -91,7 +91,6 @@
     <!-- emoji-id-related -->
     <string name="emoji_id_bullet_separator">•••</string>
     <string name="emoji_id_chunk_separator">l</string>
-    <string name="paste_emoji_id">Paste copied Emoji ID</string>
     <string name="tap_to_see_full_emoji_id">Tap to see full Emoji ID</string>
 
     <!-- dialog -->
@@ -225,11 +224,6 @@
     <string name="send_amount_field_error_fee_default">Not enough XTM in your available balance</string>
     <string name="send_note_field_title">Note (Optional)</string>
     <string name="send_note_field_hint">Add note or payment reference</string>
-
-    <!-- send tari - add recipient -->
-    <string name="add_recipient_recent_tx_contacts">Recent</string>
-    <string name="add_recipient_my_contacts">My Contacts</string>
-    <string name="add_recipient_invalid_emoji_id">Not a valid Emoji ID</string>
 
     <!-- QR-scanner -->
     <string name="add_recipient_scan_qr_description">Scan Tari QR code in the box below</string>
@@ -753,21 +747,17 @@
     <string name="contact_book_add_contact_address_field_hint">Recipient address</string>
     <string name="contact_book_add_contact_address_field_error_text">Invalid wallet address</string>
     <string name="contact_book_add_contact_save_button">Save Contact</string>
-    <string name="contact_book_add_contact_placeholder">Enter Emoji ID, Contact Name or Yat</string>
-    <string name="contact_book_add_contact_placeholder_no_yat">Scan QR code or Enter Address</string>
     <string name="contact_book_add_contact_cant_add_yourself_title">Can’t add yourself</string>
     <string name="contact_book_add_contact_cant_add_yourself_description">You can’t add your own Tari wallet address to your contact book</string>
     <string name="contact_book_select_contact_cant_send_to_yourself_title">Can’t send Tari to yourself</string>
     <string name="contact_book_select_contact_cant_send_to_yourself_description">You can’t send Tari to your own Tari wallet address</string>
     <string name="contact_book_search_hint">Find Contact</string>
-    <string name="transaction_send_to">Send To</string>
     <string name="contact_book_details_connected_wallets_bitcoin">Open Bitcoin Wallet</string>
     <string name="contact_book_details_connected_wallets_etherium">Open Etherium Wallet</string>
     <string name="contact_book_details_connected_wallets_monero">Open Monero Wallet</string>
     <string name="contact_book_details_connected_wallets_no_application">Unfortunately, there are no applications that could open this type of address. Try to install corresponding application</string>
     <string name="contact_book_details_edit_title">Edit Contact</string>
     <string name="contact_book_add_contact_done_button">Done</string>
-    <string name="contact_book_add_contact_next_button">Next</string>
     <string name="share_contact_via_qr_code">QR Code</string>
     <string name="share_contact_via_qr_link">Link</string>
     <string name="wallet_info_alias_edit_title">Edit Name</string>
