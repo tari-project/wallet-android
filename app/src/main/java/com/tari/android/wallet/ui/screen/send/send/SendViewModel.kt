@@ -24,6 +24,7 @@ import com.tari.android.wallet.ui.screen.send.send.SendFragment.Companion.PARAME
 import com.tari.android.wallet.ui.screen.send.send.SendFragment.Companion.PARAMETER_NOTE
 import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.extension.collectFlow
+import com.tari.android.wallet.util.extension.filterNumbers
 import com.tari.android.wallet.util.extension.greaterThan
 import com.tari.android.wallet.util.extension.isTrue
 import com.tari.android.wallet.util.extension.launchOnMain
@@ -104,7 +105,7 @@ class SendViewModel(savedState: SavedStateHandle) : CommonViewModel() {
     }
 
     fun onAmountChange(amountValue: String) {
-        _uiState.update { it.copy(amountValue = amountValue.replace(",", ".")) }
+        _uiState.update { it.copy(amountValue = amountValue.replace(",", ".").filterNumbers()) }
 
         _uiState.value.amount?.let { amount ->
             doOnWalletRunning { wallet ->
