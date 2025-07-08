@@ -55,7 +55,6 @@ fun TariTextField(
     trailingIcon: @Composable (() -> Unit)? = null,
     errorText: String? = null,
     enabled: Boolean = true,
-    singleLine: Boolean = true,
     keyboardOptions: KeyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
     keyboardActions: KeyboardActions = KeyboardActions.Default,
     visualTransformation: VisualTransformation = VisualTransformation.None,
@@ -110,6 +109,7 @@ fun TariTextField(
                 focusedContainerColor = TariDesignSystem.colors.backgroundPrimary,
                 focusedTextColor = TariDesignSystem.colors.textPrimary,
                 unfocusedContainerColor = TariDesignSystem.colors.backgroundPrimary,
+                disabledContainerColor = TariDesignSystem.colors.actionDisabledBackground,
                 unfocusedTextColor = TariDesignSystem.colors.textPrimary,
                 focusedIndicatorColor = Color.Transparent,
                 unfocusedIndicatorColor = Color.Transparent,
@@ -123,7 +123,6 @@ fun TariTextField(
             keyboardActions = keyboardActions,
             visualTransformation = visualTransformation,
             enabled = enabled,
-            singleLine = singleLine,
         )
 
         if (errorText != null) {
