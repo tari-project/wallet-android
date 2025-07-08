@@ -59,13 +59,13 @@ import com.tari.android.wallet.R.string.tari_about_title
 import com.tari.android.wallet.R.string.tari_url
 import com.tari.android.wallet.R.string.ttl_store_url
 import com.tari.android.wallet.R.string.user_agreement_url
+import com.tari.android.wallet.application.Navigation
+import com.tari.android.wallet.application.Navigation.AllSettings
 import com.tari.android.wallet.application.YatAdapter
 import com.tari.android.wallet.data.sharedPrefs.CorePrefRepository
 import com.tari.android.wallet.data.sharedPrefs.backup.BackupPrefRepository
 import com.tari.android.wallet.infrastructure.backup.BackupState
 import com.tari.android.wallet.infrastructure.backup.BackupStateHandler
-import com.tari.android.wallet.navigation.Navigation
-import com.tari.android.wallet.navigation.Navigation.AllSettings
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.common.SingleLiveEvent
 import com.tari.android.wallet.ui.common.recyclerView.CommonViewHolderItem
@@ -151,7 +151,7 @@ class AllSettingsViewModel : CommonViewModel() {
             }.takeIf { DebugConfig.isYatEnabled },
             SettingsTitleViewHolderItem(resourceManager.getString(all_settings_contact_label)),
             SettingsRowViewHolderItem(resourceManager.getString(all_settings_contacts), vector_all_settings_contacts_icon) {
-                tariNavigator.navigate(Navigation.ContactBook.AllContacts)
+                tariNavigator.navigate(Navigation.ContactBook.AllContacts())
             },
             SettingsTitleViewHolderItem(resourceManager.getString(all_settings_security_label)),
             backupOption,
@@ -213,7 +213,7 @@ class AllSettingsViewModel : CommonViewModel() {
             },
             DividerViewHolderItem(),
             SettingsRowViewHolderItem(resourceManager.getString(all_settings_explorer), vector_all_settings_block_explorer_icon) {
-                openUrl(networkRepository.currentNetwork.blockExplorerBaseUrl.orEmpty()) // TODO maybe we should open specific url, not base url?
+                openUrl(networkRepository.currentNetwork.blockExplorerBaseUrl.orEmpty())
             }.takeIf { networkRepository.currentNetwork.isBlockExplorerAvailable },
             SettingsTitleViewHolderItem(resourceManager.getString(all_settings_advanced_settings_label)),
             SettingsRowViewHolderItem(resourceManager.getString(all_settings_select_theme), vector_all_settings_select_theme_icon) {

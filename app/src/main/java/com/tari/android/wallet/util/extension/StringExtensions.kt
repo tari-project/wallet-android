@@ -159,3 +159,5 @@ fun String.sha256(): String {
     val digest = MessageDigest.getInstance("SHA-256").digest(bytes)
     return digest.joinToString(separator = "") { "%02x".format(it) }
 }
+
+fun String.filterNumbers(): String = this.filter { it.isDigit() || it == '.' }

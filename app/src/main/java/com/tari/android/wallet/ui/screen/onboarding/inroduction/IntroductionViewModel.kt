@@ -1,6 +1,6 @@
 package com.tari.android.wallet.ui.screen.onboarding.inroduction
 
-import com.tari.android.wallet.navigation.Navigation
+import com.tari.android.wallet.application.Navigation
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.screen.settings.allSettings.TariVersionModel
 import com.tari.android.wallet.util.EffectFlow

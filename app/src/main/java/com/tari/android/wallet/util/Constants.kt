@@ -46,7 +46,6 @@ object Constants {
      */
     object UI {
 
-        const val keyboardHideWaitMs = 100L
         const val xShortDurationMs = 100L
         const val shortDurationMs = 300L
         const val mediumDurationMs = 600L
@@ -107,10 +106,6 @@ object Constants {
         const val STORE_AND_FORWARD_MESSAGE_DURATION_SEC = 10800L
         const val EMOJI_FORMATTER_CHUNK_SIZE = 3
         val DEFAULT_FEE_PER_GRAM = 10.toMicroTari()
-    }
-
-    object Contacts {
-        const val RECENT_CONTACTS_COUNT = 3
     }
 
     object Build {

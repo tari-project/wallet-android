@@ -23,8 +23,16 @@ data class WalletError(
         },
     )
 
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is WalletError) return false
+        if (code != other.code) return false
+        return true
+    }
+
     companion object {
         val DatabaseDataError = WalletError(114)
+        val FundsPendingError = WalletError(115)
         val TransactionNotFoundError = WalletError(204)
         val ContactNotFoundError = WalletError(401)
         val InvalidPassphraseEncryptionCypherError = WalletError(420)

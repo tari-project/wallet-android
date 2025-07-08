@@ -8,18 +8,22 @@ import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.tari.android.wallet.R
@@ -31,6 +35,7 @@ import com.tari.android.wallet.ui.compose.components.TariTextField
 import com.tari.android.wallet.ui.compose.components.TariTopBar
 import com.tari.android.wallet.ui.screen.settings.themeSelector.TariTheme
 import com.tari.android.wallet.util.MockDataStub
+import com.tari.android.wallet.util.extension.newValueIfChanged
 
 
 @Composable
@@ -42,6 +47,8 @@ fun AddContactScreen(
     onAddressChange: (address: String) -> Unit,
     onSaveClick: () -> Unit,
 ) {
+    val focusManager = LocalFocusManager.current
+
     Scaffold(
         modifier = Modifier
             .fillMaxSize()
@@ -61,18 +68,20 @@ fun AddContactScreen(
                 .padding(paddingValues),
         ) {
             Spacer(Modifier.size(24.dp))
-            Text(
-                modifier = Modifier.padding(horizontal = 24.dp),
-                text = stringResource(R.string.contact_book_add_contact_alias_field_title),
-                style = TariDesignSystem.typography.body1.copy(color = TariDesignSystem.colors.textPrimary),
-            )
-            Spacer(Modifier.size(8.dp))
+
+
+            var aliasValue by remember { mutableStateOf(TextFieldValue(uiState.alias)) }
+            aliasValue = aliasValue.newValueIfChanged(uiState.alias)
             TariTextField(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 24.dp),
-                value = uiState.alias,
-                onValueChanged = onAliasChange,
+                value = aliasValue,
+                onValueChanged = {
+                    onAliasChange(it.text)
+                    aliasValue = it
+                },
+                title = stringResource(R.string.contact_book_add_contact_alias_field_title),
                 hint = stringResource(R.string.contact_book_add_contact_alias_field_hint),
             )
 
@@ -80,17 +89,8 @@ fun AddContactScreen(
             TariHorizontalDivider(Modifier.padding(horizontal = 24.dp))
             Spacer(Modifier.size(24.dp))
 
-            Text(
-                modifier = Modifier.padding(horizontal = 24.dp),
-                text = stringResource(R.string.contact_book_add_contact_address_field_title),
-                style = TariDesignSystem.typography.body1.copy(
-                    color = if (!uiState.isValidWalletAddress) TariDesignSystem.colors.errorMain else TariDesignSystem.colors.textPrimary
-                ),
-            )
-            Spacer(Modifier.size(8.dp))
-
-            var addressValue by rememberSaveable { mutableStateOf(uiState.walletAddress?.fullBase58.orEmpty()) }
-            uiState.walletAddress?.let { addressValue = it.fullBase58 }
+            var addressValue by remember { mutableStateOf(TextFieldValue(uiState.walletAddress?.fullBase58.orEmpty())) }
+            addressValue = addressValue.newValueIfChanged(uiState.walletAddress?.fullBase58)
             TariTextField(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -98,8 +98,9 @@ fun AddContactScreen(
                 value = addressValue,
                 onValueChanged = {
                     addressValue = it
-                    onAddressChange(it)
+                    onAddressChange(it.text)
                 },
+                title = stringResource(R.string.contact_book_add_contact_address_field_title),
                 hint = stringResource(R.string.contact_book_add_contact_address_field_hint),
                 errorText = stringResource(R.string.contact_book_add_contact_address_field_error_text).takeIf { !uiState.isValidWalletAddress },
                 trailingIcon = {
@@ -111,6 +112,8 @@ fun AddContactScreen(
                         )
                     }
                 },
+                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
             )
 
             Spacer(Modifier.weight(1f))

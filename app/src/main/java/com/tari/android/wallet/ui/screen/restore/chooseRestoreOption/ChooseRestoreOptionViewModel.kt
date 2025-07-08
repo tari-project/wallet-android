@@ -3,6 +3,7 @@ package com.tari.android.wallet.ui.screen.restore.chooseRestoreOption
 import android.content.Intent
 import androidx.fragment.app.Fragment
 import com.tari.android.wallet.R
+import com.tari.android.wallet.application.Navigation
 import com.tari.android.wallet.application.deeplinks.DeepLink
 import com.tari.android.wallet.application.walletManager.WalletConfig
 import com.tari.android.wallet.application.walletManager.doOnWalletRunning
@@ -12,7 +13,6 @@ import com.tari.android.wallet.infrastructure.backup.BackupManager
 import com.tari.android.wallet.infrastructure.backup.BackupStorageAuthRevokedException
 import com.tari.android.wallet.infrastructure.backup.BackupStorageTamperedException
 import com.tari.android.wallet.model.TariWalletAddress
-import com.tari.android.wallet.navigation.Navigation
 import com.tari.android.wallet.ui.common.CommonFragment
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.dialog.modular.ModularDialogArgs
@@ -89,10 +89,10 @@ class ChooseRestoreOptionViewModel : CommonViewModel() {
         fragment.startQrScanner(QrScannerSource.PaperWallet)
     }
 
-    override fun handleDeeplink(deepLink: DeepLink) {
+    override fun handleDeeplink(deeplink: DeepLink) {
         // Don't call super to make only PaperWallet deeplink work here
-        if (deepLink is DeepLink.PaperWallet) {
-            showPaperWalletDialog(deepLink)
+        if (deeplink is DeepLink.PaperWallet) {
+            showPaperWalletDialog(deeplink)
         } else {
             showInvalidQrDialog()
         }
@@ -125,10 +125,10 @@ class ChooseRestoreOptionViewModel : CommonViewModel() {
         }
     }
 
-    private fun restoreFromPaperWallet(seedWords: List<String>, balance: String, anonId: String?) {
+    private fun restoreFromPaperWallet(seedWords: List<String>, anonId: String?) {
         sharedPrefsRepository.airdropAnonId = anonId
         _uiState.update { it.copy(paperWalletProgress = true) }
-        walletManager.start(seedWords, balance)
+        walletManager.start(seedWords)
         launchOnIo {
             walletManager.doOnWalletRunning {
                 _uiState.update { it.copy(paperWalletProgress = false) }
@@ -206,7 +206,7 @@ class ChooseRestoreOptionViewModel : CommonViewModel() {
             val seeds = deeplink.seedWords(passphraseModule.value)
             if (seeds != null) {
                 hideDialog()
-                restoreFromPaperWallet(seeds, deeplink.balance, deeplink.anonId)
+                restoreFromPaperWallet(seeds, deeplink.anonId)
             } else {
                 showPaperWalletErrorDialog()
             }

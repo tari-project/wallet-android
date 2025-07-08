@@ -25,12 +25,8 @@ import com.tari.android.wallet.ui.dialog.modular.modules.connection.ConnectionSt
 import com.tari.android.wallet.ui.dialog.modular.modules.connection.ConnectionStatusesModuleView
 import com.tari.android.wallet.ui.dialog.modular.modules.customBaseNodeBody.CustomBaseNodeBodyModule
 import com.tari.android.wallet.ui.dialog.modular.modules.customBaseNodeBody.CustomBaseNodeBodyModuleView
-import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadBoldSpannableModule
-import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadBoldSpannableModuleView
 import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
 import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModuleView
-import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadSpannableModule
-import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadSpannableModuleView
 import com.tari.android.wallet.ui.dialog.modular.modules.icon.IconModule
 import com.tari.android.wallet.ui.dialog.modular.modules.icon.IconModuleView
 import com.tari.android.wallet.ui.dialog.modular.modules.imageModule.ImageModule
@@ -141,8 +137,6 @@ open class ModularDialog(context: Activity) {
             val view = when (module) {
                 is SpaceModule -> SpaceModuleView(context, module)
                 is HeadModule -> HeadModuleView(context, module)
-                is HeadSpannableModule -> HeadSpannableModuleView(context, module)
-                is HeadBoldSpannableModule -> HeadBoldSpannableModuleView(context, module)
                 is ImageModule -> ImageModuleView(context, module)
                 is BodyModule -> BodyModuleView(context, module)
                 is OptionModule -> OptionModuleView(context, module)

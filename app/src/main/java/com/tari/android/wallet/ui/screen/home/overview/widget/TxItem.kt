@@ -158,14 +158,6 @@ fun TxDto.itemMessage(): String {
             }
         }
 
-        // TODO as far as we use only OSP tx, all the txs are OSP, but we have contact address of them
-//        tx.isOneSided -> {
-//            when (tx.direction) {
-//                Tx.Direction.INBOUND -> stringResource(R.string.tx_list_someone) + " " + stringResource(R.string.tx_list_paid_you)
-//                Tx.Direction.OUTBOUND -> stringResource(R.string.tx_list_you_paid) + " " + stringResource(R.string.tx_list_someone).lowercase()
-//            }
-//        }
-
         else -> { // display emoji id
             when (tx.direction) {
                 Tx.Direction.INBOUND -> contact.walletAddress.shortString() + " " + stringResource(R.string.tx_list_paid_you)
