@@ -10,6 +10,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -22,8 +24,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -32,6 +37,7 @@ import com.tari.android.wallet.application.walletManager.WalletConfig
 import com.tari.android.wallet.model.TariWalletAddress
 import com.tari.android.wallet.ui.compose.PreviewSecondarySurface
 import com.tari.android.wallet.ui.compose.TariDesignSystem
+import com.tari.android.wallet.ui.compose.components.AmountVisualTransformation
 import com.tari.android.wallet.ui.compose.components.TariHorizontalDivider
 import com.tari.android.wallet.ui.compose.components.TariPrimaryButton
 import com.tari.android.wallet.ui.compose.components.TariProgressView
@@ -67,6 +73,8 @@ fun SendScreen(
             )
         }
     ) { paddingValues ->
+        val focusManager = LocalFocusManager.current
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -143,7 +151,12 @@ fun SendScreen(
                     }
                 },
                 errorText = uiState.amountError?.let { stringResource(it) },
-                numberKeyboard = true,
+                visualTransformation = AmountVisualTransformation(),
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Number,
+                    imeAction = if (uiState.disabledNoteField) ImeAction.Done else ImeAction.Next,
+                ),
+                keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
             )
 
             Spacer(Modifier.size(16.dp))
@@ -190,6 +203,8 @@ fun SendScreen(
                 title = stringResource(R.string.send_note_field_title),
                 hint = stringResource(R.string.send_note_field_hint),
                 enabled = !uiState.disabledNoteField,
+                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
             )
 
             Spacer(Modifier.weight(1f))

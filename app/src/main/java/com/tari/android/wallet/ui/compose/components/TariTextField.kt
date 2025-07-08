@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -29,7 +30,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.OffsetMapping
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.TransformedText
@@ -53,8 +54,11 @@ fun TariTextField(
     leadingIcon: @Composable (() -> Unit)? = null,
     trailingIcon: @Composable (() -> Unit)? = null,
     errorText: String? = null,
-    numberKeyboard: Boolean = false,
     enabled: Boolean = true,
+    singleLine: Boolean = true,
+    keyboardOptions: KeyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
+    keyboardActions: KeyboardActions = KeyboardActions.Default,
+    visualTransformation: VisualTransformation = VisualTransformation.None,
 ) {
     Column(modifier = modifier) {
         Row(verticalAlignment = Alignment.Bottom) {
@@ -115,9 +119,11 @@ fun TariTextField(
             textStyle = TariDesignSystem.typography.body1.copy(
                 color = if (enabled) TariDesignSystem.colors.textPrimary else TariDesignSystem.colors.textDisabled,
             ),
-            keyboardOptions = if (numberKeyboard) KeyboardOptions(keyboardType = KeyboardType.Number) else KeyboardOptions.Default,
-            visualTransformation = if (numberKeyboard) AmountVisualTransformation() else VisualTransformation.None,
+            keyboardOptions = keyboardOptions,
+            keyboardActions = keyboardActions,
+            visualTransformation = visualTransformation,
             enabled = enabled,
+            singleLine = singleLine,
         )
 
         if (errorText != null) {
