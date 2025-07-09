@@ -6,9 +6,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.map
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.Navigation
-import com.tari.android.wallet.application.baseNodes.BaseNodesManager
 import com.tari.android.wallet.application.walletManager.doOnWalletRunning
-import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodeDto
 import com.tari.android.wallet.ffi.FFISeedWords
 import com.tari.android.wallet.model.seedPhrase.SeedPhrase
 import com.tari.android.wallet.ui.common.CommonViewModel
@@ -17,25 +15,15 @@ import com.tari.android.wallet.ui.common.debounce
 import com.tari.android.wallet.ui.common.domain.ResourceManager
 import com.tari.android.wallet.ui.component.loadingButton.LoadingButtonState
 import com.tari.android.wallet.ui.dialog.modular.SimpleDialogArgs
-import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
-import com.tari.android.wallet.ui.dialog.modular.modules.input.InputModule
 import com.tari.android.wallet.ui.screen.restore.inputSeedWords.suggestions.SuggestionState
 import com.tari.android.wallet.ui.screen.restore.inputSeedWords.suggestions.SuggestionViewHolderItem
-import com.tari.android.wallet.util.DebugConfig
 import com.tari.android.wallet.util.extension.launchOnIo
 import com.tari.android.wallet.util.extension.launchOnMain
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
-import javax.inject.Inject
 
 class InputSeedWordsViewModel : CommonViewModel() {
 
     private var mnemonicList = mutableListOf<String>()
-
-    @Inject
-    lateinit var baseNodesManager: BaseNodesManager
 
     private val _suggestions = MediatorLiveData<SuggestionState>()
     val suggestions: LiveData<SuggestionState> = _suggestions.debounce(50)
@@ -64,9 +52,6 @@ class InputSeedWordsViewModel : CommonViewModel() {
 
     private val _continueButtonState = MediatorLiveData<LoadingButtonState>()
     val continueButtonState: LiveData<LoadingButtonState> = _continueButtonState
-
-    private val _customBaseNodeState = MutableStateFlow(CustomBaseNodeState())
-    val customBaseNodeState = _customBaseNodeState.asStateFlow()
 
     init {
         component.inject(this)
@@ -116,14 +101,6 @@ class InputSeedWordsViewModel : CommonViewModel() {
             walletManager.doOnWalletRunning {
                 tariNavigator.navigate(Navigation.InputSeedWords.ToRestoreFromSeeds)
                 _inProgress.postValue(false)
-            }
-        }
-
-        if (DebugConfig.selectBaseNodeEnabled) {
-            customBaseNodeState.value.customBaseNode?.let {
-                baseNodesManager.addUserBaseNode(it)
-                baseNodesManager.setBaseNode(it)
-                walletManager.syncBaseNode()
             }
         }
 
@@ -275,68 +252,6 @@ class InputSeedWordsViewModel : CommonViewModel() {
             }
         }
         _suggestions.postValue(state)
-    }
-
-    fun chooseCustomBaseNodeClick() {
-        showEditBaseNodeDialog()
-    }
-
-    private fun showEditBaseNodeDialog() {
-        var saveAction: () -> Boolean = { false }
-        val title = HeadModule(
-            title = resourceManager.getString(R.string.add_base_node_form_title),
-            rightButtonTitle = resourceManager.getString(R.string.add_base_node_action_button),
-            rightButtonAction = { saveAction() },
-        )
-        val nameInput = InputModule(
-            value = customBaseNodeState.value.customBaseNode?.name.orEmpty(),
-            hint = resourceManager.getString(R.string.add_base_node_name_hint),
-            isFirst = true,
-            onDoneAction = { saveAction() },
-        )
-        val hexInput = InputModule(
-            value = customBaseNodeState.value.customBaseNode?.publicKeyHex.orEmpty(),
-            hint = resourceManager.getString(R.string.add_base_node_hex_hint),
-            onDoneAction = { saveAction() },
-        )
-        val addressInput = InputModule(
-            value = customBaseNodeState.value.customBaseNode?.address.orEmpty(),
-            hint = resourceManager.getString(R.string.add_base_node_address_hint),
-            isEnd = true,
-            onDoneAction = { saveAction() },
-        )
-        saveAction = {
-            customBaseNodeEntered(nameInput.value, hexInput.value, addressInput.value)
-            true
-        }
-
-        showInputModalDialog(
-            title,
-            nameInput,
-            hexInput,
-            addressInput,
-        )
-    }
-
-    private fun customBaseNodeEntered(enteredName: String, enteredHex: String, enteredAddress: String) {
-        hideDialog()
-        if (baseNodesManager.isValidBaseNode("$enteredHex::$enteredAddress")) {
-            val baseNode = BaseNodeDto(
-                name = enteredName.takeIf { it.isNotBlank() } ?: resourceManager.getString(R.string.add_base_node_default_name_custom),
-                publicKeyHex = enteredHex,
-                address = enteredAddress,
-                isCustom = true,
-            )
-            _customBaseNodeState.update { it.copy(customBaseNode = baseNode) }
-        } else {
-            _customBaseNodeState.update { it.copy(customBaseNode = null) }
-            showModularDialog(
-                SimpleDialogArgs(
-                    title = resourceManager.getString(R.string.common_error_title),
-                    description = resourceManager.getString(R.string.restore_from_seed_words_form_error_message),
-                ).getModular(resourceManager)
-            )
-        }
     }
 
     sealed class RestorationError(title: String, message: String) {

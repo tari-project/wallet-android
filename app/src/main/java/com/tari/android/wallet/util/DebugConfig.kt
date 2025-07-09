@@ -73,13 +73,9 @@ object DebugConfig {
     private val _useYatSandbox = valueIfDebug(false)
     val yatEnvironment = if (_useYatSandbox) YatEnvironment.SANDBOX else YatEnvironment.PRODUCTION
 
-    val hardcodedBaseNodes = valueIfDebug(false)
-
     val showCopySeedsButton = valueIfDebug(true)
 
     val sweepFundsButtonEnabled = valueIfDebug(false)
-
-    val selectBaseNodeEnabled = valueIfDebug(false) // TODO remove all the code related to this ?
 
     const val showInvitedFriendsInProfile = false
 

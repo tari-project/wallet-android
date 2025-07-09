@@ -5,18 +5,15 @@ import androidx.core.net.toUri
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.Navigation
 import com.tari.android.wallet.application.TariNavigator
-import com.tari.android.wallet.application.baseNodes.BaseNodesManager
 import com.tari.android.wallet.application.walletManager.WalletManager
 import com.tari.android.wallet.data.airdrop.AirdropRepository
 import com.tari.android.wallet.data.contacts.Contact
 import com.tari.android.wallet.data.contacts.ContactsRepository
-import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodeDto
 import com.tari.android.wallet.data.sharedPrefs.tor.TorPrefRepository
 import com.tari.android.wallet.di.ApplicationScope
 import com.tari.android.wallet.model.TariWalletAddress
 import com.tari.android.wallet.ui.common.DialogHandler
 import com.tari.android.wallet.ui.common.domain.ResourceManager
-import com.tari.android.wallet.ui.dialog.confirm.ConfirmDialogArgs
 import com.tari.android.wallet.ui.dialog.modular.ModularDialogArgs.DialogId
 import com.tari.android.wallet.ui.dialog.modular.modules.body.BodyModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonModule
@@ -32,7 +29,6 @@ import javax.inject.Singleton
 
 @Singleton
 class DeeplinkManager @Inject constructor(
-    private val baseNodesManager: BaseNodesManager,
     private val contactRepository: ContactsRepository,
     private val torSharedRepository: TorPrefRepository,
     private val resourceManager: ResourceManager,
@@ -51,7 +47,6 @@ class DeeplinkManager @Inject constructor(
 
     fun execute(dialogHandler: DialogHandler, deeplink: DeepLink) {
         when (deeplink) {
-            is DeepLink.AddBaseNode -> showAddBaseNodeDialog(dialogHandler, deeplink)
             is DeepLink.Contacts -> showAddContactsDialog(dialogHandler, deeplink)
             is DeepLink.Send -> sendAction(deeplink)
             is DeepLink.UserProfile -> showUserProfileDialog(dialogHandler, deeplink)
@@ -59,23 +54,6 @@ class DeeplinkManager @Inject constructor(
             is DeepLink.PaperWallet -> showPaperWalletDialog(dialogHandler, deeplink)
             is DeepLink.AirdropLoginToken -> handleAirdropTokenAction(deeplink)
         }
-    }
-
-    private fun showAddBaseNodeDialog(dialogHandler: DialogHandler, deeplink: DeepLink.AddBaseNode) {
-        val baseNode = deeplink.data()
-        dialogHandler.showModularDialog(
-            ConfirmDialogArgs(
-                dialogId = DialogId.DEEPLINK_ADD_BASE_NODE,
-                title = resourceManager.getString(R.string.home_custom_base_node_title),
-                description = resourceManager.getString(R.string.home_custom_base_node_description),
-                cancelButtonText = resourceManager.getString(R.string.home_custom_base_node_no_button),
-                confirmButtonText = resourceManager.getString(R.string.common_lets_do_it),
-                onConfirm = {
-                    dialogHandler.hideDialog(DialogId.DEEPLINK_ADD_BASE_NODE)
-                    addBaseNodeAction(dialogHandler, baseNode)
-                },
-            ).getModular(baseNode, resourceManager)
-        )
     }
 
     private fun showUserProfileDialog(dialogHandler: DialogHandler, deeplink: DeepLink.UserProfile) {
@@ -194,8 +172,6 @@ class DeeplinkManager @Inject constructor(
         )
     }
 
-    private fun DeepLink.AddBaseNode.data(): BaseNodeDto = BaseNodeDto.fromDeeplink(this)
-
     private fun DeepLink.Contacts.data(): List<Contact> = this.contacts.mapNotNull {
         runCatching {
             val tariWalletAddress = TariWalletAddress.fromBase58(it.tariAddress)
@@ -218,16 +194,6 @@ class DeeplinkManager @Inject constructor(
             Navigation.BackToHome,
             Navigation.TxSend.Send(contact, deeplink.amount, deeplink.note),
         )
-    }
-
-    private fun addBaseNodeAction(dialogHandler: DialogHandler, baseNodeDto: BaseNodeDto) {
-        if (DebugConfig.selectBaseNodeEnabled) {
-            baseNodesManager.addUserBaseNode(baseNodeDto)
-            baseNodesManager.setBaseNode(baseNodeDto)
-            walletManager.syncBaseNode()
-        } else {
-            dialogHandler.showNotReadyYetDialog()
-        }
     }
 
     private fun goToBackupAction() {

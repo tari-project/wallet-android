@@ -41,7 +41,6 @@ import com.tari.android.wallet.data.airdrop.AirdropRepository
 import com.tari.android.wallet.data.baseNode.BaseNodeStateHandler
 import com.tari.android.wallet.data.recovery.WalletRestorationStateHandler
 import com.tari.android.wallet.data.sharedPrefs.CorePrefRepository
-import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodeDto
 import com.tari.android.wallet.data.sharedPrefs.network.NetworkPrefRepository
 import com.tari.android.wallet.data.sharedPrefs.security.SecurityPrefRepository
 import com.tari.android.wallet.data.sharedPrefs.tariSettings.TariSettingsPrefRepository
@@ -50,12 +49,10 @@ import com.tari.android.wallet.ffi.Base58String
 import com.tari.android.wallet.ffi.FFIByteVector
 import com.tari.android.wallet.ffi.FFICommsConfig
 import com.tari.android.wallet.ffi.FFIException
-import com.tari.android.wallet.ffi.FFIPublicKey
 import com.tari.android.wallet.ffi.FFISeedWords
 import com.tari.android.wallet.ffi.FFITariTransportConfig
 import com.tari.android.wallet.ffi.FFITariWalletAddress
 import com.tari.android.wallet.ffi.FFIWallet
-import com.tari.android.wallet.ffi.HexString
 import com.tari.android.wallet.ffi.NetAddressString
 import com.tari.android.wallet.ffi.runWithDestroy
 import com.tari.android.wallet.model.MicroTari
@@ -76,7 +73,6 @@ import com.tari.android.wallet.ui.common.DialogManager
 import com.tari.android.wallet.ui.screen.send.obsolete.finalize.FinalizeSendTxModel
 import com.tari.android.wallet.util.BroadcastEffectFlow
 import com.tari.android.wallet.util.Constants
-import com.tari.android.wallet.util.DebugConfig
 import com.tari.android.wallet.util.extension.collectFlow
 import com.tari.android.wallet.util.extension.safeCastTo
 import kotlinx.coroutines.CoroutineScope
@@ -142,7 +138,6 @@ class WalletManager @Inject constructor(
     private val walletValidator = WalletValidator(
         walletManager = this,
         baseNodeStateHandler = baseNodeStateHandler,
-        baseNodesManager = baseNodesManager,
     )
 
     init {
@@ -226,13 +221,6 @@ class WalletManager @Inject constructor(
             walletCallbacks = walletCallbacks,
         )
 
-        if (DebugConfig.selectBaseNodeEnabled) {
-            baseNodesManager.refreshBaseNodeList(wallet)
-            if (baseNodesManager.currentBaseNode == null) {
-                baseNodesManager.setNextBaseNode()
-            }
-        }
-
         // Need to update the balance state after the wallet is initialized,
         // because the first balance callback is called after the wallet is connected to the base node and validated
         balanceStateHandler.updateBalanceState(wallet.getBalance())
@@ -287,60 +275,14 @@ class WalletManager @Inject constructor(
         }
     }
 
-    // ------------------------------------------------------ Sync Base Node ------------------------------------------------------
-
-    /**
-     * Syncs the wallet with the base node and validates the wallet
-     */
-    @Deprecated("Should be removed once the BaseNode pinning feature is implemented")
-    fun syncBaseNode() {
-        if (!DebugConfig.selectBaseNodeEnabled) {
-            Logger.e("Base Node connection: Base node selection is disabled, but syncBaseNode() is called!!")
-        }
-        var currentBaseNode: BaseNodeDto? = baseNodesManager.currentBaseNode ?: return
-
-        applicationScope.launch(Dispatchers.IO) {
-            doOnWalletRunning { wallet ->
-                while (currentBaseNode != null) {
-                    try {
-                        currentBaseNode?.let { it ->
-                            logger.i("Base Node connection: sync with base node ${it.publicKeyHex}::${it.address} started")
-                            val baseNodeKeyFFI = FFIPublicKey(HexString(it.publicKeyHex))
-                            val addBaseNodeResult = wallet.addBaseNodePeer(baseNodeKeyFFI, it.address)
-                            baseNodeKeyFFI.destroy()
-                            logger.i("Base Node connection: addBaseNodePeer ${if (addBaseNodeResult) "success" else "failed"}")
-
-                            walletValidator.validateWallet()
-                        }
-                        break
-                    } catch (e: Throwable) {
-                        logger.i("Base Node connection: error connecting to base node $currentBaseNode with an error: ${e.message}")
-                        currentBaseNode = baseNodesManager.setNextBaseNode()
-                    }
-                }
-
-                if (currentBaseNode == null) {
-                    logger.e("Base Node connection: error: cannot connect to any base node")
-                }
-            }
-        }
-    }
-
     // ------------------------------------------------------ Restore Wallet ------------------------------------------------------
 
     /**
      * Starts the wallet recovery process. Returns true if the recovery process was started successfully.
      * The recovery process events will be handled in the onWalletRestoration() callback.
      */
-    fun startRecovery(baseNode: BaseNodeDto?, recoveryOutputMessage: String): Boolean {
-        if (DebugConfig.selectBaseNodeEnabled) {
-            // TODO we don't support selecting base node for recovery yet
-            //  val baseNodeFFI = baseNode?.let { FFIPublicKey(HexString(it.publicKeyHex)) }
-            //  return walletInstance?.startRecovery(baseNodeFFI, recoveryOutputMessage) ?: false
-            return false
-        } else {
-            return walletInstance?.startRecovery(recoveryOutputMessage) == true
-        }
+    fun startRecovery(recoveryOutputMessage: String): Boolean {
+        return walletInstance?.startRecovery(recoveryOutputMessage) == true
     }
 
     fun onWalletRestored() {

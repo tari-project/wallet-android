@@ -23,8 +23,6 @@ import com.tari.android.wallet.ui.dialog.modular.modules.checked.CheckedModule
 import com.tari.android.wallet.ui.dialog.modular.modules.checked.CheckedModuleView
 import com.tari.android.wallet.ui.dialog.modular.modules.connection.ConnectionStatusesModule
 import com.tari.android.wallet.ui.dialog.modular.modules.connection.ConnectionStatusesModuleView
-import com.tari.android.wallet.ui.dialog.modular.modules.customBaseNodeBody.CustomBaseNodeBodyModule
-import com.tari.android.wallet.ui.dialog.modular.modules.customBaseNodeBody.CustomBaseNodeBodyModuleView
 import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
 import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModuleView
 import com.tari.android.wallet.ui.dialog.modular.modules.icon.IconModule
@@ -144,7 +142,6 @@ open class ModularDialog(context: Activity) {
                 is CheckedModule -> CheckedModuleView(context, module)
                 is LogSourceCheckedModule -> CheckedModuleView(context, module.checkedModule)
                 is LogLevelCheckedModule -> CheckedModuleView(context, module.checkedModule)
-                is CustomBaseNodeBodyModule -> CustomBaseNodeBodyModuleView(context, module)
                 is ShareQrCodeModule -> ShareQRCodeModuleView(context, module)
                 is ListItemModule -> ListItemModuleView(context, module)
                 is DetailItemModule -> DetailItemModuleView(context, module)
