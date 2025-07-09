@@ -77,7 +77,6 @@ import com.tari.android.wallet.ui.screen.settings.backup.enterCurrentPassword.En
 import com.tari.android.wallet.ui.screen.settings.backup.learnMore.BackupLearnMoreViewModel
 import com.tari.android.wallet.ui.screen.settings.backup.learnMore.item.BackupLearnMoreItemViewModel
 import com.tari.android.wallet.ui.screen.settings.backup.verifySeedPhrase.VerifySeedPhraseViewModel
-import com.tari.android.wallet.ui.screen.settings.baseNodeConfig.changeBaseNode.ChangeBaseNodeViewModel
 import com.tari.android.wallet.ui.screen.settings.bugReporting.BugsReportingViewModel
 import com.tari.android.wallet.ui.screen.settings.dataCollection.DataCollectionViewModel
 import com.tari.android.wallet.ui.screen.settings.deleteWallet.DeleteWalletViewModel
@@ -128,7 +127,6 @@ interface ApplicationComponent {
     fun inject(viewModel: InputSeedWordsViewModel)
     fun inject(viewModel: VerifySeedPhraseViewModel)
     fun inject(viewModel: BackupSettingsViewModel)
-    fun inject(viewModel: ChangeBaseNodeViewModel)
     fun inject(viewModel: NetworkSelectionViewModel)
     fun inject(viewModel: AllSettingsViewModel)
     fun inject(viewModel: FinalizeSendTxViewModel)

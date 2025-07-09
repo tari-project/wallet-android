@@ -170,28 +170,6 @@ sealed class DeepLink : Parcelable {
     }
 
     @Parcelize
-    data class AddBaseNode(val name: String = "", val peer: String = "") : DeepLink() {
-
-        constructor(params: Map<String, String>) : this(
-            params[KEY_NAME].orEmpty(),
-            params[KEY_PEER].orEmpty(),
-        )
-
-        override fun getParams(): Map<String, String> = hashMapOf<String, String>().apply {
-            put(KEY_NAME, name)
-            put(KEY_PEER, peer)
-        }
-
-        override fun getCommand(): String = COMMAND_ADD_NODE
-
-        companion object {
-            const val COMMAND_ADD_NODE = "base_nodes/add"
-            const val KEY_NAME = "name"
-            const val KEY_PEER = "peer"
-        }
-    }
-
-    @Parcelize
     data class TorBridges(val torConfigurations: List<TorBridgeConfiguration>) : DeepLink()
 
     // tari://esmeralda/paper_wallet?private_key=1234567890XX&anon_id=1234567890XX&tt=1234567890XX
@@ -261,7 +239,6 @@ sealed class DeepLink : Parcelable {
         fun getByCommand(command: String, params: Map<String, String>): DeepLink? = when (command) {
             Contacts.COMMAND_CONTACTS -> Contacts(params)
             Send.COMMAND_SEND -> Send(params)
-            AddBaseNode.COMMAND_ADD_NODE -> AddBaseNode(params)
             UserProfile.COMMAND_PROFILE -> UserProfile(params)
             PaperWallet.COMMAND_PAPER_WALLET -> PaperWallet(params)
             AirdropLoginToken.COMMAND_AIRDROP_LOGIN -> AirdropLoginToken(params)

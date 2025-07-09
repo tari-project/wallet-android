@@ -35,7 +35,6 @@ package com.tari.android.wallet.data.sharedPrefs
 import android.content.SharedPreferences
 import com.tari.android.wallet.data.sharedPrefs.addressPoisoning.AddressPoisoningPrefRepository
 import com.tari.android.wallet.data.sharedPrefs.backup.BackupPrefRepository
-import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodePrefRepository
 import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefBooleanDelegate
 import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefStringDelegate
 import com.tari.android.wallet.data.sharedPrefs.network.NetworkPrefRepository
@@ -63,7 +62,6 @@ class CorePrefRepository @Inject constructor(
     sharedPrefs: SharedPreferences,
     networkRepository: NetworkPrefRepository,
     private val backupSettingsRepository: BackupPrefRepository,
-    private val baseNodeSharedRepository: BaseNodePrefRepository,
     private val yatSharedRepository: YatPrefRepository,
     private val torSharedRepository: TorPrefRepository,
     private val tariSettingsSharedRepository: TariSettingsPrefRepository,
@@ -142,7 +140,6 @@ class CorePrefRepository @Inject constructor(
     fun walletAddressExists(): Boolean = walletAddressBase58 != null
 
     fun clear() {
-        baseNodeSharedRepository.clear()
         backupSettingsRepository.clear()
         yatSharedRepository.clear()
         torSharedRepository.clear()
