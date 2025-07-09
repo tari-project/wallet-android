@@ -2,8 +2,8 @@
 <com.tari.android.wallet.ui.component.tari.background.TariPrimaryBackground xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:fitsSystemWindows="true"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true">
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -82,29 +82,6 @@
                                 app:flexWrap="wrap" />
 
                         </com.tari.android.wallet.ui.component.tari.background.obsolete.TariSecondaryBackgroundConstraint>
-
-                        <com.tari.android.wallet.ui.component.tari.TariGradientButton
-                            android:id="@+id/choose_base_node_button"
-                            android:layout_width="match_parent"
-                            android:layout_height="@dimen/common_action_button_height"
-                            android:layout_marginHorizontal="25dp"
-                            android:layout_marginTop="60dp"
-                            android:visibility="gone"
-                            app:title="@string/restore_from_seed_words_select_node" />
-
-                        <com.tari.android.wallet.ui.component.tari.TariTextView
-                            android:id="@+id/choose_custom_base_node_button"
-                            android:layout_width="match_parent"
-                            android:layout_height="@dimen/common_action_button_height"
-                            android:layout_gravity="center"
-                            android:layout_marginHorizontal="25dp"
-                            android:layout_marginTop="60dp"
-                            android:foreground="?attr/selectableItemBackground"
-                            android:gravity="center"
-                            android:text="@string/restore_from_seed_words_button_select_base_node_select"
-                            android:textColor="?attr/palette_text_heading"
-                            android:textSize="13sp"
-                            app:customFont="heavy" />
 
                         <com.tari.android.wallet.ui.component.loadingButton.LoadingButtonView
                             android:id="@+id/continue_cta_view"

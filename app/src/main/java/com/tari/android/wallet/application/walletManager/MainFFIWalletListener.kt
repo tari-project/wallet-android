@@ -23,7 +23,6 @@ import com.tari.android.wallet.model.tx.CancelledTx
 import com.tari.android.wallet.model.tx.CompletedTx
 import com.tari.android.wallet.model.tx.PendingInboundTx
 import com.tari.android.wallet.model.tx.PendingOutboundTx
-import com.tari.android.wallet.util.DebugConfig
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -172,18 +171,12 @@ class MainFFIWalletListener(
             }
 
             ConnectivityStatus.ONLINE -> {
-                if (DebugConfig.selectBaseNodeEnabled) baseNodesManager.refreshBaseNodeList(walletManager.requireWalletInstance)
                 if (baseNodeStateHandler.updateState(BaseNodeState.Online)) {
                     logger.i("Base Node connection: connected [ONLINE]")
                 }
             }
 
             ConnectivityStatus.OFFLINE -> {
-                val currentBaseNode = baseNodesManager.currentBaseNode
-                if (DebugConfig.selectBaseNodeEnabled && (currentBaseNode == null || !currentBaseNode.isCustom)) {
-                    baseNodesManager.setNextBaseNode()
-                    walletManager.syncBaseNode()
-                }
                 if (baseNodeStateHandler.updateState(BaseNodeState.Offline)) {
                     logger.i("Base Node connection: disconnected [OFFLINE]")
                 }

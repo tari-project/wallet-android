@@ -62,7 +62,6 @@ import com.tari.android.wallet.ui.screen.settings.backup.enterCurrentPassword.En
 import com.tari.android.wallet.ui.screen.settings.backup.learnMore.BackupLearnMoreFragment
 import com.tari.android.wallet.ui.screen.settings.backup.verifySeedPhrase.VerifySeedPhraseFragment
 import com.tari.android.wallet.ui.screen.settings.backup.writeDownSeedWords.WriteDownSeedPhraseFragment
-import com.tari.android.wallet.ui.screen.settings.baseNodeConfig.changeBaseNode.ChangeBaseNodeFragment
 import com.tari.android.wallet.ui.screen.settings.dataCollection.DataCollectionFragment
 import com.tari.android.wallet.ui.screen.settings.deleteWallet.DeleteWalletFragment
 import com.tari.android.wallet.ui.screen.settings.networkSelection.NetworkSelectionFragment
@@ -116,7 +115,6 @@ class TariNavigator @Inject constructor(
             is AllSettings.ToScreenRecording -> addFragment(ScreenRecordingSettingsFragment())
             is AllSettings.BackToBackupSettings -> popUpTo(BackupSettingsFragment::class.java.simpleName)
             is AllSettings.ToBackupSettings -> addFragment(BackupSettingsFragment.newInstance(), withAnimation = navigation.withAnimation)
-            is AllSettings.ToBaseNodeSelection -> toBaseNodeSelection()
             is AllSettings.ToDeleteWallet -> addFragment(DeleteWalletFragment())
             is AllSettings.ToNetworkSelection -> addFragment(NetworkSelectionFragment())
             is AllSettings.ToTorBridges -> addFragment(TorBridgesSelectionFragment())
@@ -125,7 +123,6 @@ class TariNavigator @Inject constructor(
             is AllSettings.ToRequestTari -> addFragment(RequestTariFragment.newInstance())
 
             is InputSeedWords.ToRestoreFromSeeds -> addFragment(WalletRestoringFragment.newInstance())
-            is InputSeedWords.ToBaseNodeSelection -> toBaseNodeSelection()
 
             is TxSend.ToFinalizing -> continueToFinalizeSendTx(navigation.transactionData)
             is TxSend.Send -> addFragment(SendFragment.newInstance(navigation.contact, navigation.amount, navigation.note))
@@ -207,8 +204,6 @@ class TariNavigator @Inject constructor(
             popUpTo(LocalAuthFragment::class.java.simpleName)
         }
     }
-
-    private fun toBaseNodeSelection() = addFragment(ChangeBaseNodeFragment())
 
     private fun continueToFinalizeSendTx(transactionData: TransactionData) {
         if (transactionData.yat != null) {
@@ -294,13 +289,11 @@ sealed class Navigation {
         data object ToThemeSelection : AllSettings()
         data object ToTorBridges : AllSettings()
         data object ToNetworkSelection : AllSettings()
-        data object ToBaseNodeSelection : AllSettings()
         data object ToRequestTari : AllSettings()
     }
 
     sealed class InputSeedWords : Navigation() {
         data object ToRestoreFromSeeds : InputSeedWords()
-        data object ToBaseNodeSelection : InputSeedWords()
     }
 
     sealed class ContactBook : Navigation() {

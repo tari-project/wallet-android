@@ -2,12 +2,10 @@ package com.tari.android.wallet.application.walletManager
 
 import com.google.gson.Gson
 import com.orhanobut.logger.Logger
-import com.tari.android.wallet.application.baseNodes.BaseNodesManager
 import com.tari.android.wallet.application.walletManager.WalletManager.WalletValidationResult
 import com.tari.android.wallet.application.walletManager.WalletManager.WalletValidationType
 import com.tari.android.wallet.data.baseNode.BaseNodeStateHandler
 import com.tari.android.wallet.data.baseNode.BaseNodeSyncState
-import com.tari.android.wallet.util.DebugConfig
 import java.math.BigInteger
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.ConcurrentMap
@@ -15,7 +13,6 @@ import java.util.concurrent.ConcurrentMap
 class WalletValidator(
     private val walletManager: WalletManager,
     private val baseNodeStateHandler: BaseNodeStateHandler,
-    private val baseNodesManager: BaseNodesManager,
 ) {
 
     private val logger
@@ -70,11 +67,6 @@ class WalletValidator(
         when {
             failed -> {
                 walletValidationStatusMap.clear()
-                val currentBaseNode = baseNodesManager.currentBaseNode
-                if (DebugConfig.selectBaseNodeEnabled && (currentBaseNode == null || !currentBaseNode.isCustom)) {
-                    baseNodesManager.setNextBaseNode()
-                    walletManager.syncBaseNode()
-                }
                 baseNodeStateHandler.updateSyncState(BaseNodeSyncState.Failed)
             }
 
