@@ -24,4 +24,13 @@ class BalanceStateHandler @Inject constructor() {
     fun updateBalanceState(balanceInfo: BalanceInfo) {
         _balanceState.update { balanceInfo }
     }
+
+    fun clear() {
+        _balanceState.value = BalanceInfo(
+            availableBalance = 0.toMicroTari(),
+            pendingIncomingBalance = 0.toMicroTari(),
+            pendingOutgoingBalance = 0.toMicroTari(),
+            timeLockedBalance = 0.toMicroTari(),
+        )
+    }
 }

@@ -377,6 +377,9 @@ class WalletManager @Inject constructor(
         walletConfig.clearWalletFiles()
         corePrefRepository.clear()
         walletCallbacks.removeAllListeners()
+        airdropRepository.clear()
+        baseNodeStateHandler.clear()
+        balanceStateHandler.clear()
     }
 
     // ------------------------------------------------------ Misc ------------------------------------------------------
