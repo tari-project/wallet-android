@@ -1,6 +1,5 @@
 package com.tari.android.wallet.data
 
-import com.tari.android.wallet.R
 import com.tari.android.wallet.application.baseNodes.BaseNodesManager
 import com.tari.android.wallet.data.baseNode.BaseNodeState
 import com.tari.android.wallet.data.baseNode.BaseNodeStateHandler
@@ -53,7 +52,6 @@ class ConnectionStateHandler @Inject constructor(
                 it.copy(
                     walletScannedHeight = height,
                     chainTip = baseNodeState.heightOfLongestChain.toInt(),
-                    baseNodeIdHex = baseNodeState.nodeId,
                 )
             }
         }
@@ -67,7 +65,6 @@ data class ConnectionState(
     val baseNodeSyncState: BaseNodeSyncState = BaseNodeSyncState.NotStarted,
     val walletScannedHeight: Int = 0,
     val chainTip: Int = 0,
-    val baseNodeIdHex: String? = null,
 ) {
     val indicatorState: ConnectionIndicatorState
         get() = when (networkState) {
@@ -102,8 +99,8 @@ data class ConnectionState(
         }
 }
 
-sealed class ConnectionIndicatorState(val resId: Int) {
-    data object Connected : ConnectionIndicatorState(R.drawable.vector_network_state_full)
-    data object ConnectedWithIssues : ConnectionIndicatorState(R.drawable.vector_network_state_limited)
-    data object Disconnected : ConnectionIndicatorState(R.drawable.vector_network_state_off)
+sealed class ConnectionIndicatorState() {
+    data object Connected : ConnectionIndicatorState()
+    data object ConnectedWithIssues : ConnectionIndicatorState()
+    data object Disconnected : ConnectionIndicatorState()
 }
