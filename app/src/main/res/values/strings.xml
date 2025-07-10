@@ -474,7 +474,6 @@
     <string name="restore_wallet_error_file_not_found">Wallet could not be restored. Backup does not exist.</string>
     <string name="restore_wallet_restore_cta">Restore Wallet</string>
     <string name="restore_wallet_password_match_error">@string/enter_backup_password_password_match_error</string>
-    <string name="restore_wallet_output_message">You recovered some funds</string>
     <string name="restore_wallet_invalid_qr_code">Invalid QR Code</string>
     <string name="restore_wallet_invalid_qr_code_description">The QR code you scanned does not contain valid paper wallet seeds</string>
     <string name="restore_wallet_paper_wallet_title">Sync your Universe wallet?</string>
@@ -565,7 +564,6 @@
     <string name="connection_status_dialog_chain_tip">Chain Tip: </string>
     <string name="connection_status_dialog_chain_tip_value">#%1$s (%2$s)</string>
     <string name="connection_status_dialog_chain_tip_waiting">Waiting for connection…</string>
-    <string name="connection_status_dialog_base_node_id">Base Node ID: %s</string>
 
     <string name="tor_bridges_title">Bridges Configuration</string>
     <string name="tor_bridges_connect">Connect</string>

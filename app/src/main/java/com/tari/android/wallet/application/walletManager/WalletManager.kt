@@ -281,8 +281,8 @@ class WalletManager @Inject constructor(
      * Starts the wallet recovery process. Returns true if the recovery process was started successfully.
      * The recovery process events will be handled in the onWalletRestoration() callback.
      */
-    fun startRecovery(recoveryOutputMessage: String): Boolean {
-        return walletInstance?.startRecovery(recoveryOutputMessage) == true
+    fun startRecovery(): Boolean {
+        return walletInstance?.startRecovery() == true
     }
 
     fun onWalletRestored() {

@@ -14,12 +14,7 @@ class BaseNodesManager @Inject constructor() {
     private val _walletScannedHeight = MutableStateFlow(0)
     val walletScannedHeight = _walletScannedHeight.asStateFlow()
 
-    private val _baseNodeState = MutableStateFlow(
-        TariBaseNodeState(
-            heightOfLongestChain = BigInteger.ZERO,
-            nodeId = null,
-        )
-    )
+    private val _baseNodeState = MutableStateFlow(TariBaseNodeState(heightOfLongestChain = BigInteger.ZERO))
     val baseNodeState = _baseNodeState.asStateFlow()
 
     fun saveBaseNodeState(baseNodeState: TariBaseNodeState) {
