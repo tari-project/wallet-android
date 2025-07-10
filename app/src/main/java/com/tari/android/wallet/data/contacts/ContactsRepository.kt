@@ -12,7 +12,7 @@ import javax.inject.Singleton
 @Singleton
 class ContactsRepository @Inject constructor(
     private val contactsDb: ContactsDb,
-    @ApplicationScope private val applicationScope: CoroutineScope,
+    @param:ApplicationScope private val applicationScope: CoroutineScope,
 ) {
     private val _contactList: MutableStateFlow<List<Contact>> = MutableStateFlow(emptyList())
     val contactList = _contactList.asStateFlow()

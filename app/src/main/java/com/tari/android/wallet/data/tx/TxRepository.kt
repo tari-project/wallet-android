@@ -20,7 +20,7 @@ import javax.inject.Singleton
 class TxRepository @Inject constructor(
     private val contactsRepository: ContactsRepository,
     private val walletManager: WalletManager,
-    @ApplicationScope private val applicationScope: CoroutineScope,
+    @param:ApplicationScope private val applicationScope: CoroutineScope,
 ) {
     private val logger
         get() = Logger.t(TxRepository::class.java.simpleName)
@@ -54,6 +54,8 @@ class TxRepository @Inject constructor(
                     is WalletEvent.Tx.TxCancelled,
                     is WalletEvent.TxSend.TxSendSuccessful,
                     is WalletEvent.UtxosSplit -> refreshTxList()
+
+                    is WalletEvent.OnWalletRemove -> clear()
 
                     else -> Unit
                 }
@@ -95,4 +97,8 @@ class TxRepository @Inject constructor(
         tx = this,
         contact = contactsRepository.findOrCreateContact(this.tariContact.walletAddress),
     )
+
+    fun clear() {
+        _txs.value = TxListData()
+    }
 }
