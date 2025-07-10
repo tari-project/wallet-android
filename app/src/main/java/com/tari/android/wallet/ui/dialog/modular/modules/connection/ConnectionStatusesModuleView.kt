@@ -41,7 +41,5 @@ class ConnectionStatusesModuleView(context: Context, module: ConnectionStatusesM
         if (module.connectionState.walletScannedHeight != module.connectionState.chainTip) {
             ui.textChainTipValue.setTextColor(context.getColor(android.R.color.holo_red_light))
         }
-
-        ui.textBaseNodeId.text = context.string(R.string.connection_status_dialog_base_node_id, module.connectionState.baseNodeIdHex ?: "--")
     }
 }

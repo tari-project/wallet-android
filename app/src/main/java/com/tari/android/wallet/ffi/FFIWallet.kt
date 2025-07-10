@@ -89,6 +89,7 @@ class FFIWallet(
         seedWords: FFISeedWords?,
         dnsPeer: String,
         isDnsSecureOn: Boolean,
+        httepBaseNode: String,
         walletCallbacks: WalletCallbacks,
         callbackReceivedTx: String,
         callbackReceivedTxSig: String,
@@ -155,7 +156,6 @@ class FFIWallet(
     private external fun jniVerifyMessageSignature(publicKeyPtr: FFIPublicKey, message: String, signature: String, libError: FFIError): Boolean
     private external fun jniGetBaseNodePeers(libError: FFIError): FFIPointer
     private external fun jniGetPrivateViewKey(libError: FFIError): FFIPointer
-    private external fun jniAddBaseNodePeer(publicKey: FFIPublicKey, address: String, libError: FFIError): Boolean
     private external fun jniStartTXOValidation(libError: FFIError): ByteArray
     private external fun jniStartTxValidation(libError: FFIError): ByteArray
     private external fun jniRestartTxBroadcast(libError: FFIError): ByteArray
@@ -172,7 +172,6 @@ class FFIWallet(
         walletCallbacks: WalletCallbacks,
         callback: String,
         callbackSig: String,
-        recoveryOutputMessage: String,
         libError: FFIError
     ): Boolean
 
@@ -220,6 +219,7 @@ class FFIWallet(
                 seedWords = seedWords,
                 dnsPeer = tariNetwork.dnsPeer,
                 isDnsSecureOn = IS_DNS_SECURE_ON,
+                httepBaseNode = tariNetwork.httpBaseNode,
                 walletCallbacks = walletCallbacks,
                 WalletCallbacks::onTxReceived.name, "([BJ)V",
                 WalletCallbacks::onTxReplyReceived.name, "([BJ)V",
@@ -314,7 +314,7 @@ class FFIWallet(
     fun estimateTxFee(amount: MicroTari, feePerGram: MicroTari): MicroTari = runWithError { error ->
         val defaultKernelCount = BigInteger("1")
         val defaultOutputCount = BigInteger("2")
-        val gram = feePerGram?.value ?: Constants.Wallet.DEFAULT_FEE_PER_GRAM.value
+        val gram = feePerGram.value
         MicroTari(
             BigInteger(
                 1, jniEstimateTxFee(
@@ -410,9 +410,6 @@ class FFIWallet(
         }
     }
 
-    fun addBaseNodePeer(baseNodePublicKey: FFIPublicKey, baseNodeAddress: String): Boolean =
-        runWithError { jniAddBaseNodePeer(baseNodePublicKey, baseNodeAddress, it) }
-
     fun setKeyValue(key: String, value: String): Boolean = runWithError { jniSetKeyValue(key, value, it) }
 
     fun getKeyValue(key: String): String = runWithError { jniGetKeyValue(key, it) }
@@ -425,20 +422,19 @@ class FFIWallet(
 
     fun setRequiredConfirmationCount(number: BigInteger) = runWithError { jniSetConfirmations(number.toString(), it) }
 
-    fun startRecovery(recoveryOutputMessage: String): Boolean =
+    fun startRecovery(): Boolean =
         runWithError {
             jniStartRecovery(
                 walletCallbacks = walletCallbacks,
                 callback = walletCallbacks::onWalletRecovery.name,
                 callbackSig = "([BI[B[B)V",
-                recoveryOutputMessage = recoveryOutputMessage,
                 libError = it,
             )
         }
 
     fun getLowestFeePerGram(): MicroTari = runWithError { error ->
-        FFIFeePerGramStats(jniWalletGetFeePerGramStats(3, error)).runWithDestroy { stats ->
-            stats.getAt(0).getMin().toMicroTari().takeIf { it > 0.toMicroTari() }
+        FFIFeePerGramStat(jniWalletGetFeePerGramStats(3, error)).runWithDestroy { stats ->
+            stats.getMin().toMicroTari().takeIf { it > 0.toMicroTari() }
                 ?: 1.toMicroTari() // Sometimes the minimum fee can be 0, so we set it to 1 microTari
         }
     }

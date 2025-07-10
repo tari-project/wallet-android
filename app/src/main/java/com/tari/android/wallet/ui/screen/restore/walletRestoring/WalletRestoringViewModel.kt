@@ -62,9 +62,7 @@ class WalletRestoringViewModel : CommonViewModel() {
 
     private fun startRecoveryWithoutNode() {
         runCatching {
-            val startedSuccessfully = walletManager.startRecovery(
-                recoveryOutputMessage = resourceManager.getString(R.string.restore_wallet_output_message),
-            )
+            val startedSuccessfully = walletManager.startRecovery()
             if (!startedSuccessfully) {
                 onError(RestorationError.ConnectionFailed(resourceManager, this@WalletRestoringViewModel::cancelRecovery))
             }
@@ -150,7 +148,7 @@ class WalletRestoringViewModel : CommonViewModel() {
 
         class ConnectionFailed(resourceManager: ResourceManager, attempt: Long, maxAttempts: Long) : RestorationState(
             status = resourceManager.getString(R.string.restore_from_seed_words_overlay_status_connecting),
-            progress = resourceManager.getString(R.string.restore_from_seed_words_overlay_status_connection_failed, attempt + 1, maxAttempts + 1),
+            progress = resourceManager.getString(R.string.restore_from_seed_words_overlay_status_connection_failed, attempt, maxAttempts),
         )
 
         class ConnectedToBaseNode(resourceManager: ResourceManager) : RestorationState(

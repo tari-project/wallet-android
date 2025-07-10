@@ -197,7 +197,6 @@ object MockDataStub {
         timestamp = BigInteger.valueOf(System.currentTimeMillis()),
         id = 1.toBigInteger(),
         tariContact = TariContact(WALLET_ADDRESS, contactAlias),
-        confirmationCount = 0.toBigInteger(),
         txKernel = CompletedTransactionKernel(
             excess = "excess",
             publicNonce = "publicNonce",

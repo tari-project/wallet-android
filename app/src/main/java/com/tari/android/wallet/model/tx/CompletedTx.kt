@@ -59,7 +59,6 @@ data class CompletedTx(
     override val status: TxStatus,
     override val tariContact: TariContact,
     val fee: MicroTari,
-    val confirmationCount: BigInteger,
     val txKernel: CompletedTransactionKernel?,
     val minedTimestamp: BigInteger,
     val minedHeight: BigInteger,
@@ -74,7 +73,6 @@ data class CompletedTx(
         status = TxStatus.map(tx.getStatus()),
         tariContact = tx.getContact(),
         fee = MicroTari(tx.getFee()),
-        confirmationCount = tx.getConfirmationCount(),
         txKernel = try {
             val status = TxStatus.map(tx.getStatus())
             tx.takeIf { status != TxStatus.IMPORTED && status != TxStatus.PENDING }
@@ -89,7 +87,7 @@ data class CompletedTx(
 
     constructor(pointer: FFIPointer) : this(FFICompletedTx(pointer))
 
-    override fun toString() = "CompletedTx(fee=$fee, status=$status, confirmationCount=$confirmationCount) ${super.toString()}"
+    override fun toString() = "CompletedTx(fee=$fee, status=$status) ${super.toString()}"
 
     override val rawDetails: String
         get() = "{" +
@@ -100,7 +98,6 @@ data class CompletedTx(
                 "\"timestamp\":\"$timestamp\"," +
                 "\"paymentId\":\"$paymentId\"," +
                 "\"status\":\"$status\"," +
-                "\"confirmationCount\":\"$confirmationCount\"," +
                 "\"txKernel\":${txKernel?.let { "{\"excess\":\"${it.excess}\",\"publicNonce\":\"${it.publicNonce}\"," + "\"signature\":\"${it.signature}\"}" } ?: "null"}," +
                 "\"minedTimestamp\":\"$minedTimestamp\"," +
                 "\"minedHeight\":\"$minedHeight\"" +
