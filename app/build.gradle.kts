@@ -1,4 +1,4 @@
-import java.io.ByteArrayOutputStream
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import java.nio.file.Files
 import java.nio.file.Paths
 import java.util.Properties
@@ -15,12 +15,12 @@ plugins {
 }
 
 val commitNumber: Int by lazy {
-    val stdout = ByteArrayOutputStream()
-    rootProject.exec {
-        commandLine("git", "rev-list", "--count", "HEAD")
-        standardOutput = stdout
-    }
-    stdout.toString().trim().toInt()
+    val processBuilder = ProcessBuilder("git", "rev-list", "--count", "HEAD")
+    val output = File.createTempFile("git-commit-count", "")
+    processBuilder.redirectOutput(output)
+    val process = processBuilder.start()
+    process.waitFor()
+    output.readText().trim().toInt()
 }
 
 android {
@@ -106,8 +106,10 @@ android {
         targetCompatibility = JavaVersion.VERSION_17
     }
 
-    kotlinOptions {
-        jvmTarget = "17"
+    kotlin {
+        compilerOptions {
+            jvmTarget = JvmTarget.JVM_17
+        }
     }
 
     java {
@@ -160,9 +162,6 @@ android {
                 "com/itextpdf/io/font/cmap/MHei-Medium.properties",
                 "com/itextpdf/io/font/cmap/HeiseiMin-W3.properties",
                 "com/itextpdf/io/font/cmap/cjk_registry.properties",
-                "lib/arm64-v8a/libtor.so",
-                "lib/armeabi-v7a/libtor.so",
-                "lib/x86_64/libtor.so",
             )
         }
     }
@@ -298,12 +297,6 @@ dependencies {
 
     // used to read log files
     implementation(Dependencies.commonsIo)
-
-    implementation(Dependencies.contactsAndroid)
-
-    implementation(Dependencies.blessedAndroid)
-
-    implementation(Dependencies.itext7Core)
 
     implementation(Dependencies.keyboardVisibilityEvent)
 

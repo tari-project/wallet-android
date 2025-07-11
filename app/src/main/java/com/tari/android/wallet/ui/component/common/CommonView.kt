@@ -6,12 +6,13 @@ import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.LinearLayout
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.net.toUri
 import androidx.lifecycle.LifecycleOwner
 import androidx.viewbinding.ViewBinding
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.dialog.modular.ModularDialog
-import contacts.ui.view.activity
+import com.tari.android.wallet.util.extension.safeCastTo
 
 abstract class CommonView<VM : CommonViewModel, VB : ViewBinding> : LinearLayout {
 
@@ -55,6 +56,15 @@ abstract class CommonView<VM : CommonViewModel, VB : ViewBinding> : LinearLayout
 
         openLink.observe(viewLifecycle) { context.startActivity(Intent(Intent.ACTION_VIEW, it.toUri())) }
 
-        modularDialog.observe(viewLifecycle) { args -> activity?.let { activity -> dialogManager.replace(ModularDialog(activity, args)) } }
+        modularDialog.observe(viewLifecycle) { args ->
+            context.safeCastTo<AppCompatActivity>()?.let { activity ->
+                dialogManager.replace(
+                    ModularDialog(
+                        activity,
+                        args
+                    )
+                )
+            }
+        }
     }
 }

@@ -120,9 +120,9 @@ object TxDetailsModel {
             }
 
         sealed class TxStatusText {
-            data class InProgress(@StringRes val textRes: Int) : TxStatusText()
+            data class InProgress(@param:StringRes val textRes: Int) : TxStatusText()
             data object Completed : TxStatusText()
-            data class Cancelled(@StringRes val textRes: Int) : TxStatusText()
+            data class Cancelled(@param:StringRes val textRes: Int) : TxStatusText()
         }
 
         sealed class PayRefStatus {

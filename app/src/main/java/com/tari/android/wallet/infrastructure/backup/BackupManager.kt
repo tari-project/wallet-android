@@ -69,7 +69,7 @@ class BackupManager @Inject constructor(
     private val walletManager: WalletManager,
     private val appStateHandler: AppStateHandler,
     private val backupStateHandler: BackupStateHandler,
-    @ApplicationScope private val applicationScope: CoroutineScope,
+    @param:ApplicationScope private val applicationScope: CoroutineScope,
 ) {
 
     private val logger

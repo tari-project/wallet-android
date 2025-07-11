@@ -20,7 +20,7 @@ import javax.inject.Singleton
 class TxRepository @Inject constructor(
     private val contactsRepository: ContactsRepository,
     private val walletManager: WalletManager,
-    @ApplicationScope private val applicationScope: CoroutineScope,
+    @param:ApplicationScope private val applicationScope: CoroutineScope,
 ) {
     private val logger
         get() = Logger.t(TxRepository::class.java.simpleName)

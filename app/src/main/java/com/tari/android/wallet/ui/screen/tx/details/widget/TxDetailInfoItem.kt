@@ -231,7 +231,6 @@ fun TxDetailInfoPayRefItem(
                 R.string.tx_detail_payment_reference_waiting,
                 paymentReference.totalSteps,
                 paymentReference.step,
-                paymentReference.totalSteps,
             )
         },
         valueTextColor = when (paymentReference) {

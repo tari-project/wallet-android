@@ -44,7 +44,7 @@ import com.tari.android.wallet.R
  * @author The Tari Development Team
  */
 
-enum class TariFont(@FontRes private val fontRes: Int) {
+enum class TariFont(@param:FontRes private val fontRes: Int) {
 
     // font files
     BLACK(R.font.poppins_semibold),

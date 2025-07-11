@@ -5,9 +5,8 @@ import com.tari.android.wallet.ui.dialog.modular.IDialogModule
 
 class HeadModule(
     val title: String,
-    val subtitle: String = "",
     val rightButtonTitle: String = "",
-    @DrawableRes val rightButtonIcon: Int? = null,
+    @param:DrawableRes val rightButtonIcon: Int? = null,
     val rightButtonAction: () -> Unit = {},
 ) : IDialogModule() {
     val showRightAction: Boolean
