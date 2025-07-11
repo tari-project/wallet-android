@@ -14,7 +14,7 @@ import javax.inject.Singleton
 @Singleton
 class FcmHelper @Inject constructor(
     private val pushRepository: PushRepository,
-    @ApplicationScope private val applicationScope: CoroutineScope,
+    @param:ApplicationScope private val applicationScope: CoroutineScope,
 ) {
     private val logger
         get() = Logger.t(FcmHelper::class.simpleName)
@@ -41,7 +41,7 @@ class FcmHelper @Inject constructor(
     }
 
     private fun getFcmToken(onTokenReceived: (token: String) -> Unit) {
-        FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener { task ->
+        FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
             if (task.isSuccessful) {
                 task.result?.let { token ->
                     logger.i("FCM registration token: $token")
@@ -50,6 +50,6 @@ class FcmHelper @Inject constructor(
             } else {
                 logger.i("Fetching FCM registration token failed", task.exception)
             }
-        })
+        }
     }
 }

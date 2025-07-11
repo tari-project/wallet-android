@@ -144,7 +144,7 @@
     <string name="home_completed_transactions_title">Completed Transactions</string>
     <string name="home_custom_base_node_title">Add custom base node</string>
     <string name="home_custom_base_node_description">The QR code is a deep link request to assign your wallet to use this base node.</string>
-    <string name="home_custom_base_node_full_description"><![CDATA[<strong>Name: </strong>%s<br><br><strong>Peer:</strong><br>%s]]></string>
+    <string name="home_custom_base_node_full_description"><![CDATA[<strong>Name: </strong>%1$s<br><br><strong>Peer:</strong><br>%2$s]]></string>
     <string name="home_custom_base_node_no_button">Not this time</string>
     <!-- store and forward update progress -->
     <!--Balance label-->
@@ -206,7 +206,7 @@
     <!-- request tari -->
     <string name="request_tari_generate_qr_code">Generate QR Code</string>
     <string name="request_tari_share">Share</string>
-    <string name="request_tari_share_text">Hi! Please send me %s Tari(s) using this link: %s</string>
+    <string name="request_tari_share_text">Hi! Please send me %1$s Tari(s) using this link: %2$s</string>
 
     <!-- receive -->
     <string name="receive_tari_topbar_title">Receive</string>
@@ -327,7 +327,7 @@
     <string name="tx_detail_payment_reference_tooltip_title">Your unique payment ID!</string>
     <string name="tx_detail_payment_reference_tooltip_desc">Share this with anyone who needs to confirm your payment –
     they can look it up on a block explorer while your privacy stays protected.</string>
-    <string name="tx_detail_payment_reference_waiting">Waiting for %s block confirmations (%s of %s confirmed)</string>
+    <string name="tx_detail_payment_reference_waiting">Waiting for %1$s block confirmations (%2$s of %1$s confirmed)</string>
 
     <!-- debug screens -->
     <!-- logs -->
@@ -449,7 +449,7 @@
     <string name="back_up_wallet_backing_up_error_desc">Error occurred during backup: %s</string>
     <string name="back_up_wallet_backing_up_unknown_error">Unknown error</string>
     <string name="back_up_wallet_backing_up_disabled_error">No backup available.\nCreate a backup using Google Drive first</string>
-    <string name="back_up_wallet_last_successful_backup">Last sync: %s at %s</string>
+    <string name="back_up_wallet_last_successful_backup">Last sync: %1$s at %2$s</string>
     <string name="back_up_wallet_turn_off_backup_warning_title">Your backup will be deleted</string>
     <string name="back_up_wallet_turn_off_backup_warning_description">Are you sure you want to proceed?</string>
     <string name="back_up_wallet_google_title">Google Drive Backup</string>
@@ -513,7 +513,7 @@
     <string name="restore_from_seed_words_overlay_status_connecting">Waiting for connection</string>
     <string name="restore_from_seed_words_overlay_status_connected">Connection established. The process will start soon</string>
     <string name="restore_from_seed_words_overlay_status_progress">Restoring in progress:</string>
-    <string name="restore_from_seed_words_overlay_status_connection_failed">Attempt %s out of %s</string>
+    <string name="restore_from_seed_words_overlay_status_connection_failed">Attempt %1$s out of %2$s</string>
     <string name="restore_from_seed_words_overlay_error_title">Recovery Failed</string>
     <string name="restore_from_seed_words_overlay_error_description_connection_failed">Unable to connect with base node. Please try again later</string>
     <string name="restore_from_seed_words_overlay_error_description_internal_error">Unable to recover your wallet due to the error</string>
@@ -574,7 +574,7 @@
     <string name="connection_status_dialog_base_node_sync_success">Synced with Base Node</string>
     <string name="connection_status_dialog_base_node_sync_failure">Failed sync with Base Node</string>
     <string name="connection_status_dialog_chain_tip">Chain Tip: </string>
-    <string name="connection_status_dialog_chain_tip_value">#%s (%s)</string>
+    <string name="connection_status_dialog_chain_tip_value">#%1$s (%2$s)</string>
     <string name="connection_status_dialog_chain_tip_waiting">Waiting for connection…</string>
     <string name="connection_status_dialog_base_node_id">Base Node ID: %s</string>
 
@@ -593,7 +593,7 @@
     <string name="tor_bridges_connecting_error_description">Can\'t connect to the bridge because: %s</string>
     <string name="tor_bridges_connection_progress_title">Connecting to the TOR</string>
     <string name="tor_bridges_connection_progress_description">Trying to connect to the TOR</string>
-    <string name="tor_bridges_connection_progress_description_full">"Trying to connect to the TOR:\n%s\nProgress: %s%%"</string>
+    <string name="tor_bridges_connection_progress_description_full">"Trying to connect to the TOR:\n%1$s\nProgress: %2$s%%"</string>
     <string name="tor_bridges_connection_progress_successful_title">Connection to the TOR</string>
     <string name="tor_bridges_connection_progress_successful_description">Connecting to TOR connection was established successfully\n</string>
     <string name="tor_bridges_connection_progress_successful_no_bridges">No used bridges</string>
