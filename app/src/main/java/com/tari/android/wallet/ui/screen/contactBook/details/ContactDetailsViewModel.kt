@@ -41,8 +41,8 @@ class ContactDetailsViewModel(savedState: SavedStateHandle) : CommonViewModel() 
 
     private val _uiState = MutableStateFlow(
         UiState(
-            contact = savedState.getOrThrow<Contact>(PARAMETER_CONTACT),
-            userTxs = txRepository.txs.value.userTxs(savedState.getOrThrow<Contact>(PARAMETER_CONTACT)),
+            contact = savedState.getOrThrow(PARAMETER_CONTACT),
+            userTxs = txRepository.txs.value.userTxs(savedState.getOrThrow(PARAMETER_CONTACT)),
             ticker = networkRepository.currentNetwork.ticker,
         )
     )

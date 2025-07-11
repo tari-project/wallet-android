@@ -27,13 +27,13 @@ class RoundButtonWithIconView @JvmOverloads constructor(
         }
     }
 
-    fun setArgs(text: String, @DrawableRes icon: Int, action: () -> Unit, size: Size = Size.Medium, isSelected: Boolean = false) {
+    fun setArgs(text: String, @DrawableRes icon: Int, action: () -> Unit, isSelected: Boolean = false) {
         this.setOnThrottledClickListener { action() }
         ui.icon.setImageResource(icon)
-        val padding = context.resources.getDimensionPixelSize(size.padding)
+        val padding = context.resources.getDimensionPixelSize(R.dimen.contact_book_share_button_padding_medium)
         ui.optionBackground.setPadding(padding, padding, padding, padding)
         ui.optionBackground.updateLayoutParams<LinearLayout.LayoutParams> {
-            val backSize = context.resources.getDimensionPixelSize(size.value)
+            val backSize = context.resources.getDimensionPixelSize(R.dimen.contact_book_share_button_size_medium)
             height = backSize
             width = backSize
         }
@@ -44,10 +44,5 @@ class RoundButtonWithIconView @JvmOverloads constructor(
         ui.optionBackground.updateBack(backColor = backgroundColor)
         val iconColor = if (isSelected) PaletteManager.getBackgroundPrimary(context) else PaletteManager.getTextHeading(context)
         ui.icon.setColorFilter(iconColor)
-    }
-
-    enum class Size(val value: Int, val padding: Int) {
-        Big(R.dimen.contact_book_share_button_size_big, R.dimen.contact_book_share_button_padding_big),
-        Medium(R.dimen.contact_book_share_button_size_medium, R.dimen.contact_book_share_button_padding_medium)
     }
 }

@@ -84,20 +84,6 @@ class TorPrefRepository @Inject constructor(sharedPrefs: SharedPreferences, netw
             customTorBridges = TorBridgeConfigurationList(this.distinct())
         }
     }
-
-    fun addCurrentTorBridge(torBridgeConfiguration: TorBridgeConfiguration) {
-        currentTorBridges.apply {
-            add(torBridgeConfiguration)
-            currentTorBridges = TorBridgeConfigurationList(this.distinct())
-        }
-    }
-
-    fun removeCurrentTorBridge(torBridgeConfiguration: TorBridgeConfiguration) {
-        currentTorBridges.apply {
-            remove(torBridgeConfiguration)
-            currentTorBridges = TorBridgeConfigurationList(this.distinct())
-        }
-    }
 }
 
 class TorBridgeConfigurationList(configs: List<TorBridgeConfiguration>) : ArrayList<TorBridgeConfiguration>(configs) {

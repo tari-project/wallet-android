@@ -38,7 +38,7 @@ class SecurityPrefRepository @Inject constructor(
 
     var databasePassphrase: String? by SharedPrefStringSecuredDelegate(context, sharedPrefs, this, formatKey(WALLET_DATABASE_PASSPHRASE))
 
-    var attempts: LoginAttemptList by SharedPrefGsonDelegate<LoginAttemptList>(
+    var attempts: LoginAttemptList by SharedPrefGsonDelegate(
         prefs = sharedPrefs,
         commonRepository = this,
         name = formatKey(LOGIN_ATTEMPTS),

@@ -9,7 +9,6 @@ import com.tari.android.wallet.R
 import com.tari.android.wallet.databinding.TariToolbarBinding
 import com.tari.android.wallet.util.extension.invisible
 import com.tari.android.wallet.util.extension.obtain
-import com.tari.android.wallet.util.extension.repopulate
 import com.tari.android.wallet.util.extension.runRecycle
 import com.tari.android.wallet.util.extension.setEndMargin
 import com.tari.android.wallet.util.extension.setStartMargin
@@ -47,12 +46,8 @@ class TariToolbar(context: Context, attrs: AttributeSet) : FrameLayout(context, 
     }
 
     fun setRightArgs(vararg args: TariToolbarActionArg) {
-        rightArgs.repopulate(args.toMutableList())
-        invalidateToolbar()
-    }
-
-    fun setLeftArgs(vararg args: TariToolbarActionArg) {
-        leftArgs.repopulate(args.toMutableList())
+        rightArgs.clear()
+        rightArgs.addAll(args.toList())
         invalidateToolbar()
     }
 

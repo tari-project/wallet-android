@@ -41,7 +41,6 @@
     <dimen name="add_amount_element_container_translation_y">9dp</dimen>
     <dimen name="add_amount_gem_size">21dp</dimen>
     <dimen name="add_amount_leftmost_digit_margin_start">10dp</dimen>
-    <dimen name="add_amount_available_balance_error_amount_nudge_distance">40dp</dimen>
 
     <!-- wallet info -->
     <dimen name="wallet_info_container_qr_code_size">230dp</dimen>
@@ -61,8 +60,6 @@
 
     <dimen name="contact_book_share_button_size_medium">46dp</dimen>
     <dimen name="contact_book_share_button_padding_medium">12dp</dimen>
-    <dimen name="contact_book_share_button_size_big">80dp</dimen>
-    <dimen name="contact_book_share_button_padding_big">22dp</dimen>
 
     <dimen name="pin_code_input_size">46dp</dimen>
     <dimen name="pin_code_input_margin">12dp</dimen>

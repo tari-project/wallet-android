@@ -83,8 +83,8 @@ class HomeOverviewViewModel : CommonViewModel() {
         }
 
         collectFlow(transactionRepository.txs.map { it.allTxs }) { txs ->
-            _uiState.update {
-                it.copy(
+            _uiState.update { state ->
+                state.copy(
                     txList = txs.sortedByDescending { it.tx.timestamp }
                         .take(TRANSACTION_AMOUNT_HOME_PAGE),
                 )

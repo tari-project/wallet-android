@@ -45,7 +45,7 @@ class BackupOptionViewModel : CommonViewModel() {
     private val _switchChecked = MutableLiveData<Boolean>()
     val switchChecked: LiveData<Boolean> = _switchChecked
 
-    private val _inProgress = MutableLiveData<Boolean>(false)
+    private val _inProgress = MutableLiveData(false)
     val inProgress: LiveData<Boolean> = _inProgress
 
     private val _openFolderSelection = SingleLiveEvent<Unit>()

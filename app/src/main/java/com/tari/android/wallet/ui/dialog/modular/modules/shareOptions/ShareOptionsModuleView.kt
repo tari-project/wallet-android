@@ -33,8 +33,8 @@ class ShareOptionsModuleView(context: Context, shareOptionsModule: ShareOptionsM
             onClick = shareOptionsModule.shareDeeplink,
         )
 
-        ui.root.addView(ShareOptionView(context).apply { setArgs(qrCodeArgs, ShareOptionView.Size.Medium) })
-        ui.root.addView(ShareOptionView(context).apply { setArgs(linkArgs, ShareOptionView.Size.Medium) })
+        ui.root.addView(ShareOptionView(context).apply { setArgs(qrCodeArgs) })
+        ui.root.addView(ShareOptionView(context).apply { setArgs(linkArgs) })
     }
 }
 

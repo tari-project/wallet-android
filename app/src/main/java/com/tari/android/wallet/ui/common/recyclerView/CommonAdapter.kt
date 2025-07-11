@@ -19,10 +19,6 @@ abstract class CommonAdapter<T : CommonViewHolderItem> : ListAdapter<T, CommonVi
         this.onClickListener = onClickListener ?: ItemClickListener()
     }
 
-    fun setClickListener(onClickListener: (T) -> Unit) {
-        this.onClickListener = ItemClickListener(onClickListener)
-    }
-
     fun setLongClickListener(onLongClickListener: ItemLongClickListener<T>?) {
         this.onLongClickListener = onLongClickListener ?: ItemLongClickListener()
     }
@@ -40,7 +36,8 @@ abstract class CommonAdapter<T : CommonViewHolderItem> : ListAdapter<T, CommonVi
         val item = getItem(position)
         val builder = viewHolderBuilders.firstOrNull { it.itemJavaClass == item.javaClass || isFitSuperclass(item.javaClass, it.itemJavaClass) }
 
-        builder ?: throw Exception("Invalid builder class \nrequired: ${item.javaClass} \nposition: $position \n$viewHolderBuilders \n${item.javaClass}")
+        builder
+            ?: throw Exception("Invalid builder class \nrequired: ${item.javaClass} \nposition: $position \n$viewHolderBuilders \n${item.javaClass}")
 
         return viewHolderBuilders.indexOf<ViewHolderBuilder?>(builder)
     }
