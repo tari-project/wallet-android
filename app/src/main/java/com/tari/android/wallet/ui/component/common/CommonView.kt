@@ -33,11 +33,7 @@ abstract class CommonView<VM : CommonViewModel, VB : ViewBinding> : LinearLayout
         init()
     }
 
-    constructor(context: Context, attrs: AttributeSet, defStyleAttr: Int) : super(
-        context,
-        attrs,
-        defStyleAttr
-    ) {
+    constructor(context: Context, attrs: AttributeSet, defStyleAttr: Int) : super(context, attrs, defStyleAttr) {
         init()
     }
 
@@ -57,14 +53,7 @@ abstract class CommonView<VM : CommonViewModel, VB : ViewBinding> : LinearLayout
         openLink.observe(viewLifecycle) { context.startActivity(Intent(Intent.ACTION_VIEW, it.toUri())) }
 
         modularDialog.observe(viewLifecycle) { args ->
-            context.safeCastTo<AppCompatActivity>()?.let { activity ->
-                dialogManager.replace(
-                    ModularDialog(
-                        activity,
-                        args
-                    )
-                )
-            }
+            context.safeCastTo<AppCompatActivity>()?.let { activity -> dialogManager.replace(ModularDialog(activity, args)) }
         }
     }
 }

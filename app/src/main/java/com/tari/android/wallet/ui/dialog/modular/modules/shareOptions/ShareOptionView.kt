@@ -26,13 +26,13 @@ class ShareOptionView @JvmOverloads constructor(
         }
     }
 
-    fun setArgs(args: ShareOptionArgs, size: Size = Size.Medium) {
+    fun setArgs(args: ShareOptionArgs) {
         this.setOnThrottledClickListener { args.onClick() }
         ui.icon.setImageResource(args.icon)
-        val padding = context.resources.getDimensionPixelSize(size.padding)
+        val padding = context.resources.getDimensionPixelSize(R.dimen.contact_book_share_button_padding_medium)
         ui.optionBackground.setPadding(padding, padding, padding, padding)
         ui.optionBackground.updateLayoutParams<LinearLayout.LayoutParams> {
-            val backSize = context.resources.getDimensionPixelSize(size.value)
+            val backSize = context.resources.getDimensionPixelSize(R.dimen.contact_book_share_button_size_medium)
             height = backSize
             width = backSize
         }
@@ -43,10 +43,5 @@ class ShareOptionView @JvmOverloads constructor(
         ui.optionBackground.updateBack(backColor = backgroundColor)
         val iconColor = if (args.isSelected) PaletteManager.getBackgroundPrimary(context) else PaletteManager.getTextHeading(context)
         ui.icon.setColorFilter(iconColor)
-    }
-
-    enum class Size(val value: Int, val padding: Int) {
-        Big(R.dimen.contact_book_share_button_size_big, R.dimen.contact_book_share_button_padding_big),
-        Medium(R.dimen.contact_book_share_button_size_medium, R.dimen.contact_book_share_button_padding_medium)
     }
 }

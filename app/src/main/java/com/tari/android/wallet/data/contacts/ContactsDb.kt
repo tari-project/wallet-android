@@ -10,7 +10,7 @@ private const val CONTACTS_DB_KEY = "contacts_db"
 @Singleton
 class ContactsDb @Inject constructor() {
 
-    suspend fun loadAllContacts(): List<ContactDto> = Paper.book().read(CONTACTS_DB_KEY) ?: emptyList<ContactDto>()
+    suspend fun loadAllContacts(): List<ContactDto> = Paper.book().read(CONTACTS_DB_KEY) ?: emptyList()
 
     suspend fun saveContacts(contacts: List<ContactDto>) {
         Paper.book().write(CONTACTS_DB_KEY, contacts)
@@ -28,16 +28,16 @@ class ContactsDb @Inject constructor() {
     }
 
     suspend fun upsertContactList(contacts: List<ContactDto>) {
-        val contacts = loadAllContacts().toMutableList()
+        val allContacts = loadAllContacts().toMutableList()
         contacts.forEach { contact ->
-            val existingContactIndex = contacts.indexOfFirst { it.walletAddressBase58 == contact.walletAddressBase58 }
+            val existingContactIndex = allContacts.indexOfFirst { it.walletAddressBase58 == contact.walletAddressBase58 }
             if (existingContactIndex != -1) {
-                contacts[existingContactIndex] = contact
+                allContacts[existingContactIndex] = contact
             } else {
-                contacts.add(0, contact)
+                allContacts.add(0, contact)
             }
         }
-        saveContacts(contacts.filter { !it.alias.isNullOrBlank() })
+        saveContacts(allContacts.filter { !it.alias.isNullOrBlank() })
     }
 
     suspend fun deleteContact(walletAddressBase58: Base58) {
