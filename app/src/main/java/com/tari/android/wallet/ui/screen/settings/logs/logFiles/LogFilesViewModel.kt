@@ -26,7 +26,12 @@ class LogFilesViewModel : CommonViewModel() {
         component.inject(this)
 
         val files = walletConfig.getLogFiles()
-        val wholeList = files.map { listOf(LogFileViewHolderItem(getFileName(it), it) { goNext.postValue(it.file) }, DividerViewHolderItem()) }
+        val wholeList = files.map {
+            listOf(
+                LogFileViewHolderItem(getFileName(it), it) { logViewHolder -> goNext.postValue(logViewHolder.file) },
+                DividerViewHolderItem(),
+            )
+        }
             .flatten()
             .toMutableList()
         logFiles.postValue(wholeList)

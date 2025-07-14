@@ -231,7 +231,7 @@ sealed class Navigation {
 
     data class EnterPinCode(val behavior: PinCodeScreenBehavior, val stashedPin: String? = null) : Navigation()
     data object ChangeBiometrics : Navigation()
-    data class SplashScreen(val seedWords: List<String>? = null, val clearTop: Boolean = true, val uri: Uri? = null) : Navigation()
+    data class SplashScreen(val seedWords: List<String>? = null, val clearTop: Boolean = true) : Navigation()
     data class Home(val uri: Uri? = null) : Navigation()
     data object BackToHome : Navigation()
 

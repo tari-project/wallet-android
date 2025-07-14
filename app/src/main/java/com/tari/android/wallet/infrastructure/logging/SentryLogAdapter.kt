@@ -4,7 +4,6 @@ import com.orhanobut.logger.LogAdapter
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.application.walletManager.WalletConfig
 import com.tari.android.wallet.data.sharedPrefs.sentry.SentryPrefRepository
-import com.welie.blessed.BluetoothPeripheralManager
 import io.sentry.Attachment
 import io.sentry.Breadcrumb
 import io.sentry.Hint
@@ -24,11 +23,9 @@ class SentryLogAdapter(
     override fun isLoggable(priority: Int, tag: String?): Boolean = sentryPrefRepository.isEnabled == true
 
     override fun log(priority: Int, tag: String?, message: String) {
-        if (tag == BluetoothPeripheralManager::class.java.simpleName) return
-
         if (priority == Logger.ERROR) {
             externalScope.launch(Dispatchers.IO) {
-                try {
+                runCatching {
                     val files = walletConfig.getLogFiles()
                     val lines = files.firstOrNull()?.inputStream()?.bufferedReader()?.readLines()?.takeLast(100)?.joinToString("\n")
 
@@ -41,7 +38,7 @@ class SentryLogAdapter(
 
                     val attachment = Hint.withAttachment(Attachment(files.firstOrNull()?.absolutePath.orEmpty()))
                     Sentry.captureEvent(SentryEvent(SentryException(message)), attachment)
-                } catch (e: Throwable) {
+                }.onFailure {
                     Sentry.captureException(SentryException(message), Hint.withAttachment(Attachment("tag", tag.orEmpty())))
                 }
             }

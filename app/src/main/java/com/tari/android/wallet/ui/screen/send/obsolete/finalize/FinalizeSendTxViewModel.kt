@@ -131,8 +131,8 @@ class FinalizeSendTxViewModel(savedState: SavedStateHandle) : CommonViewModel() 
     }
 
     sealed class FinalizingStep(
-        @StringRes val descLine1Res: Int,
-        @StringRes val descLine2Res: Int,
+        @param:StringRes val descLine1Res: Int,
+        @param:StringRes val descLine2Res: Int,
     ) {
         var isStarted: Boolean = false
         var isCompleted: Boolean = false
@@ -217,7 +217,7 @@ class FinalizeSendTxViewModel(savedState: SavedStateHandle) : CommonViewModel() 
     ) {
         override fun execute() {
             launchOnIo {
-                try {
+                runCatching {
                     val txId = walletManager.sendTari(
                         tariContact = TariContact(transactionData.recipientContact.walletAddress),
                         amount = transactionData.amount,
@@ -228,7 +228,7 @@ class FinalizeSendTxViewModel(savedState: SavedStateHandle) : CommonViewModel() 
 
                     logger.i("Tx sent: $txId")
                     _uiState.update { it.copy(sentTxId = txId) }
-                } catch (e: Exception) {
+                }.onFailure {
                     setFailureReason(TxFailureReason.SEND_ERROR)
                 }
                 isCompleted = true

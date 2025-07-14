@@ -42,8 +42,8 @@ class TxDetailsViewModel(savedState: SavedStateHandle) : CommonViewModel() {
 
     private val _uiState = MutableStateFlow(
         TxDetailsModel.UiState(
-            tx = savedState.getOrThrow<Tx>(TX_EXTRA_KEY),
-            showCloseButton = savedState.getOrThrow<Boolean>(SHOW_CLOSE_BUTTON_EXTRA_KEY),
+            tx = savedState.getOrThrow(TX_EXTRA_KEY),
+            showCloseButton = savedState.getOrThrow(SHOW_CLOSE_BUTTON_EXTRA_KEY),
             ticker = networkRepository.currentNetwork.ticker,
             blockExplorerBaseUrl = networkRepository.currentNetwork.blockExplorerBaseUrl,
             heightOfLongestChain = baseNodesManager.baseNodeState.value.heightOfLongestChain.toInt(),

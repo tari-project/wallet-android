@@ -193,8 +193,6 @@ fun View.setLayoutSize(width: Int, height: Int) {
 
 fun View.getBottomMargin() = (layoutParams as ViewGroup.MarginLayoutParams).bottomMargin
 
-fun View.getStartMargin() = (layoutParams as ViewGroup.MarginLayoutParams).marginStart
-
 fun View.setStartMargin(margin: Int) {
     withMargin {
         it.marginStart = margin

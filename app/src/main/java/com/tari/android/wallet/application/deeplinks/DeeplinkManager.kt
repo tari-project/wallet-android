@@ -40,7 +40,7 @@ class DeeplinkManager @Inject constructor(
     private val navigator: TariNavigator,
     private val deeplinkParser: DeeplinkParser,
     private val airdropRepository: AirdropRepository,
-    @ApplicationScope private val applicationScope: CoroutineScope,
+    @param:ApplicationScope private val applicationScope: CoroutineScope,
 ) {
 
     fun parseDeepLink(deepLink: Uri): DeepLink? = deeplinkParser.parse(deepLink)

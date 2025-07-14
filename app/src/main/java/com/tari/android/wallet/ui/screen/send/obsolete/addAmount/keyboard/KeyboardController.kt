@@ -541,28 +541,4 @@ class KeyboardController {
             element.second.setWidthAndHeightToMeasured()
         }
     }
-
-    fun nudgeAmountView(): ValueAnimator = with(amountInputBinding) {
-        // don't allow digit entry during this animation
-        digitAnimIsRunning = true
-        ValueAnimator.ofFloat(0f, 1f).apply {
-            addUpdateListener { valueAnimator: ValueAnimator ->
-                val value = valueAnimator.animatedValue as Float
-                // nudge the amount
-                if (value < 0.5f) { // nudge right for the half of the animation
-                    elementContainerView.translationX =
-                        context.dimenPx(R.dimen.add_amount_available_balance_error_amount_nudge_distance) * value
-                } else { // nudge back to original position for the second half
-                    elementContainerView.translationX =
-                        context.dimenPx(R.dimen.add_amount_available_balance_error_amount_nudge_distance) * (1f - value)
-                }
-                if (value == 1f) {
-                    digitAnimIsRunning = false
-                }
-            }
-            duration = Constants.UI.shortDurationMs
-            interpolator = EasingInterpolator(Ease.CIRC_OUT)
-            start()
-        }.also { animations.add(it) }
-    }
 }
