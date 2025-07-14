@@ -37,7 +37,6 @@ import com.tari.android.wallet.application.TariWalletApplication
 import com.tari.android.wallet.infrastructure.ShareManager
 import com.tari.android.wallet.notification.TariFcmService
 import com.tari.android.wallet.ui.common.CommonViewModel
-import com.tari.android.wallet.ui.component.clipboardController.WalletAddressViewModel
 import com.tari.android.wallet.ui.screen.StartActivity
 import com.tari.android.wallet.ui.screen.auth.AuthActivity
 import com.tari.android.wallet.ui.screen.auth.AuthViewModel
@@ -45,7 +44,6 @@ import com.tari.android.wallet.ui.screen.biometrics.ChangeBiometricsViewModel
 import com.tari.android.wallet.ui.screen.contactBook.add.AddContactViewModel
 import com.tari.android.wallet.ui.screen.contactBook.details.ContactDetailsViewModel
 import com.tari.android.wallet.ui.screen.contactBook.list.ContactListViewModel
-import com.tari.android.wallet.ui.screen.contactBook.obsolete.contactSelection.ContactSelectionViewModel
 import com.tari.android.wallet.ui.screen.debug.sampleDesign.SampleDesignSystemViewModel
 import com.tari.android.wallet.ui.screen.home.HomeViewModel
 import com.tari.android.wallet.ui.screen.home.overview.HomeOverviewViewModel
@@ -65,12 +63,11 @@ import com.tari.android.wallet.ui.screen.restore.chooseRestoreOption.ChooseResto
 import com.tari.android.wallet.ui.screen.restore.enterRestorationPassword.EnterRestorationPasswordViewModel
 import com.tari.android.wallet.ui.screen.restore.inputSeedWords.InputSeedWordsViewModel
 import com.tari.android.wallet.ui.screen.restore.walletRestoring.WalletRestoringViewModel
-import com.tari.android.wallet.ui.screen.send.addAmount.AddAmountViewModel
-import com.tari.android.wallet.ui.screen.send.addNote.AddNoteViewModel
 import com.tari.android.wallet.ui.screen.send.confirm.ConfirmViewModel
-import com.tari.android.wallet.ui.screen.send.finalize.FinalizeSendTxViewModel
+import com.tari.android.wallet.ui.screen.send.obsolete.finalize.FinalizeSendTxViewModel
+import com.tari.android.wallet.ui.screen.send.obsolete.requestTari.RequestTariViewModel
 import com.tari.android.wallet.ui.screen.send.receive.ReceiveViewModel
-import com.tari.android.wallet.ui.screen.send.requestTari.RequestTariViewModel
+import com.tari.android.wallet.ui.screen.send.send.SendViewModel
 import com.tari.android.wallet.ui.screen.settings.allSettings.AllSettingsViewModel
 import com.tari.android.wallet.ui.screen.settings.allSettings.about.TariAboutViewModel
 import com.tari.android.wallet.ui.screen.settings.backup.backupSettings.BackupSettingsViewModel
@@ -137,7 +134,6 @@ interface ApplicationComponent {
     fun inject(viewModel: FinalizeSendTxViewModel)
     fun inject(viewModel: WalletInfoViewModel)
     fun inject(viewModel: RequestTariViewModel)
-    fun inject(viewModel: AddAmountViewModel)
     fun inject(viewModel: TorBridgesSelectionViewModel)
     fun inject(viewModel: CustomTorBridgesViewModel)
     fun inject(viewModel: LocalAuthViewModel)
@@ -157,13 +153,10 @@ interface ApplicationComponent {
     fun inject(viewModel: TxHistoryViewModel)
     fun inject(viewModel: EnterCurrentPasswordViewModel)
     fun inject(viewModel: ChangeSecurePasswordViewModel)
-    fun inject(viewModel: AddNoteViewModel)
     fun inject(viewModel: BackupLearnMoreViewModel)
     fun inject(viewModel: BackupLearnMoreItemViewModel)
-    fun inject(viewModel: ContactSelectionViewModel)
     fun inject(viewModel: TxDetailsViewModel)
     fun inject(viewModel: ShareManager)
-    fun inject(viewModel: WalletAddressViewModel)
     fun inject(viewModel: QrScannerViewModel)
     fun inject(viewModel: DataCollectionViewModel)
     fun inject(viewModel: EnterPinCodeViewModel)
@@ -177,6 +170,7 @@ interface ApplicationComponent {
     fun inject(viewModel: ContactListViewModel)
     fun inject(viewModel: ContactDetailsViewModel)
     fun inject(viewModel: AddContactViewModel)
+    fun inject(viewModel: SendViewModel)
 
     fun inject(tariFcmService: TariFcmService)
 

@@ -37,6 +37,11 @@ import java.math.BigInteger
 
 fun String.parseToBigInteger(): BigInteger = runCatching { BigInteger(this) }.getOrNull() ?: BigInteger.ZERO
 
+// Converts an amount string if formatted as a decimal (e.g. "1.23") to a MicroTari object.
+fun String.toMicroTariOrNull(): MicroTari? = runCatching {
+    this.replace(",", ".").takeIf { it.isValidFloat() }?.toBigDecimal()?.multiply(MicroTari.precisionValue)?.toBigInteger()?.toMicroTari()
+}.getOrNull()
+
 fun Int.toMicroTari() = BigInteger.valueOf(this.toLong()).toMicroTari()
 
 fun Long.toMicroTari() = BigInteger.valueOf(this).toMicroTari()
@@ -44,3 +49,5 @@ fun Long.toMicroTari() = BigInteger.valueOf(this).toMicroTari()
 fun BigInteger.toMicroTari() = MicroTari(this)
 
 fun Byte.flag(bitmask: Byte): Boolean = (this.toInt() and bitmask.toInt()) == bitmask.toInt()
+
+private fun String.isValidFloat(): Boolean = Regex("^\\d+(\\.\\d+)?$").matches(this)

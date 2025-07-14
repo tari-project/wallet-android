@@ -45,12 +45,6 @@
     <!-- no connection -->
     <string name="error_no_connection_title">Can\'t connect to the internet</string>
     <string name="error_no_connection_description">Your phone appears to be offline or has a poor connection at the moment. Please try again when you\'ve found a stronger signal.</string>
-    <!-- balance exceeded -->
-    <string name="error_balance_exceeded_title">Hold your horses! 🐴</string>
-    <string name="error_balance_exceeded_description">Sorry, you can’t send this much XTM until your previous transaction(s) are complete. Please
-        wait for at least one transaction to complete and then try again.</string>
-    <string name="error_fee_more_than_amount_title">Amount Error</string>
-    <string name="error_fee_more_than_amount_description">Sorry, the amount cannot be less than the fee.</string>
 
     <string name="error_wallet_message_generic">Something went wrong! Please try again later. Please send us a bug report if this problem persists.</string>
     <string name="error_wallet_message_114">The wallet could not be restored. The backup file is not supported. We updated the wallet version, old
@@ -97,7 +91,6 @@
     <!-- emoji-id-related -->
     <string name="emoji_id_bullet_separator">•••</string>
     <string name="emoji_id_chunk_separator">l</string>
-    <string name="paste_emoji_id">Paste copied Emoji ID</string>
     <string name="tap_to_see_full_emoji_id">Tap to see full Emoji ID</string>
 
     <!-- dialog -->
@@ -219,10 +212,19 @@
     <string name="receive_tari_topbar_title">Receive</string>
     <string name="receive_tari_your_address">Your Address</string>
 
-    <!-- send tari - add recipient -->
-    <string name="add_recipient_recent_tx_contacts">Recent</string>
-    <string name="add_recipient_my_contacts">My Contacts</string>
-    <string name="add_recipient_invalid_emoji_id">Not a valid Emoji ID</string>
+    <string name="send_screen_title">Send</string>
+    <string name="send_recipient_address_field_title">To</string>
+    <string name="send_recipient_address_field_hint">Recipient address</string>
+    <string name="send_amount_field_title">Amount</string>
+    <string name="send_amount_field_hint">Enter XTM amount to send</string>
+    <string name="send_amount_field_error">Amount is not valid</string>
+    <string name="send_amount_field_error_not_enough_funds">Sorry, you can’t send this much XTM until your previous transaction(s) are complete. Please wait for at least one transaction to complete and then try again.</string>
+    <string name="send_amount_field_error_lower_than_fee">Sorry, the amount cannot be less than the fee.</string>
+    <string name="send_amount_field_error_fee_funds_pending">Sorry, you can’t send this much XTM. Please wait for at least one transaction to complete and then try again.</string>
+    <string name="send_amount_field_error_fee_default">Not enough XTM in your available balance</string>
+    <string name="send_note_field_title">Note (Optional)</string>
+    <string name="send_note_field_hint">Add note or payment reference</string>
+    <string name="send_note_field_disabled_payment_id">Your address does already have a Payment ID. You can\’t add another one.</string>
 
     <!-- QR-scanner -->
     <string name="add_recipient_scan_qr_description">Scan Tari QR code in the box below</string>
@@ -231,18 +233,7 @@
     <string name="add_recipient_camera_permission_denied_message">Camera permission denied</string>
 
     <!-- send tari - amount -->
-    <string name="add_amount_under_construction">Under Construction</string>
-    <string name="add_amount_not_enough_available_balance">Not enough XTM in your available balance</string>
-    <string name="add_amount_funds_pending">Sorry, you can’t send this much XTM. Please wait for at least one transaction to complete and then try
-        again.</string>
     <string name="add_amount_tx_fee">Transaction Fee</string>
-    <string name="add_amount_wallet_balance">Wallet Balance</string>
-    <string name="add_amount_modify_fee_calculating_fees">Calculating transaction fee…</string>
-
-    <!-- send tari - note -->
-    <string name="add_note_prompt">Transaction Note</string>
-    <string name="add_note_hint">Let the recipient know what the payment is for</string>
-    <string name="add_note_slide_to_send">Slide to Send</string>
 
     <!-- send tari - successful -->
     <string name="finalize_send_tx_sending_step_1_desc_line_1">Connecting to the</string>
@@ -757,21 +748,17 @@
     <string name="contact_book_add_contact_address_field_hint">Recipient address</string>
     <string name="contact_book_add_contact_address_field_error_text">Invalid wallet address</string>
     <string name="contact_book_add_contact_save_button">Save Contact</string>
-    <string name="contact_book_add_contact_placeholder">Enter Emoji ID, Contact Name or Yat</string>
-    <string name="contact_book_add_contact_placeholder_no_yat">Scan QR code or Enter Address</string>
     <string name="contact_book_add_contact_cant_add_yourself_title">Can’t add yourself</string>
     <string name="contact_book_add_contact_cant_add_yourself_description">You can’t add your own Tari wallet address to your contact book</string>
     <string name="contact_book_select_contact_cant_send_to_yourself_title">Can’t send Tari to yourself</string>
     <string name="contact_book_select_contact_cant_send_to_yourself_description">You can’t send Tari to your own Tari wallet address</string>
     <string name="contact_book_search_hint">Find Contact</string>
-    <string name="transaction_send_to">Send To</string>
     <string name="contact_book_details_connected_wallets_bitcoin">Open Bitcoin Wallet</string>
     <string name="contact_book_details_connected_wallets_etherium">Open Etherium Wallet</string>
     <string name="contact_book_details_connected_wallets_monero">Open Monero Wallet</string>
     <string name="contact_book_details_connected_wallets_no_application">Unfortunately, there are no applications that could open this type of address. Try to install corresponding application</string>
     <string name="contact_book_details_edit_title">Edit Contact</string>
     <string name="contact_book_add_contact_done_button">Done</string>
-    <string name="contact_book_add_contact_next_button">Next</string>
     <string name="share_contact_via_qr_code">QR Code</string>
     <string name="share_contact_via_qr_link">Link</string>
     <string name="wallet_info_alias_edit_title">Edit Name</string>

@@ -21,7 +21,7 @@ class AddContactFragment : CommonFragment<AddContactViewModel>() {
             AddContactScreen(
                 uiState = state,
                 onBackClick = { viewModel.onBackPressed() },
-                onScanQrClick = { startQrScanner(QrScannerSource.TransactionSend) },
+                onScanQrClick = { startQrScanner(QrScannerSource.AddContact) },
                 onSaveClick = { viewModel.saveContact() },
                 onAliasChange = { viewModel.onAliasChange(it) },
                 onAddressChange = { viewModel.onAddressChange(it) },

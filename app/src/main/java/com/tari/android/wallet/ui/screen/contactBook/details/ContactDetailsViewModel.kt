@@ -2,13 +2,13 @@ package com.tari.android.wallet.ui.screen.contactBook.details
 
 import androidx.lifecycle.SavedStateHandle
 import com.tari.android.wallet.R
+import com.tari.android.wallet.application.Navigation
 import com.tari.android.wallet.application.deeplinks.DeepLink
 import com.tari.android.wallet.data.contacts.Contact
 import com.tari.android.wallet.data.contacts.ContactsRepository
 import com.tari.android.wallet.data.tx.TxDto
 import com.tari.android.wallet.data.tx.TxListData
 import com.tari.android.wallet.data.tx.TxRepository
-import com.tari.android.wallet.navigation.Navigation
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.dialog.modular.DialogArgs
 import com.tari.android.wallet.ui.dialog.modular.ModularDialogArgs
@@ -53,7 +53,7 @@ class ContactDetailsViewModel(savedState: SavedStateHandle) : CommonViewModel() 
     }
 
     fun onSendTariClicked() {
-        tariNavigator.navigate(Navigation.ContactBook.ToSendTari(uiState.value.contact))
+        tariNavigator.navigate(Navigation.TxSend.Send(uiState.value.contact))
     }
 
     fun onRequestTariClicked() {

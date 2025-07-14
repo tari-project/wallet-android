@@ -155,7 +155,7 @@
 
         <!-- send tari -->
         <activity
-            android:name=".ui.screen.send.finalize.YatFinalizeSendTxActivity"
+            android:name=".ui.screen.send.obsolete.finalize.YatFinalizeSendTxActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:exported="true"
             android:launchMode="singleInstance"

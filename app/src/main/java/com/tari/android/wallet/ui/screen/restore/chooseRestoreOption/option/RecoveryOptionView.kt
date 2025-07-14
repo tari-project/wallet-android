@@ -30,7 +30,6 @@ class RecoveryOptionView : CommonView<RecoveryOptionViewModel, ViewRestoreOption
         val text = when (option) {
             BackupOption.Google -> R.string.back_up_wallet_restore_with_google_drive
             BackupOption.Local -> R.string.back_up_wallet_restore_with_local_files
-//            BackupOption.Dropbox -> R.string.back_up_wallet_restore_with_dropbox // FIXME: Dropbox backup is not supported yet
         }
         ui.title.text = context.getString(text)
         bindViewModel(RecoveryOptionViewModel().apply { this.option = option })
