@@ -10,7 +10,6 @@ data class ModularDialogArgs(
 ) {
     object DialogId {
         const val NO_ID = -1
-        const val CONNECTION_STATUS = 601
         const val DEBUG_MENU = 602
         const val SCREEN_RECORDING = 603
         const val DEEPLINK_ADD_CONTACTS = 605

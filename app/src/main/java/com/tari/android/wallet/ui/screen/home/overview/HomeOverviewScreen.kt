@@ -28,6 +28,7 @@ import com.tari.android.wallet.ui.compose.components.TariTextButton
 import com.tari.android.wallet.ui.screen.home.overview.widget.ActiveMinersCard
 import com.tari.android.wallet.ui.screen.home.overview.widget.BalanceInfoModal
 import com.tari.android.wallet.ui.screen.home.overview.widget.BlockSyncChip
+import com.tari.android.wallet.ui.screen.home.overview.widget.ConnectionStatusModal
 import com.tari.android.wallet.ui.screen.home.overview.widget.EmptyTxList
 import com.tari.android.wallet.ui.screen.home.overview.widget.RestoreSuccessModal
 import com.tari.android.wallet.ui.screen.home.overview.widget.SyncSuccessModal
@@ -49,6 +50,7 @@ fun HomeOverviewScreen(
     onTxClick: (txDto: TxDto) -> Unit,
     onViewAllTxsClick: () -> Unit,
     onConnectionStatusClick: () -> Unit,
+    onConnectionStatusDismiss: () -> Unit,
     onSyncDialogDismiss: () -> Unit,
     onBalanceInfoClicked: () -> Unit,
     onBalanceInfoDialogDismiss: () -> Unit,
@@ -221,6 +223,13 @@ fun HomeOverviewScreen(
                 ticker = uiState.ticker,
             )
         }
+
+        if (uiState.showConnectionStatusDialog) {
+            ConnectionStatusModal(
+                onDismiss = onConnectionStatusDismiss,
+                connectionState = uiState.connectionState,
+            )
+        }
     }
 }
 
@@ -250,6 +259,7 @@ private fun HomeOverviewScreenPreview() {
             onTxClick = {},
             onViewAllTxsClick = {},
             onConnectionStatusClick = {},
+            onConnectionStatusDismiss = {},
             onSyncDialogDismiss = {},
             onBalanceInfoClicked = {},
             onBalanceInfoDialogDismiss = {},
@@ -285,6 +295,7 @@ private fun HomeOverviewScreenHiddenPreview() {
             onTxClick = {},
             onViewAllTxsClick = {},
             onConnectionStatusClick = {},
+            onConnectionStatusDismiss = {},
             onSyncDialogDismiss = {},
             onBalanceInfoClicked = {},
             onBalanceInfoDialogDismiss = {},
@@ -320,6 +331,7 @@ private fun HomeOverviewEmptyScreenPreview() {
             onTxClick = {},
             onViewAllTxsClick = {},
             onConnectionStatusClick = {},
+            onConnectionStatusDismiss = {},
             onSyncDialogDismiss = {},
             onBalanceInfoClicked = {},
             onBalanceInfoDialogDismiss = {},
@@ -356,6 +368,7 @@ private fun HomeOverviewProgressScreenPreview() {
             onTxClick = {},
             onViewAllTxsClick = {},
             onConnectionStatusClick = {},
+            onConnectionStatusDismiss = {},
             onSyncDialogDismiss = {},
             onBalanceInfoClicked = {},
             onBalanceInfoDialogDismiss = {},
