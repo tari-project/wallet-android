@@ -171,6 +171,14 @@ class HomeOverviewViewModel : CommonViewModel() {
         _uiState.update { it.copy(showBalanceInfoDialog = false) }
     }
 
+    fun showConnectionStatusDialog() {
+        _uiState.update { it.copy(showConnectionStatusDialog = true) }
+    }
+
+    fun onConnectionStatusDialogDismiss() {
+        _uiState.update { it.copy(showConnectionStatusDialog = false) }
+    }
+
     fun onStartMiningClicked() {
         openUrl(TARI_COM)
     }

@@ -21,8 +21,6 @@ import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonModuleView
 import com.tari.android.wallet.ui.dialog.modular.modules.checked.CheckedModule
 import com.tari.android.wallet.ui.dialog.modular.modules.checked.CheckedModuleView
-import com.tari.android.wallet.ui.dialog.modular.modules.connection.ConnectionStatusesModule
-import com.tari.android.wallet.ui.dialog.modular.modules.connection.ConnectionStatusesModuleView
 import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
 import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModuleView
 import com.tari.android.wallet.ui.dialog.modular.modules.icon.IconModule
@@ -147,7 +145,6 @@ open class ModularDialog(context: Activity) {
                 is DetailItemModule -> DetailItemModuleView(context, module)
                 is UtxoAmountModule -> UtxoAmountModuleView(context, module)
                 is UtxoSplitModule -> UtxoSplitModuleView(context, module)
-                is ConnectionStatusesModule -> ConnectionStatusesModuleView(context, module)
                 is SecurityStageHeadModule -> SecurityStageHeadModuleView(context, module)
                 is BackupLearnMoreItemModule -> BackupLearnMoreItemModuleView(context, module)
                 is InputModule -> InputModuleView(context, module)

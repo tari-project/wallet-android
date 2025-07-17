@@ -37,14 +37,14 @@ class ConnectionStateHandler @Inject constructor(
         applicationScope.collectFlow(networkConnectionStateHandler.networkConnectionState) { networkState ->
             _connectionState.update { it.copy(networkState = networkState) }
         }
+        applicationScope.collectFlow(torProxyStateHandler.torProxyState) { torProxyState ->
+            _connectionState.update { it.copy(torProxyState = torProxyState) }
+        }
         applicationScope.collectFlow(baseNodeStateHandler.baseNodeState) { baseNodeState ->
             _connectionState.update { it.copy(baseNodeState = baseNodeState) }
         }
         applicationScope.collectFlow(baseNodeStateHandler.baseNodeSyncState) { syncState ->
             _connectionState.update { it.copy(baseNodeSyncState = syncState) }
-        }
-        applicationScope.collectFlow(torProxyStateHandler.torProxyState) { torProxyState ->
-            _connectionState.update { it.copy(torProxyState = torProxyState) }
         }
 
         applicationScope.collectFlow(baseNodesManager.walletScannedHeight.combineToPair(baseNodesManager.baseNodeState)) { (height, baseNodeState) ->

@@ -198,10 +198,6 @@ abstract class CommonActivity<VM : CommonViewModel> : AppCompatActivity(), Shake
                     SpaceModule(8),
                     OptionModule(getString(R.string.debug_dialog_logs)) { openActivity(DebugNavigation.Logs) },
                     OptionModule(getString(R.string.debug_dialog_report)) { openActivity(DebugNavigation.BugReport) },
-                    OptionModule(getString(R.string.debug_dialog_connection_status)) {
-                        dialogHandler.hideDialog(ModularDialogArgs.DialogId.DEBUG_MENU)
-                        dialogHandler.showConnectionStatusDialog()
-                    },
                     OptionModule(getString(R.string.debug_dialog_sample_design_system)) { openActivity(DebugNavigation.SampleDesignSystem) }
                         .takeIf { DebugConfig.isDebug() },
                     BodyModule(versionInfo),
