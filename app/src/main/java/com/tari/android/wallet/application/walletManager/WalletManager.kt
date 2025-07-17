@@ -34,11 +34,10 @@ package com.tari.android.wallet.application.walletManager
 
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.application.AppStateHandler
-import com.tari.android.wallet.application.baseNodes.BaseNodesManager
+import com.tari.android.wallet.data.baseNode.BaseNodeStateHandler
 import com.tari.android.wallet.application.walletManager.WalletCallbacks.Companion.MAIN_WALLET_CONTEXT_ID
 import com.tari.android.wallet.data.BalanceStateHandler
 import com.tari.android.wallet.data.airdrop.AirdropRepository
-import com.tari.android.wallet.data.baseNode.BaseNodeStateHandler
 import com.tari.android.wallet.data.recovery.WalletRestorationStateHandler
 import com.tari.android.wallet.data.sharedPrefs.CorePrefRepository
 import com.tari.android.wallet.data.sharedPrefs.network.NetworkPrefRepository
@@ -73,6 +72,7 @@ import com.tari.android.wallet.ui.common.DialogManager
 import com.tari.android.wallet.ui.screen.send.obsolete.finalize.FinalizeSendTxModel
 import com.tari.android.wallet.util.BroadcastEffectFlow
 import com.tari.android.wallet.util.Constants
+import com.tari.android.wallet.util.DebugConfig
 import com.tari.android.wallet.util.extension.collectFlow
 import com.tari.android.wallet.util.extension.safeCastTo
 import kotlinx.coroutines.CoroutineScope
@@ -83,7 +83,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.io.File
-import java.math.BigInteger
 import java.util.concurrent.atomic.AtomicReference
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -102,10 +101,9 @@ class WalletManager @Inject constructor(
     private val networkPrefRepository: NetworkPrefRepository,
     private val tariSettingsPrefRepository: TariSettingsPrefRepository,
     private val securityPrefRepository: SecurityPrefRepository,
-    private val baseNodesManager: BaseNodesManager,
+    private val baseNodeStateHandler: BaseNodeStateHandler,
     private val torConfig: TorConfig,
     private val torProxyStateHandler: TorProxyStateHandler,
-    private val baseNodeStateHandler: BaseNodeStateHandler,
     private val walletRestorationStateHandler: WalletRestorationStateHandler,
     private val dialogManager: DialogManager,
     private val balanceStateHandler: BalanceStateHandler,
@@ -135,11 +133,6 @@ class WalletManager @Inject constructor(
     private val logger
         get() = Logger.t(WalletManager::class.simpleName)
 
-    private val walletValidator = WalletValidator(
-        walletManager = this,
-        baseNodeStateHandler = baseNodeStateHandler,
-    )
-
     init {
         applicationScope.collectFlow(appStateHandler.appEvent) { event ->
             when (event) {
@@ -166,11 +159,9 @@ class WalletManager @Inject constructor(
             walletContextId = MAIN_WALLET_CONTEXT_ID,
             listener = MainFFIWalletListener(
                 walletManager = this,
-                walletValidator = walletValidator,
                 externalScope = applicationScope,
-                baseNodesManager = baseNodesManager,
-                balanceStateHandler = balanceStateHandler,
                 baseNodeStateHandler = baseNodeStateHandler,
+                balanceStateHandler = balanceStateHandler,
                 walletRestorationStateHandler = walletRestorationStateHandler,
             ),
         )
@@ -224,12 +215,6 @@ class WalletManager @Inject constructor(
         // Need to update the balance state after the wallet is initialized,
         // because the first balance callback is called after the wallet is connected to the base node and validated
         balanceStateHandler.updateBalanceState(wallet.getBalance())
-
-        applicationScope.launch(Dispatchers.IO) {
-            baseNodeStateHandler.doOnBaseNodeOnline {
-                walletValidator.validateWallet()
-            }
-        }
 
         saveWalletAddressToSharedPrefs(wallet)
 
@@ -355,15 +340,6 @@ class WalletManager @Inject constructor(
     fun getLastAccessedToDbVersion(): String {
         return createCommsConfig().runWithDestroy { it.getLastVersion() }
     }
-
-    enum class ConnectivityStatus(val value: Int) {
-        CONNECTING(0),
-        ONLINE(1),
-        OFFLINE(2),
-    }
-
-    enum class WalletValidationType { TXO, TX }
-    data class WalletValidationResult(val requestKey: BigInteger, val isSuccess: Boolean?)
 
     sealed class WalletEvent {
         object Tx {
