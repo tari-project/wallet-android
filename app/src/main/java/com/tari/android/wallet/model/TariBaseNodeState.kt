@@ -10,6 +10,9 @@ data class TariBaseNodeState(
     val heightOfLongestChain: BigInteger,
 ) : Parcelable {
 
+    val isSynced: Boolean
+        get() = heightOfLongestChain > BigInteger.ZERO
+
     constructor(ffiTariBaseNodeState: FFITariBaseNodeState) : this(
         heightOfLongestChain = ffiTariBaseNodeState.getHeightOfLongestChain(),
     )

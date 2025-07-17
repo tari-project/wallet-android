@@ -18,8 +18,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.tari.android.wallet.R
 import com.tari.android.wallet.data.ConnectionState
-import com.tari.android.wallet.data.baseNode.BaseNodeState
-import com.tari.android.wallet.data.baseNode.BaseNodeSyncState
 import com.tari.android.wallet.data.network.NetworkConnectionState
 import com.tari.android.wallet.tor.TorBootstrapStatus
 import com.tari.android.wallet.tor.TorProxyState
@@ -108,23 +106,6 @@ fun ConnectionStatusModal(
                 )
                 Spacer(Modifier.weight(1f))
                 ConnectionIconView(connectionState.baseNodeStateIcon())
-            }
-            Spacer(Modifier.size(20.dp))
-            TariHorizontalDivider(Modifier.padding(horizontal = 10.dp))
-            Spacer(Modifier.size(20.dp))
-
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 30.dp),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Text(
-                    modifier = Modifier.weight(1f),
-                    text = stringResource(connectionState.baseNodeSyncText()),
-                    style = TariDesignSystem.typography.body1.copy(color = TariDesignSystem.colors.textPrimary),
-                )
-                ConnectionIconView(connectionState.baseNodeSyncIcon())
             }
             Spacer(Modifier.size(20.dp))
             TariHorizontalDivider(Modifier.padding(horizontal = 10.dp))
@@ -234,31 +215,14 @@ private fun ConnectionState.torIcon(): ConnectionIcon = when (torProxyState) {
 private fun ConnectionState.torBootstrapPercent(): Int? = torProxyState.safeCastTo<TorProxyState.Initializing>()?.bootstrapStatus?.progress
 
 @StringRes
-private fun ConnectionState.baseNodeStateText(): Int = when (baseNodeState) {
-    BaseNodeState.Syncing -> R.string.connection_status_dialog_base_node_status_connecting
-    BaseNodeState.Offline -> R.string.connection_status_dialog_base_node_status_disconnected
-    BaseNodeState.Online -> R.string.connection_status_dialog_base_node_status_connected
+private fun ConnectionState.baseNodeStateText(): Int = when {
+    baseNodeState.isSynced -> R.string.connection_status_dialog_base_node_status_connected
+    else -> R.string.connection_status_dialog_base_node_status_connecting
 }
 
-private fun ConnectionState.baseNodeStateIcon(): ConnectionIcon = when (baseNodeState) {
-    BaseNodeState.Syncing -> ConnectionIcon.Progress
-    BaseNodeState.Offline -> ConnectionIcon.Failure
-    BaseNodeState.Online -> ConnectionIcon.Success
-}
-
-@StringRes
-private fun ConnectionState.baseNodeSyncText(): Int = when (baseNodeSyncState) {
-    BaseNodeSyncState.NotStarted -> R.string.connection_status_dialog_base_node_sync_idle
-    BaseNodeSyncState.Syncing -> R.string.connection_status_dialog_base_node_sync_pending
-    BaseNodeSyncState.Online -> R.string.connection_status_dialog_base_node_sync_success
-    BaseNodeSyncState.Failed -> R.string.connection_status_dialog_base_node_sync_failure
-}
-
-private fun ConnectionState.baseNodeSyncIcon(): ConnectionIcon = when (baseNodeSyncState) {
-    BaseNodeSyncState.NotStarted -> ConnectionIcon.Failure
-    BaseNodeSyncState.Syncing -> ConnectionIcon.Progress
-    BaseNodeSyncState.Online -> ConnectionIcon.Success
-    BaseNodeSyncState.Failed -> ConnectionIcon.Failure
+private fun ConnectionState.baseNodeStateIcon(): ConnectionIcon = when {
+    baseNodeState.isSynced -> ConnectionIcon.Success
+    else -> ConnectionIcon.Progress
 }
 
 private enum class ConnectionIcon { Success, Progress, Failure }

@@ -3,7 +3,7 @@ package com.tari.android.wallet.ui.screen.utxos.list
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import com.tari.android.wallet.R
-import com.tari.android.wallet.application.baseNodes.BaseNodesManager
+import com.tari.android.wallet.data.baseNode.BaseNodeStateHandler
 import com.tari.android.wallet.application.walletManager.WalletManager
 import com.tari.android.wallet.model.TariCoinPreview
 import com.tari.android.wallet.model.TariUtxo
@@ -33,7 +33,7 @@ import javax.inject.Inject
 class UtxosListViewModel : CommonViewModel() {
 
     @Inject
-    lateinit var baseNodesManager: BaseNodesManager
+    lateinit var baseNodeStateHandler: BaseNodeStateHandler
 
     val screenState: MutableLiveData<ScreenState> = MutableLiveData(ScreenState.Loading)
     val joinSplitButtonsState: MutableLiveData<JoinSplitButtonsState> = MutableLiveData(JoinSplitButtonsState.None)
@@ -180,7 +180,7 @@ class UtxosListViewModel : CommonViewModel() {
                 MockDataStub.createUtxoList()
             } else {
                 walletManager.requireWalletInstance.getAllUtxos().itemsList
-                    .map { UtxosViewHolderItem(it, baseNodesManager.baseNodeState.value.heightOfLongestChain.toLong()) }
+                    .map { UtxosViewHolderItem(it, baseNodeStateHandler.baseNodeState.value.heightOfLongestChain.toLong()) }
                     .filter { it.showStatus }
             }
 

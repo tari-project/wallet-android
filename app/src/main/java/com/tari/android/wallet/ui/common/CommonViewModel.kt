@@ -16,8 +16,6 @@ import com.tari.android.wallet.application.deeplinks.DeepLink
 import com.tari.android.wallet.application.deeplinks.DeeplinkManager
 import com.tari.android.wallet.application.walletManager.WalletManager
 import com.tari.android.wallet.application.walletManager.doOnWalletRunning
-import com.tari.android.wallet.data.ConnectionState
-import com.tari.android.wallet.data.ConnectionStateHandler
 import com.tari.android.wallet.data.sharedPrefs.CorePrefRepository
 import com.tari.android.wallet.data.sharedPrefs.network.NetworkPrefRepository
 import com.tari.android.wallet.data.sharedPrefs.security.SecurityPrefRepository
@@ -43,7 +41,6 @@ import com.tari.android.wallet.util.extension.addTo
 import com.tari.android.wallet.util.extension.launchOnIo
 import com.tari.android.wallet.util.extension.launchOnMain
 import io.reactivex.disposables.CompositeDisposable
-import kotlinx.coroutines.flow.StateFlow
 import yat.android.lib.YatIntegration
 import javax.inject.Inject
 
@@ -79,9 +76,6 @@ open class CommonViewModel : ViewModel(), DialogHandler {
     lateinit var walletManager: WalletManager
 
     @Inject
-    lateinit var connectionStateHandler: ConnectionStateHandler
-
-    @Inject
     lateinit var dialogManager: DialogManager
 
     @Inject
@@ -97,8 +91,6 @@ open class CommonViewModel : ViewModel(), DialogHandler {
         get() = Logger.t(this::class.simpleName)
 
     val currentTheme = tariSettingsSharedRepository.currentTheme
-
-    val connectionState: StateFlow<ConnectionState> = connectionStateHandler.connectionState
 
     private val _backPressed = SingleLiveEvent<Unit>()
     val backPressed: LiveData<Unit> = _backPressed

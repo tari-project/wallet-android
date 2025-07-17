@@ -6,7 +6,7 @@ import com.tari.android.wallet.R.string.common_are_you_sure
 import com.tari.android.wallet.R.string.tx_details_cancel_dialog_cancel
 import com.tari.android.wallet.R.string.tx_details_cancel_dialog_description
 import com.tari.android.wallet.R.string.tx_details_cancel_dialog_not_cancel
-import com.tari.android.wallet.application.baseNodes.BaseNodesManager
+import com.tari.android.wallet.data.baseNode.BaseNodeStateHandler
 import com.tari.android.wallet.application.walletManager.WalletManager.WalletEvent
 import com.tari.android.wallet.data.contacts.Contact
 import com.tari.android.wallet.data.contacts.ContactsRepository
@@ -34,7 +34,7 @@ class TxDetailsViewModel(savedState: SavedStateHandle) : CommonViewModel() {
     lateinit var contactsRepository: ContactsRepository
 
     @Inject
-    lateinit var baseNodesManager: BaseNodesManager
+    lateinit var baseNodeStateHandler: BaseNodeStateHandler
 
     init {
         component.inject(this)
@@ -46,7 +46,7 @@ class TxDetailsViewModel(savedState: SavedStateHandle) : CommonViewModel() {
             showCloseButton = savedState.getOrThrow(SHOW_CLOSE_BUTTON_EXTRA_KEY),
             ticker = networkRepository.currentNetwork.ticker,
             blockExplorerBaseUrl = networkRepository.currentNetwork.blockExplorerBaseUrl,
-            heightOfLongestChain = baseNodesManager.baseNodeState.value.heightOfLongestChain.toInt(),
+            heightOfLongestChain = baseNodeStateHandler.baseNodeState.value.heightOfLongestChain.toInt(),
         )
     )
     val uiState = _uiState.asStateFlow()
@@ -71,7 +71,7 @@ class TxDetailsViewModel(savedState: SavedStateHandle) : CommonViewModel() {
             }
         }
 
-        collectFlow(baseNodesManager.baseNodeState) { baseNodeState ->
+        collectFlow(baseNodeStateHandler.baseNodeState) { baseNodeState ->
             _uiState.update {
                 it.copy(
                     // need to refresh payRef data, cos it could be invalid in the first try and okay once the network mined next block

@@ -9,7 +9,6 @@ import android.os.Bundle
 import android.provider.Settings
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
 import com.orhanobut.logger.Logger
@@ -88,11 +87,10 @@ abstract class CommonActivity<VM : CommonViewModel> : AppCompatActivity(), Shake
     }
 
     private fun openSettings() {
-        Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
-            val packageName = this@CommonActivity.packageName
-            data = Uri.fromParts("package", packageName, null)
-            ContextCompat.startActivity(this@CommonActivity, this, Bundle())
-        }
+        startActivity(
+            Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+                .apply { data = Uri.fromParts("package", this@CommonActivity.packageName, null) }
+        )
     }
 
 
