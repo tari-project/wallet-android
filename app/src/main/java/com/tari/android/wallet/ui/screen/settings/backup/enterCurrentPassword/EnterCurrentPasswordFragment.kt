@@ -6,8 +6,8 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.viewModels
+import com.tari.android.wallet.application.Navigation
 import com.tari.android.wallet.databinding.FragmentEnterCurrentPasswordBinding
-import com.tari.android.wallet.navigation.Navigation
 import com.tari.android.wallet.ui.common.CommonXmlFragment
 import com.tari.android.wallet.util.extension.gone
 import com.tari.android.wallet.util.extension.postDelayed

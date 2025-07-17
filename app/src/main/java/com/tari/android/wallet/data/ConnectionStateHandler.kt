@@ -29,7 +29,7 @@ class ConnectionStateHandler @Inject constructor(
     baseNodesManager: BaseNodesManager,
     networkConnectionStateHandler: NetworkConnectionStateHandler,
     baseNodeStateHandler: BaseNodeStateHandler,
-    @ApplicationScope private val applicationScope: CoroutineScope,
+    @param:ApplicationScope private val applicationScope: CoroutineScope,
 ) {
     private val _connectionState = MutableStateFlow(ConnectionState())
     val connectionState = _connectionState.asStateFlow()

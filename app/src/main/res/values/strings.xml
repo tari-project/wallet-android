@@ -45,12 +45,6 @@
     <!-- no connection -->
     <string name="error_no_connection_title">Can\'t connect to the internet</string>
     <string name="error_no_connection_description">Your phone appears to be offline or has a poor connection at the moment. Please try again when you\'ve found a stronger signal.</string>
-    <!-- balance exceeded -->
-    <string name="error_balance_exceeded_title">Hold your horses! 🐴</string>
-    <string name="error_balance_exceeded_description">Sorry, you can’t send this much XTM until your previous transaction(s) are complete. Please
-        wait for at least one transaction to complete and then try again.</string>
-    <string name="error_fee_more_than_amount_title">Amount Error</string>
-    <string name="error_fee_more_than_amount_description">Sorry, the amount cannot be less than the fee.</string>
 
     <string name="error_wallet_message_generic">Something went wrong! Please try again later. Please send us a bug report if this problem persists.</string>
     <string name="error_wallet_message_114">The wallet could not be restored. The backup file is not supported. We updated the wallet version, old
@@ -97,7 +91,6 @@
     <!-- emoji-id-related -->
     <string name="emoji_id_bullet_separator">•••</string>
     <string name="emoji_id_chunk_separator">l</string>
-    <string name="paste_emoji_id">Paste copied Emoji ID</string>
     <string name="tap_to_see_full_emoji_id">Tap to see full Emoji ID</string>
 
     <!-- dialog -->
@@ -151,7 +144,7 @@
     <string name="home_completed_transactions_title">Completed Transactions</string>
     <string name="home_custom_base_node_title">Add custom base node</string>
     <string name="home_custom_base_node_description">The QR code is a deep link request to assign your wallet to use this base node.</string>
-    <string name="home_custom_base_node_full_description"><![CDATA[<strong>Name: </strong>%s<br><br><strong>Peer:</strong><br>%s]]></string>
+    <string name="home_custom_base_node_full_description"><![CDATA[<strong>Name: </strong>%1$s<br><br><strong>Peer:</strong><br>%2$s]]></string>
     <string name="home_custom_base_node_no_button">Not this time</string>
     <!-- store and forward update progress -->
     <!--Balance label-->
@@ -213,16 +206,25 @@
     <!-- request tari -->
     <string name="request_tari_generate_qr_code">Generate QR Code</string>
     <string name="request_tari_share">Share</string>
-    <string name="request_tari_share_text">Hi! Please send me %s Tari(s) using this link: %s</string>
+    <string name="request_tari_share_text">Hi! Please send me %1$s Tari(s) using this link: %2$s</string>
 
     <!-- receive -->
     <string name="receive_tari_topbar_title">Receive</string>
     <string name="receive_tari_your_address">Your Address</string>
 
-    <!-- send tari - add recipient -->
-    <string name="add_recipient_recent_tx_contacts">Recent</string>
-    <string name="add_recipient_my_contacts">My Contacts</string>
-    <string name="add_recipient_invalid_emoji_id">Not a valid Emoji ID</string>
+    <string name="send_screen_title">Send</string>
+    <string name="send_recipient_address_field_title">To</string>
+    <string name="send_recipient_address_field_hint">Recipient address</string>
+    <string name="send_amount_field_title">Amount</string>
+    <string name="send_amount_field_hint">Enter XTM amount to send</string>
+    <string name="send_amount_field_error">Amount is not valid</string>
+    <string name="send_amount_field_error_not_enough_funds">Sorry, you can’t send this much XTM until your previous transaction(s) are complete. Please wait for at least one transaction to complete and then try again.</string>
+    <string name="send_amount_field_error_lower_than_fee">Sorry, the amount cannot be less than the fee.</string>
+    <string name="send_amount_field_error_fee_funds_pending">Sorry, you can’t send this much XTM. Please wait for at least one transaction to complete and then try again.</string>
+    <string name="send_amount_field_error_fee_default">Not enough XTM in your available balance</string>
+    <string name="send_note_field_title">Note (Optional)</string>
+    <string name="send_note_field_hint">Add note or payment reference</string>
+    <string name="send_note_field_disabled_payment_id">Your address does already have a Payment ID. You can\’t add another one.</string>
 
     <!-- QR-scanner -->
     <string name="add_recipient_scan_qr_description">Scan Tari QR code in the box below</string>
@@ -231,18 +233,7 @@
     <string name="add_recipient_camera_permission_denied_message">Camera permission denied</string>
 
     <!-- send tari - amount -->
-    <string name="add_amount_under_construction">Under Construction</string>
-    <string name="add_amount_not_enough_available_balance">Not enough XTM in your available balance</string>
-    <string name="add_amount_funds_pending">Sorry, you can’t send this much XTM. Please wait for at least one transaction to complete and then try
-        again.</string>
     <string name="add_amount_tx_fee">Transaction Fee</string>
-    <string name="add_amount_wallet_balance">Wallet Balance</string>
-    <string name="add_amount_modify_fee_calculating_fees">Calculating transaction fee…</string>
-
-    <!-- send tari - note -->
-    <string name="add_note_prompt">Transaction Note</string>
-    <string name="add_note_hint">Let the recipient know what the payment is for</string>
-    <string name="add_note_slide_to_send">Slide to Send</string>
 
     <!-- send tari - successful -->
     <string name="finalize_send_tx_sending_step_1_desc_line_1">Connecting to the</string>
@@ -336,7 +327,7 @@
     <string name="tx_detail_payment_reference_tooltip_title">Your unique payment ID!</string>
     <string name="tx_detail_payment_reference_tooltip_desc">Share this with anyone who needs to confirm your payment –
     they can look it up on a block explorer while your privacy stays protected.</string>
-    <string name="tx_detail_payment_reference_waiting">Waiting for %s block confirmations (%s of %s confirmed)</string>
+    <string name="tx_detail_payment_reference_waiting">Waiting for %1$s block confirmations (%2$s of %1$s confirmed)</string>
 
     <!-- debug screens -->
     <!-- logs -->
@@ -458,7 +449,7 @@
     <string name="back_up_wallet_backing_up_error_desc">Error occurred during backup: %s</string>
     <string name="back_up_wallet_backing_up_unknown_error">Unknown error</string>
     <string name="back_up_wallet_backing_up_disabled_error">No backup available.\nCreate a backup using Google Drive first</string>
-    <string name="back_up_wallet_last_successful_backup">Last sync: %s at %s</string>
+    <string name="back_up_wallet_last_successful_backup">Last sync: %1$s at %2$s</string>
     <string name="back_up_wallet_turn_off_backup_warning_title">Your backup will be deleted</string>
     <string name="back_up_wallet_turn_off_backup_warning_description">Are you sure you want to proceed?</string>
     <string name="back_up_wallet_google_title">Google Drive Backup</string>
@@ -522,7 +513,7 @@
     <string name="restore_from_seed_words_overlay_status_connecting">Waiting for connection</string>
     <string name="restore_from_seed_words_overlay_status_connected">Connection established. The process will start soon</string>
     <string name="restore_from_seed_words_overlay_status_progress">Restoring in progress:</string>
-    <string name="restore_from_seed_words_overlay_status_connection_failed">Attempt %s out of %s</string>
+    <string name="restore_from_seed_words_overlay_status_connection_failed">Attempt %1$s out of %2$s</string>
     <string name="restore_from_seed_words_overlay_error_title">Recovery Failed</string>
     <string name="restore_from_seed_words_overlay_error_description_connection_failed">Unable to connect with base node. Please try again later</string>
     <string name="restore_from_seed_words_overlay_error_description_internal_error">Unable to recover your wallet due to the error</string>
@@ -583,7 +574,7 @@
     <string name="connection_status_dialog_base_node_sync_success">Synced with Base Node</string>
     <string name="connection_status_dialog_base_node_sync_failure">Failed sync with Base Node</string>
     <string name="connection_status_dialog_chain_tip">Chain Tip: </string>
-    <string name="connection_status_dialog_chain_tip_value">#%s (%s)</string>
+    <string name="connection_status_dialog_chain_tip_value">#%1$s (%2$s)</string>
     <string name="connection_status_dialog_chain_tip_waiting">Waiting for connection…</string>
     <string name="connection_status_dialog_base_node_id">Base Node ID: %s</string>
 
@@ -602,7 +593,7 @@
     <string name="tor_bridges_connecting_error_description">Can\'t connect to the bridge because: %s</string>
     <string name="tor_bridges_connection_progress_title">Connecting to the TOR</string>
     <string name="tor_bridges_connection_progress_description">Trying to connect to the TOR</string>
-    <string name="tor_bridges_connection_progress_description_full">"Trying to connect to the TOR:\n%s\nProgress: %s%%"</string>
+    <string name="tor_bridges_connection_progress_description_full">"Trying to connect to the TOR:\n%1$s\nProgress: %2$s%%"</string>
     <string name="tor_bridges_connection_progress_successful_title">Connection to the TOR</string>
     <string name="tor_bridges_connection_progress_successful_description">Connecting to TOR connection was established successfully\n</string>
     <string name="tor_bridges_connection_progress_successful_no_bridges">No used bridges</string>
@@ -757,21 +748,17 @@
     <string name="contact_book_add_contact_address_field_hint">Recipient address</string>
     <string name="contact_book_add_contact_address_field_error_text">Invalid wallet address</string>
     <string name="contact_book_add_contact_save_button">Save Contact</string>
-    <string name="contact_book_add_contact_placeholder">Enter Emoji ID, Contact Name or Yat</string>
-    <string name="contact_book_add_contact_placeholder_no_yat">Scan QR code or Enter Address</string>
     <string name="contact_book_add_contact_cant_add_yourself_title">Can’t add yourself</string>
     <string name="contact_book_add_contact_cant_add_yourself_description">You can’t add your own Tari wallet address to your contact book</string>
     <string name="contact_book_select_contact_cant_send_to_yourself_title">Can’t send Tari to yourself</string>
     <string name="contact_book_select_contact_cant_send_to_yourself_description">You can’t send Tari to your own Tari wallet address</string>
     <string name="contact_book_search_hint">Find Contact</string>
-    <string name="transaction_send_to">Send To</string>
     <string name="contact_book_details_connected_wallets_bitcoin">Open Bitcoin Wallet</string>
     <string name="contact_book_details_connected_wallets_etherium">Open Etherium Wallet</string>
     <string name="contact_book_details_connected_wallets_monero">Open Monero Wallet</string>
     <string name="contact_book_details_connected_wallets_no_application">Unfortunately, there are no applications that could open this type of address. Try to install corresponding application</string>
     <string name="contact_book_details_edit_title">Edit Contact</string>
     <string name="contact_book_add_contact_done_button">Done</string>
-    <string name="contact_book_add_contact_next_button">Next</string>
     <string name="share_contact_via_qr_code">QR Code</string>
     <string name="share_contact_via_qr_link">Link</string>
     <string name="wallet_info_alias_edit_title">Edit Name</string>

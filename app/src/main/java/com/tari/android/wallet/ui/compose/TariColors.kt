@@ -288,7 +288,7 @@ val TariDarkColorPalette = TariColors(
     actionHover = Color(0x1AFFFFFF),
     actionSelected = Color(0x26FFFFFF),
     actionDisabled = Color(0x66FFFFFF),
-    actionDisabledBackground = Color(0x1AFFFFFF),
+    actionDisabledBackground = Color(0x0DFFFFFF),
     actionFocus = Color(0x1AFFFFFF),
 
     divider = Color(0x1FFFFFFF),

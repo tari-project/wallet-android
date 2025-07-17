@@ -1,8 +1,8 @@
 package com.tari.android.wallet.infrastructure
 
 import com.tari.android.wallet.R
-import com.tari.android.wallet.navigation.Navigation
-import com.tari.android.wallet.navigation.TariNavigator
+import com.tari.android.wallet.application.Navigation
+import com.tari.android.wallet.application.TariNavigator
 import com.tari.android.wallet.ui.common.DialogHandler
 import com.tari.android.wallet.ui.common.domain.ResourceManager
 import com.tari.android.wallet.ui.dialog.modular.DialogArgs

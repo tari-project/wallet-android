@@ -66,6 +66,11 @@ sealed class DeepLink : Parcelable {
         else -> null
     }
 
+    fun getAmountOrNull(): MicroTari? = when (this) {
+        is Send -> amount
+        else -> null
+    }
+
     // tari://esmeralda/contacts?list[0][alias]=Name&list[0][tariAddress]=tariAddress&list[1][alias]=Name&list[1][tariAddress]=tariAddress
     @Parcelize
     data class Contacts(val contacts: List<DeeplinkContact>) : DeepLink() {
@@ -128,7 +133,7 @@ sealed class DeepLink : Parcelable {
 
         override fun getParams(): Map<String, String> = hashMapOf<String, String>().apply {
             put(KEY_TARI_ADDRESS, walletAddress)
-            put(KEY_AMOUNT, amount?.formattedValue.orEmpty())
+            put(KEY_AMOUNT, amount?.formattedMicroTariValue.orEmpty())
             put(KEY_NOTE, note)
         }
 
@@ -189,12 +194,11 @@ sealed class DeepLink : Parcelable {
     @Parcelize
     data class TorBridges(val torConfigurations: List<TorBridgeConfiguration>) : DeepLink()
 
-    // tari://esmeralda/paper_wallet?private_key=1234567890XX&anon_id=1234567890XX&balance=0%20%C2%B5T&tt=1234567890XX
+    // tari://esmeralda/paper_wallet?private_key=1234567890XX&anon_id=1234567890XX&tt=1234567890XX
     @Parcelize
     data class PaperWallet(
         val privateKey: String,
         val anonId: String = "",
-        val balance: String = "",
         val tt: String = "",
     ) : DeepLink() {
 
@@ -207,14 +211,12 @@ sealed class DeepLink : Parcelable {
         constructor(params: Map<String, String>) : this(
             params[KEY_PRIVATE_KEY].orEmpty(),
             params[KEY_ANON_ID].orEmpty(),
-            params[KEY_BALANCE].orEmpty(),
             params[KEY_TT].orEmpty(),
         )
 
         override fun getParams(): Map<String, String> = hashMapOf<String, String>().apply {
             put(KEY_PRIVATE_KEY, privateKey)
             put(KEY_ANON_ID, anonId)
-            put(KEY_BALANCE, balance)
             put(KEY_TT, tt)
         }
 
@@ -224,7 +226,6 @@ sealed class DeepLink : Parcelable {
             const val COMMAND_PAPER_WALLET = "paper_wallet"
             const val KEY_PRIVATE_KEY = "private_key"
             const val KEY_ANON_ID = "anon_id"
-            const val KEY_BALANCE = "balance"
             const val KEY_TT = "tt"
         }
     }

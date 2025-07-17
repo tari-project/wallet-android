@@ -1,10 +1,10 @@
 @file:Suppress("ConstPropertyName")
 
 object Dependencies {
-    const val gradlePlugin = "com.android.tools.build:gradle:8.7.2"
+    const val gradlePlugin = "com.android.tools.build:gradle:8.11.0"
 
     object Kotlin {
-        const val version = "2.0.21"
+        const val version = "2.2.0"
 
         const val reflect = "org.jetbrains.kotlin:kotlin-reflect:$version"
         const val stdlib = "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$version"
@@ -12,20 +12,20 @@ object Dependencies {
     }
 
     object AndroidX {
-        const val appcompat = "androidx.appcompat:appcompat:1.7.0"
+        const val appcompat = "androidx.appcompat:appcompat:1.7.1"
         const val biometric = "androidx.biometric:biometric:1.1.0"
-        const val constraintLayout = "androidx.constraintlayout:constraintlayout:2.2.0"
-        const val coreKtx = "androidx.core:core-ktx:1.15.0"
+        const val constraintLayout = "androidx.constraintlayout:constraintlayout:2.2.1"
+        const val coreKtx = "androidx.core:core-ktx:1.16.0"
         const val legacySupport = "androidx.legacy:legacy-support-v13:1.0.0"
-        const val recyclerview = "androidx.recyclerview:recyclerview:1.3.2"
+        const val recyclerview = "androidx.recyclerview:recyclerview:1.4.0"
         const val viewpager2 = "androidx.viewpager2:viewpager2:1.1.0"
-        const val material = "com.google.android.material:material:1.11.0"
-        const val activityKtx = "androidx.activity:activity-ktx:1.9.3"
-        const val fragmentKtx = "androidx.fragment:fragment-ktx:1.8.5"
-        const val dynamicAnimation = "androidx.dynamicanimation:dynamicanimation:1.0.0"
+        const val material = "com.google.android.material:material:1.12.0"
+        const val activityKtx = "androidx.activity:activity-ktx:1.10.1"
+        const val fragmentKtx = "androidx.fragment:fragment-ktx:1.8.8"
+        const val dynamicAnimation = "androidx.dynamicanimation:dynamicanimation:1.1.0"
 
         object Lifecycle {
-            const val version = "2.8.7"
+            const val version = "2.9.1"
 
             const val extensions = "androidx.lifecycle:lifecycle-extensions:2.2.0"
             const val livedataKtx = "androidx.lifecycle:lifecycle-livedata-ktx:$version"
@@ -35,12 +35,12 @@ object Dependencies {
         }
 
         object Compose {
-            const val bom = "androidx.compose:compose-bom:2025.04.01"
+            const val bom = "androidx.compose:compose-bom:2025.06.01"
             const val material = "androidx.compose.material:material" // FIXME: check usage and replace with material3
             const val material3 = "androidx.compose.material3:material3"
             const val uiTooling = "androidx.compose.ui:ui-tooling"
             const val uiToolingPreview = "androidx.compose.ui:ui-tooling-preview"
-            const val activity = "androidx.activity:activity-compose:1.9.2"
+            const val activity = "androidx.activity:activity-compose:1.10.1"
         }
     }
 
@@ -52,9 +52,9 @@ object Dependencies {
     }
 
     object Firebase {
-        const val gradlePlugin = "com.google.gms:google-services:4.4.2"
+        const val gradlePlugin = "com.google.gms:google-services:4.4.3"
 
-        const val bom = "com.google.firebase:firebase-bom:33.8.0"
+        const val bom = "com.google.firebase:firebase-bom:33.16.0"
         const val messaging = "com.google.firebase:firebase-messaging"
     }
 
@@ -65,7 +65,7 @@ object Dependencies {
     }
 
     object Google {
-        const val playServicesAuth = "com.google.android.gms:play-services-auth:21.2.0"
+        const val playServicesAuth = "com.google.android.gms:play-services-auth:21.3.0"
         const val httpClientGson = "com.google.http-client:google-http-client-gson:1.45.1"
         const val apiClientAndroid = "com.google.api-client:google-api-client-android:2.7.0"
         const val apiServicesDrive = "com.google.apis:google-api-services-drive:v3-rev20241027-2.0.0"
@@ -100,12 +100,9 @@ object Dependencies {
     const val seismic = "com.squareup:seismic:1.0.3"
     const val rxjava = "io.reactivex.rxjava2:rxjava:2.2.21"
     const val easingInterpolator = "com.github.MasayukiSuda:EasingInterpolator:1.3.2"
-    const val torAndroid = "info.guardianproject:tor-android:0.4.8.7"
+    const val torAndroid = "info.guardianproject:tor-android:0.4.8.17"
     const val jtorctl = "info.guardianproject:jtorctl:0.4.5.7"
     const val commonsIo = "commons-io:commons-io:2.18.0"
-    const val contactsAndroid = "com.github.vestrel00:contacts-android:0.3.1"
-    const val blessedAndroid = "com.github.weliem:blessed-android:2.5.0"
-    const val itext7Core = "com.itextpdf:itext7-core:9.0.0"
     const val keyboardVisibilityEvent = "net.yslibrary.keyboardvisibilityevent:keyboardvisibilityevent:2.3.0"
     const val mavenArtifact = "org.apache.maven:maven-artifact:3.9.9"
     const val paperDb = "io.github.pilgr:paperdb:2.7.2"

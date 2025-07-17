@@ -37,9 +37,6 @@ abstract class CommonFragment<VM : CommonViewModel> : Fragment(), FragmentPopped
 
     lateinit var viewModel: VM
 
-    protected val dialogHandler: DialogHandler
-        get() = viewModel
-
     protected val animations = mutableListOf<Animator>()
 
     val logger: Printer

@@ -3,6 +3,8 @@ package com.tari.android.wallet.application.deeplinks
 import android.net.Uri
 import androidx.core.net.toUri
 import com.tari.android.wallet.R
+import com.tari.android.wallet.application.Navigation
+import com.tari.android.wallet.application.TariNavigator
 import com.tari.android.wallet.application.baseNodes.BaseNodesManager
 import com.tari.android.wallet.application.walletManager.WalletManager
 import com.tari.android.wallet.data.airdrop.AirdropRepository
@@ -12,8 +14,6 @@ import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodeDto
 import com.tari.android.wallet.data.sharedPrefs.tor.TorPrefRepository
 import com.tari.android.wallet.di.ApplicationScope
 import com.tari.android.wallet.model.TariWalletAddress
-import com.tari.android.wallet.navigation.Navigation
-import com.tari.android.wallet.navigation.TariNavigator
 import com.tari.android.wallet.ui.common.DialogHandler
 import com.tari.android.wallet.ui.common.domain.ResourceManager
 import com.tari.android.wallet.ui.dialog.confirm.ConfirmDialogArgs
@@ -40,7 +40,7 @@ class DeeplinkManager @Inject constructor(
     private val navigator: TariNavigator,
     private val deeplinkParser: DeeplinkParser,
     private val airdropRepository: AirdropRepository,
-    @ApplicationScope private val applicationScope: CoroutineScope,
+    @param:ApplicationScope private val applicationScope: CoroutineScope,
 ) {
 
     fun parseDeepLink(deepLink: Uri): DeepLink? = deeplinkParser.parse(deepLink)
@@ -216,7 +216,7 @@ class DeeplinkManager @Inject constructor(
 
         navigator.navigateSequence(
             Navigation.BackToHome,
-            Navigation.TxList.ToSendTariToUser(contact, deeplink.amount, deeplink.note),
+            Navigation.TxSend.Send(contact, deeplink.amount, deeplink.note),
         )
     }
 

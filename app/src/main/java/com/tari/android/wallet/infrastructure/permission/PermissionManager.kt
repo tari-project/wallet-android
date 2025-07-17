@@ -4,7 +4,7 @@ import android.content.Context
 import android.content.pm.PackageManager
 import androidx.core.content.ContextCompat
 import com.tari.android.wallet.R
-import com.tari.android.wallet.navigation.TariNavigator
+import com.tari.android.wallet.application.TariNavigator
 import com.tari.android.wallet.ui.common.SingleLiveEvent
 import com.tari.android.wallet.ui.common.domain.ResourceManager
 import com.tari.android.wallet.ui.dialog.modular.DialogArgs

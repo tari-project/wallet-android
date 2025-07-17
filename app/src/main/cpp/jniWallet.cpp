@@ -566,7 +566,6 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniGetUtxos(
     return ExecuteWithErrorAndCast<TariVector *>(jEnv, error, [&](int *errorPointer) {
         auto pWallet = GetPointerField<TariWallet *>(jEnv, jThis);
         auto pSorting = (TariUtxoSort) jSorting;
-        //todo states
         return wallet_get_utxos(pWallet, jPage, jPageSize, pSorting, nullptr, jDustThreshold, errorPointer);
     });
 }

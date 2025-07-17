@@ -73,4 +73,9 @@ class AirdropRepository @Inject constructor(
     }
 
     private fun Result<Any>.is401() = this.exceptionOrNull()?.safeCastTo<HttpException>()?.code() == 401
+
+    fun clear() {
+        clearAirdropToken()
+        _airdropToken.value = null
+    }
 }

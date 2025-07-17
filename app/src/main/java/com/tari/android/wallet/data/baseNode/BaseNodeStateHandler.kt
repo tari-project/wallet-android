@@ -43,4 +43,9 @@ class BaseNodeStateHandler @Inject constructor() {
         baseNodeState.firstOrNull { it == BaseNodeState.Online }
             ?.let { action() }
     }
+
+    fun clear() {
+        _baseNodeState.value = BaseNodeState.Syncing
+        _baseNodeSyncState.value = BaseNodeSyncState.NotStarted
+    }
 }
