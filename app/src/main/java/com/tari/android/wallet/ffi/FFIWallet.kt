@@ -90,6 +90,7 @@ class FFIWallet(
         dnsPeer: String,
         isDnsSecureOn: Boolean,
         httepBaseNode: String,
+        walletBirthdayOffset: Int,
         walletCallbacks: WalletCallbacks,
         callbackReceivedTx: String,
         callbackReceivedTxSig: String,
@@ -202,9 +203,14 @@ class FFIWallet(
         passphrase: String,
         seedWords: FFISeedWords?,
         walletCallbacks: WalletCallbacks,
+        createWallet: Boolean,
     ) : this(walletCallbacks) {
         val error = FFIError()
         logger.i("Pre jniCreate")
+
+        // On recovery or normal operation this should be like 2 days.
+        // But for brand new wallets on first startup this can be set to 0, for immediate sync
+        val walletBirthdayOffset = if (createWallet) 0 else 2
 
         try {
             jniCreate(
@@ -220,6 +226,7 @@ class FFIWallet(
                 dnsPeer = tariNetwork.dnsPeer,
                 isDnsSecureOn = IS_DNS_SECURE_ON,
                 httepBaseNode = tariNetwork.httpBaseNode,
+                walletBirthdayOffset = walletBirthdayOffset,
                 walletCallbacks = walletCallbacks,
                 WalletCallbacks::onTxReceived.name, "([BJ)V",
                 WalletCallbacks::onTxReplyReceived.name, "([BJ)V",

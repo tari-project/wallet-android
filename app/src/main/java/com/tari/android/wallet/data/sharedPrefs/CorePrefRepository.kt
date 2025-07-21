@@ -43,7 +43,6 @@ import com.tari.android.wallet.data.sharedPrefs.security.SecurityPrefRepository
 import com.tari.android.wallet.data.sharedPrefs.securityStages.SecurityStagesPrefRepository
 import com.tari.android.wallet.data.sharedPrefs.sentry.SentryPrefRepository
 import com.tari.android.wallet.data.sharedPrefs.tariSettings.TariSettingsPrefRepository
-import com.tari.android.wallet.data.sharedPrefs.tor.TorPrefRepository
 import com.tari.android.wallet.data.sharedPrefs.yat.YatPrefRepository
 import com.tari.android.wallet.model.Base58
 import com.tari.android.wallet.model.TariWalletAddress
@@ -63,7 +62,6 @@ class CorePrefRepository @Inject constructor(
     networkRepository: NetworkPrefRepository,
     private val backupSettingsRepository: BackupPrefRepository,
     private val yatSharedRepository: YatPrefRepository,
-    private val torSharedRepository: TorPrefRepository,
     private val tariSettingsSharedRepository: TariSettingsPrefRepository,
     private val securityStagesRepository: SecurityStagesPrefRepository,
     private val sentryPrefRepository: SentryPrefRepository,
@@ -142,7 +140,6 @@ class CorePrefRepository @Inject constructor(
     fun clear() {
         backupSettingsRepository.clear()
         yatSharedRepository.clear()
-        torSharedRepository.clear()
         tariSettingsSharedRepository.clear()
         securityStagesRepository.clear()
         sentryPrefRepository.clear()

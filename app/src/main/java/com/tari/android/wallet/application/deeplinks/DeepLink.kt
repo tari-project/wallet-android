@@ -33,7 +33,6 @@
 package com.tari.android.wallet.application.deeplinks
 
 import android.os.Parcelable
-import com.tari.android.wallet.data.sharedPrefs.tor.TorBridgeConfiguration
 import com.tari.android.wallet.ffi.FFISeedWords
 import com.tari.android.wallet.ffi.runWithDestroy
 import com.tari.android.wallet.model.Base58
@@ -168,9 +167,6 @@ sealed class DeepLink : Parcelable {
             const val KEY_ALIAS = "alias"
         }
     }
-
-    @Parcelize
-    data class TorBridges(val torConfigurations: List<TorBridgeConfiguration>) : DeepLink()
 
     // tari://esmeralda/paper_wallet?private_key=1234567890XX&anon_id=1234567890XX&tt=1234567890XX
     @Parcelize

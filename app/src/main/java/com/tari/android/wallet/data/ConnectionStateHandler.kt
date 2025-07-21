@@ -5,8 +5,6 @@ import com.tari.android.wallet.data.network.NetworkConnectionState
 import com.tari.android.wallet.data.network.NetworkConnectionStateHandler
 import com.tari.android.wallet.di.ApplicationScope
 import com.tari.android.wallet.model.TariBaseNodeState
-import com.tari.android.wallet.tor.TorProxyState
-import com.tari.android.wallet.tor.TorProxyStateHandler
 import com.tari.android.wallet.util.extension.collectFlow
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -21,7 +19,6 @@ import javax.inject.Singleton
  */
 @Singleton
 class ConnectionStateHandler @Inject constructor(
-    torProxyStateHandler: TorProxyStateHandler,
     baseNodeStateHandler: BaseNodeStateHandler,
     networkConnectionStateHandler: NetworkConnectionStateHandler,
     @param:ApplicationScope private val applicationScope: CoroutineScope,
@@ -32,9 +29,6 @@ class ConnectionStateHandler @Inject constructor(
     init {
         applicationScope.collectFlow(networkConnectionStateHandler.networkConnectionState) { networkState ->
             _connectionState.update { it.copy(networkState = networkState) }
-        }
-        applicationScope.collectFlow(torProxyStateHandler.torProxyState) { torProxyState ->
-            _connectionState.update { it.copy(torProxyState = torProxyState) }
         }
         applicationScope.collectFlow(baseNodeStateHandler.walletScannedHeight) { height ->
             _connectionState.update { it.copy(walletScannedHeight = height) }
@@ -47,14 +41,12 @@ class ConnectionStateHandler @Inject constructor(
 
 data class ConnectionState(
     val networkState: NetworkConnectionState = NetworkConnectionState.UNKNOWN,
-    val torProxyState: TorProxyState = TorProxyState.NotReady,
     val baseNodeState: TariBaseNodeState = TariBaseNodeState(heightOfLongestChain = 0.toBigInteger()),
     val walletScannedHeight: Int = 0,
 ) {
     val indicatorState: ConnectionIndicatorState
         get() = when {
             networkState != NetworkConnectionState.CONNECTED ||
-                    torProxyState !is TorProxyState.Running ||
                     !baseNodeState.isSynced -> ConnectionIndicatorState.Disconnected
 
             baseNodeState.heightOfLongestChain.toInt() != walletScannedHeight -> ConnectionIndicatorState.ConnectedWithIssues

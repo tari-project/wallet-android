@@ -34,10 +34,10 @@ package com.tari.android.wallet.application.walletManager
 
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.application.AppStateHandler
-import com.tari.android.wallet.data.baseNode.BaseNodeStateHandler
 import com.tari.android.wallet.application.walletManager.WalletCallbacks.Companion.MAIN_WALLET_CONTEXT_ID
 import com.tari.android.wallet.data.BalanceStateHandler
 import com.tari.android.wallet.data.airdrop.AirdropRepository
+import com.tari.android.wallet.data.baseNode.BaseNodeStateHandler
 import com.tari.android.wallet.data.recovery.WalletRestorationStateHandler
 import com.tari.android.wallet.data.sharedPrefs.CorePrefRepository
 import com.tari.android.wallet.data.sharedPrefs.network.NetworkPrefRepository
@@ -45,14 +45,11 @@ import com.tari.android.wallet.data.sharedPrefs.security.SecurityPrefRepository
 import com.tari.android.wallet.data.sharedPrefs.tariSettings.TariSettingsPrefRepository
 import com.tari.android.wallet.di.ApplicationScope
 import com.tari.android.wallet.ffi.Base58String
-import com.tari.android.wallet.ffi.FFIByteVector
 import com.tari.android.wallet.ffi.FFICommsConfig
 import com.tari.android.wallet.ffi.FFIException
 import com.tari.android.wallet.ffi.FFISeedWords
-import com.tari.android.wallet.ffi.FFITariTransportConfig
 import com.tari.android.wallet.ffi.FFITariWalletAddress
 import com.tari.android.wallet.ffi.FFIWallet
-import com.tari.android.wallet.ffi.NetAddressString
 import com.tari.android.wallet.ffi.runWithDestroy
 import com.tari.android.wallet.model.MicroTari
 import com.tari.android.wallet.model.TariContact
@@ -65,14 +62,9 @@ import com.tari.android.wallet.model.tx.CompletedTx
 import com.tari.android.wallet.model.tx.PendingInboundTx
 import com.tari.android.wallet.model.tx.PendingOutboundTx
 import com.tari.android.wallet.notification.FcmHelper
-import com.tari.android.wallet.tor.TorConfig
-import com.tari.android.wallet.tor.TorProxyManager
-import com.tari.android.wallet.tor.TorProxyStateHandler
 import com.tari.android.wallet.ui.common.DialogManager
 import com.tari.android.wallet.ui.screen.send.obsolete.finalize.FinalizeSendTxModel
 import com.tari.android.wallet.util.BroadcastEffectFlow
-import com.tari.android.wallet.util.Constants
-import com.tari.android.wallet.util.DebugConfig
 import com.tari.android.wallet.util.extension.collectFlow
 import com.tari.android.wallet.util.extension.safeCastTo
 import kotlinx.coroutines.CoroutineScope
@@ -82,7 +74,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import java.io.File
 import java.util.concurrent.atomic.AtomicReference
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -96,14 +87,11 @@ import javax.inject.Singleton
 @Singleton
 class WalletManager @Inject constructor(
     private val walletConfig: WalletConfig,
-    private val torManager: TorProxyManager,
     private val corePrefRepository: CorePrefRepository,
     private val networkPrefRepository: NetworkPrefRepository,
     private val tariSettingsPrefRepository: TariSettingsPrefRepository,
     private val securityPrefRepository: SecurityPrefRepository,
     private val baseNodeStateHandler: BaseNodeStateHandler,
-    private val torConfig: TorConfig,
-    private val torProxyStateHandler: TorProxyStateHandler,
     private val walletRestorationStateHandler: WalletRestorationStateHandler,
     private val dialogManager: DialogManager,
     private val balanceStateHandler: BalanceStateHandler,
@@ -152,7 +140,7 @@ class WalletManager @Inject constructor(
     // ------------------------------------------------------ Start Wallet ------------------------------------------------------
 
     @Synchronized
-    fun start(seedWords: List<String>? = null) {
+    fun start(seedWords: List<String>? = null, createWallet: Boolean = false) {
         val ffiSeedWords = SeedPhrase.createOrNull(seedWords)
 
         walletCallbacks.addListener(
@@ -166,22 +154,17 @@ class WalletManager @Inject constructor(
             ),
         )
 
-        torManager.run()
-        applicationScope.launch {
-            torProxyStateHandler.doOnTorReadyForWallet {
-                startWallet(ffiSeedWords)
-            }
-        }
+        startWallet(ffiSeedWords, createWallet)
     }
 
-    private fun startWallet(ffiSeedWords: FFISeedWords?) {
+    private fun startWallet(ffiSeedWords: FFISeedWords?, createWallet: Boolean) {
         if (walletState.value is WalletState.NotReady || walletState.value is WalletState.Failed) {
             logger.i("Start wallet: Initializing wallet...")
             _walletState.update { WalletState.Initializing }
             applicationScope.launch {
                 try {
                     if (walletInstance == null) {
-                        walletInstance = initWallet(ffiSeedWords)
+                        walletInstance = initWallet(ffiSeedWords, createWallet)
                     }
                     _walletState.update { WalletState.Running }
                     logger.i("Start wallet: Wallet was started")
@@ -198,7 +181,7 @@ class WalletManager @Inject constructor(
         }
     }
 
-    private fun initWallet(ffiSeedWords: FFISeedWords?): FFIWallet {
+    private fun initWallet(ffiSeedWords: FFISeedWords?, createWallet: Boolean): FFIWallet {
         val passphrase = securityPrefRepository.databasePassphrase.takeIf { !it.isNullOrEmpty() }
             ?: corePrefRepository.generateDatabasePassphrase().also { securityPrefRepository.databasePassphrase = it }
 
@@ -210,6 +193,7 @@ class WalletManager @Inject constructor(
             passphrase = passphrase,
             seedWords = ffiSeedWords,
             walletCallbacks = walletCallbacks,
+            createWallet = createWallet,
         )
 
         // Need to update the balance state after the wallet is initialized,
@@ -225,29 +209,9 @@ class WalletManager @Inject constructor(
     }
 
     private fun createCommsConfig(): FFICommsConfig = FFICommsConfig(
-        publicAddress = NetAddressString(address = "127.0.0.1", port = 39069).toString(),
-        transport = createTorTransportConfig(),
         databaseName = WalletConfig.WALLET_DB_NAME,
         datastorePath = walletConfig.getWalletFilesDirPath(),
-        discoveryTimeoutSec = Constants.Wallet.DISCOVERY_TIMEOUT_SEC,
-        safMessageDurationSec = Constants.Wallet.STORE_AND_FORWARD_MESSAGE_DURATION_SEC,
     )
-
-    private fun createTorTransportConfig(): FFITariTransportConfig {
-        val cookieFile = File(torConfig.cookieFilePath)
-        if (!cookieFile.exists()) {
-            cookieFile.createNewFile()
-        }
-        val cookieString: ByteArray = cookieFile.readBytes()
-        val torCookie = FFIByteVector(cookieString)
-        return FFITariTransportConfig(
-            controlAddress = NetAddressString(torConfig.controlHost, torConfig.controlPort),
-            torCookie = torCookie,
-            torPort = torConfig.connectionPort,
-            socksUsername = torConfig.sock5Username,
-            socksPassword = torConfig.sock5Password,
-        )
-    }
 
     /**
      * Stores wallet's Base58 address and emoji id into the shared prefs
@@ -287,8 +251,6 @@ class WalletManager @Inject constructor(
         walletInstance?.destroy()
         walletInstance = null
         _walletState.update { WalletState.NotReady }
-        // stop tor proxy
-        torManager.shutdown()
         walletCallbacks.removeListener(MAIN_WALLET_CONTEXT_ID)
     }
 

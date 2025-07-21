@@ -9,7 +9,6 @@ import com.tari.android.wallet.application.walletManager.WalletManager
 import com.tari.android.wallet.data.airdrop.AirdropRepository
 import com.tari.android.wallet.data.contacts.Contact
 import com.tari.android.wallet.data.contacts.ContactsRepository
-import com.tari.android.wallet.data.sharedPrefs.tor.TorPrefRepository
 import com.tari.android.wallet.di.ApplicationScope
 import com.tari.android.wallet.model.TariWalletAddress
 import com.tari.android.wallet.ui.common.DialogHandler
@@ -30,7 +29,6 @@ import javax.inject.Singleton
 @Singleton
 class DeeplinkManager @Inject constructor(
     private val contactRepository: ContactsRepository,
-    private val torSharedRepository: TorPrefRepository,
     private val resourceManager: ResourceManager,
     private val walletManager: WalletManager,
     private val navigator: TariNavigator,
@@ -50,7 +48,6 @@ class DeeplinkManager @Inject constructor(
             is DeepLink.Contacts -> showAddContactsDialog(dialogHandler, deeplink)
             is DeepLink.Send -> sendAction(deeplink)
             is DeepLink.UserProfile -> showUserProfileDialog(dialogHandler, deeplink)
-            is DeepLink.TorBridges -> addTorBridges(deeplink)
             is DeepLink.PaperWallet -> showPaperWalletDialog(dialogHandler, deeplink)
             is DeepLink.AirdropLoginToken -> handleAirdropTokenAction(deeplink)
         }
@@ -82,12 +79,6 @@ class DeeplinkManager @Inject constructor(
             },
             ButtonModule(resourceManager.getString(R.string.common_cancel), ButtonStyle.Close)
         )
-    }
-
-    private fun addTorBridges(deeplink: DeepLink.TorBridges) {
-        deeplink.torConfigurations.forEach {
-            torSharedRepository.addTorBridgeConfiguration(it)
-        }
     }
 
     private fun showPaperWalletDialog(dialogHandler: DialogHandler, deeplink: DeepLink.PaperWallet) {

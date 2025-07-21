@@ -26,7 +26,7 @@ class IntroductionViewModel : CommonViewModel() {
     }
 
     fun onCreateWalletClick() {
-        walletManager.start()
+        walletManager.start(createWallet = true)
         launchOnMain {
             _effect.send(IntroductionModel.Effect.GoToCreateWallet)
         }

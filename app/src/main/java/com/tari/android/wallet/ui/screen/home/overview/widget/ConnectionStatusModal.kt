@@ -19,8 +19,6 @@ import androidx.compose.ui.unit.dp
 import com.tari.android.wallet.R
 import com.tari.android.wallet.data.ConnectionState
 import com.tari.android.wallet.data.network.NetworkConnectionState
-import com.tari.android.wallet.tor.TorBootstrapStatus
-import com.tari.android.wallet.tor.TorProxyState
 import com.tari.android.wallet.ui.compose.PreviewSecondarySurface
 import com.tari.android.wallet.ui.compose.TariDesignSystem
 import com.tari.android.wallet.ui.compose.components.TariHorizontalDivider
@@ -28,7 +26,6 @@ import com.tari.android.wallet.ui.compose.components.TariModalBottomSheet
 import com.tari.android.wallet.ui.compose.components.TariProgressView
 import com.tari.android.wallet.ui.compose.components.TariTextButton
 import com.tari.android.wallet.ui.screen.settings.themeSelector.TariTheme
-import com.tari.android.wallet.util.extension.safeCastTo
 
 @Composable
 fun ConnectionStatusModal(
@@ -65,30 +62,6 @@ fun ConnectionStatusModal(
                     style = TariDesignSystem.typography.body1.copy(color = TariDesignSystem.colors.textPrimary),
                 )
                 ConnectionIconView(connectionState.networkIcon())
-            }
-            Spacer(Modifier.size(20.dp))
-            TariHorizontalDivider(Modifier.padding(horizontal = 10.dp))
-            Spacer(Modifier.size(20.dp))
-
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 30.dp),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Text(
-                    text = stringResource(connectionState.torText()),
-                    style = TariDesignSystem.typography.body1.copy(color = TariDesignSystem.colors.textPrimary),
-                )
-                connectionState.torBootstrapPercent()?.let { percent ->
-                    Spacer(Modifier.size(8.dp))
-                    Text(
-                        text = "($percent%)",
-                        style = TariDesignSystem.typography.body1,
-                    )
-                }
-                Spacer(Modifier.weight(1f))
-                ConnectionIconView(connectionState.torIcon())
             }
             Spacer(Modifier.size(20.dp))
             TariHorizontalDivider(Modifier.padding(horizontal = 10.dp))
@@ -196,25 +169,6 @@ private fun ConnectionState.networkIcon(): ConnectionIcon = when (networkState) 
 }
 
 @StringRes
-private fun ConnectionState.torText(): Int = when (torProxyState) {
-    is TorProxyState.NotReady -> R.string.connection_status_dialog_tor_status_disconnected
-    is TorProxyState.ReadyForWallet -> R.string.connection_status_dialog_tor_status_ready_for_wallet
-    is TorProxyState.Initializing -> R.string.connection_status_dialog_tor_status_connecting
-    is TorProxyState.Running -> R.string.connection_status_dialog_tor_status_connected
-    is TorProxyState.Failed -> R.string.connection_status_dialog_tor_status_failed
-}
-
-private fun ConnectionState.torIcon(): ConnectionIcon = when (torProxyState) {
-    is TorProxyState.NotReady -> ConnectionIcon.Failure
-    is TorProxyState.ReadyForWallet -> ConnectionIcon.Progress
-    is TorProxyState.Initializing -> ConnectionIcon.Progress
-    is TorProxyState.Running -> ConnectionIcon.Success
-    is TorProxyState.Failed -> ConnectionIcon.Failure
-}
-
-private fun ConnectionState.torBootstrapPercent(): Int? = torProxyState.safeCastTo<TorProxyState.Initializing>()?.bootstrapStatus?.progress
-
-@StringRes
 private fun ConnectionState.baseNodeStateText(): Int = when {
     baseNodeState.isSynced -> R.string.connection_status_dialog_base_node_status_connected
     else -> R.string.connection_status_dialog_base_node_status_connecting
@@ -233,9 +187,7 @@ private fun ConnectionStatusModalPreview() {
     PreviewSecondarySurface(TariTheme.Light) {
         ConnectionStatusModal(
             onDismiss = {},
-            connectionState = ConnectionState(
-                torProxyState = TorProxyState.Initializing(bootstrapStatus = TorBootstrapStatus(progress = 50, summary = "")),
-            ),
+            connectionState = ConnectionState(),
         )
     }
 }

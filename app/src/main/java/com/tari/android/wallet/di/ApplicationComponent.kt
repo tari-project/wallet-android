@@ -85,8 +85,6 @@ import com.tari.android.wallet.ui.screen.settings.logs.logs.LogsViewModel
 import com.tari.android.wallet.ui.screen.settings.networkSelection.NetworkSelectionViewModel
 import com.tari.android.wallet.ui.screen.settings.screenRecording.ScreenRecordingSettingsViewModel
 import com.tari.android.wallet.ui.screen.settings.themeSelector.ThemeSelectorViewModel
-import com.tari.android.wallet.ui.screen.settings.torBridges.TorBridgesSelectionViewModel
-import com.tari.android.wallet.ui.screen.settings.torBridges.customBridges.CustomTorBridgesViewModel
 import com.tari.android.wallet.ui.screen.tx.details.TxDetailsViewModel
 import com.tari.android.wallet.ui.screen.tx.history.TxHistoryViewModel
 import com.tari.android.wallet.ui.screen.utxos.list.UtxosListViewModel
@@ -102,7 +100,6 @@ import javax.inject.Singleton
 @Component(
     modules = [
         ApplicationModule::class,
-        TorModule::class,
         RetrofitModule::class,
         CoroutinesDispatchersModule::class,
     ]
@@ -132,8 +129,6 @@ interface ApplicationComponent {
     fun inject(viewModel: FinalizeSendTxViewModel)
     fun inject(viewModel: WalletInfoViewModel)
     fun inject(viewModel: RequestTariViewModel)
-    fun inject(viewModel: TorBridgesSelectionViewModel)
-    fun inject(viewModel: CustomTorBridgesViewModel)
     fun inject(viewModel: LocalAuthViewModel)
     fun inject(viewModel: CreateWalletViewModel)
     fun inject(viewModel: IntroductionViewModel)

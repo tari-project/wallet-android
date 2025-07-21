@@ -20,7 +20,6 @@ import com.tari.android.wallet.application.Navigation.InputSeedWords
 import com.tari.android.wallet.application.Navigation.Restore
 import com.tari.android.wallet.application.Navigation.ShareText
 import com.tari.android.wallet.application.Navigation.SplashScreen
-import com.tari.android.wallet.application.Navigation.TorBridge
 import com.tari.android.wallet.application.Navigation.TxList
 import com.tari.android.wallet.application.Navigation.TxSend
 import com.tari.android.wallet.application.Navigation.VerifySeedPhrase
@@ -67,8 +66,6 @@ import com.tari.android.wallet.ui.screen.settings.deleteWallet.DeleteWalletFragm
 import com.tari.android.wallet.ui.screen.settings.networkSelection.NetworkSelectionFragment
 import com.tari.android.wallet.ui.screen.settings.screenRecording.ScreenRecordingSettingsFragment
 import com.tari.android.wallet.ui.screen.settings.themeSelector.ThemeSelectorFragment
-import com.tari.android.wallet.ui.screen.settings.torBridges.TorBridgesSelectionFragment
-import com.tari.android.wallet.ui.screen.settings.torBridges.customBridges.CustomTorBridgesFragment
 import com.tari.android.wallet.ui.screen.tx.details.TxDetailsFragment
 import com.tari.android.wallet.ui.screen.tx.history.TxHistoryFragment
 import com.tari.android.wallet.ui.screen.utxos.list.UtxosListFragment
@@ -117,7 +114,6 @@ class TariNavigator @Inject constructor(
             is AllSettings.ToBackupSettings -> addFragment(BackupSettingsFragment.newInstance(), withAnimation = navigation.withAnimation)
             is AllSettings.ToDeleteWallet -> addFragment(DeleteWalletFragment())
             is AllSettings.ToNetworkSelection -> addFragment(NetworkSelectionFragment())
-            is AllSettings.ToTorBridges -> addFragment(TorBridgesSelectionFragment())
             is AllSettings.ToDataCollection -> addFragment(DataCollectionFragment())
             is AllSettings.ToThemeSelection -> addFragment(ThemeSelectorFragment())
             is AllSettings.ToRequestTari -> addFragment(RequestTariFragment.newInstance())
@@ -133,8 +129,6 @@ class TariNavigator @Inject constructor(
             is TxList.ToAllSettings -> addFragment(AllSettingsFragment.newInstance())
             is TxList.ToReceive -> addFragment(ReceiveFragment())
             is TxList.HomeTransactionHistory -> addFragment(TxHistoryFragment.newInstance())
-
-            is TorBridge.ToCustomBridges -> addFragment(CustomTorBridgesFragment())
 
             is VerifySeedPhrase.ToSeedPhraseVerification -> addFragment(VerifySeedPhraseFragment.newInstance(navigation.seedWords))
 
@@ -259,10 +253,6 @@ sealed class Navigation {
         data class ToSeedPhraseVerification(val seedWords: List<String>) : VerifySeedPhrase()
     }
 
-    sealed class TorBridge : Navigation() {
-        data object ToCustomBridges : TorBridge()
-    }
-
     sealed class TxList : Navigation() {
         data class ToTxDetails(val tx: Tx, val showCloseButton: Boolean = false) : TxList()
         data object ToAllSettings : TxList()
@@ -287,7 +277,6 @@ sealed class Navigation {
         data object ToDeleteWallet : AllSettings()
         data object ToScreenRecording : AllSettings()
         data object ToThemeSelection : AllSettings()
-        data object ToTorBridges : AllSettings()
         data object ToNetworkSelection : AllSettings()
         data object ToRequestTari : AllSettings()
     }

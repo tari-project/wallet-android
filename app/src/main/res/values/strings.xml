@@ -8,7 +8,6 @@
     <string name="user_agreement_url" translatable="false">https://www.tari.com/user_agreement/</string>
     <string name="privacy_policy_url" translatable="false">https://www.tari.com/privacy_policy/</string>
     <string name="disclaimer_url" translatable="false">https://www.tari.com/disclaimer/</string>
-    <string name="tor_bridges_url" translatable="false">https://bridges.torproject.org/bridges</string>
 
     <!-- digits -->
     <string name="digit_0">0</string>
@@ -392,7 +391,6 @@
     <string name="all_settings_disclaimer">Disclaimer</string>
     <string name="all_settings_explorer">Block Explorer</string>
     <string name="all_settings_screen_recording">Screen recording</string>
-    <string name="all_settings_bridge_configuration">Bridge Configuration</string>
     <string name="all_settings_connect_yats">Connect Yats</string>
     <string name="all_settings_select_theme">Select Theme</string>
     <string name="all_settings_select_network">Select Network</string>
@@ -548,42 +546,11 @@
     <string name="connection_status_dialog_title">Connection Status</string>
     <string name="connection_status_dialog_network_status_disconnected">Disconnected from the Internet</string>
     <string name="connection_status_dialog_network_status_connected">Connected to the Internet</string>
-    <string name="connection_status_dialog_tor_status_disconnected">Disconnected from Tor</string>
-    <string name="connection_status_dialog_tor_status_ready_for_wallet">Ready for Wallet Creation</string>
-    <string name="connection_status_dialog_tor_status_connecting">Connecting with Tor</string>
-    <string name="connection_status_dialog_tor_status_connected">Connected with Tor</string>
-    <string name="connection_status_dialog_tor_status_failed">Failed to connect with Tor</string>
-    <string name="connection_status_dialog_base_node_status_disconnected">Disconnected from Base Node</string>
     <string name="connection_status_dialog_base_node_status_connecting">Connecting to Base Node</string>
     <string name="connection_status_dialog_base_node_status_connected">Connected to Base Node</string>
-    <string name="connection_status_dialog_base_node_sync_idle">Waiting for Sync</string>
-    <string name="connection_status_dialog_base_node_sync_pending">Syncing with Base Node</string>
-    <string name="connection_status_dialog_base_node_sync_success">Synced with Base Node</string>
-    <string name="connection_status_dialog_base_node_sync_failure">Failed sync with Base Node</string>
     <string name="connection_status_dialog_chain_tip">Chain Tip: </string>
     <string name="connection_status_dialog_chain_tip_value">#%1$s (%2$s)</string>
     <string name="connection_status_dialog_chain_tip_waiting">Waiting for connection…</string>
-
-    <string name="tor_bridges_title">Bridges Configuration</string>
-    <string name="tor_bridges_connect">Connect</string>
-    <string name="tor_bridges_no_bridges">No Bridges</string>
-    <string name="tor_bridges_custom_bridges">Custom Bridges</string>
-    <string name="tor_bridges_description">If you are in a country or using a connection that censor Tor, you might need to use bridges</string>
-    <string name="tor_bridges_paste_bridges">Paste Bridges</string>
-    <string name="tor_bridges_hint" formatted="false">Available formates:\n• obfs4 &lt;IP ADDRESS>:&lt;PORT> &lt;FINGERPRINT> cert=&lt;CERTIFICATE> iat-mode=&lt;value>\nexample:\nobfs4 192.95.36.142:443 CDF2E852BF539B82BD10E27E9115A31734E378C2 cert=qUVQ0srL!JI/vO6V6m/24anYXiJD3QP2HgzUKQtQ7GRqqUvs7P+tG43RtAqdhLOALP7DJQ iat-mode=1\n\n • &lt;IP ADDRESS>:&lt;PORT> &lt;FINGERPRINT>\nexample:\n78.156.103.189:9301 2BD90810282F8B331FC7D47705167166253E1442"</string>
-    <string name="tor_bridges_request">Request Bridges from torproject.org</string>
-    <string name="tor_bridges_scan_qr">Scan QR Code</string>
-    <string name="tor_bridges_upload_qr_code">Upload QR Code</string>
-    <string name="tor_bridges_incorrect_format">Incorrect tor bridge format</string>
-    <string name="tor_bridges_connecting_error_title">Connection error</string>
-    <string name="tor_bridges_connecting_error_description">Can\'t connect to the bridge because: %s</string>
-    <string name="tor_bridges_connection_progress_title">Connecting to the TOR</string>
-    <string name="tor_bridges_connection_progress_description">Trying to connect to the TOR</string>
-    <string name="tor_bridges_connection_progress_description_full">"Trying to connect to the TOR:\n%1$s\nProgress: %2$s%%"</string>
-    <string name="tor_bridges_connection_progress_successful_title">Connection to the TOR</string>
-    <string name="tor_bridges_connection_progress_successful_description">Connecting to TOR connection was established successfully\n</string>
-    <string name="tor_bridges_connection_progress_successful_no_bridges">No used bridges</string>
-    <string name="tor_bridges_connection_progress_successful_used_bridges">Used bridges\n</string>
 
     <string name="tari_about_title">About</string>
     <string name="tari_about_description"><![CDATA[The following icons are licensed under<br><font color=#8931FF>Creative Commons 3.0:</font>]]></string>

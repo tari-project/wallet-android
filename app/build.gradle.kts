@@ -292,9 +292,6 @@ dependencies {
     implementation(Dependencies.AndroidX.dynamicAnimation)
     implementation(Dependencies.easingInterpolator)
 
-    implementation(Dependencies.torAndroid)
-    implementation(Dependencies.jtorctl)
-
     // used to read log files
     implementation(Dependencies.commonsIo)
 
