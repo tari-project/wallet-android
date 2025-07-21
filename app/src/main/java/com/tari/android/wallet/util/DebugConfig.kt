@@ -73,13 +73,9 @@ object DebugConfig {
     private val _useYatSandbox = valueIfDebug(false)
     val yatEnvironment = if (_useYatSandbox) YatEnvironment.SANDBOX else YatEnvironment.PRODUCTION
 
-    val hardcodedBaseNodes = valueIfDebug(false)
-
     val showCopySeedsButton = valueIfDebug(true)
 
     val sweepFundsButtonEnabled = valueIfDebug(false)
-
-    val selectBaseNodeEnabled = valueIfDebug(false) // TODO remove all the code related to this ?
 
     const val showInvitedFriendsInProfile = false
 
@@ -201,7 +197,6 @@ object MockDataStub {
         timestamp = BigInteger.valueOf(System.currentTimeMillis()),
         id = 1.toBigInteger(),
         tariContact = TariContact(WALLET_ADDRESS, contactAlias),
-        confirmationCount = 0.toBigInteger(),
         txKernel = CompletedTransactionKernel(
             excess = "excess",
             publicNonce = "publicNonce",

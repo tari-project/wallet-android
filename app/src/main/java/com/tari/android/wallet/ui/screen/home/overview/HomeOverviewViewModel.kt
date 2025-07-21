@@ -13,6 +13,7 @@ import com.tari.android.wallet.application.securityStage.StagedWalletSecurityMan
 import com.tari.android.wallet.application.walletManager.WalletManager.WalletEvent
 import com.tari.android.wallet.application.walletManager.doOnWalletRunning
 import com.tari.android.wallet.data.BalanceStateHandler
+import com.tari.android.wallet.data.ConnectionStateHandler
 import com.tari.android.wallet.data.airdrop.AirdropRepository
 import com.tari.android.wallet.data.sharedPrefs.sentry.SentryPrefRepository
 import com.tari.android.wallet.data.tx.TxRepository
@@ -55,6 +56,9 @@ class HomeOverviewViewModel : CommonViewModel() {
 
     @Inject
     lateinit var airdropRepository: AirdropRepository
+
+    @Inject
+    lateinit var connectionStateHandler: ConnectionStateHandler
 
     init {
         component.inject(this)
@@ -107,7 +111,7 @@ class HomeOverviewViewModel : CommonViewModel() {
             }
         }
 
-        collectFlow(connectionState) { connectionState ->
+        collectFlow(connectionStateHandler.connectionState) { connectionState ->
             _uiState.update { it.copy(connectionState = connectionState) }
         }
 
@@ -169,6 +173,14 @@ class HomeOverviewViewModel : CommonViewModel() {
 
     fun onBalanceInfoDialogDismiss() {
         _uiState.update { it.copy(showBalanceInfoDialog = false) }
+    }
+
+    fun showConnectionStatusDialog() {
+        _uiState.update { it.copy(showConnectionStatusDialog = true) }
+    }
+
+    fun onConnectionStatusDialogDismiss() {
+        _uiState.update { it.copy(showConnectionStatusDialog = false) }
     }
 
     fun onStartMiningClicked() {

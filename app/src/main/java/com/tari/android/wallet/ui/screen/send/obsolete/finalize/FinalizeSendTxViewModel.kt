@@ -14,9 +14,6 @@ import com.tari.android.wallet.application.walletManager.WalletManager
 import com.tari.android.wallet.data.network.NetworkConnectionStateHandler
 import com.tari.android.wallet.model.TariContact
 import com.tari.android.wallet.model.TransactionData
-import com.tari.android.wallet.tor.TorBootstrapStatus
-import com.tari.android.wallet.tor.TorProxyState
-import com.tari.android.wallet.tor.TorProxyStateHandler
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.dialog.modular.ModularDialogArgs
 import com.tari.android.wallet.ui.dialog.modular.modules.body.BodyModule
@@ -28,7 +25,6 @@ import com.tari.android.wallet.util.BroadcastEffectFlow
 import com.tari.android.wallet.util.extension.collectFlow
 import com.tari.android.wallet.util.extension.launchOnIo
 import com.tari.android.wallet.util.extension.launchOnMain
-import com.tari.android.wallet.util.extension.switchToMain
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.mapNotNull
@@ -38,9 +34,6 @@ import org.joda.time.Seconds
 import javax.inject.Inject
 
 class FinalizeSendTxViewModel(savedState: SavedStateHandle) : CommonViewModel() {
-
-    @Inject
-    lateinit var torProxyStateHandler: TorProxyStateHandler
 
     @Inject
     lateinit var networkConnection: NetworkConnectionStateHandler
@@ -181,7 +174,6 @@ class FinalizeSendTxViewModel(savedState: SavedStateHandle) : CommonViewModel() 
         }
 
         private fun checkConnectionStatus() {
-            val torProxyState = torProxyStateHandler.torProxyState.value
             // check internet connection
             if (!networkConnection.isNetworkConnected()) {
                 // either not connected or Tor proxy is not running
@@ -189,25 +181,8 @@ class FinalizeSendTxViewModel(savedState: SavedStateHandle) : CommonViewModel() 
                 isCompleted = true
                 return
             }
-            // check whether Tor proxy is running
-            if (torProxyState !is TorProxyState.Running) {
-                // either not connected or Tor proxy is not running
-                setFailureReason(TxFailureReason.BASE_NODE_CONNECTION_ERROR)
-                isCompleted = true
-                return
-            }
-            // check Tor bootstrap status
-            if (torProxyState.bootstrapStatus.progress < TorBootstrapStatus.MAX_PROGRESS) {
-                launchOnIo {
-                    torProxyStateHandler.doOnTorBootstrapped {
-                        switchToMain {
-                            checkConnectionStatus()
-                        }
-                    }
-                }
-            } else {
-                isCompleted = true
-            }
+
+            isCompleted = true
         }
     }
 

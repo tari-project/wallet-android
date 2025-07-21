@@ -31,5 +31,6 @@ class HomeOverviewModel {
         val showWalletSyncSuccessDialog: Boolean = false,
         val showWalletRestoreSuccessDialog: Boolean = false,
         val showBalanceInfoDialog: Boolean = false,
+        val showConnectionStatusDialog: Boolean = false,
     )
 }

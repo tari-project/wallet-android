@@ -46,12 +46,8 @@ class FFICommsConfig() : FFIBase() {
         get() = Logger.t(FFICommsConfig::class.simpleName)
 
     private external fun jniCreate(
-        publicAddress: String,
-        transport: FFITariTransportConfig,
         databaseName: String,
         datastorePath: String,
-        discoveryTimeoutSec: Long,
-        jSafDurationSec: Long,
         error: FFIError
     )
 
@@ -61,19 +57,15 @@ class FFICommsConfig() : FFIBase() {
 
 
     constructor(
-        publicAddress: String,
-        transport: FFITariTransportConfig,
         databaseName: String,
         datastorePath: String,
-        discoveryTimeoutSec: Long,
-        safMessageDurationSec: Long,
     ) : this() {
         if (databaseName.isEmpty()) {
             throw FFIException(message = "databaseName may not be empty")
         }
         val writeableDir = File(datastorePath)
         if (writeableDir.exists() && writeableDir.isDirectory && writeableDir.canWrite()) {
-            runWithError { jniCreate(publicAddress, transport, databaseName, datastorePath, discoveryTimeoutSec, safMessageDurationSec, it) }
+            runWithError { jniCreate(databaseName, datastorePath, it) }
         } else {
             val messageBuilder = StringBuilder()
             if (!writeableDir.exists()) {

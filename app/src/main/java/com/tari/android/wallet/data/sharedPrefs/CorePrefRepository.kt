@@ -35,7 +35,6 @@ package com.tari.android.wallet.data.sharedPrefs
 import android.content.SharedPreferences
 import com.tari.android.wallet.data.sharedPrefs.addressPoisoning.AddressPoisoningPrefRepository
 import com.tari.android.wallet.data.sharedPrefs.backup.BackupPrefRepository
-import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodePrefRepository
 import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefBooleanDelegate
 import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefStringDelegate
 import com.tari.android.wallet.data.sharedPrefs.network.NetworkPrefRepository
@@ -44,7 +43,6 @@ import com.tari.android.wallet.data.sharedPrefs.security.SecurityPrefRepository
 import com.tari.android.wallet.data.sharedPrefs.securityStages.SecurityStagesPrefRepository
 import com.tari.android.wallet.data.sharedPrefs.sentry.SentryPrefRepository
 import com.tari.android.wallet.data.sharedPrefs.tariSettings.TariSettingsPrefRepository
-import com.tari.android.wallet.data.sharedPrefs.tor.TorPrefRepository
 import com.tari.android.wallet.data.sharedPrefs.yat.YatPrefRepository
 import com.tari.android.wallet.model.Base58
 import com.tari.android.wallet.model.TariWalletAddress
@@ -63,9 +61,7 @@ class CorePrefRepository @Inject constructor(
     sharedPrefs: SharedPreferences,
     networkRepository: NetworkPrefRepository,
     private val backupSettingsRepository: BackupPrefRepository,
-    private val baseNodeSharedRepository: BaseNodePrefRepository,
     private val yatSharedRepository: YatPrefRepository,
-    private val torSharedRepository: TorPrefRepository,
     private val tariSettingsSharedRepository: TariSettingsPrefRepository,
     private val securityStagesRepository: SecurityStagesPrefRepository,
     private val sentryPrefRepository: SentryPrefRepository,
@@ -142,10 +138,8 @@ class CorePrefRepository @Inject constructor(
     fun walletAddressExists(): Boolean = walletAddressBase58 != null
 
     fun clear() {
-        baseNodeSharedRepository.clear()
         backupSettingsRepository.clear()
         yatSharedRepository.clear()
-        torSharedRepository.clear()
         tariSettingsSharedRepository.clear()
         securityStagesRepository.clear()
         sentryPrefRepository.clear()

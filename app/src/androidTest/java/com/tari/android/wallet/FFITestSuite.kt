@@ -43,12 +43,9 @@ import org.junit.runners.Suite
 @RunWith(Suite::class)
 @Suite.SuiteClasses(
     FFIByteVectorTests::class,
-    FFICommsConfigTests::class,
     FFITariContactTests::class,
     FFIWalletAddressTests::class,
-    FFITransportTypeTest::class,
     HexStringTests::class,
     NetAddressStringTests::class,
-    FFIWalletTests::class
 )
 class FFITestSuite
