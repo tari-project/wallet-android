@@ -639,11 +639,18 @@
     <string name="backup_wallet_storage_full_desc">Your storage is full</string>
     <string name="backup_restored_tx">Funds recovered from your previous wallet</string>
 
-    <!--    FFI Validation-->
+    <!--    Version Validation-->
     <string name="ffi_validation_error_title">Incompatible version detected</string>
     <string name="ffi_validation_error_message">The data stored locally is incompatible with the current version of the App or with the network itself. We strongly recommend removing the wallet and creating a new one</string>
     <string name="ffi_validation_error_delete">Delete the wallet</string>
     <string name="ffi_validation_error_cancel">I still want to use the wallet</string>
+    <string name="version_validation_error_mandatory_update_title">You must update the app</string>
+    <string name="version_validation_error_mandatory_update_message">Recently, we made some amazing changes to the app, but unfortunately, you need to update to the latest version to continue using it.</string>
+    <string name="version_validation_error_recommended_update_title">Update recommended</string>
+    <string name="version_validation_error_recommended_update_message">You are using an outdated version of the app. We recommend updating to the latest version to ensure the best experience.</string>
+    <string name="version_validation_error_play_store">Update in Play Store</string>
+    <string name="version_validation_error_github">Update in GitHub</string>
+    <string name="version_validation_error_ignore">Ignore</string>
 
 
     <!-- Staged wallet security -->
