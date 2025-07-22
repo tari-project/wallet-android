@@ -35,6 +35,7 @@ package com.tari.android.wallet.di
 import com.tari.android.wallet.BuildConfig
 import com.tari.android.wallet.data.airdrop.AirdropRetrofitService
 import com.tari.android.wallet.data.push.PushRetrofitService
+import com.tari.android.wallet.data.rwa.RwaRetrofitService
 import dagger.Module
 import dagger.Provides
 import okhttp3.OkHttpClient
@@ -50,9 +51,11 @@ class RetrofitModule {
     private companion object {
         private const val AIRDROP_BASE_URL = "https://airdrop.tari.com"
         private const val PUSH_BASE_URL = "https://push.tari.com"
+        private const val RWA_BASE_URL = "https://rwa.y.at/"
 
         private const val RETROFIT_AIRDROP = "airdrop_retrofit"
         private const val RETROFIT_PUSH = "push_retrofit"
+        private const val RETROFIT_RWA = "rwa_retrofit"
     }
 
     @Provides
@@ -98,6 +101,28 @@ class RetrofitModule {
     @Singleton
     fun providePushRepository(@Named(RETROFIT_PUSH) retrofit: Retrofit): PushRetrofitService =
         retrofit.create(PushRetrofitService::class.java)
+
+    @Provides
+    @Named(RETROFIT_RWA)
+    @Singleton
+    fun provideRwaHttpClient(): OkHttpClient = OkHttpClient.Builder()
+        .addLoggingIfDebug()
+        .build()
+
+    @Provides
+    @Named(RETROFIT_RWA)
+    @Singleton
+    fun provideRwaRetrofit(@Named(RETROFIT_RWA) client: OkHttpClient): Retrofit =
+        Retrofit.Builder()
+            .baseUrl(RWA_BASE_URL)
+            .client(client)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+
+    @Provides
+    @Singleton
+    fun provideRwaRepository(@Named(RETROFIT_RWA) retrofit: Retrofit): RwaRetrofitService =
+        retrofit.create(RwaRetrofitService::class.java)
 
     private fun OkHttpClient.Builder.addLoggingIfDebug(): OkHttpClient.Builder {
         if (BuildConfig.DEBUG) {
