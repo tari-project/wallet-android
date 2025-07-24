@@ -1,6 +1,9 @@
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import java.nio.file.Files
 import java.nio.file.Paths
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 import java.util.Properties
 
 plugins {
@@ -23,6 +26,8 @@ val commitNumber: Int by lazy {
     output.readText().trim().toInt()
 }
 
+val currentDate: String = SimpleDateFormat("ddMMMyy", Locale.getDefault()).format(Date())
+
 android {
     namespace = "com.tari.android.wallet"
 
@@ -32,7 +37,7 @@ android {
         targetSdk = TariBuildConfig.targetSdk
         compileSdk = TariBuildConfig.compileSdk
         versionCode = commitNumber
-        versionName = "${TariBuildConfig.versionNumber}-libwallet-${TariBuildConfig.LibWallet.version}"
+        versionName = "${TariBuildConfig.versionNumber}-lib-${TariBuildConfig.LibWallet.version}($currentDate)"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         multiDexEnabled = true
 
