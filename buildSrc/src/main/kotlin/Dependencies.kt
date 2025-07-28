@@ -100,8 +100,6 @@ object Dependencies {
     const val seismic = "com.squareup:seismic:1.0.3"
     const val rxjava = "io.reactivex.rxjava2:rxjava:2.2.21"
     const val easingInterpolator = "com.github.MasayukiSuda:EasingInterpolator:1.3.2"
-    const val torAndroid = "info.guardianproject:tor-android:0.4.8.17"
-    const val jtorctl = "info.guardianproject:jtorctl:0.4.5.7"
     const val commonsIo = "commons-io:commons-io:2.18.0"
     const val keyboardVisibilityEvent = "net.yslibrary.keyboardvisibilityevent:keyboardvisibilityevent:2.3.0"
     const val mavenArtifact = "org.apache.maven:maven-artifact:3.9.9"

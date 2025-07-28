@@ -77,7 +77,6 @@ import com.tari.android.wallet.ui.screen.settings.backup.enterCurrentPassword.En
 import com.tari.android.wallet.ui.screen.settings.backup.learnMore.BackupLearnMoreViewModel
 import com.tari.android.wallet.ui.screen.settings.backup.learnMore.item.BackupLearnMoreItemViewModel
 import com.tari.android.wallet.ui.screen.settings.backup.verifySeedPhrase.VerifySeedPhraseViewModel
-import com.tari.android.wallet.ui.screen.settings.baseNodeConfig.changeBaseNode.ChangeBaseNodeViewModel
 import com.tari.android.wallet.ui.screen.settings.bugReporting.BugsReportingViewModel
 import com.tari.android.wallet.ui.screen.settings.dataCollection.DataCollectionViewModel
 import com.tari.android.wallet.ui.screen.settings.deleteWallet.DeleteWalletViewModel
@@ -86,8 +85,6 @@ import com.tari.android.wallet.ui.screen.settings.logs.logs.LogsViewModel
 import com.tari.android.wallet.ui.screen.settings.networkSelection.NetworkSelectionViewModel
 import com.tari.android.wallet.ui.screen.settings.screenRecording.ScreenRecordingSettingsViewModel
 import com.tari.android.wallet.ui.screen.settings.themeSelector.ThemeSelectorViewModel
-import com.tari.android.wallet.ui.screen.settings.torBridges.TorBridgesSelectionViewModel
-import com.tari.android.wallet.ui.screen.settings.torBridges.customBridges.CustomTorBridgesViewModel
 import com.tari.android.wallet.ui.screen.tx.details.TxDetailsViewModel
 import com.tari.android.wallet.ui.screen.tx.history.TxHistoryViewModel
 import com.tari.android.wallet.ui.screen.utxos.list.UtxosListViewModel
@@ -103,7 +100,6 @@ import javax.inject.Singleton
 @Component(
     modules = [
         ApplicationModule::class,
-        TorModule::class,
         RetrofitModule::class,
         CoroutinesDispatchersModule::class,
     ]
@@ -128,14 +124,11 @@ interface ApplicationComponent {
     fun inject(viewModel: InputSeedWordsViewModel)
     fun inject(viewModel: VerifySeedPhraseViewModel)
     fun inject(viewModel: BackupSettingsViewModel)
-    fun inject(viewModel: ChangeBaseNodeViewModel)
     fun inject(viewModel: NetworkSelectionViewModel)
     fun inject(viewModel: AllSettingsViewModel)
     fun inject(viewModel: FinalizeSendTxViewModel)
     fun inject(viewModel: WalletInfoViewModel)
     fun inject(viewModel: RequestTariViewModel)
-    fun inject(viewModel: TorBridgesSelectionViewModel)
-    fun inject(viewModel: CustomTorBridgesViewModel)
     fun inject(viewModel: LocalAuthViewModel)
     fun inject(viewModel: CreateWalletViewModel)
     fun inject(viewModel: IntroductionViewModel)

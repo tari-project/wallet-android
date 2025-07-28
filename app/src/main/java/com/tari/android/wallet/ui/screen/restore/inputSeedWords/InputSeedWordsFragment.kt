@@ -8,10 +8,8 @@ import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Lifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.tari.android.wallet.R
-import com.tari.android.wallet.application.Navigation
 import com.tari.android.wallet.databinding.FragmentWalletInputSeedWordsBinding
 import com.tari.android.wallet.model.seedPhrase.SeedPhrase
 import com.tari.android.wallet.ui.common.CommonXmlFragment
@@ -19,9 +17,7 @@ import com.tari.android.wallet.ui.common.recyclerView.CommonAdapter
 import com.tari.android.wallet.ui.screen.restore.inputSeedWords.suggestions.SuggestionState
 import com.tari.android.wallet.ui.screen.restore.inputSeedWords.suggestions.SuggestionViewHolderItem
 import com.tari.android.wallet.ui.screen.restore.inputSeedWords.suggestions.SuggestionsAdapter
-import com.tari.android.wallet.util.DebugConfig
 import com.tari.android.wallet.util.extension.hideKeyboard
-import com.tari.android.wallet.util.extension.launchAndRepeatOnLifecycle
 import com.tari.android.wallet.util.extension.observe
 import com.tari.android.wallet.util.extension.observeOnLoad
 import com.tari.android.wallet.util.extension.setOnThrottledClickListener
@@ -29,7 +25,6 @@ import com.tari.android.wallet.util.extension.setSelectionToEnd
 import com.tari.android.wallet.util.extension.setTextSilently
 import com.tari.android.wallet.util.extension.setVisible
 import com.tari.android.wallet.util.extension.showKeyboard
-import kotlinx.coroutines.launch
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent
 import net.yslibrary.android.keyboardvisibilityevent.Unregistrar
 
@@ -82,10 +77,6 @@ class InputSeedWordsFragment : CommonXmlFragment<FragmentWalletInputSeedWordsBin
             }
             true
         }
-        chooseBaseNodeButton.setVisible(DebugConfig.selectBaseNodeEnabled && DebugConfig.hardcodedBaseNodes)
-        chooseCustomBaseNodeButton.setVisible(DebugConfig.selectBaseNodeEnabled && !DebugConfig.hardcodedBaseNodes)
-        chooseBaseNodeButton.setOnClickListener { viewModel.tariNavigator.navigate(Navigation.InputSeedWords.ToBaseNodeSelection) }
-        chooseCustomBaseNodeButton.setOnClickListener { viewModel.chooseCustomBaseNodeClick() }
         suggestionsAdapter.setClickListener(CommonAdapter.ItemClickListener { viewModel.selectSuggestion(it) })
         suggestions.adapter = suggestionsAdapter
         suggestions.layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
@@ -112,17 +103,6 @@ class InputSeedWordsFragment : CommonXmlFragment<FragmentWalletInputSeedWordsBin
 
         observeOnLoad(isAllEntered)
         observeOnLoad(isInProgress)
-
-        viewLifecycleOwner.launchAndRepeatOnLifecycle(Lifecycle.State.STARTED) {
-            launch {
-                customBaseNodeState.collect { state ->
-                    ui.chooseCustomBaseNodeButton.text = getText(
-                        if (state.isAddressSet) R.string.restore_from_seed_words_button_select_base_node_edit
-                        else R.string.restore_from_seed_words_button_select_base_node_select
-                    )
-                }
-            }
-        }
     }
 
     private fun showSuggestions(suggestions: SuggestionState) = when (suggestions) {

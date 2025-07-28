@@ -34,29 +34,22 @@ package com.tari.android.wallet.application.walletManager
 
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.application.AppStateHandler
-import com.tari.android.wallet.application.baseNodes.BaseNodesManager
 import com.tari.android.wallet.application.walletManager.WalletCallbacks.Companion.MAIN_WALLET_CONTEXT_ID
 import com.tari.android.wallet.data.BalanceStateHandler
 import com.tari.android.wallet.data.airdrop.AirdropRepository
 import com.tari.android.wallet.data.baseNode.BaseNodeStateHandler
 import com.tari.android.wallet.data.recovery.WalletRestorationStateHandler
 import com.tari.android.wallet.data.sharedPrefs.CorePrefRepository
-import com.tari.android.wallet.data.sharedPrefs.baseNode.BaseNodeDto
 import com.tari.android.wallet.data.sharedPrefs.network.NetworkPrefRepository
 import com.tari.android.wallet.data.sharedPrefs.security.SecurityPrefRepository
 import com.tari.android.wallet.data.sharedPrefs.tariSettings.TariSettingsPrefRepository
 import com.tari.android.wallet.di.ApplicationScope
 import com.tari.android.wallet.ffi.Base58String
-import com.tari.android.wallet.ffi.FFIByteVector
 import com.tari.android.wallet.ffi.FFICommsConfig
 import com.tari.android.wallet.ffi.FFIException
-import com.tari.android.wallet.ffi.FFIPublicKey
 import com.tari.android.wallet.ffi.FFISeedWords
-import com.tari.android.wallet.ffi.FFITariTransportConfig
 import com.tari.android.wallet.ffi.FFITariWalletAddress
 import com.tari.android.wallet.ffi.FFIWallet
-import com.tari.android.wallet.ffi.HexString
-import com.tari.android.wallet.ffi.NetAddressString
 import com.tari.android.wallet.ffi.runWithDestroy
 import com.tari.android.wallet.model.MicroTari
 import com.tari.android.wallet.model.TariContact
@@ -69,14 +62,9 @@ import com.tari.android.wallet.model.tx.CompletedTx
 import com.tari.android.wallet.model.tx.PendingInboundTx
 import com.tari.android.wallet.model.tx.PendingOutboundTx
 import com.tari.android.wallet.notification.FcmHelper
-import com.tari.android.wallet.tor.TorConfig
-import com.tari.android.wallet.tor.TorProxyManager
-import com.tari.android.wallet.tor.TorProxyStateHandler
 import com.tari.android.wallet.ui.common.DialogManager
 import com.tari.android.wallet.ui.screen.send.obsolete.finalize.FinalizeSendTxModel
 import com.tari.android.wallet.util.BroadcastEffectFlow
-import com.tari.android.wallet.util.Constants
-import com.tari.android.wallet.util.DebugConfig
 import com.tari.android.wallet.util.extension.collectFlow
 import com.tari.android.wallet.util.extension.safeCastTo
 import kotlinx.coroutines.CoroutineScope
@@ -86,8 +74,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import java.io.File
-import java.math.BigInteger
 import java.util.concurrent.atomic.AtomicReference
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -101,14 +87,10 @@ import javax.inject.Singleton
 @Singleton
 class WalletManager @Inject constructor(
     private val walletConfig: WalletConfig,
-    private val torManager: TorProxyManager,
     private val corePrefRepository: CorePrefRepository,
     private val networkPrefRepository: NetworkPrefRepository,
     private val tariSettingsPrefRepository: TariSettingsPrefRepository,
     private val securityPrefRepository: SecurityPrefRepository,
-    private val baseNodesManager: BaseNodesManager,
-    private val torConfig: TorConfig,
-    private val torProxyStateHandler: TorProxyStateHandler,
     private val baseNodeStateHandler: BaseNodeStateHandler,
     private val walletRestorationStateHandler: WalletRestorationStateHandler,
     private val dialogManager: DialogManager,
@@ -139,12 +121,6 @@ class WalletManager @Inject constructor(
     private val logger
         get() = Logger.t(WalletManager::class.simpleName)
 
-    private val walletValidator = WalletValidator(
-        walletManager = this,
-        baseNodeStateHandler = baseNodeStateHandler,
-        baseNodesManager = baseNodesManager,
-    )
-
     init {
         applicationScope.collectFlow(appStateHandler.appEvent) { event ->
             when (event) {
@@ -164,38 +140,31 @@ class WalletManager @Inject constructor(
     // ------------------------------------------------------ Start Wallet ------------------------------------------------------
 
     @Synchronized
-    fun start(seedWords: List<String>? = null) {
+    fun start(seedWords: List<String>? = null, createWallet: Boolean = false) {
         val ffiSeedWords = SeedPhrase.createOrNull(seedWords)
 
         walletCallbacks.addListener(
             walletContextId = MAIN_WALLET_CONTEXT_ID,
             listener = MainFFIWalletListener(
                 walletManager = this,
-                walletValidator = walletValidator,
                 externalScope = applicationScope,
-                baseNodesManager = baseNodesManager,
-                balanceStateHandler = balanceStateHandler,
                 baseNodeStateHandler = baseNodeStateHandler,
+                balanceStateHandler = balanceStateHandler,
                 walletRestorationStateHandler = walletRestorationStateHandler,
             ),
         )
 
-        torManager.run()
-        applicationScope.launch {
-            torProxyStateHandler.doOnTorReadyForWallet {
-                startWallet(ffiSeedWords)
-            }
-        }
+        startWallet(ffiSeedWords, createWallet)
     }
 
-    private fun startWallet(ffiSeedWords: FFISeedWords?) {
+    private fun startWallet(ffiSeedWords: FFISeedWords?, createWallet: Boolean) {
         if (walletState.value is WalletState.NotReady || walletState.value is WalletState.Failed) {
             logger.i("Start wallet: Initializing wallet...")
             _walletState.update { WalletState.Initializing }
             applicationScope.launch {
                 try {
                     if (walletInstance == null) {
-                        walletInstance = initWallet(ffiSeedWords)
+                        walletInstance = initWallet(ffiSeedWords, createWallet)
                     }
                     _walletState.update { WalletState.Running }
                     logger.i("Start wallet: Wallet was started")
@@ -212,7 +181,7 @@ class WalletManager @Inject constructor(
         }
     }
 
-    private fun initWallet(ffiSeedWords: FFISeedWords?): FFIWallet {
+    private fun initWallet(ffiSeedWords: FFISeedWords?, createWallet: Boolean): FFIWallet {
         val passphrase = securityPrefRepository.databasePassphrase.takeIf { !it.isNullOrEmpty() }
             ?: corePrefRepository.generateDatabasePassphrase().also { securityPrefRepository.databasePassphrase = it }
 
@@ -224,24 +193,12 @@ class WalletManager @Inject constructor(
             passphrase = passphrase,
             seedWords = ffiSeedWords,
             walletCallbacks = walletCallbacks,
+            createWallet = createWallet,
         )
-
-        if (DebugConfig.selectBaseNodeEnabled) {
-            baseNodesManager.refreshBaseNodeList(wallet)
-            if (baseNodesManager.currentBaseNode == null) {
-                baseNodesManager.setNextBaseNode()
-            }
-        }
 
         // Need to update the balance state after the wallet is initialized,
         // because the first balance callback is called after the wallet is connected to the base node and validated
         balanceStateHandler.updateBalanceState(wallet.getBalance())
-
-        applicationScope.launch(Dispatchers.IO) {
-            baseNodeStateHandler.doOnBaseNodeOnline {
-                walletValidator.validateWallet()
-            }
-        }
 
         saveWalletAddressToSharedPrefs(wallet)
 
@@ -252,29 +209,9 @@ class WalletManager @Inject constructor(
     }
 
     private fun createCommsConfig(): FFICommsConfig = FFICommsConfig(
-        publicAddress = NetAddressString(address = "127.0.0.1", port = 39069).toString(),
-        transport = createTorTransportConfig(),
         databaseName = WalletConfig.WALLET_DB_NAME,
         datastorePath = walletConfig.getWalletFilesDirPath(),
-        discoveryTimeoutSec = Constants.Wallet.DISCOVERY_TIMEOUT_SEC,
-        safMessageDurationSec = Constants.Wallet.STORE_AND_FORWARD_MESSAGE_DURATION_SEC,
     )
-
-    private fun createTorTransportConfig(): FFITariTransportConfig {
-        val cookieFile = File(torConfig.cookieFilePath)
-        if (!cookieFile.exists()) {
-            cookieFile.createNewFile()
-        }
-        val cookieString: ByteArray = cookieFile.readBytes()
-        val torCookie = FFIByteVector(cookieString)
-        return FFITariTransportConfig(
-            controlAddress = NetAddressString(torConfig.controlHost, torConfig.controlPort),
-            torCookie = torCookie,
-            torPort = torConfig.connectionPort,
-            socksUsername = torConfig.sock5Username,
-            socksPassword = torConfig.sock5Password,
-        )
-    }
 
     /**
      * Stores wallet's Base58 address and emoji id into the shared prefs
@@ -287,60 +224,14 @@ class WalletManager @Inject constructor(
         }
     }
 
-    // ------------------------------------------------------ Sync Base Node ------------------------------------------------------
-
-    /**
-     * Syncs the wallet with the base node and validates the wallet
-     */
-    @Deprecated("Should be removed once the BaseNode pinning feature is implemented")
-    fun syncBaseNode() {
-        if (!DebugConfig.selectBaseNodeEnabled) {
-            Logger.e("Base Node connection: Base node selection is disabled, but syncBaseNode() is called!!")
-        }
-        var currentBaseNode: BaseNodeDto? = baseNodesManager.currentBaseNode ?: return
-
-        applicationScope.launch(Dispatchers.IO) {
-            doOnWalletRunning { wallet ->
-                while (currentBaseNode != null) {
-                    try {
-                        currentBaseNode?.let { it ->
-                            logger.i("Base Node connection: sync with base node ${it.publicKeyHex}::${it.address} started")
-                            val baseNodeKeyFFI = FFIPublicKey(HexString(it.publicKeyHex))
-                            val addBaseNodeResult = wallet.addBaseNodePeer(baseNodeKeyFFI, it.address)
-                            baseNodeKeyFFI.destroy()
-                            logger.i("Base Node connection: addBaseNodePeer ${if (addBaseNodeResult) "success" else "failed"}")
-
-                            walletValidator.validateWallet()
-                        }
-                        break
-                    } catch (e: Throwable) {
-                        logger.i("Base Node connection: error connecting to base node $currentBaseNode with an error: ${e.message}")
-                        currentBaseNode = baseNodesManager.setNextBaseNode()
-                    }
-                }
-
-                if (currentBaseNode == null) {
-                    logger.e("Base Node connection: error: cannot connect to any base node")
-                }
-            }
-        }
-    }
-
     // ------------------------------------------------------ Restore Wallet ------------------------------------------------------
 
     /**
      * Starts the wallet recovery process. Returns true if the recovery process was started successfully.
      * The recovery process events will be handled in the onWalletRestoration() callback.
      */
-    fun startRecovery(baseNode: BaseNodeDto?, recoveryOutputMessage: String): Boolean {
-        if (DebugConfig.selectBaseNodeEnabled) {
-            // TODO we don't support selecting base node for recovery yet
-            //  val baseNodeFFI = baseNode?.let { FFIPublicKey(HexString(it.publicKeyHex)) }
-            //  return walletInstance?.startRecovery(baseNodeFFI, recoveryOutputMessage) ?: false
-            return false
-        } else {
-            return walletInstance?.startRecovery(recoveryOutputMessage) == true
-        }
+    fun startRecovery(): Boolean {
+        return walletInstance?.startRecovery() == true
     }
 
     fun onWalletRestored() {
@@ -360,8 +251,6 @@ class WalletManager @Inject constructor(
         walletInstance?.destroy()
         walletInstance = null
         _walletState.update { WalletState.NotReady }
-        // stop tor proxy
-        torManager.shutdown()
         walletCallbacks.removeListener(MAIN_WALLET_CONTEXT_ID)
     }
 
@@ -413,15 +302,6 @@ class WalletManager @Inject constructor(
     fun getLastAccessedToDbVersion(): String {
         return createCommsConfig().runWithDestroy { it.getLastVersion() }
     }
-
-    enum class ConnectivityStatus(val value: Int) {
-        CONNECTING(0),
-        ONLINE(1),
-        OFFLINE(2),
-    }
-
-    enum class WalletValidationType { TXO, TX }
-    data class WalletValidationResult(val requestKey: BigInteger, val isSuccess: Boolean?)
 
     sealed class WalletEvent {
         object Tx {

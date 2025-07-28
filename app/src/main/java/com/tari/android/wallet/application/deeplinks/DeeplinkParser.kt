@@ -2,7 +2,6 @@ package com.tari.android.wallet.application.deeplinks
 
 import android.net.Uri
 import com.tari.android.wallet.data.sharedPrefs.network.NetworkPrefRepository
-import com.tari.android.wallet.data.sharedPrefs.tor.TorBridgeConfiguration
 import com.tari.android.wallet.model.TariWalletAddress
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -15,11 +14,6 @@ class DeeplinkParser @Inject constructor(private val networkRepository: NetworkP
         val walletAddress = TariWalletAddress.makeTariAddressOrNull(deepLinkUri.toString())
         if (walletAddress != null) {
             return DeepLink.UserProfile(tariAddress = walletAddress.fullBase58)
-        }
-
-        val torBridges = getTorDeeplink(deepLinkUri.toString().trim())
-        if (torBridges.isNotEmpty()) {
-            return DeepLink.TorBridges(torBridges)
         }
 
         if (!deepLinkUri.authority.equals(networkRepository.currentNetwork.network.uriComponent)) {
@@ -46,12 +40,6 @@ class DeeplinkParser @Inject constructor(private val networkRepository: NetworkP
     }
 
     fun toDeeplink(deepLink: DeepLink): String {
-        if (deepLink is DeepLink.TorBridges) {
-            return deepLink.torConfigurations.joinToString("\n") {
-                "${it.ip}:${it.port} ${it.fingerprint}"
-            }
-        }
-
         val fullPart = Uri.Builder()
             .scheme(SCHEME)
             .authority(networkRepository.currentNetwork.network.uriComponent)
@@ -64,20 +52,7 @@ class DeeplinkParser @Inject constructor(private val networkRepository: NetworkP
         return fullPart.build().toString()
     }
 
-    private fun getTorDeeplink(input: String): List<TorBridgeConfiguration> {
-        return REGEX.findAll(input).mapNotNull { match ->
-            try {
-                val ipAddressAndPort = match.groupValues[1].split(":")
-                val sha1Hash = match.groupValues[2]
-                TorBridgeConfiguration("", ipAddressAndPort[0], ipAddressAndPort[1], sha1Hash)
-            } catch (e: Exception) {
-                null
-            }
-        }.toList()
-    }
-
     companion object {
         const val SCHEME = "tari"
-        val REGEX = Regex("""(\d+\.\d+\.\d+\.\d+:\d+) ([0-9A-Fa-f]+)""")
     }
 }

@@ -5,7 +5,6 @@ import com.tari.android.wallet.R
 import com.tari.android.wallet.R.drawable.vector_all_settings_about_icon
 import com.tari.android.wallet.R.drawable.vector_all_settings_backup_options_icon
 import com.tari.android.wallet.R.drawable.vector_all_settings_block_explorer_icon
-import com.tari.android.wallet.R.drawable.vector_all_settings_bridge_configuration_icon
 import com.tari.android.wallet.R.drawable.vector_all_settings_cart
 import com.tari.android.wallet.R.drawable.vector_all_settings_contacts_icon
 import com.tari.android.wallet.R.drawable.vector_all_settings_contribute_to_tari_icon
@@ -16,7 +15,6 @@ import com.tari.android.wallet.R.drawable.vector_all_settings_passcode
 import com.tari.android.wallet.R.drawable.vector_all_settings_privacy_policy_icon
 import com.tari.android.wallet.R.drawable.vector_all_settings_report_bug_icon
 import com.tari.android.wallet.R.drawable.vector_all_settings_screen_recording_icon
-import com.tari.android.wallet.R.drawable.vector_all_settings_select_base_node_icon
 import com.tari.android.wallet.R.drawable.vector_all_settings_select_network_icon
 import com.tari.android.wallet.R.drawable.vector_all_settings_select_theme_icon
 import com.tari.android.wallet.R.drawable.vector_all_settings_user_agreement_icon
@@ -25,7 +23,6 @@ import com.tari.android.wallet.R.drawable.vector_all_settings_yat_icon
 import com.tari.android.wallet.R.drawable.vector_fingerprint
 import com.tari.android.wallet.R.string.all_settings_advanced_settings_label
 import com.tari.android.wallet.R.string.all_settings_biometrics
-import com.tari.android.wallet.R.string.all_settings_bridge_configuration
 import com.tari.android.wallet.R.string.all_settings_connect_yats
 import com.tari.android.wallet.R.string.all_settings_contact_label
 import com.tari.android.wallet.R.string.all_settings_contacts
@@ -41,7 +38,6 @@ import com.tari.android.wallet.R.string.all_settings_report_a_bug
 import com.tari.android.wallet.R.string.all_settings_screen_recording
 import com.tari.android.wallet.R.string.all_settings_secondary_settings_label
 import com.tari.android.wallet.R.string.all_settings_security_label
-import com.tari.android.wallet.R.string.all_settings_select_base_node
 import com.tari.android.wallet.R.string.all_settings_select_network
 import com.tari.android.wallet.R.string.all_settings_select_theme
 import com.tari.android.wallet.R.string.all_settings_store
@@ -228,17 +224,9 @@ class AllSettingsViewModel : CommonViewModel() {
                 tariNavigator.navigate(AllSettings.ToScreenRecording)
             },
             DividerViewHolderItem(),
-            SettingsRowViewHolderItem(resourceManager.getString(all_settings_bridge_configuration), vector_all_settings_bridge_configuration_icon) {
-                tariNavigator.navigate(AllSettings.ToTorBridges)
-            },
-            DividerViewHolderItem(),
             SettingsRowViewHolderItem(resourceManager.getString(all_settings_select_network), vector_all_settings_select_network_icon) {
                 tariNavigator.navigate(AllSettings.ToNetworkSelection)
             },
-            DividerViewHolderItem().takeIf { DebugConfig.selectBaseNodeEnabled },
-            SettingsRowViewHolderItem(resourceManager.getString(all_settings_select_base_node), vector_all_settings_select_base_node_icon) {
-                tariNavigator.navigate(AllSettings.ToBaseNodeSelection)
-            }.takeIf { DebugConfig.selectBaseNodeEnabled },
             DividerViewHolderItem(),
             SettingsRowViewHolderItem(
                 title = resourceManager.getString(all_settings_delete_wallet),
