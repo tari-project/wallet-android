@@ -75,17 +75,11 @@ class WalletRestoringViewModel : CommonViewModel() {
         collectFlow(walletRestorationStateHandler.walletRestorationState) { state ->
             launchOnMain {
                 when (state) {
-                    is WalletRestorationState.ConnectingToBaseNode -> updateState(RestorationState.ConnectingToBaseNode(resourceManager))
-                    is WalletRestorationState.ConnectedToBaseNode -> updateState(RestorationState.ConnectedToBaseNode(resourceManager))
                     is WalletRestorationState.ScanningRoundFailed -> onConnectionFailed(state.retryCount, state.retryLimit)
-                    is WalletRestorationState.ConnectionToBaseNodeFailed -> onConnectionFailed(state.retryCount, state.retryLimit)
-                    is WalletRestorationState.Progress -> updateState(
-                        RestorationState.Recovery(resourceManager, state.currentBlock, state.numberOfBlocks)
-                    )
 
-                    is WalletRestorationState.RecoveryFailed -> onError(
-                        RestorationError.RecoveryInternalError(resourceManager, this@WalletRestoringViewModel::cancelRecovery)
-                    )
+                    is WalletRestorationState.Progress -> {
+                        updateState(RestorationState.Recovery(resourceManager, state.currentBlock, state.numberOfBlocks))
+                    }
 
                     is WalletRestorationState.Completed -> onSuccessRestoration()
                 }
@@ -151,13 +145,9 @@ class WalletRestoringViewModel : CommonViewModel() {
             progress = resourceManager.getString(R.string.restore_from_seed_words_overlay_status_connection_failed, attempt, maxAttempts),
         )
 
-        class ConnectedToBaseNode(resourceManager: ResourceManager) : RestorationState(
-            status = resourceManager.getString(R.string.restore_from_seed_words_overlay_status_connected)
-        )
-
         class Recovery(resourceManager: ResourceManager, currentBlocks: Long, allBlocks: Long) : RestorationState(
             status = resourceManager.getString(R.string.restore_from_seed_words_overlay_status_progress),
-            progress = DecimalFormat("#.##").format((currentBlocks.toDouble() / allBlocks) * 100) + "%",
+            progress = DecimalFormat("#.##").format(if (allBlocks == 0L) 0f else (currentBlocks.toDouble() / allBlocks) * 100) + "%",
         )
     }
 }

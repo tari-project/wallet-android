@@ -194,13 +194,9 @@ class WalletCallbacks @Inject constructor() {
             walletContextId = walletContextId,
             message = "Wallet restoration: ${
                 when (state) {
-                    is WalletRestorationState.ConnectingToBaseNode -> "Connecting to base node"
-                    is WalletRestorationState.ConnectedToBaseNode -> "Connected to base node"
-                    is WalletRestorationState.ConnectionToBaseNodeFailed -> "Connection to base node failed: ${state.retryCount}/${state.retryLimit}"
                     is WalletRestorationState.Progress -> "Progress: ${state.currentBlock}/${state.numberOfBlocks}"
                     is WalletRestorationState.Completed -> "Completed: ${state.numberOfUTXO} UTXOs, ${state.microTari.size} MicroTari"
                     is WalletRestorationState.ScanningRoundFailed -> "Scanning round failed: ${state.retryCount}/${state.retryLimit}"
-                    is WalletRestorationState.RecoveryFailed -> "Recovery failed"
                 }
             }"
         )
