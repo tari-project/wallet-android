@@ -9,10 +9,17 @@ import javax.inject.Singleton
 @Singleton
 class WalletRestorationStateHandler @Inject constructor() {
 
-    private val _walletRestorationState = MutableStateFlow<WalletRestorationState>(WalletRestorationState.Progress(0, 0))
+    private val _walletRestorationState = MutableStateFlow<WalletRestorationState>(WalletRestorationState.NotStarted)
     val walletRestorationState = _walletRestorationState.asStateFlow()
 
     fun updateState(newState: WalletRestorationState) {
         _walletRestorationState.update { newState }
+    }
+
+    fun isWalletRestoring(): Boolean = _walletRestorationState.value !is WalletRestorationState.NotStarted &&
+            _walletRestorationState.value !is WalletRestorationState.Completed
+
+    fun clear() {
+        _walletRestorationState.value = WalletRestorationState.NotStarted
     }
 }

@@ -17,6 +17,7 @@
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
     <uses-permission android:name="android.permission.MANAGE_ACCOUNTS" /> <!-- remove billing support in case it gets included by a 3rd party lib -->
     <uses-permission android:name="android.permission.DETECT_SCREEN_CAPTURE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
 
     <queries>
         <intent>
@@ -45,6 +46,12 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_provider" />
         </provider>
+
+        <!-- Service needed for Tari Wallet to keep syncing in the background -->
+        <service
+            android:name=".application.WalletSyncService"
+            android:exported="false"
+            android:foregroundServiceType="dataSync"></service>
 
         <!-- Firebase Cloud Messaging -->
         <service

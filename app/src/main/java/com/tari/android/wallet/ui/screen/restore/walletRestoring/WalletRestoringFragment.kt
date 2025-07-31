@@ -38,6 +38,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
 import androidx.fragment.app.viewModels
+import com.tari.android.wallet.application.WalletSyncService
 import com.tari.android.wallet.databinding.FragmentWalletRestoringBinding
 import com.tari.android.wallet.ui.common.CommonXmlFragment
 import com.tari.android.wallet.ui.component.loadingSwitch.TariLoadingSwitchState
@@ -56,8 +57,6 @@ class WalletRestoringFragment : CommonXmlFragment<FragmentWalletRestoringBinding
 
         subscribeUI()
 
-        viewModel.startRestoring()
-
         doOnBackPressed { viewModel.showResetFlowDialog() }
     }
 
@@ -73,11 +72,19 @@ class WalletRestoringFragment : CommonXmlFragment<FragmentWalletRestoringBinding
             }
         }
         ui.awakeSwitchView.setOnCheckedChangeListener { toggleKeepScreenAwake(it) }
+
+        collectFlow(effect) {
+            when (it) {
+                is WalletRestoringViewModel.Effect.StartService -> WalletSyncService.startService(requireContext())
+                is WalletRestoringViewModel.Effect.StopService -> WalletSyncService.stopIfRunning(requireContext())
+            }
+        }
     }
 
     private fun processRecoveryState(state: WalletRestoringViewModel.RestorationState) {
         ui.statusLabel.text = state.status
         ui.progressLabel.text = state.progress
+        WalletSyncService.updateNotification(requireContext(), "${state.status} ${state.progress}")
     }
 
     companion object {
