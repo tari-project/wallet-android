@@ -265,6 +265,7 @@ class WalletManager @Inject constructor(
         airdropRepository.clear()
         baseNodeStateHandler.clear()
         balanceStateHandler.clear()
+        walletRestorationStateHandler.clear()
     }
 
     // ------------------------------------------------------ Misc ------------------------------------------------------

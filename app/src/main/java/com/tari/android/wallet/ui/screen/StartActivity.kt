@@ -41,6 +41,7 @@ import androidx.lifecycle.coroutineScope
 import com.tari.android.wallet.application.walletManager.WalletConfig
 import com.tari.android.wallet.application.walletManager.WalletManager
 import com.tari.android.wallet.application.walletManager.doOnWalletNotReady
+import com.tari.android.wallet.data.recovery.WalletRestorationStateHandler
 import com.tari.android.wallet.data.sharedPrefs.CorePrefRepository
 import com.tari.android.wallet.data.sharedPrefs.network.NetworkPrefRepository
 import com.tari.android.wallet.data.sharedPrefs.security.SecurityPrefRepository
@@ -73,6 +74,9 @@ class StartActivity : AppCompatActivity() {
     @Inject
     lateinit var walletManager: WalletManager
 
+    @Inject
+    lateinit var walletRestorationStateHandler: WalletRestorationStateHandler
+
     override fun onCreate(savedInstanceState: Bundle?) {
         appComponent.inject(this)
         super.onCreate(savedInstanceState)
@@ -88,7 +92,7 @@ class StartActivity : AppCompatActivity() {
         }
 
         val exists = walletConfig.walletExists() && sharedPrefsRepository.onboardingAuthSetupCompleted
-        if (walletConfig.walletExists() && !sharedPrefsRepository.onboardingAuthSetupCompleted) {
+        if (walletConfig.walletExists() && !sharedPrefsRepository.onboardingAuthSetupCompleted && !walletRestorationStateHandler.isWalletRestoring()) {
             // in cases interrupted restoration
             walletManager.deleteWallet()
             sharedPrefsRepository.clear()

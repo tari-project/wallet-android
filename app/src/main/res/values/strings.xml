@@ -493,6 +493,8 @@
     <string name="restore_from_seed_words_error_phrase_too_short">You entered not enough seed words. Please add some more and try again</string>
     <string name="restore_from_seed_words_error_unknown">Unable to generate key from seed words. Please check your seed words and try again</string>
     <string name="restore_from_seed_words_overlay_status_connecting">Waiting for connection</string>
+    <string name="restore_from_seed_words_overlay_status_reconnecting">Reconnecting:</string>
+    <string name="restore_from_seed_words_overlay_status_connected">Connection established. The process will start soon</string>
     <string name="restore_from_seed_words_overlay_status_progress">Restoring in progress:</string>
     <string name="restore_from_seed_words_overlay_status_connection_failed">Attempt %1$s out of %2$s</string>
     <string name="restore_from_seed_words_overlay_error_title">Recovery Failed</string>
@@ -760,4 +762,6 @@
     <string name="address_poisoning_this_trust_account">This is a trusted contact</string>
     <string name="address_poisoning_trust_disclaimer">Marking a contact as trusted means you trust this person and we won’t ask you to double check the address again.</string>
 
+    <string name="wallet_sync_service_notification_title">Wallet Sync</string>
+    <string name="wallet_sync_service_notification_message">Your wallet is being synced in the background</string>
 </resources>
