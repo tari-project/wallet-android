@@ -188,6 +188,7 @@ class WalletCallbacks @Inject constructor() {
             walletContextId = walletContextId,
             message = "Wallet restoration: ${
                 when (state) {
+                    is WalletRestorationState.NotStarted -> "Not started"
                     is WalletRestorationState.Progress -> "Progress: ${state.currentBlock}/${state.numberOfBlocks}"
                     is WalletRestorationState.Completed -> "Completed: ${state.numberOfUTXO} UTXOs, ${state.microTari.size} MicroTari"
                     is WalletRestorationState.ScanningRoundFailed -> "Scanning round failed: ${state.retryCount}/${state.retryLimit}"

@@ -18,12 +18,6 @@ class WalletRestoreViewModel() : CommonViewModel() {
         }
     }
 
-    fun checkIfWalletRestored() {
-        if (!tariSettingsSharedRepository.isRestoredWallet) {
-            walletManager.stop()
-        }
-    }
-
     private fun resetFlow() {
         walletManager.deleteWallet()
         tariNavigator.navigate(Navigation.SplashScreen())

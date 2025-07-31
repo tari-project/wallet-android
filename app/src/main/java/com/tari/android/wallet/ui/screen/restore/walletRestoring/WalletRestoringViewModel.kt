@@ -12,6 +12,7 @@ import com.tari.android.wallet.ui.dialog.modular.modules.body.BodyModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonStyle
 import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
+import com.tari.android.wallet.util.EffectFlow
 import com.tari.android.wallet.util.extension.collectFlow
 import com.tari.android.wallet.util.extension.launchOnIo
 import com.tari.android.wallet.util.extension.launchOnMain
@@ -35,13 +36,21 @@ class WalletRestoringViewModel : CommonViewModel() {
     private val _keepScreenAwake = MutableStateFlow(sharedPrefsRepository.keepScreenAwakeWhenRestore)
     val keepScreenAwake = _keepScreenAwake.asStateFlow()
 
+    private val _effect = EffectFlow<Effect>()
+    val effect = _effect.flow
+
     init {
         component.inject(this)
+
+        startRestoring()
     }
 
     fun startRestoring() = launchOnIo {
+        switchToMain { _effect.send(Effect.StartService) }
         subscribeOnRestorationState()
-        startRecoveryWithoutNode()
+        if (!walletRestorationStateHandler.isWalletRestoring()) {
+            startRecovery()
+        }
     }
 
     fun showResetFlowDialog() {
@@ -60,7 +69,7 @@ class WalletRestoringViewModel : CommonViewModel() {
         )
     }
 
-    private fun startRecoveryWithoutNode() {
+    private fun startRecovery() {
         runCatching {
             val startedSuccessfully = walletManager.startRecovery()
             if (!startedSuccessfully) {
@@ -75,13 +84,21 @@ class WalletRestoringViewModel : CommonViewModel() {
         collectFlow(walletRestorationStateHandler.walletRestorationState) { state ->
             launchOnMain {
                 when (state) {
-                    is WalletRestorationState.ScanningRoundFailed -> onConnectionFailed(state.retryCount, state.retryLimit)
+                    is WalletRestorationState.NotStarted -> {
+                        updateState(RestorationState.ConnectingToBaseNode(resourceManager))
+                    }
+
+                    is WalletRestorationState.ScanningRoundFailed -> {
+                        onConnectionFailed(state.retryCount, state.retryLimit)
+                    }
 
                     is WalletRestorationState.Progress -> {
                         updateState(RestorationState.Recovery(resourceManager, state.currentBlock, state.numberOfBlocks))
                     }
 
-                    is WalletRestorationState.Completed -> onSuccessRestoration()
+                    is WalletRestorationState.Completed -> {
+                        onSuccessRestoration()
+                    }
                 }
             }
         }
@@ -99,7 +116,9 @@ class WalletRestoringViewModel : CommonViewModel() {
         )
     }
 
-    private fun onSuccessRestoration() {
+    private suspend fun onSuccessRestoration() = switchToMain {
+        _effect.send(Effect.StopService)
+
         tariSettingsSharedRepository.hasVerifiedSeedWords = true
         walletManager.onWalletRestored()
         tariNavigator.navigate(Navigation.SplashScreen(clearTop = false))
@@ -108,6 +127,7 @@ class WalletRestoringViewModel : CommonViewModel() {
     private fun updateState(recoveryState: RestorationState) = _recoveryState.update { recoveryState }
 
     private fun cancelRecovery() {
+        launchOnMain { _effect.send(Effect.StopService) }
         walletManager.deleteWallet()
         tariNavigator.navigate(Navigation.SplashScreen())
     }
@@ -141,7 +161,7 @@ class WalletRestoringViewModel : CommonViewModel() {
         )
 
         class ConnectionFailed(resourceManager: ResourceManager, attempt: Long, maxAttempts: Long) : RestorationState(
-            status = resourceManager.getString(R.string.restore_from_seed_words_overlay_status_connecting),
+            status = resourceManager.getString(R.string.restore_from_seed_words_overlay_status_reconnecting),
             progress = resourceManager.getString(R.string.restore_from_seed_words_overlay_status_connection_failed, attempt, maxAttempts),
         )
 
@@ -149,5 +169,10 @@ class WalletRestoringViewModel : CommonViewModel() {
             status = resourceManager.getString(R.string.restore_from_seed_words_overlay_status_progress),
             progress = DecimalFormat("#.##").format(if (allBlocks == 0L) 0f else (currentBlocks.toDouble() / allBlocks) * 100) + "%",
         )
+    }
+
+    sealed class Effect {
+        data object StartService : Effect()
+        data object StopService : Effect()
     }
 }

@@ -55,9 +55,4 @@ class WalletRestoreActivity : CommonXmlActivity<ActivityWalletBackupBinding, Wal
             addFragment(ChooseRestoreOptionFragment(), isRoot = true)
         }
     }
-
-    override fun onDestroy() {
-        viewModel.checkIfWalletRestored()
-        super.onDestroy()
-    }
 }
