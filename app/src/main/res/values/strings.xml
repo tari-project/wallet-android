@@ -232,8 +232,6 @@
     <!-- send tari - successful -->
     <string name="finalize_send_tx_sending_step_1_desc_line_1">Connecting to the</string>
     <string name="finalize_send_tx_sending_step_1_desc_line_2" tools:ignore="TypographyEllipsis">Tari Network...</string>
-    <string name="finalize_send_tx_sending_step_2_desc_line_1">Searching for the</string>
-    <string name="finalize_send_tx_sending_step_2_desc_line_2" tools:ignore="TypographyEllipsis">recipient on the Tari Network...</string>
     <string name="finalize_send_tx_sending_step_3_desc_line_1">Good to go!</string>
     <string name="finalize_send_tx_sending_step_3_desc_line_2" tools:ignore="TypographyEllipsis">Your transaction is on its way...</string>
     <string name="finalize_send_tx_sending_cancel_dialog_title">Cancel Sending</string>
@@ -496,7 +494,6 @@
     <string name="restore_from_seed_words_error_phrase_too_short">You entered not enough seed words. Please add some more and try again</string>
     <string name="restore_from_seed_words_error_unknown">Unable to generate key from seed words. Please check your seed words and try again</string>
     <string name="restore_from_seed_words_overlay_status_connecting">Waiting for connection</string>
-    <string name="restore_from_seed_words_overlay_status_connected">Connection established. The process will start soon</string>
     <string name="restore_from_seed_words_overlay_status_progress">Restoring in progress:</string>
     <string name="restore_from_seed_words_overlay_status_connection_failed">Attempt %1$s out of %2$s</string>
     <string name="restore_from_seed_words_overlay_error_title">Recovery Failed</string>
@@ -650,7 +647,6 @@
     <string name="version_validation_error_recommended_update_message">You are using an outdated version of the app. We recommend updating to the latest version to ensure the best experience.</string>
     <string name="version_validation_error_play_store">Update in Play Store</string>
     <string name="version_validation_error_github">Update in GitHub</string>
-    <string name="version_validation_error_ignore">Ignore</string>
 
 
     <!-- Staged wallet security -->
