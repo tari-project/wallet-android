@@ -73,9 +73,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class TariNavigator @Inject constructor(
-    private val yatAdapter: YatAdapter,
-) {
+class TariNavigator @Inject constructor() {
     // The activity on which the navigation intents are performed.
     // Set in the #onResume method of the activity!
     lateinit var currentActivity: CommonActivity<*>
@@ -120,7 +118,7 @@ class TariNavigator @Inject constructor(
 
             is InputSeedWords.ToRestoreFromSeeds -> addFragment(WalletRestoringFragment.newInstance())
 
-            is TxSend.ToFinalizing -> continueToFinalizeSendTx(navigation.transactionData)
+            is TxSend.ToFinalizing -> addFragment(FinalizeSendTxFragment.create(navigation.transactionData))
             is TxSend.Send -> addFragment(SendFragment.newInstance(navigation.contact, navigation.amount, navigation.note))
             is TxSend.Confirm -> addFragment(ConfirmFragment.newInstance(navigation.transactionData))
 
@@ -196,14 +194,6 @@ class TariNavigator @Inject constructor(
             popUpTo(AllSettingsFragment::class.java.simpleName)
         } else {
             popUpTo(LocalAuthFragment::class.java.simpleName)
-        }
-    }
-
-    private fun continueToFinalizeSendTx(transactionData: TransactionData) {
-        if (transactionData.yat != null) {
-            yatAdapter.showOutcomingFinalizeActivity(this.currentActivity, transactionData)
-        } else {
-            addFragment(FinalizeSendTxFragment.create(transactionData))
         }
     }
 

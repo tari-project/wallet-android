@@ -53,7 +53,6 @@ import com.tari.android.wallet.ffi.FFIWallet
 import com.tari.android.wallet.ffi.runWithDestroy
 import com.tari.android.wallet.model.MicroTari
 import com.tari.android.wallet.model.TariContact
-import com.tari.android.wallet.model.TransactionSendStatus
 import com.tari.android.wallet.model.TxId
 import com.tari.android.wallet.model.fullBase58
 import com.tari.android.wallet.model.seedPhrase.SeedPhrase
@@ -114,9 +113,6 @@ class WalletManager @Inject constructor(
 
     private val _walletEvent = BroadcastEffectFlow<WalletEvent>()
     val walletEvent: Flow<WalletEvent> = _walletEvent.flow
-
-    private val _txSentConfirmations = MutableStateFlow(emptyList<TxSendResult>())
-    val txSentConfirmations = _txSentConfirmations.asStateFlow()
 
     private val logger
         get() = Logger.t(WalletManager::class.simpleName)
@@ -279,21 +275,16 @@ class WalletManager @Inject constructor(
         }
     }
 
-    fun updateTxSentConfirmations(txSendResult: TxSendResult) {
-        _txSentConfirmations.update { it + txSendResult }
-    }
-
     @Throws(FFIException::class)
     fun sendTari(
         tariContact: TariContact,
         amount: MicroTari,
         feePerGram: MicroTari,
         message: String,
-        isOneSidePayment: Boolean,
     ): TxId {
         val recipientAddress = FFITariWalletAddress(Base58String(tariContact.walletAddress.fullBase58))
 
-        val txId = requireWalletInstance.sendTx(recipientAddress, amount.value, feePerGram.value, message, isOneSidePayment)
+        val txId = requireWalletInstance.sendTx(recipientAddress, amount.value, feePerGram.value, message)
 
         recipientAddress.destroy()
         return txId
@@ -326,6 +317,4 @@ class WalletManager @Inject constructor(
 
         data object UtxosSplit : WalletEvent()
     }
-
-    data class TxSendResult(val txId: TxId, val status: TransactionSendStatus)
 }
