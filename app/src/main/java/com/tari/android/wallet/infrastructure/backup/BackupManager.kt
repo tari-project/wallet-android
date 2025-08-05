@@ -44,7 +44,6 @@ import com.tari.android.wallet.data.sharedPrefs.backup.BackupPrefRepository
 import com.tari.android.wallet.data.sharedPrefs.delegates.SerializableTime
 import com.tari.android.wallet.di.ApplicationScope
 import com.tari.android.wallet.infrastructure.backup.googleDrive.GoogleDriveBackupStorage
-import com.tari.android.wallet.infrastructure.backup.local.LocalBackupStorage
 import com.tari.android.wallet.notification.NotificationHelper
 import com.tari.android.wallet.ui.screen.settings.backup.data.BackupOption
 import com.tari.android.wallet.ui.screen.settings.backup.data.BackupOptionDto
@@ -63,7 +62,6 @@ import javax.inject.Singleton
 class BackupManager @Inject constructor(
     private val context: Context,
     private val backupSettingsRepository: BackupPrefRepository,
-    private val localFileBackupStorage: LocalBackupStorage,
     private val googleDriveBackupStorage: GoogleDriveBackupStorage,
     private val notificationHelper: NotificationHelper,
     private val walletManager: WalletManager,
@@ -196,7 +194,6 @@ class BackupManager @Inject constructor(
 
     private fun BackupOptionDto.getStorage(): BackupStorage = when (this.type) {
         BackupOption.Google -> googleDriveBackupStorage
-        BackupOption.Local -> localFileBackupStorage
     }
 
     private fun postBackupFailedNotification(exception: Exception) {

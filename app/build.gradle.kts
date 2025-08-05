@@ -1,3 +1,4 @@
+import TariBuildConfig.LibWallet.LibWalletNetwork
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import java.nio.file.Files
 import java.nio.file.Paths
@@ -58,12 +59,11 @@ android {
 
         buildConfigField("String", "LIB_WALLET_MIN_VALID_VERSION", "\"${TariBuildConfig.LibWallet.minValidVersion}\"")
         buildConfigField("String", "LIB_WALLET_VERSION", "\"${TariBuildConfig.LibWallet.version}\"")
-        buildConfigField("String", "LIB_WALLET_NETWORK", "\"${TariBuildConfig.LibWallet.network}\"")
 
         buildConfigField("String", "NOTIFICATIONS_API_KEY", "\"${loadSecretProps()["service.notifications.api_key"]}\"")
     }
 
-    flavorDimensions.add("privacy-mode")
+    flavorDimensions.add("network")
 
     buildTypes {
         loadSentryProps()
@@ -88,11 +88,23 @@ android {
     }
 
     productFlavors {
-        create("regular") {
-            dimension = "privacy-mode"
+        create("mainnet") {
+            dimension = "network"
+
+            buildConfigField("String", "LIB_WALLET_NETWORK", "\"${LibWalletNetwork.MAINNET}\"")
+            applicationIdSuffix = ""
+            manifestPlaceholders["appName"] = "@string/app_name"
+            manifestPlaceholders["appIcon"] = "@mipmap/ic_launcher"
+            manifestPlaceholders["appRoundIcon"] = "@mipmap/ic_launcher_round"
         }
-        create("privacy") {
-            dimension = "privacy-mode"
+        create("esmeralda") {
+            dimension = "network"
+
+            buildConfigField("String", "LIB_WALLET_NETWORK", "\"${LibWalletNetwork.ESMERALDA}\"")
+            applicationIdSuffix = ".esmeralda"
+            manifestPlaceholders["appName"] = "@string/app_name_esmeralda"
+            manifestPlaceholders["appIcon"] = "@mipmap/ic_launcher_esmeralda"
+            manifestPlaceholders["appRoundIcon"] = "@mipmap/ic_launcher_esmeralda_round"
         }
     }
 

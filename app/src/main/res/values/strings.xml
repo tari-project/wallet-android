@@ -1,5 +1,6 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name">Tari</string>
+    <string name="app_name_esmeralda">Esmeralda</string>
 
     <!-- URLs, etc -->
     <string name="ttl_store_url" translatable="false">https://store.tarilabs.com</string>
@@ -441,9 +442,7 @@
     <string name="back_up_wallet_turn_off_backup_warning_title">Your backup will be deleted</string>
     <string name="back_up_wallet_turn_off_backup_warning_description">Are you sure you want to proceed?</string>
     <string name="back_up_wallet_google_title">Google Drive Backup</string>
-    <string name="back_up_wallet_local_file_title">Local File Backup</string>
     <string name="back_up_wallet_restore_with_google_drive">Restore with Google Drive</string>
-    <string name="back_up_wallet_restore_with_local_files">Restore with Local files</string>
     <string name="back_up_wallet_restore_with_paper_wallet">Sync with Universe desktop</string>
     <string name="back_up_wallet_keep_screen_awake">Keep screen awake during sync</string>
 

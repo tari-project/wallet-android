@@ -39,8 +39,8 @@ import androidx.documentfile.provider.DocumentFile
 import androidx.fragment.app.Fragment
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.application.walletManager.WalletConfig
+import com.tari.android.wallet.data.sharedPrefs.backup.BackupPrefRepository
 import com.tari.android.wallet.data.sharedPrefs.network.NetworkPrefRepository
-import com.tari.android.wallet.util.extension.getLastPathComponent
 import com.tari.android.wallet.infrastructure.backup.BackupFileProcessor
 import com.tari.android.wallet.infrastructure.backup.BackupNamingPolicy
 import com.tari.android.wallet.infrastructure.backup.BackupStorage
@@ -48,7 +48,7 @@ import com.tari.android.wallet.infrastructure.backup.BackupStorageAuthRevokedExc
 import com.tari.android.wallet.infrastructure.backup.BackupStorageSetupCancelled
 import com.tari.android.wallet.infrastructure.backup.BackupStorageSetupException
 import com.tari.android.wallet.infrastructure.backup.BackupStorageTamperedException
-import com.tari.android.wallet.data.sharedPrefs.backup.BackupPrefRepository
+import com.tari.android.wallet.util.extension.getLastPathComponent
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.apache.commons.io.FileUtils
@@ -57,6 +57,7 @@ import java.io.File
 import javax.inject.Inject
 import javax.inject.Singleton
 
+// FIXME: This backup storage is not used anymore
 @Singleton
 class LocalBackupStorage @Inject constructor(
     private val context: Context,
