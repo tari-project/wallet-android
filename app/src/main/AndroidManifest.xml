@@ -28,17 +28,17 @@
         android:name=".application.TariWalletApplication"
         android:allowBackup="false"
         android:hardwareAccelerated="true"
-        android:icon="@mipmap/ic_launcher"
-        android:label="@string/app_name"
-        android:roundIcon="@mipmap/ic_launcher_round"
+        android:icon="${appIcon}"
+        android:label="${appName}"
+        android:roundIcon="${appRoundIcon}"
         android:supportsRtl="false"
         android:theme="@style/AppTheme.Light"
-        tools:replace="android:supportsRtl,android:allowBackup">
+        tools:replace="android:supportsRtl,android:allowBackup,android:label">
 
         <!-- file provider to share log files with other applications (i.e. email clients) -->
         <provider
             android:name="androidx.core.content.FileProvider"
-            android:authorities="com.tari.android.wallet.files"
+            android:authorities="${applicationId}.files"
             android:exported="false"
             android:grantUriPermissions="true">
             <meta-data

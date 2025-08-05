@@ -102,14 +102,7 @@ object Constants {
      * Wallet constants.
      */
     object Wallet {
-        const val DISCOVERY_TIMEOUT_SEC = 20L
-        const val STORE_AND_FORWARD_MESSAGE_DURATION_SEC = 10800L
         const val EMOJI_FORMATTER_CHUNK_SIZE = 3
         val DEFAULT_FEE_PER_GRAM = 10.toMicroTari()
-    }
-
-    object Build {
-        const val regularFlavor = "regular"
-        const val privacyFlavor = "privacy"
     }
 }

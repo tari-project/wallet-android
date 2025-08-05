@@ -7,19 +7,8 @@ object TariBuildConfig {
     const val compileSdk = 35
 
     object LibWallet {
-        // We use different versions of the library for different networks, set $network to easily switch between them
-        val network: LibWalletNetwork = LibWalletNetwork.MAINNET
-
-        val version = when (network) {
-            LibWalletNetwork.MAINNET -> "v4.10.0"
-            LibWalletNetwork.NEXTNET -> "v4.9.0-rc.0"
-            LibWalletNetwork.ESMERALDA -> "v4.9.0-pre.1"
-        }
-        val minValidVersion = when (network) {
-            LibWalletNetwork.MAINNET -> "v0.0.0"
-            LibWalletNetwork.NEXTNET -> "v4.0.0-rc.0"
-            LibWalletNetwork.ESMERALDA -> "v4.0.0-pre.0"
-        }
+        val version = "v4.10.0"
+        val minValidVersion = "v0.0.0" // Always valid. Probably, need to remove the check in the future.
 
         const val hostURL = "https://github.com/tari-project/tari/releases/download/"
         const val x64A = "libminotari_wallet_ffi.android_x86_64.a"
@@ -33,6 +22,6 @@ object TariBuildConfig {
         val x64AFileUrl
             get() = "${hostURL}${version}/${x64A}"
 
-        enum class LibWalletNetwork { MAINNET, NEXTNET, ESMERALDA }
+        enum class LibWalletNetwork { MAINNET, ESMERALDA }
     }
 }

@@ -63,7 +63,6 @@ class BackupOptionViewModel : CommonViewModel() {
     val title: Int
         get() = when (currentOption.type) {
             BackupOption.Google -> R.string.back_up_wallet_google_title
-            BackupOption.Local -> R.string.back_up_wallet_local_file_title
         }
 
     fun setup() {
