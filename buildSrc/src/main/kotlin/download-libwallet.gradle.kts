@@ -7,7 +7,7 @@ import java.util.zip.ZipInputStream
 tasks.register("downloadLibwallet") {
     val rootDir = "${rootProject.projectDir}/libwallet"
 
-    val requestedTasks = gradle.startParameter.taskNames
+    val requestedTasks = gradle.startParameter.taskNames.filter { it.contains("assemble", ignoreCase = true) }
     println("DEBUG INFO: Requested tasks: $requestedTasks")
     logger.info("DEBUG INFO: Requested tasks: $requestedTasks")
 
