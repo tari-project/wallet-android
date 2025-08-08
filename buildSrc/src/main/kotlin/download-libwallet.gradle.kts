@@ -24,7 +24,9 @@ tasks.register("downloadLibwallet") {
         logger.info("Downloading binaries for version ${TariBuildConfig.LibWallet.version} for $networkFlavor")
         println("Downloading binaries for version ${TariBuildConfig.LibWallet.version} for $networkFlavor")
 
-        val hostURL = "https://github.com/tari-project/tari/releases/download/"
+        // TODO uncomment!!!!!!!!
+//        val hostURL = "https://github.com/tari-project/tari/releases/download/"
+        val hostURL = "https://github.com/leet4tari/tari/releases/download/"
         val archive = when (networkFlavor) {
             MAINNET -> "libminotari_wallet_ffi-mainnet_archive.zip"
             ESMERALDA -> "libminotari_wallet_ffi-esme_archive.zip"
