@@ -7,14 +7,20 @@ import java.util.zip.ZipInputStream
 tasks.register("downloadLibwallet") {
     val rootDir = "${rootProject.projectDir}/libwallet"
 
-    val requestedTasks = gradle.startParameter.taskNames
+    // gradle.startParameter.taskNames returns the list of tasks requested to be executed (e.g. "assembleMainnetRelease", "assembleEsmeraldaDebug")
+    val requestedTasks = gradle.startParameter.taskNames.filter { it.contains("assemble", ignoreCase = true) }
+    val mainnetTask = requestedTasks.any { it.contains("mainnet", ignoreCase = true) }
+    val esmeraldaTask = requestedTasks.any { it.contains("esmeralda", ignoreCase = true) }
+
     val networkFlavor = when {
-        requestedTasks.all { it.contains("mainnet", ignoreCase = true) } -> MAINNET
-        requestedTasks.all { it.contains("esmeralda", ignoreCase = true) } -> ESMERALDA
-        else -> error(
-            "All task must be for the same network. " +
-                    "It is required to download network-specific libwallet binaries, which are not compatible with each other."
+        mainnetTask && !esmeraldaTask -> MAINNET
+        esmeraldaTask && !mainnetTask -> ESMERALDA
+        mainnetTask && esmeraldaTask -> error(
+            "Both mainnet and esmeralda tasks were requested (${requestedTasks.joinToString(", ")})" +
+                    "\nPlease specify only one network to download the corresponding libwallet binaries."
         )
+
+        else -> return@register
     }
 
     inputs.property("version", TariBuildConfig.LibWallet.version + " $networkFlavor")

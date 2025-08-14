@@ -32,7 +32,11 @@ class WalletSyncService : Service() {
         super.onCreate()
         instance = this
         createNotificationChannel()
-        registerReceiver(notificationReceiver, IntentFilter(ACTION_UPDATE_NOTIFICATION))
+        registerReceiver(
+            /* receiver = */ notificationReceiver,
+            /* filter = */ IntentFilter(ACTION_UPDATE_NOTIFICATION),
+            /* flags = */ Context.RECEIVER_NOT_EXPORTED,
+        )
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -106,6 +110,7 @@ class WalletSyncService : Service() {
         fun updateNotification(context: Context, newText: String) {
             context.sendBroadcast(
                 Intent(ACTION_UPDATE_NOTIFICATION).apply {
+                    setPackage(context.packageName)
                     putExtra(EXTRA_NOTIFICATION_TEXT, newText)
                 }
             )
