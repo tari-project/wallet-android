@@ -1,5 +1,6 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name">Tari</string>
+    <string name="app_name_esmeralda">Esmeralda</string>
 
     <!-- URLs, etc -->
     <string name="ttl_store_url" translatable="false">https://store.tarilabs.com</string>
@@ -232,8 +233,6 @@
     <!-- send tari - successful -->
     <string name="finalize_send_tx_sending_step_1_desc_line_1">Connecting to the</string>
     <string name="finalize_send_tx_sending_step_1_desc_line_2" tools:ignore="TypographyEllipsis">Tari Network...</string>
-    <string name="finalize_send_tx_sending_step_2_desc_line_1">Searching for the</string>
-    <string name="finalize_send_tx_sending_step_2_desc_line_2" tools:ignore="TypographyEllipsis">recipient on the Tari Network...</string>
     <string name="finalize_send_tx_sending_step_3_desc_line_1">Good to go!</string>
     <string name="finalize_send_tx_sending_step_3_desc_line_2" tools:ignore="TypographyEllipsis">Your transaction is on its way...</string>
     <string name="finalize_send_tx_sending_cancel_dialog_title">Cancel Sending</string>
@@ -443,9 +442,7 @@
     <string name="back_up_wallet_turn_off_backup_warning_title">Your backup will be deleted</string>
     <string name="back_up_wallet_turn_off_backup_warning_description">Are you sure you want to proceed?</string>
     <string name="back_up_wallet_google_title">Google Drive Backup</string>
-    <string name="back_up_wallet_local_file_title">Local File Backup</string>
     <string name="back_up_wallet_restore_with_google_drive">Restore with Google Drive</string>
-    <string name="back_up_wallet_restore_with_local_files">Restore with Local files</string>
     <string name="back_up_wallet_restore_with_paper_wallet">Sync with Universe desktop</string>
     <string name="back_up_wallet_keep_screen_awake">Keep screen awake during sync</string>
 
@@ -496,6 +493,7 @@
     <string name="restore_from_seed_words_error_phrase_too_short">You entered not enough seed words. Please add some more and try again</string>
     <string name="restore_from_seed_words_error_unknown">Unable to generate key from seed words. Please check your seed words and try again</string>
     <string name="restore_from_seed_words_overlay_status_connecting">Waiting for connection</string>
+    <string name="restore_from_seed_words_overlay_status_reconnecting">Reconnecting:</string>
     <string name="restore_from_seed_words_overlay_status_connected">Connection established. The process will start soon</string>
     <string name="restore_from_seed_words_overlay_status_progress">Restoring in progress:</string>
     <string name="restore_from_seed_words_overlay_status_connection_failed">Attempt %1$s out of %2$s</string>
@@ -639,11 +637,17 @@
     <string name="backup_wallet_storage_full_desc">Your storage is full</string>
     <string name="backup_restored_tx">Funds recovered from your previous wallet</string>
 
-    <!--    FFI Validation-->
+    <!--    Version Validation-->
     <string name="ffi_validation_error_title">Incompatible version detected</string>
     <string name="ffi_validation_error_message">The data stored locally is incompatible with the current version of the App or with the network itself. We strongly recommend removing the wallet and creating a new one</string>
     <string name="ffi_validation_error_delete">Delete the wallet</string>
     <string name="ffi_validation_error_cancel">I still want to use the wallet</string>
+    <string name="version_validation_error_mandatory_update_title">You must update the app</string>
+    <string name="version_validation_error_mandatory_update_message">Recently, we made some amazing changes to the app, but unfortunately, you need to update to the latest version to continue using it.</string>
+    <string name="version_validation_error_recommended_update_title">Update recommended</string>
+    <string name="version_validation_error_recommended_update_message">You are using an outdated version of the app. We recommend updating to the latest version to ensure the best experience.</string>
+    <string name="version_validation_error_play_store">Update in Play Store</string>
+    <string name="version_validation_error_github">Update in GitHub</string>
 
 
     <!-- Staged wallet security -->
@@ -758,4 +762,6 @@
     <string name="address_poisoning_this_trust_account">This is a trusted contact</string>
     <string name="address_poisoning_trust_disclaimer">Marking a contact as trusted means you trust this person and we won’t ask you to double check the address again.</string>
 
+    <string name="wallet_sync_service_notification_title">Wallet Sync</string>
+    <string name="wallet_sync_service_notification_message">Your wallet is being synced in the background</string>
 </resources>

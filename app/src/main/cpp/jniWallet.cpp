@@ -1117,7 +1117,6 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniSendTx(
         jstring jAmount,
         jstring jFeePerGram,
         jstring jPaymentId,
-        jboolean jOneSided,
         jobject error) {
     return ExecuteWithError<jbyteArray>(jEnv, error, [&](int *errorPointer) {
         auto pWallet = GetPointerField<TariWallet *>(jEnv, jThis);
@@ -1133,7 +1132,7 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniSendTx(
         jbyteArray result = getBytesFromUnsignedLongLong(
                 jEnv,
                 wallet_send_transaction(pWallet, pDestination, amount, nullptr, feePerGram,
-                                        jOneSided, pPaymentId, errorPointer));
+                                        true, pPaymentId, errorPointer));
         jEnv->ReleaseStringUTFChars(jAmount, nativeAmount);
         jEnv->ReleaseStringUTFChars(jFeePerGram, nativeFeePerGram);
         jEnv->ReleaseStringUTFChars(jPaymentId, pPaymentId);

@@ -7,12 +7,9 @@ import com.tari.android.wallet.ffi.FFICompletedTx
 import com.tari.android.wallet.ffi.FFIPendingInboundTx
 import com.tari.android.wallet.ffi.FFIPointer
 import com.tari.android.wallet.ffi.FFITariBaseNodeState
-import com.tari.android.wallet.ffi.FFITransactionSendStatus
 import com.tari.android.wallet.ffi.runWithDestroy
 import com.tari.android.wallet.model.BalanceInfo
 import com.tari.android.wallet.model.TariBaseNodeState
-import com.tari.android.wallet.model.TransactionSendStatus
-import com.tari.android.wallet.model.TxId
 import com.tari.android.wallet.model.tx.CancelledTx
 import com.tari.android.wallet.model.tx.CompletedTx
 import com.tari.android.wallet.model.tx.PendingInboundTx
@@ -121,10 +118,7 @@ class WalletCallbacks @Inject constructor() {
     }
 
     fun onDirectSendResult(contextPtr: ByteArray, bytes: ByteArray, pointer: FFIPointer) {
-        val walletContextId = BigInteger(1, contextPtr).toInt()
-        val txId = BigInteger(1, bytes)
-        log(walletContextId, "Tx direct send result $txId")
-        listeners[walletContextId]?.onDirectSendResult(txId, FFITransactionSendStatus(pointer).getStatus())
+        // FIXME: not used anymore, should be removed once FFI is updated
     }
 
     fun onTxCancelled(contextPtr: ByteArray, completedTx: FFIPointer, rejectionReason: ByteArray) {
@@ -184,7 +178,7 @@ class WalletCallbacks @Inject constructor() {
     }
 
     fun onContactLivenessDataUpdated(contextPtr: ByteArray, livenessUpdate: FFIPointer) {
-        // No callback for this event
+        // FIXME: not used anymore, should be removed once FFI is updated
     }
 
     fun onWalletRecovery(contextPtr: ByteArray, event: Int, firstArg: ByteArray, secondArg: ByteArray) {
@@ -194,6 +188,7 @@ class WalletCallbacks @Inject constructor() {
             walletContextId = walletContextId,
             message = "Wallet restoration: ${
                 when (state) {
+                    is WalletRestorationState.NotStarted -> "Not started"
                     is WalletRestorationState.Progress -> "Progress: ${state.currentBlock}/${state.numberOfBlocks}"
                     is WalletRestorationState.Completed -> "Completed: ${state.numberOfUTXO} UTXOs, ${state.microTari.size} MicroTari"
                     is WalletRestorationState.ScanningRoundFailed -> "Scanning round failed: ${state.retryCount}/${state.retryLimit}"
@@ -225,7 +220,6 @@ interface FFIWalletListener {
     fun onTxMinedUnconfirmed(completedTx: CompletedTx, confirmationCount: Int) = Unit
     fun onTxFauxConfirmed(completedTx: CompletedTx) = Unit
     fun onTxFauxUnconfirmed(completedTx: CompletedTx, confirmationCount: Int) = Unit
-    fun onDirectSendResult(txId: TxId, status: TransactionSendStatus) = Unit
     fun onTxCancelled(cancelledTx: CancelledTx, rejectionReason: Int) = Unit
     fun onBalanceUpdated(balanceInfo: BalanceInfo) = Unit
     fun onWalletRestoration(state: WalletRestorationState) = Unit

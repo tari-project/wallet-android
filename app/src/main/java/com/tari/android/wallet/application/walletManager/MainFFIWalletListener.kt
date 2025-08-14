@@ -1,9 +1,8 @@
 package com.tari.android.wallet.application.walletManager
 
-import com.tari.android.wallet.data.baseNode.BaseNodeStateHandler
-import com.tari.android.wallet.application.walletManager.WalletManager.TxSendResult
 import com.tari.android.wallet.application.walletManager.WalletManager.WalletEvent
 import com.tari.android.wallet.data.BalanceStateHandler
+import com.tari.android.wallet.data.baseNode.BaseNodeStateHandler
 import com.tari.android.wallet.data.recovery.WalletRestorationState
 import com.tari.android.wallet.data.recovery.WalletRestorationStateHandler
 import com.tari.android.wallet.ffi.runWithDestroy
@@ -11,8 +10,6 @@ import com.tari.android.wallet.model.BalanceInfo
 import com.tari.android.wallet.model.TariBaseNodeState
 import com.tari.android.wallet.model.TariContact
 import com.tari.android.wallet.model.TariWalletAddress
-import com.tari.android.wallet.model.TransactionSendStatus
-import com.tari.android.wallet.model.TxId
 import com.tari.android.wallet.model.tx.CancelledTx
 import com.tari.android.wallet.model.tx.CompletedTx
 import com.tari.android.wallet.model.tx.PendingInboundTx
@@ -109,10 +106,6 @@ class MainFFIWalletListener(
                 confirmationCount = confirmationCount,
             )
         )
-    }
-
-    override fun onDirectSendResult(txId: TxId, status: TransactionSendStatus) = runOnMain {
-        walletManager.updateTxSentConfirmations(TxSendResult(txId, status))
     }
 
     override fun onTxCancelled(cancelledTx: CancelledTx, rejectionReason: Int) = runOnMain {

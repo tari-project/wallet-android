@@ -5,6 +5,7 @@ import java.nio.ByteBuffer
 
 sealed class WalletRestorationState {
 
+    data object NotStarted : WalletRestorationState()
     data class ScanningRoundFailed(val retryCount: Long, val retryLimit: Long) : WalletRestorationState()
     data class Progress(val currentBlock: Long, val numberOfBlocks: Long) : WalletRestorationState()
     data class Completed(val numberOfUTXO: Long, val microTari: ByteArray) : WalletRestorationState()

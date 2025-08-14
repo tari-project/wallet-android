@@ -4,7 +4,6 @@ import com.orhanobut.logger.AndroidLogAdapter
 import com.orhanobut.logger.FormatStrategy
 import com.orhanobut.logger.Logger
 import com.orhanobut.logger.PrettyFormatStrategy
-import com.tari.android.wallet.BuildConfig
 import com.tari.android.wallet.application.walletManager.WalletConfig
 import com.tari.android.wallet.application.walletManager.WalletManager
 import com.tari.android.wallet.data.sharedPrefs.sentry.SentryPrefRepository
@@ -30,9 +29,6 @@ class LoggerAdapter @Inject constructor(
 
         Logger.addLogAdapter(AndroidLogAdapter(formatStrategy))
         Logger.addLogAdapter(FFIFileAdapter(walletManager.walletInstance))
-        @Suppress("KotlinConstantConditions")
-        if (BuildConfig.FLAVOR != "privacy") {
-            Logger.addLogAdapter(SentryLogAdapter(walletConfig, sentryPrefRepository, applicationScope))
-        }
+        Logger.addLogAdapter(SentryLogAdapter(walletConfig, sentryPrefRepository, applicationScope))
     }
 }

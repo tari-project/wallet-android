@@ -17,6 +17,8 @@
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
     <uses-permission android:name="android.permission.MANAGE_ACCOUNTS" /> <!-- remove billing support in case it gets included by a 3rd party lib -->
     <uses-permission android:name="android.permission.DETECT_SCREEN_CAPTURE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
 
     <queries>
         <intent>
@@ -28,23 +30,29 @@
         android:name=".application.TariWalletApplication"
         android:allowBackup="false"
         android:hardwareAccelerated="true"
-        android:icon="@mipmap/ic_launcher"
-        android:label="@string/app_name"
-        android:roundIcon="@mipmap/ic_launcher_round"
+        android:icon="${appIcon}"
+        android:label="${appName}"
+        android:roundIcon="${appRoundIcon}"
         android:supportsRtl="false"
         android:theme="@style/AppTheme.Light"
-        tools:replace="android:supportsRtl,android:allowBackup">
+        tools:replace="android:supportsRtl,android:allowBackup,android:label">
 
         <!-- file provider to share log files with other applications (i.e. email clients) -->
         <provider
             android:name="androidx.core.content.FileProvider"
-            android:authorities="com.tari.android.wallet.files"
+            android:authorities="${applicationId}.files"
             android:exported="false"
             android:grantUriPermissions="true">
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_provider" />
         </provider>
+
+        <!-- Service needed for Tari Wallet to keep syncing in the background -->
+        <service
+            android:name=".application.WalletSyncService"
+            android:exported="false"
+            android:foregroundServiceType="dataSync"></service>
 
         <!-- Firebase Cloud Messaging -->
         <service
