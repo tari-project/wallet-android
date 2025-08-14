@@ -7,10 +7,8 @@ import java.util.zip.ZipInputStream
 tasks.register("downloadLibwallet") {
     val rootDir = "${rootProject.projectDir}/libwallet"
 
+    // gradle.startParameter.taskNames returns the list of tasks requested to be executed (e.g. "assembleMainnetRelease", "assembleEsmeraldaDebug")
     val requestedTasks = gradle.startParameter.taskNames.filter { it.contains("assemble", ignoreCase = true) }
-    println("DEBUG INFO: Requested tasks: $requestedTasks")
-    logger.info("DEBUG INFO: Requested tasks: $requestedTasks")
-
     val mainnetTask = requestedTasks.any { it.contains("mainnet", ignoreCase = true) }
     val esmeraldaTask = requestedTasks.any { it.contains("esmeralda", ignoreCase = true) }
 
@@ -21,6 +19,7 @@ tasks.register("downloadLibwallet") {
             "Both mainnet and esmeralda tasks were requested (${requestedTasks.joinToString(", ")})" +
                     "\nPlease specify only one network to download the corresponding libwallet binaries."
         )
+
         else -> return@register
     }
 
@@ -31,9 +30,7 @@ tasks.register("downloadLibwallet") {
         logger.info("Downloading binaries for version ${TariBuildConfig.LibWallet.version} for $networkFlavor")
         println("Downloading binaries for version ${TariBuildConfig.LibWallet.version} for $networkFlavor")
 
-        // TODO uncomment!!!!!!!!
-//        val hostURL = "https://github.com/tari-project/tari/releases/download/"
-        val hostURL = "https://github.com/leet4tari/tari/releases/download/"
+        val hostURL = "https://github.com/tari-project/tari/releases/download/"
         val archive = when (networkFlavor) {
             MAINNET -> "libminotari_wallet_ffi-mainnet_archive.zip"
             ESMERALDA -> "libminotari_wallet_ffi-esme_archive.zip"
