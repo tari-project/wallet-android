@@ -9,7 +9,7 @@ import javax.inject.Singleton
 @Singleton
 class WalletRestorationStateHandler @Inject constructor() {
 
-    private val _walletRestorationState = MutableStateFlow<WalletRestorationState>(WalletRestorationState.ConnectingToBaseNode)
+    private val _walletRestorationState = MutableStateFlow<WalletRestorationState>(WalletRestorationState.Progress(0, 0))
     val walletRestorationState = _walletRestorationState.asStateFlow()
 
     fun updateState(newState: WalletRestorationState) {

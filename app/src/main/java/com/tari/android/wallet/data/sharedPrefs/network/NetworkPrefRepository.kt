@@ -51,6 +51,7 @@ class NetworkPrefRepository @Inject constructor(sharedPrefs: SharedPreferences) 
         private val NETWORK_MAINNET: TariNetwork = TariNetwork(
             network = Network.MAINNET,
             dnsPeer = "seeds.tari.com",
+            httpBaseNode = "https://rpc.tari.com",
             blockExplorerBaseUrl = "https://explore.tari.com",
             ticker = TICKER_MAINNET,
             recommended = true,
@@ -58,6 +59,7 @@ class NetworkPrefRepository @Inject constructor(sharedPrefs: SharedPreferences) 
         private val NETWORK_STAGENET: TariNetwork = TariNetwork(
             network = Network.STAGENET,
             dnsPeer = "seeds.stagenet.tari.com",
+            httpBaseNode = "https://rpc.stagenet.tari.com",
             blockExplorerBaseUrl = null,
             ticker = TICKER_TESTNET,
             recommended = true,
@@ -65,6 +67,7 @@ class NetworkPrefRepository @Inject constructor(sharedPrefs: SharedPreferences) 
         private val NETWORK_NEXTNET: TariNetwork = TariNetwork(
             network = Network.NEXTNET,
             dnsPeer = "aurora.nextnet.tari.com",
+            httpBaseNode = "https://rpc.nextnet.tari.com",
             blockExplorerBaseUrl = "https://explore-nextnet.tari.com",
             ticker = TICKER_TESTNET,
             recommended = false,
@@ -72,6 +75,7 @@ class NetworkPrefRepository @Inject constructor(sharedPrefs: SharedPreferences) 
         private val NETWORK_ESMERALDA: TariNetwork = TariNetwork(
             network = Network.ESMERALDA,
             dnsPeer = "seeds.esmeralda.tari.com",
+            httpBaseNode = "https://rpc.esmeralda.tari.com",
             blockExplorerBaseUrl = null,
             ticker = TICKER_TESTNET,
             recommended = false,

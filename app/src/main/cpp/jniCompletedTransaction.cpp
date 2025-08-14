@@ -200,18 +200,6 @@ Java_com_tari_android_wallet_ffi_FFICompletedTx_jniGetStatus(
 }
 
 extern "C"
-JNIEXPORT jbyteArray JNICALL
-Java_com_tari_android_wallet_ffi_FFICompletedTx_jniGetConfirmationCount(
-        JNIEnv *jEnv,
-        jobject jThis,
-        jobject error) {
-    return ExecuteWithError<jbyteArray>(jEnv, error, [&](int *errorPointer) {
-        auto pCompletedTx = GetPointerField<TariCompletedTransaction *>(jEnv, jThis);
-        return getBytesFromUnsignedLongLong(jEnv, completed_transaction_get_confirmations(pCompletedTx, errorPointer));
-    });
-}
-
-extern "C"
 JNIEXPORT jboolean JNICALL
 Java_com_tari_android_wallet_ffi_FFICompletedTx_jniIsOutbound(
         JNIEnv *jEnv,

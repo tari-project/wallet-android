@@ -8,7 +8,6 @@ import com.tari.android.wallet.ffi.FFIPendingInboundTx
 import com.tari.android.wallet.ffi.FFIPointer
 import com.tari.android.wallet.ffi.FFITariBaseNodeState
 import com.tari.android.wallet.ffi.FFITransactionSendStatus
-import com.tari.android.wallet.ffi.TransactionValidationStatus
 import com.tari.android.wallet.ffi.runWithDestroy
 import com.tari.android.wallet.model.BalanceInfo
 import com.tari.android.wallet.model.TariBaseNodeState
@@ -151,23 +150,8 @@ class WalletCallbacks @Inject constructor() {
         listeners[walletContextId]?.onBaseNodeStateChanged(baseNodeState)
     }
 
-    private var oldConnectivityStatusMessage = ""
     fun onConnectivityStatus(contextPtr: ByteArray, bytes: ByteArray) {
-        val walletContextId = BigInteger(1, contextPtr).toInt()
-        val connectivityStatus = BigInteger(1, bytes)
-
-        val newMessage = "Connectivity status is [${
-            when (connectivityStatus.toInt()) {
-                0 -> "Connecting"
-                1 -> "Online"
-                2 -> "Offline"
-                else -> "Unknown"
-            }
-        }]"
-        log(walletContextId, newMessage, oldConnectivityStatusMessage)
-        oldConnectivityStatusMessage = newMessage
-
-        listeners[walletContextId]?.onConnectivityStatus(connectivityStatus.toInt())
+        // FIXME: not used anymore, should be removed once FFI is updated
     }
 
     fun onWalletScannedHeight(contextPtr: ByteArray, bytes: ByteArray) {
@@ -192,21 +176,11 @@ class WalletCallbacks @Inject constructor() {
     }
 
     fun onTXOValidationComplete(contextPtr: ByteArray, bytes: ByteArray, statusBytes: ByteArray) {
-        val walletContextId = BigInteger(1, contextPtr).toInt()
-        val requestId = BigInteger(1, bytes)
-        val statusInteger = BigInteger(1, statusBytes).toInt()
-        val status = TransactionValidationStatus.entries.firstOrNull { it.value == statusInteger } ?: return
-        log(walletContextId, "TXO validation [$requestId] complete. Result: $status")
-        listeners[walletContextId]?.onTXOValidationComplete(requestId, status)
+        // FIXME: not used anymore, should be removed once FFI is updated
     }
 
     fun onTxValidationComplete(contextPtr: ByteArray, requestIdBytes: ByteArray, statusBytes: ByteArray) {
-        val walletContextId = BigInteger(1, contextPtr).toInt()
-        val requestId = BigInteger(1, requestIdBytes)
-        val statusInteger = BigInteger(1, statusBytes).toInt()
-        val status = TransactionValidationStatus.entries.firstOrNull { it.value == statusInteger } ?: return
-        log(walletContextId, "Tx validation [$requestId] complete. Result: $status")
-        listeners[walletContextId]?.onTxValidationComplete(requestId, status)
+        // FIXME: not used anymore, should be removed once FFI is updated
     }
 
     fun onContactLivenessDataUpdated(contextPtr: ByteArray, livenessUpdate: FFIPointer) {
@@ -220,13 +194,9 @@ class WalletCallbacks @Inject constructor() {
             walletContextId = walletContextId,
             message = "Wallet restoration: ${
                 when (state) {
-                    is WalletRestorationState.ConnectingToBaseNode -> "Connecting to base node"
-                    is WalletRestorationState.ConnectedToBaseNode -> "Connected to base node"
-                    is WalletRestorationState.ConnectionToBaseNodeFailed -> "Connection to base node failed: ${state.retryCount}/${state.retryLimit}"
                     is WalletRestorationState.Progress -> "Progress: ${state.currentBlock}/${state.numberOfBlocks}"
                     is WalletRestorationState.Completed -> "Completed: ${state.numberOfUTXO} UTXOs, ${state.microTari.size} MicroTari"
                     is WalletRestorationState.ScanningRoundFailed -> "Scanning round failed: ${state.retryCount}/${state.retryLimit}"
-                    is WalletRestorationState.RecoveryFailed -> "Recovery failed"
                 }
             }"
         )
@@ -257,10 +227,7 @@ interface FFIWalletListener {
     fun onTxFauxUnconfirmed(completedTx: CompletedTx, confirmationCount: Int) = Unit
     fun onDirectSendResult(txId: TxId, status: TransactionSendStatus) = Unit
     fun onTxCancelled(cancelledTx: CancelledTx, rejectionReason: Int) = Unit
-    fun onTXOValidationComplete(responseId: BigInteger, status: TransactionValidationStatus) = Unit
-    fun onTxValidationComplete(responseId: BigInteger, status: TransactionValidationStatus) = Unit
     fun onBalanceUpdated(balanceInfo: BalanceInfo) = Unit
-    fun onConnectivityStatus(status: Int) = Unit
     fun onWalletRestoration(state: WalletRestorationState) = Unit
     fun onWalletScannedHeight(height: Int) = Unit
     fun onBaseNodeStateChanged(baseNodeState: TariBaseNodeState) = Unit
