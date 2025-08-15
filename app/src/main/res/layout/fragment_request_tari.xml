@@ -2,8 +2,8 @@
 <com.tari.android.wallet.ui.component.tari.background.obsolete.TariPrimaryBackgroundConstraint xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:fitsSystemWindows="true"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true">
 
     <com.tari.android.wallet.ui.component.tari.toolbar.TariToolbar
         android:id="@+id/toolbar"
@@ -72,6 +72,7 @@
                 android:background="@drawable/vector_disable_able_gradient_button_bg"
                 android:elevation="0dp"
                 android:src="@drawable/vector_share"
+                android:tint="@color/button_text_color_selector"
                 app:customFont="heavy" />
 
         </androidx.appcompat.widget.LinearLayoutCompat>
