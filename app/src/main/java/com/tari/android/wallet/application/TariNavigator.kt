@@ -20,7 +20,6 @@ import com.tari.android.wallet.application.Navigation.InputSeedWords
 import com.tari.android.wallet.application.Navigation.Restore
 import com.tari.android.wallet.application.Navigation.ShareText
 import com.tari.android.wallet.application.Navigation.SplashScreen
-import com.tari.android.wallet.application.Navigation.TorBridge
 import com.tari.android.wallet.application.Navigation.TxList
 import com.tari.android.wallet.application.Navigation.TxSend
 import com.tari.android.wallet.application.Navigation.VerifySeedPhrase
@@ -62,14 +61,11 @@ import com.tari.android.wallet.ui.screen.settings.backup.enterCurrentPassword.En
 import com.tari.android.wallet.ui.screen.settings.backup.learnMore.BackupLearnMoreFragment
 import com.tari.android.wallet.ui.screen.settings.backup.verifySeedPhrase.VerifySeedPhraseFragment
 import com.tari.android.wallet.ui.screen.settings.backup.writeDownSeedWords.WriteDownSeedPhraseFragment
-import com.tari.android.wallet.ui.screen.settings.baseNodeConfig.changeBaseNode.ChangeBaseNodeFragment
 import com.tari.android.wallet.ui.screen.settings.dataCollection.DataCollectionFragment
 import com.tari.android.wallet.ui.screen.settings.deleteWallet.DeleteWalletFragment
 import com.tari.android.wallet.ui.screen.settings.networkSelection.NetworkSelectionFragment
 import com.tari.android.wallet.ui.screen.settings.screenRecording.ScreenRecordingSettingsFragment
 import com.tari.android.wallet.ui.screen.settings.themeSelector.ThemeSelectorFragment
-import com.tari.android.wallet.ui.screen.settings.torBridges.TorBridgesSelectionFragment
-import com.tari.android.wallet.ui.screen.settings.torBridges.customBridges.CustomTorBridgesFragment
 import com.tari.android.wallet.ui.screen.tx.details.TxDetailsFragment
 import com.tari.android.wallet.ui.screen.tx.history.TxHistoryFragment
 import com.tari.android.wallet.ui.screen.utxos.list.UtxosListFragment
@@ -77,9 +73,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class TariNavigator @Inject constructor(
-    private val yatAdapter: YatAdapter,
-) {
+class TariNavigator @Inject constructor() {
     // The activity on which the navigation intents are performed.
     // Set in the #onResume method of the activity!
     lateinit var currentActivity: CommonActivity<*>
@@ -116,18 +110,15 @@ class TariNavigator @Inject constructor(
             is AllSettings.ToScreenRecording -> addFragment(ScreenRecordingSettingsFragment())
             is AllSettings.BackToBackupSettings -> popUpTo(BackupSettingsFragment::class.java.simpleName)
             is AllSettings.ToBackupSettings -> addFragment(BackupSettingsFragment.newInstance(), withAnimation = navigation.withAnimation)
-            is AllSettings.ToBaseNodeSelection -> toBaseNodeSelection()
             is AllSettings.ToDeleteWallet -> addFragment(DeleteWalletFragment())
             is AllSettings.ToNetworkSelection -> addFragment(NetworkSelectionFragment())
-            is AllSettings.ToTorBridges -> addFragment(TorBridgesSelectionFragment())
             is AllSettings.ToDataCollection -> addFragment(DataCollectionFragment())
             is AllSettings.ToThemeSelection -> addFragment(ThemeSelectorFragment())
             is AllSettings.ToRequestTari -> addFragment(RequestTariFragment.newInstance())
 
             is InputSeedWords.ToRestoreFromSeeds -> addFragment(WalletRestoringFragment.newInstance())
-            is InputSeedWords.ToBaseNodeSelection -> toBaseNodeSelection()
 
-            is TxSend.ToFinalizing -> continueToFinalizeSendTx(navigation.transactionData)
+            is TxSend.ToFinalizing -> addFragment(FinalizeSendTxFragment.create(navigation.transactionData))
             is TxSend.Send -> addFragment(SendFragment.newInstance(navigation.contact, navigation.amount, navigation.note))
             is TxSend.Confirm -> addFragment(ConfirmFragment.newInstance(navigation.transactionData))
 
@@ -136,8 +127,6 @@ class TariNavigator @Inject constructor(
             is TxList.ToAllSettings -> addFragment(AllSettingsFragment.newInstance())
             is TxList.ToReceive -> addFragment(ReceiveFragment())
             is TxList.HomeTransactionHistory -> addFragment(TxHistoryFragment.newInstance())
-
-            is TorBridge.ToCustomBridges -> addFragment(CustomTorBridgesFragment())
 
             is VerifySeedPhrase.ToSeedPhraseVerification -> addFragment(VerifySeedPhraseFragment.newInstance(navigation.seedWords))
 
@@ -208,16 +197,6 @@ class TariNavigator @Inject constructor(
         }
     }
 
-    private fun toBaseNodeSelection() = addFragment(ChangeBaseNodeFragment())
-
-    private fun continueToFinalizeSendTx(transactionData: TransactionData) {
-        if (transactionData.yat != null) {
-            yatAdapter.showOutcomingFinalizeActivity(this.currentActivity, transactionData)
-        } else {
-            addFragment(FinalizeSendTxFragment.create(transactionData))
-        }
-    }
-
     private fun hideSoftKeyboard() {
         val imm = currentActivity.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         val view = currentActivity.currentFocus ?: View(currentActivity)
@@ -264,10 +243,6 @@ sealed class Navigation {
         data class ToSeedPhraseVerification(val seedWords: List<String>) : VerifySeedPhrase()
     }
 
-    sealed class TorBridge : Navigation() {
-        data object ToCustomBridges : TorBridge()
-    }
-
     sealed class TxList : Navigation() {
         data class ToTxDetails(val tx: Tx, val showCloseButton: Boolean = false) : TxList()
         data object ToAllSettings : TxList()
@@ -292,15 +267,12 @@ sealed class Navigation {
         data object ToDeleteWallet : AllSettings()
         data object ToScreenRecording : AllSettings()
         data object ToThemeSelection : AllSettings()
-        data object ToTorBridges : AllSettings()
         data object ToNetworkSelection : AllSettings()
-        data object ToBaseNodeSelection : AllSettings()
         data object ToRequestTari : AllSettings()
     }
 
     sealed class InputSeedWords : Navigation() {
         data object ToRestoreFromSeeds : InputSeedWords()
-        data object ToBaseNodeSelection : InputSeedWords()
     }
 
     sealed class ContactBook : Navigation() {

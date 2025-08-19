@@ -42,6 +42,7 @@ import com.tari.android.wallet.R
 import com.tari.android.wallet.application.walletManager.WalletManager
 import com.tari.android.wallet.application.walletManager.doOnWalletFailed
 import com.tari.android.wallet.application.walletManager.doOnWalletRunning
+import com.tari.android.wallet.data.recovery.WalletRestorationStateHandler
 import com.tari.android.wallet.data.sharedPrefs.CorePrefRepository
 import com.tari.android.wallet.databinding.ActivityOnboardingFlowBinding
 import com.tari.android.wallet.di.DiContainer.appComponent
@@ -76,6 +77,9 @@ class OnboardingFlowActivity : CommonXmlActivity<ActivityOnboardingFlowBinding, 
     @Inject
     lateinit var walletManager: WalletManager
 
+    @Inject
+    lateinit var walletRestorationStateHandler: WalletRestorationStateHandler
+
     override fun onCreate(savedInstanceState: Bundle?) {
         appComponent.inject(this)
         super.onCreate(savedInstanceState)
@@ -92,6 +96,10 @@ class OnboardingFlowActivity : CommonXmlActivity<ActivityOnboardingFlowBinding, 
 
         // TODO move this logic to VM. We shouldn't manage scopes inside the activity
         when {
+            walletRestorationStateHandler.isWalletRestoring() -> {
+                loadFragment(WalletRestoringFragment())
+            }
+
             paperWalletSeeds != null -> {
                 walletManager.start(paperWalletSeeds)
 

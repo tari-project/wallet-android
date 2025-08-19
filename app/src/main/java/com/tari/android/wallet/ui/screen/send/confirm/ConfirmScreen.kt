@@ -181,7 +181,6 @@ private fun ConfirmScreenPreview() {
                     feePerGram = 1000.toMicroTari(),
                     note = "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
                     recipientContact = MockDataStub.createContact(),
-                    isOneSidePayment = true,
                 ),
             ),
             onBackClick = {},

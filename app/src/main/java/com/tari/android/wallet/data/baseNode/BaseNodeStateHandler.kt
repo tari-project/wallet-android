@@ -1,51 +1,32 @@
 package com.tari.android.wallet.data.baseNode
 
-import kotlinx.coroutines.Dispatchers
+import com.tari.android.wallet.model.TariBaseNodeState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.withContext
+import java.math.BigInteger
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class BaseNodeStateHandler @Inject constructor() {
 
-    /**
-     * Base node state. Showing the wallet is connected to the base node or not.
-     */
-    private val _baseNodeState = MutableStateFlow(BaseNodeState.Syncing)
+    private val _walletScannedHeight = MutableStateFlow(0)
+    val walletScannedHeight = _walletScannedHeight.asStateFlow()
+
+    private val _baseNodeState = MutableStateFlow(TariBaseNodeState(heightOfLongestChain = BigInteger.ZERO))
     val baseNodeState = _baseNodeState.asStateFlow()
 
-    /**
-     * Base node sync state. Showing the wallet validation status after connecting to the base node.
-     */
-    private val _baseNodeSyncState = MutableStateFlow<BaseNodeSyncState>(BaseNodeSyncState.NotStarted)
-    val baseNodeSyncState = _baseNodeSyncState.asStateFlow()
-
-    /**
-     * Update base node state.
-     * @return true if the state is updated, false otherwise.
-     */
-    fun updateState(newState: BaseNodeState): Boolean {
-        return if (newState != _baseNodeState.value) {
-            _baseNodeState.update { newState }
-            true
-        } else false
+    fun saveBaseNodeState(baseNodeState: TariBaseNodeState) {
+        _baseNodeState.update { baseNodeState }
     }
 
-    fun updateSyncState(state: BaseNodeSyncState) {
-        _baseNodeSyncState.update { state }
-    }
-
-    suspend fun doOnBaseNodeOnline(action: suspend () -> Unit) = withContext(Dispatchers.IO) {
-        baseNodeState.firstOrNull { it == BaseNodeState.Online }
-            ?.let { action() }
+    fun saveWalletScannedHeight(height: Int) {
+        _walletScannedHeight.update { height }
     }
 
     fun clear() {
-        _baseNodeState.value = BaseNodeState.Syncing
-        _baseNodeSyncState.value = BaseNodeSyncState.NotStarted
+        _baseNodeState.update { TariBaseNodeState(heightOfLongestChain = BigInteger.ZERO) }
+        _walletScannedHeight.update { 0 }
     }
 }

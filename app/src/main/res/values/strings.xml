@@ -1,5 +1,6 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name">Tari</string>
+    <string name="app_name_esmeralda">Esmeralda</string>
 
     <!-- URLs, etc -->
     <string name="ttl_store_url" translatable="false">https://store.tarilabs.com</string>
@@ -8,7 +9,6 @@
     <string name="user_agreement_url" translatable="false">https://www.tari.com/user_agreement/</string>
     <string name="privacy_policy_url" translatable="false">https://www.tari.com/privacy_policy/</string>
     <string name="disclaimer_url" translatable="false">https://www.tari.com/disclaimer/</string>
-    <string name="tor_bridges_url" translatable="false">https://bridges.torproject.org/bridges</string>
 
     <!-- digits -->
     <string name="digit_0">0</string>
@@ -142,11 +142,6 @@
     <string name="home_tx_list_header_yesterday">Yesterday</string>
     <string name="home_pending_transactions_title">Pending Transactions</string>
     <string name="home_completed_transactions_title">Completed Transactions</string>
-    <string name="home_custom_base_node_title">Add custom base node</string>
-    <string name="home_custom_base_node_description">The QR code is a deep link request to assign your wallet to use this base node.</string>
-    <string name="home_custom_base_node_full_description"><![CDATA[<strong>Name: </strong>%1$s<br><br><strong>Peer:</strong><br>%2$s]]></string>
-    <string name="home_custom_base_node_no_button">Not this time</string>
-    <!-- store and forward update progress -->
     <!--Balance label-->
     <string name="home_transaction_list_empty_description">Nothing to show here yet. Keep an eye on this screen to stay updated on the status of your transactions. Oh, and remember, you can also use the request function to ask someone to send you some Tari if you want!</string>
     <string name="home_transaction_view_all_txs">View all transactions</string>
@@ -238,8 +233,6 @@
     <!-- send tari - successful -->
     <string name="finalize_send_tx_sending_step_1_desc_line_1">Connecting to the</string>
     <string name="finalize_send_tx_sending_step_1_desc_line_2" tools:ignore="TypographyEllipsis">Tari Network...</string>
-    <string name="finalize_send_tx_sending_step_2_desc_line_1">Searching for the</string>
-    <string name="finalize_send_tx_sending_step_2_desc_line_2" tools:ignore="TypographyEllipsis">recipient on the Tari Network...</string>
     <string name="finalize_send_tx_sending_step_3_desc_line_1">Good to go!</string>
     <string name="finalize_send_tx_sending_step_3_desc_line_2" tools:ignore="TypographyEllipsis">Your transaction is on its way...</string>
     <string name="finalize_send_tx_sending_cancel_dialog_title">Cancel Sending</string>
@@ -334,7 +327,6 @@
     <string name="debug_dialog_title">Debug Menu</string>
     <string name="debug_dialog_logs">View logs</string>
     <string name="debug_dialog_report">Report a bug</string>
-    <string name="debug_dialog_connection_status">View connection status</string>
     <string name="debug_dialog_sample_design_system">Sample design system</string>
     <string name="debug_logs_title">Debug Logs</string>
     <string name="debug_logs_cant_open_file">Unable to open file. Please try again later</string>
@@ -362,7 +354,6 @@
 
     <string name="debug_log_filter_debug">Debug</string>
     <!-- base node config -->
-    <string name="debug_change_base_node">Change base node</string>
 
     <string name="select_theme_title">Select theme</string>
     <string name="select_theme_description">Select a theme below to change the color scheme</string>
@@ -399,9 +390,7 @@
     <string name="all_settings_disclaimer">Disclaimer</string>
     <string name="all_settings_explorer">Block Explorer</string>
     <string name="all_settings_screen_recording">Screen recording</string>
-    <string name="all_settings_bridge_configuration">Bridge Configuration</string>
     <string name="all_settings_connect_yats">Connect Yats</string>
-    <string name="all_settings_select_base_node">Select Base Node</string>
     <string name="all_settings_select_theme">Select Theme</string>
     <string name="all_settings_select_network">Select Network</string>
     <string name="all_settings_select_network_recommended">(Recommended)</string>
@@ -453,9 +442,7 @@
     <string name="back_up_wallet_turn_off_backup_warning_title">Your backup will be deleted</string>
     <string name="back_up_wallet_turn_off_backup_warning_description">Are you sure you want to proceed?</string>
     <string name="back_up_wallet_google_title">Google Drive Backup</string>
-    <string name="back_up_wallet_local_file_title">Local File Backup</string>
     <string name="back_up_wallet_restore_with_google_drive">Restore with Google Drive</string>
-    <string name="back_up_wallet_restore_with_local_files">Restore with Local files</string>
     <string name="back_up_wallet_restore_with_paper_wallet">Sync with Universe desktop</string>
     <string name="back_up_wallet_keep_screen_awake">Keep screen awake during sync</string>
 
@@ -481,7 +468,6 @@
     <string name="restore_wallet_error_file_not_found">Wallet could not be restored. Backup does not exist.</string>
     <string name="restore_wallet_restore_cta">Restore Wallet</string>
     <string name="restore_wallet_password_match_error">@string/enter_backup_password_password_match_error</string>
-    <string name="restore_wallet_output_message">You recovered some funds</string>
     <string name="restore_wallet_invalid_qr_code">Invalid QR Code</string>
     <string name="restore_wallet_invalid_qr_code_description">The QR code you scanned does not contain valid paper wallet seeds</string>
     <string name="restore_wallet_paper_wallet_title">Sync your Universe wallet?</string>
@@ -502,15 +488,12 @@
     <!-- Wallet recovery with seed phrase -->
     <string name="restore_from_seed_words_title">Restore With Seed Phrase</string>
     <string name="restore_from_seed_words_description">Enter your seed phrase to restore your wallet</string>
-    <string name="restore_from_seed_words_select_node">Select base node</string>
     <string name="restore_from_seed_words_submit_title">Restore Wallet</string>
-    <string name="restore_from_seed_words_button_select_base_node_select">Select Custom Base Node</string>
-    <string name="restore_from_seed_words_button_select_base_node_edit">Edit Base Node</string>
-    <string name="restore_from_seed_words_form_error_message">Oops, looks like the address you entered isn\'t good. We had to revert your change.</string>
     <string name="restore_from_seed_words_error_invalid_seed_word">At least one of the entered seed words is invalid. Please review them and try again</string>
     <string name="restore_from_seed_words_error_phrase_too_short">You entered not enough seed words. Please add some more and try again</string>
     <string name="restore_from_seed_words_error_unknown">Unable to generate key from seed words. Please check your seed words and try again</string>
     <string name="restore_from_seed_words_overlay_status_connecting">Waiting for connection</string>
+    <string name="restore_from_seed_words_overlay_status_reconnecting">Reconnecting:</string>
     <string name="restore_from_seed_words_overlay_status_connected">Connection established. The process will start soon</string>
     <string name="restore_from_seed_words_overlay_status_progress">Restoring in progress:</string>
     <string name="restore_from_seed_words_overlay_status_connection_failed">Attempt %1$s out of %2$s</string>
@@ -561,43 +544,11 @@
     <string name="connection_status_dialog_title">Connection Status</string>
     <string name="connection_status_dialog_network_status_disconnected">Disconnected from the Internet</string>
     <string name="connection_status_dialog_network_status_connected">Connected to the Internet</string>
-    <string name="connection_status_dialog_tor_status_disconnected">Disconnected from Tor</string>
-    <string name="connection_status_dialog_tor_status_ready_for_wallet">Ready for Wallet Creation</string>
-    <string name="connection_status_dialog_tor_status_connecting">Connecting with Tor</string>
-    <string name="connection_status_dialog_tor_status_connected">Connected with Tor</string>
-    <string name="connection_status_dialog_tor_status_failed">Failed to connect with Tor</string>
-    <string name="connection_status_dialog_base_node_status_disconnected">Disconnected from Base Node</string>
     <string name="connection_status_dialog_base_node_status_connecting">Connecting to Base Node</string>
     <string name="connection_status_dialog_base_node_status_connected">Connected to Base Node</string>
-    <string name="connection_status_dialog_base_node_sync_idle">Waiting for Sync</string>
-    <string name="connection_status_dialog_base_node_sync_pending">Syncing with Base Node</string>
-    <string name="connection_status_dialog_base_node_sync_success">Synced with Base Node</string>
-    <string name="connection_status_dialog_base_node_sync_failure">Failed sync with Base Node</string>
     <string name="connection_status_dialog_chain_tip">Chain Tip: </string>
     <string name="connection_status_dialog_chain_tip_value">#%1$s (%2$s)</string>
     <string name="connection_status_dialog_chain_tip_waiting">Waiting for connection…</string>
-    <string name="connection_status_dialog_base_node_id">Base Node ID: %s</string>
-
-    <string name="tor_bridges_title">Bridges Configuration</string>
-    <string name="tor_bridges_connect">Connect</string>
-    <string name="tor_bridges_no_bridges">No Bridges</string>
-    <string name="tor_bridges_custom_bridges">Custom Bridges</string>
-    <string name="tor_bridges_description">If you are in a country or using a connection that censor Tor, you might need to use bridges</string>
-    <string name="tor_bridges_paste_bridges">Paste Bridges</string>
-    <string name="tor_bridges_hint" formatted="false">Available formates:\n• obfs4 &lt;IP ADDRESS>:&lt;PORT> &lt;FINGERPRINT> cert=&lt;CERTIFICATE> iat-mode=&lt;value>\nexample:\nobfs4 192.95.36.142:443 CDF2E852BF539B82BD10E27E9115A31734E378C2 cert=qUVQ0srL!JI/vO6V6m/24anYXiJD3QP2HgzUKQtQ7GRqqUvs7P+tG43RtAqdhLOALP7DJQ iat-mode=1\n\n • &lt;IP ADDRESS>:&lt;PORT> &lt;FINGERPRINT>\nexample:\n78.156.103.189:9301 2BD90810282F8B331FC7D47705167166253E1442"</string>
-    <string name="tor_bridges_request">Request Bridges from torproject.org</string>
-    <string name="tor_bridges_scan_qr">Scan QR Code</string>
-    <string name="tor_bridges_upload_qr_code">Upload QR Code</string>
-    <string name="tor_bridges_incorrect_format">Incorrect tor bridge format</string>
-    <string name="tor_bridges_connecting_error_title">Connection error</string>
-    <string name="tor_bridges_connecting_error_description">Can\'t connect to the bridge because: %s</string>
-    <string name="tor_bridges_connection_progress_title">Connecting to the TOR</string>
-    <string name="tor_bridges_connection_progress_description">Trying to connect to the TOR</string>
-    <string name="tor_bridges_connection_progress_description_full">"Trying to connect to the TOR:\n%1$s\nProgress: %2$s%%"</string>
-    <string name="tor_bridges_connection_progress_successful_title">Connection to the TOR</string>
-    <string name="tor_bridges_connection_progress_successful_description">Connecting to TOR connection was established successfully\n</string>
-    <string name="tor_bridges_connection_progress_successful_no_bridges">No used bridges</string>
-    <string name="tor_bridges_connection_progress_successful_used_bridges">Used bridges\n</string>
 
     <string name="tari_about_title">About</string>
     <string name="tari_about_description"><![CDATA[The following icons are licensed under<br><font color=#8931FF>Creative Commons 3.0:</font>]]></string>
@@ -614,7 +565,6 @@
     <string name="tari_about_icon_url_magnifier">https://thenounproject.com/icon/magnifier-4213152/</string>
     <string name="tari_about_icon_url_repair">https://thenounproject.com/icon/repair-tools-4213156/</string>
     <string name="tari_about_icon_url_server">https://thenounproject.com/icon/internet-server-4213144/</string>
-    <string name="tari_about_icon_url_networking">https://thenounproject.com/icon/networking-4213263/</string>
     <string name="tari_about_icon_url_delete">https://thenounproject.com/icon/delete-4727971/</string>
     <string name="tari_about_icon_url_seed_words">https://thenounproject.com/icon/write-4207866/</string>
     <string name="tari_about_icon_url_cloud">https://thenounproject.com/icon/cloud-3384041/</string>
@@ -634,7 +584,6 @@
     <string name="tari_about_icon_text_magnifier">Refresh by Poombatta from\nNounProject.com</string>
     <string name="tari_about_icon_text_repair">Repair Tools by Design Circle from\nNounProject.com</string>
     <string name="tari_about_icon_text_server">Internet Server by Design Circle from\nNounProject.com</string>
-    <string name="tari_about_icon_text_networking">Networking by Design Circle from\nNounProject.com</string>
     <string name="tari_about_icon_text_delete">Delete by Maya Nurhayati from\nNounProject.com</string>
     <string name="tari_about_icon_text_seed_words">Write by Mada Creative from NounProject.com</string>
     <string name="tari_about_icon_text_cloud">Cloud by Tippawan Sookruay from NounProject.com</string>
@@ -688,11 +637,17 @@
     <string name="backup_wallet_storage_full_desc">Your storage is full</string>
     <string name="backup_restored_tx">Funds recovered from your previous wallet</string>
 
-    <!--    FFI Validation-->
+    <!--    Version Validation-->
     <string name="ffi_validation_error_title">Incompatible version detected</string>
     <string name="ffi_validation_error_message">The data stored locally is incompatible with the current version of the App or with the network itself. We strongly recommend removing the wallet and creating a new one</string>
     <string name="ffi_validation_error_delete">Delete the wallet</string>
     <string name="ffi_validation_error_cancel">I still want to use the wallet</string>
+    <string name="version_validation_error_mandatory_update_title">You must update the app</string>
+    <string name="version_validation_error_mandatory_update_message">Recently, we made some amazing changes to the app, but unfortunately, you need to update to the latest version to continue using it.</string>
+    <string name="version_validation_error_recommended_update_title">Update recommended</string>
+    <string name="version_validation_error_recommended_update_message">You are using an outdated version of the app. We recommend updating to the latest version to ensure the best experience.</string>
+    <string name="version_validation_error_play_store">Update in Play Store</string>
+    <string name="version_validation_error_github">Update in GitHub</string>
 
 
     <!-- Staged wallet security -->
@@ -799,13 +754,6 @@
     <string name="pin_code_subtitle_feature_auth">Enter your passcode to proceed</string>
     <string name="pin_code_error_message">Wrong passcode</string>
 
-    <string name="add_base_node_form_title">Add Base Node</string>
-    <string name="add_base_node_address_hint">Address</string>
-    <string name="add_base_node_name_hint">Name</string>
-    <string name="add_base_node_hex_hint">Hex</string>
-    <string name="add_base_node_action_button">Save</string>
-    <string name="add_base_node_default_name_custom">Custom</string>
-
     <string name="address_poisoning_title">Heads Up!</string>
     <string name="address_poisoning_title_description">Looks like there are %s very similar addresses in your contact book. Please double check that you’re sending to the right one!</string>
     <string name="address_poisoning_number_of_transactions">No of transactions: %s</string>
@@ -814,4 +762,6 @@
     <string name="address_poisoning_this_trust_account">This is a trusted contact</string>
     <string name="address_poisoning_trust_disclaimer">Marking a contact as trusted means you trust this person and we won’t ask you to double check the address again.</string>
 
+    <string name="wallet_sync_service_notification_title">Wallet Sync</string>
+    <string name="wallet_sync_service_notification_message">Your wallet is being synced in the background</string>
 </resources>

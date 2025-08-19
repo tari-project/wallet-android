@@ -50,7 +50,6 @@ class FFICompletedTx() : FFITxBase() {
     private external fun jniGetMinedTimestamp(libError: FFIError): ByteArray
     private external fun jniGetMinedHeight(libError: FFIError): ByteArray
     private external fun jniGetStatus(libError: FFIError): Int
-    private external fun jniGetConfirmationCount(libError: FFIError): ByteArray
     private external fun jniIsOutbound(libError: FFIError): Boolean
     private external fun jniGetCancellationReason(libError: FFIError): Int
     private external fun jniDestroy()
@@ -83,8 +82,6 @@ class FFICompletedTx() : FFITxBase() {
     fun getMinedHeight(): BigInteger = runWithError { BigInteger(1, jniGetMinedHeight(it)) }
 
     fun getStatus(): FFITxStatus = runWithError { FFITxStatus.map(jniGetStatus(it)) }
-
-    fun getConfirmationCount(): BigInteger = runWithError { BigInteger(1, jniGetConfirmationCount(it)) }
 
     override fun isOutbound(): Boolean = runWithError { jniIsOutbound(it) }
 

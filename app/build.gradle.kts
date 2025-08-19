@@ -1,6 +1,10 @@
+import TariBuildConfig.LibWallet.LibWalletNetwork
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import java.nio.file.Files
 import java.nio.file.Paths
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 import java.util.Properties
 
 plugins {
@@ -23,6 +27,8 @@ val commitNumber: Int by lazy {
     output.readText().trim().toInt()
 }
 
+val currentDate: String = SimpleDateFormat("ddMMMyy", Locale.getDefault()).format(Date())
+
 android {
     namespace = "com.tari.android.wallet"
 
@@ -32,7 +38,7 @@ android {
         targetSdk = TariBuildConfig.targetSdk
         compileSdk = TariBuildConfig.compileSdk
         versionCode = commitNumber
-        versionName = "${TariBuildConfig.versionNumber}-libwallet-${TariBuildConfig.LibWallet.version}"
+        versionName = "${TariBuildConfig.versionNumber}-lib-${TariBuildConfig.LibWallet.version}($currentDate)"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         multiDexEnabled = true
 
@@ -53,12 +59,11 @@ android {
 
         buildConfigField("String", "LIB_WALLET_MIN_VALID_VERSION", "\"${TariBuildConfig.LibWallet.minValidVersion}\"")
         buildConfigField("String", "LIB_WALLET_VERSION", "\"${TariBuildConfig.LibWallet.version}\"")
-        buildConfigField("String", "LIB_WALLET_NETWORK", "\"${TariBuildConfig.LibWallet.network}\"")
 
         buildConfigField("String", "NOTIFICATIONS_API_KEY", "\"${loadSecretProps()["service.notifications.api_key"]}\"")
     }
 
-    flavorDimensions.add("privacy-mode")
+    flavorDimensions.add("network")
 
     buildTypes {
         loadSentryProps()
@@ -83,11 +88,23 @@ android {
     }
 
     productFlavors {
-        create("regular") {
-            dimension = "privacy-mode"
+        create("mainnet") {
+            dimension = "network"
+
+            buildConfigField("String", "LIB_WALLET_NETWORK", "\"${LibWalletNetwork.MAINNET}\"")
+            applicationIdSuffix = ""
+            manifestPlaceholders["appName"] = "@string/app_name"
+            manifestPlaceholders["appIcon"] = "@mipmap/ic_launcher"
+            manifestPlaceholders["appRoundIcon"] = "@mipmap/ic_launcher_round"
         }
-        create("privacy") {
-            dimension = "privacy-mode"
+        create("esmeralda") {
+            dimension = "network"
+
+            buildConfigField("String", "LIB_WALLET_NETWORK", "\"${LibWalletNetwork.ESMERALDA}\"")
+            applicationIdSuffix = ".esmeralda"
+            manifestPlaceholders["appName"] = "@string/app_name_esmeralda"
+            manifestPlaceholders["appIcon"] = "@mipmap/ic_launcher_esmeralda"
+            manifestPlaceholders["appRoundIcon"] = "@mipmap/ic_launcher_esmeralda_round"
         }
     }
 
@@ -291,9 +308,6 @@ dependencies {
     // spring animation
     implementation(Dependencies.AndroidX.dynamicAnimation)
     implementation(Dependencies.easingInterpolator)
-
-    implementation(Dependencies.torAndroid)
-    implementation(Dependencies.jtorctl)
 
     // used to read log files
     implementation(Dependencies.commonsIo)

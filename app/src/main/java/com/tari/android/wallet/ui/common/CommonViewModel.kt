@@ -16,8 +16,6 @@ import com.tari.android.wallet.application.deeplinks.DeepLink
 import com.tari.android.wallet.application.deeplinks.DeeplinkManager
 import com.tari.android.wallet.application.walletManager.WalletManager
 import com.tari.android.wallet.application.walletManager.doOnWalletRunning
-import com.tari.android.wallet.data.ConnectionState
-import com.tari.android.wallet.data.ConnectionStateHandler
 import com.tari.android.wallet.data.sharedPrefs.CorePrefRepository
 import com.tari.android.wallet.data.sharedPrefs.network.NetworkPrefRepository
 import com.tari.android.wallet.data.sharedPrefs.security.SecurityPrefRepository
@@ -38,14 +36,11 @@ import com.tari.android.wallet.ui.dialog.modular.modules.addressDetails.AddressD
 import com.tari.android.wallet.ui.dialog.modular.modules.body.BodyModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonStyle
-import com.tari.android.wallet.ui.dialog.modular.modules.connection.ConnectionStatusesModule
 import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
 import com.tari.android.wallet.util.extension.addTo
-import com.tari.android.wallet.util.extension.collectFlow
 import com.tari.android.wallet.util.extension.launchOnIo
 import com.tari.android.wallet.util.extension.launchOnMain
 import io.reactivex.disposables.CompositeDisposable
-import kotlinx.coroutines.flow.StateFlow
 import yat.android.lib.YatIntegration
 import javax.inject.Inject
 
@@ -81,9 +76,6 @@ open class CommonViewModel : ViewModel(), DialogHandler {
     lateinit var walletManager: WalletManager
 
     @Inject
-    lateinit var connectionStateHandler: ConnectionStateHandler
-
-    @Inject
     lateinit var dialogManager: DialogManager
 
     @Inject
@@ -99,8 +91,6 @@ open class CommonViewModel : ViewModel(), DialogHandler {
         get() = Logger.t(this::class.simpleName)
 
     val currentTheme = tariSettingsSharedRepository.currentTheme
-
-    val connectionState: StateFlow<ConnectionState> = connectionStateHandler.connectionState
 
     private val _backPressed = SingleLiveEvent<Unit>()
     val backPressed: LiveData<Unit> = _backPressed
@@ -122,10 +112,6 @@ open class CommonViewModel : ViewModel(), DialogHandler {
             /* onNext = */ { checkAuthorization() },
             /* onError = */ { logger.e("Error checking authorization", it) },
         ).addTo(compositeDisposable)
-
-        collectFlow(connectionState) { connectionState ->
-            showConnectionStatusDialog(refresh = true)
-        }
     }
 
     override fun onCleared() {
@@ -292,22 +278,6 @@ open class CommonViewModel : ViewModel(), DialogHandler {
         )
     }
 
-
-    override fun showConnectionStatusDialog(refresh: Boolean) {
-        if (!refresh || dialogManager.isDialogShowing(ModularDialogArgs.DialogId.CONNECTION_STATUS)) {
-            showModularDialog(
-                ModularDialogArgs(
-                    dialogId = ModularDialogArgs.DialogId.CONNECTION_STATUS,
-                    modules = listOf(
-                        HeadModule(resourceManager.getString(R.string.connection_status_dialog_title)),
-                        ConnectionStatusesModule(connectionState.value),
-                        ButtonModule(resourceManager.getString(R.string.common_close), ButtonStyle.Close),
-                    ),
-                )
-            )
-        }
-    }
-
     override fun hideDialog(dialogId: Int) {
         launchOnMain {
             dialogManager.dismiss(dialogId)
@@ -380,5 +350,4 @@ interface DialogHandler {
     fun showAddressDetailsDialog(walletAddress: TariWalletAddress)
     fun showInternetConnectionErrorDialog()
     fun showWalletErrorDialog()
-    fun showConnectionStatusDialog(refresh: Boolean = false)
 }

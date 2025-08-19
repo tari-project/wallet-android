@@ -26,6 +26,7 @@ class HomeOverviewFragment : CommonFragment<HomeOverviewViewModel>() {
                 onTxClick = { viewModel.navigateToTxDetail(it.tx) },
                 onViewAllTxsClick = { viewModel.onAllTxClicked() },
                 onConnectionStatusClick = { viewModel.showConnectionStatusDialog() },
+                onConnectionStatusDismiss = { viewModel.onConnectionStatusDialogDismiss() },
                 onSyncDialogDismiss = { viewModel.onSyncDialogDismiss() },
                 onBalanceInfoClicked = { viewModel.onBalanceInfoClicked() },
                 onBalanceInfoDialogDismiss = { viewModel.onBalanceInfoDialogDismiss() },
