@@ -4,11 +4,14 @@ import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.util.zip.ZipInputStream
 
+// Release notes:
+// - The app does not require the Tor connection to connect to the Tari network anymore.
+// - The wallet sync process is now much faster and more reliable.
+
 tasks.register("downloadLibwallet") {
     val rootDir = "${rootProject.projectDir}/libwallet"
 
-    // gradle.startParameter.taskNames returns the list of tasks requested to be executed (e.g. "assembleMainnetRelease", "assembleEsmeraldaDebug")
-    val requestedTasks = gradle.startParameter.taskNames.filter { it.contains("assemble", ignoreCase = true) }
+    val requestedTasks = gradle.startParameter.taskNames
     val mainnetTask = requestedTasks.any { it.contains("mainnet", ignoreCase = true) }
     val esmeraldaTask = requestedTasks.any { it.contains("esmeralda", ignoreCase = true) }
 
