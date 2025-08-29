@@ -177,10 +177,6 @@ class WalletCallbacks @Inject constructor() {
         // FIXME: not used anymore, should be removed once FFI is updated
     }
 
-    fun onContactLivenessDataUpdated(contextPtr: ByteArray, livenessUpdate: FFIPointer) {
-        // FIXME: not used anymore, should be removed once FFI is updated
-    }
-
     fun onWalletRecovery(contextPtr: ByteArray, event: Int, firstArg: ByteArray, secondArg: ByteArray) {
         val walletContextId = BigInteger(1, contextPtr).toInt()
         val state = WalletRestorationState.create(event, firstArg, secondArg)

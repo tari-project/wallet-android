@@ -114,8 +114,6 @@ class FFIWallet(
         callbackTxCancellationSig: String,
         callbackTXOValidationComplete: String,
         callbackTXOValidationCompleteSig: String,
-        callbackContactsLivenessDataUpdated: String,
-        callbackContactsLivenessDataUpdatedSig: String,
         callbackBalanceUpdated: String,
         callbackBalanceUpdatedSig: String,
         callbackTransactionValidationComplete: String,
@@ -132,9 +130,6 @@ class FFIWallet(
     private external fun jniGetBalance(libError: FFIError): FFIPointer
     private external fun jniLogMessage(message: String, libError: FFIError)
     private external fun jniGetWalletAddress(libError: FFIError): FFIPointer
-    private external fun jniGetContacts(libError: FFIError): FFIPointer
-    private external fun jniAddUpdateContact(contactPtr: FFIContact, libError: FFIError): Boolean
-    private external fun jniRemoveContact(contactPtr: FFIContact, libError: FFIError): Boolean
     private external fun jniGetCompletedTxs(libError: FFIError): FFIPointer
     private external fun jniGetCancelledTxs(libError: FFIError): FFIPointer
     private external fun jniGetCompletedTxById(id: String, libError: FFIError): FFIPointer
@@ -238,7 +233,6 @@ class FFIWallet(
                 WalletCallbacks::onDirectSendResult.name, "([B[BJ)V",
                 WalletCallbacks::onTxCancelled.name, "([BJ[B)V",
                 WalletCallbacks::onTXOValidationComplete.name, "([B[B[B)V",
-                WalletCallbacks::onContactLivenessDataUpdated.name, "([BJ)V",
                 WalletCallbacks::onBalanceUpdated.name, "([BJ)V",
                 WalletCallbacks::onTxValidationComplete.name, "([B[B[B)V",
                 WalletCallbacks::onConnectivityStatus.name, "([B[B)V",
@@ -266,26 +260,6 @@ class FFIWallet(
     fun getAllUtxos(): TariVector = runWithError { TariVector(FFITariVector(jniGetAllUtxos(it))) }
 
     fun getWalletAddress(): FFITariWalletAddress = runWithError { FFITariWalletAddress(jniGetWalletAddress(it)) }
-
-    fun getContacts(): FFIContacts = runWithError { FFIContacts(jniGetContacts(it)) }
-
-    fun findContactByWalletAddress(walletAddress: TariWalletAddress): FFIContact? = getContacts().find { ffiContact ->
-        ffiContact.getWalletAddress().runWithDestroy { TariWalletAddress(it) } == walletAddress
-    }
-
-    fun addUpdateContact(walletAddress: TariWalletAddress, alias: String, isFavorite: Boolean): Boolean = runWithError {
-        FFITariWalletAddress(Base58String(walletAddress.fullBase58)).runWithDestroy { ffiTariWalletAddress ->
-            FFIContact(alias, ffiTariWalletAddress, isFavorite).runWithDestroy { contactToUpdate ->
-                jniAddUpdateContact(contactToUpdate, it)
-            }
-        }
-    }
-
-    fun removeContact(walletAddress: TariWalletAddress): Boolean = runWithError {
-        findContactByWalletAddress(walletAddress)?.runWithDestroy { contact ->
-            jniRemoveContact(contact, it)
-        } == true
-    }
 
     fun getCompletedTxs(): List<CompletedTx> = runWithError { FFICompletedTxs(jniGetCompletedTxs(it)).iterateWithDestroy { tx -> CompletedTx(tx) } }
 

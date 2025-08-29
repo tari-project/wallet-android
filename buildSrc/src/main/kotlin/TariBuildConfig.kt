@@ -7,7 +7,7 @@ object TariBuildConfig {
     const val compileSdk = 35
 
     object LibWallet {
-        val version = "v5.0.0-pre.8"
+        val version = "v5.0.0-rc.0"
         val minValidVersion = "v0.0.0" // Always valid. Probably, need to remove the check in the future.
 
         enum class LibWalletNetwork { MAINNET, ESMERALDA }

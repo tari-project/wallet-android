@@ -5,7 +5,6 @@ import com.tari.android.wallet.data.BalanceStateHandler
 import com.tari.android.wallet.data.baseNode.BaseNodeStateHandler
 import com.tari.android.wallet.data.recovery.WalletRestorationState
 import com.tari.android.wallet.data.recovery.WalletRestorationStateHandler
-import com.tari.android.wallet.ffi.runWithDestroy
 import com.tari.android.wallet.model.BalanceInfo
 import com.tari.android.wallet.model.TariBaseNodeState
 import com.tari.android.wallet.model.TariContact
@@ -132,8 +131,7 @@ class MainFFIWalletListener(
         baseNodeStateHandler.saveBaseNodeState(baseNodeState)
     }
 
-    private fun getUserByWalletAddress(address: TariWalletAddress): TariContact =
-        walletManager.requireWalletInstance.findContactByWalletAddress(address)?.runWithDestroy { TariContact(it) } ?: TariContact(address)
+    private fun getUserByWalletAddress(address: TariWalletAddress): TariContact = TariContact(address)
 
     private fun runOnMain(block: suspend CoroutineScope.() -> Unit) {
         externalScope.launch(Dispatchers.Main) { block() }
