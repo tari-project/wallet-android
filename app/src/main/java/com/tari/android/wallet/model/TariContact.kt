@@ -33,7 +33,6 @@
 package com.tari.android.wallet.model
 
 import android.os.Parcelable
-import com.tari.android.wallet.ffi.FFIContact
 import kotlinx.parcelize.Parcelize
 
 /**
@@ -47,12 +46,5 @@ data class TariContact(
     val alias: String = "",
     val isFavorite: Boolean = false,
 ) : Parcelable {
-
-    constructor(ffiContact: FFIContact) : this(
-        walletAddress = TariWalletAddress(ffiContact.getWalletAddress()),
-        alias = ffiContact.getAlias(),
-        isFavorite = ffiContact.getIsFavorite()
-    )
-
     override fun toString() = "Contact(alias='$alias') ${super.toString()}"
 }

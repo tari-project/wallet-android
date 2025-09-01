@@ -35,8 +35,6 @@
 #include <android/log.h>
 #include <wallet.h>
 #include <string>
-#include <cmath>
-#include <android/log.h>
 #include "jniCommon.cpp"
 
 /**
@@ -92,14 +90,14 @@ jmethodID txFauxConfirmedCallbackMethodId;
 jmethodID txFauxUnconfirmedCallbackMethodId;
 jmethodID directSendResultCallbackMethodId;
 jmethodID txCancellationCallbackMethodId;
-jmethodID contactsLivenessDataUpdatedCallbackMethodId;
 jmethodID connectivityStatusCallbackId;
 jmethodID txoValidationCompleteCallbackMethodId;
 jmethodID transactionValidationCompleteCallbackMethodId;
-jmethodID recoveringProcessCompleteCallbackMethodId;
 jmethodID balanceUpdatedCallbackMethodId;
 jmethodID walletScannedHeightCallbackMethodId;
 jmethodID baseNodeStatusCallbackMethodId;
+
+jmethodID recoveringProcessCompleteCallbackMethodId;
 
 void txBroadcastCallback(void *context, TariCompletedTransaction *pCompletedTransaction) {
     auto *jniEnv = getJNIEnv();
@@ -226,17 +224,6 @@ void txoValidationCompleteCallback(void *context, uint64_t requestId, uint64_t s
     g_vm->DetachCurrentThread();
 }
 
-void contactsLivenessDataUpdatedCallback(void *context, TariContactsLivenessData *pTariContactsLivenessData) {
-    auto *jniEnv = getJNIEnv();
-    if (jniEnv == nullptr || callbackHandler == nullptr) {
-        return;
-    }
-    auto jpTariContactsLivenessData = reinterpret_cast<jlong>(pTariContactsLivenessData);
-    jbyteArray contextBytes = getBytesFromUnsignedLongLong(jniEnv, reinterpret_cast<uint64_t>(context));
-    jniEnv->CallVoidMethod(callbackHandler, contactsLivenessDataUpdatedCallbackMethodId, contextBytes, jpTariContactsLivenessData);
-    g_vm->DetachCurrentThread();
-}
-
 void transactionValidationCompleteCallback(void *context, uint64_t requestId, uint64_t status) {
     auto *jniEnv = getJNIEnv();
     if (jniEnv == nullptr || callbackHandler == nullptr) {
@@ -360,8 +347,6 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniCreate(
         jstring callback_tx_cancellation_sig,
         jstring callback_txo_validation_complete,
         jstring callback_txo_validation_complete_sig,
-        jstring callback_contacts_liveness_data_updated,
-        jstring callback_contacts_liveness_data_updated_sig,
         jstring callback_balance_updated,
         jstring callback_balance_updated_sig,
         jstring callback_transaction_validation_complete,
@@ -450,12 +435,6 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniCreate(
         SetNullPointerField(jEnv, jThis);
     }
 
-    contactsLivenessDataUpdatedCallbackMethodId = getMethodId(jEnv, jWalletCallbacks, callback_contacts_liveness_data_updated,
-                                                              callback_contacts_liveness_data_updated_sig);
-    if (contactsLivenessDataUpdatedCallbackMethodId == nullptr) {
-        SetNullPointerField(jEnv, jThis);
-    }
-
     balanceUpdatedCallbackMethodId = getMethodId(jEnv, jWalletCallbacks, callback_balance_updated, callback_balance_updated_sig);
     if (balanceUpdatedCallbackMethodId == nullptr) {
         SetNullPointerField(jEnv, jThis);
@@ -535,7 +514,6 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniCreate(
             txDirectSendResultCallback,
             txCancellationCallback,
             txoValidationCompleteCallback,
-            contactsLivenessDataUpdatedCallback,
             balanceUpdatedCallback,
             transactionValidationCompleteCallback,
             storeAndForwardMessagesReceivedCallback,
@@ -614,46 +592,6 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniGetWalletAddress(
     return ExecuteWithErrorAndCast<TariWalletAddress *>(jEnv, error, [&](int *errorPointer) {
         auto pWallet = GetPointerField<TariWallet *>(jEnv, jThis);
         return wallet_get_tari_one_sided_address(pWallet, errorPointer);
-    });
-}
-
-extern "C"
-JNIEXPORT jlong JNICALL
-Java_com_tari_android_wallet_ffi_FFIWallet_jniGetContacts(
-        JNIEnv *jEnv,
-        jobject jThis,
-        jobject error) {
-    return ExecuteWithErrorAndCast<TariContacts *>(jEnv, error, [&](int *errorPointer) {
-        auto pWallet = GetPointerField<TariWallet *>(jEnv, jThis);
-        return wallet_get_contacts(pWallet, errorPointer);
-    });
-}
-
-extern "C"
-JNIEXPORT jboolean JNICALL
-Java_com_tari_android_wallet_ffi_FFIWallet_jniAddUpdateContact(
-        JNIEnv *jEnv,
-        jobject jThis,
-        jobject jpContact,
-        jobject error) {
-    return ExecuteWithError<jboolean>(jEnv, error, [&](int *errorPointer) {
-        auto pWallet = GetPointerField<TariWallet *>(jEnv, jThis);
-        auto pContact = GetPointerField<TariContact *>(jEnv, jpContact);
-        return static_cast<jboolean>(wallet_upsert_contact(pWallet, pContact, errorPointer) != 0);
-    });
-}
-
-extern "C"
-JNIEXPORT jboolean JNICALL
-Java_com_tari_android_wallet_ffi_FFIWallet_jniRemoveContact(
-        JNIEnv *jEnv,
-        jobject jThis,
-        jobject jpContact,
-        jobject error) {
-    return ExecuteWithError<jboolean>(jEnv, error, [&](int *errorPointer) {
-        auto pWallet = GetPointerField<TariWallet *>(jEnv, jThis);
-        auto pContact = GetPointerField<TariContact *>(jEnv, jpContact);
-        return static_cast<jboolean>(wallet_remove_contact(pWallet, pContact, errorPointer) != 0);
     });
 }
 
@@ -1131,8 +1069,15 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniSendTx(
 
         jbyteArray result = getBytesFromUnsignedLongLong(
                 jEnv,
-                wallet_send_transaction(pWallet, pDestination, amount, nullptr, feePerGram,
-                                        true, pPaymentId, errorPointer));
+                wallet_send_transaction(
+                        pWallet,
+                        pDestination,
+                        amount,
+                        nullptr,
+                        feePerGram,
+                        pPaymentId,
+                        errorPointer
+                ));
         jEnv->ReleaseStringUTFChars(jAmount, nativeAmount);
         jEnv->ReleaseStringUTFChars(jFeePerGram, nativeFeePerGram);
         jEnv->ReleaseStringUTFChars(jPaymentId, pPaymentId);

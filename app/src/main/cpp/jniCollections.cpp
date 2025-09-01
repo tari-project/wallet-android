@@ -32,46 +32,8 @@
  */
 
 #include <jni.h>
-#include <android/log.h>
 #include <wallet.h>
-#include <string>
-#include <cmath>
-#include <android/log.h>
 #include "jniCommon.cpp"
-
-extern "C"
-JNIEXPORT jint JNICALL
-Java_com_tari_android_wallet_ffi_FFIContacts_jniGetLength(
-        JNIEnv *jEnv,
-        jobject jThis,
-        jobject error) {
-    return ExecuteWithError<jint>(jEnv, error, [&](int *errorPointer) {
-        auto pContacts = GetPointerField<TariContacts *>(jEnv, jThis);
-        return contacts_get_length(pContacts, errorPointer);
-    });
-}
-
-extern "C"
-JNIEXPORT jlong JNICALL
-Java_com_tari_android_wallet_ffi_FFIContacts_jniGetAt(
-        JNIEnv *jEnv,
-        jobject jThis,
-        jint index,
-        jobject error) {
-    return ExecuteWithErrorAndCast<TariContact *>(jEnv, error, [&](int *errorPointer) -> TariContact * {
-        auto pContacts = GetPointerField<TariContacts *>(jEnv, jThis);
-        return contacts_get_at(pContacts, static_cast<unsigned int>(index), errorPointer);
-    });
-}
-
-extern "C"
-JNIEXPORT void JNICALL
-Java_com_tari_android_wallet_ffi_FFIContacts_jniDestroy(
-        JNIEnv *jEnv,
-        jobject jThis) {
-    contacts_destroy(GetPointerField<TariContacts *>(jEnv, jThis));
-    SetNullPointerField(jEnv, jThis);
-}
 
 extern "C"
 JNIEXPORT jint JNICALL
