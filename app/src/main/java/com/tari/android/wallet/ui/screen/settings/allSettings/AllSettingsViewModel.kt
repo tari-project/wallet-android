@@ -113,6 +113,13 @@ class AllSettingsViewModel : CommonViewModel() {
     private val _allSettingsOptions = MutableStateFlow(generateOptions())
     val allSettingsOptions = _allSettingsOptions.asStateFlow()
 
+    private val _uiState = MutableStateFlow(
+        UiState(
+            versionText = TariVersionModel(networkRepository).versionInfo,
+        )
+    )
+    val uiState = _uiState.asStateFlow()
+
     init {
         collectFlow(backupStateHandler.backupState) { onBackupStateChanged(it) }
 
@@ -247,6 +254,28 @@ class AllSettingsViewModel : CommonViewModel() {
     }
 
     private fun onBackupStateChanged(backupState: BackupState) {
+        _uiState.update {
+            it.copy(
+                backupState = when (backupState) {
+                    is BackupState.BackupDisabled -> PresentationBackupState(Warning)
+                    is BackupState.BackupInProgress -> PresentationBackupState(
+                        InProgress,
+                        back_up_wallet_backup_status_in_progress,
+                        R.attr.palette_text_body
+                    )
+
+                    is BackupState.BackupUpToDate -> PresentationBackupState(
+                        Success,
+                        back_up_wallet_backup_status_up_to_date,
+                        R.attr.palette_system_green
+                    )
+
+                    is BackupState.BackupFailed -> PresentationBackupState(Warning, back_up_wallet_backup_status_outdated, R.attr.palette_system_red)
+                }
+            )
+        }
+
+        // TODO remove it!
         backupOption.backupState = when (backupState) {
             is BackupState.BackupDisabled -> PresentationBackupState(Warning)
             is BackupState.BackupInProgress -> PresentationBackupState(InProgress, back_up_wallet_backup_status_in_progress, R.attr.palette_text_body)
@@ -255,4 +284,19 @@ class AllSettingsViewModel : CommonViewModel() {
         }
         _allSettingsOptions.update { generateOptions() }
     }
+
+    fun onSettingClick(setting: Setting) {
+        when (setting) {
+            Setting.Profile -> tariNavigator.navigate(AllSettings.ToMyProfile)
+            Setting.Contacts -> tariNavigator.navigate(Navigation.ContactBook.AllContacts())
+            Setting.WalletSettings -> showNotReadyYetDialog()
+            Setting.Support -> showNotReadyYetDialog()
+            Setting.Legal -> showNotReadyYetDialog()
+        }
+    }
+
+    data class UiState(
+        var backupState: PresentationBackupState? = null,
+        val versionText: String,
+    )
 }

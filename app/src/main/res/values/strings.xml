@@ -399,6 +399,11 @@
     <string name="all_settings_select_network_confirm_description">You will be logged out and switched to a different network. Do you want to continue?</string>
     <string name="all_settings_version_text_copy_title">Tari Wallet Version</string>
     <string name="all_settings_version_text_copy_toast_message">Tari version was copied</string>
+    <string name="all_settings_menu_profile">Profile</string>
+    <string name="all_settings_menu_contacts">Contacts</string>
+    <string name="all_settings_menu_wallet_settings">Wallet Settings</string>
+    <string name="all_settings_menu_support">Support &amp; Resources</string>
+    <string name="all_settings_menu_legal">Legal</string>
 
     <!-- Screen recording -->
     <string name="screen_recording_title">Screen recording</string>
