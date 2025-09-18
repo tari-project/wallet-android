@@ -1,6 +1,5 @@
 package com.tari.android.wallet.ui.screen.settings.allSettings
 
-import androidx.lifecycle.LiveData
 import com.tari.android.wallet.R
 import com.tari.android.wallet.R.drawable.vector_all_settings_about_icon
 import com.tari.android.wallet.R.drawable.vector_all_settings_backup_options_icon
@@ -19,11 +18,9 @@ import com.tari.android.wallet.R.drawable.vector_all_settings_select_network_ico
 import com.tari.android.wallet.R.drawable.vector_all_settings_select_theme_icon
 import com.tari.android.wallet.R.drawable.vector_all_settings_user_agreement_icon
 import com.tari.android.wallet.R.drawable.vector_all_settings_visit_tari_icon
-import com.tari.android.wallet.R.drawable.vector_all_settings_yat_icon
 import com.tari.android.wallet.R.drawable.vector_fingerprint
 import com.tari.android.wallet.R.string.all_settings_advanced_settings_label
 import com.tari.android.wallet.R.string.all_settings_biometrics
-import com.tari.android.wallet.R.string.all_settings_connect_yats
 import com.tari.android.wallet.R.string.all_settings_contact_label
 import com.tari.android.wallet.R.string.all_settings_contacts
 import com.tari.android.wallet.R.string.all_settings_contribute
@@ -57,13 +54,13 @@ import com.tari.android.wallet.R.string.ttl_store_url
 import com.tari.android.wallet.R.string.user_agreement_url
 import com.tari.android.wallet.application.Navigation
 import com.tari.android.wallet.application.Navigation.AllSettings
+import com.tari.android.wallet.application.Navigation.ContactBook.AllContacts
 import com.tari.android.wallet.application.YatAdapter
 import com.tari.android.wallet.data.sharedPrefs.CorePrefRepository
 import com.tari.android.wallet.data.sharedPrefs.backup.BackupPrefRepository
 import com.tari.android.wallet.infrastructure.backup.BackupState
 import com.tari.android.wallet.infrastructure.backup.BackupStateHandler
 import com.tari.android.wallet.ui.common.CommonViewModel
-import com.tari.android.wallet.ui.common.SingleLiveEvent
 import com.tari.android.wallet.ui.common.recyclerView.CommonViewHolderItem
 import com.tari.android.wallet.ui.common.recyclerView.items.DividerViewHolderItem
 import com.tari.android.wallet.ui.common.recyclerView.items.SpaceVerticalViewHolderItem
@@ -88,7 +85,7 @@ import javax.inject.Inject
 class AllSettingsViewModel : CommonViewModel() {
 
     private val backupOption = SettingsBackupOptionViewHolderItem(leftIconId = vector_all_settings_backup_options_icon) {
-        runWithAuthorization { tariNavigator.navigate(AllSettings.ToBackupSettings(true)) }
+        runWithAuthorization { tariNavigator.navigate(AllSettings.BackupSettings(true)) }
     }
 
     @Inject
@@ -106,9 +103,6 @@ class AllSettingsViewModel : CommonViewModel() {
     init {
         component.inject(this)
     }
-
-    private val _openYatOnboarding = SingleLiveEvent<Unit>()
-    val openYatOnboarding: LiveData<Unit> = _openYatOnboarding
 
     private val _allSettingsOptions = MutableStateFlow(generateOptions())
     val allSettingsOptions = _allSettingsOptions.asStateFlow()
@@ -146,12 +140,9 @@ class AllSettingsViewModel : CommonViewModel() {
                 address = settingsRepository.walletAddress,
                 yat = yatAdapter.connectedYat.orEmpty(),
                 alias = alias,
-                action = { tariNavigator.navigate(AllSettings.ToMyProfile) },
+                action = { tariNavigator.navigate(AllSettings.MyProfile) },
             ),
             DividerViewHolderItem(),
-            SettingsRowViewHolderItem(resourceManager.getString(all_settings_connect_yats), vector_all_settings_yat_icon) {
-                _openYatOnboarding.postValue(Unit)
-            }.takeIf { DebugConfig.isYatEnabled },
             SettingsTitleViewHolderItem(resourceManager.getString(all_settings_contact_label)),
             SettingsRowViewHolderItem(resourceManager.getString(all_settings_contacts), vector_all_settings_contacts_icon) {
                 tariNavigator.navigate(Navigation.ContactBook.AllContacts())
@@ -160,27 +151,21 @@ class AllSettingsViewModel : CommonViewModel() {
             backupOption,
             DividerViewHolderItem(),
             SettingsRowViewHolderItem(resourceManager.getString(all_settings_data_collection), vector_all_settings_data_collection) {
-                tariNavigator.navigate(AllSettings.ToDataCollection)
+                tariNavigator.navigate(AllSettings.DataCollection)
             },
             DividerViewHolderItem(),
             if (pinCode != null) {
                 SettingsRowViewHolderItem(resourceManager.getString(all_settings_pin_code), vector_all_settings_passcode) {
-                    runWithAuthorization {
-                        tariNavigator.navigate(Navigation.EnterPinCode(PinCodeScreenBehavior.ChangeNew))
-                    }
+                    runWithAuthorization { tariNavigator.navigate(Navigation.EnterPinCode(PinCodeScreenBehavior.ChangeNew)) }
                 }
             } else {
                 SettingsRowViewHolderItem(resourceManager.getString(all_settings_create_pin_code), vector_all_settings_passcode) {
-                    runWithAuthorization {
-                        tariNavigator.navigate(Navigation.EnterPinCode(PinCodeScreenBehavior.Create))
-                    }
+                    runWithAuthorization { tariNavigator.navigate(Navigation.EnterPinCode(PinCodeScreenBehavior.Create)) }
                 }
             },
             DividerViewHolderItem(),
             SettingsRowViewHolderItem(resourceManager.getString(all_settings_biometrics), vector_fingerprint) {
-                runWithAuthorization {
-                    tariNavigator.navigate(Navigation.ChangeBiometrics)
-                }
+                runWithAuthorization { tariNavigator.navigate(Navigation.ChangeBiometrics) }
             },
             SettingsTitleViewHolderItem(resourceManager.getString(all_settings_secondary_settings_label)),
             SettingsRowViewHolderItem(resourceManager.getString(all_settings_store), vector_all_settings_cart) {
@@ -188,11 +173,11 @@ class AllSettingsViewModel : CommonViewModel() {
             }.takeIf { DebugConfig.showTtlStoreMenu },
             DividerViewHolderItem().takeIf { DebugConfig.showTtlStoreMenu },
             SettingsRowViewHolderItem(resourceManager.getString(tari_about_title), vector_all_settings_about_icon) {
-                tariNavigator.navigate(AllSettings.ToAbout)
+                tariNavigator.navigate(AllSettings.About)
             },
             DividerViewHolderItem(),
             SettingsRowViewHolderItem(resourceManager.getString(all_settings_report_a_bug), vector_all_settings_report_bug_icon) {
-                tariNavigator.navigate(AllSettings.ToBugReporting)
+                tariNavigator.navigate(AllSettings.BugReporting)
             },
             DividerViewHolderItem(),
             SettingsRowViewHolderItem(resourceManager.getString(all_settings_visit_site), vector_all_settings_visit_tari_icon) {
@@ -220,19 +205,19 @@ class AllSettingsViewModel : CommonViewModel() {
             }.takeIf { networkRepository.currentNetwork.isBlockExplorerAvailable },
             SettingsTitleViewHolderItem(resourceManager.getString(all_settings_advanced_settings_label)),
             SettingsRowViewHolderItem(resourceManager.getString(all_settings_select_theme), vector_all_settings_select_theme_icon) {
-                tariNavigator.navigate(AllSettings.ToThemeSelection)
+                tariNavigator.navigate(AllSettings.ThemeSelection)
             },
             DividerViewHolderItem(),
             SettingsRowViewHolderItem(
                 title = resourceManager.getString(all_settings_screen_recording),
                 leftIconId = vector_all_settings_screen_recording_icon,
-                warning = tariSettingsSharedRepository.screenRecordingTurnedOn,
+                warning = tariSettingsSharedRepository.screenRecordingTurnedOn, // TODO make the warning state for settings options
             ) {
-                tariNavigator.navigate(AllSettings.ToScreenRecording)
+                tariNavigator.navigate(AllSettings.ScreenRecording)
             },
             DividerViewHolderItem(),
             SettingsRowViewHolderItem(resourceManager.getString(all_settings_select_network), vector_all_settings_select_network_icon) {
-                tariNavigator.navigate(AllSettings.ToNetworkSelection)
+                tariNavigator.navigate(AllSettings.NetworkSelection)
             },
             DividerViewHolderItem(),
             SettingsRowViewHolderItem(
@@ -240,10 +225,11 @@ class AllSettingsViewModel : CommonViewModel() {
                 leftIconId = vector_all_settings_delete_button_icon,
                 iconId = null,
                 style = SettingsRowStyle.Warning,
-            ) { tariNavigator.navigate(AllSettings.ToDeleteWallet) },
+            ) { tariNavigator.navigate(AllSettings.DeleteWallet) },
             DividerViewHolderItem(),
             SettingsVersionViewHolderItem(versionText) {
                 copyToClipboard(
+                    // TODO add on click version action
                     clipLabel = resourceManager.getString(all_settings_version_text_copy_title),
                     clipText = versionText,
                     toastMessage = resourceManager.getString(all_settings_version_text_copy_toast_message),
@@ -257,23 +243,31 @@ class AllSettingsViewModel : CommonViewModel() {
         _uiState.update {
             it.copy(
                 backupState = when (backupState) {
-                    is BackupState.BackupDisabled -> PresentationBackupState(Warning)
+                    is BackupState.BackupDisabled -> PresentationBackupState(
+                        status = Warning,
+                    )
+
                     is BackupState.BackupInProgress -> PresentationBackupState(
-                        InProgress,
-                        back_up_wallet_backup_status_in_progress,
-                        R.attr.palette_text_body
+                        status = InProgress,
+                        textId = back_up_wallet_backup_status_in_progress,
+                        textColor = R.attr.palette_text_body,
                     )
 
                     is BackupState.BackupUpToDate -> PresentationBackupState(
-                        Success,
-                        back_up_wallet_backup_status_up_to_date,
-                        R.attr.palette_system_green
+                        status = Success,
+                        textId = back_up_wallet_backup_status_up_to_date,
+                        textColor = R.attr.palette_system_green,
                     )
 
-                    is BackupState.BackupFailed -> PresentationBackupState(Warning, back_up_wallet_backup_status_outdated, R.attr.palette_system_red)
+                    is BackupState.BackupFailed -> PresentationBackupState(
+                        status = Warning,
+                        textId = back_up_wallet_backup_status_outdated,
+                        textColor = R.attr.palette_system_red,
+                    )
                 }
             )
         }
+        _allSettingsOptions.update { generateOptions() }
 
         // TODO remove it!
         backupOption.backupState = when (backupState) {
@@ -282,16 +276,33 @@ class AllSettingsViewModel : CommonViewModel() {
             is BackupState.BackupUpToDate -> PresentationBackupState(Success, back_up_wallet_backup_status_up_to_date, R.attr.palette_system_green)
             is BackupState.BackupFailed -> PresentationBackupState(Warning, back_up_wallet_backup_status_outdated, R.attr.palette_system_red)
         }
-        _allSettingsOptions.update { generateOptions() }
     }
 
     fun onSettingClick(setting: Setting) {
         when (setting) {
-            Setting.Profile -> tariNavigator.navigate(AllSettings.ToMyProfile)
-            Setting.Contacts -> tariNavigator.navigate(Navigation.ContactBook.AllContacts())
-            Setting.WalletSettings -> showNotReadyYetDialog()
-            Setting.Support -> showNotReadyYetDialog()
-            Setting.Legal -> showNotReadyYetDialog()
+            Setting.Profile -> tariNavigator.navigate(AllSettings.MyProfile)
+            Setting.Contacts -> tariNavigator.navigate(AllContacts())
+            Setting.WalletSettings -> TODO()
+            Setting.Support -> TODO()
+            Setting.Legal -> TODO()
+            Setting.Backup -> runWithAuthorization { tariNavigator.navigate(AllSettings.BackupSettings(true)) }
+            Setting.DataCollection -> tariNavigator.navigate(AllSettings.DataCollection)
+            Setting.ChangePasscode -> runWithAuthorization { tariNavigator.navigate(Navigation.EnterPinCode(PinCodeScreenBehavior.ChangeNew)) }
+            Setting.CreatePasscode -> runWithAuthorization { tariNavigator.navigate(Navigation.EnterPinCode(PinCodeScreenBehavior.Create)) }
+            Setting.Biometrics -> runWithAuthorization { tariNavigator.navigate(Navigation.ChangeBiometrics) }
+            Setting.TtlStore -> openUrl(resourceManager.getString(ttl_store_url))
+            Setting.About -> tariNavigator.navigate(AllSettings.About)
+            Setting.ReportBug -> tariNavigator.navigate(AllSettings.BugReporting)
+            Setting.VisitTari -> openUrl(resourceManager.getString(tari_url))
+            Setting.Contribute -> openUrl(resourceManager.getString(github_repo_url))
+            Setting.UserAgreement -> openUrl(resourceManager.getString(user_agreement_url))
+            Setting.PrivacyPolicy -> openUrl(resourceManager.getString(privacy_policy_url))
+            Setting.Disclaimer -> openUrl(resourceManager.getString(disclaimer_url))
+            Setting.BlockExplorer -> openUrl(networkRepository.currentNetwork.blockExplorerBaseUrl.orEmpty())
+            Setting.SelectTheme -> tariNavigator.navigate(AllSettings.ThemeSelection)
+            Setting.ScreenRecording -> tariNavigator.navigate(AllSettings.ScreenRecording)
+            Setting.SelectNetwork -> tariNavigator.navigate(AllSettings.NetworkSelection)
+            Setting.DeleteWallet -> tariNavigator.navigate(AllSettings.DeleteWallet)
         }
     }
 

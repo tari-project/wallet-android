@@ -104,17 +104,17 @@ class TariNavigator @Inject constructor() {
             is ContactBook.ContactDetails -> addFragment(ContactDetailsFragment.createFragment(navigation.contact))
             is ContactBook.AddContact -> addFragment(AddContactFragment())
 
-            is AllSettings.ToBugReporting -> DebugActivity.launch(currentActivity, DebugNavigation.BugReport)
-            is AllSettings.ToMyProfile -> addFragment(WalletInfoFragment())
-            is AllSettings.ToAbout -> addFragment(TariAboutFragment())
-            is AllSettings.ToScreenRecording -> addFragment(ScreenRecordingSettingsFragment())
+            is AllSettings.BugReporting -> DebugActivity.launch(currentActivity, DebugNavigation.BugReport)
+            is AllSettings.MyProfile -> addFragment(WalletInfoFragment())
+            is AllSettings.About -> addFragment(TariAboutFragment())
+            is AllSettings.ScreenRecording -> addFragment(ScreenRecordingSettingsFragment())
             is AllSettings.BackToBackupSettings -> popUpTo(BackupSettingsFragment::class.java.simpleName)
-            is AllSettings.ToBackupSettings -> addFragment(BackupSettingsFragment.newInstance(), withAnimation = navigation.withAnimation)
-            is AllSettings.ToDeleteWallet -> addFragment(DeleteWalletFragment())
-            is AllSettings.ToNetworkSelection -> addFragment(NetworkSelectionFragment())
-            is AllSettings.ToDataCollection -> addFragment(DataCollectionFragment())
-            is AllSettings.ToThemeSelection -> addFragment(ThemeSelectorFragment())
-            is AllSettings.ToRequestTari -> addFragment(RequestTariFragment.newInstance())
+            is AllSettings.BackupSettings -> addFragment(BackupSettingsFragment.newInstance(), withAnimation = navigation.withAnimation)
+            is AllSettings.DeleteWallet -> addFragment(DeleteWalletFragment())
+            is AllSettings.NetworkSelection -> addFragment(NetworkSelectionFragment())
+            is AllSettings.DataCollection -> addFragment(DataCollectionFragment())
+            is AllSettings.ThemeSelection -> addFragment(ThemeSelectorFragment())
+            is AllSettings.RequestTari -> addFragment(RequestTariFragment.newInstance())
 
             is InputSeedWords.ToRestoreFromSeeds -> addFragment(WalletRestoringFragment.newInstance())
 
@@ -258,17 +258,17 @@ sealed class Navigation {
     }
 
     sealed class AllSettings : Navigation() {
-        data object ToMyProfile : AllSettings()
-        data object ToBugReporting : AllSettings()
-        data object ToDataCollection : AllSettings()
-        data object ToAbout : AllSettings()
+        data object MyProfile : AllSettings()
+        data object BugReporting : AllSettings()
+        data object DataCollection : AllSettings()
+        data object About : AllSettings()
         data object BackToBackupSettings : AllSettings()
-        data class ToBackupSettings(val withAnimation: Boolean) : AllSettings()
-        data object ToDeleteWallet : AllSettings()
-        data object ToScreenRecording : AllSettings()
-        data object ToThemeSelection : AllSettings()
-        data object ToNetworkSelection : AllSettings()
-        data object ToRequestTari : AllSettings()
+        data class BackupSettings(val withAnimation: Boolean) : AllSettings()
+        data object DeleteWallet : AllSettings()
+        data object ScreenRecording : AllSettings()
+        data object ThemeSelection : AllSettings()
+        data object NetworkSelection : AllSettings()
+        data object RequestTari : AllSettings()
     }
 
     sealed class InputSeedWords : Navigation() {

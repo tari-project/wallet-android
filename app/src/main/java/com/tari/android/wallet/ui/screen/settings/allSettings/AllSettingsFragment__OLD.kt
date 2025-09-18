@@ -42,7 +42,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.tari.android.wallet.databinding.FragmentAllSettingsBinding
 import com.tari.android.wallet.ui.common.CommonXmlFragment
 import com.tari.android.wallet.util.extension.collectFlow
-import com.tari.android.wallet.util.extension.observe
 
 class AllSettingsFragment__OLD : CommonXmlFragment<FragmentAllSettingsBinding, AllSettingsViewModel>() {
 
@@ -85,8 +84,6 @@ class AllSettingsFragment__OLD : CommonXmlFragment<FragmentAllSettingsBinding, A
     }
 
     private fun observeUI() = with(viewModel) {
-        observe(openYatOnboarding) { yatAdapter.openOnboarding(requireActivity()) }
-
         collectFlow(allSettingsOptions) { optionsAdapter.update(it) }
     }
 

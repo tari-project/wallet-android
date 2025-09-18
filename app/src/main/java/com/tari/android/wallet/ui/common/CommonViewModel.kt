@@ -298,7 +298,7 @@ open class CommonViewModel : ViewModel(), DialogHandler {
                     confirmButtonText = resourceManager.getString(R.string.screen_recording_disabled_dialog_confirm_button),
                     cancelButtonText = resourceManager.getString(R.string.screen_recording_disabled_dialog_cancel_button),
                     onConfirm = { hideDialog(ModularDialogArgs.DialogId.SCREEN_RECORDING) },
-                    onCancel = { tariNavigator.navigate(AllSettings.ToScreenRecording) },
+                    onCancel = { tariNavigator.navigate(AllSettings.ScreenRecording) },
                     onDismiss = { },
                 ).getModular(resourceManager)
             )

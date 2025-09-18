@@ -89,7 +89,7 @@ class StagedSecurityDelegate(
         dialogHandler.hideDialog()
         tariNavigator.navigateSequence(
             Navigation.TxList.ToAllSettings,
-            Navigation.AllSettings.ToBackupSettings(false),
+            Navigation.AllSettings.BackupSettings(false),
             Navigation.BackupSettings.ToWalletBackupWithRecoveryPhrase,
         )
     }
@@ -98,7 +98,7 @@ class StagedSecurityDelegate(
         dialogHandler.hideDialog()
         tariNavigator.navigateSequence(
             Navigation.TxList.ToAllSettings,
-            Navigation.AllSettings.ToBackupSettings(true),
+            Navigation.AllSettings.BackupSettings(true),
         )
     }
 
@@ -106,7 +106,7 @@ class StagedSecurityDelegate(
         dialogHandler.hideDialog()
         tariNavigator.navigateSequence(
             Navigation.TxList.ToAllSettings,
-            Navigation.AllSettings.ToBackupSettings(false),
+            Navigation.AllSettings.BackupSettings(false),
             Navigation.BackupSettings.ToChangePassword,
         )
     }
