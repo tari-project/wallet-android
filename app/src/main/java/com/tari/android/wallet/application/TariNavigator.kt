@@ -55,6 +55,7 @@ import com.tari.android.wallet.ui.screen.send.receive.ReceiveFragment
 import com.tari.android.wallet.ui.screen.send.send.SendFragment
 import com.tari.android.wallet.ui.screen.settings.allSettings.AllSettingsFragment
 import com.tari.android.wallet.ui.screen.settings.allSettings.about.TariAboutFragment
+import com.tari.android.wallet.ui.screen.settings.allSettings.legal.LegalSettingsFragment
 import com.tari.android.wallet.ui.screen.settings.allSettings.support.SupportSettingsFragment
 import com.tari.android.wallet.ui.screen.settings.allSettings.walletSettings.WalletSettingsFragment
 import com.tari.android.wallet.ui.screen.settings.backup.backupSettings.BackupSettingsFragment
@@ -119,6 +120,7 @@ class TariNavigator @Inject constructor() {
             is AllSettings.RequestTari -> addFragment(RequestTariFragment.newInstance())
             is AllSettings.CategoryWalletSettings -> addFragment(WalletSettingsFragment.newInstance())
             is AllSettings.CategorySupportSettings -> addFragment(SupportSettingsFragment.newInstance())
+            is AllSettings.CategoryLegalSettings -> addFragment(LegalSettingsFragment.newInstance())
 
             is InputSeedWords.ToRestoreFromSeeds -> addFragment(WalletRestoringFragment.newInstance())
 
@@ -275,6 +277,7 @@ sealed class Navigation {
         data object RequestTari : AllSettings()
         data object CategoryWalletSettings : AllSettings()
         data object CategorySupportSettings : AllSettings()
+        data object CategoryLegalSettings : AllSettings()
     }
 
     sealed class InputSeedWords : Navigation() {
