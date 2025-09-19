@@ -26,7 +26,6 @@ import com.tari.android.wallet.ui.dialog.modular.modules.option.OptionModule
 import com.tari.android.wallet.ui.dialog.modular.modules.space.SpaceModule
 import com.tari.android.wallet.ui.screen.debug.DebugNavigation
 import com.tari.android.wallet.ui.screen.debug.activity.DebugActivity
-import com.tari.android.wallet.ui.screen.settings.allSettings.TariVersionModel
 import com.tari.android.wallet.ui.screen.settings.themeSelector.TariTheme
 import com.tari.android.wallet.util.DebugConfig
 import com.tari.android.wallet.util.extension.addEnterLeftAnimation
@@ -186,7 +185,7 @@ abstract class CommonActivity<VM : CommonViewModel> : AppCompatActivity(), Shake
     override fun hearShake() = showDebugDialog()
 
     private fun showDebugDialog() {
-        val versionInfo = TariVersionModel(viewModel.networkRepository).versionInfo
+        val versionInfo = viewModel.networkRepository.versionInfo
 
         dialogHandler.showModularDialog(
             ModularDialogArgs(

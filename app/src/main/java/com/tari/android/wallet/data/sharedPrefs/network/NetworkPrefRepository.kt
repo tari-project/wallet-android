@@ -10,6 +10,10 @@ import javax.inject.Singleton
 
 @Singleton
 class NetworkPrefRepository @Inject constructor(sharedPrefs: SharedPreferences) {
+
+    val versionInfo: String
+        get() = "${currentNetwork.network.displayName} ${BuildConfig.VERSION_NAME} b${BuildConfig.VERSION_CODE}"
+
     // defaultNetwork is the network that will be used if the current network is not set or is not supported
     private val defaultNetwork = when (BuildConfig.LIB_WALLET_NETWORK) {
         "MAINNET" -> NETWORK_MAINNET

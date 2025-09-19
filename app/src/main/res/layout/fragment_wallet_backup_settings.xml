@@ -90,7 +90,7 @@
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:layout_gravity="center_vertical"
-                                    android:src="@drawable/vector_wallet_not_backed" />
+                                    android:src="@drawable/vector_warning_exclamation" />
 
                                 <androidx.appcompat.widget.AppCompatImageView
                                     android:id="@+id/backup_with_recovery_phrase_success_view"

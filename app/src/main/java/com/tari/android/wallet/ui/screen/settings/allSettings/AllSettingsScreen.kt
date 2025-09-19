@@ -9,8 +9,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -32,6 +30,7 @@ import com.tari.android.wallet.ui.screen.settings.themeSelector.TariTheme
 fun AllSettingsScreen(
     uiState: AllSettingsViewModel.UiState,
     onSettingClick: (option: Setting) -> Unit,
+    onVersionClick: () -> Unit,
 ) {
     Scaffold(
         modifier = Modifier
@@ -39,11 +38,7 @@ fun AllSettingsScreen(
             .statusBarsPadding(),
         containerColor = TariDesignSystem.colors.backgroundSecondary,
     ) { paddingValues ->
-        Column(
-            modifier = Modifier
-                .padding(paddingValues)
-                .verticalScroll(rememberScrollState()),
-        ) {
+        Column(modifier = Modifier.padding(paddingValues)) {
             Spacer(Modifier.size(30.dp))
             Text(
                 modifier = Modifier.padding(horizontal = 20.dp),
@@ -87,6 +82,7 @@ fun AllSettingsScreen(
             Text(
                 modifier = Modifier
                     .fillMaxWidth()
+                    .clickable { onVersionClick() }
                     .padding(20.dp),
                 text = uiState.versionText,
                 style = TariDesignSystem.typography.body2,
@@ -98,7 +94,7 @@ fun AllSettingsScreen(
 }
 
 @Composable
-fun SettingsItem(
+private fun SettingsItem(
     setting: Setting,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -133,6 +129,7 @@ private fun AllSettingsScreenPreview() {
                 versionText = "TESTNET v0.27.0 (b776)",
             ),
             onSettingClick = {},
+            onVersionClick = {},
         )
     }
 }

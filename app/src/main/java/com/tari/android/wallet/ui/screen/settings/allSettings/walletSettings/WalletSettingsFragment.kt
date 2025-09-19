@@ -1,4 +1,4 @@
-package com.tari.android.wallet.ui.screen.settings.allSettings
+package com.tari.android.wallet.ui.screen.settings.allSettings.walletSettings
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -11,16 +11,16 @@ import com.tari.android.wallet.ui.common.CommonFragment
 import com.tari.android.wallet.ui.compose.TariDesignSystem
 import com.tari.android.wallet.util.extension.composeContent
 
-class AllSettingsFragment : CommonFragment<AllSettingsViewModel>() {
+class WalletSettingsFragment : CommonFragment<WalletSettingsViewModel>() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?) = composeContent {
         val uiState by viewModel.uiState.collectAsState()
 
         TariDesignSystem(viewModel.currentTheme) {
-            AllSettingsScreen(
+            WalletSettingsScreen(
                 uiState = uiState,
+                onBackClick = { viewModel.onBackPressed() },
                 onSettingClick = { viewModel.onSettingClick(it) },
-                onVersionClick = { viewModel.onVersionClick() },
             )
         }
     }
@@ -28,12 +28,12 @@ class AllSettingsFragment : CommonFragment<AllSettingsViewModel>() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val viewModel: AllSettingsViewModel by viewModels()
+        val viewModel: WalletSettingsViewModel by viewModels()
         bindViewModel(viewModel)
     }
 
 
     companion object {
-        fun newInstance() = AllSettingsFragment()
+        fun newInstance() = WalletSettingsFragment()
     }
 }
