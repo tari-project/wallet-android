@@ -70,6 +70,7 @@ import com.tari.android.wallet.ui.screen.send.receive.ReceiveViewModel
 import com.tari.android.wallet.ui.screen.send.send.SendViewModel
 import com.tari.android.wallet.ui.screen.settings.allSettings.AllSettingsViewModel
 import com.tari.android.wallet.ui.screen.settings.allSettings.about.TariAboutViewModel
+import com.tari.android.wallet.ui.screen.settings.allSettings.support.SupportSettingsViewModel
 import com.tari.android.wallet.ui.screen.settings.allSettings.walletSettings.WalletSettingsViewModel
 import com.tari.android.wallet.ui.screen.settings.backup.backupSettings.BackupSettingsViewModel
 import com.tari.android.wallet.ui.screen.settings.backup.backupSettings.option.BackupOptionViewModel
@@ -128,6 +129,7 @@ interface ApplicationComponent {
     fun inject(viewModel: NetworkSelectionViewModel)
     fun inject(viewModel: AllSettingsViewModel)
     fun inject(viewModel: WalletSettingsViewModel)
+    fun inject(viewModel: SupportSettingsViewModel)
     fun inject(viewModel: FinalizeSendTxViewModel)
     fun inject(viewModel: WalletInfoViewModel)
     fun inject(viewModel: RequestTariViewModel)

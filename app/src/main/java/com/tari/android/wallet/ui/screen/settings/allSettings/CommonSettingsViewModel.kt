@@ -19,7 +19,7 @@ abstract class CommonSettingsViewModel : CommonViewModel() {
             Setting.Profile -> tariNavigator.navigate(AllSettings.MyProfile)
             Setting.Contacts -> tariNavigator.navigate(AllContacts())
             Setting.WalletSettings -> tariNavigator.navigate(AllSettings.CategoryWalletSettings)
-            Setting.Support -> TODO()
+            Setting.Support -> tariNavigator.navigate(AllSettings.CategorySupportSettings)
             Setting.Legal -> TODO()
             Setting.Backup -> runWithAuthorization { tariNavigator.navigate(AllSettings.BackupSettings(true)) }
             Setting.DataCollection -> tariNavigator.navigate(AllSettings.DataCollection)
