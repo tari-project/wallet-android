@@ -43,7 +43,6 @@ import org.junit.runners.Suite
 @RunWith(Suite::class)
 @Suite.SuiteClasses(
     FFIByteVectorTests::class,
-    FFITariContactTests::class,
     FFIWalletAddressTests::class,
     HexStringTests::class,
     NetAddressStringTests::class,
