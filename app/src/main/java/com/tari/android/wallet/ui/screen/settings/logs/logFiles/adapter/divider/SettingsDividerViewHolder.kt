@@ -1,4 +1,4 @@
-package com.tari.android.wallet.ui.screen.settings.allSettings.divider
+package com.tari.android.wallet.ui.screen.settings.logs.logFiles.adapter.divider
 
 import com.tari.android.wallet.databinding.ItemSettingsDividerBinding
 import com.tari.android.wallet.ui.common.recyclerView.CommonViewHolder

@@ -8,16 +8,18 @@ import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefBooleanNulla
 import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefGsonDelegate
 import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefStringSecuredDelegate
 import com.tari.android.wallet.data.sharedPrefs.network.NetworkPrefRepository
-import com.tari.android.wallet.data.sharedPrefs.network.formatKey
+import com.tari.android.wallet.di.ApplicationScope
+import kotlinx.coroutines.CoroutineScope
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class SecurityPrefRepository @Inject constructor(
-    context: Context,
-    sharedPrefs: SharedPreferences,
-    networkRepository: NetworkPrefRepository,
-) : CommonPrefRepository(networkRepository) {
+    private val context: Context,
+    private val sharedPrefs: SharedPreferences,
+    private val networkRepository: NetworkPrefRepository,
+    @param:ApplicationScope private val applicationScope: CoroutineScope,
+) : CommonPrefRepository(applicationScope) {
 
     companion object Key {
         const val IS_AUTHENTICATED = "tari_wallet_is_authenticated"
@@ -28,20 +30,43 @@ class SecurityPrefRepository @Inject constructor(
         const val LOGIN_ATTEMPTS = "tari_login_attempts"
     }
 
-    var isAuthenticated: Boolean by SharedPrefBooleanDelegate(sharedPrefs, this, formatKey(IS_AUTHENTICATED))
+    var isAuthenticated: Boolean by SharedPrefBooleanDelegate(
+        prefs = sharedPrefs,
+        prefsUpdater = this,
+        name = networkRepository.currentNetwork.formatKey(IS_AUTHENTICATED),
+    )
 
-    var isFeatureAuthenticated: Boolean by SharedPrefBooleanDelegate(sharedPrefs, this, formatKey(IS_FEATURE_AUTHENTICATED))
+    var isFeatureAuthenticated: Boolean by SharedPrefBooleanDelegate(
+        prefs = sharedPrefs,
+        prefsUpdater = this,
+        name = networkRepository.currentNetwork.formatKey(IS_FEATURE_AUTHENTICATED),
+    )
 
-    var pinCode: String? by SharedPrefStringSecuredDelegate(context, sharedPrefs, this, formatKey(PIN_CODE), null)
+    var pinCode: String? by SharedPrefStringSecuredDelegate(
+        context = context,
+        prefs = sharedPrefs,
+        prefsUpdater = this,
+        name = networkRepository.currentNetwork.formatKey(PIN_CODE),
+        defValue = null,
+    )
 
-    var biometricsAuth: Boolean? by SharedPrefBooleanNullableDelegate(sharedPrefs, this, formatKey(BIOMETRICS))
+    var biometricsAuth: Boolean? by SharedPrefBooleanNullableDelegate(
+        prefs = sharedPrefs,
+        prefsUpdater = this,
+        name = networkRepository.currentNetwork.formatKey(BIOMETRICS),
+    )
 
-    var databasePassphrase: String? by SharedPrefStringSecuredDelegate(context, sharedPrefs, this, formatKey(WALLET_DATABASE_PASSPHRASE))
+    var databasePassphrase: String? by SharedPrefStringSecuredDelegate(
+        context = context,
+        prefs = sharedPrefs,
+        prefsUpdater = this,
+        name = networkRepository.currentNetwork.formatKey(WALLET_DATABASE_PASSPHRASE),
+    )
 
     var attempts: LoginAttemptList by SharedPrefGsonDelegate(
         prefs = sharedPrefs,
-        commonRepository = this,
-        name = formatKey(LOGIN_ATTEMPTS),
+        prefsUpdater = this,
+        name = networkRepository.currentNetwork.formatKey(LOGIN_ATTEMPTS),
         type = LoginAttemptList::class.java,
         defValue = LoginAttemptList(),
     )

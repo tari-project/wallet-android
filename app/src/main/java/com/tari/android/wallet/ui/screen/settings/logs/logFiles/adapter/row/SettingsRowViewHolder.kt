@@ -1,4 +1,4 @@
-package com.tari.android.wallet.ui.screen.settings.allSettings.row
+package com.tari.android.wallet.ui.screen.settings.logs.logFiles.adapter.row
 
 import com.tari.android.wallet.databinding.ItemSettingsRowBinding
 import com.tari.android.wallet.ui.common.recyclerView.CommonViewHolder

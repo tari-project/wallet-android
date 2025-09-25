@@ -37,14 +37,18 @@ import com.tari.android.wallet.data.sharedPrefs.CommonPrefRepository
 import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefBooleanDelegate
 import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefGsonDelegate
 import com.tari.android.wallet.data.sharedPrefs.network.NetworkPrefRepository
-import com.tari.android.wallet.data.sharedPrefs.network.formatKey
+import com.tari.android.wallet.di.ApplicationScope
 import com.tari.android.wallet.ui.screen.settings.themeSelector.TariTheme
+import kotlinx.coroutines.CoroutineScope
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class TariSettingsPrefRepository @Inject constructor(sharedPrefs: SharedPreferences, networkRepository: NetworkPrefRepository) :
-    CommonPrefRepository(networkRepository) {
+class TariSettingsPrefRepository @Inject constructor(
+    private val sharedPrefs: SharedPreferences,
+    private val networkRepository: NetworkPrefRepository,
+    @param:ApplicationScope private val applicationScope: CoroutineScope,
+) : CommonPrefRepository(applicationScope) {
 
     private object Key {
         const val IS_RESTORED_WALLET = "tari_is_restored_wallet"
@@ -53,15 +57,28 @@ class TariSettingsPrefRepository @Inject constructor(sharedPrefs: SharedPreferen
         const val THEME_KEY = "tari_theme_key"
     }
 
-    var isRestoredWallet: Boolean by SharedPrefBooleanDelegate(sharedPrefs, this, formatKey(Key.IS_RESTORED_WALLET))
+    var isRestoredWallet: Boolean by SharedPrefBooleanDelegate(
+        prefs = sharedPrefs,
+        prefsUpdater = this,
+        name = networkRepository.currentNetwork.formatKey(Key.IS_RESTORED_WALLET),
+    )
 
-    var hasVerifiedSeedWords: Boolean by SharedPrefBooleanDelegate(sharedPrefs, this, formatKey(Key.HAS_VERIFIED_SEED_WORDS))
+    var hasVerifiedSeedWords: Boolean by SharedPrefBooleanDelegate(
+        prefs = sharedPrefs,
+        prefsUpdater = this,
+        name = networkRepository.currentNetwork.formatKey(Key.HAS_VERIFIED_SEED_WORDS),
+    )
 
-    var screenRecordingTurnedOn: Boolean by SharedPrefBooleanDelegate(sharedPrefs, this, formatKey(Key.SCREEN_RECORDING_TURNED_ON_KEY), false)
+    var screenRecordingTurnedOn: Boolean by SharedPrefBooleanDelegate(
+        prefs = sharedPrefs,
+        prefsUpdater = this,
+        name = networkRepository.currentNetwork.formatKey(Key.SCREEN_RECORDING_TURNED_ON_KEY),
+        defValue = false
+    )
 
     var currentTheme: TariTheme by SharedPrefGsonDelegate(
         prefs = sharedPrefs,
-        commonRepository = this,
+        prefsUpdater = this,
         name = Key.THEME_KEY,
         type = TariTheme::class.java,
         defValue = TariTheme.AppBased,

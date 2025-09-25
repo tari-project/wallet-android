@@ -38,14 +38,15 @@ import com.tari.android.wallet.data.sharedPrefs.backup.BackupPrefRepository
 import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefBooleanDelegate
 import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefStringDelegate
 import com.tari.android.wallet.data.sharedPrefs.network.NetworkPrefRepository
-import com.tari.android.wallet.data.sharedPrefs.network.formatKey
 import com.tari.android.wallet.data.sharedPrefs.security.SecurityPrefRepository
 import com.tari.android.wallet.data.sharedPrefs.securityStages.SecurityStagesPrefRepository
 import com.tari.android.wallet.data.sharedPrefs.sentry.SentryPrefRepository
 import com.tari.android.wallet.data.sharedPrefs.tariSettings.TariSettingsPrefRepository
 import com.tari.android.wallet.data.sharedPrefs.yat.YatPrefRepository
+import com.tari.android.wallet.di.ApplicationScope
 import com.tari.android.wallet.model.Base58
 import com.tari.android.wallet.model.TariWalletAddress
+import kotlinx.coroutines.CoroutineScope
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.random.Random
@@ -67,7 +68,8 @@ class CorePrefRepository @Inject constructor(
     private val sentryPrefRepository: SentryPrefRepository,
     private val securityPrefRepository: SecurityPrefRepository,
     private val addressPoisoningSharedRepository: AddressPoisoningPrefRepository,
-) : CommonPrefRepository(networkRepository) {
+    @param:ApplicationScope private val applicationScope: CoroutineScope,
+) : CommonPrefRepository(applicationScope) {
 
     private object Key {
         const val WALLET_ADDRESS_BASE58 = "tari_wallet_public_key_hex_string"
@@ -86,19 +88,47 @@ class CorePrefRepository @Inject constructor(
         const val AIRDROP_REFRESH_TOKEN = "AIRDROP_REFRESH_TOKEN"
     }
 
-    var walletAddressBase58: Base58? by SharedPrefStringDelegate(sharedPrefs, this, formatKey(Key.WALLET_ADDRESS_BASE58))
+    var walletAddressBase58: Base58? by SharedPrefStringDelegate(
+        prefs = sharedPrefs,
+        prefsUpdater = this,
+        name = networkRepository.currentNetwork.formatKey(Key.WALLET_ADDRESS_BASE58),
+    )
 
-    var emojiId: String? by SharedPrefStringDelegate(sharedPrefs, this, formatKey(Key.EMOJI_ID))
+    var emojiId: String? by SharedPrefStringDelegate(
+        prefs = sharedPrefs,
+        prefsUpdater = this,
+        name = networkRepository.currentNetwork.formatKey(Key.EMOJI_ID),
+    )
 
-    var alias: String? by SharedPrefStringDelegate(sharedPrefs, this, formatKey(Key.ALIAS))
+    var alias: String? by SharedPrefStringDelegate(
+        prefs = sharedPrefs,
+        prefsUpdater = this,
+        name = networkRepository.currentNetwork.formatKey(Key.ALIAS),
+    )
 
-    var onboardingStarted: Boolean by SharedPrefBooleanDelegate(sharedPrefs, this, formatKey(Key.ONBOARDING_STARTED))
+    var onboardingStarted: Boolean by SharedPrefBooleanDelegate(
+        prefs = sharedPrefs,
+        prefsUpdater = this,
+        name = networkRepository.currentNetwork.formatKey(Key.ONBOARDING_STARTED),
+    )
 
-    var onboardingCompleted: Boolean by SharedPrefBooleanDelegate(sharedPrefs, this, formatKey(Key.ONBOARDING_COMPLETED))
+    var onboardingCompleted: Boolean by SharedPrefBooleanDelegate(
+        prefs = sharedPrefs,
+        prefsUpdater = this,
+        name = networkRepository.currentNetwork.formatKey(Key.ONBOARDING_COMPLETED),
+    )
 
-    var onboardingAuthSetupStarted: Boolean by SharedPrefBooleanDelegate(sharedPrefs, this, formatKey(Key.ONBOARDING_AUTH_SETUP_STARTED))
+    var onboardingAuthSetupStarted: Boolean by SharedPrefBooleanDelegate(
+        prefs = sharedPrefs,
+        prefsUpdater = this,
+        name = networkRepository.currentNetwork.formatKey(Key.ONBOARDING_AUTH_SETUP_STARTED),
+    )
 
-    var onboardingAuthSetupCompleted: Boolean by SharedPrefBooleanDelegate(sharedPrefs, this, formatKey(Key.ONBOARDING_AUTH_SETUP_COMPLETED))
+    var onboardingAuthSetupCompleted: Boolean by SharedPrefBooleanDelegate(
+        prefs = sharedPrefs,
+        prefsUpdater = this,
+        name = networkRepository.currentNetwork.formatKey(Key.ONBOARDING_AUTH_SETUP_COMPLETED),
+    )
 
     val onboardingAuthWasInterrupted: Boolean
         get() = onboardingAuthSetupStarted && (!onboardingAuthSetupCompleted || securityPrefRepository.pinCode == null)
@@ -106,36 +136,51 @@ class CorePrefRepository @Inject constructor(
     val onboardingWasInterrupted: Boolean
         get() = onboardingStarted && !onboardingCompleted
 
-    var onboardingDisplayedAtHome: Boolean by SharedPrefBooleanDelegate(sharedPrefs, this, formatKey(Key.ONBOARDING_DISPLAYED_AT_HOME))
+    var onboardingDisplayedAtHome: Boolean by SharedPrefBooleanDelegate(
+        prefs = sharedPrefs,
+        prefsUpdater = this,
+        name = networkRepository.currentNetwork.formatKey(Key.ONBOARDING_DISPLAYED_AT_HOME),
+    )
 
     var needToShowRecoverySuccessDialog: Boolean by SharedPrefBooleanDelegate(
         prefs = sharedPrefs,
-        commonRepository = this,
-        name = formatKey(Key.NEED_TO_SHOW_RECOVERY_SUCCESS_DIALOG),
+        prefsUpdater = this,
+        name = networkRepository.currentNetwork.formatKey(Key.NEED_TO_SHOW_RECOVERY_SUCCESS_DIALOG),
         defValue = false,
     )
 
-    var isDataCleared: Boolean by SharedPrefBooleanDelegate(sharedPrefs, this, formatKey(Key.IS_DATA_CLEARED), true)
-
-    var keepScreenAwakeWhenRestore: Boolean by SharedPrefBooleanDelegate(
+    var isDataCleared: Boolean by SharedPrefBooleanDelegate(
         prefs = sharedPrefs,
-        commonRepository = this,
-        name = formatKey(Key.KEEP_SCREEN_AWAKE_WHEN_RESTORE),
+        prefsUpdater = this,
+        name = networkRepository.currentNetwork.formatKey(Key.IS_DATA_CLEARED),
         defValue = true,
     )
 
-    var airdropToken: String? by SharedPrefStringDelegate(sharedPrefs, this, formatKey(Key.AIRDROP_TOKEN))
-    var airdropRefreshToken: String? by SharedPrefStringDelegate(sharedPrefs, this, formatKey(Key.AIRDROP_REFRESH_TOKEN))
-    var airdropAnonId: String? by SharedPrefStringDelegate(sharedPrefs, this, formatKey(Key.ANON_ID))
+    var keepScreenAwakeWhenRestore: Boolean by SharedPrefBooleanDelegate(
+        prefs = sharedPrefs,
+        prefsUpdater = this,
+        name = networkRepository.currentNetwork.formatKey(Key.KEEP_SCREEN_AWAKE_WHEN_RESTORE),
+        defValue = true,
+    )
+
+    var airdropToken: String? by SharedPrefStringDelegate(
+        prefs = sharedPrefs,
+        prefsUpdater = this,
+        name = networkRepository.currentNetwork.formatKey(Key.AIRDROP_TOKEN),
+    )
+    var airdropRefreshToken: String? by SharedPrefStringDelegate(
+        prefs = sharedPrefs,
+        prefsUpdater = this,
+        name = networkRepository.currentNetwork.formatKey(Key.AIRDROP_REFRESH_TOKEN),
+    )
+    var airdropAnonId: String? by SharedPrefStringDelegate(
+        prefs = sharedPrefs,
+        prefsUpdater = this,
+        name = networkRepository.currentNetwork.formatKey(Key.ANON_ID),
+    )
 
     val walletAddress: TariWalletAddress
         get() = walletAddressBase58?.let { TariWalletAddress.fromBase58(it) } ?: error("Wallet address is not set to shared preferences")
-
-    /**
-     * Sometimes the wallet address is not set to the shared preferences (e.g. after a wallet removing).
-     * TODO: Investigate why the app accesses the wallet address when it is not set
-     */
-    fun walletAddressExists(): Boolean = walletAddressBase58 != null
 
     fun clear() {
         backupSettingsRepository.clear()

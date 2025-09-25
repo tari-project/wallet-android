@@ -3,13 +3,18 @@ package com.tari.android.wallet.data.sharedPrefs.network
 import android.content.SharedPreferences
 import com.tari.android.wallet.BuildConfig
 import com.tari.android.wallet.application.Network
-import com.tari.android.wallet.data.sharedPrefs.SimplePrefRepository
+import com.tari.android.wallet.data.sharedPrefs.CommonPrefRepository
 import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefGsonDelegate
+import com.tari.android.wallet.di.ApplicationScope
+import kotlinx.coroutines.CoroutineScope
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class NetworkPrefRepository @Inject constructor(sharedPrefs: SharedPreferences) {
+class NetworkPrefRepository @Inject constructor(
+    private val sharedPrefs: SharedPreferences,
+    @param:ApplicationScope private val applicationScope: CoroutineScope,
+) : CommonPrefRepository(applicationScope) {
 
     val versionInfo: String
         get() = "${currentNetwork.network.displayName} ${BuildConfig.VERSION_NAME} b${BuildConfig.VERSION_CODE}"
@@ -31,8 +36,8 @@ class NetworkPrefRepository @Inject constructor(sharedPrefs: SharedPreferences) 
 
     private var _currentNetwork: Network by SharedPrefGsonDelegate(
         prefs = sharedPrefs,
-        commonRepository = SimplePrefRepository(this),
-        name = Keys.CURRENT_NETWORK,
+        prefsUpdater = this,
+        name = Keys.CURRENT_NETWORK, // This key doesn't rely on the current network config. It's common for the whole app
         type = Network::class.java,
         defValue = defaultNetwork.network,
     )

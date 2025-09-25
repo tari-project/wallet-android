@@ -1,4 +1,4 @@
-package com.tari.android.wallet.ui.screen.settings.allSettings.about.list
+package com.tari.android.wallet.ui.screen.settings.about.list
 
 import com.tari.android.wallet.ui.common.recyclerView.CommonAdapter
 import com.tari.android.wallet.ui.common.recyclerView.ViewHolderBuilder

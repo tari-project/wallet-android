@@ -13,6 +13,9 @@ import com.tari.android.wallet.util.extension.composeContent
 
 class AllSettingsFragment : CommonFragment<AllSettingsViewModel>() {
 
+    // We need to prevent screen recording when onResume is called when this fragment is not on top
+    override fun screenRecordingAlwaysDisable() = !isFragmentOnTop()
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?) = composeContent {
         val uiState by viewModel.uiState.collectAsState()
 

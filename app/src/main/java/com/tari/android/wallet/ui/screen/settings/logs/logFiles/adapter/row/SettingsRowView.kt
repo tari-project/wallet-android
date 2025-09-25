@@ -1,4 +1,4 @@
-package com.tari.android.wallet.ui.screen.settings.allSettings.row
+package com.tari.android.wallet.ui.screen.settings.logs.logFiles.adapter.row
 
 import android.content.Context
 import android.util.AttributeSet

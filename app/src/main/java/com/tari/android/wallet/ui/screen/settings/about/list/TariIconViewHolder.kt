@@ -1,11 +1,11 @@
-package com.tari.android.wallet.ui.screen.settings.allSettings.about.list
+package com.tari.android.wallet.ui.screen.settings.about.list
 
 import androidx.core.content.ContextCompat
 import com.tari.android.wallet.databinding.ItemTariIconBinding
 import com.tari.android.wallet.ui.common.recyclerView.CommonViewHolder
 import com.tari.android.wallet.ui.common.recyclerView.ViewHolderBuilder
 
-class TariIconViewHolder(view: ItemTariIconBinding): CommonViewHolder<TariIconViewHolderItem, ItemTariIconBinding>(view) {
+class TariIconViewHolder(view: ItemTariIconBinding) : CommonViewHolder<TariIconViewHolderItem, ItemTariIconBinding>(view) {
     override fun bind(item: TariIconViewHolderItem) {
         super.bind(item)
 

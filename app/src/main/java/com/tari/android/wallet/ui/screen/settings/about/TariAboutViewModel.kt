@@ -1,4 +1,4 @@
-package com.tari.android.wallet.ui.screen.settings.allSettings.about
+package com.tari.android.wallet.ui.screen.settings.about
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -39,7 +39,7 @@ import com.tari.android.wallet.R.string.tari_about_icon_url_speach_bublles
 import com.tari.android.wallet.R.string.tari_about_icon_url_writing
 import com.tari.android.wallet.R.string.tari_about_license_url
 import com.tari.android.wallet.ui.common.CommonViewModel
-import com.tari.android.wallet.ui.screen.settings.allSettings.about.list.TariIconViewHolderItem
+import com.tari.android.wallet.ui.screen.settings.about.list.TariIconViewHolderItem
 
 class TariAboutViewModel : CommonViewModel() {
 

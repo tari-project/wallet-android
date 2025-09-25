@@ -53,8 +53,8 @@ import com.tari.android.wallet.ui.screen.send.obsolete.finalize.FinalizeSendTxFr
 import com.tari.android.wallet.ui.screen.send.obsolete.requestTari.RequestTariFragment
 import com.tari.android.wallet.ui.screen.send.receive.ReceiveFragment
 import com.tari.android.wallet.ui.screen.send.send.SendFragment
+import com.tari.android.wallet.ui.screen.settings.about.TariAboutFragment
 import com.tari.android.wallet.ui.screen.settings.allSettings.AllSettingsFragment
-import com.tari.android.wallet.ui.screen.settings.allSettings.about.TariAboutFragment
 import com.tari.android.wallet.ui.screen.settings.allSettings.legal.LegalSettingsFragment
 import com.tari.android.wallet.ui.screen.settings.allSettings.support.SupportSettingsFragment
 import com.tari.android.wallet.ui.screen.settings.allSettings.walletSettings.WalletSettingsFragment
