@@ -74,7 +74,6 @@ import com.tari.android.wallet.ui.screen.settings.allSettings.legal.LegalSetting
 import com.tari.android.wallet.ui.screen.settings.allSettings.support.SupportSettingsViewModel
 import com.tari.android.wallet.ui.screen.settings.allSettings.walletSettings.WalletSettingsViewModel
 import com.tari.android.wallet.ui.screen.settings.backup.backupSettings.BackupSettingsViewModel
-import com.tari.android.wallet.ui.screen.settings.backup.backupSettings.option.BackupOptionViewModel
 import com.tari.android.wallet.ui.screen.settings.backup.changeSecurePassword.ChangeSecurePasswordViewModel
 import com.tari.android.wallet.ui.screen.settings.backup.enterCurrentPassword.EnterCurrentPasswordViewModel
 import com.tari.android.wallet.ui.screen.settings.backup.learnMore.BackupLearnMoreViewModel
@@ -144,7 +143,6 @@ interface ApplicationComponent {
     fun inject(viewModel: BugsReportingViewModel)
     fun inject(viewModel: LogFilesViewModel)
     fun inject(viewModel: LogsViewModel)
-    fun inject(viewModel: BackupOptionViewModel)
     fun inject(viewModel: ThemeSelectorViewModel)
     fun inject(viewModel: DeleteWalletViewModel)
     fun inject(viewModel: HomeViewModel)

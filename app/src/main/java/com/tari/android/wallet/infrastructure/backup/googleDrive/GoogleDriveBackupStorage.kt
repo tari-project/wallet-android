@@ -104,11 +104,9 @@ class GoogleDriveBackupStorage @Inject constructor(
     }
 
     override suspend fun onSetupActivityResult(requestCode: Int, resultCode: Int, intent: Intent?): Boolean {
-        when (requestCode) {
-            REQUEST_CODE_SIGN_IN -> when (resultCode) {
-                Activity.RESULT_OK -> saveDrive(intent)
-            }
-        }
+        if (requestCode != REQUEST_CODE_SIGN_IN || resultCode != Activity.RESULT_OK) return false
+
+        saveDrive(intent)
         return true
     }
 

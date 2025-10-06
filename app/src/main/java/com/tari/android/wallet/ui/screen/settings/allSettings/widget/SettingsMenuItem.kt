@@ -32,6 +32,23 @@ fun SettingsMenuItem(
     modifier: Modifier = Modifier,
     onClick: () -> Unit = {},
 ) {
+    SettingsMenuItem(
+        title = stringResource(setting.titleRes),
+        textColor = textColor,
+        endIcon = endIcon,
+        modifier = modifier,
+        onClick = onClick,
+    )
+}
+
+@Composable
+fun SettingsMenuItem(
+    title: String,
+    textColor: Color = TariDesignSystem.colors.textPrimary,
+    endIcon: @Composable (() -> Unit)? = null,
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit = {},
+) {
     Row(
         modifier = modifier
             .fillMaxWidth()
@@ -41,7 +58,7 @@ fun SettingsMenuItem(
     ) {
         Text(
             modifier = Modifier.weight(1f),
-            text = stringResource(setting.titleRes),
+            text = title,
             style = TariDesignSystem.typography.body1.copy(color = textColor),
         )
         Spacer(Modifier.size(20.dp))
