@@ -1,11 +1,13 @@
 package com.tari.android.wallet.ui.screen.settings.backup.data
 
+import android.os.Parcelable
 import com.tari.android.wallet.data.sharedPrefs.delegates.SerializableTime
-import java.io.Serializable
+import kotlinx.parcelize.Parcelize
 
+@Parcelize
 data class BackupOptionDto(
     val type: BackupOption,
-    val isEnable: Boolean,
+    val isEnabled: Boolean,
     val lastSuccessDate: SerializableTime?,
     val lastFailureDate: SerializableTime?,
-) : Serializable // TODO Parcelable?
+) : Parcelable

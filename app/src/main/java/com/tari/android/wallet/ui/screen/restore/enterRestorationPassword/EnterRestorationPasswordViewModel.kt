@@ -24,7 +24,7 @@ class EnterRestorationPasswordViewModel : CommonViewModel() {
     lateinit var walletConfig: WalletConfig
 
     @Inject
-    lateinit var backupSettingsRepository: BackupPrefRepository
+    lateinit var backupPrefs: BackupPrefRepository
 
     init {
         component.inject(this)
@@ -32,7 +32,7 @@ class EnterRestorationPasswordViewModel : CommonViewModel() {
         launchOnIo {
             walletManager.doOnWalletRunning {
                 if (walletConfig.walletExists()) {
-                    backupSettingsRepository.updateOption(backupSettingsRepository.currentBackupOption.copy(isEnable = true))
+                    backupPrefs.updateOption(backupPrefs.currentBackupOption.copy(isEnabled = true))
                     backupManager.backupNow()
 
                     walletManager.onWalletRestored()
@@ -61,7 +61,7 @@ class EnterRestorationPasswordViewModel : CommonViewModel() {
         launchOnIo {
             try {
                 backupManager.restoreLatestBackup(password)
-                backupSettingsRepository.backupPassword = password
+                backupPrefs.backupPassword = password
                 launchOnMain {
                     walletManager.start()
                 }

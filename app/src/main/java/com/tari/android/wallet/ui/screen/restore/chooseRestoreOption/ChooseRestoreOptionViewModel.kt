@@ -36,7 +36,7 @@ class ChooseRestoreOptionViewModel : CommonViewModel() {
     lateinit var backupManager: BackupManager
 
     @Inject
-    lateinit var backupPrefRepository: BackupPrefRepository
+    lateinit var backupPrefs: BackupPrefRepository
 
     @Inject
     lateinit var walletConfig: WalletConfig
@@ -45,7 +45,7 @@ class ChooseRestoreOptionViewModel : CommonViewModel() {
         component.inject(this)
     }
 
-    private val _uiState = MutableStateFlow(ChooseRestoreOptionModel.UiState(backupOption = backupPrefRepository.currentBackupOption))
+    private val _uiState = MutableStateFlow(ChooseRestoreOptionModel.UiState(backupOption = backupPrefs.currentBackupOption))
     val uiState = _uiState.asStateFlow()
 
     init {
@@ -53,7 +53,7 @@ class ChooseRestoreOptionViewModel : CommonViewModel() {
             walletManager.doOnWalletRunning { wallet ->
                 uiState.value.selectedOption?.let { selectedOption ->
                     if (walletConfig.walletExists()) {
-                        backupPrefRepository.restoredTxs?.takeIf { it.utxos.isNotEmpty() }?.let { restoredTxs ->
+                        backupPrefs.restoredTxs?.takeIf { it.utxos.isNotEmpty() }?.let { restoredTxs ->
                             val tariWalletAddress = TariWalletAddress.fromBase58(restoredTxs.sourceBase58)
                             val message = resourceManager.getString(R.string.backup_restored_tx)
 
@@ -64,8 +64,8 @@ class ChooseRestoreOptionViewModel : CommonViewModel() {
                             }
                         }
 
-                        val dto = backupPrefRepository.getOptionDto(selectedOption).copy(isEnable = true)
-                        backupPrefRepository.updateOption(dto)
+                        val dto = backupPrefs.getOptionDto(selectedOption).copy(isEnabled = true)
+                        backupPrefs.updateOption(dto)
                         backupManager.backupNow()
 
                         walletManager.onWalletRestored()

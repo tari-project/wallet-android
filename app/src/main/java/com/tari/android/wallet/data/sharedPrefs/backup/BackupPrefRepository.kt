@@ -29,7 +29,7 @@ class BackupPrefRepository @Inject constructor(
         prefsUpdater = this,
         name = networkRepository.currentNetwork.formatKey(Keys.GOOGLE_DRIVE_OPTION_KEY),
         type = BackupOptionDto::class.java,
-        defValue = BackupOptionDto(type = BackupOption.Google, isEnable = false, lastSuccessDate = null, lastFailureDate = null),
+        defValue = BackupOptionDto(type = BackupOption.Google, isEnabled = false, lastSuccessDate = null, lastFailureDate = null),
     )
 
     var backupPassword: String? by SharedPrefStringSecuredDelegate(
@@ -59,7 +59,7 @@ class BackupPrefRepository @Inject constructor(
     fun clear() {
         backupPassword = null
         localBackupFolderURI = null
-        googleDriveOption = BackupOptionDto(BackupOption.Google, isEnable = false, lastSuccessDate = null, lastFailureDate = null)
+        googleDriveOption = BackupOptionDto(BackupOption.Google, isEnabled = false, lastSuccessDate = null, lastFailureDate = null)
     }
 
     fun updateOption(option: BackupOptionDto) {

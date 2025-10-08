@@ -45,6 +45,7 @@ import javax.inject.Singleton
 
 @Singleton
 class TariSettingsPrefRepository @Inject constructor(
+    // TODO rename to SettingsPrefRepository
     private val sharedPrefs: SharedPreferences,
     private val networkRepository: NetworkPrefRepository,
     @param:ApplicationScope private val applicationScope: CoroutineScope,

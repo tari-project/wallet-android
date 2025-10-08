@@ -632,6 +632,7 @@
     <string name="enter_backup_password_page_desc_highlighted_part">you will not be able to recover your wallet</string>
     <string name="back_up_wallet_storage_setup_error_title">Wallet Backup Incomplete</string>
     <string name="backup_wallet_storage_full_title">Wallet Backup Incomplete</string>
+    <string name="backup_error_google_sign_in">Unable to sign in with Google</string>
     <string name="check_backup_storage_status_auth_revoked_error_description">Storage is not accessible</string>
     <string name="back_up_wallet_storage_setup_error_desc">Storage setup was interrupt</string>
     <string name="backup_wallet_storage_full_desc">Your storage is full</string>

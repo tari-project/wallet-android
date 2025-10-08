@@ -3,6 +3,9 @@ package com.tari.android.wallet.infrastructure.backup
 import com.orhanobut.logger.Logger
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -22,5 +25,13 @@ class BackupStateHandler @Inject constructor() {
     fun updateBackupState(backupState: BackupState) {
         logger.d("Update backup state to $backupState")
         _backupState.update { backupState }
+    }
+
+    suspend fun doOnBackupError(action: suspend (Throwable?) -> Unit) { // TODO maybe make error events istead of state
+        backupState
+            .filter { it is BackupState.BackupFailed }
+            .mapNotNull { (it as BackupState.BackupFailed).backupException }
+            .distinctUntilChanged()
+            .collect { action(it) }
     }
 }

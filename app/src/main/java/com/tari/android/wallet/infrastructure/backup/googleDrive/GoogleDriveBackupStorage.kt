@@ -53,6 +53,7 @@ import com.orhanobut.logger.Logger
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.walletManager.WalletConfig
 import com.tari.android.wallet.infrastructure.backup.BackupFileProcessor
+import com.tari.android.wallet.infrastructure.backup.BackupGoogleSignInFailedException
 import com.tari.android.wallet.infrastructure.backup.BackupNamingPolicy
 import com.tari.android.wallet.infrastructure.backup.BackupStorage
 import com.tari.android.wallet.infrastructure.backup.BackupStorageAuthRevokedException
@@ -104,9 +105,14 @@ class GoogleDriveBackupStorage @Inject constructor(
     }
 
     override suspend fun onSetupActivityResult(requestCode: Int, resultCode: Int, intent: Intent?): Boolean {
-        if (requestCode != REQUEST_CODE_SIGN_IN || resultCode != Activity.RESULT_OK) return false
+        if (requestCode != REQUEST_CODE_SIGN_IN) return false
 
-        saveDrive(intent)
+        if (resultCode == Activity.RESULT_OK) {
+            saveDrive(intent)
+        } else {
+            throw BackupGoogleSignInFailedException()
+        }
+
         return true
     }
 
