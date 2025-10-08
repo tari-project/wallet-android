@@ -7,7 +7,7 @@ import com.tari.android.wallet.application.Navigation
 import com.tari.android.wallet.data.sharedPrefs.security.LoginAttemptDto
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.common.SingleLiveEvent
-import com.tari.android.wallet.util.extension.addTo
+import com.tari.android.wallet.util.extension.launchOnMain
 import java.time.LocalDateTime
 import java.time.OffsetDateTime
 
@@ -62,10 +62,10 @@ class EnterPinCodeViewModel : CommonViewModel() {
         component.inject(this)
 
         doFraudLogic()
-        securityPrefRepository.updateNotifier.subscribe(
-            /* onNext = */ { doFraudLogic() },
-            /* onError = */ { logger.d("Error updating fraud logic", it) },
-        ).addTo(compositeDisposable)
+
+        launchOnMain {
+            securityPrefRepository.doOnSettingsUpdated { doFraudLogic() }
+        }
     }
 
     private fun doFraudLogic() {

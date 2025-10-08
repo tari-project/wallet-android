@@ -4,12 +4,12 @@ import android.content.SharedPreferences
 import android.net.Uri
 import com.google.gson.GsonBuilder
 import com.orhanobut.logger.Logger
-import com.tari.android.wallet.data.sharedPrefs.CommonPrefRepository
+import com.tari.android.wallet.data.sharedPrefs.PrefUpdater
 import kotlin.reflect.KProperty
 
 class SharedPrefGsonNullableDelegate<T>(
     private val prefs: SharedPreferences,
-    private val commonRepository: CommonPrefRepository,
+    private val prefsUpdater: PrefUpdater,
     private val name: String,
     private val type: Class<T>,
     private val defValue: T? = null,
@@ -20,7 +20,7 @@ class SharedPrefGsonNullableDelegate<T>(
     }
 
     init {
-        commonRepository.updateNotifier.onNext(Unit)
+        prefsUpdater.notifySettingsUpdated()
     }
 
     operator fun getValue(thisRef: Any?, property: KProperty<*>): T? {
@@ -41,7 +41,7 @@ class SharedPrefGsonNullableDelegate<T>(
         prefs.edit().run {
             putString(name, gson.toJson(value, type))
             apply()
-            commonRepository.updateNotifier.onNext(Unit)
+            prefsUpdater.notifySettingsUpdated()
         }
     }
 

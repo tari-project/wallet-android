@@ -1,16 +1,16 @@
 package com.tari.android.wallet.data.sharedPrefs.delegates
 
 import android.content.SharedPreferences
-import com.tari.android.wallet.data.sharedPrefs.CommonPrefRepository
+import com.tari.android.wallet.data.sharedPrefs.PrefUpdater
 import kotlin.reflect.KProperty
 
 class SharedPrefBooleanNullableDelegate(
-    val prefs: SharedPreferences,
-    val commonRepository: CommonPrefRepository,
-    val name: String
+    private val prefs: SharedPreferences,
+    private val prefsUpdater: PrefUpdater,
+    private val name: String,
 ) {
     init {
-        commonRepository.updateNotifier.onNext(Unit)
+        prefsUpdater.notifySettingsUpdated()
     }
 
     operator fun getValue(thisRef: Any?, property: KProperty<*>): Boolean? =
@@ -24,6 +24,6 @@ class SharedPrefBooleanNullableDelegate(
                 putBoolean(name, value)
             }
             apply()
-            commonRepository.updateNotifier.onNext(Unit)
+            prefsUpdater.notifySettingsUpdated()
         }
 }

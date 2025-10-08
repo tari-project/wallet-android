@@ -57,7 +57,7 @@ class ContactDetailsViewModel(savedState: SavedStateHandle) : CommonViewModel() 
     }
 
     fun onRequestTariClicked() {
-        tariNavigator.navigate(Navigation.AllSettings.ToRequestTari)
+        tariNavigator.navigate(Navigation.AllSettings.RequestTari)
     }
 
     fun onEmojiCopyClick() {

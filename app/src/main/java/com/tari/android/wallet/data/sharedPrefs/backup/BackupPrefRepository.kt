@@ -8,24 +8,26 @@ import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefGsonDelegate
 import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefGsonNullableDelegate
 import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefStringSecuredDelegate
 import com.tari.android.wallet.data.sharedPrefs.network.NetworkPrefRepository
-import com.tari.android.wallet.data.sharedPrefs.network.formatKey
+import com.tari.android.wallet.di.ApplicationScope
 import com.tari.android.wallet.infrastructure.backup.BackupUtxos
 import com.tari.android.wallet.ui.screen.settings.backup.data.BackupOption
 import com.tari.android.wallet.ui.screen.settings.backup.data.BackupOptionDto
+import kotlinx.coroutines.CoroutineScope
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class BackupPrefRepository @Inject constructor(
-    context: Context,
-    sharedPrefs: SharedPreferences,
-    networkRepository: NetworkPrefRepository
-) : CommonPrefRepository(networkRepository) {
+    private val context: Context,
+    private val sharedPrefs: SharedPreferences,
+    private val networkRepository: NetworkPrefRepository,
+    @param:ApplicationScope private val applicationScope: CoroutineScope,
+) : CommonPrefRepository(applicationScope) {
 
     private var googleDriveOption: BackupOptionDto by SharedPrefGsonDelegate(
         prefs = sharedPrefs,
-        commonRepository = this,
-        name = formatKey(Keys.GOOGLE_DRIVE_OPTION_KEY),
+        prefsUpdater = this,
+        name = networkRepository.currentNetwork.formatKey(Keys.GOOGLE_DRIVE_OPTION_KEY),
         type = BackupOptionDto::class.java,
         defValue = BackupOptionDto(type = BackupOption.Google, isEnable = false, lastSuccessDate = null, lastFailureDate = null),
     )
@@ -33,21 +35,21 @@ class BackupPrefRepository @Inject constructor(
     var backupPassword: String? by SharedPrefStringSecuredDelegate(
         context = context,
         prefs = sharedPrefs,
-        commonRepository = this,
-        name = formatKey(Keys.BACKUP_PASSWORD),
+        prefsUpdater = this,
+        name = networkRepository.currentNetwork.formatKey(Keys.BACKUP_PASSWORD),
     )
 
     var localBackupFolderURI: Uri? by SharedPrefGsonNullableDelegate(
         prefs = sharedPrefs,
-        commonRepository = this,
-        name = formatKey(Keys.LOCAL_BACKUP_FOLDER_URI),
+        prefsUpdater = this,
+        name = networkRepository.currentNetwork.formatKey(Keys.LOCAL_BACKUP_FOLDER_URI),
         type = Uri::class.java,
     )
 
     var restoredTxs: BackupUtxos? by SharedPrefGsonNullableDelegate(
         prefs = sharedPrefs,
-        commonRepository = this,
-        name = formatKey(Keys.LAST_RESTORED_TXS),
+        prefsUpdater = this,
+        name = networkRepository.currentNetwork.formatKey(Keys.LAST_RESTORED_TXS),
         type = BackupUtxos::class.java,
     )
 
