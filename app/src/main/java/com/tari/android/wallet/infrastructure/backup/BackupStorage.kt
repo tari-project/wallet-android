@@ -33,7 +33,8 @@
 package com.tari.android.wallet.infrastructure.backup
 
 import android.content.Intent
-import androidx.fragment.app.Fragment
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.ActivityResultLauncher
 import org.joda.time.DateTime
 
 /**
@@ -43,9 +44,9 @@ import org.joda.time.DateTime
  */
 interface BackupStorage {
 
-    fun setup(hostFragment: Fragment)
+    fun setup(launcher: ActivityResultLauncher<Intent?>)
 
-    suspend fun onSetupActivityResult(requestCode: Int, resultCode: Int, intent: Intent?): Boolean
+    suspend fun onSetupActivityResult(result: ActivityResult): Boolean
 
     suspend fun backup(): DateTime
 
@@ -56,5 +57,4 @@ interface BackupStorage {
     suspend fun deleteAllBackupFiles()
 
     suspend fun signOut()
-
 }

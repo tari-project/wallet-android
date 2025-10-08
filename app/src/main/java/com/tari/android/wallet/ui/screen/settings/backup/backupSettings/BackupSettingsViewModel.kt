@@ -1,7 +1,8 @@
 package com.tari.android.wallet.ui.screen.settings.backup.backupSettings
 
 import android.content.Intent
-import androidx.fragment.app.Fragment
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.ActivityResultLauncher
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.Navigation
 import com.tari.android.wallet.data.sharedPrefs.backup.BackupPrefRepository
@@ -87,14 +88,14 @@ class BackupSettingsViewModel : CommonViewModel() {
         }
     }
 
-    fun setupStorage(fragment: Fragment) {
-        backupManager.setupStorage(fragment)
+    fun setupStorage(launcher: ActivityResultLauncher<Intent?>) {
+        backupManager.setupStorage(launcher)
     }
 
-    fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+    fun handleActivityResult(result: ActivityResult) {
         launchOnIo {
             try {
-                val authResultHandled = backupManager.onSetupActivityResult(requestCode, resultCode, data)
+                val authResultHandled = backupManager.onSetupActivityResult(result)
                 if (authResultHandled) {
                     backupManager.backupNow(
                         onSuccess = {

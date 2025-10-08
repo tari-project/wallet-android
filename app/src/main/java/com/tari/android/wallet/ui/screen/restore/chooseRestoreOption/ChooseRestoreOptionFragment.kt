@@ -37,6 +37,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.result.ActivityResultLauncher
 import androidx.core.view.children
 import androidx.fragment.app.viewModels
 import com.tari.android.wallet.databinding.FragmentChooseRestoreOptionBinding
@@ -50,6 +51,10 @@ import com.tari.android.wallet.util.extension.visible
 
 class ChooseRestoreOptionFragment : CommonXmlFragment<FragmentChooseRestoreOptionBinding, ChooseRestoreOptionViewModel>() {
 
+    private val googleSignInLauncher: ActivityResultLauncher<Intent?> = registerForActivityResult() { result ->
+        viewModel.handleActivityResult(result)
+    }
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?) =
         FragmentChooseRestoreOptionBinding.inflate(inflater, container, false).also { ui = it }.root
 
@@ -62,12 +67,6 @@ class ChooseRestoreOptionFragment : CommonXmlFragment<FragmentChooseRestoreOptio
         setupUI()
 
         observeUI()
-    }
-
-    @Deprecated("Deprecated in Java")
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        viewModel.onActivityResult(requestCode, resultCode, data)
     }
 
     private fun setupUI() = with(ui) {
@@ -97,9 +96,7 @@ class ChooseRestoreOptionFragment : CommonXmlFragment<FragmentChooseRestoreOptio
         val view = RecoveryOptionView(requireContext()).apply {
             viewLifecycle = viewLifecycleOwner
             ui.restoreWalletCtaView.setOnClickListener {
-                this@ChooseRestoreOptionFragment.viewModel.startRecovery(
-                    hostFragment = this@ChooseRestoreOptionFragment,
-                )
+                this@ChooseRestoreOptionFragment.viewModel.startRecovery(googleSignInLauncher)
             }
             init(option.type)
         }

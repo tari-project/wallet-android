@@ -32,10 +32,10 @@
  */
 package com.tari.android.wallet.infrastructure.backup.googleDrive
 
-import android.app.Activity
 import android.content.Context
 import android.content.Intent
-import androidx.fragment.app.Fragment
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.ActivityResultLauncher
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
@@ -60,6 +60,7 @@ import com.tari.android.wallet.infrastructure.backup.BackupStorageAuthRevokedExc
 import com.tari.android.wallet.infrastructure.backup.BackupStorageFullException
 import com.tari.android.wallet.infrastructure.backup.BackupStorageTamperedException
 import com.tari.android.wallet.util.extension.getLastPathComponent
+import com.tari.android.wallet.util.extension.resultOk
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.joda.time.DateTime
@@ -100,15 +101,13 @@ class GoogleDriveBackupStorage @Inject constructor(
         }
     }
 
-    override fun setup(hostFragment: Fragment) {
-        hostFragment.startActivityForResult(googleClient.signInIntent, REQUEST_CODE_SIGN_IN)
+    override fun setup(launcher: ActivityResultLauncher<Intent?>) {
+        launcher.launch(googleClient.signInIntent)
     }
 
-    override suspend fun onSetupActivityResult(requestCode: Int, resultCode: Int, intent: Intent?): Boolean {
-        if (requestCode != REQUEST_CODE_SIGN_IN) return false
-
-        if (resultCode == Activity.RESULT_OK) {
-            saveDrive(intent)
+    override suspend fun onSetupActivityResult(result: ActivityResult): Boolean {
+        if (result.resultOk()) {
+            saveDrive(result.data)
         } else {
             throw BackupGoogleSignInFailedException()
         }
@@ -242,7 +241,5 @@ class GoogleDriveBackupStorage @Inject constructor(
 
     private companion object {
         private const val DRIVE_BACKUP_PARENT_FOLDER_NAME = "appDataFolder"
-        private const val REQUEST_CODE_SIGN_IN = 1356
     }
-
 }

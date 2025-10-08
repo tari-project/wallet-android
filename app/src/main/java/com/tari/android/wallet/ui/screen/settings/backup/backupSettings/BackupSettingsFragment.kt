@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.result.ActivityResultLauncher
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.fragment.app.viewModels
@@ -15,6 +16,10 @@ import com.tari.android.wallet.util.extension.composeContent
 
 class BackupSettingsFragment : CommonFragment<BackupSettingsViewModel>() {
 
+    private val googleSignInLauncher: ActivityResultLauncher<Intent?> = registerForActivityResult() { result ->
+        viewModel.handleActivityResult(result)
+    }
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?) = composeContent {
         val uiState by viewModel.uiState.collectAsState()
 
@@ -22,7 +27,7 @@ class BackupSettingsFragment : CommonFragment<BackupSettingsViewModel>() {
             BackupSettingsScreen(
                 uiState = uiState,
                 onBackClick = { viewModel.onBackPressed() },
-                onSeedPhraseClick = { viewModel.onBackupWithRecoveryPhrase() },
+                onSeedPhraseClick = { viewModel.onBackupWithRecoveryPhraseClick() },
                 onPasswordClick = { viewModel.onUpdatePassword() },
                 onUploadNowClick = { viewModel.onBackupToCloud() },
                 onLearnMoreClick = { viewModel.learnMore() },
@@ -39,15 +44,9 @@ class BackupSettingsFragment : CommonFragment<BackupSettingsViewModel>() {
 
         collectFlow(viewModel.effect) { effect ->
             when (effect) {
-                BackupSettingsViewModel.Effect.SetupStorage -> viewModel.setupStorage(this)
+                BackupSettingsViewModel.Effect.SetupStorage -> viewModel.setupStorage(googleSignInLauncher)
             }
         }
-    }
-
-    @Deprecated("Deprecated in Java") // TODO use the modernier way of handling this
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        viewModel.onActivityResult(requestCode, resultCode, data)
     }
 
     companion object {

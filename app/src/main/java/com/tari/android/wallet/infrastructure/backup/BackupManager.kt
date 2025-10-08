@@ -34,7 +34,8 @@ package com.tari.android.wallet.infrastructure.backup
 
 import android.content.Context
 import android.content.Intent
-import androidx.fragment.app.Fragment
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.ActivityResultLauncher
 import com.orhanobut.logger.Logger
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.AppStateHandler
@@ -115,12 +116,12 @@ class BackupManager @Inject constructor(
         backupNow()
     }
 
-    fun setupStorage(hostFragment: Fragment) {
-        currentOption.getStorage().setup(hostFragment)
+    fun setupStorage(launcher: ActivityResultLauncher<Intent?>) {
+        currentOption.getStorage().setup(launcher)
     }
 
-    suspend fun onSetupActivityResult(requestCode: Int, resultCode: Int, intent: Intent?): Boolean =
-        currentOption.getStorage().onSetupActivityResult(requestCode, resultCode, intent)
+    suspend fun onSetupActivityResult(result: ActivityResult): Boolean =
+        currentOption.getStorage().onSetupActivityResult(result)
 
     /**
      * Result listeners are optional, could be used for initial enabling of a backup option

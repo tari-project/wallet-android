@@ -1,7 +1,8 @@
 package com.tari.android.wallet.ui.screen.restore.chooseRestoreOption
 
 import android.content.Intent
-import androidx.fragment.app.Fragment
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.ActivityResultLauncher
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.Navigation
 import com.tari.android.wallet.application.deeplinks.DeepLink
@@ -76,9 +77,9 @@ class ChooseRestoreOptionViewModel : CommonViewModel() {
         }
     }
 
-    fun startRecovery(hostFragment: Fragment) {
+    fun startRecovery(launcher: ActivityResultLauncher<Intent?>) {
         _uiState.update { it.copy(isStarted = true) }
-        backupManager.setupStorage(hostFragment)
+        backupManager.setupStorage(launcher)
     }
 
     fun onRecoveryPhraseClicked() {
@@ -98,10 +99,10 @@ class ChooseRestoreOptionViewModel : CommonViewModel() {
         }
     }
 
-    fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+    fun handleActivityResult(result: ActivityResult) {
         launchOnIo {
             try {
-                if (backupManager.onSetupActivityResult(requestCode, resultCode, data)) {
+                if (backupManager.onSetupActivityResult(result)) {
                     restoreFromBackup()
                 }
             } catch (exception: Exception) {
