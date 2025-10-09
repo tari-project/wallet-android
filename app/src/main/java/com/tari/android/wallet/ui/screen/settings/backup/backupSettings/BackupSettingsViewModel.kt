@@ -20,7 +20,7 @@ import com.tari.android.wallet.ui.dialog.modular.modules.body.BodyModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonStyle
 import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
-import com.tari.android.wallet.ui.screen.settings.backup.data.BackupOptionDto
+import com.tari.android.wallet.ui.screen.settings.backup.data.BackupOption
 import com.tari.android.wallet.util.EffectFlow
 import com.tari.android.wallet.util.extension.collectFlow
 import com.tari.android.wallet.util.extension.launchOnIo
@@ -196,7 +196,7 @@ class BackupSettingsViewModel : CommonViewModel() {
 
     data class UiState(
         private val backupState: BackupState,
-        private val backupOption: BackupOptionDto,
+        private val backupOption: BackupOption,
 
         val seedPhraseWarning: Boolean,
     ) {

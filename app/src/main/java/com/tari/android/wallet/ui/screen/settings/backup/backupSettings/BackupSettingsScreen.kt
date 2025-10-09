@@ -31,7 +31,6 @@ import com.tari.android.wallet.ui.compose.components.TariSwitch
 import com.tari.android.wallet.ui.compose.components.TariTopBar
 import com.tari.android.wallet.ui.screen.settings.allSettings.widget.SettingsMenuItem
 import com.tari.android.wallet.ui.screen.settings.backup.data.BackupOption
-import com.tari.android.wallet.ui.screen.settings.backup.data.BackupOptionDto
 import com.tari.android.wallet.ui.screen.settings.themeSelector.TariTheme
 import org.joda.time.DateTime
 import org.joda.time.format.DateTimeFormat
@@ -183,8 +182,7 @@ private fun AllSettingsScreenPreview() {
             uiState = BackupSettingsViewModel.UiState(
                 backupState = BackupState.BackupDisabled,
                 seedPhraseWarning = true,
-                backupOption = BackupOptionDto(
-                    type = BackupOption.Google,
+                backupOption = BackupOption(
                     isEnabled = false,
                     lastSuccessDate = null,
                     lastFailureDate = null,

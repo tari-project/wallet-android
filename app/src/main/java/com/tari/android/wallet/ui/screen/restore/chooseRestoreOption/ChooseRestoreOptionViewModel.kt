@@ -46,32 +46,30 @@ class ChooseRestoreOptionViewModel : CommonViewModel() {
         component.inject(this)
     }
 
-    private val _uiState = MutableStateFlow(ChooseRestoreOptionModel.UiState(backupOption = backupPrefs.currentBackupOption))
+    private val _uiState = MutableStateFlow(ChooseRestoreOptionModel.UiState())
     val uiState = _uiState.asStateFlow()
 
     init {
         launchOnIo {
             walletManager.doOnWalletRunning { wallet ->
-                uiState.value.selectedOption?.let { selectedOption ->
-                    if (walletConfig.walletExists()) {
-                        backupPrefs.restoredTxs?.takeIf { it.utxos.isNotEmpty() }?.let { restoredTxs ->
-                            val tariWalletAddress = TariWalletAddress.fromBase58(restoredTxs.sourceBase58)
-                            val message = resourceManager.getString(R.string.backup_restored_tx)
+                if (walletConfig.walletExists()) {
+                    backupPrefs.restoredTxs?.takeIf { it.utxos.isNotEmpty() }?.let { restoredTxs ->
+                        val tariWalletAddress = TariWalletAddress.fromBase58(restoredTxs.sourceBase58)
+                        val message = resourceManager.getString(R.string.backup_restored_tx)
 
-                            try {
-                                wallet.restoreWithUnbindedOutputs(restoredTxs.utxos, tariWalletAddress, message)
-                            } catch (exception: Exception) {
-                                handleException(exception)
-                            }
+                        try {
+                            wallet.restoreWithUnbindedOutputs(restoredTxs.utxos, tariWalletAddress, message)
+                        } catch (exception: Exception) {
+                            handleException(exception)
                         }
-
-                        val dto = backupPrefs.getOptionDto(selectedOption).copy(isEnabled = true)
-                        backupPrefs.updateOption(dto)
-                        backupManager.backupNow()
-
-                        walletManager.onWalletRestored()
-                        tariNavigator.navigate(Navigation.SplashScreen(clearTop = false))
                     }
+
+                    val dto = backupPrefs.currentBackupOption.copy(isEnabled = true)
+                    backupPrefs.updateOption(dto)
+                    backupManager.backupNow()
+
+                    walletManager.onWalletRestored()
+                    tariNavigator.navigate(Navigation.SplashScreen(clearTop = false))
                 }
             }
         }

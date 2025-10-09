@@ -44,7 +44,6 @@ import com.tari.android.wallet.data.sharedPrefs.backup.BackupPrefRepository
 import com.tari.android.wallet.data.sharedPrefs.network.NetworkPrefRepository
 import com.tari.android.wallet.infrastructure.backup.BackupFileProcessor
 import com.tari.android.wallet.infrastructure.backup.BackupNamingPolicy
-import com.tari.android.wallet.infrastructure.backup.BackupStorage
 import com.tari.android.wallet.infrastructure.backup.BackupStorageAuthRevokedException
 import com.tari.android.wallet.infrastructure.backup.BackupStorageSetupCancelled
 import com.tari.android.wallet.infrastructure.backup.BackupStorageSetupException
@@ -67,17 +66,17 @@ class LocalBackupStorage @Inject constructor(
     private val walletConfig: WalletConfig,
     private val networkRepository: NetworkPrefRepository,
     private val backupFileProcessor: BackupFileProcessor
-) : BackupStorage {
+) {
 
     private val logger
         get() = Logger.t(LocalBackupStorage::class.simpleName)
 
 
-    override fun setup(launcher: ActivityResultLauncher<Intent?>) {
+    fun setup(launcher: ActivityResultLauncher<Intent?>) {
         launcher.launch(Intent(Intent.ACTION_OPEN_DOCUMENT_TREE))
     }
 
-    override suspend fun onSetupActivityResult(result: ActivityResult): Boolean {
+    suspend fun onSetupActivityResult(result: ActivityResult): Boolean {
         when (result.resultCode) {
             Activity.RESULT_OK -> {
                 val uri = result.data?.data
@@ -99,7 +98,7 @@ class LocalBackupStorage @Inject constructor(
         return true
     }
 
-    override suspend fun backup(): DateTime {
+    suspend fun backup(): DateTime {
         val backupFolder = getBackupFolder()
 
         return withContext(Dispatchers.IO) {
@@ -129,7 +128,7 @@ class LocalBackupStorage @Inject constructor(
         }
     }
 
-    override suspend fun deleteAllBackupFiles() {
+    suspend fun deleteAllBackupFiles() {
         val backupFolder = getBackupFolder()
         // delete all backup files
         for (existingFile in backupFolder.listFiles()) {
@@ -141,12 +140,12 @@ class LocalBackupStorage @Inject constructor(
         }
     }
 
-    override suspend fun signOut() {
+    suspend fun signOut() {
         backupSettingsRepository.localBackupFolderURI = null
         backupFileProcessor.clearTempFolder()
     }
 
-    override suspend fun restoreLatestBackup(password: String?) {
+    suspend fun restoreLatestBackup(password: String?) {
         val backupFolder = getBackupFolder()
         val backupFiles = backupFolder.listFiles().firstOrNull { documentFile: DocumentFile? ->
             namingPolicy.isBackupFileName(documentFile?.name.orEmpty())
@@ -172,7 +171,7 @@ class LocalBackupStorage @Inject constructor(
         }
     }
 
-    override suspend fun hasBackup(): Boolean {
+    suspend fun hasBackup(): Boolean {
         val backupFolderURI = backupSettingsRepository.localBackupFolderURI ?: return false
         val backupFolder = DocumentFile.fromTreeUri(context, backupFolderURI) ?: throw BackupStorageAuthRevokedException()
         if (!backupFolder.exists()) {

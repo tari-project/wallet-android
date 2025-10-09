@@ -47,7 +47,6 @@ import com.tari.android.wallet.di.ApplicationScope
 import com.tari.android.wallet.infrastructure.backup.googleDrive.GoogleDriveBackupStorage
 import com.tari.android.wallet.notification.NotificationHelper
 import com.tari.android.wallet.ui.screen.settings.backup.data.BackupOption
-import com.tari.android.wallet.ui.screen.settings.backup.data.BackupOptionDto
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
@@ -72,7 +71,7 @@ class BackupManager @Inject constructor(
     private val logger
         get() = Logger.t(BackupManager::class.simpleName)
 
-    val currentOption: BackupOptionDto
+    val currentOption: BackupOption
         get() = backupPrefs.currentBackupOption
 
     private val backupMutex = Mutex()
@@ -117,11 +116,11 @@ class BackupManager @Inject constructor(
     }
 
     fun setupStorage(launcher: ActivityResultLauncher<Intent?>) {
-        currentOption.getStorage().setup(launcher)
+        googleDriveBackupStorage.setup(launcher)
     }
 
     suspend fun onSetupActivityResult(result: ActivityResult): Boolean =
-        currentOption.getStorage().onSetupActivityResult(result)
+        googleDriveBackupStorage.onSetupActivityResult(result)
 
     /**
      * Result listeners are optional, could be used for initial enabling of a backup option
@@ -144,7 +143,7 @@ class BackupManager @Inject constructor(
             logger.i("Backup started")
             backupStateHandler.updateBackupState(BackupState.BackupInProgress)
             try {
-                val backupDate = currentOption.getStorage().backup()
+                val backupDate = googleDriveBackupStorage.backup()
                 backupPrefs.updateOption(
                     currentOption.copy(
                         isEnabled = true,
@@ -182,25 +181,21 @@ class BackupManager @Inject constructor(
         )
         backupPrefs.backupPassword = null
         backupStateHandler.updateBackupState(BackupState.BackupDisabled)
-        applicationScope.launch { currentOption.getStorage().signOut() }
+        applicationScope.launch { googleDriveBackupStorage.signOut() }
     }
 
     suspend fun signOut() {
-        currentOption.getStorage().signOut()
+        googleDriveBackupStorage.signOut()
     }
 
     suspend fun restoreLatestBackup(password: String? = null) = backupMutex.withLock {
-        currentOption.getStorage().restoreLatestBackup(password)
+        googleDriveBackupStorage.restoreLatestBackup(password)
     }
 
-    private fun getBackupStateByOption(optionDto: BackupOptionDto): BackupState = when {
+    private fun getBackupStateByOption(optionDto: BackupOption): BackupState = when {
         !optionDto.isEnabled -> BackupState.BackupDisabled
         optionDto.lastFailureDate != null -> BackupState.BackupFailed()
         else -> BackupState.BackupUpToDate
-    }
-
-    private fun BackupOptionDto.getStorage(): BackupStorage = when (this.type) {
-        BackupOption.Google -> googleDriveBackupStorage
     }
 
     private fun postBackupFailedNotification(exception: Exception) {
