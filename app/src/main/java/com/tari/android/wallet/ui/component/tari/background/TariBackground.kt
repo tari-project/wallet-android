@@ -26,10 +26,6 @@ abstract class TariBackground(context: Context, attrs: AttributeSet) : FrameLayo
         updateBack()
     }
 
-    fun restoreFullBack() {
-        updateBack()
-    }
-
     fun updateBack(r: Float? = null, elevation: Float? = null, backColor: Int? = null) {
         r?.let { radius = it }
         elevation?.let { backElevation = it }
@@ -62,11 +58,6 @@ abstract class TariBackground(context: Context, attrs: AttributeSet) : FrameLayo
         val shapeDrawable = ShapeDrawable(RoundRectShape(floatArrayOf(r, r, r, r, r, r, r, r), null, null))
         backColor?.let { shapeDrawable.paint.color = it }
         background = shapeDrawable
-    }
-
-    fun reset() {
-        background = null
-        elevation = 0.0F
     }
 
     override fun onAttachedToWindow() {

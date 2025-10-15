@@ -11,7 +11,6 @@ import com.tari.android.wallet.data.sharedPrefs.network.NetworkPrefRepository
 import com.tari.android.wallet.di.ApplicationScope
 import com.tari.android.wallet.infrastructure.backup.BackupUtxos
 import com.tari.android.wallet.ui.screen.settings.backup.data.BackupOption
-import com.tari.android.wallet.ui.screen.settings.backup.data.BackupOptionDto
 import kotlinx.coroutines.CoroutineScope
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -24,12 +23,12 @@ class BackupPrefRepository @Inject constructor(
     @param:ApplicationScope private val applicationScope: CoroutineScope,
 ) : CommonPrefRepository(applicationScope) {
 
-    private var googleDriveOption: BackupOptionDto by SharedPrefGsonDelegate(
+    private var googleDriveOption: BackupOption by SharedPrefGsonDelegate(
         prefs = sharedPrefs,
         prefsUpdater = this,
         name = networkRepository.currentNetwork.formatKey(Keys.GOOGLE_DRIVE_OPTION_KEY),
-        type = BackupOptionDto::class.java,
-        defValue = BackupOptionDto(type = BackupOption.Google, isEnable = false, lastSuccessDate = null, lastFailureDate = null),
+        type = BackupOption::class.java,
+        defValue = BackupOption(isEnabled = false, lastSuccessDate = null, lastFailureDate = null),
     )
 
     var backupPassword: String? by SharedPrefStringSecuredDelegate(
@@ -53,23 +52,17 @@ class BackupPrefRepository @Inject constructor(
         type = BackupUtxos::class.java,
     )
 
-    val currentBackupOption: BackupOptionDto
+    val currentBackupOption: BackupOption
         get() = googleDriveOption
 
     fun clear() {
         backupPassword = null
         localBackupFolderURI = null
-        googleDriveOption = BackupOptionDto(BackupOption.Google, isEnable = false, lastSuccessDate = null, lastFailureDate = null)
+        googleDriveOption = BackupOption(isEnabled = false, lastSuccessDate = null, lastFailureDate = null)
     }
 
-    fun updateOption(option: BackupOptionDto) {
-        when (option.type) {
-            BackupOption.Google -> googleDriveOption = option
-        }
-    }
-
-    fun getOptionDto(type: BackupOption): BackupOptionDto = when (type) {
-        BackupOption.Google -> googleDriveOption
+    fun updateOption(option: BackupOption) {
+        googleDriveOption = option
     }
 
     companion object {

@@ -21,18 +21,18 @@ val MAX_HOT_WALLET_BALANCE = MicroTari((BigDecimal.valueOf(1_000_000_000) * Micr
 
 @Singleton
 class StagedWalletSecurityManager @Inject constructor(
-    private val securityStagesRepository: SecurityStagesPrefRepository,
-    private val backupPrefsRepository: BackupPrefRepository,
-    private val tariSettingsSharedRepository: TariSettingsPrefRepository,
+    private val securityStagesPrefs: SecurityStagesPrefRepository,
+    private val backupPrefs: BackupPrefRepository,
+    private val settingsPrefs: TariSettingsPrefRepository,
 ) {
     private val hasVerifiedSeedPhrase
-        get() = tariSettingsSharedRepository.hasVerifiedSeedWords
+        get() = settingsPrefs.hasVerifiedSeedWords
 
     private val isBackupOn
-        get() = backupPrefsRepository.currentBackupOption.isEnable
+        get() = backupPrefs.currentBackupOption.isEnabled
 
     private val isBackupPasswordSet
-        get() = !backupPrefsRepository.backupPassword.isNullOrEmpty()
+        get() = !backupPrefs.backupPassword.isNullOrEmpty()
 
     private val disabledTimestampSinceNow: Calendar
         get() = Calendar.getInstance().also { it.add(Calendar.DAY_OF_YEAR, 7) }
@@ -44,9 +44,9 @@ class StagedWalletSecurityManager @Inject constructor(
         val securityStage = checkSecurityStage(balance) ?: return NoStagedSecurityPopUp
         //todo Stage 3 is currently disabled
         if (securityStage == WalletSecurityStage.Stage3) return NoStagedSecurityPopUp
-        if (securityStagesRepository.disabledTimestamp.isAfterNow()) return NoStagedSecurityPopUp
+        if (securityStagesPrefs.disabledTimestamp.isAfterNow()) return NoStagedSecurityPopUp
 
-        securityStagesRepository.disabledTimestamp = disabledTimestampSinceNow
+        securityStagesPrefs.disabledTimestamp = disabledTimestampSinceNow
 
         return ShowStagedSecurityPopUp(securityStage)
     }

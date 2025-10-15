@@ -11,6 +11,7 @@ import android.view.View
 import android.view.WindowManager
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
+import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.core.content.ContextCompat
@@ -48,7 +49,7 @@ abstract class CommonFragment<VM : CommonViewModel> : Fragment(), FragmentPopped
 
     private var fragmentPoppedListener: FragmentPoppedListener? = null
 
-    private val launcher = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { results ->
+    private val permissionsLauncher = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { results ->
         if (results.all { it.value }) {
             viewModel.permissionManager.grantedAction()
         } else {
@@ -56,7 +57,7 @@ abstract class CommonFragment<VM : CommonViewModel> : Fragment(), FragmentPopped
         }
     }
 
-    private val scanQrCode = registerForActivityResult(StartActivityForResult()) { result ->
+    private val scanQrCodeLauncher = registerForActivityResult() { result ->
         val qrDeepLink = result.dataIfOk()?.parcelable<DeepLink>(QrScannerActivity.EXTRA_DEEPLINK) ?: return@registerForActivityResult
         viewModel.handleDeeplink(qrDeepLink)
     }
@@ -109,6 +110,9 @@ abstract class CommonFragment<VM : CommonViewModel> : Fragment(), FragmentPopped
 
     protected open fun screenRecordingAlwaysDisable() = false
 
+    protected fun registerForActivityResult(resultCallback: (result: ActivityResult) -> Unit) =
+        registerForActivityResult(StartActivityForResult(), resultCallback)
+
     fun bindViewModel(viewModel: VM) = with(viewModel) {
         this@CommonFragment.viewModel = this
 
@@ -119,7 +123,7 @@ abstract class CommonFragment<VM : CommonViewModel> : Fragment(), FragmentPopped
 
 
     fun startQrScanner(source: QrScannerSource) {
-        scanQrCode.launch(QrScannerActivity.newIntent(requireContext(), source))
+        scanQrCodeLauncher.launch(QrScannerActivity.newIntent(requireContext(), source))
     }
 
     fun setFragmentPoppedListener(listener: FragmentPoppedListener) {
@@ -143,9 +147,7 @@ abstract class CommonFragment<VM : CommonViewModel> : Fragment(), FragmentPopped
 
         observe(inputDialog) { dialogManager.replace(InputModularDialog(requireActivity(), it)) }
 
-        observe(permissionManager.checkForPermission) {
-            launcher.launch(it.toTypedArray())
-        }
+        observe(permissionManager.checkForPermission) { permissionsLauncher.launch(it.toTypedArray()) }
 
         observe(permissionManager.openSettings) { openSettings() }
 

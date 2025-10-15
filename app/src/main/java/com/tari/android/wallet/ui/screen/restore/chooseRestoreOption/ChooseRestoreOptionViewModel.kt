@@ -1,7 +1,8 @@
 package com.tari.android.wallet.ui.screen.restore.chooseRestoreOption
 
 import android.content.Intent
-import androidx.fragment.app.Fragment
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.ActivityResultLauncher
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.Navigation
 import com.tari.android.wallet.application.deeplinks.DeepLink
@@ -36,7 +37,7 @@ class ChooseRestoreOptionViewModel : CommonViewModel() {
     lateinit var backupManager: BackupManager
 
     @Inject
-    lateinit var backupPrefRepository: BackupPrefRepository
+    lateinit var backupPrefs: BackupPrefRepository
 
     @Inject
     lateinit var walletConfig: WalletConfig
@@ -45,40 +46,38 @@ class ChooseRestoreOptionViewModel : CommonViewModel() {
         component.inject(this)
     }
 
-    private val _uiState = MutableStateFlow(ChooseRestoreOptionModel.UiState(backupOption = backupPrefRepository.currentBackupOption))
+    private val _uiState = MutableStateFlow(ChooseRestoreOptionModel.UiState())
     val uiState = _uiState.asStateFlow()
 
     init {
         launchOnIo {
             walletManager.doOnWalletRunning { wallet ->
-                uiState.value.selectedOption?.let { selectedOption ->
-                    if (walletConfig.walletExists()) {
-                        backupPrefRepository.restoredTxs?.takeIf { it.utxos.isNotEmpty() }?.let { restoredTxs ->
-                            val tariWalletAddress = TariWalletAddress.fromBase58(restoredTxs.sourceBase58)
-                            val message = resourceManager.getString(R.string.backup_restored_tx)
+                if (walletConfig.walletExists()) {
+                    backupPrefs.restoredTxs?.takeIf { it.utxos.isNotEmpty() }?.let { restoredTxs ->
+                        val tariWalletAddress = TariWalletAddress.fromBase58(restoredTxs.sourceBase58)
+                        val message = resourceManager.getString(R.string.backup_restored_tx)
 
-                            try {
-                                wallet.restoreWithUnbindedOutputs(restoredTxs.utxos, tariWalletAddress, message)
-                            } catch (exception: Exception) {
-                                handleException(exception)
-                            }
+                        try {
+                            wallet.restoreWithUnbindedOutputs(restoredTxs.utxos, tariWalletAddress, message)
+                        } catch (exception: Exception) {
+                            handleException(exception)
                         }
-
-                        val dto = backupPrefRepository.getOptionDto(selectedOption).copy(isEnable = true)
-                        backupPrefRepository.updateOption(dto)
-                        backupManager.backupNow()
-
-                        walletManager.onWalletRestored()
-                        tariNavigator.navigate(Navigation.SplashScreen(clearTop = false))
                     }
+
+                    val dto = backupPrefs.currentBackupOption.copy(isEnabled = true)
+                    backupPrefs.updateOption(dto)
+                    backupManager.backupNow()
+
+                    walletManager.onWalletRestored()
+                    tariNavigator.navigate(Navigation.SplashScreen(clearTop = false))
                 }
             }
         }
     }
 
-    fun startRecovery(hostFragment: Fragment) {
+    fun startRecovery(launcher: ActivityResultLauncher<Intent?>) {
         _uiState.update { it.copy(isStarted = true) }
-        backupManager.setupStorage(hostFragment)
+        backupManager.setupStorage(launcher)
     }
 
     fun onRecoveryPhraseClicked() {
@@ -98,10 +97,10 @@ class ChooseRestoreOptionViewModel : CommonViewModel() {
         }
     }
 
-    fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+    fun handleActivityResult(result: ActivityResult) {
         launchOnIo {
             try {
-                if (backupManager.onSetupActivityResult(requestCode, resultCode, data)) {
+                if (backupManager.onSetupActivityResult(result)) {
                     restoreFromBackup()
                 }
             } catch (exception: Exception) {

@@ -32,10 +32,10 @@
  */
 package com.tari.android.wallet.infrastructure.backup.googleDrive
 
-import android.app.Activity
 import android.content.Context
 import android.content.Intent
-import androidx.fragment.app.Fragment
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.ActivityResultLauncher
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
@@ -53,12 +53,13 @@ import com.orhanobut.logger.Logger
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.walletManager.WalletConfig
 import com.tari.android.wallet.infrastructure.backup.BackupFileProcessor
+import com.tari.android.wallet.infrastructure.backup.BackupGoogleSignInFailedException
 import com.tari.android.wallet.infrastructure.backup.BackupNamingPolicy
-import com.tari.android.wallet.infrastructure.backup.BackupStorage
 import com.tari.android.wallet.infrastructure.backup.BackupStorageAuthRevokedException
 import com.tari.android.wallet.infrastructure.backup.BackupStorageFullException
 import com.tari.android.wallet.infrastructure.backup.BackupStorageTamperedException
 import com.tari.android.wallet.util.extension.getLastPathComponent
+import com.tari.android.wallet.util.extension.resultOk
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.joda.time.DateTime
@@ -73,7 +74,7 @@ class GoogleDriveBackupStorage @Inject constructor(
     private val namingPolicy: BackupNamingPolicy,
     private val walletConfig: WalletConfig,
     private val backupFileProcessor: BackupFileProcessor
-) : BackupStorage {
+) {
 
     private val logger
         get() = Logger.t(GoogleDriveBackupStorage::class.simpleName)
@@ -99,28 +100,21 @@ class GoogleDriveBackupStorage @Inject constructor(
         }
     }
 
-    override fun setup(hostFragment: Fragment) {
-        hostFragment.startActivityForResult(googleClient.signInIntent, REQUEST_CODE_SIGN_IN)
+    fun setup(launcher: ActivityResultLauncher<Intent?>) {
+        launcher.launch(googleClient.signInIntent)
     }
 
-    override suspend fun onSetupActivityResult(requestCode: Int, resultCode: Int, intent: Intent?): Boolean {
-        when (requestCode) {
-            REQUEST_CODE_SIGN_IN -> when (resultCode) {
-                Activity.RESULT_OK -> saveDrive(intent)
-            }
+    suspend fun onSetupActivityResult(result: ActivityResult): Boolean {
+        if (result.resultOk()) {
+            saveDrive(result.data)
+        } else {
+            throw BackupGoogleSignInFailedException()
         }
+
         return true
     }
 
-    private fun saveDrive(intent: Intent?) {
-        val result = GoogleSignIn.getSignedInAccountFromIntent(intent).result
-        val credential = GoogleAccountCredential.usingOAuth2(context, listOf(DriveScopes.DRIVE_APPDATA)).apply { selectedAccount = result.account }
-        googleDrive = Drive.Builder(NetHttpTransport(), GsonFactory(), credential)
-            .setApplicationName(context.resources.getString(R.string.app_name))
-            .build()
-    }
-
-    override suspend fun backup(): DateTime {
+    suspend fun backup(): DateTime {
         return withContext(Dispatchers.IO) {
             val (backupFile, backupDate, mimeType) = backupFileProcessor.generateBackupFile()
             // upload file
@@ -147,21 +141,7 @@ class GoogleDriveBackupStorage @Inject constructor(
         }
     }
 
-    private fun createBackupFile(file: File, mimeType: String) {
-        val metadata: com.google.api.services.drive.model.File =
-            com.google.api.services.drive.model.File()
-                .setParents(listOf(DRIVE_BACKUP_PARENT_FOLDER_NAME))
-                .setMimeType(mimeType)
-                .setName(file.getLastPathComponent())
-        googleDrive?.let {
-            it.files()
-                .create(metadata, FileContent(mimeType, file))
-                .setFields("id")
-                .execute()
-        } ?: error("Google Drive client is not initialized.")
-    }
-
-    override suspend fun hasBackup(): Boolean {
+    suspend fun hasBackup(): Boolean {
         try {
             return getLastBackupFileIdAndName()?.second != null
         } catch (exception: UserRecoverableAuthIOException) {
@@ -171,7 +151,7 @@ class GoogleDriveBackupStorage @Inject constructor(
         }
     }
 
-    override suspend fun restoreLatestBackup(password: String?) {
+    suspend fun restoreLatestBackup(password: String?) {
         val (backupFileId, backupFileName) = try {
             getLastBackupFileIdAndName()
         } catch (e: UserRecoverableAuthIOException) {
@@ -200,21 +180,7 @@ class GoogleDriveBackupStorage @Inject constructor(
         }
     }
 
-    private fun getLastBackupFileIdAndName(): Pair<String, String>? {
-        val file = searchForBackups().files.firstOrNull { namingPolicy.isBackupFileName(it.name) } ?: return null
-        return file.id to file.name
-    }
-
-    private fun searchForBackups(pageToken: String? = null): FileList = googleDrive?.let {
-        it.files().list()
-            .setSpaces(DRIVE_BACKUP_PARENT_FOLDER_NAME)
-            .setQ("'$DRIVE_BACKUP_PARENT_FOLDER_NAME' in parents")
-            .setFields("nextPageToken, files(id, name)")
-            .setPageToken(pageToken)
-            .execute()
-    } ?: error("Google Drive client is not initialized.")
-
-    override suspend fun deleteAllBackupFiles() {
+    suspend fun deleteAllBackupFiles() { // TODO why it never called?
         val driveFiles = googleDrive?.files() ?: return
         var pageToken: String? = null
         do {
@@ -229,16 +195,50 @@ class GoogleDriveBackupStorage @Inject constructor(
         } while (pageToken != null)
     }
 
-    override suspend fun signOut() {
+    suspend fun signOut() {
         if (GoogleSignIn.getLastSignedInAccount(context) != null) {
             backupFileProcessor.clearTempFolder()
             googleClient.signOut()
         }
     }
 
-    private companion object {
-        private const val DRIVE_BACKUP_PARENT_FOLDER_NAME = "appDataFolder"
-        private const val REQUEST_CODE_SIGN_IN = 1356
+    private fun saveDrive(intent: Intent?) {
+        val result = GoogleSignIn.getSignedInAccountFromIntent(intent).result
+        val credential = GoogleAccountCredential.usingOAuth2(context, listOf(DriveScopes.DRIVE_APPDATA)).apply { selectedAccount = result.account }
+        googleDrive = Drive.Builder(NetHttpTransport(), GsonFactory(), credential)
+            .setApplicationName(context.resources.getString(R.string.app_name))
+            .build()
     }
 
+    private fun createBackupFile(file: File, mimeType: String) {
+        val metadata: com.google.api.services.drive.model.File =
+            com.google.api.services.drive.model.File()
+                .setParents(listOf(DRIVE_BACKUP_PARENT_FOLDER_NAME))
+                .setMimeType(mimeType)
+                .setName(file.getLastPathComponent())
+        googleDrive?.let {
+            it.files()
+                .create(metadata, FileContent(mimeType, file))
+                .setFields("id")
+                .execute()
+        } ?: error("Google Drive client is not initialized.")
+    }
+
+    private fun getLastBackupFileIdAndName(): Pair<String, String>? {
+        val file = searchForBackups().files.firstOrNull { namingPolicy.isBackupFileName(it.name) } ?: return null
+        return file.id to file.name
+    }
+
+    private fun searchForBackups(pageToken: String? = null): FileList = googleDrive?.let {
+        it.files().list()
+            .setSpaces(DRIVE_BACKUP_PARENT_FOLDER_NAME)
+            .setQ("'$DRIVE_BACKUP_PARENT_FOLDER_NAME' in parents")
+            .setFields("nextPageToken, files(id, name)")
+            .setPageToken(pageToken)
+            .execute()
+    } ?: error("Google Drive client is not initialized.")
+
+    private companion object {
+        private const val DRIVE_BACKUP_PARENT_FOLDER_NAME = "appDataFolder"
+    }
 }
