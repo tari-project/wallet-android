@@ -34,6 +34,7 @@ package com.tari.android.wallet.di
 
 import com.tari.android.wallet.BuildConfig
 import com.tari.android.wallet.data.airdrop.AirdropRetrofitService
+import com.tari.android.wallet.data.exolix.ExolixRetrofitService
 import com.tari.android.wallet.data.push.PushRetrofitService
 import com.tari.android.wallet.data.rwa.RwaRetrofitService
 import dagger.Module
@@ -52,10 +53,12 @@ class RetrofitModule {
         private const val AIRDROP_BASE_URL = "https://airdrop.tari.com"
         private const val PUSH_BASE_URL = "https://push.tari.com"
         private const val RWA_BASE_URL = "https://rwa.y.at/"
+        private const val EXOLIX_BASE_URL = "https://exolix.com"
 
         private const val RETROFIT_AIRDROP = "airdrop_retrofit"
         private const val RETROFIT_PUSH = "push_retrofit"
         private const val RETROFIT_RWA = "rwa_retrofit"
+        private const val RETROFIT_EXOLIX = "exolix_retrofit"
     }
 
     @Provides
@@ -123,6 +126,34 @@ class RetrofitModule {
     @Singleton
     fun provideRwaRepository(@Named(RETROFIT_RWA) retrofit: Retrofit): RwaRetrofitService =
         retrofit.create(RwaRetrofitService::class.java)
+
+    @Provides
+    @Named(RETROFIT_EXOLIX)
+    @Singleton
+    fun provideExolixHttpClient(): OkHttpClient = OkHttpClient.Builder()
+        .addInterceptor { chain ->
+            val request = chain.request().newBuilder()
+                .addHeader("Authorization", BuildConfig.EXOLIX_API_KEY)
+                .build()
+            chain.proceed(request)
+        }
+        .addLoggingIfDebug()
+        .build()
+
+    @Provides
+    @Named(RETROFIT_EXOLIX)
+    @Singleton
+    fun provideExolixRetrofit(@Named(RETROFIT_EXOLIX) client: OkHttpClient): Retrofit =
+        Retrofit.Builder()
+            .baseUrl(EXOLIX_BASE_URL)
+            .client(client)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+
+    @Provides
+    @Singleton
+    fun provideExolixRepository(@Named(RETROFIT_EXOLIX) retrofit: Retrofit): ExolixRetrofitService =
+        retrofit.create(ExolixRetrofitService::class.java)
 
     private fun OkHttpClient.Builder.addLoggingIfDebug(): OkHttpClient.Builder {
         if (BuildConfig.DEBUG) {

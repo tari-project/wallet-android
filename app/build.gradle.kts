@@ -61,6 +61,7 @@ android {
         buildConfigField("String", "LIB_WALLET_VERSION", "\"${TariBuildConfig.LibWallet.version}\"")
 
         buildConfigField("String", "NOTIFICATIONS_API_KEY", "\"${loadSecretProps()["service.notifications.api_key"]}\"")
+        buildConfigField("String", "EXOLIX_API_KEY", "\"${loadSecretProps()["exolix.api.key"]}\"")
     }
 
     flavorDimensions.add("network")
