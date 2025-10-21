@@ -26,7 +26,10 @@ import com.tari.android.wallet.application.walletManager.WalletConfig
 import com.tari.android.wallet.model.TransactionData
 import com.tari.android.wallet.ui.compose.PreviewSecondarySurface
 import com.tari.android.wallet.ui.compose.TariDesignSystem
+import com.tari.android.wallet.ui.compose.components.TariLoadingLayout
+import com.tari.android.wallet.ui.compose.components.TariLoadingLayoutState
 import com.tari.android.wallet.ui.compose.components.TariPrimaryButton
+import com.tari.android.wallet.ui.compose.components.TariProgressView
 import com.tari.android.wallet.ui.compose.components.TariTextButton
 import com.tari.android.wallet.ui.compose.components.TariTopBar
 import com.tari.android.wallet.ui.screen.send.confirm.widget.SenderCard
@@ -149,21 +152,34 @@ fun ConfirmScreen(
 
             Spacer(Modifier.weight(1f))
 
-            TariPrimaryButton(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 20.dp),
-                text = stringResource(R.string.confirm_tx_confirm_and_send_button),
-                onClick = onConfirmClick,
-            )
-            Spacer(Modifier.size(16.dp))
-            TariTextButton(
-                modifier = Modifier
-                    .align(Alignment.CenterHorizontally)
-                    .padding(horizontal = 20.dp),
-                text = stringResource(R.string.common_cancel),
-                onClick = onBackClick,
-            )
+            TariLoadingLayout(
+                modifier = Modifier.fillMaxWidth(),
+                targetLoadingState = if (uiState.isSending) TariLoadingLayoutState.Loading else TariLoadingLayoutState.Content,
+                loadingLayout = {
+                    TariProgressView(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 64.dp),
+                    )
+                }
+            ) {
+                TariPrimaryButton(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 20.dp),
+                    text = stringResource(R.string.confirm_tx_confirm_and_send_button),
+                    onClick = onConfirmClick,
+                )
+                Spacer(Modifier.size(16.dp))
+                TariTextButton(
+                    modifier = Modifier
+                        .align(Alignment.CenterHorizontally)
+                        .padding(horizontal = 20.dp),
+                    text = stringResource(R.string.common_cancel),
+                    onClick = onBackClick,
+                )
+            }
+
             Spacer(Modifier.size(16.dp))
         }
     }
@@ -176,6 +192,31 @@ private fun ConfirmScreenPreview() {
         ConfirmScreen(
             uiState = ConfirmViewModel.UiState(
                 ticker = "XTM",
+                isSending = false,
+                transactionData = TransactionData(
+                    amount = 1200000.toMicroTari(),
+                    feePerGram = 1000.toMicroTari(),
+                    note = "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+                    recipientContact = MockDataStub.createContact(),
+                ),
+            ),
+            onBackClick = {},
+            onConfirmClick = {},
+            onCopyValueClick = {},
+            onFeeInfoClick = {},
+            onEmojiIdDetailsClick = {},
+        )
+    }
+}
+
+@Composable
+@Preview
+private fun ConfirmScreenSendingPreview() {
+    PreviewSecondarySurface(TariTheme.Light) {
+        ConfirmScreen(
+            uiState = ConfirmViewModel.UiState(
+                ticker = "XTM",
+                isSending = true,
                 transactionData = TransactionData(
                     amount = 1200000.toMicroTari(),
                     feePerGram = 1000.toMicroTari(),

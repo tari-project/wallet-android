@@ -64,7 +64,7 @@ import com.tari.android.wallet.ui.screen.restore.enterRestorationPassword.EnterR
 import com.tari.android.wallet.ui.screen.restore.inputSeedWords.InputSeedWordsViewModel
 import com.tari.android.wallet.ui.screen.restore.walletRestoring.WalletRestoringViewModel
 import com.tari.android.wallet.ui.screen.send.confirm.ConfirmViewModel
-import com.tari.android.wallet.ui.screen.send.obsolete.finalize.FinalizeSendTxViewModel
+
 import com.tari.android.wallet.ui.screen.send.obsolete.requestTari.RequestTariViewModel
 import com.tari.android.wallet.ui.screen.send.receive.ReceiveViewModel
 import com.tari.android.wallet.ui.screen.send.send.SendViewModel
@@ -131,7 +131,7 @@ interface ApplicationComponent {
     fun inject(viewModel: WalletSettingsViewModel)
     fun inject(viewModel: SupportSettingsViewModel)
     fun inject(viewModel: LegalSettingsViewModel)
-    fun inject(viewModel: FinalizeSendTxViewModel)
+
     fun inject(viewModel: WalletInfoViewModel)
     fun inject(viewModel: RequestTariViewModel)
     fun inject(viewModel: LocalAuthViewModel)

@@ -161,16 +161,6 @@
             android:theme="@style/AppTheme.Light"
             android:windowSoftInputMode="stateAlwaysHidden" />
 
-        <!-- send tari -->
-        <activity
-            android:name=".ui.screen.send.obsolete.finalize.YatFinalizeSendTxActivity"
-            android:configChanges="keyboardHidden|orientation|screenSize"
-            android:exported="true"
-            android:launchMode="singleInstance"
-            android:screenOrientation="portrait"
-            android:theme="@style/YatLibTheme.TransparentCompat"
-            android:windowSoftInputMode="stateAlwaysHidden" />
-
         <activity
             android:name=".ui.screen.debug.activity.DebugActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
