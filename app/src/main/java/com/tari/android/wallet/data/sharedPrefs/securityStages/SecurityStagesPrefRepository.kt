@@ -36,14 +36,18 @@ import android.content.SharedPreferences
 import com.tari.android.wallet.data.sharedPrefs.CommonPrefRepository
 import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefGsonDelegate
 import com.tari.android.wallet.data.sharedPrefs.network.NetworkPrefRepository
-import com.tari.android.wallet.data.sharedPrefs.network.formatKey
+import com.tari.android.wallet.di.ApplicationScope
+import kotlinx.coroutines.CoroutineScope
 import java.util.Calendar
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class SecurityStagesPrefRepository @Inject constructor(sharedPrefs: SharedPreferences, networkRepository: NetworkPrefRepository) :
-    CommonPrefRepository(networkRepository) {
+class SecurityStagesPrefRepository @Inject constructor(
+    private val sharedPrefs: SharedPreferences,
+    private val networkRepository: NetworkPrefRepository,
+    @param:ApplicationScope private val applicationScope: CoroutineScope,
+) : CommonPrefRepository(applicationScope) {
 
     private object Key {
         const val DISABLED_TIMESTAMP = "tari_disabled_timestamp"
@@ -51,8 +55,8 @@ class SecurityStagesPrefRepository @Inject constructor(sharedPrefs: SharedPrefer
 
     var disabledTimestamp: Calendar by SharedPrefGsonDelegate(
         prefs = sharedPrefs,
-        commonRepository = this,
-        name = formatKey(Key.DISABLED_TIMESTAMP),
+        prefsUpdater = this,
+        name = networkRepository.currentNetwork.formatKey(Key.DISABLED_TIMESTAMP),
         type = Calendar::class.java,
         defValue = Calendar.getInstance(),
     )

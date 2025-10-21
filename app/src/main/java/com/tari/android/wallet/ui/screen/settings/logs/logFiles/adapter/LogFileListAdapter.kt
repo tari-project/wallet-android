@@ -35,7 +35,7 @@ package com.tari.android.wallet.ui.screen.settings.logs.logFiles.adapter
 import com.tari.android.wallet.ui.common.recyclerView.CommonAdapter
 import com.tari.android.wallet.ui.common.recyclerView.CommonViewHolderItem
 import com.tari.android.wallet.ui.common.recyclerView.ViewHolderBuilder
-import com.tari.android.wallet.ui.screen.settings.allSettings.divider.SettingsDividerViewHolder
+import com.tari.android.wallet.ui.screen.settings.logs.logFiles.adapter.divider.SettingsDividerViewHolder
 
 class LogFileListAdapter : CommonAdapter<CommonViewHolderItem>() {
     override var viewHolderBuilders: List<ViewHolderBuilder> = listOf(LogFileViewHolder.getBuilder(), SettingsDividerViewHolder.getBuilder())

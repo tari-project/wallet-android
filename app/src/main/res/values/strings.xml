@@ -230,14 +230,6 @@
     <!-- send tari - amount -->
     <string name="add_amount_tx_fee">Transaction Fee</string>
 
-    <!-- send tari - successful -->
-    <string name="finalize_send_tx_sending_step_1_desc_line_1">Connecting to the</string>
-    <string name="finalize_send_tx_sending_step_1_desc_line_2" tools:ignore="TypographyEllipsis">Tari Network...</string>
-    <string name="finalize_send_tx_sending_step_3_desc_line_1">Good to go!</string>
-    <string name="finalize_send_tx_sending_step_3_desc_line_2" tools:ignore="TypographyEllipsis">Your transaction is on its way...</string>
-    <string name="finalize_send_tx_sending_cancel_dialog_title">Cancel Sending</string>
-    <string name="finalize_send_tx_sending_cancel_dialog_description">Are you sure you want to leave this screen? Your transaction may be cancelled.</string>
-
     <!-- send tari - confirm & pay -->
     <string name="confirm_tx_confirm_and_send_button">Confirm &amp; Send</string>
     <string name="confirm_tx_you_are_about_to_send">You are about to send</string>
@@ -369,16 +361,11 @@
 
     <!-- Settings -->
     <string name="all_settings_page_title">Settings</string>
-    <string name="all_settings_contact_label">Contacts</string>
-    <string name="all_settings_security_label">Security</string>
-    <string name="all_settings_advanced_settings_label">Advanced</string>
     <string name="all_settings_back_up_wallet_settings_entry">Wallet Backups</string>
     <string name="all_settings_back_up_wallet_settings_safety">Learn More</string>
-    <string name="all_settings_secondary_settings_label">More</string>
     <string name="all_settings_report_a_bug">Report a Bug</string>
     <string name="all_settings_store">The TTL Store</string>
     <string name="all_settings_data_collection">Data Collection</string>
-    <string name="all_settings_contacts">Contact Book</string>
     <string name="all_settings_pin_code">Change Passcode</string>
     <string name="all_settings_create_pin_code">Create Passcode</string>
     <string name="all_settings_biometrics">Biometrics</string>
@@ -390,7 +377,6 @@
     <string name="all_settings_disclaimer">Disclaimer</string>
     <string name="all_settings_explorer">Block Explorer</string>
     <string name="all_settings_screen_recording">Screen recording</string>
-    <string name="all_settings_connect_yats">Connect Yats</string>
     <string name="all_settings_select_theme">Select Theme</string>
     <string name="all_settings_select_network">Select Network</string>
     <string name="all_settings_select_network_recommended">(Recommended)</string>
@@ -399,6 +385,11 @@
     <string name="all_settings_select_network_confirm_description">You will be logged out and switched to a different network. Do you want to continue?</string>
     <string name="all_settings_version_text_copy_title">Tari Wallet Version</string>
     <string name="all_settings_version_text_copy_toast_message">Tari version was copied</string>
+    <string name="all_settings_menu_profile">Profile</string>
+    <string name="all_settings_menu_contacts">Contacts</string>
+    <string name="all_settings_menu_wallet_settings">Wallet Settings</string>
+    <string name="all_settings_menu_support">Support &amp; Resources</string>
+    <string name="all_settings_menu_legal">Legal</string>
 
     <!-- Screen recording -->
     <string name="screen_recording_title">Screen recording</string>
@@ -430,6 +421,7 @@
     <string name="back_up_wallet_backup_status_checking_backup">Checking</string>
     <string name="back_up_wallet_backup_status_in_progress">In progress</string>
     <string name="back_up_wallet_backup_status_outdated">Out of date</string>
+    <string name="back_up_wallet_backup_status_disabled">Disabled</string>
     <string name="back_up_wallet_backup_status_up_to_date">Up to date</string>
     <string name="back_up_wallet_restore_with_recovery_phrase">Restore with recovery phrase</string>
     <string name="back_up_wallet_restoring_wallet_label">Restoring your wallet</string>
@@ -632,6 +624,7 @@
     <string name="enter_backup_password_page_desc_highlighted_part">you will not be able to recover your wallet</string>
     <string name="back_up_wallet_storage_setup_error_title">Wallet Backup Incomplete</string>
     <string name="backup_wallet_storage_full_title">Wallet Backup Incomplete</string>
+    <string name="backup_error_google_sign_in">Unable to sign in with Google</string>
     <string name="check_backup_storage_status_auth_revoked_error_description">Storage is not accessible</string>
     <string name="back_up_wallet_storage_setup_error_desc">Storage setup was interrupt</string>
     <string name="backup_wallet_storage_full_desc">Your storage is full</string>

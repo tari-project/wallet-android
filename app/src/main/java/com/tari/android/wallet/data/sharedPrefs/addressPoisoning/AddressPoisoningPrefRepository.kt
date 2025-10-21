@@ -36,8 +36,9 @@ import android.content.SharedPreferences
 import com.tari.android.wallet.data.sharedPrefs.CommonPrefRepository
 import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefGsonDelegate
 import com.tari.android.wallet.data.sharedPrefs.network.NetworkPrefRepository
-import com.tari.android.wallet.data.sharedPrefs.network.formatKey
+import com.tari.android.wallet.di.ApplicationScope
 import com.tari.android.wallet.model.TariWalletAddress
+import kotlinx.coroutines.CoroutineScope
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -45,7 +46,8 @@ import javax.inject.Singleton
 class AddressPoisoningPrefRepository @Inject constructor(
     sharedPrefs: SharedPreferences,
     networkRepository: NetworkPrefRepository,
-) : CommonPrefRepository(networkRepository) {
+    @param:ApplicationScope private val applicationScope: CoroutineScope,
+) : CommonPrefRepository(applicationScope) {
 
     private object Key {
         const val TRUSTED_CONTACT_LIST = "TRUSTED_CONTACT_LIST"
@@ -53,8 +55,8 @@ class AddressPoisoningPrefRepository @Inject constructor(
 
     private var trustedContactList: TrustedContactList by SharedPrefGsonDelegate(
         prefs = sharedPrefs,
-        commonRepository = this,
-        name = formatKey(Key.TRUSTED_CONTACT_LIST),
+        prefsUpdater = this,
+        name = networkRepository.currentNetwork.formatKey(Key.TRUSTED_CONTACT_LIST),
         type = TrustedContactList::class.java,
         defValue = TrustedContactList(),
     )

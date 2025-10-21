@@ -134,7 +134,7 @@ private fun TariLoadingLayoutPreview() {
 
 @Composable
 @Preview
-fun TariErrorViewPreview() {
+private fun TariErrorViewPreview() {
     PreviewSecondarySurface(TariTheme.Light) {
         TariErrorView(
             modifier = Modifier.padding(20.dp),
@@ -145,7 +145,7 @@ fun TariErrorViewPreview() {
 
 @Composable
 @Preview
-fun TariErrorWarningViewPreview() {
+private fun TariErrorWarningViewPreview() {
     PreviewSecondarySurface(TariTheme.Light) {
         TariErrorWarningView(
             modifier = Modifier.padding(20.dp),
@@ -155,7 +155,7 @@ fun TariErrorWarningViewPreview() {
 
 @Composable
 @Preview
-fun TariProgressViewPreview() {
+private fun TariProgressViewPreview() {
     PreviewSecondarySurface(TariTheme.Light) {
         TariProgressView(
             modifier = Modifier.padding(20.dp),

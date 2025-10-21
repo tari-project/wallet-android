@@ -62,7 +62,6 @@ import com.tari.android.wallet.model.tx.PendingInboundTx
 import com.tari.android.wallet.model.tx.PendingOutboundTx
 import com.tari.android.wallet.notification.FcmHelper
 import com.tari.android.wallet.ui.common.DialogManager
-import com.tari.android.wallet.ui.screen.send.obsolete.finalize.FinalizeSendTxModel
 import com.tari.android.wallet.util.BroadcastEffectFlow
 import com.tari.android.wallet.util.extension.collectFlow
 import com.tari.android.wallet.util.extension.safeCastTo
@@ -311,7 +310,9 @@ class WalletManager @Inject constructor(
 
         object TxSend {
             data class TxSendSuccessful(val txId: TxId) : WalletEvent()
-            data class TxSendFailed(val failureReason: FinalizeSendTxModel.TxFailureReason) : WalletEvent()
+            data class TxSendFailed(val failureReason: TxFailureReason) : WalletEvent() {
+                enum class TxFailureReason { NETWORK_CONNECTION_ERROR, SEND_ERROR }
+            }
         }
 
         data object OnWalletRemove : WalletEvent()

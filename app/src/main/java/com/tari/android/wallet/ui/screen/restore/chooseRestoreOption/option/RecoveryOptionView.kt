@@ -7,7 +7,6 @@ import android.view.ViewGroup
 import com.tari.android.wallet.R
 import com.tari.android.wallet.databinding.ViewRestoreOptionBinding
 import com.tari.android.wallet.ui.component.common.CommonView
-import com.tari.android.wallet.ui.screen.settings.backup.data.BackupOption
 import com.tari.android.wallet.util.extension.gone
 import com.tari.android.wallet.util.extension.setVisible
 
@@ -26,12 +25,10 @@ class RecoveryOptionView : CommonView<RecoveryOptionViewModel, ViewRestoreOption
         defStyleAttr
     )
 
-    fun init(option: BackupOption) {
-        val text = when (option) {
-            BackupOption.Google -> R.string.back_up_wallet_restore_with_google_drive
-        }
+    fun init() {
+        val text = R.string.back_up_wallet_restore_with_google_drive
         ui.title.text = context.getString(text)
-        bindViewModel(RecoveryOptionViewModel().apply { this.option = option })
+        bindViewModel(RecoveryOptionViewModel())
     }
 
     fun updateLoading(isLoading: Boolean) {

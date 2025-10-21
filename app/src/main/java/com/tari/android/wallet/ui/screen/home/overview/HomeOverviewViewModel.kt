@@ -11,6 +11,7 @@ import com.tari.android.wallet.R.string.error_node_unreachable_title
 import com.tari.android.wallet.application.Navigation
 import com.tari.android.wallet.application.securityStage.StagedWalletSecurityManager
 import com.tari.android.wallet.application.walletManager.WalletManager.WalletEvent
+import com.tari.android.wallet.application.walletManager.WalletManager.WalletEvent.TxSend.TxSendFailed.TxFailureReason
 import com.tari.android.wallet.application.walletManager.doOnWalletRunning
 import com.tari.android.wallet.data.BalanceStateHandler
 import com.tari.android.wallet.data.ConnectionStateHandler
@@ -26,7 +27,6 @@ import com.tari.android.wallet.ui.dialog.modular.modules.body.BodyModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonStyle
 import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
-import com.tari.android.wallet.ui.screen.send.obsolete.finalize.FinalizeSendTxModel.TxFailureReason
 import com.tari.android.wallet.util.extension.collectFlow
 import com.tari.android.wallet.util.extension.launchOnIo
 import kotlinx.coroutines.delay
@@ -231,22 +231,19 @@ class HomeOverviewViewModel : CommonViewModel() {
     }
 
     private fun onTxSendFailed(failureReason: TxFailureReason) = when (failureReason) {
-        TxFailureReason.NETWORK_CONNECTION_ERROR -> displayNetworkConnectionErrorDialog()
-        TxFailureReason.BASE_NODE_CONNECTION_ERROR, TxFailureReason.SEND_ERROR -> displayBaseNodeConnectionErrorDialog()
-    }
+        TxFailureReason.NETWORK_CONNECTION_ERROR -> {
+            showSimpleDialog(
+                title = resourceManager.getString(error_no_connection_title),
+                description = resourceManager.getString(error_no_connection_description),
+            )
+        }
 
-    private fun displayNetworkConnectionErrorDialog() {
-        showSimpleDialog(
-            title = resourceManager.getString(error_no_connection_title),
-            description = resourceManager.getString(error_no_connection_description),
-        )
-    }
-
-    private fun displayBaseNodeConnectionErrorDialog() {
-        showSimpleDialog(
-            title = resourceManager.getString(error_node_unreachable_title),
-            description = resourceManager.getString(error_node_unreachable_description),
-        )
+        TxFailureReason.SEND_ERROR -> {
+            showSimpleDialog(
+                title = resourceManager.getString(error_node_unreachable_title),
+                description = resourceManager.getString(error_node_unreachable_description),
+            )
+        }
     }
 
     private fun showTxDetail(txId: TxId) {

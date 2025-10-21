@@ -37,7 +37,6 @@ import com.tari.android.wallet.ui.dialog.modular.modules.body.BodyModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonStyle
 import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
-import com.tari.android.wallet.util.extension.addTo
 import com.tari.android.wallet.util.extension.launchOnIo
 import com.tari.android.wallet.util.extension.launchOnMain
 import io.reactivex.disposables.CompositeDisposable
@@ -108,10 +107,9 @@ open class CommonViewModel : ViewModel(), DialogHandler {
     val inputDialog: LiveData<ModularDialogArgs> = _inputDialog
 
     init {
-        securityPrefRepository.updateNotifier.subscribe(
-            /* onNext = */ { checkAuthorization() },
-            /* onError = */ { logger.e("Error checking authorization", it) },
-        ).addTo(compositeDisposable)
+        launchOnMain {
+            securityPrefRepository.doOnSettingsUpdated { checkAuthorization() }
+        }
     }
 
     override fun onCleared() {
@@ -298,7 +296,7 @@ open class CommonViewModel : ViewModel(), DialogHandler {
                     confirmButtonText = resourceManager.getString(R.string.screen_recording_disabled_dialog_confirm_button),
                     cancelButtonText = resourceManager.getString(R.string.screen_recording_disabled_dialog_cancel_button),
                     onConfirm = { hideDialog(ModularDialogArgs.DialogId.SCREEN_RECORDING) },
-                    onCancel = { tariNavigator.navigate(AllSettings.ToScreenRecording) },
+                    onCancel = { tariNavigator.navigate(AllSettings.ScreenRecording) },
                     onDismiss = { },
                 ).getModular(resourceManager)
             )

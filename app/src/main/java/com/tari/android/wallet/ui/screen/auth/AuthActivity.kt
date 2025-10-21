@@ -50,7 +50,6 @@ import com.tari.android.wallet.ui.common.CommonXmlActivity
 import com.tari.android.wallet.ui.common.domain.PaletteManager
 import com.tari.android.wallet.ui.screen.pinCode.EnterPinCodeFragment
 import com.tari.android.wallet.ui.screen.pinCode.PinCodeScreenBehavior
-import com.tari.android.wallet.ui.screen.settings.allSettings.TariVersionModel
 import com.tari.android.wallet.util.extension.setColor
 import com.tari.android.wallet.util.extension.string
 import com.tari.android.wallet.util.extension.visible
@@ -87,7 +86,7 @@ class AuthActivity : CommonXmlActivity<ActivityAuthBinding, AuthViewModel>() {
     }
 
     private fun setupUi() {
-        ui.networkInfoTextView.text = TariVersionModel(viewModel.networkRepository).versionInfo
+        ui.networkInfoTextView.text = viewModel.networkRepository.versionInfo
     }
 
     private fun doAuth() {
@@ -114,8 +113,8 @@ class AuthActivity : CommonXmlActivity<ActivityAuthBinding, AuthViewModel>() {
                             this@AuthActivity,
                             title = string(auth_title),
                             subtitle =
-                            if (viewModel.authService.isBiometricAuthAvailable) string(auth_biometric_prompt)
-                            else string(auth_device_lock_code_prompt)
+                                if (viewModel.authService.isBiometricAuthAvailable) string(auth_biometric_prompt)
+                                else string(auth_device_lock_code_prompt)
                         )
                         proceedLogin()
                     }

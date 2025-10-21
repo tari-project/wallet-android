@@ -64,14 +64,16 @@ import com.tari.android.wallet.ui.screen.restore.enterRestorationPassword.EnterR
 import com.tari.android.wallet.ui.screen.restore.inputSeedWords.InputSeedWordsViewModel
 import com.tari.android.wallet.ui.screen.restore.walletRestoring.WalletRestoringViewModel
 import com.tari.android.wallet.ui.screen.send.confirm.ConfirmViewModel
-import com.tari.android.wallet.ui.screen.send.obsolete.finalize.FinalizeSendTxViewModel
+
 import com.tari.android.wallet.ui.screen.send.obsolete.requestTari.RequestTariViewModel
 import com.tari.android.wallet.ui.screen.send.receive.ReceiveViewModel
 import com.tari.android.wallet.ui.screen.send.send.SendViewModel
+import com.tari.android.wallet.ui.screen.settings.about.TariAboutViewModel
 import com.tari.android.wallet.ui.screen.settings.allSettings.AllSettingsViewModel
-import com.tari.android.wallet.ui.screen.settings.allSettings.about.TariAboutViewModel
+import com.tari.android.wallet.ui.screen.settings.allSettings.legal.LegalSettingsViewModel
+import com.tari.android.wallet.ui.screen.settings.allSettings.support.SupportSettingsViewModel
+import com.tari.android.wallet.ui.screen.settings.allSettings.walletSettings.WalletSettingsViewModel
 import com.tari.android.wallet.ui.screen.settings.backup.backupSettings.BackupSettingsViewModel
-import com.tari.android.wallet.ui.screen.settings.backup.backupSettings.option.BackupOptionViewModel
 import com.tari.android.wallet.ui.screen.settings.backup.changeSecurePassword.ChangeSecurePasswordViewModel
 import com.tari.android.wallet.ui.screen.settings.backup.enterCurrentPassword.EnterCurrentPasswordViewModel
 import com.tari.android.wallet.ui.screen.settings.backup.learnMore.BackupLearnMoreViewModel
@@ -126,7 +128,10 @@ interface ApplicationComponent {
     fun inject(viewModel: BackupSettingsViewModel)
     fun inject(viewModel: NetworkSelectionViewModel)
     fun inject(viewModel: AllSettingsViewModel)
-    fun inject(viewModel: FinalizeSendTxViewModel)
+    fun inject(viewModel: WalletSettingsViewModel)
+    fun inject(viewModel: SupportSettingsViewModel)
+    fun inject(viewModel: LegalSettingsViewModel)
+
     fun inject(viewModel: WalletInfoViewModel)
     fun inject(viewModel: RequestTariViewModel)
     fun inject(viewModel: LocalAuthViewModel)
@@ -138,7 +143,6 @@ interface ApplicationComponent {
     fun inject(viewModel: BugsReportingViewModel)
     fun inject(viewModel: LogFilesViewModel)
     fun inject(viewModel: LogsViewModel)
-    fun inject(viewModel: BackupOptionViewModel)
     fun inject(viewModel: ThemeSelectorViewModel)
     fun inject(viewModel: DeleteWalletViewModel)
     fun inject(viewModel: HomeViewModel)

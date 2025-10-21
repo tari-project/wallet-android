@@ -1,6 +1,6 @@
 object TariBuildConfig {
 
-    const val versionNumber = "1.4.1"
+    const val versionNumber = "1.4.2"
 
     const val minSdk = 26
     const val targetSdk = 35

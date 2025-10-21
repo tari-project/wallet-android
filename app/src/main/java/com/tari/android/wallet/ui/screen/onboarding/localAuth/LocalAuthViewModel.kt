@@ -10,7 +10,6 @@ import com.tari.android.wallet.ui.screen.onboarding.localAuth.LocalAuthModel.Eff
 import com.tari.android.wallet.ui.screen.onboarding.localAuth.LocalAuthModel.SecureState
 import com.tari.android.wallet.ui.screen.pinCode.PinCodeScreenBehavior
 import com.tari.android.wallet.util.EffectFlow
-import com.tari.android.wallet.util.extension.addTo
 import com.tari.android.wallet.util.extension.launchOnMain
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -38,10 +37,9 @@ class LocalAuthViewModel : CommonViewModel() {
         sharedPrefsRepository.onboardingAuthSetupStarted = true
         updateState()
 
-        securityPrefRepository.updateNotifier.subscribe(
-            /* onNext = */{ updateState() },
-            /* onError = */ { logger.d("Error updating secure state", it) },
-        ).addTo(compositeDisposable)
+        launchOnMain {
+            securityPrefRepository.doOnSettingsUpdated { updateState() }
+        }
     }
 
     fun securedWithBiometrics() {

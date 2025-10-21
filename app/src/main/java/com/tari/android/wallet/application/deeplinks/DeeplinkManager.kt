@@ -190,7 +190,7 @@ class DeeplinkManager @Inject constructor(
     private fun goToBackupAction() {
         navigator.navigateSequence(
             Navigation.TxList.ToAllSettings,
-            Navigation.AllSettings.ToBackupSettings(true),
+            Navigation.AllSettings.BackupSettings(true),
         )
     }
 
