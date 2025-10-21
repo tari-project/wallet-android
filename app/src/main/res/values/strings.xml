@@ -230,14 +230,6 @@
     <!-- send tari - amount -->
     <string name="add_amount_tx_fee">Transaction Fee</string>
 
-    <!-- send tari - successful -->
-    <string name="finalize_send_tx_sending_step_1_desc_line_1">Connecting to the</string>
-    <string name="finalize_send_tx_sending_step_1_desc_line_2" tools:ignore="TypographyEllipsis">Tari Network...</string>
-    <string name="finalize_send_tx_sending_step_3_desc_line_1">Good to go!</string>
-    <string name="finalize_send_tx_sending_step_3_desc_line_2" tools:ignore="TypographyEllipsis">Your transaction is on its way...</string>
-    <string name="finalize_send_tx_sending_cancel_dialog_title">Cancel Sending</string>
-    <string name="finalize_send_tx_sending_cancel_dialog_description">Are you sure you want to leave this screen? Your transaction may be cancelled.</string>
-
     <!-- send tari - confirm & pay -->
     <string name="confirm_tx_confirm_and_send_button">Confirm &amp; Send</string>
     <string name="confirm_tx_you_are_about_to_send">You are about to send</string>

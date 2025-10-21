@@ -49,7 +49,6 @@ import com.tari.android.wallet.ui.screen.restore.enterRestorationPassword.EnterR
 import com.tari.android.wallet.ui.screen.restore.inputSeedWords.InputSeedWordsFragment
 import com.tari.android.wallet.ui.screen.restore.walletRestoring.WalletRestoringFragment
 import com.tari.android.wallet.ui.screen.send.confirm.ConfirmFragment
-import com.tari.android.wallet.ui.screen.send.obsolete.finalize.FinalizeSendTxFragment
 import com.tari.android.wallet.ui.screen.send.obsolete.requestTari.RequestTariFragment
 import com.tari.android.wallet.ui.screen.send.receive.ReceiveFragment
 import com.tari.android.wallet.ui.screen.send.send.SendFragment
@@ -124,7 +123,6 @@ class TariNavigator @Inject constructor() {
 
             is InputSeedWords.ToRestoreFromSeeds -> addFragment(WalletRestoringFragment.newInstance())
 
-            is TxSend.ToFinalizing -> addFragment(FinalizeSendTxFragment.create(navigation.transactionData))
             is TxSend.Send -> addFragment(SendFragment.newInstance(navigation.contact, navigation.amount, navigation.note))
             is TxSend.Confirm -> addFragment(ConfirmFragment.newInstance(navigation.transactionData))
 
@@ -258,7 +256,6 @@ sealed class Navigation {
     }
 
     sealed class TxSend : Navigation() {
-        data class ToFinalizing(val transactionData: TransactionData) : TxSend()
         data class Send(val contact: Contact? = null, val amount: MicroTari? = null, val note: String? = null) : TxSend()
         data class Confirm(val transactionData: TransactionData) : TxSend()
     }

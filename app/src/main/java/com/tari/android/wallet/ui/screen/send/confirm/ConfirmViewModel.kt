@@ -3,16 +3,27 @@ package com.tari.android.wallet.ui.screen.send.confirm
 import androidx.lifecycle.SavedStateHandle
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.Navigation
+import com.tari.android.wallet.application.walletManager.WalletManager
+import com.tari.android.wallet.application.walletManager.WalletManager.WalletEvent.TxSend.TxSendFailed.TxFailureReason
+import com.tari.android.wallet.data.network.NetworkConnectionStateHandler
 import com.tari.android.wallet.model.MicroTari
+import com.tari.android.wallet.model.TariContact
 import com.tari.android.wallet.model.TransactionData
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.screen.send.confirm.ConfirmFragment.Companion.PARAMETER_TRANSACTION
 import com.tari.android.wallet.util.extension.getOrThrow
+import com.tari.android.wallet.util.extension.launchOnIo
+import com.tari.android.wallet.util.extension.switchToMain
 import com.tari.android.wallet.util.shortString
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
+import javax.inject.Inject
 
 class ConfirmViewModel(savedState: SavedStateHandle) : CommonViewModel() {
+
+    @Inject
+    lateinit var networkConnection: NetworkConnectionStateHandler
 
     init {
         component.inject(this)
@@ -27,7 +38,33 @@ class ConfirmViewModel(savedState: SavedStateHandle) : CommonViewModel() {
     val uiState = _uiState.asStateFlow()
 
     fun onConfirmClicked() {
-        tariNavigator.navigate(Navigation.TxSend.ToFinalizing(uiState.value.transactionData))
+        _uiState.update { it.copy(isSending = true) }
+
+        launchOnIo {
+            // First check network connection
+            if (!networkConnection.isNetworkConnected()) {
+                walletManager.sendWalletEvent(WalletManager.WalletEvent.TxSend.TxSendFailed(TxFailureReason.NETWORK_CONNECTION_ERROR))
+                switchToMain { _uiState.update { it.copy(isSending = false) } }
+                return@launchOnIo
+            }
+
+            // Then send the transaction
+            runCatching {
+                val txId = walletManager.sendTari(
+                    tariContact = TariContact(uiState.value.transactionData.recipientContact.walletAddress),
+                    amount = uiState.value.transactionData.amount,
+                    feePerGram = uiState.value.transactionData.feePerGram,
+                    message = uiState.value.transactionData.message,
+                )
+
+                logger.i("Tx sent: $txId")
+                walletManager.sendWalletEvent(WalletManager.WalletEvent.TxSend.TxSendSuccessful(txId))
+            }.onFailure {
+                walletManager.sendWalletEvent(WalletManager.WalletEvent.TxSend.TxSendFailed(TxFailureReason.SEND_ERROR))
+            }
+
+            switchToMain { tariNavigator.navigate(Navigation.BackToHome) }
+        }
     }
 
     fun copyTxValueToClipboard(value: String) {
@@ -51,6 +88,7 @@ class ConfirmViewModel(savedState: SavedStateHandle) : CommonViewModel() {
     data class UiState(
         val ticker: String,
         val transactionData: TransactionData,
+        val isSending: Boolean = false,
     ) {
         val screenTitle: String
             get() = transactionData.recipientContact.alias.orEmpty().takeIf { it.isNotBlank() }
@@ -59,5 +97,6 @@ class ConfirmViewModel(savedState: SavedStateHandle) : CommonViewModel() {
         val totalAmount: MicroTari
             get() = transactionData.amount + transactionData.feePerGram
     }
+
 }
 
