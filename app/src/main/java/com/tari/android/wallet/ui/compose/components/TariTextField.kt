@@ -165,12 +165,15 @@ fun TariSearchField(
     onQueryChanged: (TextFieldValue) -> Unit,
     hint: String,
     modifier: Modifier = Modifier,
+    onSearchClicked: () -> Unit = {},
 ) {
     TariTextField(
         value = searchQuery,
         onValueChanged = onQueryChanged,
         hint = hint,
         modifier = modifier,
+        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
+        keyboardActions = KeyboardActions(onSearch = { onSearchClicked() }),
         leadingIcon = {
             Icon(
                 imageVector = Icons.Rounded.Search,

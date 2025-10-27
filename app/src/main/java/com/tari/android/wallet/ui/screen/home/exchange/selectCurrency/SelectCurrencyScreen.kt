@@ -20,6 +20,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
@@ -48,6 +49,8 @@ fun SelectCurrencyScreen(
     onCurrencyItemClick: (currency: Exolix.Currency) -> Unit,
     onLoadMoreCurrencies: () -> Unit,
 ) {
+    val focusManager = LocalFocusManager.current
+
     Scaffold(
         modifier = Modifier
             .fillMaxSize()
@@ -88,6 +91,7 @@ fun SelectCurrencyScreen(
                         searchQuery = it
                         onSearchQueryChange(it.text)
                     },
+                    onSearchClicked = { focusManager.clearFocus() },
                 )
                 Spacer(Modifier.size(16.dp))
             }
