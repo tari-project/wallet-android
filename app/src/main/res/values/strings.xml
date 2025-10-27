@@ -86,6 +86,26 @@
     <string name="common_copied_to_clipboard">Copied to clipboard</string>
     <string name="common_copy">Copy</string>
 
+    <!-- Exchange screen -->
+    <string name="exchange_title">Exchange Tari</string>
+    <string name="exchange_network_label">Network:</string>
+    <string name="exchange_amount_placeholder">Enter amount</string>
+    <string name="exchange_invalid_amount_error">Please enter a valid amount</string>
+    <string name="exchange_converted_amount_placeholder">Converted amount</string>
+    <string name="exchange_rate_display">1 %1$s ≈ %2$s %3$s</string>
+    <string name="exchange_select_currency_title">Select Currency</string>
+    <string name="exchange_search_currency_hint">Search currencies...</string>
+    <string name="exchange_no_currencies_found">No currencies found</string>
+    <string name="exchange_no_currencies_description">Try adjusting your search or check your connection</string>
+    <string name="exchange_select_network_title">Select Network</string>
+    <string name="exchange_search_network_hint">Search networks...</string>
+    <string name="exchange_no_networks_found">No networks found</string>
+    <string name="exchange_no_networks_description">No networks available for this currency</string>
+    <string name="exchange_network_default_label">(Default)</string>
+    <string name="exchange_min_amount_label_short">Min:</string>
+    <string name="exchange_max_amount_label_short">Max:</string>
+    <string name="exchange_load_more_currencies_error">Failed to load more currencies. Please try again later.</string>
+
     <!-- emoji id copied view -->
 
     <!-- emoji-id-related -->
@@ -412,13 +432,11 @@
 
     <!-- Wallet back up -->
     <string name="back_up_wallet_page_title">Security</string>
-    <string name="back_up_wallet_page_label">Wallet Backups</string>
     <string name="back_up_wallet_to_cloud_cta">Upload Now</string>
     <string name="back_up_wallet_with_recovery_phrase_cta">Write Down Seed Phrase</string>
     <string name="back_up_wallet_page_description">By backing up your wallet, you’ll ensure that you don’t lose your XTM if your phone is lost or
         broken.</string>
 
-    <string name="back_up_wallet_backup_status_checking_backup">Checking</string>
     <string name="back_up_wallet_backup_status_in_progress">In progress</string>
     <string name="back_up_wallet_backup_status_outdated">Out of date</string>
     <string name="back_up_wallet_backup_status_disabled">Disabled</string>
@@ -486,7 +504,6 @@
     <string name="restore_from_seed_words_error_unknown">Unable to generate key from seed words. Please check your seed words and try again</string>
     <string name="restore_from_seed_words_overlay_status_connecting">Waiting for connection</string>
     <string name="restore_from_seed_words_overlay_status_reconnecting">Reconnecting:</string>
-    <string name="restore_from_seed_words_overlay_status_connected">Connection established. The process will start soon</string>
     <string name="restore_from_seed_words_overlay_status_progress">Restoring in progress:</string>
     <string name="restore_from_seed_words_overlay_status_connection_failed">Attempt %1$s out of %2$s</string>
     <string name="restore_from_seed_words_overlay_error_title">Recovery Failed</string>

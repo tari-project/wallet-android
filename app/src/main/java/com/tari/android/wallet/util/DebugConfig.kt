@@ -37,6 +37,7 @@ package com.tari.android.wallet.util
 import com.tari.android.wallet.BuildConfig
 import com.tari.android.wallet.application.addressPoisoning.SimilarAddressDto
 import com.tari.android.wallet.data.contacts.Contact
+import com.tari.android.wallet.data.exolix.Exolix
 import com.tari.android.wallet.data.tx.TxDto
 import com.tari.android.wallet.ffi.FFITxCancellationReason
 import com.tari.android.wallet.model.Base58
@@ -54,6 +55,7 @@ import com.tari.android.wallet.ui.screen.utxos.list.adapters.UtxosViewHolderItem
 import com.tari.android.wallet.util.extension.toMicroTari
 import org.joda.time.DateTime
 import yat.android.lib.YatIntegration
+import java.math.BigDecimal
 import java.math.BigInteger
 import kotlin.random.Random
 
@@ -266,6 +268,104 @@ object MockDataStub {
             trusted = false,
         )
     }
+
+    fun createNetwork(
+        network: String = "ETH",
+        name: String = "Ethereum",
+        shortName: String? = "ETH",
+        isDefault: Boolean = true,
+        memoNeeded: Boolean = false,
+        precision: Int = 18,
+        icon: String? = "https://exolix.com/icons/coins/ETH.png",
+    ) = Exolix.Network(
+        network = network,
+        name = name,
+        shortName = shortName,
+        isDefault = isDefault,
+        memoNeeded = memoNeeded,
+        precision = precision,
+        icon = icon,
+    )
+
+    fun createNetworkList() = listOf(
+        createNetwork(
+            network = "ETH",
+            name = "Ethereum",
+            shortName = "ETH",
+            isDefault = true,
+            memoNeeded = false,
+            precision = 18,
+        ),
+        createNetwork(
+            network = "BSC",
+            name = "Binance Smart Chain",
+            shortName = "BSC",
+            isDefault = false,
+            memoNeeded = true,
+            precision = 18,
+        ),
+        createNetwork(
+            network = "POLYGON",
+            name = "Polygon",
+            shortName = "MATIC",
+            isDefault = false,
+            memoNeeded = false,
+            precision = 18,
+        ),
+    )
+
+    fun createCurrency(
+        code: String = "ETH",
+        name: String = "Ethereum",
+        icon: String = "https://exolix.com/icons/coins/ETH.png",
+        networks: List<Exolix.Network>? = createNetworkList(),
+    ) = Exolix.Currency(
+        code = code,
+        name = name,
+        icon = icon,
+        notes = "Popular cryptocurrency",
+        networks = networks,
+    )
+
+    fun createCurrencyList(count: Int = 10) = List(count) { index ->
+        val currencies = listOf(
+            Triple("ETH", "Ethereum", "https://exolix.com/icons/coins/ETH.png"),
+            Triple("BTC", "Bitcoin", "https://exolix.com/icons/coins/BTC.png"),
+            Triple("USDT", "Tether", "https://exolix.com/icons/coins/USDT.png"),
+            Triple("BNB", "Binance Coin", "https://exolix.com/icons/coins/BNB.png"),
+            Triple("ADA", "Cardano", "https://exolix.com/icons/coins/ADA.png"),
+            Triple("SOL", "Solana", "https://exolix.com/icons/coins/SOL.png"),
+            Triple("DOT", "Polkadot", "https://exolix.com/icons/coins/DOT.png"),
+            Triple("DOGE", "Dogecoin", "https://exolix.com/icons/coins/DOGE.png"),
+            Triple("AVAX", "Avalanche", "https://exolix.com/icons/coins/AVAX.png"),
+            Triple("LTC", "Litecoin", "https://exolix.com/icons/coins/LTC.png"),
+        )
+        val (code, name, icon) = currencies[index % currencies.size]
+        createCurrency(
+            code = code,
+            name = name,
+            icon = icon,
+            networks = if (index % 3 == 0) createNetworkList() else listOf(createNetwork(code, name, code, true)),
+        )
+    }
+
+    fun createRate(
+        fromAmount: BigDecimal = 100.0.toBigDecimal(),
+        toAmount: BigDecimal = 95.toBigDecimal(),
+        rate: BigDecimal = 0.95.toBigDecimal(),
+        message: String? = "Sample rate message",
+        minAmount: BigDecimal = 10.0.toBigDecimal(),
+        withdrawMin: BigDecimal = 5.0.toBigDecimal(),
+        maxAmount: BigDecimal = 1000.0.toBigDecimal(),
+    ) = Exolix.Rate(
+        fromAmount = fromAmount,
+        toAmount = toAmount,
+        rate = rate,
+        message = message,
+        minAmount = minAmount,
+        withdrawMin = withdrawMin,
+        maxAmount = maxAmount,
+    )
 }
 
 object YatEnvironment {

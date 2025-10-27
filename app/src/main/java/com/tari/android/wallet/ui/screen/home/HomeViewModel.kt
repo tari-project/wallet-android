@@ -42,17 +42,8 @@ class HomeViewModel : CommonViewModel() {
     }
 
     fun onMenuItemClicked(option: HomeModel.BottomMenuOption) {
-        when (option) {
-            HomeModel.BottomMenuOption.Shop,
-            HomeModel.BottomMenuOption.Home,
-            HomeModel.BottomMenuOption.Settings,
-            HomeModel.BottomMenuOption.Profile -> {
-                _uiState.update {
-                    it.copy(selectedMenuItem = option)
-                }
-            }
-
-            HomeModel.BottomMenuOption.Gem -> showNotReadyYetDialog()
+        _uiState.update {
+            it.copy(selectedMenuItem = option)
         }
     }
 

@@ -104,4 +104,9 @@ object Dependencies {
     const val keyboardVisibilityEvent = "net.yslibrary.keyboardvisibilityevent:keyboardvisibilityevent:2.3.0"
     const val mavenArtifact = "org.apache.maven:maven-artifact:3.9.9"
     const val paperDb = "io.github.pilgr:paperdb:2.7.2"
+
+    object Coil {
+        const val compose = "io.coil-kt.coil3:coil-compose:3.3.0"
+        const val networkOkhttp = "io.coil-kt.coil3:coil-network-okhttp:3.3.0"
+    }
 }

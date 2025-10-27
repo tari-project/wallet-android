@@ -1,12 +1,15 @@
 package com.tari.android.wallet.data.exolix
 
+import android.os.Parcelable
 import com.google.gson.annotations.SerializedName
+import kotlinx.parcelize.Parcelize
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.Headers
 import retrofit2.http.POST
 import retrofit2.http.Path
 import retrofit2.http.Query
+import java.math.BigDecimal
 
 interface ExolixRetrofitService {
 
@@ -16,7 +19,7 @@ interface ExolixRetrofitService {
         @Query("page") page: Int? = null,
         @Query("size") size: Int? = null,
         @Query("search") search: String? = null,
-        @Query("withNetworks") withNetworks: Boolean? = null
+        @Query("withNetworks") withNetworks: Boolean = true,
     ): Exolix.CurrenciesResponse
 
     @GET("/api/v2/currencies/{code}/networks")
@@ -38,7 +41,7 @@ interface ExolixRetrofitService {
         @Query("amount") amount: String,
         @Query("withdrawalAmount") withdrawalAmount: String? = null,
         @Query("rateType") rateType: String = "fixed"
-    ): Exolix.RateResponse
+    ): Exolix.Rate
 
     @GET("/api/v2/transactions")
     suspend fun getTransactions(
@@ -69,8 +72,8 @@ object Exolix {
         @SerializedName("networkFrom") val networkFrom: String,
         @SerializedName("coinTo") val coinTo: String,
         @SerializedName("networkTo") val networkTo: String,
-        @SerializedName("amount") val amount: Double,
-        @SerializedName("withdrawalAmount") val withdrawalAmount: Double? = null,
+        @SerializedName("amount") val amount: BigDecimal,
+        @SerializedName("withdrawalAmount") val withdrawalAmount: BigDecimal? = null,
         @SerializedName("withdrawalAddress") val withdrawalAddress: String,
         @SerializedName("withdrawalExtraId") val withdrawalExtraId: String? = null,
         @SerializedName("rateType") val rateType: String = "fixed",
@@ -85,14 +88,26 @@ object Exolix {
         @SerializedName("count") val count: Int
     )
 
+    @Parcelize
     data class Currency(
         @SerializedName("code") val code: String,
         @SerializedName("name") val name: String,
         @SerializedName("icon") val icon: String,
         @SerializedName("notes") val notes: String,
         @SerializedName("networks") val networks: List<Network>? = null
-    )
+    ) : Parcelable {
+        val defaultNetwork: Network?
+            get() = networks?.firstOrNull { it.isDefault } ?: networks?.firstOrNull()
 
+        val supportsMultipleNetworks: Boolean
+            get() = (networks?.size ?: 0) > 1
+
+        override fun equals(other: Any?): Boolean {
+            return other is Currency && other.code == code
+        }
+    }
+
+    @Parcelize
     data class Network(
         @SerializedName("network") val network: String,
         @SerializedName("name") val name: String,
@@ -108,21 +123,25 @@ object Exolix {
         @SerializedName("precision") val precision: Int,
         @SerializedName("contract") val contract: String? = null,
         @SerializedName("icon") val icon: String? = null
-    )
+    ) : Parcelable {
+        override fun equals(other: Any?): Boolean {
+            return other is Network && other.network == network
+        }
+    }
 
     data class NetworksResponse(
         @SerializedName("data") val data: List<Network>,
         @SerializedName("count") val count: Int
     )
 
-    data class RateResponse(
-        @SerializedName("fromAmount") val fromAmount: Double,
-        @SerializedName("toAmount") val toAmount: Double,
-        @SerializedName("rate") val rate: Double,
+    data class Rate(
+        @SerializedName("fromAmount") val fromAmount: BigDecimal,
+        @SerializedName("toAmount") val toAmount: BigDecimal,
+        @SerializedName("rate") val rate: BigDecimal = BigDecimal.ZERO,
         @SerializedName("message") val message: String? = null,
-        @SerializedName("minAmount") val minAmount: Double,
-        @SerializedName("withdrawMin") val withdrawMin: Double,
-        @SerializedName("maxAmount") val maxAmount: Double
+        @SerializedName("minAmount") val minAmount: BigDecimal,
+        @SerializedName("withdrawMin") val withdrawMin: BigDecimal = BigDecimal.ZERO,
+        @SerializedName("maxAmount") val maxAmount: BigDecimal,
     )
 
     data class TransactionsResponse(
@@ -132,8 +151,8 @@ object Exolix {
 
     data class Transaction(
         @SerializedName("id") val id: String,
-        @SerializedName("amount") val amount: Double,
-        @SerializedName("amountTo") val amountTo: Double,
+        @SerializedName("amount") val amount: BigDecimal,
+        @SerializedName("amountTo") val amountTo: BigDecimal,
         @SerializedName("coinFrom") val coinFrom: CoinInfo,
         @SerializedName("coinTo") val coinTo: CoinInfo,
         @SerializedName("comment") val comment: String? = null,
@@ -144,7 +163,7 @@ object Exolix {
         @SerializedName("withdrawalExtraId") val withdrawalExtraId: String? = null,
         @SerializedName("hashIn") val hashIn: HashInfo? = null,
         @SerializedName("hashOut") val hashOut: HashInfo? = null,
-        @SerializedName("rate") val rate: Double,
+        @SerializedName("rate") val rate: BigDecimal,
         @SerializedName("rateType") val rateType: String,
         @SerializedName("refundAddress") val refundAddress: String? = null,
         @SerializedName("refundExtraId") val refundExtraId: String? = null,
@@ -154,8 +173,8 @@ object Exolix {
 
     data class TransactionResponse(
         @SerializedName("id") val id: String,
-        @SerializedName("amount") val amount: Double,
-        @SerializedName("amountTo") val amountTo: Double,
+        @SerializedName("amount") val amount: BigDecimal,
+        @SerializedName("amountTo") val amountTo: BigDecimal,
         @SerializedName("coinFrom") val coinFrom: CoinInfo,
         @SerializedName("coinTo") val coinTo: CoinInfo,
         @SerializedName("comment") val comment: String? = null,
@@ -166,7 +185,7 @@ object Exolix {
         @SerializedName("withdrawalExtraId") val withdrawalExtraId: String? = null,
         @SerializedName("hashIn") val hashIn: HashInfo? = null,
         @SerializedName("hashOut") val hashOut: HashInfo? = null,
-        @SerializedName("rate") val rate: Double,
+        @SerializedName("rate") val rate: BigDecimal,
         @SerializedName("rateType") val rateType: String,
         @SerializedName("refundAddress") val refundAddress: String? = null,
         @SerializedName("refundExtraId") val refundExtraId: String? = null,
@@ -192,8 +211,8 @@ object Exolix {
 
     data class CreateExchangeResponse(
         @SerializedName("id") val id: String,
-        @SerializedName("amount") val amount: Double,
-        @SerializedName("amountTo") val amountTo: Double,
+        @SerializedName("amount") val amount: BigDecimal,
+        @SerializedName("amountTo") val amountTo: BigDecimal,
         @SerializedName("coinFrom") val coinFrom: CoinInfo,
         @SerializedName("coinTo") val coinTo: CoinInfo,
         @SerializedName("comment") val comment: String? = null,
@@ -204,7 +223,7 @@ object Exolix {
         @SerializedName("withdrawalExtraId") val withdrawalExtraId: String? = null,
         @SerializedName("hashIn") val hashIn: HashInfo? = null,
         @SerializedName("hashOut") val hashOut: HashInfo? = null,
-        @SerializedName("rate") val rate: Double,
+        @SerializedName("rate") val rate: BigDecimal,
         @SerializedName("rateType") val rateType: String,
         @SerializedName("refundAddress") val refundAddress: String? = null,
         @SerializedName("refundExtraId") val refundExtraId: String? = null,
