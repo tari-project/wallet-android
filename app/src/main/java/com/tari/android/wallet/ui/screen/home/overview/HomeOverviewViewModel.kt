@@ -199,6 +199,10 @@ class HomeOverviewViewModel : CommonViewModel() {
         tariNavigator.navigate(Navigation.TxList.HomeTransactionHistory)
     }
 
+    fun onBuyClicked() {
+        tariNavigator.navigate(Navigation.Exchange.StartExchange)
+    }
+
     private fun checkForDataConsent() {
         if (sentryPrefRepository.isEnabled == null) {
             sentryPrefRepository.isEnabled = false

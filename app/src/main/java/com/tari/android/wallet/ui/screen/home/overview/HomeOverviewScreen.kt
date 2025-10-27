@@ -24,6 +24,7 @@ import com.tari.android.wallet.ui.compose.TariDesignSystem
 import com.tari.android.wallet.ui.compose.components.TariInheritTextButton
 import com.tari.android.wallet.ui.compose.components.TariProgressView
 import com.tari.android.wallet.ui.compose.components.TariPullToRefreshBox
+import com.tari.android.wallet.ui.compose.components.TariSecondaryButton
 import com.tari.android.wallet.ui.compose.components.TariTextButton
 import com.tari.android.wallet.ui.screen.home.overview.widget.ActiveMinersCard
 import com.tari.android.wallet.ui.screen.home.overview.widget.BalanceInfoModal
@@ -47,6 +48,7 @@ fun HomeOverviewScreen(
     onStartMiningClicked: () -> Unit,
     onSendTariClicked: () -> Unit,
     onRequestTariClicked: () -> Unit,
+    onBuyClicked: () -> Unit,
     onTxClick: (txDto: TxDto) -> Unit,
     onViewAllTxsClick: () -> Unit,
     onConnectionStatusClick: () -> Unit,
@@ -105,6 +107,14 @@ fun HomeOverviewScreen(
                         onBalanceHelpClicked = onBalanceInfoClicked,
                         onHideBalanceClicked = onHideBalanceClicked,
                         isBalanceHidden = uiState.balanceHidden,
+                    )
+                    Spacer(modifier = Modifier.height(20.dp))
+                    TariSecondaryButton(
+                        modifier = Modifier
+                            .padding(horizontal = 20.dp)
+                            .fillMaxWidth(),
+                        text = stringResource(R.string.home_buy_xtm),
+                        onClick = onBuyClicked,
                     )
                     Spacer(modifier = Modifier.height(10.dp))
                     Row(
@@ -256,6 +266,7 @@ private fun HomeOverviewScreenPreview() {
             onStartMiningClicked = {},
             onSendTariClicked = {},
             onRequestTariClicked = {},
+            onBuyClicked = {},
             onTxClick = {},
             onViewAllTxsClick = {},
             onConnectionStatusClick = {},
@@ -292,6 +303,7 @@ private fun HomeOverviewScreenHiddenPreview() {
             onStartMiningClicked = {},
             onSendTariClicked = {},
             onRequestTariClicked = {},
+            onBuyClicked = {},
             onTxClick = {},
             onViewAllTxsClick = {},
             onConnectionStatusClick = {},
@@ -328,6 +340,7 @@ private fun HomeOverviewEmptyScreenPreview() {
             onStartMiningClicked = {},
             onSendTariClicked = {},
             onRequestTariClicked = {},
+            onBuyClicked = {},
             onTxClick = {},
             onViewAllTxsClick = {},
             onConnectionStatusClick = {},
@@ -365,6 +378,7 @@ private fun HomeOverviewProgressScreenPreview() {
             onStartMiningClicked = {},
             onSendTariClicked = {},
             onRequestTariClicked = {},
+            onBuyClicked = {},
             onTxClick = {},
             onViewAllTxsClick = {},
             onConnectionStatusClick = {},

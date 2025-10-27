@@ -40,6 +40,7 @@ import com.tari.android.wallet.ui.screen.contactBook.list.ContactListFragment
 import com.tari.android.wallet.ui.screen.debug.DebugNavigation
 import com.tari.android.wallet.ui.screen.debug.activity.DebugActivity
 import com.tari.android.wallet.ui.screen.home.HomeActivity
+import com.tari.android.wallet.ui.screen.home.exchange.ExchangeFragment
 import com.tari.android.wallet.ui.screen.home.exchange.selectCurrency.SelectCurrencyFragment
 import com.tari.android.wallet.ui.screen.home.exchange.selectNetwork.SelectNetworkFragment
 import com.tari.android.wallet.ui.screen.home.overview.HomeOverviewFragment
@@ -112,6 +113,7 @@ class TariNavigator @Inject constructor() {
 
             is Exchange.SelectCurrency -> addFragment(SelectCurrencyFragment.newInstance(navigation.preselectedCurrency))
             is Exchange.SelectNetwork -> addFragment(SelectNetworkFragment.newInstance(ArrayList(navigation.networks), navigation.preselectedNetwork))
+            is Exchange.StartExchange -> addFragment(ExchangeFragment.newInstance())
 
             is AllSettings.BugReporting -> DebugActivity.launch(currentActivity, DebugNavigation.BugReport)
             is AllSettings.MyProfile -> addFragment(WalletInfoFragment())
@@ -222,7 +224,7 @@ sealed class Navigation {
     data class EnterPinCode(val behavior: PinCodeScreenBehavior, val stashedPin: String? = null) : Navigation()
     data object ChangeBiometrics : Navigation()
     data class SplashScreen(val seedWords: List<String>? = null, val clearTop: Boolean = true) : Navigation()
-    data class Home(val uri: Uri? = null) : Navigation()
+    data class Home(val uri: Uri? = null, val tab: String? = null) : Navigation()
     data object BackToHome : Navigation()
 
     data class ShareText(val text: String) : Navigation()
@@ -295,6 +297,7 @@ sealed class Navigation {
     }
 
     sealed class Exchange : Navigation() {
+        data object StartExchange : Exchange()
         data class SelectCurrency(val preselectedCurrency: Exolix.Currency? = null) : Exchange()
         data class SelectNetwork(val networks: List<Exolix.Network>, val preselectedNetwork: Exolix.Network?) : Exchange()
     }

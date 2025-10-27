@@ -33,7 +33,6 @@ import com.tari.android.wallet.R
 import com.tari.android.wallet.ui.compose.PreviewPrimarySurface
 import com.tari.android.wallet.ui.compose.TariDesignSystem
 import com.tari.android.wallet.ui.screen.home.HomeModel.BottomMenuOption
-import com.tari.android.wallet.ui.screen.home.exchange.ExchangeFragment
 import com.tari.android.wallet.ui.screen.home.overview.HomeOverviewFragment
 import com.tari.android.wallet.ui.screen.profile.login.ProfileLoginFragment
 import com.tari.android.wallet.ui.screen.profile.profile.ProfileFragment
@@ -77,12 +76,6 @@ fun HomeScreen(
                         modifier = Modifier.fillMaxSize(),
                         fragmentManager = fragmentManager,
                         fragment = StoreFragment.newInstance(),
-                    )
-
-                    BottomMenuOption.Exchange -> FragmentContainer(
-                        modifier = Modifier.fillMaxSize(),
-                        fragmentManager = fragmentManager,
-                        fragment = ExchangeFragment(),
                     )
 
                     BottomMenuOption.Profile -> if (uiState.airdropLoggedIn) {
@@ -140,10 +133,6 @@ private fun NavigationMenu(
             BottomNavigationItem(
                 iconRes = if (selectedItem == BottomMenuOption.Home) R.drawable.vector_home_nav_menu_home_filled else R.drawable.vector_home_nav_menu_home,
                 onItemClick = { onMenuItemClicked(BottomMenuOption.Home) },
-            )
-            BottomNavigationItem(
-                iconRes = if (selectedItem == BottomMenuOption.Exchange) R.drawable.vector_home_nav_menu_gem_filled else R.drawable.vector_home_nav_menu_gem,
-                onItemClick = { onMenuItemClicked(BottomMenuOption.Exchange) },
             )
             if (DebugConfig.showTtlStoreMenu) {
                 BottomNavigationItem(

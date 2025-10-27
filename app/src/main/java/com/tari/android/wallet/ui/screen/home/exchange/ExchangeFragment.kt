@@ -24,6 +24,7 @@ class ExchangeFragment : CommonFragment<ExchangeViewModel>() {
         TariDesignSystem(viewModel.currentTheme) {
             ExchangeScreen(
                 uiState = uiState,
+                onBackClick = { viewModel.onBackPressed() },
                 onReloadDefCurrency = { viewModel.loadDefaultCurrency() },
                 onAmountChanged = { viewModel.onAmountChanged(it) },
                 onSelectCurrencyClicked = { viewModel.onSelectCurrencyClicked() },
@@ -49,5 +50,9 @@ class ExchangeFragment : CommonFragment<ExchangeViewModel>() {
             val network = bundle.parcelable<Exolix.Network>(SelectNetworkFragment.NETWORK_RESULT_KEY)
             network?.let { viewModel.onNetworkSelected(it) }
         }
+    }
+
+    companion object {
+        fun newInstance() = ExchangeFragment()
     }
 }

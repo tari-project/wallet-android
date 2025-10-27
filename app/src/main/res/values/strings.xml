@@ -173,6 +173,7 @@
     <string name="home_active_miners_you_not_mining">You\'re not mining</string>
     <string name="home_wallet_balance">Wallet Balance</string>
     <string name="home_wallet_balance_hidden">*******</string>
+    <string name="home_buy_xtm">Buy XTM</string>
     <string name="home_empty_state_title">You don’t have any activity yet. </string>
     <string name="home_empty_state_description">Once you receive some XTM, you’ll see it here.</string>
     <string name="home_empty_state_button">Start Mining Tari</string>

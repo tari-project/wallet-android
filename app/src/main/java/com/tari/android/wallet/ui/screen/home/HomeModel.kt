@@ -6,5 +6,5 @@ object HomeModel {
         val airdropLoggedIn: Boolean,
     )
 
-    enum class BottomMenuOption { Home, Shop, Profile, Settings, Exchange }
+    enum class BottomMenuOption { Home, Shop, Profile, Settings }
 }
