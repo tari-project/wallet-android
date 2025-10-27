@@ -290,6 +290,8 @@ dependencies {
     implementation(Dependencies.logger)
 
     implementation(Dependencies.lottie)
+    implementation(Dependencies.Coil.compose)
+    implementation(Dependencies.Coil.networkOkhttp)
 
     // QR scanner
     implementation(Dependencies.codeScanner)
