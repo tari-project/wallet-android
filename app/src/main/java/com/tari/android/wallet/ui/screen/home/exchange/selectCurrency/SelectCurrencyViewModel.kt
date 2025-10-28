@@ -2,7 +2,7 @@ package com.tari.android.wallet.ui.screen.home.exchange.selectCurrency
 
 import androidx.lifecycle.SavedStateHandle
 import com.tari.android.wallet.R
-import com.tari.android.wallet.data.exolix.Exolix
+import com.tari.android.wallet.data.exolix.CurrencyDto
 import com.tari.android.wallet.data.exolix.ExolixRepository
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.util.EffectFlow
@@ -25,7 +25,7 @@ class SelectCurrencyViewModel(savedState: SavedStateHandle) : CommonViewModel() 
     }
 
     private val _uiState = MutableStateFlow(
-        UiState(selectedCurrency = savedState.getOrThrow<Exolix.Currency>(SelectCurrencyFragment.PRESELECTED_CURRENCY_KEY))
+        UiState(selectedCurrency = savedState.getOrThrow<CurrencyDto>(SelectCurrencyFragment.PRESELECTED_CURRENCY_KEY))
     )
     val uiState = _uiState.asStateFlow()
 
@@ -55,7 +55,7 @@ class SelectCurrencyViewModel(savedState: SavedStateHandle) : CommonViewModel() 
         loadMoreCurrencies()
     }
 
-    fun onCurrencyItemClicked(currency: Exolix.Currency) {
+    fun onCurrencyItemClicked(currency: CurrencyDto) {
         launchOnMain {
             _effect.send(Effect.SetSelectResult(currency))
             tariNavigator.navigateBack()
@@ -78,7 +78,7 @@ class SelectCurrencyViewModel(savedState: SavedStateHandle) : CommonViewModel() 
                         it.hideLoading()
                             .hideError()
                             .copy(
-                                currencies = it.currencies + response.data,
+                                currencies = it.currencies + response.currencies,
                                 currentPage = nextPage,
                                 totalCount = response.count,
                             )
@@ -90,7 +90,7 @@ class SelectCurrencyViewModel(savedState: SavedStateHandle) : CommonViewModel() 
     }
 
     data class UiState(
-        val currencies: List<Exolix.Currency> = emptyList(),
+        val currencies: List<CurrencyDto> = emptyList(),
         val searchQuery: String = "",
         val errorMessage: String? = null,
 
@@ -98,7 +98,7 @@ class SelectCurrencyViewModel(savedState: SavedStateHandle) : CommonViewModel() 
         val loading: Boolean = false,
 
         val totalCount: Int? = null,
-        val selectedCurrency: Exolix.Currency? = null,
+        val selectedCurrency: CurrencyDto? = null,
     ) {
         val showEmptyState: Boolean
             get() = currencies.isEmpty() && !hasMorePages
@@ -113,6 +113,6 @@ class SelectCurrencyViewModel(savedState: SavedStateHandle) : CommonViewModel() 
     }
 
     sealed class Effect {
-        data class SetSelectResult(val selectedCurrency: Exolix.Currency) : Effect()
+        data class SetSelectResult(val selectedCurrency: CurrencyDto) : Effect()
     }
 }

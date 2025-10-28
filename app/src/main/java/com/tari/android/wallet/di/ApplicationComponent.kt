@@ -48,7 +48,6 @@ import com.tari.android.wallet.ui.screen.debug.sampleDesign.SampleDesignSystemVi
 import com.tari.android.wallet.ui.screen.home.HomeViewModel
 import com.tari.android.wallet.ui.screen.home.exchange.ExchangeViewModel
 import com.tari.android.wallet.ui.screen.home.exchange.selectCurrency.SelectCurrencyViewModel
-import com.tari.android.wallet.ui.screen.home.exchange.selectNetwork.SelectNetworkViewModel
 import com.tari.android.wallet.ui.screen.home.overview.HomeOverviewViewModel
 import com.tari.android.wallet.ui.screen.onboarding.activity.OnboardingFlowActivity
 import com.tari.android.wallet.ui.screen.onboarding.createWallet.CreateWalletFragment
@@ -67,7 +66,6 @@ import com.tari.android.wallet.ui.screen.restore.enterRestorationPassword.EnterR
 import com.tari.android.wallet.ui.screen.restore.inputSeedWords.InputSeedWordsViewModel
 import com.tari.android.wallet.ui.screen.restore.walletRestoring.WalletRestoringViewModel
 import com.tari.android.wallet.ui.screen.send.confirm.ConfirmViewModel
-
 import com.tari.android.wallet.ui.screen.send.obsolete.requestTari.RequestTariViewModel
 import com.tari.android.wallet.ui.screen.send.receive.ReceiveViewModel
 import com.tari.android.wallet.ui.screen.send.send.SendViewModel
@@ -173,7 +171,6 @@ interface ApplicationComponent {
     fun inject(viewModel: SendViewModel)
     fun inject(viewModel: ExchangeViewModel)
     fun inject(viewModel: SelectCurrencyViewModel)
-    fun inject(viewModel: SelectNetworkViewModel)
 
     fun inject(tariFcmService: TariFcmService)
 

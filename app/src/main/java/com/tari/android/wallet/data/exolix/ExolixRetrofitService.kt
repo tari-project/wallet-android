@@ -95,17 +95,7 @@ object Exolix {
         @SerializedName("icon") val icon: String,
         @SerializedName("notes") val notes: String,
         @SerializedName("networks") val networks: List<Network>? = null
-    ) : Parcelable {
-        val defaultNetwork: Network?
-            get() = networks?.firstOrNull { it.isDefault } ?: networks?.firstOrNull()
-
-        val supportsMultipleNetworks: Boolean
-            get() = (networks?.size ?: 0) > 1
-
-        override fun equals(other: Any?): Boolean {
-            return other is Currency && other.code == code
-        }
-    }
+    ) : Parcelable
 
     @Parcelize
     data class Network(

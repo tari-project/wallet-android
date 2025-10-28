@@ -27,7 +27,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.tari.android.wallet.R
-import com.tari.android.wallet.data.exolix.Exolix
+import com.tari.android.wallet.data.exolix.CurrencyDto
 import com.tari.android.wallet.ui.compose.PreviewSecondarySurface
 import com.tari.android.wallet.ui.compose.TariDesignSystem
 import com.tari.android.wallet.ui.compose.components.TariErrorView
@@ -46,7 +46,7 @@ fun SelectCurrencyScreen(
     uiState: SelectCurrencyViewModel.UiState,
     onBackClick: () -> Unit,
     onSearchQueryChange: (query: String) -> Unit,
-    onCurrencyItemClick: (currency: Exolix.Currency) -> Unit,
+    onCurrencyItemClick: (currency: CurrencyDto) -> Unit,
     onLoadMoreCurrencies: () -> Unit,
 ) {
     val focusManager = LocalFocusManager.current
@@ -106,9 +106,9 @@ fun SelectCurrencyScreen(
                         modifier = Modifier
                             .padding(horizontal = 16.dp, vertical = 4.dp)
                             .animateItem(),
-                        title = currency.code,
-                        subtitle = currency.name,
-                        iconUrl = currency.icon,
+                        title = currency.coin,
+                        subtitle = currency.networkName,
+                        iconUrl = currency.iconUrl,
                         selected = currency == uiState.selectedCurrency,
                         onClick = { onCurrencyItemClick(currency) },
                     )
@@ -198,8 +198,8 @@ private fun SelectCurrencyScreenPreview() {
     PreviewSecondarySurface(TariTheme.Light) {
         SelectCurrencyScreen(
             uiState = SelectCurrencyViewModel.UiState(
-                currencies = MockDataStub.createCurrencyList(5),
-                selectedCurrency = MockDataStub.createCurrencyList(5).first(),
+                currencies = MockDataStub.createCurrencyDtoList(5),
+                selectedCurrency = MockDataStub.createCurrencyDtoList(5).first(),
             ),
             onBackClick = {},
             onSearchQueryChange = {},

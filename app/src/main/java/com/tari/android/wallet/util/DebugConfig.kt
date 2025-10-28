@@ -37,6 +37,7 @@ package com.tari.android.wallet.util
 import com.tari.android.wallet.BuildConfig
 import com.tari.android.wallet.application.addressPoisoning.SimilarAddressDto
 import com.tari.android.wallet.data.contacts.Contact
+import com.tari.android.wallet.data.exolix.CurrencyDto
 import com.tari.android.wallet.data.exolix.Exolix
 import com.tari.android.wallet.data.tx.TxDto
 import com.tari.android.wallet.ffi.FFITxCancellationReason
@@ -327,6 +328,25 @@ object MockDataStub {
         networks = networks,
     )
 
+    fun createCurrencyDto(
+        code: String = "ETH",
+        name: String = "Ethereum",
+        icon: String = "https://exolix.com/icons/coins/ETH.png",
+        networks: List<Exolix.Network>? = createNetworkList(),
+    ): CurrencyDto {
+        val currency = createCurrency(
+            code = code,
+            name = name,
+            icon = icon,
+            networks = networks,
+        )
+        val network = currency.networks!!.first { it.isDefault }
+        return CurrencyDto(
+            currency = currency,
+            network = network,
+        )
+    }
+
     fun createCurrencyList(count: Int = 10) = List(count) { index ->
         val currencies = listOf(
             Triple("ETH", "Ethereum", "https://exolix.com/icons/coins/ETH.png"),
@@ -348,6 +368,39 @@ object MockDataStub {
             networks = if (index % 3 == 0) createNetworkList() else listOf(createNetwork(code, name, code, true)),
         )
     }
+
+    fun createCurrencyDtoList(count: Int = 10): List<CurrencyDto> {
+        val currencies = listOf(
+            Triple("ETH", "Ethereum", "https://exolix.com/icons/coins/ETH.png"),
+            Triple("BTC", "Bitcoin", "https://exolix.com/icons/coins/BTC.png"),
+            Triple("USDT", "Tether", "https://exolix.com/icons/coins/USDT.png"),
+            Triple("BNB", "Binance Coin", "https://exolix.com/icons/coins/BNB.png"),
+            Triple("ADA", "Cardano", "https://exolix.com/icons/coins/ADA.png"),
+            Triple("SOL", "Solana", "https://exolix.com/icons/coins/SOL.png"),
+            Triple("DOT", "Polkadot", "https://exolix.com/icons/coins/DOT.png"),
+            Triple("DOGE", "Dogecoin", "https://exolix.com/icons/coins/DOGE.png"),
+            Triple("AVAX", "Avalanche", "https://exolix.com/icons/coins/AVAX.png"),
+            Triple("LTC", "Litecoin", "https://exolix.com/icons/coins/LTC.png"),
+        )
+
+        return buildList {
+            for (index in 0 until count) {
+                val (code, name, icon) = currencies[index % currencies.size]
+                val currency = createCurrency(
+                    code = code,
+                    name = name,
+                    icon = icon,
+                    networks = if (index % 3 == 0) createNetworkList() else listOf(createNetwork(code, name, code, true)),
+                )
+
+                val networks = currency.networks.orEmpty()
+                val sortedNetworks = networks.sortedByDescending { it.isDefault }
+
+                sortedNetworks.forEach { network -> add(CurrencyDto(currency, network)) }
+            }
+        }
+    }
+
 
     fun createRate(
         fromAmount: BigDecimal = 100.0.toBigDecimal(),

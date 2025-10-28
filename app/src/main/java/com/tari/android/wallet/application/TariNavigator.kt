@@ -25,7 +25,7 @@ import com.tari.android.wallet.application.Navigation.TxList
 import com.tari.android.wallet.application.Navigation.TxSend
 import com.tari.android.wallet.application.Navigation.VerifySeedPhrase
 import com.tari.android.wallet.data.contacts.Contact
-import com.tari.android.wallet.data.exolix.Exolix
+import com.tari.android.wallet.data.exolix.CurrencyDto
 import com.tari.android.wallet.model.MicroTari
 import com.tari.android.wallet.model.TransactionData
 import com.tari.android.wallet.model.tx.Tx
@@ -42,7 +42,6 @@ import com.tari.android.wallet.ui.screen.debug.activity.DebugActivity
 import com.tari.android.wallet.ui.screen.home.HomeActivity
 import com.tari.android.wallet.ui.screen.home.exchange.ExchangeFragment
 import com.tari.android.wallet.ui.screen.home.exchange.selectCurrency.SelectCurrencyFragment
-import com.tari.android.wallet.ui.screen.home.exchange.selectNetwork.SelectNetworkFragment
 import com.tari.android.wallet.ui.screen.home.overview.HomeOverviewFragment
 import com.tari.android.wallet.ui.screen.onboarding.activity.OnboardingFlowActivity
 import com.tari.android.wallet.ui.screen.onboarding.localAuth.LocalAuthFragment
@@ -112,7 +111,6 @@ class TariNavigator @Inject constructor() {
             is ContactBook.AddContact -> addFragment(AddContactFragment())
 
             is Exchange.SelectCurrency -> addFragment(SelectCurrencyFragment.newInstance(navigation.preselectedCurrency))
-            is Exchange.SelectNetwork -> addFragment(SelectNetworkFragment.newInstance(ArrayList(navigation.networks), navigation.preselectedNetwork))
             is Exchange.StartExchange -> addFragment(ExchangeFragment.newInstance())
 
             is AllSettings.BugReporting -> DebugActivity.launch(currentActivity, DebugNavigation.BugReport)
@@ -298,7 +296,6 @@ sealed class Navigation {
 
     sealed class Exchange : Navigation() {
         data object StartExchange : Exchange()
-        data class SelectCurrency(val preselectedCurrency: Exolix.Currency? = null) : Exchange()
-        data class SelectNetwork(val networks: List<Exolix.Network>, val preselectedNetwork: Exolix.Network?) : Exchange()
+        data class SelectCurrency(val preselectedCurrency: CurrencyDto? = null) : Exchange()
     }
 }

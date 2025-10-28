@@ -35,6 +35,7 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.tari.android.wallet.R
+import com.tari.android.wallet.data.exolix.CurrencyDto
 import com.tari.android.wallet.data.exolix.Exolix
 import com.tari.android.wallet.ui.compose.PreviewSecondarySurface
 import com.tari.android.wallet.ui.compose.TariDesignSystem
@@ -131,8 +132,7 @@ fun ExchangeScreen(
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp),
                 fromCurrency = uiState.fromCurrency,
-                toCurrency = uiState.selectedToCurrency,
-                toNetwork = uiState.selectedToNetwork,
+                toCurrency = uiState.toCurrency,
                 rate = uiState.rate,
                 loadingDefaultCurrency = uiState.loadingDefaultCurrency,
                 loadingDefaultCurrencyError = uiState.loadingDefaultCurrencyError,
@@ -188,7 +188,7 @@ fun ExchangeScreen(
 
 @Composable
 private fun YouSendLayout(
-    fromCurrency: Exolix.Currency,
+    fromCurrency: CurrencyDto?,
     rate: Exolix.Rate?,
     amountError: Boolean,
     amountValue: String,
@@ -230,12 +230,14 @@ private fun YouSendLayout(
                 keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
             )
             Spacer(Modifier.size(16.dp))
-            SelectedCurrencyChip(
-                modifier = Modifier.padding(top = 8.dp),
-                title = fromCurrency.name,
-                subtitle = fromCurrency.code,
-                iconUrl = fromCurrency.icon,
-            )
+            if (fromCurrency != null) {
+                SelectedCurrencyChip(
+                    modifier = Modifier.padding(top = 8.dp),
+                    title = fromCurrency.coin,
+                    subtitle = fromCurrency.networkName,
+                    iconUrl = fromCurrency.iconUrl,
+                )
+            }
         }
 
         if (amountError && rate != null) {
@@ -249,7 +251,7 @@ private fun YouSendLayout(
                     Spacer(Modifier.size(8.dp))
                     Text(
                         modifier = Modifier.clickable { onMinAmountClicked() },
-                        text = "${rate.minAmount} ${fromCurrency.code}",
+                        text = "${rate.minAmount} ${fromCurrency?.coin.orEmpty()}",
                         style = TariDesignSystem.typography.headingLarge,
                     )
                 }
@@ -262,7 +264,7 @@ private fun YouSendLayout(
                     Spacer(Modifier.size(8.dp))
                     Text(
                         modifier = Modifier.clickable { onMaxAmountClicked() },
-                        text = "${rate.maxAmount} ${fromCurrency.code}",
+                        text = "${rate.maxAmount} ${fromCurrency?.coin.orEmpty()}",
                         style = TariDesignSystem.typography.headingLarge,
                     )
                 }
@@ -273,9 +275,8 @@ private fun YouSendLayout(
 
 @Composable
 private fun YouReceiveLayout(
-    fromCurrency: Exolix.Currency?,
-    toCurrency: Exolix.Currency?,
-    toNetwork: Exolix.Network?,
+    fromCurrency: CurrencyDto?,
+    toCurrency: CurrencyDto?,
     rate: Exolix.Rate?,
     loadingDefaultCurrency: Boolean,
     loadingDefaultCurrencyError: Boolean,
@@ -323,12 +324,12 @@ private fun YouReceiveLayout(
                 visualTransformation = AmountVisualTransformation(),
             )
             Spacer(Modifier.size(16.dp))
-            if (toCurrency != null && toNetwork != null) {
+            if (toCurrency != null) {
                 SelectedCurrencyChip(
                     modifier = Modifier.padding(top = 8.dp),
-                    title = toCurrency.name,
-                    subtitle = toNetwork.name,
-                    iconUrl = toCurrency.icon,
+                    title = toCurrency.coin,
+                    subtitle = toCurrency.networkName,
+                    iconUrl = toCurrency.iconUrl,
                     onClick = onSelectCurrencyClicked,
                 )
             }
@@ -337,12 +338,7 @@ private fun YouReceiveLayout(
         if (rate != null && fromCurrency != null && toCurrency != null) {
             Spacer(Modifier.size(16.dp))
             Text(
-                text = stringResource(
-                    R.string.exchange_rate_display,
-                    fromCurrency.code,
-                    rate.rate.toString(),
-                    toCurrency.code,
-                ),
+                text = stringResource(R.string.exchange_rate_display, fromCurrency.coin, rate.rate.toString(), toCurrency.coin),
                 style = TariDesignSystem.typography.headingMedium,
             )
         }
@@ -356,8 +352,7 @@ private fun ExchangeScreenPreview() {
         ExchangeScreen(
             uiState = ExchangeViewModel.UiState(
                 amountValue = "100",
-                selectedToCurrency = MockDataStub.createCurrency(),
-                selectedToNetwork = MockDataStub.createNetwork(),
+                selectedCurrency = MockDataStub.createCurrencyDto(),
                 rate = MockDataStub.createRate(
                     toAmount = 123.21321f.toBigDecimal()
                 ),
@@ -381,8 +376,7 @@ private fun ExchangeScreenDarkPreview() {
         ExchangeScreen(
             uiState = ExchangeViewModel.UiState(
                 amountValue = "100",
-                selectedToCurrency = MockDataStub.createCurrency(),
-                selectedToNetwork = MockDataStub.createNetwork(),
+                selectedCurrency = MockDataStub.createCurrencyDto(),
                 rate = MockDataStub.createRate(
                     toAmount = 123.21321f.toBigDecimal()
                 ),
@@ -410,8 +404,7 @@ private fun ExchangeScreenWrongAmountPreview() {
                     minAmount = 10.0.toBigDecimal(),
                     maxAmount = 500.0.toBigDecimal()
                 ),
-                selectedToCurrency = MockDataStub.createCurrency(),
-                selectedToNetwork = MockDataStub.createNetwork(),
+                selectedCurrency = MockDataStub.createCurrencyDto(),
             ),
             onBackClick = {},
             onReloadDefCurrency = {},

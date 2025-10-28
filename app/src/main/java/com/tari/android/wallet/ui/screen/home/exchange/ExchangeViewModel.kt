@@ -1,6 +1,7 @@
 package com.tari.android.wallet.ui.screen.home.exchange
 
 import com.tari.android.wallet.application.Navigation
+import com.tari.android.wallet.data.exolix.CurrencyDto
 import com.tari.android.wallet.data.exolix.Exolix
 import com.tari.android.wallet.data.exolix.ExolixRepository
 import com.tari.android.wallet.ui.common.CommonViewModel
@@ -13,21 +14,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import java.math.BigDecimal
 import javax.inject.Inject
-
-private val TARI_CURRENCY: Exolix.Currency = Exolix.Currency(
-    code = "XTM",
-    name = "Tari",
-    icon = "https://exolix.com/icons/networks/Tari_1755361659372.png",
-    notes = "",
-)
-private val TARI_NETWORK: Exolix.Network = Exolix.Network(
-    name = "Tari",
-    network = "Tari",
-    icon = "https://exolix.com/icons/networks/Tari_1755361659372.png",
-    isDefault = true,
-    memoNeeded = false,
-    precision = 10,
-)
 
 class ExchangeViewModel : CommonViewModel() {
 
@@ -55,18 +41,8 @@ class ExchangeViewModel : CommonViewModel() {
         fetchRateIfValid()
     }
 
-    fun onCurrencySelected(currency: Exolix.Currency) {
-        _uiState.update { state ->
-            state.copy(
-                selectedToCurrency = currency,
-                selectedToNetwork = currency.defaultNetwork,
-            )
-        }
-        fetchRateIfValid()
-    }
-
-    fun onNetworkSelected(network: Exolix.Network) {
-        _uiState.update { it.copy(selectedToNetwork = network) }
+    fun onCurrencySelected(currency: CurrencyDto) {
+        _uiState.update { it.copy(selectedCurrency = currency) }
         fetchRateIfValid()
     }
 
@@ -79,13 +55,7 @@ class ExchangeViewModel : CommonViewModel() {
     }
 
     fun onSelectCurrencyClicked() {
-        tariNavigator.navigate(Navigation.Exchange.SelectCurrency(uiState.value.selectedToCurrency))
-    }
-
-    fun onSelectNetworkClicked() {
-        val networks = uiState.value.selectedToCurrency?.networks ?: return
-        val preselectedNetwork = uiState.value.selectedToNetwork
-        tariNavigator.navigate(Navigation.Exchange.SelectNetwork(networks, preselectedNetwork))
+        tariNavigator.navigate(Navigation.Exchange.SelectCurrency(uiState.value.selectedCurrency))
     }
 
     fun onFixedRateToggled(fixedRate: Boolean) {
@@ -102,7 +72,7 @@ class ExchangeViewModel : CommonViewModel() {
         launchOnIo {
             exolixRepository.getCurrencies(page = 1, size = 1)
                 .onSuccess { response ->
-                    val defaultCurrency = response.data.firstOrNull()
+                    val defaultCurrency = response.currencies.firstOrNull()
                     if (defaultCurrency != null) {
                         onCurrencySelected(defaultCurrency)
                     }
@@ -115,12 +85,10 @@ class ExchangeViewModel : CommonViewModel() {
 
     private fun fetchRateIfValid() {
         val amount = _uiState.value.amount
-        val toCurrency = _uiState.value.selectedToCurrency
-        val toNetwork = _uiState.value.selectedToNetwork
+        val toCurrency = _uiState.value.toCurrency
         val fromCurrency = _uiState.value.fromCurrency
-        val fromNetwork = _uiState.value.fromNetwork
 
-        if (!_uiState.value.isAmountValid || toCurrency == null || toNetwork == null) {
+        if (!_uiState.value.isAmountValid || toCurrency == null || fromCurrency == null) {
             // Clear rate if invalid
             _uiState.update { it.copy(rate = null) }
             return
@@ -131,10 +99,10 @@ class ExchangeViewModel : CommonViewModel() {
         rateFetchJob?.cancel()
         rateFetchJob = launchOnIo {
             exolixRepository.getRate(
-                coinFrom = fromCurrency.code,
-                networkFrom = fromNetwork.network,
-                coinTo = toCurrency.code,
-                networkTo = toNetwork.network,
+                coinFrom = fromCurrency.coin,
+                networkFrom = fromCurrency.networkName,
+                coinTo = toCurrency.coin,
+                networkTo = toCurrency.networkName,
                 amount = amount.toString(),
                 rateType = if (_uiState.value.fixedRate) Exolix.Rate.RateType.FIXED else Exolix.Rate.RateType.FLOATING,
             ).onSuccess { rate ->
@@ -154,8 +122,7 @@ class ExchangeViewModel : CommonViewModel() {
     data class UiState(
         val amountValue: String = "",
 
-        val fromCurrency: Exolix.Currency = TARI_CURRENCY,
-        val fromNetwork: Exolix.Network = TARI_NETWORK,
+        val selectedCurrency: CurrencyDto? = null, // TODO private?
 
         val loadingDefaultCurrency: Boolean = false,
         val loadingDefaultCurrencyError: Boolean = false,
@@ -173,5 +140,30 @@ class ExchangeViewModel : CommonViewModel() {
 
         val amountError: Boolean
             get() = rate != null && amount != null && (amount!! < rate.minAmount || amount!! > rate.maxAmount)
+
+        val fromCurrency: CurrencyDto?
+            get() = TARI_CURRENCY // TODO direction!!
+
+        val toCurrency: CurrencyDto?
+            get() = selectedCurrency // TODO direction!!
+
+        val TARI_CURRENCY = CurrencyDto(
+            currency = Exolix.Currency(
+//    code = "XTM",
+                code = "ETH", // TODO uncomment!!!
+                name = "Tari",
+                icon = "https://exolix.com/icons/networks/Tari_1755361659372.png",
+                notes = "",
+            ),
+            network = Exolix.Network(
+                name = "Tari",
+//    network = "Tari",
+                network = "ETH", // TODO uncomment!!!
+                icon = "https://exolix.com/icons/networks/Tari_1755361659372.png",
+                isDefault = true,
+                memoNeeded = false,
+                precision = 10,
+            ),
+        )
     }
 }

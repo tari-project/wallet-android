@@ -8,7 +8,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.fragment.app.setFragmentResult
 import androidx.fragment.app.viewModels
-import com.tari.android.wallet.data.exolix.Exolix
+import com.tari.android.wallet.data.exolix.CurrencyDto
 import com.tari.android.wallet.ui.common.CommonFragment
 import com.tari.android.wallet.ui.compose.TariDesignSystem
 import com.tari.android.wallet.util.extension.collectFlow
@@ -51,7 +51,7 @@ class SelectCurrencyFragment : CommonFragment<SelectCurrencyViewModel>() {
 
         const val PRESELECTED_CURRENCY_KEY = "PRESELECTED_CURRENCY_KEY"
 
-        fun newInstance(preselectedCurrency: Exolix.Currency? = null) = SelectCurrencyFragment().apply {
+        fun newInstance(preselectedCurrency: CurrencyDto? = null) = SelectCurrencyFragment().apply {
             arguments = Bundle().apply {
                 putParcelable(PRESELECTED_CURRENCY_KEY, preselectedCurrency)
             }

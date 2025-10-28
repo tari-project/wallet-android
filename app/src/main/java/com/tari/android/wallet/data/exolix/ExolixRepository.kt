@@ -1,7 +1,9 @@
 package com.tari.android.wallet.data.exolix
 
+import android.os.Parcelable
 import com.google.gson.Gson
 import com.tari.android.wallet.util.extension.switchToIo
+import kotlinx.parcelize.Parcelize
 import retrofit2.HttpException
 import java.math.BigDecimal
 import javax.inject.Inject
@@ -12,14 +14,22 @@ class ExolixRepository @Inject constructor(
     private val exolixRetrofitService: ExolixRetrofitService,
 ) {
 
-    // Common methods
     suspend fun getCurrencies(
         page: Int? = null,
         size: Int? = null,
         searchQuery: String? = null,
-    ): Result<Exolix.CurrenciesResponse> = switchToIo {
+    ): Result<CurrenciesResult> = switchToIo {
         runCatching {
-            exolixRetrofitService.getCurrencies(page, size, searchQuery, withNetworks = true)
+            val response = exolixRetrofitService.getCurrencies(page, size, searchQuery, withNetworks = true)
+
+            CurrenciesResult(
+                currencies = response.data.flatMap { currency ->
+                    currency.networks.orEmpty()
+                        .sortedByDescending { it.isDefault }
+                        .map { network -> CurrencyDto(currency, network) }
+                },
+                count = response.count,
+            )
         }
     }
 
@@ -97,3 +107,29 @@ class ExolixRepository @Inject constructor(
         }
     }
 }
+
+@Parcelize
+data class CurrencyDto(
+    val currency: Exolix.Currency,
+    val network: Exolix.Network,
+) : Parcelable {
+    val coin: String
+        get() = currency.code
+
+    val networkName: String
+        get() = network.name
+
+    val iconUrl: String
+        get() = currency.icon
+
+    override fun equals(other: Any?): Boolean {
+        return other is CurrencyDto &&
+                other.currency.code == currency.code &&
+                other.network.network == network.network
+    }
+}
+
+data class CurrenciesResult(
+    val currencies: List<CurrencyDto>,
+    val count: Int,
+)
