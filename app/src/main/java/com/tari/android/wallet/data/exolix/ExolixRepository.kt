@@ -46,10 +46,10 @@ class ExolixRepository @Inject constructor(
         networkTo: String? = null,
         amount: String,
         withdrawalAmount: String? = null,
-        rateType: String = "fixed",
+        rateType: Exolix.Rate.RateType,
     ): Result<Exolix.Rate> = switchToIo {
         runCatching {
-            exolixRetrofitService.getRate(coinFrom, networkFrom, coinTo, networkTo, amount, withdrawalAmount, rateType)
+            exolixRetrofitService.getRate(coinFrom, networkFrom, coinTo, networkTo, amount, withdrawalAmount, rateType.type)
         }.recoverCatching { e ->
             if (e is HttpException && e.code() == 422) {
                 val errorBody = e.response()?.errorBody()?.string()

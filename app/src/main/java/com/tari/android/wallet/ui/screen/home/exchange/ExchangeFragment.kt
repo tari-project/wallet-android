@@ -28,9 +28,10 @@ class ExchangeFragment : CommonFragment<ExchangeViewModel>() {
                 onReloadDefCurrency = { viewModel.loadDefaultCurrency() },
                 onAmountChanged = { viewModel.onAmountChanged(it) },
                 onSelectCurrencyClicked = { viewModel.onSelectCurrencyClicked() },
-                onSelectNetworkClicked = { viewModel.onSelectNetworkClicked() },
                 onMinAmountClicked = { viewModel.onMinAmountClicked() },
                 onMaxAmountClicked = { viewModel.onMaxAmountClicked() },
+                onExchangeClicked = { viewModel.onExchangeClicked() },
+                onFixedRateToggled = { viewModel.onFixedRateToggled(it) },
             )
         }
     }

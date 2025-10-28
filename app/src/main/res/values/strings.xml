@@ -105,6 +105,11 @@
     <string name="exchange_min_amount_label_short">Min:</string>
     <string name="exchange_max_amount_label_short">Max:</string>
     <string name="exchange_load_more_currencies_error">Failed to load more currencies. Please try again later.</string>
+    <string name="exchange_you_send_label">You send</string>
+    <string name="exchange_you_receive_label">You receive</string>
+    <string name="exchange_powered_by_label">Powered by</string>
+    <string name="exchange_exchange_now_button">Exchange Now</string>
+    <string name="exchange_fixed_rate">Fixed rate</string>
 
     <!-- emoji id copied view -->
 

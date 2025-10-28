@@ -142,7 +142,12 @@ object Exolix {
         @SerializedName("minAmount") val minAmount: BigDecimal,
         @SerializedName("withdrawMin") val withdrawMin: BigDecimal = BigDecimal.ZERO,
         @SerializedName("maxAmount") val maxAmount: BigDecimal,
-    )
+    ) {
+        enum class RateType(val type: String) {
+            FIXED("fixed"),
+            FLOATING("float");
+        }
+    }
 
     data class TransactionsResponse(
         @SerializedName("data") val data: List<Transaction>,

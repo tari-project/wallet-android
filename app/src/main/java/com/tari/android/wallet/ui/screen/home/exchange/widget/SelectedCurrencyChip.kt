@@ -17,7 +17,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
@@ -37,7 +36,7 @@ fun SelectedCurrencyChip(
         modifier = modifier
             .wrapContentSize(align = Alignment.CenterStart)
             .clip(TariDesignSystem.shapes.button)
-            .background(color = TariDesignSystem.colors.backgroundAccent)
+            .background(color = TariDesignSystem.colors.actionFocus)
             .clickable(onClick = onClick ?: {}, enabled = onClick != null)
             .padding(horizontal = 8.dp, vertical = 3.dp),
         verticalAlignment = Alignment.CenterVertically,
@@ -66,7 +65,7 @@ fun SelectedCurrencyChip(
                 modifier = Modifier.size(20.dp),
                 imageVector = Icons.Default.KeyboardArrowDown,
                 contentDescription = null,
-                tint = Color.Black,
+                tint = TariDesignSystem.colors.textPrimary,
             )
         } else {
             Spacer(modifier = Modifier.width(20.dp))
@@ -78,6 +77,26 @@ fun SelectedCurrencyChip(
 @Composable
 private fun PreviewSelectedCurrencyCard() {
     PreviewSecondarySurface(TariTheme.Light) {
+        SelectedCurrencyChip(
+            modifier = Modifier.padding(16.dp),
+            title = "ETH",
+            subtitle = "Arbitrum",
+            iconUrl = "https://cryptologos.cc/logos/ethereum-eth-logo.png",
+            onClick = {},
+        )
+        SelectedCurrencyChip(
+            modifier = Modifier.padding(16.dp),
+            title = "XTM",
+            subtitle = "Tari",
+            iconUrl = "https://exolix.com/icons/networks/Tari_1755361659372.png",
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun PreviewSelectedCurrencyDarkCard() {
+    PreviewSecondarySurface(TariTheme.Dark) {
         SelectedCurrencyChip(
             modifier = Modifier.padding(16.dp),
             title = "ETH",

@@ -88,6 +88,15 @@ class ExchangeViewModel : CommonViewModel() {
         tariNavigator.navigate(Navigation.Exchange.SelectNetwork(networks, preselectedNetwork))
     }
 
+    fun onFixedRateToggled(fixedRate: Boolean) {
+        _uiState.update { it.copy(fixedRate = fixedRate) }
+        fetchRateIfValid()
+    }
+
+    fun onExchangeClicked() {
+        showNotReadyYetDialog()
+    }
+
     fun loadDefaultCurrency() {
         _uiState.update { it.copy(loadingDefaultCurrency = true, loadingDefaultCurrencyError = false) }
         launchOnIo {
@@ -127,6 +136,7 @@ class ExchangeViewModel : CommonViewModel() {
                 coinTo = toCurrency.code,
                 networkTo = toNetwork.network,
                 amount = amount.toString(),
+                rateType = if (_uiState.value.fixedRate) Exolix.Rate.RateType.FIXED else Exolix.Rate.RateType.FLOATING,
             ).onSuccess { rate ->
                 _uiState.update {
                     it.copy(
@@ -152,17 +162,16 @@ class ExchangeViewModel : CommonViewModel() {
         val selectedToCurrency: Exolix.Currency? = null,
         val selectedToNetwork: Exolix.Network? = null,
 
+        val fixedRate: Boolean = false,
         val rate: Exolix.Rate? = null,
         val rateLoading: Boolean = false,
-
-        val exchangeInfo: String = "",
     ) {
         val amount: BigDecimal?
             get() = runCatching { amountValue.toBigDecimal() }.getOrNull()
         val isAmountValid: Boolean
             get() = amount != null
 
-        val rateError: Boolean
+        val amountError: Boolean
             get() = rate != null && amount != null && (amount!! < rate.minAmount || amount!! > rate.maxAmount)
     }
 }
