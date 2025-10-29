@@ -9,11 +9,14 @@ import com.tari.android.wallet.util.extension.filterNumbers
 import com.tari.android.wallet.util.extension.filterSingleDot
 import com.tari.android.wallet.util.extension.launchOnIo
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import java.math.BigDecimal
 import javax.inject.Inject
+
+private const val RATE_AUTO_REFRESH_INTERVAL_MS = 10_000L
 
 class ExchangeViewModel : CommonViewModel() {
 
@@ -28,6 +31,7 @@ class ExchangeViewModel : CommonViewModel() {
     val uiState = _uiState.asStateFlow()
 
     private var rateFetchJob: Job? = null
+    private var autoRefreshJob: Job? = null
 
     init {
         loadDefaultCurrency()
@@ -79,6 +83,15 @@ class ExchangeViewModel : CommonViewModel() {
         fetchRateIfValid()
     }
 
+    fun onPullToRefresh() {
+        fetchRateIfValid()
+    }
+
+    fun onRefreshClicked() {
+        stopAutoRefresh()
+        fetchRateIfValid()
+    }
+
     fun loadDefaultCurrency() {
         _uiState.update { it.copy(loadingDefaultCurrency = true, loadingDefaultCurrencyError = false) }
         launchOnIo {
@@ -96,19 +109,19 @@ class ExchangeViewModel : CommonViewModel() {
     }
 
     private fun fetchRateIfValid() {
+        rateFetchJob?.cancel()
+
         val amount = _uiState.value.amount
         val fromCurrency = _uiState.value.fromCurrency
         val toCurrency = _uiState.value.toCurrency
 
-        if (!_uiState.value.isAmountValid || fromCurrency == null || toCurrency == null) {
-            // Clear rate if invalid
-            _uiState.update { it.copy(rate = null) }
+        if (_uiState.value.amount == null || fromCurrency == null || toCurrency == null) {
+            _uiState.update { it.copy(rate = null, rateLoading = false) }
+            stopAutoRefresh()
             return
         }
 
         _uiState.update { it.copy(rateLoading = true) }
-
-        rateFetchJob?.cancel()
         rateFetchJob = launchOnIo {
             exolixRepository.getRate(
                 coinFrom = fromCurrency.coin,
@@ -119,11 +132,32 @@ class ExchangeViewModel : CommonViewModel() {
                 rateType = if (_uiState.value.fixedRate) Exolix.Rate.RateType.FIXED else Exolix.Rate.RateType.FLOATING,
             ).onSuccess { rate ->
                 _uiState.update { it.copy(rate = rate, rateLoading = false) }
+                startAutoRefresh()
             }.onFailure { exception ->
                 _uiState.update { it.copy(rateLoading = false) }
                 showErrorDialog(exception) // TODO better message
             }
         }
+    }
+
+    private fun startAutoRefresh() {
+        autoRefreshJob?.cancel()
+        _uiState.update { it.copy(autoRefreshActive = true) }
+        autoRefreshJob = launchOnIo {
+            delay(RATE_AUTO_REFRESH_INTERVAL_MS)
+            fetchRateIfValid()
+        }
+    }
+
+    private fun stopAutoRefresh() {
+        autoRefreshJob?.cancel()
+        autoRefreshJob = null
+        _uiState.update { it.copy(autoRefreshActive = false) }
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        stopAutoRefresh()
     }
 
     data class UiState(
@@ -139,13 +173,12 @@ class ExchangeViewModel : CommonViewModel() {
         val fixedRate: Boolean = false,
         val rate: Exolix.Rate? = null,
         val rateLoading: Boolean = false,
+        val autoRefreshActive: Boolean = false,
 
         val exchangeDirection: ExchangeDirection = ExchangeDirection.BUY_TARI,
     ) {
         val amount: BigDecimal?
             get() = runCatching { amountValue.toBigDecimal() }.getOrNull()
-        val isAmountValid: Boolean
-            get() = amount != null
 
         val amountError: Boolean
             get() = rate != null && amount != null && (amount!! < rate.minAmount || amount!! > rate.maxAmount)

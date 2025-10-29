@@ -18,6 +18,8 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
@@ -51,6 +53,7 @@ import com.tari.android.wallet.ui.compose.components.TariLoadingLayout
 import com.tari.android.wallet.ui.compose.components.TariLoadingLayoutState
 import com.tari.android.wallet.ui.compose.components.TariPrimaryButton
 import com.tari.android.wallet.ui.compose.components.TariProgressView
+import com.tari.android.wallet.ui.compose.components.TariPullToRefreshBox
 import com.tari.android.wallet.ui.compose.components.TariSwitch
 import com.tari.android.wallet.ui.compose.components.TariTextField
 import com.tari.android.wallet.ui.compose.components.TariTopBar
@@ -72,6 +75,8 @@ fun ExchangeScreen(
     onExchangeClicked: () -> Unit,
     onFixedRateToggled: (Boolean) -> Unit,
     onChangeDirectionClicked: () -> Unit,
+    onPullToRefresh: () -> Unit,
+    onRefreshClicked: () -> Unit,
 ) {
     Scaffold(
         modifier = Modifier
@@ -82,138 +87,153 @@ fun ExchangeScreen(
             TariTopBar(
                 title = stringResource(R.string.exchange_title),
                 onBack = onBackClick,
-            )
-        },
-    ) { paddingValues ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-                .verticalScroll(rememberScrollState()),
-        ) {
-            Spacer(Modifier.size(20.dp))
-
-            YouSendLayout(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp),
-                fromCurrency = uiState.fromCurrency,
-                rate = uiState.rate,
-                amountError = uiState.amountError,
-                amountValue = uiState.amountValue,
-                onAmountChanged = onAmountChanged,
-                onMinAmountClicked = onMinAmountClicked,
-                onMaxAmountClicked = onMaxAmountClicked,
-                onSelectCurrencyClicked = onSelectCurrencyClicked,
-            )
-
-            Spacer(Modifier.size(20.dp))
-            Row(
-                modifier = Modifier.padding(horizontal = 16.dp),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                TariHorizontalDivider(Modifier.weight(1f))
-                TariLoadingLayout(
-                    modifier = Modifier
-                        .padding(horizontal = 16.dp)
-                        .size(48.dp),
-                    targetLoadingState = if (uiState.rateLoading) TariLoadingLayoutState.Loading else TariLoadingLayoutState.Content,
-                    loadingLayout = {
-                        Box(modifier = Modifier.fillMaxSize()) { TariProgressView(modifier = Modifier.align(Alignment.Center)) }
-                    }
-                ) {
-                    Box(modifier = Modifier.fillMaxSize()) {
-                        IconButton(
-                            modifier = Modifier.align(Alignment.Center),
-                            onClick = onChangeDirectionClicked,
-                        ) {
+                action = if (uiState.autoRefreshActive) {
+                    {
+                        IconButton(onClick = onRefreshClicked) {
                             Icon(
-                                painter = painterResource(R.drawable.vector_two_arrows_circle),
+                                imageVector = Icons.Default.Refresh,
+                                contentDescription = stringResource(R.string.exchange_refresh_rate),
                                 tint = TariDesignSystem.colors.textPrimary,
-                                contentDescription = null,
                             )
                         }
                     }
-                }
-                TariHorizontalDivider(Modifier.weight(1f))
-            }
-            Spacer(Modifier.size(20.dp))
-
-            YouReceiveLayout(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp),
-                fromCurrency = uiState.fromCurrency,
-                toCurrency = uiState.toCurrency,
-                rate = uiState.rate,
-                loadingDefaultCurrency = uiState.loadingDefaultCurrency,
-                loadingDefaultCurrencyError = uiState.loadingDefaultCurrencyError,
-                onReloadDefaultCurrency = onReloadDefCurrency,
-                onSelectCurrencyClicked = onSelectCurrencyClicked,
+                } else null,
             )
-            Spacer(Modifier.size(20.dp))
-
-            Row(
-                modifier = Modifier.padding(horizontal = 16.dp),
-                verticalAlignment = Alignment.CenterVertically,
+        },
+    ) { paddingValues ->
+        TariPullToRefreshBox(
+            modifier = Modifier.padding(paddingValues),
+            onPullToRefresh = onPullToRefresh,
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState()),
             ) {
-                TariSwitch(
-                    checked = uiState.fixedRate,
-                    onCheckedChange = onFixedRateToggled,
-                )
-                Spacer(Modifier.size(10.dp))
-                Text(
-                    text = stringResource(R.string.exchange_fixed_rate),
-                    style = TariDesignSystem.typography.body1,
-                    color = TariDesignSystem.colors.textPrimary,
-                )
-            }
+                Spacer(Modifier.size(20.dp))
 
-            Spacer(Modifier.size(20.dp))
-            uiState.toCurrency?.let { toCurrency ->
-                Text(
-                    modifier = Modifier.padding(horizontal = 16.dp),
-                    text = stringResource(R.string.exchange_destination_address_label, toCurrency.coin),
-                    style = TariDesignSystem.typography.body1,
-                    color = TariDesignSystem.colors.textPrimary,
-                )
-            }
-            Spacer(Modifier.size(12.dp))
-
-            if (uiState.exchangeDirection == ExchangeDirection.BUY_TARI) {
-                TariWalletAddressInfoBox(
+                YouSendLayout(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 16.dp),
+                    fromCurrency = uiState.fromCurrency,
+                    rate = uiState.rate,
+                    amountError = uiState.amountError,
+                    amountValue = uiState.amountValue,
+                    onAmountChanged = onAmountChanged,
+                    onMinAmountClicked = onMinAmountClicked,
+                    onMaxAmountClicked = onMaxAmountClicked,
+                    onSelectCurrencyClicked = onSelectCurrencyClicked,
                 )
+
+                Spacer(Modifier.size(20.dp))
+                Row(
+                    modifier = Modifier.padding(horizontal = 16.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    TariHorizontalDivider(Modifier.weight(1f))
+                    TariLoadingLayout(
+                        modifier = Modifier
+                            .padding(horizontal = 16.dp)
+                            .size(48.dp),
+                        targetLoadingState = if (uiState.rateLoading) TariLoadingLayoutState.Loading else TariLoadingLayoutState.Content,
+                        loadingLayout = {
+                            Box(modifier = Modifier.fillMaxSize()) { TariProgressView(modifier = Modifier.align(Alignment.Center)) }
+                        }
+                    ) {
+                        Box(modifier = Modifier.fillMaxSize()) {
+                            IconButton(
+                                modifier = Modifier.align(Alignment.Center),
+                                onClick = onChangeDirectionClicked,
+                            ) {
+                                Icon(
+                                    painter = painterResource(R.drawable.vector_two_arrows_circle),
+                                    tint = TariDesignSystem.colors.textPrimary,
+                                    contentDescription = null,
+                                )
+                            }
+                        }
+                    }
+                    TariHorizontalDivider(Modifier.weight(1f))
+                }
+                Spacer(Modifier.size(20.dp))
+
+                YouReceiveLayout(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp),
+                    fromCurrency = uiState.fromCurrency,
+                    toCurrency = uiState.toCurrency,
+                    rate = uiState.rate,
+                    loadingDefaultCurrency = uiState.loadingDefaultCurrency,
+                    loadingDefaultCurrencyError = uiState.loadingDefaultCurrencyError,
+                    onReloadDefaultCurrency = onReloadDefCurrency,
+                    onSelectCurrencyClicked = onSelectCurrencyClicked,
+                )
+                Spacer(Modifier.size(20.dp))
+
+                Row(
+                    modifier = Modifier.padding(horizontal = 16.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    TariSwitch(
+                        checked = uiState.fixedRate,
+                        onCheckedChange = onFixedRateToggled,
+                    )
+                    Spacer(Modifier.size(10.dp))
+                    Text(
+                        text = stringResource(R.string.exchange_fixed_rate),
+                        style = TariDesignSystem.typography.body1,
+                        color = TariDesignSystem.colors.textPrimary,
+                    )
+                }
+
+                Spacer(Modifier.size(20.dp))
+                uiState.toCurrency?.let { toCurrency ->
+                    Text(
+                        modifier = Modifier.padding(horizontal = 16.dp),
+                        text = stringResource(R.string.exchange_destination_address_label, toCurrency.coin),
+                        style = TariDesignSystem.typography.body1,
+                        color = TariDesignSystem.colors.textPrimary,
+                    )
+                }
+                Spacer(Modifier.size(12.dp))
+
+                if (uiState.exchangeDirection == ExchangeDirection.BUY_TARI) {
+                    TariWalletAddressInfoBox(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp),
+                    )
+                }
+
+                Spacer(Modifier.weight(1f))
+
+                Spacer(Modifier.size(20.dp))
+                Text(
+                    modifier = Modifier.align(Alignment.CenterHorizontally),
+                    text = stringResource(R.string.exchange_powered_by_label),
+                    style = TariDesignSystem.typography.body1,
+                )
+                Image(
+                    modifier = Modifier
+                        .align(Alignment.CenterHorizontally)
+                        .size(width = 92.dp, height = 32.dp),
+                    contentScale = ContentScale.FillWidth,
+                    painter = painterResource(R.drawable.exolix_logo),
+                    contentDescription = null,
+                )
+                Spacer(Modifier.size(40.dp))
+
+                TariPrimaryButton(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp),
+                    text = stringResource(R.string.exchange_exchange_now_button),
+                    onClick = onExchangeClicked,
+                )
+                Spacer(Modifier.size(40.dp))
             }
-
-            Spacer(Modifier.weight(1f))
-
-            Spacer(Modifier.size(20.dp))
-            Text(
-                modifier = Modifier.align(Alignment.CenterHorizontally),
-                text = stringResource(R.string.exchange_powered_by_label),
-                style = TariDesignSystem.typography.body1,
-            )
-            Image(
-                modifier = Modifier
-                    .align(Alignment.CenterHorizontally)
-                    .size(width = 92.dp, height = 32.dp),
-                contentScale = ContentScale.FillWidth,
-                painter = painterResource(R.drawable.exolix_logo),
-                contentDescription = null,
-            )
-            Spacer(Modifier.size(40.dp))
-
-            TariPrimaryButton(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp),
-                text = stringResource(R.string.exchange_exchange_now_button),
-                onClick = onExchangeClicked,
-            )
-            Spacer(Modifier.size(40.dp))
         }
     }
 }
@@ -421,6 +441,8 @@ private fun ExchangeScreenPreview() {
             onExchangeClicked = {},
             onFixedRateToggled = {},
             onChangeDirectionClicked = {},
+            onPullToRefresh = {},
+            onRefreshClicked = {},
         )
     }
 }
@@ -446,6 +468,8 @@ private fun ExchangeScreenDarkPreview() {
             onExchangeClicked = {},
             onFixedRateToggled = {},
             onChangeDirectionClicked = {},
+            onPullToRefresh = {},
+            onRefreshClicked = {},
         )
     }
 }
@@ -472,6 +496,8 @@ private fun ExchangeScreenWrongAmountPreview() {
             onExchangeClicked = {},
             onFixedRateToggled = {},
             onChangeDirectionClicked = {},
+            onPullToRefresh = {},
+            onRefreshClicked = {},
         )
     }
 }
@@ -495,6 +521,8 @@ private fun ExchangeScreenCurrencyLoadingPreview() {
             onExchangeClicked = {},
             onFixedRateToggled = {},
             onChangeDirectionClicked = {},
+            onPullToRefresh = {},
+            onRefreshClicked = {},
         )
     }
 }
@@ -517,6 +545,8 @@ private fun ExchangeScreenCurrencyErrorPreview() {
             onExchangeClicked = {},
             onFixedRateToggled = {},
             onChangeDirectionClicked = {},
+            onPullToRefresh = {},
+            onRefreshClicked = {},
         )
     }
 }
