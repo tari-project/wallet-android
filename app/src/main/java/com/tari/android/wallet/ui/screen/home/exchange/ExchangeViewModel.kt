@@ -67,6 +67,18 @@ class ExchangeViewModel : CommonViewModel() {
         showNotReadyYetDialog()
     }
 
+    fun onChangeDirectionClicked() {
+        _uiState.update {
+            it.copy(
+                exchangeDirection = when (it.exchangeDirection) {
+                    UiState.ExchangeDirection.BUY_TARI -> UiState.ExchangeDirection.SELL_TARI
+                    UiState.ExchangeDirection.SELL_TARI -> UiState.ExchangeDirection.BUY_TARI
+                }
+            )
+        }
+        fetchRateIfValid()
+    }
+
     fun loadDefaultCurrency() {
         _uiState.update { it.copy(loadingDefaultCurrency = true, loadingDefaultCurrencyError = false) }
         launchOnIo {
@@ -85,10 +97,10 @@ class ExchangeViewModel : CommonViewModel() {
 
     private fun fetchRateIfValid() {
         val amount = _uiState.value.amount
-        val toCurrency = _uiState.value.toCurrency
         val fromCurrency = _uiState.value.fromCurrency
+        val toCurrency = _uiState.value.toCurrency
 
-        if (!_uiState.value.isAmountValid || toCurrency == null || fromCurrency == null) {
+        if (!_uiState.value.isAmountValid || fromCurrency == null || toCurrency == null) {
             // Clear rate if invalid
             _uiState.update { it.copy(rate = null) }
             return
@@ -106,12 +118,7 @@ class ExchangeViewModel : CommonViewModel() {
                 amount = amount.toString(),
                 rateType = if (_uiState.value.fixedRate) Exolix.Rate.RateType.FIXED else Exolix.Rate.RateType.FLOATING,
             ).onSuccess { rate ->
-                _uiState.update {
-                    it.copy(
-                        rate = rate,
-                        rateLoading = false,
-                    )
-                }
+                _uiState.update { it.copy(rate = rate, rateLoading = false) }
             }.onFailure { exception ->
                 _uiState.update { it.copy(rateLoading = false) }
                 showErrorDialog(exception) // TODO better message
@@ -122,7 +129,7 @@ class ExchangeViewModel : CommonViewModel() {
     data class UiState(
         val amountValue: String = "",
 
-        val selectedCurrency: CurrencyDto? = null, // TODO private?
+        val selectedCurrency: CurrencyDto? = null,
 
         val loadingDefaultCurrency: Boolean = false,
         val loadingDefaultCurrencyError: Boolean = false,
@@ -132,6 +139,8 @@ class ExchangeViewModel : CommonViewModel() {
         val fixedRate: Boolean = false,
         val rate: Exolix.Rate? = null,
         val rateLoading: Boolean = false,
+
+        val exchangeDirection: ExchangeDirection = ExchangeDirection.BUY_TARI,
     ) {
         val amount: BigDecimal?
             get() = runCatching { amountValue.toBigDecimal() }.getOrNull()
@@ -142,10 +151,10 @@ class ExchangeViewModel : CommonViewModel() {
             get() = rate != null && amount != null && (amount!! < rate.minAmount || amount!! > rate.maxAmount)
 
         val fromCurrency: CurrencyDto?
-            get() = TARI_CURRENCY // TODO direction!!
+            get() = if (exchangeDirection == ExchangeDirection.BUY_TARI) selectedCurrency else TARI_CURRENCY
 
         val toCurrency: CurrencyDto?
-            get() = selectedCurrency // TODO direction!!
+            get() = if (exchangeDirection == ExchangeDirection.BUY_TARI) TARI_CURRENCY else selectedCurrency
 
         val TARI_CURRENCY = CurrencyDto(
             currency = Exolix.Currency(
@@ -164,6 +173,12 @@ class ExchangeViewModel : CommonViewModel() {
                 memoNeeded = false,
                 precision = 10,
             ),
+            selectable = false,
         )
+
+        enum class ExchangeDirection {
+            SELL_TARI,
+            BUY_TARI;
+        }
     }
 }

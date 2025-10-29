@@ -1,6 +1,9 @@
 package com.tari.android.wallet.ui.screen.home.exchange
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -16,6 +19,7 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -25,6 +29,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
@@ -49,6 +54,7 @@ import com.tari.android.wallet.ui.compose.components.TariProgressView
 import com.tari.android.wallet.ui.compose.components.TariSwitch
 import com.tari.android.wallet.ui.compose.components.TariTextField
 import com.tari.android.wallet.ui.compose.components.TariTopBar
+import com.tari.android.wallet.ui.screen.home.exchange.ExchangeViewModel.UiState.ExchangeDirection
 import com.tari.android.wallet.ui.screen.home.exchange.widget.SelectedCurrencyChip
 import com.tari.android.wallet.ui.screen.settings.themeSelector.TariTheme
 import com.tari.android.wallet.util.MockDataStub
@@ -65,6 +71,7 @@ fun ExchangeScreen(
     onMaxAmountClicked: () -> Unit,
     onExchangeClicked: () -> Unit,
     onFixedRateToggled: (Boolean) -> Unit,
+    onChangeDirectionClicked: () -> Unit,
 ) {
     Scaffold(
         modifier = Modifier
@@ -97,6 +104,7 @@ fun ExchangeScreen(
                 onAmountChanged = onAmountChanged,
                 onMinAmountClicked = onMinAmountClicked,
                 onMaxAmountClicked = onMaxAmountClicked,
+                onSelectCurrencyClicked = onSelectCurrencyClicked,
             )
 
             Spacer(Modifier.size(20.dp))
@@ -115,12 +123,16 @@ fun ExchangeScreen(
                     }
                 ) {
                     Box(modifier = Modifier.fillMaxSize()) {
-                        Icon(
+                        IconButton(
                             modifier = Modifier.align(Alignment.Center),
-                            painter = painterResource(R.drawable.vector_two_arrows_circle),
-                            tint = TariDesignSystem.colors.textPrimary,
-                            contentDescription = null,
-                        )
+                            onClick = onChangeDirectionClicked,
+                        ) {
+                            Icon(
+                                painter = painterResource(R.drawable.vector_two_arrows_circle),
+                                tint = TariDesignSystem.colors.textPrimary,
+                                contentDescription = null,
+                            )
+                        }
                     }
                 }
                 TariHorizontalDivider(Modifier.weight(1f))
@@ -157,8 +169,28 @@ fun ExchangeScreen(
                 )
             }
 
+            Spacer(Modifier.size(20.dp))
+            uiState.toCurrency?.let { toCurrency ->
+                Text(
+                    modifier = Modifier.padding(horizontal = 16.dp),
+                    text = stringResource(R.string.exchange_destination_address_label, toCurrency.coin),
+                    style = TariDesignSystem.typography.body1,
+                    color = TariDesignSystem.colors.textPrimary,
+                )
+            }
+            Spacer(Modifier.size(12.dp))
+
+            if (uiState.exchangeDirection == ExchangeDirection.BUY_TARI) {
+                TariWalletAddressInfoBox(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp),
+                )
+            }
+
             Spacer(Modifier.weight(1f))
 
+            Spacer(Modifier.size(20.dp))
             Text(
                 modifier = Modifier.align(Alignment.CenterHorizontally),
                 text = stringResource(R.string.exchange_powered_by_label),
@@ -195,6 +227,7 @@ private fun YouSendLayout(
     onAmountChanged: (String) -> Unit,
     onMinAmountClicked: () -> Unit,
     onMaxAmountClicked: () -> Unit,
+    onSelectCurrencyClicked: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val focusManager = LocalFocusManager.current
@@ -236,6 +269,7 @@ private fun YouSendLayout(
                     title = fromCurrency.coin,
                     subtitle = fromCurrency.networkName,
                     iconUrl = fromCurrency.iconUrl,
+                    onClick = if (fromCurrency.selectable) onSelectCurrencyClicked else null,
                 )
             }
         }
@@ -330,7 +364,7 @@ private fun YouReceiveLayout(
                     title = toCurrency.coin,
                     subtitle = toCurrency.networkName,
                     iconUrl = toCurrency.iconUrl,
-                    onClick = onSelectCurrencyClicked,
+                    onClick = if (toCurrency.selectable) onSelectCurrencyClicked else null,
                 )
             }
         }
@@ -346,6 +380,26 @@ private fun YouReceiveLayout(
 }
 
 @Composable
+private fun TariWalletAddressInfoBox(modifier: Modifier = Modifier) {
+    Box(
+        modifier = modifier
+            .clip(TariDesignSystem.shapes.chip)
+            .border(
+                border = BorderStroke(1.dp, TariDesignSystem.colors.secondaryMain),
+                shape = TariDesignSystem.shapes.chip,
+            )
+            .background(TariDesignSystem.colors.backgroundAccent)
+            .padding(16.dp),
+    ) {
+        Text(
+            text = stringResource(R.string.exchange_tari_wallet_address_info),
+            style = TariDesignSystem.typography.body1,
+            color = TariDesignSystem.colors.textPrimary,
+        )
+    }
+}
+
+@Composable
 @Preview
 private fun ExchangeScreenPreview() {
     PreviewSecondarySurface(TariTheme.Light) {
@@ -356,6 +410,7 @@ private fun ExchangeScreenPreview() {
                 rate = MockDataStub.createRate(
                     toAmount = 123.21321f.toBigDecimal()
                 ),
+                exchangeDirection = ExchangeDirection.BUY_TARI,
             ),
             onBackClick = {},
             onReloadDefCurrency = {},
@@ -365,6 +420,7 @@ private fun ExchangeScreenPreview() {
             onMaxAmountClicked = {},
             onExchangeClicked = {},
             onFixedRateToggled = {},
+            onChangeDirectionClicked = {},
         )
     }
 }
@@ -389,6 +445,7 @@ private fun ExchangeScreenDarkPreview() {
             onMaxAmountClicked = {},
             onExchangeClicked = {},
             onFixedRateToggled = {},
+            onChangeDirectionClicked = {},
         )
     }
 }
@@ -414,6 +471,7 @@ private fun ExchangeScreenWrongAmountPreview() {
             onMaxAmountClicked = {},
             onExchangeClicked = {},
             onFixedRateToggled = {},
+            onChangeDirectionClicked = {},
         )
     }
 }
@@ -436,6 +494,7 @@ private fun ExchangeScreenCurrencyLoadingPreview() {
             onMaxAmountClicked = {},
             onExchangeClicked = {},
             onFixedRateToggled = {},
+            onChangeDirectionClicked = {},
         )
     }
 }
@@ -457,6 +516,7 @@ private fun ExchangeScreenCurrencyErrorPreview() {
             onMaxAmountClicked = {},
             onExchangeClicked = {},
             onFixedRateToggled = {},
+            onChangeDirectionClicked = {},
         )
     }
 }

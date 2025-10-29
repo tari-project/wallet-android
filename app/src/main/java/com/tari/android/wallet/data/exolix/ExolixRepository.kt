@@ -112,12 +112,13 @@ class ExolixRepository @Inject constructor(
 data class CurrencyDto(
     val currency: Exolix.Currency,
     val network: Exolix.Network,
+    val selectable: Boolean = true, // Tari currency is always selected and cannot be changed
 ) : Parcelable {
     val coin: String
         get() = currency.code
 
     val networkName: String
-        get() = network.name
+        get() = network.network
 
     val iconUrl: String
         get() = currency.icon

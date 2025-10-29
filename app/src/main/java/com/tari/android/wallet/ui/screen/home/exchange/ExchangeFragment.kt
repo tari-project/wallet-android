@@ -31,6 +31,7 @@ class ExchangeFragment : CommonFragment<ExchangeViewModel>() {
                 onMaxAmountClicked = { viewModel.onMaxAmountClicked() },
                 onExchangeClicked = { viewModel.onExchangeClicked() },
                 onFixedRateToggled = { viewModel.onFixedRateToggled(it) },
+                onChangeDirectionClicked = { viewModel.onChangeDirectionClicked() }
             )
         }
     }

@@ -110,6 +110,8 @@
     <string name="exchange_powered_by_label">Powered by</string>
     <string name="exchange_exchange_now_button">Exchange Now</string>
     <string name="exchange_fixed_rate">Fixed rate</string>
+    <string name="exchange_destination_address_label">Destination Address (%1$s)</string>
+    <string name="exchange_tari_wallet_address_info">Your new XTM will be sent to your current Tari wallet address on mobile.</string>
 
     <!-- emoji id copied view -->
 
