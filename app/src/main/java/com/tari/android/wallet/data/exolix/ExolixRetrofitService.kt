@@ -13,7 +13,6 @@ import java.math.BigDecimal
 
 interface ExolixRetrofitService {
 
-    // Common endpoints
     @GET("/api/v2/currencies")
     suspend fun getCurrencies(
         @Query("page") page: Int? = null,
@@ -29,7 +28,7 @@ interface ExolixRetrofitService {
     suspend fun getAllNetworks(
         @Query("page") page: Int? = null,
         @Query("size") size: Int? = null,
-        @Query("search") search: String? = null
+        @Query("search") search: String? = null,
     ): Exolix.NetworksResponse
 
     @GET("/api/v2/rate")
@@ -40,7 +39,7 @@ interface ExolixRetrofitService {
         @Query("networkTo") networkTo: String? = null,
         @Query("amount") amount: String,
         @Query("withdrawalAmount") withdrawalAmount: String? = null,
-        @Query("rateType") rateType: String = "fixed"
+        @Query("rateType") rateType: Exolix.RateType = Exolix.RateType.FIXED,
     ): Exolix.Rate
 
     @GET("/api/v2/transactions")
@@ -52,10 +51,9 @@ interface ExolixRetrofitService {
         @Query("order") order: String? = null,
         @Query("dateFrom") dateFrom: String? = null,
         @Query("dateTo") dateTo: String? = null,
-        @Query("statuses") statuses: String? = null
+        @Query("statuses") statuses: String? = null,
     ): Exolix.TransactionsResponse
 
-    // Exchange endpoints
     @GET("/api/v2/transactions/{id}")
     suspend fun getTransaction(@Path("id") id: String): Exolix.TransactionResponse
 
@@ -66,6 +64,44 @@ interface ExolixRetrofitService {
 
 object Exolix {
 
+    enum class RateType(val value: String) {
+        @SerializedName("fixed")
+        FIXED("fixed"),
+
+        @SerializedName("float")
+        FLOATING("float");
+
+        override fun toString(): String = value
+    }
+
+    enum class TransactionStatus(val value: String) {
+        @SerializedName("wait")
+        WAIT("wait"),
+
+        @SerializedName("confirmation")
+        CONFIRMATION("confirmation"),
+
+        @SerializedName("confirmed")
+        CONFIRMED("confirmed"),
+
+        @SerializedName("exchanging")
+        EXCHANGING("exchanging"),
+
+        @SerializedName("sending")
+        SENDING("sending"),
+
+        @SerializedName("success")
+        SUCCESS("success"),
+
+        @SerializedName("overdue")
+        OVERDUE("overdue"),
+
+        @SerializedName("refunded")
+        REFUNDED("refunded");
+
+        override fun toString(): String = value
+    }
+
     data class CreateExchangeRequest(
         @SerializedName("coinFrom") val coinFrom: String,
         @SerializedName("networkFrom") val networkFrom: String,
@@ -75,16 +111,15 @@ object Exolix {
         @SerializedName("withdrawalAmount") val withdrawalAmount: BigDecimal? = null,
         @SerializedName("withdrawalAddress") val withdrawalAddress: String,
         @SerializedName("withdrawalExtraId") val withdrawalExtraId: String? = null,
-        @SerializedName("rateType") val rateType: String = "fixed",
+        @SerializedName("rateType") val rateType: RateType = RateType.FIXED,
         @SerializedName("refundAddress") val refundAddress: String? = null,
         @SerializedName("refundExtraId") val refundExtraId: String? = null,
-        @SerializedName("slippage") val slippage: Double? = null
+        @SerializedName("slippage") val slippage: Double? = null,
     )
 
-    // Response models
     data class CurrenciesResponse(
         @SerializedName("data") val data: List<Currency>,
-        @SerializedName("count") val count: Int
+        @SerializedName("count") val count: Int,
     )
 
     @Parcelize
@@ -93,7 +128,7 @@ object Exolix {
         @SerializedName("name") val name: String,
         @SerializedName("icon") val icon: String,
         @SerializedName("notes") val notes: String,
-        @SerializedName("networks") val networks: List<Network>? = null
+        @SerializedName("networks") val networks: List<Network>? = null,
     ) : Parcelable
 
     @Parcelize
@@ -111,7 +146,7 @@ object Exolix {
         @SerializedName("decimal") val decimal: Int? = null,
         @SerializedName("precision") val precision: Int,
         @SerializedName("contract") val contract: String? = null,
-        @SerializedName("icon") val icon: String? = null
+        @SerializedName("icon") val icon: String? = null,
     ) : Parcelable {
         override fun equals(other: Any?): Boolean {
             return other is Network && other.network == network
@@ -120,7 +155,7 @@ object Exolix {
 
     data class NetworksResponse(
         @SerializedName("data") val data: List<Network>,
-        @SerializedName("count") val count: Int
+        @SerializedName("count") val count: Int,
     )
 
     @Parcelize
@@ -132,16 +167,11 @@ object Exolix {
         @SerializedName("minAmount") val minAmount: BigDecimal,
         @SerializedName("withdrawMin") val withdrawMin: BigDecimal = BigDecimal.ZERO,
         @SerializedName("maxAmount") val maxAmount: BigDecimal,
-    ) : Parcelable {
-        enum class RateType(val type: String) {
-            FIXED("fixed"),
-            FLOATING("float");
-        }
-    }
+    ) : Parcelable
 
     data class TransactionsResponse(
         @SerializedName("data") val data: List<Transaction>,
-        @SerializedName("count") val count: Int
+        @SerializedName("count") val count: Int,
     )
 
     data class Transaction(
@@ -159,11 +189,11 @@ object Exolix {
         @SerializedName("hashIn") val hashIn: HashInfo? = null,
         @SerializedName("hashOut") val hashOut: HashInfo? = null,
         @SerializedName("rate") val rate: BigDecimal,
-        @SerializedName("rateType") val rateType: String,
+        @SerializedName("rateType") val rateType: RateType,
         @SerializedName("refundAddress") val refundAddress: String? = null,
         @SerializedName("refundExtraId") val refundExtraId: String? = null,
-        @SerializedName("status") val status: String,
-        @SerializedName("source") val source: String? = null
+        @SerializedName("status") val status: TransactionStatus,
+        @SerializedName("source") val source: String? = null,
     )
 
     data class TransactionResponse(
@@ -181,11 +211,11 @@ object Exolix {
         @SerializedName("hashIn") val hashIn: HashInfo? = null,
         @SerializedName("hashOut") val hashOut: HashInfo? = null,
         @SerializedName("rate") val rate: BigDecimal,
-        @SerializedName("rateType") val rateType: String,
+        @SerializedName("rateType") val rateType: RateType,
         @SerializedName("refundAddress") val refundAddress: String? = null,
         @SerializedName("refundExtraId") val refundExtraId: String? = null,
-        @SerializedName("status") val status: String,
-        @SerializedName("source") val source: String? = null
+        @SerializedName("status") val status: TransactionStatus,
+        @SerializedName("source") val source: String? = null,
     )
 
     data class CoinInfo(
@@ -196,12 +226,12 @@ object Exolix {
         @SerializedName("networkShortName") val networkShortName: String? = null,
         @SerializedName("icon") val icon: String,
         @SerializedName("memoName") val memoName: String? = null,
-        @SerializedName("contract") val contract: String? = null
+        @SerializedName("contract") val contract: String? = null,
     )
 
     data class HashInfo(
         @SerializedName("hash") val hash: String? = null,
-        @SerializedName("link") val link: String? = null
+        @SerializedName("link") val link: String? = null,
     )
 
     data class CreateExchangeResponse(
@@ -219,9 +249,9 @@ object Exolix {
         @SerializedName("hashIn") val hashIn: HashInfo? = null,
         @SerializedName("hashOut") val hashOut: HashInfo? = null,
         @SerializedName("rate") val rate: BigDecimal,
-        @SerializedName("rateType") val rateType: String,
+        @SerializedName("rateType") val rateType: RateType,
         @SerializedName("refundAddress") val refundAddress: String? = null,
         @SerializedName("refundExtraId") val refundExtraId: String? = null,
-        @SerializedName("status") val status: String
+        @SerializedName("status") val status: TransactionStatus,
     )
 }

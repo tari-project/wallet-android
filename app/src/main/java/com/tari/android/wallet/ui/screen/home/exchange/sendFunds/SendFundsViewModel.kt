@@ -42,10 +42,10 @@ class SendFundsViewModel(savedState: SavedStateHandle) : CommonViewModel() {
                     )
                     _uiState.update {
                         it.copy(
+                            loading = false,
                             exchangeId = response.id,
                             depositAddress = response.depositAddress,
                             qrBitmap = qrBitmap,
-                            loading = false
                         )
                     }
                 }
@@ -53,7 +53,7 @@ class SendFundsViewModel(savedState: SavedStateHandle) : CommonViewModel() {
                     _uiState.update {
                         it.copy(
                             loading = false,
-                            error = exception.message ?: resourceManager.getString(R.string.exchange_create_exchange_error)
+                            error = exception.message ?: resourceManager.getString(R.string.exchange_create_exchange_error),
                         )
                     }
                 }

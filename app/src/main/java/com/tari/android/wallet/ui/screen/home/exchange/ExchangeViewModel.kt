@@ -149,7 +149,7 @@ class ExchangeViewModel : CommonViewModel() {
                 coinTo = toCurrency.coin,
                 networkTo = toCurrency.networkName,
                 amount = amount.toString(),
-                rateType = if (_uiState.value.fixedRate) Exolix.Rate.RateType.FIXED else Exolix.Rate.RateType.FLOATING,
+                rateType = if (_uiState.value.fixedRate) Exolix.RateType.FIXED else Exolix.RateType.FLOATING,
             ).onSuccess { rate ->
                 _uiState.update { it.copy(rate = rate, rateLoading = false) }
                 startAutoRefresh()
