@@ -88,7 +88,6 @@
 
     <!-- Exchange screen -->
     <string name="exchange_title">Exchange Tari</string>
-    <string name="exchange_network_label">Network:</string>
     <string name="exchange_amount_placeholder">Enter amount</string>
     <string name="exchange_invalid_amount_error">Please enter a valid amount</string>
     <string name="exchange_converted_amount_placeholder">Converted amount</string>
@@ -97,10 +96,6 @@
     <string name="exchange_search_currency_hint">Search currencies...</string>
     <string name="exchange_no_currencies_found">No currencies found</string>
     <string name="exchange_no_currencies_description">Try adjusting your search or check your connection</string>
-    <string name="exchange_select_network_title">Select Network</string>
-    <string name="exchange_search_network_hint">Search networks...</string>
-    <string name="exchange_no_networks_found">No networks found</string>
-    <string name="exchange_no_networks_description">No networks available for this currency</string>
     <string name="exchange_network_default_label">(Default)</string>
     <string name="exchange_min_amount_label_short">Min:</string>
     <string name="exchange_max_amount_label_short">Max:</string>
@@ -113,6 +108,21 @@
     <string name="exchange_destination_address_label">Destination Address (%1$s)</string>
     <string name="exchange_tari_wallet_address_info">Your new XTM will be sent to your current Tari wallet address on mobile.</string>
     <string name="exchange_refresh_rate">Refresh rate</string>
+    <string name="exchange_send_funds_title">Send funds</string>
+    <string name="exchange_send_exact_amount">Send the exact amount to the address below in one transaction</string>
+    <string name="exchange_you_need_to_send">You need to send</string>
+    <string name="exchange_to_exolix_address">To Exolix address</string>
+    <string name="exchange_send_funds_once">Send funds to the address above only once.</string>
+    <string name="exchange_cancel_transaction">Cancel Transaction</string>
+    <string name="exchange_copy_amount_content_description">Copy amount</string>
+    <string name="exchange_copy_address_content_description">Copy address</string>
+    <string name="exchange_create_exchange_error">Failed to create exchange</string>
+    <string name="exchange_amount_label">Amount</string>
+    <string name="exchange_amount_copied">Amount copied</string>
+    <string name="exchange_address_label">Address</string>
+    <string name="exchange_address_copied">Address copied</string>
+    <string name="exchange_rate_error_title">Exchange rate unavailable (%1$s)</string>
+    <string name="exchange_rate_error_message">Unable to fetch the exchange rate at this time. Please check your internet connection and try again.</string>
 
     <!-- emoji id copied view -->
 

@@ -43,6 +43,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.tari.android.wallet.R
 import com.tari.android.wallet.data.exolix.CurrencyDto
+import com.tari.android.wallet.data.exolix.ExchangeDirection
 import com.tari.android.wallet.data.exolix.Exolix
 import com.tari.android.wallet.ui.compose.PreviewSecondarySurface
 import com.tari.android.wallet.ui.compose.TariDesignSystem
@@ -57,7 +58,6 @@ import com.tari.android.wallet.ui.compose.components.TariPullToRefreshBox
 import com.tari.android.wallet.ui.compose.components.TariSwitch
 import com.tari.android.wallet.ui.compose.components.TariTextField
 import com.tari.android.wallet.ui.compose.components.TariTopBar
-import com.tari.android.wallet.ui.screen.home.exchange.ExchangeViewModel.UiState.ExchangeDirection
 import com.tari.android.wallet.ui.screen.home.exchange.widget.SelectedCurrencyChip
 import com.tari.android.wallet.ui.screen.settings.themeSelector.TariTheme
 import com.tari.android.wallet.util.MockDataStub
@@ -230,6 +230,7 @@ fun ExchangeScreen(
                         .fillMaxWidth()
                         .padding(horizontal = 16.dp),
                     text = stringResource(R.string.exchange_exchange_now_button),
+                    enabled = uiState.exchangeButtonEnabled,
                     onClick = onExchangeClicked,
                 )
                 Spacer(Modifier.size(40.dp))
@@ -427,9 +428,7 @@ private fun ExchangeScreenPreview() {
             uiState = ExchangeViewModel.UiState(
                 amountValue = "100",
                 selectedCurrency = MockDataStub.createCurrencyDto(),
-                rate = MockDataStub.createRate(
-                    toAmount = 123.21321f.toBigDecimal()
-                ),
+                rate = MockDataStub.createRate(),
                 exchangeDirection = ExchangeDirection.BUY_TARI,
             ),
             onBackClick = {},
@@ -455,9 +454,7 @@ private fun ExchangeScreenDarkPreview() {
             uiState = ExchangeViewModel.UiState(
                 amountValue = "100",
                 selectedCurrency = MockDataStub.createCurrencyDto(),
-                rate = MockDataStub.createRate(
-                    toAmount = 123.21321f.toBigDecimal()
-                ),
+                rate = MockDataStub.createRate(),
             ),
             onBackClick = {},
             onReloadDefCurrency = {},

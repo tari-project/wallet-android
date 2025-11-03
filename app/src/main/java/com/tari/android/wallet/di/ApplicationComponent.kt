@@ -48,6 +48,7 @@ import com.tari.android.wallet.ui.screen.debug.sampleDesign.SampleDesignSystemVi
 import com.tari.android.wallet.ui.screen.home.HomeViewModel
 import com.tari.android.wallet.ui.screen.home.exchange.ExchangeViewModel
 import com.tari.android.wallet.ui.screen.home.exchange.selectCurrency.SelectCurrencyViewModel
+import com.tari.android.wallet.ui.screen.home.exchange.sendFunds.SendFundsViewModel
 import com.tari.android.wallet.ui.screen.home.overview.HomeOverviewViewModel
 import com.tari.android.wallet.ui.screen.onboarding.activity.OnboardingFlowActivity
 import com.tari.android.wallet.ui.screen.onboarding.createWallet.CreateWalletFragment
@@ -171,6 +172,7 @@ interface ApplicationComponent {
     fun inject(viewModel: SendViewModel)
     fun inject(viewModel: ExchangeViewModel)
     fun inject(viewModel: SelectCurrencyViewModel)
+    fun inject(viewModel: SendFundsViewModel)
 
     fun inject(tariFcmService: TariFcmService)
 

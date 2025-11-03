@@ -66,7 +66,6 @@ interface ExolixRetrofitService {
 
 object Exolix {
 
-    // Request models
     data class CreateExchangeRequest(
         @SerializedName("coinFrom") val coinFrom: String,
         @SerializedName("networkFrom") val networkFrom: String,
@@ -124,6 +123,7 @@ object Exolix {
         @SerializedName("count") val count: Int
     )
 
+    @Parcelize
     data class Rate(
         @SerializedName("fromAmount") val fromAmount: BigDecimal,
         @SerializedName("toAmount") val toAmount: BigDecimal,
@@ -132,7 +132,7 @@ object Exolix {
         @SerializedName("minAmount") val minAmount: BigDecimal,
         @SerializedName("withdrawMin") val withdrawMin: BigDecimal = BigDecimal.ZERO,
         @SerializedName("maxAmount") val maxAmount: BigDecimal,
-    ) {
+    ) : Parcelable {
         enum class RateType(val type: String) {
             FIXED("fixed"),
             FLOATING("float");

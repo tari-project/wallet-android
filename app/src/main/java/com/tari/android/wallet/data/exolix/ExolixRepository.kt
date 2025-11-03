@@ -2,6 +2,7 @@ package com.tari.android.wallet.data.exolix
 
 import android.os.Parcelable
 import com.google.gson.Gson
+import com.tari.android.wallet.data.sharedPrefs.CorePrefRepository
 import com.tari.android.wallet.util.extension.switchToIo
 import kotlinx.parcelize.Parcelize
 import retrofit2.HttpException
@@ -9,9 +10,31 @@ import java.math.BigDecimal
 import javax.inject.Inject
 import javax.inject.Singleton
 
+
+val TARI_CURRENCY = CurrencyDto(
+    currency = Exolix.Currency(
+//    code = "XTM",
+        code = "ETH", // TODO uncomment!!!
+        name = "Tari",
+        icon = "https://exolix.com/icons/networks/Tari_1755361659372.png",
+        notes = "",
+    ),
+    network = Exolix.Network(
+        name = "Tari",
+//    network = "Tari",
+        network = "ETH", // TODO uncomment!!!
+        icon = "https://exolix.com/icons/networks/Tari_1755361659372.png",
+        isDefault = true,
+        memoNeeded = false,
+        precision = 10,
+    ),
+    selectable = false,
+)
+
 @Singleton
 class ExolixRepository @Inject constructor(
     private val exolixRetrofitService: ExolixRetrofitService,
+    private val corePrefRepository: CorePrefRepository,
 ) {
 
     suspend fun getCurrencies(
@@ -101,9 +124,26 @@ class ExolixRepository @Inject constructor(
         }
     }
 
-    suspend fun createExchange(request: Exolix.CreateExchangeRequest): Result<Exolix.CreateExchangeResponse> = switchToIo {
+    suspend fun createExchange(requestData: ExchangeRequestData): Result<Exolix.CreateExchangeResponse> = switchToIo {
         runCatching {
-            exolixRetrofitService.createExchange(request)
+            val fromAddress = if (requestData.direction == ExchangeDirection.SELL_TARI) {
+                corePrefRepository.walletAddress.fullBase58
+            } else {
+                requestData.selectedAddress ?: error("Selected address is null for BUY_TARI exchange")
+            }
+            val fromCurrency = if (requestData.direction == ExchangeDirection.SELL_TARI) TARI_CURRENCY else requestData.selectedCurrency
+            val toCurrency = if (requestData.direction == ExchangeDirection.SELL_TARI) requestData.selectedCurrency else TARI_CURRENCY
+
+            exolixRetrofitService.createExchange(
+                Exolix.CreateExchangeRequest(
+                    coinFrom = fromCurrency.coin,
+                    networkFrom = fromCurrency.networkName,
+                    coinTo = toCurrency.coin,
+                    networkTo = toCurrency.networkName,
+                    amount = requestData.amount,
+                    withdrawalAddress = fromAddress,
+                )
+            )
         }
     }
 }
@@ -130,7 +170,21 @@ data class CurrencyDto(
     }
 }
 
+@Parcelize
+data class ExchangeRequestData(
+    val selectedCurrency: CurrencyDto,
+    val selectedAddress: String? = null,
+    val amount: BigDecimal,
+    val rate: Exolix.Rate,
+    val direction: ExchangeDirection,
+) : Parcelable
+
 data class CurrenciesResult(
     val currencies: List<CurrencyDto>,
     val count: Int,
 )
+
+enum class ExchangeDirection {
+    SELL_TARI,
+    BUY_TARI;
+}

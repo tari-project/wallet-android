@@ -401,7 +401,6 @@ object MockDataStub {
         }
     }
 
-
     fun createRate(
         fromAmount: BigDecimal = 100.0.toBigDecimal(),
         toAmount: BigDecimal = 95.toBigDecimal(),

@@ -1,9 +1,14 @@
 package com.tari.android.wallet.ui.screen.home.exchange
 
+import com.tari.android.wallet.R
 import com.tari.android.wallet.application.Navigation
 import com.tari.android.wallet.data.exolix.CurrencyDto
+import com.tari.android.wallet.data.exolix.ExchangeDirection
+import com.tari.android.wallet.data.exolix.ExchangeRequestData
 import com.tari.android.wallet.data.exolix.Exolix
 import com.tari.android.wallet.data.exolix.ExolixRepository
+import com.tari.android.wallet.data.exolix.TARI_CURRENCY
+import com.tari.android.wallet.model.WalletError
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.util.extension.filterNumbers
 import com.tari.android.wallet.util.extension.filterSingleDot
@@ -37,6 +42,11 @@ class ExchangeViewModel : CommonViewModel() {
         loadDefaultCurrency()
     }
 
+    override fun onCleared() {
+        super.onCleared()
+        stopAutoRefresh()
+    }
+
     fun onAmountChanged(amountValue: String) {
         val newAmount = amountValue.filterSingleDot().filterNumbers()
         if (newAmount == _uiState.value.amountValue) return
@@ -67,16 +77,12 @@ class ExchangeViewModel : CommonViewModel() {
         fetchRateIfValid()
     }
 
-    fun onExchangeClicked() {
-        showNotReadyYetDialog()
-    }
-
     fun onChangeDirectionClicked() {
         _uiState.update {
             it.copy(
                 exchangeDirection = when (it.exchangeDirection) {
-                    UiState.ExchangeDirection.BUY_TARI -> UiState.ExchangeDirection.SELL_TARI
-                    UiState.ExchangeDirection.SELL_TARI -> UiState.ExchangeDirection.BUY_TARI
+                    ExchangeDirection.BUY_TARI -> ExchangeDirection.SELL_TARI
+                    ExchangeDirection.SELL_TARI -> ExchangeDirection.BUY_TARI
                 }
             )
         }
@@ -90,6 +96,20 @@ class ExchangeViewModel : CommonViewModel() {
     fun onRefreshClicked() {
         stopAutoRefresh()
         fetchRateIfValid()
+    }
+
+    fun onExchangeClicked() {
+        stopAutoRefresh()
+
+        val request = ExchangeRequestData(
+            selectedCurrency = _uiState.value.selectedCurrency ?: error("selectedCurrency is null, but exchange button is not disabled"),
+            selectedAddress = null, // TODO add address selection
+            amount = _uiState.value.amount ?: error("amount is null, but exchange button is not disabled"),
+            rate = _uiState.value.rate ?: error("rate is null, but exchange button is not disabled"),
+            direction = _uiState.value.exchangeDirection,
+        )
+
+        tariNavigator.navigate(Navigation.Exchange.SendFunds(request))
     }
 
     fun loadDefaultCurrency() {
@@ -133,9 +153,13 @@ class ExchangeViewModel : CommonViewModel() {
             ).onSuccess { rate ->
                 _uiState.update { it.copy(rate = rate, rateLoading = false) }
                 startAutoRefresh()
-            }.onFailure { exception ->
+            }.onFailure { e ->
                 _uiState.update { it.copy(rateLoading = false) }
-                showErrorDialog(exception) // TODO better message
+
+                showSimpleDialog(
+                    title = resourceManager.getString(R.string.exchange_rate_error_title, WalletError(e).code),
+                    description = resourceManager.getString(R.string.exchange_rate_error_message),
+                )
             }
         }
     }
@@ -153,11 +177,6 @@ class ExchangeViewModel : CommonViewModel() {
         autoRefreshJob?.cancel()
         autoRefreshJob = null
         _uiState.update { it.copy(autoRefreshActive = false) }
-    }
-
-    override fun onCleared() {
-        super.onCleared()
-        stopAutoRefresh()
     }
 
     data class UiState(
@@ -189,29 +208,7 @@ class ExchangeViewModel : CommonViewModel() {
         val toCurrency: CurrencyDto?
             get() = if (exchangeDirection == ExchangeDirection.BUY_TARI) TARI_CURRENCY else selectedCurrency
 
-        val TARI_CURRENCY = CurrencyDto(
-            currency = Exolix.Currency(
-//    code = "XTM",
-                code = "ETH", // TODO uncomment!!!
-                name = "Tari",
-                icon = "https://exolix.com/icons/networks/Tari_1755361659372.png",
-                notes = "",
-            ),
-            network = Exolix.Network(
-                name = "Tari",
-//    network = "Tari",
-                network = "ETH", // TODO uncomment!!!
-                icon = "https://exolix.com/icons/networks/Tari_1755361659372.png",
-                isDefault = true,
-                memoNeeded = false,
-                precision = 10,
-            ),
-            selectable = false,
-        )
-
-        enum class ExchangeDirection {
-            SELL_TARI,
-            BUY_TARI;
-        }
+        val exchangeButtonEnabled: Boolean
+            get() = fromCurrency != null && toCurrency != null && amount != null && !amountError && !rateLoading
     }
 }
