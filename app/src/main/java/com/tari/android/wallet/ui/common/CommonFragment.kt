@@ -26,7 +26,6 @@ import com.tari.android.wallet.infrastructure.logging.LoggerTags
 import com.tari.android.wallet.ui.dialog.modular.InputModularDialog
 import com.tari.android.wallet.ui.dialog.modular.ModularDialog
 import com.tari.android.wallet.ui.screen.qr.QrScannerActivity
-import com.tari.android.wallet.ui.screen.qr.QrScannerSource
 import com.tari.android.wallet.util.extension.dataIfOk
 import com.tari.android.wallet.util.extension.observe
 import com.tari.android.wallet.util.extension.parcelable
@@ -122,8 +121,8 @@ abstract class CommonFragment<VM : CommonViewModel> : Fragment(), FragmentPopped
     }
 
 
-    fun startQrScanner(source: QrScannerSource) {
-        scanQrCodeLauncher.launch(QrScannerActivity.newIntent(requireContext(), source))
+    fun startQrScanner() {
+        scanQrCodeLauncher.launch(QrScannerActivity.newIntent(requireContext()))
     }
 
     fun setFragmentPoppedListener(listener: FragmentPoppedListener) {

@@ -153,10 +153,7 @@ class QrScannerActivity : CommonXmlActivity<ActivityQrScannerBinding, QrScannerV
     companion object {
         private const val REQUEST_CAMERA_PERMISSION = 102
         const val EXTRA_DEEPLINK = "EXTRA_DEEPLINK"
-        const val EXTRA_QR_DATA_SOURCE = "EXTRA_QR_DATA_SOURCE"
 
-        fun newIntent(context: Context, source: QrScannerSource) = Intent(context, QrScannerActivity::class.java).also {
-            it.putExtra(EXTRA_QR_DATA_SOURCE, source)
-        }
+        fun newIntent(context: Context) = Intent(context, QrScannerActivity::class.java)
     }
 }

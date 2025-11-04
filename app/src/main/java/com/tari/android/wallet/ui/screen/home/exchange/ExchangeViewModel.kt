@@ -2,6 +2,7 @@ package com.tari.android.wallet.ui.screen.home.exchange
 
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.Navigation
+import com.tari.android.wallet.application.deeplinks.DeepLink
 import com.tari.android.wallet.data.exolix.CurrencyDto
 import com.tari.android.wallet.data.exolix.ExchangeDirection
 import com.tari.android.wallet.data.exolix.ExchangeRequestData
@@ -89,6 +90,28 @@ class ExchangeViewModel : CommonViewModel() {
         fetchRateIfValid()
     }
 
+    fun onDestinationAddressChanged(address: String) {
+        _uiState.update { it.copy(destinationAddress = address) }
+    }
+
+    override fun handleDeeplink(deeplink: DeepLink) {
+        when (deeplink) {
+            is DeepLink.Send -> {
+                if (deeplink.walletAddress.isNotEmpty()) {
+                    _uiState.update { it.copy(destinationAddress = deeplink.walletAddress) }
+                }
+            }
+
+            is DeepLink.Raw -> {
+                if (deeplink.value.isNotEmpty()) {
+                    _uiState.update { it.copy(destinationAddress = deeplink.value) }
+                }
+            }
+
+            else -> super.handleDeeplink(deeplink)
+        }
+    }
+
     fun onPullToRefresh() {
         fetchRateIfValid()
     }
@@ -103,7 +126,7 @@ class ExchangeViewModel : CommonViewModel() {
 
         val request = ExchangeRequestData(
             selectedCurrency = _uiState.value.selectedCurrency ?: error("selectedCurrency is null, but exchange button is not disabled"),
-            selectedAddress = null, // TODO add address selection
+            selectedAddress = _uiState.value.destinationAddress.takeIf { it.isNotBlank() },
             amount = _uiState.value.amount ?: error("amount is null, but exchange button is not disabled"),
             rate = _uiState.value.rate ?: error("rate is null, but exchange button is not disabled"),
             direction = _uiState.value.exchangeDirection,
@@ -183,6 +206,8 @@ class ExchangeViewModel : CommonViewModel() {
         val amountValue: String = "",
 
         val selectedCurrency: CurrencyDto? = null,
+        val exchangeDirection: ExchangeDirection = ExchangeDirection.BUY_TARI,
+        val destinationAddress: String = "",
 
         val loadingDefaultCurrency: Boolean = false,
         val loadingDefaultCurrencyError: Boolean = false,
@@ -193,8 +218,6 @@ class ExchangeViewModel : CommonViewModel() {
         val rate: Exolix.Rate? = null,
         val rateLoading: Boolean = false,
         val autoRefreshActive: Boolean = false,
-
-        val exchangeDirection: ExchangeDirection = ExchangeDirection.BUY_TARI,
     ) {
         val amount: BigDecimal?
             get() = runCatching { amountValue.toBigDecimal() }.getOrNull()
@@ -208,7 +231,21 @@ class ExchangeViewModel : CommonViewModel() {
         val toCurrency: CurrencyDto?
             get() = if (exchangeDirection == ExchangeDirection.BUY_TARI) TARI_CURRENCY else selectedCurrency
 
+        val destinationAddressError: Boolean
+            get() {
+                if (exchangeDirection != ExchangeDirection.SELL_TARI || destinationAddress.isBlank()) return false
+                val addressRegex = selectedCurrency?.network?.addressRegex ?: return false
+                return !destinationAddress.matches(Regex(addressRegex))
+            }
+
         val exchangeButtonEnabled: Boolean
-            get() = fromCurrency != null && toCurrency != null && amount != null && !amountError && !rateLoading
+            get() {
+                val baseCondition = fromCurrency != null && toCurrency != null && amount != null && !amountError && !rateLoading
+                return if (exchangeDirection == ExchangeDirection.SELL_TARI) {
+                    baseCondition && destinationAddress.isNotBlank() && !destinationAddressError
+                } else {
+                    baseCondition
+                }
+            }
     }
 }

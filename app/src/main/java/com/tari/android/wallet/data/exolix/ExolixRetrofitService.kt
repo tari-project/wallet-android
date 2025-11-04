@@ -140,11 +140,11 @@ object Exolix {
         @SerializedName("addressRegex") val addressRegex: String? = null,
         @SerializedName("isDefault") val isDefault: Boolean,
         @SerializedName("blockExplorer") val blockExplorer: String? = null,
-        @SerializedName("memoNeeded") val memoNeeded: Boolean,
+        @SerializedName("memoNeeded") val memoNeeded: Boolean = false,
         @SerializedName("memoName") val memoName: String? = null,
         @SerializedName("memoRegex") val memoRegex: String? = null,
         @SerializedName("decimal") val decimal: Int? = null,
-        @SerializedName("precision") val precision: Int,
+        @SerializedName("precision") val precision: Int = 0,
         @SerializedName("contract") val contract: String? = null,
         @SerializedName("icon") val icon: String? = null,
     ) : Parcelable {

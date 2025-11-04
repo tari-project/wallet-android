@@ -22,7 +22,6 @@ import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonStyle
 import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
 import com.tari.android.wallet.ui.dialog.modular.modules.input.InputModule
-import com.tari.android.wallet.ui.screen.qr.QrScannerSource
 import com.tari.android.wallet.util.extension.launchOnIo
 import com.tari.android.wallet.util.extension.launchOnMain
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -85,7 +84,7 @@ class ChooseRestoreOptionViewModel : CommonViewModel() {
     }
 
     fun onPaperWalletClicked(fragment: CommonFragment<*>) {
-        fragment.startQrScanner(QrScannerSource.PaperWallet)
+        fragment.startQrScanner()
     }
 
     override fun handleDeeplink(deeplink: DeepLink) {

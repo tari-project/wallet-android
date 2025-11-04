@@ -278,6 +278,7 @@ object MockDataStub {
         memoNeeded: Boolean = false,
         precision: Int = 18,
         icon: String? = "https://exolix.com/icons/coins/ETH.png",
+        addressRegex: String? = "^0x[a-fA-F0-9]{40}$",
     ) = Exolix.Network(
         network = network,
         name = name,
@@ -286,6 +287,7 @@ object MockDataStub {
         memoNeeded = memoNeeded,
         precision = precision,
         icon = icon,
+        addressRegex = addressRegex,
     )
 
     fun createNetworkList() = listOf(
@@ -294,24 +296,18 @@ object MockDataStub {
             name = "Ethereum",
             shortName = "ETH",
             isDefault = true,
-            memoNeeded = false,
-            precision = 18,
         ),
         createNetwork(
             network = "BSC",
             name = "Binance Smart Chain",
             shortName = "BSC",
             isDefault = false,
-            memoNeeded = true,
-            precision = 18,
         ),
         createNetwork(
             network = "POLYGON",
             name = "Polygon",
             shortName = "MATIC",
             isDefault = false,
-            memoNeeded = false,
-            precision = 18,
         ),
     )
 
@@ -405,7 +401,7 @@ object MockDataStub {
         fromAmount: BigDecimal = 100.0.toBigDecimal(),
         toAmount: BigDecimal = 95.toBigDecimal(),
         rate: BigDecimal = 0.95.toBigDecimal(),
-        message: String? = "Sample rate message",
+        message: String? = null,
         minAmount: BigDecimal = 10.0.toBigDecimal(),
         withdrawMin: BigDecimal = 5.0.toBigDecimal(),
         maxAmount: BigDecimal = 1000.0.toBigDecimal(),

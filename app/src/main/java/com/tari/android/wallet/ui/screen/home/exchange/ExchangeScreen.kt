@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
@@ -20,6 +21,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.rounded.Clear
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
@@ -77,11 +79,14 @@ fun ExchangeScreen(
     onChangeDirectionClicked: () -> Unit,
     onPullToRefresh: () -> Unit,
     onRefreshClicked: () -> Unit,
+    onDestinationAddressChanged: (String) -> Unit,
+    onScanQrClick: () -> Unit,
 ) {
     Scaffold(
         modifier = Modifier
             .fillMaxSize()
-            .statusBarsPadding(),
+            .statusBarsPadding()
+            .imePadding(),
         containerColor = TariDesignSystem.colors.backgroundSecondary,
         topBar = {
             TariTopBar(
@@ -188,22 +193,59 @@ fun ExchangeScreen(
                     )
                 }
 
-                Spacer(Modifier.size(20.dp))
-                uiState.toCurrency?.let { toCurrency ->
-                    Text(
-                        modifier = Modifier.padding(horizontal = 16.dp),
-                        text = stringResource(R.string.exchange_destination_address_label, toCurrency.coin),
-                        style = TariDesignSystem.typography.body1,
-                        color = TariDesignSystem.colors.textPrimary,
-                    )
-                }
-                Spacer(Modifier.size(12.dp))
-
                 if (uiState.exchangeDirection == ExchangeDirection.BUY_TARI) {
+                    Spacer(Modifier.size(20.dp))
+                    uiState.toCurrency?.let { toCurrency ->
+                        Text(
+                            modifier = Modifier.padding(horizontal = 16.dp),
+                            text = stringResource(R.string.exchange_destination_address_label, toCurrency.coin),
+                            style = TariDesignSystem.typography.body1,
+                            color = TariDesignSystem.colors.textPrimary,
+                        )
+                    }
+                    Spacer(Modifier.size(12.dp))
                     TariWalletAddressInfoBox(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(horizontal = 16.dp),
+                    )
+                } else {
+                    var textFieldValue by remember { mutableStateOf(TextFieldValue(uiState.destinationAddress)) }
+                    textFieldValue = textFieldValue.newValueIfChanged(uiState.destinationAddress)
+                    TariTextField(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp),
+                        value = textFieldValue,
+                        onValueChanged = { newValue ->
+                            onDestinationAddressChanged(newValue.text)
+                            textFieldValue = newValue
+                        },
+                        hint = stringResource(R.string.exchange_destination_address_placeholder),
+                        title = stringResource(R.string.exchange_destination_address_label, uiState.toCurrency?.coin.orEmpty()),
+                        titleAdditionalLayout = {
+                            IconButton(onClick = onScanQrClick) {
+                                Icon(
+                                    painter = painterResource(R.drawable.vector_icon_qr),
+                                    tint = TariDesignSystem.colors.componentsNavbarIcons,
+                                    contentDescription = stringResource(R.string.exchange_qr_scan_content_description),
+                                )
+                            }
+                        },
+                        trailingIcon = if (uiState.destinationAddress.isNotBlank()) {
+                            {
+                                IconButton(onClick = { onDestinationAddressChanged("") }) {
+                                    Icon(
+                                        imageVector = Icons.Rounded.Clear,
+                                        tint = TariDesignSystem.colors.textSecondary,
+                                        contentDescription = stringResource(R.string.exchange_clear_address_content_description),
+                                    )
+                                }
+                            }
+                        } else null,
+                        errorText = if (uiState.destinationAddressError) {
+                            stringResource(R.string.exchange_invalid_address_error, uiState.selectedCurrency?.networkName.orEmpty())
+                        } else null,
                     )
                 }
 
@@ -442,6 +484,8 @@ private fun ExchangeScreenPreview() {
             onChangeDirectionClicked = {},
             onPullToRefresh = {},
             onRefreshClicked = {},
+            onDestinationAddressChanged = {},
+            onScanQrClick = {},
         )
     }
 }
@@ -467,6 +511,8 @@ private fun ExchangeScreenDarkPreview() {
             onChangeDirectionClicked = {},
             onPullToRefresh = {},
             onRefreshClicked = {},
+            onDestinationAddressChanged = {},
+            onScanQrClick = {},
         )
     }
 }
@@ -495,6 +541,8 @@ private fun ExchangeScreenWrongAmountPreview() {
             onChangeDirectionClicked = {},
             onPullToRefresh = {},
             onRefreshClicked = {},
+            onDestinationAddressChanged = {},
+            onScanQrClick = {},
         )
     }
 }
@@ -520,6 +568,8 @@ private fun ExchangeScreenCurrencyLoadingPreview() {
             onChangeDirectionClicked = {},
             onPullToRefresh = {},
             onRefreshClicked = {},
+            onDestinationAddressChanged = {},
+            onScanQrClick = {},
         )
     }
 }
@@ -544,6 +594,74 @@ private fun ExchangeScreenCurrencyErrorPreview() {
             onChangeDirectionClicked = {},
             onPullToRefresh = {},
             onRefreshClicked = {},
+            onDestinationAddressChanged = {},
+            onScanQrClick = {},
+        )
+    }
+}
+
+@Composable
+@Preview
+private fun ExchangeScreenSellTariPreview() {
+    PreviewSecondarySurface(TariTheme.Light) {
+        ExchangeScreen(
+            uiState = ExchangeViewModel.UiState(
+                amountValue = "100",
+                selectedCurrency = CurrencyDto(
+                    currency = MockDataStub.createCurrency(),
+                    network = MockDataStub.createNetwork(),
+                    selectable = true,
+                ),
+                rate = MockDataStub.createRate(),
+                exchangeDirection = ExchangeDirection.SELL_TARI,
+                destinationAddress = "0xe4a0b9f89c2dae9a25a44547e038e12e4fc56c31",
+            ),
+            onBackClick = {},
+            onReloadDefCurrency = {},
+            onAmountChanged = {},
+            onSelectCurrencyClicked = {},
+            onMinAmountClicked = {},
+            onMaxAmountClicked = {},
+            onExchangeClicked = {},
+            onFixedRateToggled = {},
+            onChangeDirectionClicked = {},
+            onPullToRefresh = {},
+            onRefreshClicked = {},
+            onDestinationAddressChanged = {},
+            onScanQrClick = {},
+        )
+    }
+}
+
+@Composable
+@Preview
+private fun ExchangeScreenSellTariInvalidAddressPreview() {
+    PreviewSecondarySurface(TariTheme.Light) {
+        ExchangeScreen(
+            uiState = ExchangeViewModel.UiState(
+                amountValue = "100",
+                selectedCurrency = CurrencyDto(
+                    currency = MockDataStub.createCurrency(),
+                    network = MockDataStub.createNetwork(),
+                    selectable = true,
+                ),
+                rate = MockDataStub.createRate(),
+                exchangeDirection = ExchangeDirection.SELL_TARI,
+                destinationAddress = "invalid_address_123",
+            ),
+            onBackClick = {},
+            onReloadDefCurrency = {},
+            onAmountChanged = {},
+            onSelectCurrencyClicked = {},
+            onMinAmountClicked = {},
+            onMaxAmountClicked = {},
+            onExchangeClicked = {},
+            onFixedRateToggled = {},
+            onChangeDirectionClicked = {},
+            onPullToRefresh = {},
+            onRefreshClicked = {},
+            onDestinationAddressChanged = {},
+            onScanQrClick = {},
         )
     }
 }

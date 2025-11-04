@@ -34,6 +34,8 @@ class ExchangeFragment : CommonFragment<ExchangeViewModel>() {
                 onChangeDirectionClicked = { viewModel.onChangeDirectionClicked() },
                 onPullToRefresh = { viewModel.onPullToRefresh() },
                 onRefreshClicked = { viewModel.onRefreshClicked() },
+                onDestinationAddressChanged = { viewModel.onDestinationAddressChanged(it) },
+                onScanQrClick = { startQrScanner() },
             )
         }
     }

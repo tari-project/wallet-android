@@ -126,10 +126,10 @@ class ExolixRepository @Inject constructor(
 
     suspend fun createExchange(requestData: ExchangeRequestData): Result<Exolix.CreateExchangeResponse> = switchToIo {
         runCatching {
-            val fromAddress = if (requestData.direction == ExchangeDirection.SELL_TARI) {
-                corePrefRepository.walletAddress.fullBase58
+            val toAddress = if (requestData.direction == ExchangeDirection.SELL_TARI) {
+                requestData.selectedAddress ?: error("Selected address is null for SELL_TARI exchange")
             } else {
-                requestData.selectedAddress ?: error("Selected address is null for BUY_TARI exchange")
+                corePrefRepository.walletAddress.fullBase58
             }
             val fromCurrency = if (requestData.direction == ExchangeDirection.SELL_TARI) TARI_CURRENCY else requestData.selectedCurrency
             val toCurrency = if (requestData.direction == ExchangeDirection.SELL_TARI) requestData.selectedCurrency else TARI_CURRENCY
@@ -141,7 +141,7 @@ class ExolixRepository @Inject constructor(
                     coinTo = toCurrency.coin,
                     networkTo = toCurrency.networkName,
                     amount = requestData.amount,
-                    withdrawalAddress = fromAddress,
+                    withdrawalAddress = toAddress,
                 )
             )
         }

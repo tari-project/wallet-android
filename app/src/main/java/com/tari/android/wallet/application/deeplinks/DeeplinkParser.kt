@@ -10,13 +10,16 @@ import javax.inject.Singleton
 class DeeplinkParser @Inject constructor(private val networkRepository: NetworkPrefRepository) {
 
     fun parse(deepLinkUri: Uri): DeepLink? {
+        val rawValue = deepLinkUri.toString()
+
         // Try to parse the URI as a pure Tari address (e.g. the QR code from Safe Trade scan)
-        val walletAddress = TariWalletAddress.makeTariAddressOrNull(deepLinkUri.toString())
+        val walletAddress = TariWalletAddress.makeTariAddressOrNull(rawValue)
         if (walletAddress != null) {
             return DeepLink.UserProfile(tariAddress = walletAddress.fullBase58)
         }
 
-        if (!deepLinkUri.authority.equals(networkRepository.currentNetwork.network.uriComponent)) {
+        if (deepLinkUri.authority != null && deepLinkUri.authority != networkRepository.currentNetwork.network.uriComponent) {
+            // Returns null because the deep link is valid, but is for a different network
             return null
         }
 
@@ -36,7 +39,7 @@ class DeeplinkParser @Inject constructor(private val networkRepository: NetworkP
                 is DeepLink.UserProfile -> TariWalletAddress.validateBase58(it.tariAddress)
                 else -> true // Handle other DeepLink types or consider returning null if they shouldn't be valid
             }
-        }
+        } ?: DeepLink.Raw(rawValue) // Fallback to raw value if command not recognized
     }
 
     fun toDeeplink(deepLink: DeepLink): String {

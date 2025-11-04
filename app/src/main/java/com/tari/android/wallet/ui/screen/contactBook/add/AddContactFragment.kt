@@ -9,7 +9,6 @@ import androidx.compose.runtime.getValue
 import androidx.fragment.app.viewModels
 import com.tari.android.wallet.ui.common.CommonFragment
 import com.tari.android.wallet.ui.compose.TariDesignSystem
-import com.tari.android.wallet.ui.screen.qr.QrScannerSource
 import com.tari.android.wallet.util.extension.composeContent
 
 class AddContactFragment : CommonFragment<AddContactViewModel>() {
@@ -21,7 +20,7 @@ class AddContactFragment : CommonFragment<AddContactViewModel>() {
             AddContactScreen(
                 uiState = state,
                 onBackClick = { viewModel.onBackPressed() },
-                onScanQrClick = { startQrScanner(QrScannerSource.AddContact) },
+                onScanQrClick = { startQrScanner() },
                 onSaveClick = { viewModel.saveContact() },
                 onAliasChange = { viewModel.onAliasChange(it) },
                 onAddressChange = { viewModel.onAddressChange(it) },

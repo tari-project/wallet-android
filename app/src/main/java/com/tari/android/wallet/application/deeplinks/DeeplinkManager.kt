@@ -50,6 +50,10 @@ class DeeplinkManager @Inject constructor(
             is DeepLink.UserProfile -> showUserProfileDialog(dialogHandler, deeplink)
             is DeepLink.PaperWallet -> showPaperWalletDialog(dialogHandler, deeplink)
             is DeepLink.AirdropLoginToken -> handleAirdropTokenAction(deeplink)
+            is DeepLink.Raw -> {
+                // Raw deeplinks are handled by individual ViewModels via handleDeeplink()
+                // No default action required here
+            }
         }
     }
 

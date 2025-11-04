@@ -230,6 +230,13 @@ sealed class DeepLink : Parcelable {
         }
     }
 
+    // Raw deeplink for unparseable QR codes (e.g., cryptocurrency addresses)
+    @Parcelize
+    data class Raw(val value: String) : DeepLink() {
+        override fun getParams(): Map<String, String> = hashMapOf()
+        override fun getCommand(): String = ""
+    }
+
     companion object {
 
         fun getByCommand(command: String, params: Map<String, String>): DeepLink? = when (command) {
