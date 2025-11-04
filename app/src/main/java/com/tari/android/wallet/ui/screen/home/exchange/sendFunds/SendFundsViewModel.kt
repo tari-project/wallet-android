@@ -3,6 +3,7 @@ package com.tari.android.wallet.ui.screen.home.exchange.sendFunds
 import android.graphics.Bitmap
 import androidx.lifecycle.SavedStateHandle
 import com.tari.android.wallet.R
+import com.tari.android.wallet.application.Navigation
 import com.tari.android.wallet.data.exolix.ExchangeRequestData
 import com.tari.android.wallet.data.exolix.ExolixRepository
 import com.tari.android.wallet.ui.common.CommonViewModel
@@ -80,6 +81,14 @@ class SendFundsViewModel(savedState: SavedStateHandle) : CommonViewModel() {
                 toastMessage = resourceManager.getString(R.string.exchange_address_copied),
             )
         }
+    }
+
+    fun onOpenTxDetails() {
+        // TODO: Implement when transaction details screen is ready
+        tariNavigator.navigateSequence(
+            Navigation.BackToHome,
+            Navigation.Exchange.ExchangeStatus(_uiState.value.exchangeId!!),
+        )
     }
 
     data class UiState(

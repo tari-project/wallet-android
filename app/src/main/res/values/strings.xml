@@ -128,6 +128,33 @@
     <string name="exchange_qr_scan_content_description">Scan QR code</string>
     <string name="exchange_clear_address_content_description">Clear address</string>
 
+    <!-- exchange status screen -->
+    <string name="exchange_status_title">Exchange Status</string>
+    <string name="exchange_status_swapped">Swapped</string>
+    <string name="exchange_status_refunded">Refunded</string>
+    <string name="exchange_status_in_progress">In Progress</string>
+    <string name="exchange_status_description">You\'ve successfully swapped %1$s %2$s to %3$s %4$s</string>
+    <string name="exchange_status_amount_received">Amount received</string>
+    <string name="exchange_status_destination_address">Destination Address (%1$s)</string>
+    <string name="exchange_status_transaction_details">Transaction Details</string>
+    <string name="exchange_status_load_error">Failed to load transaction details (Error %1$d)</string>
+
+    <!-- exchange status card titles -->
+    <string name="exchange_status_card_waiting_for_deposit">Waiting for deposit</string>
+    <string name="exchange_status_card_funds_received">Funds Received</string>
+    <string name="exchange_status_card_swapped">Swapped</string>
+    <string name="exchange_status_card_deposit_overdue">Deposit Overdue</string>
+    <string name="exchange_status_card_funds_refunded">Funds Refunded</string>
+
+    <!-- exchange status card subtitles -->
+    <string name="exchange_status_card_subtitle_wait">We have not received your %1$s yet.</string>
+    <string name="exchange_status_card_subtitle_received">We have received your %1$s.</string>
+    <string name="exchange_status_card_subtitle_exchanging">We have received your %1$s. Your exchange is processing.</string>
+    <string name="exchange_status_card_subtitle_sending">We have received your %1$s. Sending %2$s.</string>
+    <string name="exchange_status_card_subtitle_success">You\'ve successfully swapped %1$s %2$s to %3$s %4$s</string>
+    <string name="exchange_status_card_subtitle_overdue">Deposit %1$s %2$s is overdue.</string>
+    <string name="exchange_status_card_subtitle_refunded">Your %1$s %2$s was refunded.</string>
+
     <!-- emoji id copied view -->
 
     <!-- emoji-id-related -->

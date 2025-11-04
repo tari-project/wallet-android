@@ -414,6 +414,76 @@ object MockDataStub {
         withdrawMin = withdrawMin,
         maxAmount = maxAmount,
     )
+
+    fun createCoinInfo(
+        coinCode: String = "ETH",
+        coinName: String = "Ethereum",
+        network: String = "ethereum",
+        networkName: String = "Ethereum",
+        networkShortName: String? = "ETH",
+        icon: String = "https://exolix.com/icons/coins/ETH.png",
+    ) = Exolix.CoinInfo(
+        coinCode = coinCode,
+        coinName = coinName,
+        network = network,
+        networkName = networkName,
+        networkShortName = networkShortName,
+        icon = icon,
+    )
+
+    fun createTransactionResponse(
+        id: String = "test-transaction-id-12345",
+        amount: BigDecimal = BigDecimal("100.01"),
+        amountTo: BigDecimal = BigDecimal("0.9982"),
+        coinFrom: Exolix.CoinInfo = createCoinInfo(
+            coinCode = "ETH",
+            coinName = "Ethereum",
+            network = "ethereum",
+            networkName = "Ethereum",
+            networkShortName = "ETH",
+        ),
+        coinTo: Exolix.CoinInfo = createCoinInfo(
+            coinCode = "XTM",
+            coinName = "Tari",
+            network = "tari",
+            networkName = "Tari",
+            networkShortName = "XTM",
+        ),
+        createdAt: String = "2024-01-01T12:00:00Z",
+        depositAddress: String = "0x1234567890abcdef1234567890abcdef12345678",
+        depositExtraId: String? = null,
+        withdrawalAddress: String = "0x9876543210fedcba9876543210fedcba98765432",
+        withdrawalExtraId: String? = null,
+        hashIn: Exolix.HashInfo? = null,
+        hashOut: Exolix.HashInfo? = null,
+        rate: BigDecimal = BigDecimal("0.01"),
+        rateType: Exolix.RateType = Exolix.RateType.FIXED,
+        refundAddress: String? = null,
+        refundExtraId: String? = null,
+        status: Exolix.TransactionStatus = Exolix.TransactionStatus.SUCCESS,
+        source: String? = null,
+        comment: String? = null,
+    ) = Exolix.TransactionResponse(
+        id = id,
+        amount = amount,
+        amountTo = amountTo,
+        coinFrom = coinFrom,
+        coinTo = coinTo,
+        comment = comment,
+        createdAt = createdAt,
+        depositAddress = depositAddress,
+        depositExtraId = depositExtraId,
+        withdrawalAddress = withdrawalAddress,
+        withdrawalExtraId = withdrawalExtraId,
+        hashIn = hashIn,
+        hashOut = hashOut,
+        rate = rate,
+        rateType = rateType,
+        refundAddress = refundAddress,
+        refundExtraId = refundExtraId,
+        status = status,
+        source = source,
+    )
 }
 
 object YatEnvironment {

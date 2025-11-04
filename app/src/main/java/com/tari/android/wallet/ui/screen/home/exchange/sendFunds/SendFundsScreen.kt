@@ -37,6 +37,7 @@ import com.tari.android.wallet.ui.compose.TariDesignSystem
 import com.tari.android.wallet.ui.compose.components.TariErrorView
 import com.tari.android.wallet.ui.compose.components.TariLoadingLayout
 import com.tari.android.wallet.ui.compose.components.TariLoadingLayoutState
+import com.tari.android.wallet.ui.compose.components.TariPrimaryButton
 import com.tari.android.wallet.ui.compose.components.TariProgressView
 import com.tari.android.wallet.ui.compose.components.TariTextButton
 import com.tari.android.wallet.ui.compose.components.TariTopBar
@@ -52,6 +53,7 @@ fun SendFundsScreen(
     onCopyAmount: () -> Unit,
     onCopyAddress: () -> Unit,
     onCancelTransaction: () -> Unit,
+    onOpenTxDetails: () -> Unit,
     onRetry: () -> Unit,
 ) {
     Scaffold(
@@ -101,6 +103,7 @@ fun SendFundsScreen(
                     onCopyAmount = onCopyAmount,
                     onCopyAddress = onCopyAddress,
                     onCancelTransaction = onCancelTransaction,
+                    onOpenTxDetails = onOpenTxDetails,
                 )
             }
         }
@@ -115,6 +118,7 @@ private fun SendFundsContent(
     onCopyAmount: () -> Unit,
     onCopyAddress: () -> Unit,
     onCancelTransaction: () -> Unit,
+    onOpenTxDetails: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -136,109 +140,112 @@ private fun SendFundsContent(
         Card(
             modifier = modifier.padding(horizontal = 16.dp),
             shape = TariDesignSystem.shapes.card,
+            colors = CardDefaults.cardColors(TariDesignSystem.colors.backgroundPrimary),
             elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
         ) {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(TariDesignSystem.colors.backgroundPrimary)
-                    .padding(16.dp),
-            ) {
-                Column {
+            Column(Modifier.padding(16.dp)) {
+                Text(
+                    text = stringResource(R.string.exchange_you_need_to_send),
+                    style = TariDesignSystem.typography.body1,
+                    color = TariDesignSystem.colors.textSecondary,
+                )
+                Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(
-                        text = stringResource(R.string.exchange_you_need_to_send),
+                        text = "${request.amount} ${request.selectedCurrency.coin}",
+                        style = TariDesignSystem.typography.body1,
+                        color = TariDesignSystem.colors.textPrimary,
+                    )
+                    IconButton(
+                        modifier = Modifier.size(32.dp),
+                        onClick = onCopyAmount,
+                    ) {
+                        Icon(
+                            modifier = Modifier.size(20.dp),
+                            painter = painterResource(R.drawable.vector_icon_copy),
+                            contentDescription = stringResource(R.string.exchange_copy_amount_content_description),
+                            tint = TariDesignSystem.colors.secondaryMain,
+                        )
+                    }
+                    Spacer(Modifier.size(8.dp))
+                    Text(
+                        text = request.selectedCurrency.networkName,
                         style = TariDesignSystem.typography.body1,
                         color = TariDesignSystem.colors.textSecondary,
                     )
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text(
-                            text = "${request.amount} ${request.selectedCurrency.coin}",
-                            style = TariDesignSystem.typography.body1,
-                            color = TariDesignSystem.colors.textPrimary,
-                        )
-                        IconButton(
-                            modifier = Modifier.size(32.dp),
-                            onClick = onCopyAmount,
-                        ) {
-                            Icon(
-                                modifier = Modifier.size(20.dp),
-                                painter = painterResource(R.drawable.vector_icon_copy),
-                                contentDescription = stringResource(R.string.exchange_copy_amount_content_description),
-                                tint = TariDesignSystem.colors.secondaryMain,
-                            )
-                        }
-                        Spacer(Modifier.size(8.dp))
-                        Text(
-                            text = request.selectedCurrency.networkName,
-                            style = TariDesignSystem.typography.body1,
-                            color = TariDesignSystem.colors.textSecondary,
-                        )
-                    }
+                }
 
-                    Spacer(Modifier.size(8.dp))
+                Spacer(Modifier.size(8.dp))
 
+                Text(
+                    text = stringResource(R.string.exchange_to_exolix_address),
+                    style = TariDesignSystem.typography.body1,
+                    color = TariDesignSystem.colors.textSecondary,
+                )
+                Spacer(Modifier.size(8.dp))
+                Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(
-                        text = stringResource(R.string.exchange_to_exolix_address),
+                        modifier = Modifier.weight(1f),
+                        text = depositAddress,
                         style = TariDesignSystem.typography.body1,
-                        color = TariDesignSystem.colors.textSecondary,
+                        color = TariDesignSystem.colors.textPrimary,
                     )
-                    Spacer(Modifier.size(8.dp))
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text(
-                            modifier = Modifier.weight(1f),
-                            text = depositAddress,
-                            style = TariDesignSystem.typography.body1,
-                            color = TariDesignSystem.colors.textPrimary,
+                    IconButton(
+                        modifier = Modifier.size(32.dp),
+                        onClick = onCopyAddress,
+                    ) {
+                        Icon(
+                            modifier = Modifier.size(20.dp),
+                            painter = painterResource(R.drawable.vector_icon_copy),
+                            contentDescription = stringResource(R.string.exchange_copy_address_content_description),
+                            tint = TariDesignSystem.colors.secondaryMain,
                         )
-                        IconButton(
-                            modifier = Modifier.size(32.dp),
-                            onClick = onCopyAddress,
-                        ) {
-                            Icon(
-                                modifier = Modifier.size(20.dp),
-                                painter = painterResource(R.drawable.vector_icon_copy),
-                                contentDescription = stringResource(R.string.exchange_copy_address_content_description),
-                                tint = TariDesignSystem.colors.secondaryMain,
-                            )
-                        }
                     }
+                }
 
-                    Spacer(Modifier.size(16.dp))
+                Spacer(Modifier.size(16.dp))
 
-                    QrCodeCard(
-                        qrBitmap = qrBitmap,
-                        modifier = Modifier.align(Alignment.CenterHorizontally),
-                    )
+                QrCodeCard(
+                    qrBitmap = qrBitmap,
+                    modifier = Modifier.align(Alignment.CenterHorizontally),
+                )
 
-                    Spacer(Modifier.size(16.dp))
+                Spacer(Modifier.size(16.dp))
 
-                    Box(
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clip(TariDesignSystem.shapes.card)
+                        .background(TariDesignSystem.colors.systemSecondaryGreen)
+                        .border(1.dp, TariDesignSystem.colors.successDark, TariDesignSystem.shapes.card),
+                ) {
+                    Text(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .clip(TariDesignSystem.shapes.card)
-                            .background(TariDesignSystem.colors.systemSecondaryGreen)
-                            .border(1.dp, TariDesignSystem.colors.successDark, TariDesignSystem.shapes.card),
-                    ) {
-                        Text(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(20.dp),
-                            text = stringResource(R.string.exchange_send_funds_once),
-                            style = TariDesignSystem.typography.headingSmall,
-                            color = TariDesignSystem.colors.successDark,
-                            textAlign = TextAlign.Center,
-                        )
-                    }
+                            .padding(20.dp),
+                        text = stringResource(R.string.exchange_send_funds_once),
+                        style = TariDesignSystem.typography.headingSmall,
+                        color = TariDesignSystem.colors.successDark,
+                        textAlign = TextAlign.Center,
+                    )
                 }
             }
         }
         Spacer(Modifier.weight(1f))
         Spacer(Modifier.size(40.dp))
 
-        TariTextButton(
+        TariPrimaryButton(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp),
+                .padding(horizontal = 16.dp)
+                .align(Alignment.CenterHorizontally),
+            text = "OPEN TX DETAILS (TODO)",
+            onClick = onOpenTxDetails,
+        )
+
+        TariTextButton(
+            modifier = Modifier
+                .padding(horizontal = 16.dp)
+                .align(Alignment.CenterHorizontally),
             text = stringResource(R.string.exchange_cancel_transaction),
             warningColor = true,
             onClick = onCancelTransaction,
@@ -273,6 +280,7 @@ private fun SendFundsScreenPreview() {
             onCopyAddress = {},
             onCancelTransaction = {},
             onRetry = {},
+            onOpenTxDetails = {},
         )
     }
 }
