@@ -136,8 +136,16 @@
     <string name="exchange_status_description">You\'ve successfully swapped %1$s %2$s to %3$s %4$s</string>
     <string name="exchange_status_amount_received">Amount received</string>
     <string name="exchange_status_destination_address">Destination Address (%1$s)</string>
+    <string name="exchange_status_destination_extra_id">Destination Extra ID</string>
     <string name="exchange_status_transaction_details">Transaction Details</string>
     <string name="exchange_status_load_error">Failed to load transaction details (Error %1$d)</string>
+    <string name="exchange_status_created_at">Created</string>
+    <string name="exchange_status_exchange_rate">Exchange Rate</string>
+    <string name="exchange_status_rate_type_fixed">Fixed</string>
+    <string name="exchange_status_rate_type_floating">Floating</string>
+    <string name="exchange_status_comment">Comment</string>
+    <string name="exchange_status_refund_address">Refund Address (%1$s)</string>
+    <string name="exchange_status_refund_extra_id">Refund Extra ID</string>
 
     <!-- exchange status card titles -->
     <string name="exchange_status_card_waiting_for_deposit">Waiting for deposit</string>

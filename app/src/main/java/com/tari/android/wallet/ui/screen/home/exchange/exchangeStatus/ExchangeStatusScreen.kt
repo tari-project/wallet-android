@@ -34,6 +34,8 @@ import com.tari.android.wallet.ui.screen.settings.themeSelector.TariTheme
 import com.tari.android.wallet.ui.screen.tx.details.widget.TxDetailInfoCopyItem
 import com.tari.android.wallet.ui.screen.tx.details.widget.TxDetailInfoItem
 import com.tari.android.wallet.util.MockDataStub
+import com.tari.android.wallet.util.extension.parseISODate
+import com.tari.android.wallet.util.extension.txFormattedDate
 
 @Composable
 fun ExchangeStatusScreen(
@@ -127,6 +129,32 @@ private fun ExchangeStatusContent(
 
         Spacer(Modifier.size(10.dp))
 
+        transaction.createdAt.parseISODate()?.let { date ->
+            TxDetailInfoItem(
+                modifier = Modifier.fillMaxWidth(),
+                title = stringResource(R.string.exchange_status_created_at),
+                value = date.txFormattedDate(),
+            )
+            Spacer(Modifier.size(10.dp))
+        }
+
+        TxDetailInfoItem(
+            modifier = Modifier.fillMaxWidth(),
+            title = stringResource(R.string.exchange_status_exchange_rate),
+            value = String.format(
+                "1 %s = %s %s (%s)",
+                transaction.coinFrom.coinCode,
+                transaction.rate.toPlainString(),
+                transaction.coinTo.coinCode,
+                when (transaction.rateType) {
+                    Exolix.RateType.FIXED -> stringResource(R.string.exchange_status_rate_type_fixed)
+                    Exolix.RateType.FLOATING -> stringResource(R.string.exchange_status_rate_type_floating)
+                },
+            ),
+        )
+
+        Spacer(Modifier.size(10.dp))
+
         TxDetailInfoCopyItem(
             modifier = Modifier.fillMaxWidth(),
             title = stringResource(R.string.exchange_status_destination_address, transaction.coinTo.networkName),
@@ -136,6 +164,49 @@ private fun ExchangeStatusContent(
         )
 
         Spacer(Modifier.size(10.dp))
+
+        if (!transaction.withdrawalExtraId.isNullOrBlank()) {
+            TxDetailInfoCopyItem(
+                modifier = Modifier.fillMaxWidth(),
+                title = stringResource(R.string.exchange_status_destination_extra_id),
+                value = transaction.withdrawalExtraId,
+                singleLine = false,
+                onCopyClicked = onCopyClick,
+            )
+            Spacer(Modifier.size(10.dp))
+        }
+
+        if (!transaction.comment.isNullOrBlank()) {
+            TxDetailInfoItem(
+                modifier = Modifier.fillMaxWidth(),
+                title = stringResource(R.string.exchange_status_comment),
+                value = transaction.comment,
+                singleLine = false,
+            )
+            Spacer(Modifier.size(10.dp))
+        }
+
+        if (!transaction.refundAddress.isNullOrBlank()) {
+            TxDetailInfoCopyItem(
+                modifier = Modifier.fillMaxWidth(),
+                title = stringResource(R.string.exchange_status_refund_address, transaction.coinFrom.networkName),
+                value = transaction.refundAddress,
+                singleLine = false,
+                onCopyClicked = onCopyClick,
+            )
+            Spacer(Modifier.size(10.dp))
+        }
+
+        if (!transaction.refundExtraId.isNullOrBlank()) {
+            TxDetailInfoCopyItem(
+                modifier = Modifier.fillMaxWidth(),
+                title = stringResource(R.string.exchange_status_refund_extra_id),
+                value = transaction.refundExtraId,
+                singleLine = false,
+                onCopyClicked = onCopyClick,
+            )
+            Spacer(Modifier.size(10.dp))
+        }
 
         TxDetailInfoItem(
             modifier = Modifier.fillMaxWidth(),
@@ -171,7 +242,18 @@ private fun ExchangeStatusScreenSuccessPreview() {
     PreviewSecondarySurface(TariTheme.Light) {
         ExchangeStatusScreen(
             uiState = ExchangeStatusViewModel.UiState(
-                transaction = MockDataStub.createTransactionResponse(),
+                transaction = MockDataStub.createTransactionResponse(
+                    id = "dummy_id",
+                    amountTo = java.math.BigDecimal("123.45"),
+                    rate = java.math.BigDecimal("0.005"),
+                    rateType = Exolix.RateType.FIXED,
+                    createdAt = "2024-06-01T12:00:00Z",
+                    withdrawalAddress = "0x9876543210fedcba9876543210fedcba98765432",
+                    withdrawalExtraId = "withdrawal_extra_id",
+                    refundAddress = "0x1234567890abcdef1234567890abcdef12345678",
+                    refundExtraId = "dummy_refund_extra_id",
+                    comment = "Test exchange transaction",
+                ),
             ),
             onBackClick = {},
             onTransactionDetailsClick = {},
