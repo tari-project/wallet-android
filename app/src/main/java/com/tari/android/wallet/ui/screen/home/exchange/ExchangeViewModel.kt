@@ -8,7 +8,6 @@ import com.tari.android.wallet.data.exolix.ExchangeDirection
 import com.tari.android.wallet.data.exolix.ExchangeRequestData
 import com.tari.android.wallet.data.exolix.Exolix
 import com.tari.android.wallet.data.exolix.ExolixRepository
-import com.tari.android.wallet.data.exolix.TARI_CURRENCY
 import com.tari.android.wallet.model.WalletError
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.util.extension.filterNumbers
@@ -40,7 +39,7 @@ class ExchangeViewModel : CommonViewModel() {
     private var autoRefreshJob: Job? = null
 
     init {
-        loadDefaultCurrency()
+        loadCurrencies()
     }
 
     override fun onCleared() {
@@ -126,6 +125,7 @@ class ExchangeViewModel : CommonViewModel() {
 
         val request = ExchangeRequestData(
             selectedCurrency = _uiState.value.selectedCurrency ?: error("selectedCurrency is null, but exchange button is not disabled"),
+            tariCurrency = _uiState.value.tariCurrency ?: error("tariCurrency is null, but exchange button is not disabled"),
             selectedAddress = _uiState.value.destinationAddress.takeIf { it.isNotBlank() },
             amount = _uiState.value.amount ?: error("amount is null, but exchange button is not disabled"),
             rate = _uiState.value.rate ?: error("rate is null, but exchange button is not disabled"),
@@ -135,19 +135,28 @@ class ExchangeViewModel : CommonViewModel() {
         tariNavigator.navigate(Navigation.Exchange.SendFunds(request))
     }
 
-    fun loadDefaultCurrency() {
-        _uiState.update { it.copy(loadingDefaultCurrency = true, loadingDefaultCurrencyError = false) }
+    fun loadCurrencies() {
+        _uiState.update { it.copy(loadingCurrencies = true, loadingCurrenciesError = false) }
         launchOnIo {
-            exolixRepository.getCurrencies(page = 1, size = 1)
-                .onSuccess { response ->
-                    val defaultCurrency = response.currencies.firstOrNull()
-                    if (defaultCurrency != null) {
-                        onCurrencySelected(defaultCurrency)
-                    }
-                    _uiState.update { it.copy(loadingDefaultCurrency = false) }
-                }.onFailure {
-                    _uiState.update { state -> state.copy(loadingDefaultCurrency = false, loadingDefaultCurrencyError = true) }
+            val tariResult = exolixRepository.getTariCurrency()
+            val selectedResult = exolixRepository.getCurrencies(page = 1, size = 1)
+
+            if (tariResult.isSuccess && selectedResult.isSuccess) {
+                val tariCurrency = tariResult.getOrThrow()
+                val defaultCurrency = selectedResult.getOrThrow().currencies.firstOrNull() ?: error("No currencies available")
+
+                onCurrencySelected(defaultCurrency)
+
+                _uiState.update {
+                    it.copy(
+                        tariCurrency = tariCurrency,
+                        loadingCurrencies = false,
+                        loadingCurrenciesError = false
+                    )
                 }
+            } else {
+                _uiState.update { it.copy(loadingCurrencies = false, loadingCurrenciesError = true) }
+            }
         }
     }
 
@@ -206,13 +215,12 @@ class ExchangeViewModel : CommonViewModel() {
         val amountValue: String = "",
 
         val selectedCurrency: CurrencyDto? = null,
+        val tariCurrency: CurrencyDto? = null,
         val exchangeDirection: ExchangeDirection = ExchangeDirection.BUY_TARI,
         val destinationAddress: String = "",
 
-        val loadingDefaultCurrency: Boolean = false,
-        val loadingDefaultCurrencyError: Boolean = false,
-        val selectedToCurrency: Exolix.Currency? = null,
-        val selectedToNetwork: Exolix.Network? = null,
+        val loadingCurrencies: Boolean = false,
+        val loadingCurrenciesError: Boolean = false,
 
         val fixedRate: Boolean = false,
         val rate: Exolix.Rate? = null,
@@ -226,10 +234,10 @@ class ExchangeViewModel : CommonViewModel() {
             get() = rate != null && amount != null && (amount!! < rate.minAmount || amount!! > rate.maxAmount)
 
         val fromCurrency: CurrencyDto?
-            get() = if (exchangeDirection == ExchangeDirection.BUY_TARI) selectedCurrency else TARI_CURRENCY
+            get() = if (exchangeDirection == ExchangeDirection.BUY_TARI) selectedCurrency else tariCurrency
 
         val toCurrency: CurrencyDto?
-            get() = if (exchangeDirection == ExchangeDirection.BUY_TARI) TARI_CURRENCY else selectedCurrency
+            get() = if (exchangeDirection == ExchangeDirection.BUY_TARI) tariCurrency else selectedCurrency
 
         val destinationAddressError: Boolean
             get() {

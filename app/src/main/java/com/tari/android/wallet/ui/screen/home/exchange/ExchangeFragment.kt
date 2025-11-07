@@ -24,7 +24,7 @@ class ExchangeFragment : CommonFragment<ExchangeViewModel>() {
             ExchangeScreen(
                 uiState = uiState,
                 onBackClick = { viewModel.onBackPressed() },
-                onReloadDefCurrency = { viewModel.loadDefaultCurrency() },
+                onReloadCurrencies = { viewModel.loadCurrencies() },
                 onAmountChanged = { viewModel.onAmountChanged(it) },
                 onSelectCurrencyClicked = { viewModel.onSelectCurrencyClicked() },
                 onMinAmountClicked = { viewModel.onMinAmountClicked() },

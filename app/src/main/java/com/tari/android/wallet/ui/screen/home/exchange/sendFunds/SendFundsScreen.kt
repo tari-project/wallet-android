@@ -265,6 +265,7 @@ private fun SendFundsScreenPreview() {
                         code = "ETH",
                         name = "Ethereum",
                     ),
+                    tariCurrency = MockDataStub.createCurrencyDto(code = "XTM", name = "Tari"),
                     selectedAddress = null,
                     amount = BigDecimal("0.124"),
                     rate = MockDataStub.createRate(),

@@ -123,6 +123,7 @@
     <string name="exchange_address_copied">Address copied</string>
     <string name="exchange_rate_error_title">Exchange rate unavailable (%1$s)</string>
     <string name="exchange_rate_error_message">Unable to fetch the exchange rate at this time. Please check your internet connection and try again.</string>
+    <string name="exchange_currencies_load_error">Unable to load currencies. Please check your connection and try again.</string>
     <string name="exchange_destination_address_placeholder">Enter destination address</string>
     <string name="exchange_invalid_address_error">Invalid address format for the %1$s network</string>
     <string name="exchange_qr_scan_content_description">Scan QR code</string>
