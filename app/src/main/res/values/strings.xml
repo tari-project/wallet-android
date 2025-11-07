@@ -164,6 +164,15 @@
     <string name="exchange_status_card_subtitle_overdue">Deposit %1$s %2$s is overdue.</string>
     <string name="exchange_status_card_subtitle_refunded">Your %1$s %2$s was refunded.</string>
 
+    <!-- Exchange status strings for pending transaction card -->
+    <string name="exchange_status_wait">Waiting for deposit</string>
+    <string name="exchange_status_confirmation">Confirming deposit</string>
+    <string name="exchange_status_confirmed">Deposit confirmed</string>
+    <string name="exchange_status_exchanging">Exchanging</string>
+    <string name="exchange_status_sending">Sending</string>
+    <string name="exchange_status_success">Completed</string>
+    <string name="exchange_status_overdue">Overdue</string>
+
     <!-- emoji id copied view -->
 
     <!-- emoji-id-related -->
@@ -225,6 +234,8 @@
     <string name="home_transaction_view_all_txs">View all transactions</string>
     <string name="home_search_hint">Enter Emoji ID or Contact Name</string>
     <string name="home_title_tari_universe">Tari Universe</string>
+    <string name="home_swap_in_progress_title">Swap in progress</string>
+    <string name="home_pending_exolix_transaction_title_format">Swap %1$s %2$s to %3$s %4$s</string>
     <string name="home_active_miners_title">Active Miners</string>
     <string name="home_active_miners_start_mining">Start mining</string>
     <string name="home_active_miners_you_mining">You\'re mining</string>

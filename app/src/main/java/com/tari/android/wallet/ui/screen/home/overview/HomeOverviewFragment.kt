@@ -24,6 +24,7 @@ class HomeOverviewFragment : CommonFragment<HomeOverviewViewModel>() {
                 onSendTariClicked = { viewModel.onSendTariClicked() },
                 onRequestTariClicked = { viewModel.onRequestTariClicked() },
                 onBuyClicked = { viewModel.onBuyClicked() },
+                onPendingExolixTransactionClick = { viewModel.onPendingExolixTransactionClicked() },
                 onTxClick = { viewModel.navigateToTxDetail(it.tx) },
                 onViewAllTxsClick = { viewModel.onAllTxClicked() },
                 onConnectionStatusClick = { viewModel.showConnectionStatusDialog() },

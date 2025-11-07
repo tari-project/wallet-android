@@ -3,6 +3,7 @@ package com.tari.android.wallet.data.exolix
 import android.os.Parcelable
 import com.google.gson.Gson
 import com.tari.android.wallet.data.sharedPrefs.CorePrefRepository
+import com.tari.android.wallet.data.sharedPrefs.exolix.ExolixPrefRepository
 import com.tari.android.wallet.util.extension.switchToIo
 import kotlinx.parcelize.Parcelize
 import retrofit2.HttpException
@@ -16,6 +17,7 @@ private const val TARI_CURRENCY_CODE = "XTM"
 class ExolixRepository @Inject constructor(
     private val exolixRetrofitService: ExolixRetrofitService,
     private val corePrefRepository: CorePrefRepository,
+    private val exolixPrefRepository: ExolixPrefRepository,
 ) {
 
     suspend fun getCurrencies(
@@ -114,7 +116,6 @@ class ExolixRepository @Inject constructor(
         }
     }
 
-    // Exchange methods
     suspend fun getTransaction(id: String): Result<Exolix.TransactionResponse> = switchToIo {
         runCatching {
             exolixRetrofitService.getTransaction(id)
@@ -140,7 +141,10 @@ class ExolixRepository @Inject constructor(
                     amount = requestData.amount,
                     withdrawalAddress = toAddress,
                 )
-            )
+            ).also { response ->
+                val transaction = exolixRetrofitService.getTransaction(response.id)
+                exolixPrefRepository.savePendingTransaction(transaction)
+            }
         }
     }
 }

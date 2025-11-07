@@ -18,6 +18,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.tari.android.wallet.R
+import com.tari.android.wallet.data.exolix.Exolix
 import com.tari.android.wallet.data.tx.TxDto
 import com.tari.android.wallet.model.BalanceInfo
 import com.tari.android.wallet.ui.compose.TariDesignSystem
@@ -31,6 +32,7 @@ import com.tari.android.wallet.ui.screen.home.overview.widget.BalanceInfoModal
 import com.tari.android.wallet.ui.screen.home.overview.widget.BlockSyncChip
 import com.tari.android.wallet.ui.screen.home.overview.widget.ConnectionStatusModal
 import com.tari.android.wallet.ui.screen.home.overview.widget.EmptyTxList
+import com.tari.android.wallet.ui.screen.home.overview.widget.PendingExolixTxItem
 import com.tari.android.wallet.ui.screen.home.overview.widget.RestoreSuccessModal
 import com.tari.android.wallet.ui.screen.home.overview.widget.SyncSuccessModal
 import com.tari.android.wallet.ui.screen.home.overview.widget.TxItem
@@ -49,6 +51,7 @@ fun HomeOverviewScreen(
     onSendTariClicked: () -> Unit,
     onRequestTariClicked: () -> Unit,
     onBuyClicked: () -> Unit,
+    onPendingExolixTransactionClick: () -> Unit,
     onTxClick: (txDto: TxDto) -> Unit,
     onViewAllTxsClick: () -> Unit,
     onConnectionStatusClick: () -> Unit,
@@ -132,6 +135,23 @@ fun HomeOverviewScreen(
                             modifier = Modifier.weight(1f),
                             text = stringResource(R.string.request_tari_subtitle),
                             onClick = onRequestTariClicked,
+                        )
+                    }
+                }
+
+                uiState.pendingExolixTransaction?.let { transaction ->
+                    item {
+                        Spacer(modifier = Modifier.height(30.dp))
+                        Text(
+                            modifier = Modifier.padding(horizontal = 16.dp),
+                            text = stringResource(R.string.home_swap_in_progress_title),
+                            style = TariDesignSystem.typography.headingXLarge,
+                        )
+                        Spacer(modifier = Modifier.height(15.dp))
+                        PendingExolixTxItem(
+                            transaction = transaction,
+                            modifier = Modifier.padding(horizontal = 16.dp),
+                            onClick = onPendingExolixTransactionClick,
                         )
                     }
                 }
@@ -261,12 +281,17 @@ private fun HomeOverviewScreenPreview() {
                 networkName = "Testnet",
                 ffiVersion = "v1.11.0-rc.0",
                 txList = MockDataStub.createTxList(),
+                pendingExolixTransaction = MockDataStub.createTransactionResponse(
+                    status = Exolix.TransactionStatus.EXCHANGING,
+                ),
+
             ),
             onPullToRefresh = {},
             onStartMiningClicked = {},
             onSendTariClicked = {},
             onRequestTariClicked = {},
             onBuyClicked = {},
+            onPendingExolixTransactionClick = {},
             onTxClick = {},
             onViewAllTxsClick = {},
             onConnectionStatusClick = {},
@@ -304,6 +329,7 @@ private fun HomeOverviewScreenHiddenPreview() {
             onSendTariClicked = {},
             onRequestTariClicked = {},
             onBuyClicked = {},
+            onPendingExolixTransactionClick = {},
             onTxClick = {},
             onViewAllTxsClick = {},
             onConnectionStatusClick = {},
@@ -341,6 +367,7 @@ private fun HomeOverviewEmptyScreenPreview() {
             onSendTariClicked = {},
             onRequestTariClicked = {},
             onBuyClicked = {},
+            onPendingExolixTransactionClick = {},
             onTxClick = {},
             onViewAllTxsClick = {},
             onConnectionStatusClick = {},
@@ -379,6 +406,7 @@ private fun HomeOverviewProgressScreenPreview() {
             onSendTariClicked = {},
             onRequestTariClicked = {},
             onBuyClicked = {},
+            onPendingExolixTransactionClick = {},
             onTxClick = {},
             onViewAllTxsClick = {},
             onConnectionStatusClick = {},
