@@ -44,6 +44,7 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.tari.android.wallet.R
+import com.tari.android.wallet.application.walletManager.WalletConfig
 import com.tari.android.wallet.data.exolix.CurrencyDto
 import com.tari.android.wallet.data.exolix.ExchangeDirection
 import com.tari.android.wallet.data.exolix.Exolix
@@ -371,7 +372,7 @@ private fun YouSendLayout(
                     Spacer(Modifier.size(8.dp))
                     Text(
                         modifier = Modifier.clickable { onMinAmountClicked() },
-                        text = "${rate.minAmount} ${fromCurrency?.coin.orEmpty()}",
+                        text = "${WalletConfig.amountFormatter.format(rate.minAmount)} ${fromCurrency?.coin.orEmpty()}",
                         style = TariDesignSystem.typography.headingLarge,
                     )
                 }
@@ -384,7 +385,7 @@ private fun YouSendLayout(
                     Spacer(Modifier.size(8.dp))
                     Text(
                         modifier = Modifier.clickable { onMaxAmountClicked() },
-                        text = "${rate.maxAmount} ${fromCurrency?.coin.orEmpty()}",
+                        text = "${WalletConfig.amountFormatter.format(rate.maxAmount)} ${fromCurrency?.coin.orEmpty()}",
                         style = TariDesignSystem.typography.headingLarge,
                     )
                 }
@@ -433,7 +434,12 @@ private fun YouReceiveLayout(
         if (rate != null && fromCurrency != null && toCurrency != null) {
             Spacer(Modifier.size(16.dp))
             Text(
-                text = stringResource(R.string.exchange_rate_display, fromCurrency.coin, rate.rate.toString(), toCurrency.coin),
+                text = stringResource(
+                    R.string.exchange_rate_display,
+                    fromCurrency.coin,
+                    WalletConfig.amountFormatter.format(rate.rate),
+                    toCurrency.coin,
+                ),
                 style = TariDesignSystem.typography.headingMedium,
             )
         }

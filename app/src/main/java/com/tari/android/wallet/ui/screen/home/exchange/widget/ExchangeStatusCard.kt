@@ -22,6 +22,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.tari.android.wallet.R
+import com.tari.android.wallet.application.walletManager.WalletConfig
 import com.tari.android.wallet.data.exolix.Exolix
 import com.tari.android.wallet.ui.compose.PreviewSecondarySurface
 import com.tari.android.wallet.ui.compose.TariDesignSystem
@@ -103,18 +104,23 @@ private fun Exolix.TransactionResponse.statusSubtitle(): String =
 
         Exolix.TransactionStatus.EXCHANGING -> stringResource(R.string.exchange_status_card_subtitle_exchanging, coinFrom.coinName)
         Exolix.TransactionStatus.SENDING -> stringResource(R.string.exchange_status_card_subtitle_sending, coinFrom.coinName, coinTo.coinCode)
-        Exolix.TransactionStatus.OVERDUE -> stringResource(R.string.exchange_status_card_subtitle_overdue, amount.toPlainString(), coinFrom.coinCode)
+        Exolix.TransactionStatus.OVERDUE -> stringResource(
+            R.string.exchange_status_card_subtitle_overdue,
+            WalletConfig.amountFormatter.format(amount),
+            coinFrom.coinCode,
+        )
+
         Exolix.TransactionStatus.REFUNDED -> stringResource(
             R.string.exchange_status_card_subtitle_refunded,
-            amount.toPlainString(),
+            WalletConfig.amountFormatter.format(amount),
             coinFrom.coinCode,
         )
 
         Exolix.TransactionStatus.SUCCESS -> stringResource(
             R.string.exchange_status_card_subtitle_success,
-            amount.toPlainString(),
+            WalletConfig.amountFormatter.format(amount),
             coinFrom.coinCode,
-            amountTo.toPlainString(),
+            WalletConfig.amountFormatter.format(amountTo),
             coinTo.coinCode,
         )
     }

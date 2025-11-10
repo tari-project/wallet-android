@@ -30,6 +30,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.tari.android.wallet.R
+import com.tari.android.wallet.application.walletManager.WalletConfig
 import com.tari.android.wallet.data.exolix.ExchangeDirection
 import com.tari.android.wallet.data.exolix.ExchangeRequestData
 import com.tari.android.wallet.ui.compose.PreviewSecondarySurface
@@ -151,7 +152,7 @@ private fun SendFundsContent(
                 )
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(
-                        text = "${request.amount} ${request.selectedCurrency.coin}",
+                        text = "${WalletConfig.amountFormatter.format(request.amount)} ${request.selectedCurrency.coin}",
                         style = TariDesignSystem.typography.body1,
                         color = TariDesignSystem.colors.textPrimary,
                     )

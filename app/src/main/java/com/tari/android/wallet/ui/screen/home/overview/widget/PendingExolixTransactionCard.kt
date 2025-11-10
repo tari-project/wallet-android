@@ -24,6 +24,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.tari.android.wallet.R
+import com.tari.android.wallet.application.walletManager.WalletConfig
 import com.tari.android.wallet.data.exolix.Exolix
 import com.tari.android.wallet.ui.compose.PreviewSecondarySurface
 import com.tari.android.wallet.ui.compose.TariDesignSystem
@@ -69,9 +70,9 @@ fun PendingExolixTxItem(
                 Text(
                     text = stringResource(
                         R.string.home_pending_exolix_transaction_title_format,
-                        transaction.amount.stripTrailingZeros().toPlainString(),
+                        WalletConfig.amountFormatter.format(transaction.amount),
                         transaction.coinFrom.coinCode,
-                        transaction.amountTo.stripTrailingZeros().toPlainString(),
+                        WalletConfig.amountFormatter.format(transaction.amountTo),
                         transaction.coinTo.coinCode,
                     ),
                     style = TariDesignSystem.typography.headingMedium,

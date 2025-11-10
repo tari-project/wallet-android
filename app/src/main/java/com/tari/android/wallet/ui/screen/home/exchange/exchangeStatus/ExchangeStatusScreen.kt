@@ -20,6 +20,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.tari.android.wallet.R
+import com.tari.android.wallet.application.walletManager.WalletConfig
 import com.tari.android.wallet.data.exolix.Exolix
 import com.tari.android.wallet.ui.compose.PreviewSecondarySurface
 import com.tari.android.wallet.ui.compose.TariDesignSystem
@@ -124,7 +125,7 @@ private fun ExchangeStatusContent(
         TxDetailInfoItem(
             modifier = Modifier.fillMaxWidth(),
             title = stringResource(R.string.exchange_status_amount_received),
-            value = "${transaction.amountTo.toPlainString()} ${transaction.coinTo.coinCode}",
+            value = "${WalletConfig.amountFormatter.format(transaction.amountTo)} ${transaction.coinTo.coinCode}",
         )
 
         Spacer(Modifier.size(10.dp))
@@ -144,7 +145,7 @@ private fun ExchangeStatusContent(
             value = String.format(
                 "1 %s = %s %s (%s)",
                 transaction.coinFrom.coinCode,
-                transaction.rate.toPlainString(),
+                WalletConfig.amountFormatter.format(transaction.rate),
                 transaction.coinTo.coinCode,
                 when (transaction.rateType) {
                     Exolix.RateType.FIXED -> stringResource(R.string.exchange_status_rate_type_fixed)
