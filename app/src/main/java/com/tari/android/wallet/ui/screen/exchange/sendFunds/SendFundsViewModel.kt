@@ -1,4 +1,4 @@
-package com.tari.android.wallet.ui.screen.home.exchange.sendFunds
+package com.tari.android.wallet.ui.screen.exchange.sendFunds
 
 import android.graphics.Bitmap
 import androidx.lifecycle.SavedStateHandle
@@ -7,7 +7,7 @@ import com.tari.android.wallet.application.Navigation
 import com.tari.android.wallet.data.exolix.ExchangeRequestData
 import com.tari.android.wallet.data.exolix.ExolixRepository
 import com.tari.android.wallet.ui.common.CommonViewModel
-import com.tari.android.wallet.ui.screen.home.exchange.sendFunds.SendFundsFragment.Companion.ARG_REQUEST
+import com.tari.android.wallet.ui.screen.exchange.sendFunds.SendFundsFragment.Companion.ARG_REQUEST
 import com.tari.android.wallet.util.QrUtil
 import com.tari.android.wallet.util.extension.getOrThrow
 import com.tari.android.wallet.util.extension.launchOnIo

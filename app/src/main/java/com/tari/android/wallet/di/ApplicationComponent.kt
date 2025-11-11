@@ -45,12 +45,12 @@ import com.tari.android.wallet.ui.screen.contactBook.add.AddContactViewModel
 import com.tari.android.wallet.ui.screen.contactBook.details.ContactDetailsViewModel
 import com.tari.android.wallet.ui.screen.contactBook.list.ContactListViewModel
 import com.tari.android.wallet.ui.screen.debug.sampleDesign.SampleDesignSystemViewModel
+import com.tari.android.wallet.ui.screen.exchange.ExchangeViewModel
+import com.tari.android.wallet.ui.screen.exchange.review.ExchangeReviewViewModel
+import com.tari.android.wallet.ui.screen.exchange.selectCurrency.SelectCurrencyViewModel
+import com.tari.android.wallet.ui.screen.exchange.sendFunds.SendFundsViewModel
+import com.tari.android.wallet.ui.screen.exchange.status.ExchangeStatusViewModel
 import com.tari.android.wallet.ui.screen.home.HomeViewModel
-import com.tari.android.wallet.ui.screen.home.exchange.ExchangeViewModel
-import com.tari.android.wallet.ui.screen.home.exchange.exchangeStatus.ExchangeStatusViewModel
-import com.tari.android.wallet.ui.screen.home.exchange.review.ReviewViewModel
-import com.tari.android.wallet.ui.screen.home.exchange.selectCurrency.SelectCurrencyViewModel
-import com.tari.android.wallet.ui.screen.home.exchange.sendFunds.SendFundsViewModel
 import com.tari.android.wallet.ui.screen.home.overview.HomeOverviewViewModel
 import com.tari.android.wallet.ui.screen.onboarding.activity.OnboardingFlowActivity
 import com.tari.android.wallet.ui.screen.onboarding.createWallet.CreateWalletFragment
@@ -174,7 +174,7 @@ interface ApplicationComponent {
     fun inject(viewModel: SendViewModel)
     fun inject(viewModel: ExchangeViewModel)
     fun inject(viewModel: SelectCurrencyViewModel)
-    fun inject(viewModel: ReviewViewModel)
+    fun inject(viewModel: ExchangeReviewViewModel)
     fun inject(viewModel: SendFundsViewModel)
     fun inject(viewModel: ExchangeStatusViewModel)
 

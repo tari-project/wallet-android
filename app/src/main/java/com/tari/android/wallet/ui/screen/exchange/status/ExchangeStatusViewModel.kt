@@ -1,4 +1,4 @@
-package com.tari.android.wallet.ui.screen.home.exchange.exchangeStatus
+package com.tari.android.wallet.ui.screen.exchange.status
 
 import androidx.lifecycle.SavedStateHandle
 import com.tari.android.wallet.R
@@ -6,7 +6,7 @@ import com.tari.android.wallet.data.exolix.Exolix
 import com.tari.android.wallet.data.exolix.ExolixRepository
 import com.tari.android.wallet.model.WalletError
 import com.tari.android.wallet.ui.common.CommonViewModel
-import com.tari.android.wallet.ui.screen.home.exchange.exchangeStatus.ExchangeStatusFragment.Companion.ARG_TRANSACTION_ID
+import com.tari.android.wallet.ui.screen.exchange.status.ExchangeStatusFragment.Companion.ARG_TRANSACTION_ID
 import com.tari.android.wallet.util.extension.getOrThrow
 import com.tari.android.wallet.util.extension.launchOnIo
 import kotlinx.coroutines.flow.MutableStateFlow

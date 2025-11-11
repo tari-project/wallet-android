@@ -1,4 +1,4 @@
-package com.tari.android.wallet.ui.screen.home.exchange.selectCurrency
+package com.tari.android.wallet.ui.screen.exchange.selectCurrency
 
 import androidx.lifecycle.SavedStateHandle
 import com.tari.android.wallet.R

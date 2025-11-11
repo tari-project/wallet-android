@@ -40,12 +40,12 @@ import com.tari.android.wallet.ui.screen.contactBook.details.ContactDetailsFragm
 import com.tari.android.wallet.ui.screen.contactBook.list.ContactListFragment
 import com.tari.android.wallet.ui.screen.debug.DebugNavigation
 import com.tari.android.wallet.ui.screen.debug.activity.DebugActivity
+import com.tari.android.wallet.ui.screen.exchange.ExchangeFragment
+import com.tari.android.wallet.ui.screen.exchange.review.ExchangeReviewFragment
+import com.tari.android.wallet.ui.screen.exchange.selectCurrency.SelectCurrencyFragment
+import com.tari.android.wallet.ui.screen.exchange.sendFunds.SendFundsFragment
+import com.tari.android.wallet.ui.screen.exchange.status.ExchangeStatusFragment
 import com.tari.android.wallet.ui.screen.home.HomeActivity
-import com.tari.android.wallet.ui.screen.home.exchange.ExchangeFragment
-import com.tari.android.wallet.ui.screen.home.exchange.exchangeStatus.ExchangeStatusFragment
-import com.tari.android.wallet.ui.screen.home.exchange.review.ReviewFragment
-import com.tari.android.wallet.ui.screen.home.exchange.selectCurrency.SelectCurrencyFragment
-import com.tari.android.wallet.ui.screen.home.exchange.sendFunds.SendFundsFragment
 import com.tari.android.wallet.ui.screen.home.overview.HomeOverviewFragment
 import com.tari.android.wallet.ui.screen.onboarding.activity.OnboardingFlowActivity
 import com.tari.android.wallet.ui.screen.onboarding.localAuth.LocalAuthFragment
@@ -116,7 +116,7 @@ class TariNavigator @Inject constructor() {
 
             is Exchange.SelectCurrency -> addFragment(SelectCurrencyFragment.newInstance(navigation.preselectedCurrency))
             is Exchange.StartExchange -> addFragment(ExchangeFragment.newInstance())
-            is Exchange.Review -> addFragment(ReviewFragment.newInstance(navigation.request))
+            is Exchange.Review -> addFragment(ExchangeReviewFragment.newInstance(navigation.request))
             is Exchange.SendFunds -> addFragment(SendFundsFragment.newInstance(navigation.request))
             is Exchange.ExchangeStatus -> addFragment(ExchangeStatusFragment.newInstance(navigation.transactionId))
 

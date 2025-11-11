@@ -1,4 +1,4 @@
-package com.tari.android.wallet.ui.screen.home.exchange.widget
+package com.tari.android.wallet.ui.screen.exchange.widget
 
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes

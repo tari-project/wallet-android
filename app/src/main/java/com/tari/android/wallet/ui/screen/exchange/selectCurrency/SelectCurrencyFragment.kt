@@ -1,4 +1,4 @@
-package com.tari.android.wallet.ui.screen.home.exchange.selectCurrency
+package com.tari.android.wallet.ui.screen.exchange.selectCurrency
 
 import android.os.Bundle
 import android.view.LayoutInflater

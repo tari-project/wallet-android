@@ -1,4 +1,4 @@
-package com.tari.android.wallet.ui.screen.home.exchange
+package com.tari.android.wallet.ui.screen.exchange
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
@@ -61,7 +61,7 @@ import com.tari.android.wallet.ui.compose.components.TariPullToRefreshBox
 import com.tari.android.wallet.ui.compose.components.TariSwitch
 import com.tari.android.wallet.ui.compose.components.TariTextField
 import com.tari.android.wallet.ui.compose.components.TariTopBar
-import com.tari.android.wallet.ui.screen.home.exchange.widget.SelectedCurrencyChip
+import com.tari.android.wallet.ui.screen.exchange.widget.SelectedCurrencyChip
 import com.tari.android.wallet.ui.screen.settings.themeSelector.TariTheme
 import com.tari.android.wallet.util.MockDataStub
 import com.tari.android.wallet.util.extension.newValueIfChanged

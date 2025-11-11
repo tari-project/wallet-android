@@ -1,4 +1,4 @@
-package com.tari.android.wallet.ui.screen.home.exchange.exchangeStatus
+package com.tari.android.wallet.ui.screen.exchange.status
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -29,7 +29,7 @@ import com.tari.android.wallet.ui.compose.components.TariLoadingLayoutState
 import com.tari.android.wallet.ui.compose.components.TariPrimaryButton
 import com.tari.android.wallet.ui.compose.components.TariProgressView
 import com.tari.android.wallet.ui.compose.components.TariTopBar
-import com.tari.android.wallet.ui.screen.home.exchange.widget.ExchangeStatusCard
+import com.tari.android.wallet.ui.screen.exchange.widget.ExchangeStatusCard
 import com.tari.android.wallet.ui.screen.settings.themeSelector.TariTheme
 import com.tari.android.wallet.ui.screen.tx.details.widget.TxDetailInfoCopyItem
 import com.tari.android.wallet.ui.screen.tx.details.widget.TxDetailInfoItem

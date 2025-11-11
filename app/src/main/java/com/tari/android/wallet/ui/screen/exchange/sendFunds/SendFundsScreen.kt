@@ -1,4 +1,4 @@
-package com.tari.android.wallet.ui.screen.home.exchange.sendFunds
+package com.tari.android.wallet.ui.screen.exchange.sendFunds
 
 import android.graphics.Bitmap
 import androidx.compose.foundation.background

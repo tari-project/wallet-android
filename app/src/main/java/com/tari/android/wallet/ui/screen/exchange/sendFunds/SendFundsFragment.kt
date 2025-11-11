@@ -1,4 +1,4 @@
-package com.tari.android.wallet.ui.screen.home.exchange.exchangeStatus
+package com.tari.android.wallet.ui.screen.exchange.sendFunds
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -7,22 +7,25 @@ import android.view.ViewGroup
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.fragment.app.viewModels
+import com.tari.android.wallet.data.exolix.ExchangeRequestData
 import com.tari.android.wallet.ui.common.CommonFragment
 import com.tari.android.wallet.ui.compose.TariDesignSystem
 import com.tari.android.wallet.util.extension.composeContent
 
-class ExchangeStatusFragment : CommonFragment<ExchangeStatusViewModel>() {
+class SendFundsFragment : CommonFragment<SendFundsViewModel>() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?) = composeContent {
         val uiState by viewModel.uiState.collectAsState()
 
         TariDesignSystem(viewModel.currentTheme) {
-            ExchangeStatusScreen(
+            SendFundsScreen(
                 uiState = uiState,
                 onBackClick = { viewModel.onBackPressed() },
-                onTransactionDetailsClick = viewModel::onTransactionDetailsClicked,
-                onCopyClick = viewModel::onCopyClicked,
-                onRetry = viewModel::loadTransaction,
+                onCopyAmount = { viewModel.onCopyAmount() },
+                onCopyAddress = { viewModel.onCopyAddress() },
+                onCancelTransaction = { viewModel.onBackPressed() },
+                onOpenTxDetails = { viewModel.onOpenTxDetails() },
+                onRetry = { viewModel.onRetry() },
             )
         }
     }
@@ -30,16 +33,16 @@ class ExchangeStatusFragment : CommonFragment<ExchangeStatusViewModel>() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val viewModel: ExchangeStatusViewModel by viewModels()
+        val viewModel: SendFundsViewModel by viewModels()
         bindViewModel(viewModel)
     }
 
     companion object {
-        const val ARG_TRANSACTION_ID = "ARG_TRANSACTION_ID"
+        const val ARG_REQUEST = "ARG_REQUEST"
 
-        fun newInstance(transactionId: String) = ExchangeStatusFragment().apply {
+        fun newInstance(request: ExchangeRequestData) = SendFundsFragment().apply {
             arguments = Bundle().apply {
-                putString(ARG_TRANSACTION_ID, transactionId)
+                putParcelable(ARG_REQUEST, request)
             }
         }
     }

@@ -1,4 +1,4 @@
-package com.tari.android.wallet.ui.screen.home.exchange.review
+package com.tari.android.wallet.ui.screen.exchange.review
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
@@ -35,7 +35,7 @@ import com.tari.android.wallet.ui.compose.components.TariLoadingLayoutState
 import com.tari.android.wallet.ui.compose.components.TariPrimaryButton
 import com.tari.android.wallet.ui.compose.components.TariProgressView
 import com.tari.android.wallet.ui.compose.components.TariTopBar
-import com.tari.android.wallet.ui.screen.home.exchange.widget.SelectedCurrencyChip
+import com.tari.android.wallet.ui.screen.exchange.widget.SelectedCurrencyChip
 import com.tari.android.wallet.ui.screen.send.confirm.widget.SenderCard
 import com.tari.android.wallet.ui.screen.settings.themeSelector.TariTheme
 import com.tari.android.wallet.ui.screen.tx.details.widget.TxDetailInfoAddressItem
@@ -45,8 +45,8 @@ import com.tari.android.wallet.util.MockDataStub
 import com.tari.android.wallet.util.extension.toMicroTari
 
 @Composable
-fun ReviewScreen(
-    uiState: ReviewViewModel.UiState,
+fun ExchangeReviewScreen(
+    uiState: ExchangeReviewViewModel.UiState,
     onBackClick: () -> Unit,
     onCopyValueClick: (value: String) -> Unit,
     onConfirmClick: () -> Unit,
@@ -98,7 +98,7 @@ fun ReviewScreen(
 
 @Composable
 private fun ReviewContent(
-    uiState: ReviewViewModel.UiState,
+    uiState: ExchangeReviewViewModel.UiState,
     onCopyValueClick: (value: String) -> Unit,
     onConfirmClick: () -> Unit,
     onEmojiIdDetailsClick: () -> Unit,
@@ -261,10 +261,10 @@ private fun ReviewContent(
 
 @Composable
 @Preview
-private fun ReviewScreenPreview() {
+private fun ExchangeReviewScreenPreview() {
     PreviewSecondarySurface(TariTheme.Light) {
-        ReviewScreen(
-            uiState = ReviewViewModel.UiState(
+        ExchangeReviewScreen(
+            uiState = ExchangeReviewViewModel.UiState(
                 request = MockDataStub.createExchangeRequestData(
                     direction = ExchangeDirection.SELL_TARI,
                 ),

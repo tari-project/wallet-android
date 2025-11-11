@@ -1,4 +1,4 @@
-package com.tari.android.wallet.ui.screen.home.exchange.review
+package com.tari.android.wallet.ui.screen.exchange.review
 
 import androidx.lifecycle.SavedStateHandle
 import com.tari.android.wallet.R
@@ -13,7 +13,7 @@ import com.tari.android.wallet.model.MicroTari
 import com.tari.android.wallet.model.TariContact
 import com.tari.android.wallet.model.TariWalletAddress
 import com.tari.android.wallet.ui.common.CommonViewModel
-import com.tari.android.wallet.ui.screen.home.exchange.review.ReviewFragment.Companion.ARG_REQUEST
+import com.tari.android.wallet.ui.screen.exchange.review.ExchangeReviewFragment.Companion.ARG_REQUEST
 import com.tari.android.wallet.util.extension.getOrThrow
 import com.tari.android.wallet.util.extension.launchOnIo
 import com.tari.android.wallet.util.extension.switchToMain
@@ -23,7 +23,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 
-class ReviewViewModel(savedState: SavedStateHandle) : CommonViewModel() {
+class ExchangeReviewViewModel(savedState: SavedStateHandle) : CommonViewModel() {
 
     @Inject
     lateinit var exolixRepository: ExolixRepository

@@ -1,4 +1,4 @@
-package com.tari.android.wallet.ui.screen.home.exchange.selectCurrency
+package com.tari.android.wallet.ui.screen.exchange.selectCurrency
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -37,7 +37,7 @@ import com.tari.android.wallet.ui.compose.components.TariProgressView
 import com.tari.android.wallet.ui.compose.components.TariSearchField
 import com.tari.android.wallet.ui.compose.components.TariTopBar
 import com.tari.android.wallet.ui.compose.widgets.InfiniteListHandler
-import com.tari.android.wallet.ui.screen.home.exchange.widget.CurrencyItem
+import com.tari.android.wallet.ui.screen.exchange.widget.CurrencyItem
 import com.tari.android.wallet.ui.screen.settings.themeSelector.TariTheme
 import com.tari.android.wallet.util.MockDataStub
 

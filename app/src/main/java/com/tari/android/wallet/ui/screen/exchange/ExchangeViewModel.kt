@@ -1,4 +1,4 @@
-package com.tari.android.wallet.ui.screen.home.exchange
+package com.tari.android.wallet.ui.screen.exchange
 
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.Navigation

@@ -1,4 +1,4 @@
-package com.tari.android.wallet.ui.screen.home.exchange.widget
+package com.tari.android.wallet.ui.screen.exchange.widget
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
