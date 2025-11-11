@@ -116,13 +116,13 @@ class ExolixRepository @Inject constructor(
         }
     }
 
-    suspend fun getTransaction(id: String): Result<Exolix.TransactionResponse> = switchToIo {
+    suspend fun getTransaction(id: String): Result<Exolix.Transaction> = switchToIo {
         runCatching {
             exolixRetrofitService.getTransaction(id)
         }
     }
 
-    suspend fun createExchange(requestData: ExchangeRequestData): Result<Exolix.CreateExchangeResponse> = switchToIo {
+    suspend fun createExchange(requestData: ExchangeRequestData): Result<Exolix.Transaction> = switchToIo {
         runCatching {
             val toAddress = if (requestData.direction == ExchangeDirection.SELL_TARI) {
                 requestData.selectedAddress ?: error("Selected address is null for SELL_TARI exchange")
@@ -140,6 +140,7 @@ class ExolixRepository @Inject constructor(
                     networkTo = toCurrency.networkName,
                     amount = requestData.amount,
                     withdrawalAddress = toAddress,
+                    rateType = requestData.rateType,
                 )
             ).also { response ->
                 val transaction = exolixRetrofitService.getTransaction(response.id)
@@ -178,6 +179,7 @@ data class ExchangeRequestData(
     val selectedAddress: String? = null,
     val amount: BigDecimal,
     val rate: Exolix.Rate,
+    val rateType: Exolix.RateType,
     val direction: ExchangeDirection,
 ) : Parcelable
 

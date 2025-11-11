@@ -67,7 +67,7 @@ class ExchangeStatusViewModel(savedState: SavedStateHandle) : CommonViewModel() 
     }
 
     data class UiState(
-        val transaction: Exolix.TransactionResponse? = null,
+        val transaction: Exolix.Transaction? = null,
         val loading: Boolean = false,
         val error: String? = null,
     )

@@ -33,7 +33,7 @@ import com.tari.android.wallet.util.MockDataStub
 
 @Composable
 fun PendingExolixTxItem(
-    transaction: Exolix.TransactionResponse,
+    transaction: Exolix.Transaction,
     modifier: Modifier = Modifier,
     onClick: () -> Unit,
 ) {
@@ -111,7 +111,7 @@ private fun Exolix.TransactionStatus.statusText(): String = stringResource(
 private fun PendingExolixTxItemPreview() {
     PreviewSecondarySurface(TariTheme.Light) {
         PendingExolixTxItem(
-            transaction = MockDataStub.createTransactionResponse(
+            transaction = MockDataStub.createExchangeTransaction(
                 status = Exolix.TransactionStatus.WAIT,
             ),
             modifier = Modifier.padding(16.dp),

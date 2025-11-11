@@ -32,7 +32,7 @@ import com.tari.android.wallet.util.MockDataStub
 
 @Composable
 fun ExchangeStatusCard(
-    transaction: Exolix.TransactionResponse,
+    transaction: Exolix.Transaction,
     modifier: Modifier = Modifier,
 ) {
     Card(
@@ -69,7 +69,7 @@ fun ExchangeStatusCard(
 }
 
 @get:DrawableRes
-private val Exolix.TransactionResponse.statusIcon: Int
+private val Exolix.Transaction.statusIcon: Int
     get() = when (this.status) {
         Exolix.TransactionStatus.SUCCESS -> R.drawable.vector_exolix_status_success
         Exolix.TransactionStatus.EXCHANGING -> R.drawable.vector_exolix_status_exchanging
@@ -82,7 +82,7 @@ private val Exolix.TransactionResponse.statusIcon: Int
     }
 
 @get:StringRes
-private val Exolix.TransactionResponse.statusTitle: Int
+private val Exolix.Transaction.statusTitle: Int
     get() = when (this.status) {
         Exolix.TransactionStatus.WAIT -> R.string.exchange_status_card_waiting_for_deposit
         Exolix.TransactionStatus.CONFIRMATION,
@@ -96,7 +96,7 @@ private val Exolix.TransactionResponse.statusTitle: Int
     }
 
 @Composable
-private fun Exolix.TransactionResponse.statusSubtitle(): String =
+private fun Exolix.Transaction.statusSubtitle(): String =
     when (this.status) {
         Exolix.TransactionStatus.WAIT -> stringResource(R.string.exchange_status_card_subtitle_wait, coinFrom.coinName)
         Exolix.TransactionStatus.CONFIRMATION,
@@ -136,56 +136,56 @@ private fun ExchangeStatusCardPreview() {
         ) {
             ExchangeStatusCard(
                 modifier = Modifier.padding(horizontal = 16.dp),
-                transaction = MockDataStub.createTransactionResponse(
+                transaction = MockDataStub.createExchangeTransaction(
                     status = Exolix.TransactionStatus.WAIT,
                 ),
             )
             Spacer(Modifier.size(16.dp))
             ExchangeStatusCard(
                 modifier = Modifier.padding(horizontal = 16.dp),
-                transaction = MockDataStub.createTransactionResponse(
+                transaction = MockDataStub.createExchangeTransaction(
                     status = Exolix.TransactionStatus.CONFIRMATION,
                 ),
             )
             Spacer(Modifier.size(16.dp))
             ExchangeStatusCard(
                 modifier = Modifier.padding(horizontal = 16.dp),
-                transaction = MockDataStub.createTransactionResponse(
+                transaction = MockDataStub.createExchangeTransaction(
                     status = Exolix.TransactionStatus.CONFIRMED,
                 ),
             )
             Spacer(Modifier.size(16.dp))
             ExchangeStatusCard(
                 modifier = Modifier.padding(horizontal = 16.dp),
-                transaction = MockDataStub.createTransactionResponse(
+                transaction = MockDataStub.createExchangeTransaction(
                     status = Exolix.TransactionStatus.EXCHANGING,
                 ),
             )
             Spacer(Modifier.size(16.dp))
             ExchangeStatusCard(
                 modifier = Modifier.padding(horizontal = 16.dp),
-                transaction = MockDataStub.createTransactionResponse(
+                transaction = MockDataStub.createExchangeTransaction(
                     status = Exolix.TransactionStatus.SENDING,
                 ),
             )
             Spacer(Modifier.size(16.dp))
             ExchangeStatusCard(
                 modifier = Modifier.padding(horizontal = 16.dp),
-                transaction = MockDataStub.createTransactionResponse(
+                transaction = MockDataStub.createExchangeTransaction(
                     status = Exolix.TransactionStatus.SUCCESS,
                 ),
             )
             Spacer(Modifier.size(16.dp))
             ExchangeStatusCard(
                 modifier = Modifier.padding(horizontal = 16.dp),
-                transaction = MockDataStub.createTransactionResponse(
+                transaction = MockDataStub.createExchangeTransaction(
                     status = Exolix.TransactionStatus.OVERDUE,
                 ),
             )
             Spacer(Modifier.size(16.dp))
             ExchangeStatusCard(
                 modifier = Modifier.padding(horizontal = 16.dp),
-                transaction = MockDataStub.createTransactionResponse(
+                transaction = MockDataStub.createExchangeTransaction(
                     status = Exolix.TransactionStatus.REFUNDED,
                 ),
             )

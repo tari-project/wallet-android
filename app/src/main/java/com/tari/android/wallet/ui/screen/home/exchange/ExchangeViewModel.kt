@@ -129,10 +129,16 @@ class ExchangeViewModel : CommonViewModel() {
             selectedAddress = _uiState.value.destinationAddress.takeIf { it.isNotBlank() },
             amount = _uiState.value.amount ?: error("amount is null, but exchange button is not disabled"),
             rate = _uiState.value.rate ?: error("rate is null, but exchange button is not disabled"),
+            rateType = if (_uiState.value.fixedRate) Exolix.RateType.FIXED else Exolix.RateType.FLOATING,
             direction = _uiState.value.exchangeDirection,
         )
 
-        tariNavigator.navigate(Navigation.Exchange.SendFunds(request))
+        tariNavigator.navigate(
+            when (_uiState.value.exchangeDirection) {
+                ExchangeDirection.SELL_TARI -> Navigation.Exchange.Review(request)
+                ExchangeDirection.BUY_TARI -> Navigation.Exchange.SendFunds(request)
+            }
+        )
     }
 
     fun loadCurrencies() {

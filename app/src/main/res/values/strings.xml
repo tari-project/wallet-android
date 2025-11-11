@@ -148,6 +148,18 @@
     <string name="exchange_status_refund_address">Refund Address (%1$s)</string>
     <string name="exchange_status_refund_extra_id">Refund Extra ID</string>
 
+    <!-- exchange review screen -->
+    <string name="exchange_review_title">Review Exchange</string>
+    <string name="exchange_review_you_are_about_to_swap">You are about to swap</string>
+    <string name="exchange_review_rate">Rate</string>
+    <string name="exchange_review_rate_value">%1$s %2$s ≈ %3$s (%4$s)</string>
+    <string name="exchange_review_from_wallet">XTM will be deducted from\n(your Tari wallet address)</string>
+    <string name="exchange_review_to_exolix_address">To Exolix address</string>
+    <string name="exchange_review_confirm_button">Confirm</string>
+    <string name="exchange_review_label">Exchange Review</string>
+    <string name="exchange_tx_message">Exchange via Exolix</string>
+    <string name="exchange_invalid_deposit_address_error">Invalid deposit address received from Exolix</string>
+
     <!-- exchange status card titles -->
     <string name="exchange_status_card_waiting_for_deposit">Waiting for deposit</string>
     <string name="exchange_status_card_funds_received">Funds Received</string>

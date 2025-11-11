@@ -38,6 +38,8 @@ import com.tari.android.wallet.BuildConfig
 import com.tari.android.wallet.application.addressPoisoning.SimilarAddressDto
 import com.tari.android.wallet.data.contacts.Contact
 import com.tari.android.wallet.data.exolix.CurrencyDto
+import com.tari.android.wallet.data.exolix.ExchangeDirection
+import com.tari.android.wallet.data.exolix.ExchangeRequestData
 import com.tari.android.wallet.data.exolix.Exolix
 import com.tari.android.wallet.data.tx.TxDto
 import com.tari.android.wallet.ffi.FFITxCancellationReason
@@ -431,26 +433,43 @@ object MockDataStub {
         icon = icon,
     )
 
-    fun createTransactionResponse(
-        id: String = "test-transaction-id-12345",
+    fun createWalletAddress(
+        network: TariWalletAddress.Network = TariWalletAddress.Network.NEXTNET,
+        fullBase58: Base58 = BASE58,
+        fullEmojiId: EmojiId = EMOJI_ID,
+    ) = TariWalletAddress(
+        network = network,
+        features = listOf(TariWalletAddress.Feature.INTERACTIVE),
+        networkEmoji = EMOJI_ID,
+        featuresEmoji = EMOJI_ID,
+        viewKeyEmojis = EMOJI_ID,
+        spendKeyEmojis = EMOJI_ID,
+        checksumEmoji = EMOJI_ID,
+        fullBase58 = fullBase58,
+        fullEmojiId = fullEmojiId,
+        unknownAddress = false,
+    )
+
+    fun createExchangeTransaction(
+        id: String = "test-exchange-id-12345",
         amount: BigDecimal = BigDecimal("100.01"),
         amountTo: BigDecimal = BigDecimal("0.9982"),
         coinFrom: Exolix.CoinInfo = createCoinInfo(
-            coinCode = "ETH",
-            coinName = "Ethereum",
-            network = "ethereum",
-            networkName = "Ethereum",
-            networkShortName = "ETH",
-        ),
-        coinTo: Exolix.CoinInfo = createCoinInfo(
             coinCode = "XTM",
             coinName = "Tari",
             network = "tari",
             networkName = "Tari",
             networkShortName = "XTM",
         ),
+        coinTo: Exolix.CoinInfo = createCoinInfo(
+            coinCode = "ETH",
+            coinName = "Ethereum",
+            network = "ethereum",
+            networkName = "Ethereum",
+            networkShortName = "ETH",
+        ),
         createdAt: String = "2024-01-01T12:00:00Z",
-        depositAddress: String = "0x1234567890abcdef1234567890abcdef12345678",
+        depositAddress: String = "C05575BE00EF016A209B1F493D9027B0E330F3E25FE89BBE6FA66D966EE5B6356",
         depositExtraId: String? = null,
         withdrawalAddress: String = "0x9876543210fedcba9876543210fedcba98765432",
         withdrawalExtraId: String? = null,
@@ -458,12 +477,12 @@ object MockDataStub {
         hashOut: Exolix.HashInfo? = null,
         rate: BigDecimal = BigDecimal("0.00998"),
         rateType: Exolix.RateType = Exolix.RateType.FIXED,
-        refundAddress: String? = "0x1234567890abcdef1234567890abcdef12345678",
+        refundAddress: String? = null,
         refundExtraId: String? = null,
-        status: Exolix.TransactionStatus = Exolix.TransactionStatus.SUCCESS,
+        status: Exolix.TransactionStatus = Exolix.TransactionStatus.WAIT,
         source: String? = null,
         comment: String? = null,
-    ) = Exolix.TransactionResponse(
+    ) = Exolix.Transaction(
         id = id,
         amount = amount,
         amountTo = amountTo,
@@ -483,6 +502,35 @@ object MockDataStub {
         refundExtraId = refundExtraId,
         status = status,
         source = source,
+    )
+
+    fun createExchangeRequestData(
+        selectedCurrency: CurrencyDto = createCurrencyDto(
+            code = "ETH",
+            name = "Ethereum",
+        ),
+        tariCurrency: CurrencyDto = createCurrencyDto(
+            code = "XTM",
+            name = "Tari",
+            networks = listOf(createNetwork("tari", "Tari", "XTM", true)),
+        ),
+        selectedAddress: String? = null,
+        amount: BigDecimal = BigDecimal("100.01"),
+        rate: Exolix.Rate = createRate(
+            fromAmount = amount,
+            toAmount = BigDecimal("0.9982"),
+            rate = BigDecimal("0.00998"),
+        ),
+        rateType: Exolix.RateType = Exolix.RateType.FIXED,
+        direction: ExchangeDirection = ExchangeDirection.SELL_TARI,
+    ) = ExchangeRequestData(
+        selectedCurrency = selectedCurrency,
+        tariCurrency = tariCurrency,
+        selectedAddress = selectedAddress,
+        amount = amount,
+        rate = rate,
+        rateType = rateType,
+        direction = direction,
     )
 }
 

@@ -55,11 +55,11 @@ interface ExolixRetrofitService {
     ): Exolix.TransactionsResponse
 
     @GET("/api/v2/transactions/{id}")
-    suspend fun getTransaction(@Path("id") id: String): Exolix.TransactionResponse
+    suspend fun getTransaction(@Path("id") id: String): Exolix.Transaction
 
     @POST("/api/v2/transactions")
     @Headers("Content-Type: application/json")
-    suspend fun createExchange(@Body request: Exolix.CreateExchangeRequest): Exolix.CreateExchangeResponse
+    suspend fun createExchange(@Body request: Exolix.CreateExchangeRequest): Exolix.Transaction
 }
 
 object Exolix {
@@ -111,7 +111,7 @@ object Exolix {
         @SerializedName("withdrawalAmount") val withdrawalAmount: BigDecimal? = null,
         @SerializedName("withdrawalAddress") val withdrawalAddress: String,
         @SerializedName("withdrawalExtraId") val withdrawalExtraId: String? = null,
-        @SerializedName("rateType") val rateType: RateType = RateType.FIXED,
+        @SerializedName("rateType") val rateType: RateType,
         @SerializedName("refundAddress") val refundAddress: String? = null,
         @SerializedName("refundExtraId") val refundExtraId: String? = null,
         @SerializedName("slippage") val slippage: Double? = null,
@@ -196,28 +196,6 @@ object Exolix {
         @SerializedName("source") val source: String? = null,
     )
 
-    data class TransactionResponse(
-        @SerializedName("id") val id: String,
-        @SerializedName("amount") val amount: BigDecimal,
-        @SerializedName("amountTo") val amountTo: BigDecimal,
-        @SerializedName("coinFrom") val coinFrom: CoinInfo,
-        @SerializedName("coinTo") val coinTo: CoinInfo,
-        @SerializedName("comment") val comment: String? = null,
-        @SerializedName("createdAt") val createdAt: String,
-        @SerializedName("depositAddress") val depositAddress: String,
-        @SerializedName("depositExtraId") val depositExtraId: String? = null,
-        @SerializedName("withdrawalAddress") val withdrawalAddress: String,
-        @SerializedName("withdrawalExtraId") val withdrawalExtraId: String? = null,
-        @SerializedName("hashIn") val hashIn: HashInfo? = null,
-        @SerializedName("hashOut") val hashOut: HashInfo? = null,
-        @SerializedName("rate") val rate: BigDecimal,
-        @SerializedName("rateType") val rateType: RateType,
-        @SerializedName("refundAddress") val refundAddress: String? = null,
-        @SerializedName("refundExtraId") val refundExtraId: String? = null,
-        @SerializedName("status") val status: TransactionStatus,
-        @SerializedName("source") val source: String? = null,
-    )
-
     data class CoinInfo(
         @SerializedName("coinCode") val coinCode: String,
         @SerializedName("coinName") val coinName: String,
@@ -232,26 +210,5 @@ object Exolix {
     data class HashInfo(
         @SerializedName("hash") val hash: String? = null,
         @SerializedName("link") val link: String? = null,
-    )
-
-    data class CreateExchangeResponse(
-        @SerializedName("id") val id: String,
-        @SerializedName("amount") val amount: BigDecimal,
-        @SerializedName("amountTo") val amountTo: BigDecimal,
-        @SerializedName("coinFrom") val coinFrom: CoinInfo,
-        @SerializedName("coinTo") val coinTo: CoinInfo,
-        @SerializedName("comment") val comment: String? = null,
-        @SerializedName("createdAt") val createdAt: String,
-        @SerializedName("depositAddress") val depositAddress: String,
-        @SerializedName("depositExtraId") val depositExtraId: String? = null,
-        @SerializedName("withdrawalAddress") val withdrawalAddress: String,
-        @SerializedName("withdrawalExtraId") val withdrawalExtraId: String? = null,
-        @SerializedName("hashIn") val hashIn: HashInfo? = null,
-        @SerializedName("hashOut") val hashOut: HashInfo? = null,
-        @SerializedName("rate") val rate: BigDecimal,
-        @SerializedName("rateType") val rateType: RateType,
-        @SerializedName("refundAddress") val refundAddress: String? = null,
-        @SerializedName("refundExtraId") val refundExtraId: String? = null,
-        @SerializedName("status") val status: TransactionStatus,
     )
 }

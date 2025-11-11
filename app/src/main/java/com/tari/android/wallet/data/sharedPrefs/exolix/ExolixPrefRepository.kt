@@ -21,14 +21,14 @@ class ExolixPrefRepository @Inject constructor(
         const val PENDING_TRANSACTION_DATA = "exolix_pending_transaction_data"
     }
 
-    var pendingTransaction: Exolix.TransactionResponse? by SharedPrefGsonNullableDelegate(
+    var pendingTransaction: Exolix.Transaction? by SharedPrefGsonNullableDelegate(
         prefs = sharedPreferences,
         prefsUpdater = this,
         name = networkRepository.currentNetwork.formatKey(Key.PENDING_TRANSACTION_DATA),
-        type = Exolix.TransactionResponse::class.java,
+        type = Exolix.Transaction::class.java,
     )
 
-    fun savePendingTransaction(transaction: Exolix.TransactionResponse) {
+    fun savePendingTransaction(transaction: Exolix.Transaction) {
         pendingTransaction = transaction
     }
 

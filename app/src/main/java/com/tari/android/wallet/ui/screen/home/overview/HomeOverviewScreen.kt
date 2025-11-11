@@ -281,10 +281,9 @@ private fun HomeOverviewScreenPreview() {
                 networkName = "Testnet",
                 ffiVersion = "v1.11.0-rc.0",
                 txList = MockDataStub.createTxList(),
-                pendingExolixTransaction = MockDataStub.createTransactionResponse(
+                pendingExolixTransaction = MockDataStub.createExchangeTransaction(
                     status = Exolix.TransactionStatus.EXCHANGING,
                 ),
-
             ),
             onPullToRefresh = {},
             onStartMiningClicked = {},

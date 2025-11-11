@@ -29,7 +29,7 @@ class HomeOverviewModel {
         val isMining: Boolean? = null,
         val isMiningError: Boolean = false,
 
-        val pendingExolixTransaction: Exolix.TransactionResponse? = null,
+        val pendingExolixTransaction: Exolix.Transaction? = null,
 
         val showWalletSyncSuccessDialog: Boolean = false,
         val showWalletRestoreSuccessDialog: Boolean = false,

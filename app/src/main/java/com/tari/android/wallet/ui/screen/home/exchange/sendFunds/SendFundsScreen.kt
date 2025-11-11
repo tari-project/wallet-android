@@ -33,6 +33,7 @@ import com.tari.android.wallet.R
 import com.tari.android.wallet.application.walletManager.WalletConfig
 import com.tari.android.wallet.data.exolix.ExchangeDirection
 import com.tari.android.wallet.data.exolix.ExchangeRequestData
+import com.tari.android.wallet.data.exolix.Exolix
 import com.tari.android.wallet.ui.compose.PreviewSecondarySurface
 import com.tari.android.wallet.ui.compose.TariDesignSystem
 import com.tari.android.wallet.ui.compose.components.TariErrorView
@@ -270,6 +271,7 @@ private fun SendFundsScreenPreview() {
                     selectedAddress = null,
                     amount = BigDecimal("0.124"),
                     rate = MockDataStub.createRate(),
+                    rateType = Exolix.RateType.FIXED,
                     direction = ExchangeDirection.BUY_TARI,
                 ),
                 exchangeId = "test-exchange-id-12345",

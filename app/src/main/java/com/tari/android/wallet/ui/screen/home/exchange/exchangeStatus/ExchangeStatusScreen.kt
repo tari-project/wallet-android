@@ -1,6 +1,5 @@
 package com.tari.android.wallet.ui.screen.home.exchange.exchangeStatus
 
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -68,20 +67,11 @@ fun ExchangeStatusScreen(
                 else -> TariLoadingLayoutState.Content
             },
             loadingLayout = {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(32.dp),
-                    contentAlignment = Alignment.Center,
-                ) {
-                    TariProgressView()
-                }
+                TariProgressView(modifier = Modifier.fillMaxSize())
             },
             errorLayout = {
                 TariErrorView(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(32.dp),
+                    modifier = Modifier.fillMaxSize(),
                     errorMessage = uiState.error.orEmpty(),
                     onTryAgainClick = onRetry,
                 )
@@ -101,7 +91,7 @@ fun ExchangeStatusScreen(
 
 @Composable
 private fun ExchangeStatusContent(
-    transaction: Exolix.TransactionResponse,
+    transaction: Exolix.Transaction,
     onTransactionDetailsClick: () -> Unit,
     onCopyClick: (value: String) -> Unit,
     onDoneClick: () -> Unit,
@@ -243,7 +233,7 @@ private fun ExchangeStatusScreenSuccessPreview() {
     PreviewSecondarySurface(TariTheme.Light) {
         ExchangeStatusScreen(
             uiState = ExchangeStatusViewModel.UiState(
-                transaction = MockDataStub.createTransactionResponse(
+                transaction = MockDataStub.createExchangeTransaction(
                     id = "dummy_id",
                     amountTo = java.math.BigDecimal("123.45"),
                     rate = java.math.BigDecimal("0.005"),
