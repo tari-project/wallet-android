@@ -53,7 +53,6 @@ class ConfirmViewModel(savedState: SavedStateHandle) : CommonViewModel() {
                 val txId = walletManager.sendTari(
                     tariContact = TariContact(uiState.value.transactionData.recipientContact.walletAddress),
                     amount = uiState.value.transactionData.amount,
-                    feePerGram = uiState.value.transactionData.feePerGram,
                     message = uiState.value.transactionData.message,
                 )
 
@@ -95,7 +94,7 @@ class ConfirmViewModel(savedState: SavedStateHandle) : CommonViewModel() {
                 ?: transactionData.recipientContact.walletAddress.shortString()
 
         val totalAmount: MicroTari
-            get() = transactionData.amount + transactionData.feePerGram
+            get() = transactionData.amount + transactionData.fee
     }
 
 }

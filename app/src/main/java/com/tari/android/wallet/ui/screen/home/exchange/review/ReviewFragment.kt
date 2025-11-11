@@ -25,6 +25,7 @@ class ReviewFragment : CommonFragment<ReviewViewModel>() {
                 onConfirmClick = { viewModel.onConfirmClicked() },
                 onRetry = { viewModel.onRetry() },
                 onEmojiIdDetailsClick = { viewModel.onAddressDetailsClicked() },
+                onFeeInfoClick = { viewModel.onFeeInfoClicked() },
             )
         }
     }

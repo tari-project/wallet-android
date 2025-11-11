@@ -11,6 +11,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -40,6 +42,7 @@ import com.tari.android.wallet.ui.screen.tx.details.widget.TxDetailInfoAddressIt
 import com.tari.android.wallet.ui.screen.tx.details.widget.TxDetailInfoCopyItem
 import com.tari.android.wallet.ui.screen.tx.details.widget.TxDetailInfoItem
 import com.tari.android.wallet.util.MockDataStub
+import com.tari.android.wallet.util.extension.toMicroTari
 
 @Composable
 fun ReviewScreen(
@@ -49,6 +52,7 @@ fun ReviewScreen(
     onConfirmClick: () -> Unit,
     onRetry: () -> Unit,
     onEmojiIdDetailsClick: () -> Unit,
+    onFeeInfoClick: () -> Unit,
 ) {
     Scaffold(
         modifier = Modifier
@@ -86,6 +90,7 @@ fun ReviewScreen(
                 onCopyValueClick = onCopyValueClick,
                 onConfirmClick = onConfirmClick,
                 onEmojiIdDetailsClick = onEmojiIdDetailsClick,
+                onFeeInfoClick = onFeeInfoClick,
             )
         }
     }
@@ -97,6 +102,7 @@ private fun ReviewContent(
     onCopyValueClick: (value: String) -> Unit,
     onConfirmClick: () -> Unit,
     onEmojiIdDetailsClick: () -> Unit,
+    onFeeInfoClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -156,9 +162,27 @@ private fun ReviewContent(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 20.dp),
+                title = stringResource(R.string.exchange_status_exchange_fee),
+                value = "${WalletConfig.amountFormatter.format(uiState.fee.tariValue) ?: "-"} ${transaction.coinFrom.coinCode}",
+            ) {
+                IconButton(onClick = onFeeInfoClick) {
+                    Icon(
+                        painter = painterResource(R.drawable.vector_icon_question_circle),
+                        contentDescription = null,
+                        tint = TariDesignSystem.colors.componentsNavbarIcons,
+                    )
+                }
+            }
+
+            Spacer(Modifier.size(10.dp))
+
+            TxDetailInfoItem(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 20.dp),
                 title = stringResource(R.string.exchange_status_exchange_rate),
                 value = String.format(
-                    "1 %s = %s %s (%s)",
+                    "1 %s ≈ %s %s (%s)",
                     transaction.coinFrom.coinCode,
                     WalletConfig.amountFormatter.format(transaction.rate),
                     transaction.coinTo.coinCode,
@@ -244,6 +268,7 @@ private fun ReviewScreenPreview() {
                 request = MockDataStub.createExchangeRequestData(
                     direction = ExchangeDirection.SELL_TARI,
                 ),
+                fee = 1000.toMicroTari(),
                 walletAddress = MockDataStub.createWalletAddress(),
                 transaction = MockDataStub.createExchangeTransaction(),
                 creatingExchange = false,
@@ -254,6 +279,7 @@ private fun ReviewScreenPreview() {
             onCopyValueClick = {},
             onRetry = {},
             onEmojiIdDetailsClick = {},
+            onFeeInfoClick = {},
         )
     }
 }

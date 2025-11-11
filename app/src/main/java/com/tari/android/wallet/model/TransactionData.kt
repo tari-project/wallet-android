@@ -9,7 +9,7 @@ data class TransactionData(
     val recipientContact: Contact,
     val amount: MicroTari,
     val note: String?,
-    val feePerGram: MicroTari,
+    val fee: MicroTari,
 ) : Parcelable {
     val message: String
         get() = note.orEmpty()

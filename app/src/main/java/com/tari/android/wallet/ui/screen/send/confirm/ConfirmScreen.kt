@@ -101,7 +101,7 @@ fun ConfirmScreen(
                     .fillMaxWidth()
                     .padding(horizontal = 40.dp),
                 title = stringResource(R.string.tx_detail_transaction_fee),
-                value = "${WalletConfig.amountFormatter.format(uiState.transactionData.feePerGram.tariValue)} ${uiState.ticker}",
+                value = "${WalletConfig.amountFormatter.format(uiState.transactionData.fee.tariValue)} ${uiState.ticker}",
             ) {
                 IconButton(onClick = onFeeInfoClick) {
                     Icon(
@@ -195,7 +195,7 @@ private fun ConfirmScreenPreview() {
                 isSending = false,
                 transactionData = TransactionData(
                     amount = 1200000.toMicroTari(),
-                    feePerGram = 1000.toMicroTari(),
+                    fee = 1000.toMicroTari(),
                     note = "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
                     recipientContact = MockDataStub.createContact(),
                 ),
@@ -219,7 +219,7 @@ private fun ConfirmScreenSendingPreview() {
                 isSending = true,
                 transactionData = TransactionData(
                     amount = 1200000.toMicroTari(),
-                    feePerGram = 1000.toMicroTari(),
+                    fee = 1000.toMicroTari(),
                     note = "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
                     recipientContact = MockDataStub.createContact(),
                 ),

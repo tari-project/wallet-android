@@ -14,7 +14,6 @@ import com.tari.android.wallet.model.TariContact
 import com.tari.android.wallet.model.TariWalletAddress
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.screen.home.exchange.review.ReviewFragment.Companion.ARG_REQUEST
-import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.extension.getOrThrow
 import com.tari.android.wallet.util.extension.launchOnIo
 import com.tari.android.wallet.util.extension.switchToMain
@@ -37,16 +36,18 @@ class ReviewViewModel(savedState: SavedStateHandle) : CommonViewModel() {
     }
 
     private val _uiState = MutableStateFlow(
-        UiState(
-            request = savedState.getOrThrow(ARG_REQUEST),
-            walletAddress = sharedPrefsRepository.walletAddress,
-        )
+        savedState.getOrThrow<ExchangeRequestData>(ARG_REQUEST).let { request ->
+            UiState(
+                request = request,
+                walletAddress = sharedPrefsRepository.walletAddress,
+                fee = walletManager.requireWalletInstance.estimateTxFee(request.amount.toMicroTari()),
+            )
+        }
     )
     val uiState = _uiState.asStateFlow()
 
     init {
         createExchange()
-        // TODO calculate fee
     }
 
     fun onRetry() {
@@ -85,11 +86,9 @@ class ReviewViewModel(savedState: SavedStateHandle) : CommonViewModel() {
 
             // Send the transaction
             runCatching {
-                val amountInMicroTari = amount.multiply(MicroTari.precisionValue).toBigInteger().toMicroTari()
                 val txId = walletManager.sendTari(
                     tariContact = TariContact(tariAddress),
-                    amount = amountInMicroTari,
-                    feePerGram = Constants.Wallet.DEFAULT_FEE_PER_GRAM,
+                    amount = amount.toMicroTari(),
                     message = resourceManager.getString(R.string.exchange_tx_message),
                 )
 
@@ -121,6 +120,13 @@ class ReviewViewModel(savedState: SavedStateHandle) : CommonViewModel() {
         showAddressDetailsDialog(_uiState.value.walletAddress)
     }
 
+    fun onFeeInfoClicked() {
+        showSimpleDialog(
+            title = resourceManager.getString(R.string.tx_detail_fee_tooltip_transaction_fee),
+            description = resourceManager.getString(R.string.tx_detail_fee_tooltip_desc),
+        )
+    }
+
     private fun createExchange() {
         _uiState.update { it.copy(creatingExchange = true, creatingExchangeError = null) }
         launchOnIo {
@@ -147,6 +153,7 @@ class ReviewViewModel(savedState: SavedStateHandle) : CommonViewModel() {
     data class UiState(
         val request: ExchangeRequestData,
         val walletAddress: TariWalletAddress,
+        val fee: MicroTari,
         val transaction: Exolix.Transaction? = null,
 
         val creatingExchange: Boolean = false,
