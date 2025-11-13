@@ -312,7 +312,7 @@ class FFIWallet(
         amount: BigInteger,
         message: String,
     ): TxId {
-        val feePerGram = getLowestFeePerGram()
+        val feePerGram = getLowestFeePerGram().value
         if (amount < BigInteger.valueOf(0L)) {
             throw FFIException(message = "Amount is less than 0.")
         }
