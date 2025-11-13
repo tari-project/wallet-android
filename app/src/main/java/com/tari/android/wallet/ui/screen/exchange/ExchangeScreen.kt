@@ -442,9 +442,9 @@ private fun YouReceiveLayout(
             Spacer(Modifier.size(16.dp))
             Text(
                 text = stringResource(
-                    R.string.exchange_rate_display,
+                    if (uiState.fixedRate) R.string.exchange_rate_display_fixed else R.string.exchange_rate_display_floating,
                     fromCurrency.coin,
-                    WalletConfig.amountFormatter.format(rate.rate),
+                    WalletConfig.formatAnyAmount(rate.rate),
                     toCurrency.coin,
                 ),
                 style = TariDesignSystem.typography.headingMedium,

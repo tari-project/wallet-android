@@ -132,10 +132,10 @@ private fun ExchangeStatusContent(
         TxDetailInfoItem(
             modifier = Modifier.fillMaxWidth(),
             title = stringResource(R.string.exchange_status_exchange_rate),
-            value = String.format(
-                "1 %s = %s %s (%s)",
+            value = stringResource(
+                if (transaction.rateType == Exolix.RateType.FIXED) R.string.exchange_rate_value_fixed else R.string.exchange_rate_value_floating,
                 transaction.coinFrom.coinCode,
-                WalletConfig.amountFormatter.format(transaction.rate),
+                WalletConfig.formatAnyAmount(transaction.rate),
                 transaction.coinTo.coinCode,
                 when (transaction.rateType) {
                     Exolix.RateType.FIXED -> stringResource(R.string.exchange_status_rate_type_fixed)

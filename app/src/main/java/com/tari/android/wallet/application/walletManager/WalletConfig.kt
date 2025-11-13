@@ -145,8 +145,25 @@ class WalletConfig @Inject constructor(
             roundingMode = RoundingMode.FLOOR
         }
 
-        val amountFormatter = DecimalFormat("#,##0.00####").apply {
+        val amountFormatter = DecimalFormat("#,##0.######").apply {
             roundingMode = RoundingMode.FLOOR
+        }
+
+        private val smallAmountFormatter = DecimalFormat("#,##0.##########").apply {
+            roundingMode = RoundingMode.FLOOR
+        }
+
+        /**
+         * Formats amounts with adaptive precision:
+         * - For values >= 0.000001: shows up to 6 decimal places (e.g., 123.456789 -> "123.456789", 0.000123 -> "0.000123")
+         * - For values < 0.000001: shows up to 10 decimal places (e.g., 0.000000123 -> "0.000000123")
+         */
+        fun formatAnyAmount(value: java.math.BigDecimal): String {
+            return if (value.abs() >= java.math.BigDecimal("0.000001")) {
+                amountFormatter.format(value)
+            } else {
+                smallAmountFormatter.format(value)
+            }
         }
     }
 }
