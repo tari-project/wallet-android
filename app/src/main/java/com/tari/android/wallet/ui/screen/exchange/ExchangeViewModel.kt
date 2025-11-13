@@ -3,16 +3,20 @@ package com.tari.android.wallet.ui.screen.exchange
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.Navigation
 import com.tari.android.wallet.application.deeplinks.DeepLink
+import com.tari.android.wallet.data.BalanceStateHandler
 import com.tari.android.wallet.data.exolix.CurrencyDto
 import com.tari.android.wallet.data.exolix.ExchangeDirection
 import com.tari.android.wallet.data.exolix.ExchangeRequestData
 import com.tari.android.wallet.data.exolix.Exolix
 import com.tari.android.wallet.data.exolix.ExolixRepository
+import com.tari.android.wallet.model.MicroTari
 import com.tari.android.wallet.model.WalletError
 import com.tari.android.wallet.ui.common.CommonViewModel
+import com.tari.android.wallet.util.extension.collectFlow
 import com.tari.android.wallet.util.extension.filterNumbers
 import com.tari.android.wallet.util.extension.filterSingleDot
 import com.tari.android.wallet.util.extension.launchOnIo
+import com.tari.android.wallet.util.extension.toMicroTari
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -28,11 +32,18 @@ class ExchangeViewModel : CommonViewModel() {
     @Inject
     lateinit var exolixRepository: ExolixRepository
 
+    @Inject
+    lateinit var balanceStateHandler: BalanceStateHandler
+
     init {
         component.inject(this)
     }
 
-    private val _uiState = MutableStateFlow(UiState())
+    private val _uiState = MutableStateFlow(
+        UiState(
+            availableBalance = balanceStateHandler.balanceState.value.availableBalance,
+        )
+    )
     val uiState = _uiState.asStateFlow()
 
     private var rateFetchJob: Job? = null
@@ -40,6 +51,9 @@ class ExchangeViewModel : CommonViewModel() {
 
     init {
         loadCurrencies()
+        collectFlow(balanceStateHandler.balanceState) { balanceState ->
+            _uiState.update { it.copy(availableBalance = balanceState.availableBalance) }
+        }
     }
 
     override fun onCleared() {
@@ -232,12 +246,27 @@ class ExchangeViewModel : CommonViewModel() {
         val rate: Exolix.Rate? = null,
         val rateLoading: Boolean = false,
         val autoRefreshActive: Boolean = false,
+
+        val availableBalance: MicroTari,
     ) {
         val amount: BigDecimal?
             get() = runCatching { amountValue.toBigDecimal() }.getOrNull()
 
-        val amountError: Boolean
+        val rateAmountError: Boolean
             get() = rate != null && amount != null && (amount!! < rate.minAmount || amount!! > rate.maxAmount)
+
+        val availableBalanceError: Boolean
+            get() = exchangeDirection == ExchangeDirection.SELL_TARI &&
+                    amount != null &&
+                    amount!!.toMicroTari() > availableBalance
+
+        val amountErrorMessage: Int?
+            get() = when {
+                amount != null && amount!! <= BigDecimal.ZERO -> R.string.send_amount_field_error
+                rateAmountError -> R.string.exchange_amount_outside_rate_limits
+                availableBalanceError -> R.string.exchange_insufficient_funds_error
+                else -> null
+            }
 
         val fromCurrency: CurrencyDto?
             get() = if (exchangeDirection == ExchangeDirection.BUY_TARI) selectedCurrency else tariCurrency
@@ -254,7 +283,12 @@ class ExchangeViewModel : CommonViewModel() {
 
         val exchangeButtonEnabled: Boolean
             get() {
-                val baseCondition = fromCurrency != null && toCurrency != null && amount != null && !amountError && !rateLoading
+                val baseCondition = fromCurrency != null &&
+                        toCurrency != null &&
+                        amount != null &&
+                        !rateAmountError &&
+                        !availableBalanceError &&
+                        !rateLoading
                 return if (exchangeDirection == ExchangeDirection.SELL_TARI) {
                     baseCondition && destinationAddress.isNotBlank() && !destinationAddressError
                 } else {

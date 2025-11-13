@@ -89,7 +89,8 @@
     <!-- Exchange screen -->
     <string name="exchange_title">Exchange Tari</string>
     <string name="exchange_amount_placeholder">Enter amount</string>
-    <string name="exchange_invalid_amount_error">Please enter a valid amount</string>
+    <string name="exchange_insufficient_funds_error">Insufficient available balance</string>
+    <string name="exchange_amount_outside_rate_limits">Amount is outside the allowed range</string>
     <string name="exchange_converted_amount_placeholder">Converted amount</string>
     <string name="exchange_rate_display">1 %1$s ≈ %2$s %3$s</string>
     <string name="exchange_select_currency_title">Select Currency</string>

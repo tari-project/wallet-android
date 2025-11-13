@@ -47,7 +47,6 @@ import com.tari.android.wallet.R
 import com.tari.android.wallet.application.walletManager.WalletConfig
 import com.tari.android.wallet.data.exolix.CurrencyDto
 import com.tari.android.wallet.data.exolix.ExchangeDirection
-import com.tari.android.wallet.data.exolix.Exolix
 import com.tari.android.wallet.ui.compose.PreviewSecondarySurface
 import com.tari.android.wallet.ui.compose.TariDesignSystem
 import com.tari.android.wallet.ui.compose.components.AmountVisualTransformation
@@ -64,7 +63,9 @@ import com.tari.android.wallet.ui.compose.components.TariTopBar
 import com.tari.android.wallet.ui.screen.exchange.widget.SelectedCurrencyChip
 import com.tari.android.wallet.ui.screen.settings.themeSelector.TariTheme
 import com.tari.android.wallet.util.MockDataStub
+import com.tari.android.wallet.util.extension.letNotNull
 import com.tari.android.wallet.util.extension.newValueIfChanged
+import com.tari.android.wallet.util.extension.toMicroTari
 
 @Composable
 fun ExchangeScreen(
@@ -147,10 +148,7 @@ fun ExchangeScreen(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(horizontal = 16.dp),
-                        fromCurrency = uiState.fromCurrency,
-                        rate = uiState.rate,
-                        amountError = uiState.amountError,
-                        amountValue = uiState.amountValue,
+                        uiState = uiState,
                         onAmountChanged = onAmountChanged,
                         onMinAmountClicked = onMinAmountClicked,
                         onMaxAmountClicked = onMaxAmountClicked,
@@ -193,9 +191,7 @@ fun ExchangeScreen(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(horizontal = 16.dp),
-                        fromCurrency = uiState.fromCurrency,
-                        toCurrency = uiState.toCurrency,
-                        rate = uiState.rate,
+                        uiState = uiState,
                         onSelectCurrencyClicked = onSelectCurrencyClicked,
                     )
                     Spacer(Modifier.size(20.dp))
@@ -307,10 +303,7 @@ fun ExchangeScreen(
 
 @Composable
 private fun YouSendLayout(
-    fromCurrency: CurrencyDto?,
-    rate: Exolix.Rate?,
-    amountError: Boolean,
-    amountValue: String,
+    uiState: ExchangeViewModel.UiState,
     onAmountChanged: (String) -> Unit,
     onMinAmountClicked: () -> Unit,
     onMaxAmountClicked: () -> Unit,
@@ -327,8 +320,8 @@ private fun YouSendLayout(
         )
         Spacer(Modifier.size(20.dp))
         Row {
-            var textFieldValue by remember { mutableStateOf(TextFieldValue(amountValue)) }
-            textFieldValue = textFieldValue.newValueIfChanged(amountValue)
+            var textFieldValue by remember { mutableStateOf(TextFieldValue(uiState.amountValue)) }
+            textFieldValue = textFieldValue.newValueIfChanged(uiState.amountValue)
             TariTextField(
                 modifier = Modifier.weight(1f, false),
                 value = textFieldValue,
@@ -338,8 +331,8 @@ private fun YouSendLayout(
                 },
                 hint = stringResource(R.string.exchange_amount_placeholder),
                 errorText = when {
-                    !rate?.message.isNullOrBlank() -> rate.message
-                    amountError -> stringResource(R.string.exchange_invalid_amount_error)
+                    !uiState.rate?.message.isNullOrBlank() -> uiState.rate.message
+                    uiState.amountErrorMessage != null -> stringResource(uiState.amountErrorMessage!!)
                     else -> null
                 },
                 visualTransformation = AmountVisualTransformation(),
@@ -350,7 +343,7 @@ private fun YouSendLayout(
                 keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
             )
             Spacer(Modifier.size(16.dp))
-            if (fromCurrency != null) {
+            uiState.fromCurrency?.let { fromCurrency ->
                 SelectedCurrencyChip(
                     modifier = Modifier.padding(top = 8.dp),
                     title = fromCurrency.coin,
@@ -361,7 +354,23 @@ private fun YouSendLayout(
             }
         }
 
-        if (amountError && rate != null) {
+        if (uiState.exchangeDirection == ExchangeDirection.SELL_TARI) {
+            Spacer(Modifier.size(8.dp))
+            Text(
+                text = stringResource(
+                    R.string.home_available_to_spend_balance,
+                    WalletConfig.balanceFormatter.format(uiState.availableBalance.tariValue) + " " + uiState.fromCurrency?.coin.orEmpty()
+                ),
+                style = TariDesignSystem.typography.body1,
+                color = if (uiState.availableBalanceError) {
+                    TariDesignSystem.colors.errorMain
+                } else {
+                    TariDesignSystem.colors.textSecondary
+                },
+            )
+        }
+
+        if (uiState.rateAmountError && uiState.rate != null) {
             Spacer(Modifier.size(20.dp))
             Column {
                 Row(verticalAlignment = Alignment.Bottom) {
@@ -372,7 +381,7 @@ private fun YouSendLayout(
                     Spacer(Modifier.size(8.dp))
                     Text(
                         modifier = Modifier.clickable { onMinAmountClicked() },
-                        text = "${WalletConfig.amountFormatter.format(rate.minAmount)} ${fromCurrency?.coin.orEmpty()}",
+                        text = "${WalletConfig.amountFormatter.format(uiState.rate.minAmount)} ${uiState.fromCurrency?.coin.orEmpty()}",
                         style = TariDesignSystem.typography.headingLarge,
                     )
                 }
@@ -385,7 +394,7 @@ private fun YouSendLayout(
                     Spacer(Modifier.size(8.dp))
                     Text(
                         modifier = Modifier.clickable { onMaxAmountClicked() },
-                        text = "${WalletConfig.amountFormatter.format(rate.maxAmount)} ${fromCurrency?.coin.orEmpty()}",
+                        text = "${WalletConfig.amountFormatter.format(uiState.rate.maxAmount)} ${uiState.fromCurrency?.coin.orEmpty()}",
                         style = TariDesignSystem.typography.headingLarge,
                     )
                 }
@@ -396,9 +405,7 @@ private fun YouSendLayout(
 
 @Composable
 private fun YouReceiveLayout(
-    fromCurrency: CurrencyDto?,
-    toCurrency: CurrencyDto?,
-    rate: Exolix.Rate?,
+    uiState: ExchangeViewModel.UiState,
     onSelectCurrencyClicked: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -413,14 +420,14 @@ private fun YouReceiveLayout(
         Row {
             TariTextField(
                 modifier = Modifier.weight(1f, false),
-                value = TextFieldValue(rate?.toAmount?.toString() ?: ""),
+                value = TextFieldValue(uiState.rate?.toAmount?.toString() ?: ""),
                 onValueChanged = {},
                 hint = stringResource(R.string.exchange_converted_amount_placeholder),
                 enabled = false,
                 visualTransformation = AmountVisualTransformation(),
             )
             Spacer(Modifier.size(16.dp))
-            if (toCurrency != null) {
+            uiState.toCurrency?.let { toCurrency ->
                 SelectedCurrencyChip(
                     modifier = Modifier.padding(top = 8.dp),
                     title = toCurrency.coin,
@@ -431,7 +438,7 @@ private fun YouReceiveLayout(
             }
         }
 
-        if (rate != null && fromCurrency != null && toCurrency != null) {
+        letNotNull(uiState.rate, uiState.fromCurrency, uiState.toCurrency) { rate, fromCurrency, toCurrency ->
             Spacer(Modifier.size(16.dp))
             Text(
                 text = stringResource(
@@ -472,6 +479,7 @@ private fun ExchangeScreenPreview() {
     PreviewSecondarySurface(TariTheme.Light) {
         ExchangeScreen(
             uiState = ExchangeViewModel.UiState(
+                availableBalance = 1000000.toMicroTari(),
                 amountValue = "100",
                 selectedCurrency = MockDataStub.createCurrencyDto(),
                 tariCurrency = MockDataStub.createCurrencyDto(code = "XTM", name = "Tari"),
@@ -501,6 +509,7 @@ private fun ExchangeScreenDarkPreview() {
     PreviewSecondarySurface(TariTheme.Dark) {
         ExchangeScreen(
             uiState = ExchangeViewModel.UiState(
+                availableBalance = 1000000.toMicroTari(),
                 amountValue = "100",
                 selectedCurrency = MockDataStub.createCurrencyDto(),
                 tariCurrency = MockDataStub.createCurrencyDto(code = "XTM", name = "Tari"),
@@ -529,6 +538,7 @@ private fun ExchangeScreenWrongAmountPreview() {
     PreviewSecondarySurface(TariTheme.Light) {
         ExchangeScreen(
             uiState = ExchangeViewModel.UiState(
+                availableBalance = 1000000.toMicroTari(),
                 amountValue = "1000",
                 rate = MockDataStub.createRate(
                     minAmount = 10.0.toBigDecimal(),
@@ -560,6 +570,7 @@ private fun ExchangeScreenCurrencyLoadingPreview() {
     PreviewSecondarySurface(TariTheme.Light) {
         ExchangeScreen(
             uiState = ExchangeViewModel.UiState(
+                availableBalance = 1000000.toMicroTari(),
                 rateLoading = true,
                 loadingCurrencies = true,
                 loadingCurrenciesError = false,
@@ -587,6 +598,7 @@ private fun ExchangeScreenCurrencyErrorPreview() {
     PreviewSecondarySurface(TariTheme.Light) {
         ExchangeScreen(
             uiState = ExchangeViewModel.UiState(
+                availableBalance = 1000000.toMicroTari(),
                 loadingCurrencies = false,
                 loadingCurrenciesError = true,
             ),
@@ -613,6 +625,7 @@ private fun ExchangeScreenSellTariPreview() {
     PreviewSecondarySurface(TariTheme.Light) {
         ExchangeScreen(
             uiState = ExchangeViewModel.UiState(
+                availableBalance = 123_000000.toMicroTari(),
                 amountValue = "100",
                 selectedCurrency = CurrencyDto(
                     currency = MockDataStub.createCurrency(),
@@ -647,6 +660,7 @@ private fun ExchangeScreenSellTariInvalidAddressPreview() {
     PreviewSecondarySurface(TariTheme.Light) {
         ExchangeScreen(
             uiState = ExchangeViewModel.UiState(
+                availableBalance = 1000000.toMicroTari(),
                 amountValue = "100",
                 selectedCurrency = CurrencyDto(
                     currency = MockDataStub.createCurrency(),
