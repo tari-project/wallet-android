@@ -119,16 +119,12 @@ fun ExchangeScreen(
                 else -> TariLoadingLayoutState.Content
             },
             loadingLayout = {
-                TariProgressView(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(32.dp),
-                )
+                TariProgressView(Modifier.fillMaxSize())
             },
             errorLayout = {
                 TariErrorView(
                     modifier = Modifier
-                        .fillMaxWidth()
+                        .fillMaxSize()
                         .padding(32.dp),
                     errorMessage = stringResource(R.string.exchange_currencies_load_error),
                     onTryAgainClick = onReloadCurrencies,

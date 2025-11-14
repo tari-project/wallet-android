@@ -5,9 +5,11 @@ import androidx.lifecycle.SavedStateHandle
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.Navigation
 import com.tari.android.wallet.data.exolix.ExchangeRequestData
+import com.tari.android.wallet.data.exolix.Exolix
 import com.tari.android.wallet.data.exolix.ExolixRepository
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.screen.exchange.sendFunds.SendFundsFragment.Companion.ARG_REQUEST
+import com.tari.android.wallet.ui.screen.exchange.sendFunds.SendFundsFragment.Companion.ARG_TRANSACTION
 import com.tari.android.wallet.util.QrUtil
 import com.tari.android.wallet.util.extension.getOrThrow
 import com.tari.android.wallet.util.extension.launchOnIo
@@ -16,7 +18,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 
-class SendFundsViewModel(savedState: SavedStateHandle) : CommonViewModel() {
+class SendFundsViewModel(val savedState: SavedStateHandle) : CommonViewModel() {
 
     @Inject
     lateinit var exolixRepository: ExolixRepository
@@ -25,30 +27,28 @@ class SendFundsViewModel(savedState: SavedStateHandle) : CommonViewModel() {
         component.inject(this)
     }
 
-    private val _uiState = MutableStateFlow(UiState(request = savedState.getOrThrow(ARG_REQUEST)))
+    private val _uiState = MutableStateFlow(
+        UiState(transaction = savedState.get<Exolix.Transaction>(ARG_TRANSACTION))
+    )
     val uiState = _uiState.asStateFlow()
 
     init {
-        sendTransactionRequest()
+        _uiState.value.transaction?.let {
+            initializeFromTransaction(it)
+        } ?: run {
+            loadTransaction()
+        }
     }
 
-    private fun sendTransactionRequest() {
+    private fun loadTransaction() {
+        val request = savedState.getOrThrow<ExchangeRequestData>(ARG_REQUEST)
+
         _uiState.update { it.copy(loading = true, error = null) }
         launchOnIo {
-            exolixRepository.createExchange(_uiState.value.request)
-                .onSuccess { response ->
-                    val qrBitmap = QrUtil.getQrEncodedBitmapOrNull(
-                        content = response.depositAddress,
-                        size = resourceManager.getDimenInPx(R.dimen.wallet_info_img_qr_code_size),
-                    )
-                    _uiState.update {
-                        it.copy(
-                            loading = false,
-                            exchangeId = response.id,
-                            depositAddress = response.depositAddress,
-                            qrBitmap = qrBitmap,
-                        )
-                    }
+            exolixRepository.createExchange(request)
+                .onSuccess { transaction ->
+                    initializeFromTransaction(transaction)
+                    _uiState.update { it.copy(loading = false, transaction = transaction) }
                 }
                 .onFailure { exception ->
                     _uiState.update {
@@ -61,23 +61,36 @@ class SendFundsViewModel(savedState: SavedStateHandle) : CommonViewModel() {
         }
     }
 
+    private fun initializeFromTransaction(transaction: Exolix.Transaction) {
+        _uiState.update {
+            it.copy(
+                qrBitmap = QrUtil.getQrEncodedBitmapOrNull(
+                    content = transaction.depositAddress,
+                    size = resourceManager.getDimenInPx(R.dimen.wallet_info_img_qr_code_size),
+                )
+            )
+        }
+    }
+
     fun onRetry() {
-        sendTransactionRequest()
+        loadTransaction()
     }
 
     fun onCopyAmount() {
-        copyToClipboard(
-            clipLabel = resourceManager.getString(R.string.exchange_amount_label),
-            clipText = _uiState.value.request.amount.toString(),
-            toastMessage = resourceManager.getString(R.string.exchange_amount_copied),
-        )
+        _uiState.value.transaction?.let { transaction ->
+            copyToClipboard(
+                clipLabel = resourceManager.getString(R.string.exchange_amount_label),
+                clipText = transaction.amount.toString(),
+                toastMessage = resourceManager.getString(R.string.exchange_amount_copied),
+            )
+        }
     }
 
     fun onCopyAddress() {
-        _uiState.value.depositAddress?.let { address ->
+        _uiState.value.transaction?.let { transaction ->
             copyToClipboard(
                 clipLabel = resourceManager.getString(R.string.exchange_address_label),
-                clipText = address,
+                clipText = transaction.depositAddress,
                 toastMessage = resourceManager.getString(R.string.exchange_address_copied),
             )
         }
@@ -85,18 +98,20 @@ class SendFundsViewModel(savedState: SavedStateHandle) : CommonViewModel() {
 
     fun onOpenTxDetails() {
         // TODO: Implement when transaction details screen is ready
-        tariNavigator.navigateSequence(
-            Navigation.BackToHome,
-            Navigation.Exchange.ExchangeStatus(_uiState.value.exchangeId!!),
-        )
+        _uiState.value.transaction?.let { transaction ->
+            tariNavigator.navigateSequence(
+                Navigation.BackToHome,
+                Navigation.Exchange.ExchangeStatus(transaction.id),
+            )
+        }
     }
 
     data class UiState(
-        val request: ExchangeRequestData,
-        val exchangeId: String? = null,
-        val depositAddress: String? = null,
+        val transaction: Exolix.Transaction? = null,
+
         val qrBitmap: Bitmap? = null,
-        val loading: Boolean = true,
+
+        val loading: Boolean = false,
         val error: String? = null,
     )
 }

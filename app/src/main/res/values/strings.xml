@@ -119,6 +119,7 @@
     <string name="exchange_copy_amount_content_description">Copy amount</string>
     <string name="exchange_copy_address_content_description">Copy address</string>
     <string name="exchange_create_exchange_error">Failed to create exchange</string>
+    <string name="exchange_fetch_transaction_error">Failed to fetch transaction details</string>
     <string name="exchange_amount_label">Amount</string>
     <string name="exchange_amount_copied">Amount copied</string>
     <string name="exchange_address_label">Address</string>

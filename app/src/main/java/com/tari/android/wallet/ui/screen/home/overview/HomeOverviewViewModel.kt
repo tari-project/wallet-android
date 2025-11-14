@@ -16,6 +16,7 @@ import com.tari.android.wallet.application.walletManager.doOnWalletRunning
 import com.tari.android.wallet.data.BalanceStateHandler
 import com.tari.android.wallet.data.ConnectionStateHandler
 import com.tari.android.wallet.data.airdrop.AirdropRepository
+import com.tari.android.wallet.data.exolix.Exolix
 import com.tari.android.wallet.data.sharedPrefs.exolix.ExolixPrefRepository
 import com.tari.android.wallet.data.sharedPrefs.sentry.SentryPrefRepository
 import com.tari.android.wallet.data.tx.TxRepository
@@ -212,7 +213,11 @@ class HomeOverviewViewModel : CommonViewModel() {
 
     fun onPendingExolixTransactionClicked() {
         _uiState.value.pendingExolixTransaction?.let { transaction ->
-            tariNavigator.navigate(Navigation.Exchange.ExchangeStatus(transaction.id))
+            if (transaction.status == Exolix.TransactionStatus.WAIT) {
+                tariNavigator.navigate(Navigation.Exchange.SendFunds(transaction = transaction))
+            } else {
+                tariNavigator.navigate(Navigation.Exchange.ExchangeStatus(transaction.id))
+            }
         }
     }
 

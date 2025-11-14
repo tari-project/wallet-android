@@ -31,8 +31,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.walletManager.WalletConfig
-import com.tari.android.wallet.data.exolix.ExchangeDirection
-import com.tari.android.wallet.data.exolix.ExchangeRequestData
 import com.tari.android.wallet.data.exolix.Exolix
 import com.tari.android.wallet.ui.compose.PreviewSecondarySurface
 import com.tari.android.wallet.ui.compose.TariDesignSystem
@@ -46,7 +44,6 @@ import com.tari.android.wallet.ui.compose.components.TariTopBar
 import com.tari.android.wallet.ui.compose.widgets.QrCodeCard
 import com.tari.android.wallet.ui.screen.settings.themeSelector.TariTheme
 import com.tari.android.wallet.util.MockDataStub
-import java.math.BigDecimal
 
 @Composable
 fun SendFundsScreen(
@@ -97,10 +94,9 @@ fun SendFundsScreen(
                 )
             },
         ) {
-            if (uiState.depositAddress != null) {
+            uiState.transaction?.let { transaction ->
                 SendFundsContent(
-                    request = uiState.request,
-                    depositAddress = uiState.depositAddress,
+                    transaction = transaction,
                     qrBitmap = uiState.qrBitmap,
                     onCopyAmount = onCopyAmount,
                     onCopyAddress = onCopyAddress,
@@ -114,8 +110,7 @@ fun SendFundsScreen(
 
 @Composable
 private fun SendFundsContent(
-    request: ExchangeRequestData,
-    depositAddress: String,
+    transaction: Exolix.Transaction,
     qrBitmap: Bitmap?,
     onCopyAmount: () -> Unit,
     onCopyAddress: () -> Unit,
@@ -153,7 +148,7 @@ private fun SendFundsContent(
                 )
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(
-                        text = "${WalletConfig.amountFormatter.format(request.amount)} ${request.selectedCurrency.coin}",
+                        text = "${WalletConfig.amountFormatter.format(transaction.amount)} ${transaction.coinFrom.coinCode}",
                         style = TariDesignSystem.typography.body1,
                         color = TariDesignSystem.colors.textPrimary,
                     )
@@ -170,7 +165,7 @@ private fun SendFundsContent(
                     }
                     Spacer(Modifier.size(8.dp))
                     Text(
-                        text = request.selectedCurrency.networkName,
+                        text = transaction.coinFrom.networkName,
                         style = TariDesignSystem.typography.body1,
                         color = TariDesignSystem.colors.textSecondary,
                     )
@@ -187,7 +182,7 @@ private fun SendFundsContent(
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(
                         modifier = Modifier.weight(1f),
-                        text = depositAddress,
+                        text = transaction.depositAddress,
                         style = TariDesignSystem.typography.body1,
                         color = TariDesignSystem.colors.textPrimary,
                     )
@@ -262,20 +257,9 @@ private fun SendFundsScreenPreview() {
     PreviewSecondarySurface(TariTheme.Light) {
         SendFundsScreen(
             uiState = SendFundsViewModel.UiState(
-                request = ExchangeRequestData(
-                    selectedCurrency = MockDataStub.createCurrencyDto(
-                        code = "ETH",
-                        name = "Ethereum",
-                    ),
-                    tariCurrency = MockDataStub.createCurrencyDto(code = "XTM", name = "Tari"),
-                    selectedAddress = null,
-                    amount = BigDecimal("0.124"),
-                    rate = MockDataStub.createRate(),
-                    rateType = Exolix.RateType.FIXED,
-                    direction = ExchangeDirection.BUY_TARI,
+                transaction = MockDataStub.createExchangeTransaction(
+                    status = Exolix.TransactionStatus.WAIT,
                 ),
-                exchangeId = "test-exchange-id-12345",
-                depositAddress = "0x311c25b376bd55608bf836424ac0b7616e044c920x311c25b376bd55608bf836424ac0b7616e044c92",
                 qrBitmap = null,
                 loading = false,
             ),

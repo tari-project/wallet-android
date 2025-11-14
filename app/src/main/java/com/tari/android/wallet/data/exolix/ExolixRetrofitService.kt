@@ -174,6 +174,7 @@ object Exolix {
         @SerializedName("count") val count: Int,
     )
 
+    @Parcelize
     data class Transaction(
         @SerializedName("id") val id: String,
         @SerializedName("amount") val amount: BigDecimal,
@@ -194,8 +195,9 @@ object Exolix {
         @SerializedName("refundExtraId") val refundExtraId: String? = null,
         @SerializedName("status") val status: TransactionStatus,
         @SerializedName("source") val source: String? = null,
-    )
+    ) : Parcelable
 
+    @Parcelize
     data class CoinInfo(
         @SerializedName("coinCode") val coinCode: String,
         @SerializedName("coinName") val coinName: String,
@@ -205,10 +207,11 @@ object Exolix {
         @SerializedName("icon") val icon: String,
         @SerializedName("memoName") val memoName: String? = null,
         @SerializedName("contract") val contract: String? = null,
-    )
+    ) : Parcelable
 
+    @Parcelize
     data class HashInfo(
         @SerializedName("hash") val hash: String? = null,
         @SerializedName("link") val link: String? = null,
-    )
+    ) : Parcelable
 }
