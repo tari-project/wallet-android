@@ -45,6 +45,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.walletManager.WalletConfig
+import com.tari.android.wallet.application.walletManager.formatAnyAmount
 import com.tari.android.wallet.data.exolix.CurrencyDto
 import com.tari.android.wallet.data.exolix.ExchangeDirection
 import com.tari.android.wallet.ui.compose.PreviewSecondarySurface
@@ -444,7 +445,7 @@ private fun YouReceiveLayout(
                 text = stringResource(
                     if (uiState.fixedRate) R.string.exchange_rate_display_fixed else R.string.exchange_rate_display_floating,
                     fromCurrency.coin,
-                    WalletConfig.formatAnyAmount(rate.rate),
+                    rate.rate.formatAnyAmount(),
                     toCurrency.coin,
                 ),
                 style = TariDesignSystem.typography.headingMedium,

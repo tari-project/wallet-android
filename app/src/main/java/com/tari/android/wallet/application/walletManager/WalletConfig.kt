@@ -5,6 +5,7 @@ import com.tari.android.wallet.data.sharedPrefs.network.NetworkPrefRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
+import java.math.BigDecimal
 import java.math.RoundingMode
 import java.text.DecimalFormat
 import java.util.Collections
@@ -149,21 +150,19 @@ class WalletConfig @Inject constructor(
             roundingMode = RoundingMode.FLOOR
         }
 
-        private val smallAmountFormatter = DecimalFormat("#,##0.##########").apply {
+        val smallAmountFormatter = DecimalFormat("#,##0.##########").apply {
             roundingMode = RoundingMode.FLOOR
         }
-
-        /**
-         * Formats amounts with adaptive precision:
-         * - For values >= 0.000001: shows up to 6 decimal places (e.g., 123.456789 -> "123.456789", 0.000123 -> "0.000123")
-         * - For values < 0.000001: shows up to 10 decimal places (e.g., 0.000000123 -> "0.000000123")
-         */
-        fun formatAnyAmount(value: java.math.BigDecimal): String {
-            return if (value.abs() >= java.math.BigDecimal("0.000001")) {
-                amountFormatter.format(value)
-            } else {
-                smallAmountFormatter.format(value)
-            }
-        }
     }
+}
+
+/**
+ * Formats amounts with adaptive precision:
+ * - For values >= 0.000001: shows up to 6 decimal places (e.g., 123.456789 -> "123.456789", 0.000123 -> "0.000123")
+ * - For values < 0.000001: shows up to 10 decimal places (e.g., 0.000000123 -> "0.000000123")
+ */
+fun BigDecimal.formatAnyAmount(): String = if (this.abs() >= BigDecimal("0.000001")) {
+    WalletConfig.amountFormatter.format(this)
+} else {
+    WalletConfig.smallAmountFormatter.format(this)
 }

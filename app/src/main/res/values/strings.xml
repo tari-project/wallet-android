@@ -137,7 +137,9 @@
     <string name="exchange_status_refunded">Refunded</string>
     <string name="exchange_status_in_progress">In Progress</string>
     <string name="exchange_status_description">You\'ve successfully swapped %1$s %2$s to %3$s %4$s</string>
+    <string name="exchange_status_amount_to_receive">You will receive</string>
     <string name="exchange_status_amount_received">Amount received</string>
+    <string name="exchange_status_amount">Amount</string>
     <string name="exchange_status_destination_address">Destination Address (%1$s)</string>
     <string name="exchange_status_destination_extra_id">Destination Extra ID</string>
     <string name="exchange_status_transaction_details">Transaction Details</string>
@@ -165,20 +167,22 @@
     <string name="exchange_invalid_deposit_address_error">Invalid deposit address received from Exolix</string>
 
     <!-- exchange status card titles -->
-    <string name="exchange_status_card_waiting_for_deposit">Waiting for deposit</string>
+    <string name="exchange_status_card_waiting_for_deposit">Waiting for your deposit</string>
+    <string name="exchange_status_card_deposits_in_progress">Deposits in Progress</string>
     <string name="exchange_status_card_funds_received">Funds Received</string>
-    <string name="exchange_status_card_swapped">Swapped</string>
-    <string name="exchange_status_card_deposit_overdue">Deposit Overdue</string>
-    <string name="exchange_status_card_funds_refunded">Funds Refunded</string>
+    <string name="exchange_status_card_sending">Sending Your %1$s</string>
+    <string name="exchange_status_card_exchange_complete">Exchange Complete</string>
+    <string name="exchange_status_card_transaction_expired">Transaction Expired</string>
+    <string name="exchange_status_card_transaction_refunded">Transaction Refunded</string>
 
     <!-- exchange status card subtitles -->
-    <string name="exchange_status_card_subtitle_wait">We have not received your %1$s yet.</string>
-    <string name="exchange_status_card_subtitle_received">We have received your %1$s.</string>
-    <string name="exchange_status_card_subtitle_exchanging">We have received your %1$s. Your exchange is processing.</string>
-    <string name="exchange_status_card_subtitle_sending">We have received your %1$s. Sending %2$s.</string>
-    <string name="exchange_status_card_subtitle_success">You\'ve successfully swapped %1$s %2$s to %3$s %4$s</string>
-    <string name="exchange_status_card_subtitle_overdue">Deposit %1$s %2$s is overdue.</string>
-    <string name="exchange_status_card_subtitle_refunded">Your %1$s %2$s was refunded.</string>
+    <string name="exchange_status_card_subtitle_wait">Send your %1$s to the deposit address to proceed with the exchange.</string>
+    <string name="exchange_status_card_subtitle_received">Your deposit has been confirmed. Processing exchange.</string>
+    <string name="exchange_status_card_subtitle_exchanging">Your exchange is being processed.</string>
+    <string name="exchange_status_card_subtitle_sending">Sending %1$s to your destination address.</string>
+    <string name="exchange_status_card_subtitle_success">Your exchange was completed successfully.</string>
+    <string name="exchange_status_card_subtitle_overdue">The deposit window has expired. Transaction cancelled.</string>
+    <string name="exchange_status_card_subtitle_refunded">Your deposit has been refunded to your refund address.</string>
 
     <!-- Exchange status strings for pending transaction card -->
     <string name="exchange_status_wait">Waiting for deposit</string>

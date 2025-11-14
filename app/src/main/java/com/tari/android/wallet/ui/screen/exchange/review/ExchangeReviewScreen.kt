@@ -25,6 +25,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.walletManager.WalletConfig
+import com.tari.android.wallet.application.walletManager.formatAnyAmount
 import com.tari.android.wallet.data.exolix.ExchangeDirection
 import com.tari.android.wallet.data.exolix.Exolix
 import com.tari.android.wallet.ui.compose.PreviewSecondarySurface
@@ -184,7 +185,7 @@ private fun ReviewContent(
                 value = stringResource(
                     if (transaction.rateType == Exolix.RateType.FIXED) R.string.exchange_rate_value_fixed else R.string.exchange_rate_value_floating,
                     transaction.coinFrom.coinCode,
-                    WalletConfig.formatAnyAmount(transaction.rate),
+                    transaction.rate.formatAnyAmount(),
                     transaction.coinTo.coinCode,
                     when (transaction.rateType) {
                         Exolix.RateType.FIXED -> stringResource(R.string.exchange_status_rate_type_fixed)

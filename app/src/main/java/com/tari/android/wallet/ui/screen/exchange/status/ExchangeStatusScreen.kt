@@ -20,6 +20,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.walletManager.WalletConfig
+import com.tari.android.wallet.application.walletManager.formatAnyAmount
 import com.tari.android.wallet.data.exolix.Exolix
 import com.tari.android.wallet.ui.compose.PreviewSecondarySurface
 import com.tari.android.wallet.ui.compose.TariDesignSystem
@@ -114,7 +115,7 @@ private fun ExchangeStatusContent(
 
         TxDetailInfoItem(
             modifier = Modifier.fillMaxWidth(),
-            title = stringResource(R.string.exchange_status_amount_received),
+            title = transaction.amountLabel(),
             value = "${WalletConfig.amountFormatter.format(transaction.amountTo)} ${transaction.coinTo.coinCode}",
         )
 
@@ -135,7 +136,7 @@ private fun ExchangeStatusContent(
             value = stringResource(
                 if (transaction.rateType == Exolix.RateType.FIXED) R.string.exchange_rate_value_fixed else R.string.exchange_rate_value_floating,
                 transaction.coinFrom.coinCode,
-                WalletConfig.formatAnyAmount(transaction.rate),
+                transaction.rate.formatAnyAmount(),
                 transaction.coinTo.coinCode,
                 when (transaction.rateType) {
                     Exolix.RateType.FIXED -> stringResource(R.string.exchange_status_rate_type_fixed)
@@ -226,6 +227,20 @@ private fun ExchangeStatusContent(
         Spacer(Modifier.size(40.dp))
     }
 }
+
+@Composable
+private fun Exolix.Transaction.amountLabel(): String =
+    when (this.status) {
+        Exolix.TransactionStatus.WAIT,
+        Exolix.TransactionStatus.CONFIRMATION,
+        Exolix.TransactionStatus.CONFIRMED,
+        Exolix.TransactionStatus.EXCHANGING,
+        Exolix.TransactionStatus.SENDING -> stringResource(R.string.exchange_status_amount_to_receive)
+
+        Exolix.TransactionStatus.SUCCESS -> stringResource(R.string.exchange_status_amount_received)
+        Exolix.TransactionStatus.OVERDUE,
+        Exolix.TransactionStatus.REFUNDED -> stringResource(R.string.exchange_status_amount)
+    }
 
 @Composable
 @Preview
