@@ -3,7 +3,7 @@ package com.tari.android.wallet.data.sharedPrefs.exolix
 import android.content.SharedPreferences
 import com.tari.android.wallet.data.exolix.Exolix
 import com.tari.android.wallet.data.sharedPrefs.CommonPrefRepository
-import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefGsonNullableDelegate
+import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefGsonDelegate
 import com.tari.android.wallet.data.sharedPrefs.network.NetworkPrefRepository
 import com.tari.android.wallet.di.ApplicationScope
 import kotlinx.coroutines.CoroutineScope
@@ -12,31 +12,51 @@ import javax.inject.Singleton
 
 @Singleton
 class ExolixPrefRepository @Inject constructor(
-    private val sharedPreferences: SharedPreferences,
-    private val networkRepository: NetworkPrefRepository,
+    sharedPreferences: SharedPreferences,
+    networkRepository: NetworkPrefRepository,
     @param:ApplicationScope private val applicationScope: CoroutineScope,
 ) : CommonPrefRepository(applicationScope) {
 
     private object Key {
-        const val PENDING_TRANSACTION_DATA = "exolix_pending_transaction_data"
+        const val TRANSACTIONS = "exolix_transactions"
     }
 
-    var pendingTransaction: Exolix.Transaction? by SharedPrefGsonNullableDelegate(
+    private var transactionList: ExolixTransactionList by SharedPrefGsonDelegate(
         prefs = sharedPreferences,
         prefsUpdater = this,
-        name = networkRepository.currentNetwork.formatKey(Key.PENDING_TRANSACTION_DATA),
-        type = Exolix.Transaction::class.java,
+        name = networkRepository.currentNetwork.formatKey(Key.TRANSACTIONS),
+        type = ExolixTransactionList::class.java,
+        defValue = ExolixTransactionList(),
     )
 
-    fun savePendingTransaction(transaction: Exolix.Transaction) {
-        pendingTransaction = transaction
+    var transactions: List<Exolix.Transaction>
+        get() = transactionList
+        set(value) {
+            transactionList = ExolixTransactionList(value)
+        }
+
+    fun saveTransaction(transaction: Exolix.Transaction) {
+        val currentTransactions = transactions.toMutableList()
+        val existingIndex = currentTransactions.indexOfFirst { it.id == transaction.id }
+
+        if (existingIndex >= 0) {
+            currentTransactions[existingIndex] = transaction
+        } else {
+            currentTransactions.add(transaction)
+        }
+
+        transactions = currentTransactions
     }
 
-    fun removePendingTransaction() {
-        pendingTransaction = null
+    fun removeTransaction(transactionId: String) {
+        transactions = transactions.filterNot { it.id == transactionId }
     }
 
     fun clear() {
-        pendingTransaction = null
+        transactions = emptyList()
     }
+}
+
+private class ExolixTransactionList(transactions: List<Exolix.Transaction>) : ArrayList<Exolix.Transaction>(transactions) {
+    constructor() : this(emptyList())
 }

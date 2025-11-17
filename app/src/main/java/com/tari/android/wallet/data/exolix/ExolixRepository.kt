@@ -144,8 +144,35 @@ class ExolixRepository @Inject constructor(
                 )
             ).also { response ->
                 val transaction = exolixRetrofitService.getTransaction(response.id)
-                exolixPrefRepository.savePendingTransaction(transaction)
+                exolixPrefRepository.saveTransaction(transaction)
             }
+        }
+    }
+
+    /**
+     * Get all pending transactions with refreshed details from the API.
+     * Each transaction is fetched from the API to get the latest status and details.
+     */
+    suspend fun getPendingTransactions(): Result<List<Exolix.Transaction>> = switchToIo {
+        runCatching {
+            val storedTransactions = exolixPrefRepository.transactions
+            val refreshedTransactions = mutableListOf<Exolix.Transaction>()
+
+            storedTransactions.forEach { storedTx ->
+                val refreshedTx = runCatching {
+                    exolixRetrofitService.getTransaction(storedTx.id)
+                }.getOrNull()
+
+                if (refreshedTx != null) {
+                    exolixPrefRepository.saveTransaction(refreshedTx)
+                    refreshedTransactions.add(refreshedTx)
+                } else {
+                    // If API call fails, keep the stored version
+                    refreshedTransactions.add(storedTx)
+                }
+            }
+
+            refreshedTransactions.sortedByDescending { it.createdAt }
         }
     }
 }

@@ -17,7 +17,7 @@ import com.tari.android.wallet.data.BalanceStateHandler
 import com.tari.android.wallet.data.ConnectionStateHandler
 import com.tari.android.wallet.data.airdrop.AirdropRepository
 import com.tari.android.wallet.data.exolix.Exolix
-import com.tari.android.wallet.data.sharedPrefs.exolix.ExolixPrefRepository
+import com.tari.android.wallet.data.exolix.ExolixRepository
 import com.tari.android.wallet.data.sharedPrefs.sentry.SentryPrefRepository
 import com.tari.android.wallet.data.tx.TxRepository
 import com.tari.android.wallet.model.TxId
@@ -63,7 +63,7 @@ class HomeOverviewViewModel : CommonViewModel() {
     lateinit var connectionStateHandler: ConnectionStateHandler
 
     @Inject
-    lateinit var exolixPrefRepository: ExolixPrefRepository
+    lateinit var exolixRepository: ExolixRepository
 
     init {
         component.inject(this)
@@ -81,7 +81,7 @@ class HomeOverviewViewModel : CommonViewModel() {
             ticker = networkRepository.currentNetwork.ticker,
             networkName = networkRepository.currentNetwork.network.displayName,
             ffiVersion = BuildConfig.LIB_WALLET_VERSION,
-            pendingExolixTransaction = exolixPrefRepository.pendingTransaction,
+            exolixTransactions = emptyList(),
         )
     )
     val uiState = _uiState.asStateFlow()
@@ -150,7 +150,12 @@ class HomeOverviewViewModel : CommonViewModel() {
                 .onFailure { _uiState.update { it.copy(activeMinersCountError = it.activeMinersCount == null) } }
         }
 
-        _uiState.update { it.copy(pendingExolixTransaction = exolixPrefRepository.pendingTransaction) }
+        launchOnIo {
+            exolixRepository.getPendingTransactions()
+                .onSuccess { transactions ->
+                    _uiState.update { it.copy(exolixTransactions = transactions) }
+                }
+        }
     }
 
     fun navigateToTxDetail(tx: Tx) {
@@ -211,13 +216,11 @@ class HomeOverviewViewModel : CommonViewModel() {
         tariNavigator.navigate(Navigation.Exchange.StartExchange)
     }
 
-    fun onPendingExolixTransactionClicked() {
-        _uiState.value.pendingExolixTransaction?.let { transaction ->
-            if (transaction.status == Exolix.TransactionStatus.WAIT) {
-                tariNavigator.navigate(Navigation.Exchange.SendFunds(transaction = transaction))
-            } else {
-                tariNavigator.navigate(Navigation.Exchange.ExchangeStatus(transaction.id))
-            }
+    fun onExolixTransactionClicked(transaction: Exolix.Transaction) {
+        if (transaction.status == Exolix.TransactionStatus.WAIT) {
+            tariNavigator.navigate(Navigation.Exchange.SendFunds(transaction = transaction))
+        } else {
+            tariNavigator.navigate(Navigation.Exchange.ExchangeStatus(transaction.id))
         }
     }
 

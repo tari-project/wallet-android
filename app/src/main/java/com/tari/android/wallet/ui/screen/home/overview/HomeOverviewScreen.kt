@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -51,7 +52,7 @@ fun HomeOverviewScreen(
     onSendTariClicked: () -> Unit,
     onRequestTariClicked: () -> Unit,
     onBuyClicked: () -> Unit,
-    onPendingExolixTransactionClick: () -> Unit,
+    onPendingExolixTransactionClick: (Exolix.Transaction) -> Unit,
     onTxClick: (txDto: TxDto) -> Unit,
     onViewAllTxsClick: () -> Unit,
     onConnectionStatusClick: () -> Unit,
@@ -139,7 +140,7 @@ fun HomeOverviewScreen(
                     }
                 }
 
-                uiState.pendingExolixTransaction?.let { transaction ->
+                if (uiState.exolixTransactions.isNotEmpty()) {
                     item {
                         Spacer(modifier = Modifier.height(30.dp))
                         Text(
@@ -148,11 +149,17 @@ fun HomeOverviewScreen(
                             style = TariDesignSystem.typography.headingXLarge,
                         )
                         Spacer(modifier = Modifier.height(15.dp))
+                    }
+
+                    items(uiState.exolixTransactions) { transaction ->
                         PendingExolixTxItem(
+                            modifier = Modifier
+                                .padding(horizontal = 16.dp)
+                                .animateItem(),
                             transaction = transaction,
-                            modifier = Modifier.padding(horizontal = 16.dp),
-                            onClick = onPendingExolixTransactionClick,
+                            onClick = { onPendingExolixTransactionClick(transaction) },
                         )
+                        Spacer(modifier = Modifier.height(10.dp))
                     }
                 }
 
@@ -281,8 +288,10 @@ private fun HomeOverviewScreenPreview() {
                 networkName = "Testnet",
                 ffiVersion = "v1.11.0-rc.0",
                 txList = MockDataStub.createTxList(),
-                pendingExolixTransaction = MockDataStub.createExchangeTransaction(
-                    status = Exolix.TransactionStatus.EXCHANGING,
+                exolixTransactions = listOf(
+                    MockDataStub.createExchangeTransaction(
+                        status = Exolix.TransactionStatus.EXCHANGING,
+                    ),
                 ),
             ),
             onPullToRefresh = {},
