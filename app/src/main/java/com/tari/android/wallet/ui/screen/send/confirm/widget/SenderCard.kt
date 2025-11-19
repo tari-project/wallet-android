@@ -29,7 +29,7 @@ fun SenderCard(
     modifier: Modifier = Modifier,
     title: String,
     comment: String? = null,
-    @DrawableRes iconRes: Int,
+    endIcon: @Composable () -> Unit,
 ) {
     Row(
         modifier = modifier
@@ -59,22 +59,40 @@ fun SenderCard(
             }
         }
 
-        Box(
-            modifier = Modifier
-                .size(44.dp)
-                .clip(CircleShape)
-                .background(color = TariDesignSystem.colors.secondaryMain), contentAlignment = Alignment.Center
-        ) {
-            Icon(
-                modifier = Modifier
-                    .size(24.dp)
-                    .clip(CircleShape),
-                painter = painterResource(iconRes),
-                contentDescription = null,
-                tint = TariDesignSystem.colors.componentsNavbarBackground,
-            )
-        }
+        endIcon()
     }
+}
+
+@Composable
+fun SenderCard(
+    modifier: Modifier = Modifier,
+    title: String,
+    comment: String? = null,
+    @DrawableRes iconRes: Int,
+) {
+    SenderCard(
+        modifier = modifier,
+        title = title,
+        comment = comment,
+        endIcon = {
+            Box(
+                modifier = Modifier
+                    .size(44.dp)
+                    .clip(CircleShape)
+                    .background(color = TariDesignSystem.colors.secondaryMain),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    modifier = Modifier
+                        .size(24.dp)
+                        .clip(CircleShape),
+                    painter = painterResource(iconRes),
+                    contentDescription = null,
+                    tint = TariDesignSystem.colors.componentsNavbarBackground,
+                )
+            }
+        }
+    )
 }
 
 @Composable

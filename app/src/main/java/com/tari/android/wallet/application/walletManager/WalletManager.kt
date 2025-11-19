@@ -279,12 +279,11 @@ class WalletManager @Inject constructor(
     fun sendTari(
         tariContact: TariContact,
         amount: MicroTari,
-        feePerGram: MicroTari,
         message: String,
     ): TxId {
         val recipientAddress = FFITariWalletAddress(Base58String(tariContact.walletAddress.fullBase58))
 
-        val txId = requireWalletInstance.sendTx(recipientAddress, amount.value, feePerGram.value, message)
+        val txId = requireWalletInstance.sendTx(recipientAddress, amount.value, message)
 
         recipientAddress.destroy()
         return txId

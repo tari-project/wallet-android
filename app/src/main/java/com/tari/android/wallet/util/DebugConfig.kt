@@ -37,6 +37,10 @@ package com.tari.android.wallet.util
 import com.tari.android.wallet.BuildConfig
 import com.tari.android.wallet.application.addressPoisoning.SimilarAddressDto
 import com.tari.android.wallet.data.contacts.Contact
+import com.tari.android.wallet.data.exolix.CurrencyDto
+import com.tari.android.wallet.data.exolix.ExchangeDirection
+import com.tari.android.wallet.data.exolix.ExchangeRequestData
+import com.tari.android.wallet.data.exolix.Exolix
 import com.tari.android.wallet.data.tx.TxDto
 import com.tari.android.wallet.ffi.FFITxCancellationReason
 import com.tari.android.wallet.model.Base58
@@ -54,6 +58,7 @@ import com.tari.android.wallet.ui.screen.utxos.list.adapters.UtxosViewHolderItem
 import com.tari.android.wallet.util.extension.toMicroTari
 import org.joda.time.DateTime
 import yat.android.lib.YatIntegration
+import java.math.BigDecimal
 import java.math.BigInteger
 import kotlin.random.Random
 
@@ -266,6 +271,267 @@ object MockDataStub {
             trusted = false,
         )
     }
+
+    fun createNetwork(
+        network: String = "ETH",
+        name: String = "Ethereum",
+        shortName: String? = "ETH",
+        isDefault: Boolean = true,
+        memoNeeded: Boolean = false,
+        precision: Int = 18,
+        icon: String? = "https://exolix.com/icons/coins/ETH.png",
+        addressRegex: String? = "^0x[a-fA-F0-9]{40}$",
+    ) = Exolix.Network(
+        network = network,
+        name = name,
+        shortName = shortName,
+        isDefault = isDefault,
+        memoNeeded = memoNeeded,
+        precision = precision,
+        icon = icon,
+        addressRegex = addressRegex,
+    )
+
+    fun createNetworkList() = listOf(
+        createNetwork(
+            network = "ETH",
+            name = "Ethereum",
+            shortName = "ETH",
+            isDefault = true,
+        ),
+        createNetwork(
+            network = "BSC",
+            name = "Binance Smart Chain",
+            shortName = "BSC",
+            isDefault = false,
+        ),
+        createNetwork(
+            network = "POLYGON",
+            name = "Polygon",
+            shortName = "MATIC",
+            isDefault = false,
+        ),
+    )
+
+    fun createCurrency(
+        code: String = "ETH",
+        name: String = "Ethereum",
+        icon: String = "https://exolix.com/icons/coins/ETH.png",
+        networks: List<Exolix.Network>? = createNetworkList(),
+    ) = Exolix.Currency(
+        code = code,
+        name = name,
+        icon = icon,
+        notes = "Popular cryptocurrency",
+        networks = networks,
+    )
+
+    fun createCurrencyDto(
+        code: String = "ETH",
+        name: String = "Ethereum",
+        icon: String = "https://exolix.com/icons/coins/ETH.png",
+        networks: List<Exolix.Network>? = createNetworkList(),
+    ): CurrencyDto {
+        val currency = createCurrency(
+            code = code,
+            name = name,
+            icon = icon,
+            networks = networks,
+        )
+        val network = currency.networks!!.first { it.isDefault }
+        return CurrencyDto(
+            currency = currency,
+            network = network,
+        )
+    }
+
+    fun createCurrencyList(count: Int = 10) = List(count) { index ->
+        val currencies = listOf(
+            Triple("ETH", "Ethereum", "https://exolix.com/icons/coins/ETH.png"),
+            Triple("BTC", "Bitcoin", "https://exolix.com/icons/coins/BTC.png"),
+            Triple("USDT", "Tether", "https://exolix.com/icons/coins/USDT.png"),
+            Triple("BNB", "Binance Coin", "https://exolix.com/icons/coins/BNB.png"),
+            Triple("ADA", "Cardano", "https://exolix.com/icons/coins/ADA.png"),
+            Triple("SOL", "Solana", "https://exolix.com/icons/coins/SOL.png"),
+            Triple("DOT", "Polkadot", "https://exolix.com/icons/coins/DOT.png"),
+            Triple("DOGE", "Dogecoin", "https://exolix.com/icons/coins/DOGE.png"),
+            Triple("AVAX", "Avalanche", "https://exolix.com/icons/coins/AVAX.png"),
+            Triple("LTC", "Litecoin", "https://exolix.com/icons/coins/LTC.png"),
+        )
+        val (code, name, icon) = currencies[index % currencies.size]
+        createCurrency(
+            code = code,
+            name = name,
+            icon = icon,
+            networks = if (index % 3 == 0) createNetworkList() else listOf(createNetwork(code, name, code, true)),
+        )
+    }
+
+    fun createCurrencyDtoList(count: Int = 10): List<CurrencyDto> {
+        val currencies = listOf(
+            Triple("ETH", "Ethereum", "https://exolix.com/icons/coins/ETH.png"),
+            Triple("BTC", "Bitcoin", "https://exolix.com/icons/coins/BTC.png"),
+            Triple("USDT", "Tether", "https://exolix.com/icons/coins/USDT.png"),
+            Triple("BNB", "Binance Coin", "https://exolix.com/icons/coins/BNB.png"),
+            Triple("ADA", "Cardano", "https://exolix.com/icons/coins/ADA.png"),
+            Triple("SOL", "Solana", "https://exolix.com/icons/coins/SOL.png"),
+            Triple("DOT", "Polkadot", "https://exolix.com/icons/coins/DOT.png"),
+            Triple("DOGE", "Dogecoin", "https://exolix.com/icons/coins/DOGE.png"),
+            Triple("AVAX", "Avalanche", "https://exolix.com/icons/coins/AVAX.png"),
+            Triple("LTC", "Litecoin", "https://exolix.com/icons/coins/LTC.png"),
+        )
+
+        return buildList {
+            for (index in 0 until count) {
+                val (code, name, icon) = currencies[index % currencies.size]
+                val currency = createCurrency(
+                    code = code,
+                    name = name,
+                    icon = icon,
+                    networks = if (index % 3 == 0) createNetworkList() else listOf(createNetwork(code, name, code, true)),
+                )
+
+                val networks = currency.networks.orEmpty()
+                val sortedNetworks = networks.sortedByDescending { it.isDefault }
+
+                sortedNetworks.forEach { network -> add(CurrencyDto(currency, network)) }
+            }
+        }
+    }
+
+    fun createRate(
+        fromAmount: BigDecimal = 100.0.toBigDecimal(),
+        toAmount: BigDecimal = 95.toBigDecimal(),
+        rate: BigDecimal = 0.95.toBigDecimal(),
+        message: String? = null,
+        minAmount: BigDecimal = 10.0.toBigDecimal(),
+        withdrawMin: BigDecimal = 5.0.toBigDecimal(),
+        maxAmount: BigDecimal = 1000.0.toBigDecimal(),
+    ) = Exolix.Rate(
+        fromAmount = fromAmount,
+        toAmount = toAmount,
+        rate = rate,
+        message = message,
+        minAmount = minAmount,
+        withdrawMin = withdrawMin,
+        maxAmount = maxAmount,
+    )
+
+    fun createCoinInfo(
+        coinCode: String = "ETH",
+        coinName: String = "Ethereum",
+        network: String = "ethereum",
+        networkName: String = "Ethereum",
+        networkShortName: String? = "ETH",
+        icon: String = "https://exolix.com/icons/coins/ETH.png",
+    ) = Exolix.CoinInfo(
+        coinCode = coinCode,
+        coinName = coinName,
+        network = network,
+        networkName = networkName,
+        networkShortName = networkShortName,
+        icon = icon,
+    )
+
+    fun createWalletAddress(
+        network: TariWalletAddress.Network = TariWalletAddress.Network.NEXTNET,
+        fullBase58: Base58 = BASE58,
+        fullEmojiId: EmojiId = EMOJI_ID,
+    ) = TariWalletAddress(
+        network = network,
+        features = listOf(TariWalletAddress.Feature.INTERACTIVE),
+        networkEmoji = EMOJI_ID,
+        featuresEmoji = EMOJI_ID,
+        viewKeyEmojis = EMOJI_ID,
+        spendKeyEmojis = EMOJI_ID,
+        checksumEmoji = EMOJI_ID,
+        fullBase58 = fullBase58,
+        fullEmojiId = fullEmojiId,
+        unknownAddress = false,
+    )
+
+    fun createExchangeTransaction(
+        id: String = "test-exchange-id-12345",
+        amount: BigDecimal = BigDecimal("100.01"),
+        amountTo: BigDecimal = BigDecimal("0.9982"),
+        coinFrom: Exolix.CoinInfo = createCoinInfo(
+            coinCode = "XTM",
+            coinName = "Tari",
+            network = "tari",
+            networkName = "Tari",
+            networkShortName = "XTM",
+        ),
+        coinTo: Exolix.CoinInfo = createCoinInfo(
+            coinCode = "ETH",
+            coinName = "Ethereum",
+            network = "ethereum",
+            networkName = "Ethereum",
+            networkShortName = "ETH",
+        ),
+        createdAt: String = "2024-01-01T12:00:00Z",
+        depositAddress: String = "C05575BE00EF016A209B1F493D9027B0E330F3E25FE89BBE6FA66D966EE5B6356",
+        depositExtraId: String? = null,
+        withdrawalAddress: String = "0x9876543210fedcba9876543210fedcba98765432",
+        withdrawalExtraId: String? = null,
+        hashIn: Exolix.HashInfo? = null,
+        hashOut: Exolix.HashInfo? = null,
+        rate: BigDecimal = BigDecimal("0.00998"),
+        rateType: Exolix.RateType = Exolix.RateType.FIXED,
+        refundAddress: String? = null,
+        refundExtraId: String? = null,
+        status: Exolix.TransactionStatus = Exolix.TransactionStatus.WAIT,
+        source: String? = null,
+        comment: String? = null,
+    ) = Exolix.Transaction(
+        id = id,
+        amount = amount,
+        amountTo = amountTo,
+        coinFrom = coinFrom,
+        coinTo = coinTo,
+        comment = comment,
+        createdAt = createdAt,
+        depositAddress = depositAddress,
+        depositExtraId = depositExtraId,
+        withdrawalAddress = withdrawalAddress,
+        withdrawalExtraId = withdrawalExtraId,
+        hashIn = hashIn,
+        hashOut = hashOut,
+        rate = rate,
+        rateType = rateType,
+        refundAddress = refundAddress,
+        refundExtraId = refundExtraId,
+        status = status,
+        source = source,
+    )
+
+    fun createExchangeRequestData(
+        selectedCurrency: CurrencyDto = createCurrencyDto(
+            code = "ETH",
+            name = "Ethereum",
+        ),
+        tariCurrency: CurrencyDto = createCurrencyDto(
+            code = "XTM",
+            name = "Tari",
+            networks = listOf(createNetwork("tari", "Tari", "XTM", true)),
+        ),
+        selectedAddress: String? = null,
+        amount: BigDecimal = BigDecimal("100.01"),
+        rate: Exolix.Rate = createRate(
+            fromAmount = amount,
+            toAmount = BigDecimal("0.9982"),
+            rate = BigDecimal("0.00998"),
+        ),
+        rateType: Exolix.RateType = Exolix.RateType.FIXED,
+        direction: ExchangeDirection = ExchangeDirection.SELL_TARI,
+    ) = ExchangeRequestData(
+        selectedCurrency = selectedCurrency,
+        tariCurrency = tariCurrency,
+        selectedAddress = selectedAddress,
+        amount = amount,
+        rate = rate,
+        rateType = rateType,
+        direction = direction,
+    )
 }
 
 object YatEnvironment {

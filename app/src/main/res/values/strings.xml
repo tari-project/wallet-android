@@ -86,6 +86,116 @@
     <string name="common_copied_to_clipboard">Copied to clipboard</string>
     <string name="common_copy">Copy</string>
 
+    <!-- Exchange screen -->
+    <string name="exchange_title">Exchange Tari</string>
+    <string name="exchange_amount_placeholder">Enter amount</string>
+    <string name="exchange_insufficient_funds_error">Insufficient available balance</string>
+    <string name="exchange_amount_outside_rate_limits">Amount is outside the allowed range</string>
+    <string name="exchange_converted_amount_placeholder">Converted amount</string>
+    <string name="exchange_rate_display_fixed">1 %1$s = %2$s %3$s</string>
+    <string name="exchange_rate_display_floating">1 %1$s ≈ %2$s %3$s</string>
+    <string name="exchange_select_currency_title">Select Currency</string>
+    <string name="exchange_search_currency_hint">Search currencies...</string>
+    <string name="exchange_no_currencies_found">No currencies found</string>
+    <string name="exchange_no_currencies_description">Try adjusting your search or check your connection</string>
+    <string name="exchange_network_default_label">(Default)</string>
+    <string name="exchange_min_amount_label_short">Min:</string>
+    <string name="exchange_max_amount_label_short">Max:</string>
+    <string name="exchange_load_more_currencies_error">Failed to load more currencies. Please try again later.</string>
+    <string name="exchange_you_send_label">You send</string>
+    <string name="exchange_you_receive_label">You receive</string>
+    <string name="exchange_powered_by_label">Powered by</string>
+    <string name="exchange_exchange_now_button">Exchange Now</string>
+    <string name="exchange_fixed_rate">Fixed rate</string>
+    <string name="exchange_destination_address_label">Destination Address (%1$s)</string>
+    <string name="exchange_tari_wallet_address_info">Your new XTM will be sent to your current Tari wallet address on mobile.</string>
+    <string name="exchange_refresh_rate">Refresh rate</string>
+    <string name="exchange_send_funds_title">Send funds</string>
+    <string name="exchange_send_exact_amount">Send the exact amount to the address below in one transaction</string>
+    <string name="exchange_you_need_to_send">You need to send</string>
+    <string name="exchange_to_exolix_address">To Exolix address</string>
+    <string name="exchange_send_funds_once">Send funds to the address above only once.</string>
+    <string name="exchange_cancel_transaction">Cancel Transaction</string>
+    <string name="exchange_ive_sent_funds_button">I\'ve sent the Funds</string>
+    <string name="exchange_copy_amount_content_description">Copy amount</string>
+    <string name="exchange_copy_address_content_description">Copy address</string>
+    <string name="exchange_create_exchange_error">Failed to create exchange</string>
+    <string name="exchange_fetch_transaction_error">Failed to fetch transaction details</string>
+    <string name="exchange_amount_label">Amount</string>
+    <string name="exchange_amount_copied">Amount copied</string>
+    <string name="exchange_address_label">Address</string>
+    <string name="exchange_address_copied">Address copied</string>
+    <string name="exchange_rate_error_title">Exchange rate unavailable (%1$s)</string>
+    <string name="exchange_rate_error_message">Unable to fetch the exchange rate at this time. Please check your internet connection and try again.</string>
+    <string name="exchange_currencies_load_error">Unable to load currencies. Please check your connection and try again.</string>
+    <string name="exchange_destination_address_placeholder">Enter destination address</string>
+    <string name="exchange_invalid_address_error">Invalid address format for the %1$s network</string>
+    <string name="exchange_qr_scan_content_description">Scan QR code</string>
+    <string name="exchange_clear_address_content_description">Clear address</string>
+
+    <!-- exchange status screen -->
+    <string name="exchange_status_title">Exchange Status</string>
+    <string name="exchange_status_swapped">Swapped</string>
+    <string name="exchange_status_refunded">Refunded</string>
+    <string name="exchange_status_in_progress">In Progress</string>
+    <string name="exchange_status_description">You\'ve successfully swapped %1$s %2$s to %3$s %4$s</string>
+    <string name="exchange_status_amount_to_receive">You will receive</string>
+    <string name="exchange_status_amount_received">Amount received</string>
+    <string name="exchange_status_amount">Amount</string>
+    <string name="exchange_status_destination_address">Destination Address (%1$s)</string>
+    <string name="exchange_status_destination_extra_id">Destination Extra ID</string>
+    <string name="exchange_status_transaction_details">Transaction Details</string>
+    <string name="exchange_status_load_error">Failed to load transaction details. Please try again later.</string>
+    <string name="exchange_status_created_at">Created</string>
+    <string name="exchange_status_exchange_rate">Exchange Rate</string>
+    <string name="exchange_status_exchange_fee">Network Fee</string>
+    <string name="exchange_status_rate_type_fixed">Fixed</string>
+    <string name="exchange_status_rate_type_floating">Floating</string>
+    <string name="exchange_status_comment">Comment</string>
+    <string name="exchange_status_refund_address">Refund Address (%1$s)</string>
+    <string name="exchange_status_refund_extra_id">Refund Extra ID</string>
+    <string name="exchange_status_show_qr_code">Show QR Code</string>
+
+    <!-- exchange review screen -->
+    <string name="exchange_review_title">Review Exchange</string>
+    <string name="exchange_review_you_are_about_to_swap">You are about to swap</string>
+    <string name="exchange_review_rate">Rate</string>
+    <string name="exchange_rate_value_fixed">1 %1$s = %2$s %3$s (%4$s)</string>
+    <string name="exchange_rate_value_floating">1 %1$s ≈ %2$s %3$s (%4$s)</string>
+    <string name="exchange_review_from_wallet">XTM will be deducted from\n(your Tari wallet address)</string>
+    <string name="exchange_review_to_exolix_address">To Exolix address</string>
+    <string name="exchange_review_confirm_button">Confirm</string>
+    <string name="exchange_review_label">Exchange Review</string>
+    <string name="exchange_tx_message">Exchange via Exolix</string>
+    <string name="exchange_invalid_deposit_address_error">Invalid deposit address received from Exolix</string>
+
+    <!-- exchange status card titles -->
+    <string name="exchange_status_card_waiting_for_deposit">Waiting for your deposit</string>
+    <string name="exchange_status_card_deposits_in_progress">Deposits in Progress</string>
+    <string name="exchange_status_card_funds_received">Funds Received</string>
+    <string name="exchange_status_card_sending">Sending Your %1$s</string>
+    <string name="exchange_status_card_exchange_complete">Exchange Complete</string>
+    <string name="exchange_status_card_transaction_expired">Transaction Expired</string>
+    <string name="exchange_status_card_transaction_refunded">Transaction Refunded</string>
+
+    <!-- exchange status card subtitles -->
+    <string name="exchange_status_card_subtitle_wait">Send your %1$s to the deposit address to proceed with the exchange.</string>
+    <string name="exchange_status_card_subtitle_received">Your deposit has been confirmed. Processing exchange.</string>
+    <string name="exchange_status_card_subtitle_exchanging">Your exchange is being processed.</string>
+    <string name="exchange_status_card_subtitle_sending">Sending %1$s to your destination address.</string>
+    <string name="exchange_status_card_subtitle_success">Your exchange was completed successfully.</string>
+    <string name="exchange_status_card_subtitle_overdue">The deposit window has expired. Transaction cancelled.</string>
+    <string name="exchange_status_card_subtitle_refunded">Your deposit has been refunded to your refund address.</string>
+
+    <!-- Exchange status strings for pending transaction card -->
+    <string name="exchange_status_wait">Waiting for deposit</string>
+    <string name="exchange_status_confirmation">Confirming deposit</string>
+    <string name="exchange_status_confirmed">Deposit confirmed</string>
+    <string name="exchange_status_exchanging">Exchanging</string>
+    <string name="exchange_status_sending">Sending</string>
+    <string name="exchange_status_success">Completed</string>
+    <string name="exchange_status_overdue">Overdue</string>
+
     <!-- emoji id copied view -->
 
     <!-- emoji-id-related -->
@@ -147,12 +257,15 @@
     <string name="home_transaction_view_all_txs">View all transactions</string>
     <string name="home_search_hint">Enter Emoji ID or Contact Name</string>
     <string name="home_title_tari_universe">Tari Universe</string>
+    <string name="home_swap_in_progress_title">Swap in progress</string>
+    <string name="home_pending_exolix_transaction_title_format">Swap %1$s %2$s to %3$s %4$s</string>
     <string name="home_active_miners_title">Active Miners</string>
     <string name="home_active_miners_start_mining">Start mining</string>
     <string name="home_active_miners_you_mining">You\'re mining</string>
     <string name="home_active_miners_you_not_mining">You\'re not mining</string>
     <string name="home_wallet_balance">Wallet Balance</string>
     <string name="home_wallet_balance_hidden">*******</string>
+    <string name="home_buy_xtm">Buy XTM</string>
     <string name="home_empty_state_title">You don’t have any activity yet. </string>
     <string name="home_empty_state_description">Once you receive some XTM, you’ll see it here.</string>
     <string name="home_empty_state_button">Start Mining Tari</string>
@@ -412,13 +525,11 @@
 
     <!-- Wallet back up -->
     <string name="back_up_wallet_page_title">Security</string>
-    <string name="back_up_wallet_page_label">Wallet Backups</string>
     <string name="back_up_wallet_to_cloud_cta">Upload Now</string>
     <string name="back_up_wallet_with_recovery_phrase_cta">Write Down Seed Phrase</string>
     <string name="back_up_wallet_page_description">By backing up your wallet, you’ll ensure that you don’t lose your XTM if your phone is lost or
         broken.</string>
 
-    <string name="back_up_wallet_backup_status_checking_backup">Checking</string>
     <string name="back_up_wallet_backup_status_in_progress">In progress</string>
     <string name="back_up_wallet_backup_status_outdated">Out of date</string>
     <string name="back_up_wallet_backup_status_disabled">Disabled</string>
@@ -486,7 +597,6 @@
     <string name="restore_from_seed_words_error_unknown">Unable to generate key from seed words. Please check your seed words and try again</string>
     <string name="restore_from_seed_words_overlay_status_connecting">Waiting for connection</string>
     <string name="restore_from_seed_words_overlay_status_reconnecting">Reconnecting:</string>
-    <string name="restore_from_seed_words_overlay_status_connected">Connection established. The process will start soon</string>
     <string name="restore_from_seed_words_overlay_status_progress">Restoring in progress:</string>
     <string name="restore_from_seed_words_overlay_status_connection_failed">Attempt %1$s out of %2$s</string>
     <string name="restore_from_seed_words_overlay_error_title">Recovery Failed</string>

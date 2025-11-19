@@ -32,8 +32,6 @@
  */
 package com.tari.android.wallet.util
 
-import com.tari.android.wallet.util.extension.toMicroTari
-
 /**
  * Contains application-wide constant values.
  *
@@ -46,7 +44,6 @@ object Constants {
      */
     object UI {
 
-        const val xShortDurationMs = 100L
         const val shortDurationMs = 300L
         const val mediumDurationMs = 600L
         const val longDurationMs = 1000L
@@ -86,12 +83,6 @@ object Constants {
             const val numPadDigitEnterAnimDurationMs = 90L
         }
 
-        object FinalizeSendTx {
-            const val lottieAnimStartDelayMs = 400L
-            const val textAppearAnimStartDelayMs = 200L
-            const val successfulInfoFadeOutAnimStartDelayMs = 1500L
-        }
-
         object Auth {
             const val viewFadeAnimDelayMs = 200L
             const val localAuthAnimDurationMs = 800L
@@ -103,6 +94,5 @@ object Constants {
      */
     object Wallet {
         const val EMOJI_FORMATTER_CHUNK_SIZE = 3
-        val DEFAULT_FEE_PER_GRAM = 10.toMicroTari()
     }
 }

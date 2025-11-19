@@ -1,8 +1,6 @@
 package com.tari.android.wallet.ui.screen.send.receive
 
-import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -15,10 +13,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
@@ -27,7 +21,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -39,6 +32,7 @@ import com.tari.android.wallet.ui.compose.TariDesignSystem
 import com.tari.android.wallet.ui.compose.components.TariPrimaryButton
 import com.tari.android.wallet.ui.compose.components.TariTopBar
 import com.tari.android.wallet.ui.compose.widgets.AddressCard
+import com.tari.android.wallet.ui.compose.widgets.QrCodeCard
 import com.tari.android.wallet.ui.screen.settings.themeSelector.TariTheme
 import com.tari.android.wallet.util.MockDataStub
 
@@ -135,33 +129,6 @@ private fun NetworkTitle(ticker: String, networkName: String, modifier: Modifier
                 text = networkName,
                 style = TariDesignSystem.typography.body2,
             )
-        }
-    }
-}
-
-@Composable
-private fun QrCodeCard(qrBitmap: Bitmap?, modifier: Modifier = Modifier) {
-    Card(
-        colors = CardDefaults.cardColors(containerColor = TariDesignSystem.colors.backgroundPrimary),
-        elevation = CardDefaults.elevatedCardElevation(defaultElevation = 2.dp),
-        shape = RoundedCornerShape(24.dp),
-        modifier = modifier.size(232.dp),
-    ) {
-        Box(
-            modifier = modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center,
-        ) {
-            if (qrBitmap != null) {
-                Image(
-                    modifier = modifier.fillMaxSize(),
-                    bitmap = qrBitmap.asImageBitmap(),
-                    contentDescription = null,
-                )
-            } else {
-                CircularProgressIndicator(
-                    color = TariDesignSystem.colors.textPrimary,
-                )
-            }
         }
     }
 }

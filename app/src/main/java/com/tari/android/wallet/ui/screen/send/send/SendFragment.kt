@@ -13,7 +13,6 @@ import com.tari.android.wallet.model.MicroTari
 import com.tari.android.wallet.ui.common.CommonFragment
 import com.tari.android.wallet.ui.compose.TariDesignSystem
 import com.tari.android.wallet.ui.screen.contactBook.list.ContactListFragment
-import com.tari.android.wallet.ui.screen.qr.QrScannerSource
 import com.tari.android.wallet.util.extension.composeContent
 import com.tari.android.wallet.util.extension.parcelable
 
@@ -30,13 +29,13 @@ class SendFragment : CommonFragment<SendViewModel>() {
                 onAmountChange = { viewModel.onAmountChange(it) },
                 onFeeHelpClicked = { viewModel.onFeeHelpClicked() },
                 onContinueClick = { viewModel.onContinueClick() },
-                onScanQrClick = { startQrScanner(QrScannerSource.TransactionSend) },
+                onScanQrClick = { startQrScanner() },
                 onContactBookClick = { viewModel.onContactBookClick() },
                 onNoteChange = { viewModel.onNoteChange(it) },
             )
         }
 
-        setFragmentResultListener(ContactListFragment.CONTACT_REQUEST_KEY) { requestKey, bundle ->
+        setFragmentResultListener(ContactListFragment.CONTACT_REQUEST_KEY) { _, bundle ->
             bundle.parcelable<Contact>(ContactListFragment.CONTACT_RESULT_KEY)?.let { selectedContact ->
                 viewModel.selectContact(selectedContact)
             }

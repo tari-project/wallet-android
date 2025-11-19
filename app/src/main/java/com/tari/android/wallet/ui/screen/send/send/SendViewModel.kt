@@ -22,7 +22,6 @@ import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonStyle
 import com.tari.android.wallet.ui.screen.send.send.SendFragment.Companion.PARAMETER_AMOUNT
 import com.tari.android.wallet.ui.screen.send.send.SendFragment.Companion.PARAMETER_CONTACT
 import com.tari.android.wallet.ui.screen.send.send.SendFragment.Companion.PARAMETER_NOTE
-import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.extension.collectFlow
 import com.tari.android.wallet.util.extension.filterNumbers
 import com.tari.android.wallet.util.extension.greaterThan
@@ -68,10 +67,6 @@ class SendViewModel(savedState: SavedStateHandle) : CommonViewModel() {
     val uiState = _uiState.asStateFlow()
 
     init {
-        doOnWalletRunning { wallet ->
-            _uiState.update { it.copy(feePerGram = wallet.getLowestFeePerGram()) }
-        }
-
         collectFlow(balanceStateHandler.balanceState) { balanceState ->
             _uiState.update { it.copy(availableBalance = balanceState.availableBalance) }
         }
@@ -109,7 +104,7 @@ class SendViewModel(savedState: SavedStateHandle) : CommonViewModel() {
 
         _uiState.value.amount?.let { amount ->
             doOnWalletRunning { wallet ->
-                val fee = runCatching { wallet.estimateTxFee(amount, uiState.value.feePerGram) }
+                val fee = runCatching { wallet.estimateTxFee(amount) }
                 _uiState.update {
                     it.copy(
                         fee = fee.getOrNull(),
@@ -195,7 +190,6 @@ class SendViewModel(savedState: SavedStateHandle) : CommonViewModel() {
 
         val amountValue: String = "",
 
-        val feePerGram: MicroTari = Constants.Wallet.DEFAULT_FEE_PER_GRAM,
         val fee: MicroTari? = null,
         @param:StringRes val feeError: Int? = null,
 
@@ -212,12 +206,12 @@ class SendViewModel(savedState: SavedStateHandle) : CommonViewModel() {
             get() = transactionData != null
 
         val transactionData: TransactionData?
-            get() = letNotNull(contact, amount.takeIf { amountError == null }) { contact, amount ->
+            get() = letNotNull(contact, amount.takeIf { amountError == null }, fee) { contact, amount, fee ->
                 TransactionData(
                     recipientContact = contact,
                     amount = amount,
                     note = note,
-                    feePerGram = feePerGram,
+                    fee = fee,
                 )
             }
 

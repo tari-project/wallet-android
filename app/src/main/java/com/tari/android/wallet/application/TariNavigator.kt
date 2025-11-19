@@ -15,6 +15,7 @@ import com.tari.android.wallet.application.Navigation.ChangeBiometrics
 import com.tari.android.wallet.application.Navigation.ContactBook
 import com.tari.android.wallet.application.Navigation.CustomBridge
 import com.tari.android.wallet.application.Navigation.EnterPinCode
+import com.tari.android.wallet.application.Navigation.Exchange
 import com.tari.android.wallet.application.Navigation.Home
 import com.tari.android.wallet.application.Navigation.InputSeedWords
 import com.tari.android.wallet.application.Navigation.Restore
@@ -24,6 +25,9 @@ import com.tari.android.wallet.application.Navigation.TxList
 import com.tari.android.wallet.application.Navigation.TxSend
 import com.tari.android.wallet.application.Navigation.VerifySeedPhrase
 import com.tari.android.wallet.data.contacts.Contact
+import com.tari.android.wallet.data.exolix.CurrencyDto
+import com.tari.android.wallet.data.exolix.ExchangeRequestData
+import com.tari.android.wallet.data.exolix.Exolix
 import com.tari.android.wallet.model.MicroTari
 import com.tari.android.wallet.model.TransactionData
 import com.tari.android.wallet.model.tx.Tx
@@ -37,6 +41,11 @@ import com.tari.android.wallet.ui.screen.contactBook.details.ContactDetailsFragm
 import com.tari.android.wallet.ui.screen.contactBook.list.ContactListFragment
 import com.tari.android.wallet.ui.screen.debug.DebugNavigation
 import com.tari.android.wallet.ui.screen.debug.activity.DebugActivity
+import com.tari.android.wallet.ui.screen.exchange.ExchangeFragment
+import com.tari.android.wallet.ui.screen.exchange.review.ExchangeReviewFragment
+import com.tari.android.wallet.ui.screen.exchange.selectCurrency.SelectCurrencyFragment
+import com.tari.android.wallet.ui.screen.exchange.sendFunds.SendFundsFragment
+import com.tari.android.wallet.ui.screen.exchange.status.ExchangeStatusFragment
 import com.tari.android.wallet.ui.screen.home.HomeActivity
 import com.tari.android.wallet.ui.screen.home.overview.HomeOverviewFragment
 import com.tari.android.wallet.ui.screen.onboarding.activity.OnboardingFlowActivity
@@ -105,6 +114,12 @@ class TariNavigator @Inject constructor() {
             is ContactBook.AllContacts -> addFragment(ContactListFragment.newInstance(navigation.startForSelectResult))
             is ContactBook.ContactDetails -> addFragment(ContactDetailsFragment.createFragment(navigation.contact))
             is ContactBook.AddContact -> addFragment(AddContactFragment())
+
+            is Exchange.SelectCurrency -> addFragment(SelectCurrencyFragment.newInstance(navigation.preselectedCurrency))
+            is Exchange.StartExchange -> addFragment(ExchangeFragment.newInstance())
+            is Exchange.Review -> addFragment(ExchangeReviewFragment.newInstance(navigation.request))
+            is Exchange.SendFunds -> addFragment(SendFundsFragment.newInstance(navigation.request, navigation.transaction))
+            is Exchange.ExchangeStatus -> addFragment(ExchangeStatusFragment.newInstance(navigation.transactionId))
 
             is AllSettings.BugReporting -> DebugActivity.launch(currentActivity, DebugNavigation.BugReport)
             is AllSettings.MyProfile -> addFragment(WalletInfoFragment())
@@ -215,7 +230,7 @@ sealed class Navigation {
     data class EnterPinCode(val behavior: PinCodeScreenBehavior, val stashedPin: String? = null) : Navigation()
     data object ChangeBiometrics : Navigation()
     data class SplashScreen(val seedWords: List<String>? = null, val clearTop: Boolean = true) : Navigation()
-    data class Home(val uri: Uri? = null) : Navigation()
+    data class Home(val uri: Uri? = null, val tab: String? = null) : Navigation()
     data object BackToHome : Navigation()
 
     data class ShareText(val text: String) : Navigation()
@@ -285,5 +300,13 @@ sealed class Navigation {
         data class AllContacts(val startForSelectResult: Boolean = false) : ContactBook()
         data class ContactDetails(val contact: Contact) : ContactBook()
         data object AddContact : ContactBook()
+    }
+
+    sealed class Exchange : Navigation() {
+        data object StartExchange : Exchange()
+        data class SelectCurrency(val preselectedCurrency: CurrencyDto? = null) : Exchange()
+        data class Review(val request: ExchangeRequestData) : Exchange()
+        data class SendFunds(val request: ExchangeRequestData? = null, val transaction: Exolix.Transaction? = null) : Exchange()
+        data class ExchangeStatus(val transactionId: String) : Exchange()
     }
 }

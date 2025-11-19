@@ -20,6 +20,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.tari.android.wallet.R
@@ -54,24 +55,30 @@ fun TariErrorView(
     errorMessage: String = stringResource(R.string.common_error_description),
     onTryAgainClick: () -> Unit,
 ) {
-    Column(
+    Box(
         modifier = modifier,
-        horizontalAlignment = Alignment.CenterHorizontally,
+        contentAlignment = Alignment.Center,
     ) {
-        Text(
-            text = errorTitle,
-            style = TariDesignSystem.typography.headingLarge,
-        )
-        Text(
-            text = errorMessage,
-            style = TariDesignSystem.typography.body2.copy(color = TariDesignSystem.colors.textPrimary),
-        )
-        Spacer(modifier = Modifier.size(12.dp))
-        TariPrimaryButton(
-            size = TariButtonSize.Small,
-            text = stringResource(R.string.common_error_try_again_button),
-            onClick = onTryAgainClick,
-        )
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            Text(
+                text = errorTitle,
+                textAlign = TextAlign.Center,
+                style = TariDesignSystem.typography.headingLarge,
+            )
+            Text(
+                text = errorMessage,
+                textAlign = TextAlign.Center,
+                style = TariDesignSystem.typography.body2.copy(color = TariDesignSystem.colors.textPrimary),
+            )
+            Spacer(modifier = Modifier.size(12.dp))
+            TariPrimaryButton(
+                size = TariButtonSize.Small,
+                text = stringResource(R.string.common_error_try_again_button),
+                onClick = onTryAgainClick,
+            )
+        }
     }
 }
 
@@ -80,20 +87,24 @@ fun TariErrorWarningView(
     modifier: Modifier = Modifier,
     errorTitle: String = stringResource(R.string.common_error_connection_title),
 ) {
-    Row(
+    Box(
         modifier = modifier,
-        horizontalArrangement = Arrangement.spacedBy(4.dp, Alignment.Start),
-        verticalAlignment = Alignment.CenterVertically,
+        contentAlignment = Alignment.Center,
     ) {
-        Icon(
-            painter = painterResource(R.drawable.vector_warning),
-            contentDescription = null,
-            tint = TariDesignSystem.colors.systemRed,
-        )
-        Text(
-            text = errorTitle,
-            style = TariDesignSystem.typography.body2.copy(color = TariDesignSystem.colors.systemRed),
-        )
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(4.dp, Alignment.Start),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Icon(
+                painter = painterResource(R.drawable.vector_warning),
+                contentDescription = null,
+                tint = TariDesignSystem.colors.systemRed,
+            )
+            Text(
+                text = errorTitle,
+                style = TariDesignSystem.typography.body2.copy(color = TariDesignSystem.colors.systemRed),
+            )
+        }
     }
 }
 

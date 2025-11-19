@@ -45,6 +45,11 @@ import com.tari.android.wallet.ui.screen.contactBook.add.AddContactViewModel
 import com.tari.android.wallet.ui.screen.contactBook.details.ContactDetailsViewModel
 import com.tari.android.wallet.ui.screen.contactBook.list.ContactListViewModel
 import com.tari.android.wallet.ui.screen.debug.sampleDesign.SampleDesignSystemViewModel
+import com.tari.android.wallet.ui.screen.exchange.ExchangeViewModel
+import com.tari.android.wallet.ui.screen.exchange.review.ExchangeReviewViewModel
+import com.tari.android.wallet.ui.screen.exchange.selectCurrency.SelectCurrencyViewModel
+import com.tari.android.wallet.ui.screen.exchange.sendFunds.SendFundsViewModel
+import com.tari.android.wallet.ui.screen.exchange.status.ExchangeStatusViewModel
 import com.tari.android.wallet.ui.screen.home.HomeViewModel
 import com.tari.android.wallet.ui.screen.home.overview.HomeOverviewViewModel
 import com.tari.android.wallet.ui.screen.onboarding.activity.OnboardingFlowActivity
@@ -64,7 +69,6 @@ import com.tari.android.wallet.ui.screen.restore.enterRestorationPassword.EnterR
 import com.tari.android.wallet.ui.screen.restore.inputSeedWords.InputSeedWordsViewModel
 import com.tari.android.wallet.ui.screen.restore.walletRestoring.WalletRestoringViewModel
 import com.tari.android.wallet.ui.screen.send.confirm.ConfirmViewModel
-
 import com.tari.android.wallet.ui.screen.send.obsolete.requestTari.RequestTariViewModel
 import com.tari.android.wallet.ui.screen.send.receive.ReceiveViewModel
 import com.tari.android.wallet.ui.screen.send.send.SendViewModel
@@ -168,6 +172,11 @@ interface ApplicationComponent {
     fun inject(viewModel: ContactDetailsViewModel)
     fun inject(viewModel: AddContactViewModel)
     fun inject(viewModel: SendViewModel)
+    fun inject(viewModel: ExchangeViewModel)
+    fun inject(viewModel: SelectCurrencyViewModel)
+    fun inject(viewModel: ExchangeReviewViewModel)
+    fun inject(viewModel: SendFundsViewModel)
+    fun inject(viewModel: ExchangeStatusViewModel)
 
     fun inject(tariFcmService: TariFcmService)
 

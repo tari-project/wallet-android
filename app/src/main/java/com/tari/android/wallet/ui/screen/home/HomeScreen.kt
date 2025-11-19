@@ -78,8 +78,6 @@ fun HomeScreen(
                         fragment = StoreFragment.newInstance(),
                     )
 
-                    BottomMenuOption.Gem -> TODO()
-
                     BottomMenuOption.Profile -> if (uiState.airdropLoggedIn) {
                         FragmentContainer(
                             modifier = Modifier.fillMaxSize(),
@@ -142,11 +140,6 @@ private fun NavigationMenu(
                     onItemClick = { onMenuItemClicked(BottomMenuOption.Shop) },
                 )
             }
-            // FIXME: uncomment once the gem feature is implemented
-//            BottomNavigationItem(
-//                iconRes = if (selectedItem == BottomMenuOption.Gem) R.drawable.vector_home_nav_menu_gem_filled else R.drawable.vector_home_nav_menu_gem,
-//                onItemClick = { onMenuItemClicked(BottomMenuOption.Gem) },
-//            )
             BottomNavigationItem(
                 iconRes = if (selectedItem == BottomMenuOption.Profile) R.drawable.vector_home_nav_menu_profile_filled else R.drawable.vector_home_nav_menu_profile,
                 onItemClick = { onMenuItemClicked(BottomMenuOption.Profile) },

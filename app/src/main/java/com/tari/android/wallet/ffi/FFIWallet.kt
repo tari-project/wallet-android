@@ -52,7 +52,6 @@ import com.tari.android.wallet.model.tx.CompletedTx
 import com.tari.android.wallet.model.tx.PendingInboundTx
 import com.tari.android.wallet.model.tx.PendingOutboundTx
 import com.tari.android.wallet.model.tx.Tx
-import com.tari.android.wallet.util.Constants
 import com.tari.android.wallet.util.DebugConfig
 import com.tari.android.wallet.util.extension.toMicroTari
 import java.math.BigInteger
@@ -291,15 +290,15 @@ class FFIWallet(
 
     fun cancelPendingTx(id: BigInteger): Boolean = runWithError { jniCancelPendingTx(id.toString(), it) }
 
-    fun estimateTxFee(amount: MicroTari, feePerGram: MicroTari): MicroTari = runWithError { error ->
+    fun estimateTxFee(amount: MicroTari): MicroTari = runWithError { error ->
         val defaultKernelCount = BigInteger("1")
         val defaultOutputCount = BigInteger("2")
-        val gram = feePerGram.value
+        val feePerGram: BigInteger = getLowestFeePerGram().value
         MicroTari(
             BigInteger(
                 1, jniEstimateTxFee(
                     amount = amount.value.toString(),
-                    gramFee = gram.toString(),
+                    gramFee = feePerGram.toString(),
                     kernelCount = defaultKernelCount.toString(),
                     outputCount = defaultOutputCount.toString(),
                     libError = error,
@@ -311,9 +310,9 @@ class FFIWallet(
     fun sendTx(
         destination: FFITariWalletAddress,
         amount: BigInteger,
-        feePerGram: BigInteger,
         message: String,
     ): TxId {
+        val feePerGram = getLowestFeePerGram().value
         if (amount < BigInteger.valueOf(0L)) {
             throw FFIException(message = "Amount is less than 0.")
         }
@@ -327,7 +326,7 @@ class FFIWallet(
     fun joinUtxos(utxos: List<TariUtxo>) = runWithError { error ->
         jniJoinUtxos(
             commitments = utxos.map { it.commitment }.toTypedArray(),
-            feePerGram = Constants.Wallet.DEFAULT_FEE_PER_GRAM.value.toString(),
+            feePerGram = getLowestFeePerGram().value.toString(),
             libError = error,
         )
     }
@@ -336,7 +335,7 @@ class FFIWallet(
         jniSplitUtxos(
             commitments = utxos.map { it.commitment }.toTypedArray(),
             splitCount = splitCount.toString(),
-            feePerGram = Constants.Wallet.DEFAULT_FEE_PER_GRAM.value.toString(),
+            feePerGram = getLowestFeePerGram().value.toString(),
             libError = error,
         )
     }
@@ -345,7 +344,7 @@ class FFIWallet(
         FFITariCoinPreview(
             jniPreviewJoinUtxos(
                 commitments = utxos.map { it.commitment }.toTypedArray(),
-                feePerGram = Constants.Wallet.DEFAULT_FEE_PER_GRAM.value.toString(),
+                feePerGram = getLowestFeePerGram().value.toString(),
                 libError = error,
             )
         ).runWithDestroy { TariCoinPreview(it) }
@@ -356,7 +355,7 @@ class FFIWallet(
             jniPreviewSplitUtxos(
                 commitments = utxos.map { it.commitment }.toTypedArray(),
                 splitCount = splitCount.toString(),
-                feePerGram = Constants.Wallet.DEFAULT_FEE_PER_GRAM.value.toString(),
+                feePerGram = getLowestFeePerGram().value.toString(),
                 libError = error,
             )
         ).runWithDestroy { TariCoinPreview(it) }

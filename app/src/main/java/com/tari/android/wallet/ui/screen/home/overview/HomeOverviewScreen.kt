@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -18,18 +19,21 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.tari.android.wallet.R
+import com.tari.android.wallet.data.exolix.Exolix
 import com.tari.android.wallet.data.tx.TxDto
 import com.tari.android.wallet.model.BalanceInfo
 import com.tari.android.wallet.ui.compose.TariDesignSystem
 import com.tari.android.wallet.ui.compose.components.TariInheritTextButton
 import com.tari.android.wallet.ui.compose.components.TariProgressView
 import com.tari.android.wallet.ui.compose.components.TariPullToRefreshBox
+import com.tari.android.wallet.ui.compose.components.TariSecondaryButton
 import com.tari.android.wallet.ui.compose.components.TariTextButton
 import com.tari.android.wallet.ui.screen.home.overview.widget.ActiveMinersCard
 import com.tari.android.wallet.ui.screen.home.overview.widget.BalanceInfoModal
 import com.tari.android.wallet.ui.screen.home.overview.widget.BlockSyncChip
 import com.tari.android.wallet.ui.screen.home.overview.widget.ConnectionStatusModal
 import com.tari.android.wallet.ui.screen.home.overview.widget.EmptyTxList
+import com.tari.android.wallet.ui.screen.home.overview.widget.PendingExolixTxItem
 import com.tari.android.wallet.ui.screen.home.overview.widget.RestoreSuccessModal
 import com.tari.android.wallet.ui.screen.home.overview.widget.SyncSuccessModal
 import com.tari.android.wallet.ui.screen.home.overview.widget.TxItem
@@ -47,6 +51,8 @@ fun HomeOverviewScreen(
     onStartMiningClicked: () -> Unit,
     onSendTariClicked: () -> Unit,
     onRequestTariClicked: () -> Unit,
+    onBuyClicked: () -> Unit,
+    onPendingExolixTransactionClick: (Exolix.Transaction) -> Unit,
     onTxClick: (txDto: TxDto) -> Unit,
     onViewAllTxsClick: () -> Unit,
     onConnectionStatusClick: () -> Unit,
@@ -106,6 +112,14 @@ fun HomeOverviewScreen(
                         onHideBalanceClicked = onHideBalanceClicked,
                         isBalanceHidden = uiState.balanceHidden,
                     )
+                    Spacer(modifier = Modifier.height(20.dp))
+                    TariSecondaryButton(
+                        modifier = Modifier
+                            .padding(horizontal = 20.dp)
+                            .fillMaxWidth(),
+                        text = stringResource(R.string.home_buy_xtm),
+                        onClick = onBuyClicked,
+                    )
                     Spacer(modifier = Modifier.height(10.dp))
                     Row(
                         modifier = Modifier
@@ -123,6 +137,29 @@ fun HomeOverviewScreen(
                             text = stringResource(R.string.request_tari_subtitle),
                             onClick = onRequestTariClicked,
                         )
+                    }
+                }
+
+                if (uiState.exolixTransactions.isNotEmpty()) {
+                    item {
+                        Spacer(modifier = Modifier.height(30.dp))
+                        Text(
+                            modifier = Modifier.padding(horizontal = 16.dp),
+                            text = stringResource(R.string.home_swap_in_progress_title),
+                            style = TariDesignSystem.typography.headingXLarge,
+                        )
+                        Spacer(modifier = Modifier.height(15.dp))
+                    }
+
+                    items(uiState.exolixTransactions) { transaction ->
+                        PendingExolixTxItem(
+                            modifier = Modifier
+                                .padding(horizontal = 16.dp)
+                                .animateItem(),
+                            transaction = transaction,
+                            onClick = { onPendingExolixTransactionClick(transaction) },
+                        )
+                        Spacer(modifier = Modifier.height(10.dp))
                     }
                 }
 
@@ -251,11 +288,18 @@ private fun HomeOverviewScreenPreview() {
                 networkName = "Testnet",
                 ffiVersion = "v1.11.0-rc.0",
                 txList = MockDataStub.createTxList(),
+                exolixTransactions = listOf(
+                    MockDataStub.createExchangeTransaction(
+                        status = Exolix.TransactionStatus.EXCHANGING,
+                    ),
+                ),
             ),
             onPullToRefresh = {},
             onStartMiningClicked = {},
             onSendTariClicked = {},
             onRequestTariClicked = {},
+            onBuyClicked = {},
+            onPendingExolixTransactionClick = {},
             onTxClick = {},
             onViewAllTxsClick = {},
             onConnectionStatusClick = {},
@@ -292,6 +336,8 @@ private fun HomeOverviewScreenHiddenPreview() {
             onStartMiningClicked = {},
             onSendTariClicked = {},
             onRequestTariClicked = {},
+            onBuyClicked = {},
+            onPendingExolixTransactionClick = {},
             onTxClick = {},
             onViewAllTxsClick = {},
             onConnectionStatusClick = {},
@@ -328,6 +374,8 @@ private fun HomeOverviewEmptyScreenPreview() {
             onStartMiningClicked = {},
             onSendTariClicked = {},
             onRequestTariClicked = {},
+            onBuyClicked = {},
+            onPendingExolixTransactionClick = {},
             onTxClick = {},
             onViewAllTxsClick = {},
             onConnectionStatusClick = {},
@@ -365,6 +413,8 @@ private fun HomeOverviewProgressScreenPreview() {
             onStartMiningClicked = {},
             onSendTariClicked = {},
             onRequestTariClicked = {},
+            onBuyClicked = {},
+            onPendingExolixTransactionClick = {},
             onTxClick = {},
             onViewAllTxsClick = {},
             onConnectionStatusClick = {},

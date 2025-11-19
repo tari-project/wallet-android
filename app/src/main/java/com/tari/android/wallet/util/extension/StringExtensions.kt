@@ -161,3 +161,16 @@ fun String.sha256(): String {
 }
 
 fun String.filterNumbers(): String = this.filter { it.isDigit() || it == '.' }
+
+fun String.filterSingleDot(): String {
+    var dotFound = false
+    return replace(",", ".")
+        .filter {
+            if (it == '.') {
+                if (dotFound) false else {
+                    dotFound = true
+                    true
+                }
+            } else true
+        }
+}

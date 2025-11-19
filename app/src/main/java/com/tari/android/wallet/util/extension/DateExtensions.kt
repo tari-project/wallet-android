@@ -36,6 +36,7 @@ import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
 import java.util.Locale
+import java.util.TimeZone
 
 /**
  * Contains Date functions.
@@ -57,6 +58,12 @@ fun Date.txFormattedDate(): String {
     return SimpleDateFormat("MMMM d'$indicator' yyyy 'at' h:mm a", Locale.ENGLISH)
         .format(this)
 }
+
+fun String.parseISODate(): Date? = runCatching {
+    val format = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.ENGLISH)
+    format.timeZone = TimeZone.getTimeZone("UTC")
+    format.parse(this)
+}.getOrNull()
 
 fun Calendar.isAfterNow(): Boolean {
     return this.after(Calendar.getInstance())

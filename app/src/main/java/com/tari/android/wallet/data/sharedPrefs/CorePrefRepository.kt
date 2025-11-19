@@ -37,6 +37,7 @@ import com.tari.android.wallet.data.sharedPrefs.addressPoisoning.AddressPoisonin
 import com.tari.android.wallet.data.sharedPrefs.backup.BackupPrefRepository
 import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefBooleanDelegate
 import com.tari.android.wallet.data.sharedPrefs.delegates.SharedPrefStringDelegate
+import com.tari.android.wallet.data.sharedPrefs.exolix.ExolixPrefRepository
 import com.tari.android.wallet.data.sharedPrefs.network.NetworkPrefRepository
 import com.tari.android.wallet.data.sharedPrefs.security.SecurityPrefRepository
 import com.tari.android.wallet.data.sharedPrefs.securityStages.SecurityStagesPrefRepository
@@ -68,6 +69,7 @@ class CorePrefRepository @Inject constructor(
     private val sentryPrefRepository: SentryPrefRepository,
     private val securityPrefRepository: SecurityPrefRepository,
     private val addressPoisoningSharedRepository: AddressPoisoningPrefRepository,
+    private val exolixPrefRepository: ExolixPrefRepository,
     @param:ApplicationScope private val applicationScope: CoroutineScope,
 ) : CommonPrefRepository(applicationScope) {
 
@@ -190,6 +192,7 @@ class CorePrefRepository @Inject constructor(
         sentryPrefRepository.clear()
         securityPrefRepository.clear()
         addressPoisoningSharedRepository.clear()
+        exolixPrefRepository.clear()
         walletAddressBase58 = null
         emojiId = null
         onboardingStarted = false

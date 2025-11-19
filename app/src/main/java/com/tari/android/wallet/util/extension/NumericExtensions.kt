@@ -33,6 +33,7 @@
 package com.tari.android.wallet.util.extension
 
 import com.tari.android.wallet.model.MicroTari
+import java.math.BigDecimal
 import java.math.BigInteger
 
 fun String.parseToBigInteger(): BigInteger = runCatching { BigInteger(this) }.getOrNull() ?: BigInteger.ZERO
@@ -41,6 +42,8 @@ fun String.parseToBigInteger(): BigInteger = runCatching { BigInteger(this) }.ge
 fun String.toMicroTariOrNull(): MicroTari? = runCatching {
     this.replace(",", ".").takeIf { it.isValidFloat() }?.toBigDecimal()?.multiply(MicroTari.precisionValue)?.toBigInteger()?.toMicroTari()
 }.getOrNull()
+
+fun BigDecimal.toMicroTari() = (this.multiply(MicroTari.precisionValue)).toBigInteger().toMicroTari()
 
 fun Int.toMicroTari() = BigInteger.valueOf(this.toLong()).toMicroTari()
 

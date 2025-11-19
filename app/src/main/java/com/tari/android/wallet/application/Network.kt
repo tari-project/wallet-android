@@ -36,27 +36,20 @@ package com.tari.android.wallet.application
  * Tari network.
  */
 enum class Network(val uriComponent: String, val displayName: String) {
+
     MAINNET("mainnet", "MAINNET"),
-
     RINCEWIND("rincewind", "RINCEWIND"),
-
     RIDCULLY("ridcully", "RIDCULLY"),
-
     STIBBONS("stibbons", "STIBBONS"),
-
     IGOR("igor", "IGOR"),
-
     DIBBLER("dibbler", "DIBBLER"),
-
     ESMERALDA("esmeralda", "ESMERALDA"),
-
     NEXTNET("nextnet", "NextNet"),
-
     STAGENET("stagenet", "StageNet");
 
     companion object {
         fun from(uriComponent: String): Network {
-            return entries.firstOrNull { it.uriComponent.lowercase() == uriComponent.lowercase() }
+            return entries.firstOrNull { it.uriComponent.equals(uriComponent, ignoreCase = true) }
                 ?: throw RuntimeException("Unknown network: $uriComponent")
         }
     }

@@ -23,6 +23,8 @@ class HomeOverviewFragment : CommonFragment<HomeOverviewViewModel>() {
                 onStartMiningClicked = { viewModel.onStartMiningClicked() },
                 onSendTariClicked = { viewModel.onSendTariClicked() },
                 onRequestTariClicked = { viewModel.onRequestTariClicked() },
+                onBuyClicked = { viewModel.onBuyClicked() },
+                onPendingExolixTransactionClick = viewModel::onExolixTransactionClicked,
                 onTxClick = { viewModel.navigateToTxDetail(it.tx) },
                 onViewAllTxsClick = { viewModel.onAllTxClicked() },
                 onConnectionStatusClick = { viewModel.showConnectionStatusDialog() },
