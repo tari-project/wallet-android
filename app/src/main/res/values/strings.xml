@@ -116,6 +116,7 @@
     <string name="exchange_to_exolix_address">To Exolix address</string>
     <string name="exchange_send_funds_once">Send funds to the address above only once.</string>
     <string name="exchange_cancel_transaction">Cancel Transaction</string>
+    <string name="exchange_ive_sent_funds_button">I\'ve sent the Funds</string>
     <string name="exchange_copy_amount_content_description">Copy amount</string>
     <string name="exchange_copy_address_content_description">Copy address</string>
     <string name="exchange_create_exchange_error">Failed to create exchange</string>
@@ -144,7 +145,7 @@
     <string name="exchange_status_destination_address">Destination Address (%1$s)</string>
     <string name="exchange_status_destination_extra_id">Destination Extra ID</string>
     <string name="exchange_status_transaction_details">Transaction Details</string>
-    <string name="exchange_status_load_error">Failed to load transaction details (Error %1$d)</string>
+    <string name="exchange_status_load_error">Failed to load transaction details. Please try again later.</string>
     <string name="exchange_status_created_at">Created</string>
     <string name="exchange_status_exchange_rate">Exchange Rate</string>
     <string name="exchange_status_exchange_fee">Network Fee</string>
@@ -153,6 +154,7 @@
     <string name="exchange_status_comment">Comment</string>
     <string name="exchange_status_refund_address">Refund Address (%1$s)</string>
     <string name="exchange_status_refund_extra_id">Refund Extra ID</string>
+    <string name="exchange_status_show_qr_code">Show QR Code</string>
 
     <!-- exchange review screen -->
     <string name="exchange_review_title">Review Exchange</string>

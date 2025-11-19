@@ -23,6 +23,8 @@ class ExchangeStatusFragment : CommonFragment<ExchangeStatusViewModel>() {
                 onTransactionDetailsClick = viewModel::onTransactionDetailsClicked,
                 onCopyClick = viewModel::onCopyClicked,
                 onRetry = viewModel::loadTransaction,
+                onPullToRefresh = viewModel::onRefreshClicked,
+                onShowQrCodeClick = viewModel::onShowQrCodeClicked,
             )
         }
     }

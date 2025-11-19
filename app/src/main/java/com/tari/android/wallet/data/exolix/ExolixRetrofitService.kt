@@ -100,6 +100,8 @@ object Exolix {
         REFUNDED("refunded");
 
         override fun toString(): String = value
+
+        fun isFinal(): Boolean = this == SUCCESS || this == REFUNDED || this == OVERDUE
     }
 
     data class CreateExchangeRequest(

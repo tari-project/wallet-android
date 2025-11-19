@@ -13,10 +13,15 @@ import com.tari.android.wallet.ui.screen.exchange.sendFunds.SendFundsFragment.Co
 import com.tari.android.wallet.util.QrUtil
 import com.tari.android.wallet.util.extension.getOrThrow
 import com.tari.android.wallet.util.extension.launchOnIo
+import com.tari.android.wallet.util.extension.launchOnMain
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import javax.inject.Inject
+
+private const val TX_STATUS_AUTO_REFRESH_INTERVAL_MS = 10_000L
 
 class SendFundsViewModel(val savedState: SavedStateHandle) : CommonViewModel() {
 
@@ -32,12 +37,19 @@ class SendFundsViewModel(val savedState: SavedStateHandle) : CommonViewModel() {
     )
     val uiState = _uiState.asStateFlow()
 
+    private var autoRefreshJob: Job? = null
+
     init {
         _uiState.value.transaction?.let {
             initializeFromTransaction(it)
         } ?: run {
             loadTransaction()
         }
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        stopAutoRefresh()
     }
 
     private fun loadTransaction() {
@@ -49,6 +61,7 @@ class SendFundsViewModel(val savedState: SavedStateHandle) : CommonViewModel() {
                 .onSuccess { transaction ->
                     initializeFromTransaction(transaction)
                     _uiState.update { it.copy(loading = false, transaction = transaction) }
+                    startAutoRefresh()
                 }
                 .onFailure { exception ->
                     _uiState.update {
@@ -59,6 +72,34 @@ class SendFundsViewModel(val savedState: SavedStateHandle) : CommonViewModel() {
                     }
                 }
         }
+    }
+
+    private fun refreshTransactionStatus() {
+        val transactionId = _uiState.value.transaction?.id ?: return
+
+        launchOnIo {
+            val transaction = exolixRepository.getTransaction(transactionId).getOrNull()
+
+            if (transaction != null && transaction.status != Exolix.TransactionStatus.WAIT) {
+                stopAutoRefresh()
+                openTxDetails()
+            } else {
+                startAutoRefresh()
+            }
+        }
+    }
+
+    private fun startAutoRefresh() {
+        autoRefreshJob?.cancel()
+        autoRefreshJob = launchOnIo {
+            delay(TX_STATUS_AUTO_REFRESH_INTERVAL_MS)
+            refreshTransactionStatus()
+        }
+    }
+
+    private fun stopAutoRefresh() {
+        autoRefreshJob?.cancel()
+        autoRefreshJob = null
     }
 
     private fun initializeFromTransaction(transaction: Exolix.Transaction) {
@@ -96,13 +137,14 @@ class SendFundsViewModel(val savedState: SavedStateHandle) : CommonViewModel() {
         }
     }
 
-    fun onOpenTxDetails() {
-        // TODO: Implement when transaction details screen is ready
+    fun openTxDetails() {
         _uiState.value.transaction?.let { transaction ->
-            tariNavigator.navigateSequence(
-                Navigation.BackToHome,
-                Navigation.Exchange.ExchangeStatus(transaction.id),
-            )
+            launchOnMain {
+                tariNavigator.navigateSequence(
+                    Navigation.BackToHome,
+                    Navigation.Exchange.ExchangeStatus(transaction.id),
+                )
+            }
         }
     }
 

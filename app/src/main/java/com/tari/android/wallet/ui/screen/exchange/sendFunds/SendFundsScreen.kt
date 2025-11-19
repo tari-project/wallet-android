@@ -235,7 +235,7 @@ private fun SendFundsContent(
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp)
                 .align(Alignment.CenterHorizontally),
-            text = "OPEN TX DETAILS (TODO)",
+            text = stringResource(R.string.exchange_ive_sent_funds_button),
             onClick = onOpenTxDetails,
         )
 
