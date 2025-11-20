@@ -106,8 +106,8 @@ fun SelectCurrencyScreen(
                         modifier = Modifier
                             .padding(horizontal = 16.dp, vertical = 4.dp)
                             .animateItem(),
-                        title = currency.coin,
-                        subtitle = currency.networkName,
+                        title = currency.currency.code + ": " + currency.currency.name,
+                        subtitle = currency.network.name,
                         iconUrl = currency.iconUrl,
                         selected = currency == uiState.selectedCurrency,
                         onClick = { onCurrencyItemClick(currency) },
@@ -178,7 +178,6 @@ private fun LoadingItem(
             )
         },
         contentLayout = {
-            // TODO improve "all loaded" UI
             Text(
                 text = "You have loaded all currencies",
                 style = TariDesignSystem.typography.body2,
