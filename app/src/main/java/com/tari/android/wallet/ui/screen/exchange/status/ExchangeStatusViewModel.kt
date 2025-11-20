@@ -97,10 +97,6 @@ class ExchangeStatusViewModel(savedState: SavedStateHandle) : CommonViewModel() 
         _uiState.update { it.copy(autoRefreshActive = false) }
     }
 
-    fun onTransactionDetailsClicked() {
-        showNotReadyYetDialog()
-    }
-
     fun onShowQrCodeClicked() {
         _uiState.value.transaction?.let { transaction ->
             launchOnMain { tariNavigator.navigate(Navigation.Exchange.SendFunds(transaction = transaction)) }

@@ -152,23 +152,24 @@ private fun SendFundsContent(
                         style = TariDesignSystem.typography.body1,
                         color = TariDesignSystem.colors.textPrimary,
                     )
-                    IconButton(
-                        modifier = Modifier.size(32.dp),
-                        onClick = onCopyAmount,
-                    ) {
-                        Icon(
-                            modifier = Modifier.size(20.dp),
-                            painter = painterResource(R.drawable.vector_icon_copy),
-                            contentDescription = stringResource(R.string.exchange_copy_amount_content_description),
-                            tint = TariDesignSystem.colors.secondaryMain,
-                        )
-                    }
                     Spacer(Modifier.size(8.dp))
                     Text(
                         text = transaction.coinFrom.networkName,
                         style = TariDesignSystem.typography.body1,
                         color = TariDesignSystem.colors.textSecondary,
                     )
+                    Spacer(Modifier.weight(1f))
+                    IconButton(
+                        modifier = Modifier.size(32.dp),
+                        onClick = onCopyAmount,
+                    ) {
+                        Icon(
+                            modifier = Modifier.size(24.dp),
+                            painter = painterResource(R.drawable.vector_icon_copy),
+                            contentDescription = stringResource(R.string.exchange_copy_amount_content_description),
+                            tint = TariDesignSystem.colors.secondaryMain,
+                        )
+                    }
                 }
 
                 Spacer(Modifier.size(8.dp))
@@ -191,7 +192,7 @@ private fun SendFundsContent(
                         onClick = onCopyAddress,
                     ) {
                         Icon(
-                            modifier = Modifier.size(20.dp),
+                            modifier = Modifier.size(24.dp),
                             painter = painterResource(R.drawable.vector_icon_copy),
                             contentDescription = stringResource(R.string.exchange_copy_address_content_description),
                             tint = TariDesignSystem.colors.secondaryMain,

@@ -19,7 +19,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -48,7 +47,6 @@ import com.tari.android.wallet.util.extension.txFormattedDate
 fun ExchangeStatusScreen(
     uiState: ExchangeStatusViewModel.UiState,
     onBackClick: () -> Unit,
-    onTransactionDetailsClick: () -> Unit,
     onCopyClick: (String) -> Unit,
     onRetry: () -> Unit,
     onPullToRefresh: () -> Unit,
@@ -117,7 +115,6 @@ fun ExchangeStatusScreen(
                     ExchangeStatusContent(
                         transaction = transaction,
                         showQrCodeButton = uiState.showQrCodeButton,
-                        onTransactionDetailsClick = onTransactionDetailsClick,
                         onCopyClick = onCopyClick,
                         onDoneClick = onBackClick,
                         onShowQrCodeClick = onShowQrCodeClick,
@@ -132,7 +129,6 @@ fun ExchangeStatusScreen(
 private fun ExchangeStatusContent(
     transaction: Exolix.Transaction,
     showQrCodeButton: Boolean,
-    onTransactionDetailsClick: () -> Unit,
     onCopyClick: (value: String) -> Unit,
     onDoneClick: () -> Unit,
     onShowQrCodeClick: () -> Unit,
@@ -240,20 +236,12 @@ private fun ExchangeStatusContent(
             Spacer(Modifier.size(10.dp))
         }
 
-        TxDetailInfoItem(
+        TxDetailInfoCopyItem(
             modifier = Modifier.fillMaxWidth(),
             title = stringResource(R.string.exchange_status_transaction_details),
             value = transaction.id,
             singleLine = false,
-        ) {
-            androidx.compose.material3.IconButton(onClick = onTransactionDetailsClick) {
-                Icon(
-                    painter = painterResource(R.drawable.vector_icon_open_url),
-                    contentDescription = null,
-                    tint = TariDesignSystem.colors.componentsNavbarIcons,
-                )
-            }
-        }
+        )
 
         Spacer(Modifier.weight(1f))
         Spacer(Modifier.size(24.dp))
@@ -312,7 +300,6 @@ private fun ExchangeStatusScreenSuccessPreview() {
                 autoRefreshActive = true,
             ),
             onBackClick = {},
-            onTransactionDetailsClick = {},
             onCopyClick = {},
             onRetry = {},
             onPullToRefresh = {},
@@ -339,7 +326,6 @@ private fun ExchangeStatusScreenWaitPreview() {
                 autoRefreshActive = true,
             ),
             onBackClick = {},
-            onTransactionDetailsClick = {},
             onCopyClick = {},
             onRetry = {},
             onPullToRefresh = {},

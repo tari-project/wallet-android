@@ -20,7 +20,6 @@ class ExchangeStatusFragment : CommonFragment<ExchangeStatusViewModel>() {
             ExchangeStatusScreen(
                 uiState = uiState,
                 onBackClick = { viewModel.onBackPressed() },
-                onTransactionDetailsClick = viewModel::onTransactionDetailsClicked,
                 onCopyClick = viewModel::onCopyClicked,
                 onRetry = viewModel::loadTransaction,
                 onPullToRefresh = viewModel::onRefreshClicked,
