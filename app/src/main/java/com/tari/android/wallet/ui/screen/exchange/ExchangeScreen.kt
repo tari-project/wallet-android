@@ -131,9 +131,7 @@ fun ExchangeScreen(
                 )
             },
         ) {
-            TariPullToRefreshBox(
-                onPullToRefresh = onPullToRefresh,
-            ) {
+            TariPullToRefreshBox(onPullToRefresh) {
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
@@ -287,7 +285,7 @@ fun ExchangeScreen(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(horizontal = 16.dp),
-                        text = stringResource(R.string.exchange_exchange_now_button),
+                        text = stringResource(R.string.exchange_next_step_button),
                         enabled = uiState.exchangeButtonEnabled,
                         onClick = onExchangeClicked,
                     )
@@ -334,7 +332,7 @@ private fun YouSendLayout(
                 },
                 visualTransformation = AmountVisualTransformation(),
                 keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Number,
+                    keyboardType = KeyboardType.Decimal,
                     imeAction = ImeAction.Done,
                 ),
                 keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
@@ -367,34 +365,34 @@ private fun YouSendLayout(
             )
         }
 
-        if (uiState.rateAmountError && uiState.rate != null) {
-            Spacer(Modifier.size(20.dp))
-            Column {
-                Row(verticalAlignment = Alignment.Bottom) {
-                    Text(
-                        text = stringResource(R.string.exchange_min_amount_label_short),
-                        style = TariDesignSystem.typography.body1,
-                    )
-                    Spacer(Modifier.size(8.dp))
-                    Text(
-                        modifier = Modifier.clickable { onMinAmountClicked() },
-                        text = "${WalletConfig.amountFormatter.format(uiState.rate.minAmount)} ${uiState.fromCurrency?.coin.orEmpty()}",
-                        style = TariDesignSystem.typography.headingLarge,
-                    )
-                }
+        Spacer(Modifier.size(20.dp))
+        val minAmountText = uiState.rate?.minAmount?.let { WalletConfig.amountFormatter.format(it) }
+        val maxAmountText = uiState.rate?.maxAmount?.let { WalletConfig.amountFormatter.format(it) }
+        Column {
+            Row(verticalAlignment = Alignment.Bottom) {
+                Text(
+                    text = stringResource(R.string.exchange_min_amount_label_short),
+                    style = TariDesignSystem.typography.body1,
+                )
                 Spacer(Modifier.size(8.dp))
-                Row(verticalAlignment = Alignment.Bottom) {
-                    Text(
-                        text = stringResource(R.string.exchange_max_amount_label_short),
-                        style = TariDesignSystem.typography.body1,
-                    )
-                    Spacer(Modifier.size(8.dp))
-                    Text(
-                        modifier = Modifier.clickable { onMaxAmountClicked() },
-                        text = "${WalletConfig.amountFormatter.format(uiState.rate.maxAmount)} ${uiState.fromCurrency?.coin.orEmpty()}",
-                        style = TariDesignSystem.typography.headingLarge,
-                    )
-                }
+                Text(
+                    modifier = Modifier.clickable(enabled = minAmountText != null) { onMinAmountClicked() },
+                    text = "${minAmountText ?: "-"} ${uiState.fromCurrency?.coin.orEmpty()}",
+                    style = TariDesignSystem.typography.headingLarge,
+                )
+            }
+            Spacer(Modifier.size(8.dp))
+            Row(verticalAlignment = Alignment.Bottom) {
+                Text(
+                    text = stringResource(R.string.exchange_max_amount_label_short),
+                    style = TariDesignSystem.typography.body1,
+                )
+                Spacer(Modifier.size(8.dp))
+                Text(
+                    modifier = Modifier.clickable(enabled = maxAmountText != null) { onMaxAmountClicked() },
+                    text = "${maxAmountText ?: "-"} ${uiState.fromCurrency?.coin.orEmpty()}",
+                    style = TariDesignSystem.typography.headingLarge,
+                )
             }
         }
     }
@@ -480,7 +478,7 @@ private fun ExchangeScreenPreview() {
                 amountValue = "100",
                 selectedCurrency = MockDataStub.createCurrencyDto(),
                 tariCurrency = MockDataStub.createCurrencyDto(code = "XTM", name = "Tari"),
-                rate = MockDataStub.createRate(),
+                rate = null,
                 exchangeDirection = ExchangeDirection.BUY_TARI,
             ),
             onBackClick = {},

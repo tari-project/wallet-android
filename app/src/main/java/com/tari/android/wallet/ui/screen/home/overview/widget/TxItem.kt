@@ -40,6 +40,7 @@ import org.joda.time.Minutes
 import java.util.Locale
 
 private const val TX_ITEM_DATE_FORMAT = "E, MMM d"
+private const val TX_ITEM_DATE_TIME_FORMAT = "E, MMM d 'at' h:mm a"
 private val MIN_ROUNDING = 10000.toBigInteger()
 
 @Composable
@@ -84,7 +85,7 @@ fun TxItem(
                     style = TariDesignSystem.typography.headingMedium,
                 )
                 Text(
-                    text = txDto.tx.dateTime.txListItemFormattedDate(),
+                    text = txDto.tx.dateTime.txListItemFormattedDate(withTime = true),
                     style = TariDesignSystem.typography.body2,
                 )
             }
@@ -118,12 +119,12 @@ fun TxItem(
 }
 
 @Composable
-fun DateTime.txListItemFormattedDate(): String {
+fun DateTime.txListItemFormattedDate(relative: Boolean = true, withTime: Boolean = false): String {
     val txDate = this.toLocalDate()
     val todayDate = LocalDate.now()
     val yesterdayDate = todayDate.minusDays(1)
     return when {
-        txDate.isEqual(todayDate) -> {
+        relative && txDate.isEqual(todayDate) -> {
             val minutesSinceTx = Minutes.minutesBetween(this, DateTime.now()).minutes
             when {
                 minutesSinceTx == 0 -> stringResource(R.string.tx_list_now)
@@ -132,8 +133,9 @@ fun DateTime.txListItemFormattedDate(): String {
             }
         }
 
-        txDate.isEqual(yesterdayDate) -> stringResource(R.string.home_tx_list_header_yesterday)
-        else -> txDate.toString(TX_ITEM_DATE_FORMAT, Locale.ENGLISH)
+        relative && txDate.isEqual(yesterdayDate) -> stringResource(R.string.home_tx_list_header_yesterday)
+
+        else -> this.toString(if (withTime) TX_ITEM_DATE_TIME_FORMAT else TX_ITEM_DATE_FORMAT, Locale.ENGLISH)
     }
 }
 
@@ -171,8 +173,9 @@ fun TxDto.itemMessage(): String {
 @Composable
 private fun TxItemPreview() {
     PreviewSecondarySurface(TariTheme.Light) {
+        Spacer(Modifier.size(16.dp))
         TxItem(
-            modifier = Modifier.padding(16.dp),
+            modifier = Modifier.padding(horizontal = 16.dp),
             txDto = MockDataStub.createTxDto(
                 amount = 12345678,
                 contactAlias = "Alice",
@@ -181,9 +184,9 @@ private fun TxItemPreview() {
             balanceHidden = false,
             onTxClick = {},
         )
-
+        Spacer(Modifier.size(16.dp))
         TxItem(
-            modifier = Modifier.padding(16.dp),
+            modifier = Modifier.padding(horizontal = 16.dp),
             txDto = MockDataStub.createTxDto(
                 amount = 12345,
                 contactAlias = "Alice",
@@ -192,9 +195,9 @@ private fun TxItemPreview() {
             balanceHidden = false,
             onTxClick = {},
         )
-
+        Spacer(Modifier.size(16.dp))
         TxItem(
-            modifier = Modifier.padding(16.dp),
+            modifier = Modifier.padding(horizontal = 16.dp),
             txDto = MockDataStub.createTxDto(
                 amount = 1234,
                 contactAlias = "Alice",
@@ -203,9 +206,9 @@ private fun TxItemPreview() {
             balanceHidden = false,
             onTxClick = {},
         )
-
+        Spacer(Modifier.size(16.dp))
         TxItem(
-            modifier = Modifier.padding(16.dp),
+            modifier = Modifier.padding(horizontal = 16.dp),
             txDto = MockDataStub.createTxDto(
                 amount = 1234,
                 contactAlias = "Alice",
@@ -214,5 +217,6 @@ private fun TxItemPreview() {
             balanceHidden = true,
             onTxClick = {},
         )
+        Spacer(Modifier.size(16.dp))
     }
 }

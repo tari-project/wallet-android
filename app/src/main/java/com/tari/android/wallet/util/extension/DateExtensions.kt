@@ -32,11 +32,11 @@
  */
 package com.tari.android.wallet.util.extension
 
+import org.joda.time.DateTime
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
 import java.util.Locale
-import java.util.TimeZone
 
 /**
  * Contains Date functions.
@@ -59,11 +59,10 @@ fun Date.txFormattedDate(): String {
         .format(this)
 }
 
-fun String.parseISODate(): Date? = runCatching {
-    val format = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.ENGLISH)
-    format.timeZone = TimeZone.getTimeZone("UTC")
-    format.parse(this)
-}.getOrNull()
+fun String.parseDateTime(): DateTime? {
+    // Parse ISO 8601 date format from API (e.g., "2025-01-24T10:30:00Z")
+    return runCatching { DateTime.parse(this) }.getOrNull()
+}
 
 fun Calendar.isAfterNow(): Boolean {
     return this.after(Calendar.getInstance())
