@@ -143,8 +143,7 @@ class ExolixRepository @Inject constructor(
                     rateType = requestData.rateType,
                 )
             ).also { response ->
-                val transaction = exolixRetrofitService.getTransaction(response.id)
-                exolixPrefRepository.saveTransaction(transaction)
+                exolixPrefRepository.saveTransaction(response)
             }
         }
     }
@@ -155,7 +154,7 @@ class ExolixRepository @Inject constructor(
      */
     suspend fun getPendingTransactions(): Result<List<Exolix.Transaction>> = switchToIo {
         runCatching {
-            val storedTransactions = exolixPrefRepository.transactions
+            val storedTransactions = exolixPrefRepository.transactions.sortedByDescending { it.createdAt }.take(5) // TODO decide how many to refresh
             val refreshedTransactions = mutableListOf<Exolix.Transaction>()
 
             storedTransactions.forEach { storedTx ->

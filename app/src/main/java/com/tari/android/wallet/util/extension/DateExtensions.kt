@@ -33,6 +33,7 @@
 package com.tari.android.wallet.util.extension
 
 import org.joda.time.DateTime
+import org.joda.time.DateTimeZone
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
@@ -60,8 +61,9 @@ fun Date.txFormattedDate(): String {
 }
 
 fun String.parseDateTime(): DateTime? {
-    // Parse ISO 8601 date format from API (e.g., "2025-01-24T10:30:00Z")
-    return runCatching { DateTime.parse(this) }.getOrNull()
+    // Parse ISO 8601 date format from API (e.g., "2025-11-24T16:12:49.098Z")
+    // The "Z" suffix indicates UTC, so we convert to local timezone
+    return runCatching { DateTime.parse(this).withZone(DateTimeZone.getDefault()) }.getOrNull()
 }
 
 fun Calendar.isAfterNow(): Boolean {

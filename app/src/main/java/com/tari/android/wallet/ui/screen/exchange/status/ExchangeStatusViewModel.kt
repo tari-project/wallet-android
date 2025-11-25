@@ -8,6 +8,7 @@ import com.tari.android.wallet.data.exolix.ExolixRepository
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.ui.screen.exchange.status.ExchangeStatusFragment.Companion.ARG_TRANSACTION_ID
 import com.tari.android.wallet.util.extension.getOrThrow
+import com.tari.android.wallet.util.extension.isTrue
 import com.tari.android.wallet.util.extension.launchOnIo
 import com.tari.android.wallet.util.extension.launchOnMain
 import kotlinx.coroutines.Job
@@ -118,6 +119,6 @@ class ExchangeStatusViewModel(savedState: SavedStateHandle) : CommonViewModel() 
         val autoRefreshActive: Boolean = false,
     ) {
         val showQrCodeButton: Boolean
-            get() = transaction?.status == Exolix.TransactionStatus.WAIT
+            get() = transaction?.waitingForDeposit.isTrue()
     }
 }

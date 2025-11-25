@@ -125,7 +125,7 @@
     <string name="exchange_amount_copied">Amount copied</string>
     <string name="exchange_address_label">Address</string>
     <string name="exchange_address_copied">Address copied</string>
-    <string name="exchange_rate_error_title">Exchange rate unavailable (%1$s)</string>
+    <string name="exchange_rate_error_title">Exchange rate unavailable</string>
     <string name="exchange_rate_error_message">Unable to fetch the exchange rate at this time. Please check your internet connection and try again.</string>
     <string name="exchange_currencies_load_error">Unable to load currencies. Please check your connection and try again.</string>
     <string name="exchange_destination_address_placeholder">Enter destination address</string>
@@ -168,6 +168,7 @@
     <string name="exchange_review_label">Exchange Review</string>
     <string name="exchange_tx_message">Exchange via Exolix</string>
     <string name="exchange_invalid_deposit_address_error">Invalid deposit address received from Exolix</string>
+    <string name="exchange_problem_sending_tx">There was a problem sending the transaction in the Tari network. Please try again later or contact support if the problem persists.</string>
 
     <!-- exchange status card titles -->
     <string name="exchange_status_card_waiting_for_deposit">Waiting for your deposit</string>

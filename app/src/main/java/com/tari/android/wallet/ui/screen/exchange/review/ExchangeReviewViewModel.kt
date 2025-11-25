@@ -93,7 +93,6 @@ class ExchangeReviewViewModel(savedState: SavedStateHandle) : CommonViewModel() 
                 )
 
                 logger.i("Exchange tx sent: $txId")
-                walletManager.sendWalletEvent(WalletManager.WalletEvent.TxSend.TxSendSuccessful(txId))
 
                 switchToMain {
                     tariNavigator.navigateSequence(
@@ -102,9 +101,12 @@ class ExchangeReviewViewModel(savedState: SavedStateHandle) : CommonViewModel() 
                     )
                 }
             }.onFailure { exception ->
-                logger.e("Failed to send exchange tx", exception)
-                walletManager.sendWalletEvent(WalletManager.WalletEvent.TxSend.TxSendFailed(TxFailureReason.SEND_ERROR))
+                logger.d("Failed to send exchange tx: ${exception.message}")
                 switchToMain { _uiState.update { it.copy(sending = false) } }
+                showSimpleDialog(
+                    title = resourceManager.getString(R.string.common_error_title),
+                    description = resourceManager.getString(R.string.exchange_problem_sending_tx),
+                )
             }
         }
     }

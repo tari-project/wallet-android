@@ -217,7 +217,7 @@ class HomeOverviewViewModel : CommonViewModel() {
     }
 
     fun onExolixTransactionClicked(transaction: Exolix.Transaction) {
-        if (transaction.status == Exolix.TransactionStatus.WAIT) {
+        if (transaction.waitingForDeposit) {
             tariNavigator.navigate(Navigation.Exchange.SendFunds(transaction = transaction))
         } else {
             tariNavigator.navigate(Navigation.Exchange.ExchangeStatus(transaction.id))

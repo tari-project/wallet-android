@@ -197,7 +197,11 @@ object Exolix {
         @SerializedName("refundExtraId") val refundExtraId: String? = null,
         @SerializedName("status") val status: TransactionStatus,
         @SerializedName("source") val source: String? = null,
-    ) : Parcelable
+    ) : Parcelable {
+        // Exolix processes XTM transactions instantly, so no need to show waiting for deposit state
+        val waitingForDeposit: Boolean
+            get() = status == TransactionStatus.WAIT && coinFrom.coinCode != "XTM"
+    }
 
     @Parcelize
     data class CoinInfo(
