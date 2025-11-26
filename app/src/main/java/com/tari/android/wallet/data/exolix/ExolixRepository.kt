@@ -204,7 +204,6 @@ data class ExchangeRequestData(
     val tariCurrency: CurrencyDto,
     val selectedAddress: String? = null,
     val amount: BigDecimal,
-    val rate: Exolix.Rate,
     val rateType: Exolix.RateType,
     val direction: ExchangeDirection,
 ) : Parcelable

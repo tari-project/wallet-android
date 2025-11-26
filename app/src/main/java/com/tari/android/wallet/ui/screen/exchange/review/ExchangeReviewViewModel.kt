@@ -35,14 +35,13 @@ class ExchangeReviewViewModel(savedState: SavedStateHandle) : CommonViewModel() 
         component.inject(this)
     }
 
+    private val request = savedState.getOrThrow<ExchangeRequestData>(ARG_REQUEST)
+
     private val _uiState = MutableStateFlow(
-        savedState.getOrThrow<ExchangeRequestData>(ARG_REQUEST).let { request ->
-            UiState(
-                request = request,
-                walletAddress = sharedPrefsRepository.walletAddress,
-                fee = walletManager.requireWalletInstance.estimateTxFee(request.amount.toMicroTari()),
-            )
-        }
+        UiState(
+            walletAddress = sharedPrefsRepository.walletAddress,
+            fee = walletManager.requireWalletInstance.estimateTxFee(request.amount.toMicroTari()),
+        )
     )
     val uiState = _uiState.asStateFlow()
 
@@ -57,7 +56,7 @@ class ExchangeReviewViewModel(savedState: SavedStateHandle) : CommonViewModel() 
     fun onConfirmClicked() {
         val transaction = _uiState.value.transaction ?: error("Exchange transaction is for some reason null on confirm")
         val depositAddress = transaction.depositAddress
-        val amount = _uiState.value.request.amount
+        val amount = transaction.amount
 
         _uiState.update { it.copy(sending = true) }
 
@@ -132,7 +131,7 @@ class ExchangeReviewViewModel(savedState: SavedStateHandle) : CommonViewModel() 
     private fun createExchange() {
         _uiState.update { it.copy(creatingExchange = true, creatingExchangeError = null) }
         launchOnIo {
-            exolixRepository.createExchange(_uiState.value.request)
+            exolixRepository.createExchange(request)
                 .onSuccess { response ->
                     _uiState.update {
                         it.copy(
@@ -153,7 +152,6 @@ class ExchangeReviewViewModel(savedState: SavedStateHandle) : CommonViewModel() 
     }
 
     data class UiState(
-        val request: ExchangeRequestData,
         val walletAddress: TariWalletAddress,
         val fee: MicroTari,
         val transaction: Exolix.Transaction? = null,
