@@ -19,6 +19,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -30,6 +31,8 @@ import com.tari.android.wallet.ui.compose.PreviewSecondarySurface
 import com.tari.android.wallet.ui.compose.TariDesignSystem
 import com.tari.android.wallet.ui.screen.settings.themeSelector.TariTheme
 import com.tari.android.wallet.util.MockDataStub
+import com.tari.android.wallet.util.extension.parseDateTime
+import java.util.Locale
 
 @Composable
 fun PendingExolixTxItem(
@@ -78,9 +81,21 @@ fun PendingExolixTxItem(
                     style = TariDesignSystem.typography.headingMedium,
                 )
                 Text(
-                    text = transaction.status.statusText(),
+                    text = transaction.id, // TODO remove after testing!!
                     style = TariDesignSystem.typography.body2,
                 )
+                Text(
+                    text = transaction.status.statusText(),
+                    style = TariDesignSystem.typography.body2,
+                    color = transaction.status.statusColor(),
+                )
+                transaction.createdAt.parseDateTime()?.let { dateTime ->
+                    Text(
+//                        text = dateTime.txListItemFormattedDate(withTime = true), // TODO uncomment after testing!!
+                        text = dateTime.toString("E, MMM d 'at' HH:mm", Locale.ENGLISH),
+                        style = TariDesignSystem.typography.body2,
+                    )
+                }
             }
             Icon(
                 modifier = Modifier.size(20.dp),
@@ -107,15 +122,53 @@ private fun Exolix.TransactionStatus.statusText(): String = stringResource(
 )
 
 @Composable
+private fun Exolix.TransactionStatus.statusColor(): Color = when (this) {
+    Exolix.TransactionStatus.SUCCESS -> TariDesignSystem.colors.systemGreen
+
+    Exolix.TransactionStatus.OVERDUE,
+    Exolix.TransactionStatus.REFUNDED -> TariDesignSystem.colors.systemRed
+
+    Exolix.TransactionStatus.WAIT -> TariDesignSystem.colors.textSecondary
+
+    else -> TariDesignSystem.colors.warningMain
+}
+
+@Composable
 @Preview
 private fun PendingExolixTxItemPreview() {
     PreviewSecondarySurface(TariTheme.Light) {
+        Spacer(Modifier.size(16.dp))
         PendingExolixTxItem(
             transaction = MockDataStub.createExchangeTransaction(
                 status = Exolix.TransactionStatus.WAIT,
             ),
-            modifier = Modifier.padding(16.dp),
+            modifier = Modifier.padding(horizontal = 16.dp),
             onClick = {},
         )
+        Spacer(Modifier.size(16.dp))
+        PendingExolixTxItem(
+            transaction = MockDataStub.createExchangeTransaction(
+                status = Exolix.TransactionStatus.CONFIRMATION,
+            ),
+            modifier = Modifier.padding(horizontal = 16.dp),
+            onClick = {},
+        )
+        Spacer(Modifier.size(16.dp))
+        PendingExolixTxItem(
+            transaction = MockDataStub.createExchangeTransaction(
+                status = Exolix.TransactionStatus.OVERDUE,
+            ),
+            modifier = Modifier.padding(horizontal = 16.dp),
+            onClick = {},
+        )
+        Spacer(Modifier.size(16.dp))
+        PendingExolixTxItem(
+            transaction = MockDataStub.createExchangeTransaction(
+                status = Exolix.TransactionStatus.SUCCESS,
+            ),
+            modifier = Modifier.padding(horizontal = 16.dp),
+            onClick = {},
+        )
+        Spacer(Modifier.size(16.dp))
     }
 }

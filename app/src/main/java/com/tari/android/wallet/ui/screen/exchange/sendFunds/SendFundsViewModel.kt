@@ -61,7 +61,6 @@ class SendFundsViewModel(val savedState: SavedStateHandle) : CommonViewModel() {
                 .onSuccess { transaction ->
                     initializeFromTransaction(transaction)
                     _uiState.update { it.copy(loading = false, transaction = transaction) }
-                    startAutoRefresh()
                 }
                 .onFailure { exception ->
                     _uiState.update {
@@ -111,6 +110,7 @@ class SendFundsViewModel(val savedState: SavedStateHandle) : CommonViewModel() {
                 )
             )
         }
+        startAutoRefresh()
     }
 
     fun onRetry() {

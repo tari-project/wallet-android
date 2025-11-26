@@ -134,7 +134,7 @@ fun SendScreen(
                             Text(
                                 text = stringResource(
                                     R.string.home_available_to_spend_balance,
-                                    WalletConfig.balanceFormatter.format(uiState.availableBalance.tariValue) + " " + uiState.ticker
+                                    WalletConfig.balanceFormatter.format(availableBalance.tariValue) + " " + uiState.ticker
                                 ),
                                 style = TariDesignSystem.typography.body1,
                                 color = if (uiState.availableBalanceError) {
@@ -153,7 +153,7 @@ fun SendScreen(
                 errorText = uiState.amountError?.let { stringResource(it) },
                 visualTransformation = AmountVisualTransformation(),
                 keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Number,
+                    keyboardType = KeyboardType.Decimal,
                     imeAction = if (uiState.disabledNoteField) ImeAction.Done else ImeAction.Next,
                 ),
                 keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),

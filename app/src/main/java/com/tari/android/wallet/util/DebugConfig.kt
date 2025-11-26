@@ -38,8 +38,6 @@ import com.tari.android.wallet.BuildConfig
 import com.tari.android.wallet.application.addressPoisoning.SimilarAddressDto
 import com.tari.android.wallet.data.contacts.Contact
 import com.tari.android.wallet.data.exolix.CurrencyDto
-import com.tari.android.wallet.data.exolix.ExchangeDirection
-import com.tari.android.wallet.data.exolix.ExchangeRequestData
 import com.tari.android.wallet.data.exolix.Exolix
 import com.tari.android.wallet.data.tx.TxDto
 import com.tari.android.wallet.ffi.FFITxCancellationReason
@@ -345,28 +343,6 @@ object MockDataStub {
         )
     }
 
-    fun createCurrencyList(count: Int = 10) = List(count) { index ->
-        val currencies = listOf(
-            Triple("ETH", "Ethereum", "https://exolix.com/icons/coins/ETH.png"),
-            Triple("BTC", "Bitcoin", "https://exolix.com/icons/coins/BTC.png"),
-            Triple("USDT", "Tether", "https://exolix.com/icons/coins/USDT.png"),
-            Triple("BNB", "Binance Coin", "https://exolix.com/icons/coins/BNB.png"),
-            Triple("ADA", "Cardano", "https://exolix.com/icons/coins/ADA.png"),
-            Triple("SOL", "Solana", "https://exolix.com/icons/coins/SOL.png"),
-            Triple("DOT", "Polkadot", "https://exolix.com/icons/coins/DOT.png"),
-            Triple("DOGE", "Dogecoin", "https://exolix.com/icons/coins/DOGE.png"),
-            Triple("AVAX", "Avalanche", "https://exolix.com/icons/coins/AVAX.png"),
-            Triple("LTC", "Litecoin", "https://exolix.com/icons/coins/LTC.png"),
-        )
-        val (code, name, icon) = currencies[index % currencies.size]
-        createCurrency(
-            code = code,
-            name = name,
-            icon = icon,
-            networks = if (index % 3 == 0) createNetworkList() else listOf(createNetwork(code, name, code, true)),
-        )
-    }
-
     fun createCurrencyDtoList(count: Int = 10): List<CurrencyDto> {
         val currencies = listOf(
             Triple("ETH", "Ethereum", "https://exolix.com/icons/coins/ETH.png"),
@@ -502,35 +478,6 @@ object MockDataStub {
         refundExtraId = refundExtraId,
         status = status,
         source = source,
-    )
-
-    fun createExchangeRequestData(
-        selectedCurrency: CurrencyDto = createCurrencyDto(
-            code = "ETH",
-            name = "Ethereum",
-        ),
-        tariCurrency: CurrencyDto = createCurrencyDto(
-            code = "XTM",
-            name = "Tari",
-            networks = listOf(createNetwork("tari", "Tari", "XTM", true)),
-        ),
-        selectedAddress: String? = null,
-        amount: BigDecimal = BigDecimal("100.01"),
-        rate: Exolix.Rate = createRate(
-            fromAmount = amount,
-            toAmount = BigDecimal("0.9982"),
-            rate = BigDecimal("0.00998"),
-        ),
-        rateType: Exolix.RateType = Exolix.RateType.FIXED,
-        direction: ExchangeDirection = ExchangeDirection.SELL_TARI,
-    ) = ExchangeRequestData(
-        selectedCurrency = selectedCurrency,
-        tariCurrency = tariCurrency,
-        selectedAddress = selectedAddress,
-        amount = amount,
-        rate = rate,
-        rateType = rateType,
-        direction = direction,
     )
 }
 

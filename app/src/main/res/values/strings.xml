@@ -87,7 +87,7 @@
     <string name="common_copy">Copy</string>
 
     <!-- Exchange screen -->
-    <string name="exchange_title">Exchange Tari</string>
+    <string name="exchange_title">Select Pair</string>
     <string name="exchange_amount_placeholder">Enter amount</string>
     <string name="exchange_insufficient_funds_error">Insufficient available balance</string>
     <string name="exchange_amount_outside_rate_limits">Amount is outside the allowed range</string>
@@ -105,18 +105,18 @@
     <string name="exchange_you_send_label">You send</string>
     <string name="exchange_you_receive_label">You receive</string>
     <string name="exchange_powered_by_label">Powered by</string>
-    <string name="exchange_exchange_now_button">Exchange Now</string>
+    <string name="exchange_next_step_button">Next Step</string>
     <string name="exchange_fixed_rate">Fixed rate</string>
     <string name="exchange_destination_address_label">Destination Address (%1$s)</string>
     <string name="exchange_tari_wallet_address_info">Your new XTM will be sent to your current Tari wallet address on mobile.</string>
     <string name="exchange_refresh_rate">Refresh rate</string>
-    <string name="exchange_send_funds_title">Send funds</string>
+    <string name="exchange_send_funds_title">Send Funds</string>
     <string name="exchange_send_exact_amount">Send the exact amount to the address below in one transaction</string>
     <string name="exchange_you_need_to_send">You need to send</string>
     <string name="exchange_to_exolix_address">To Exolix address</string>
     <string name="exchange_send_funds_once">Send funds to the address above only once.</string>
     <string name="exchange_cancel_transaction">Cancel Transaction</string>
-    <string name="exchange_ive_sent_funds_button">I\'ve sent the Funds</string>
+    <string name="exchange_ive_sent_funds_button">I\'ve Sent the Funds</string>
     <string name="exchange_copy_amount_content_description">Copy amount</string>
     <string name="exchange_copy_address_content_description">Copy address</string>
     <string name="exchange_create_exchange_error">Failed to create exchange</string>
@@ -125,7 +125,7 @@
     <string name="exchange_amount_copied">Amount copied</string>
     <string name="exchange_address_label">Address</string>
     <string name="exchange_address_copied">Address copied</string>
-    <string name="exchange_rate_error_title">Exchange rate unavailable (%1$s)</string>
+    <string name="exchange_rate_error_title">Exchange rate unavailable</string>
     <string name="exchange_rate_error_message">Unable to fetch the exchange rate at this time. Please check your internet connection and try again.</string>
     <string name="exchange_currencies_load_error">Unable to load currencies. Please check your connection and try again.</string>
     <string name="exchange_destination_address_placeholder">Enter destination address</string>
@@ -144,7 +144,7 @@
     <string name="exchange_status_amount">Amount</string>
     <string name="exchange_status_destination_address">Destination Address (%1$s)</string>
     <string name="exchange_status_destination_extra_id">Destination Extra ID</string>
-    <string name="exchange_status_transaction_details">Transaction Details</string>
+    <string name="exchange_status_transaction_details">Transaction ID</string>
     <string name="exchange_status_load_error">Failed to load transaction details. Please try again later.</string>
     <string name="exchange_status_created_at">Created</string>
     <string name="exchange_status_exchange_rate">Exchange Rate</string>
@@ -168,6 +168,7 @@
     <string name="exchange_review_label">Exchange Review</string>
     <string name="exchange_tx_message">Exchange via Exolix</string>
     <string name="exchange_invalid_deposit_address_error">Invalid deposit address received from Exolix</string>
+    <string name="exchange_problem_sending_tx">There was a problem sending the transaction in the Tari network. Please try again later or contact support if the problem persists.</string>
 
     <!-- exchange status card titles -->
     <string name="exchange_status_card_waiting_for_deposit">Waiting for your deposit</string>
@@ -305,6 +306,8 @@
     <string name="tx_list_minutes_ago">%dm ago</string>
     <string name="tx_list_hours_ago">%dh ago</string>
     <string name="tx_list_now">Now</string>
+    <string name="tx_list_today_at">Today at %s</string>
+    <string name="tx_list_yesterday_at">Yesterday at %s</string>
 
     <!-- send tari -->
     <string name="request_tari_title">Receive Tari</string>

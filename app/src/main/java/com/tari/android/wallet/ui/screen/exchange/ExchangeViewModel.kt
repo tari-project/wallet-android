@@ -10,7 +10,6 @@ import com.tari.android.wallet.data.exolix.ExchangeRequestData
 import com.tari.android.wallet.data.exolix.Exolix
 import com.tari.android.wallet.data.exolix.ExolixRepository
 import com.tari.android.wallet.model.MicroTari
-import com.tari.android.wallet.model.WalletError
 import com.tari.android.wallet.ui.common.CommonViewModel
 import com.tari.android.wallet.util.extension.collectFlow
 import com.tari.android.wallet.util.extension.filterNumbers
@@ -142,7 +141,6 @@ class ExchangeViewModel : CommonViewModel() {
             tariCurrency = _uiState.value.tariCurrency ?: error("tariCurrency is null, but exchange button is not disabled"),
             selectedAddress = _uiState.value.destinationAddress.takeIf { it.isNotBlank() },
             amount = _uiState.value.amount ?: error("amount is null, but exchange button is not disabled"),
-            rate = _uiState.value.rate ?: error("rate is null, but exchange button is not disabled"),
             rateType = if (_uiState.value.fixedRate) Exolix.RateType.FIXED else Exolix.RateType.FLOATING,
             direction = _uiState.value.exchangeDirection,
         )
@@ -205,11 +203,11 @@ class ExchangeViewModel : CommonViewModel() {
             ).onSuccess { rate ->
                 _uiState.update { it.copy(rate = rate, rateLoading = false) }
                 startAutoRefresh()
-            }.onFailure { e ->
+            }.onFailure { error ->
                 _uiState.update { it.copy(rateLoading = false) }
-
+                logger.d("Failed to fetch exchange rate: ${error.message}")
                 showSimpleDialog(
-                    title = resourceManager.getString(R.string.exchange_rate_error_title, WalletError(e).code),
+                    title = resourceManager.getString(R.string.exchange_rate_error_title),
                     description = resourceManager.getString(R.string.exchange_rate_error_message),
                 )
             }

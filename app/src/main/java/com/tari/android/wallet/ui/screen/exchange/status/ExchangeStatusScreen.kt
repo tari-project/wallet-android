@@ -36,12 +36,12 @@ import com.tari.android.wallet.ui.compose.components.TariProgressView
 import com.tari.android.wallet.ui.compose.components.TariPullToRefreshBox
 import com.tari.android.wallet.ui.compose.components.TariTopBar
 import com.tari.android.wallet.ui.screen.exchange.widget.ExchangeStatusCard
+import com.tari.android.wallet.ui.screen.home.overview.widget.txListItemFormattedDate
 import com.tari.android.wallet.ui.screen.settings.themeSelector.TariTheme
 import com.tari.android.wallet.ui.screen.tx.details.widget.TxDetailInfoCopyItem
 import com.tari.android.wallet.ui.screen.tx.details.widget.TxDetailInfoItem
 import com.tari.android.wallet.util.MockDataStub
-import com.tari.android.wallet.util.extension.parseISODate
-import com.tari.android.wallet.util.extension.txFormattedDate
+import com.tari.android.wallet.util.extension.parseDateTime
 
 @Composable
 fun ExchangeStatusScreen(
@@ -157,11 +157,11 @@ private fun ExchangeStatusContent(
 
         Spacer(Modifier.size(10.dp))
 
-        transaction.createdAt.parseISODate()?.let { date ->
+        transaction.createdAt.parseDateTime()?.let { date ->
             TxDetailInfoItem(
                 modifier = Modifier.fillMaxWidth(),
                 title = stringResource(R.string.exchange_status_created_at),
-                value = date.txFormattedDate(),
+                value = date.txListItemFormattedDate(relative = false, withTime = true),
             )
             Spacer(Modifier.size(10.dp))
         }

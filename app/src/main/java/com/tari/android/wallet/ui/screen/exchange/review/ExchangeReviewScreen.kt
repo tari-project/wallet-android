@@ -26,7 +26,6 @@ import androidx.compose.ui.unit.dp
 import com.tari.android.wallet.R
 import com.tari.android.wallet.application.walletManager.WalletConfig
 import com.tari.android.wallet.application.walletManager.formatAnyAmount
-import com.tari.android.wallet.data.exolix.ExchangeDirection
 import com.tari.android.wallet.data.exolix.Exolix
 import com.tari.android.wallet.ui.compose.PreviewSecondarySurface
 import com.tari.android.wallet.ui.compose.TariDesignSystem
@@ -118,36 +117,38 @@ private fun ReviewContent(
         Spacer(Modifier.size(16.dp))
 
         Box {
-            Column {
-                SenderCard(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 20.dp),
-                    title = "${WalletConfig.amountFormatter.format(uiState.request.amount)} ${uiState.request.tariCurrency.coin}",
-                    endIcon = {
-                        SelectedCurrencyChip(
-                            title = uiState.request.tariCurrency.coin,
-                            subtitle = uiState.request.tariCurrency.networkName,
-                            iconUrl = uiState.request.tariCurrency.iconUrl,
-                            onClick = null,
-                        )
-                    }
-                )
-                Spacer(Modifier.size(8.dp))
-                SenderCard(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 20.dp),
-                    title = "${WalletConfig.amountFormatter.format(uiState.request.rate.toAmount)} ${uiState.request.selectedCurrency.coin}",
-                    endIcon = {
-                        SelectedCurrencyChip(
-                            title = uiState.request.selectedCurrency.coin,
-                            subtitle = uiState.request.selectedCurrency.networkName,
-                            iconUrl = uiState.request.selectedCurrency.iconUrl,
-                            onClick = null,
-                        )
-                    }
-                )
+            uiState.transaction?.let { transaction ->
+                Column {
+                    SenderCard(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 20.dp),
+                        title = "${WalletConfig.amountFormatter.format(transaction.amount)} ${transaction.coinFrom.coinCode}",
+                        endIcon = {
+                            SelectedCurrencyChip(
+                                title = transaction.coinFrom.coinCode,
+                                subtitle = transaction.coinFrom.network,
+                                iconUrl = transaction.coinFrom.icon,
+                                onClick = null,
+                            )
+                        }
+                    )
+                    Spacer(Modifier.size(8.dp))
+                    SenderCard(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 20.dp),
+                        title = "${WalletConfig.amountFormatter.format(transaction.amountTo)} ${transaction.coinTo.coinCode}",
+                        endIcon = {
+                            SelectedCurrencyChip(
+                                title = transaction.coinTo.coinCode,
+                                subtitle = transaction.coinTo.network,
+                                iconUrl = transaction.coinTo.icon,
+                                onClick = null,
+                            )
+                        }
+                    )
+                }
             }
             Image(
                 modifier = Modifier.align(Alignment.Center),
@@ -266,9 +267,6 @@ private fun ExchangeReviewScreenPreview() {
     PreviewSecondarySurface(TariTheme.Light) {
         ExchangeReviewScreen(
             uiState = ExchangeReviewViewModel.UiState(
-                request = MockDataStub.createExchangeRequestData(
-                    direction = ExchangeDirection.SELL_TARI,
-                ),
                 fee = 1000.toMicroTari(),
                 walletAddress = MockDataStub.createWalletAddress(),
                 transaction = MockDataStub.createExchangeTransaction(),
