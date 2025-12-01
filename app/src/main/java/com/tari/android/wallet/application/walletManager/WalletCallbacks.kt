@@ -144,7 +144,7 @@ class WalletCallbacks @Inject constructor() {
         listeners[walletContextId]?.onBaseNodeStateChanged(baseNodeState)
     }
 
-    fun onConnectivityStatus(contextPtr: ByteArray, bytes: ByteArray) {
+    fun onConnectivityStatus(contextPtr: ByteArray, status: ByteArray, latency: ByteArray) {
         // FIXME: not used anymore, should be removed once FFI is updated
     }
 

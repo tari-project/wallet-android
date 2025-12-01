@@ -62,7 +62,7 @@ add_library(
         jniByteVector.cpp
         jniPrivateKey.cpp
         jniPublicKey.cpp
-        jniCommsConfig.cpp
+        jniWalletConfig.cpp
         jniCompletedTransaction.cpp
         jniCompletedTransactionKernel.cpp
         jniPendingInboundTransaction.cpp

@@ -39,7 +39,6 @@ import com.tari.android.wallet.application.walletManager.WalletCallbacks
 import com.tari.android.wallet.data.sharedPrefs.network.TariNetwork
 import com.tari.android.wallet.model.BalanceInfo
 import com.tari.android.wallet.model.MicroTari
-import com.tari.android.wallet.model.PublicKey
 import com.tari.android.wallet.model.TariCoinPreview
 import com.tari.android.wallet.model.TariPaymentRecord
 import com.tari.android.wallet.model.TariUnblindedOutput
@@ -78,7 +77,7 @@ class FFIWallet(
 
     private external fun jniCreate(
         walletContextId: Int,
-        commsConfig: FFICommsConfig,
+        commsConfig: FFIWalletConfig,
         logPath: String,
         logVerbosity: Int,
         maxNumberOfRollingLogFiles: Int,
@@ -148,7 +147,6 @@ class FFIWallet(
 
     private external fun jniSignMessage(message: String, libError: FFIError): String
     private external fun jniVerifyMessageSignature(publicKeyPtr: FFIPublicKey, message: String, signature: String, libError: FFIError): Boolean
-    private external fun jniGetBaseNodePeers(libError: FFIError): FFIPointer
     private external fun jniGetPrivateViewKey(libError: FFIError): FFIPointer
     private external fun jniStartTXOValidation(libError: FFIError): ByteArray
     private external fun jniStartTxValidation(libError: FFIError): ByteArray
@@ -191,7 +189,7 @@ class FFIWallet(
     constructor(
         walletContextId: Int,
         tariNetwork: TariNetwork,
-        commsConfig: FFICommsConfig,
+        commsConfig: FFIWalletConfig,
         logPath: String,
         passphrase: String,
         seedWords: FFISeedWords?,
@@ -234,7 +232,7 @@ class FFIWallet(
                 WalletCallbacks::onTXOValidationComplete.name, "([B[B[B)V",
                 WalletCallbacks::onBalanceUpdated.name, "([BJ)V",
                 WalletCallbacks::onTxValidationComplete.name, "([B[B[B)V",
-                WalletCallbacks::onConnectivityStatus.name, "([B[B)V",
+                WalletCallbacks::onConnectivityStatus.name, "([B[B[B)V",
                 WalletCallbacks::onWalletScannedHeight.name, "([B[B)V",
                 WalletCallbacks::onBaseNodeStatus.name, "([BJ)V",
                 libError = error,
@@ -380,12 +378,6 @@ class FFIWallet(
 
     fun getSeedWords(): List<String> = runWithError { error ->
         FFISeedWords(jniGetSeedWords(error)).runWithDestroy { seedWords -> (0 until seedWords.getLength()).map { seedWords.getAt(it) } }
-    }
-
-    fun getBaseNodePeers(): List<PublicKey> = runWithError { error ->
-        FFIPublicKeys(jniGetBaseNodePeers(error)).let { ffiPublicKeys ->
-            List(ffiPublicKeys.getLength()) { index -> PublicKey(ffiPublicKeys.getAt(index)) }
-        }
     }
 
     fun setKeyValue(key: String, value: String): Boolean = runWithError { jniSetKeyValue(key, value, it) }

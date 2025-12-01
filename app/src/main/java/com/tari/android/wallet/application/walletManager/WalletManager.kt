@@ -45,11 +45,11 @@ import com.tari.android.wallet.data.sharedPrefs.security.SecurityPrefRepository
 import com.tari.android.wallet.data.sharedPrefs.tariSettings.TariSettingsPrefRepository
 import com.tari.android.wallet.di.ApplicationScope
 import com.tari.android.wallet.ffi.Base58String
-import com.tari.android.wallet.ffi.FFICommsConfig
 import com.tari.android.wallet.ffi.FFIException
 import com.tari.android.wallet.ffi.FFISeedWords
 import com.tari.android.wallet.ffi.FFITariWalletAddress
 import com.tari.android.wallet.ffi.FFIWallet
+import com.tari.android.wallet.ffi.FFIWalletConfig
 import com.tari.android.wallet.ffi.runWithDestroy
 import com.tari.android.wallet.model.MicroTari
 import com.tari.android.wallet.model.TariContact
@@ -203,7 +203,7 @@ class WalletManager @Inject constructor(
         return wallet
     }
 
-    private fun createCommsConfig(): FFICommsConfig = FFICommsConfig(
+    private fun createCommsConfig(): FFIWalletConfig = FFIWalletConfig(
         databaseName = WalletConfig.WALLET_DB_NAME,
         datastorePath = walletConfig.getWalletFilesDirPath(),
     )
