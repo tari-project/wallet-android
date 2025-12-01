@@ -148,6 +148,13 @@ class SendFundsViewModel(val savedState: SavedStateHandle) : CommonViewModel() {
         }
     }
 
+    fun onCancelTransaction() {
+        uiState.value.transaction?.id?.let { idToRemove ->
+            exolixRepository.removePendingTransaction(idToRemove)
+            tariNavigator.navigate(Navigation.BackToHome)
+        }
+    }
+
     data class UiState(
         val transaction: Exolix.Transaction? = null,
 

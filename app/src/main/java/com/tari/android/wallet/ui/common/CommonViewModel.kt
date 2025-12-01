@@ -155,7 +155,7 @@ open class CommonViewModel : ViewModel(), DialogHandler {
         _openLink.postValue(url)
     }
 
-    fun onBackPressed() {
+    open fun onBackPressed() {
         _backPressed.value = Unit
     }
 

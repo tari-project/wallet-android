@@ -26,6 +26,7 @@ class ExchangeReviewFragment : CommonFragment<ExchangeReviewViewModel>() {
                 onRetry = { viewModel.onRetry() },
                 onEmojiIdDetailsClick = { viewModel.onAddressDetailsClicked() },
                 onFeeInfoClick = { viewModel.onFeeInfoClicked() },
+                onCancelTransaction = { viewModel.cancelTransaction() },
             )
         }
     }

@@ -240,14 +240,16 @@ private fun SendFundsContent(
             onClick = onOpenTxDetails,
         )
 
-        TariTextButton(
-            modifier = Modifier
-                .padding(horizontal = 16.dp)
-                .align(Alignment.CenterHorizontally),
-            text = stringResource(R.string.exchange_cancel_transaction),
-            warningColor = true,
-            onClick = onCancelTransaction,
-        )
+        if (transaction.waitingForDeposit) {
+            TariTextButton(
+                modifier = Modifier
+                    .padding(horizontal = 16.dp)
+                    .align(Alignment.CenterHorizontally),
+                text = stringResource(R.string.exchange_cancel_transaction),
+                warningColor = true,
+                onClick = onCancelTransaction,
+            )
+        }
         Spacer(Modifier.size(40.dp))
     }
 }
@@ -260,6 +262,7 @@ private fun SendFundsScreenPreview() {
             uiState = SendFundsViewModel.UiState(
                 transaction = MockDataStub.createExchangeTransaction(
                     status = Exolix.TransactionStatus.WAIT,
+                    coinFrom = MockDataStub.createCoinInfo(coinCode = "ETH"),
                 ),
                 qrBitmap = null,
                 loading = false,
