@@ -174,6 +174,10 @@ class ExolixRepository @Inject constructor(
             refreshedTransactions.sortedByDescending { it.createdAt }
         }
     }
+
+    fun removePendingTransaction(id: String) {
+        exolixPrefRepository.removeTransaction(id)
+    }
 }
 
 @Parcelize

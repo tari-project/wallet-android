@@ -24,7 +24,7 @@ class SendFundsFragment : CommonFragment<SendFundsViewModel>() {
                 onBackClick = { viewModel.onBackPressed() },
                 onCopyAmount = { viewModel.onCopyAmount() },
                 onCopyAddress = { viewModel.onCopyAddress() },
-                onCancelTransaction = { viewModel.onBackPressed() },
+                onCancelTransaction = { viewModel.onCancelTransaction() },
                 onOpenTxDetails = { viewModel.openTxDetails() },
                 onRetry = { viewModel.onRetry() },
             )

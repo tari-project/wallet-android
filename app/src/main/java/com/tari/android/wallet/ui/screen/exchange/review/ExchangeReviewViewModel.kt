@@ -49,6 +49,12 @@ class ExchangeReviewViewModel(savedState: SavedStateHandle) : CommonViewModel() 
         createExchange()
     }
 
+    override fun onBackPressed() {
+        _uiState.value.transaction?.id?.let { exolixRepository.removePendingTransaction(it) }
+
+        super.onBackPressed()
+    }
+
     fun onRetry() {
         createExchange()
     }
@@ -149,6 +155,11 @@ class ExchangeReviewViewModel(savedState: SavedStateHandle) : CommonViewModel() 
                     }
                 }
         }
+    }
+
+    fun cancelTransaction() {
+        _uiState.value.transaction?.id?.let { exolixRepository.removePendingTransaction(it) }
+        tariNavigator.navigate(Navigation.BackToHome)
     }
 
     data class UiState(

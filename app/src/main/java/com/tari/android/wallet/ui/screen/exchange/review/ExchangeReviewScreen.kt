@@ -34,6 +34,7 @@ import com.tari.android.wallet.ui.compose.components.TariLoadingLayout
 import com.tari.android.wallet.ui.compose.components.TariLoadingLayoutState
 import com.tari.android.wallet.ui.compose.components.TariPrimaryButton
 import com.tari.android.wallet.ui.compose.components.TariProgressView
+import com.tari.android.wallet.ui.compose.components.TariTextButton
 import com.tari.android.wallet.ui.compose.components.TariTopBar
 import com.tari.android.wallet.ui.screen.exchange.widget.SelectedCurrencyChip
 import com.tari.android.wallet.ui.screen.send.confirm.widget.SenderCard
@@ -48,6 +49,7 @@ import com.tari.android.wallet.util.extension.toMicroTari
 fun ExchangeReviewScreen(
     uiState: ExchangeReviewViewModel.UiState,
     onBackClick: () -> Unit,
+    onCancelTransaction: () -> Unit,
     onCopyValueClick: (value: String) -> Unit,
     onConfirmClick: () -> Unit,
     onRetry: () -> Unit,
@@ -91,6 +93,7 @@ fun ExchangeReviewScreen(
                 onConfirmClick = onConfirmClick,
                 onEmojiIdDetailsClick = onEmojiIdDetailsClick,
                 onFeeInfoClick = onFeeInfoClick,
+                onCancelTransaction = onCancelTransaction,
             )
         }
     }
@@ -103,6 +106,7 @@ private fun ReviewContent(
     onConfirmClick: () -> Unit,
     onEmojiIdDetailsClick: () -> Unit,
     onFeeInfoClick: () -> Unit,
+    onCancelTransaction: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -257,6 +261,15 @@ private fun ReviewContent(
             )
         }
 
+        TariTextButton(
+            modifier = Modifier
+                .padding(horizontal = 16.dp)
+                .align(Alignment.CenterHorizontally),
+            text = stringResource(R.string.exchange_cancel_transaction),
+            warningColor = true,
+            onClick = onCancelTransaction,
+        )
+
         Spacer(Modifier.size(40.dp))
     }
 }
@@ -279,6 +292,7 @@ private fun ExchangeReviewScreenPreview() {
             onRetry = {},
             onEmojiIdDetailsClick = {},
             onFeeInfoClick = {},
+            onCancelTransaction = {},
         )
     }
 }

@@ -85,6 +85,8 @@ fun ExchangeScreen(
     onDestinationAddressChanged: (String) -> Unit,
     onScanQrClick: () -> Unit,
 ) {
+    val focusManager = LocalFocusManager.current
+
     Scaffold(
         modifier = Modifier
             .fillMaxSize()
@@ -260,6 +262,11 @@ fun ExchangeScreen(
                             errorText = if (uiState.destinationAddressError) {
                                 stringResource(R.string.exchange_invalid_address_error, uiState.selectedCurrency?.networkName.orEmpty())
                             } else null,
+                            keyboardOptions = KeyboardOptions(
+                                keyboardType = KeyboardType.Decimal,
+                                imeAction = ImeAction.Done,
+                            ),
+                            keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
                         )
                     }
 
