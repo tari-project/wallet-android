@@ -37,7 +37,7 @@
 
 extern "C"
 JNIEXPORT void JNICALL
-Java_com_tari_android_wallet_ffi_FFICommsConfig_jniCreate(
+Java_com_tari_android_wallet_ffi_FFIWalletConfig_jniCreate(
         JNIEnv *jEnv,
         jobject jThis,
         jstring jDatabaseName,
@@ -47,7 +47,7 @@ Java_com_tari_android_wallet_ffi_FFICommsConfig_jniCreate(
     const char *pDatastorePath = jEnv->GetStringUTFChars(jDatastorePath, JNI_FALSE);
 
     ExecuteWithError(jEnv, error, [&](int *errorPointer) {
-        TariCommsConfig *pCommsConfig = comms_config_create(
+        TariWalletDbConfig *pCommsConfig = wallet_db_config_create(
                 pDatabaseName,
                 pDatastorePath,
                 errorPointer
@@ -60,12 +60,12 @@ Java_com_tari_android_wallet_ffi_FFICommsConfig_jniCreate(
 
 extern "C"
 JNIEXPORT jstring JNICALL
-Java_com_tari_android_wallet_ffi_FFICommsConfig_jniGetLastVersion(
+Java_com_tari_android_wallet_ffi_FFIWalletConfig_jniGetLastVersion(
         JNIEnv *jEnv,
         jobject jThis,
         jobject error) {
     return ExecuteWithError<jstring>(jEnv, error, [&](int *errorPointer) {
-        auto pWallet = GetPointerField<TariCommsConfig *>(jEnv, jThis);
+        auto pWallet = GetPointerField<TariWalletDbConfig *>(jEnv, jThis);
         char *pSignature = wallet_get_last_version(pWallet, errorPointer);
 
         jstring result = jEnv->NewStringUTF(pSignature);
@@ -77,9 +77,9 @@ Java_com_tari_android_wallet_ffi_FFICommsConfig_jniGetLastVersion(
 
 extern "C"
 JNIEXPORT void JNICALL
-Java_com_tari_android_wallet_ffi_FFICommsConfig_jniDestroy(
+Java_com_tari_android_wallet_ffi_FFIWalletConfig_jniDestroy(
         JNIEnv *jEnv,
         jobject jThis) {
-    comms_config_destroy(GetPointerField<TariCommsConfig *>(jEnv, jThis));
+    wallet_db_config_destroy(GetPointerField<TariWalletDbConfig *>(jEnv, jThis));
     SetNullPointerField(jEnv, jThis);
 }

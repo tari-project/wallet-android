@@ -40,10 +40,10 @@ import java.io.File
  *
  * @author The Tari Development Team
  */
-class FFICommsConfig() : FFIBase() {
+class FFIWalletConfig() : FFIBase() {
 
     private val logger
-        get() = Logger.t(FFICommsConfig::class.simpleName)
+        get() = Logger.t(FFIWalletConfig::class.simpleName)
 
     private external fun jniCreate(
         databaseName: String,

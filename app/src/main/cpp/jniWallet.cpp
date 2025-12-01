@@ -236,14 +236,15 @@ void transactionValidationCompleteCallback(void *context, uint64_t requestId, ui
     g_vm->DetachCurrentThread();
 }
 
-void connectivityStatusCallback(void *context, uint64_t status) {
+void connectivityStatusCallback(void *context, uint64_t status, uint64_t latency) {
     auto *jniEnv = getJNIEnv();
     if (jniEnv == nullptr || callbackHandler == nullptr) {
         return;
     }
     jbyteArray contextBytes = getBytesFromUnsignedLongLong(jniEnv, reinterpret_cast<uint64_t>(context));
-    jbyteArray requestIdBytes = getBytesFromUnsignedLongLong(jniEnv, status);
-    jniEnv->CallVoidMethod(callbackHandler, connectivityStatusCallbackId, contextBytes, requestIdBytes);
+    jbyteArray statusBytes = getBytesFromUnsignedLongLong(jniEnv, status);
+    jbyteArray latencyBytes = getBytesFromUnsignedLongLong(jniEnv, latency);
+    jniEnv->CallVoidMethod(callbackHandler, connectivityStatusCallbackId, contextBytes, statusBytes, latencyBytes);
     g_vm->DetachCurrentThread();
 }
 
@@ -452,7 +453,7 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniCreate(
     }
 
     auto pContext = reinterpret_cast<int *>(jpContext);
-    auto pWalletConfig = GetPointerField<TariCommsConfig *>(jEnv, jpWalletConfig);
+    auto pWalletConfig = GetPointerField<TariWalletDbConfig *>(jEnv, jpWalletConfig);
 
     const char *pLogPath = jEnv->GetStringUTFChars(jLogPath, JNI_FALSE);
     if (strlen(pLogPath) == 0) {
@@ -498,9 +499,6 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniCreate(
             nullptr,
             pSeedWords,
             pNetwork,
-            pDnsPeer,
-            nullptr,
-            isDnsSecureOn,
             pHttpBaseNode,
             walletBirthdayOffset,
             txReceivedCallback,
@@ -516,7 +514,6 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniCreate(
             txoValidationCompleteCallback,
             balanceUpdatedCallback,
             transactionValidationCompleteCallback,
-            storeAndForwardMessagesReceivedCallback,
             connectivityStatusCallback,
             walletScannedHeightCallback,
             baseNodeStatusCallback,
@@ -1212,19 +1209,6 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniImportExternalUtxoAsNonRewindable(
 
         jEnv->ReleaseStringUTFChars(jMessage, pMessage);
         return result;
-    });
-}
-
-extern "C"
-JNIEXPORT jlong JNICALL
-Java_com_tari_android_wallet_ffi_FFIWallet_jniGetBaseNodePeers(
-        JNIEnv *jEnv,
-        jobject jThis,
-        jobject error
-) {
-    return ExecuteWithErrorAndCast<TariPublicKeys *>(jEnv, error, [&](int *error) {
-        auto pWallet = GetPointerField<TariWallet *>(jEnv, jThis);
-        return wallet_get_seed_peers(pWallet, error);
     });
 }
 
