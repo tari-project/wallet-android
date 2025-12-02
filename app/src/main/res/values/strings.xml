@@ -258,8 +258,11 @@
     <string name="home_transaction_view_all_txs">View all transactions</string>
     <string name="home_search_hint">Enter Emoji ID or Contact Name</string>
     <string name="home_title_tari_universe">Tari Universe</string>
-    <string name="home_swap_in_progress_title">Swap in progress</string>
+    <string name="home_swap_in_progress_title">Recent Swaps</string>
+    <string name="home_swap_view_all_swaps">View all swaps</string>
     <string name="home_pending_exolix_transaction_title_format">Swap %1$s %2$s to %3$s %4$s</string>
+    <string name="all_swaps_title">All Swaps</string>
+    <string name="all_swaps_empty_message">No pending swaps</string>
     <string name="home_active_miners_title">Active Miners</string>
     <string name="home_active_miners_start_mining">Start mining</string>
     <string name="home_active_miners_you_mining">You\'re mining</string>

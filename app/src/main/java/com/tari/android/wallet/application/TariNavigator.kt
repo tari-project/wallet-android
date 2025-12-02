@@ -47,6 +47,7 @@ import com.tari.android.wallet.ui.screen.exchange.selectCurrency.SelectCurrencyF
 import com.tari.android.wallet.ui.screen.exchange.sendFunds.SendFundsFragment
 import com.tari.android.wallet.ui.screen.exchange.status.ExchangeStatusFragment
 import com.tari.android.wallet.ui.screen.home.HomeActivity
+import com.tari.android.wallet.ui.screen.home.allSwaps.AllSwapsFragment
 import com.tari.android.wallet.ui.screen.home.overview.HomeOverviewFragment
 import com.tari.android.wallet.ui.screen.onboarding.activity.OnboardingFlowActivity
 import com.tari.android.wallet.ui.screen.onboarding.localAuth.LocalAuthFragment
@@ -120,6 +121,7 @@ class TariNavigator @Inject constructor() {
             is Exchange.Review -> addFragment(ExchangeReviewFragment.newInstance(navigation.request))
             is Exchange.SendFunds -> addFragment(SendFundsFragment.newInstance(navigation.request, navigation.transaction))
             is Exchange.ExchangeStatus -> addFragment(ExchangeStatusFragment.newInstance(navigation.transactionId))
+            is Exchange.AllSwaps -> addFragment(AllSwapsFragment.newInstance())
 
             is AllSettings.BugReporting -> DebugActivity.launch(currentActivity, DebugNavigation.BugReport)
             is AllSettings.MyProfile -> addFragment(WalletInfoFragment())
@@ -308,5 +310,6 @@ sealed class Navigation {
         data class Review(val request: ExchangeRequestData) : Exchange()
         data class SendFunds(val request: ExchangeRequestData? = null, val transaction: Exolix.Transaction? = null) : Exchange()
         data class ExchangeStatus(val transactionId: String) : Exchange()
+        data object AllSwaps : Exchange()
     }
 }
