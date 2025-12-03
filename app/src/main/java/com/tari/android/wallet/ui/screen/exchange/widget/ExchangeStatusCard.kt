@@ -96,15 +96,15 @@ private fun Exolix.Transaction.statusTitle(): String =
 @Composable
 private fun Exolix.Transaction.statusSubtitle(): String =
     when (this.status) {
-        Exolix.TransactionStatus.WAIT -> stringResource(R.string.exchange_status_card_subtitle_wait, coinFrom.coinName)
+        Exolix.TransactionStatus.WAIT -> stringResource(R.string.exchange_status_card_subtitle_wait, coinFrom.coinCode)
         Exolix.TransactionStatus.CONFIRMATION,
-        Exolix.TransactionStatus.CONFIRMED -> stringResource(R.string.exchange_status_card_subtitle_received)
+        Exolix.TransactionStatus.CONFIRMED -> stringResource(R.string.exchange_status_card_subtitle_received, coinFrom.coinCode)
 
-        Exolix.TransactionStatus.EXCHANGING -> stringResource(R.string.exchange_status_card_subtitle_exchanging)
+        Exolix.TransactionStatus.EXCHANGING -> stringResource(R.string.exchange_status_card_subtitle_exchanging, coinFrom.coinCode)
         Exolix.TransactionStatus.SENDING -> stringResource(R.string.exchange_status_card_subtitle_sending, coinTo.coinCode)
         Exolix.TransactionStatus.OVERDUE -> stringResource(R.string.exchange_status_card_subtitle_overdue)
-        Exolix.TransactionStatus.REFUNDED -> stringResource(R.string.exchange_status_card_subtitle_refunded)
-        Exolix.TransactionStatus.SUCCESS -> stringResource(R.string.exchange_status_card_subtitle_success)
+        Exolix.TransactionStatus.REFUNDED -> stringResource(R.string.exchange_status_card_subtitle_refunded, coinFrom.coinCode)
+        Exolix.TransactionStatus.SUCCESS -> stringResource(R.string.exchange_status_card_subtitle_success, coinTo.coinCode)
     }
 
 @Composable

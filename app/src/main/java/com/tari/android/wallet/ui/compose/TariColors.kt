@@ -260,8 +260,8 @@ val TariDarkColorPalette = TariColors(
     secondaryContrast = Color(0xFFFFFFFF),
 
     successMain = Color(0xFF03FE66),
-    successDark = Color(0xFF2CFC7D),
-    successLight = Color(0xFF00C047),
+    successDark = Color(0xFF00C047),
+    successLight = Color(0xFF2CFC7D),
     successContrast = Color(0xFFFFFFFF),
 
     errorMain = Color(0xFFFF3232),

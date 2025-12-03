@@ -100,6 +100,9 @@ open class CommonViewModel : ViewModel(), DialogHandler {
     private val _copyToClipboard = SingleLiveEvent<ClipboardArgs>()
     val copyToClipboard: LiveData<ClipboardArgs> = _copyToClipboard
 
+    private val _sendEmail = SingleLiveEvent<EmailTemplateArgs>()
+    val sendEmail: LiveData<EmailTemplateArgs> = _sendEmail
+
     private val _modularDialog = SingleLiveEvent<ModularDialogArgs>()
     val modularDialog: LiveData<ModularDialogArgs> = _modularDialog
 
@@ -153,6 +156,14 @@ open class CommonViewModel : ViewModel(), DialogHandler {
 
     fun openUrl(url: String) {
         _openLink.postValue(url)
+    }
+
+    fun sendEmailTemplate(
+        recipientEmail: String,
+        subject: String,
+        body: String,
+    ) {
+        _sendEmail.postValue(EmailTemplateArgs(recipientEmail, subject, body))
     }
 
     open fun onBackPressed() {

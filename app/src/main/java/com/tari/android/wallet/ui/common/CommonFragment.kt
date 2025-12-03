@@ -142,6 +142,8 @@ abstract class CommonFragment<VM : CommonViewModel> : Fragment(), FragmentPopped
 
         observe(copyToClipboard) { copy(it) }
 
+        observe(sendEmail) { sendEmail(it) }
+
         observe(modularDialog) { dialogManager.replace(ModularDialog(requireActivity(), it)) }
 
         observe(inputDialog) { dialogManager.replace(InputModularDialog(requireActivity(), it)) }
@@ -175,6 +177,20 @@ abstract class CommonFragment<VM : CommonViewModel> : Fragment(), FragmentPopped
         clipboardManager.setPrimaryClip(ClipData.newPlainText(clipboardArgs.clipLabel, clipboardArgs.clipText))
         Toast.makeText(requireContext(), clipboardArgs.toastMessage, Toast.LENGTH_SHORT).show()
     }
+
+    private fun sendEmail(emailArgs: EmailTemplateArgs) {
+        runCatching {
+            startActivity(Intent(Intent.ACTION_SENDTO).apply {
+                data = Uri.parse(
+                    "mailto:${emailArgs.recipientEmail}" +
+                            "?subject=${Uri.encode(emailArgs.subject)}" +
+                            "&body=${Uri.encode(emailArgs.body)}"
+                )
+            })
+        }.onFailure {
+            Toast.makeText(requireContext(), "No email app found", Toast.LENGTH_SHORT).show()
+        }
+    }
 }
 
 /**
@@ -183,3 +199,9 @@ abstract class CommonFragment<VM : CommonViewModel> : Fragment(), FragmentPopped
 interface FragmentPoppedListener {
     fun onFragmentPopped(fragmentClass: Class<out Fragment>)
 }
+
+data class EmailTemplateArgs(
+    val recipientEmail: String,
+    val subject: String,
+    val body: String,
+)

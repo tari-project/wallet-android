@@ -34,6 +34,7 @@ import com.tari.android.wallet.ui.compose.components.TariLoadingLayoutState
 import com.tari.android.wallet.ui.compose.components.TariPrimaryButton
 import com.tari.android.wallet.ui.compose.components.TariProgressView
 import com.tari.android.wallet.ui.compose.components.TariPullToRefreshBox
+import com.tari.android.wallet.ui.compose.components.TariTextButton
 import com.tari.android.wallet.ui.compose.components.TariTopBar
 import com.tari.android.wallet.ui.screen.exchange.widget.ExchangeStatusCard
 import com.tari.android.wallet.ui.screen.home.overview.widget.txListItemFormattedDate
@@ -51,6 +52,8 @@ fun ExchangeStatusScreen(
     onRetry: () -> Unit,
     onPullToRefresh: () -> Unit,
     onShowQrCodeClick: () -> Unit,
+    onRemoveTransaction: () -> Unit,
+    onContactSupportClick: () -> Unit,
 ) {
     Scaffold(
         modifier = Modifier
@@ -118,6 +121,8 @@ fun ExchangeStatusScreen(
                         onCopyClick = onCopyClick,
                         onDoneClick = onBackClick,
                         onShowQrCodeClick = onShowQrCodeClick,
+                        onRemoveTransaction = onRemoveTransaction,
+                        onContactSupportClick = onContactSupportClick,
                     )
                 }
             }
@@ -132,6 +137,8 @@ private fun ExchangeStatusContent(
     onCopyClick: (value: String) -> Unit,
     onDoneClick: () -> Unit,
     onShowQrCodeClick: () -> Unit,
+    onRemoveTransaction: () -> Unit,
+    onContactSupportClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -149,11 +156,27 @@ private fun ExchangeStatusContent(
 
         Spacer(Modifier.size(32.dp))
 
-        TxDetailInfoItem(
-            modifier = Modifier.fillMaxWidth(),
-            title = transaction.amountLabel(),
-            value = "${WalletConfig.amountFormatter.format(transaction.amountTo)} ${transaction.coinTo.coinCode}",
-        )
+        if (transaction.status == Exolix.TransactionStatus.WAIT) {
+            TxDetailInfoItem(
+                modifier = Modifier.fillMaxWidth(),
+                title = stringResource(R.string.exchange_status_amount_to_send),
+                value = "${WalletConfig.amountFormatter.format(transaction.amount)} ${transaction.coinFrom.coinCode}",
+            )
+            Spacer(Modifier.size(10.dp))
+            TxDetailInfoCopyItem(
+                modifier = Modifier.fillMaxWidth(),
+                title = stringResource(R.string.exchange_status_address_to_send),
+                value = transaction.depositAddress,
+                singleLine = false,
+                onCopyClicked = onCopyClick,
+            )
+        } else {
+            TxDetailInfoItem(
+                modifier = Modifier.fillMaxWidth(),
+                title = transaction.amountLabel(),
+                value = "${WalletConfig.amountFormatter.format(transaction.amountTo)} ${transaction.coinTo.coinCode}",
+            )
+        }
 
         Spacer(Modifier.size(10.dp))
 
@@ -241,6 +264,15 @@ private fun ExchangeStatusContent(
             title = stringResource(R.string.exchange_status_transaction_details),
             value = transaction.id,
             singleLine = false,
+            onCopyClicked = onCopyClick,
+        )
+
+        TariTextButton(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp),
+            text = stringResource(R.string.exchange_contact_support),
+            onClick = onContactSupportClick,
         )
 
         Spacer(Modifier.weight(1f))
@@ -260,6 +292,18 @@ private fun ExchangeStatusContent(
             text = stringResource(R.string.common_done),
             onClick = onDoneClick,
         )
+
+        if (transaction.waitingForDeposit || transaction.status.isFinal()) {
+            Spacer(Modifier.size(16.dp))
+            TariTextButton(
+                modifier = Modifier
+                    .padding(horizontal = 16.dp)
+                    .align(Alignment.CenterHorizontally),
+                text = stringResource(R.string.exchange_remove_transaction),
+                warningColor = true,
+                onClick = onRemoveTransaction,
+            )
+        }
 
         Spacer(Modifier.size(40.dp))
     }
@@ -286,7 +330,7 @@ private fun ExchangeStatusScreenSuccessPreview() {
         ExchangeStatusScreen(
             uiState = ExchangeStatusViewModel.UiState(
                 transaction = MockDataStub.createExchangeTransaction(
-                    id = "dummy_id",
+                    status = Exolix.TransactionStatus.CONFIRMATION,
                     amountTo = java.math.BigDecimal("123.45"),
                     rate = java.math.BigDecimal("0.005"),
                     rateType = Exolix.RateType.FIXED,
@@ -304,6 +348,8 @@ private fun ExchangeStatusScreenSuccessPreview() {
             onRetry = {},
             onPullToRefresh = {},
             onShowQrCodeClick = {},
+            onRemoveTransaction = {},
+            onContactSupportClick = {},
         )
     }
 }
@@ -315,13 +361,7 @@ private fun ExchangeStatusScreenWaitPreview() {
         ExchangeStatusScreen(
             uiState = ExchangeStatusViewModel.UiState(
                 transaction = MockDataStub.createExchangeTransaction(
-                    id = "dummy_id",
                     status = Exolix.TransactionStatus.WAIT,
-                    amountTo = java.math.BigDecimal("123.45"),
-                    rate = java.math.BigDecimal("0.005"),
-                    rateType = Exolix.RateType.FIXED,
-                    createdAt = "2024-06-01T12:00:00Z",
-                    withdrawalAddress = "0x9876543210fedcba9876543210fedcba98765432",
                 ),
                 autoRefreshActive = true,
             ),
@@ -330,6 +370,30 @@ private fun ExchangeStatusScreenWaitPreview() {
             onRetry = {},
             onPullToRefresh = {},
             onShowQrCodeClick = {},
+            onRemoveTransaction = {},
+            onContactSupportClick = {},
+        )
+    }
+}
+
+@Composable
+@Preview
+private fun ExchangeStatusScreenOverduePreview() {
+    PreviewSecondarySurface(TariTheme.Light) {
+        ExchangeStatusScreen(
+            uiState = ExchangeStatusViewModel.UiState(
+                transaction = MockDataStub.createExchangeTransaction(
+                    status = Exolix.TransactionStatus.OVERDUE,
+                ),
+                autoRefreshActive = true,
+            ),
+            onBackClick = {},
+            onCopyClick = {},
+            onRetry = {},
+            onPullToRefresh = {},
+            onShowQrCodeClick = {},
+            onRemoveTransaction = {},
+            onContactSupportClick = {},
         )
     }
 }
