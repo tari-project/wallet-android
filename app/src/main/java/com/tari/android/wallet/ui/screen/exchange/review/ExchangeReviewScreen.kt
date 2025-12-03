@@ -265,7 +265,7 @@ private fun ReviewContent(
             modifier = Modifier
                 .padding(horizontal = 16.dp)
                 .align(Alignment.CenterHorizontally),
-            text = stringResource(R.string.exchange_cancel_transaction),
+            text = stringResource(R.string.exchange_remove_transaction),
             warningColor = true,
             onClick = onCancelTransaction,
         )

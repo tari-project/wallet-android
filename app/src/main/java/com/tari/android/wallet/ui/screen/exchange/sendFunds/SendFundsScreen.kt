@@ -245,7 +245,7 @@ private fun SendFundsContent(
                 modifier = Modifier
                     .padding(horizontal = 16.dp)
                     .align(Alignment.CenterHorizontally),
-                text = stringResource(R.string.exchange_cancel_transaction),
+                text = stringResource(R.string.exchange_remove_transaction),
                 warningColor = true,
                 onClick = onCancelTransaction,
             )
@@ -258,6 +258,29 @@ private fun SendFundsContent(
 @Preview
 private fun SendFundsScreenPreview() {
     PreviewSecondarySurface(TariTheme.Light) {
+        SendFundsScreen(
+            uiState = SendFundsViewModel.UiState(
+                transaction = MockDataStub.createExchangeTransaction(
+                    status = Exolix.TransactionStatus.WAIT,
+                    coinFrom = MockDataStub.createCoinInfo(coinCode = "ETH"),
+                ),
+                qrBitmap = null,
+                loading = false,
+            ),
+            onBackClick = {},
+            onCopyAmount = {},
+            onCopyAddress = {},
+            onCancelTransaction = {},
+            onRetry = {},
+            onOpenTxDetails = {},
+        )
+    }
+}
+
+@Composable
+@Preview
+private fun SendFundsScreenPreviewD() {
+    PreviewSecondarySurface(TariTheme.Dark) {
         SendFundsScreen(
             uiState = SendFundsViewModel.UiState(
                 transaction = MockDataStub.createExchangeTransaction(

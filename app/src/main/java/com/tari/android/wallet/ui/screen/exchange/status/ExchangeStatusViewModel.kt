@@ -19,6 +19,7 @@ import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 
 private const val TX_STATUS_AUTO_REFRESH_INTERVAL_MS = 10_000L
+private const val EXOLIX_SUPPORT_EMAIL = "support@exolix.com"
 
 class ExchangeStatusViewModel(savedState: SavedStateHandle) : CommonViewModel() {
 
@@ -109,6 +110,28 @@ class ExchangeStatusViewModel(savedState: SavedStateHandle) : CommonViewModel() 
             clipLabel = resourceManager.getString(R.string.exchange_status_transaction_details),
             clipText = value,
         )
+    }
+
+    fun onRemoveTransactionClicked() {
+        uiState.value.transaction?.id?.let { idToRemove ->
+            exolixRepository.removePendingTransaction(idToRemove)
+            onBackPressed()
+        }
+    }
+
+    fun onContactSupportClicked() {
+        uiState.value.transaction?.let { transaction ->
+            sendEmailTemplate(
+                recipientEmail = EXOLIX_SUPPORT_EMAIL,
+                subject = resourceManager.getString(R.string.exchange_support_email_subject, transaction.id),
+                body = resourceManager.getString(
+                    R.string.exchange_support_email_body,
+                    transaction.id,
+                    transaction.coinFrom.coinCode,
+                    transaction.coinTo.coinCode,
+                ),
+            )
+        }
     }
 
     data class UiState(

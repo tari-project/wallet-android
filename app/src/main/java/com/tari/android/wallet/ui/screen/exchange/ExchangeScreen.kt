@@ -152,7 +152,7 @@ fun ExchangeScreen(
                         onSelectCurrencyClicked = onSelectCurrencyClicked,
                     )
 
-                    Spacer(Modifier.size(20.dp))
+                    Spacer(Modifier.size(10.dp))
                     Row(
                         modifier = Modifier.padding(horizontal = 16.dp),
                         verticalAlignment = Alignment.CenterVertically,
@@ -182,7 +182,7 @@ fun ExchangeScreen(
                         }
                         TariHorizontalDivider(Modifier.weight(1f))
                     }
-                    Spacer(Modifier.size(20.dp))
+                    Spacer(Modifier.size(10.dp))
 
                     YouReceiveLayout(
                         modifier = Modifier
@@ -191,7 +191,7 @@ fun ExchangeScreen(
                         uiState = uiState,
                         onSelectCurrencyClicked = onSelectCurrencyClicked,
                     )
-                    Spacer(Modifier.size(20.dp))
+                    Spacer(Modifier.size(10.dp))
 
                     Row(
                         modifier = Modifier.padding(horizontal = 16.dp),
@@ -286,7 +286,7 @@ fun ExchangeScreen(
                         painter = painterResource(R.drawable.exolix_logo),
                         contentDescription = null,
                     )
-                    Spacer(Modifier.size(40.dp))
+                    Spacer(Modifier.size(20.dp))
 
                     TariPrimaryButton(
                         modifier = Modifier

@@ -160,18 +160,16 @@ class ExchangeViewModel : CommonViewModel() {
             val selectedResult = exolixRepository.getCurrencies(page = 1, size = 1)
 
             if (tariResult.isSuccess && selectedResult.isSuccess) {
-                val tariCurrency = tariResult.getOrThrow()
-                val defaultCurrency = selectedResult.getOrThrow().currencies.firstOrNull() ?: error("No currencies available")
-
-                onCurrencySelected(defaultCurrency)
-
                 _uiState.update {
                     it.copy(
-                        tariCurrency = tariCurrency,
+                        tariCurrency = tariResult.getOrThrow(),
+                        selectedCurrency = selectedResult.getOrThrow().currencies.firstOrNull() ?: error("No currencies available"),
                         loadingCurrencies = false,
                         loadingCurrenciesError = false
                     )
                 }
+
+                fetchRateIfValid()
             } else {
                 _uiState.update { it.copy(loadingCurrencies = false, loadingCurrenciesError = true) }
             }
@@ -181,11 +179,11 @@ class ExchangeViewModel : CommonViewModel() {
     private fun fetchRateIfValid() {
         rateFetchJob?.cancel()
 
-        val amount = _uiState.value.amount
+        val amount = _uiState.value.amount ?: BigDecimal.ZERO
         val fromCurrency = _uiState.value.fromCurrency
         val toCurrency = _uiState.value.toCurrency
 
-        if (_uiState.value.amount == null || fromCurrency == null || toCurrency == null) {
+        if (fromCurrency == null || toCurrency == null) {
             _uiState.update { it.copy(rate = null, rateLoading = false) }
             stopAutoRefresh()
             return
@@ -230,7 +228,7 @@ class ExchangeViewModel : CommonViewModel() {
     }
 
     data class UiState(
-        val amountValue: String = "",
+        val amountValue: String = "0.1",
 
         val selectedCurrency: CurrencyDto? = null,
         val tariCurrency: CurrencyDto? = null,

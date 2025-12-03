@@ -152,9 +152,10 @@ class ExolixRepository @Inject constructor(
      * Get all pending transactions with refreshed details from the API.
      * Each transaction is fetched from the API to get the latest status and details.
      */
-    suspend fun getPendingTransactions(): Result<List<Exolix.Transaction>> = switchToIo {
+    suspend fun getPendingTransactions(number: Int = -1): Result<List<Exolix.Transaction>> = switchToIo {
         runCatching {
-            val storedTransactions = exolixPrefRepository.transactions.sortedByDescending { it.createdAt }.take(5) // TODO decide how many to refresh
+            val storedTransactions = exolixPrefRepository.transactions.sortedByDescending { it.createdAt }
+                .let { if (number > 0) it.take(number) else it }
             val refreshedTransactions = mutableListOf<Exolix.Transaction>()
 
             storedTransactions.forEach { storedTx ->

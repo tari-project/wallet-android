@@ -19,11 +19,13 @@ class ExchangeStatusFragment : CommonFragment<ExchangeStatusViewModel>() {
         TariDesignSystem(viewModel.currentTheme) {
             ExchangeStatusScreen(
                 uiState = uiState,
-                onBackClick = { viewModel.onBackPressed() },
+                onBackClick = viewModel::onBackPressed,
                 onCopyClick = viewModel::onCopyClicked,
                 onRetry = viewModel::loadTransaction,
                 onPullToRefresh = viewModel::onRefreshClicked,
                 onShowQrCodeClick = viewModel::onShowQrCodeClicked,
+                onRemoveTransaction = viewModel::onRemoveTransactionClicked,
+                onContactSupportClick = viewModel::onContactSupportClicked,
             )
         }
     }

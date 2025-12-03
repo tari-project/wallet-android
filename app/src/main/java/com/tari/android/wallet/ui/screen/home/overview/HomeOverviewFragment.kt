@@ -27,6 +27,7 @@ class HomeOverviewFragment : CommonFragment<HomeOverviewViewModel>() {
                 onPendingExolixTransactionClick = viewModel::onExolixTransactionClicked,
                 onTxClick = { viewModel.navigateToTxDetail(it.tx) },
                 onViewAllTxsClick = { viewModel.onAllTxClicked() },
+                onViewAllSwapsClick = { viewModel.onAllSwapsClicked() },
                 onConnectionStatusClick = { viewModel.showConnectionStatusDialog() },
                 onConnectionStatusDismiss = { viewModel.onConnectionStatusDialogDismiss() },
                 onSyncDialogDismiss = { viewModel.onSyncDialogDismiss() },

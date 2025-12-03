@@ -55,6 +55,7 @@ fun HomeOverviewScreen(
     onPendingExolixTransactionClick: (Exolix.Transaction) -> Unit,
     onTxClick: (txDto: TxDto) -> Unit,
     onViewAllTxsClick: () -> Unit,
+    onViewAllSwapsClick: () -> Unit,
     onConnectionStatusClick: () -> Unit,
     onConnectionStatusDismiss: () -> Unit,
     onSyncDialogDismiss: () -> Unit,
@@ -151,13 +152,26 @@ fun HomeOverviewScreen(
                         Spacer(modifier = Modifier.height(15.dp))
                     }
 
-                    items(uiState.exolixTransactions) { transaction ->
+                    val displayedSwaps = uiState.exolixTransactions
+                    items(displayedSwaps) { transaction ->
                         PendingExolixTxItem(
                             modifier = Modifier
                                 .padding(horizontal = 16.dp)
                                 .animateItem(),
                             transaction = transaction,
                             onClick = { onPendingExolixTransactionClick(transaction) },
+                        )
+                        Spacer(modifier = Modifier.height(10.dp))
+                    }
+
+                    item {
+                        TariTextButton(
+                            modifier = Modifier
+                                .padding(horizontal = 16.dp)
+                                .fillMaxWidth()
+                                .wrapContentWidth(align = Alignment.CenterHorizontally),
+                            text = stringResource(R.string.home_swap_view_all_swaps),
+                            onClick = onViewAllSwapsClick,
                         )
                         Spacer(modifier = Modifier.height(10.dp))
                     }
@@ -302,6 +316,7 @@ private fun HomeOverviewScreenPreview() {
             onPendingExolixTransactionClick = {},
             onTxClick = {},
             onViewAllTxsClick = {},
+            onViewAllSwapsClick = {},
             onConnectionStatusClick = {},
             onConnectionStatusDismiss = {},
             onSyncDialogDismiss = {},
@@ -340,6 +355,7 @@ private fun HomeOverviewScreenHiddenPreview() {
             onPendingExolixTransactionClick = {},
             onTxClick = {},
             onViewAllTxsClick = {},
+            onViewAllSwapsClick = {},
             onConnectionStatusClick = {},
             onConnectionStatusDismiss = {},
             onSyncDialogDismiss = {},
@@ -378,6 +394,7 @@ private fun HomeOverviewEmptyScreenPreview() {
             onPendingExolixTransactionClick = {},
             onTxClick = {},
             onViewAllTxsClick = {},
+            onViewAllSwapsClick = {},
             onConnectionStatusClick = {},
             onConnectionStatusDismiss = {},
             onSyncDialogDismiss = {},
@@ -417,6 +434,7 @@ private fun HomeOverviewProgressScreenPreview() {
             onPendingExolixTransactionClick = {},
             onTxClick = {},
             onViewAllTxsClick = {},
+            onViewAllSwapsClick = {},
             onConnectionStatusClick = {},
             onConnectionStatusDismiss = {},
             onSyncDialogDismiss = {},

@@ -115,7 +115,7 @@
     <string name="exchange_you_need_to_send">You need to send</string>
     <string name="exchange_to_exolix_address">To Exolix address</string>
     <string name="exchange_send_funds_once">Send funds to the address above only once.</string>
-    <string name="exchange_cancel_transaction">Cancel Transaction</string>
+    <string name="exchange_remove_transaction">Remove Transaction</string>
     <string name="exchange_ive_sent_funds_button">I\'ve Sent the Funds</string>
     <string name="exchange_copy_amount_content_description">Copy amount</string>
     <string name="exchange_copy_address_content_description">Copy address</string>
@@ -140,6 +140,8 @@
     <string name="exchange_status_in_progress">In Progress</string>
     <string name="exchange_status_description">You\'ve successfully swapped %1$s %2$s to %3$s %4$s</string>
     <string name="exchange_status_amount_to_receive">You will receive</string>
+    <string name="exchange_status_amount_to_send">You need to send</string>
+    <string name="exchange_status_address_to_send">To Exolix address</string>
     <string name="exchange_status_amount_received">Amount received</string>
     <string name="exchange_status_amount">Amount</string>
     <string name="exchange_status_destination_address">Destination Address (%1$s)</string>
@@ -155,6 +157,9 @@
     <string name="exchange_status_refund_address">Refund Address (%1$s)</string>
     <string name="exchange_status_refund_extra_id">Refund Extra ID</string>
     <string name="exchange_status_show_qr_code">Show QR Code</string>
+    <string name="exchange_contact_support">Contact support</string>
+    <string name="exchange_support_email_subject">Exchange Support Request - Transaction ID: %1$s</string>
+    <string name="exchange_support_email_body">Hello Exolix Support,\n\nI need assistance with my exchange transaction.\n\nTransaction ID: %1$s\nFrom: %2$s\nTo: %3$s\n\nDescription of the issue:\n[Please describe your issue here]\n\nThank you for your help.</string>
 
     <!-- exchange review screen -->
     <string name="exchange_review_title">Review Exchange</string>
@@ -180,13 +185,13 @@
     <string name="exchange_status_card_transaction_refunded">Transaction Refunded</string>
 
     <!-- exchange status card subtitles -->
-    <string name="exchange_status_card_subtitle_wait">Send your %1$s to the deposit address to proceed with the exchange.</string>
-    <string name="exchange_status_card_subtitle_received">Your deposit has been confirmed. Processing exchange.</string>
-    <string name="exchange_status_card_subtitle_exchanging">Your exchange is being processed.</string>
-    <string name="exchange_status_card_subtitle_sending">Sending %1$s to your destination address.</string>
-    <string name="exchange_status_card_subtitle_success">Your exchange was completed successfully.</string>
-    <string name="exchange_status_card_subtitle_overdue">The deposit window has expired. Transaction cancelled.</string>
-    <string name="exchange_status_card_subtitle_refunded">Your deposit has been refunded to your refund address.</string>
+    <string name="exchange_status_card_subtitle_wait">We have not received your %1$s yet. We are waiting for the network to confirm the transaction.</string>
+    <string name="exchange_status_card_subtitle_received">We have received your %1$s. Your exchange is processing. Your exchange may take up to 60 minutes to update.</string>
+    <string name="exchange_status_card_subtitle_exchanging">We have received your %1$s. Your exchange is processing.</string>
+    <string name="exchange_status_card_subtitle_sending">The exchange is complete. Your %1$s is on its way to your wallet.</string>
+    <string name="exchange_status_card_subtitle_success">The exchange is complete. Your %1$s is on its way to your wallet.</string>
+    <string name="exchange_status_card_subtitle_overdue">We did not receive your deposit within the time limit. Please start a new transaction.</string>
+    <string name="exchange_status_card_subtitle_refunded">Your exchange could not be completed. We have returned your original %1$s to your wallet.</string>
 
     <!-- Exchange status strings for pending transaction card -->
     <string name="exchange_status_wait">Waiting for deposit</string>
@@ -258,8 +263,11 @@
     <string name="home_transaction_view_all_txs">View all transactions</string>
     <string name="home_search_hint">Enter Emoji ID or Contact Name</string>
     <string name="home_title_tari_universe">Tari Universe</string>
-    <string name="home_swap_in_progress_title">Swap in progress</string>
+    <string name="home_swap_in_progress_title">Recent Swaps</string>
+    <string name="home_swap_view_all_swaps">View all swaps</string>
     <string name="home_pending_exolix_transaction_title_format">Swap %1$s %2$s to %3$s %4$s</string>
+    <string name="all_swaps_title">All Swaps</string>
+    <string name="all_swaps_empty_message">No pending swaps</string>
     <string name="home_active_miners_title">Active Miners</string>
     <string name="home_active_miners_start_mining">Start mining</string>
     <string name="home_active_miners_you_mining">You\'re mining</string>

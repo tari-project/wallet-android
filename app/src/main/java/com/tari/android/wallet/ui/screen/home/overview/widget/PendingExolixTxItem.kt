@@ -32,7 +32,6 @@ import com.tari.android.wallet.ui.compose.TariDesignSystem
 import com.tari.android.wallet.ui.screen.settings.themeSelector.TariTheme
 import com.tari.android.wallet.util.MockDataStub
 import com.tari.android.wallet.util.extension.parseDateTime
-import java.util.Locale
 
 @Composable
 fun PendingExolixTxItem(
@@ -81,18 +80,13 @@ fun PendingExolixTxItem(
                     style = TariDesignSystem.typography.headingMedium,
                 )
                 Text(
-                    text = transaction.id, // TODO remove after testing!!
-                    style = TariDesignSystem.typography.body2,
-                )
-                Text(
                     text = transaction.status.statusText(),
                     style = TariDesignSystem.typography.body2,
                     color = transaction.status.statusColor(),
                 )
                 transaction.createdAt.parseDateTime()?.let { dateTime ->
                     Text(
-//                        text = dateTime.txListItemFormattedDate(withTime = true), // TODO uncomment after testing!!
-                        text = dateTime.toString("E, MMM d 'at' HH:mm", Locale.ENGLISH),
+                        text = dateTime.txListItemFormattedDate(withTime = true),
                         style = TariDesignSystem.typography.body2,
                     )
                 }

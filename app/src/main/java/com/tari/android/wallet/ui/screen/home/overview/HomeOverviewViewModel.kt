@@ -41,6 +41,7 @@ import javax.inject.Inject
 const val TARI_COM = "https://tari.com/"
 private const val DATA_REFRESH_INTERVAL_MILLIS = 60_000L
 private const val TRANSACTION_AMOUNT_HOME_PAGE = 5
+private const val SWAPS_AMOUNT_HOME_PAGE = 2
 
 class HomeOverviewViewModel : CommonViewModel() {
 
@@ -151,7 +152,7 @@ class HomeOverviewViewModel : CommonViewModel() {
         }
 
         launchOnIo {
-            exolixRepository.getPendingTransactions()
+            exolixRepository.getPendingTransactions(SWAPS_AMOUNT_HOME_PAGE)
                 .onSuccess { transactions ->
                     _uiState.update { it.copy(exolixTransactions = transactions) }
                 }
@@ -222,6 +223,10 @@ class HomeOverviewViewModel : CommonViewModel() {
         } else {
             tariNavigator.navigate(Navigation.Exchange.ExchangeStatus(transaction.id))
         }
+    }
+
+    fun onAllSwapsClicked() {
+        tariNavigator.navigate(Navigation.Exchange.AllSwaps)
     }
 
     private fun checkForDataConsent() {
