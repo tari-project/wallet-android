@@ -64,7 +64,25 @@ class ExchangeViewModel : CommonViewModel() {
         val newAmount = amountValue.filterSingleDot().filterNumbers()
         if (newAmount == _uiState.value.amountValue) return
 
-        _uiState.update { it.copy(amountValue = amountValue.filterSingleDot().filterNumbers()) }
+        _uiState.update {
+            it.copy(
+                amountValue = amountValue.filterSingleDot().filterNumbers(),
+                lastEditedField = LastEditedField.SEND_AMOUNT,
+            )
+        }
+        fetchRateIfValid()
+    }
+
+    fun onReceiveAmountChanged(receiveAmountValue: String) {
+        val newAmount = receiveAmountValue.filterSingleDot().filterNumbers()
+        if (newAmount == _uiState.value.receiveAmountValue) return
+
+        _uiState.update {
+            it.copy(
+                receiveAmountValue = receiveAmountValue.filterSingleDot().filterNumbers(),
+                lastEditedField = LastEditedField.RECEIVE_AMOUNT,
+            )
+        }
         fetchRateIfValid()
     }
 
@@ -96,7 +114,13 @@ class ExchangeViewModel : CommonViewModel() {
                 exchangeDirection = when (it.exchangeDirection) {
                     ExchangeDirection.BUY_TARI -> ExchangeDirection.SELL_TARI
                     ExchangeDirection.SELL_TARI -> ExchangeDirection.BUY_TARI
-                }
+                },
+                amountValue = uiState.value.receiveAmountValue,
+                receiveAmountValue = uiState.value.amountValue,
+                lastEditedField = when (it.lastEditedField) {
+                    LastEditedField.SEND_AMOUNT -> LastEditedField.RECEIVE_AMOUNT
+                    LastEditedField.RECEIVE_AMOUNT -> LastEditedField.SEND_AMOUNT
+                },
             )
         }
         fetchRateIfValid()
@@ -136,11 +160,20 @@ class ExchangeViewModel : CommonViewModel() {
     fun onExchangeClicked() {
         stopAutoRefresh()
 
+        // Determine which amount to use based on last edited field
+        val (amount, withdrawalAmount) = when (_uiState.value.lastEditedField) {
+            LastEditedField.SEND_AMOUNT -> _uiState.value.amount to null
+            LastEditedField.RECEIVE_AMOUNT -> null to _uiState.value.receiveAmount
+        }
+
+        if (amount == null && withdrawalAmount == null) error("Both amount and withdrawalAmount are null, but exchange button is not disabled")
+
         val request = ExchangeRequestData(
             selectedCurrency = _uiState.value.selectedCurrency ?: error("selectedCurrency is null, but exchange button is not disabled"),
             tariCurrency = _uiState.value.tariCurrency ?: error("tariCurrency is null, but exchange button is not disabled"),
             selectedAddress = _uiState.value.destinationAddress.takeIf { it.isNotBlank() },
-            amount = _uiState.value.amount ?: error("amount is null, but exchange button is not disabled"),
+            amount = amount,
+            withdrawalAmount = withdrawalAmount,
             rateType = if (_uiState.value.fixedRate) Exolix.RateType.FIXED else Exolix.RateType.FLOATING,
             direction = _uiState.value.exchangeDirection,
         )
@@ -179,11 +212,16 @@ class ExchangeViewModel : CommonViewModel() {
     private fun fetchRateIfValid() {
         rateFetchJob?.cancel()
 
-        val amount = _uiState.value.amount ?: BigDecimal.ZERO
         val fromCurrency = _uiState.value.fromCurrency
         val toCurrency = _uiState.value.toCurrency
 
-        if (fromCurrency == null || toCurrency == null) {
+        // Determine which amount to use based on last edited field
+        val (amount, withdrawalAmount) = when (_uiState.value.lastEditedField) {
+            LastEditedField.SEND_AMOUNT -> _uiState.value.amount to null
+            LastEditedField.RECEIVE_AMOUNT -> null to _uiState.value.receiveAmount
+        }
+
+        if (fromCurrency == null || toCurrency == null || (amount == null && withdrawalAmount == null)) {
             _uiState.update { it.copy(rate = null, rateLoading = false) }
             stopAutoRefresh()
             return
@@ -196,10 +234,32 @@ class ExchangeViewModel : CommonViewModel() {
                 networkFrom = fromCurrency.networkName,
                 coinTo = toCurrency.coin,
                 networkTo = toCurrency.networkName,
-                amount = amount.toString(),
+                amount = amount?.toString(),
+                withdrawalAmount = withdrawalAmount?.toString(),
                 rateType = if (_uiState.value.fixedRate) Exolix.RateType.FIXED else Exolix.RateType.FLOATING,
             ).onSuccess { rate ->
-                _uiState.update { it.copy(rate = rate, rateLoading = false) }
+                // Update the opposite field based on which was edited
+                _uiState.update {
+                    when (it.lastEditedField) {
+                        LastEditedField.SEND_AMOUNT -> {
+                            // Send was edited, update receive with toAmount from API
+                            it.copy(
+                                rate = rate,
+                                rateLoading = false,
+                                receiveAmountValue = rate.toAmount.toString()
+                            )
+                        }
+
+                        LastEditedField.RECEIVE_AMOUNT -> {
+                            // Receive was edited, update send with amount from API
+                            it.copy(
+                                rate = rate,
+                                rateLoading = false,
+                                amountValue = rate.fromAmount.toString()
+                            )
+                        }
+                    }
+                }
                 startAutoRefresh()
             }.onFailure { error ->
                 _uiState.update { it.copy(rateLoading = false) }
@@ -227,8 +287,14 @@ class ExchangeViewModel : CommonViewModel() {
         _uiState.update { it.copy(autoRefreshActive = false) }
     }
 
+    enum class LastEditedField {
+        SEND_AMOUNT,
+        RECEIVE_AMOUNT,
+    }
+
     data class UiState(
         val amountValue: String = "0.1",
+        val receiveAmountValue: String = "",
 
         val selectedCurrency: CurrencyDto? = null,
         val tariCurrency: CurrencyDto? = null,
@@ -244,9 +310,13 @@ class ExchangeViewModel : CommonViewModel() {
         val autoRefreshActive: Boolean = false,
 
         val availableBalance: MicroTari,
+        val lastEditedField: LastEditedField = LastEditedField.SEND_AMOUNT,
     ) {
         val amount: BigDecimal?
             get() = runCatching { amountValue.toBigDecimal() }.getOrNull()
+
+        val receiveAmount: BigDecimal?
+            get() = runCatching { receiveAmountValue.toBigDecimal() }.getOrNull()
 
         val rateAmountError: Boolean
             get() = rate != null && amount != null && (amount!! < rate.minAmount || amount!! > rate.maxAmount)
@@ -279,9 +349,13 @@ class ExchangeViewModel : CommonViewModel() {
 
         val exchangeButtonEnabled: Boolean
             get() {
+                // At least one amount field must be filled
+                val hasValidAmount = (amount != null && amount!! > BigDecimal.ZERO) ||
+                        (receiveAmount != null && receiveAmount!! > BigDecimal.ZERO)
+
                 val baseCondition = fromCurrency != null &&
                         toCurrency != null &&
-                        amount != null &&
+                        hasValidAmount &&
                         !rateAmountError &&
                         !availableBalanceError &&
                         !rateLoading

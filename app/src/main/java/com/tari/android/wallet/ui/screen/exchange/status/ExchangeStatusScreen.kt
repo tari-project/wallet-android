@@ -170,13 +170,14 @@ private fun ExchangeStatusContent(
                 singleLine = false,
                 onCopyClicked = onCopyClick,
             )
-        } else {
-            TxDetailInfoItem(
-                modifier = Modifier.fillMaxWidth(),
-                title = transaction.amountLabel(),
-                value = "${WalletConfig.amountFormatter.format(transaction.amountTo)} ${transaction.coinTo.coinCode}",
-            )
         }
+
+        Spacer(Modifier.size(10.dp))
+        TxDetailInfoItem(
+            modifier = Modifier.fillMaxWidth(),
+            title = transaction.amountLabel(),
+            value = "${WalletConfig.amountFormatter.format(transaction.amountTo)} ${transaction.coinTo.coinCode}",
+        )
 
         Spacer(Modifier.size(10.dp))
 

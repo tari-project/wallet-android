@@ -74,6 +74,7 @@ fun ExchangeScreen(
     onBackClick: () -> Unit,
     onReloadCurrencies: () -> Unit,
     onAmountChanged: (String) -> Unit,
+    onReceiveAmountChanged: (String) -> Unit,
     onSelectCurrencyClicked: () -> Unit,
     onMinAmountClicked: () -> Unit,
     onMaxAmountClicked: () -> Unit,
@@ -189,6 +190,7 @@ fun ExchangeScreen(
                             .fillMaxWidth()
                             .padding(horizontal = 16.dp),
                         uiState = uiState,
+                        onReceiveAmountChanged = onReceiveAmountChanged,
                         onSelectCurrencyClicked = onSelectCurrencyClicked,
                     )
                     Spacer(Modifier.size(10.dp))
@@ -315,12 +317,6 @@ private fun YouSendLayout(
     val focusManager = LocalFocusManager.current
 
     Column(modifier = modifier) {
-        Text(
-            modifier = Modifier.align(Alignment.CenterHorizontally),
-            text = stringResource(R.string.exchange_you_send_label),
-            style = TariDesignSystem.typography.body1,
-        )
-        Spacer(Modifier.size(20.dp))
         Row {
             var textFieldValue by remember { mutableStateOf(TextFieldValue(uiState.amountValue)) }
             textFieldValue = textFieldValue.newValueIfChanged(uiState.amountValue)
@@ -331,6 +327,7 @@ private fun YouSendLayout(
                     if (newValue.text != textFieldValue.text) onAmountChanged(newValue.text)
                     textFieldValue = newValue
                 },
+                title = stringResource(R.string.exchange_you_send_label),
                 hint = stringResource(R.string.exchange_amount_placeholder),
                 errorText = when {
                     !uiState.rate?.message.isNullOrBlank() -> uiState.rate.message
@@ -347,7 +344,7 @@ private fun YouSendLayout(
             Spacer(Modifier.size(16.dp))
             uiState.fromCurrency?.let { fromCurrency ->
                 SelectedCurrencyChip(
-                    modifier = Modifier.padding(top = 8.dp),
+                    modifier = Modifier.padding(top = 36.dp),
                     title = fromCurrency.coin,
                     subtitle = fromCurrency.networkName,
                     iconUrl = fromCurrency.iconUrl,
@@ -373,8 +370,8 @@ private fun YouSendLayout(
         }
 
         Spacer(Modifier.size(20.dp))
-        val minAmountText = uiState.rate?.minAmount?.let { WalletConfig.amountFormatter.format(it) }
-        val maxAmountText = uiState.rate?.maxAmount?.let { WalletConfig.amountFormatter.format(it) }
+        val minAmountText = uiState.rate?.minAmount?.formatAnyAmount()
+        val maxAmountText = uiState.rate?.maxAmount?.formatAnyAmount()
         Column {
             Row(verticalAlignment = Alignment.Bottom) {
                 Text(
@@ -408,30 +405,36 @@ private fun YouSendLayout(
 @Composable
 private fun YouReceiveLayout(
     uiState: ExchangeViewModel.UiState,
+    onReceiveAmountChanged: (String) -> Unit,
     onSelectCurrencyClicked: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Column(modifier = modifier) {
-        Text(
-            modifier = Modifier.align(Alignment.CenterHorizontally),
-            text = stringResource(R.string.exchange_you_receive_label),
-            style = TariDesignSystem.typography.body1,
-        )
-        Spacer(Modifier.size(20.dp))
+    val focusManager = LocalFocusManager.current
 
+    Column(modifier = modifier) {
         Row {
+            var textFieldValue by remember { mutableStateOf(TextFieldValue(uiState.receiveAmountValue)) }
+            textFieldValue = textFieldValue.newValueIfChanged(uiState.receiveAmountValue)
             TariTextField(
                 modifier = Modifier.weight(1f, false),
-                value = TextFieldValue(uiState.rate?.toAmount?.toString() ?: ""),
-                onValueChanged = {},
+                value = textFieldValue,
+                onValueChanged = { newValue ->
+                    if (newValue.text != textFieldValue.text) onReceiveAmountChanged(newValue.text)
+                    textFieldValue = newValue
+                },
+                title = stringResource(R.string.exchange_you_receive_label),
                 hint = stringResource(R.string.exchange_converted_amount_placeholder),
-                enabled = false,
                 visualTransformation = AmountVisualTransformation(),
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Decimal,
+                    imeAction = ImeAction.Done,
+                ),
+                keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
             )
             Spacer(Modifier.size(16.dp))
             uiState.toCurrency?.let { toCurrency ->
                 SelectedCurrencyChip(
-                    modifier = Modifier.padding(top = 8.dp),
+                    modifier = Modifier.padding(top = 36.dp),
                     title = toCurrency.coin,
                     subtitle = toCurrency.networkName,
                     iconUrl = toCurrency.iconUrl,
@@ -491,6 +494,7 @@ private fun ExchangeScreenPreview() {
             onBackClick = {},
             onReloadCurrencies = {},
             onAmountChanged = {},
+            onReceiveAmountChanged = {},
             onSelectCurrencyClicked = {},
             onMinAmountClicked = {},
             onMaxAmountClicked = {},
@@ -520,6 +524,7 @@ private fun ExchangeScreenDarkPreview() {
             onBackClick = {},
             onReloadCurrencies = {},
             onAmountChanged = {},
+            onReceiveAmountChanged = {},
             onSelectCurrencyClicked = {},
             onMinAmountClicked = {},
             onMaxAmountClicked = {},
@@ -552,6 +557,7 @@ private fun ExchangeScreenWrongAmountPreview() {
             onBackClick = {},
             onReloadCurrencies = {},
             onAmountChanged = {},
+            onReceiveAmountChanged = {},
             onSelectCurrencyClicked = {},
             onMinAmountClicked = {},
             onMaxAmountClicked = {},
@@ -580,6 +586,7 @@ private fun ExchangeScreenCurrencyLoadingPreview() {
             onBackClick = {},
             onReloadCurrencies = {},
             onAmountChanged = {},
+            onReceiveAmountChanged = {},
             onSelectCurrencyClicked = {},
             onMinAmountClicked = {},
             onMaxAmountClicked = {},
@@ -607,6 +614,7 @@ private fun ExchangeScreenCurrencyErrorPreview() {
             onBackClick = {},
             onReloadCurrencies = {},
             onAmountChanged = {},
+            onReceiveAmountChanged = {},
             onSelectCurrencyClicked = {},
             onMinAmountClicked = {},
             onMaxAmountClicked = {},
@@ -642,6 +650,7 @@ private fun ExchangeScreenSellTariPreview() {
             onBackClick = {},
             onReloadCurrencies = {},
             onAmountChanged = {},
+            onReceiveAmountChanged = {},
             onSelectCurrencyClicked = {},
             onMinAmountClicked = {},
             onMaxAmountClicked = {},
@@ -677,6 +686,7 @@ private fun ExchangeScreenSellTariInvalidAddressPreview() {
             onBackClick = {},
             onReloadCurrencies = {},
             onAmountChanged = {},
+            onReceiveAmountChanged = {},
             onSelectCurrencyClicked = {},
             onMinAmountClicked = {},
             onMaxAmountClicked = {},

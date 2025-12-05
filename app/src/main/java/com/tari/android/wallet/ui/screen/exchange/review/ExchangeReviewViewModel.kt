@@ -40,7 +40,6 @@ class ExchangeReviewViewModel(savedState: SavedStateHandle) : CommonViewModel() 
     private val _uiState = MutableStateFlow(
         UiState(
             walletAddress = sharedPrefsRepository.walletAddress,
-            fee = walletManager.requireWalletInstance.estimateTxFee(request.amount.toMicroTari()),
         )
     )
     val uiState = _uiState.asStateFlow()
@@ -138,11 +137,12 @@ class ExchangeReviewViewModel(savedState: SavedStateHandle) : CommonViewModel() 
         _uiState.update { it.copy(creatingExchange = true, creatingExchangeError = null) }
         launchOnIo {
             exolixRepository.createExchange(request)
-                .onSuccess { response ->
+                .onSuccess { transaction ->
                     _uiState.update {
                         it.copy(
                             creatingExchange = false,
-                            transaction = response,
+                            transaction = transaction,
+                            fee = walletManager.requireWalletInstance.estimateTxFee(transaction.amount.toMicroTari()),
                         )
                     }
                 }
@@ -164,7 +164,7 @@ class ExchangeReviewViewModel(savedState: SavedStateHandle) : CommonViewModel() 
 
     data class UiState(
         val walletAddress: TariWalletAddress,
-        val fee: MicroTari,
+        val fee: MicroTari? = null,
         val transaction: Exolix.Transaction? = null,
 
         val creatingExchange: Boolean = false,
