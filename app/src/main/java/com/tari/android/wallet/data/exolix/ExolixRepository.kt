@@ -76,7 +76,7 @@ class ExolixRepository @Inject constructor(
         networkFrom: String? = null,
         coinTo: String,
         networkTo: String? = null,
-        amount: String,
+        amount: String? = null,
         withdrawalAmount: String? = null,
         rateType: Exolix.RateType,
     ): Result<Exolix.Rate> = switchToIo {
@@ -139,6 +139,7 @@ class ExolixRepository @Inject constructor(
                     coinTo = toCurrency.coin,
                     networkTo = toCurrency.networkName,
                     amount = requestData.amount,
+                    withdrawalAmount = requestData.withdrawalAmount,
                     withdrawalAddress = toAddress,
                     rateType = requestData.rateType,
                 )
@@ -208,7 +209,8 @@ data class ExchangeRequestData(
     val selectedCurrency: CurrencyDto,
     val tariCurrency: CurrencyDto,
     val selectedAddress: String? = null,
-    val amount: BigDecimal,
+    val amount: BigDecimal? = null,
+    val withdrawalAmount: BigDecimal? = null,
     val rateType: Exolix.RateType,
     val direction: ExchangeDirection,
 ) : Parcelable

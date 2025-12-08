@@ -37,7 +37,7 @@ interface ExolixRetrofitService {
         @Query("networkFrom") networkFrom: String? = null,
         @Query("coinTo") coinTo: String,
         @Query("networkTo") networkTo: String? = null,
-        @Query("amount") amount: String,
+        @Query("amount") amount: String? = null,
         @Query("withdrawalAmount") withdrawalAmount: String? = null,
         @Query("rateType") rateType: Exolix.RateType = Exolix.RateType.FIXED,
     ): Exolix.Rate
@@ -109,7 +109,7 @@ object Exolix {
         @SerializedName("networkFrom") val networkFrom: String,
         @SerializedName("coinTo") val coinTo: String,
         @SerializedName("networkTo") val networkTo: String,
-        @SerializedName("amount") val amount: BigDecimal,
+        @SerializedName("amount") val amount: BigDecimal? = null,
         @SerializedName("withdrawalAmount") val withdrawalAmount: BigDecimal? = null,
         @SerializedName("withdrawalAddress") val withdrawalAddress: String,
         @SerializedName("withdrawalExtraId") val withdrawalExtraId: String? = null,

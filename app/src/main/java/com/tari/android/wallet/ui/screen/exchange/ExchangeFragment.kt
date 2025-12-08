@@ -26,6 +26,7 @@ class ExchangeFragment : CommonFragment<ExchangeViewModel>() {
                 onBackClick = { viewModel.onBackPressed() },
                 onReloadCurrencies = { viewModel.loadCurrencies() },
                 onAmountChanged = { viewModel.onAmountChanged(it) },
+                onReceiveAmountChanged = { viewModel.onReceiveAmountChanged(it) },
                 onSelectCurrencyClicked = { viewModel.onSelectCurrencyClicked() },
                 onMinAmountClicked = { viewModel.onMinAmountClicked() },
                 onMaxAmountClicked = { viewModel.onMaxAmountClicked() },

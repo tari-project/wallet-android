@@ -169,7 +169,7 @@ private fun ReviewContent(
                     .fillMaxWidth()
                     .padding(horizontal = 20.dp),
                 title = stringResource(R.string.exchange_status_exchange_fee),
-                value = "${WalletConfig.amountFormatter.format(uiState.fee.tariValue) ?: "-"} ${transaction.coinFrom.coinCode}",
+                value = "${uiState.fee?.tariValue?.formatAnyAmount() ?: "-"} ${transaction.coinFrom.coinCode}",
             ) {
                 IconButton(onClick = onFeeInfoClick) {
                     Icon(
