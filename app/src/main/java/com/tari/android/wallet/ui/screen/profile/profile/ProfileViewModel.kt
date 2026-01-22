@@ -11,6 +11,7 @@ import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonStyle
 import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
 import com.tari.android.wallet.ui.screen.home.overview.TARI_COM
+import com.tari.android.wallet.util.DebugConfig
 import com.tari.android.wallet.util.extension.collectFlow
 import com.tari.android.wallet.util.extension.launchOnIo
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -38,6 +39,8 @@ class ProfileViewModel : CommonViewModel() {
         ProfileModel.UiState(
             tariMined = txRepository.txs.value.minedTariCount(),
             ticker = networkRepository.currentNetwork.ticker,
+            showInvitedFriendsInProfile = DebugConfig.showInvitedFriendsInProfile,
+            airdropEnabled = DebugConfig.airdropEnabled,
         )
     )
     val uiState = _uiState.asStateFlow()
@@ -51,7 +54,14 @@ class ProfileViewModel : CommonViewModel() {
     }
 
     fun onInviteLinkShareClick() {
-        tariNavigator.navigate(Navigation.ShareText(String.format(FRIEND_INVITE_ADDRESS, uiState.value.userDetails?.referralCode)))
+        tariNavigator.navigate(
+            Navigation.ShareText(
+                String.format(
+                    FRIEND_INVITE_ADDRESS,
+                    uiState.value.userDetails?.referralCode
+                )
+            )
+        )
     }
 
     fun onStartMiningClicked() {
@@ -64,6 +74,8 @@ class ProfileViewModel : CommonViewModel() {
     }
 
     fun refreshUserDetails() {
+        if (DebugConfig.airdropEnabled.not()) return
+
         launchOnIo {
             _uiState.update { it.copy(userDetailsError = false) } // To start loading animation
 
@@ -90,6 +102,8 @@ class ProfileViewModel : CommonViewModel() {
     }
 
     fun refreshFriendList() {
+        if (DebugConfig.airdropEnabled.not()) return
+
         launchOnIo {
             _uiState.update { it.copy(friendsError = false) } // To start loading animation
 
