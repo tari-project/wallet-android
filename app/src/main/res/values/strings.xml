@@ -424,7 +424,10 @@
     <string name="tx_details_cancellation_reason_orphan">The transaction was cancelled due to some funds being spent no longer being present in the chain.</string>
     <string name="tx_details_cancellation_reason_time_locked">This transaction was cancelled due to the funds not having reached their time-lock period yet.</string>
     <string name="tx_details_cancellation_reason_invalid_transaction">The transaction failed to the invalid input data. This situation shouldn\'t happen. Please send a bug report or contact us directly.</string>
-    <string name="tx_details_cancellation_reason_abandoned_coinbase">The coinbase was abandoned.</string>
+    <string name="tx_details_cancellation_reason_oversized">The transaction was cancelled because it was too large to be processed.</string>
+    <string name="tx_details_cancellation_reason_fee_too_low">The transaction was cancelled because its fee was too low.</string>
+    <string name="tx_details_cancellation_reason_already_mined">The transaction was cancelled because its funds were already mined in another transaction.</string>
+    <string name="tx_details_cancellation_reason_invalid_encrypted_value">The transaction failed because an output\'s encrypted value could not be verified.</string>
     <string name="tx_details_cancellation_reason_not_cancelled">The transaction was not cancelled, but for some reason looks like cancelled.
         Please, contact us directly if you see this message.</string>
     <string name="tx_detail_fee_tooltip_transaction_fee">Transaction Fee</string>

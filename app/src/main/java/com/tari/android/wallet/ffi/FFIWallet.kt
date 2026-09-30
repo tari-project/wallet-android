@@ -151,8 +151,9 @@ class FFIWallet(
     private external fun jniStartTXOValidation(libError: FFIError): ByteArray
     private external fun jniStartTxValidation(libError: FFIError): ByteArray
     private external fun jniRestartTxBroadcast(libError: FFIError): ByteArray
-    private external fun jniPowerModeNormal(libError: FFIError)
-    private external fun jniPowerModeLow(libError: FFIError)
+    // jniPowerModeNormal/jniPowerModeLow removed: the underlying FFI functions
+    // wallet_set_normal_power_mode/wallet_set_low_power_mode were dropped upstream in v6.0.1-pre.2
+    // (wallet power-mode support was removed entirely, no replacement API).
     private external fun jniGetSeedWords(libError: FFIError): FFIPointer
     private external fun jniSetKeyValue(key: String, value: String, libError: FFIError): Boolean
     private external fun jniGetKeyValue(key: String, libError: FFIError): String
@@ -372,9 +373,8 @@ class FFIWallet(
 
     fun restartTxBroadcast(): BigInteger = runWithError { BigInteger(1, jniRestartTxBroadcast(it)) }
 
-    fun setPowerModeNormal() = runWithError { jniPowerModeNormal(it) }
-
-    fun setPowerModeLow() = runWithError { jniPowerModeLow(it) }
+    // setPowerModeNormal()/setPowerModeLow() removed: the upstream FFI dropped wallet power-mode
+    // support entirely in v6.0.1-pre.2 (no replacement API).
 
     fun getSeedWords(): List<String> = runWithError { error ->
         FFISeedWords(jniGetSeedWords(error)).runWithDestroy { seedWords -> (0 until seedWords.getLength()).map { seedWords.getAt(it) } }
@@ -403,10 +403,11 @@ class FFIWallet(
         }
 
     fun getLowestFeePerGram(): MicroTari = runWithError { error ->
-        FFIFeePerGramStat(jniWalletGetFeePerGramStats(3, error)).runWithDestroy { stats ->
-            stats.getMin().toMicroTari().takeIf { it > 0.toMicroTari() }
-                ?: 1.toMicroTari() // Sometimes the minimum fee can be 0, so we set it to 1 microTari
-        }
+        FFIFeePerGramStats(jniWalletGetFeePerGramStats(3, error)).iterateWithDestroy { stat -> stat.getMin() }
+            .minOrNull()
+            ?.toMicroTari()
+            ?.takeIf { it > 0.toMicroTari() }
+            ?: 1.toMicroTari() // Sometimes the minimum fee can be 0, so we set it to 1 microTari
     }
 
     fun getUnbindedOutputs(): List<TariUnblindedOutput> = runWithError { error ->

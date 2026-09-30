@@ -9,7 +9,10 @@ enum class FFITxCancellationReason {
     Orphan,
     TimeLocked,
     InvalidTransaction,
-    AbandonedCoinbase;
+    Oversized,
+    FeeTooLow,
+    AlreadyMined,
+    InvalidEncryptedValue;
 
     companion object {
         fun map(status: Int): FFITxCancellationReason {
@@ -22,7 +25,10 @@ enum class FFITxCancellationReason {
                 4 -> Orphan
                 5 -> TimeLocked
                 6 -> InvalidTransaction
-                7 -> AbandonedCoinbase
+                7 -> Oversized
+                8 -> FeeTooLow
+                9 -> AlreadyMined
+                10 -> InvalidEncryptedValue
                 else -> throw FFIException(message = "Unexpected reason: $status")
             }
         }
