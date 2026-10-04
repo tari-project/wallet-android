@@ -24,10 +24,8 @@ class HomeOverviewModel {
         val ffiVersion: String,
         val connectionState: ConnectionState = ConnectionState(),
 
-        val activeMinersCount: Int? = null,
-        val activeMinersCountError: Boolean = false,
-        val isMining: Boolean? = null,
-        val isMiningError: Boolean = false,
+        val activeNodesCount: Int? = null,
+        val activeNodesCountError: Boolean = false,
 
         val exolixTransactions: List<Exolix.Transaction> = emptyList(),
 

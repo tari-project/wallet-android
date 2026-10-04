@@ -1,9 +1,7 @@
 package com.tari.android.wallet.data.airdrop
 
 import com.tari.android.wallet.data.sharedPrefs.CorePrefRepository
-import com.tari.android.wallet.ffi.FFIWallet
 import com.tari.android.wallet.util.extension.safeCastTo
-import com.tari.android.wallet.util.extension.sha256
 import com.tari.android.wallet.util.extension.switchToIo
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -30,21 +28,6 @@ class AirdropRepository @Inject constructor(
         corePrefRepository.airdropToken = null
         corePrefRepository.airdropRefreshToken = null
         _airdropToken.value = null
-    }
-
-    suspend fun getMinerStats(): Result<Int> = switchToIo {
-        runCatching { airdropRetrofit.getMinerStats().totalMiners }
-    }
-
-    suspend fun getMiningStatus(wallet: FFIWallet): Result<Boolean> = switchToIo {
-        // any of airdropToken or anonId should be non-null to get mining status
-        runCatching {
-            airdropRetrofit.getMinerStatus(
-                token = "Bearer ${corePrefRepository.airdropToken}",
-                viewKeyHashed = wallet.getPrivateViewKey().getByteVector().hex().sha256(),
-                anonId = corePrefRepository.airdropAnonId ?: "unset",
-            ).mining
-        }
     }
 
     suspend fun getUserDetails(): Result<UserDetailsResponse> = switchToIo {

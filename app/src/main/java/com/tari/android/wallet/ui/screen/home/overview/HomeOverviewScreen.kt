@@ -41,7 +41,6 @@ import com.tari.android.wallet.ui.screen.home.overview.widget.VersionCodeChip
 import com.tari.android.wallet.ui.screen.home.overview.widget.WalletBalanceCard
 import com.tari.android.wallet.ui.screen.settings.themeSelector.TariTheme
 import com.tari.android.wallet.util.MockDataStub
-import com.tari.android.wallet.util.extension.isTrue
 import com.tari.android.wallet.util.extension.toMicroTari
 
 @Composable
@@ -98,11 +97,8 @@ fun HomeOverviewScreen(
                     Spacer(modifier = Modifier.height(25.dp))
                     ActiveMinersCard(
                         modifier = Modifier.padding(horizontal = 16.dp),
-                        activeMinersCount = uiState.activeMinersCount,
-                        activeMinersCountError = uiState.activeMinersCountError,
-                        isMining = uiState.isMining,
-                        showMiningStatus = !uiState.isMiningError,
-                        onStartMiningClicked = onStartMiningClicked,
+                        activeNodesCount = uiState.activeNodesCount,
+                        activeNodesCountError = uiState.activeNodesCountError,
                     )
                     Spacer(modifier = Modifier.height(10.dp))
                     WalletBalanceCard(
@@ -202,7 +198,7 @@ fun HomeOverviewScreen(
                     } else {
                         item {
                             EmptyTxList(
-                                showStartMiningButton = !uiState.isMining.isTrue(),
+                                showStartMiningButton = true,
                                 onStartMiningClicked = onStartMiningClicked,
                                 modifier = Modifier
                                     .fillMaxWidth()
@@ -290,8 +286,7 @@ private fun HomeOverviewScreenPreview() {
     TariDesignSystem(TariTheme.Light) {
         HomeOverviewScreen(
             uiState = HomeOverviewModel.UiState(
-                activeMinersCount = 10,
-                isMining = false,
+                activeNodesCount = 10,
                 balance = BalanceInfo(
                     availableBalance = 4_836_150_000.toMicroTari(),
                     pendingIncomingBalance = 0.toMicroTari(),
@@ -333,8 +328,7 @@ private fun HomeOverviewScreenHiddenPreview() {
     TariDesignSystem(TariTheme.Light) {
         HomeOverviewScreen(
             uiState = HomeOverviewModel.UiState(
-                activeMinersCount = 10,
-                isMining = false,
+                activeNodesCount = 10,
                 balance = BalanceInfo(
                     availableBalance = 4_836_150_000.toMicroTari(),
                     pendingIncomingBalance = 0.toMicroTari(),
@@ -372,8 +366,7 @@ private fun HomeOverviewEmptyScreenPreview() {
     TariDesignSystem(TariTheme.Light) {
         HomeOverviewScreen(
             uiState = HomeOverviewModel.UiState(
-                activeMinersCount = 10,
-                isMining = false,
+                activeNodesCount = 10,
                 balance = BalanceInfo(
                     availableBalance = 4_836_150_000.toMicroTari(),
                     pendingIncomingBalance = 0.toMicroTari(),
@@ -412,8 +405,7 @@ private fun HomeOverviewProgressScreenPreview() {
     TariDesignSystem(TariTheme.Light) {
         HomeOverviewScreen(
             uiState = HomeOverviewModel.UiState(
-                activeMinersCount = 10,
-                isMining = false,
+                activeNodesCount = 10,
                 balance = BalanceInfo(
                     availableBalance = 4_836_150_000.toMicroTari(),
                     pendingIncomingBalance = 0.toMicroTari(),

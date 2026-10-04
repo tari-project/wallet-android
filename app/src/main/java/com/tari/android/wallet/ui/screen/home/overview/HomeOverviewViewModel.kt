@@ -12,12 +12,11 @@ import com.tari.android.wallet.application.Navigation
 import com.tari.android.wallet.application.securityStage.StagedWalletSecurityManager
 import com.tari.android.wallet.application.walletManager.WalletManager.WalletEvent
 import com.tari.android.wallet.application.walletManager.WalletManager.WalletEvent.TxSend.TxSendFailed.TxFailureReason
-import com.tari.android.wallet.application.walletManager.doOnWalletRunning
 import com.tari.android.wallet.data.BalanceStateHandler
 import com.tari.android.wallet.data.ConnectionStateHandler
-import com.tari.android.wallet.data.airdrop.AirdropRepository
 import com.tari.android.wallet.data.exolix.Exolix
 import com.tari.android.wallet.data.exolix.ExolixRepository
+import com.tari.android.wallet.data.netmap.NetmapRepository
 import com.tari.android.wallet.data.sharedPrefs.sentry.SentryPrefRepository
 import com.tari.android.wallet.data.tx.TxRepository
 import com.tari.android.wallet.model.TxId
@@ -58,7 +57,7 @@ class HomeOverviewViewModel : CommonViewModel() {
     lateinit var balanceStateHandler: BalanceStateHandler
 
     @Inject
-    lateinit var airdropRepository: AirdropRepository
+    lateinit var netmapRepository: NetmapRepository
 
     @Inject
     lateinit var connectionStateHandler: ConnectionStateHandler
@@ -136,19 +135,10 @@ class HomeOverviewViewModel : CommonViewModel() {
 
     fun refreshData() {
         launchOnIo {
-            _uiState.update { it.copy(isMiningError = false) }
-            walletManager.doOnWalletRunning { wallet ->
-                airdropRepository.getMiningStatus(wallet)
-                    .onSuccess { mining -> _uiState.update { it.copy(isMining = mining, isMiningError = false) } }
-                    .onFailure { _uiState.update { it.copy(isMiningError = it.isMining == null) } }
-            }
-        }
-
-        launchOnIo {
-            _uiState.update { it.copy(activeMinersCountError = false) }
-            airdropRepository.getMinerStats()
-                .onSuccess { activeMinersCount -> _uiState.update { it.copy(activeMinersCount = activeMinersCount, activeMinersCountError = false) } }
-                .onFailure { _uiState.update { it.copy(activeMinersCountError = it.activeMinersCount == null) } }
+            _uiState.update { it.copy(activeNodesCountError = false) }
+            netmapRepository.getActiveNodesCount()
+                .onSuccess { activeNodesCount -> _uiState.update { it.copy(activeNodesCount = activeNodesCount, activeNodesCountError = false) } }
+                .onFailure { _uiState.update { it.copy(activeNodesCountError = it.activeNodesCount == null) } }
         }
 
         launchOnIo {

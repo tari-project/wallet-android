@@ -32,16 +32,12 @@ import com.tari.android.wallet.ui.compose.components.TariErrorWarningView
 import com.tari.android.wallet.ui.compose.components.TariLoadingLayout
 import com.tari.android.wallet.ui.compose.components.TariLoadingLayoutState
 import com.tari.android.wallet.ui.compose.components.TariProgressView
-import com.tari.android.wallet.ui.compose.widgets.StartMiningButton
 import com.tari.android.wallet.ui.screen.settings.themeSelector.TariTheme
 
 @Composable
 fun ActiveMinersCard(
-    isMining: Boolean?,
-    showMiningStatus: Boolean,
-    activeMinersCount: Int?,
-    activeMinersCountError: Boolean,
-    onStartMiningClicked: () -> Unit,
+    activeNodesCount: Int?,
+    activeNodesCountError: Boolean,
     modifier: Modifier = Modifier,
 ) {
     val backgroundBrush = Brush.verticalGradient(
@@ -63,7 +59,7 @@ fun ActiveMinersCard(
             ) {
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
-                        text = stringResource(R.string.home_active_miners_title),
+                        text = stringResource(R.string.home_active_nodes_title),
                         color = Color.White,
                         style = TariDesignSystem.typography.body2,
                     )
@@ -80,8 +76,8 @@ fun ActiveMinersCard(
 
                         TariLoadingLayout(
                             targetLoadingState = when {
-                                activeMinersCountError -> TariLoadingLayoutState.Error
-                                activeMinersCount != null -> TariLoadingLayoutState.Content
+                                activeNodesCountError -> TariLoadingLayoutState.Error
+                                activeNodesCount != null -> TariLoadingLayoutState.Content
                                 else -> TariLoadingLayoutState.Loading
                             },
                             loadingLayout = {
@@ -92,22 +88,11 @@ fun ActiveMinersCard(
                             },
                         ) {
                             Text(
-                                text = activeMinersCount.toString(),
+                                text = activeNodesCount.toString(),
                                 color = Color.White,
                                 style = TariDesignSystem.typography.heading2XLarge,
                             )
                         }
-                    }
-                }
-                Spacer(modifier = Modifier.width(8.dp))
-                if (showMiningStatus) {
-                    TariLoadingLayout(
-                        targetLoadingState = if (isMining == null) TariLoadingLayoutState.Loading else TariLoadingLayoutState.Content,
-                    ) {
-                        StartMiningButton(
-                            isMining = isMining!!,
-                            onStartMiningClick = onStartMiningClicked,
-                        )
                     }
                 }
             }
@@ -131,38 +116,20 @@ private fun ActiveMinersCardPreview() {
         Column {
             ActiveMinersCard(
                 modifier = Modifier.padding(16.dp),
-                activeMinersCount = 10,
-                activeMinersCountError = false,
-                isMining = true,
-                showMiningStatus = true,
-                onStartMiningClicked = {},
+                activeNodesCount = 10,
+                activeNodesCountError = false,
             )
 
             ActiveMinersCard(
                 modifier = Modifier.padding(16.dp),
-                activeMinersCount = 10,
-                activeMinersCountError = false,
-                isMining = false,
-                showMiningStatus = true,
-                onStartMiningClicked = {},
+                activeNodesCount = 10,
+                activeNodesCountError = true,
             )
 
             ActiveMinersCard(
                 modifier = Modifier.padding(16.dp),
-                activeMinersCount = 10,
-                activeMinersCountError = true,
-                isMining = false,
-                showMiningStatus = false,
-                onStartMiningClicked = {},
-            )
-
-            ActiveMinersCard(
-                modifier = Modifier.padding(16.dp),
-                activeMinersCount = null,
-                activeMinersCountError = false,
-                isMining = null,
-                showMiningStatus = true,
-                onStartMiningClicked = {},
+                activeNodesCount = null,
+                activeNodesCountError = false,
             )
         }
     }
