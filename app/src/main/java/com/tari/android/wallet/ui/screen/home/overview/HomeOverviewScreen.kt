@@ -40,6 +40,7 @@ import com.tari.android.wallet.ui.screen.home.overview.widget.TxItem
 import com.tari.android.wallet.ui.screen.home.overview.widget.VersionCodeChip
 import com.tari.android.wallet.ui.screen.home.overview.widget.WalletBalanceCard
 import com.tari.android.wallet.ui.screen.settings.themeSelector.TariTheme
+import com.tari.android.wallet.util.DebugConfig
 import com.tari.android.wallet.util.MockDataStub
 import com.tari.android.wallet.util.extension.toMicroTari
 
@@ -110,14 +111,16 @@ fun HomeOverviewScreen(
                         isBalanceHidden = uiState.balanceHidden,
                     )
                     Spacer(modifier = Modifier.height(20.dp))
-                    TariSecondaryButton(
-                        modifier = Modifier
-                            .padding(horizontal = 20.dp)
-                            .fillMaxWidth(),
-                        text = stringResource(R.string.home_buy_xtm),
-                        onClick = onBuyClicked,
-                    )
-                    Spacer(modifier = Modifier.height(10.dp))
+                    if (DebugConfig.exolixEnabled) {
+                        TariSecondaryButton(
+                            modifier = Modifier
+                                .padding(horizontal = 20.dp)
+                                .fillMaxWidth(),
+                            text = stringResource(R.string.home_buy_xtm),
+                            onClick = onBuyClicked,
+                        )
+                        Spacer(modifier = Modifier.height(10.dp))
+                    }
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -137,7 +140,7 @@ fun HomeOverviewScreen(
                     }
                 }
 
-                if (uiState.exolixTransactions.isNotEmpty()) {
+                if (DebugConfig.exolixEnabled && uiState.exolixTransactions.isNotEmpty()) {
                     item {
                         Spacer(modifier = Modifier.height(30.dp))
                         Text(

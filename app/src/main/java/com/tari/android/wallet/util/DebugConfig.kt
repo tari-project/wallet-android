@@ -86,6 +86,8 @@ object DebugConfig {
 
     const val airdropEnabled = false
 
+    const val exolixEnabled = false
+
     fun isDebug() = BuildConfig.BUILD_TYPE == "debug"
 
     private fun valueIfDebug(value: Boolean) = isDebug() && value

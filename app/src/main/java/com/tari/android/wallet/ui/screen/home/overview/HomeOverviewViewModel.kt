@@ -28,6 +28,7 @@ import com.tari.android.wallet.ui.dialog.modular.modules.body.BodyModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonStyle
 import com.tari.android.wallet.ui.dialog.modular.modules.head.HeadModule
+import com.tari.android.wallet.util.DebugConfig
 import com.tari.android.wallet.util.extension.collectFlow
 import com.tari.android.wallet.util.extension.launchOnIo
 import kotlinx.coroutines.delay
@@ -141,7 +142,7 @@ class HomeOverviewViewModel : CommonViewModel() {
                 .onFailure { _uiState.update { it.copy(activeNodesCountError = it.activeNodesCount == null) } }
         }
 
-        launchOnIo {
+        if (DebugConfig.exolixEnabled) launchOnIo {
             exolixRepository.getPendingTransactions(SWAPS_AMOUNT_HOME_PAGE)
                 .onSuccess { transactions ->
                     _uiState.update { it.copy(exolixTransactions = transactions) }
