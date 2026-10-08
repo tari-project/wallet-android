@@ -913,29 +913,8 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniRestartTxBroadcast(
     });
 }
 
-extern "C"
-JNIEXPORT void JNICALL
-Java_com_tari_android_wallet_ffi_FFIWallet_jniPowerModeNormal(
-        JNIEnv *jEnv,
-        jobject jThis,
-        jobject error) {
-    ExecuteWithError(jEnv, error, [&](int *errorPointer) {
-        auto pWallet = GetPointerField<TariWallet *>(jEnv, jThis);
-        wallet_set_normal_power_mode(pWallet, errorPointer);
-    });
-}
-
-extern "C"
-JNIEXPORT void JNICALL
-Java_com_tari_android_wallet_ffi_FFIWallet_jniPowerModeLow(
-        JNIEnv *jEnv,
-        jobject jThis,
-        jobject error) {
-    ExecuteWithError(jEnv, error, [&](int *errorPointer) {
-        auto pWallet = GetPointerField<TariWallet *>(jEnv, jThis);
-        wallet_set_low_power_mode(pWallet, errorPointer);
-    });
-}
+// wallet_set_normal_power_mode / wallet_set_low_power_mode were removed from the FFI in
+// v6.0.1-pre.2 (upstream dropped wallet power-mode support entirely, no replacement API).
 
 extern "C"
 JNIEXPORT jlong JNICALL
@@ -1158,7 +1137,7 @@ Java_com_tari_android_wallet_ffi_FFIWallet_jniWalletGetFeePerGramStats(
         jint count,
         jobject error
 ) {
-    return ExecuteWithErrorAndCast<TariFeePerGramStat *>(jEnv, error, [&](int *errorPointer) {
+    return ExecuteWithErrorAndCast<TariFeePerGramStats *>(jEnv, error, [&](int *errorPointer) {
         auto pWallet = GetPointerField<TariWallet *>(jEnv, jThis);
         return wallet_get_fee_per_gram_stats(pWallet, count, errorPointer);
     });

@@ -13,7 +13,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -30,7 +29,6 @@ import com.tari.android.wallet.ui.compose.components.TariSearchField
 import com.tari.android.wallet.ui.compose.components.TariSecondaryButton
 import com.tari.android.wallet.ui.compose.components.TariTextButton
 import com.tari.android.wallet.ui.compose.components.TariTextField
-import com.tari.android.wallet.ui.compose.widgets.StartMiningButton
 import com.tari.android.wallet.ui.screen.settings.themeSelector.TariTheme
 
 
@@ -226,13 +224,6 @@ fun SampleDesignSystemScreen(
                 text = "Inherit Text Button Disabled",
                 onClick = { },
                 enabled = false,
-            )
-
-            var isMining by rememberSaveable { mutableStateOf(false) }
-            StartMiningButton(
-                isMining = isMining,
-                onStartMiningClick = { isMining = !isMining },
-                modifier = Modifier.padding(20.dp),
             )
 
             var textFieldValue by remember { mutableStateOf(TextFieldValue("")) }

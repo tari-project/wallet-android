@@ -88,7 +88,10 @@ object TxDetailsModel {
                         FFITxCancellationReason.Orphan -> R.string.tx_details_cancellation_reason_orphan
                         FFITxCancellationReason.TimeLocked -> R.string.tx_details_cancellation_reason_time_locked
                         FFITxCancellationReason.InvalidTransaction -> R.string.tx_details_cancellation_reason_invalid_transaction
-                        FFITxCancellationReason.AbandonedCoinbase -> R.string.tx_details_cancellation_reason_abandoned_coinbase
+                        FFITxCancellationReason.Oversized -> R.string.tx_details_cancellation_reason_oversized
+                        FFITxCancellationReason.FeeTooLow -> R.string.tx_details_cancellation_reason_fee_too_low
+                        FFITxCancellationReason.AlreadyMined -> R.string.tx_details_cancellation_reason_already_mined
+                        FFITxCancellationReason.InvalidEncryptedValue -> R.string.tx_details_cancellation_reason_invalid_encrypted_value
                         FFITxCancellationReason.Unknown -> R.string.tx_details_cancellation_reason_unknown
                         FFITxCancellationReason.NotCancelled -> R.string.tx_details_cancellation_reason_not_cancelled
                     }

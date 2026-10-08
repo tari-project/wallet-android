@@ -85,3 +85,6 @@ libwallet/x86_64/libminotari_wallet_ffi.a
 !app/src/main/jniLibs/
 
 .kotlin
+
+# Scratch/debug directories used by dispatch agents; never intended to be committed.
+_*_scratch/

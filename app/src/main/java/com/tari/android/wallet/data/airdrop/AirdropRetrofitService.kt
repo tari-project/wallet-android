@@ -6,19 +6,8 @@ import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.Headers
 import retrofit2.http.POST
-import retrofit2.http.Path
 
 interface AirdropRetrofitService {
-
-    @GET("/api/miner/stats")
-    suspend fun getMinerStats(): MinerStatsResponse
-
-    @GET("/api/miner/status/{id}")
-    suspend fun getMinerStatus(
-        @Header("Authorization") token: String,
-        @Header("x-view-key-hashed") viewKeyHashed: String,
-        @Path("id") anonId: String,
-    ): MiningStatusResponse
 
     @GET("/api/user/details")
     suspend fun getUserDetails(@Header("Authorization") token: String): UserDetailsResponse
@@ -30,14 +19,6 @@ interface AirdropRetrofitService {
     @Headers("Content-Type: application/json", "Cache-Control: no-store")
     suspend fun refreshAuthToken(@Body request: RefreshTokenRequest): RefreshTokenResponse
 }
-
-data class MinerStatsResponse(
-    val totalMiners: Int,
-)
-
-data class MiningStatusResponse(
-    val mining: Boolean
-)
 
 data class UserDetailsResponse(
     @SerializedName("user") val user: User,

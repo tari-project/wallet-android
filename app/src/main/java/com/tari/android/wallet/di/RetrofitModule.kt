@@ -35,6 +35,7 @@ package com.tari.android.wallet.di
 import com.tari.android.wallet.BuildConfig
 import com.tari.android.wallet.data.airdrop.AirdropRetrofitService
 import com.tari.android.wallet.data.exolix.ExolixRetrofitService
+import com.tari.android.wallet.data.netmap.NetmapRetrofitService
 import com.tari.android.wallet.data.push.PushRetrofitService
 import com.tari.android.wallet.data.rwa.RwaRetrofitService
 import dagger.Module
@@ -54,11 +55,13 @@ class RetrofitModule {
         private const val PUSH_BASE_URL = "https://push.tari.com"
         private const val RWA_BASE_URL = "https://rwa.y.at/"
         private const val EXOLIX_BASE_URL = "https://exolix.com"
+        private const val NETMAP_BASE_URL = "https://netmap.supportxtm.com"
 
         private const val RETROFIT_AIRDROP = "airdrop_retrofit"
         private const val RETROFIT_PUSH = "push_retrofit"
         private const val RETROFIT_RWA = "rwa_retrofit"
         private const val RETROFIT_EXOLIX = "exolix_retrofit"
+        private const val RETROFIT_NETMAP = "netmap_retrofit"
     }
 
     @Provides
@@ -154,6 +157,28 @@ class RetrofitModule {
     @Singleton
     fun provideExolixRepository(@Named(RETROFIT_EXOLIX) retrofit: Retrofit): ExolixRetrofitService =
         retrofit.create(ExolixRetrofitService::class.java)
+
+    @Provides
+    @Named(RETROFIT_NETMAP)
+    @Singleton
+    fun provideNetmapHttpClient(): OkHttpClient = OkHttpClient.Builder()
+        .addLoggingIfDebug()
+        .build()
+
+    @Provides
+    @Named(RETROFIT_NETMAP)
+    @Singleton
+    fun provideNetmapRetrofit(@Named(RETROFIT_NETMAP) client: OkHttpClient): Retrofit =
+        Retrofit.Builder()
+            .baseUrl(NETMAP_BASE_URL)
+            .client(client)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+
+    @Provides
+    @Singleton
+    fun provideNetmapRepository(@Named(RETROFIT_NETMAP) retrofit: Retrofit): NetmapRetrofitService =
+        retrofit.create(NetmapRetrofitService::class.java)
 
     private fun OkHttpClient.Builder.addLoggingIfDebug(): OkHttpClient.Builder {
         if (BuildConfig.DEBUG) {
