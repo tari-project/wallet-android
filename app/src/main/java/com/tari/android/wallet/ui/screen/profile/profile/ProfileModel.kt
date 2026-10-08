@@ -13,6 +13,9 @@ object ProfileModel {
 
         val friends: List<ReferralStatusResponse.Referral>? = null,
         val friendsError: Boolean = false,
+
+        val showInvitedFriendsInProfile: Boolean = false,
+        val airdropEnabled: Boolean,
     ) {
         val noActivityYet: Boolean
             get() = tariMined == 0.toBigDecimal()

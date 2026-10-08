@@ -5,6 +5,7 @@ import com.tari.android.wallet.application.Navigation
 import com.tari.android.wallet.application.walletManager.doOnWalletFailed
 import com.tari.android.wallet.data.airdrop.AirdropRepository
 import com.tari.android.wallet.ui.common.CommonViewModel
+import com.tari.android.wallet.util.DebugConfig
 import com.tari.android.wallet.util.extension.collectFlow
 import com.tari.android.wallet.util.extension.launchOnIo
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -21,7 +22,12 @@ class HomeViewModel : CommonViewModel() {
         component.inject(this)
     }
 
-    private val _uiState = MutableStateFlow(HomeModel.UiState(airdropLoggedIn = airdropRepository.airdropToken.value != null))
+    private val _uiState = MutableStateFlow(
+        HomeModel.UiState(
+            airdropLoggedIn = airdropRepository.airdropToken.value != null,
+            airdropEnabled = DebugConfig.airdropEnabled,
+        )
+    )
     val uiState = _uiState.asStateFlow()
 
     val isAuthenticated: Boolean

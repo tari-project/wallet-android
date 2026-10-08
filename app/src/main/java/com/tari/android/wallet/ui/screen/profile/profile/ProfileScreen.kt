@@ -34,7 +34,6 @@ import com.tari.android.wallet.ui.screen.profile.profile.widget.GemsEarnedCard
 import com.tari.android.wallet.ui.screen.profile.profile.widget.InviteLinkCard
 import com.tari.android.wallet.ui.screen.profile.profile.widget.TariMinedCard
 import com.tari.android.wallet.ui.screen.settings.themeSelector.TariTheme
-import com.tari.android.wallet.util.DebugConfig
 import com.tari.android.wallet.util.extension.toMicroTari
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -61,7 +60,7 @@ fun ProfileScreen(
                     TariLoadingLayout(
                         targetLoadingState = when {
                             uiState.userDetailsError -> TariLoadingLayoutState.Error
-                            uiState.userDetails == null -> TariLoadingLayoutState.Loading
+                            uiState.userDetails == null && uiState.airdropEnabled -> TariLoadingLayoutState.Loading
                             else -> TariLoadingLayoutState.Content
                         },
                         errorLayout = {
@@ -80,55 +79,67 @@ fun ProfileScreen(
                             )
                         },
                     ) {
-                        uiState.userDetails?.let { userDetails ->
-                            Spacer(Modifier.size(64.dp))
+                        Spacer(Modifier.size(64.dp))
+                        uiState.userDetails?.userTag?.let { userTag ->
                             Text(
                                 modifier = Modifier.align(Alignment.CenterHorizontally),
-                                text = "@${uiState.userDetails.userTag}",
+                                text = "@$userTag",
                                 style = TariDesignSystem.typography.heading2XLarge,
                             )
+                        }
 
-                            if (uiState.noActivityYet) {
-                                Spacer(Modifier.size(10.dp))
-                                EmptyTxList(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    showStartMiningButton = false,
-                                    onStartMiningClicked = onStartMiningClicked,
-                                )
-                            }
-
-                            Spacer(Modifier.size(76.dp))
-                            Row(
-                                modifier = Modifier
-                                    .height(120.dp)
-                                    .padding(horizontal = 20.dp),
-                            ) {
-                                TariMinedCard(
-                                    modifier = Modifier.weight(1f),
-                                    balance = uiState.tariMined,
-                                    ticker = uiState.ticker,
-                                )
-                                Spacer(Modifier.width(10.dp))
-                                GemsEarnedCard(
-                                    modifier = Modifier.weight(1f),
-                                    gemsCount = uiState.userDetails.gemsEarned,
-                                )
-                            }
+                        if (uiState.noActivityYet) {
                             Spacer(Modifier.size(10.dp))
-                            InviteLinkCard(
-                                modifier = Modifier.padding(horizontal = 20.dp),
-                                link = String.format(FRIEND_INVITE_ADDRESS_SHORT, uiState.userDetails.referralCode),
-                                onShareClick = onInviteLinkShareClick,
+                            EmptyTxList(
+                                modifier = Modifier.fillMaxWidth(),
+                                showStartMiningButton = false,
+                                onStartMiningClicked = onStartMiningClicked,
                             )
+                        }
+
+                        Spacer(Modifier.size(76.dp))
+                        Row(
+                            modifier = Modifier
+                                .height(120.dp)
+                                .padding(horizontal = 20.dp),
+                        ) {
+                            TariMinedCard(
+                                modifier = Modifier.weight(1f),
+                                balance = uiState.tariMined,
+                                ticker = uiState.ticker,
+                            )
+                            if (uiState.airdropEnabled) {
+                                uiState.userDetails?.gemsEarned?.let { gemsEarned ->
+                                    Spacer(Modifier.width(10.dp))
+                                    GemsEarnedCard(
+                                        modifier = Modifier.weight(1f),
+                                        gemsCount = gemsEarned,
+                                    )
+                                }
+                            }
+                        }
+                        Spacer(Modifier.size(10.dp))
+
+                        if (uiState.airdropEnabled) {
+                            uiState.userDetails?.referralCode?.let { referralCode ->
+                                InviteLinkCard(
+                                    modifier = Modifier.padding(horizontal = 20.dp),
+                                    link = String.format(FRIEND_INVITE_ADDRESS_SHORT, referralCode),
+                                    onShareClick = onInviteLinkShareClick,
+                                )
+                            }
                         }
                     }
                 }
 
-                if (DebugConfig.showInvitedFriendsInProfile) {
+                if (uiState.showInvitedFriendsInProfile) {
                     item {
                         Spacer(Modifier.size(20.dp))
                         Text(
-                            text = stringResource(R.string.airdrop_profile_friends_invited_title, uiState.friends?.size ?: "-"),
+                            text = stringResource(
+                                R.string.airdrop_profile_friends_invited_title,
+                                uiState.friends?.size ?: "-"
+                            ),
                             style = TariDesignSystem.typography.headingXLarge,
                             modifier = Modifier.padding(horizontal = 20.dp)
                         )
@@ -174,7 +185,7 @@ fun ProfileScreen(
                     }
                 }
 
-                if (uiState.userDetails != null) {
+                if (uiState.airdropEnabled && uiState.userDetails != null) {
                     item {
                         Spacer(Modifier.size(20.dp))
                         TariInheritTextButton(
@@ -190,6 +201,38 @@ fun ProfileScreen(
                 item { Spacer(Modifier.size(52.dp)) }
             }
         }
+    }
+}
+
+@Preview
+@Composable
+private fun ProfileScreenNoAirdropPreview() {
+    TariDesignSystem(TariTheme.Light) {
+        ProfileScreen(
+            uiState = ProfileModel.UiState(
+                tariMined = 2_836_150_000_123_456_123.toMicroTari().tariValue,
+                ticker = "XTM",
+                userDetails = ProfileModel.UiState.UserDetails(
+                    userTag = "NaveenSpark",
+                    gemsEarned = 24_836_150.0,
+                    referralCode = "129g78",
+                ),
+                friends = List(10) { index ->
+                    Referral(
+                        name = "sevi_$index",
+                        photos = null,
+                        completed = false
+                    )
+                },
+                airdropEnabled = false,
+            ),
+            onInviteLinkShareClick = {},
+            onStartMiningClicked = {},
+            onPullToRefresh = {},
+            onDetailsRetryClick = {},
+            onFriendsRetryClick = {},
+            onDisconnectClick = {},
+        )
     }
 }
 
@@ -213,6 +256,7 @@ private fun ProfileScreenPreview() {
                         completed = false
                     )
                 },
+                airdropEnabled = true,
             ),
             onInviteLinkShareClick = {},
             onStartMiningClicked = {},
@@ -244,50 +288,7 @@ private fun ProfileScreenNoDataPreview() {
                         completed = false
                     )
                 },
-            ),
-            onInviteLinkShareClick = {},
-            onStartMiningClicked = {},
-            onPullToRefresh = {},
-            onDetailsRetryClick = {},
-            onFriendsRetryClick = {},
-            onDisconnectClick = {},
-        )
-    }
-}
-
-@Preview
-@Composable
-private fun ProfileScreenLoadingPreview() {
-    TariDesignSystem(TariTheme.Light) {
-        ProfileScreen(
-            uiState = ProfileModel.UiState(
-                tariMined = 0.toMicroTari().tariValue,
-                ticker = "XTM",
-                userDetails = null,
-                friends = null,
-            ),
-            onInviteLinkShareClick = {},
-            onStartMiningClicked = {},
-            onPullToRefresh = {},
-            onDetailsRetryClick = {},
-            onFriendsRetryClick = {},
-            onDisconnectClick = {},
-        )
-    }
-}
-
-@Preview
-@Composable
-private fun ProfileScreenErrorPreview() {
-    TariDesignSystem(TariTheme.Light) {
-        ProfileScreen(
-            uiState = ProfileModel.UiState(
-                tariMined = 0.toMicroTari().tariValue,
-                ticker = "XTM",
-                userDetails = null,
-                friends = null,
-                userDetailsError = true,
-                friendsError = true,
+                airdropEnabled = true,
             ),
             onInviteLinkShareClick = {},
             onStartMiningClicked = {},

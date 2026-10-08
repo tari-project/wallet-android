@@ -84,6 +84,8 @@ object DebugConfig {
 
     const val showTtlStoreMenu = false
 
+    const val airdropEnabled = false
+
     fun isDebug() = BuildConfig.BUILD_TYPE == "debug"
 
     private fun valueIfDebug(value: Boolean) = isDebug() && value

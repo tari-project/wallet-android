@@ -78,7 +78,7 @@ fun HomeScreen(
                         fragment = StoreFragment.newInstance(),
                     )
 
-                    BottomMenuOption.Profile -> if (uiState.airdropLoggedIn) {
+                    BottomMenuOption.Profile -> if (uiState.airdropEnabled.not() || uiState.airdropLoggedIn) {
                         FragmentContainer(
                             modifier = Modifier.fillMaxSize(),
                             fragmentManager = fragmentManager,
