@@ -45,4 +45,13 @@ class AirdropLoginDeeplinkPolicyTest {
         assertEquals(Decision.IGNORE, AirdropLoginDeeplinkPolicy.decide(now, now, " ", "refresh"))
         assertEquals(Decision.IGNORE, AirdropLoginDeeplinkPolicy.decide(null, now, "", ""))
     }
+
+    @Test
+    fun `confirmation is pending only within the window`() {
+        assertEquals(false, AirdropLoginDeeplinkPolicy.isConfirmationPending(null, now))
+        assertEquals(true, AirdropLoginDeeplinkPolicy.isConfirmationPending(now, now))
+        assertEquals(true, AirdropLoginDeeplinkPolicy.isConfirmationPending(now - PENDING_LOGIN_TTL_MS + 1, now))
+        assertEquals(false, AirdropLoginDeeplinkPolicy.isConfirmationPending(now - PENDING_LOGIN_TTL_MS, now))
+        assertEquals(false, AirdropLoginDeeplinkPolicy.isConfirmationPending(now + 1000, now))
+    }
 }

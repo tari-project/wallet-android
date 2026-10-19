@@ -220,6 +220,20 @@ class DeeplinkManagerAirdropLoginTest {
     }
 
     @Test
+    fun `late dismiss of an earlier confirmation does not clear the current one`() {
+        openLink()
+        val first = shownDialog()!!
+        first.dismiss()
+        openLink("second", "second-refresh")
+        val second = shownDialog()
+
+        first.dismiss()
+        openLink("attacker", "attacker-refresh")
+
+        assertSame(second, shownDialog())
+    }
+
+    @Test
     fun `expired marker is cleared and needs confirmation`() {
         pendingSince = System.currentTimeMillis() - AirdropLoginDeeplinkPolicy.PENDING_LOGIN_TTL_MS - 1
 

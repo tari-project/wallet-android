@@ -15,4 +15,14 @@ object AirdropLoginDeeplinkPolicy {
         val age = now - pendingSince
         return if (age in 0 until PENDING_LOGIN_TTL_MS) Decision.SAVE else Decision.CONFIRM
     }
+
+    /**
+     * A confirmation dialog can disappear without a dismiss callback (e.g. its activity is destroyed), so a pending one only blocks new links
+     * for a bounded time.
+     */
+    fun isConfirmationPending(pendingSince: Long?, now: Long): Boolean {
+        if (pendingSince == null) return false
+        val age = now - pendingSince
+        return age in 0 until PENDING_LOGIN_TTL_MS
+    }
 }

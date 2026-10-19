@@ -45,8 +45,9 @@ class DeeplinkManager @Inject constructor(
     // App-wide so the airdrop login confirmation survives the screen that received the deeplink; shown by CommonActivity
     val airdropLoginDialog = SingleLiveEvent<ModularDialogArgs>()
 
-    // Accessed on the main thread only (deeplink handling and dialog callbacks)
-    private var airdropLoginPending = false
+    // The airdrop login confirmation in progress (start time and id); accessed on the main thread only
+    private var airdropLoginPendingSince: Long? = null
+    private var airdropLoginSessionId = 0
 
     fun parseDeepLink(deepLink: Uri): DeepLink? = deeplinkParser.parse(deepLink)
 
@@ -236,15 +237,21 @@ class DeeplinkManager @Inject constructor(
             AirdropLoginDeeplinkPolicy.Decision.CONFIRM -> {
                 airdropRepository.clearLoginPending()
                 // Only one confirmation at a time, so a second link can't swap the account under the user
-                if (!airdropLoginPending) {
-                    airdropLoginPending = true
-                    showAirdropLoginWarningDialog(deeplink)
+                val now = System.currentTimeMillis()
+                if (!AirdropLoginDeeplinkPolicy.isConfirmationPending(airdropLoginPendingSince, now)) {
+                    // Close a stale confirmation that may still be on screen so it can't be updated in place
+                    for (dialogId in listOf(DialogId.DEEPLINK_AIRDROP_LOGIN, DialogId.DEEPLINK_AIRDROP_LOGIN_ACCOUNT)) {
+                        if (dialogManager.isDialogShowing(dialogId)) dialogManager.dismiss(dialogId, forceDismiss = true)
+                    }
+                    airdropLoginPendingSince = now
+                    airdropLoginSessionId++
+                    showAirdropLoginWarningDialog(deeplink, airdropLoginSessionId)
                 }
             }
         }
     }
 
-    private fun showAirdropLoginWarningDialog(deeplink: DeepLink.AirdropLoginToken) {
+    private fun showAirdropLoginWarningDialog(deeplink: DeepLink.AirdropLoginToken, sessionId: Int) {
         var lookupRequested = false
         var message = resourceManager.getString(R.string.airdrop_login_deeplink_message)
         if (airdropRepository.airdropToken.value != null) {
@@ -252,7 +259,7 @@ class DeeplinkManager @Inject constructor(
         }
         airdropLoginDialog.postValue(
             ModularDialogArgs(
-                dialogArgs = DialogArgs(onDismiss = { if (!lookupRequested) airdropLoginPending = false }),
+                dialogArgs = DialogArgs(onDismiss = { if (!lookupRequested) clearAirdropLoginPending(sessionId) }),
                 dialogId = DialogId.DEEPLINK_AIRDROP_LOGIN,
                 modules = listOf(
                     HeadModule(resourceManager.getString(R.string.airdrop_login_deeplink_title)),
@@ -262,7 +269,7 @@ class DeeplinkManager @Inject constructor(
                         dialogManager.dismiss(DialogId.DEEPLINK_AIRDROP_LOGIN)
                         applicationScope.launch {
                             val accountName = airdropRepository.getAccountName(deeplink.token)
-                            showAirdropLoginAccountDialog(deeplink, accountName)
+                            showAirdropLoginAccountDialog(deeplink, accountName, sessionId)
                         }
                     },
                     ButtonModule(resourceManager.getString(R.string.common_cancel), ButtonStyle.Close),
@@ -271,7 +278,7 @@ class DeeplinkManager @Inject constructor(
         )
     }
 
-    private fun showAirdropLoginAccountDialog(deeplink: DeepLink.AirdropLoginToken, accountName: String?) {
+    private fun showAirdropLoginAccountDialog(deeplink: DeepLink.AirdropLoginToken, accountName: String?, sessionId: Int) {
         var message = if (accountName != null) {
             resourceManager.getString(R.string.airdrop_login_deeplink_account, accountName)
         } else {
@@ -282,7 +289,7 @@ class DeeplinkManager @Inject constructor(
         }
         airdropLoginDialog.postValue(
             ModularDialogArgs(
-                dialogArgs = DialogArgs(onDismiss = { airdropLoginPending = false }),
+                dialogArgs = DialogArgs(onDismiss = { clearAirdropLoginPending(sessionId) }),
                 dialogId = DialogId.DEEPLINK_AIRDROP_LOGIN_ACCOUNT,
                 modules = listOf(
                     HeadModule(resourceManager.getString(R.string.airdrop_login_deeplink_title)),
@@ -295,5 +302,10 @@ class DeeplinkManager @Inject constructor(
                 ),
             )
         )
+    }
+
+    // A late dismiss of an older, expired confirmation must not clear the one that replaced it
+    private fun clearAirdropLoginPending(sessionId: Int) {
+        if (airdropLoginSessionId == sessionId) airdropLoginPendingSince = null
     }
 }

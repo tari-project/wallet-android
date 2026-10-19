@@ -99,6 +99,8 @@ open class ModularDialog(context: Activity) {
         }
     }
 
+    fun isActivityAlive(): Boolean = weakContext.get()?.isStillAlive() == true
+
     fun addDismissListener(onDismiss: () -> Unit) {
         onDismissListeners.add(onDismiss)
     }
