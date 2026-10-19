@@ -49,7 +49,7 @@ class DeeplinkManager @Inject constructor(
             is DeepLink.Send -> sendAction(deeplink)
             is DeepLink.UserProfile -> showUserProfileDialog(dialogHandler, deeplink)
             is DeepLink.PaperWallet -> showPaperWalletDialog(dialogHandler, deeplink)
-            is DeepLink.AirdropLoginToken -> handleAirdropTokenAction(deeplink)
+            is DeepLink.AirdropLoginToken -> handleAirdropTokenAction(dialogHandler, deeplink)
             is DeepLink.Raw -> {
                 // Raw deeplinks are handled by individual ViewModels via handleDeeplink()
                 // No default action required here
@@ -203,7 +203,42 @@ class DeeplinkManager @Inject constructor(
         navigator.navigate(Navigation.SplashScreen(seedWords))
     }
 
-    private fun handleAirdropTokenAction(deeplink: DeepLink.AirdropLoginToken) {
-        airdropRepository.saveAirdropToken(deeplink.token, deeplink.refreshToken)
+    private fun handleAirdropTokenAction(dialogHandler: DialogHandler, deeplink: DeepLink.AirdropLoginToken) {
+        val decision = AirdropLoginDeeplinkPolicy.decide(
+            pendingSince = airdropRepository.getLoginPendingSince(),
+            now = System.currentTimeMillis(),
+            token = deeplink.token,
+            refreshToken = deeplink.refreshToken,
+        )
+        // The pending login marker is single-use, so clear it whenever a valid token arrives
+        when (decision) {
+            AirdropLoginDeeplinkPolicy.Decision.IGNORE -> Unit
+            AirdropLoginDeeplinkPolicy.Decision.SAVE -> {
+                airdropRepository.clearLoginPending()
+                airdropRepository.saveAirdropToken(deeplink.token, deeplink.refreshToken)
+            }
+
+            AirdropLoginDeeplinkPolicy.Decision.CONFIRM -> {
+                airdropRepository.clearLoginPending()
+                showAirdropLoginConfirmationDialog(dialogHandler, deeplink)
+            }
+        }
+    }
+
+    private fun showAirdropLoginConfirmationDialog(dialogHandler: DialogHandler, deeplink: DeepLink.AirdropLoginToken) {
+        var message = resourceManager.getString(R.string.airdrop_login_deeplink_message)
+        if (airdropRepository.airdropToken.value != null) {
+            message += "\n\n" + resourceManager.getString(R.string.airdrop_login_deeplink_replace_warning)
+        }
+        dialogHandler.showModularDialog(
+            dialogId = DialogId.DEEPLINK_AIRDROP_LOGIN,
+            HeadModule(resourceManager.getString(R.string.airdrop_login_deeplink_title)),
+            BodyModule(message),
+            ButtonModule(resourceManager.getString(R.string.common_confirm), ButtonStyle.Normal) {
+                airdropRepository.saveAirdropToken(deeplink.token, deeplink.refreshToken)
+                dialogHandler.hideDialog(DialogId.DEEPLINK_AIRDROP_LOGIN)
+            },
+            ButtonModule(resourceManager.getString(R.string.common_cancel), ButtonStyle.Close),
+        )
     }
 }

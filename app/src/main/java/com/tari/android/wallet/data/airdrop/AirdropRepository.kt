@@ -30,6 +30,16 @@ class AirdropRepository @Inject constructor(
         _airdropToken.value = null
     }
 
+    fun markLoginPending(now: Long) {
+        corePrefRepository.airdropLoginPendingSince = now.toString()
+    }
+
+    fun getLoginPendingSince(): Long? = corePrefRepository.airdropLoginPendingSince?.toLongOrNull()
+
+    fun clearLoginPending() {
+        corePrefRepository.airdropLoginPendingSince = null
+    }
+
     suspend fun getUserDetails(): Result<UserDetailsResponse> = switchToIo {
         val result = runCatching {
             airdropRetrofit.getUserDetails(token = "Bearer ${corePrefRepository.airdropToken}")
