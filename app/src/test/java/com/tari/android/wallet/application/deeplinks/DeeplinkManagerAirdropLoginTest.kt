@@ -6,6 +6,7 @@ import androidx.arch.core.executor.TaskExecutor
 import com.tari.android.wallet.R
 import com.tari.android.wallet.data.airdrop.AirdropRepository
 import com.tari.android.wallet.ui.common.DialogHandler
+import com.tari.android.wallet.ui.common.DialogManager
 import com.tari.android.wallet.ui.dialog.modular.ModularDialogArgs
 import com.tari.android.wallet.ui.dialog.modular.ModularDialogArgs.DialogId
 import com.tari.android.wallet.ui.dialog.modular.modules.body.BodyModule
@@ -39,6 +40,8 @@ class DeeplinkManagerAirdropLoginTest {
         coEvery { getAccountName(any()) } returns "alice"
     }
     private val dialogHandler = mockk<DialogHandler>(relaxed = true)
+    private val dialogManager = mockk<DialogManager>(relaxed = true)
+    private var now = 1_700_000_000_000L
     private val deeplinkManager = DeeplinkManager(
         contactRepository = mockk(relaxed = true),
         resourceManager = mockk(relaxed = true) {
@@ -50,9 +53,10 @@ class DeeplinkManagerAirdropLoginTest {
         navigator = mockk(relaxed = true),
         deeplinkParser = mockk(relaxed = true),
         airdropRepository = airdropRepository,
-        dialogManager = mockk(relaxed = true),
+        dialogManager = dialogManager,
         applicationScope = CoroutineScope(Dispatchers.Unconfined),
-    )
+        mainDispatcher = Dispatchers.Unconfined,
+    ).apply { currentTimeMillis = { now } }
 
     @Before
     fun setUp() {
@@ -88,7 +92,7 @@ class DeeplinkManagerAirdropLoginTest {
 
     @Test
     fun `fresh marker saves silently, is consumed and shows connected message`() {
-        pendingSince = System.currentTimeMillis()
+        pendingSince = now
 
         openLink()
 
@@ -234,8 +238,80 @@ class DeeplinkManagerAirdropLoginTest {
     }
 
     @Test
+    fun `expired pending confirmation lets a new link start over and closes the stale dialogs`() {
+        openLink()
+        val stale = shownDialog()
+
+        every { dialogManager.isDialogShowing(any()) } returns true
+        now += AirdropLoginDeeplinkPolicy.PENDING_LOGIN_TTL_MS
+        openLink("next", "next-refresh")
+
+        assertTrue(stale !== shownDialog())
+        assertEquals(DialogId.DEEPLINK_AIRDROP_LOGIN, shownDialog()!!.dialogId)
+        verify(exactly = 1) { dialogManager.dismiss(DialogId.DEEPLINK_AIRDROP_LOGIN, true) }
+        verify(exactly = 1) { dialogManager.dismiss(DialogId.DEEPLINK_AIRDROP_LOGIN_ACCOUNT, true) }
+    }
+
+    @Test
+    fun `link within the pending window is ignored`() {
+        openLink()
+        val first = shownDialog()
+
+        now += AirdropLoginDeeplinkPolicy.PENDING_LOGIN_TTL_MS - 1
+        openLink("attacker", "attacker-refresh")
+
+        assertSame(first, shownDialog())
+        verify(exactly = 0) { dialogManager.dismiss(any(), true) }
+    }
+
+    @Test
+    fun `lookup finishing after the session changed shows nothing`() {
+        openLink("old", "old-refresh")
+        val oldWarning = shownDialog()!!
+        coEvery { airdropRepository.getAccountName("old") } answers {
+            now += AirdropLoginDeeplinkPolicy.PENDING_LOGIN_TTL_MS
+            openLink("new", "new-refresh")
+            "old account"
+        }
+
+        oldWarning.tapMainButton()
+
+        val shown = shownDialog()!!
+        assertEquals(DialogId.DEEPLINK_AIRDROP_LOGIN, shown.dialogId)
+        assertTrue(shown !== oldWarning)
+    }
+
+    @Test
+    fun `confirm on an account dialog from an older session does not save`() {
+        openLink("old", "old-refresh")
+        shownDialog()!!.tapMainButton()
+        val oldAccount = shownDialog()!!
+        assertEquals(DialogId.DEEPLINK_AIRDROP_LOGIN_ACCOUNT, oldAccount.dialogId)
+
+        now += AirdropLoginDeeplinkPolicy.PENDING_LOGIN_TTL_MS
+        openLink("new", "new-refresh")
+        oldAccount.tapMainButton()
+
+        verify(exactly = 0) { airdropRepository.saveAirdropToken(any(), any()) }
+    }
+
+    @Test
+    fun `show account on a warning dialog from an older session does nothing`() {
+        openLink("old", "old-refresh")
+        val oldWarning = shownDialog()!!
+
+        now += AirdropLoginDeeplinkPolicy.PENDING_LOGIN_TTL_MS
+        openLink("new", "new-refresh")
+        val newWarning = shownDialog()
+        oldWarning.tapMainButton()
+
+        coVerify(exactly = 0) { airdropRepository.getAccountName(any()) }
+        assertSame(newWarning, shownDialog())
+    }
+
+    @Test
     fun `expired marker is cleared and needs confirmation`() {
-        pendingSince = System.currentTimeMillis() - AirdropLoginDeeplinkPolicy.PENDING_LOGIN_TTL_MS - 1
+        pendingSince = now - AirdropLoginDeeplinkPolicy.PENDING_LOGIN_TTL_MS - 1
 
         openLink()
 
@@ -246,7 +322,7 @@ class DeeplinkManagerAirdropLoginTest {
 
     @Test
     fun `empty token is ignored and keeps the marker`() {
-        val marker = System.currentTimeMillis()
+        val marker = now
         pendingSince = marker
 
         openLink("", "refresh")

@@ -17,10 +17,10 @@ annotation class ApplicationScope
 
 @Module
 class CoroutinesDispatchersModule {
-    private companion object {
+    companion object {
         private const val DEFAULT = "DEFAULT"
         private const val IO = "IO"
-        private const val MAIN = "MAIN"
+        const val MAIN = "MAIN"
         private const val MAIN_IMMEDIATE = "MAIN_IMMEDIATE"
     }
 

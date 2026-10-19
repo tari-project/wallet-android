@@ -51,7 +51,7 @@ class DialogManager @Inject constructor() {
 
     fun isDialogShowing(dialogId: Int?): Boolean {
         // A dialog whose activity was destroyed never gets its dismiss callback, so drop it here instead
-        dialogQueue.removeAll { !it.isActivityAlive() }
+        dialogQueue.removeAll { it.isActivityDestroyed() }
         return dialogId != null && dialogId != DialogId.NO_ID && dialogQueue.any { it.args?.dialogId == dialogId }
     }
 
