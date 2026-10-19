@@ -1,12 +1,16 @@
 package com.tari.android.wallet.application.deeplinks
 
+import android.annotation.SuppressLint
+import androidx.arch.core.executor.ArchTaskExecutor
+import androidx.arch.core.executor.TaskExecutor
 import com.tari.android.wallet.R
 import com.tari.android.wallet.data.airdrop.AirdropRepository
 import com.tari.android.wallet.ui.common.DialogHandler
-import com.tari.android.wallet.ui.dialog.modular.IDialogModule
+import com.tari.android.wallet.ui.dialog.modular.ModularDialogArgs
 import com.tari.android.wallet.ui.dialog.modular.ModularDialogArgs.DialogId
 import com.tari.android.wallet.ui.dialog.modular.modules.body.BodyModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonModule
+import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonStyle
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
@@ -15,14 +19,18 @@ import io.mockk.verify
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
+import org.junit.After
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
+import org.junit.Assert.assertSame
 import org.junit.Assert.assertTrue
+import org.junit.Before
 import org.junit.Test
 
+@SuppressLint("RestrictedApi")
 class DeeplinkManagerAirdropLoginTest {
 
     private var pendingSince: Long? = null
-    private var dialogModules: List<IDialogModule> = emptyList()
 
     private val airdropRepository = mockk<AirdropRepository>(relaxed = true) {
         every { airdropToken } returns MutableStateFlow(null)
@@ -30,12 +38,7 @@ class DeeplinkManagerAirdropLoginTest {
         every { clearLoginPending() } answers { pendingSince = null }
         coEvery { getAccountName(any()) } returns "alice"
     }
-    private val dialogHandler = mockk<DialogHandler>(relaxed = true) {
-        every { showModularDialog(DialogId.DEEPLINK_AIRDROP_LOGIN, *varargAll { true }) } answers {
-            @Suppress("UNCHECKED_CAST")
-            dialogModules = (args[1] as Array<IDialogModule>).toList()
-        }
-    }
+    private val dialogHandler = mockk<DialogHandler>(relaxed = true)
     private val deeplinkManager = DeeplinkManager(
         contactRepository = mockk(relaxed = true),
         resourceManager = mockk(relaxed = true) {
@@ -47,79 +50,184 @@ class DeeplinkManagerAirdropLoginTest {
         navigator = mockk(relaxed = true),
         deeplinkParser = mockk(relaxed = true),
         airdropRepository = airdropRepository,
+        dialogManager = mockk(relaxed = true),
         applicationScope = CoroutineScope(Dispatchers.Unconfined),
     )
 
-    private fun dialogBody(): String = dialogModules.filterIsInstance<BodyModule>().first().text.orEmpty()
+    @Before
+    fun setUp() {
+        // Runs LiveData posts synchronously on the test thread
+        ArchTaskExecutor.getInstance().setDelegate(object : TaskExecutor() {
+            override fun executeOnDiskIO(runnable: Runnable) = runnable.run()
+            override fun postToMainThread(runnable: Runnable) = runnable.run()
+            override fun isMainThread(): Boolean = true
+        })
+    }
 
-    private fun confirmDialog() = dialogModules.filterIsInstance<ButtonModule>().first().action()
+    @After
+    fun tearDown() {
+        ArchTaskExecutor.getInstance().setDelegate(null)
+    }
+
+    private fun shownDialog(): ModularDialogArgs? = deeplinkManager.airdropLoginDialog.value
+
+    private fun ModularDialogArgs.body(): String = modules.filterIsInstance<BodyModule>().first().text.orEmpty()
+
+    // Mirrors ModularDialog: a Normal button runs its action; Cancel (Close) runs its action and then dismisses
+    private fun ModularDialogArgs.tapMainButton() = modules.filterIsInstance<ButtonModule>().first { it.style == ButtonStyle.Normal }.action()
+
+    private fun ModularDialogArgs.tapCancel() {
+        modules.filterIsInstance<ButtonModule>().first { it.style == ButtonStyle.Close }.action()
+        dismiss()
+    }
+
+    private fun ModularDialogArgs.dismiss() = dialogArgs.onDismiss()
+
+    private fun openLink(token: String = "token", refreshToken: String = "refresh") =
+        deeplinkManager.execute(dialogHandler, DeepLink.AirdropLoginToken(token, refreshToken))
 
     @Test
     fun `fresh marker saves silently, is consumed and shows connected message`() {
         pendingSince = System.currentTimeMillis()
 
-        deeplinkManager.execute(dialogHandler, DeepLink.AirdropLoginToken("token", "refresh"))
+        openLink()
 
         verify(exactly = 1) { airdropRepository.saveAirdropToken("token", "refresh") }
-        verify(exactly = 0) { dialogHandler.showModularDialog(any<Int>(), *anyVararg()) }
         verify(exactly = 1) { dialogHandler.showSimpleDialog(any(), any<CharSequence>(), any<CharSequence>(), any(), any(), any(), any()) }
-        assertEquals(null, pendingSince)
+        assertNull(shownDialog())
+        assertNull(pendingSince)
     }
 
     @Test
-    fun `second deeplink after marker is consumed needs confirmation`() {
-        pendingSince = System.currentTimeMillis()
+    fun `no marker shows warning dialog without any network call`() {
+        openLink()
 
-        deeplinkManager.execute(dialogHandler, DeepLink.AirdropLoginToken("token", "refresh"))
-        deeplinkManager.execute(dialogHandler, DeepLink.AirdropLoginToken("attacker", "attacker-refresh"))
-
-        verify(exactly = 1) { airdropRepository.saveAirdropToken("token", "refresh") }
-        verify(exactly = 0) { airdropRepository.saveAirdropToken("attacker", "attacker-refresh") }
-        verify(exactly = 1) { dialogHandler.showModularDialog(DialogId.DEEPLINK_AIRDROP_LOGIN, *anyVararg()) }
-    }
-
-    @Test
-    fun `no marker shows the account and saves only after confirm`() {
-        deeplinkManager.execute(dialogHandler, DeepLink.AirdropLoginToken("token", "refresh"))
-
-        assertTrue(dialogBody().contains("Account: alice"))
+        assertEquals(DialogId.DEEPLINK_AIRDROP_LOGIN, shownDialog()!!.dialogId)
+        coVerify(exactly = 0) { airdropRepository.getAccountName(any()) }
         verify(exactly = 0) { airdropRepository.saveAirdropToken(any(), any()) }
-
-        confirmDialog()
-        verify(exactly = 1) { airdropRepository.saveAirdropToken("token", "refresh") }
     }
 
     @Test
-    fun `candidate token is only used for the lookup before confirm`() {
-        deeplinkManager.execute(dialogHandler, DeepLink.AirdropLoginToken("candidate", "candidate-refresh"))
+    fun `show account looks up candidate token and confirm saves`() {
+        openLink("candidate", "candidate-refresh")
+        val warning = shownDialog()!!
+        warning.tapMainButton()
+        warning.dismiss()
 
         coVerify(exactly = 1) { airdropRepository.getAccountName("candidate") }
+        val account = shownDialog()!!
+        assertEquals(DialogId.DEEPLINK_AIRDROP_LOGIN_ACCOUNT, account.dialogId)
+        assertTrue(account.body().contains("Account: alice"))
         verify(exactly = 0) { airdropRepository.saveAirdropToken(any(), any()) }
         verify(exactly = 0) { airdropRepository.clearAirdropToken() }
+
+        account.tapMainButton()
+        verify(exactly = 1) { airdropRepository.saveAirdropToken("candidate", "candidate-refresh") }
     }
 
     @Test
-    fun `failed account lookup still shows dialog marked unverified`() {
+    fun `cancel on account dialog does not save`() {
+        openLink()
+        shownDialog()!!.tapMainButton()
+
+        shownDialog()!!.tapCancel()
+
+        verify(exactly = 0) { airdropRepository.saveAirdropToken(any(), any()) }
+    }
+
+    @Test
+    fun `failed lookup shows unverified account dialog and saves only on confirm`() {
         coEvery { airdropRepository.getAccountName(any()) } returns null
 
-        deeplinkManager.execute(dialogHandler, DeepLink.AirdropLoginToken("token", "refresh"))
+        openLink()
+        shownDialog()!!.tapMainButton()
 
-        assertTrue(dialogBody().contains("unverified"))
+        val account = shownDialog()!!
+        assertTrue(account.body().contains("unverified"))
         verify(exactly = 0) { airdropRepository.saveAirdropToken(any(), any()) }
 
-        confirmDialog()
+        account.tapMainButton()
         verify(exactly = 1) { airdropRepository.saveAirdropToken("token", "refresh") }
+    }
+
+    @Test
+    fun `second link is ignored while warning dialog is pending`() {
+        openLink()
+        val warning = shownDialog()
+
+        openLink("attacker", "attacker-refresh")
+
+        assertSame(warning, shownDialog())
+    }
+
+    @Test
+    fun `second link is ignored while account dialog is pending`() {
+        openLink()
+        val warning = shownDialog()!!
+        warning.tapMainButton()
+        warning.dismiss()
+        val account = shownDialog()
+
+        openLink("attacker", "attacker-refresh")
+
+        assertSame(account, shownDialog())
+        coVerify(exactly = 0) { airdropRepository.getAccountName("attacker") }
+    }
+
+    @Test
+    fun `pending is cleared when warning dialog is dismissed`() {
+        openLink()
+        val warning = shownDialog()!!
+        warning.dismiss()
+
+        openLink("next", "next-refresh")
+
+        val next = shownDialog()!!
+        assertEquals(DialogId.DEEPLINK_AIRDROP_LOGIN, next.dialogId)
+        next.tapMainButton()
+        coVerify(exactly = 1) { airdropRepository.getAccountName("next") }
+    }
+
+    @Test
+    fun `pending is cleared after cancel on warning dialog`() {
+        openLink()
+        val warning = shownDialog()!!
+        warning.tapCancel()
+
+        openLink("next", "next-refresh")
+
+        assertTrue(warning !== shownDialog())
+        assertEquals(DialogId.DEEPLINK_AIRDROP_LOGIN, shownDialog()!!.dialogId)
+    }
+
+    @Test
+    fun `pending is cleared after confirm or cancel on account dialog`() {
+        openLink()
+        shownDialog()!!.tapMainButton()
+        val confirmed = shownDialog()!!
+        confirmed.tapMainButton()
+        confirmed.dismiss()
+
+        openLink("second", "second-refresh")
+        val secondWarning = shownDialog()!!
+        assertEquals(DialogId.DEEPLINK_AIRDROP_LOGIN, secondWarning.dialogId)
+        secondWarning.tapMainButton()
+        shownDialog()!!.tapCancel()
+
+        openLink("third", "third-refresh")
+        assertEquals(DialogId.DEEPLINK_AIRDROP_LOGIN, shownDialog()!!.dialogId)
+        verify(exactly = 0) { airdropRepository.saveAirdropToken("second", any()) }
     }
 
     @Test
     fun `expired marker is cleared and needs confirmation`() {
         pendingSince = System.currentTimeMillis() - AirdropLoginDeeplinkPolicy.PENDING_LOGIN_TTL_MS - 1
 
-        deeplinkManager.execute(dialogHandler, DeepLink.AirdropLoginToken("token", "refresh"))
+        openLink()
 
         verify(exactly = 0) { airdropRepository.saveAirdropToken(any(), any()) }
-        verify(exactly = 1) { dialogHandler.showModularDialog(DialogId.DEEPLINK_AIRDROP_LOGIN, *anyVararg()) }
-        assertEquals(null, pendingSince)
+        assertEquals(DialogId.DEEPLINK_AIRDROP_LOGIN, shownDialog()!!.dialogId)
+        assertNull(pendingSince)
     }
 
     @Test
@@ -127,11 +235,10 @@ class DeeplinkManagerAirdropLoginTest {
         val marker = System.currentTimeMillis()
         pendingSince = marker
 
-        deeplinkManager.execute(dialogHandler, DeepLink.AirdropLoginToken("", "refresh"))
+        openLink("", "refresh")
 
         verify(exactly = 0) { airdropRepository.saveAirdropToken(any(), any()) }
-        coVerify(exactly = 0) { airdropRepository.getAccountName(any()) }
-        verify(exactly = 0) { dialogHandler.showModularDialog(any<Int>(), *anyVararg()) }
+        assertNull(shownDialog())
         assertEquals(marker, pendingSince)
     }
 }

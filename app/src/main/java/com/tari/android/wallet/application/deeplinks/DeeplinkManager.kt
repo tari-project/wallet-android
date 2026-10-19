@@ -12,7 +12,11 @@ import com.tari.android.wallet.data.contacts.ContactsRepository
 import com.tari.android.wallet.di.ApplicationScope
 import com.tari.android.wallet.model.TariWalletAddress
 import com.tari.android.wallet.ui.common.DialogHandler
+import com.tari.android.wallet.ui.common.DialogManager
+import com.tari.android.wallet.ui.common.SingleLiveEvent
 import com.tari.android.wallet.ui.common.domain.ResourceManager
+import com.tari.android.wallet.ui.dialog.modular.DialogArgs
+import com.tari.android.wallet.ui.dialog.modular.ModularDialogArgs
 import com.tari.android.wallet.ui.dialog.modular.ModularDialogArgs.DialogId
 import com.tari.android.wallet.ui.dialog.modular.modules.body.BodyModule
 import com.tari.android.wallet.ui.dialog.modular.modules.button.ButtonModule
@@ -34,8 +38,15 @@ class DeeplinkManager @Inject constructor(
     private val navigator: TariNavigator,
     private val deeplinkParser: DeeplinkParser,
     private val airdropRepository: AirdropRepository,
+    private val dialogManager: DialogManager,
     @param:ApplicationScope private val applicationScope: CoroutineScope,
 ) {
+
+    // App-wide so the airdrop login confirmation survives the screen that received the deeplink; shown by CommonActivity
+    val airdropLoginDialog = SingleLiveEvent<ModularDialogArgs>()
+
+    // Accessed on the main thread only (deeplink handling and dialog callbacks)
+    private var airdropLoginPending = false
 
     fun parseDeepLink(deepLink: Uri): DeepLink? = deeplinkParser.parse(deepLink)
 
@@ -224,17 +235,44 @@ class DeeplinkManager @Inject constructor(
 
             AirdropLoginDeeplinkPolicy.Decision.CONFIRM -> {
                 airdropRepository.clearLoginPending()
-                applicationScope.launch {
-                    val accountName = airdropRepository.getAccountName(deeplink.token)
-                    showAirdropLoginConfirmationDialog(dialogHandler, deeplink, accountName)
+                // Only one confirmation at a time, so a second link can't swap the account under the user
+                if (!airdropLoginPending) {
+                    airdropLoginPending = true
+                    showAirdropLoginWarningDialog(deeplink)
                 }
             }
         }
     }
 
-    private fun showAirdropLoginConfirmationDialog(dialogHandler: DialogHandler, deeplink: DeepLink.AirdropLoginToken, accountName: String?) {
-        var message = resourceManager.getString(R.string.airdrop_login_deeplink_message) + "\n\n"
-        message += if (accountName != null) {
+    private fun showAirdropLoginWarningDialog(deeplink: DeepLink.AirdropLoginToken) {
+        var lookupRequested = false
+        var message = resourceManager.getString(R.string.airdrop_login_deeplink_message)
+        if (airdropRepository.airdropToken.value != null) {
+            message += "\n\n" + resourceManager.getString(R.string.airdrop_login_deeplink_replace_warning)
+        }
+        airdropLoginDialog.postValue(
+            ModularDialogArgs(
+                dialogArgs = DialogArgs(onDismiss = { if (!lookupRequested) airdropLoginPending = false }),
+                dialogId = DialogId.DEEPLINK_AIRDROP_LOGIN,
+                modules = listOf(
+                    HeadModule(resourceManager.getString(R.string.airdrop_login_deeplink_title)),
+                    BodyModule(message),
+                    ButtonModule(resourceManager.getString(R.string.airdrop_login_deeplink_show_account), ButtonStyle.Normal) {
+                        lookupRequested = true
+                        dialogManager.dismiss(DialogId.DEEPLINK_AIRDROP_LOGIN)
+                        applicationScope.launch {
+                            val accountName = airdropRepository.getAccountName(deeplink.token)
+                            showAirdropLoginAccountDialog(deeplink, accountName)
+                        }
+                    },
+                    ButtonModule(resourceManager.getString(R.string.common_cancel), ButtonStyle.Close),
+                ),
+            )
+        )
+    }
+
+    private fun showAirdropLoginAccountDialog(deeplink: DeepLink.AirdropLoginToken, accountName: String?) {
+        var message = if (accountName != null) {
             resourceManager.getString(R.string.airdrop_login_deeplink_account, accountName)
         } else {
             resourceManager.getString(R.string.airdrop_login_deeplink_unverified)
@@ -242,15 +280,20 @@ class DeeplinkManager @Inject constructor(
         if (airdropRepository.airdropToken.value != null) {
             message += "\n\n" + resourceManager.getString(R.string.airdrop_login_deeplink_replace_warning)
         }
-        dialogHandler.showModularDialog(
-            dialogId = DialogId.DEEPLINK_AIRDROP_LOGIN,
-            HeadModule(resourceManager.getString(R.string.airdrop_login_deeplink_title)),
-            BodyModule(message),
-            ButtonModule(resourceManager.getString(R.string.common_confirm), ButtonStyle.Normal) {
-                airdropRepository.saveAirdropToken(deeplink.token, deeplink.refreshToken)
-                dialogHandler.hideDialog(DialogId.DEEPLINK_AIRDROP_LOGIN)
-            },
-            ButtonModule(resourceManager.getString(R.string.common_cancel), ButtonStyle.Close),
+        airdropLoginDialog.postValue(
+            ModularDialogArgs(
+                dialogArgs = DialogArgs(onDismiss = { airdropLoginPending = false }),
+                dialogId = DialogId.DEEPLINK_AIRDROP_LOGIN_ACCOUNT,
+                modules = listOf(
+                    HeadModule(resourceManager.getString(R.string.airdrop_login_deeplink_title)),
+                    BodyModule(message),
+                    ButtonModule(resourceManager.getString(R.string.common_confirm), ButtonStyle.Normal) {
+                        airdropRepository.saveAirdropToken(deeplink.token, deeplink.refreshToken)
+                        dialogManager.dismiss(DialogId.DEEPLINK_AIRDROP_LOGIN_ACCOUNT)
+                    },
+                    ButtonModule(resourceManager.getString(R.string.common_cancel), ButtonStyle.Close),
+                ),
+            )
         )
     }
 }

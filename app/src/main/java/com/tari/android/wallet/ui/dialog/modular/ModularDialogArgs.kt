@@ -18,5 +18,6 @@ data class ModularDialogArgs(
         const val DEEPLINK_PAPER_WALLET_ENTER_PASSPHRASE = 607
         const val DEEPLINK_PAPER_CANCEL_SEND_TX = 608
         const val DEEPLINK_AIRDROP_LOGIN = 609
+        const val DEEPLINK_AIRDROP_LOGIN_ACCOUNT = 610
     }
 }

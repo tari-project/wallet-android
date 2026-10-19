@@ -83,6 +83,8 @@ abstract class CommonActivity<VM : CommonViewModel> : AppCompatActivity(), Shake
         observe(permissionManager.openSettings) { openSettings() }
 
         observe(permissionManager.dialog) { dialogManager.replace(ModularDialog(this@CommonActivity, it)) }
+
+        observe(deeplinkManager.airdropLoginDialog) { dialogManager.replace(ModularDialog(this@CommonActivity, it)) }
     }
 
     private fun openSettings() {

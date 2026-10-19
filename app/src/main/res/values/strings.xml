@@ -294,6 +294,7 @@
     <string name="airdrop_login_deeplink_title">Connect airdrop account?</string>
     <string name="airdrop_login_deeplink_message">A link is trying to sign this app in to an airdrop account. Only continue if you started this sign-in yourself.</string>
     <string name="airdrop_login_deeplink_replace_warning">This will replace the airdrop account that is currently connected.</string>
+    <string name="airdrop_login_deeplink_show_account">Show account</string>
     <string name="airdrop_login_deeplink_account">Account: %s</string>
     <string name="airdrop_login_deeplink_unverified">The account could not be verified.</string>
     <string name="airdrop_login_deeplink_connected_title">Airdrop account connected</string>
