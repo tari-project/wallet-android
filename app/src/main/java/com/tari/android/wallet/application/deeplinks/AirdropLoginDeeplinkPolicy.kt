@@ -2,7 +2,7 @@ package com.tari.android.wallet.application.deeplinks
 
 object AirdropLoginDeeplinkPolicy {
 
-    const val PENDING_LOGIN_TTL_MS = 30 * 60 * 1000L
+    const val PENDING_LOGIN_TTL_MS = 10 * 60 * 1000L
 
     enum class Decision { SAVE, CONFIRM, IGNORE }
 

@@ -216,17 +216,29 @@ class DeeplinkManager @Inject constructor(
             AirdropLoginDeeplinkPolicy.Decision.SAVE -> {
                 airdropRepository.clearLoginPending()
                 airdropRepository.saveAirdropToken(deeplink.token, deeplink.refreshToken)
+                dialogHandler.showSimpleDialog(
+                    title = resourceManager.getString(R.string.airdrop_login_deeplink_connected_title),
+                    description = resourceManager.getString(R.string.airdrop_login_deeplink_connected_message),
+                )
             }
 
             AirdropLoginDeeplinkPolicy.Decision.CONFIRM -> {
                 airdropRepository.clearLoginPending()
-                showAirdropLoginConfirmationDialog(dialogHandler, deeplink)
+                applicationScope.launch {
+                    val accountName = airdropRepository.getAccountName(deeplink.token)
+                    showAirdropLoginConfirmationDialog(dialogHandler, deeplink, accountName)
+                }
             }
         }
     }
 
-    private fun showAirdropLoginConfirmationDialog(dialogHandler: DialogHandler, deeplink: DeepLink.AirdropLoginToken) {
-        var message = resourceManager.getString(R.string.airdrop_login_deeplink_message)
+    private fun showAirdropLoginConfirmationDialog(dialogHandler: DialogHandler, deeplink: DeepLink.AirdropLoginToken, accountName: String?) {
+        var message = resourceManager.getString(R.string.airdrop_login_deeplink_message) + "\n\n"
+        message += if (accountName != null) {
+            resourceManager.getString(R.string.airdrop_login_deeplink_account, accountName)
+        } else {
+            resourceManager.getString(R.string.airdrop_login_deeplink_unverified)
+        }
         if (airdropRepository.airdropToken.value != null) {
             message += "\n\n" + resourceManager.getString(R.string.airdrop_login_deeplink_replace_warning)
         }

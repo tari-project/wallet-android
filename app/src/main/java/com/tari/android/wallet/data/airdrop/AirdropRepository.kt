@@ -40,6 +40,15 @@ class AirdropRepository @Inject constructor(
         corePrefRepository.airdropLoginPendingSince = null
     }
 
+    // Looks up the account a not-yet-saved token belongs to, without touching the stored session
+    suspend fun getAccountName(token: String): String? = switchToIo {
+        runCatching {
+            val user = airdropRetrofit.getUserDetails(token = "Bearer $token").user
+            val name = user.displayName?.takeIf { it.isNotBlank() } ?: user.name
+            name.takeIf { it.isNotBlank() }
+        }.getOrNull()
+    }
+
     suspend fun getUserDetails(): Result<UserDetailsResponse> = switchToIo {
         val result = runCatching {
             airdropRetrofit.getUserDetails(token = "Bearer ${corePrefRepository.airdropToken}")

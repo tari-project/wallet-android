@@ -17,6 +17,12 @@ class AirdropLoginDeeplinkPolicyTest {
     }
 
     @Test
+    fun `ttl is ten minutes`() {
+        assertEquals(10 * 60 * 1000L, PENDING_LOGIN_TTL_MS)
+        assertEquals(Decision.CONFIRM, AirdropLoginDeeplinkPolicy.decide(now - 11 * 60 * 1000L, now, "token", "refresh"))
+    }
+
+    @Test
     fun `expired marker asks for confirmation`() {
         assertEquals(Decision.CONFIRM, AirdropLoginDeeplinkPolicy.decide(now - PENDING_LOGIN_TTL_MS, now, "token", "refresh"))
         assertEquals(Decision.CONFIRM, AirdropLoginDeeplinkPolicy.decide(now - 2 * PENDING_LOGIN_TTL_MS, now, "token", "refresh"))
