@@ -296,7 +296,7 @@
     <string name="airdrop_login_deeplink_replace_warning">This will replace the airdrop account that is currently connected.</string>
     <string name="airdrop_login_deeplink_show_account">Show account</string>
     <string name="airdrop_login_deeplink_account">Account: %s</string>
-    <string name="airdrop_login_deeplink_unverified">The account could not be verified.</string>
+    <string name="airdrop_login_deeplink_unverified">This account could not be verified, so it can\'t be connected.</string>
     <string name="airdrop_login_deeplink_connected_title">Airdrop account connected</string>
     <string name="airdrop_login_deeplink_connected_message">Your airdrop account is now connected to this wallet.</string>
     <string name="airdrop_profile_tari_mined">Tari Mined</string>

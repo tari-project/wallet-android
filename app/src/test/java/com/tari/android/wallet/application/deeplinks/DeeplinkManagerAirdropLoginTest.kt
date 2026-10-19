@@ -5,6 +5,7 @@ import androidx.arch.core.executor.ArchTaskExecutor
 import androidx.arch.core.executor.TaskExecutor
 import com.tari.android.wallet.R
 import com.tari.android.wallet.data.airdrop.AirdropRepository
+import com.tari.android.wallet.data.airdrop.VerifiedAirdropAccount
 import com.tari.android.wallet.ui.common.DialogHandler
 import com.tari.android.wallet.ui.common.DialogManager
 import com.tari.android.wallet.ui.dialog.modular.ModularDialogArgs
@@ -37,7 +38,7 @@ class DeeplinkManagerAirdropLoginTest {
         every { airdropToken } returns MutableStateFlow(null)
         every { getLoginPendingSince() } answers { pendingSince }
         every { clearLoginPending() } answers { pendingSince = null }
-        coEvery { getAccountName(any()) } returns "alice"
+        coEvery { verifyAccount(any()) } returns VerifiedAirdropAccount("new-token", "new-refresh", "alice")
     }
     private val dialogHandler = mockk<DialogHandler>(relaxed = true)
     private val dialogManager = mockk<DialogManager>(relaxed = true)
@@ -107,26 +108,29 @@ class DeeplinkManagerAirdropLoginTest {
         openLink()
 
         assertEquals(DialogId.DEEPLINK_AIRDROP_LOGIN, shownDialog()!!.dialogId)
-        coVerify(exactly = 0) { airdropRepository.getAccountName(any()) }
+        coVerify(exactly = 0) { airdropRepository.verifyAccount(any()) }
         verify(exactly = 0) { airdropRepository.saveAirdropToken(any(), any()) }
     }
 
     @Test
-    fun `show account looks up candidate token and confirm saves`() {
+    fun `show account verifies the refresh token and confirm saves the refreshed pair`() {
         openLink("candidate", "candidate-refresh")
         val warning = shownDialog()!!
+        assertTrue(warning.filterObscuredTouches)
         warning.tapMainButton()
         warning.dismiss()
 
-        coVerify(exactly = 1) { airdropRepository.getAccountName("candidate") }
+        coVerify(exactly = 1) { airdropRepository.verifyAccount("candidate-refresh") }
         val account = shownDialog()!!
         assertEquals(DialogId.DEEPLINK_AIRDROP_LOGIN_ACCOUNT, account.dialogId)
+        assertTrue(account.filterObscuredTouches)
         assertTrue(account.body().contains("Account: alice"))
         verify(exactly = 0) { airdropRepository.saveAirdropToken(any(), any()) }
         verify(exactly = 0) { airdropRepository.clearAirdropToken() }
 
         account.tapMainButton()
-        verify(exactly = 1) { airdropRepository.saveAirdropToken("candidate", "candidate-refresh") }
+        verify(exactly = 1) { airdropRepository.saveAirdropToken("new-token", "new-refresh") }
+        verify(exactly = 0) { airdropRepository.saveAirdropToken("candidate", "candidate-refresh") }
     }
 
     @Test
@@ -140,18 +144,18 @@ class DeeplinkManagerAirdropLoginTest {
     }
 
     @Test
-    fun `failed lookup shows unverified account dialog and saves only on confirm`() {
-        coEvery { airdropRepository.getAccountName(any()) } returns null
+    fun `failed verification shows unverified account dialog that can only be cancelled`() {
+        // Covers refresh failure, details failure and a blank name: verifyAccount returns null for all of them
+        coEvery { airdropRepository.verifyAccount(any()) } returns null
 
         openLink()
         shownDialog()!!.tapMainButton()
 
         val account = shownDialog()!!
         assertTrue(account.body().contains("unverified"))
+        assertEquals(listOf(ButtonStyle.Close), account.modules.filterIsInstance<ButtonModule>().map { it.style })
+        account.tapCancel()
         verify(exactly = 0) { airdropRepository.saveAirdropToken(any(), any()) }
-
-        account.tapMainButton()
-        verify(exactly = 1) { airdropRepository.saveAirdropToken("token", "refresh") }
     }
 
     @Test
@@ -175,7 +179,7 @@ class DeeplinkManagerAirdropLoginTest {
         openLink("attacker", "attacker-refresh")
 
         assertSame(account, shownDialog())
-        coVerify(exactly = 0) { airdropRepository.getAccountName("attacker") }
+        coVerify(exactly = 0) { airdropRepository.verifyAccount("attacker-refresh") }
     }
 
     @Test
@@ -189,7 +193,7 @@ class DeeplinkManagerAirdropLoginTest {
         val next = shownDialog()!!
         assertEquals(DialogId.DEEPLINK_AIRDROP_LOGIN, next.dialogId)
         next.tapMainButton()
-        coVerify(exactly = 1) { airdropRepository.getAccountName("next") }
+        coVerify(exactly = 1) { airdropRepository.verifyAccount("next-refresh") }
     }
 
     @Test
@@ -268,10 +272,10 @@ class DeeplinkManagerAirdropLoginTest {
     fun `lookup finishing after the session changed shows nothing`() {
         openLink("old", "old-refresh")
         val oldWarning = shownDialog()!!
-        coEvery { airdropRepository.getAccountName("old") } answers {
+        coEvery { airdropRepository.verifyAccount("old-refresh") } answers {
             now += AirdropLoginDeeplinkPolicy.PENDING_LOGIN_TTL_MS
             openLink("new", "new-refresh")
-            "old account"
+            VerifiedAirdropAccount("old-new-token", "old-new-refresh", "old account")
         }
 
         oldWarning.tapMainButton()
@@ -305,7 +309,7 @@ class DeeplinkManagerAirdropLoginTest {
         val newWarning = shownDialog()
         oldWarning.tapMainButton()
 
-        coVerify(exactly = 0) { airdropRepository.getAccountName(any()) }
+        coVerify(exactly = 0) { airdropRepository.verifyAccount(any()) }
         assertSame(newWarning, shownDialog())
     }
 

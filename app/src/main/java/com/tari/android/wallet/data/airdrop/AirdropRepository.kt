@@ -40,12 +40,20 @@ class AirdropRepository @Inject constructor(
         corePrefRepository.airdropLoginPendingSince = null
     }
 
-    // Looks up the account a not-yet-saved token belongs to, without touching the stored session
-    suspend fun getAccountName(token: String): String? = switchToIo {
+    /**
+     * Exchanges a not-yet-saved refresh token for a new token pair and looks up the account it belongs to, without touching the stored
+     * session. Returns null if either call fails or the account has no name.
+     */
+    suspend fun verifyAccount(refreshToken: String): VerifiedAirdropAccount? = switchToIo {
         runCatching {
-            val user = airdropRetrofit.getUserDetails(token = "Bearer $token").user
+            val tokens = airdropRetrofit.refreshAuthToken(RefreshTokenRequest(refreshToken))
+            val user = airdropRetrofit.getUserDetails(token = "Bearer ${tokens.token}").user
             val name = user.displayName?.takeIf { it.isNotBlank() } ?: user.name
-            name.takeIf { it.isNotBlank() }
+            if (name.isBlank() || tokens.token.isBlank() || tokens.refreshToken.isBlank()) {
+                null
+            } else {
+                VerifiedAirdropAccount(token = tokens.token, refreshToken = tokens.refreshToken, name = name)
+            }
         }.getOrNull()
     }
 
@@ -81,3 +89,9 @@ class AirdropRepository @Inject constructor(
         _airdropToken.value = null
     }
 }
+
+data class VerifiedAirdropAccount(
+    val token: String,
+    val refreshToken: String,
+    val name: String,
+)

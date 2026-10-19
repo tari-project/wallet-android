@@ -5,6 +5,7 @@ import android.app.Activity
 import android.app.Dialog
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
+import android.os.Build
 import android.view.Gravity
 import android.view.View
 import android.widget.LinearLayout
@@ -113,6 +114,10 @@ open class ModularDialog(context: Activity) {
             with(dialog) {
                 setCancelable(args.dialogArgs.cancelable)
                 setCanceledOnTouchOutside(args.dialogArgs.canceledOnTouchOutside)
+                if (args.filterObscuredTouches) {
+                    window?.decorView?.filterTouchesWhenObscured = true
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) window?.setHideOverlayWindows(true)
+                }
                 setOnDismissListener {
                     onDismissListeners.forEach { runCatching { it() } }
                     args.dialogArgs.onDismiss()

@@ -8,6 +8,7 @@ import com.tari.android.wallet.application.Navigation
 import com.tari.android.wallet.application.TariNavigator
 import com.tari.android.wallet.application.walletManager.WalletManager
 import com.tari.android.wallet.data.airdrop.AirdropRepository
+import com.tari.android.wallet.data.airdrop.VerifiedAirdropAccount
 import com.tari.android.wallet.data.contacts.Contact
 import com.tari.android.wallet.data.contacts.ContactsRepository
 import com.tari.android.wallet.di.ApplicationScope
@@ -270,6 +271,7 @@ class DeeplinkManager @Inject constructor(
             ModularDialogArgs(
                 dialogArgs = DialogArgs(onDismiss = { if (!lookupRequested) clearAirdropLoginPending(sessionId) }),
                 dialogId = DialogId.DEEPLINK_AIRDROP_LOGIN,
+                filterObscuredTouches = true,
                 modules = listOf(
                     HeadModule(resourceManager.getString(R.string.airdrop_login_deeplink_title)),
                     BodyModule(message),
@@ -278,9 +280,9 @@ class DeeplinkManager @Inject constructor(
                         if (sessionId == airdropLoginSessionId) {
                             lookupRequested = true
                             applicationScope.launch {
-                                val accountName = airdropRepository.getAccountName(deeplink.token)
+                                val account = airdropRepository.verifyAccount(deeplink.refreshToken)
                                 withContext(mainDispatcher) {
-                                    if (sessionId == airdropLoginSessionId) showAirdropLoginAccountDialog(deeplink, accountName, sessionId)
+                                    if (sessionId == airdropLoginSessionId) showAirdropLoginAccountDialog(account, sessionId)
                                 }
                             }
                         }
@@ -292,25 +294,29 @@ class DeeplinkManager @Inject constructor(
         )
     }
 
-    private fun showAirdropLoginAccountDialog(deeplink: DeepLink.AirdropLoginToken, accountName: String?, sessionId: Int) {
-        var message = if (accountName != null) {
-            resourceManager.getString(R.string.airdrop_login_deeplink_account, accountName)
+    // An account that could not be verified can only be cancelled
+    private fun showAirdropLoginAccountDialog(account: VerifiedAirdropAccount?, sessionId: Int) {
+        var message = if (account != null) {
+            resourceManager.getString(R.string.airdrop_login_deeplink_account, account.name)
         } else {
             resourceManager.getString(R.string.airdrop_login_deeplink_unverified)
         }
-        if (airdropRepository.airdropToken.value != null) {
+        if (account != null && airdropRepository.airdropToken.value != null) {
             message += "\n\n" + resourceManager.getString(R.string.airdrop_login_deeplink_replace_warning)
         }
         airdropLoginDialog.postValue(
             ModularDialogArgs(
                 dialogArgs = DialogArgs(onDismiss = { clearAirdropLoginPending(sessionId) }),
                 dialogId = DialogId.DEEPLINK_AIRDROP_LOGIN_ACCOUNT,
-                modules = listOf(
+                filterObscuredTouches = true,
+                modules = listOfNotNull(
                     HeadModule(resourceManager.getString(R.string.airdrop_login_deeplink_title)),
                     BodyModule(message),
-                    ButtonModule(resourceManager.getString(R.string.common_confirm), ButtonStyle.Normal) {
-                        if (sessionId == airdropLoginSessionId) airdropRepository.saveAirdropToken(deeplink.token, deeplink.refreshToken)
-                        dialogManager.dismiss(DialogId.DEEPLINK_AIRDROP_LOGIN_ACCOUNT)
+                    account?.let {
+                        ButtonModule(resourceManager.getString(R.string.common_confirm), ButtonStyle.Normal) {
+                            if (sessionId == airdropLoginSessionId) airdropRepository.saveAirdropToken(account.token, account.refreshToken)
+                            dialogManager.dismiss(DialogId.DEEPLINK_AIRDROP_LOGIN_ACCOUNT)
+                        }
                     },
                     ButtonModule(resourceManager.getString(R.string.common_cancel), ButtonStyle.Close),
                 ),

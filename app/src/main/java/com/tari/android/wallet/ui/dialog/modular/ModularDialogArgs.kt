@@ -7,6 +7,8 @@ data class ModularDialogArgs(
     val dialogArgs: DialogArgs = DialogArgs(),
     val modules: List<IDialogModule> = emptyList(),
     val dialogId: Int = DialogId.NO_ID,
+    // Ignores touches while another app draws over the dialog (tapjacking)
+    val filterObscuredTouches: Boolean = false,
 ) {
     object DialogId {
         const val NO_ID = -1
