@@ -49,7 +49,11 @@ class DialogManager @Inject constructor() {
         dialogQueue.clear()
     }
 
-    fun isDialogShowing(dialogId: Int?) = dialogId != null && dialogId != DialogId.NO_ID && dialogQueue.any { it.args?.dialogId == dialogId }
+    fun isDialogShowing(dialogId: Int?): Boolean {
+        // A dialog whose activity was destroyed never gets its dismiss callback, so drop it here instead
+        dialogQueue.removeAll { it.isActivityDestroyed() }
+        return dialogId != null && dialogId != DialogId.NO_ID && dialogQueue.any { it.args?.dialogId == dialogId }
+    }
 
     fun showNotReadyYetDialog(context: Activity) {
         replace(

@@ -1,11 +1,14 @@
 package com.tari.android.wallet.ui.dialog.modular
 
 import android.animation.ValueAnimator
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.Dialog
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
+import android.os.Build
 import android.view.Gravity
+import android.view.MotionEvent
 import android.view.View
 import android.widget.LinearLayout
 import androidx.appcompat.widget.LinearLayoutCompat
@@ -66,7 +69,12 @@ open class ModularDialog(context: Activity) {
         applyArgs(args)
     }
 
-    val dialog: Dialog = Dialog(context, R.style.BottomSlideDialog).apply {
+    val dialog: Dialog = object : Dialog(context, R.style.BottomSlideDialog) {
+        override fun dispatchTouchEvent(ev: MotionEvent): Boolean {
+            if (isBlockedObscuredTouch(args?.filterObscuredTouches == true, Build.VERSION.SDK_INT, ev.flags)) return false
+            return super.dispatchTouchEvent(ev)
+        }
+    }.apply {
         setContentView(R.layout.dialog_base)
         window?.let {
             it.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
@@ -99,6 +107,8 @@ open class ModularDialog(context: Activity) {
         }
     }
 
+    fun isActivityDestroyed(): Boolean = weakContext.get()?.isDestroyed ?: true
+
     fun addDismissListener(onDismiss: () -> Unit) {
         onDismissListeners.add(onDismiss)
     }
@@ -111,6 +121,10 @@ open class ModularDialog(context: Activity) {
             with(dialog) {
                 setCancelable(args.dialogArgs.cancelable)
                 setCanceledOnTouchOutside(args.dialogArgs.canceledOnTouchOutside)
+                if (args.filterObscuredTouches) {
+                    window?.decorView?.filterTouchesWhenObscured = true
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) window?.setHideOverlayWindows(true)
+                }
                 setOnDismissListener {
                     onDismissListeners.forEach { runCatching { it() } }
                     args.dialogArgs.onDismiss()
@@ -185,3 +199,13 @@ open class ModularDialog(context: Activity) {
         }
     }
 }
+
+/**
+ * filterTouchesWhenObscured only drops touches on fully obscured windows. Before Android 12, where setHideOverlayWindows isn't available,
+ * also drop touches while another app's window partially covers the dialog.
+ */
+@SuppressLint("InlinedApi") // only checked on API 29+
+internal fun isBlockedObscuredTouch(filterObscuredTouches: Boolean, sdkInt: Int, eventFlags: Int): Boolean =
+    filterObscuredTouches &&
+        sdkInt >= Build.VERSION_CODES.Q && sdkInt < Build.VERSION_CODES.S &&
+        (eventFlags and MotionEvent.FLAG_WINDOW_IS_PARTIALLY_OBSCURED) != 0

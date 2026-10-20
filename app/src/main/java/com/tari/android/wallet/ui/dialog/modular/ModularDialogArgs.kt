@@ -7,6 +7,8 @@ data class ModularDialogArgs(
     val dialogArgs: DialogArgs = DialogArgs(),
     val modules: List<IDialogModule> = emptyList(),
     val dialogId: Int = DialogId.NO_ID,
+    // Ignores touches while another app draws over the dialog (tapjacking)
+    val filterObscuredTouches: Boolean = false,
 ) {
     object DialogId {
         const val NO_ID = -1
@@ -17,5 +19,7 @@ data class ModularDialogArgs(
         const val DEEPLINK_PAPER_WALLET_REMEMBER_TO_BACKUP = 606
         const val DEEPLINK_PAPER_WALLET_ENTER_PASSPHRASE = 607
         const val DEEPLINK_PAPER_CANCEL_SEND_TX = 608
+        const val DEEPLINK_AIRDROP_LOGIN = 609
+        const val DEEPLINK_AIRDROP_LOGIN_ACCOUNT = 610
     }
 }

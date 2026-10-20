@@ -88,6 +88,7 @@ class CorePrefRepository @Inject constructor(
         const val KEEP_SCREEN_AWAKE_WHEN_RESTORE = "KEEP_SCREEN_AWAKE_WHEN_RESTORE"
         const val AIRDROP_TOKEN = "airdrop_token"
         const val AIRDROP_REFRESH_TOKEN = "AIRDROP_REFRESH_TOKEN"
+        const val AIRDROP_LOGIN_PENDING_SINCE = "AIRDROP_LOGIN_PENDING_SINCE"
     }
 
     var walletAddressBase58: Base58? by SharedPrefStringDelegate(
@@ -175,6 +176,12 @@ class CorePrefRepository @Inject constructor(
         prefsUpdater = this,
         name = networkRepository.currentNetwork.formatKey(Key.AIRDROP_REFRESH_TOKEN),
     )
+    // Epoch millis of the last "Connect" tap, stored as a string
+    var airdropLoginPendingSince: String? by SharedPrefStringDelegate(
+        prefs = sharedPrefs,
+        prefsUpdater = this,
+        name = networkRepository.currentNetwork.formatKey(Key.AIRDROP_LOGIN_PENDING_SINCE),
+    )
     var airdropAnonId: String? by SharedPrefStringDelegate(
         prefs = sharedPrefs,
         prefsUpdater = this,
@@ -204,6 +211,7 @@ class CorePrefRepository @Inject constructor(
         airdropAnonId = null
         airdropToken = null
         airdropRefreshToken = null
+        airdropLoginPendingSince = null
     }
 
     fun generateDatabasePassphrase(): String {
