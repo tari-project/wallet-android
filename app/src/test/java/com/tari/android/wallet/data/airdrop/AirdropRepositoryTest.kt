@@ -72,4 +72,20 @@ class AirdropRepositoryTest {
 
         assertNull(repository.verifyAccount("candidate-refresh"))
     }
+
+    @Test
+    fun `verify account shows a sanitised name and falls back when display name has nothing left`() = runBlocking {
+        coEvery { retrofit.refreshAuthToken(any()) } returns RefreshTokenResponse("new-token", "new-refresh")
+        coEvery { retrofit.getUserDetails(any()) } returns user(displayName = "\u202E\u200B", name = "Alice\nSmith")
+
+        assertEquals("Alice Smith", repository.verifyAccount("candidate-refresh")?.name)
+    }
+
+    @Test
+    fun `verify account fails when no name survives sanitising`() = runBlocking {
+        coEvery { retrofit.refreshAuthToken(any()) } returns RefreshTokenResponse("new-token", "new-refresh")
+        coEvery { retrofit.getUserDetails(any()) } returns user(displayName = "\u202E", name = "\u200B\n")
+
+        assertNull(repository.verifyAccount("candidate-refresh"))
+    }
 }

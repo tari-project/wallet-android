@@ -18,6 +18,7 @@ class ProfileLoginViewModel : CommonViewModel() {
     val authUrl = String.format(AUTH_URL_ADDRESS, networkRepository.currentNetwork.network.uriComponent)
 
     fun onConnectAirdropClick() {
+        deeplinkManager.cancelAirdropLoginConfirmation()
         airdropRepository.markLoginPending(System.currentTimeMillis())
         openUrl(authUrl)
     }

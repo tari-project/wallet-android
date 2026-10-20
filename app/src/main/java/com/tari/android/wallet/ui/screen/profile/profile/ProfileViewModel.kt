@@ -126,6 +126,7 @@ class ProfileViewModel : CommonViewModel() {
             BodyModule(resourceManager.getString(R.string.airdrop_profile_disconnect_dialog_message)),
             ButtonModule(resourceManager.getString(R.string.common_confirm), ButtonStyle.Warning) {
                 airdropRepository.clearAirdropToken()
+                deeplinkManager.cancelAirdropLoginConfirmation()
                 hideDialog()
             },
             ButtonModule(resourceManager.getString(R.string.common_cancel), ButtonStyle.Close),

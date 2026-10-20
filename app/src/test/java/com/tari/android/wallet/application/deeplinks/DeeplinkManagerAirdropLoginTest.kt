@@ -33,9 +33,10 @@ import org.junit.Test
 class DeeplinkManagerAirdropLoginTest {
 
     private var pendingSince: Long? = null
+    private val airdropTokenFlow = MutableStateFlow<String?>(null)
 
     private val airdropRepository = mockk<AirdropRepository>(relaxed = true) {
-        every { airdropToken } returns MutableStateFlow(null)
+        every { airdropToken } returns airdropTokenFlow
         every { getLoginPendingSince() } answers { pendingSince }
         every { clearLoginPending() } answers { pendingSince = null }
         coEvery { verifyAccount(any()) } returns VerifiedAirdropAccount("new-token", "new-refresh", "alice")
@@ -48,6 +49,7 @@ class DeeplinkManagerAirdropLoginTest {
         resourceManager = mockk(relaxed = true) {
             every { getString(any()) } returns ""
             every { getString(R.string.airdrop_login_deeplink_unverified) } returns "unverified"
+            every { getString(R.string.airdrop_login_deeplink_replace_warning) } returns "WARNING"
             every { getString(R.string.airdrop_login_deeplink_account, *anyVararg()) } answers { "Account: " + (args[1] as Array<*>).joinToString() }
         },
         walletManager = mockk(relaxed = true),
@@ -311,6 +313,98 @@ class DeeplinkManagerAirdropLoginTest {
 
         coVerify(exactly = 0) { airdropRepository.verifyAccount(any()) }
         assertSame(newWarning, shownDialog())
+    }
+
+    @Test
+    fun `own sign-in cancels an open confirmation`() {
+        openLink("attacker", "attacker-refresh")
+        shownDialog()!!.tapMainButton()
+        val attackerAccount = shownDialog()!!
+        every { dialogManager.isDialogShowing(any()) } returns true
+
+        pendingSince = now
+        openLink("own", "own-refresh")
+        attackerAccount.tapMainButton()
+
+        verify(exactly = 1) { airdropRepository.saveAirdropToken("own", "own-refresh") }
+        verify(exactly = 0) { airdropRepository.saveAirdropToken("new-token", "new-refresh") }
+        verify(exactly = 1) { dialogManager.dismiss(DialogId.DEEPLINK_AIRDROP_LOGIN_ACCOUNT, true) }
+    }
+
+    @Test
+    fun `cancelling the confirmation makes its dialogs inert and lets a new link show`() {
+        openLink("attacker", "attacker-refresh")
+        val attackerWarning = shownDialog()!!
+
+        deeplinkManager.cancelAirdropLoginConfirmation()
+        attackerWarning.tapMainButton()
+
+        coVerify(exactly = 0) { airdropRepository.verifyAccount(any()) }
+        openLink("next", "next-refresh")
+        assertTrue(attackerWarning !== shownDialog())
+    }
+
+    @Test
+    fun `cancelling after the account is shown makes confirm do nothing`() {
+        openLink()
+        shownDialog()!!.tapMainButton()
+        val account = shownDialog()!!
+
+        deeplinkManager.cancelAirdropLoginConfirmation()
+        account.tapMainButton()
+
+        verify(exactly = 0) { airdropRepository.saveAirdropToken(any(), any()) }
+    }
+
+    @Test
+    fun `confirm is refused once the pending window has expired`() {
+        openLink()
+        shownDialog()!!.tapMainButton()
+        val account = shownDialog()!!
+
+        now += AirdropLoginDeeplinkPolicy.PENDING_LOGIN_TTL_MS
+        account.tapMainButton()
+
+        verify(exactly = 0) { airdropRepository.saveAirdropToken(any(), any()) }
+    }
+
+    @Test
+    fun `confirm is refused when a session appeared after the dialog was built`() {
+        openLink()
+        shownDialog()!!.tapMainButton()
+        val account = shownDialog()!!
+
+        airdropTokenFlow.value = "existing"
+        account.tapMainButton()
+
+        verify(exactly = 0) { airdropRepository.saveAirdropToken(any(), any()) }
+    }
+
+    @Test
+    fun `confirm is refused when the session went away after the dialog was built`() {
+        airdropTokenFlow.value = "existing"
+        openLink()
+        shownDialog()!!.tapMainButton()
+        val account = shownDialog()!!
+
+        airdropTokenFlow.value = null
+        account.tapMainButton()
+
+        verify(exactly = 0) { airdropRepository.saveAirdropToken(any(), any()) }
+    }
+
+    @Test
+    fun `replace warning is shown above the account name`() {
+        airdropTokenFlow.value = "existing"
+        openLink()
+        shownDialog()!!.tapMainButton()
+
+        val body = shownDialog()!!.body()
+        assertTrue(body.startsWith("WARNING"))
+        assertTrue(body.indexOf("WARNING") < body.indexOf("Account: alice"))
+
+        shownDialog()!!.tapMainButton()
+        verify(exactly = 1) { airdropRepository.saveAirdropToken("new-token", "new-refresh") }
     }
 
     @Test

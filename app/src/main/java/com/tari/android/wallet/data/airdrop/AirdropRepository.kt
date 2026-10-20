@@ -1,5 +1,6 @@
 package com.tari.android.wallet.data.airdrop
 
+import com.tari.android.wallet.application.deeplinks.AirdropLoginDeeplinkPolicy
 import com.tari.android.wallet.data.sharedPrefs.CorePrefRepository
 import com.tari.android.wallet.util.extension.safeCastTo
 import com.tari.android.wallet.util.extension.switchToIo
@@ -42,14 +43,15 @@ class AirdropRepository @Inject constructor(
 
     /**
      * Exchanges a not-yet-saved refresh token for a new token pair and looks up the account it belongs to, without touching the stored
-     * session. Returns null if either call fails or the account has no name.
+     * session. Returns null if either call fails or the account has no displayable name.
      */
     suspend fun verifyAccount(refreshToken: String): VerifiedAirdropAccount? = switchToIo {
         runCatching {
             val tokens = airdropRetrofit.refreshAuthToken(RefreshTokenRequest(refreshToken))
             val user = airdropRetrofit.getUserDetails(token = "Bearer ${tokens.token}").user
-            val name = user.displayName?.takeIf { it.isNotBlank() } ?: user.name
-            if (name.isBlank() || tokens.token.isBlank() || tokens.refreshToken.isBlank()) {
+            val name = AirdropLoginDeeplinkPolicy.sanitizeAccountName(user.displayName.orEmpty())
+                ?: AirdropLoginDeeplinkPolicy.sanitizeAccountName(user.name)
+            if (name == null || tokens.token.isBlank() || tokens.refreshToken.isBlank()) {
                 null
             } else {
                 VerifiedAirdropAccount(token = tokens.token, refreshToken = tokens.refreshToken, name = name)
