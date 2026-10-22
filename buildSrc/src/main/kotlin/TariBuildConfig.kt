@@ -3,8 +3,8 @@ object TariBuildConfig {
     const val versionNumber = "1.5.0"
 
     const val minSdk = 26
-    const val targetSdk = 35
-    const val compileSdk = 35
+    const val targetSdk = 36
+    const val compileSdk = 36
 
     object LibWallet {
         val version = "v6.1.0"
