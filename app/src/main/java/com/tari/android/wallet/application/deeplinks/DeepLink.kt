@@ -76,7 +76,7 @@ sealed class DeepLink : Parcelable {
 
         constructor(params: Map<String, String>) : this(
             contacts = params.filterKeys { it.startsWith("list[") }
-                .map { FormatExtractor(it.key, it.value) }
+                .mapNotNull { FormatExtractor.tryCreate(it.key, it.value) }
                 .groupBy { it.index }
                 .map { param ->
                     DeeplinkContact(
@@ -105,18 +105,20 @@ sealed class DeepLink : Parcelable {
         @Parcelize
         data class DeeplinkContact(val alias: String, val tariAddress: Base58) : Parcelable
 
-        class FormatExtractor(val key: String, val value: String = "") {
-            val index: Int
-            val name: String
+        class FormatExtractor(val index: Int, val name: String, val value: String = "") {
+            constructor(key: String, value: String = "") : this(
+                index = key.replace("list[", "").replace("]", "").split("[").getOrNull(0)?.toIntOrNull() ?: 0,
+                name = key.replace("list[", "").replace("]", "").split("[").getOrNull(1)?.split("=")?.firstOrNull().orEmpty(),
+                value = value,
+            )
 
-            init {
-                key.replace("list[", "")
-                    .replace("]", "")
-                    .split("[")
-                    .let {
-                        index = it[0].toInt()
-                        name = it[1].split("=")[0]
-                    }
+            companion object {
+                fun tryCreate(key: String, value: String = ""): FormatExtractor? {
+                    val parts = key.removePrefix("list[").replace("]", "").split("[")
+                    val index = parts.getOrNull(0)?.toIntOrNull() ?: return null
+                    val name = parts.getOrNull(1)?.split("=")?.firstOrNull()?.takeIf { it.isNotEmpty() } ?: return null
+                    return FormatExtractor(index = index, name = name, value = value)
+                }
             }
         }
     }
@@ -126,7 +128,10 @@ sealed class DeepLink : Parcelable {
 
         constructor(params: Map<String, String>) : this(
             params[KEY_TARI_ADDRESS].orEmpty(),
-            params[KEY_AMOUNT]?.let { if (it.isEmpty()) null else MicroTari(it.parseToBigInteger()) },
+            params[KEY_AMOUNT]?.takeIf { it.isNotEmpty() }
+                ?.toBigIntegerOrNull()
+                ?.takeIf { it >= java.math.BigInteger.ZERO }
+                ?.let { MicroTari(it) },
             params[KEY_NOTE].orEmpty()
         )
 

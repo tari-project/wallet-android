@@ -46,6 +46,7 @@ class AirdropRepository @Inject constructor(
      * session. Returns null if either call fails or the account has no displayable name.
      */
     suspend fun verifyAccount(refreshToken: String): VerifiedAirdropAccount? = switchToIo {
+        if (refreshToken.isBlank()) return@switchToIo null
         runCatching {
             val tokens = airdropRetrofit.refreshAuthToken(RefreshTokenRequest(refreshToken))
             val user = airdropRetrofit.getUserDetails(token = "Bearer ${tokens.token}").user
@@ -60,28 +61,39 @@ class AirdropRepository @Inject constructor(
     }
 
     suspend fun getUserDetails(): Result<UserDetailsResponse> = switchToIo {
+        withTokenRefresh { token ->
+            airdropRetrofit.getUserDetails(token = "Bearer $token")
+        }
+    }
+
+    suspend fun getReferralList(): Result<ReferralStatusResponse> = switchToIo {
+        withTokenRefresh { token ->
+            airdropRetrofit.getReferralStatus(token = "Bearer $token")
+        }
+    }
+
+    private suspend fun <T : Any> withTokenRefresh(block: suspend (token: String?) -> T): Result<T> {
         val result = runCatching {
-            airdropRetrofit.getUserDetails(token = "Bearer ${corePrefRepository.airdropToken}")
+            block(corePrefRepository.airdropToken)
         }
         if (result.is401()) {
-            val newTokens = runCatching {
-                airdropRetrofit.refreshAuthToken(RefreshTokenRequest(corePrefRepository.airdropRefreshToken.orEmpty()))
-            }.getOrNull()
+            val refreshToken = corePrefRepository.airdropRefreshToken.orEmpty()
+            val newTokens = if (refreshToken.isNotBlank()) {
+                runCatching {
+                    airdropRetrofit.refreshAuthToken(RefreshTokenRequest(refreshToken))
+                }.getOrNull()
+            } else {
+                null
+            }
 
-            if (newTokens != null) {
+            if (newTokens != null && newTokens.token.isNotBlank() && newTokens.refreshToken.isNotBlank()) {
                 saveAirdropToken(newTokens.token, newTokens.refreshToken)
-                return@switchToIo runCatching { airdropRetrofit.getUserDetails(token = "Bearer ${corePrefRepository.airdropToken}") }
+                return runCatching { block(newTokens.token) }
             } else {
                 clearAirdropToken()
             }
         }
-        return@switchToIo result
-    }
-
-    suspend fun getReferralList(): Result<ReferralStatusResponse> = switchToIo {
-        runCatching {
-            airdropRetrofit.getReferralStatus(token = "Bearer ${corePrefRepository.airdropToken}")
-        }
+        return result
     }
 
     private fun Result<Any>.is401() = this.exceptionOrNull()?.safeCastTo<HttpException>()?.code() == 401

@@ -88,4 +88,21 @@ class AirdropRepositoryTest {
 
         assertNull(repository.verifyAccount("candidate-refresh"))
     }
+
+    @Test
+    fun `verify account skips network call when refresh token is blank`() = runBlocking {
+        assertNull(repository.verifyAccount("   "))
+        coVerify(exactly = 0) { retrofit.refreshAuthToken(any()) }
+    }
+
+    @Test
+    fun `FormatExtractor rejects malformed list keys without throwing`() {
+        assertNull(com.tari.android.wallet.application.deeplinks.DeepLink.Contacts.FormatExtractor.tryCreate("list[]", "Alice"))
+        assertNull(com.tari.android.wallet.application.deeplinks.DeepLink.Contacts.FormatExtractor.tryCreate("list[abc][alias]", "Alice"))
+        assertNull(com.tari.android.wallet.application.deeplinks.DeepLink.Contacts.FormatExtractor.tryCreate("list[0]", "Alice"))
+        val valid = com.tari.android.wallet.application.deeplinks.DeepLink.Contacts.FormatExtractor.tryCreate("list[2][alias]", "Bob")
+        assertEquals(2, valid?.index)
+        assertEquals("alias", valid?.name)
+        assertEquals("Bob", valid?.value)
+    }
 }
