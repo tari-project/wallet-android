@@ -25,10 +25,13 @@ class DeeplinkParser @Inject constructor(private val networkRepository: NetworkP
 
         val command = deepLinkUri.path.orEmpty().trimStart('/')
         val parameters = if (command == DeepLink.Contacts.COMMAND_CONTACTS) { // list params
-            deepLinkUri.query.orEmpty().split("&").associate {
-                val (key, value) = it.split("=")
-                key to value
-            }
+            deepLinkUri.query.orEmpty()
+                .split("&")
+                .filter { it.isNotBlank() && it.contains("=") }
+                .associate {
+                    val (key, value) = it.split("=", limit = 2)
+                    key to value
+                }
         } else {
             deepLinkUri.queryParameterNames.associateWith { deepLinkUri.getQueryParameter(it).orEmpty() }
         }
@@ -46,7 +49,12 @@ class DeeplinkParser @Inject constructor(private val networkRepository: NetworkP
         val fullPart = Uri.Builder()
             .scheme(SCHEME)
             .authority(networkRepository.currentNetwork.network.uriComponent)
-            .appendPath(deepLink.getCommand())
+            .apply {
+                deepLink.getCommand()
+                    .split('/')
+                    .filter { it.isNotEmpty() }
+                    .forEach { appendPath(it) }
+            }
 
         deepLink.getParams().forEach { (key, value) ->
             fullPart.appendQueryParameter(key, value)

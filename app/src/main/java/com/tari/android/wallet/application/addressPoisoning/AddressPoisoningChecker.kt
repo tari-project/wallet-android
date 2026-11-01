@@ -59,6 +59,7 @@ class AddressPoisoningChecker @Inject constructor(
             return (contactsRepository.contactList.value
                     // add the current wallet address to the list because it may not exist if there were no interactions with it
                     + contactsRepository.findOrCreateContact(this))
+                .distinctBy { it.walletAddress }
                 .filter { it.walletAddress.isSimilarTo(this) }
                 .map { contact ->
                     SimilarAddressDto(
@@ -71,7 +72,7 @@ class AddressPoisoningChecker @Inject constructor(
                     )
                 }.let { similarContacts ->
                     // put the current wallet address to the first place
-                    listOf(similarContacts.first { it.contact.walletAddress == this }) +
+                    listOfNotNull(similarContacts.firstOrNull { it.contact.walletAddress == this }) +
                             similarContacts.filter { it.contact.walletAddress != this }
                 }
         }
