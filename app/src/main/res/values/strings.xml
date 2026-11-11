@@ -340,6 +340,7 @@
     <string name="send_recipient_address_field_title">To</string>
     <string name="send_recipient_address_field_hint">Recipient address</string>
     <string name="send_amount_field_title">Amount</string>
+    <string name="send_amount_max_button">MAX</string>
     <string name="send_amount_field_hint">Enter XTM amount to send</string>
     <string name="send_amount_field_error">Amount is not valid</string>
     <string name="send_amount_field_error_not_enough_funds">Sorry, you can’t send this much XTM until your previous transaction(s) are complete. Please wait for at least one transaction to complete and then try again.</string>

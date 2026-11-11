@@ -88,3 +88,5 @@ libwallet/x86_64/libminotari_wallet_ffi.a
 
 # Scratch/debug directories used by dispatch agents; never intended to be committed.
 _*_scratch/
+config.bat
+node_modules

@@ -32,6 +32,7 @@ class SendFragment : CommonFragment<SendViewModel>() {
                 onScanQrClick = { startQrScanner() },
                 onContactBookClick = { viewModel.onContactBookClick() },
                 onNoteChange = { viewModel.onNoteChange(it) },
+                onSendMaxClick = { viewModel.onSendMaxClick() },
             )
         }
 
