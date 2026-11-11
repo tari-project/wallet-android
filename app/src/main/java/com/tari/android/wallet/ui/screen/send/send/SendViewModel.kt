@@ -123,6 +123,40 @@ class SendViewModel(savedState: SavedStateHandle) : CommonViewModel() {
         }
     }
 
+    fun onSendMaxClick() {
+        val available = _uiState.value.availableBalance ?: return
+        if (available.value <= java.math.BigInteger.ZERO) return
+
+        doOnWalletRunning { wallet ->
+            val initialFee = runCatching { wallet.estimateTxFee(available) }.getOrNull()
+            val candidate = if (initialFee != null && available > initialFee) {
+                available - initialFee
+            } else {
+                available
+            }
+
+            val refinedFee = runCatching { wallet.estimateTxFee(candidate) }.getOrNull() ?: initialFee
+            val maxAmount = if (refinedFee != null && available > refinedFee) {
+                available - refinedFee
+            } else {
+                null
+            }
+
+            launchOnMain {
+                if (maxAmount != null && maxAmount.value > java.math.BigInteger.ZERO) {
+                    onAmountChange(maxAmount.formattedTariValue)
+                } else {
+                    _uiState.update {
+                        it.copy(
+                            amountValue = available.formattedTariValue,
+                            feeError = R.string.send_amount_field_error_lower_than_fee,
+                        )
+                    }
+                }
+            }
+        }
+    }
+
     fun onNoteChange(note: String) {
         _uiState.update { it.copy(note = note) }
     }

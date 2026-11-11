@@ -41,12 +41,14 @@ import com.tari.android.wallet.ui.compose.components.AmountVisualTransformation
 import com.tari.android.wallet.ui.compose.components.TariHorizontalDivider
 import com.tari.android.wallet.ui.compose.components.TariPrimaryButton
 import com.tari.android.wallet.ui.compose.components.TariProgressView
+import com.tari.android.wallet.ui.compose.components.TariTextButton
 import com.tari.android.wallet.ui.compose.components.TariTextField
 import com.tari.android.wallet.ui.compose.components.TariTopBar
 import com.tari.android.wallet.ui.screen.settings.themeSelector.TariTheme
 import com.tari.android.wallet.util.MockDataStub
 import com.tari.android.wallet.util.extension.newValueIfChanged
 import com.tari.android.wallet.util.extension.toMicroTari
+import java.math.BigInteger
 
 @Composable
 fun SendScreen(
@@ -59,6 +61,7 @@ fun SendScreen(
     onContinueClick: () -> Unit,
     onScanQrClick: () -> Unit,
     onContactBookClick: () -> Unit,
+    onSendMaxClick: () -> Unit = {},
 ) {
     Scaffold(
         modifier = Modifier
@@ -129,7 +132,7 @@ fun SendScreen(
                 title = stringResource(R.string.send_amount_field_title),
                 hint = stringResource(R.string.send_amount_field_hint),
                 titleAdditionalLayout = {
-                    Column {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
                         uiState.availableBalance?.let { availableBalance ->
                             Text(
                                 text = stringResource(
@@ -148,6 +151,12 @@ fun SendScreen(
                         }
 
                         Spacer(Modifier.size(8.dp))
+
+                        TariTextButton(
+                            text = stringResource(R.string.send_amount_max_button),
+                            onClick = onSendMaxClick,
+                            enabled = uiState.availableBalance?.value?.let { it > BigInteger.ZERO } == true,
+                        )
                     }
                 },
                 errorText = uiState.amountError?.let { stringResource(it) },
