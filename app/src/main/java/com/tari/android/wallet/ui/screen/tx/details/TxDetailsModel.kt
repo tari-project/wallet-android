@@ -45,6 +45,9 @@ object TxDetailsModel {
                     TxStatus.ONE_SIDED_CONFIRMED,
                     TxStatus.MINED_CONFIRMED,
                     TxStatus.IMPORTED,
+                    TxStatus.MINED_CONFIRMED_LOCKED,
+                    TxStatus.ONE_SIDED_CONFIRMED_LOCKED,
+                    TxStatus.COINBASE_CONFIRMED_LOCKED,
                 ) -> when (tx.direction) {
                     Direction.INBOUND -> R.string.tx_detail_payment_received
                     Direction.OUTBOUND -> R.string.tx_detail_payment_sent

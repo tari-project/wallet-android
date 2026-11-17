@@ -53,6 +53,9 @@ enum class FFITxStatus {
     COINBASE_UNCONFIRMED,
     COINBASE_CONFIRMED,
     COINBASE_NOT_IN_BLOCKCHAIN,
+    MINED_CONFIRMED_LOCKED,
+    ONE_SIDED_CONFIRMED_LOCKED,
+    COINBASE_CONFIRMED_LOCKED,
     UNKNOWN;
 
     companion object {
@@ -73,8 +76,11 @@ enum class FFITxStatus {
                 11 -> COINBASE_UNCONFIRMED
                 12 -> COINBASE_CONFIRMED
                 13 -> COINBASE_NOT_IN_BLOCKCHAIN
-                14 -> UNKNOWN
-                else -> throw FFIException(message = "Unexpected status: $status")
+                14 -> MINED_CONFIRMED_LOCKED
+                15 -> ONE_SIDED_CONFIRMED_LOCKED
+                16 -> COINBASE_CONFIRMED_LOCKED
+                // A status this app version does not know must not take the whole transaction list down.
+                else -> UNKNOWN
             }
         }
     }

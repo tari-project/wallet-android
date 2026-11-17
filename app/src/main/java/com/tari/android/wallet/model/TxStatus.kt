@@ -50,14 +50,18 @@ enum class TxStatus {
     COINBASE_UNCONFIRMED,
     COINBASE_CONFIRMED,
     COINBASE_NOT_IN_BLOCKCHAIN,
+    MINED_CONFIRMED_LOCKED,
+    ONE_SIDED_CONFIRMED_LOCKED,
+    COINBASE_CONFIRMED_LOCKED,
     UNKNOWN;
 
     fun isOneSided(): Boolean {
-        return this == ONE_SIDED_CONFIRMED || this == ONE_SIDED_UNCONFIRMED
+        return this == ONE_SIDED_CONFIRMED || this == ONE_SIDED_UNCONFIRMED || this == ONE_SIDED_CONFIRMED_LOCKED
     }
 
     fun isCoinbase(): Boolean {
-        return this == COINBASE || this == COINBASE_UNCONFIRMED || this == COINBASE_CONFIRMED || this == COINBASE_NOT_IN_BLOCKCHAIN
+        return this == COINBASE || this == COINBASE_UNCONFIRMED || this == COINBASE_CONFIRMED || this == COINBASE_NOT_IN_BLOCKCHAIN ||
+                this == COINBASE_CONFIRMED_LOCKED
     }
 
     companion object {
@@ -78,6 +82,9 @@ enum class TxStatus {
                 FFITxStatus.COINBASE_UNCONFIRMED -> COINBASE_UNCONFIRMED
                 FFITxStatus.COINBASE_CONFIRMED -> COINBASE_CONFIRMED
                 FFITxStatus.COINBASE_NOT_IN_BLOCKCHAIN -> COINBASE_NOT_IN_BLOCKCHAIN
+                FFITxStatus.MINED_CONFIRMED_LOCKED -> MINED_CONFIRMED_LOCKED
+                FFITxStatus.ONE_SIDED_CONFIRMED_LOCKED -> ONE_SIDED_CONFIRMED_LOCKED
+                FFITxStatus.COINBASE_CONFIRMED_LOCKED -> COINBASE_CONFIRMED_LOCKED
                 FFITxStatus.UNKNOWN -> UNKNOWN
             }
         }
