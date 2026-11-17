@@ -128,7 +128,7 @@ class BackupManager @Inject constructor(
     fun backupNow(
         onSuccess: () -> Unit = {},
         onFailure: (backupException: Throwable?) -> Unit = {},
-    ) = {
+    ) {
         applicationScope.launch {
             if (!currentOption.isEnabled) {
                 logger.d("Backup is disabled. Exit.")
