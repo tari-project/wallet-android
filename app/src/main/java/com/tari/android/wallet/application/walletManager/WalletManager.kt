@@ -280,10 +280,13 @@ class WalletManager @Inject constructor(
         tariContact: TariContact,
         amount: MicroTari,
         message: String,
+        feePerGram: MicroTari? = null,
     ): TxId {
         val recipientAddress = FFITariWalletAddress(Base58String(tariContact.walletAddress.fullBase58))
 
-        val txId = requireWalletInstance.sendTx(recipientAddress, amount.value, message)
+        val wallet = requireWalletInstance
+        // Send with the fee rate the user saw the fee for. Without one, ask the base node as before.
+        val txId = wallet.sendTx(recipientAddress, amount.value, message, feePerGram ?: wallet.getLowestFeePerGram())
 
         recipientAddress.destroy()
         return txId

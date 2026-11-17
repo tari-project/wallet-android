@@ -54,6 +54,7 @@ class ConfirmViewModel(savedState: SavedStateHandle) : CommonViewModel() {
                     tariContact = TariContact(uiState.value.transactionData.recipientContact.walletAddress),
                     amount = uiState.value.transactionData.amount,
                     message = uiState.value.transactionData.message,
+                    feePerGram = uiState.value.transactionData.feePerGram,
                 )
 
                 logger.i("Tx sent: $txId")

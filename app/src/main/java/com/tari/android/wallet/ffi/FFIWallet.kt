@@ -289,15 +289,14 @@ class FFIWallet(
 
     fun cancelPendingTx(id: BigInteger): Boolean = runWithError { jniCancelPendingTx(id.toString(), it) }
 
-    fun estimateTxFee(amount: MicroTari): MicroTari = runWithError { error ->
+    fun estimateTxFee(amount: MicroTari, feePerGram: MicroTari = getLowestFeePerGram()): MicroTari = runWithError { error ->
         val defaultKernelCount = BigInteger("1")
         val defaultOutputCount = BigInteger("2")
-        val feePerGram: BigInteger = getLowestFeePerGram().value
         MicroTari(
             BigInteger(
                 1, jniEstimateTxFee(
                     amount = amount.value.toString(),
-                    gramFee = feePerGram.toString(),
+                    gramFee = feePerGram.value.toString(),
                     kernelCount = defaultKernelCount.toString(),
                     outputCount = defaultOutputCount.toString(),
                     libError = error,
@@ -310,15 +309,15 @@ class FFIWallet(
         destination: FFITariWalletAddress,
         amount: BigInteger,
         message: String,
+        feePerGram: MicroTari = getLowestFeePerGram(),
     ): TxId {
-        val feePerGram = getLowestFeePerGram().value
         if (amount < BigInteger.valueOf(0L)) {
             throw FFIException(message = "Amount is less than 0.")
         }
         if (destination == getWalletAddress()) {
             throw FFIException(message = "Tx source and destination are the same.")
         }
-        val txIdBytes = runWithError { jniSendTx(destination, amount.toString(), feePerGram.toString(), message, it) }
+        val txIdBytes = runWithError { jniSendTx(destination, amount.toString(), feePerGram.value.toString(), message, it) }
         return BigInteger(1, txIdBytes)
     }
 
