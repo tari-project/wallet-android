@@ -118,7 +118,7 @@ class GoogleDriveBackupStorage @Inject constructor(
         return withContext(Dispatchers.IO) {
             val (backupFile, backupDate, mimeType) = backupFileProcessor.generateBackupFile()
             // upload file
-            try {
+            val newBackupFileId = try {
                 createBackupFile(backupFile, mimeType)
             } catch (exception: UserRecoverableAuthIOException) {
                 throw BackupStorageAuthRevokedException()
@@ -136,6 +136,12 @@ class GoogleDriveBackupStorage @Inject constructor(
                 backupFileProcessor.clearTempFolder()
             } catch (e: Exception) {
                 logger.i("Ignorable backup error while clearing temporary and old files $e")
+            }
+            try {
+                // The new backup replaces the earlier ones, as LocalBackupStorage.backup() does for a local folder.
+                deleteSupersededBackupFiles(newBackupFileId)
+            } catch (e: Exception) {
+                logger.i("Ignorable backup error while deleting superseded backup files $e")
             }
             return@withContext backupDate
         }
@@ -210,17 +216,30 @@ class GoogleDriveBackupStorage @Inject constructor(
             .build()
     }
 
-    private fun createBackupFile(file: File, mimeType: String) {
+    private fun deleteSupersededBackupFiles(keepFileId: String?) {
+        if (keepFileId.isNullOrEmpty()) return
+        val driveFiles = googleDrive?.files() ?: return
+        var pageToken: String? = null
+        do {
+            val page = searchForBackups(pageToken)
+            supersededBackupFileIds(page.files.map { it.id to it.name }, keepFileId, namingPolicy::isBackupFileName)
+                .forEach { driveFiles.delete(it).execute() }
+            pageToken = page.nextPageToken
+        } while (pageToken != null)
+    }
+
+    private fun createBackupFile(file: File, mimeType: String): String? {
         val metadata: com.google.api.services.drive.model.File =
             com.google.api.services.drive.model.File()
                 .setParents(listOf(DRIVE_BACKUP_PARENT_FOLDER_NAME))
                 .setMimeType(mimeType)
                 .setName(file.getLastPathComponent())
-        googleDrive?.let {
+        return googleDrive?.let {
             it.files()
                 .create(metadata, FileContent(mimeType, file))
                 .setFields("id")
                 .execute()
+                .id
         } ?: error("Google Drive client is not initialized.")
     }
 
@@ -238,7 +257,18 @@ class GoogleDriveBackupStorage @Inject constructor(
             .execute()
     } ?: error("Google Drive client is not initialized.")
 
-    private companion object {
+    companion object {
         private const val DRIVE_BACKUP_PARENT_FOLDER_NAME = "appDataFolder"
+
+        /**
+         * Ids of the backup files that the backup with [keepFileId] replaces. Files that are not backups stay.
+         */
+        internal fun supersededBackupFileIds(
+            files: List<Pair<String?, String?>>,
+            keepFileId: String,
+            isBackupFileName: (String) -> Boolean,
+        ): List<String> = files
+            .filter { (id, name) -> !id.isNullOrEmpty() && id != keepFileId && isBackupFileName(name.orEmpty()) }
+            .mapNotNull { it.first }
     }
 }
