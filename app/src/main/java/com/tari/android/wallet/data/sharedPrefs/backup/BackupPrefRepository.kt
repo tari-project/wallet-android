@@ -58,6 +58,7 @@ class BackupPrefRepository @Inject constructor(
     fun clear() {
         backupPassword = null
         localBackupFolderURI = null
+        restoredTxs = null
         googleDriveOption = BackupOption(isEnabled = false, lastSuccessDate = null, lastFailureDate = null)
     }
 
