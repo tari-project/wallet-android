@@ -84,7 +84,7 @@ class FFIPendingInboundTx() : FFITxBase() {
             5 -> FFITxStatus.COINBASE
             6 -> FFITxStatus.MINED_CONFIRMED
             7 -> FFITxStatus.UNKNOWN
-            else -> throw FFIException(message = "Unexpected status: $this")
+            else -> FFITxStatus.UNKNOWN
         }
     }
 
