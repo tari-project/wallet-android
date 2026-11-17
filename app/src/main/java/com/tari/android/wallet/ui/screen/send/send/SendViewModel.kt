@@ -104,10 +104,12 @@ class SendViewModel(savedState: SavedStateHandle) : CommonViewModel() {
 
         _uiState.value.amount?.let { amount ->
             doOnWalletRunning { wallet ->
-                val fee = runCatching { wallet.estimateTxFee(amount) }
+                val feePerGram = runCatching { wallet.getLowestFeePerGram() }
+                val fee = feePerGram.mapCatching { wallet.estimateTxFee(amount, it) }
                 _uiState.update {
                     it.copy(
                         fee = fee.getOrNull(),
+                        feePerGram = feePerGram.getOrNull()?.takeIf { fee.isSuccess },
                         feeError = fee.exceptionOrNull()?.let { error ->
                             logger.i("Error estimating fee: ${error.message}")
                             when {
@@ -119,7 +121,7 @@ class SendViewModel(savedState: SavedStateHandle) : CommonViewModel() {
                 }
             }
         } ?: run {
-            _uiState.update { it.copy(fee = null, feeError = null) }
+            _uiState.update { it.copy(fee = null, feePerGram = null, feeError = null) }
         }
     }
 
@@ -191,6 +193,7 @@ class SendViewModel(savedState: SavedStateHandle) : CommonViewModel() {
         val amountValue: String = "",
 
         val fee: MicroTari? = null,
+        val feePerGram: MicroTari? = null,
         @param:StringRes val feeError: Int? = null,
 
         val note: String = "",
@@ -212,6 +215,7 @@ class SendViewModel(savedState: SavedStateHandle) : CommonViewModel() {
                     amount = amount,
                     note = note,
                     fee = fee,
+                    feePerGram = feePerGram,
                 )
             }
 
