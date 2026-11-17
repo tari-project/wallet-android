@@ -97,10 +97,9 @@ class BackupSettingsViewModel : CommonViewModel() {
             try {
                 val authResultHandled = backupManager.onSetupActivityResult(result)
                 if (authResultHandled) {
+                    // backupNow() skips a disabled option, so enable it first. A failed first backup turns it off again.
+                    backupPrefs.updateOption(currentOption.copy(isEnabled = true))
                     backupManager.backupNow(
-                        onSuccess = {
-                            backupPrefs.updateOption(currentOption.copy(isEnabled = true))
-                        },
                         onFailure = { backupException ->
                             backupManager.turnOff()
                             showBackupFailureDialog(backupException)
