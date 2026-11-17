@@ -60,6 +60,10 @@ class ChooseRestoreOptionViewModel : CommonViewModel() {
                             wallet.restoreWithUnbindedOutputs(restoredTxs.utxos, tariWalletAddress, message)
                         } catch (exception: Exception) {
                             handleException(exception)
+                        } finally {
+                            // The restored outputs carry their spending keys. Do not keep them in the preferences
+                            // once the import was attempted, and do not import them into a later wallet.
+                            backupPrefs.restoredTxs = null
                         }
                     }
 
